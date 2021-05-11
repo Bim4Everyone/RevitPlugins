@@ -92,6 +92,7 @@ namespace RevitCopyStandarts.ViewModels {
                 commands.ForEach(command => command.Execute());
             } finally {
                 sourceDocument.Close(false);
+                System.Windows.MessageBox.Show("Копирование выполнено успешно!", "Сообщение", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
             }
         }
 
