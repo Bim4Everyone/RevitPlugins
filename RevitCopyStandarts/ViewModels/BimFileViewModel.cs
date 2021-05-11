@@ -65,7 +65,7 @@ namespace RevitCopyStandarts.ViewModels {
                     //new CopyFiltersCommand(sourceDocument, _targetDocument),
                     //new CopyObjectStylesCommand(sourceDocument, _targetDocument)
                     new CopyColorFillSchemesCommand(sourceDocument, _targetDocument)
-                };                
+                };
 
                 //commands.AddRange(GetOptionalStandarts(sourceDocument));
                 commands.ForEach(command => command.Execute());
@@ -85,12 +85,16 @@ namespace RevitCopyStandarts.ViewModels {
         }
 
         private ICopyStandartsCommand GetCopyStandartsCommand(Document sourceDocument, string className) {
-            Type type = Type.GetType(_commandsMap[className]);
-            if(type == null) {
-                return new CopyOptionalStandartsCommand(sourceDocument, _targetDocument) { BuiltInCategoryName = _commandsMap[className] };
+            if(_commandsMap.TryGetValue(className, out string commandName)) {
+                Type type = Type.GetType(_commandsMap[commandName]);
+                if(type == null) {
+                    return new CopyOptionalStandartsCommand(sourceDocument, _targetDocument) { BuiltInCategoryName = _commandsMap[commandName] };
+                }
+
+                return (ICopyStandartsCommand) Activator.CreateInstance(type, sourceDocument, _targetDocument);
             }
 
-            return (ICopyStandartsCommand) Activator.CreateInstance(type, sourceDocument, _targetDocument);
+            throw new ArgumentException($"Неизвестное наименование команды \"{className}\".");
         }
     }
 
