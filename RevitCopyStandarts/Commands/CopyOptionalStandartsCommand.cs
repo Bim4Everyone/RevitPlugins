@@ -12,10 +12,6 @@ namespace RevitCopyStandarts.Commands {
             : base(source, destination) {
         }
 
-        public override string Name {
-            get { return $"Опциональный \"{BuiltInCategoryName}\""; }
-        }
-
         public string BuiltInCategoryName { get; set; }
 
         protected override FilteredElementCollector GetFilteredElementCollector() {

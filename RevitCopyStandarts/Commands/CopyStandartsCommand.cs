@@ -19,7 +19,7 @@ namespace RevitCopyStandarts.Commands {
             _target = target;
         }
 
-        public abstract string Name { get; }
+        public virtual string Name { get; set; }
 
         protected virtual FilteredElementCollector GetFilteredElementCollector() {
             return new FilteredElementCollector(_source);

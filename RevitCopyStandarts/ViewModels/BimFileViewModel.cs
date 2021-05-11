@@ -46,6 +46,8 @@ namespace RevitCopyStandarts.ViewModels {
             { "ElectricalSetting", "Autodesk.Revit.DB.Electrical.ElectricalSetting" },
             { "ElectricalLoadClassification", "Autodesk.Revit.DB.Electrical.ElectricalLoadClassification" },
             { "VoltageType", "Autodesk.Revit.DB.Electrical.VoltageType" },
+            { "ConduitSettings", "Autodesk.Revit.DB.Electrical.ConduitSettings" },
+            { "ConduitSize", "Autodesk.Revit.DB.Electrical.ConduitSize" }
         };
 
 
@@ -90,9 +92,10 @@ namespace RevitCopyStandarts.ViewModels {
 
                 commands.AddRange(GetOptionalStandarts(sourceDocument));
                 commands.ForEach(command => command.Execute());
+                
+                System.Windows.MessageBox.Show("Копирование выполнено успешно!", "Сообщение", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
             } finally {
                 sourceDocument.Close(false);
-                System.Windows.MessageBox.Show("Копирование выполнено успешно!", "Сообщение", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
             }
         }
 
@@ -108,9 +111,9 @@ namespace RevitCopyStandarts.ViewModels {
 
         private ICopyStandartsCommand GetCopyStandartsCommand(Document sourceDocument, string className) {
             if(_commandsMap.TryGetValue(className, out string commandName)) {
-                Type type = Type.GetType(_commandsMap[commandName]);
+                Type type = Type.GetType(commandName);
                 if(type == null) {
-                    return new CopyOptionalStandartsCommand(sourceDocument, _targetDocument) { BuiltInCategoryName = _commandsMap[commandName] };
+                    return new CopyOptionalStandartsCommand(sourceDocument, _targetDocument) { Name = className, BuiltInCategoryName = commandName };
                 }
 
                 return (ICopyStandartsCommand) Activator.CreateInstance(type, sourceDocument, _targetDocument);
