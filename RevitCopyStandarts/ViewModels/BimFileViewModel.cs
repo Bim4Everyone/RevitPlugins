@@ -15,14 +15,37 @@ using RevitCopyStandarts.Commands;
 
 namespace RevitCopyStandarts.ViewModels {
     public class BimFileViewModel {
-        private static Dictionary<string, string> _commandsMap = new Dictionary<string, string>() {
+        private static readonly Dictionary<string, string> _commandsMap = new Dictionary<string, string>() {
             { "BrowserOrganization", "Autodesk.Revit.DB.BrowserOrganization" },
-            //{ "Стадии", "Autodesk.Revit.DB.Phase" },
             { "ObjectStyles", "RevitCopyStandarts.Commands.CopyObjectStylesCommand" },
             { "ProjectInfo", "Autodesk.Revit.DB.ProjectInfo" },
+            { "GlobalParameter", "Autodesk.Revit.DB.GlobalParameter" },
+            { "PrintSettings", "Autodesk.Revit.DB.PrintSetting" },
+            { "LinePattern", "Autodesk.Revit.DB.LinePattern" },
             { "WallTypes", "RevitCopyStandarts.Commands.CopyWallTypesCommand" },
             { "CurtainTypes", "RevitCopyStandarts.Commands.CopyCurtainTypesCommand" },
             { "FloorType", "Autodesk.Revit.DB.FloorType" },
+            { "RoofType", "Autodesk.Revit.DB.RoofType" },
+            { "CeilingType", "Autodesk.Revit.DB.CeilingType" },
+            { "StairsType", "Autodesk.Revit.DB.Architecture.StairsType" },
+            { "RailingType", "Autodesk.Revit.DB.Architecture.RailingType" },
+            { "ColorFillSchemes", "RevitCopyStandarts.Commands.CopyColorFillSchemesCommand" },
+            { "TopRailType", "Autodesk.Revit.DB.Architecture.TopRailType" },
+            { "HandRailType", "Autodesk.Revit.DB.Architecture.HandRailType" },
+            { "PipeType", "Autodesk.Revit.DB.Plumbing.PipeType" },
+            { "FlexPipeType", "Autodesk.Revit.DB.Plumbing.FlexPipeType" },
+            { "PipeInsulationType", "Autodesk.Revit.DB.Plumbing.PipeInsulationType" },
+            { "PipingSystem", "Autodesk.Revit.DB.Plumbing.PipingSystem" },
+            { "PipeSettings", "Autodesk.Revit.DB.Plumbing.PipeSettings" },
+            { "DuctType", "Autodesk.Revit.DB.Mechanical.DuctType" },
+            { "FlexDuctType", "Autodesk.Revit.DB.Mechanical.FlexDuctType" },
+            { "DuctInsulationType", "Autodesk.Revit.DB.Mechanical.DuctInsulationType" },
+            { "DuctSettings", "Autodesk.Revit.DB.Mechanical.DuctSettings" },
+            { "CableTraySettings", "Autodesk.Revit.DB.Electrical.CableTraySettings" },
+            { "CableTraySizes", "Autodesk.Revit.DB.Electrical.CableTraySizes" },
+            { "ElectricalSetting", "Autodesk.Revit.DB.Electrical.ElectricalSetting" },
+            { "ElectricalLoadClassification", "Autodesk.Revit.DB.Electrical.ElectricalLoadClassification" },
+            { "VoltageType", "Autodesk.Revit.DB.Electrical.VoltageType" },
         };
 
 
@@ -57,17 +80,15 @@ namespace RevitCopyStandarts.ViewModels {
             Document sourceDocument = _application.OpenDocumentFile(_fileInfo.FullName);
             try {
                 var commands = new List<ICopyStandartsCommand>() {
-                    //new CopyViewTemplatesCommand(sourceDocument, _targetDocument),
-                    ////new CopyFamiliesCommand(sourceDocument, _targetDocument),
-                    //new CopyViewSchedulesCommand(sourceDocument, _targetDocument),
-                    //new CopyMaterialsCommand(sourceDocument, _targetDocument),
+                    new CopyViewTemplatesCommand(sourceDocument, _targetDocument),
+                    //new CopyFamiliesCommand(sourceDocument, _targetDocument),
+                    new CopyViewSchedulesCommand(sourceDocument, _targetDocument),
+                    new CopyMaterialsCommand(sourceDocument, _targetDocument),
                     new CopyViewLegendsCommand(sourceDocument, _targetDocument),
-                    //new CopyFiltersCommand(sourceDocument, _targetDocument),
-                    //new CopyObjectStylesCommand(sourceDocument, _targetDocument)
-                    //new CopyColorFillSchemesCommand(sourceDocument, _targetDocument)
+                    new CopyFiltersCommand(sourceDocument, _targetDocument)
                 };
 
-                //commands.AddRange(GetOptionalStandarts(sourceDocument));
+                commands.AddRange(GetOptionalStandarts(sourceDocument));
                 commands.ForEach(command => command.Execute());
             } finally {
                 sourceDocument.Close(false);
