@@ -61,10 +61,10 @@ namespace RevitCopyStandarts.ViewModels {
                     ////new CopyFamiliesCommand(sourceDocument, _targetDocument),
                     //new CopyViewSchedulesCommand(sourceDocument, _targetDocument),
                     //new CopyMaterialsCommand(sourceDocument, _targetDocument),
-                    //new CopyViewLegendsCommand(sourceDocument, _targetDocument),
+                    new CopyViewLegendsCommand(sourceDocument, _targetDocument),
                     //new CopyFiltersCommand(sourceDocument, _targetDocument),
                     //new CopyObjectStylesCommand(sourceDocument, _targetDocument)
-                    new CopyColorFillSchemesCommand(sourceDocument, _targetDocument)
+                    //new CopyColorFillSchemesCommand(sourceDocument, _targetDocument)
                 };
 
                 //commands.AddRange(GetOptionalStandarts(sourceDocument));

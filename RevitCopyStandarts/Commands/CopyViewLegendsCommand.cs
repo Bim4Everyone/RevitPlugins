@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 namespace RevitCopyStandarts.Commands {
+    /// <summary>
+    /// Копирует легенды в документ (создает дубликаты)
+    /// </summary>
     internal class CopyViewLegendsCommand : CopyStandartsCommand {
         public CopyViewLegendsCommand(Document source, Document destination)
             : base(source, destination) {
