@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 namespace RevitCopyStandarts.Commands {
+    /// <summary>
+    /// Копирует фильтры в файл View -> Filters
+    /// </summary>
     internal class CopyFiltersCommand : CopyStandartsCommand {
         public CopyFiltersCommand(Document source, Document destination)
             : base(source, destination) {
