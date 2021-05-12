@@ -15,24 +15,19 @@ using Autodesk.Revit.UI;
 namespace RevitCopyStandarts {
     public class CopyStandartsApp : IExternalApplication {
         public Result OnStartup(UIControlledApplication application) {
-            try {
-                application.CreateRibbonTab("BIM 1");
-            } catch {
-
-            }
-
-            RibbonPanel ribbonPanel = application.CreateRibbonPanel("BIM 1", "Стандартизация");
-            string thisAssemblyPath = Assembly.GetExecutingAssembly().Location;
-
+            application.CreateRibbonTab("BIM 2");
+            
+            RibbonPanel ribbonPanel = application.CreateRibbonPanel("BIM 2", "Стандартизация");
             var commandButton = new PushButtonData(
-                "CopyStandartsCommand",
-                "Копирование стандартов",
-                thisAssemblyPath,
-                "RevitCopyStandarts.CopyStandartsCommand");
+                "CopyStandartsRevitCommand",
+                "Копирование" + Environment.NewLine + "стандартов",
+                Assembly.GetExecutingAssembly().Location,
+                "RevitCopyStandarts.CopyStandartsRevitCommand") {
+                ToolTip = "Копирование" + Environment.NewLine + "стандартов",
+                //Image = new BitmapImage(new Uri("pack://application:,,,/RevitRibbonAddin;component/Resources/image.png"))
+            };
 
-            //commandButton.Image = new BitmapImage(new Uri("pack://application:,,,/RevitRibbonAddin;component/Resources/image.png"));
-            commandButton.ToolTip = "Копирование" + Environment.NewLine + "стандартов";
-
+            ribbonPanel.AddItem(commandButton);
             return Result.Succeeded;
         }
 

@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Autodesk Inc.")]
 [assembly: AssemblyProduct("RevitCopyStandarts Revit C# .NET Add-In")]
-[assembly: AssemblyCopyright("Copyright 2020 (C) Jeremy Tammik, Autodesk Inc.")]
+[assembly: AssemblyCopyright("Copyright 2020 (C) dosymep")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -41,6 +41,16 @@
     <StartAction>Program</StartAction>
     <StartProgram>$(ProgramW6432)\Autodesk\Revit 2020\Revit.exe</StartProgram>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AdWindows">
       <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\AdWindows.dll</HintPath>
@@ -71,6 +81,7 @@
     </Compile>
     <Compile Include="Commands\CopyColorFillSchemesCommand.cs" />
     <Compile Include="Commands\CopyCurtainTypesCommand.cs" />
+    <Compile Include="Commands\CopyDwgExportOptionsCommand.cs" />
     <Compile Include="Commands\CopyFloorTypeCommand.cs" />
     <Compile Include="Commands\CopyFoundationSlabCommand.cs" />
     <Compile Include="Commands\CopyObjectStylesCommand.cs" />

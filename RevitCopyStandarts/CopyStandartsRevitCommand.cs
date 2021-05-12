@@ -32,7 +32,7 @@ namespace RevitCopyStandarts {
             Application application = uiApplication.Application;
             Document document = uiDocument.Document;
 
-            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+            //AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             try {
                 var mainWindow = new MainWindow() { BimCategories = new ViewModels.BimCategoriesViewModel(@"C:\Users\biseuv_o\Documents\Revit", document, application) };
                 new WindowInteropHelper(mainWindow) { Owner = uiApplication.MainWindowHandle };
@@ -44,7 +44,7 @@ namespace RevitCopyStandarts {
                 System.Windows.MessageBox.Show(ex.Message, "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
 #endif
             } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
+                //AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
             }
 
             return Result.Succeeded;
