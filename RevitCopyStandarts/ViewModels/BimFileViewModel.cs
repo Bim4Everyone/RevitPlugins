@@ -21,10 +21,9 @@ namespace RevitCopyStandarts.ViewModels {
             { "ProjectInfo", "Autodesk.Revit.DB.ProjectInfo" },
             { "GlobalParameter", "Autodesk.Revit.DB.GlobalParameter" },
             { "PrintSettings", "Autodesk.Revit.DB.PrintSetting" },
-            { "LinePattern", "Autodesk.Revit.DB.LinePattern" },
+            //{ "LinePattern", "Autodesk.Revit.DB.LinePattern" },
             { "WallTypes", "RevitCopyStandarts.Commands.CopyWallTypesCommand" },
             { "CurtainTypes", "RevitCopyStandarts.Commands.CopyCurtainTypesCommand" },
-            { "FloorType", "Autodesk.Revit.DB.FloorType" },
             { "RoofType", "Autodesk.Revit.DB.RoofType" },
             { "CeilingType", "Autodesk.Revit.DB.CeilingType" },
             { "StairsType", "Autodesk.Revit.DB.Architecture.StairsType" },
@@ -47,7 +46,12 @@ namespace RevitCopyStandarts.ViewModels {
             { "ElectricalLoadClassification", "Autodesk.Revit.DB.Electrical.ElectricalLoadClassification" },
             { "VoltageType", "Autodesk.Revit.DB.Electrical.VoltageType" },
             { "ConduitSettings", "Autodesk.Revit.DB.Electrical.ConduitSettings" },
-            { "ConduitSize", "Autodesk.Revit.DB.Electrical.ConduitSize" }
+            //{ "ConduitSize", "Autodesk.Revit.DB.Electrical.ConduitSize" },
+            { "RebarBarType", "Autodesk.Revit.DB.Structure.RebarBarType" },
+            { "WallFoundationType", "Autodesk.Revit.DB.WallFoundationType" },
+            { "PanelScheduleTemplate", "Autodesk.Revit.DB.Electrical.PanelScheduleTemplate" },
+            { "StructuralSettings", "Autodesk.Revit.DB.Structure.StructuralSettings" },
+            { "FloorType", "RevitCopyStandarts.Commands.CopyFloorTypeCommand" },
         };
 
 
