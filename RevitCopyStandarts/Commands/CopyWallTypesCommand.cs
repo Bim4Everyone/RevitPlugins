@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 namespace RevitCopyStandarts.Commands {
-    internal class CopyWallTypesCommand : CopyStandartsCommand{
+    internal class CopyWallTypesCommand : CopyStandartsCommand {
         public CopyWallTypesCommand(Document source, Document target)
             : base(source, target) {
 

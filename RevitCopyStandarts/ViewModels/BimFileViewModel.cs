@@ -55,6 +55,8 @@ namespace RevitCopyStandarts.ViewModels {
             { "FoundationSlab", "RevitCopyStandarts.Commands.CopyFoundationSlabCommand" },
             { "SlabEdgeType", "Autodesk.Revit.DB.SlabEdgeType" },
             { "DuctSystemType", "Autodesk.Revit.DB.Mechanical.MechanicalSystemType" },
+            { "GutterType", "Autodesk.Revit.DB.Architecture.GutterType" },
+            { "BuildingPadType", "Autodesk.Revit.DB.BuildingPadType" },
         };
 
 
