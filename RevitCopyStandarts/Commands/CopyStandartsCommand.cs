@@ -30,7 +30,7 @@ namespace RevitCopyStandarts.Commands {
         }
 
         protected virtual bool IsAllowCommit(Element newElement, Element sourceElement) {
-            return true;
+            return newElement.Name.Equals(sourceElement);
         }
 
         protected virtual IDuplicateTypeNamesHandler GetDuplicateTypeNamesHandler() {
