@@ -52,6 +52,7 @@ namespace RevitCopyStandarts.ViewModels {
             { "PanelScheduleTemplate", "Autodesk.Revit.DB.Electrical.PanelScheduleTemplate" },
             { "StructuralSettings", "Autodesk.Revit.DB.Structure.StructuralSettings" },
             { "FloorType", "RevitCopyStandarts.Commands.CopyFloorTypeCommand" },
+            { "FoundationSlab", "RevitCopyStandarts.Commands.CopyFoundationSlabCommand" },
         };
 
 
