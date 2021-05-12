@@ -12,6 +12,8 @@ namespace RevitCopyStandarts.Commands {
             : base(source, target) {
         }
 
+        public override string Name { get; set; } = "Типы перекрытий";
+
         protected override IEnumerable<Element> FilterElements(IList<Element> elements) {
             return elements.Cast<FloorType>().Where(item => item.IsFoundationSlab == false);
         }

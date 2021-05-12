@@ -18,11 +18,11 @@ namespace RevitCopyStandarts.Commands {
 
         public void Execute() {
             using(var transactionGroup = new TransactionGroup(_target)) {
-                transactionGroup.Start($"Копирование \"Категория\"");
+                transactionGroup.Start($"Копирование \"Стили объектов\"");
 
                 foreach(Category sourceCategory in _source.Settings.Categories) {
                     using(var transaction = new Transaction(_target)) {
-                        transaction.Start($"Копирование \"Категория - {sourceCategory.Name}\"");
+                        transaction.Start($"Копирование \"Стили объектов - {sourceCategory.Name}\"");
 
                         Category targetCategory = GetCategory(sourceCategory, _target.Settings.Categories);
                         if(targetCategory == null) {
