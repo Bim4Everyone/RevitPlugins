@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>Command RevitServerFolders</Text>
+    <Description>Some description for RevitServerFolders</Description>
+    <Assembly>RevitServerFolders.dll</Assembly>
+    <FullClassName>RevitServerFolders.Command</FullClassName>
+    <ClientId>9acb16ed-8c53-43f8-b71c-d7cbc77bf622</ClientId>
+    <VendorId>com.typepad.thebuildingcoder</VendorId>
+    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+  </AddIn>
+  <AddIn Type="Application">
+    <Name>Application RevitServerFolders</Name>
+    <Assembly>RevitServerFolders.dll</Assembly>
+    <FullClassName>RevitServerFolders.App</FullClassName>
+    <ClientId>22475cf9-711e-4bb4-a3f8-518f24fa492a</ClientId>
+    <VendorId>com.typepad.thebuildingcoder</VendorId>
+    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+  </AddIn>
+</RevitAddIns>
