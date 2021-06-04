@@ -62,9 +62,10 @@ namespace dosymep.Views.Revit {
 
         protected ObservableCollection<RevitServerInfo> GetChildren(RevitContents contents) {
             IEnumerable<RevitServerInfo> revitFolders = contents.Folders.Select(item => new RevitFolderInfo(_revitServerClient) { RevitContents = contents, RevitResponse = item });
-            IEnumerable<RevitServerInfo> revitModels = contents.Models.Select(item => new RevitModelInfo(_revitServerClient) { RevitContents = contents, RevitResponse = item });
-
-            return new ObservableCollection<RevitServerInfo>(revitFolders.Union(revitModels));
+            //IEnumerable<RevitServerInfo> revitModels = contents.Models.Select(item => new RevitModelInfo(_revitServerClient) { RevitContents = contents, RevitResponse = item });
+            //return new ObservableCollection<RevitServerInfo>(revitFolders.Union(revitModels));
+            
+            return new ObservableCollection<RevitServerInfo>(revitFolders);
         }
 
         #region INotifyPropertyChanged
