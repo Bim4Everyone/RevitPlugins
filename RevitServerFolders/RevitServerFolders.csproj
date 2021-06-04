@@ -64,6 +64,9 @@
     <AssemblyOriginatorKeyFile>sign.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="RevitAPI">
@@ -80,6 +83,9 @@
     <Reference Include="System.Text.Json, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -99,6 +105,17 @@
     <Compile Include="dosymep\Revit\ServerClient\RevitServerClient.cs" />
     <Compile Include="dosymep\Revit\ServerClient\RevitServerClientBuilder.cs" />
     <Compile Include="dosymep\Revit\ServerClient\ServerInformations.cs" />
+    <Compile Include="dosymep\Views\Revit\RevitServerExplorerWindow.xaml.cs">
+      <DependentUpon>RevitServerExplorerWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="dosymep\WPF\Commands\RelayCommand.cs" />
+    <Compile Include="dosymep\Views\Revit\RevitFolderInfo.cs" />
+    <Compile Include="dosymep\Views\Revit\RevitModelInfo.cs" />
+    <Compile Include="dosymep\Views\Revit\RevitServerExplorerView.xaml.cs">
+      <DependentUpon>RevitServerExplorerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="dosymep\Views\Revit\RevitServerInfo.cs" />
+    <Compile Include="dosymep\Views\Revit\RevitServerViewModel.cs" />
     <Compile Include="ExportNwcFileViewModel.cs" />
     <Compile Include="ExportNwcFileWindow.xaml.cs">
       <DependentUpon>ExportNwcFileWindow.xaml</DependentUpon>
@@ -119,12 +136,11 @@
     <Compile Include="SelectFileView.xaml.cs">
       <DependentUpon>SelectFileView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SelectServerRvtFolderWindow.xaml.cs">
-      <DependentUpon>SelectServerRvtFolderWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UnloadRevitLinksCommand.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\folder.png" />
+    <Resource Include="Resources\revit.png" />
     <Content Include="RevitServerFolders.addin" />
   </ItemGroup>
   <ItemGroup>
@@ -132,6 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="packages.config" />
     <None Include="sign.snk" />
   </ItemGroup>
   <ItemGroup>
@@ -147,6 +164,14 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="dosymep\Views\Revit\RevitServerExplorerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="dosymep\Views\Revit\RevitServerExplorerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ExportNwcFileWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -163,11 +188,8 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SelectServerRvtFolderWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

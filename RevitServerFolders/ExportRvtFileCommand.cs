@@ -34,9 +34,11 @@ namespace RevitServerFolders {
         public void Execute(UIApplication uiapp) {
             try {
                 var exportRvtFileViewModel = new ExportRvtFileViewModel(uiapp.Application.VersionNumber, ExportRvtFileConfig.GetExportRvtFileConfig());
+                
                 var exportWindow = new ExportRvtFileWindow { DataContext = exportRvtFileViewModel };
                 new WindowInteropHelper(exportWindow) { Owner = uiapp.MainWindowHandle };
                 
+                exportRvtFileViewModel.Owner = exportWindow;
                 if(exportWindow.ShowDialog() == true) {
                     exportRvtFileViewModel = (ExportRvtFileViewModel) exportWindow.DataContext;
                     ExportRvtFileConfig.SaveExportRvtFileConfig(new ExportRvtFileConfig() {

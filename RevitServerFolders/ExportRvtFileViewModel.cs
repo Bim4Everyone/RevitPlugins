@@ -9,6 +9,9 @@ using System.Windows.Forms;
 using System.Windows.Input;
 
 using dosymep.Revit.ServerClient;
+using dosymep.Views.Revit;
+
+using RevitServerFolders.dosymep.Views.Revit;
 
 namespace RevitServerFolders {
     public class ExportRvtFileConfig {
@@ -42,7 +45,6 @@ namespace RevitServerFolders {
         }
     }
 
-
     public class ExportRvtFileViewModel : INotifyPropertyChanged, IDataErrorInfo {
         private string _serverName;
         private List<string> _serverNames;
@@ -57,6 +59,8 @@ namespace RevitServerFolders {
         private bool _cleanTargetRvtFolder;
         private bool _cleanTargetNwcFolder;
         private string _error;
+
+        private RevitServerViewModel _revitServerViewModel;
 
         public ExportRvtFileViewModel() { }
 
@@ -74,17 +78,9 @@ namespace RevitServerFolders {
             CleanTargetNwcFolder = exportRvtFileConfig.CleanTargetNwcFolder;
 
             SelectSourceRvtFolderCommand = new RelayCommand(p => {
-                var client = new RevitServerClientBuilder()
-                    .SetServerName(ServerName)
-                    .SetServerVersion(RevitVersion)
-                    .UseJsonNetSerializer()
-                    .Build();
-
-                var viewModel = new RevitServerViewModel(client) { CurrentFolder = SourceRvtFolder };
-                var selectWindow = new SelectServerRvtFolderWindow() { DataContext = viewModel };
-
+                RevitServerExplorerWindow selectWindow = GetSelectWindow();
                 if(selectWindow.ShowDialog() == true) {
-                    SourceRvtFolder = ((RevitServerViewModel) selectWindow.DataContext).CurrentFolder;
+                    SourceRvtFolder = selectWindow.ViewModel.SelectedItem.Path;
                 }
             });
 
@@ -92,7 +88,16 @@ namespace RevitServerFolders {
             SelectTargetNwcFolderCommand = new RelayCommand(SelectTargetNwcFolder);
         }
 
+        private RevitServerExplorerWindow GetSelectWindow() {
+            if(_revitServerViewModel == null || !ServerName.Equals(_revitServerViewModel.ServerName)) {
+                _revitServerViewModel = new RevitServerViewModel(ServerName, RevitVersion);
+            }
+          
+            return new RevitServerExplorerWindow() { ViewModel = _revitServerViewModel, Owner = Owner };
+        }
+
         public string RevitVersion { get; }
+        public System.Windows.Window Owner { get; set; }
 
         public string ServerName {
             get => _serverName;
