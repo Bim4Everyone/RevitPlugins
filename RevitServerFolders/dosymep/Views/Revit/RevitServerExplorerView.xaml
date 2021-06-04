@@ -9,6 +9,11 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <TreeView x:Name="_tlRevitServer" ItemsSource="{Binding Path=Root}">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay}" />
+                </Style>
+            </TreeView.ItemContainerStyle>
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectedItemChanged">
                     <i:InvokeCommandAction
