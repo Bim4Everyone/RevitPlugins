@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using dosymep.Async;
 using dosymep.Revit.ServerClient;
 
 #endregion
@@ -47,9 +48,13 @@ namespace RevitServerFolders {
                 }
             }
 
-            var client = new RevitServerClient(ServerName, RevitVersion);
+            var client = new RevitServerClientBuilder()
+                .SetServerName(ServerName)
+                .SetServerVersion(RevitVersion)
+                .UseJsonNetSerializer()
+                .Build();
 
-            var directory = client.GetDirectory(FolderName);
+            var directory = AsyncHelper.RunSync(() => client.GetContentsAsync(FolderName));
             List<string> revitModels = GetFileList(client, directory);
 
             var doubles = revitModels.GroupBy(item => Path.GetFileName(item)).Where(item => item.Count() > 1).Select(item => item.Key).ToList();
@@ -62,15 +67,16 @@ namespace RevitServerFolders {
             }
         }
 
-        private List<string> GetFileList(RevitServerClient client, RevitDirectory directory) {
+        private List<string> GetFileList(IRevitServerClient client, RevitContents directory) {
             if(WithSubFolders) {
-                return client.GetRecursiveRevitFiles(directory)
-                    .Select(item => Path.Combine(item.Directory.Path, item.Name))
+                return AsyncHelper.RunSync(() => client.GetAllRevitContentsAsync(directory.Path))
+                    .SelectMany(item => item.Models)
+                    .Select(item => Path.Combine(directory.Path, item.Name))
                     .ToList();
             }
 
             return directory.Models
-                .Select(item => Path.Combine(item.Directory.Path, item.Name))
+                .Select(item => Path.Combine(directory.Path, item.Name))
                 .ToList();
         }
 

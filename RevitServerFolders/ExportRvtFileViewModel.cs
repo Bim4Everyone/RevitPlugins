@@ -74,7 +74,13 @@ namespace RevitServerFolders {
             CleanTargetNwcFolder = exportRvtFileConfig.CleanTargetNwcFolder;
 
             SelectSourceRvtFolderCommand = new RelayCommand(p => {
-                var viewModel = new RevitServerViewModel(new RevitServerClient(ServerName, RevitVersion)) { CurrentFolder = SourceRvtFolder };
+                var client = new RevitServerClientBuilder()
+                    .SetServerName(ServerName)
+                    .SetServerVersion(RevitVersion)
+                    .UseJsonNetSerializer()
+                    .Build();
+
+                var viewModel = new RevitServerViewModel(client) { CurrentFolder = SourceRvtFolder };
                 var selectWindow = new SelectServerRvtFolderWindow() { DataContext = viewModel };
 
                 if(selectWindow.ShowDialog() == true) {

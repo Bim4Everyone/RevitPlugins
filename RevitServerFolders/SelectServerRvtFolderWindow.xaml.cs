@@ -32,16 +32,15 @@ namespace RevitServerFolders {
     }
 
     internal class RevitServerViewModel : INotifyPropertyChanged {
-        private readonly RevitServerClient _revitServerClient;
+        private readonly IRevitServerClient _revitServerClient;
         
         private string _currentFolder;
         private ObservableCollection<string> _revitFolders;
 
         public RevitServerViewModel() { }
 
-        public RevitServerViewModel(RevitServerClient revitServerClient) {
+        public RevitServerViewModel(IRevitServerClient revitServerClient) {
             _revitServerClient = revitServerClient;
-            //RevitFolders = new ObservableCollection<string>(_revitServerClient.GetRootDirectory().Folders.Select(item => item.Name));
         }
 
         public string CurrentFolder {
