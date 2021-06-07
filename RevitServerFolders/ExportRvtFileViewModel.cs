@@ -74,6 +74,7 @@ namespace RevitServerFolders {
             WithSubFolders = exportRvtFileConfig.WithSubFolders;
             SourceRvtFolder = exportRvtFileConfig.SourceRvtFolder;
             TargetRvtFolder = exportRvtFileConfig.TargetRvtFolder;
+            WithRooms = exportRvtFileConfig.WithRooms;
             WithNwcFiles = exportRvtFileConfig.WithNwcFiles;
             TargetNwcFolder = exportRvtFileConfig.TargetNwcFolder;
             CleanTargetRvtFolder = exportRvtFileConfig.CleanTargetRvtFolder;
