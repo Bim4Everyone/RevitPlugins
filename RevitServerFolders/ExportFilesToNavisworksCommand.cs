@@ -60,31 +60,66 @@ namespace RevitServerFolders {
                         continue;
                     }
 
-                    document.Export(TargetFolderName,
-                        Path.GetFileNameWithoutExtension(fileName),
-                        new NavisworksExportOptions {
-                            ViewId = exportView.Id,
-                            ExportScope = NavisworksExportScope.View,
-
-                            ExportElementIds = false,
-                            ConvertElementProperties = true,
-                            Parameters = NavisworksParameters.All,
-                            Coordinates = NavisworksCoordinates.Shared,
-                            FacetingFactor = 1.0,
-                            ExportUrls = false,
-                            ConvertLights = false,
-                            ExportRoomAsAttribute = false,
-                            ConvertLinkedCADFormats = true,
-                            ExportLinks = false,
-                            ExportParts = false,
-                            FindMissingMaterials = false,
-                            DivideFileIntoLevels = true,
-                            ExportRoomGeometry = false
-                        });                    
+                    document.Export(TargetFolderName, GetFileName(fileName), GetExportOptions(exportView));
                 } finally {
                     document.Close(false);
                 }
             }
+        }
+
+        protected virtual NavisworksExportOptions GetExportOptions(Element exportView) {
+            return new NavisworksExportOptions {
+                ViewId = exportView.Id,
+                ExportScope = NavisworksExportScope.View,
+
+                ExportElementIds = false,
+                ConvertElementProperties = true,
+                Parameters = NavisworksParameters.All,
+                Coordinates = NavisworksCoordinates.Shared,
+                FacetingFactor = 1.0,
+                ExportUrls = false,
+                ConvertLights = false,
+                ExportRoomAsAttribute = false,
+                ConvertLinkedCADFormats = true,
+                ExportLinks = false,
+                ExportParts = false,
+                FindMissingMaterials = false,
+                DivideFileIntoLevels = true,
+                ExportRoomGeometry = false
+            };
+        }
+
+        protected virtual string GetFileName(string fileName) {
+            return Path.GetFileNameWithoutExtension(fileName);
+        }
+    }
+
+    internal class ExportRoomFilesToNavisworksCommand : ExportFilesToNavisworksCommand {
+        protected override string GetFileName(string fileName) {
+            return base.GetFileName(fileName) + "_ROOMS";
+        }
+
+        protected override NavisworksExportOptions GetExportOptions(Element exportView) {
+            return new NavisworksExportOptions {
+                ViewId = exportView.Id,
+                ExportScope = NavisworksExportScope.View,
+
+                ExportRoomGeometry = true,
+                ExportRoomAsAttribute = true,
+
+                ExportElementIds = false,
+                ConvertElementProperties = true,
+                Parameters = NavisworksParameters.All,
+                Coordinates = NavisworksCoordinates.Shared,
+                FacetingFactor = 1.0,
+                ExportUrls = false,
+                ConvertLights = false,
+                ConvertLinkedCADFormats = true,
+                ExportLinks = false,
+                ExportParts = false,
+                FindMissingMaterials = false,
+                DivideFileIntoLevels = true,
+            };
         }
     }
 }
