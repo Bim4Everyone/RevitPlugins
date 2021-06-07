@@ -67,15 +67,8 @@ namespace RevitServerFolders {
                             Application = uiapp.Application,
                             SourceFolderName = exportRvtFileViewModel.TargetRvtFolder,
                             TargetFolderName = exportRvtFileViewModel.TargetNwcFolder,
-                            CleanTargetFolder = exportRvtFileViewModel.CleanTargetNwcFolder
-                        }.Execute();
-                    }
 
-                    if(exportRvtFileViewModel.WithRooms) {
-                        new ExportRoomFilesToNavisworksCommand() {
-                            Application = uiapp.Application,
-                            SourceFolderName = exportRvtFileViewModel.TargetRvtFolder,
-                            TargetFolderName = exportRvtFileViewModel.TargetNwcFolder,
+                            WithRooms = exportRvtFileViewModel.WithRooms,
                             CleanTargetFolder = exportRvtFileViewModel.CleanTargetNwcFolder
                         }.Execute();
                     }
@@ -113,17 +106,10 @@ namespace RevitServerFolders {
                         Application = uiapp.Application,
                         SourceFolderName = exportNwcFileViewModel.SourceNwcFolder,
                         TargetFolderName = exportNwcFileViewModel.TargetNwcFolder,
+
+                        WithRooms = exportNwcFileViewModel.WithRooms,
                         CleanTargetFolder = exportNwcFileViewModel.CleanTargetNwcFolder
                     }.Execute();
-
-                    if(exportNwcFileViewModel.WithRooms) {
-                        new ExportRoomFilesToNavisworksCommand() {
-                            Application = uiapp.Application,
-                            SourceFolderName = exportNwcFileViewModel.SourceNwcFolder,
-                            TargetFolderName = exportNwcFileViewModel.TargetNwcFolder,
-                            CleanTargetFolder = exportNwcFileViewModel.CleanTargetNwcFolder
-                        }.Execute();
-                    }
 
                     System.Windows.MessageBox.Show("Готово!", "Сообщение!", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
                 }

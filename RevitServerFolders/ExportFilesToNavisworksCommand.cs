@@ -15,6 +15,8 @@ namespace RevitServerFolders {
 
         public string SourceFolderName { get; set; }
         public string TargetFolderName { get; set; }
+
+        public bool WithRooms { get; set; }
         public bool CleanTargetFolder { get; set; }
 
         public void Execute() {
@@ -61,13 +63,20 @@ namespace RevitServerFolders {
                     }
 
                     document.Export(TargetFolderName, GetFileName(fileName), GetExportOptions(exportView));
+                    if(WithRooms) {
+                        document.Export(TargetFolderName, GetRoomsFileName(fileName), GetRoomsExportOptions(exportView));
+                    }
                 } finally {
                     document.Close(false);
                 }
             }
         }
 
-        protected virtual NavisworksExportOptions GetExportOptions(Element exportView) {
+        private string GetFileName(string fileName) {
+            return Path.GetFileNameWithoutExtension(fileName);
+        }
+
+        private NavisworksExportOptions GetExportOptions(Element exportView) {
             return new NavisworksExportOptions {
                 ViewId = exportView.Id,
                 ExportScope = NavisworksExportScope.View,
@@ -89,37 +98,16 @@ namespace RevitServerFolders {
             };
         }
 
-        protected virtual string GetFileName(string fileName) {
-            return Path.GetFileNameWithoutExtension(fileName);
-        }
-    }
-
-    internal class ExportRoomFilesToNavisworksCommand : ExportFilesToNavisworksCommand {
-        protected override string GetFileName(string fileName) {
-            return base.GetFileName(fileName) + "_ROOMS";
+        private string GetRoomsFileName(string fileName) {
+            return GetFileName(fileName) + "_ROOMS";
         }
 
-        protected override NavisworksExportOptions GetExportOptions(Element exportView) {
-            return new NavisworksExportOptions {
-                ViewId = exportView.Id,
-                ExportScope = NavisworksExportScope.View,
+        private NavisworksExportOptions GetRoomsExportOptions(Element exportView) {
+            var exportOptions = GetExportOptions(exportView);
+            exportOptions.ExportRoomGeometry = true;
+            exportOptions.ExportRoomAsAttribute = true;
 
-                ExportRoomGeometry = true,
-                ExportRoomAsAttribute = true,
-
-                ExportElementIds = false,
-                ConvertElementProperties = true,
-                Parameters = NavisworksParameters.All,
-                Coordinates = NavisworksCoordinates.Shared,
-                FacetingFactor = 1.0,
-                ExportUrls = false,
-                ConvertLights = false,
-                ConvertLinkedCADFormats = true,
-                ExportLinks = false,
-                ExportParts = false,
-                FindMissingMaterials = false,
-                DivideFileIntoLevels = true,
-            };
+            return exportOptions;
         }
     }
 }
