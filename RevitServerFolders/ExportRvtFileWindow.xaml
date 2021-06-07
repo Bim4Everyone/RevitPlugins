@@ -57,7 +57,9 @@
                           IsChecked="{Binding Path=WithNwcFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </GroupBox.Header>
             <StackPanel>
-                <CheckBox Margin="10" Content="Выгрузка помещений" IsChecked="{Binding Path=WithRooms, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <CheckBox Margin="10" Content="Выгрузка помещений" 
+                          IsChecked="{Binding Path=WithRooms, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          IsEnabled="{Binding ElementName=_withNwcFiles, Path=IsChecked, TargetNullValue=false}"/>
                 <local:FilePathEditView Margin="0,0,0,10"
                             LabelName="Папка сохранения NWC-файлов"
                             CheckName="Очистить папку перед сохранением"
