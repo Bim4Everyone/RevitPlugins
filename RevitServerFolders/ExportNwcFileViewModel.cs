@@ -9,6 +9,7 @@ using System.Windows.Input;
 
 namespace RevitServerFolders {
     public class ExportNwcFileConfig {
+        public bool WithRooms { get; set; }
         public bool WithSubFolders { get; set; }
 
         public string SourceNwcFolder { get; set; }
@@ -35,6 +36,7 @@ namespace RevitServerFolders {
     }
 
     public class ExportNwcFileViewModel : INotifyPropertyChanged, IDataErrorInfo {
+        private bool _withRooms;
         private bool _withSubFolders;
         private string _sourceNwcFolder;
         private string _targetNwcFolder;
@@ -50,6 +52,13 @@ namespace RevitServerFolders {
 
             SelectSourceNwcFolderCommand = new RelayCommand(SelectSourceNwcFolder);
             SelectTargetNwcFolderCommand = new RelayCommand(SelectTargetNwcFolder);
+        }
+        public bool WithRooms{
+            get => _withRooms;
+            set {
+                _withRooms = value;
+                OnPropertyChanged(nameof(WithRooms));
+            }
         }
         public bool WithSubFolders {
             get => _withSubFolders;

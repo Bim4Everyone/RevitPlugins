@@ -34,15 +34,16 @@ namespace RevitServerFolders {
         public void Execute(UIApplication uiapp) {
             try {
                 var exportRvtFileViewModel = new ExportRvtFileViewModel(uiapp.Application.VersionNumber, ExportRvtFileConfig.GetExportRvtFileConfig());
-                
+
                 var exportWindow = new ExportRvtFileWindow { DataContext = exportRvtFileViewModel };
                 new WindowInteropHelper(exportWindow) { Owner = uiapp.MainWindowHandle };
-                
+
                 exportRvtFileViewModel.Owner = exportWindow;
                 if(exportWindow.ShowDialog() == true) {
                     exportRvtFileViewModel = (ExportRvtFileViewModel) exportWindow.DataContext;
                     ExportRvtFileConfig.SaveExportRvtFileConfig(new ExportRvtFileConfig() {
                         ServerName = exportRvtFileViewModel.ServerName,
+                        WithRooms = exportRvtFileViewModel.WithRooms,
                         WithNwcFiles = exportRvtFileViewModel.WithNwcFiles,
                         SourceRvtFolder = exportRvtFileViewModel.SourceRvtFolder,
                         TargetNwcFolder = exportRvtFileViewModel.TargetNwcFolder,
@@ -70,6 +71,15 @@ namespace RevitServerFolders {
                         }.Execute();
                     }
 
+                    if(exportRvtFileViewModel.WithRooms) {
+                        new ExportRoomFilesToNavisworksCommand() {
+                            Application = uiapp.Application,
+                            SourceFolderName = exportRvtFileViewModel.TargetRvtFolder,
+                            TargetFolderName = exportRvtFileViewModel.TargetNwcFolder,
+                            CleanTargetFolder = exportRvtFileViewModel.CleanTargetNwcFolder
+                        }.Execute();
+                    }
+
                     System.Windows.MessageBox.Show("Готово!", "Сообщение!", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
                 }
             } catch(Exception ex) {
@@ -88,13 +98,14 @@ namespace RevitServerFolders {
                 var exportNwcFileViewModel = new ExportNwcFileViewModel(ExportNwcFileConfig.GetExportNwcFileConfig());
                 var exportWindow = new ExportNwcFileWindow { DataContext = exportNwcFileViewModel };
                 new WindowInteropHelper(exportWindow) { Owner = uiapp.MainWindowHandle };
-                
+
                 if(exportWindow.ShowDialog() == true) {
                     exportNwcFileViewModel = (ExportNwcFileViewModel) exportWindow.DataContext;
                     ExportNwcFileConfig.SaveExportNwcFileConfig(new ExportNwcFileConfig() {
                         CleanTargetNwcFolder = exportNwcFileViewModel.CleanTargetNwcFolder,
                         SourceNwcFolder = exportNwcFileViewModel.SourceNwcFolder,
                         TargetNwcFolder = exportNwcFileViewModel.TargetNwcFolder,
+                        WithRooms = exportNwcFileViewModel.WithRooms,
                         WithSubFolders = exportNwcFileViewModel.WithSubFolders
                     });
 
@@ -105,8 +116,17 @@ namespace RevitServerFolders {
                         CleanTargetFolder = exportNwcFileViewModel.CleanTargetNwcFolder
                     }.Execute();
 
+                    if(exportNwcFileViewModel.WithRooms) {
+                        new ExportRoomFilesToNavisworksCommand() {
+                            Application = uiapp.Application,
+                            SourceFolderName = exportNwcFileViewModel.SourceNwcFolder,
+                            TargetFolderName = exportNwcFileViewModel.TargetNwcFolder,
+                            CleanTargetFolder = exportNwcFileViewModel.CleanTargetNwcFolder
+                        }.Execute();
+                    }
+
                     System.Windows.MessageBox.Show("Готово!", "Сообщение!", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-                }                
+                }
             } catch(Exception ex) {
 #if DEBUG
                 System.Windows.MessageBox.Show(ex.ToString(), "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);

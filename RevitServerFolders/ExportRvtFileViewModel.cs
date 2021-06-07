@@ -17,6 +17,7 @@ namespace RevitServerFolders {
     public class ExportRvtFileConfig {
         public string ServerName { get; set; }
 
+        public bool WithRooms { get; set; }
         public bool WithNwcFiles { get; set; }
         public bool WithSubFolders { get; set; }
 
@@ -49,6 +50,7 @@ namespace RevitServerFolders {
         private string _serverName;
         private List<string> _serverNames;
 
+        private bool _withRooms;
         private bool _withSubFolders;
         private string _sourceRvtFolder;
         private string _targetRvtFolder;
@@ -114,6 +116,14 @@ namespace RevitServerFolders {
             set {
                 _serverNames = value;
                 OnPropertyChanged(nameof(ServerNames));
+            }
+        }
+
+        public bool WithRooms {
+            get => _withRooms;
+            set {
+                _withRooms = value;
+                OnPropertyChanged(nameof(WithRooms));
             }
         }
 
