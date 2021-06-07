@@ -25,7 +25,7 @@
                 <HierarchicalDataTemplate DataType="{x:Type local:RevitServerInfo}" ItemsSource="{Binding Path=Children}">
                     <StackPanel Orientation="Horizontal">
                         <Image Height="16" Source="{Binding Path=ImageSource}"/>
-                        <Label Content="{Binding Path=Name}" ToolTip="{Binding Path=Path}" />
+                        <TextBlock Text="{Binding Path=Name}" ToolTip="{Binding Path=Path}" FontSize="15" />
                         <i:Interaction.Triggers>
                             <i:EventTrigger SourceObject="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}}" EventName="Expanded">
                                 <i:InvokeCommandAction Command="{Binding Path=ExpandCommand}" />
