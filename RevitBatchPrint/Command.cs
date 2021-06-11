@@ -43,6 +43,11 @@ namespace RevitBatchPrint {
                     .OrderBy(item => item)
                     .ToList();
 
+                if(viewSheetNames.Count == 0) {
+                    TaskDialog.Show("Пакетная печать.", "Не были обнаружены основные надписи.");
+                    return;
+                }
+
                 var window = new PrintViewSheetNamesWindow() {
                     DataContext = new ViewSheetNamesViewModel() {
                         Names = viewSheetNames,
