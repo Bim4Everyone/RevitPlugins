@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>Command RevitBatchPrint</Text>
+    <Description>Some description for RevitBatchPrint</Description>
+    <Assembly>RevitBatchPrint.dll</Assembly>
+    <FullClassName>RevitBatchPrint.Command</FullClassName>
+    <ClientId>380be51f-28d9-4722-b2fd-a415acf313d7</ClientId>
+    <VendorId>com.typepad.thebuildingcoder</VendorId>
+    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+  </AddIn>
+  <AddIn Type="Application">
+    <Name>Application RevitBatchPrint</Name>
+    <Assembly>RevitBatchPrint.dll</Assembly>
+    <FullClassName>RevitBatchPrint.App</FullClassName>
+    <ClientId>8ffba909-cf93-450c-8221-fe051331480c</ClientId>
+    <VendorId>com.typepad.thebuildingcoder</VendorId>
+    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+  </AddIn>
+</RevitAddIns>
