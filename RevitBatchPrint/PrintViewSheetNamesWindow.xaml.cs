@@ -32,11 +32,20 @@ namespace RevitBatchPrint {
         }
     }
 
-    public class ViewSheetNamesViewModel : INotifyPropertyChanged {
-        private string _selectedName;
-        private List<string> _names;
+    public class ViewSheetNamesCountViewModel {
+        public int Count { get; set; }
+        public string Name { get; set; }
 
-        public string SelectedName {
+        public override string ToString() {
+            return $"{Name} [{Count}]";
+        }
+    }
+
+    public class ViewSheetNamesViewModel : INotifyPropertyChanged {
+        private ViewSheetNamesCountViewModel _selectedName;
+        private List<ViewSheetNamesCountViewModel> _names;
+
+        public ViewSheetNamesCountViewModel SelectedName {
             get => _selectedName;
             set {
                 _selectedName = value;
@@ -44,7 +53,7 @@ namespace RevitBatchPrint {
             }
         }
         
-        public List<string> Names { 
+        public List<ViewSheetNamesCountViewModel> Names { 
             get => _names;
             set {
                 _names = value;

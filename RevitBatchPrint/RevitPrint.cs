@@ -33,6 +33,8 @@ namespace RevitBatchPrint {
 
         public void Execute() {
             var printManager = _document.PrintManager;
+            printManager.PrintToFile = true;
+            printManager.PrintToFileName = System.IO.Path.ChangeExtension(System.IO.Path.GetFileName(_document.PathName), ".pdf");
             printManager.SelectNewPrintDriver(PdfPrinterName);
 
             List<ViewSheet> viewSheets = GetViewSheets()
@@ -41,7 +43,6 @@ namespace RevitBatchPrint {
                 // Сортировка вызывает сомнения
                 .OrderBy(item => Convert.ToInt32(Regex.Match(item.SheetNumber, @"\d+$").Groups[0].Value))
                 .ToList();
-
 
             foreach(ViewSheet viewSheet in viewSheets) {
                 try {
@@ -53,8 +54,8 @@ namespace RevitBatchPrint {
                                 continue;
                             }
 
-                            var paperSize = GetPaperSizeByName(printManager, printSettings.Format.Name);
-
+                            var paperSize = GetPaperSizeByName(printManager, printSettings.Format.Name);                            
+                            
                             printManager.PrintSetup.CurrentPrintSetting = printManager.PrintSetup.InSession;
                             printManager.PrintSetup.CurrentPrintSetting.PrintParameters.PaperSize = paperSize;
                             printManager.PrintSetup.CurrentPrintSetting.PrintParameters.ZoomType = ZoomType.Zoom;

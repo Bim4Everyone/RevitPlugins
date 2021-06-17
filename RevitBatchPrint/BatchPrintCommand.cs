@@ -15,7 +15,7 @@ using Autodesk.Revit.UI.Selection;
 
 namespace RevitBatchPrint {
     [Transaction(TransactionMode.Manual)]
-    public class Command : IExternalCommand {
+    public class BatchPrintCommand : IExternalCommand {
         public Result Execute(
           ExternalCommandData commandData,
           ref string message,
@@ -39,8 +39,9 @@ namespace RevitBatchPrint {
                 var viewSheetNames = viewSheets
                     .SelectMany(item => revitPrint.FilterParameterNames.Select(paramName => item.LookupParameter(paramName)?.AsString()))
                     .Where(item => !string.IsNullOrEmpty(item))
-                    .Distinct()
-                    .OrderBy(item => item)
+                    .GroupBy(item => item)
+                    .Select(item => new ViewSheetNamesCountViewModel { Name = item.Key, Count = item.Count() })
+                    .OrderBy(item => item.Name)
                     .ToList();
 
                 if(viewSheetNames.Count == 0) {
@@ -57,7 +58,7 @@ namespace RevitBatchPrint {
 
                 new WindowInteropHelper(window) { Owner = uiapp.MainWindowHandle };
                 if(window.ShowDialog() == true) {
-                    revitPrint.FilterParameterValue = viewSheetNames.FirstOrDefault();
+                    revitPrint.FilterParameterValue = ((ViewSheetNamesViewModel) window.DataContext).SelectedName.Name;
                     revitPrint.Execute();
 
                     if(revitPrint.Errors.Count > 0) {
