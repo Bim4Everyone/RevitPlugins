@@ -16,7 +16,7 @@ namespace RevitCopyStandarts.ViewModels {
             _mainDocument = mainDocument;
             _application = application;
             
-            IEnumerable<BimCategoryViewModel> categories = Directory.EnumerateFiles(mainFolder, "*.rvt", SearchOption.AllDirectories)
+            IEnumerable<BimCategoryViewModel> categories = Directory.EnumerateFiles(mainFolder, "*.rvt", SearchOption.TopDirectoryOnly)
                 .Select(item => new FileInfo(item))
                 .GroupBy(item => item.Name.Split('_')[0])
                 .Select(item => new BimCategoryViewModel(item.Key, item, _mainDocument, _application))

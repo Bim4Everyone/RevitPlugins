@@ -34,9 +34,7 @@ namespace RevitCopyStandarts {
 
             //AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             try {
-                var mainWindow = new MainWindow() { BimCategories = new ViewModels.BimCategoriesViewModel(@"C:\Users\biseuv_o\Documents\Revit", document, application) };
-                new WindowInteropHelper(mainWindow) { Owner = uiApplication.MainWindowHandle };
-                mainWindow.ShowDialog();
+                new PyRevitCommand().Execute(commandData.Application);
             } catch(Exception ex) {
 #if DEBUG
                 System.Windows.MessageBox.Show(ex.ToString(), "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
@@ -58,6 +56,18 @@ namespace RevitCopyStandarts {
             }
 
             return null;
+        }
+    }
+
+    public class PyRevitCommand {
+        public void Execute(UIApplication uiApplication) {
+            UIDocument uiDocument = uiApplication.ActiveUIDocument;
+            Application application = uiApplication.Application;
+            Document document = uiDocument.Document;
+
+            var mainWindow = new MainWindow() { BimCategories = new ViewModels.BimCategoriesViewModel(@"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Шаблоны и настройки", document, application) };
+            new WindowInteropHelper(mainWindow) { Owner = uiApplication.MainWindowHandle };
+            mainWindow.ShowDialog();
         }
     }
 }
