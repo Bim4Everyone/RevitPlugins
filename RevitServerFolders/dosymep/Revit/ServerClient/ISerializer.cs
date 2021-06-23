@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
+
+using pyRevitLabs.Json;
 
 namespace dosymep.Revit.ServerClient {
     /// <summary>
@@ -25,7 +26,7 @@ namespace dosymep.Revit.ServerClient {
     internal class JsonNetSerializer : ISerializer {
         /// <inheritdoc/>
         public T Deserialize<T>(string text) {
-            return JsonSerializer.Deserialize<T>(text);
+            return JsonConvert.DeserializeObject<T>(text);
         }
     }
 }

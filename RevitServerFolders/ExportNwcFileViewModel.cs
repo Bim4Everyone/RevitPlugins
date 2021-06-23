@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Windows.Forms;
 using System.Windows.Input;
+
+using pyRevitLabs.Json;
 
 namespace RevitServerFolders {
     public class ExportNwcFileConfig {
@@ -23,7 +24,7 @@ namespace RevitServerFolders {
 
         public static ExportNwcFileConfig GetExportNwcFileConfig() {
             if(File.Exists(GetConfigPath())) {
-                return JsonSerializer.Deserialize<ExportNwcFileConfig>(File.ReadAllText(GetConfigPath()));
+                return JsonConvert.DeserializeObject<ExportNwcFileConfig>(File.ReadAllText(GetConfigPath()));
             }
 
             return new ExportNwcFileConfig();
@@ -31,7 +32,7 @@ namespace RevitServerFolders {
 
         public static void SaveExportNwcFileConfig(ExportNwcFileConfig exportNwcFileConfig) {
             Directory.CreateDirectory(Path.GetDirectoryName(GetConfigPath()));
-            File.WriteAllText(GetConfigPath(), JsonSerializer.Serialize(exportNwcFileConfig, typeof(ExportNwcFileConfig)));
+            File.WriteAllText(GetConfigPath(), JsonConvert.SerializeObject(exportNwcFileConfig));
         }
     }
 

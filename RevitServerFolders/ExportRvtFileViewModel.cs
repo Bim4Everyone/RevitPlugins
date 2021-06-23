@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Windows.Forms;
 using System.Windows.Input;
 
 using dosymep.Revit.ServerClient;
 using dosymep.Views.Revit;
+
+using pyRevitLabs.Json;
 
 using RevitServerFolders.dosymep.Views.Revit;
 
@@ -34,7 +35,7 @@ namespace RevitServerFolders {
 
         public static ExportRvtFileConfig GetExportRvtFileConfig() {
             if(File.Exists(GetConfigPath())) {
-                return JsonSerializer.Deserialize<ExportRvtFileConfig>(File.ReadAllText(GetConfigPath()));
+                return JsonConvert.DeserializeObject<ExportRvtFileConfig>(File.ReadAllText(GetConfigPath()));
             }
 
             return new ExportRvtFileConfig();
@@ -42,7 +43,7 @@ namespace RevitServerFolders {
 
         public static void SaveExportRvtFileConfig(ExportRvtFileConfig exportRvtFileConfig) {
             Directory.CreateDirectory(Path.GetDirectoryName(GetConfigPath()));
-            File.WriteAllText(GetConfigPath(), JsonSerializer.Serialize(exportRvtFileConfig, typeof(ExportRvtFileConfig)));
+            File.WriteAllText(GetConfigPath(), JsonConvert.SerializeObject(exportRvtFileConfig));
         }
     }
 
