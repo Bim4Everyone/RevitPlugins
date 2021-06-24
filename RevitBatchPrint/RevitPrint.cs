@@ -16,7 +16,7 @@ namespace RevitBatchPrint {
         public string PdfPrinterName { get; set; } = "PDFCreator";
 
         public string FilterParameterValue { get; set; }
-        public IReadOnlyList<string> FilterParameterNames { get; set; } = new List<string>() { "Орг.ОбознчТома(Комплекта)", "ADSK_Комплект чертежей" };
+        public IReadOnlyList<string> FilterParameterNames { get; set; } = new List<string>() { "Орг.ОбознчТома(Комплекта)", "Орг.КомплектЧертежей", "ADSK_Комплект чертежей" };
 
         public List<string> Errors { get; set; } = new List<string>();
 
