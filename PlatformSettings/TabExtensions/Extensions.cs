@@ -9,12 +9,31 @@ using pyRevitLabs.PyRevit;
 #endregion
 
 namespace PlatformSettings.TabExtensions {
+    /// <summary>
+    /// Класс получения расширений.
+    /// </summary>
     internal abstract class Extensions {
+        /// <summary>
+        /// Путь до папки с расширениями.
+        /// </summary>
         public abstract string Path { get; }
+
+        /// <summary>
+        /// Список URL метаданных расширений.
+        /// </summary>
         public abstract List<string> Url { get; }
 
+        /// <summary>
+        /// Возвращает объект расширения для View.
+        /// </summary>
+        /// <param name="extension">Определение расширения.</param>
+        /// <returns>Возвращает объект расширения для View.</returns>
         protected abstract PyRevitExtensionViewModel GetPyRevitExtensionViewModel(PyRevitExtensionDefinition extension);
 
+        /// <summary>
+        /// Возвращает список всех расширений для View.
+        /// </summary>
+        /// <returns>Возвращает список всех расширений для View.</returns>
         public List<PyRevitExtensionViewModel> GetPyRevitExtensionViewModels() {
             List<PyRevitExtension> installedExtensions = GetInstallExtensions();
             List<PyRevitExtensionDefinition> extensions = GetPyRevitExtensionDefinitions();
@@ -30,10 +49,18 @@ namespace PlatformSettings.TabExtensions {
             }).ToList();
         }
 
+        /// <summary>
+        /// Возвращает список установленных расширений.
+        /// </summary>
+        /// <returns>Возвращает список установленных расширений.</returns>
         private List<PyRevitExtension> GetInstallExtensions() {
             return PyRevitExtensions.GetInstalledExtensions(Path);
         }
 
+        /// <summary>
+        /// Возвращает определения расширений по списку URL.
+        /// </summary>
+        /// <returns>Возвращает определения расширений по списку URL.</returns>
         private List<PyRevitExtensionDefinition> GetPyRevitExtensionDefinitions() {
             return Url.SelectMany(url => PyRevitExtensionsEx.LookupExtensionInDefinitionFile(url, null)).ToList();
         }
