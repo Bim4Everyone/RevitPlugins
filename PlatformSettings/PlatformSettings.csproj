@@ -72,9 +72,13 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App.cs" />
+    <Compile Include="TabExtensions\BimExtensions.cs" />
+    <Compile Include="TabExtensions\DisableExtensionBehav.cs" />
+    <Compile Include="TabExtensions\Extensions.cs" />
+    <Compile Include="TabExtensions\IToggleExtension.cs" />
     <Compile Include="PlatformSettingsCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TabExtensions\PyExtensions.cs" />
     <Compile Include="PyRevitExtensionsEx.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
@@ -89,9 +93,9 @@
     <Compile Include="TabExtensions\TabExtensionsSettingsView.xaml.cs">
       <DependentUpon>TabExtensionsSettingsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TabExtensions\UnistalExtensionBehav.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="PlatformSettings.addin" />
     <Content Include="Python\icon.png" />
     <Content Include="Python\script.py" />
   </ItemGroup>
