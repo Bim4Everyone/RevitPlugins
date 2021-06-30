@@ -4,12 +4,12 @@ using pyRevitLabs.PyRevit;
 
 namespace PlatformSettings.TabExtensions {
     public class PyRevitExtensionViewModel : INotifyPropertyChanged {
-        private readonly PyRevitExtensionDefinition _pyRevitExtension;
+        private readonly PyRevitExtensionDefinitionEx _pyRevitExtension;
 
         private bool _enabled;
         private bool _allowChangeEnabled;
 
-        public PyRevitExtensionViewModel(PyRevitExtensionDefinition pyRevitExtension) {
+        public PyRevitExtensionViewModel(PyRevitExtensionDefinitionEx pyRevitExtension) {
             _pyRevitExtension = pyRevitExtension;
         }
 

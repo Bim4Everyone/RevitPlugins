@@ -23,7 +23,7 @@ namespace PlatformSettings.TabExtensions {
         };
 
         /// <inheritdoc/>
-        protected override PyRevitExtensionViewModel GetPyRevitExtensionViewModel(PyRevitExtensionDefinition extension) {
+        protected override PyRevitExtensionViewModel GetPyRevitExtensionViewModel(PyRevitExtensionDefinitionEx extension) {
             var viewModel = new PyRevitExtensionViewModel(extension) { AllowChangeEnabled = true };
             viewModel.ToggleExtension = new DisableExtensionBehav(viewModel);
 

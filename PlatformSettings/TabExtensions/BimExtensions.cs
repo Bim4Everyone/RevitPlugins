@@ -20,7 +20,7 @@ namespace PlatformSettings.TabExtensions {
         public override List<string> Url { get; } = new List<string>() { "https://raw.githubusercontent.com/dosymep/BIMExtensions/master/extensions.json" };
 
         /// <inheritdoc/>
-        protected override PyRevitExtensionViewModel GetPyRevitExtensionViewModel(PyRevitExtensionDefinition extension) {
+        protected override PyRevitExtensionViewModel GetPyRevitExtensionViewModel(PyRevitExtensionDefinitionEx extension) {
             var viewModel = new PyRevitExtensionViewModel(extension) { AllowChangeEnabled = !extension.BuiltIn };
             viewModel.ToggleExtension = new UnistalExtensionBehav(viewModel);
 

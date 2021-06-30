@@ -9,6 +9,70 @@ using pyRevitLabs.NLog;
 using pyRevitLabs.PyRevit;
 
 namespace PlatformSettings {
+    /// <summary>
+    /// https://github.com/eirannejad/pyRevit/blob/7eb0a4e1f6d2509735b2da80168b1c8b0e5b2f20/dev/pyRevitLabs/pyRevitLabs.PyRevit/PyRevitExtension.cs#L35
+    /// Пришлось создать дубликат класса, чтобы нормально происходила десериализация.
+    /// По неизвестной мне причине во время получения boolean свойств появлялась ошибка RuntimeBinder.
+    /// </summary>
+    public class PyRevitExtensionDefinitionEx {
+        private readonly dynamic _jsonObj;
+
+        public PyRevitExtensionDefinitionEx(JObject jsonObj) {
+            _jsonObj = jsonObj ?? throw new ArgumentNullException(nameof(jsonObj));
+        }
+
+        public PyRevitExtensionDefinitionEx(string extDefJsonFile) {
+            if(string.IsNullOrEmpty(extDefJsonFile)) {
+                throw new ArgumentException($"'{nameof(extDefJsonFile)}' cannot be null or empty.", nameof(extDefJsonFile));
+            }
+
+            _jsonObj = JObject.Parse(File.ReadAllText(extDefJsonFile));
+            if(_jsonObj is null)
+                throw new PyRevitException("jsonObj can not be null.");
+        }
+
+        public override string ToString() {
+            return string.Format("Name: \"{0}\" | Type: \"{1}\" | Repo: \"{2}\"", Name, Type, Url);
+        }
+
+        public bool BuiltIn { get { return Convert.ToBoolean(_jsonObj.builtin); } }
+
+        public bool DefaultEnabled { get { return Convert.ToBoolean(_jsonObj.default_enabled); } }
+
+        public bool RocketModeCompatible { get { return Convert.ToBoolean(_jsonObj.rocket_mode_compatible); } }
+
+        public string Name { get { return _jsonObj.name; } }
+
+        public PyRevitExtensionTypes Type {
+            get {
+                switch("." + _jsonObj.type) {
+                    case PyRevitConsts.ExtensionUIPostfix:
+                    return PyRevitExtensionTypes.UIExtension;
+                    case PyRevitConsts.ExtensionLibraryPostfix:
+                    return PyRevitExtensionTypes.LibraryExtension;
+                    default:
+                    return PyRevitExtensionTypes.Unknown;
+                }
+            }
+        }
+
+        public string Description { get { return _jsonObj.description; } }
+
+        public string Author { get { return _jsonObj.author; } }
+
+        public string AuthorProfile { get { return _jsonObj.author_url; } }
+
+        public string Url { get { return _jsonObj.url; } }
+
+        public string Website { get { return _jsonObj.website; } }
+
+        public string ImageUrl { get { return _jsonObj.image; } }
+
+        public dynamic Templates { get { return _jsonObj.templates; } }
+
+        public dynamic Dependencies { get { return _jsonObj.dependencies; } }
+    }
+
     internal static class PyRevitExtensionsEx {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -17,7 +81,7 @@ namespace PlatformSettings {
         /// </summary>
         /// <param name="extension">Расширение pyRevit.</param>
         /// <returns>Возвращает полное наименование расширения (BIM4Everyone.lib).</returns>
-        public static string GetExtensionName(this PyRevitExtensionDefinition extension) {
+        public static string GetExtensionName(this PyRevitExtensionDefinitionEx extension) {
             logger.Debug("Getting extension name \"{0}\"", extension.Name);
             return extension.Name + PyRevitExtension.GetExtensionDirExt(extension.Type);
         }
@@ -29,7 +93,7 @@ namespace PlatformSettings {
         /// <returns>Возвращает статус включения расширения. <see cref="true"/> - если расширение включено, иначе <see cref="false"/>.</returns>
         public static bool IsEnabledExtension(string extName) {
             logger.Debug("Getting state extension \"{0}\"", extName);
-            
+
             string disabled = PyRevitConfigs.GetConfigFile().GetValue(extName, "disabled");
             return string.IsNullOrEmpty(disabled) ? false : !bool.Parse(disabled);
         }
@@ -75,10 +139,10 @@ namespace PlatformSettings {
         /// <param name="fileOrUri"></param>
         /// <param name="searchPattern"></param>
         /// <returns></returns>
-        public static List<PyRevitExtensionDefinition> LookupExtensionInDefinitionFile(
+        public static List<PyRevitExtensionDefinitionEx> LookupExtensionInDefinitionFile(
                 string fileOrUri,
                 string searchPattern = null) {
-            var pyrevtExts = new List<PyRevitExtensionDefinition>();
+            var pyrevtExts = new List<PyRevitExtensionDefinitionEx>();
             string filePath = null;
 
             // determine if path is file or uri
@@ -127,14 +191,14 @@ namespace PlatformSettings {
                         }
 
                         if(extensionsObj.extensions == null) {
-                            var extDef = new PyRevitExtensionDefinition((JObject) extensionsObj);
+                            var extDef = new PyRevitExtensionDefinitionEx((JObject) extensionsObj);
                             pyrevtExts.Add(extDef);
                             return pyrevtExts;
                         }
 
                         // make extension list
                         foreach(JObject extObj in extensionsObj.extensions) {
-                            var extDef = new PyRevitExtensionDefinition(extObj);
+                            var extDef = new PyRevitExtensionDefinitionEx(extObj);
 
                             logger.Debug("Registered extension \"{0}\"", extDef.Name);
                             if(searchPattern != null) {

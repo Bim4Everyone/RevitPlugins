@@ -28,7 +28,7 @@ namespace PlatformSettings.TabExtensions {
         /// </summary>
         /// <param name="extension">Определение расширения.</param>
         /// <returns>Возвращает объект расширения для View.</returns>
-        protected abstract PyRevitExtensionViewModel GetPyRevitExtensionViewModel(PyRevitExtensionDefinition extension);
+        protected abstract PyRevitExtensionViewModel GetPyRevitExtensionViewModel(PyRevitExtensionDefinitionEx extension);
 
         /// <summary>
         /// Возвращает список всех расширений для View.
@@ -36,7 +36,7 @@ namespace PlatformSettings.TabExtensions {
         /// <returns>Возвращает список всех расширений для View.</returns>
         public List<PyRevitExtensionViewModel> GetPyRevitExtensionViewModels() {
             List<PyRevitExtension> installedExtensions = GetInstallExtensions();
-            List<PyRevitExtensionDefinition> extensions = GetPyRevitExtensionDefinitions();
+            List<PyRevitExtensionDefinitionEx> extensions = GetPyRevitExtensionDefinitions();
 
             return extensions.Select(extension => {
                 var viewModel = GetPyRevitExtensionViewModel(extension);
@@ -61,7 +61,7 @@ namespace PlatformSettings.TabExtensions {
         /// Возвращает определения расширений по списку URL.
         /// </summary>
         /// <returns>Возвращает определения расширений по списку URL.</returns>
-        private List<PyRevitExtensionDefinition> GetPyRevitExtensionDefinitions() {
+        private List<PyRevitExtensionDefinitionEx> GetPyRevitExtensionDefinitions() {
             return Url.SelectMany(url => PyRevitExtensionsEx.LookupExtensionInDefinitionFile(url, null)).ToList();
         }
     }
