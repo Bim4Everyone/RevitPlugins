@@ -31,6 +31,7 @@ namespace PlatformSettings.TabExtensions {
 
         public PyRevitExtension InstalledExtension { get; set; }
         public IToggleExtension ToggleExtension { get; set; }
+        public string ExtensionName { get => _pyRevitExtension.GetExtensionName(); }
 
         public bool BuiltIn { get => _pyRevitExtension.BuiltIn; }
         public bool DefaultEnabled { get => _pyRevitExtension.DefaultEnabled; }

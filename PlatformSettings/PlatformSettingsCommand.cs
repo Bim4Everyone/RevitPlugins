@@ -63,7 +63,7 @@ namespace PlatformSettings {
 
                 var installedExtension = installedExtensions.FirstOrDefault(item => item.Name.Equals(extension.Name));
                 viewModel.InstalledExtension = installedExtension;
-                viewModel.Enabled = PyRevitExtensionsEx.GetEnabledExtension(extension.Name + PyRevitExtension.GetExtensionDirExt(extension.Type));
+                viewModel.Enabled = PyRevitExtensionsEx.IsEnabledExtension(extension.GetExtensionName());
 
                 return viewModel;
             }).ToList();
@@ -91,7 +91,7 @@ namespace PlatformSettings {
             viewModel.ToggleExtension = new UnistalExtensionBehav(viewModel);
 
             if(viewModel.BuiltIn) {
-                PyRevitExtensionsEx.ToggleExtension(viewModel.Name + PyRevitExtension.GetExtensionDirExt(viewModel.Type), viewModel.BuiltIn);
+                PyRevitExtensionsEx.ToggleExtension(viewModel.ExtensionName, viewModel.BuiltIn);
             }
 
             return viewModel;
@@ -143,12 +143,12 @@ namespace PlatformSettings {
             if(enabled) {
                 if(_viewModel.InstalledExtension == null) {
                     PyRevitExtensions.InstallExtension(_viewModel.Name, _viewModel.Type, _viewModel.Url);
-                    PyRevitExtensionsEx.ToggleExtension(_viewModel.Name + PyRevitExtension.GetExtensionDirExt(_viewModel.Type), enabled);
+                    PyRevitExtensionsEx.ToggleExtension(_viewModel.ExtensionName, enabled);
                 }
             } else {
                 if(_viewModel.InstalledExtension != null) {
                     PyRevitExtensions.UninstallExtension(_viewModel.InstalledExtension);
-                    PyRevitExtensionsEx.ToggleExtension(_viewModel.Name + PyRevitExtension.GetExtensionDirExt(_viewModel.Type), enabled);
+                    PyRevitExtensionsEx.ToggleExtension(_viewModel.ExtensionName, enabled);
                 }
             }
         }

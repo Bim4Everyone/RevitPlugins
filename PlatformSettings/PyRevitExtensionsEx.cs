@@ -12,7 +12,11 @@ namespace PlatformSettings {
     internal static class PyRevitExtensionsEx {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        public static bool GetEnabledExtension(string extName) {
+        public static string GetExtensionName(this PyRevitExtensionDefinition extension) {
+            return extension.Name + PyRevitExtension.GetExtensionDirExt(extension.Type);
+        }
+
+        public static bool IsEnabledExtension(string extName) {
             logger.Debug("Getting state extension \"{0}\"", extName);
             
             string disabled = PyRevitConfigs.GetConfigFile().GetValue(extName, "disabled");
