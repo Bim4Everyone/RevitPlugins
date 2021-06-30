@@ -25,19 +25,12 @@ namespace PlatformSettings {
         }
 
         public bool Execute(ExternalCommandData commandData) {
-            var bimExtension = new BimExtensions();
-            var pyExtension = new PyExtensions();
-
-            var extensions = bimExtension.GetPyRevitExtensionViewModels().Union(pyExtension.GetPyRevitExtensionViewModels());
-            var settings = new PlatformSettingsViewModel() { PyRevitExtensions = new ObservableCollection<PyRevitExtensionViewModel>(extensions) };
-
-            var window = new SettingsWindow() { DataContext = settings };
+            var window = new SettingsWindow() { DataContext = new PlatformSettingsViewModel() };
             new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
 
             if(window.ShowDialog() == true) {
-                foreach(var extension in settings.PyRevitExtensions) {
-                    extension.ToggleExtension.Toggle(extension.Enabled);
-                }
+                var settings = ((PlatformSettingsViewModel) window.DataContext);
+                settings.SaveSettings();
 
                 return true;
             }

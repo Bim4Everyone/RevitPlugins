@@ -19,15 +19,33 @@ namespace PlatformSettings.TabExtensions {
     /// Interaction logic for TabsSettingsView.xaml
     /// </summary>
     public partial class TabExtensionsSettingsView : UserControl {
-        public static readonly DependencyProperty PyRevitExtensionsProperty = DependencyProperty.Register(nameof(PyRevitExtensions), typeof(ObservableCollection<PyRevitExtensionViewModel>), typeof(TabExtensionsSettingsView));
+        public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(nameof(ViewModel), typeof(TabExtensionsSettingsViewModel), typeof(TabExtensionsSettingsView));
 
         public TabExtensionsSettingsView() {
             InitializeComponent();
         }
 
-        public ObservableCollection<PyRevitExtensionViewModel> PyRevitExtensions {
-            get { return (ObservableCollection<PyRevitExtensionViewModel>) GetValue(PyRevitExtensionsProperty); }
-            set { SetValue(PyRevitExtensionsProperty, value); }
+        public TabExtensionsSettingsViewModel ViewModel {
+            get { return (TabExtensionsSettingsViewModel) GetValue(ViewModelProperty); }
+            set { SetValue(ViewModelProperty, value); }
+        }
+    }
+
+    public class TabExtensionsSettingsViewModel {
+        public TabExtensionsSettingsViewModel() {
+            var bimExtension = new BimExtensions();
+            var pyExtension = new PyExtensions();
+
+            var extensions = bimExtension.GetPyRevitExtensionViewModels().Union(pyExtension.GetPyRevitExtensionViewModels());
+            PyRevitExtensions = new ObservableCollection<PyRevitExtensionViewModel>(extensions);
+        }
+
+        public ObservableCollection<PyRevitExtensionViewModel> PyRevitExtensions { get; set; }
+
+        public void SaveSettings() {
+            foreach(var extension in PyRevitExtensions) {
+                extension.ToggleExtension.Toggle(extension.Enabled);
+            }
         }
     }
 }

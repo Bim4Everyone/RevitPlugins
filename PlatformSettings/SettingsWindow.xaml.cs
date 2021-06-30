@@ -35,6 +35,14 @@ namespace PlatformSettings {
     }
 
     public class PlatformSettingsViewModel {
-        public ObservableCollection<PyRevitExtensionViewModel> PyRevitExtensions { get; set; }
+        public PlatformSettingsViewModel() {
+            TabExtensionsSettingsViewModel = new TabExtensionsSettingsViewModel();
+        }
+
+        public TabExtensionsSettingsViewModel TabExtensionsSettingsViewModel { get; set; }
+
+        public void SaveSettings() {
+            TabExtensionsSettingsViewModel?.SaveSettings();
+        }
     }
 }

@@ -15,7 +15,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="45"/>
         </Grid.RowDefinitions>
-        <tabextensions:TabExtensionsSettingsView Grid.Row="0" PyRevitExtensions="{Binding Path=PyRevitExtensions}"/>
+        <tabextensions:TabExtensionsSettingsView Grid.Row="0" ViewModel="{Binding Path=TabExtensionsSettingsViewModel}"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="1">
             <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80"/>
             <Button Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80"/>
