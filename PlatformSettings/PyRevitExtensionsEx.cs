@@ -12,10 +12,21 @@ namespace PlatformSettings {
     internal static class PyRevitExtensionsEx {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
+        /// <summary>
+        /// Возвращает полное наименование расширения (BIM4Everyone.lib).
+        /// </summary>
+        /// <param name="extension">Расширение pyRevit.</param>
+        /// <returns>Возвращает полное наименование расширения (BIM4Everyone.lib).</returns>
         public static string GetExtensionName(this PyRevitExtensionDefinition extension) {
+            logger.Debug("Getting extension name \"{0}\"", extension.Name);
             return extension.Name + PyRevitExtension.GetExtensionDirExt(extension.Type);
         }
 
+        /// <summary>
+        /// Возвращает статус включения расширения.
+        /// </summary>
+        /// <param name="extName">Полное наименование расширения.</param>
+        /// <returns>Возвращает статус включения расширения. <see cref="true"/> - если расширение включено, иначе <see cref="false"/>.</returns>
         public static bool IsEnabledExtension(string extName) {
             logger.Debug("Getting state extension \"{0}\"", extName);
             
@@ -23,6 +34,11 @@ namespace PlatformSettings {
             return string.IsNullOrEmpty(disabled) ? false : !bool.Parse(disabled);
         }
 
+        /// <summary>
+        /// Переключает состояние расширения.
+        /// </summary>
+        /// <param name="extName">Полное наименование расширения.</param>
+        /// <param name="state">Состояние расширения <see cref="true"/> - расширение включено, <see cref="false"/> выключено</param>
         public static void ToggleExtension(string extName, bool state) {
             logger.Debug("{0} extension \"{1}\"", state ? "Enabling" : "Disabling", extName);
             PyRevitConfigs.GetConfigFile().SetValue(extName, "disabled", !state);
