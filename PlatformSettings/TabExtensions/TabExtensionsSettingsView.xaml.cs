@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,21 +32,41 @@ namespace PlatformSettings.TabExtensions {
         }
     }
 
-    public class TabExtensionsSettingsViewModel {
+    public class TabExtensionsSettingsViewModel : ITabSetting, INotifyPropertyChanged {
         public TabExtensionsSettingsViewModel() {
-            var bimExtension = new BimExtensions();
-            var pyExtension = new PyExtensions();
+            Name = "Расширения";
+            Content = new TabExtensionsSettingsView() { ViewModel = this };
 
-            var extensions = bimExtension.GetPyRevitExtensionViewModels().Union(pyExtension.GetPyRevitExtensionViewModels());
+            IEnumerable<PyRevitExtensionViewModel> extensions = GetExtensions();
             PyRevitExtensions = new ObservableCollection<PyRevitExtensionViewModel>(extensions);
+            OnPropertyChanged(nameof(PyRevitExtensions));
         }
 
-        public ObservableCollection<PyRevitExtensionViewModel> PyRevitExtensions { get; set; }
+        public string Name { get; }
+        public object Content { get; }
+        public ObservableCollection<PyRevitExtensionViewModel> PyRevitExtensions { get; }
 
         public void SaveSettings() {
             foreach(var extension in PyRevitExtensions) {
                 extension.ToggleExtension.Toggle(extension.Enabled);
             }
         }
+
+        private static IEnumerable<PyRevitExtensionViewModel> GetExtensions() {
+            var bimExtension = new BimExtensions();
+            var pyExtension = new PyExtensions();
+
+            return bimExtension.GetPyRevitExtensionViewModels().Union(pyExtension.GetPyRevitExtensionViewModels());
+        }
+
+        #region INotifyPropertyChanged
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName) {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion
     }
 }

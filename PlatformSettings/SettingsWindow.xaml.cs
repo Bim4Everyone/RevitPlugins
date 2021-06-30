@@ -37,12 +37,22 @@ namespace PlatformSettings {
     public class PlatformSettingsViewModel {
         public PlatformSettingsViewModel() {
             TabExtensionsSettingsViewModel = new TabExtensionsSettingsViewModel();
+
+            TabSettings = new ObservableCollection<ITabSetting> {
+                TabExtensionsSettingsViewModel
+            };
         }
 
+        public ObservableCollection<ITabSetting> TabSettings { get; }
         public TabExtensionsSettingsViewModel TabExtensionsSettingsViewModel { get; set; }
 
         public void SaveSettings() {
             TabExtensionsSettingsViewModel?.SaveSettings();
         }
+    }
+
+    public interface ITabSetting {
+        string Name { get; }
+        object Content { get; }
     }
 }

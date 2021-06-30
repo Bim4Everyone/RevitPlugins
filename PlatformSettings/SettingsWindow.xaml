@@ -15,7 +15,14 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="45"/>
         </Grid.RowDefinitions>
-        <tabextensions:TabExtensionsSettingsView Grid.Row="0" ViewModel="{Binding Path=TabExtensionsSettingsViewModel}"/>
+        <TabControl ItemsSource="{Binding Path=TabSettings}">
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem">
+                    <Setter Property="Header" Value="{Binding Name}" />
+                    <Setter Property="Content" Value="{Binding Content}" />
+                </Style>
+            </TabControl.ItemContainerStyle>
+        </TabControl>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="1">
             <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80"/>
             <Button Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80"/>
