@@ -38,7 +38,7 @@ namespace PlatformSettings {
 
             if(window.ShowDialog() == true) {
                 foreach(var extension in settings.PyRevitExtensions) {
-                    extension.UnistalExtensionsBehav.Unistal(extension.Enabled);
+                    extension.ToggleExtension.Toggle(extension.Enabled);
                 }
 
                 return true;
@@ -88,7 +88,7 @@ namespace PlatformSettings {
 
         protected override PyRevitExtensionViewModel GetPyRevitExtensionViewModel(PyRevitExtensionDefinition extension) {
             var viewModel = new PyRevitExtensionViewModel(extension) { AllowChangeEnabled = !extension.BuiltIn };
-            viewModel.UnistalExtensionsBehav = new UnistalExtensionBehav(viewModel);
+            viewModel.ToggleExtension = new UnistalExtensionBehav(viewModel);
 
             if(viewModel.BuiltIn) {
                 PyRevitExtensionsEx.ToggleExtension(viewModel.Name + PyRevitExtension.GetExtensionDirExt(viewModel.Type), viewModel.BuiltIn);
@@ -108,38 +108,38 @@ namespace PlatformSettings {
 
         protected override PyRevitExtensionViewModel GetPyRevitExtensionViewModel(PyRevitExtensionDefinition extension) {
             var viewModel = new PyRevitExtensionViewModel(extension) { AllowChangeEnabled = true };
-            viewModel.UnistalExtensionsBehav = new DisableExtensionBehav(viewModel);
+            viewModel.ToggleExtension = new DisableExtensionBehav(viewModel);
 
             return viewModel;
         }
     }
 
-    public interface IUnistalExtensionsBehav {
-        void Unistal(bool enabled);
+    public interface IToggleExtension {
+        void Toggle(bool enabled);
     }
 
-    internal class DisableExtensionBehav : IUnistalExtensionsBehav {
+    internal class DisableExtensionBehav : IToggleExtension {
         private readonly PyRevitExtensionViewModel _viewModel;
 
         public DisableExtensionBehav(PyRevitExtensionViewModel viewModel) {
             _viewModel = viewModel;
         }
 
-        public void Unistal(bool enabled) {
+        public void Toggle(bool enabled) {
             if(_viewModel.InstalledExtension != null) {
                 PyRevitExtensionsEx.ToggleExtension(_viewModel.InstalledExtension, enabled);
             }
         }
     }
 
-    internal class UnistalExtensionBehav : IUnistalExtensionsBehav {
+    internal class UnistalExtensionBehav : IToggleExtension {
         private readonly PyRevitExtensionViewModel _viewModel;
 
         public UnistalExtensionBehav(PyRevitExtensionViewModel viewModel) {
             _viewModel = viewModel;
         }
 
-        public void Unistal(bool enabled) {
+        public void Toggle(bool enabled) {
             if(enabled) {
                 if(_viewModel.InstalledExtension == null) {
                     PyRevitExtensions.InstallExtension(_viewModel.Name, _viewModel.Type, _viewModel.Url);
