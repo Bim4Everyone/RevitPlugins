@@ -3,10 +3,21 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:PlatformSettings"
+             xmlns:local="clr-namespace:PlatformSettings.SharedParams"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
-    </Grid>
+             d:DesignHeight="450" d:DesignWidth="800"
+             x:Name="_this">
+    <StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock DataContext="{Binding ElementName=_this}" Text="{Binding Path=ViewModel.Path}" IsEnabled="False"/>
+            <Button DataContext="{Binding ElementName=_this}" Command="{Binding Path=ViewModel.OpenFile}" Content="..."/>
+        </StackPanel>
+        <ListBox DataContext="{Binding ElementName=_this}" ItemsSource="{Binding Path=ViewModel.SharedParams}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <local:SharedParamView ViewModel="{Binding}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </StackPanel>
 </UserControl>

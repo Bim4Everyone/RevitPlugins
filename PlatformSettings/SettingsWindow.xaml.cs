@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using PlatformSettings.SharedParams;
 using PlatformSettings.TabExtensions;
 
 namespace PlatformSettings {
@@ -37,17 +38,21 @@ namespace PlatformSettings {
     public class PlatformSettingsViewModel {
         public PlatformSettingsViewModel() {
             TabExtensionsSettingsViewModel = new TabExtensionsSettingsViewModel();
+            SharedParamsSettingsViewModel = new SharedParamsSettingsViewModel();
 
             TabSettings = new ObservableCollection<ITabSetting> {
-                TabExtensionsSettingsViewModel
+                TabExtensionsSettingsViewModel,
+                SharedParamsSettingsViewModel
             };
         }
 
         public ObservableCollection<ITabSetting> TabSettings { get; }
         public TabExtensionsSettingsViewModel TabExtensionsSettingsViewModel { get; set; }
+        public SharedParamsSettingsViewModel SharedParamsSettingsViewModel { get; set; }
 
         public void SaveSettings() {
             TabExtensionsSettingsViewModel?.SaveSettings();
+            SharedParamsSettingsViewModel.SaveSettings();
         }
     }
 
