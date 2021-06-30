@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone.SharedParams;
 
 namespace PlatformSettings.SharedParams {
@@ -39,7 +41,9 @@ namespace PlatformSettings.SharedParams {
         public SharedParamViewModel(SharedParam sharedParam) {
             _sharedParam = sharedParam;
         }
-
+       
+        public StorageType SharedParamType { get => _sharedParam.SharedParamType; }
+        
         public string Name {
             get => _sharedParam.Name;
             set {
