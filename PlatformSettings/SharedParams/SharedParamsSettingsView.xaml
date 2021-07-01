@@ -22,7 +22,7 @@
                      Text="{Binding Path=ViewModel.Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Button Grid.Column="1" HorizontalAlignment="Right" Width="25" Content="..."
                     DataContext="{Binding ElementName=_this}" 
-                    Command="{Binding Path=ViewModel.OpenFile}" />
+                    Command="{Binding Path=ViewModel.OpenFile}" Click="Button_Click" />
         </Grid>
         <ListBox Grid.Row="1" 
                  DataContext="{Binding ElementName=_this}" 

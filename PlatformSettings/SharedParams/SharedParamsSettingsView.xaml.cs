@@ -32,14 +32,18 @@ namespace PlatformSettings.SharedParams {
             get { return (SharedParamsSettingsViewModel) GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e) {
+            ViewModel.OpenFile.Execute(null);
+        }
     }
 
     public class SharedParamsSettingsViewModel : ITabSetting, INotifyPropertyChanged {
-        private readonly SharedParamsConfig _sharedParamsConfig;
         private string _path;
+        private readonly SharedParamsConfig _sharedParamsConfig;
 
         public SharedParamsSettingsViewModel() {
-            Path = pyRevitLabs.PyRevit.PyRevitConfigs.GetConfigFile().GetValue("PlatformSettings", "SharedParamsPath");
+            Path = new System.IO.FileInfo(pyRevitLabs.PyRevit.PyRevitConfigs.GetConfigFile().GetValue("PlatformSettings", "SharedParamsPath").Trim('\"')).FullName;
             _sharedParamsConfig = SharedParamsConfig.Load(Path);
 
             Name = "Общие параметры";
@@ -47,6 +51,8 @@ namespace PlatformSettings.SharedParams {
 
             SharedParams = new ObservableCollection<SharedParamViewModel>(_sharedParamsConfig.GetSharedParams().Select(item => new SharedParamViewModel(item)));
             OnPropertyChanged(nameof(SharedParams));
+
+            OpenFile = new RelayCommand(SelectConfigFile);
         }
 
         public string Name { get; }
@@ -66,7 +72,16 @@ namespace PlatformSettings.SharedParams {
         public void SaveSettings() {
             if(!string.IsNullOrEmpty(Path)) {
                 _sharedParamsConfig.Save(Path);
-                pyRevitLabs.PyRevit.PyRevitConfigs.GetConfigFile().SetValue("PlatformSettings", "SharedParamsPath", Path);
+                pyRevitLabs.PyRevit.PyRevitConfigs.GetConfigFile().SetValue("PlatformSettings", "SharedParamsPath", $"\"{Path}\"");
+            }
+        }
+
+        private void SelectConfigFile(object p) {
+            using(var dialog = new System.Windows.Forms.FolderBrowserDialog()) {
+                dialog.SelectedPath = System.IO.Path.GetDirectoryName(Path);
+                if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+                    Path = System.IO.Path.Combine(dialog.SelectedPath, "shared_params.json");
+                }
             }
         }
 
