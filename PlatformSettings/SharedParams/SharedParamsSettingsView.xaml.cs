@@ -64,8 +64,10 @@ namespace PlatformSettings.SharedParams {
         }
 
         public void SaveSettings() {
-            SharedParamsConfig.Save(_sharedParamsConfig, Path);
-            pyRevitLabs.PyRevit.PyRevitConfigs.GetConfigFile().SetValue("PlatformSettings", "SharedParamsPath", Path);
+            if(!string.IsNullOrEmpty(Path)) {
+                _sharedParamsConfig.Save(Path);
+                pyRevitLabs.PyRevit.PyRevitConfigs.GetConfigFile().SetValue("PlatformSettings", "SharedParamsPath", Path);
+            }
         }
 
         #region INotifyPropertyChanged

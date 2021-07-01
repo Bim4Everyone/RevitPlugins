@@ -41,7 +41,7 @@ namespace PlatformSettings.SharedParams {
         public SharedParamViewModel(SharedParam sharedParam) {
             _sharedParam = sharedParam;
         }
-       
+        public string Description { get => _sharedParam.Description; }
         public StorageType SharedParamType { get => _sharedParam.SharedParamType; }
         
         public string Name {
@@ -51,7 +51,7 @@ namespace PlatformSettings.SharedParams {
                 OnPropertyChanged(nameof(Name));
             }
         }
-
+        
         #region INotifyPropertyChanged
 
         public event PropertyChangedEventHandler PropertyChanged;

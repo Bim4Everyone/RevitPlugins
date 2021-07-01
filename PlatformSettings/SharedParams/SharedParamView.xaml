@@ -4,11 +4,18 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PlatformSettings.SharedParams"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
+             mc:Ignorable="d" d:DesignWidth="800"
              x:Name="_this">
-    <StackPanel>
-        <TextBox DataContext="{Binding ElementName=_this}" Text="{Binding Path=ViewModel.Name}"/>
-        <TextBlock DataContext="{Binding ElementName=_this}" Text="{Binding Path=ViewModel.SharedParamType}" IsEnabled="False"/>
-    </StackPanel>
+    <Grid DataContext="{Binding ElementName=_this}" ToolTip="{Binding Path=ViewModel.Description}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+        </Grid.RowDefinitions>
+        <TextBox Grid.Row="0"
+            DataContext="{Binding ElementName=_this}" 
+            Text="{Binding Path=ViewModel.Name}"/>
+        <TextBlock Grid.Row="1"
+            DataContext="{Binding ElementName=_this}" 
+            Text="{Binding Path=ViewModel.SharedParamType}" IsEnabled="False"/>
+    </Grid>
 </UserControl>

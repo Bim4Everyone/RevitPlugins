@@ -42,9 +42,11 @@
   <ItemGroup>
     <Reference Include="dosymep.Bim4Everyone">
       <HintPath>..\..\..\..\Users\biseuv_o\AppData\Roaming\pyRevit\Extensions\BIM4Everyone.lib\dosymep.Bim4Everyone.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="dosymep.Revit">
       <HintPath>..\..\..\..\Users\biseuv_o\AppData\Roaming\pyRevit\Extensions\BIM4Everyone.lib\dosymep.Revit.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
