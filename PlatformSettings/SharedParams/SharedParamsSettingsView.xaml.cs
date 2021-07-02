@@ -17,6 +17,8 @@ using System.Windows.Shapes;
 
 using dosymep.Bim4Everyone.SharedParams;
 
+using pyRevitLabs.NLog;
+
 namespace PlatformSettings.SharedParams {
     /// <summary>
     /// Interaction logic for SharedParamsSettingsView.xaml
@@ -39,6 +41,8 @@ namespace PlatformSettings.SharedParams {
     }
 
     public class SharedParamsSettingsViewModel : ITabSetting, INotifyPropertyChanged {
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         private string _path;
         private readonly SharedParamsConfig _sharedParamsConfig;
 
@@ -70,9 +74,13 @@ namespace PlatformSettings.SharedParams {
         }
 
         public void SaveSettings() {
-            if(!string.IsNullOrEmpty(Path)) {
-                _sharedParamsConfig.Save(Path);
-                pyRevitLabs.PyRevit.PyRevitConfigs.GetConfigFile().SetValue("PlatformSettings", "SharedParamsPath", $"\"{Path}\"");
+            try {
+                if(!string.IsNullOrEmpty(Path)) {
+                    _sharedParamsConfig.Save(Path);
+                    pyRevitLabs.PyRevit.PyRevitConfigs.GetConfigFile().SetValue("PlatformSettings", "SharedParamsPath", $"\"{Path}\"");
+                }
+            } catch(Exception ex) {
+                logger.Error(ex, "Ошибка сохранения конфигурации общих параметров.");
             }
         }
 
