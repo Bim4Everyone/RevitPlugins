@@ -14,7 +14,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
-using Autodesk.Windows;
 
 using RevitCopyStandarts.ViewModels;
 
