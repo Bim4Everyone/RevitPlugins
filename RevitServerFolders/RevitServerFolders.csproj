@@ -130,7 +130,7 @@
     <Compile Include="Export\SelectFileView.xaml.cs">
       <DependentUpon>SelectFileView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Export\UnloadRevitLinksCommand.cs" />
+    <Compile Include="Export\UnloadAllLinksCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\folder.png" />

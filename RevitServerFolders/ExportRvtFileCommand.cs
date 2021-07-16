@@ -34,7 +34,7 @@ namespace RevitServerFolders {
 
                     SaveExportRvtFileConfig(exportRvtFileViewModel);
                     DetachRevitFiles(exportRvtFileViewModel);
-                    UnloadRevitLinks(exportRvtFileViewModel);
+                    UnloadAllLinks(exportRvtFileViewModel);
                     ExportFilesToNavisworks(application, exportRvtFileViewModel);
 
                     System.Windows.MessageBox.Show("Готово!", "Сообщение!", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
@@ -63,8 +63,8 @@ namespace RevitServerFolders {
             }
         }
 
-        private static void UnloadRevitLinks(ExportRvtFileViewModel exportRvtFileViewModel) {
-            new UnloadRevitLinksCommand() {
+        private static void UnloadAllLinks(ExportRvtFileViewModel exportRvtFileViewModel) {
+            new UnloadAllLinksCommand() {
                 SourceFolderName = exportRvtFileViewModel.TargetRvtFolder
             }.Execute();
         }

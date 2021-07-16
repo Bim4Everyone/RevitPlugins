@@ -26,7 +26,7 @@ namespace RevitServerFolders {
                     exportNwcFileViewModel = (ExportNwcFileViewModel) exportWindow.DataContext;
 
                     SaveExportNwcFileConfig(exportNwcFileViewModel);
-                    UnloadRevitLinks(exportNwcFileViewModel);
+                    UnloadAllLinks(exportNwcFileViewModel);
                     ExportFilesToNavisworks(application, exportNwcFileViewModel);
 
                     System.Windows.MessageBox.Show("Готово!", "Сообщение!", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
@@ -53,8 +53,8 @@ namespace RevitServerFolders {
             }.Execute();
         }
 
-        private static void UnloadRevitLinks(ExportNwcFileViewModel exportNwcFileViewModel) {
-            new UnloadRevitLinksCommand() {
+        private static void UnloadAllLinks(ExportNwcFileViewModel exportNwcFileViewModel) {
+            new UnloadAllLinksCommand() {
                 SourceFolderName = exportNwcFileViewModel.SourceNwcFolder
             }.Execute();
         }
