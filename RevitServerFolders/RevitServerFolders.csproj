@@ -66,6 +66,9 @@
     <AssemblyOriginatorKeyFile>sign.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="dosymep.Revit">
+      <HintPath>..\..\..\..\Users\biseuv_o\AppData\Roaming\pyRevit\Extensions\BIM4Everyone.lib\dosymep.Revit.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="pyRevitLabs.Json">
@@ -94,19 +97,7 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="dosymep\Async\AsyncHelper.cs" />
-    <Compile Include="dosymep\Revit\ServerClient\DirectoryInfo.cs" />
-    <Compile Include="dosymep\Revit\ServerClient\IRevitHttpClient.cs" />
-    <Compile Include="dosymep\Revit\ServerClient\IRevitServerClient.cs" />
-    <Compile Include="dosymep\Revit\ServerClient\ISerializer.cs" />
-    <Compile Include="dosymep\Revit\ServerClient\ModelLockInfo.cs" />
-    <Compile Include="dosymep\Revit\ServerClient\RevitContents.cs" />
-    <Compile Include="dosymep\Revit\ServerClient\RevitFolder.cs" />
-    <Compile Include="dosymep\Revit\ServerClient\RevitHttpClient.cs" />
-    <Compile Include="dosymep\Revit\ServerClient\RevitModel.cs" />
-    <Compile Include="dosymep\Revit\ServerClient\RevitResponse.cs" />
-    <Compile Include="dosymep\Revit\ServerClient\RevitServerClient.cs" />
-    <Compile Include="dosymep\Revit\ServerClient\RevitServerClientBuilder.cs" />
-    <Compile Include="dosymep\Revit\ServerClient\ServerInformations.cs" />
+    <Compile Include="dosymep\JsonNetSerializer.cs" />
     <Compile Include="dosymep\Views\Revit\RevitServerExplorerWindow.xaml.cs">
       <DependentUpon>RevitServerExplorerWindow.xaml</DependentUpon>
     </Compile>

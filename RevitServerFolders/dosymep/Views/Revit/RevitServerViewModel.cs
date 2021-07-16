@@ -13,7 +13,7 @@ namespace dosymep.Views.Revit {
             var revitClient = new RevitServerClientBuilder()
                 .SetServerName(serverName)
                 .SetServerVersion(serverVersion)
-                .UseJsonNetSerializer()
+                .SetJsonSerializer(new JsonNetSerializer())
                 .Build();
 
             var revitServerInfo = new RevitServerInfo(revitClient);

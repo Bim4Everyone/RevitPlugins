@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using dosymep;
 using dosymep.Async;
 using dosymep.Revit.ServerClient;
 
@@ -51,7 +52,7 @@ namespace RevitServerFolders {
             var client = new RevitServerClientBuilder()
                 .SetServerName(ServerName)
                 .SetServerVersion(RevitVersion)
-                .UseJsonNetSerializer()
+                .SetJsonSerializer(new JsonNetSerializer())
                 .Build();
 
             var directory = AsyncHelper.RunSync(() => client.GetContentsAsync(FolderName));
