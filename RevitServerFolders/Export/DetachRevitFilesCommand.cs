@@ -13,7 +13,7 @@ using dosymep.Revit.ServerClient;
 
 #endregion
 
-namespace RevitServerFolders {
+namespace RevitServerFolders.Export {
     public class DetachRevitFilesCommand {
         public string ServerName { get; set; }
         public string RevitVersion { get; set; }

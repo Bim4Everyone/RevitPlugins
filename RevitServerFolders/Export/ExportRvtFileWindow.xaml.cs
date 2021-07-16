@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace RevitServerFolders {
+namespace RevitServerFolders.Export {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>

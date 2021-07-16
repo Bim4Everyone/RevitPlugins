@@ -10,7 +10,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-namespace RevitServerFolders {
+namespace RevitServerFolders.Export {
     internal class UnloadRevitLinksCommand {
         public string SourceFolderName { get; set; }
 

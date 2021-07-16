@@ -9,7 +9,7 @@ using Autodesk.Revit.DB;
 
 #endregion
 
-namespace RevitServerFolders {
+namespace RevitServerFolders.Export {
     public class ExportFilesToNavisworksCommand {
         public Application Application { get; set; }
 

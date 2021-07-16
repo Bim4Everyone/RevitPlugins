@@ -6,9 +6,11 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
 
+using dosymep.WPF.Commands;
+
 using pyRevitLabs.Json;
 
-namespace RevitServerFolders {
+namespace RevitServerFolders.Export {
     public class ExportNwcFileConfig {
         public bool WithRooms { get; set; }
         public bool WithSubFolders { get; set; }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -7,14 +6,14 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
 
-using dosymep.Revit.ServerClient;
 using dosymep.Views.Revit;
+using dosymep.WPF.Commands;
 
 using pyRevitLabs.Json;
 
 using RevitServerFolders.dosymep.Views.Revit;
 
-namespace RevitServerFolders {
+namespace RevitServerFolders.Export {
     public class ExportRvtFileConfig {
         public string ServerName { get; set; }
 
