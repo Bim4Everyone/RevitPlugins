@@ -68,6 +68,7 @@
   <ItemGroup>
     <Reference Include="dosymep.Revit">
       <HintPath>..\..\..\..\Users\biseuv_o\AppData\Roaming\pyRevit\Extensions\BIM4Everyone.lib\dosymep.Revit.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
