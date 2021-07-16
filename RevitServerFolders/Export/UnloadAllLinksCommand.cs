@@ -19,7 +19,7 @@ namespace RevitServerFolders.Export {
                 throw new InvalidOperationException("Перед использованием укажите папку с файлами Revit.");
             }
 
-            DocumentExtensions.UnloadAllLinks(Directory.GetFiles(SourceFolderName, ".rvt"));
+            DocumentExtensions.UnloadAllLinks(Directory.GetFiles(SourceFolderName, "*.rvt"));
         }
     }
 }
