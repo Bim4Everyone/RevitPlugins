@@ -62,6 +62,10 @@ namespace RevitServerFolders {
                         CleanTargetFolder = exportRvtFileViewModel.CleanTargetRvtFolder
                     }.Execute();
 
+                    new UnloadRevitLinksCommand() { 
+                        SourceFolderName = exportRvtFileViewModel.TargetRvtFolder 
+                    }.Execute();
+
                     if(exportRvtFileViewModel.WithNwcFiles) {
                         new ExportFilesToNavisworksCommand() {
                             Application = uiapp.Application,
@@ -101,6 +105,10 @@ namespace RevitServerFolders {
                         WithRooms = exportNwcFileViewModel.WithRooms,
                         WithSubFolders = exportNwcFileViewModel.WithSubFolders
                     });
+
+                    new UnloadRevitLinksCommand() {
+                        SourceFolderName = exportNwcFileViewModel.SourceNwcFolder
+                    }.Execute();
 
                     new ExportFilesToNavisworksCommand() {
                         Application = uiapp.Application,

@@ -44,11 +44,6 @@ namespace RevitServerFolders {
                 }
             }
 
-            new UnloadRevitLinksCommand() {
-                Application = Application,
-                SourceFolderName = SourceFolderName
-            }.Execute();
-
             Directory.CreateDirectory(TargetFolderName);
             foreach(string fileName in Directory.EnumerateFiles(SourceFolderName, "*.rvt")) {
                 var document = Application.OpenDocumentFile(fileName);
