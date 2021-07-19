@@ -19,6 +19,7 @@ namespace RevitServerFolders {
     [Transaction(TransactionMode.Manual)]
     public class ExportRvtFileCommand : IExternalCommand {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
+            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
             try {
                 var uiApplication = commandData.Application;
                 var application = uiApplication.Application;
@@ -45,6 +46,8 @@ namespace RevitServerFolders {
 #else
                 System.Windows.MessageBox.Show(ex.Message, "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
 #endif
+            } finally {
+                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
             }
 
             return Result.Succeeded;

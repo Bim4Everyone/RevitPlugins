@@ -98,6 +98,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppDomainExtensions.cs" />
     <Compile Include="dosymep\Async\AsyncHelper.cs" />
     <Compile Include="dosymep\JsonNetSerializer.cs" />
     <Compile Include="dosymep\Views\Revit\RevitServerExplorerWindow.xaml.cs">
