@@ -24,8 +24,14 @@ namespace Superfilter {
             _uiDocument = new UIDocument(document);
         }
 
-        public IList<Element> GetElements() {
+        public IList<Element> GetAllElements() {
             return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .ToElements();
+        }
+
+        public IList<Element> GetElements() {
+            return new FilteredElementCollector(_document, _document.ActiveView.Id)
                 .WhereElementIsNotElementType()
                 .ToElements();
         }
