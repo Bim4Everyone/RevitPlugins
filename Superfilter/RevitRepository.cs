@@ -27,18 +27,21 @@ namespace Superfilter {
         public IList<Element> GetAllElements() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
+                .WhereElementIsViewIndependent()
                 .ToElements();
         }
 
         public IList<Element> GetElements() {
             return new FilteredElementCollector(_document, _document.ActiveView.Id)
                 .WhereElementIsNotElementType()
+                .WhereElementIsViewIndependent()
                 .ToElements();
         }
 
         public IList<Element> GetElements(View view) {
             return new FilteredElementCollector(_document, view.Id)
                 .WhereElementIsNotElementType()
+                .WhereElementIsViewIndependent()
                 .ToElements();
         }
 
