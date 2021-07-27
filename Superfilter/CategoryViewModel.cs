@@ -19,8 +19,8 @@ namespace Superfilter {
         public Category Category { get; }
         public ObservableCollection<Element> Elements { get; }
         
-        public string Name { 
-            get => Category.Name;
+        public string Name {
+            get => $"{Category?.Name ?? "Без категории"} [{Elements.Count}]";
         }
 
         public bool Selected {

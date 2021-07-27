@@ -13,7 +13,7 @@ namespace Superfilter {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
             AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
             try {
-                var viewModel = new RevitViewModel(commandData.Application.Application, commandData.Application.ActiveUIDocument.Document);
+                var viewModel = new SuperfilterViewModel(commandData.Application.Application, commandData.Application.ActiveUIDocument.Document);
 
                 var window = new MainWindow() { DataContext = viewModel };
                 new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };

@@ -27,21 +27,16 @@ namespace Superfilter {
         public IList<Element> GetAllElements() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
-                .WhereElementIsViewIndependent()
                 .ToElements();
         }
 
         public IList<Element> GetElements() {
-            return new FilteredElementCollector(_document, _document.ActiveView.Id)
-                .WhereElementIsNotElementType()
-                .WhereElementIsViewIndependent()
-                .ToElements();
+            return GetElements(_document.ActiveView);
         }
 
         public IList<Element> GetElements(View view) {
             return new FilteredElementCollector(_document, view.Id)
                 .WhereElementIsNotElementType()
-                .WhereElementIsViewIndependent()
                 .ToElements();
         }
 
@@ -59,7 +54,29 @@ namespace Superfilter {
         }
 
         public IList<Category> GetCategories(IEnumerable<Element> elements) {
-            return elements.Select(item => item.Category).Distinct().ToList();
+            return elements.Select(item => item.Category).Distinct(new CategoryComparer()).ToList();
+        }
+
+        public void SetSelectedElements(IEnumerable<Element> elements) {
+            _uiDocument.Selection.SetElementIds(elements.Select(item => item.Id).ToList());
+        }
+    }
+
+    internal class CategoryComparer : IEqualityComparer<Category> {
+        public bool Equals(Category x, Category y) {
+            if(x == null && y == null) {
+                return true;
+            }
+
+            if(x == null || y == null) {
+                return false;
+            }
+
+            return x.Name.Equals(y.Name);
+        }
+
+        public int GetHashCode(Category obj) {
+            return obj?.Name.GetHashCode() ?? 0;
         }
     }
 }

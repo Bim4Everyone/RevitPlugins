@@ -5,9 +5,21 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Superfilter"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             Height="450" Width="400" WindowStartupLocation="CenterOwner" Title="Суперфильтр">
     <Grid>
-        <ListBox ItemsSource="{Binding CategoryViewModels}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ComboBox Grid.Row="0" Margin="10" ItemsSource="{Binding RevitViewModels}" SelectedItem="{Binding RevitViewModel}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <ListBox Grid.Row="1" Margin="10,0,10,10" ItemsSource="{Binding RevitViewModel.CategoryViewModels}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
@@ -16,5 +28,9 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="ОК" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding RevitViewModel.SelectElements}"/>
+            <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
+        </StackPanel>
     </Grid>
 </Window>
