@@ -47,7 +47,11 @@ namespace PlatformSettings.SharedParams {
         private readonly SharedParamsConfig _sharedParamsConfig;
 
         public SharedParamsSettingsViewModel() {
-            Path = new System.IO.FileInfo(pyRevitLabs.PyRevit.PyRevitConfigs.GetConfigFile().GetValue("PlatformSettings", "SharedParamsPath").Trim('\"')).FullName;
+            string sharedParamsPath = pyRevitLabs.PyRevit.PyRevitConfigs.GetConfigFile().GetValue("PlatformSettings", "SharedParamsPath");
+            if(!string.IsNullOrEmpty(sharedParamsPath)) {
+                Path = new System.IO.FileInfo(sharedParamsPath.Trim('\"')).FullName;
+            }
+
             _sharedParamsConfig = SharedParamsConfig.Load(Path);
 
             Name = "Общие параметры";
