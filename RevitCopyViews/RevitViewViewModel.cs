@@ -11,7 +11,7 @@ using dosymep.Revit;
 namespace RevitCopyViews {
     internal class RevitViewViewModel : BaseViewModel {
         private readonly View _view;
-        private string _delimeter;
+        private Delimiter _delimeter;
         private string _prefix;
         private string _viewName;
 
@@ -24,7 +24,7 @@ namespace RevitCopyViews {
         public string GroupViews { get; }
         public string OriginalName { get; }
 
-        public string Delimeter {
+        public Delimiter Delimeter {
             get => _delimeter;
             set {
                 _delimeter = value;
@@ -50,8 +50,8 @@ namespace RevitCopyViews {
             }
         }
 
-        private void Reload(string delimeter) {
-            int index = OriginalName.IndexOf(delimeter);
+        private void Reload(Delimiter delimeter) {
+            int index = OriginalName.IndexOf(delimeter.Value);
             Prefix = OriginalName.Substring(0, index);
             ViewName = OriginalName.Substring(index, OriginalName.Length);
         }

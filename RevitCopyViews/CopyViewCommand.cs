@@ -24,9 +24,10 @@ namespace RevitCopyViews {
                 var selectedViews = uiDocument.Selection.GetElementIds().Select(item => document.GetElement(item)).OfType<View>().ToList();
                 if(selectedViews.Count == 0) {
                     TaskDialog.Show("Предупреждение!", "Выберите виды, которые требуется переименовать.");
+                    return Result.Succeeded;
                 }
 
-                var window = new CopyViewWindow();
+                var window = new CopyViewWindow() { DataContext = new CopyViewViewModel(selectedViews) };
                 new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
 
                 window.ShowDialog();

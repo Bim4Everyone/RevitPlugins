@@ -64,6 +64,7 @@
     <Compile Include="AppDomainExtensions.cs" />
     <Compile Include="BaseViewModel.cs" />
     <Compile Include="CopyViewCommand.cs" />
+    <Compile Include="CopyViewViewModel.cs" />
     <Compile Include="CopyViewWindow.xaml.cs">
       <DependentUpon>CopyViewWindow.xaml</DependentUpon>
     </Compile>
