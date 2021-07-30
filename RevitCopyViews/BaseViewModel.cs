@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Superfilter {
+namespace RevitCopyViews {
     internal class BaseViewModel : INotifyPropertyChanged {
         public event PropertyChangedEventHandler PropertyChanged;
 
