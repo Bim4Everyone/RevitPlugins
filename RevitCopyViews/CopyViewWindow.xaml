@@ -5,13 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RevitCopyViews"
              mc:Ignorable="d" 
-             Height="350" Width="400" WindowStartupLocation="CenterOwner" Title="Копирование видов" ResizeMode="NoResize">
+             Height="340" Width="400" WindowStartupLocation="CenterOwner" Title="Копирование видов" ResizeMode="NoResize">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="45"/>
         </Grid.RowDefinitions>
 
@@ -20,22 +21,24 @@
             <ComboBox Margin="10,0,10,0" ItemsSource="{Binding Delimeters}" SelectedItem="{Binding Delimeter}" />
         </StackPanel>
 
-        <StackPanel Grid.Row="1">
+        <CheckBox Grid.Row="1" Margin="10,10,10,10" Content="Копировать с детализацией" IsChecked="{Binding CopyWithDetail}" />
+
+        <StackPanel Grid.Row="2">
             <TextBlock Margin="10" Text="Префикс"/>
             <ComboBox Margin="10,0,10,0" ItemsSource="{Binding Prefixes}" Text="{Binding Prefix}" IsEditable="True" />
         </StackPanel>
 
-        <StackPanel Grid.Row="2">
+        <StackPanel Grid.Row="3">
             <TextBlock Margin="10" Text="Группы видов"/>
             <ComboBox Margin="10,0,10,0" ItemsSource="{Binding GroupViews}" Text="{Binding GroupView}" IsEditable="True" />
         </StackPanel>
 
-        <StackPanel Grid.Row="3">
+        <StackPanel Grid.Row="4">
             <TextBlock Margin="10" Text="Суффикс"/>
             <TextBox Margin="10,0,10,0" Text="{Binding Suffix}"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
             <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80" Command="{Binding CopyViewsCommand}" />
             <Button Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80"/>

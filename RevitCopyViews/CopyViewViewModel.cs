@@ -24,6 +24,7 @@ namespace RevitCopyViews {
 
         private ObservableCollection<string> _prefixes;
         private ObservableCollection<string> _groupViews;
+        private bool _copyWithDetail;
 
         public CopyViewViewModel(List<View> selectedViews) {
             _selectedViews = selectedViews;
@@ -38,6 +39,7 @@ namespace RevitCopyViews {
 
             Delimeter = Delimeters.FirstOrDefault();
 
+            CopyWithDetail = true;
             CopyViewsCommand = new RelayCommand(CopyViews, CanCopyViews);
         }
 
@@ -45,6 +47,14 @@ namespace RevitCopyViews {
         public Application Application { get; set; }
 
         public ICommand CopyViewsCommand { get; }
+
+        public bool CopyWithDetail {
+            get => _copyWithDetail;
+            set {
+                _copyWithDetail = value;
+                OnPropertyChanged(nameof(CopyWithDetail));
+            }
+        }
 
         public string Prefix {
             get => _prefix;
@@ -119,7 +129,9 @@ namespace RevitCopyViews {
                 transaction.Start("Копирование видов");
 
                 foreach(RevitViewViewModel revitView in RevitViewViewModels) {
-                    View newView = (View) Document.GetElement(revitView.Duplicate(ViewDuplicateOption.Duplicate));
+                    var option = CopyWithDetail ? ViewDuplicateOption.WithDetailing : ViewDuplicateOption.Duplicate;
+                    
+                    View newView = (View) Document.GetElement(revitView.Duplicate(option));
                     newView.Name = string.Join(Delimeter.Value, Prefix, revitView.ViewName, Suffix);
 
                     // У некоторых видов установлен шаблон,
