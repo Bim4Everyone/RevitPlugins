@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,8 @@ using System.Windows.Interop;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+
+using dosymep.Revit;
 
 namespace RevitCopyViews {
     [Transaction(TransactionMode.Manual)]
@@ -27,7 +30,17 @@ namespace RevitCopyViews {
                     return Result.Succeeded;
                 }
 
-                var window = new CopyViewWindow() { DataContext = new CopyViewViewModel(selectedViews) };
+                var views = new FilteredElementCollector(document).OfClass(typeof(View)).ToElements();
+                var groupViews = new ObservableCollection<string>(views.Select(item => (string) item.GetParamValueOrDefault("_Группа Видов")).Distinct());
+                var groupView = groupViews.FirstOrDefault();
+
+                var window = new CopyViewWindow() {
+                    DataContext = new CopyViewViewModel(selectedViews) {
+                        GroupView = groupView,
+                        GroupViews = groupViews
+                    }
+                };
+
                 new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
 
                 window.ShowDialog();
