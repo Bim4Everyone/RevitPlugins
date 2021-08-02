@@ -17,11 +17,11 @@ namespace RevitCopyViews {
 
         public RevitViewViewModel(View view) {
             _view = view;
-            GroupViews = (string) _view.GetParamValueOrDefault("_Группа Видов");
+            GroupView = (string) _view.GetParamValueOrDefault("_Группа Видов");
             OriginalName = _view.Name;
         }
 
-        public string GroupViews { get; }
+        public string GroupView { get; }
         public string OriginalName { get; }
 
         public Delimiter Delimeter {
@@ -53,7 +53,7 @@ namespace RevitCopyViews {
         private void Reload(Delimiter delimeter) {
             int index = OriginalName.IndexOf(delimeter.Value);
             Prefix = OriginalName.Substring(0, index);
-            ViewName = OriginalName.Substring(index, OriginalName.Length);
+            ViewName = OriginalName.Substring(index, OriginalName.Length - index);
         }
     }
 }
