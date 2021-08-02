@@ -11,9 +11,10 @@ using dosymep.Revit;
 namespace RevitCopyViews {
     internal class RevitViewViewModel : BaseViewModel {
         private readonly View _view;
-        private Delimiter _delimeter;
+
         private string _prefix;
         private string _viewName;
+        private Delimiter _delimeter;
 
         public RevitViewViewModel(View view) {
             _view = view;
@@ -53,7 +54,13 @@ namespace RevitCopyViews {
         private void Reload(Delimiter delimeter) {
             int index = OriginalName.IndexOf(delimeter.Value);
             Prefix = OriginalName.Substring(0, index);
+
+            index += delimeter.Value.Length;
             ViewName = OriginalName.Substring(index, OriginalName.Length - index);
+        }
+
+        public ElementId Duplicate(ViewDuplicateOption option) {
+            return _view.Duplicate(option);
         }
     }
 }

@@ -22,12 +22,12 @@
 
         <StackPanel Grid.Row="1">
             <TextBlock Margin="10" Text="Префикс"/>
-            <ComboBox Margin="10,0,10,0" ItemsSource="{Binding Prefixes}" SelectedItem="{Binding Prefix}" IsEditable="True" />
+            <ComboBox Margin="10,0,10,0" ItemsSource="{Binding Prefixes}" Text="{Binding Prefix}" IsEditable="True" />
         </StackPanel>
 
         <StackPanel Grid.Row="2">
             <TextBlock Margin="10" Text="Группы видов"/>
-            <ComboBox Margin="10,0,10,0" ItemsSource="{Binding GroupViews}" SelectedItem="{Binding GroupView}" IsEditable="True" />
+            <ComboBox Margin="10,0,10,0" ItemsSource="{Binding GroupViews}" Text="{Binding GroupView}" IsEditable="True" />
         </StackPanel>
 
         <StackPanel Grid.Row="3">
@@ -36,7 +36,8 @@
         </StackPanel>
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80"/>
+            <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
+            <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80" Command="{Binding CopyViewsCommand}" />
             <Button Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80"/>
         </StackPanel>
     </Grid>

@@ -4,22 +4,29 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
+using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
+
+using dosymep.Revit;
+using dosymep.WPF.Commands;
 
 namespace RevitCopyViews {
     internal class CopyViewViewModel : BaseViewModel {
-        public List<View> _selectedViews;
         private Delimiter _delimeter;
-        private ObservableCollection<string> _prefixes;
+        private List<View> _selectedViews;
+
         private string _prefix;
         private string _suffix;
         private string _groupView;
+        private string _errorText;
+
+        private ObservableCollection<string> _prefixes;
         private ObservableCollection<string> _groupViews;
 
         public CopyViewViewModel(List<View> selectedViews) {
             _selectedViews = selectedViews;
-
 
             Prefixes = new ObservableCollection<string>();
             RevitViewViewModels = new ObservableCollection<RevitViewViewModel>(_selectedViews.Select(item => new RevitViewViewModel(item)));
@@ -30,7 +37,14 @@ namespace RevitCopyViews {
             };
 
             Delimeter = Delimeters.FirstOrDefault();
+
+            CopyViewsCommand = new RelayCommand(CopyViews, CanCopyViews);
         }
+
+        public Document Document { get; set; }
+        public Application Application { get; set; }
+
+        public ICommand CopyViewsCommand { get; }
 
         public string Prefix {
             get => _prefix;
@@ -90,6 +104,54 @@ namespace RevitCopyViews {
         }
 
         public ObservableCollection<RevitViewViewModel> RevitViewViewModels { get; }
+
+
+        public string ErrorText {
+            get => _errorText;
+            set {
+                _errorText = value;
+                OnPropertyChanged(nameof(ErrorText));
+            }
+        }
+
+        private void CopyViews(object p) {
+            using(var transaction = new Transaction(Document)) {
+                transaction.Start("Копирование видов");
+
+                foreach(RevitViewViewModel revitView in RevitViewViewModels) {
+                    View newView = (View) Document.GetElement(revitView.Duplicate(ViewDuplicateOption.Duplicate));
+                    newView.Name = string.Join(Delimeter.Value, Prefix, revitView.ViewName, Suffix);
+
+                    // У некоторых видов установлен шаблон,
+                    // у которого заблокировано редактирование атрибута "_Группа Видов"
+                    // удаление шаблона разрешает изменение данного атрибута
+                    newView.ViewTemplateId = ElementId.InvalidElementId;
+                    newView.SetParamValue("_Группа Видов", GroupView);
+                }
+
+                transaction.Commit();
+            }
+        }
+
+        private bool CanCopyViews(object p) {
+            if(Delimeter == null) {
+                ErrorText = "Не выбран разделитель для префикса.";
+                return false;
+            }
+
+            if(string.IsNullOrEmpty(Prefix)) {
+                ErrorText = "Не заполнен префикс.";
+                return false;
+            }
+
+            if(string.IsNullOrEmpty(GroupView)) {
+                ErrorText = "Не заполнена группа видов.";
+                return false;
+            }
+
+            ErrorText = null;
+            return true;
+        }
     }
 
     internal class Delimiter {
