@@ -132,7 +132,11 @@ namespace RevitCopyViews {
                     var option = CopyWithDetail ? ViewDuplicateOption.WithDetailing : ViewDuplicateOption.Duplicate;
                     
                     View newView = (View) Document.GetElement(revitView.Duplicate(option));
-                    newView.Name = string.Join(Delimeter.Value, Prefix, revitView.ViewName, Suffix);
+                    if(string.IsNullOrEmpty(Suffix)) {
+                        newView.Name = string.Join(Delimeter.Value, Prefix, revitView.ViewName);
+                    } else {
+                        newView.Name = string.Join(Delimeter.Value, Prefix, revitView.ViewName, Suffix);
+                    }
 
                     // У некоторых видов установлен шаблон,
                     // у которого заблокировано редактирование атрибута "_Группа Видов"
