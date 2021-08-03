@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.WPF.ViewModels;
 
-namespace RevitCopyViews {
+namespace RevitCopyViews.ViewModels {
     internal class RevitViewViewModel : BaseViewModel {
         private readonly View _view;
 

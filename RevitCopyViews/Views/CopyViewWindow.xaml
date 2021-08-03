@@ -1,9 +1,9 @@
-﻿<Window x:Class="RevitCopyViews.CopyViewWindow"
+﻿<Window x:Class="RevitCopyViews.Views.CopyViewWindow"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:RevitCopyViews"
+             xmlns:local="clr-namespace:RevitCopyViews.ViewModels"
              mc:Ignorable="d" 
              Height="340" Width="400" WindowStartupLocation="CenterOwner" Title="Копирование видов" ResizeMode="NoResize">
     <Grid>

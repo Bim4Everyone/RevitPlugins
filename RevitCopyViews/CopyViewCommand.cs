@@ -10,7 +10,11 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep;
 using dosymep.Revit;
+
+using RevitCopyViews.ViewModels;
+using RevitCopyViews.Views;
 
 namespace RevitCopyViews {
     [Transaction(TransactionMode.Manual)]

@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RevitCopyViews {
+namespace dosymep {
     internal class AppDomainExtensions {
         public static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args) {
             var assemblyName = new AssemblyName(args.Name);

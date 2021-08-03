@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace RevitCopyViews {
+namespace RevitCopyViews.Views {
     /// <summary>
     /// Interaction logic for CopyViewWindow.xaml
     /// </summary>

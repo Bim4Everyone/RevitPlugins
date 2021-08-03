@@ -11,8 +11,9 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 using dosymep.WPF.Commands;
+using dosymep.WPF.ViewModels;
 
-namespace RevitCopyViews {
+namespace RevitCopyViews.ViewModels {
     internal class CopyViewViewModel : BaseViewModel {
         private Delimiter _delimeter;
         private List<View> _selectedViews;
