@@ -14,6 +14,7 @@ namespace RevitCopyViews.ViewModels {
         private readonly View _view;
 
         private string _prefix;
+        private string _suffix;
         private string _viewName;
         private Delimiter _delimeter;
 
@@ -32,7 +33,7 @@ namespace RevitCopyViews.ViewModels {
                 _delimeter = value;
                 OnPropertyChanged(nameof(Delimeter));
 
-                Reload(Delimeter);
+                SplitName(Delimeter);
             }
         }
 
@@ -52,12 +53,23 @@ namespace RevitCopyViews.ViewModels {
             }
         }
 
-        private void Reload(Delimiter delimeter) {
+        public string Suffix {
+            get => _suffix;
+            set {
+                _suffix = value;
+                OnPropertyChanged(nameof(Suffix));
+            }
+        }
+
+        private void SplitName(Delimiter delimeter) {
             int index = OriginalName.IndexOf(delimeter.Value);
             Prefix = OriginalName.Substring(0, index);
 
             index += delimeter.Value.Length;
             ViewName = OriginalName.Substring(index, OriginalName.Length - index);
+
+            index = OriginalName.LastIndexOf(delimeter.Value);
+            Suffix = OriginalName.Substring(index, OriginalName.Length - index);
         }
 
         public ElementId Duplicate(ViewDuplicateOption option) {
