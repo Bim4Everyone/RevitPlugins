@@ -6,11 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace dosymep.WPF.ViewModels {
-    internal class BaseViewModel : INotifyPropertyChanged {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged(string propertyName) {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+    internal class BaseViewModel : ReactiveUI.ReactiveObject {
     }
 }

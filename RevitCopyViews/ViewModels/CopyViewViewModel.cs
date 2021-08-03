@@ -13,6 +13,8 @@ using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using ReactiveUI;
+
 namespace RevitCopyViews.ViewModels {
     internal class CopyViewViewModel : BaseViewModel {
         private Delimiter _delimeter;
@@ -51,50 +53,34 @@ namespace RevitCopyViews.ViewModels {
 
         public bool CopyWithDetail {
             get => _copyWithDetail;
-            set {
-                _copyWithDetail = value;
-                OnPropertyChanged(nameof(CopyWithDetail));
-            }
+            set => this.RaiseAndSetIfChanged(ref _copyWithDetail, value);
         }
 
         public string Prefix {
             get => _prefix;
-            set {
-                _prefix = value;
-                OnPropertyChanged(nameof(Prefix));
-            }
+            set => this.RaiseAndSetIfChanged(ref _prefix, value);
         }
 
         public string Suffix {
             get => _suffix;
-            set {
-                _suffix = value;
-                OnPropertyChanged(nameof(Suffix));
-            }
+            set => this.RaiseAndSetIfChanged(ref _suffix, value);
         }
 
         public string GroupView {
             get => _groupView;
-            set {
-                _groupView = value;
-                OnPropertyChanged(nameof(GroupView));
+            set {this.RaiseAndSetIfChanged(ref _groupView, value);
             }
         }
 
         public ObservableCollection<string> GroupViews {
             get => _groupViews;
-            set {
-                _groupViews = value;
-                OnPropertyChanged(nameof(GroupViews));
-            }
+            set => this.RaiseAndSetIfChanged(ref _groupViews, value);
         }
 
         public Delimiter Delimeter {
             get => _delimeter;
             set {
-                _delimeter = value;
-                OnPropertyChanged(nameof(Delimeter));
-
+                this.RaiseAndSetIfChanged(ref _delimeter, value);
                 foreach(RevitViewViewModel revitView in RevitViewViewModels) {
                     revitView.Delimeter = Delimeter;
                 }
@@ -108,10 +94,7 @@ namespace RevitCopyViews.ViewModels {
 
         public ObservableCollection<string> Prefixes {
             get => _prefixes;
-            private set {
-                _prefixes = value;
-                OnPropertyChanged(nameof(Prefixes));
-            }
+            private set => this.RaiseAndSetIfChanged(ref _prefixes, value);
         }
 
         public ObservableCollection<RevitViewViewModel> RevitViewViewModels { get; }
@@ -119,10 +102,7 @@ namespace RevitCopyViews.ViewModels {
 
         public string ErrorText {
             get => _errorText;
-            set {
-                _errorText = value;
-                OnPropertyChanged(nameof(ErrorText));
-            }
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
         private void CopyViews(object p) {

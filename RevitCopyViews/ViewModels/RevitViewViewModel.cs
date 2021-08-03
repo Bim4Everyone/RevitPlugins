@@ -9,6 +9,8 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
+using ReactiveUI;
+
 namespace RevitCopyViews.ViewModels {
     internal class RevitViewViewModel : BaseViewModel {
         private readonly View _view;
@@ -31,7 +33,7 @@ namespace RevitCopyViews.ViewModels {
             get => _delimeter;
             set {
                 _delimeter = value;
-                OnPropertyChanged(nameof(Delimeter));
+                this.RaiseAndSetIfChanged(ref _delimeter, value);
 
                 SplitName(Delimeter);
             }
@@ -39,26 +41,17 @@ namespace RevitCopyViews.ViewModels {
 
         public string Prefix {
             get => _prefix;
-            private set {
-                _prefix = value;
-                OnPropertyChanged(nameof(Prefix));
-            }
+            private set => this.RaiseAndSetIfChanged(ref _prefix, value);
         }
 
         public string ViewName {
             get => _viewName;
-            private set {
-                _viewName = value;
-                OnPropertyChanged(nameof(ViewName));
-            }
+            private set => this.RaiseAndSetIfChanged(ref _viewName, value);
         }
 
         public string Suffix {
             get => _suffix;
-            set {
-                _suffix = value;
-                OnPropertyChanged(nameof(Suffix));
-            }
+            set => this.RaiseAndSetIfChanged(ref _suffix, value);
         }
 
         private void SplitName(Delimiter delimeter) {
