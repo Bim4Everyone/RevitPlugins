@@ -26,7 +26,7 @@
 
         <StackPanel Grid.ColumnSpan="2" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
-            <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80" Command="{Binding CopyViewsCommand}" />
+            <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80" Command="{Binding CopyUserCommand}" />
             <Button Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80"/>
         </StackPanel>
     </Grid>

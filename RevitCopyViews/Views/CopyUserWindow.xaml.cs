@@ -21,5 +21,13 @@ namespace RevitCopyViews.Views {
         public CopyUserWindow() {
             InitializeComponent();
         }
+
+        private void ButtonOk_Click(object sender, RoutedEventArgs e) {
+            DialogResult = true;
+        }
+
+        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
+            DialogResult = false;
+        }
     }
 }

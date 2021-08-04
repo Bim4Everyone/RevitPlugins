@@ -84,6 +84,7 @@
     <Compile Include="dosymep\AppDomainExtensions.cs" />
     <Compile Include="dosymep\BaseViewModel.cs" />
     <Compile Include="CopyViewCommand.cs" />
+    <Compile Include="ViewModels\CopyUserViewModel.cs" />
     <Compile Include="ViewModels\CopyViewViewModel.cs" />
     <Compile Include="ViewModels\Delimiter.cs" />
     <Compile Include="Views\CopyUserWindow.xaml.cs">
