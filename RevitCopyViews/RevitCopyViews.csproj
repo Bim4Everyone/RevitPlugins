@@ -81,6 +81,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CopyUserCommand.cs" />
     <Compile Include="dosymep\AppDomainExtensions.cs" />
     <Compile Include="dosymep\BaseViewModel.cs" />
     <Compile Include="CopyViewCommand.cs" />
