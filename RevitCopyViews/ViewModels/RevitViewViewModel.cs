@@ -37,7 +37,7 @@ namespace RevitCopyViews.ViewModels {
                 || view.ViewType == ViewType.AreaPlan
                 || view.ViewType == ViewType.EngineeringPlan) {
 
-                Elevation = view.GenLevel.Elevation.ToString("0.###", CultureInfo.InvariantCulture);
+                Elevation = view.GenLevel.Elevation.ToString("N3", CultureInfo.InvariantCulture);
             }
         }
         
