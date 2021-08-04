@@ -5,10 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RevitCopyViews.ViewModels"
              mc:Ignorable="d" 
-             Height="440" Width="480" WindowStartupLocation="CenterOwner" Title="Копирование видов">
+             Height="380" Width="480" WindowStartupLocation="CenterOwner" Title="Копирование видов">
     <Grid>        
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -16,34 +15,29 @@
             <RowDefinition Height="45"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" >
-            <TextBlock Margin="10" Text="Разделитель"/>
-            <ComboBox Margin="10,0,10,0" ItemsSource="{Binding Delimeters}" SelectedItem="{Binding Delimeter}" />
-        </StackPanel>
-
-        <StackPanel Grid.Row="1" Orientation="Horizontal">
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
             <CheckBox Margin="10,10,10,10" Content="Копировать с детализацией" IsChecked="{Binding CopyWithDetail}" />
             <CheckBox Margin="10,10,10,10" Content="With Elevation" IsChecked="{Binding WithElevation}" />
         </StackPanel>
 
-        <StackPanel Grid.Row="2">
+        <StackPanel Grid.Row="1">
             <TextBlock Margin="10" Text="Префикс"/>
             <CheckBox Margin="10,0,10,10" Content="Заменить" IsChecked="{Binding ReplacePrefix}" />
             <ComboBox Margin="10,0,10,0" ItemsSource="{Binding Prefixes}" Text="{Binding Prefix}" IsEditable="True" />
         </StackPanel>
 
-        <StackPanel Grid.Row="3">
+        <StackPanel Grid.Row="2">
             <TextBlock Margin="10" Text="Группы видов"/>
             <ComboBox Margin="10,0,10,0" ItemsSource="{Binding GroupViews}" Text="{Binding GroupView}" IsEditable="True" />
         </StackPanel>
 
-        <StackPanel Grid.Row="4">
+        <StackPanel Grid.Row="3">
             <TextBlock Margin="10" Text="Суффикс"/>
             <CheckBox Margin="10,0,10,10" Content="Заменить" IsChecked="{Binding ReplaceSuffix}" />
             <ComboBox Margin="10,0,10,0" ItemsSource="{Binding Suffixes}" Text="{Binding Suffix}" IsEditable="True" />
         </StackPanel>
 
-        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
             <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80" Command="{Binding CopyViewsCommand}" />
             <Button Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80"/>

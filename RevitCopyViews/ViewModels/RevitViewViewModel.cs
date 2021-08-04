@@ -19,7 +19,6 @@ namespace RevitCopyViews.ViewModels {
         private string _suffix;
         private string _elevations;
         private string _viewName;
-        private Delimiter _delimeter;
 
         public RevitViewViewModel(View view) {
             _view = view;
@@ -33,21 +32,13 @@ namespace RevitCopyViews.ViewModels {
 
                 Elevation = view.GenLevel.Elevation.ToString("N3", CultureInfo.InvariantCulture);
             }
+            
+            SplitName();
         }
-        
+
         public string GroupView { get; }
         public string Elevation { get; }
         public string OriginalName { get; }
-
-        public Delimiter Delimeter {
-            get => _delimeter;
-            set {
-                this.RaiseAndSetIfChanged(ref _delimeter, value);
-                if(_delimeter != null) {
-                    SplitName(_delimeter);
-                }
-            }
-        }
 
         public string Prefix {
             get => _prefix;
@@ -69,17 +60,17 @@ namespace RevitCopyViews.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _suffix, value);
         }
 
-        public SplittedViewName SplitName(Delimiter delimeter, SplitViewOptions splitViewOptions) {
-            return delimeter.SplitViewName(OriginalName, splitViewOptions);
-        }
-
-        private void SplitName(Delimiter delimeter) {
-            SplittedViewName splittedViewName = SplitName(delimeter, _defaultSplitViewOptions);
+        public void SplitName() {
+            SplittedViewName splittedViewName = SplitName(_defaultSplitViewOptions);
 
             Prefix = splittedViewName.Prefix;
             ViewName = splittedViewName.ViewName;
             Elevations = splittedViewName.Elevations;
             Suffix = splittedViewName.Suffix;
+        }
+
+        public SplittedViewName SplitName(SplitViewOptions splitViewOptions) {
+            return Delimiter.SplitViewName(OriginalName, splitViewOptions);
         }
 
         public ElementId Duplicate(ViewDuplicateOption option) {
