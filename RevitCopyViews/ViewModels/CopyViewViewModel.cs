@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
 
@@ -173,9 +174,16 @@ namespace RevitCopyViews.ViewModels {
             SplittedViewName splittedViewName = revitView.SplitName(splitViewOptions);
             splittedViewName.Prefix = Prefix;
             splittedViewName.Suffix = Suffix;
-            splittedViewName.Elevations = WithElevation ? revitView.Elevation : null;
+            splittedViewName.Elevations = WithElevation ? GetElevation(revitView) : null;
 
             return Delimiter.CreateViewName(splittedViewName);
+        }
+
+        private string GetElevation(RevitViewViewModel revitView) {
+            var cultureInfo = (CultureInfo) CultureInfo.GetCultureInfo("ru-Ru").Clone();
+            cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
+
+            return UnitUtils.ConvertFromInternalUnits(revitView.Elevation, Document.GetUnits().GetFormatOptions(UnitType.UT_Length).DisplayUnits).ToString("F3", cultureInfo);
         }
 
         private bool CanCopyViews(object p) {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,14 +28,14 @@ namespace RevitCopyViews.ViewModels {
                 || view.ViewType == ViewType.AreaPlan
                 || view.ViewType == ViewType.EngineeringPlan) {
 
-                Elevation = view.GenLevel.Elevation.ToString("N3", CultureInfo.InvariantCulture);
+                Elevation = view.GenLevel.Elevation;
             }
             
             SplitName();
         }
 
         public string GroupView { get; }
-        public string Elevation { get; }
+        public double Elevation { get; }
         public string OriginalName { get; }
 
         public string Prefix {
