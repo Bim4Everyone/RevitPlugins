@@ -26,12 +26,12 @@ namespace RevitCopyViews.ViewModels {
                 originalName = originalName.Replace(elevations ?? string.Empty, string.Empty);
             }
 
-            string prefix = splitViewOptions.ReplacePrefix ? null : GetPrefix(originalName)?.Trim().Trim('_');
+            string prefix = splitViewOptions.ReplacePrefix ? GetPrefix(originalName)?.Trim().Trim('_'): null;
             if(!string.IsNullOrEmpty(prefix)) {
                 originalName = originalName.Replace(prefix ?? string.Empty, string.Empty);
             }
 
-            string suffix = splitViewOptions.ReplaceSuffix ? null : GetSuffix(originalName)?.Trim().Trim('_');
+            string suffix = splitViewOptions.ReplaceSuffix ? GetSuffix(originalName)?.Trim().Trim('_') : null;
             if(!string.IsNullOrEmpty(suffix)) {
                 originalName = originalName.Replace(suffix ?? string.Empty, string.Empty);
             }

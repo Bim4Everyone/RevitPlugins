@@ -15,7 +15,7 @@ using ReactiveUI;
 namespace RevitCopyViews.ViewModels {
     internal class RevitViewViewModel : BaseViewModel {
         private readonly View _view;
-        private readonly SplitViewOptions _defaultSplitViewOptions = new SplitViewOptions() { ReplacePrefix = false, ReplaceSuffix = false };
+        private readonly SplitViewOptions _defaultSplitViewOptions = new SplitViewOptions() { ReplacePrefix = true, ReplaceSuffix = false };
 
         private string _prefix;
         private string _suffix;

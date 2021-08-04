@@ -21,7 +21,10 @@
             <ComboBox Margin="10,0,10,0" ItemsSource="{Binding Delimeters}" SelectedItem="{Binding Delimeter}" />
         </StackPanel>
 
-        <CheckBox Grid.Row="1" Margin="10,10,10,10" Content="Копировать с детализацией" IsChecked="{Binding CopyWithDetail}" />
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <CheckBox Margin="10,10,10,10" Content="Копировать с детализацией" IsChecked="{Binding CopyWithDetail}" />
+            <CheckBox Margin="10,10,10,10" Content="With Elevation" IsChecked="{Binding WithElevation}" />
+        </StackPanel>
 
         <StackPanel Grid.Row="2">
             <TextBlock Margin="10" Text="Префикс"/>

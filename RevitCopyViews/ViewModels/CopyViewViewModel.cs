@@ -29,6 +29,7 @@ namespace RevitCopyViews.ViewModels {
         private bool _copyWithDetail;
         private bool _replacePrefix;
         private bool _replaceSuffix;
+        private bool _withElevation;
 
         public CopyViewViewModel(List<View> selectedViews) {
             _selectedViews = selectedViews;
@@ -73,6 +74,11 @@ namespace RevitCopyViews.ViewModels {
         public bool ReplaceSuffix {
             get => _replaceSuffix;
             set => this.RaiseAndSetIfChanged(ref _replaceSuffix, value);
+        }
+
+        public bool WithElevation { 
+            get => _withElevation;
+            set => this.RaiseAndSetIfChanged(ref _withElevation, value);
         }
 
         public bool CopyWithDetail {
@@ -140,7 +146,7 @@ namespace RevitCopyViews.ViewModels {
 
                     list.Add(splittedViewName.ViewName);
 
-                    if(!string.IsNullOrEmpty(revitView.Elevation)) {
+                    if(WithElevation && !string.IsNullOrEmpty(revitView.Elevation)) {
                         list.Add(revitView.Elevation);
                     }
 
