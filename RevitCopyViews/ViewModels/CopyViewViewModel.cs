@@ -7,6 +7,7 @@ using System.Windows.Input;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -142,6 +143,7 @@ namespace RevitCopyViews.ViewModels {
         }
 
         private void CopyViews(object p) {
+            ProjectParameters.Create(Application).SetupBrowserOrganization(Document);
             using(var transaction = new Transaction(Document)) {
                 transaction.Start("Копирование видов");
 
