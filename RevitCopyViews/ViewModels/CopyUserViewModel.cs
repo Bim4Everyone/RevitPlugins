@@ -5,6 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+using Autodesk.Revit.ApplicationServices;
+using Autodesk.Revit.DB;
+
+using dosymep.Bim4Everyone.Templates;
+using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -18,6 +23,10 @@ namespace RevitCopyViews.ViewModels {
             CopyUserCommand = new RelayCommand(CopyUser, CanCopyUser);
         }
 
+        public Document Document { get; set; }
+        public Application Application { get; set; }
+
+        public List<View> Views { get; set; }
         public List<string> GroupViews { get; set; }
         public List<string> RestrictedViewNames { get; set; }
 
@@ -32,7 +41,7 @@ namespace RevitCopyViews.ViewModels {
         }
 
         public string GroupView {
-            get { return "01_" + LastName; } 
+            get { return "01_" + LastName; }
         }
 
         public string ErrorText {
@@ -43,10 +52,36 @@ namespace RevitCopyViews.ViewModels {
         public ICommand CopyUserCommand { get; }
 
         private void CopyUser(object p) {
+            ProjectParameters.Create(Application).SetupBrowserOrganization(Document);
+            using(var transaction = new Transaction(Document)) {
+                transaction.Start("Копирование видов");
 
+                foreach(View revitView in Views) {
+                    View newView = (View) Document.GetElement(revitView.Duplicate(ViewDuplicateOption.Duplicate));
+                    newView.Name = GetViewName(revitView);
+
+                    // У некоторых видов установлен шаблон,
+                    // у которого заблокировано редактирование атрибута "_Группа Видов"
+                    // удаление шаблона разрешает изменение данного атрибута
+                    newView.ViewTemplateId = ElementId.InvalidElementId;
+                    newView.SetParamValue("_Группа Видов", GroupView);
+                }
+
+                transaction.Commit();
+            }
         }
 
         private bool CanCopyUser(object p) {
+            if(string.IsNullOrEmpty(Prefix)) {
+                ErrorText = "Не заполнен префикс.";
+                return false;
+            }
+
+            if(string.IsNullOrEmpty(LastName)) {
+                ErrorText = "Не заполнена фамилия.";
+                return false;
+            }
+
             if(GroupViews.Any(item => item.Equals(GroupView, StringComparison.CurrentCultureIgnoreCase))) {
                 ErrorText = "Данная группа видов уже используется.";
                 return false;
@@ -58,6 +93,10 @@ namespace RevitCopyViews.ViewModels {
             }
 
             return true;
+        }
+
+        private string GetViewName(View revitView) {
+            return revitView.Name.Replace("User_", Prefix);
         }
     }
 }
