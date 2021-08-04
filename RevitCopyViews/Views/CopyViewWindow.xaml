@@ -17,7 +17,7 @@
 
         <StackPanel Grid.Row="0" Orientation="Horizontal">
             <CheckBox Margin="10,10,10,10" Content="Копировать с детализацией" IsChecked="{Binding CopyWithDetail}" />
-            <CheckBox Margin="10,10,10,10" Content="With Elevation" IsChecked="{Binding WithElevation}" />
+            <CheckBox Margin="10,10,10,10" Content="С отметкой этажа" IsChecked="{Binding WithElevation}" />
         </StackPanel>
 
         <StackPanel Grid.Row="1">
