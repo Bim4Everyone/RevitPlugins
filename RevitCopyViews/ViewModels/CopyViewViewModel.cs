@@ -26,6 +26,7 @@ namespace RevitCopyViews.ViewModels {
         private string _errorText;
 
         private ObservableCollection<string> _prefixes;
+        private ObservableCollection<string> _suffixes;
         private ObservableCollection<string> _groupViews;
         private bool _copyWithDetail;
 
@@ -44,6 +45,13 @@ namespace RevitCopyViews.ViewModels {
 
             CopyWithDetail = true;
             CopyViewsCommand = new RelayCommand(CopyViews, CanCopyViews);
+
+            this.WhenAnyValue(x => x.Delimeter)
+                .Subscribe(x => {
+                    foreach(var viewModel in RevitViewViewModels) {
+                        viewModel.Delimeter = x;
+                    }
+                });
         }
 
         public Document Document { get; set; }
@@ -61,15 +69,24 @@ namespace RevitCopyViews.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _prefix, value);
         }
 
+        public ObservableCollection<string> Prefixes {
+            get => _prefixes;
+            private set => this.RaiseAndSetIfChanged(ref _prefixes, value);
+        }
+
         public string Suffix {
             get => _suffix;
             set => this.RaiseAndSetIfChanged(ref _suffix, value);
         }
 
+        public ObservableCollection<string> Suffixes {
+            get => _suffixes;
+            private set => this.RaiseAndSetIfChanged(ref _suffixes, value);
+        }
+
         public string GroupView {
             get => _groupView;
-            set {this.RaiseAndSetIfChanged(ref _groupView, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref _groupView, value);
         }
 
         public ObservableCollection<string> GroupViews {
@@ -79,26 +96,11 @@ namespace RevitCopyViews.ViewModels {
 
         public Delimiter Delimeter {
             get => _delimeter;
-            set {
-                this.RaiseAndSetIfChanged(ref _delimeter, value);
-                foreach(RevitViewViewModel revitView in RevitViewViewModels) {
-                    revitView.Delimeter = Delimeter;
-                }
-
-                Prefixes = new ObservableCollection<string>(RevitViewViewModels.Select(item => item.Prefix).Distinct().OrderBy(item => item));
-                Prefix = Prefixes.FirstOrDefault();
-            }
+            set => this.RaiseAndSetIfChanged(ref _delimeter, value);
         }
-
+        
         public ObservableCollection<Delimiter> Delimeters { get; }
-
-        public ObservableCollection<string> Prefixes {
-            get => _prefixes;
-            private set => this.RaiseAndSetIfChanged(ref _prefixes, value);
-        }
-
         public ObservableCollection<RevitViewViewModel> RevitViewViewModels { get; }
-
 
         public string ErrorText {
             get => _errorText;
@@ -148,15 +150,6 @@ namespace RevitCopyViews.ViewModels {
 
             ErrorText = null;
             return true;
-        }
-    }
-
-    internal class Delimiter {
-        public string Value { get; set; }
-        public string DisplayValue { get; set; }
-
-        public override string ToString() {
-            return DisplayValue;
         }
     }
 }

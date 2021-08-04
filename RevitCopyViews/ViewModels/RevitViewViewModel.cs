@@ -17,6 +17,7 @@ namespace RevitCopyViews.ViewModels {
 
         private string _prefix;
         private string _suffix;
+        private string _elevations;
         private string _viewName;
         private Delimiter _delimeter;
 
@@ -24,6 +25,10 @@ namespace RevitCopyViews.ViewModels {
             _view = view;
             GroupView = (string) _view.GetParamValueOrDefault("_Группа Видов");
             OriginalName = _view.Name;
+
+            this.WhenAnyValue(x => x.Delimeter)
+                .WhereNotNull()
+                .Subscribe(x => SplitName(x));
         }
 
         public string GroupView { get; }
@@ -31,12 +36,7 @@ namespace RevitCopyViews.ViewModels {
 
         public Delimiter Delimeter {
             get => _delimeter;
-            set {
-                _delimeter = value;
-                this.RaiseAndSetIfChanged(ref _delimeter, value);
-
-                SplitName(Delimeter);
-            }
+            set => this.RaiseAndSetIfChanged(ref _delimeter, value);
         }
 
         public string Prefix {
@@ -49,20 +49,23 @@ namespace RevitCopyViews.ViewModels {
             private set => this.RaiseAndSetIfChanged(ref _viewName, value);
         }
 
+        public string Elevations {
+            get => _elevations;
+            set => this.RaiseAndSetIfChanged(ref _elevations, value);
+        }
+
         public string Suffix {
             get => _suffix;
             set => this.RaiseAndSetIfChanged(ref _suffix, value);
         }
 
         private void SplitName(Delimiter delimeter) {
-            int index = OriginalName.IndexOf(delimeter.Value);
-            Prefix = OriginalName.Substring(0, index);
+            SplittedViewName splittedViewName = delimeter.SplitViewName(OriginalName, new SplitViewOptions() { ReplacePrefix = false, ReplaceSuffix = false });
 
-            index += delimeter.Value.Length;
-            ViewName = OriginalName.Substring(index, OriginalName.Length - index);
-
-            index = OriginalName.LastIndexOf(delimeter.Value);
-            Suffix = OriginalName.Substring(index, OriginalName.Length - index);
+            Prefix = splittedViewName.Prefix;
+            ViewName = splittedViewName.ViewName;
+            Elevations = splittedViewName.Elevations;
+            Suffix = splittedViewName.Suffix;
         }
 
         public ElementId Duplicate(ViewDuplicateOption option) {

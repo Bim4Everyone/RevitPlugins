@@ -95,6 +95,7 @@
     <Compile Include="dosymep\BaseViewModel.cs" />
     <Compile Include="CopyViewCommand.cs" />
     <Compile Include="ViewModels\CopyViewViewModel.cs" />
+    <Compile Include="ViewModels\Delimiter.cs" />
     <Compile Include="Views\CopyViewWindow.xaml.cs">
       <DependentUpon>CopyViewWindow.xaml</DependentUpon>
     </Compile>
