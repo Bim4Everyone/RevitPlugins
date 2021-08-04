@@ -11,8 +11,6 @@ using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using ReactiveUI;
-
 namespace RevitCopyViews.ViewModels {
     internal class CopyViewViewModel : BaseViewModel {
         private Delimiter _delimeter;
@@ -26,6 +24,7 @@ namespace RevitCopyViews.ViewModels {
         private ObservableCollection<string> _prefixes;
         private ObservableCollection<string> _suffixes;
         private ObservableCollection<string> _groupViews;
+
         private bool _copyWithDetail;
         private bool _replacePrefix;
         private bool _replaceSuffix;
@@ -47,29 +46,6 @@ namespace RevitCopyViews.ViewModels {
             ReplacePrefix = true;
             CopyWithDetail = true;
             CopyViewsCommand = new RelayCommand(CopyViews, CanCopyViews);
-
-            this.WhenAnyValue(x => x.Delimeter)
-                .Subscribe(x => {
-                    foreach(var viewModel in RevitViewViewModels) {
-                        viewModel.Delimeter = x;
-                    }
-
-                    Prefixes = new ObservableCollection<string>(RevitViewViewModels.Select(item => item.Prefix).Distinct());
-                    Suffixes = new ObservableCollection<string>(RevitViewViewModels.Select(item => item.Suffix).Distinct());
-
-                    if(Prefixes.Count == 1) {
-                        Prefix = Prefixes.First();
-                    }
-
-                    if(Suffixes.Count == 1) {
-                        Suffix = Suffixes.First();
-                    }
-
-                    var groupViews = RevitViewViewModels.Select(item => item.GroupView).Distinct().ToArray();
-                    if(groupViews.Length == 1) {
-                        GroupView = groupViews.First();
-                    }
-                });
         }
 
         public Document Document { get; set; }
@@ -129,7 +105,12 @@ namespace RevitCopyViews.ViewModels {
 
         public Delimiter Delimeter {
             get => _delimeter;
-            set => this.RaiseAndSetIfChanged(ref _delimeter, value);
+            set {
+                RaiseAndSetIfChanged(ref _delimeter, value);
+                if(_delimeter != null) {
+                    Reload(value);
+                }
+            }
         }
 
         public ObservableCollection<Delimiter> Delimeters { get; }
@@ -138,6 +119,28 @@ namespace RevitCopyViews.ViewModels {
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        private void Reload(Delimiter x) {
+            foreach(RevitViewViewModel viewModel in RevitViewViewModels) {
+                viewModel.Delimeter = x;
+            }
+
+            Prefixes = new ObservableCollection<string>(RevitViewViewModels.Select(item => item.Prefix).Distinct());
+            Suffixes = new ObservableCollection<string>(RevitViewViewModels.Select(item => item.Suffix).Distinct());
+
+            if(Prefixes.Count == 1) {
+                Prefix = Prefixes.First();
+            }
+
+            if(Suffixes.Count == 1) {
+                Suffix = Suffixes.First();
+            }
+
+            string[] groupViews = RevitViewViewModels.Select(item => item.GroupView).Distinct().ToArray();
+            if(groupViews.Length == 1) {
+                GroupView = groupViews.First();
+            }
         }
 
         private void CopyViews(object p) {

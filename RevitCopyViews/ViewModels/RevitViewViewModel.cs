@@ -10,8 +10,6 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
-using ReactiveUI;
-
 namespace RevitCopyViews.ViewModels {
     internal class RevitViewViewModel : BaseViewModel {
         private readonly View _view;
@@ -28,10 +26,6 @@ namespace RevitCopyViews.ViewModels {
             GroupView = (string) _view.GetParamValueOrDefault("_Группа Видов");
             OriginalName = _view.Name;
 
-            this.WhenAnyValue(x => x.Delimeter)
-                .WhereNotNull()
-                .Subscribe(x => SplitName(x));
-
             if(view.ViewType == ViewType.FloorPlan
                 || view.ViewType == ViewType.CeilingPlan
                 || view.ViewType == ViewType.AreaPlan
@@ -47,7 +41,12 @@ namespace RevitCopyViews.ViewModels {
 
         public Delimiter Delimeter {
             get => _delimeter;
-            set => this.RaiseAndSetIfChanged(ref _delimeter, value);
+            set {
+                this.RaiseAndSetIfChanged(ref _delimeter, value);
+                if(_delimeter != null) {
+                    SplitName(_delimeter);
+                }
+            }
         }
 
         public string Prefix {
