@@ -47,6 +47,7 @@ namespace RevitCopyViews.ViewModels {
             ReplacePrefix = true;
             CopyWithDetail = true;
             CopyViewsCommand = new RelayCommand(CopyViews, CanCopyViews);
+
             this.WhenAnyValue(x => x.Delimeter)
                 .Subscribe(x => {
                     foreach(var viewModel in RevitViewViewModels) {
@@ -56,8 +57,18 @@ namespace RevitCopyViews.ViewModels {
                     Prefixes = new ObservableCollection<string>(RevitViewViewModels.Select(item => item.Prefix).Distinct());
                     Suffixes = new ObservableCollection<string>(RevitViewViewModels.Select(item => item.Suffix).Distinct());
 
-                    Prefix = Prefixes.FirstOrDefault();
-                    Suffix = Suffixes.FirstOrDefault();
+                    if(Prefixes.Count == 1) {
+                        Prefix = Prefixes.First();
+                    }
+
+                    if(Suffixes.Count == 1) {
+                        Suffix = Suffixes.First();
+                    }
+
+                    var groupViews = RevitViewViewModels.Select(item => item.GroupView).Distinct().ToArray();
+                    if(groupViews.Length == 1) {
+                        GroupView = groupViews.First();
+                    }
                 });
         }
 
