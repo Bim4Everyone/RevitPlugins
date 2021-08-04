@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Autodesk.Revit.ApplicationServices;
@@ -29,6 +27,8 @@ namespace RevitCopyViews.ViewModels {
         private ObservableCollection<string> _suffixes;
         private ObservableCollection<string> _groupViews;
         private bool _copyWithDetail;
+        private bool _replacePrefix;
+        private bool _replaceSuffix;
 
         public CopyViewViewModel(List<View> selectedViews) {
             _selectedViews = selectedViews;
@@ -43,14 +43,20 @@ namespace RevitCopyViews.ViewModels {
 
             Delimeter = Delimeters.FirstOrDefault();
 
+            ReplacePrefix = true;
             CopyWithDetail = true;
             CopyViewsCommand = new RelayCommand(CopyViews, CanCopyViews);
-
             this.WhenAnyValue(x => x.Delimeter)
                 .Subscribe(x => {
                     foreach(var viewModel in RevitViewViewModels) {
                         viewModel.Delimeter = x;
                     }
+
+                    Prefixes = new ObservableCollection<string>(RevitViewViewModels.Select(item => item.Prefix).Distinct());
+                    Suffixes = new ObservableCollection<string>(RevitViewViewModels.Select(item => item.Suffix).Distinct());
+
+                    Prefix = Prefixes.FirstOrDefault();
+                    Suffix = Suffixes.FirstOrDefault();
                 });
         }
 
@@ -58,6 +64,16 @@ namespace RevitCopyViews.ViewModels {
         public Application Application { get; set; }
 
         public ICommand CopyViewsCommand { get; }
+
+        public bool ReplacePrefix {
+            get => _replacePrefix;
+            set => this.RaiseAndSetIfChanged(ref _replacePrefix, value);
+        }
+
+        public bool ReplaceSuffix {
+            get => _replaceSuffix;
+            set => this.RaiseAndSetIfChanged(ref _replaceSuffix, value);
+        }
 
         public bool CopyWithDetail {
             get => _copyWithDetail;
@@ -98,7 +114,7 @@ namespace RevitCopyViews.ViewModels {
             get => _delimeter;
             set => this.RaiseAndSetIfChanged(ref _delimeter, value);
         }
-        
+
         public ObservableCollection<Delimiter> Delimeters { get; }
         public ObservableCollection<RevitViewViewModel> RevitViewViewModels { get; }
 
@@ -113,13 +129,26 @@ namespace RevitCopyViews.ViewModels {
 
                 foreach(RevitViewViewModel revitView in RevitViewViewModels) {
                     var option = CopyWithDetail ? ViewDuplicateOption.WithDetailing : ViewDuplicateOption.Duplicate;
-                    
+
                     View newView = (View) Document.GetElement(revitView.Duplicate(option));
-                    if(string.IsNullOrEmpty(Suffix)) {
-                        newView.Name = string.Join(Delimeter.Value, Prefix, revitView.ViewName);
-                    } else {
-                        newView.Name = string.Join(Delimeter.Value, Prefix, revitView.ViewName, Suffix);
+                    SplittedViewName splittedViewName = revitView.SplitName(Delimeter, new SplitViewOptions() { ReplacePrefix = ReplacePrefix, ReplaceSuffix = ReplaceSuffix });
+
+                    var list = new List<string>();
+                    if(!string.IsNullOrEmpty(Prefix)) {
+                        list.Add(Prefix);
                     }
+
+                    list.Add(splittedViewName.ViewName);
+
+                    if(!string.IsNullOrEmpty(revitView.Elevation)) {
+                        list.Add(revitView.Elevation);
+                    }
+
+                    if(!string.IsNullOrEmpty(Suffix)) {
+                        list.Add(Suffix);
+                    }
+
+                    newView.Name = string.Join(Delimeter.Value, list);
 
                     // У некоторых видов установлен шаблон,
                     // у которого заблокировано редактирование атрибута "_Группа Видов"

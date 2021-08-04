@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using ReactiveUI;
 namespace RevitCopyViews.ViewModels {
     internal class RevitViewViewModel : BaseViewModel {
         private readonly View _view;
+        private readonly SplitViewOptions _defaultSplitViewOptions = new SplitViewOptions() { ReplacePrefix = false, ReplaceSuffix = false };
 
         private string _prefix;
         private string _suffix;
@@ -29,9 +31,18 @@ namespace RevitCopyViews.ViewModels {
             this.WhenAnyValue(x => x.Delimeter)
                 .WhereNotNull()
                 .Subscribe(x => SplitName(x));
-        }
 
+            if(view.ViewType == ViewType.FloorPlan
+                || view.ViewType == ViewType.CeilingPlan
+                || view.ViewType == ViewType.AreaPlan
+                || view.ViewType == ViewType.EngineeringPlan) {
+
+                Elevation = view.GenLevel.Elevation.ToString("0.###", CultureInfo.InvariantCulture);
+            }
+        }
+        
         public string GroupView { get; }
+        public string Elevation { get; }
         public string OriginalName { get; }
 
         public Delimiter Delimeter {
@@ -59,8 +70,12 @@ namespace RevitCopyViews.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _suffix, value);
         }
 
+        public SplittedViewName SplitName(Delimiter delimeter, SplitViewOptions splitViewOptions) {
+            return delimeter.SplitViewName(OriginalName, splitViewOptions);
+        }
+
         private void SplitName(Delimiter delimeter) {
-            SplittedViewName splittedViewName = delimeter.SplitViewName(OriginalName, new SplitViewOptions() { ReplacePrefix = false, ReplaceSuffix = false });
+            SplittedViewName splittedViewName = SplitName(delimeter, _defaultSplitViewOptions);
 
             Prefix = splittedViewName.Prefix;
             ViewName = splittedViewName.ViewName;

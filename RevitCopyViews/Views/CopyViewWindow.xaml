@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RevitCopyViews.ViewModels"
              mc:Ignorable="d" 
-             Height="350" Width="400" WindowStartupLocation="CenterOwner" Title="Копирование видов">
+             Height="400" Width="400" WindowStartupLocation="CenterOwner" Title="Копирование видов">
     <Grid>        
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -25,6 +25,7 @@
 
         <StackPanel Grid.Row="2">
             <TextBlock Margin="10" Text="Префикс"/>
+            <CheckBox Margin="10,0,10,10" Content="Заменить" IsChecked="{Binding ReplacePrefix}" />
             <ComboBox Margin="10,0,10,0" ItemsSource="{Binding Prefixes}" Text="{Binding Prefix}" IsEditable="True" />
         </StackPanel>
 
@@ -35,7 +36,8 @@
 
         <StackPanel Grid.Row="4">
             <TextBlock Margin="10" Text="Суффикс"/>
-            <TextBox Margin="10,0,10,0" Text="{Binding Suffix}"/>
+            <CheckBox Margin="10,0,10,10" Content="Заменить" IsChecked="{Binding ReplaceSuffix}" />
+            <ComboBox Margin="10,0,10,0" ItemsSource="{Binding Suffixes}" Text="{Binding Suffix}" IsEditable="True" />
         </StackPanel>
 
         <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
