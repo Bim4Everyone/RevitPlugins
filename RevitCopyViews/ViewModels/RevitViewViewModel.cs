@@ -12,7 +12,7 @@ using dosymep.WPF.ViewModels;
 namespace RevitCopyViews.ViewModels {
     internal class RevitViewViewModel : BaseViewModel {
         private readonly View _view;
-        private readonly SplitViewOptions _defaultSplitViewOptions = new SplitViewOptions() { ReplacePrefix = true, ReplaceSuffix = false };
+        private readonly SplitViewOptions _defaultSplitViewOptions = new SplitViewOptions() { ReplacePrefix = true, ReplaceSuffix = true };
 
         private string _prefix;
         private string _suffix;
