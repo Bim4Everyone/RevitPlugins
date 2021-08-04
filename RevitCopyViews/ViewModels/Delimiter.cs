@@ -79,13 +79,14 @@ namespace RevitCopyViews.ViewModels {
         }
 
         private string GetSuffix(string originalName) {
-            int index = originalName.LastIndexOf(Value);
-            if(index >= 0) {
-                string suffix = originalName.Substring(index, originalName.Length - index);
-                string elevations = GetElevations(originalName);
-                return !string.IsNullOrEmpty(elevations) ? suffix.Replace(elevations, string.Empty) : suffix;
+            if((originalName.Split(new string[] { Value }, StringSplitOptions.RemoveEmptyEntries).Length - 1) > 1) {
+                int index = originalName.LastIndexOf(Value);
+                if(index >= 0) {
+                    string suffix = originalName.Substring(index, originalName.Length - index);
+                    string elevations = GetElevations(originalName);
+                    return !string.IsNullOrEmpty(elevations) ? suffix.Replace(elevations, string.Empty) : suffix;
+                }
             }
-
             return null;
         }
 
