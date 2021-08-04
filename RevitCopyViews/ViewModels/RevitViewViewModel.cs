@@ -17,7 +17,6 @@ namespace RevitCopyViews.ViewModels {
 
         private string _prefix;
         private string _suffix;
-        private string _elevations;
         private string _viewName;
 
         public RevitViewViewModel(View view) {
@@ -50,11 +49,6 @@ namespace RevitCopyViews.ViewModels {
             private set => this.RaiseAndSetIfChanged(ref _viewName, value);
         }
 
-        public string Elevations {
-            get => _elevations;
-            set => this.RaiseAndSetIfChanged(ref _elevations, value);
-        }
-
         public string Suffix {
             get => _suffix;
             set => this.RaiseAndSetIfChanged(ref _suffix, value);
@@ -64,9 +58,8 @@ namespace RevitCopyViews.ViewModels {
             SplittedViewName splittedViewName = SplitName(_defaultSplitViewOptions);
 
             Prefix = splittedViewName.Prefix;
-            ViewName = splittedViewName.ViewName;
-            Elevations = splittedViewName.Elevations;
             Suffix = splittedViewName.Suffix;
+            ViewName = splittedViewName.ViewName;
         }
 
         public SplittedViewName SplitName(SplitViewOptions splitViewOptions) {

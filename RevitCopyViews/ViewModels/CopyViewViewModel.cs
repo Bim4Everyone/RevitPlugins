@@ -28,6 +28,8 @@ namespace RevitCopyViews.ViewModels {
         private bool _replacePrefix;
         private bool _replaceSuffix;
         private bool _withElevation;
+        private bool _isAllowReplaceSuffix;
+        private bool _isAllowReplacePrefix;
 
         public CopyViewViewModel(List<View> selectedViews) {
             _selectedViews = selectedViews;
@@ -38,12 +40,23 @@ namespace RevitCopyViews.ViewModels {
             ReplacePrefix = true;
             CopyWithDetail = true;
             CopyViewsCommand = new RelayCommand(CopyViews, CanCopyViews);
+
+            Reload();
         }
 
         public Document Document { get; set; }
         public Application Application { get; set; }
 
         public ICommand CopyViewsCommand { get; }
+
+        public bool IsAllowReplacePrefix {
+            get => _isAllowReplacePrefix;
+            set => this.RaiseAndSetIfChanged(ref _isAllowReplacePrefix, value);
+        }
+        public bool IsAllowReplaceSuffix {
+            get => _isAllowReplaceSuffix;
+            set => this.RaiseAndSetIfChanged(ref _isAllowReplaceSuffix, value);
+        }
 
         public bool ReplacePrefix {
             get => _replacePrefix;
@@ -55,7 +68,7 @@ namespace RevitCopyViews.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _replaceSuffix, value);
         }
 
-        public bool WithElevation { 
+        public bool WithElevation {
             get => _withElevation;
             set => this.RaiseAndSetIfChanged(ref _withElevation, value);
         }
@@ -102,32 +115,50 @@ namespace RevitCopyViews.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
+        private void Reload() {
+            Prefixes = new ObservableCollection<string>(RevitViewViewModels.Select(item => item.Prefix).Where(item => !string.IsNullOrEmpty(item)).Distinct());
+            Suffixes = new ObservableCollection<string>(RevitViewViewModels.Select(item => item.Suffix).Where(item => !string.IsNullOrEmpty(item)).Distinct());
+
+            IsAllowReplacePrefix = Prefixes.Count > 0;
+            IsAllowReplaceSuffix = Suffixes.Count > 0;
+
+            ReplacePrefix = IsAllowReplacePrefix ? ReplacePrefix : false;
+            ReplaceSuffix = IsAllowReplaceSuffix ? ReplaceSuffix : false;
+
+            if(Prefixes.Count == 1) {
+                Prefix = Prefixes.First();
+            }
+
+            if(Suffixes.Count == 1) {
+                Suffix = Suffixes.First();
+            }
+
+            string[] groupViews = RevitViewViewModels.Select(item => item.GroupView).Distinct().ToArray();
+            if(groupViews.Length == 1) {
+                GroupView = groupViews.First();
+            }
+        }
+
         private void CopyViews(object p) {
             using(var transaction = new Transaction(Document)) {
                 transaction.Start("Копирование видов");
 
                 foreach(RevitViewViewModel revitView in RevitViewViewModels) {
-                    var option = CopyWithDetail ? ViewDuplicateOption.WithDetailing : ViewDuplicateOption.Duplicate;
+                    var copyOption = CopyWithDetail ? ViewDuplicateOption.WithDetailing : ViewDuplicateOption.Duplicate;
 
-                    View newView = (View) Document.GetElement(revitView.Duplicate(option));
-                    SplittedViewName splittedViewName = revitView.SplitName(new SplitViewOptions() { ReplacePrefix = ReplacePrefix, ReplaceSuffix = ReplaceSuffix });
+                    View newView = (View) Document.GetElement(revitView.Duplicate(copyOption));
 
-                    var list = new List<string>();
-                    if(!string.IsNullOrEmpty(Prefix)) {
-                        list.Add(Prefix);
-                    }
+                    var splitViewOptions = new SplitViewOptions() {
+                        ReplacePrefix = ReplacePrefix,
+                        ReplaceSuffix = ReplaceSuffix
+                    };
 
-                    list.Add(splittedViewName.ViewName);
+                    SplittedViewName splittedViewName = revitView.SplitName(splitViewOptions);
+                    splittedViewName.Prefix = Prefix;
+                    splittedViewName.Suffix = Suffix;
+                    splittedViewName.Elevations = revitView.Elevation;
 
-                    if(WithElevation && !string.IsNullOrEmpty(revitView.Elevation)) {
-                        list.Add(revitView.Elevation);
-                    }
-
-                    if(!string.IsNullOrEmpty(Suffix)) {
-                        list.Add(Suffix);
-                    }
-
-                    newView.Name = string.Join(Delimiter.Value, list);
+                    newView.Name = Delimiter.CreateViewName(splittedViewName);
 
                     // У некоторых видов установлен шаблон,
                     // у которого заблокировано редактирование атрибута "_Группа Видов"

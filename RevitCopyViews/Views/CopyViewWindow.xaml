@@ -22,7 +22,7 @@
 
         <StackPanel Grid.Row="1">
             <TextBlock Margin="10" Text="Префикс"/>
-            <CheckBox Margin="10,0,10,10" Content="Заменить" IsChecked="{Binding ReplacePrefix}" />
+            <CheckBox Margin="10,0,10,10" Content="Заменить" IsChecked="{Binding ReplacePrefix}" IsEnabled="{Binding IsAllowReplacePrefix}" />
             <ComboBox Margin="10,0,10,0" ItemsSource="{Binding Prefixes}" Text="{Binding Prefix}" IsEditable="True" />
         </StackPanel>
 
@@ -33,7 +33,7 @@
 
         <StackPanel Grid.Row="3">
             <TextBlock Margin="10" Text="Суффикс"/>
-            <CheckBox Margin="10,0,10,10" Content="Заменить" IsChecked="{Binding ReplaceSuffix}" />
+            <CheckBox Margin="10,0,10,10" Content="Заменить" IsChecked="{Binding ReplaceSuffix}" IsEnabled="{Binding IsAllowReplaceSuffix}"/>
             <ComboBox Margin="10,0,10,0" ItemsSource="{Binding Suffixes}" Text="{Binding Suffix}" IsEditable="True" />
         </StackPanel>
 
