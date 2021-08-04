@@ -47,6 +47,8 @@ namespace RevitCopyViews.ViewModels {
         public Document Document { get; set; }
         public Application Application { get; set; }
 
+        public List<string> RestrictedViewNames { get; set; }
+
         public ICommand CopyViewsCommand { get; }
 
         public bool IsAllowReplacePrefix {
@@ -147,18 +149,7 @@ namespace RevitCopyViews.ViewModels {
                     var copyOption = CopyWithDetail ? ViewDuplicateOption.WithDetailing : ViewDuplicateOption.Duplicate;
 
                     View newView = (View) Document.GetElement(revitView.Duplicate(copyOption));
-
-                    var splitViewOptions = new SplitViewOptions() {
-                        ReplacePrefix = ReplacePrefix,
-                        ReplaceSuffix = ReplaceSuffix
-                    };
-
-                    SplittedViewName splittedViewName = revitView.SplitName(splitViewOptions);
-                    splittedViewName.Prefix = Prefix;
-                    splittedViewName.Suffix = Suffix;
-                    splittedViewName.Elevations = revitView.Elevation;
-
-                    newView.Name = Delimiter.CreateViewName(splittedViewName);
+                    newView.Name = GetViewName(revitView);
 
                     // У некоторых видов установлен шаблон,
                     // у которого заблокировано редактирование атрибута "_Группа Видов"
@@ -171,6 +162,20 @@ namespace RevitCopyViews.ViewModels {
             }
         }
 
+        private string GetViewName(RevitViewViewModel revitView) {
+            var splitViewOptions = new SplitViewOptions() {
+                ReplacePrefix = ReplacePrefix,
+                ReplaceSuffix = ReplaceSuffix
+            };
+
+            SplittedViewName splittedViewName = revitView.SplitName(splitViewOptions);
+            splittedViewName.Prefix = Prefix;
+            splittedViewName.Suffix = Suffix;
+            splittedViewName.Elevations = WithElevation ? revitView.Elevation : null;
+
+            return Delimiter.CreateViewName(splittedViewName);
+        }
+
         private bool CanCopyViews(object p) {
             if(string.IsNullOrEmpty(Prefix)) {
                 ErrorText = "Не заполнен префикс.";
@@ -179,6 +184,13 @@ namespace RevitCopyViews.ViewModels {
 
             if(string.IsNullOrEmpty(GroupView)) {
                 ErrorText = "Не заполнена группа видов.";
+                return false;
+            }
+
+            IEnumerable<string> generatingNames = RevitViewViewModels.Select(item => GetViewName(item));
+            string existintName = generatingNames.FirstOrDefault(item => RestrictedViewNames.Any(viewName => item.Equals(viewName)));
+            if(!string.IsNullOrEmpty(existintName)) {
+                ErrorText = $"Найдено существующее имя вида \"{existintName}\".";
                 return false;
             }
 

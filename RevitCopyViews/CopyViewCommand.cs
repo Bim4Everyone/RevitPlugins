@@ -55,14 +55,13 @@ namespace RevitCopyViews {
             var window = new CopyViewWindow() {
                 DataContext = new CopyViewViewModel(selectedViews) {
                     Document = document,
+                    GroupViews = groupViews,
                     Application = application,
-
-                    GroupViews = groupViews
+                    RestrictedViewNames = views.Select(item => item.Name).ToList()
                 }
             };
 
             new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
-
             window.ShowDialog();
         }
     }
