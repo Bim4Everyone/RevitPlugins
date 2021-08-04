@@ -86,6 +86,9 @@
     <Compile Include="CopyViewCommand.cs" />
     <Compile Include="ViewModels\CopyViewViewModel.cs" />
     <Compile Include="ViewModels\Delimiter.cs" />
+    <Compile Include="Views\CopyUserWindow.xaml.cs">
+      <DependentUpon>CopyUserWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\CopyViewWindow.xaml.cs">
       <DependentUpon>CopyViewWindow.xaml</DependentUpon>
     </Compile>
@@ -94,6 +97,10 @@
     <Compile Include="ViewModels\RevitViewViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\CopyUserWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\CopyViewWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
