@@ -7,6 +7,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
@@ -47,6 +48,7 @@ namespace RevitCopyViews.ViewModels {
         }
 
         public Document Document { get; set; }
+        public UIDocument UIDocument { get; set; }
         public Application Application { get; set; }
 
         public List<string> RestrictedViewNames { get; set; }
@@ -145,6 +147,8 @@ namespace RevitCopyViews.ViewModels {
 
         private void CopyViews(object p) {
             ProjectParameters.Create(Application).SetupBrowserOrganization(Document);
+
+            var createdViews = new List<ElementId>();
             using(var transaction = new Transaction(Document)) {
                 transaction.Start("Копирование видов");
 
@@ -159,10 +163,14 @@ namespace RevitCopyViews.ViewModels {
                     // удаление шаблона разрешает изменение данного атрибута
                     newView.ViewTemplateId = ElementId.InvalidElementId;
                     newView.SetParamValue("_Группа Видов", GroupView);
+
+                    createdViews.Add(newView.Id);
                 }
 
                 transaction.Commit();
             }
+
+            UIDocument.Selection.SetElementIds(createdViews);
         }
 
         private string GetViewName(RevitViewViewModel revitView) {

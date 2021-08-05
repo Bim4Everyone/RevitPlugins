@@ -69,6 +69,7 @@ namespace RevitCopyViews {
             var window = new CopyUserWindow() {
                 DataContext = new CopyUserViewModel() {
                     Document = document,
+                    UIDocument = uiDocument,
                     Application = application,
 
                     Views = selectedViews,

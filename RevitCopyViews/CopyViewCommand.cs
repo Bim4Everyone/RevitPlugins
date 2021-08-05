@@ -59,6 +59,7 @@ namespace RevitCopyViews {
             var window = new CopyViewWindow() {
                 DataContext = new CopyViewViewModel(selectedViews) {
                     Document = document,
+                    UIDocument = uiDocument,
                     Application = application,
 
                     GroupViews = new ObservableCollection<string>(groupViews),
