@@ -54,6 +54,10 @@ namespace RevitCopyViews.ViewModels {
         }
 
         private static string GetSuffix(string originalName) {
+            if(originalName.Count(item => item == _value) < 2) {
+                return null;
+            }
+
             int index = originalName.LastIndexOf(_value);
             string suffix = index == -1 ? null : originalName.Substring(index, originalName.Length - index);
 
