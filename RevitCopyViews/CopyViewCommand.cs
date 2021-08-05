@@ -50,13 +50,18 @@ namespace RevitCopyViews {
             }
 
             var views = new FilteredElementCollector(document).OfClass(typeof(View)).ToElements();
-            var groupViews = new ObservableCollection<string>(views.Select(item => (string) item.GetParamValueOrDefault("_Группа Видов")).Distinct());
+            var groupViews = views
+                 .Select(item => (string) item.GetParamValueOrDefault("_Группа Видов"))
+                 .Where(item => !string.IsNullOrEmpty(item))
+                 .OrderBy(item => item)
+                 .Distinct();
 
             var window = new CopyViewWindow() {
                 DataContext = new CopyViewViewModel(selectedViews) {
                     Document = document,
-                    GroupViews = groupViews,
                     Application = application,
+
+                    GroupViews = new ObservableCollection<string>(groupViews),
                     RestrictedViewNames = views.Select(item => item.Name).ToList()
                 }
             };
