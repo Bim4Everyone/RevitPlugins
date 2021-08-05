@@ -41,7 +41,7 @@ namespace RevitCopyViews.ViewModels {
         }
 
         public string GroupView {
-            get { return "01_" + LastName; }
+            get { return "01 " + LastName; }
         }
 
         public string ErrorText {
@@ -72,13 +72,13 @@ namespace RevitCopyViews.ViewModels {
         }
 
         private bool CanCopyUser(object p) {
-            if(string.IsNullOrEmpty(Prefix)) {
-                ErrorText = "Не заполнен префикс.";
+            if(string.IsNullOrEmpty(LastName)) {
+                ErrorText = "Не заполнена фамилия.";
                 return false;
             }
 
-            if(string.IsNullOrEmpty(LastName)) {
-                ErrorText = "Не заполнена фамилия.";
+            if(string.IsNullOrEmpty(Prefix)) {
+                ErrorText = "Не заполнен префикс.";
                 return false;
             }
 
@@ -87,16 +87,17 @@ namespace RevitCopyViews.ViewModels {
                 return false;
             }
 
-            if(RestrictedViewNames.Any(item => item.StartsWith(Prefix, StringComparison.CurrentCultureIgnoreCase))) {
+            if(RestrictedViewNames.Any(item => item.StartsWith(Prefix + "_", StringComparison.CurrentCultureIgnoreCase))) {
                 ErrorText = "Данный префикс уже используется.";
                 return false;
             }
 
+            ErrorText = null;
             return true;
         }
 
         private string GetViewName(View revitView) {
-            return revitView.Name.Replace("User_", Prefix);
+            return revitView.Name.Replace("User_", Prefix + "_");
         }
     }
 }
