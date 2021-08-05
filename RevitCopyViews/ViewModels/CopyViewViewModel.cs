@@ -191,7 +191,7 @@ namespace RevitCopyViews.ViewModels {
             var cultureInfo = (CultureInfo) CultureInfo.GetCultureInfo("ru-Ru").Clone();
             cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
 
-            return UnitUtils.ConvertFromInternalUnits(revitView.Elevation, Document.GetUnits().GetFormatOptions(UnitType.UT_Length).DisplayUnits).ToString("F3", cultureInfo);
+            return UnitUtils.ConvertFromInternalUnits(revitView.Elevation, DisplayUnitType.DUT_METERS).ToString("F3", cultureInfo);
         }
 
         private bool CanCopyViews(object p) {
