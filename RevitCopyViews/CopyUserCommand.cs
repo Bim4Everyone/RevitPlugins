@@ -42,18 +42,18 @@ namespace RevitCopyViews {
             var uiDocument = uiApplication.ActiveUIDocument;
             var document = uiDocument.Document;
 
-            var selectedViews = uiDocument.Selection.GetElementIds()
-                .Select(item => document.GetElement(item))
+            
+            var views = new FilteredElementCollector(document).OfClass(typeof(View)).ToElements();
+            var selectedViews = views
                 .OfType<View>()
                 .Where(item => item.Name.StartsWith("User_"))
                 .ToList();
 
             if(selectedViews.Count == 0) {
-                TaskDialog.Show("Предупреждение!", "Выберите виды, которые требуется копировать.");
+                TaskDialog.Show("Предупреждение!", "Не были найдены пользовательские виды, которые можно копировать.");
                 return;
             }
-
-            var views = new FilteredElementCollector(document).OfClass(typeof(View)).ToElements();
+            
             var groupViews = views
                 .Select(item => (string) item.GetParamValueOrDefault("_Группа Видов"))
                 .Where(item => !string.IsNullOrEmpty(item))
