@@ -42,21 +42,38 @@ namespace RevitCopyViews {
             var uiDocument = uiApplication.ActiveUIDocument;
             var document = uiDocument.Document;
 
-            var selectedViews = uiDocument.Selection.GetElementIds().Select(item => document.GetElement(item)).OfType<View>().Where(item => item.Name.StartsWith("User_")).ToList();
+            var selectedViews = uiDocument.Selection.GetElementIds()
+                .Select(item => document.GetElement(item))
+                .OfType<View>()
+                .Where(item => item.Name.StartsWith("User_"))
+                .ToList();
+
             if(selectedViews.Count == 0) {
                 TaskDialog.Show("Предупреждение!", "Выберите виды, которые требуется копировать.");
                 return;
             }
 
             var views = new FilteredElementCollector(document).OfClass(typeof(View)).ToElements();
-            var groupViews = views.Select(item => (string) item.GetParamValueOrDefault("_Группа Видов")).Distinct().ToList();
+            var groupViews = views
+                .Select(item => (string) item.GetParamValueOrDefault("_Группа Видов"))
+                .Where(item => !string.IsNullOrEmpty(item))
+                .OrderBy(item => item)
+                .Distinct()
+                .ToList();
+
+            var restrictedViewNames = views
+                .Select(item => item.Name)
+                .OrderBy(item => item)
+                .ToList();
 
             var window = new CopyUserWindow() {
                 DataContext = new CopyUserViewModel() {
                     Document = document,
-                    GroupViews = groupViews,
                     Application = application,
-                    RestrictedViewNames = views.Select(item => item.Name).ToList()
+
+                    Views = selectedViews,
+                    GroupViews = groupViews,
+                    RestrictedViewNames = restrictedViewNames
                 }
             };
 
