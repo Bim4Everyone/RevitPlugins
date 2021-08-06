@@ -70,7 +70,7 @@ namespace RevitCopyViews.ViewModels {
         }
 
         private static string GetElevation(string originalName) {
-            return Regex.Match(originalName, $@"\d+.\d{{3}}").Value;
+            return Regex.Match(originalName, $@"{_value}[+|-]?\d+.\d{{3}}").Value;
         }
     }
 
