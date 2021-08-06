@@ -206,6 +206,13 @@ namespace RevitCopyViews.ViewModels {
             }
 
             IEnumerable<string> generatingNames = RevitViewViewModels.Select(item => GetViewName(item));
+            string generateName = generatingNames.GroupBy(item => item).Where(item => item.Count() > 1).Select(item => item.Key).FirstOrDefault();
+            if(!string.IsNullOrEmpty(generateName)) {
+                ErrorText = $"Найдено повторяющееся имя вида \"{generateName}\".";
+                return false;
+            }
+
+
             string existintName = generatingNames.FirstOrDefault(item => RestrictedViewNames.Any(viewName => item.Equals(viewName)));
             if(!string.IsNullOrEmpty(existintName)) {
                 ErrorText = $"Найдено существующее имя вида \"{existintName}\".";
