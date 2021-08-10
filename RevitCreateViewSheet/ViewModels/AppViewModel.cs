@@ -17,6 +17,7 @@ namespace RevitCreateViewSheet.ViewModels {
     internal class AppViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
 
+        private string _errorText;
         private int _countCreateView;
         private string _albumBlueprints;
 
@@ -29,6 +30,11 @@ namespace RevitCreateViewSheet.ViewModels {
             ViewSheets = new ObservableCollection<ViewSheetViewModel>();
             AlbumsBlueprints = new ObservableCollection<string>(_revitRepository.GetAlbumsBlueprints());
             FamilyInstances = new ObservableCollection<FamilyInstanceViewModel>(_revitRepository.GetTitleBlocks().Select(item => new FamilyInstanceViewModel(item)).OrderBy(item => item.Name));
+        }
+
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
         public int CountCreateView {
