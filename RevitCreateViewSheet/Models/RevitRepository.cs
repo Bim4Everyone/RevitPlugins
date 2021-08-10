@@ -31,6 +31,10 @@ namespace RevitCreateViewSheet.Models {
         }
 
 
+        public ViewSheet CreateViewSheet(FamilySymbol familySymbol) {
+            return ViewSheet.Create(Document, familySymbol.Id);
+        }
+
         public List<string> GetAlbumsBlueprints() {
             return GetViewSheets()
                 .Select(item => (string) item.GetParamValueOrDefault("ADSK_Комплект чертежей"))
@@ -39,7 +43,6 @@ namespace RevitCreateViewSheet.Models {
                 .ToList();
         }
 
-
         public List<ViewSheet> GetViewSheets() {
             return new FilteredElementCollector(Document)
                 .OfClass(typeof(ViewSheet))
@@ -47,10 +50,12 @@ namespace RevitCreateViewSheet.Models {
                 .ToList();
         }
 
-        public List<FamilyInstance> GetTitleBlocks() {
+        public List<FamilySymbol> GetTitleBlocks() {
+            var category = Category.GetCategory(Document, BuiltInCategory.OST_TitleBlocks);
             return new FilteredElementCollector(Document)
-                .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                .OfType<FamilyInstance>()
+                .OfClass(typeof(FamilySymbol))
+                .OfType<FamilySymbol>()
+                .Where(item => item.Category.Id == category.Id)
                 .ToList();
         }
     }

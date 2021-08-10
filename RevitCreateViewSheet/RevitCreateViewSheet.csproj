@@ -86,7 +86,7 @@
     <Compile Include="Models\RevitRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\AppViewModel.cs" />
-    <Compile Include="ViewModels\FamilyInstanceViewModel.cs" />
+    <Compile Include="ViewModels\TitleBlockViewModel.cs" />
     <Compile Include="ViewModels\ViewSheetViewModel.cs" />
     <Compile Include="Views\CreateViewSheetWindow.xaml.cs">
       <DependentUpon>CreateViewSheetWindow.xaml</DependentUpon>

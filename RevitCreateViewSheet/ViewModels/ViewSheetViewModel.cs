@@ -9,7 +9,7 @@ using dosymep.WPF.ViewModels;
 namespace RevitCreateViewSheet.ViewModels {
     internal class ViewSheetViewModel : BaseViewModel {
         private string _name;
-        private FamilyInstanceViewModel _familyInstance;
+        private TitleBlockViewModel _titleBlock;
 
         public ViewSheetViewModel() {
             Name = "Без имени";
@@ -20,9 +20,9 @@ namespace RevitCreateViewSheet.ViewModels {
             set => RaiseAndSetIfChanged(ref _name, value);
         }
 
-        public FamilyInstanceViewModel FamilyInstance {
-            get => _familyInstance;
-            set => RaiseAndSetIfChanged(ref _familyInstance, value);
+        public TitleBlockViewModel TitleBlock {
+            get => _titleBlock;
+            set => RaiseAndSetIfChanged(ref _titleBlock, value);
         }
 
         public override string ToString() {

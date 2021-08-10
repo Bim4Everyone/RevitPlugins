@@ -16,7 +16,7 @@ using RevitCreateViewSheet.Models;
 namespace RevitCreateViewSheet.ViewModels {
     internal class AppViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private readonly FamilyInstanceViewModel _defaultFamilyInstance;
+        private readonly TitleBlockViewModel _defaultTitleBlock;
 
         private string _errorText;
         private int _countCreateView;
@@ -32,12 +32,12 @@ namespace RevitCreateViewSheet.ViewModels {
 
             ViewSheets = new ObservableCollection<ViewSheetViewModel>();
             AlbumsBlueprints = new ObservableCollection<string>(_revitRepository.GetAlbumsBlueprints());
-            FamilyInstances = new ObservableCollection<FamilyInstanceViewModel>(_revitRepository.GetTitleBlocks().Select(item => new FamilyInstanceViewModel(item)).OrderBy(item => item.Name));
+            TitleBlocks = new ObservableCollection<TitleBlockViewModel>(_revitRepository.GetTitleBlocks().Select(item => new TitleBlockViewModel(item)).OrderBy(item => item.Name));
 
             CountCreateView = 1;
             AlbumBlueprints = AlbumsBlueprints.FirstOrDefault();
 
-            _defaultFamilyInstance = FamilyInstances.FirstOrDefault(item => item.FamilyInstanceName.Equals("Создать типы по комплектам"));
+            _defaultTitleBlock = TitleBlocks.FirstOrDefault(item => item.FamilyName.Equals("Создать типы по комплектам"));
         }
 
         public string ErrorText {
@@ -66,7 +66,7 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public ObservableCollection<string> AlbumsBlueprints { get; }
         public ObservableCollection<ViewSheetViewModel> ViewSheets { get; }
-        public ObservableCollection<FamilyInstanceViewModel> FamilyInstances { get; }
+        public ObservableCollection<TitleBlockViewModel> TitleBlocks { get; }
 
         public void RemoveViewSheet(object p) {
             ViewSheets.Remove((ViewSheetViewModel) p);
@@ -78,7 +78,7 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public void CreateViewSheet(object p) {
             foreach(int index in Enumerable.Range(0, CountCreateView)) {
-                ViewSheets.Add(new ViewSheetViewModel() { FamilyInstance = _defaultFamilyInstance });
+                ViewSheets.Add(new ViewSheetViewModel() { TitleBlock = _defaultTitleBlock });
             }
         }
 
@@ -91,7 +91,7 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         public bool CanCreateViewSheets(object p) {
-            return ViewSheets.Count > 0 && ViewSheets.All(item => !string.IsNullOrEmpty(item.Name)) && ViewSheets.All(item => item.FamilyInstance != null);
+            return ViewSheets.Count > 0 && ViewSheets.All(item => !string.IsNullOrEmpty(item.Name)) && ViewSheets.All(item => item.TitleBlock != null);
         }
     }
 }

@@ -11,7 +11,7 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -45,8 +45,8 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ComboBox
-                                ItemsSource="{Binding ElementName=_this, Path=DataContext.FamilyInstances}"
-                                SelectedItem="{Binding FamilyInstance}"/>
+                                ItemsSource="{Binding ElementName=_this, Path=DataContext.TitleBlocks}"
+                                SelectedItem="{Binding TitleBlock}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
