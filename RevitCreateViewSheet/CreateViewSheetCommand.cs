@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep;
+
+using RevitCreateViewSheet.ViewModels;
+using RevitCreateViewSheet.Views;
 
 namespace RevitCreateViewSheet {
     [Transaction(TransactionMode.Manual)]
@@ -37,7 +41,9 @@ namespace RevitCreateViewSheet {
             var uiDocument = uiApplication.ActiveUIDocument;
             var document = uiDocument.Document;
 
-
+            var window = new CreateViewSheetWindow() { DataContext = new AppViewModel(uiApplication) };
+            new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
+            window.ShowDialog();
         }
     }
 }
