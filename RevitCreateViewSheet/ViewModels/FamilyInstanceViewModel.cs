@@ -14,5 +14,9 @@ namespace RevitCreateViewSheet.ViewModels {
         public string Name {
             get => _familyInstance.Name;
         }
+
+        public override string ToString() {
+            return Name;
+        }
     }
 }

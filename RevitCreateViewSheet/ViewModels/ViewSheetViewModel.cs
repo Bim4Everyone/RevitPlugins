@@ -24,5 +24,9 @@ namespace RevitCreateViewSheet.ViewModels {
             get => _familyInstance;
             set => RaiseAndSetIfChanged(ref _familyInstance, value);
         }
+
+        public override string ToString() {
+            return Name;
+        }
     }
 }
