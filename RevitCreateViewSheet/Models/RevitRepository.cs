@@ -8,6 +8,8 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Revit;
+
 namespace RevitCreateViewSheet.Models {
     public class RevitRepository {
         private readonly UIApplication _uiApplication;
@@ -26,6 +28,15 @@ namespace RevitCreateViewSheet.Models {
 
         public UIDocument UIDocument {
             get => _uiApplication.ActiveUIDocument;
+        }
+
+
+        public List<string> GetAlbumsBlueprints() {
+            return GetViewSheets()
+                .Select(item => (string) item.GetParamValueOrDefault("ADSK_Комплект чертежей"))
+                .OrderBy(item => item)
+                .Distinct()
+                .ToList();
         }
 
 
