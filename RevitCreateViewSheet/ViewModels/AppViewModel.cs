@@ -24,12 +24,12 @@ namespace RevitCreateViewSheet.ViewModels {
             _revitRepository = new RevitRepository(uiApplication);
 
             CreateViewSheetCommand = new RelayCommand(CreateViewSheet, CanCreateViewSheet);
+            CreateViewSheetsCommand = new RelayCommand(CreateViewSheets, CanCreateViewSheets);
 
             ViewSheets = new ObservableCollection<ViewSheetViewModel>();
             AlbumsBlueprints = new ObservableCollection<string>(_revitRepository.GetAlbumsBlueprints());
             FamilyInstances = new ObservableCollection<FamilyInstanceViewModel>(_revitRepository.GetTitleBlocks().Select(item => new FamilyInstanceViewModel(item)).OrderBy(item => item.Name));
         }
-
 
         public int CountCreateView {
             get => _countCreateView;
@@ -42,6 +42,7 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         public ICommand CreateViewSheetCommand { get; }
+        public ICommand CreateViewSheetsCommand { get; }
 
         public ObservableCollection<string> AlbumsBlueprints { get; }
         public ObservableCollection<ViewSheetViewModel> ViewSheets { get; }
@@ -53,6 +54,14 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public bool CanCreateViewSheet(object p) {
             return _countCreateView > 0;
+        }
+
+        public void CreateViewSheets(object p) {
+
+        }
+
+        public bool CanCreateViewSheets(object p) {
+            return ViewSheets.Count > 0 && ViewSheets.All(item => !string.IsNullOrEmpty(item.Name));
         }
     }
 }
