@@ -24,6 +24,7 @@ namespace RevitCreateViewSheet.ViewModels {
         public AppViewModel(UIApplication uiApplication) {
             _revitRepository = new RevitRepository(uiApplication);
 
+            RemoveViewSheetCommand = new RelayCommand(RemoveViewSheet, CanRemoveViewSheet);
             CreateViewSheetCommand = new RelayCommand(CreateViewSheet, CanCreateViewSheet);
             CreateViewSheetsCommand = new RelayCommand(CreateViewSheets, CanCreateViewSheets);
 
@@ -47,12 +48,21 @@ namespace RevitCreateViewSheet.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _albumBlueprints, value);
         }
 
+        public ICommand RemoveViewSheetCommand { get; }
         public ICommand CreateViewSheetCommand { get; }
         public ICommand CreateViewSheetsCommand { get; }
 
         public ObservableCollection<string> AlbumsBlueprints { get; }
         public ObservableCollection<ViewSheetViewModel> ViewSheets { get; }
         public ObservableCollection<FamilyInstanceViewModel> FamilyInstances { get; }
+
+        public void RemoveViewSheet(object p) {
+            ViewSheets.Remove((ViewSheetViewModel) p);
+        }
+
+        public bool CanRemoveViewSheet(object p) {
+            return p is ViewSheetViewModel;
+        }
 
         public void CreateViewSheet(object p) {
             ViewSheets.Add(new ViewSheetViewModel());
