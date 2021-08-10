@@ -6,7 +6,9 @@
              xmlns:local="clr-namespace:RevitCreateViewSheet.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" 
-             Title="Создание листов" WindowStartupLocation="CenterOwner">
+             Title="Создание листов" WindowStartupLocation="CenterOwner"
+             x:Name="_this">
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="50"/>
@@ -18,17 +20,36 @@
             <RowDefinition Height="45"/>
         </Grid.RowDefinitions>
 
-        <DataGrid Grid.Column="1" Grid.Row="0" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" ItemsSource="{Binding ViewSheets}">
+        <StackPanel>
+            <Button Content="+" Command="{Binding CreateViewSheetCommand}" />
+            <TextBox Text="{Binding CountCreateView}"/>
+            <ComboBox ItemsSource="{Binding AlbumsBlueprints}" SelectedItem="{Binding AlbumBlueprints}"/>
+        </StackPanel>
+
+        <DataGrid Grid.Column="1" Grid.Row="0" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" SelectionMode="Single"
+                  x:Name="_viewSheets"
+                  ItemsSource="{Binding ViewSheets}"
+                  SelectedItem="{Binding ViewSheet}">
             <DataGrid.Columns>
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Content="Удалить лист" Command="{Binding RemoveViewSheet}"/>
+                            <Button Margin="1" Content="Удалить лист" 
+                                    Command="{Binding ElementName=_this, Path=DataContext.RemoveViewSheetCommand}"
+                                    CommandParameter="{Binding ElementName=_this, Path=DataContext.ViewSheet}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" />
-                <DataGridComboBoxColumn Header="Основная надпись" ItemsSource="{Binding FamilyInstances}" SelectedItemBinding="{Binding FamilyInstance.Name}"/>
+                <DataGridTemplateColumn Header="Основная надпись">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox
+                                ItemsSource="{Binding ElementName=_this, Path=DataContext.FamilyInstances}"
+                                SelectedItem="{Binding FamilyInstance}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
 

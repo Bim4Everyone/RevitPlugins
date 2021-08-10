@@ -16,10 +16,12 @@ using RevitCreateViewSheet.Models;
 namespace RevitCreateViewSheet.ViewModels {
     internal class AppViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly FamilyInstanceViewModel _defaultFamilyInstance;
 
         private string _errorText;
         private int _countCreateView;
         private string _albumBlueprints;
+        private ViewSheetViewModel _viewSheet;
 
         public AppViewModel(UIApplication uiApplication) {
             _revitRepository = new RevitRepository(uiApplication);
@@ -31,6 +33,11 @@ namespace RevitCreateViewSheet.ViewModels {
             ViewSheets = new ObservableCollection<ViewSheetViewModel>();
             AlbumsBlueprints = new ObservableCollection<string>(_revitRepository.GetAlbumsBlueprints());
             FamilyInstances = new ObservableCollection<FamilyInstanceViewModel>(_revitRepository.GetTitleBlocks().Select(item => new FamilyInstanceViewModel(item)).OrderBy(item => item.Name));
+
+            CountCreateView = 1;
+            AlbumBlueprints = AlbumsBlueprints.FirstOrDefault();
+
+            _defaultFamilyInstance = FamilyInstances.FirstOrDefault(item => item.FamilyInstanceName.Equals("Создать типы по комплектам"));
         }
 
         public string ErrorText {
@@ -48,6 +55,11 @@ namespace RevitCreateViewSheet.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _albumBlueprints, value);
         }
 
+        public ViewSheetViewModel ViewSheet {
+            get => _viewSheet;
+            set => this.RaiseAndSetIfChanged(ref _viewSheet, value);
+        }
+
         public ICommand RemoveViewSheetCommand { get; }
         public ICommand CreateViewSheetCommand { get; }
         public ICommand CreateViewSheetsCommand { get; }
@@ -61,11 +73,13 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         public bool CanRemoveViewSheet(object p) {
-            return p is ViewSheetViewModel;
+            return true;
         }
 
         public void CreateViewSheet(object p) {
-            ViewSheets.Add(new ViewSheetViewModel());
+            foreach(int index in Enumerable.Range(0, CountCreateView)) {
+                ViewSheets.Add(new ViewSheetViewModel() { FamilyInstance = _defaultFamilyInstance });
+            }
         }
 
         public bool CanCreateViewSheet(object p) {
@@ -77,7 +91,7 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         public bool CanCreateViewSheets(object p) {
-            return ViewSheets.Count > 0 && ViewSheets.All(item => !string.IsNullOrEmpty(item.Name));
+            return ViewSheets.Count > 0 && ViewSheets.All(item => !string.IsNullOrEmpty(item.Name)) && ViewSheets.All(item => item.FamilyInstance != null);
         }
     }
 }
