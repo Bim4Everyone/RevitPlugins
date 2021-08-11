@@ -5,13 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RevitCreateViewSheet.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" 
+             Height="550" Width="900" 
+             MinHeight="450" MinWidth="800" 
              Title="Создание листов" WindowStartupLocation="CenterOwner"
              x:Name="_this">
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="150"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -21,9 +22,11 @@
         </Grid.RowDefinitions>
 
         <StackPanel>
-            <Button Content="+" Command="{Binding CreateViewSheetCommand}" />
-            <TextBox Text="{Binding CountCreateView}"/>
-            <ComboBox ItemsSource="{Binding AlbumsBlueprints}" SelectedItem="{Binding AlbumBlueprints}"/>
+            <Button Content="Создать листы" Margin="10" Command="{Binding CreateViewSheetCommand}" />
+            <Label Margin="10,0,10,0">Количество листов</Label>
+            <TextBox Margin="10,0,10,0" Text="{Binding CountCreateView}"/>
+            <Label Margin="10,10,10,0">Альбом</Label>
+            <ComboBox Margin="10,0,10,0" ItemsSource="{Binding AlbumsBlueprints}" SelectedItem="{Binding AlbumBlueprints}"/>
         </StackPanel>
 
         <DataGrid Grid.Column="1" Grid.Row="0" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" SelectionMode="Single"
@@ -40,8 +43,8 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" />
-                <DataGridTemplateColumn Header="Основная надпись">
+                <DataGridTextColumn Header="Наименование" Width="250" Binding="{Binding Name}" />
+                <DataGridTemplateColumn Header="Основная надпись" Width="350">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ComboBox
