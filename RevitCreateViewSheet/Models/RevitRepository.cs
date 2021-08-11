@@ -36,9 +36,18 @@ namespace RevitCreateViewSheet.Models {
             return ViewSheet.Create(Document, familySymbol.Id);
         }
 
+        public string GetDefaultAlbum() {
+            return UIDocument.GetSelectedElements()
+                .OfType<ViewSheet>()
+                .Select(item => (string) item.GetParamValueOrDefault("ADSK_Комплект чертежей"))                
+                .Distinct()
+                .FirstOrDefault();
+        }
+
         public List<string> GetAlbumsBlueprints() {
             return GetViewSheets()
                 .Select(item => (string) item.GetParamValueOrDefault("ADSK_Комплект чертежей"))
+                .Where(item => !item.EndsWith("BIM"))
                 .OrderBy(item => item)
                 .Distinct()
                 .ToList();

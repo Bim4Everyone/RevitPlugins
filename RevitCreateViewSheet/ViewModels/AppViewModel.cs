@@ -40,7 +40,7 @@ namespace RevitCreateViewSheet.ViewModels {
             TitleBlocks = new ObservableCollection<TitleBlockViewModel>(_revitRepository.GetTitleBlocks().Select(item => new TitleBlockViewModel(item)).OrderBy(item => item.Name));
 
             CountCreateView = "1";
-            AlbumBlueprints = AlbumsBlueprints.FirstOrDefault();
+            AlbumBlueprints = _revitRepository.GetDefaultAlbum() ?? AlbumsBlueprints.FirstOrDefault();
 
             _defaultTitleBlock = TitleBlocks.FirstOrDefault(item => item.FamilyName.Equals("Создать типы по комплектам"));
         }
