@@ -51,7 +51,7 @@
                         <DataTemplate>
                             <ComboBox
                                 ItemsSource="{Binding ElementName=_this, Path=DataContext.TitleBlocks}"
-                                SelectedItem="{Binding TitleBlock}"/>
+                                SelectedItem="{Binding TitleBlock, UpdateSourceTrigger=PropertyChanged}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
