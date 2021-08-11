@@ -9,6 +9,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.Revit.Comparators;
 
 namespace RevitCreateViewSheet.Models {
     public class RevitRepository {
@@ -57,6 +58,20 @@ namespace RevitCreateViewSheet.Models {
                 .OfType<FamilySymbol>()
                 .Where(item => item.Category.Id == category.Id)
                 .ToList();
+        }
+
+        public int GetLastViewSheetIndex(string albumBlueprints) {
+            ViewSheet viewSheet = GetViewSheets()
+                .Where(item => ((string) item.GetParamValueOrDefault("ADSK_Комплект чертежей")).Equals(albumBlueprints))
+                .OrderBy(item => item, new ViewSheetComparer())
+                .LastOrDefault();
+
+            return GetViewSheetIndex(viewSheet) ?? 1;
+        }
+
+        private int? GetViewSheetIndex(ViewSheet viewSheet) {
+            string index = viewSheet?.SheetNumber.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
+            return int.TryParse(index, out int result) ? result : (int?) null;
         }
     }
 }

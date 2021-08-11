@@ -6,8 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone.Templates;
+using dosymep.Revit;
+using dosymep.Revit.Comparators;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -87,7 +91,22 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         public void CreateViewSheets(object p) {
+            ProjectParameters.Create(_revitRepository.Application).SetupNumerateSheets(_revitRepository.Document);
+            
+            int lastIndex = _revitRepository.GetLastViewSheetIndex(AlbumBlueprints);
+            lastIndex++;
+            using(var transaction = new Transaction(_revitRepository.Document)) {
+                transaction.Start("Создание видов");
 
+                foreach(var viewSheetViewModel in ViewSheets) {
+                    ViewSheet viewSheet = _revitRepository.CreateViewSheet(viewSheetViewModel.FamilySymbol);
+                    viewSheet.SetParamValue("ADSK_Комплект чертежей", AlbumBlueprints);
+                    viewSheet.SetParamValue(BuiltInParameter.SHEET_NAME, viewSheetViewModel.Name);
+                    viewSheet.SetParamValue(BuiltInParameter.SHEET_NUMBER, $"{AlbumBlueprints}-{lastIndex++}");
+                }
+
+                transaction.Commit();
+            }
         }
 
         public bool CanCreateViewSheets(object p) {

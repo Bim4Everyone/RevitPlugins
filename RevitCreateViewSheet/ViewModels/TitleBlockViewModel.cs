@@ -11,6 +11,10 @@ namespace RevitCreateViewSheet.ViewModels {
             _familySymbol = familySymbol;
         }
 
+        public FamilySymbol FamilySymbol {
+            get => _familySymbol;
+        }
+
         public string Name {
             get => $"{_familySymbol.FamilyName}: {_familySymbol.Name}";
         }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.ViewModels;
 
 namespace RevitCreateViewSheet.ViewModels {
@@ -13,6 +15,10 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public ViewSheetViewModel() {
             Name = "Без имени";
+        }
+
+        public FamilySymbol FamilySymbol {
+            get => _titleBlock.FamilySymbol;
         }
 
         public string Name {
