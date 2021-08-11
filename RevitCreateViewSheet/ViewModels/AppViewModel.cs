@@ -117,6 +117,8 @@ namespace RevitCreateViewSheet.ViewModels {
 
                 foreach(var viewSheetViewModel in ViewSheets) {
                     ViewSheet viewSheet = _revitRepository.CreateViewSheet(viewSheetViewModel.FamilySymbol);
+
+                    viewSheet.SetParamValue("Ш.НомерЛиста", lastIndex.ToString());
                     viewSheet.SetParamValue("ADSK_Комплект чертежей", AlbumBlueprints);
                     viewSheet.SetParamValue(BuiltInParameter.SHEET_NAME, viewSheetViewModel.Name);
                     viewSheet.SetParamValue(BuiltInParameter.SHEET_NUMBER, $"{AlbumBlueprints}-{lastIndex++}");

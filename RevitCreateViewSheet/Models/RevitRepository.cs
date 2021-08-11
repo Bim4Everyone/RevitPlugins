@@ -39,7 +39,7 @@ namespace RevitCreateViewSheet.Models {
         public string GetDefaultAlbum() {
             return UIDocument.GetSelectedElements()
                 .OfType<ViewSheet>()
-                .Select(item => (string) item.GetParamValueOrDefault("ADSK_Комплект чертежей"))                
+                .Select(item => (string) item.GetParamValueOrDefault("ADSK_Комплект чертежей"))
                 .Distinct()
                 .FirstOrDefault();
         }
