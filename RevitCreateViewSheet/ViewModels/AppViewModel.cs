@@ -23,7 +23,8 @@ namespace RevitCreateViewSheet.ViewModels {
         private readonly TitleBlockViewModel _defaultTitleBlock;
 
         private string _errorText;
-        private int _countCreateView;
+        private string _createErrorText;
+        private string _countCreateView;
         private string _albumBlueprints;
         private ViewSheetViewModel _viewSheet;
 
@@ -38,7 +39,7 @@ namespace RevitCreateViewSheet.ViewModels {
             AlbumsBlueprints = new ObservableCollection<string>(_revitRepository.GetAlbumsBlueprints());
             TitleBlocks = new ObservableCollection<TitleBlockViewModel>(_revitRepository.GetTitleBlocks().Select(item => new TitleBlockViewModel(item)).OrderBy(item => item.Name));
 
-            CountCreateView = 1;
+            CountCreateView = "1";
             AlbumBlueprints = AlbumsBlueprints.FirstOrDefault();
 
             _defaultTitleBlock = TitleBlocks.FirstOrDefault(item => item.FamilyName.Equals("Создать типы по комплектам"));
@@ -49,7 +50,12 @@ namespace RevitCreateViewSheet.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public int CountCreateView {
+        public string CreateErrorText {
+            get => _createErrorText;
+            set => this.RaiseAndSetIfChanged(ref _createErrorText, value);
+        }
+
+        public string CountCreateView {
             get => _countCreateView;
             set => this.RaiseAndSetIfChanged(ref _countCreateView, value);
         }
@@ -81,13 +87,24 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         public void CreateViewSheet(object p) {
-            foreach(int index in Enumerable.Range(0, CountCreateView)) {
+            foreach(int index in Enumerable.Range(0, int.Parse(CountCreateView))) {
                 ViewSheets.Add(new ViewSheetViewModel() { TitleBlock = _defaultTitleBlock });
             }
         }
 
         public bool CanCreateViewSheet(object p) {
-            return _countCreateView > 0;
+            if(!int.TryParse(_countCreateView, out _)) {
+                CreateErrorText = "Количество листов должно быть числовым значением.";
+                return false;
+            }
+
+            if(int.Parse(_countCreateView) <= 0) {
+                CreateErrorText = "Количество листов должно быть не отрицательным.";
+                return false;
+            }
+
+            CreateErrorText = null;
+            return true;
         }
 
         public void CreateViewSheets(object p) {
@@ -110,7 +127,28 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         public bool CanCreateViewSheets(object p) {
-            return ViewSheets.Count > 0 && ViewSheets.All(item => !string.IsNullOrEmpty(item.Name)) && ViewSheets.All(item => item.TitleBlock != null);
+            if(string.IsNullOrEmpty(AlbumBlueprints)) {
+                ErrorText = "Выберите альбом.";
+                return false;
+            }
+
+            if(ViewSheets.Count == 0) {
+                ErrorText = "Добавьте создаваемые листы.";
+                return false;
+            }
+
+            if(!ViewSheets.All(item => !string.IsNullOrEmpty(item.Name))) {
+                ErrorText = "У всех листов должно быть заполнено наименование.";
+                return false;
+            }
+
+            if(!ViewSheets.All(item => item.TitleBlock != null)) {
+                ErrorText = "У всех листов должна быть выбрана основная надпись.";
+                return false;
+            }
+
+            ErrorText = null;
+            return true;
         }
     }
 }

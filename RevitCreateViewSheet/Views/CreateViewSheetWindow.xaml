@@ -22,9 +22,11 @@
         </Grid.RowDefinitions>
 
         <StackPanel>
-            <Button Content="Создать листы" Margin="10" Command="{Binding CreateViewSheetCommand}" />
+            <Button Content="Создать листы" Margin="10" ToolTipService.ShowOnDisabled="true"
+                    Command="{Binding CreateViewSheetCommand}"
+                    ToolTip="{Binding CreateErrorText}" />
             <Label Margin="10,0,10,0">Количество листов</Label>
-            <TextBox Margin="10,0,10,0" Text="{Binding CountCreateView}"/>
+            <TextBox Margin="10,0,10,0" Text="{Binding CountCreateView, UpdateSourceTrigger=PropertyChanged}"/>
             <Label Margin="10,10,10,0">Альбом</Label>
             <ComboBox Margin="10,0,10,0" ItemsSource="{Binding AlbumsBlueprints}" SelectedItem="{Binding AlbumBlueprints}"/>
         </StackPanel>
