@@ -11,6 +11,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep;
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
 
 using RevitCopyViews.ViewModels;
@@ -51,7 +53,7 @@ namespace RevitCopyViews {
 
             var views = new FilteredElementCollector(document).OfClass(typeof(View)).ToElements();
             var groupViews = views
-                 .Select(item => (string) item.GetParamValueOrDefault("_Группа Видов"))
+                 .Select(item => (string) item.GetParamValueOrDefault(ProjectParamsConfig.Instance.ViewGroup))
                  .Where(item => !string.IsNullOrEmpty(item))
                  .OrderBy(item => item)
                  .Distinct();

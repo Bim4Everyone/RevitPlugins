@@ -9,6 +9,8 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
 using dosymep.WPF.Commands;
@@ -65,10 +67,10 @@ namespace RevitCopyViews.ViewModels {
                     newView.Name = GetViewName(revitView);
 
                     // У некоторых видов установлен шаблон,
-                    // у которого заблокировано редактирование атрибута "_Группа Видов"
+                    // у которого заблокировано редактирование атрибута ProjectParamsConfig.Instance.ViewGroup
                     // удаление шаблона разрешает изменение данного атрибута
                     newView.ViewTemplateId = ElementId.InvalidElementId;
-                    newView.SetParamValue("_Группа Видов", GroupView);
+                    newView.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, GroupView);
 
                     createdViews.Add(newView.Id);
                 }

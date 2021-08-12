@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
@@ -20,7 +22,7 @@ namespace RevitCopyViews.ViewModels {
 
         public RevitViewViewModel(View view) {
             _view = view;
-            GroupView = (string) _view.GetParamValueOrDefault("_Группа Видов");
+            GroupView = (string) _view.GetParamValueOrDefault(ProjectParamsConfig.Instance.ViewGroup);
             OriginalName = _view.Name;
 
             if(view.ViewType == ViewType.FloorPlan
