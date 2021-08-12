@@ -110,7 +110,8 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         public void CreateViewSheets(object p) {
-            ProjectParameters.Create(_revitRepository.Application).SetupNumerateSheets(_revitRepository.Document);
+            var projectParameters = ProjectParameters.Create(_revitRepository.Application);
+            projectParameters.SetupRevitParams(_revitRepository.Document, SharedParamsConfig.Instance.AlbumBlueprints, SharedParamsConfig.Instance.StampSheetNumber);
             
             int lastIndex = _revitRepository.GetLastViewSheetIndex(AlbumBlueprints);
             lastIndex++;
