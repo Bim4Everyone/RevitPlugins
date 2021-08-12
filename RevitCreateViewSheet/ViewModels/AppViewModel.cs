@@ -9,6 +9,8 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
 using dosymep.Revit.Comparators;
@@ -118,8 +120,8 @@ namespace RevitCreateViewSheet.ViewModels {
                 foreach(var viewSheetViewModel in ViewSheets) {
                     ViewSheet viewSheet = _revitRepository.CreateViewSheet(viewSheetViewModel.FamilySymbol);
 
-                    viewSheet.SetParamValue("Ш.НомерЛиста", lastIndex.ToString());
-                    viewSheet.SetParamValue("ADSK_Комплект чертежей", AlbumBlueprints);
+                    viewSheet.SetParamValue(SharedParamsConfig.Instance.StampSheetNumber, lastIndex.ToString());
+                    viewSheet.SetParamValue(SharedParamsConfig.Instance.AlbumBlueprints, AlbumBlueprints);
                     viewSheet.SetParamValue(BuiltInParameter.SHEET_NAME, viewSheetViewModel.Name);
                     viewSheet.SetParamValue(BuiltInParameter.SHEET_NUMBER, $"{AlbumBlueprints}-{lastIndex++}");
                 }

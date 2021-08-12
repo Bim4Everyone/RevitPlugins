@@ -8,6 +8,8 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 using dosymep.Revit.Comparators;
 
@@ -39,14 +41,14 @@ namespace RevitCreateViewSheet.Models {
         public string GetDefaultAlbum() {
             return UIDocument.GetSelectedElements()
                 .OfType<ViewSheet>()
-                .Select(item => (string) item.GetParamValueOrDefault("ADSK_Комплект чертежей"))
+                .Select(item => (string) item.GetParamValueOrDefault(SharedParamsConfig.Instance.AlbumBlueprints))
                 .Distinct()
                 .FirstOrDefault();
         }
 
         public List<string> GetAlbumsBlueprints() {
             return GetViewSheets()
-                .Select(item => (string) item.GetParamValueOrDefault("ADSK_Комплект чертежей"))
+                .Select(item => (string) item.GetParamValueOrDefault(SharedParamsConfig.Instance.AlbumBlueprints))
                 .Where(item => !item.EndsWith("BIM"))
                 .OrderBy(item => item)
                 .Distinct()
@@ -71,7 +73,7 @@ namespace RevitCreateViewSheet.Models {
 
         public int GetLastViewSheetIndex(string albumBlueprints) {
             ViewSheet viewSheet = GetViewSheets()
-                .Where(item => ((string) item.GetParamValueOrDefault("ADSK_Комплект чертежей")).Equals(albumBlueprints))
+                .Where(item => ((string) item.GetParamValueOrDefault(SharedParamsConfig.Instance.AlbumBlueprints)).Equals(albumBlueprints))
                 .OrderBy(item => item, new ViewSheetComparer())
                 .LastOrDefault();
 
