@@ -56,7 +56,9 @@ namespace RevitCopyViews.ViewModels {
         public ICommand CopyUserCommand { get; }
 
         private void CopyUser(object p) {
-            ProjectParameters.Create(Application).SetupBrowserOrganization(Document);
+            var projectParameters = ProjectParameters.Create(Application);
+            projectParameters.SetupBrowserOrganization(Document);
+            projectParameters.SetupRevitParams(Document, ProjectParamsConfig.Instance.ViewGroup, ProjectParamsConfig.Instance.ProjectStage);
 
             var createdViews = new List<ElementId>();
             using(var transaction = new Transaction(Document)) {
