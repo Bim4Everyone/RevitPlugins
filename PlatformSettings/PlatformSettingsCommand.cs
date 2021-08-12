@@ -29,7 +29,7 @@ namespace PlatformSettings {
             new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
 
             if(window.ShowDialog() == true) {
-                var settings = ((PlatformSettingsViewModel) window.DataContext);
+                var settings = (PlatformSettingsViewModel) window.DataContext;
                 settings.SaveSettings();
 
                 return true;

@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:PlatformSettings"
              xmlns:tabextensions="clr-namespace:PlatformSettings.TabExtensions"
              mc:Ignorable="d" 
-             Height="450" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Title="Настройки">
+             Height="450" Width="800" WindowStartupLocation="CenterScreen" Title="Настройки">
     <Window.DataContext>
         <local:PlatformSettingsViewModel/>
     </Window.DataContext>

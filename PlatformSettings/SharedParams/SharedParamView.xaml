@@ -4,17 +4,26 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PlatformSettings.SharedParams"
-             mc:Ignorable="d" d:DesignWidth="800"
+             mc:Ignorable="d" d:DesignWidth="500"
              x:Name="_this">
     <Grid DataContext="{Binding ElementName=_this}" ToolTip="{Binding Path=ViewModel.Description}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="120"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="25"/>
+            <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
-        <TextBox Grid.Row="0"
+
+        <Label Grid.Column="0" Grid.Row="0" Margin="5" Content="Наименование"/>
+        <Label Grid.Column="0" Grid.Row="1" Margin="5" Content="Тип параметра"/>
+
+        <TextBox Grid.Column="1" Grid.Row="0" Margin="5"
             DataContext="{Binding ElementName=_this}" 
             Text="{Binding Path=ViewModel.Name}"/>
-        <TextBlock Grid.Row="1"
+        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5"
             DataContext="{Binding ElementName=_this}" 
             Text="{Binding Path=ViewModel.SharedParamType}" IsEnabled="False"/>
     </Grid>

@@ -69,11 +69,16 @@ namespace PlatformSettings.SharedParams {
         public ICommand OpenFile { get; }
         public ObservableCollection<SharedParamViewModel> SharedParams { get; }
 
+        public bool IsAllowEditParams {
+            get => !string.IsNullOrEmpty(Path);
+        }
+
         public string Path {
             get => _path;
             set {
                 _path = value;
                 OnPropertyChanged(nameof(Path));
+                OnPropertyChanged(nameof(IsAllowEditParams));
             }
         }
 
