@@ -38,21 +38,25 @@ namespace PlatformSettings {
     public class PlatformSettingsViewModel {
         public PlatformSettingsViewModel() {
             TabExtensionsSettingsViewModel = new TabExtensionsSettingsViewModel();
-            SharedParamsSettingsViewModel = new SharedParamsSettingsViewModel();
+            SharedParamsSettingsViewModel = new RevitParamsSettingsViewModel(new SharedParams.SharedParams() { Name = "Общие параметры", KeyName = "SharedParamsPath", ConfigFileName = "shared_params.json" });
+            ProjectParamsSettingsViewModel = new RevitParamsSettingsViewModel(new SharedParams.ProjectParams() { Name = "Параметры проекта", KeyName = "ProjectParamsPath", ConfigFileName = "project_params.json" });
 
             TabSettings = new ObservableCollection<ITabSetting> {
                 TabExtensionsSettingsViewModel,
-                SharedParamsSettingsViewModel
+                SharedParamsSettingsViewModel,
+                ProjectParamsSettingsViewModel
             };
         }
 
         public ObservableCollection<ITabSetting> TabSettings { get; }
         public TabExtensionsSettingsViewModel TabExtensionsSettingsViewModel { get; set; }
-        public SharedParamsSettingsViewModel SharedParamsSettingsViewModel { get; set; }
+        public RevitParamsSettingsViewModel SharedParamsSettingsViewModel { get; set; }
+        public RevitParamsSettingsViewModel ProjectParamsSettingsViewModel { get; set; }
 
         public void SaveSettings() {
             TabExtensionsSettingsViewModel?.SaveSettings();
             SharedParamsSettingsViewModel.SaveSettings();
+            ProjectParamsSettingsViewModel.SaveSettings();
         }
     }
 

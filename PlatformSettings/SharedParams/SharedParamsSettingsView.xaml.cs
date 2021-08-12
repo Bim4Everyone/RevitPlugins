@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 
 using pyRevitLabs.NLog;
@@ -24,14 +25,14 @@ namespace PlatformSettings.SharedParams {
     /// Interaction logic for SharedParamsSettingsView.xaml
     /// </summary>
     public partial class SharedParamsSettingsView : UserControl {
-        public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(nameof(ViewModel), typeof(SharedParamsSettingsViewModel), typeof(SharedParamsSettingsView));
+        public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(nameof(ViewModel), typeof(RevitParamsSettingsViewModel), typeof(SharedParamsSettingsView));
 
         public SharedParamsSettingsView() {
             InitializeComponent();
         }
 
-        public SharedParamsSettingsViewModel ViewModel {
-            get { return (SharedParamsSettingsViewModel) GetValue(ViewModelProperty); }
+        public RevitParamsSettingsViewModel ViewModel {
+            get { return (RevitParamsSettingsViewModel) GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
 
@@ -40,34 +41,33 @@ namespace PlatformSettings.SharedParams {
         }
     }
 
-    public class SharedParamsSettingsViewModel : ITabSetting, INotifyPropertyChanged {
+    public class RevitParamsSettingsViewModel : ITabSetting, INotifyPropertyChanged {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private string _path;
-        private readonly SharedParamsConfig _sharedParamsConfig;
+        private readonly RevitParams _revitParams;
+        private readonly RevitParamsConfig _revitParamsConfig;
 
-        public SharedParamsSettingsViewModel() {
-            string sharedParamsPath = pyRevitLabs.PyRevit.PyRevitConfigs.GetConfigFile().GetValue("PlatformSettings", "SharedParamsPath");
-            if(!string.IsNullOrEmpty(sharedParamsPath)) {
-                Path = new System.IO.FileInfo(sharedParamsPath.Trim('\"')).FullName;
-            }
+        public RevitParamsSettingsViewModel(RevitParams revitParams) {
+            _path = revitParams.GetConfigPath();
+            _revitParams = revitParams;
+            _revitParamsConfig = revitParams.GetConfig();
 
-            _sharedParamsConfig = SharedParamsConfig.Load(Path);
-
-            Name = "Общие параметры";
+            Name = revitParams.Name;
             Content = new SharedParamsSettingsView() { ViewModel = this };
 
-            SharedParams = new ObservableCollection<SharedParamViewModel>(_sharedParamsConfig.GetSharedParams().Select(item => new SharedParamViewModel(item)));
+            SharedParams = new ObservableCollection<RevitParamViewModel>(_revitParamsConfig.GetSharedParams().Select(item => new RevitParamViewModel(item)));
             OnPropertyChanged(nameof(SharedParams));
 
             OpenFile = new RelayCommand(SelectConfigFile);
+            this._revitParams = revitParams;
         }
 
         public string Name { get; }
         public object Content { get; }
 
         public ICommand OpenFile { get; }
-        public ObservableCollection<SharedParamViewModel> SharedParams { get; }
+        public ObservableCollection<RevitParamViewModel> SharedParams { get; }
 
         public bool IsAllowEditParams {
             get => !string.IsNullOrEmpty(Path);
@@ -85,11 +85,10 @@ namespace PlatformSettings.SharedParams {
         public void SaveSettings() {
             try {
                 if(!string.IsNullOrEmpty(Path)) {
-                    _sharedParamsConfig.Save(Path);
-                    pyRevitLabs.PyRevit.PyRevitConfigs.GetConfigFile().SetValue("PlatformSettings", "SharedParamsPath", $"\"{Path}\"");
+                    _revitParams.SaveSettings(_revitParamsConfig, Path);
                 }
             } catch(Exception ex) {
-                logger.Error(ex, "Ошибка сохранения конфигурации общих параметров.");
+                logger.Error(ex, "Ошибка сохранения конфигурации параметров.");
             }
         }
 
@@ -97,7 +96,7 @@ namespace PlatformSettings.SharedParams {
             using(var dialog = new System.Windows.Forms.FolderBrowserDialog()) {
                 dialog.SelectedPath = System.IO.Path.GetDirectoryName(Path);
                 if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-                    Path = System.IO.Path.Combine(dialog.SelectedPath, "shared_params.json");
+                    Path = System.IO.Path.Combine(dialog.SelectedPath, _revitParams.ConfigFileName);
                 }
             }
         }

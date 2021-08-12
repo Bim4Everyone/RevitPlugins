@@ -82,6 +82,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="RelayCommand.cs" />
+    <Compile Include="SharedParams\ProjectParams.cs" />
+    <Compile Include="SharedParams\RevitParams.cs" />
+    <Compile Include="SharedParams\SharedParams.cs" />
     <Compile Include="TabExtensions\BimExtensions.cs" />
     <Compile Include="TabExtensions\DisableExtensionBehav.cs" />
     <Compile Include="TabExtensions\Extensions.cs" />

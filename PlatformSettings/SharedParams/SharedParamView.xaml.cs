@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 
 namespace PlatformSettings.SharedParams {
@@ -23,31 +24,31 @@ namespace PlatformSettings.SharedParams {
     /// Interaction logic for SharedParamView.xaml
     /// </summary>
     public partial class SharedParamView : UserControl {
-        public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(nameof(ViewModel), typeof(SharedParamViewModel), typeof(SharedParamView));
+        public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(nameof(ViewModel), typeof(RevitParamViewModel), typeof(SharedParamView));
 
         public SharedParamView() {
             InitializeComponent();
         }
 
-        public SharedParamViewModel ViewModel {
-            get { return (SharedParamViewModel) GetValue(ViewModelProperty); }
+        public RevitParamViewModel ViewModel {
+            get { return (RevitParamViewModel) GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
     }
 
-    public class SharedParamViewModel : INotifyPropertyChanged {
-        private readonly SharedParam _sharedParam;
+    public class RevitParamViewModel : INotifyPropertyChanged {
+        private readonly RevitParam _revitParam;
 
-        public SharedParamViewModel(SharedParam sharedParam) {
-            _sharedParam = sharedParam;
+        public RevitParamViewModel(RevitParam revitParam) {
+            _revitParam = revitParam;
         }
-        public string Description { get => _sharedParam.Description; }
-        public StorageType SharedParamType { get => _sharedParam.SharedParamType; }
+        public string Description { get => _revitParam.Description; }
+        public StorageType SharedParamType { get => _revitParam.SharedParamType; }
         
         public string Name {
-            get => _sharedParam.Name;
+            get => _revitParam.Name;
             set {
-                _sharedParam.Name = value;
+                _revitParam.Name = value;
                 OnPropertyChanged(nameof(Name));
             }
         }
