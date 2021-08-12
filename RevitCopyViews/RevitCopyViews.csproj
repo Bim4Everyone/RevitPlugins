@@ -86,10 +86,12 @@
     <Compile Include="dosymep\AppDomainExtensions.cs" />
     <Compile Include="dosymep\BaseViewModel.cs" />
     <Compile Include="CopyViewCommand.cs" />
+    <Compile Include="RenameViewCommand.cs" />
     <Compile Include="UpdateElevationCommand.cs" />
     <Compile Include="ViewModels\CopyUserViewModel.cs" />
     <Compile Include="ViewModels\CopyViewViewModel.cs" />
     <Compile Include="ViewModels\Delimiter.cs" />
+    <Compile Include="ViewModels\RenameViewViewModel.cs" />
     <Compile Include="Views\CopyUserWindow.xaml.cs">
       <DependentUpon>CopyUserWindow.xaml</DependentUpon>
     </Compile>
@@ -99,6 +101,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="dosymep\RelayCommand.cs" />
     <Compile Include="ViewModels\RevitViewViewModel.cs" />
+    <Compile Include="Views\RenameViewWindow.xaml.cs">
+      <DependentUpon>RenameViewWindow.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Include="Views\CopyUserWindow.xaml">
@@ -106,6 +111,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\CopyViewWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\RenameViewWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
