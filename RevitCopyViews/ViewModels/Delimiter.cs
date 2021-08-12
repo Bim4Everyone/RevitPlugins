@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+
+using Autodesk.Revit.DB;
 
 namespace RevitCopyViews.ViewModels {
     internal static class Delimiter {
@@ -84,5 +87,30 @@ namespace RevitCopyViews.ViewModels {
         public string ViewName { get; set; }
         public string Elevations { get; set; }
         public string Suffix { get; set; }
+
+        public bool HasElevation {
+            get => !string.IsNullOrEmpty(Elevations);
+        }
+
+        public static string GetElevation(View view) {
+            var cultureInfo = (CultureInfo) CultureInfo.GetCultureInfo("ru-Ru").Clone();
+            cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
+
+            if(view.ViewType == ViewType.FloorPlan
+                || view.ViewType == ViewType.CeilingPlan
+                || view.ViewType == ViewType.AreaPlan
+                || view.ViewType == ViewType.EngineeringPlan) {
+
+                double elevation = UnitUtils.ConvertFromInternalUnits(view.GenLevel.Elevation, DisplayUnitType.DUT_METERS);
+                if(elevation > 0) {
+                    return "+" + elevation.ToString("F3", cultureInfo);
+                }
+
+                return elevation.ToString("F3", cultureInfo);
+            }
+
+
+            return null;
+        }
     }
 }
