@@ -51,8 +51,18 @@ namespace RevitCopyViews {
             using(var transaction = new Transaction(document)) {
                 transaction.Start("Обновление отметки этажа");
 
-                var selectedViews = uiDocument.GetSelectedElements().OfType<View>();
-                foreach(var view in selectedViews) {
+                var views = new FilteredElementCollector(document)
+                   .OfClass(typeof(View))
+                   .WhereElementIsNotElementType()
+                   .OfType<View>()
+                   .Where(item => !item.IsTemplate)
+                   .Where(item => item.ViewType == ViewType.FloorPlan
+                       || item.ViewType == ViewType.CeilingPlan
+                       || item.ViewType == ViewType.AreaPlan
+                       || item.ViewType == ViewType.EngineeringPlan)
+                   .ToArray();
+
+                foreach(var view in views) {
                     var splittedName = Delimiter.SplitViewName(view.Name, new SplitViewOptions() { ReplacePrefix = false, ReplaceSuffix = false });
 
                     if(splittedName.HasElevation) {
