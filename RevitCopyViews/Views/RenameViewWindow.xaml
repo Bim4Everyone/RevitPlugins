@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RevitCopyViews.Views"
              mc:Ignorable="d" 
-             Height="500" Width="800" WindowStartupLocation="CenterOwner" Title="Переименование видов">
+             Height="485" Width="500" WindowStartupLocation="CenterOwner" Title="Переименование видов">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
