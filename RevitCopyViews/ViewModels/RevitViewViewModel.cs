@@ -36,6 +36,7 @@ namespace RevitCopyViews.ViewModels {
             SplitName();
         }
 
+        public View View { get => _view; }
         public string GroupView { get; }
         public double Elevation { get; }
         public string OriginalName { get; }
@@ -64,7 +65,11 @@ namespace RevitCopyViews.ViewModels {
         }
 
         public SplittedViewName SplitName(SplitViewOptions splitViewOptions) {
-            return Delimiter.SplitViewName(OriginalName, splitViewOptions);
+            return SplitName(OriginalName, splitViewOptions);
+        }
+
+        public SplittedViewName SplitName(string originalName, SplitViewOptions splitViewOptions) {
+            return Delimiter.SplitViewName(originalName, splitViewOptions);
         }
 
         public ElementId Duplicate(ViewDuplicateOption option) {

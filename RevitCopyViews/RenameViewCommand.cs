@@ -41,15 +41,28 @@ namespace RevitCopyViews {
             var uiDocument = uiApplication.ActiveUIDocument;
             var document = uiDocument.Document;
 
+            var selectedViews = uiDocument.Selection.GetElementIds().Select(item => document.GetElement(item)).OfType<View>().ToList();
+            if(selectedViews.Count == 0) {
+                TaskDialog.Show("Предупреждение!", "Выберите виды, которые требуется переименовать.");
+                return;
+            }
+
             var restrictedViewNames = new FilteredElementCollector(document)
                 .OfClass(typeof(View))
                 .Select(item => item.Name)
                 .OrderBy(item => item)
                 .Distinct()
-                .ToArray();
-
+                .Except(selectedViews.Select(item=> item.Name))
+                .ToList();
+           
             var window = new RenameViewWindow() {
-                DataContext = new RenameViewViewModel()
+                DataContext = new RenameViewViewModel(selectedViews) {
+                    Document = document,
+                    UIDocument = uiDocument,
+                    Application = application,
+
+                    RestrictedViewNames = restrictedViewNames
+                }
             };
 
             new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };

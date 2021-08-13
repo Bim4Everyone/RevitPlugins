@@ -21,5 +21,13 @@ namespace RevitCopyViews.Views {
         public RenameViewWindow() {
             InitializeComponent();
         }
+
+        private void ButtonOk_Click(object sender, RoutedEventArgs e) {
+            DialogResult = true;
+        }
+
+        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
+            DialogResult = false;
+        }
     }
 }
