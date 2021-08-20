@@ -64,19 +64,16 @@ namespace RevitCopyViews.ViewModels {
             using(var transaction = new Transaction(Document)) {
                 transaction.Start("Копирование видов");
 
+                View viewTemplate = CreateViewTemplate(GroupView);
                 foreach(View revitView in Views) {
                     View newView = (View) Document.GetElement(revitView.Duplicate(ViewDuplicateOption.Duplicate));
-                    newView.Name = GetViewName(revitView);
 
-                    // У некоторых видов установлен шаблон,
-                    // у которого заблокировано редактирование атрибута ProjectParamsConfig.Instance.ViewGroup
-                    // удаление шаблона разрешает изменение данного атрибута
-                    newView.ViewTemplateId = ElementId.InvalidElementId;
-                    newView.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, GroupView);
+                    newView.Name = GetViewName(revitView);
+                    newView.ViewTemplateId = viewTemplate.Id;
 
                     createdViews.Add(newView.Id);
                 }
-                
+
                 transaction.Commit();
             }
 
@@ -110,6 +107,54 @@ namespace RevitCopyViews.ViewModels {
 
         private string GetViewName(View revitView) {
             return revitView.Name.Replace("User_", Prefix + "_");
+        }
+
+        private View CreateViewTemplate(string viewTemplateName) {
+            View viewTemplate = new FilteredElementCollector(Document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(View))
+                .OfType<View>()
+                .Where(item => item.IsTemplate)
+                .FirstOrDefault(item => item.Name.Equals("99 User_План"));
+
+            if(viewTemplate == null) {
+                throw new Exception("Не был обнаружен шаблон вида \"99 User_План\".");
+            }
+
+            ElementId viewTemplateId = ElementTransformUtils.CopyElements(Document, new[] { viewTemplate.Id }, Document, Transform.Identity, new CopyPasteOptions()).First();
+
+            viewTemplate = (View) Document.GetElement(viewTemplateId);
+            viewTemplate.Name = viewTemplateName;
+            viewTemplate.RemoveFilter(viewTemplate.GetFilters().First());
+            viewTemplate.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, GroupView);
+
+            ParameterFilterElement parameterFilterElement = CreateParameterFilterElement(GroupView);
+            viewTemplate.AddFilter(parameterFilterElement.Id);
+            viewTemplate.SetFilterVisibility(parameterFilterElement.Id, false);
+            
+            return viewTemplate;
+        }
+
+        private ParameterFilterElement CreateParameterFilterElement(string filterName) {
+            ParameterElement parameterElement = new FilteredElementCollector(Document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(ParameterElement))
+                .OfType<ParameterElement>()
+                .FirstOrDefault(item => item.Name.Equals(ProjectParamsConfig.Instance.ViewGroup.Name));
+
+
+            var logicalFilter = new LogicalAndFilter(new[] {
+                new ElementParameterFilter(new FilterInverseRule(new FilterStringRule(new ParameterValueProvider(parameterElement.Id), new FilterStringEquals(), filterName, false)))
+            });
+
+            var categories = new[] { 
+                Category.GetCategory(Document, BuiltInCategory.OST_Elev).Id,
+                Category.GetCategory(Document, BuiltInCategory.OST_Callouts).Id,
+                Category.GetCategory(Document, BuiltInCategory.OST_Sections).Id,
+            };
+
+            var filterElement = ParameterFilterElement.Create(Document, $"Виды_НЕ_{filterName}", categories, logicalFilter);
+            return filterElement;
         }
     }
 }
