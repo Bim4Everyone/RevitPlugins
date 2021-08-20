@@ -65,11 +65,23 @@ namespace RevitCopyViews.ViewModels {
                 transaction.Start("Копирование видов");
 
                 View viewTemplate = CreateViewTemplate(GroupView);
+                ParameterFilterElement paramFilter = CreateParameterFilterElement(GroupView);
+                AddParamFilter(viewTemplate, paramFilter);
+
                 foreach(View revitView in Views) {
                     View newView = (View) Document.GetElement(revitView.Duplicate(ViewDuplicateOption.Duplicate));
 
                     newView.Name = GetViewName(revitView);
-                    newView.ViewTemplateId = viewTemplate.Id;
+                    if(HasViewTemplate(newView)) {
+                        newView.ViewTemplateId = viewTemplate?.Id ?? ElementId.InvalidElementId;
+                    } else {
+                        newView.ViewTemplateId = ElementId.InvalidElementId;
+                        newView.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, GroupView);
+
+                        if(newView.ViewType != ViewType.ThreeD) {
+                            AddParamFilter(newView, paramFilter);
+                        }
+                    }
 
                     createdViews.Add(newView.Id);
                 }
@@ -118,19 +130,14 @@ namespace RevitCopyViews.ViewModels {
                 .FirstOrDefault(item => item.Name.Equals("99 User_План"));
 
             if(viewTemplate == null) {
-                throw new Exception("Не был обнаружен шаблон вида \"99 User_План\".");
+                return null;
             }
 
             ElementId viewTemplateId = ElementTransformUtils.CopyElements(Document, new[] { viewTemplate.Id }, Document, Transform.Identity, new CopyPasteOptions()).First();
 
             viewTemplate = (View) Document.GetElement(viewTemplateId);
             viewTemplate.Name = viewTemplateName;
-            viewTemplate.RemoveFilter(viewTemplate.GetFilters().First());
             viewTemplate.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, GroupView);
-
-            ParameterFilterElement parameterFilterElement = CreateParameterFilterElement(GroupView);
-            viewTemplate.AddFilter(parameterFilterElement.Id);
-            viewTemplate.SetFilterVisibility(parameterFilterElement.Id, false);
             
             return viewTemplate;
         }
@@ -147,14 +154,32 @@ namespace RevitCopyViews.ViewModels {
                 new ElementParameterFilter(new FilterInverseRule(new FilterStringRule(new ParameterValueProvider(parameterElement.Id), new FilterStringEquals(), filterName, false)))
             });
 
-            var categories = new[] { 
+            var categories = new[] {
                 Category.GetCategory(Document, BuiltInCategory.OST_Elev).Id,
                 Category.GetCategory(Document, BuiltInCategory.OST_Callouts).Id,
                 Category.GetCategory(Document, BuiltInCategory.OST_Sections).Id,
             };
 
-            var filterElement = ParameterFilterElement.Create(Document, $"Виды_НЕ_{filterName}", categories, logicalFilter);
-            return filterElement;
+            return ParameterFilterElement.Create(Document, $"Виды_НЕ_{filterName}", categories, logicalFilter);
+        }
+
+        private void AddParamFilter(View view, ParameterFilterElement paramFilter) {
+            if(view == null) {
+                return;
+            }
+
+            foreach(var filter in view.GetFilters()) {
+                view.RemoveFilter(filter);
+            }
+
+            view.AddFilter(paramFilter.Id);
+            view.SetFilterVisibility(paramFilter.Id, false);
+        }
+
+        private bool HasViewTemplate(View view) {
+            return view.ViewType == ViewType.FloorPlan
+                || view.ViewType == ViewType.CeilingPlan
+                || view.ViewType == ViewType.EngineeringPlan;
         }
     }
 }
