@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Superfilter"
+             xmlns:local="clr-namespace:Superfilter.Views"
              mc:Ignorable="d" 
              Height="450" Width="400" WindowStartupLocation="CenterOwner" Title="Суперфильтр">
     <Grid>
@@ -33,21 +33,9 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <ListView Grid.Column="0" Margin="10,0,10,10" ItemsSource="{Binding RevitViewModel.CategoryViewModelsView}" SelectedItem="{Binding CategoryViewModel}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="#">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding Selected}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Наименование" DisplayMemberBinding="{Binding Path=Name}" />
-                        <GridViewColumn Header="Количество"  DisplayMemberBinding="{Binding Path=Count}" />
-                    </GridView>
-                </ListView.View>
-            </ListView>
+            
+            <local:CategoriesView Grid.Column="0" Margin="10,0,10,10" DataContext="{Binding RevitViewModel}"/>
+            
             <TreeView Grid.Column="1" Margin="10,0,10,10" ItemsSource="{Binding CategoryViewModel.Parameters}">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}">
