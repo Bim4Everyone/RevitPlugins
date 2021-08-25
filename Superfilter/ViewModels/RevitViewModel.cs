@@ -13,13 +13,15 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.Commands;
 
-namespace Superfilter {
+using Superfilter.Models;
+
+namespace Superfilter.ViewModels {
     internal class RevitViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly Func<RevitRepository, IList<Element>> _getElements;
         private string _name;
         private string _filter;
-        private bool _currentSelection;
+        private bool _currentSelection = true;
         private string _buttonFilterName;
 
         public RevitViewModel(Application application, Document document, Func<RevitRepository, IList<Element>> getElements) {
@@ -66,7 +68,9 @@ namespace Superfilter {
 
         private IEnumerable<CategoryViewModel> GetCategoryViewModels() {
             return _getElements(_revitRepository)
+                .Where(item => item.Category != null)
                 .GroupBy(item => item.Category, new CategoryComparer())
+                .Where(item => item.Key?.Parent == null)
                 .Select(item => new CategoryViewModel(item.Key, item))
                 .OrderBy(item => item.Name);
         }
