@@ -47,7 +47,11 @@ namespace Superfilter.ViewModels {
         }
 
         public string Name {
-            get => $"{_definition?.Name} [{Values.Count}]" ?? $"Без имени [{Values.Count}]";
+            get => _definition?.Name ?? $"Без имени";
+        }
+
+        public int Count {
+            get => Values.Count;
         }
 
         public bool Selected {
@@ -92,14 +96,18 @@ namespace Superfilter.ViewModels {
             get {
                 try {
                     if(_parameter.StorageType == StorageType.ElementId) {
-                        return _parameter.Element.Document.GetElement(_parameter.AsElementId()).Name + $" [{Elements.Count}] Element";
+                        return _parameter.Element.Document.GetElement(_parameter.AsElementId())?.Name ?? $"Без значения";
                     }
 
-                    return $"{_parameter.AsValueString()} [{Elements.Count}]" ?? $"Без значения [{Elements.Count}]";
+                    return _parameter.AsValueString() ?? $"Без значения";
                 } catch {
-                    return $"Без значения [{Elements.Count}]";
+                    return $"Без значения";
                 }
             }
+        }
+
+        public int Count {
+            get => Elements.Count;
         }
 
         public bool Selected {
