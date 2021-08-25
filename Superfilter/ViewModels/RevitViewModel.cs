@@ -23,6 +23,7 @@ namespace Superfilter.ViewModels {
         private string _filter;
         private bool _currentSelection = true;
         private string _buttonFilterName;
+        private CategoryViewModel _categoryViewModel;
 
         public RevitViewModel(Application application, Document document, Func<RevitRepository, IList<Element>> getElements) {
             _getElements = getElements;
@@ -57,6 +58,14 @@ namespace Superfilter.ViewModels {
             set {
                 _buttonFilterName = value;
                 OnPropertyChanged(nameof(ButtonFilterName));
+            }
+        }
+
+        public CategoryViewModel CategoryViewModel {
+            get => _categoryViewModel;
+            set {
+                _categoryViewModel = value;
+                OnPropertyChanged(nameof(CategoryViewModel));
             }
         }
 

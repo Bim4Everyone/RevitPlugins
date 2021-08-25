@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Superfilter.Views"
              mc:Ignorable="d" 
-             Height="450" Width="400" WindowStartupLocation="CenterOwner" Title="Суперфильтр">
+             Height="850" Width="800" WindowStartupLocation="CenterOwner" Title="Суперфильтр">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -35,28 +35,7 @@
             </Grid.ColumnDefinitions>
             
             <local:CategoriesView Grid.Column="0" Margin="10,0,10,10" DataContext="{Binding RevitViewModel}"/>
-            
-            <TreeView Grid.Column="1" Margin="10,0,10,10" ItemsSource="{Binding CategoryViewModel.Parameters}">
-                <TreeView.ItemContainerStyle>
-                    <Style TargetType="{x:Type TreeViewItem}">
-                        <Setter Property="IsExpanded" Value="True" />
-                    </Style>
-                </TreeView.ItemContainerStyle>
-                <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Values}">
-                        <CheckBox IsChecked="{Binding Selected}">
-                            <TextBlock Text="{Binding Name}"/>
-                        </CheckBox>
-                        <HierarchicalDataTemplate.ItemTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding Selected}">
-                                    <TextBlock Text="{Binding DisplayValue}"/>
-                                </CheckBox>
-                            </DataTemplate>
-                        </HierarchicalDataTemplate.ItemTemplate>
-                    </HierarchicalDataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
+            <local:ParamsView Grid.Column="1" Margin="10,0,10,10" DataContext="{Binding RevitViewModel.CategoryViewModel}"/>
         </Grid>
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="ОК" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding RevitViewModel.SelectElements}"/>

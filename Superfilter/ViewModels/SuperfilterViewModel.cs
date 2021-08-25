@@ -11,7 +11,6 @@ using Autodesk.Revit.DB;
 namespace Superfilter.ViewModels {
     internal class SuperfilterViewModel : BaseViewModel {
         private RevitViewModel _revitViewModel;
-        private CategoryViewModel _categoryViewModel;
 
         public SuperfilterViewModel() { }
         public SuperfilterViewModel(Application application, Document document) {
@@ -29,14 +28,6 @@ namespace Superfilter.ViewModels {
             set {
                 _revitViewModel = value;
                 OnPropertyChanged(nameof(RevitViewModel));
-            }
-        }
-
-        public CategoryViewModel CategoryViewModel {
-            get => _categoryViewModel;
-            set {
-                _categoryViewModel = value;
-                OnPropertyChanged(nameof(CategoryViewModel));
             }
         }
 
