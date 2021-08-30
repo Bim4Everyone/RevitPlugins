@@ -24,7 +24,7 @@ namespace RevitBatchPrint.Printing {
         }
 
         public IEnumerable<string> GetFormatNames() {
-            return WinSpool.EnumForms<WinSpool.FORM_INFO_2>(_shPrinter).Select(item => item.pKeyword);
+            return WinSpool.EnumForms<WinSpool.FORM_INFO_2>(_shPrinter).Select(item => item.pName);
         }
 
         public void AddFormat(string formatName, Size formatSize) {
@@ -32,13 +32,14 @@ namespace RevitBatchPrint.Printing {
         }
 
         public void AddFormat(string formatName, Size formatSize, Rectangle visibleArea) {
+            const int coeff = 1000;
             var options = new WinSpool.FORM_INFO_2() {
-                Size = formatSize,
                 pName = formatName,
                 pKeyword = formatName,
-                ImageableArea = visibleArea,
                 Flags = WinSpool.FormFlags.FORM_USER,
                 StringType = WinSpool.FormStringType.STRING_NONE,
+                Size = new SIZE(formatSize.Width * coeff, formatSize.Height * coeff),
+                ImageableArea = new RECT(visibleArea.Left * coeff, visibleArea.Top * coeff, visibleArea.Right * coeff, visibleArea.Bottom * coeff)
             };
 
             ThrowWin32Exception(WinSpool.AddForm(_shPrinter, in options));
