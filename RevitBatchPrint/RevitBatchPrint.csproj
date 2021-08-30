@@ -137,6 +137,7 @@
     <Compile Include="Models\Printing\PrinterSettings.cs" />
     <Compile Include="Models\Printing\PrintManager.cs" />
     <Compile Include="Models\PrintSettings.cs" />
+    <Compile Include="Models\RevitRepository.cs" />
     <Compile Include="Views\PrintSettingsWindow.xaml.cs">
       <DependentUpon>PrintSettingsWindow.xaml</DependentUpon>
     </Compile>
