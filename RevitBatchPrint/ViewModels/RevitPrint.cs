@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 using Autodesk.Revit.DB;
 
@@ -17,12 +16,35 @@ namespace RevitBatchPrint {
             _document = document;
         }
 
-        public string PdfPrinterName { get; set; } = "PDFCreator";
+        /// <summary>
+        /// Наименование принтера печати.
+        /// </summary>
+        public string PrinterName { get; set; }
 
-        public string FilterParameterValue { get; set; }
-        public IReadOnlyList<string> FilterParameterNames { get; set; } = new List<string>() { "Орг.ОбознчТома(Комплекта)", "Орг.КомплектЧертежей", "ADSK_Комплект чертежей" };
+        /// <summary>
+        /// Наименование параметра альбома по которому будет фильтрация листов.
+        /// </summary>
+        public string FilterParamName { get; set; }
 
+        /// <summary>
+        /// Значение параметра альбома по которому будет фильтрация листов.
+        /// </summary>
+        public string FilterParamValue { get; set; }
+
+        /// <summary>
+        /// Список ошибок при выводе на печать.
+        /// </summary>
         public List<string> Errors { get; set; } = new List<string>();
+
+        /// <summary>
+        /// Используемый принтер по умолчанию.
+        /// </summary>
+        public static string DefaultPrinterName { get; } = "PdfCreator";
+
+        /// <summary>
+        /// Наименование параметров по которым должна быть фильтрация.
+        /// </summary>
+        public static IReadOnlyList<string> FilterParamNames { get; set; } = new List<string>() { "Орг.ОбознчТома(Комплекта)", "Орг.КомплектЧертежей", "ADSK_Комплект чертежей" };
 
         public List<ViewSheet> GetViewSheets() {
             return new FilteredElementCollector(_document)
@@ -45,7 +67,7 @@ namespace RevitBatchPrint {
                 .OrderBy(item => item, new ViewSheetComparer())
                 .ToList();
 
-            var printerSettings = new Printing.PrintManager().GetPrinterSettings(PdfPrinterName);
+            var printerSettings = new Printing.PrintManager().GetPrinterSettings(PrinterName);
 
             foreach(ViewSheet viewSheet in viewSheets) {
 
@@ -56,7 +78,7 @@ namespace RevitBatchPrint {
                     printerSettings.AddFormat(printSettings.Format.Name, new System.Drawing.Size(printSettings.Format.Width, printSettings.Format.Height));
 
                     // перезагружаем в ревите принтер, чтобы появились изменения
-                    printManager.SelectNewPrintDriver(PdfPrinterName);
+                    printManager.SelectNewPrintDriver(PrinterName);
                 }
 
                 try {
@@ -87,7 +109,7 @@ namespace RevitBatchPrint {
         }
 
         private bool IsAllowPrintSheet(ViewSheet viewSheet) {
-            return FilterParameterNames.Any(item => viewSheet.LookupParameter(item)?.AsString()?.IndexOf(FilterParameterValue, StringComparison.CurrentCultureIgnoreCase) >= 0);
+            return FilterParamNames.Any(item => viewSheet.LookupParameter(item)?.AsString()?.IndexOf(FilterParamValue, StringComparison.CurrentCultureIgnoreCase) >= 0);
         }
 
         private PrintSettings GetPrintSettings(ViewSheet viewSheet) {

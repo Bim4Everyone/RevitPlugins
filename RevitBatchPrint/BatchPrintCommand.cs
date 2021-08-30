@@ -38,7 +38,7 @@ namespace RevitBatchPrint {
                 var viewSheets = revitPrint.GetViewSheets();
 
                 var viewSheetNames = viewSheets
-                    .SelectMany(item => revitPrint.FilterParameterNames.Select(paramName => item.LookupParameter(paramName)?.AsString()))
+                    .SelectMany(item => RevitPrint.FilterParamNames.Select(paramName => item.LookupParameter(paramName)?.AsString()))
                     .Where(item => !string.IsNullOrEmpty(item))
                     .GroupBy(item => item)
                     .Select(item => new ViewSheetNamesCountViewModel { Name = item.Key, Count = item.Count() })
@@ -59,7 +59,7 @@ namespace RevitBatchPrint {
 
                 new WindowInteropHelper(window) { Owner = uiapp.MainWindowHandle };
                 if(window.ShowDialog() == true) {
-                    revitPrint.FilterParameterValue = ((ViewSheetNamesViewModel) window.DataContext).SelectedName.Name;
+                    revitPrint.FilterParamValue = ((ViewSheetNamesViewModel) window.DataContext).SelectedName.Name;
                     revitPrint.Execute();
 
                     if(revitPrint.Errors.Count > 0) {
