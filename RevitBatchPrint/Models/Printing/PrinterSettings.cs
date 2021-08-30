@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 using Vanara.PInvoke;
 
-namespace RevitBatchPrint.Printing {
+namespace RevitBatchPrint.Models.Printing {
     internal class PrinterSettings : IDisposable {
         private readonly string _printerName;
         private readonly WinSpool.SafeHPRINTER _shPrinter;

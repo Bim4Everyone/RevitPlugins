@@ -1,4 +1,4 @@
-﻿namespace RevitBatchPrint {
+﻿namespace RevitBatchPrint.ViewModels {
     public class ViewSheetNamesCountViewModel {
         public int Count { get; set; }
         public string Name { get; set; }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Vanara.PInvoke;
 
-namespace RevitBatchPrint.Printing {
+namespace RevitBatchPrint.Models.Printing {
     internal class PrintManager {
         public IEnumerable<string> EnumPrinterNames() {
             return WinSpool.EnumPrinters<WinSpool.PRINTER_INFO_5>().Select(item => item.pPrinterName);

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RevitBatchPrint {
+namespace RevitBatchPrint.Models {
     internal class Format {
         private static readonly List<Format> _formats = new List<Format>() {
             new Format() { Name = "GOST_A0", Width = 841, Height = 1189 },

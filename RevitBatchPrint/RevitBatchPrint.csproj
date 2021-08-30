@@ -134,8 +134,8 @@
     <Compile Include="AppDomainExtensions.cs" />
     <Compile Include="BatchPrintCommand.cs" />
     <Compile Include="Models\Format.cs" />
-    <Compile Include="Printing\PrinterSettings.cs" />
-    <Compile Include="Printing\PrintManager.cs" />
+    <Compile Include="Models\Printing\PrinterSettings.cs" />
+    <Compile Include="Models\Printing\PrintManager.cs" />
     <Compile Include="Models\PrintSettings.cs" />
     <Compile Include="Views\PrintViewSheetNamesWindow.xaml.cs">
       <DependentUpon>PrintViewSheetNamesWindow.xaml</DependentUpon>

@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace RevitBatchPrint {
+namespace RevitBatchPrint.Views {
     /// <summary>
     /// Interaction logic for PrintViewSheetNames.xaml
     /// </summary>

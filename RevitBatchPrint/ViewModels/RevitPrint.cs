@@ -8,7 +8,9 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 using dosymep.Revit.Comparators;
 
-namespace RevitBatchPrint {
+using RevitBatchPrint.Models;
+
+namespace RevitBatchPrint.ViewModels {
     internal class RevitPrint {
         private readonly Document _document;
 
@@ -67,7 +69,7 @@ namespace RevitBatchPrint {
                 .OrderBy(item => item, new ViewSheetComparer())
                 .ToList();
 
-            var printerSettings = new Printing.PrintManager().GetPrinterSettings(PrinterName);
+            var printerSettings = new Models.Printing.PrintManager().GetPrinterSettings(PrinterName);
 
             foreach(ViewSheet viewSheet in viewSheets) {
 

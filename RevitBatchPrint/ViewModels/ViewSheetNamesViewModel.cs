@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace RevitBatchPrint {
+namespace RevitBatchPrint.ViewModels {
     public class ViewSheetNamesViewModel : INotifyPropertyChanged {
         private ViewSheetNamesCountViewModel _selectedName;
         private List<ViewSheetNamesCountViewModel> _names;
