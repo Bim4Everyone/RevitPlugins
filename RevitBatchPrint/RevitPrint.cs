@@ -38,21 +38,32 @@ namespace RevitBatchPrint {
             var printManager = _document.PrintManager;
             printManager.PrintToFile = true;
             printManager.PrintToFileName = System.IO.Path.ChangeExtension(System.IO.Path.GetFileName(_document.PathName), ".pdf");
-            printManager.SelectNewPrintDriver(PdfPrinterName);
 
             List<ViewSheet> viewSheets = GetViewSheets()
                 .Where(item => IsAllowPrintSheet(item))
                 .OrderBy(item => item, new ViewSheetComparer())
                 .ToList();
 
+            var printerSettings = new Printing.PrintManager().GetPrinterSettings(PdfPrinterName);
+
             foreach(ViewSheet viewSheet in viewSheets) {
+                var printSettings = GetPrintSettings(viewSheet);
+                bool hasFormatName = printerSettings.HasFormatName(printSettings.Format.Name);
+                if(!hasFormatName) {
+                    // создаем новый формат в Windows, если не был найден подходящий
+                    printerSettings.AddFormat(printSettings.Format.Name, new System.Drawing.Size(printSettings.Format.Width, printSettings.Format.Height));
+
+                    // перезагружаем в ревите принтер, чтобы появились изменения
+                    printManager.SelectNewPrintDriver(PdfPrinterName);
+                }
+
                 try {
                     using(Transaction transaction = new Transaction(_document, "PrintSettings")) {
                         transaction.Start();
+                        
                         try {
-                            var printSettings = GetPrintSettings(viewSheet);
-                            var paperSize = GetPaperSizeByName(printManager, printSettings.Format.Name);                            
-                            
+                            var paperSize = GetPaperSizeByName(printManager, printSettings.Format.Name);
+
                             printManager.PrintSetup.CurrentPrintSetting = printManager.PrintSetup.InSession;
                             printManager.PrintSetup.CurrentPrintSetting.PrintParameters.PaperSize = paperSize;
                             printManager.PrintSetup.CurrentPrintSetting.PrintParameters.ZoomType = ZoomType.Zoom;
@@ -69,6 +80,10 @@ namespace RevitBatchPrint {
                     }
                 } catch(Exception ex) {
                     Errors.Add($"{viewSheet.Name}: \"{ex.Message}\".");
+                } finally {
+                    if(!hasFormatName) {
+                        printerSettings.RemoveFormat(printSettings.Format.Name);
+                    }
                 }
             }
         }
