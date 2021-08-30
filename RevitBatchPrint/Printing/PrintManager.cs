@@ -8,12 +8,12 @@ using Vanara.PInvoke;
 
 namespace RevitBatchPrint.Printing {
     internal class PrintManager {
-        public IEnumerable<string> EnumPrinters() {
+        public IEnumerable<string> EnumPrinterNames() {
             return WinSpool.EnumPrinters<WinSpool.PRINTER_INFO_5>().Select(item => item.pPrinterName);
         }
 
-        public bool HasPrinter(string printerName) {
-            return EnumPrinters().Any(item => item.Equals(printerName));
+        public bool HasPrinterName(string printerName) {
+            return EnumPrinterNames().Any(item => item.Equals(printerName));
         }
 
         public PrinterSettings GetPrinterSettings(string printerName) {

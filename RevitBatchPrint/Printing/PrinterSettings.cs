@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 using Vanara.PInvoke;
@@ -16,6 +18,14 @@ namespace RevitBatchPrint.Printing {
         }
 
         public string PrinterName => _printerName;
+
+        public bool HasFormatName(string formatName) {
+            return GetFormatNames().Contains(formatName);
+        }
+
+        public IEnumerable<string> GetFormatNames() {
+            return WinSpool.EnumForms<WinSpool.FORM_INFO_2>(_shPrinter).Select(item => item.pKeyword);
+        }
 
         public void AddFormat(string formatName, Size formatSize) {
             AddFormat(formatName, formatSize, new Rectangle(Point.Empty, formatSize));

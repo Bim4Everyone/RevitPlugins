@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.Revit.Comparators;
 
 namespace RevitBatchPrint {
@@ -50,10 +51,6 @@ namespace RevitBatchPrint {
                         transaction.Start();
                         try {
                             var printSettings = GetPrintSettings(viewSheet);
-                            if(printSettings.Format == null) {
-                                continue;
-                            }
-
                             var paperSize = GetPaperSizeByName(printManager, printSettings.Format.Name);                            
                             
                             printManager.PrintSetup.CurrentPrintSetting = printManager.PrintSetup.InSession;
@@ -91,11 +88,17 @@ namespace RevitBatchPrint {
                 throw new InvalidOperationException("Не было обнаружено семейство основной надписи.");
             }
 
-            var pWidth = familyInstance.get_Parameter(BuiltInParameter.SHEET_WIDTH);
-            var pHeight = familyInstance.get_Parameter(BuiltInParameter.SHEET_HEIGHT);
+            var sheetWidth = (double?) familyInstance.GetParamValueOrDefault(BuiltInParameter.SHEET_WIDTH);
+            var sheetHeight = (double?) familyInstance.GetParamValueOrDefault(BuiltInParameter.SHEET_HEIGHT);
 
-            if(int.TryParse(pWidth?.AsValueString(), out int width) && int.TryParse(pHeight?.AsValueString(), out int height)) {
-                return new PrintSettings() { Format = Format.GetFormat(familyInstance) ?? Format.GetFormat(width, height), FormatOrientation = GetFormatOrientation(width, height) };
+            if(sheetWidth.HasValue && sheetHeight.HasValue) {
+                sheetWidth = UnitUtils.ConvertFromInternalUnits(sheetWidth.Value, DisplayUnitType.DUT_METERS);
+                sheetHeight = UnitUtils.ConvertFromInternalUnits(sheetHeight.Value, DisplayUnitType.DUT_METERS);
+
+                return new PrintSettings() {
+                    Format = Format.GetFormat((int) sheetWidth, (int) sheetHeight),
+                    FormatOrientation = GetFormatOrientation((int) sheetWidth, (int) sheetHeight)
+                };
             }
 
             throw new InvalidOperationException("Не были обнаружены размеры основной надписи.");

@@ -50,7 +50,8 @@ namespace RevitBatchPrint {
         }
 
         public static Format GetFormat(int width, int height) {
-            return _formats.FirstOrDefault(item => IsNormalWidth(width, item) && IsNormalHeight(height, item));
+            return _formats.FirstOrDefault(item => IsNormalWidth(width, item) && IsNormalHeight(height, item))
+                ?? new Format() { Name = "Шо?", Width = width, Height = height };
         }
 
         private static bool IsNormalHeight(int height, Format item) {
