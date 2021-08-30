@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -37,7 +38,7 @@ namespace RevitBatchPrint {
         public void Execute() {
             var printManager = _document.PrintManager;
             printManager.PrintToFile = true;
-            printManager.PrintToFileName = System.IO.Path.ChangeExtension(System.IO.Path.GetFileName(_document.PathName), ".pdf");
+            printManager.PrintToFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), Path.ChangeExtension(Path.GetFileName(_document.PathName), ".pdf"));
 
             List<ViewSheet> viewSheets = GetViewSheets()
                 .Where(item => IsAllowPrintSheet(item))
@@ -47,6 +48,7 @@ namespace RevitBatchPrint {
             var printerSettings = new Printing.PrintManager().GetPrinterSettings(PdfPrinterName);
 
             foreach(ViewSheet viewSheet in viewSheets) {
+
                 var printSettings = GetPrintSettings(viewSheet);
                 bool hasFormatName = printerSettings.HasFormatName(printSettings.Format.Name);
                 if(!hasFormatName) {
@@ -60,23 +62,19 @@ namespace RevitBatchPrint {
                 try {
                     using(Transaction transaction = new Transaction(_document, "PrintSettings")) {
                         transaction.Start();
-                        
-                        try {
-                            var paperSize = GetPaperSizeByName(printManager, printSettings.Format.Name);
 
-                            printManager.PrintSetup.CurrentPrintSetting = printManager.PrintSetup.InSession;
-                            printManager.PrintSetup.CurrentPrintSetting.PrintParameters.PaperSize = paperSize;
-                            printManager.PrintSetup.CurrentPrintSetting.PrintParameters.ZoomType = ZoomType.Zoom;
-                            printManager.PrintSetup.CurrentPrintSetting.PrintParameters.Zoom = 100;
-                            printManager.PrintSetup.CurrentPrintSetting.PrintParameters.PageOrientation = printSettings.FormatOrientation;
+                        var paperSize = GetPaperSizeByName(printManager, printSettings.Format.Name);
 
-                            printManager.PrintSetup.SaveAs("SheetPrintSettings");
+                        printManager.PrintSetup.CurrentPrintSetting = printManager.PrintSetup.InSession;
+                        printManager.PrintSetup.CurrentPrintSetting.PrintParameters.PaperSize = paperSize;
+                        printManager.PrintSetup.CurrentPrintSetting.PrintParameters.ZoomType = ZoomType.Zoom;
+                        printManager.PrintSetup.CurrentPrintSetting.PrintParameters.Zoom = 100;
+                        printManager.PrintSetup.CurrentPrintSetting.PrintParameters.PageOrientation = printSettings.FormatOrientation;
 
-                            printManager.Apply();
-                            printManager.SubmitPrint(viewSheet);
-                        } finally {
-                            transaction.RollBack();
-                        }
+                        printManager.PrintSetup.SaveAs("SheetPrintSettings");
+
+                        printManager.Apply();
+                        printManager.SubmitPrint(viewSheet);
                     }
                 } catch(Exception ex) {
                     Errors.Add($"{viewSheet.Name}: \"{ex.Message}\".");
@@ -107,12 +105,12 @@ namespace RevitBatchPrint {
             var sheetHeight = (double?) familyInstance.GetParamValueOrDefault(BuiltInParameter.SHEET_HEIGHT);
 
             if(sheetWidth.HasValue && sheetHeight.HasValue) {
-                sheetWidth = UnitUtils.ConvertFromInternalUnits(sheetWidth.Value, DisplayUnitType.DUT_METERS);
-                sheetHeight = UnitUtils.ConvertFromInternalUnits(sheetHeight.Value, DisplayUnitType.DUT_METERS);
+                sheetWidth = UnitUtils.ConvertFromInternalUnits(sheetWidth.Value, DisplayUnitType.DUT_MILLIMETERS);
+                sheetHeight = UnitUtils.ConvertFromInternalUnits(sheetHeight.Value, DisplayUnitType.DUT_MILLIMETERS);
 
                 return new PrintSettings() {
-                    Format = Format.GetFormat((int) sheetWidth, (int) sheetHeight),
-                    FormatOrientation = GetFormatOrientation((int) sheetWidth, (int) sheetHeight)
+                    Format = Format.GetFormat((int) Math.Round(sheetWidth.Value), (int) Math.Round(sheetHeight.Value)),
+                    FormatOrientation = GetFormatOrientation((int) Math.Round(sheetWidth.Value), (int) Math.Round(sheetHeight.Value))
                 };
             }
 
