@@ -132,6 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="AppDomainExtensions.cs" />
     <Compile Include="BatchPrintCommand.cs" />
     <Compile Include="Format.cs" />
     <Compile Include="Printing\PrinterSettings.cs" />

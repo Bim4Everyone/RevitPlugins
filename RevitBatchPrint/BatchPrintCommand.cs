@@ -16,13 +16,14 @@ using Autodesk.Revit.UI.Selection;
 namespace RevitBatchPrint {
     [Transaction(TransactionMode.Manual)]
     public class BatchPrintCommand : IExternalCommand {
-        public Result Execute(
-          ExternalCommandData commandData,
-          ref string message,
-          ElementSet elements) {
-
-            new PyRevitCommand().Execute(commandData.Application);
-            return Result.Succeeded;
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
+            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
+            try {
+                new PyRevitCommand().Execute(commandData.Application);
+                return Result.Succeeded;
+            } finally {
+                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
+            }
         }
     }
 
