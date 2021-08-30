@@ -51,6 +51,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -58,6 +59,8 @@
     <Compile Include="App.cs" />
     <Compile Include="BatchPrintCommand.cs" />
     <Compile Include="Format.cs" />
+    <Compile Include="Printing\PrinterSettings.cs" />
+    <Compile Include="Printing\PrintManager.cs" />
     <Compile Include="PrintSettings.cs" />
     <Compile Include="PrintViewSheetNamesWindow.xaml.cs">
       <DependentUpon>PrintViewSheetNamesWindow.xaml</DependentUpon>
