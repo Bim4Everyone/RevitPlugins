@@ -53,7 +53,7 @@ namespace RevitBatchPrint {
                     return;
                 }
 
-                var window = new PrintViewSheetNamesWindow() {
+                var window = new PrintSettingsWindow() {
                     DataContext = new ViewSheetNamesViewModel() {
                         Names = viewSheetNames,
                         SelectedName = viewSheetNames.FirstOrDefault()

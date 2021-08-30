@@ -137,8 +137,8 @@
     <Compile Include="Models\Printing\PrinterSettings.cs" />
     <Compile Include="Models\Printing\PrintManager.cs" />
     <Compile Include="Models\PrintSettings.cs" />
-    <Compile Include="Views\PrintViewSheetNamesWindow.xaml.cs">
-      <DependentUpon>PrintViewSheetNamesWindow.xaml</DependentUpon>
+    <Compile Include="Views\PrintSettingsWindow.xaml.cs">
+      <DependentUpon>PrintSettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\RevitPrint.cs" />
@@ -146,7 +146,7 @@
     <Compile Include="ViewModels\ViewSheetNamesCountViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\PrintViewSheetNamesWindow.xaml">
+    <Page Include="Views\PrintSettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
