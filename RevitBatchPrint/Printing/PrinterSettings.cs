@@ -3,28 +3,51 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
+using Vanara.PInvoke;
+
 namespace RevitBatchPrint.Printing {
     internal class PrinterSettings : IDisposable {
         private readonly string _printerName;
+        private readonly WinSpool.SafeHPRINTER _shPrinter;
 
         public PrinterSettings(string printerName) {
             _printerName = printerName;
+            _shPrinter = OpenPrinter2(printerName);
         }
+
+        public string PrinterName => _printerName;
 
         public void AddFormat(string formatName, Size formatSize) {
             AddFormat(formatName, formatSize, new Rectangle(Point.Empty, formatSize));
         }
 
         public void AddFormat(string formatName, Size formatSize, Rectangle visibleArea) {
-            throw new NotImplementedException();
+            var options = new WinSpool.FORM_INFO_2() {
+                Size = formatSize,
+                pName = formatName,
+                pKeyword = formatName,
+                ImageableArea = visibleArea,
+                Flags = WinSpool.FormFlags.FORM_USER,
+                StringType = WinSpool.FormStringType.STRING_NONE,
+            };
+
+            ThrowWin32Exception(WinSpool.AddForm(_shPrinter, in options));
         }
 
         public void RemoveForm(string formatName) {
-            throw new NotImplementedException();
+            ThrowWin32Exception(WinSpool.DeleteForm(_shPrinter, formatName));
+        }
+
+        private WinSpool.SafeHPRINTER OpenPrinter2(string printerName) {
+            var pDefault = new WinSpool.PRINTER_DEFAULTS();
+            var pOptions = WinSpool.PRINTER_OPTIONS.Default;
+            ThrowWin32Exception(WinSpool.OpenPrinter2(printerName, out WinSpool.SafeHPRINTER phPrinter, pDefault, in pOptions));
+
+            return phPrinter;
         }
 
         private void ClosePrinter() {
-            throw new NotImplementedException();
+            WinSpool.ClosePrinter(_shPrinter);
         }
 
         #region IDisposable
@@ -44,7 +67,7 @@ namespace RevitBatchPrint.Printing {
             if(_isDisposed) {
                 ClosePrinter();
                 if(disposing) {
-
+                    _shPrinter.Close();
                 }
 
                 _isDisposed = true;
