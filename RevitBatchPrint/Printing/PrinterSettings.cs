@@ -44,7 +44,7 @@ namespace RevitBatchPrint.Printing {
             ThrowWin32Exception(WinSpool.AddForm(_shPrinter, in options));
         }
 
-        public void RemoveForm(string formatName) {
+        public void RemoveFormat(string formatName) {
             ThrowWin32Exception(WinSpool.DeleteForm(_shPrinter, formatName));
         }
 
