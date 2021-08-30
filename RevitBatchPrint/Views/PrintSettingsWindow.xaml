@@ -5,16 +5,30 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RevitBatchPrint"
              xmlns:viewModels="clr-namespace:RevitBatchPrint.ViewModels"
-             mc:Ignorable="d" Height="150" Width="450" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Title="Пакетная печать">
+             mc:Ignorable="d" Height="180" Width="450" WindowStartupLocation="CenterOwner" Title="Пакетная печать">
     <Window.DataContext>
         <viewModels:ViewSheetNamesViewModel/>
     </Window.DataContext>
-    <StackPanel>
-        <TextBlock Text="Комплект чертежей" Margin="10,10,10,0"/>
-        <ComboBox Margin="10" ItemsSource="{Binding Path=Names}" SelectedItem="{Binding Path=SelectedName}"/>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Margin="10" Content="ОК" Width="80" Click="ButtonOk_Click"/>
-            <Button Margin="10" Content="Отмена" Width="80" Click="ButtonCancel_Click"/>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="45"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel  Grid.Row="0">
+            <TextBlock Text="Комплект чертежей" Margin="10,10,10,0"/>
+            <ComboBox Margin="10" 
+                      ItemsSource="{Binding Path=Names}"
+                      SelectedItem="{Binding Path=SelectedName}"/>
         </StackPanel>
-    </StackPanel>
+
+        <CheckBox Grid.Row="1" Margin="10" Content="Черно-белый"/>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
+            <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80" />
+            <Button Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80"/>
+        </StackPanel>
+    </Grid>
 </Window>
