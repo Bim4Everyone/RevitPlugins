@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit.Comparators;
+
 namespace RevitBatchPrint {
     internal class RevitPrint {
         private readonly Document _document;
@@ -39,9 +41,7 @@ namespace RevitBatchPrint {
 
             List<ViewSheet> viewSheets = GetViewSheets()
                 .Where(item => IsAllowPrintSheet(item))
-
-                // Сортировка вызывает сомнения
-                .OrderBy(item => Convert.ToInt32(Regex.Match(item.SheetNumber, @"\d+$").Groups[0].Value))
+                .OrderBy(item => item, new ViewSheetComparer())
                 .ToList();
 
             foreach(ViewSheet viewSheet in viewSheets) {
