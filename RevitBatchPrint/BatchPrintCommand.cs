@@ -59,7 +59,7 @@ namespace RevitBatchPrint {
                 }
 
                 var albums = printParamValues.Select(item => new PrintAlbumViewModel() { Name = item.Item1, Count = item.Item2 }).ToList();
-                var window = new PrintSettingsWindow() {
+                var window = new BatchPrintWindow() {
                     DataContext = new PrintAbumsViewModel() {
                         Albums = albums,
                         SelectedAlbum = albums.FirstOrDefault()

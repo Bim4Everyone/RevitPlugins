@@ -138,8 +138,8 @@
     <Compile Include="Models\Printing\PrintManager.cs" />
     <Compile Include="Models\PrintSettings.cs" />
     <Compile Include="Models\RevitRepository.cs" />
-    <Compile Include="Views\PrintSettingsWindow.xaml.cs">
-      <DependentUpon>PrintSettingsWindow.xaml</DependentUpon>
+    <Compile Include="Views\BatchPrintWindow.xaml.cs">
+      <DependentUpon>BatchPrintWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\RevitPrint.cs" />
@@ -147,7 +147,7 @@
     <Compile Include="ViewModels\PrintAlbumViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\PrintSettingsWindow.xaml">
+    <Page Include="Views\BatchPrintWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
