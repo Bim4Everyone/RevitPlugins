@@ -34,12 +34,11 @@ namespace RevitBatchPrint.Models {
         /// </summary>
         /// <returns>Возвращает список возможных имен параметров группировки альбомов.</returns>
         public List<string> GetPrintParamNames() {
-            return new FilteredElementCollector(Document)
-                .OfClass(typeof(ParameterElement))
-                .OfType<ParameterElement>()
+            return Document.GetProjectParamElements()
                 .Where(item => item.GetDefinition().ParameterType == ParameterType.Text)
                 .Select(item => item.Name)
                 .Distinct()
+                .OrderBy(item => item)
                 .ToList();
         }
 
@@ -57,6 +56,7 @@ namespace RevitBatchPrint.Models {
                 .GroupBy(item => (string) item.GetParamValueOrDefault(printParamName))
                 .Where(item => !string.IsNullOrEmpty(item.Key))
                 .Select(item => (item.Key, item.Count()))
+                .OrderBy(item => item.Key)
                 .ToList();
         }
 
