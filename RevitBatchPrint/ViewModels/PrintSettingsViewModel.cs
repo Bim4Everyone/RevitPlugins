@@ -6,7 +6,7 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.ViewModels;
 
 namespace RevitBatchPrint.ViewModels {
-    public class PrintSettingsViewModel : BaseViewModel {
+    internal class PrintSettingsViewModel : BaseViewModel {
         private string _printerName;
 
         private PaperPlacementType _paperPlacement = PaperPlacementType.Center;
@@ -26,6 +26,16 @@ namespace RevitBatchPrint.ViewModels {
         private bool _hideUnreferencedViewTags;
         private bool _hideCropBoundaries;
         private bool _replaceHalftoneWithThinLines;
+
+
+        private readonly Models.Printing.PrintManager _printManager;
+
+        public PrintSettingsViewModel() {
+            _printManager = new Models.Printing.PrintManager();
+            
+            PrinterName = Models.RevitRepository.DefaultPrinterName;
+            PrinterNames = new ObservableCollection<string>(_printManager.EnumPrinterNames());
+        }
 
         public string PrinterName {
             get => _printerName;
@@ -104,6 +114,10 @@ namespace RevitBatchPrint.ViewModels {
         public bool ReplaceHalftoneWithThinLines {
             get => _replaceHalftoneWithThinLines;
             set => this.RaiseAndSetIfChanged(ref _replaceHalftoneWithThinLines, value);
+        }
+
+        public Models.Printing.PrinterSettings GetPrinterSettings() {
+            return _printManager.GetPrinterSettings(PrinterName);
         }
     }
 }

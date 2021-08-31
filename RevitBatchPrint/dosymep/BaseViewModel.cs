@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace dosymep.WPF.ViewModels {
-    public class BaseViewModel : INotifyPropertyChanged {
+    internal class BaseViewModel : INotifyPropertyChanged {
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void RaiseAndSetIfChanged<TRet>(ref TRet backingField, TRet newValue, [CallerMemberName] string propertyName = null) {

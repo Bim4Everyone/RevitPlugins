@@ -4,7 +4,7 @@ using System.ComponentModel;
 using dosymep.WPF.ViewModels;
 
 namespace RevitBatchPrint.ViewModels {
-    public class PrintAbumsViewModel : BaseViewModel {
+    internal class PrintAbumsViewModel : BaseViewModel {
         private PrintAlbumViewModel _selectedName;
         private List<PrintAlbumViewModel> _names;
         private PrintSettingsViewModel _printSettings = new PrintSettingsViewModel();
