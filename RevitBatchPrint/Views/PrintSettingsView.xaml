@@ -28,15 +28,15 @@
                 <StackPanel Grid.Row="2">
                     <TextBlock Text="Качество изображения" Margin="10,10,10,0"/>
                     <ComboBox Margin="10" 
-                              SelectedValue="{Binding RasterQuality}"
-                              ItemsSource="{Binding Source={enumConverters:RasterQualityTypeConverter}}"/>
+                              SelectedValue="{Binding RasterQuality, Converter={enumConverters:RasterQualityTypeConverter}}"
+                              ItemsSource="{Binding Source={enumConverters:RasterQualityTypeExtension}}"/>
                 </StackPanel>
 
                 <StackPanel Grid.Row="1">
                     <TextBlock Text="Цвета" Margin="10,10,10,0"/>
                     <ComboBox Margin="10"
-                              SelectedValue="{Binding ColorDepth}"
-                              ItemsSource="{Binding Source={enumConverters:ColorDepthTypeConverter}}"/>
+                              SelectedValue="{Binding ColorDepth, Converter={enumConverters:ColorDepthTypeConverter}}"
+                              ItemsSource="{Binding Source={enumConverters:ColorDepthTypeExtension}}"/>
                 </StackPanel>
             </StackPanel>
         </GroupBox>

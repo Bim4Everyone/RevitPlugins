@@ -33,7 +33,7 @@
         </StackPanel>
 
         <GroupBox Grid.Row="2" Header="Настройки принтера">
-            <views:PrintSettingsView />
+            <views:PrintSettingsView DataContext="{Binding PrintSettings}" />
         </GroupBox>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">

@@ -1,31 +1,27 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 
+using dosymep.WPF.ViewModels;
+
 namespace RevitBatchPrint.ViewModels {
-    public class PrintAbumsViewModel : INotifyPropertyChanged {
+    public class PrintAbumsViewModel : BaseViewModel {
         private PrintAlbumViewModel _selectedName;
         private List<PrintAlbumViewModel> _names;
+        private PrintSettingsViewModel _printSettings = new PrintSettingsViewModel();
 
         public PrintAlbumViewModel SelectedAlbum {
             get => _selectedName;
-            set {
-                _selectedName = value;
-                OnPropertyChanged(nameof(SelectedAlbum));
-            }
+            set => this.RaiseAndSetIfChanged(ref _selectedName, value);
         }
-        
-        public List<PrintAlbumViewModel> Albums { 
+
+        public List<PrintAlbumViewModel> Albums {
             get => _names;
-            set {
-                _names = value;
-                OnPropertyChanged(nameof(Albums));
-            }
+            set => this.RaiseAndSetIfChanged(ref _names, value);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged(string propertyName) {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        public PrintSettingsViewModel PrintSettings {
+            get => _printSettings;
+            set => this.RaiseAndSetIfChanged(ref _printSettings, value);
         }
     }
 }
