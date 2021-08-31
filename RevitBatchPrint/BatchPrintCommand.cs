@@ -38,6 +38,12 @@ namespace RevitBatchPrint {
             Document doc = uidoc.Document;
 
             try {
+                var printerManager = new Models.Printing.PrintManager();
+                if(!printerManager.HasPrinterName(RevitRepository.DefaultPrinterName)) {
+                    TaskDialog.Show("Пакетная печать.", $"У вас не установлен принтер \"{RevitRepository.DefaultPrinterName}\".");
+                    return;
+                }
+
                 var repository = new RevitRepository(uiapp);
                 var printParamName = repository.GetPrintParamNames().FirstOrDefault(item => RevitRepository.PrintParamNames.Contains(item));
                 if(string.IsNullOrEmpty(printParamName)) {
