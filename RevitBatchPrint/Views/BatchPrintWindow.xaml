@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RevitBatchPrint"
+             xmlns:views="clr-namespace:RevitBatchPrint.Views"
              xmlns:viewModels="clr-namespace:RevitBatchPrint.ViewModels"
              mc:Ignorable="d" Height="580" Width="450" WindowStartupLocation="CenterOwner" Title="Пакетная печать">
     <Window.DataContext>
@@ -19,7 +20,7 @@
 
         <StackPanel  Grid.Row="0">
             <TextBlock Text="Наименование параметра" Margin="10,10,10,0"/>
-            <ComboBox Margin="10" 
+            <ComboBox Margin="10"
                       ItemsSource="{Binding Path=Albums}"
                       SelectedItem="{Binding Path=SelectedAlbum}"/>
         </StackPanel>
@@ -32,28 +33,7 @@
         </StackPanel>
 
         <GroupBox Grid.Row="2" Header="Настройки принтера">
-            <StackPanel>
-                <StackPanel>
-                    <TextBlock Text="Принтер" Margin="10,10,10,0"/>
-                    <ComboBox Margin="10" 
-                          ItemsSource="{Binding Path=Albums}"
-                          SelectedItem="{Binding Path=SelectedAlbum}"/>
-                </StackPanel>
-
-                <StackPanel>
-                    <TextBlock Text="Цвета" Margin="10,10,10,0"/>
-                    <ComboBox Margin="10" 
-                          ItemsSource="{Binding Path=Albums}"
-                          SelectedItem="{Binding Path=SelectedAlbum}"/>
-                </StackPanel>
-
-                <StackPanel>
-                    <TextBlock Text="Качество изображения" Margin="10,10,10,0"/>
-                    <ComboBox Margin="10" 
-                          ItemsSource="{Binding Path=Albums}"
-                          SelectedItem="{Binding Path=SelectedAlbum}"/>
-                </StackPanel>
-            </StackPanel>
+            <views:PrintSettingsView />
         </GroupBox>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">

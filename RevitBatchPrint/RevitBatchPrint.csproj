@@ -131,13 +131,21 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppDomainExtensions.cs" />
+    <Compile Include="dosymep\AppDomainExtensions.cs" />
+    <Compile Include="dosymep\BaseViewModel.cs" />
     <Compile Include="BatchPrintCommand.cs" />
     <Compile Include="Models\Format.cs" />
     <Compile Include="Models\Printing\PrinterSettings.cs" />
     <Compile Include="Models\Printing\PrintManager.cs" />
     <Compile Include="Models\PrintSettings.cs" />
     <Compile Include="Models\RevitRepository.cs" />
+    <Compile Include="dosymep\RelayCommand.cs" />
+    <Compile Include="ViewModels\EnumConverters\ColorDepthTypeConverter.cs" />
+    <Compile Include="ViewModels\EnumConverters\HiddenLineViewsTypeConverter.cs" />
+    <Compile Include="ViewModels\EnumConverters\MarginTypeConverter.cs" />
+    <Compile Include="ViewModels\EnumConverters\PaperPlacementTypeConverter.cs" />
+    <Compile Include="ViewModels\EnumConverters\RasterQualityTypeConverter.cs" />
+    <Compile Include="ViewModels\EnumConverters\ZoomTypeConverter.cs" />
     <Compile Include="Views\BatchPrintWindow.xaml.cs">
       <DependentUpon>BatchPrintWindow.xaml</DependentUpon>
     </Compile>
@@ -145,9 +153,17 @@
     <Compile Include="ViewModels\RevitPrint.cs" />
     <Compile Include="ViewModels\PrintAbumsViewModel.cs" />
     <Compile Include="ViewModels\PrintAlbumViewModel.cs" />
+    <Compile Include="Views\PrintSettingsView.xaml.cs">
+      <DependentUpon>PrintSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\PrintSettingsViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Views\BatchPrintWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PrintSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
