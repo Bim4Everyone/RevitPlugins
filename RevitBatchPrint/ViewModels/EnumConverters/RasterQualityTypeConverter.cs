@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
@@ -6,7 +7,8 @@ using System.Windows.Markup;
 using Autodesk.Revit.DB;
 
 namespace RevitBatchPrint.ViewModels.EnumConverters {
-    public class RasterQualityTypeConverter : MarkupExtension, IValueConverter {
+    [ValueConversion(typeof(RasterQualityType), typeof(string))]
+    internal class RasterQualityTypeConverter : MarkupExtension, IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             var colorDepthType = (RasterQualityType?) value;
             switch(colorDepthType) {
@@ -39,6 +41,12 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             }
         }
 
+        public override object ProvideValue(IServiceProvider serviceProvider) {
+            return this;
+        }
+    }
+
+    internal class RasterQualityTypeExtension : MarkupExtension {
         public override object ProvideValue(IServiceProvider serviceProvider) {
             return new[] { "Низкое", "Среднее", "Высокое", "Презентационное" };
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
@@ -6,7 +7,8 @@ using System.Windows.Markup;
 using Autodesk.Revit.DB;
 
 namespace RevitBatchPrint.ViewModels.EnumConverters {
-    public class ZoomTypeConverter : MarkupExtension, IValueConverter {
+    [ValueConversion(typeof(ZoomType), typeof(IEnumerable<string>))]
+    internal class ZoomTypeConverter : MarkupExtension, IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             var zoomType = (ZoomType?) value;
             switch(zoomType) {
@@ -31,6 +33,12 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             }
         }
 
+        public override object ProvideValue(IServiceProvider serviceProvider) {
+            return this;
+        }
+    }
+
+    internal class ZoomTypeExtension : MarkupExtension {
         public override object ProvideValue(IServiceProvider serviceProvider) {
             return new[] { "Масштаб", "Вписать" };
         }

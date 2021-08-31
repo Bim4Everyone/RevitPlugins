@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
@@ -6,7 +7,8 @@ using System.Windows.Markup;
 using Autodesk.Revit.DB;
 
 namespace RevitBatchPrint.ViewModels.EnumConverters {
-    public class MarginTypeConverter : MarkupExtension, IValueConverter {
+    [ValueConversion(typeof(MarginType), typeof(IEnumerable<string>))]
+    internal class MarginTypeConverter : MarkupExtension, IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             var marginType = (MarginType?) value;
             switch(marginType) {
@@ -35,6 +37,12 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             }
         }
 
+        public override object ProvideValue(IServiceProvider serviceProvider) {
+            return this;
+        }
+    }
+
+    internal class MarginTypeExtension : MarkupExtension {
         public override object ProvideValue(IServiceProvider serviceProvider) {
             return new[] { "Без полей", "Пределы принтера", "Пользовательские" };
         }

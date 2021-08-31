@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
@@ -6,7 +7,8 @@ using System.Windows.Markup;
 using Autodesk.Revit.DB;
 
 namespace RevitBatchPrint.ViewModels.EnumConverters {
-    public class HiddenLineViewsTypeConverter : MarkupExtension, IValueConverter {
+    [ValueConversion(typeof(HiddenLineViewsType), typeof(IEnumerable<string>))]
+    internal class HiddenLineViewsTypeConverter : MarkupExtension, IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             var hiddenLineViewsType = (HiddenLineViewsType?) value;
             switch(hiddenLineViewsType) {
@@ -31,6 +33,12 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             }
         }
 
+        public override object ProvideValue(IServiceProvider serviceProvider) {
+            return this;
+        }
+    }
+
+    internal class HiddenLineViewsTypeExtension : MarkupExtension {
         public override object ProvideValue(IServiceProvider serviceProvider) {
             return new[] { "Растровая обработка", "Векторная обработка" };
         }

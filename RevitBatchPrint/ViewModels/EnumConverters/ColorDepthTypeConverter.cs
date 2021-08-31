@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
@@ -6,7 +7,8 @@ using System.Windows.Markup;
 using Autodesk.Revit.DB;
 
 namespace RevitBatchPrint.ViewModels.EnumConverters {
-    public class ColorDepthTypeConverter : MarkupExtension, IValueConverter {
+    [ValueConversion(typeof(ColorDepthType), typeof(string))]
+    internal class ColorDepthTypeConverter : MarkupExtension, IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             var colorDepthType = (ColorDepthType?) value;
             switch(colorDepthType) {
@@ -35,6 +37,12 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             }
         }
 
+        public override object ProvideValue(IServiceProvider serviceProvider) {
+            return this;
+        }
+    }
+   
+    internal class ColorDepthTypeExtension : MarkupExtension {
         public override object ProvideValue(IServiceProvider serviceProvider) {
             return new[] { "Цвет", "Оттенки серого", "Черные линии" };
         }
