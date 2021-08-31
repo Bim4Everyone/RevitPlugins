@@ -16,37 +16,37 @@
                       SelectedValue="{Binding PrinterName}"/>
         </StackPanel>
 
-        <GroupBox Header="Вывод на печать">
+        <GroupBox Header="Вывод на печать" Padding="10">
             <StackPanel>
                 <StackPanel>
-                    <TextBlock Text="Качество изображения" Margin="10,10,10,0"/>
-                    <ComboBox Margin="10" 
+                    <TextBlock Text="Качество изображения"/>
+                    <ComboBox Margin="0,10,0,0"
                               SelectedValue="{Binding RasterQuality, Converter={enumConverters:RasterQualityTypeConverter}}"
                               ItemsSource="{Binding Source={enumConverters:RasterQualityTypeExtension}}"/>
                 </StackPanel>
 
                 <StackPanel>
-                    <TextBlock Text="Цвета" Margin="10,10,10,0"/>
-                    <ComboBox Margin="10"
+                    <TextBlock Text="Цвета" Margin="0,10,0,0"/>
+                    <ComboBox Margin="0,10,0,0"
                               SelectedValue="{Binding ColorDepth, Converter={enumConverters:ColorDepthTypeConverter}}"
                               ItemsSource="{Binding Source={enumConverters:ColorDepthTypeExtension}}"/>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
 
-        <GroupBox Header="Параметры">
+        <GroupBox Header="Параметры" Padding="10">
             <StackPanel>
                 <CheckBox Content="Выделить связи синим (только цветная печать)"
                           IsChecked="{Binding ViewLinksinBlue}"/>
-                <CheckBox Content="Печатать только имеющиеся на виде марки"
+                <CheckBox Margin="0,10,0,0" Content="Печатать только имеющиеся на виде марки"
                           IsChecked="{Binding HideUnreferencedViewTags}"/>
-                <CheckBox Content="Кромки области маскируют совпадающие линии"
+                <CheckBox Margin="0,10,0,0" Content="Кромки области маскируют совпадающие линии"
                           IsChecked="{Binding MaskCoincidentLines}"/>
-                <CheckBox Content="Скрыть границы области видимости"
+                <CheckBox Margin="0,10,0,0" Content="Скрыть границы области видимости"
                           IsChecked="{Binding HideScopeBoxes}"/>
-                <CheckBox Content="Скрыть границы обрезки"
+                <CheckBox Margin="0,10,0,0" Content="Скрыть границы обрезки"
                           IsChecked="{Binding HideCropBoundaries}"/>
-                <CheckBox Content="Заменить полутона тонкими линиями"
+                <CheckBox Margin="0,10,0,0" Content="Заменить полутона тонкими линиями"
                           IsChecked="{Binding ReplaceHalftoneWithThinLines}"/>
             </StackPanel>
         </GroupBox>

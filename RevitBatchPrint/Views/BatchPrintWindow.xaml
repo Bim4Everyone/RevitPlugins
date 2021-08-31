@@ -29,7 +29,7 @@
                       SelectedItem="{Binding Path=SelectedAlbum}"/>
         </StackPanel>
 
-        <GroupBox Grid.Row="2" Header="Настройки принтера">
+        <GroupBox Grid.Row="2" Header="Настройки принтера" Padding="10">
             <views:PrintSettingsView DataContext="{Binding PrintSettings}" />
         </GroupBox>
 
