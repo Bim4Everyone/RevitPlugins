@@ -7,7 +7,7 @@
              xmlns:viewModels="clr-namespace:RevitBatchPrint.ViewModels"
              mc:Ignorable="d" Height="180" Width="450" WindowStartupLocation="CenterOwner" Title="Пакетная печать">
     <Window.DataContext>
-        <viewModels:ViewSheetNamesViewModel/>
+        <viewModels:PrintAbumsViewModel/>
     </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
@@ -19,8 +19,8 @@
         <StackPanel  Grid.Row="0">
             <TextBlock Text="Комплект чертежей" Margin="10,10,10,0"/>
             <ComboBox Margin="10" 
-                      ItemsSource="{Binding Path=Names}"
-                      SelectedItem="{Binding Path=SelectedName}"/>
+                      ItemsSource="{Binding Path=Albums}"
+                      SelectedItem="{Binding Path=SelectedAlbum}"/>
         </StackPanel>
 
         <CheckBox Grid.Row="1" Margin="10" Content="Черно-белый"/>

@@ -143,8 +143,8 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\RevitPrint.cs" />
-    <Compile Include="ViewModels\ViewSheetNamesViewModel.cs" />
-    <Compile Include="ViewModels\ViewSheetNamesCountViewModel.cs" />
+    <Compile Include="ViewModels\PrintAbumsViewModel.cs" />
+    <Compile Include="ViewModels\PrintAlbumViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Views\PrintSettingsWindow.xaml">

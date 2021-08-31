@@ -48,15 +48,15 @@ namespace RevitBatchPrint.Models {
         /// </summary>
         /// <param name="printParamName">Наименование параметра группировки альбомов.</param>
         /// <returns>Возвращает список возможных значений параметра группировки альбомов.</returns>
-        public List<string> GetPrintParamValues(string printParamName) {
+        public List<(string, int)> GetPrintParamValues(string printParamName) {
             if(string.IsNullOrEmpty(printParamName)) {
                 throw new ArgumentException($"'{nameof(printParamName)}' cannot be null or empty.", nameof(printParamName));
             }
 
             return GetViewSheets()
-                .Select(item => (string) item.GetParamValueOrDefault(printParamName))
-                .Where(item => !string.IsNullOrEmpty(item))
-                .Distinct()
+                .GroupBy(item => (string) item.GetParamValueOrDefault(printParamName))
+                .Where(item => !string.IsNullOrEmpty(item.Key))
+                .Select(item => (item.Key, item.Count()))
                 .ToList();
         }
 

@@ -11,6 +11,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
+using RevitBatchPrint.Models;
 using RevitBatchPrint.ViewModels;
 using RevitBatchPrint.Views;
 
@@ -37,32 +38,33 @@ namespace RevitBatchPrint {
             Document doc = uidoc.Document;
 
             try {
-                var revitPrint = new RevitPrint(doc);
-                var viewSheets = revitPrint.GetViewSheets();
+                var repository = new RevitRepository(uiapp);
+                var printParamName = repository.GetPrintParamNames().FirstOrDefault(item => RevitRepository.PrintParamNames.Contains(item));
+                if(string.IsNullOrEmpty(printParamName)) {
+                    TaskDialog.Show("Пакетная печать.", "Не был найден атрибут группировки альбомов.");
+                    return;
+                }
 
-                var viewSheetNames = viewSheets
-                    .SelectMany(item => RevitPrint.FilterParamNames.Select(paramName => item.LookupParameter(paramName)?.AsString()))
-                    .Where(item => !string.IsNullOrEmpty(item))
-                    .GroupBy(item => item)
-                    .Select(item => new ViewSheetNamesCountViewModel { Name = item.Key, Count = item.Count() })
-                    .OrderBy(item => item.Name)
-                    .ToList();
-
-                if(viewSheetNames.Count == 0) {
+                var revitPrint = new RevitPrint(repository);
+                List<(string, int)> printParamValues = repository.GetPrintParamValues(printParamName);
+                if(printParamValues.Count == 0) {
                     TaskDialog.Show("Пакетная печать.", "Не были обнаружены основные надписи.");
                     return;
                 }
 
+                var albums = printParamValues.Select(item => new PrintAlbumViewModel() { Name = item.Item1, Count = item.Item2 }).ToList();
                 var window = new PrintSettingsWindow() {
-                    DataContext = new ViewSheetNamesViewModel() {
-                        Names = viewSheetNames,
-                        SelectedName = viewSheetNames.FirstOrDefault()
+                    DataContext = new PrintAbumsViewModel() {
+                        Albums = albums,
+                        SelectedAlbum = albums.FirstOrDefault()
                     }
                 };
 
                 new WindowInteropHelper(window) { Owner = uiapp.MainWindowHandle };
                 if(window.ShowDialog() == true) {
-                    revitPrint.FilterParamValue = ((ViewSheetNamesViewModel) window.DataContext).SelectedName.Name;
+                    revitPrint.PrinterName = RevitRepository.DefaultPrinterName;
+                    revitPrint.FilterParamName = printParamName;
+                    revitPrint.FilterParamValue = ((PrintAbumsViewModel) window.DataContext).SelectedAlbum.Name;
                     revitPrint.Execute();
 
                     if(revitPrint.Errors.Count > 0) {

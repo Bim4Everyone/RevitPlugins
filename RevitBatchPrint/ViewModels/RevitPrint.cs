@@ -12,10 +12,10 @@ using RevitBatchPrint.Models;
 
 namespace RevitBatchPrint.ViewModels {
     internal class RevitPrint {
-        private readonly Document _document;
+        private readonly RevitRepository _revitRepository;
 
-        public RevitPrint(Document document) {
-            _document = document;
+        public RevitPrint(RevitRepository revitRepository) {
+            _revitRepository = revitRepository;
         }
 
         /// <summary>
@@ -38,41 +38,18 @@ namespace RevitBatchPrint.ViewModels {
         /// </summary>
         public List<string> Errors { get; set; } = new List<string>();
 
-        /// <summary>
-        /// Используемый принтер по умолчанию.
-        /// </summary>
-        public static string DefaultPrinterName { get; } = "PdfCreator";
-
-        /// <summary>
-        /// Наименование параметров по которым должна быть фильтрация.
-        /// </summary>
-        public static IReadOnlyList<string> FilterParamNames { get; set; } = new List<string>() { "Орг.ОбознчТома(Комплекта)", "Орг.КомплектЧертежей", "ADSK_Комплект чертежей" };
-
-        public List<ViewSheet> GetViewSheets() {
-            return new FilteredElementCollector(_document)
-                .OfClass(typeof(ViewSheet))
-                .ToElements()
-                .OfType<ViewSheet>()
-                .Where(item => item.IsTemplate == false)
-                .Where(item => item.CanBePrinted)
-                .Where(item => item.ViewType == ViewType.DrawingSheet)
-                .ToList();
-        }
-
         public void Execute() {
-            var printManager = _document.PrintManager;
+            PrintManager printManager = _revitRepository.Document.PrintManager;
             printManager.PrintToFile = true;
-            printManager.PrintToFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), Path.ChangeExtension(Path.GetFileName(_document.PathName), ".pdf"));
+            printManager.PrintToFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), Path.ChangeExtension(Path.GetFileName(_revitRepository.Document.PathName), ".pdf"));
 
-            List<ViewSheet> viewSheets = GetViewSheets()
-                .Where(item => IsAllowPrintSheet(item))
+            List<ViewSheet> viewSheets = _revitRepository.GetViewSheets(FilterParamName, FilterParamValue)
                 .OrderBy(item => item, new ViewSheetComparer())
                 .ToList();
 
             var printerSettings = new Models.Printing.PrintManager().GetPrinterSettings(PrinterName);
 
             foreach(ViewSheet viewSheet in viewSheets) {
-
                 var printSettings = GetPrintSettings(viewSheet);
                 bool hasFormatName = printerSettings.HasFormatName(printSettings.Format.Name);
                 if(!hasFormatName) {
@@ -84,10 +61,10 @@ namespace RevitBatchPrint.ViewModels {
                 }
 
                 try {
-                    using(Transaction transaction = new Transaction(_document, "PrintSettings")) {
+                    using(Transaction transaction = new Transaction(_revitRepository.Document, "PrintSettings")) {
                         transaction.Start();
 
-                        var paperSize = GetPaperSizeByName(printManager, printSettings.Format.Name);
+                        var paperSize = _revitRepository.GetPaperSizeByName(printSettings.Format.Name);
 
                         printManager.PrintSetup.CurrentPrintSetting = printManager.PrintSetup.InSession;
                         printManager.PrintSetup.CurrentPrintSetting.PrintParameters.PaperSize = paperSize;
@@ -110,43 +87,13 @@ namespace RevitBatchPrint.ViewModels {
             }
         }
 
-        private bool IsAllowPrintSheet(ViewSheet viewSheet) {
-            return FilterParamNames.Any(item => viewSheet.LookupParameter(item)?.AsString()?.IndexOf(FilterParamValue, StringComparison.CurrentCultureIgnoreCase) >= 0);
-        }
-
         private PrintSettings GetPrintSettings(ViewSheet viewSheet) {
-            FamilyInstance familyInstance = new FilteredElementCollector(viewSheet.Document, viewSheet.Id)
-                                               .OfClass(typeof(FamilyInstance))
-                                               .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                                               .OfType<FamilyInstance>()
-                                               .FirstOrDefault();
-
+            FamilyInstance familyInstance = _revitRepository.GetTitleBlock(viewSheet);
             if(familyInstance == null) {
                 throw new InvalidOperationException("Не было обнаружено семейство основной надписи.");
             }
 
-            var sheetWidth = (double?) familyInstance.GetParamValueOrDefault(BuiltInParameter.SHEET_WIDTH);
-            var sheetHeight = (double?) familyInstance.GetParamValueOrDefault(BuiltInParameter.SHEET_HEIGHT);
-
-            if(sheetWidth.HasValue && sheetHeight.HasValue) {
-                sheetWidth = UnitUtils.ConvertFromInternalUnits(sheetWidth.Value, DisplayUnitType.DUT_MILLIMETERS);
-                sheetHeight = UnitUtils.ConvertFromInternalUnits(sheetHeight.Value, DisplayUnitType.DUT_MILLIMETERS);
-
-                return new PrintSettings() {
-                    Format = Format.GetFormat((int) Math.Round(sheetWidth.Value), (int) Math.Round(sheetHeight.Value)),
-                    FormatOrientation = GetFormatOrientation((int) Math.Round(sheetWidth.Value), (int) Math.Round(sheetHeight.Value))
-                };
-            }
-
-            throw new InvalidOperationException("Не были обнаружены размеры основной надписи.");
-        }
-
-        private static PageOrientationType GetFormatOrientation(int width, int height) {
-            return width > height ? PageOrientationType.Landscape : PageOrientationType.Portrait;
-        }
-
-        private PaperSize GetPaperSizeByName(PrintManager printManager, string formatName) {
-            return printManager.PaperSizes.OfType<PaperSize>().First(item => item.Name.Equals(formatName));
+            return _revitRepository.GetPrintSettings(familyInstance);
         }
     }
 }

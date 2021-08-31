@@ -2,23 +2,23 @@
 using System.ComponentModel;
 
 namespace RevitBatchPrint.ViewModels {
-    public class ViewSheetNamesViewModel : INotifyPropertyChanged {
-        private ViewSheetNamesCountViewModel _selectedName;
-        private List<ViewSheetNamesCountViewModel> _names;
+    public class PrintAbumsViewModel : INotifyPropertyChanged {
+        private PrintAlbumViewModel _selectedName;
+        private List<PrintAlbumViewModel> _names;
 
-        public ViewSheetNamesCountViewModel SelectedName {
+        public PrintAlbumViewModel SelectedAlbum {
             get => _selectedName;
             set {
                 _selectedName = value;
-                OnPropertyChanged(nameof(SelectedName));
+                OnPropertyChanged(nameof(SelectedAlbum));
             }
         }
         
-        public List<ViewSheetNamesCountViewModel> Names { 
+        public List<PrintAlbumViewModel> Albums { 
             get => _names;
             set {
                 _names = value;
-                OnPropertyChanged(nameof(Names));
+                OnPropertyChanged(nameof(Albums));
             }
         }
 
