@@ -150,7 +150,7 @@
       <DependentUpon>BatchPrintWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModels\RevitPrint.cs" />
+    <Compile Include="Models\RevitPrint.cs" />
     <Compile Include="ViewModels\PrintAbumsViewModel.cs" />
     <Compile Include="ViewModels\PrintAlbumViewModel.cs" />
     <Compile Include="Views\PrintSettingsView.xaml.cs">

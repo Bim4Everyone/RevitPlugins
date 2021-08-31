@@ -10,7 +10,7 @@ using dosymep.Revit.Comparators;
 
 using RevitBatchPrint.Models;
 
-namespace RevitBatchPrint.ViewModels {
+namespace RevitBatchPrint.Models {
     internal class RevitPrint {
         private readonly RevitRepository _revitRepository;
 

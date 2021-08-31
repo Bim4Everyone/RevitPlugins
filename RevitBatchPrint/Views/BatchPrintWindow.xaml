@@ -6,10 +6,7 @@
              xmlns:local="clr-namespace:RevitBatchPrint"
              xmlns:views="clr-namespace:RevitBatchPrint.Views"
              xmlns:viewModels="clr-namespace:RevitBatchPrint.ViewModels"
-             mc:Ignorable="d" Height="580" Width="450" WindowStartupLocation="CenterOwner" Title="Пакетная печать">
-    <Window.DataContext>
-        <viewModels:PrintAbumsViewModel/>
-    </Window.DataContext>
+             mc:Ignorable="d" Height="580" Width="850" WindowStartupLocation="CenterOwner" Title="Пакетная печать">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -18,11 +15,11 @@
             <RowDefinition Height="45"/>
         </Grid.RowDefinitions>
 
-        <StackPanel  Grid.Row="0">
-            <TextBlock Text="Наименование параметра" Margin="10,10,10,0"/>
+        <StackPanel  Grid.Row="0" Visibility="{Binding ShowPrintParamSelect}">
+            <TextBlock Text="Параметр комплекта чертежей" Margin="10,10,10,0"/>
             <ComboBox Margin="10"
-                      ItemsSource="{Binding Path=Albums}"
-                      SelectedItem="{Binding Path=SelectedAlbum}"/>
+                      ItemsSource="{Binding Path=PrintParamNames}"
+                      SelectedItem="{Binding Path=PrintParamName}"/>
         </StackPanel>
 
         <StackPanel  Grid.Row="1">
@@ -38,7 +35,7 @@
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
-            <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80" />
+            <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80" Command="{Binding RevitPrintCommand}" />
             <Button Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80"/>
         </StackPanel>
     </Grid>
