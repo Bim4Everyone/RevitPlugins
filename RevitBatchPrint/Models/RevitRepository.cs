@@ -22,7 +22,7 @@ namespace RevitBatchPrint.Models {
         /// <summary>
         /// Используемый принтер по умолчанию.
         /// </summary>
-        public static string DefaultPrinterName { get; } = "PdfCreator";
+        public static string DefaultPrinterName { get; } = "PDFCreator";
 
         /// <summary>
         /// Наименование параметров по которым должна быть фильтрация.
