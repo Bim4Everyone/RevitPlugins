@@ -44,6 +44,8 @@ namespace RevitBatchPrint.ViewModels {
 
         public ObservableCollection<string> PrinterNames { get; }
 
+        public System.Windows.Visibility VisibilitySelectPrinter => _printManager.HasPrinterName(Models.RevitRepository.DefaultPrinterName) ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+
         public PaperPlacementType PaperPlacement {
             get => _paperPlacement;
             set => this.RaiseAndSetIfChanged(ref _paperPlacement, value);
