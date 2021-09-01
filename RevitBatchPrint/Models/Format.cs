@@ -50,6 +50,12 @@ namespace RevitBatchPrint.Models {
         }
 
         public static Format GetFormat(int width, int height) {
+            if(width > height) {
+                int temp = height;
+                height = width;
+                width = temp;
+            }
+
             return _formats.FirstOrDefault(item => IsNormalWidth(width, item) && IsNormalHeight(height, item))
                 ?? new Format() { Name = "Шо?", Width = width, Height = height };
         }

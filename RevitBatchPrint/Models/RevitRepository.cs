@@ -14,10 +14,13 @@ namespace RevitBatchPrint.Models {
 
         public RevitRepository(UIApplication uiApplication) {
             _uiApplication = uiApplication;
+            PrintManager = Document.PrintManager;
         }
 
         public Document Document => _uiApplication.ActiveUIDocument.Document;
         public Application Application => _uiApplication.Application;
+
+        public PrintManager PrintManager { get; }
 
         /// <summary>
         /// Используемый принтер по умолчанию.
@@ -141,7 +144,7 @@ namespace RevitBatchPrint.Models {
                 throw new ArgumentException($"'{nameof(formatName)}' cannot be null or empty.", nameof(formatName));
             }
 
-            return Document.PrintManager.PaperSizes.OfType<PaperSize>().FirstOrDefault(item => item.Name.Equals(formatName));
+            return PrintManager.PaperSizes.OfType<PaperSize>().FirstOrDefault(item => item.Name.Equals(formatName));
         }
 
         /// <summary>

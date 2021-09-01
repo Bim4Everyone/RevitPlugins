@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.WPF.Commands;
@@ -19,7 +20,7 @@ namespace RevitBatchPrint.ViewModels {
         private ObservableCollection<PrintAlbumViewModel> _albums;
         private PrintSettingsViewModel _printSettings = new PrintSettingsViewModel();
 
-        private Visibility _showPrintParamSelect;
+        private System.Windows.Visibility _showPrintParamSelect;
         private string _printParamName;
         private string _errorText;
         private readonly RevitRepository _repository;
@@ -29,7 +30,7 @@ namespace RevitBatchPrint.ViewModels {
 
             PrintParamNames = new ObservableCollection<string>(_repository.GetPrintParamNames());
             PrintParamName = PrintParamNames.FirstOrDefault(item => RevitRepository.PrintParamNames.Contains(item));
-            ShowPrintParamSelect = string.IsNullOrEmpty(PrintParamName) ? Visibility.Visible : Visibility.Collapsed;
+            ShowPrintParamSelect = string.IsNullOrEmpty(PrintParamName) ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
 
             RevitPrintCommand = new RelayCommand(RevitPrint, CanRevitPrint);
         }
@@ -65,7 +66,7 @@ namespace RevitBatchPrint.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _printSettings, value);
         }
 
-        public Visibility ShowPrintParamSelect {
+        public System.Windows.Visibility ShowPrintParamSelect {
             get => _showPrintParamSelect;
             set => this.RaiseAndSetIfChanged(ref _showPrintParamSelect, value);
         }
@@ -80,7 +81,9 @@ namespace RevitBatchPrint.ViewModels {
             revitPrint.PrinterName = RevitRepository.DefaultPrinterName;
             revitPrint.FilterParamName = PrintParamName;
             revitPrint.FilterParamValue = SelectedAlbum.Name;
-            revitPrint.Execute();
+            revitPrint.PrinterSettings = PrintSettings.GetPrinterSettings();
+
+            revitPrint.Execute(SetupPrintParams);
 
             if(revitPrint.Errors.Count > 0) {
                 TaskDialog.Show("Пакетная печать.", string.Join(Environment.NewLine + "- ", revitPrint.Errors));
@@ -101,6 +104,33 @@ namespace RevitBatchPrint.ViewModels {
             }
 
             return true;
+        }
+
+        private void SetupPrintParams(PrintParameters printParameters) {
+            printParameters.PaperPlacement = PrintSettings.PaperPlacement;
+            if(PrintSettings.PaperPlacement == PaperPlacementType.Margins) {
+                printParameters.MarginType = PrintSettings.MarginType;
+                if(PrintSettings.MarginType == MarginType.UserDefined) {
+                    printParameters.UserDefinedMarginX = PrintSettings.UserDefinedMarginX;
+                    printParameters.UserDefinedMarginY = PrintSettings.UserDefinedMarginY;
+                }
+            }
+
+            printParameters.ZoomType = PrintSettings.ZoomType;
+            if(PrintSettings.ZoomType == ZoomType.Zoom) {
+                printParameters.Zoom = PrintSettings.Zoom;
+            }
+
+            printParameters.ColorDepth = PrintSettings.ColorDepth;
+            printParameters.RasterQuality = PrintSettings.RasterQuality;
+
+            printParameters.HiddenLineViews = PrintSettings.HiddenLineViews;
+            printParameters.HideCropBoundaries = PrintSettings.HideCropBoundaries;
+            printParameters.HideReforWorkPlanes = PrintSettings.HideReforWorkPlanes;
+            printParameters.HideScopeBoxes = PrintSettings.HideScopeBoxes;
+            printParameters.HideUnreferencedViewTags = PrintSettings.HideUnreferencedViewTags;
+            printParameters.MaskCoincidentLines = PrintSettings.MaskCoincidentLines;
+            printParameters.ReplaceHalftoneWithThinLines = PrintSettings.ReplaceHalftoneWithThinLines;
         }
     }
 }

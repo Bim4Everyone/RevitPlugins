@@ -9,7 +9,7 @@ namespace RevitBatchPrint.ViewModels {
     internal class PrintSettingsViewModel : BaseViewModel {
         private string _printerName;
 
-        private PaperPlacementType _paperPlacement = PaperPlacementType.Center;
+        private PaperPlacementType _paperPlacement = PaperPlacementType.Margins;
         private MarginType _marginType = MarginType.NoMargin;
         private ZoomType _zoomType = ZoomType.FitToPage;
         private HiddenLineViewsType _hiddenLineViews = HiddenLineViewsType.VectorProcessing;
@@ -21,10 +21,10 @@ namespace RevitBatchPrint.ViewModels {
         private double _userDefinedMarginY;
         private bool _maskCoincidentLines;
         private bool _viewLinksinBlue;
-        private bool _hideReforWorkPlanes;
-        private bool _hideScopeBoxes;
+        private bool _hideReforWorkPlanes = true;
+        private bool _hideScopeBoxes = true;
         private bool _hideUnreferencedViewTags;
-        private bool _hideCropBoundaries;
+        private bool _hideCropBoundaries = true;
         private bool _replaceHalftoneWithThinLines;
 
 

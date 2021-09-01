@@ -16,6 +16,9 @@ namespace RevitBatchPrint.Models {
 
         public RevitPrint(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
+
+            PrintManager = _revitRepository.PrintManager;
+            PrintParameters = PrintManager.PrintSetup.CurrentPrintSetting.PrintParameters;
         }
 
         /// <summary>
@@ -38,50 +41,59 @@ namespace RevitBatchPrint.Models {
         /// </summary>
         public List<string> Errors { get; set; } = new List<string>();
 
-        public void Execute() {
-            PrintManager printManager = _revitRepository.Document.PrintManager;
-            printManager.PrintToFile = true;
-            printManager.PrintToFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), Path.ChangeExtension(Path.GetFileName(_revitRepository.Document.PathName), ".pdf"));
+        public Document Document => _revitRepository.Document;
+        public PrintManager PrintManager { get; }
+        public PrintParameters PrintParameters { get; }
+
+        public Printing.PrinterSettings PrinterSettings { get; set; }
+
+        public void Execute(Action<PrintParameters> setupPrintParams) {
+            PrintManager.PrintToFile = true;
+            PrintManager.PrintOrderReverse = false;
+            PrintManager.PrintRange = PrintRange.Current;
+            
+            PrintManager.PrintToFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), Path.ChangeExtension(Path.GetFileName(_revitRepository.Document.PathName), ".pdf"));
+            if(File.Exists(PrintManager.PrintToFileName)) {
+                File.Delete(PrintManager.PrintToFileName);
+            }
 
             List<ViewSheet> viewSheets = _revitRepository.GetViewSheets(FilterParamName, FilterParamValue)
                 .OrderBy(item => item, new ViewSheetComparer())
                 .ToList();
 
-            var printerSettings = new Models.Printing.PrintManager().GetPrinterSettings(PrinterName);
-
             foreach(ViewSheet viewSheet in viewSheets) {
                 var printSettings = GetPrintSettings(viewSheet);
-                bool hasFormatName = printerSettings.HasFormatName(printSettings.Format.Name);
+                bool hasFormatName = PrinterSettings.HasFormatName(printSettings.Format.Name);
                 if(!hasFormatName) {
                     // создаем новый формат в Windows, если не был найден подходящий
-                    printerSettings.AddFormat(printSettings.Format.Name, new System.Drawing.Size(printSettings.Format.Width, printSettings.Format.Height));
+                    PrinterSettings.AddFormat(printSettings.Format.Name, new System.Drawing.Size(printSettings.Format.Width, printSettings.Format.Height));
 
                     // перезагружаем в ревите принтер, чтобы появились изменения
-                    printManager.SelectNewPrintDriver(PrinterName);
+                    PrintManager.SelectNewPrintDriver(PrinterName);
                 }
 
                 try {
                     using(Transaction transaction = new Transaction(_revitRepository.Document, "PrintSettings")) {
                         transaction.Start();
+                        
+                        PrintManager.PrintSetup.CurrentPrintSetting = PrintManager.PrintSetup.InSession;
+                        
+                        PaperSize paperSize = _revitRepository.GetPaperSizeByName(printSettings.Format.Name);
+                        PrintParameters.PaperSize = paperSize;
+                        PrintParameters.PageOrientation = printSettings.FormatOrientation;
 
-                        var paperSize = _revitRepository.GetPaperSizeByName(printSettings.Format.Name);
+                        setupPrintParams(PrintParameters);
 
-                        printManager.PrintSetup.CurrentPrintSetting = printManager.PrintSetup.InSession;
-                        printManager.PrintSetup.CurrentPrintSetting.PrintParameters.PaperSize = paperSize;
-                        printManager.PrintSetup.CurrentPrintSetting.PrintParameters.ZoomType = ZoomType.Zoom;
-                        printManager.PrintSetup.CurrentPrintSetting.PrintParameters.Zoom = 100;
-                        printManager.PrintSetup.CurrentPrintSetting.PrintParameters.PageOrientation = printSettings.FormatOrientation;
+                        PrintManager.PrintSetup.SaveAs("SheetPrintSettings");
 
-                        printManager.PrintSetup.SaveAs("SheetPrintSettings");
-
-                        printManager.Apply();
-                        printManager.SubmitPrint(viewSheet);
+                        PrintManager.Apply();
+                        PrintManager.SubmitPrint(viewSheet);
                     }
                 } catch(Exception ex) {
                     Errors.Add($"{viewSheet.Name}: \"{ex.Message}\".");
                 } finally {
                     if(!hasFormatName) {
-                        printerSettings.RemoveFormat(printSettings.Format.Name);
+                        PrinterSettings.RemoveFormat(printSettings.Format.Name);
                     }
                 }
             }
