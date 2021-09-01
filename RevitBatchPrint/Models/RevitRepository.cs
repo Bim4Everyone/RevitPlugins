@@ -57,11 +57,14 @@ namespace RevitBatchPrint.Models {
         /// </summary>
         /// <returns>Возвращает список возможных имен параметров группировки альбомов.</returns>
         public List<string> GetPrintParamNames() {
-            return Document.GetProjectParamElements()
-                .Where(item => item.GetDefinition().ParameterType == ParameterType.Text)
-                .Select(item => item.Name)
-                .Distinct()
+            var categoryId = new ElementId(BuiltInCategory.OST_Sheets);
+            return Document.GetParameterBindings()
+                .Where(item => item.Binding is InstanceBinding)
+                .Where(item => ((InstanceBinding) item.Binding).Categories.OfType<Category>().Any(category => category.Id == categoryId))
+                .Where(item => item.Definition.ParameterType == ParameterType.Text)
+                .Select(item => item.Definition.Name)
                 .OrderBy(item => item)
+                .Distinct()
                 .ToList();
         }
 
