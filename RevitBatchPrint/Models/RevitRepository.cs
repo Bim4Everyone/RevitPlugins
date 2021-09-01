@@ -14,13 +14,17 @@ namespace RevitBatchPrint.Models {
 
         public RevitRepository(UIApplication uiApplication) {
             _uiApplication = uiApplication;
-            PrintManager = Document.PrintManager;
+            ReloadPrintSettings();
         }
 
         public Document Document => _uiApplication.ActiveUIDocument.Document;
         public Application Application => _uiApplication.Application;
 
-        public PrintManager PrintManager { get; }
+        public PrintManager PrintManager { get; private set; }
+
+        public void ReloadPrintSettings() {
+            PrintManager = Document.PrintManager;
+        }
 
         /// <summary>
         /// Используемый принтер по умолчанию.

@@ -16,9 +16,6 @@ namespace RevitBatchPrint.Models {
 
         public RevitPrint(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
-
-            PrintManager = _revitRepository.PrintManager;
-            PrintParameters = PrintManager.PrintSetup.CurrentPrintSetting.PrintParameters;
         }
 
         /// <summary>
@@ -42,8 +39,8 @@ namespace RevitBatchPrint.Models {
         public List<string> Errors { get; set; } = new List<string>();
 
         public Document Document => _revitRepository.Document;
-        public PrintManager PrintManager { get; }
-        public PrintParameters PrintParameters { get; }
+        public PrintManager PrintManager => _revitRepository.PrintManager;
+        public PrintParameters PrintParameters => PrintManager.PrintSetup.CurrentPrintSetting.PrintParameters;
 
         public Printing.PrinterSettings PrinterSettings { get; set; }
 
@@ -51,7 +48,8 @@ namespace RevitBatchPrint.Models {
             PrintManager.PrintToFile = true;
             PrintManager.PrintOrderReverse = false;
             PrintManager.PrintRange = PrintRange.Current;
-            
+            PrintManager.SelectNewPrintDriver(PrinterName);
+
             PrintManager.PrintToFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), Path.ChangeExtension(Path.GetFileName(_revitRepository.Document.PathName), ".pdf"));
             if(File.Exists(PrintManager.PrintToFileName)) {
                 File.Delete(PrintManager.PrintToFileName);
@@ -69,7 +67,7 @@ namespace RevitBatchPrint.Models {
                     PrinterSettings.AddFormat(printSettings.Format.Name, new System.Drawing.Size(printSettings.Format.Width, printSettings.Format.Height));
 
                     // перезагружаем в ревите принтер, чтобы появились изменения
-                    PrintManager.SelectNewPrintDriver(PrinterName);
+                    _revitRepository.ReloadPrintSettings();
                 }
 
                 try {
