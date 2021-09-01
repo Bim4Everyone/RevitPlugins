@@ -52,6 +52,7 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="pyRevitLabs.Json">
       <HintPath>..\..\..\..\Users\biseuv_o\AppData\Roaming\pyRevit-Master\bin\pyRevitLabs.Json.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPI">
       <HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPI.dll</HintPath>

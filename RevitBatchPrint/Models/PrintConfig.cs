@@ -13,7 +13,18 @@ namespace RevitBatchPrint.Models {
     public class PrintConfig {
         public List<PrintSettingsConfig> PrintSettings { get; set; } = new List<PrintSettingsConfig>();
 
+        public void AddPrintSettings(PrintSettingsConfig printSettingsConfig) {
+            if(PrintSettings.Count > 10) {
+                foreach(int index in Enumerable.Range(0, PrintSettings.Count - 10)) {
+                    PrintSettings.RemoveAt(index);
+                }
+            }
+
+            PrintSettings.Add(printSettingsConfig);
+        }
+
         public PrintSettingsConfig GetPrintSettingsConfig(string documentName) {
+            documentName = string.IsNullOrEmpty(documentName) ? "Без имени.rvt" : documentName;
             return PrintSettings.FirstOrDefault(item => documentName.Equals(item.DocumentName));
         }
 
@@ -37,6 +48,9 @@ namespace RevitBatchPrint.Models {
 
     public class PrintSettingsConfig {
         public string DocumentName { get; set; }
+        public string PrinterName { get; set; }
+        public string PrintParamName { get; set; }
+        public object SelectedAlbum { get; set; }
 
         public int Zoom { get; set; }
         public ZoomType ZoomType { get; set; }

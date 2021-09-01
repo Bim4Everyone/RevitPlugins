@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -33,6 +34,8 @@ namespace RevitBatchPrint.ViewModels {
             ShowPrintParamSelect = string.IsNullOrEmpty(PrintParamName) ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
 
             RevitPrintCommand = new RelayCommand(RevitPrint, CanRevitPrint);
+
+            SetPrintConfig();
         }
 
         public string PrintParamName {
@@ -77,6 +80,8 @@ namespace RevitBatchPrint.ViewModels {
         }
 
         public void RevitPrint(object p) {
+            SavePrintConfig();
+
             var revitPrint = new RevitPrint(_repository);
             revitPrint.PrinterName = RevitRepository.DefaultPrinterName;
             revitPrint.FilterParamName = PrintParamName;
@@ -90,6 +95,72 @@ namespace RevitBatchPrint.ViewModels {
             } else {
                 TaskDialog.Show("Пакетная печать.", "Готово!");
             }
+        }
+
+        private void SetPrintConfig() {
+            var printSettingsConfig = PrintConfig.GetConfig().GetPrintSettingsConfig(GetDocumentName());
+            if(printSettingsConfig != null) {
+                _printSettings.PrinterName = printSettingsConfig.PrinterName;
+                PrintParamName = printSettingsConfig.PrintParamName;
+                SelectedAlbum = Albums?.FirstOrDefault(item => item.Name.Equals(printSettingsConfig.SelectedAlbum)) ?? SelectedAlbum;
+
+                _printSettings.Zoom = printSettingsConfig.Zoom;
+                _printSettings.ZoomType = printSettingsConfig.ZoomType;
+
+                _printSettings.ColorDepth = printSettingsConfig.ColorDepth;
+                _printSettings.RasterQuality = printSettingsConfig.RasterQuality;
+
+                _printSettings.PaperPlacement = printSettingsConfig.PaperPlacement;
+                _printSettings.MarginType = printSettingsConfig.MarginType;
+                _printSettings.UserDefinedMarginX = printSettingsConfig.UserDefinedMarginX;
+                _printSettings.UserDefinedMarginY = printSettingsConfig.UserDefinedMarginY;
+
+                _printSettings.MaskCoincidentLines = printSettingsConfig.MaskCoincidentLines;
+                _printSettings.HiddenLineViews = printSettingsConfig.HiddenLineViews;
+                _printSettings.HideCropBoundaries = printSettingsConfig.HideCropBoundaries;
+                _printSettings.HideReforWorkPlanes = printSettingsConfig.HideReforWorkPlanes;
+                _printSettings.HideScopeBoxes = printSettingsConfig.HideScopeBoxes;
+                _printSettings.HideUnreferencedViewTags = printSettingsConfig.HideUnreferencedViewTags;
+                _printSettings.ReplaceHalftoneWithThinLines = printSettingsConfig.ReplaceHalftoneWithThinLines;
+            }
+        }
+
+        private void SavePrintConfig() {
+            var printConfig = PrintConfig.GetConfig();
+            var printSettingsConfig = printConfig.GetPrintSettingsConfig(Path.GetFileName(_repository.Document.PathName));
+            if(printSettingsConfig == null) {
+                printSettingsConfig = new PrintSettingsConfig();
+                printConfig.AddPrintSettings(printSettingsConfig);
+            }
+
+            printSettingsConfig.DocumentName = GetDocumentName();
+            printSettingsConfig.PrinterName = _printSettings.PrinterName;
+            printSettingsConfig.PrintParamName = PrintParamName;
+            printSettingsConfig.SelectedAlbum = SelectedAlbum?.Name;
+
+            printSettingsConfig.Zoom = _printSettings.Zoom;
+            printSettingsConfig.ZoomType = _printSettings.ZoomType;
+
+            printSettingsConfig.ColorDepth = _printSettings.ColorDepth;
+            printSettingsConfig.RasterQuality = _printSettings.RasterQuality;
+
+            printSettingsConfig.PaperPlacement = _printSettings.PaperPlacement;
+            printSettingsConfig.MarginType = _printSettings.MarginType;
+            printSettingsConfig.UserDefinedMarginX = _printSettings.UserDefinedMarginX;
+            printSettingsConfig.UserDefinedMarginY = _printSettings.UserDefinedMarginY;
+
+            printSettingsConfig.HiddenLineViews = _printSettings.HiddenLineViews;
+            printSettingsConfig.HideCropBoundaries = _printSettings.HideCropBoundaries;
+            printSettingsConfig.HideReforWorkPlanes = _printSettings.HideReforWorkPlanes;
+            printSettingsConfig.HideScopeBoxes = _printSettings.HideScopeBoxes;
+            printSettingsConfig.HideUnreferencedViewTags = _printSettings.HideUnreferencedViewTags;
+            printSettingsConfig.MaskCoincidentLines = _printSettings.MaskCoincidentLines;
+            printSettingsConfig.ReplaceHalftoneWithThinLines = _printSettings.ReplaceHalftoneWithThinLines;
+
+            PrintConfig.SaveConfig(printConfig);
+        }
+        private string GetDocumentName() {
+            return Path.GetFileName(_repository.Document.PathName);
         }
 
         public bool CanRevitPrint(object p) {
