@@ -50,6 +50,9 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="pyRevitLabs.Json">
+      <HintPath>..\..\..\..\Users\biseuv_o\AppData\Roaming\pyRevit-Master\bin\pyRevitLabs.Json.dll</HintPath>
+    </Reference>
     <Reference Include="RevitAPI">
       <HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
       <Private>False</Private>
@@ -135,6 +138,7 @@
     <Compile Include="dosymep\BaseViewModel.cs" />
     <Compile Include="BatchPrintCommand.cs" />
     <Compile Include="Models\Format.cs" />
+    <Compile Include="Models\PrintConfig.cs" />
     <Compile Include="Models\Printing\PrinterSettings.cs" />
     <Compile Include="Models\Printing\PrintManager.cs" />
     <Compile Include="Models\PrintSettings.cs" />
