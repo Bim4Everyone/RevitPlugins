@@ -45,15 +45,7 @@ namespace RevitBatchPrint.Models {
         public Printing.PrinterSettings PrinterSettings { get; set; }
 
         public void Execute(Action<PrintParameters> setupPrintParams) {
-            PrintManager.PrintToFile = true;
-            PrintManager.PrintOrderReverse = false;
-            PrintManager.PrintRange = PrintRange.Current;
-            PrintManager.SelectNewPrintDriver(PrinterName);
-
-            PrintManager.PrintToFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), Path.ChangeExtension(Path.GetFileName(_revitRepository.Document.PathName), ".pdf"));
-            if(File.Exists(PrintManager.PrintToFileName)) {
-                File.Delete(PrintManager.PrintToFileName);
-            }
+            _revitRepository.ReloadPrintSettings(PrinterName);
 
             List<ViewSheet> viewSheets = _revitRepository.GetViewSheets(FilterParamName, FilterParamValue)
                 .OrderBy(item => item, new ViewSheetComparer())
@@ -67,7 +59,7 @@ namespace RevitBatchPrint.Models {
                     PrinterSettings.AddFormat(printSettings.Format.Name, new System.Drawing.Size(printSettings.Format.Width, printSettings.Format.Height));
 
                     // перезагружаем в ревите принтер, чтобы появились изменения
-                    _revitRepository.ReloadPrintSettings();
+                    _revitRepository.ReloadPrintSettings(PrinterName);
                 }
 
                 try {

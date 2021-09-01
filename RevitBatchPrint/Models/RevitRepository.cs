@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
@@ -14,17 +15,13 @@ namespace RevitBatchPrint.Models {
 
         public RevitRepository(UIApplication uiApplication) {
             _uiApplication = uiApplication;
-            ReloadPrintSettings();
+            PrintManager = Document.PrintManager;
         }
 
         public Document Document => _uiApplication.ActiveUIDocument.Document;
         public Application Application => _uiApplication.Application;
 
         public PrintManager PrintManager { get; private set; }
-
-        public void ReloadPrintSettings() {
-            PrintManager = Document.PrintManager;
-        }
 
         /// <summary>
         /// Используемый принтер по умолчанию.
@@ -35,6 +32,25 @@ namespace RevitBatchPrint.Models {
         /// Наименование параметров по которым должна быть фильтрация.
         /// </summary>
         public static IReadOnlyList<string> PrintParamNames { get; set; } = new List<string>() { "Орг.ОбознчТома(Комплекта)", "Орг.КомплектЧертежей", "ADSK_Комплект чертежей" };
+
+        /// <summary>
+        /// Перезагружает менеджер принтера.
+        /// </summary>
+        /// <param name="printerName">Наименование принтера.</param>
+        public void ReloadPrintSettings(string printerName) {
+            PrintManager = Document.PrintManager;
+
+            PrintManager.PrintToFile = true;
+            PrintManager.PrintOrderReverse = false;
+            PrintManager.PrintRange = PrintRange.Current;
+            PrintManager.SelectNewPrintDriver(printerName);
+
+            string fileName = string.IsNullOrEmpty(Document.PathName) ? "Без имени.pdf" : Path.ChangeExtension(Path.GetFileName(Document.PathName), ".pdf");
+            PrintManager.PrintToFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), fileName);
+            if(File.Exists(PrintManager.PrintToFileName)) {
+                File.Delete(PrintManager.PrintToFileName);
+            }
+        }
 
         /// <summary>
         /// Возвращает список возможных имен параметров группировки альбомов.
