@@ -103,6 +103,12 @@ namespace RevitBatchPrint.ViewModels {
                 return false;
             }
 
+            if(string.IsNullOrEmpty(PrintSettings.PrinterName)) {
+                ErrorText = "Не был выбран принтер.";
+                return false;
+            }
+
+            ErrorText = null;
             return true;
         }
 

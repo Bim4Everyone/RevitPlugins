@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:RevitBatchPrint"
              xmlns:views="clr-namespace:RevitBatchPrint.Views"
              xmlns:viewModels="clr-namespace:RevitBatchPrint.ViewModels"
-             mc:Ignorable="d" Height="580" Width="850" WindowStartupLocation="CenterOwner" Title="Пакетная печать">
+             mc:Ignorable="d" Height="580" Width="850" WindowStartupLocation="CenterOwner" Title="Пакетная печать" SizeToContent="Height" ResizeMode="NoResize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

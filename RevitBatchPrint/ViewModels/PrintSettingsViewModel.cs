@@ -32,9 +32,11 @@ namespace RevitBatchPrint.ViewModels {
 
         public PrintSettingsViewModel() {
             _printManager = new Models.Printing.PrintManager();
-            
-            PrinterName = Models.RevitRepository.DefaultPrinterName;
+
             PrinterNames = new ObservableCollection<string>(_printManager.EnumPrinterNames());
+            if(_printManager.HasPrinterName(Models.RevitRepository.DefaultPrinterName)) {
+                PrinterName = Models.RevitRepository.DefaultPrinterName;
+            }
         }
 
         public string PrinterName {
