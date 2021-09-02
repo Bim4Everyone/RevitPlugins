@@ -46,7 +46,7 @@ namespace RevitBatchPrint.Models {
             PrintManager.SelectNewPrintDriver(printerName);
 
             string fileName = string.IsNullOrEmpty(Document.PathName) ? "Без имени.pdf" : Path.ChangeExtension(Path.GetFileName(Document.PathName), ".pdf");
-            PrintManager.PrintToFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), fileName);
+            PrintManager.PrintToFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName);
             if(File.Exists(PrintManager.PrintToFileName)) {
                 File.Delete(PrintManager.PrintToFileName);
             }
