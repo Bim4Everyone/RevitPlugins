@@ -83,7 +83,7 @@ namespace RevitBatchPrint.ViewModels {
             SavePrintConfig();
 
             var revitPrint = new RevitPrint(_repository);
-            revitPrint.PrinterName = RevitRepository.DefaultPrinterName;
+            revitPrint.PrinterName = _printSettings.PrinterName;
             revitPrint.FilterParamName = PrintParamName;
             revitPrint.FilterParamValue = SelectedAlbum.Name;
             revitPrint.PrinterSettings = PrintSettings.GetPrinterSettings();
@@ -99,10 +99,12 @@ namespace RevitBatchPrint.ViewModels {
 
         private void SetPrintConfig() {
             var printSettingsConfig = PrintConfig.GetConfig().GetPrintSettingsConfig(GetDocumentName());
-            if(printSettingsConfig != null) {
+            if(printSettingsConfig != null) {                
                 _printSettings.PrinterName = printSettingsConfig.PrinterName;
-                PrintParamName = printSettingsConfig.PrintParamName;
-                SelectedAlbum = Albums?.FirstOrDefault(item => item.Name.Equals(printSettingsConfig.SelectedAlbum)) ?? SelectedAlbum;
+                if(PrintParamNames.Contains(printSettingsConfig.PrintParamName)) {
+                    PrintParamName = printSettingsConfig.PrintParamName;
+                    SelectedAlbum = Albums?.FirstOrDefault(item => item.Name.Equals(printSettingsConfig.SelectedAlbum)) ?? SelectedAlbum;
+                }
 
                 _printSettings.Zoom = printSettingsConfig.Zoom;
                 _printSettings.ZoomType = printSettingsConfig.ZoomType;

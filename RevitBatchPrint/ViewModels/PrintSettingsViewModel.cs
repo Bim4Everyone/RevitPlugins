@@ -41,7 +41,11 @@ namespace RevitBatchPrint.ViewModels {
 
         public string PrinterName {
             get => _printerName;
-            set => this.RaiseAndSetIfChanged(ref _printerName, value);
+            set {
+                if(_printManager.HasPrinterName(value)) {
+                    this.RaiseAndSetIfChanged(ref _printerName, value);
+                }
+            }
         }
 
         public ObservableCollection<string> PrinterNames { get; }
