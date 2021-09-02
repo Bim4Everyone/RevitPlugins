@@ -115,8 +115,10 @@ namespace RevitBatchPrint.ViewModels {
                 _printSettings.UserDefinedMarginX = printSettingsConfig.UserDefinedMarginX;
                 _printSettings.UserDefinedMarginY = printSettingsConfig.UserDefinedMarginY;
 
-                _printSettings.MaskCoincidentLines = printSettingsConfig.MaskCoincidentLines;
+
                 _printSettings.HiddenLineViews = printSettingsConfig.HiddenLineViews;
+                _printSettings.MaskCoincidentLines = printSettingsConfig.MaskCoincidentLines;
+                _printSettings.ViewLinksinBlue = printSettingsConfig.ViewLinksinBlue;
                 _printSettings.HideCropBoundaries = printSettingsConfig.HideCropBoundaries;
                 _printSettings.HideReforWorkPlanes = printSettingsConfig.HideReforWorkPlanes;
                 _printSettings.HideScopeBoxes = printSettingsConfig.HideScopeBoxes;
@@ -150,6 +152,7 @@ namespace RevitBatchPrint.ViewModels {
             printSettingsConfig.UserDefinedMarginY = _printSettings.UserDefinedMarginY;
 
             printSettingsConfig.HiddenLineViews = _printSettings.HiddenLineViews;
+            printSettingsConfig.ViewLinksinBlue = _printSettings.ViewLinksinBlue;
             printSettingsConfig.HideCropBoundaries = _printSettings.HideCropBoundaries;
             printSettingsConfig.HideReforWorkPlanes = _printSettings.HideReforWorkPlanes;
             printSettingsConfig.HideScopeBoxes = _printSettings.HideScopeBoxes;
