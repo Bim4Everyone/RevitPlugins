@@ -91,7 +91,7 @@ namespace RevitBatchPrint.ViewModels {
             revitPrint.Execute(SetupPrintParams);
 
             if(revitPrint.Errors.Count > 0) {
-                TaskDialog.Show("Пакетная печать.", string.Join(Environment.NewLine + "- ", revitPrint.Errors));
+                TaskDialog.Show("Пакетная печать.", Environment.NewLine + "- " + string.Join(Environment.NewLine + "- ", revitPrint.Errors));
             } else {
                 TaskDialog.Show("Пакетная печать.", "Готово!");
             }
