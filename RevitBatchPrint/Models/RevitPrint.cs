@@ -69,6 +69,10 @@ namespace RevitBatchPrint.Models {
                         PrintManager.PrintSetup.CurrentPrintSetting = PrintManager.PrintSetup.InSession;
                         
                         PaperSize paperSize = _revitRepository.GetPaperSizeByName(printSettings.Format.Name);
+                        if(paperSize is null) {
+                            throw new Exception($"Не был найден формат листа.{Environment.NewLine}Возможно принтер \"{PrinterName}\" не поддерживает пользовательские форматы.");
+                        }
+
                         PrintParameters.PaperSize = paperSize;
                         PrintParameters.PageOrientation = printSettings.FormatOrientation;
 
