@@ -1,127 +1,43 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
-      None
-    </ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{42B67242-5EFD-4D2F-80E3-457B6647BF3B}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RevitCopyStandarts</RootNamespace>
-    <AssemblyName>RevitCopyStandarts</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <DelaySign>false</DelaySign>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="RevitAPI">
-      <HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI">
-      <HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="CancellableProgressWindow.xaml.cs">
-      <DependentUpon>CancellableProgressWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Commands\CopyColorFillSchemesCommand.cs" />
-    <Compile Include="Commands\CopyCurtainTypesCommand.cs" />
-    <Compile Include="Commands\CopyDwgExportOptionsCommand.cs" />
-    <Compile Include="Commands\CopyFloorTypeCommand.cs" />
-    <Compile Include="Commands\CopyFoundationSlabCommand.cs" />
-    <Compile Include="Commands\CopyObjectStylesCommand.cs" />
-    <Compile Include="Commands\CopyFamiliesCommand.cs" />
-    <Compile Include="Commands\CopyFiltersCommand.cs" />
-    <Compile Include="Commands\CopyMaterialsCommand.cs" />
-    <Compile Include="Commands\CopyOptionalStandartsCommand.cs" />
-    <Compile Include="Commands\CopyStandartsCommand.cs" />
-    <Compile Include="Commands\CopyViewLegendsCommand.cs" />
-    <Compile Include="Commands\CopyViewSchedulesCommand.cs" />
-    <Compile Include="Commands\CopyViewTemplatesCommand.cs" />
-    <Compile Include="Commands\CopyWallTypesCommand.cs" />
-    <Compile Include="Commands\ICopyStandartsCommand.cs" />
-    <Compile Include="RelayCommand.cs" />
-    <Compile Include="ViewModels\BimCategoryViewModel.cs" />
-    <Compile Include="ViewModels\BimCategoriesViewModel.cs" />
-    <Compile Include="ViewModels\BimFileViewModel.cs" />
-    <Compile Include="CopyStandartsApp.cs" />
-    <Compile Include="CopyStandartsRevitCommand.cs" />
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="RevitCopyStandarts.addin" />
-    <Content Include="Замечания.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="CancellableProgressWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <Target Name="AfterClean">
-    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2020\RevitCopyStandarts.addin" />
-    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2020\RevitCopyStandarts.dll" />
-  </Target>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net48</TargetFramework>
+		<OutputType>Library</OutputType>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<UseWindowsForms>true</UseWindowsForms>
+		<UseWPF>true</UseWPF>
+		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+		<Platforms>x64</Platforms>
+	</PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+	</PropertyGroup>
+	<PropertyGroup>
+		<AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
+	</PropertyGroup>
+	<PropertyGroup>
+		<DelaySign>false</DelaySign>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+		<OutputPath>bin\x64\Debug\</OutputPath>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+		<OutputPath>bin\x64\Release\</OutputPath>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<PlatformTarget>x64</PlatformTarget>
+	</PropertyGroup>
+	<ItemGroup>
+		<Reference Include="RevitAPI">
+			<HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="RevitAPIUI">
+			<HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup>
+		<Content Include="RevitCopyStandarts.addin" />
+		<Content Include="Замечания.txt" />
+	</ItemGroup>
 </Project>

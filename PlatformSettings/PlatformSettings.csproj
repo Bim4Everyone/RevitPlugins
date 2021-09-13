@@ -1,149 +1,66 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
-      None
-    </ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5C9650AE-A794-47C6-B5F7-92D099018302}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PlatformSettings</RootNamespace>
-    <AssemblyName>PlatformSettings</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="dosymep.Bim4Everyone">
-      <HintPath>..\..\..\..\Users\biseuv_o\AppData\Roaming\pyRevit\Extensions\BIM4Everyone.lib\dosymep.Bim4Everyone.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="dosymep.Revit">
-      <HintPath>..\..\..\..\Users\biseuv_o\AppData\Roaming\pyRevit\Extensions\BIM4Everyone.lib\dosymep.Revit.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="pyRevitLabs.Common">
-      <HintPath>..\..\..\..\Users\biseuv_o\AppData\Roaming\pyRevit-Master\bin\pyRevitLabs.Common.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="pyRevitLabs.Json">
-      <HintPath>..\..\..\..\Users\biseuv_o\AppData\Roaming\pyRevit-Master\bin\pyRevitLabs.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="pyRevitLabs.NLog">
-      <HintPath>..\..\..\..\Users\biseuv_o\AppData\Roaming\pyRevit-Master\bin\pyRevitLabs.NLog.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="pyRevitLabs.PyRevit">
-      <HintPath>..\..\..\..\Users\biseuv_o\AppData\Roaming\pyRevit-Master\bin\pyRevitLabs.PyRevit.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI">
-      <HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI">
-      <HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="RelayCommand.cs" />
-    <Compile Include="SharedParams\ProjectParams.cs" />
-    <Compile Include="SharedParams\RevitParams.cs" />
-    <Compile Include="SharedParams\SharedParams.cs" />
-    <Compile Include="TabExtensions\BimExtensions.cs" />
-    <Compile Include="TabExtensions\DisableExtensionBehav.cs" />
-    <Compile Include="TabExtensions\Extensions.cs" />
-    <Compile Include="TabExtensions\IToggleExtension.cs" />
-    <Compile Include="PlatformSettingsCommand.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TabExtensions\PyExtensions.cs" />
-    <Compile Include="PyRevitExtensionsEx.cs" />
-    <Compile Include="SettingsWindow.xaml.cs">
-      <DependentUpon>SettingsWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="SharedParams\SharedParamsSettingsView.xaml.cs">
-      <DependentUpon>SharedParamsSettingsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="SharedParams\SharedParamView.xaml.cs">
-      <DependentUpon>SharedParamView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="TabExtensions\PyRevitExtensionViewModel.cs" />
-    <Compile Include="TabExtensions\TabExtensionsSettingsView.xaml.cs">
-      <DependentUpon>TabExtensionsSettingsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="TabExtensions\UnistalExtensionBehav.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Python\icon.png" />
-    <Content Include="Python\script.py" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="SettingsWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="SharedParams\SharedParamsSettingsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="SharedParams\SharedParamView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="TabExtensions\TabExtensionsSettingsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Python\bundle.yaml" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <Target Name="AfterClean">
-    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2020\PlatformSettings.addin" />
-    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2020\PlatformSettings.dll" />
-  </Target>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net48</TargetFramework>
+		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+			None
+		</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<UseWindowsForms>true</UseWindowsForms>
+		<UseWPF>true</UseWPF>
+		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+		<Platforms>x64</Platforms>
+	</PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+		<OutputPath>bin\x64\Debug\</OutputPath>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+		<OutputPath>bin\x64\Release\</OutputPath>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<PlatformTarget>x64</PlatformTarget>
+	</PropertyGroup>
+	<ItemGroup>
+		<Reference Include="dosymep.Bim4Everyone">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep.Bim4Everyone.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="dosymep.Revit">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep.Revit.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="pyRevitLabs.Common">
+			<HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.Common.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="pyRevitLabs.Json">
+			<HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.Json.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="pyRevitLabs.NLog">
+			<HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.NLog.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="pyRevitLabs.PyRevit">
+			<HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.PyRevit.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="RevitAPI">
+			<HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="RevitAPIUI">
+			<HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup>
+		<Content Include="Python\icon.png" />
+		<Content Include="Python\script.py" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+	</ItemGroup>
 </Project>

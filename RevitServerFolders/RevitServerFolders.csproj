@@ -1,198 +1,46 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
-      None
-    </ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
-    <TargetFrameworkProfile />
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-  </PropertyGroup>
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C750E95C-A78A-4FED-BA6B-D3CD89E92BFB}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RevitServerFolders</RootNamespace>
-    <AssemblyName>RevitServerFolders</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="dosymep.Revit">
-      <HintPath>..\..\..\..\Users\biseuv_o\AppData\Roaming\pyRevit\Extensions\BIM4Everyone.lib\dosymep.Revit.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="pyRevitLabs.Json">
-      <HintPath>..\..\..\..\Users\biseuv_o\AppData\Roaming\pyRevit-Master\bin\pyRevitLabs.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI">
-      <HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI">
-      <HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Xaml" />
-    <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AppDomainExtensions.cs" />
-    <Compile Include="dosymep\Async\AsyncHelper.cs" />
-    <Compile Include="dosymep\JsonNetSerializer.cs" />
-    <Compile Include="dosymep\Views\Revit\RevitServerExplorerWindow.xaml.cs">
-      <DependentUpon>RevitServerExplorerWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="dosymep\WPF\Commands\RelayCommand.cs" />
-    <Compile Include="dosymep\Views\Revit\RevitFolderInfo.cs" />
-    <Compile Include="dosymep\Views\Revit\RevitModelInfo.cs" />
-    <Compile Include="dosymep\Views\Revit\RevitServerExplorerView.xaml.cs">
-      <DependentUpon>RevitServerExplorerView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="dosymep\Views\Revit\RevitServerInfo.cs" />
-    <Compile Include="dosymep\Views\Revit\RevitServerViewModel.cs" />
-    <Compile Include="ExportNwcFileCommand.cs" />
-    <Compile Include="Export\ExportNwcFileViewModel.cs" />
-    <Compile Include="Export\ExportNwcFileWindow.xaml.cs">
-      <DependentUpon>ExportNwcFileWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ExportRvtFileCommand.cs" />
-    <Compile Include="Export\DetachRevitFilesCommand.cs" />
-    <Compile Include="Export\ExportFilesToNavisworksCommand.cs" />
-    <Compile Include="Export\FilePathEditView.xaml.cs">
-      <DependentUpon>FilePathEditView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Export\ExportRvtFileWindow.xaml.cs">
-      <DependentUpon>ExportRvtFileWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Export\ExportRvtFileViewModel.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Export\SelectFileView.xaml.cs">
-      <DependentUpon>SelectFileView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Export\UnloadAllLinksCommand.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\folder.png" />
-    <Resource Include="Resources\revit.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.7.2 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="dosymep\Views\Revit\RevitServerExplorerView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="dosymep\Views\Revit\RevitServerExplorerWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Export\ExportNwcFileWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Export\FilePathEditView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Export\ExportRvtFileWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Export\SelectFileView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <Target Name="AfterClean">
-    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2020\RevitServerFolders.addin" />
-    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2020\RevitServerFolders.dll" />
-  </Target>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net48</TargetFramework>
+		<OutputType>Library</OutputType>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<UseWindowsForms>true</UseWindowsForms>
+		<UseWPF>true</UseWPF>
+		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+		<Platforms>x64</Platforms>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+		<OutputPath>bin\x64\Debug\</OutputPath>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+		<OutputPath>bin\x64\Release\</OutputPath>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<PlatformTarget>x64</PlatformTarget>
+	</PropertyGroup>
+	<ItemGroup>
+		<Reference Include="dosymep.Revit">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep.Revit.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="pyRevitLabs.Json">
+			<HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.Json.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="RevitAPI">
+			<HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="RevitAPIUI">
+			<HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="System.Windows.Forms" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Resources\folder.png" />
+		<Resource Include="Resources\revit.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525" />
+	</ItemGroup>
 </Project>
