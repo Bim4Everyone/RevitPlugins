@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>Command RevitCopyStandarts</Text>
+    <Description>Команда вызова модуля копирования стандартов</Description>
+    <Assembly>RevitCopyStandarts.dll</Assembly>
+    <FullClassName>RevitCopyStandarts.CopyStandartsRevitCommand</FullClassName>
+    <ClientId>dd6d3462-e5f2-4d80-b8be-9261d74bc322</ClientId>
+    <VendorId>dosymep</VendorId>
+    <VendorDescription>dosymep, https://github.com/dosymep </VendorDescription>
+  </AddIn>
+  <AddIn Type="Application">
+    <Name>Application RevitCopyStandarts</Name>
+    <Assembly>RevitCopyStandarts.dll</Assembly>
+    <FullClassName>RevitCopyStandarts.CopyStandartsApp</FullClassName>
+    <ClientId>5b77f901-6c0e-4c4e-b97b-a21973393b6d</ClientId>
+    <VendorId>dosymep</VendorId>
+    <VendorDescription>dosymep, https://github.com/dosymep </VendorDescription>
+  </AddIn>
+</RevitAddIns>
