@@ -16,17 +16,16 @@ using dosymep.WPF.Commands;
 using Superfilter.Models;
 
 namespace Superfilter.ViewModels {
-    internal class RevitViewModel : BaseViewModel {
-        private readonly RevitRepository _revitRepository;
-        private readonly Func<RevitRepository, IList<Element>> _getElements;
+    internal abstract class RevitViewModel : BaseViewModel {
+        protected readonly RevitRepository _revitRepository;
+        
         private string _name;
         private string _filter;
-        private bool _currentSelection = true;
         private string _buttonFilterName;
+        private bool _currentSelection = true;
         private CategoryViewModel _categoryViewModel;
 
-        public RevitViewModel(Application application, Document document, Func<RevitRepository, IList<Element>> getElements) {
-            _getElements = getElements;
+        public RevitViewModel(Application application, Document document) {
             _revitRepository = new RevitRepository(application, document);
 
             SelectElements = new RelayCommand(SetSelectedElement, CanSetSelectedElement);
@@ -40,9 +39,27 @@ namespace Superfilter.ViewModels {
         }
 
         public string Name {
-            get => $"{_name} [{CategoryViewModels?.Count ?? 0}]";
+            get => _name;
             set => _name = value;
         }
+
+        public CategoryViewModel CategoryViewModel {
+            get => _categoryViewModel;
+            set {
+                _categoryViewModel = value;
+                OnPropertyChanged(nameof(CategoryViewModel));
+            }
+        }
+
+        public ICommand SelectElements { get; }
+        public ICommand SelectCategoriesCommand { get; }
+
+        public ICollectionView CategoryViewModelsView { get; }
+        public ObservableCollection<CategoryViewModel> CategoryViewModels { get; }
+
+        protected abstract IEnumerable<CategoryViewModel> GetCategoryViewModels();
+
+        #region Filter
 
         public string Filter {
             get => _filter;
@@ -61,29 +78,6 @@ namespace Superfilter.ViewModels {
             }
         }
 
-        public CategoryViewModel CategoryViewModel {
-            get => _categoryViewModel;
-            set {
-                _categoryViewModel = value;
-                OnPropertyChanged(nameof(CategoryViewModel));
-            }
-        }
-
-        public ICommand SelectElements { get; }
-        public ICommand SelectCategoriesCommand { get; }
-
-        public ICollectionView CategoryViewModelsView { get; }
-        public ObservableCollection<CategoryViewModel> CategoryViewModels { get; }
-
-        private IEnumerable<CategoryViewModel> GetCategoryViewModels() {
-            return _getElements(_revitRepository)
-                .Where(item => item.Category != null)
-                .GroupBy(item => item.Category, new CategoryComparer())
-                .Where(item => item.Key?.Parent == null)
-                .Select(item => new CategoryViewModel(item.Key, item))
-                .OrderBy(item => item.Name);
-        }
-
         private bool FilterCategory(CategoryViewModel category) {
             if(string.IsNullOrEmpty(Filter)) {
                 return true;
@@ -91,6 +85,10 @@ namespace Superfilter.ViewModels {
 
             return category.Name.IndexOf(Filter, StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
+
+        #endregion
+
+        #region SelectCategoriesCommand
 
         private void SelectCategories(object p) {
             ChangeCurrentSelection();
@@ -101,14 +99,18 @@ namespace Superfilter.ViewModels {
             }
         }
 
-        private void ChangeCurrentSelection() {
-            _currentSelection = !_currentSelection;
-            ButtonFilterName = _currentSelection ? "Выделить всё" : "Убрать выделение";
-        }
-
         private bool CanSelectCategories(object p) {
             return CategoryViewModelsView.CanFilter;
         }
+
+        private void ChangeCurrentSelection() {
+            _currentSelection = !_currentSelection;
+            ButtonFilterName = _currentSelection ? "Убрать выделение" : "Выделить всё";
+        }
+
+        #endregion
+
+        #region SelectElements
 
         private void SetSelectedElement(object p) {
             IEnumerable<Element> elements = CategoryViewModels.Where(item => item.Selected).SelectMany(item => item.Elements);
@@ -118,5 +120,7 @@ namespace Superfilter.ViewModels {
         private bool CanSetSelectedElement(object p) {
             return CategoryViewModels.Any(item => item.Selected);
         }
+
+        #endregion
     }
 }

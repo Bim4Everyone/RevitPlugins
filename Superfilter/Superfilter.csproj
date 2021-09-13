@@ -64,6 +64,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppDomainExtensions.cs" />
+    <Compile Include="Models\CategoryComparer.cs" />
+    <Compile Include="Models\ElementComparer.cs" />
+    <Compile Include="Models\DefinitionComparer.cs" />
+    <Compile Include="Models\ParamComparer.cs" />
+    <Compile Include="Models\ParameterValueComparer.cs" />
+    <Compile Include="ViewModels\ParametersViewModel.cs" />
+    <Compile Include="ViewModels\ParameterViewModel.cs" />
+    <Compile Include="ViewModels\Revit\ElementsRevitViewModel.cs" />
+    <Compile Include="ViewModels\Revit\SelectedRevitViewModel.cs" />
+    <Compile Include="ViewModels\Revit\ViewRevitViewModel.cs" />
     <Compile Include="Views\CategoriesView.xaml.cs">
       <DependentUpon>CategoriesView.xaml</DependentUpon>
     </Compile>

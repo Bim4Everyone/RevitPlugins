@@ -25,9 +25,13 @@ namespace Superfilter.Models {
         }
 
         public IList<Element> GetAllElements() {
-            return new FilteredElementCollector(_document)
-                .WhereElementIsNotElementType()
-                .ToElements();
+            var collector1 = new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType();
+
+            var collector2 = new FilteredElementCollector(_document)
+                .WhereElementIsElementType();
+
+            return Enumerable.Empty<Element>().Concat(collector1).Concat(collector2).ToList();
         }
 
         public IList<Element> GetElements() {
@@ -40,6 +44,20 @@ namespace Superfilter.Models {
                 .ToElements();
         }
 
+        public IList<Element> GetElements(Category category) {
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .OfCategoryId(category.Id)
+                .ToElements();
+        }
+
+        public IList<Element> GetElements(Category category, View view) {
+            return new FilteredElementCollector(_document, view.Id)
+                .WhereElementIsNotElementType()
+                .OfCategoryId(category.Id)
+                .ToElements();
+        }
+
         public IList<Element> GetSelectedElements() {
             return _uiDocument.Selection.GetElementIds()
                 .Select(item => _document.GetElement(item))
@@ -47,10 +65,7 @@ namespace Superfilter.Models {
         }
 
         public IList<Category> GetCategories() {
-            return Enum.GetValues(typeof(BuiltInCategory))
-                .OfType<BuiltInCategory>()
-                .Select(item => Category.GetCategory(_document, item))
-                .ToList();
+            return _document.Settings.Categories.OfType<Category>().Where(item => item.Parent == null).ToList();
         }
 
         public IList<Category> GetCategories(IEnumerable<Element> elements) {
@@ -60,23 +75,13 @@ namespace Superfilter.Models {
         public void SetSelectedElements(IEnumerable<Element> elements) {
             _uiDocument.Selection.SetElementIds(elements.Select(item => item.Id).ToList());
         }
-    }
 
-    internal class CategoryComparer : IEqualityComparer<Category> {
-        public bool Equals(Category x, Category y) {
-            if(x == null && y == null) {
-                return true;
-            }
-
-            if(x == null || y == null) {
-                return false;
-            }
-
-            return x.Name.Equals(y.Name);
-        }
-
-        public int GetHashCode(Category obj) {
-            return obj?.Name.GetHashCode() ?? 0;
+        public IList<ParameterElement> GetParameterElements() {
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(ParameterElement))
+                .OfType<ParameterElement>()
+                .ToList();
         }
     }
 }
