@@ -1,0 +1,26 @@
+﻿<UserControl x:Class="Superfilter.Views.CategoriesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Superfilter.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <ListView ItemsSource="{Binding CategoryViewModelsView}" SelectedItem="{Binding CategoryViewModel}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="#">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding Selected}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Наименование" DisplayMemberBinding="{Binding Path=Name}" />
+                    <GridViewColumn Header="Количество"  DisplayMemberBinding="{Binding Path=Count}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</UserControl>
