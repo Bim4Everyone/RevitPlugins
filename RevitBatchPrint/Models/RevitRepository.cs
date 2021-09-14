@@ -40,13 +40,30 @@ namespace RevitBatchPrint.Models {
         public void ReloadPrintSettings(string printerName) {
             PrintManager = Document.PrintManager;
 
+            // После выбора принтера все настройки сбрасываются
+            PrintManager.SelectNewPrintDriver(printerName);
             PrintManager.PrintToFile = true;
             PrintManager.PrintOrderReverse = false;
-            PrintManager.PrintRange = PrintRange.Current;
-            PrintManager.SelectNewPrintDriver(printerName);
 
-            string fileName = string.IsNullOrEmpty(Document.PathName) ? "Без имени.pdf" : Path.ChangeExtension(Path.GetFileName(Document.PathName), ".pdf");
-            PrintManager.PrintToFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName);
+            // Должно быть установлено это значение
+            // если установлено другое значение
+            // имя файла устанавливается ревитом
+            PrintManager.PrintRange = PrintRange.Current;
+            
+            PrintManager.Apply();
+            UpdatePrintFileName(null);
+        }
+
+        /// <summary>
+        /// Обновляет название выходного файла для виртуального принтера.
+        /// </summary>
+        /// <param name="viewSheet">Печатаемый лист.</param>
+        public void UpdatePrintFileName(ViewSheet viewSheet) {
+            string documentFileName = string.IsNullOrEmpty(Document.Title) ? "Без имени" : Document.Title;
+
+            string viewName = viewSheet?.SheetNumber;
+            string fileName = string.IsNullOrEmpty(viewName) ? documentFileName : $"{documentFileName} ({viewName} - {viewSheet.Name})";
+            PrintManager.PrintToFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName + ".pdf");
             if(File.Exists(PrintManager.PrintToFileName)) {
                 File.Delete(PrintManager.PrintToFileName);
             }

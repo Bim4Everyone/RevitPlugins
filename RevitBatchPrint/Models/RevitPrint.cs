@@ -78,6 +78,7 @@ namespace RevitBatchPrint.Models {
 
                         setupPrintParams(PrintParameters);
 
+                        _revitRepository.UpdatePrintFileName(viewSheet);
                         PrintManager.PrintSetup.SaveAs("SheetPrintSettings");
 
                         PrintManager.Apply();
