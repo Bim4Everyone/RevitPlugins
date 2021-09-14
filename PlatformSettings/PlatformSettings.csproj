@@ -1,17 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net48</TargetFramework>
-		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
-			None
-		</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+		<OutputType>Library</OutputType>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<UseWindowsForms>true</UseWindowsForms>
 		<UseWPF>true</UseWPF>
 		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
 		<Platforms>x64</Platforms>
-	</PropertyGroup>
-	<PropertyGroup>
-		<OutputType>Library</OutputType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
 		<OutputPath>bin\x64\Debug\</OutputPath>
@@ -31,6 +26,7 @@
 			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep.Revit.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+		<Reference Include="Microsoft.CSharp" />
 		<Reference Include="pyRevitLabs.Common">
 			<HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.Common.dll</HintPath>
 			<Private>False</Private>
@@ -59,8 +55,5 @@
 	<ItemGroup>
 		<Content Include="Python\icon.png" />
 		<Content Include="Python\script.py" />
-	</ItemGroup>
-	<ItemGroup>
-		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 	</ItemGroup>
 </Project>

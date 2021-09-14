@@ -1,9 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net48</TargetFramework>
-		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
-			None
-		</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<UseWPF>true</UseWPF>
 		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>

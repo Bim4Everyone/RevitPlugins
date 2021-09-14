@@ -8,15 +8,6 @@
 		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
 		<Platforms>x64</Platforms>
 	</PropertyGroup>
-	<PropertyGroup>
-		<OutputType>Library</OutputType>
-	</PropertyGroup>
-	<PropertyGroup>
-		<AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
-	</PropertyGroup>
-	<PropertyGroup>
-		<DelaySign>false</DelaySign>
-	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
 		<OutputPath>bin\x64\Debug\</OutputPath>
 	</PropertyGroup>
@@ -35,9 +26,5 @@
 			<HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
-	</ItemGroup>
-	<ItemGroup>
-		<Content Include="RevitCopyStandarts.addin" />
-		<Content Include="Замечания.txt" />
 	</ItemGroup>
 </Project>
