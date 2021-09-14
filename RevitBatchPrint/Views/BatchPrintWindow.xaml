@@ -24,18 +24,20 @@
 
         <StackPanel  Grid.Row="1">
             <TextBlock Text="Комплект чертежей" Margin="10,10,10,0"/>
-            <ComboBox Margin="10" 
-                      ItemsSource="{Binding Path=Albums}"
-                      SelectedItem="{Binding Path=SelectedAlbum}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox IsChecked="{Binding IsSelected}" Width="20" />
-                            <TextBlock Text="{Binding DisplayData}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
+            <Grid>
+                <ComboBox Margin="10" Grid.Column="1" Grid.Row="1" SelectionChanged="ComboBox_SelectionChanged"
+                      ItemsSource="{Binding Path=Albums}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding IsSelected}" Width="20" />
+                                <TextBlock Text="{Binding DisplayData}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <TextBlock IsHitTestVisible="False" Text="Выберите объекты..." Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Margin="15,0,15,0" />
+            </Grid>
         </StackPanel>
 
         <GroupBox Grid.Row="2" Header="Настройки принтера" Padding="10">

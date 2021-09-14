@@ -17,7 +17,6 @@ using RevitBatchPrint.Models;
 
 namespace RevitBatchPrint.ViewModels {
     internal class PrintAbumsViewModel : BaseViewModel {
-        private PrintAlbumViewModel _selectedAlbum;
         private ObservableCollection<PrintAlbumViewModel> _albums;
         private PrintSettingsViewModel _printSettings = new PrintSettingsViewModel();
 
@@ -45,7 +44,6 @@ namespace RevitBatchPrint.ViewModels {
                 if(!string.IsNullOrEmpty(PrintParamName)) {
                     List<(string, int)> printParamValues = _repository.GetPrintParamValues(PrintParamName);
                     Albums = new ObservableCollection<PrintAlbumViewModel>(printParamValues.Select(item => new PrintAlbumViewModel(item.Item1) { Count = item.Item2 }));
-                    SelectedAlbum = Albums.FirstOrDefault();
                 }
             }
         }
@@ -53,11 +51,6 @@ namespace RevitBatchPrint.ViewModels {
         public ObservableCollection<string> PrintParamNames { get; }
 
         public ICommand RevitPrintCommand { get; }
-
-        public PrintAlbumViewModel SelectedAlbum {
-            get => _selectedAlbum;
-            set => this.RaiseAndSetIfChanged(ref _selectedAlbum, value);
-        }
 
         public ObservableCollection<PrintAlbumViewModel> Albums {
             get => _albums;
@@ -82,16 +75,20 @@ namespace RevitBatchPrint.ViewModels {
         public void RevitPrint(object p) {
             SavePrintConfig();
 
-            var revitPrint = new RevitPrint(_repository);
-            revitPrint.PrinterName = _printSettings.PrinterName;
-            revitPrint.FilterParamName = PrintParamName;
-            revitPrint.FilterParamValue = SelectedAlbum.Name;
-            revitPrint.PrinterSettings = PrintSettings.GetPrinterSettings();
+            var revitPrintErrors = new List<string>();
+            foreach(var album in Albums.Where(item => item.IsSelected)) {
+                var revitPrint = new RevitPrint(_repository);
+                revitPrint.PrinterName = _printSettings.PrinterName;
+                revitPrint.FilterParamName = PrintParamName;
+                revitPrint.FilterParamValue = album.Name;
+                revitPrint.PrinterSettings = PrintSettings.GetPrinterSettings();
 
-            revitPrint.Execute(SetupPrintParams);
+                revitPrint.Execute(SetupPrintParams);
+                revitPrintErrors.AddRange(revitPrint.Errors);
+            }
 
-            if(revitPrint.Errors.Count > 0) {
-                TaskDialog.Show("Пакетная печать.", Environment.NewLine + "- " + string.Join(Environment.NewLine + "- ", revitPrint.Errors));
+            if(revitPrintErrors.Count > 0) {
+                TaskDialog.Show("Пакетная печать.", Environment.NewLine + "- " + string.Join(Environment.NewLine + "- ", revitPrintErrors));
             } else {
                 TaskDialog.Show("Пакетная печать.", "Готово!");
             }
@@ -103,7 +100,12 @@ namespace RevitBatchPrint.ViewModels {
                 _printSettings.PrinterName = printSettingsConfig.PrinterName;
                 if(PrintParamNames.Contains(printSettingsConfig.PrintParamName)) {
                     PrintParamName = printSettingsConfig.PrintParamName;
-                    SelectedAlbum = Albums?.FirstOrDefault(item => item.Name.Equals(printSettingsConfig.SelectedAlbum)) ?? SelectedAlbum;
+
+                    if(Albums != null) {
+                        foreach(var album in Albums) {
+                            album.IsSelected = printSettingsConfig.SelectedAlbums.Any(item => item?.Equals(album.Name) == true);
+                        }
+                    }
                 }
 
                 _printSettings.Zoom = printSettingsConfig.Zoom;
@@ -140,7 +142,7 @@ namespace RevitBatchPrint.ViewModels {
             printSettingsConfig.DocumentName = GetDocumentName();
             printSettingsConfig.PrinterName = _printSettings.PrinterName;
             printSettingsConfig.PrintParamName = PrintParamName;
-            printSettingsConfig.SelectedAlbum = SelectedAlbum?.Name;
+            printSettingsConfig.SelectedAlbums = Albums.Where(item => item.IsSelected).Select(item => item.Name).ToList();
 
             printSettingsConfig.Zoom = _printSettings.Zoom;
             printSettingsConfig.ZoomType = _printSettings.ZoomType;
@@ -174,7 +176,7 @@ namespace RevitBatchPrint.ViewModels {
                 return false;
             }
 
-            if(SelectedAlbum is null) {
+            if(Albums.All(item => item.IsSelected == false)) {
                 ErrorText = "Не был выбран комплект чертежей.";
                 return false;
             }

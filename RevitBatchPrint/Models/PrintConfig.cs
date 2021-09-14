@@ -50,7 +50,7 @@ namespace RevitBatchPrint.Models {
         public string DocumentName { get; set; }
         public string PrinterName { get; set; }
         public string PrintParamName { get; set; }
-        public object SelectedAlbum { get; set; }
+        public List<string> SelectedAlbums { get; set; } = new List<string>();
 
         public int Zoom { get; set; }
         public ZoomType ZoomType { get; set; }

@@ -30,5 +30,10 @@ namespace RevitBatchPrint.Views {
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;
         }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            ComboBox comboBox = (ComboBox) sender;
+            comboBox.SelectedItem = null;
+        }
     }
 }
