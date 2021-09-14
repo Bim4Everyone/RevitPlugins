@@ -36,7 +36,8 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
-                <TextBlock IsHitTestVisible="False" Text="Выберите объекты..." Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Margin="15,0,15,0" />
+                <TextBlock Grid.Column="1" Grid.Row="1" IsHitTestVisible="False" VerticalAlignment="Center" Margin="15,0,15,0"
+                           Text="{Binding SelectAlbumsText}"/>
             </Grid>
         </StackPanel>
 

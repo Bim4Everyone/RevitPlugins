@@ -23,6 +23,7 @@ namespace RevitBatchPrint.ViewModels {
         private System.Windows.Visibility _showPrintParamSelect;
         private string _printParamName;
         private string _errorText;
+        private string _selectAlbumsText;
         private readonly RevitRepository _repository;
 
         public PrintAbumsViewModel(UIApplication uiApplication) {
@@ -72,6 +73,11 @@ namespace RevitBatchPrint.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
+        public string SelectAlbumsText {
+            get => _selectAlbumsText;
+            set => this.RaiseAndSetIfChanged(ref _selectAlbumsText, value);
+        }
+
         public void RevitPrint(object p) {
             SavePrintConfig();
 
@@ -96,7 +102,7 @@ namespace RevitBatchPrint.ViewModels {
 
         private void SetPrintConfig() {
             var printSettingsConfig = PrintConfig.GetConfig().GetPrintSettingsConfig(GetDocumentName());
-            if(printSettingsConfig != null) {                
+            if(printSettingsConfig != null) {
                 _printSettings.PrinterName = printSettingsConfig.PrinterName;
                 if(PrintParamNames.Contains(printSettingsConfig.PrintParamName)) {
                     PrintParamName = printSettingsConfig.PrintParamName;
@@ -171,6 +177,10 @@ namespace RevitBatchPrint.ViewModels {
         }
 
         public bool CanRevitPrint(object p) {
+            // HACK: Обновление текста выбора альбома лучше сделать в другом в более очевидном месте
+            SelectAlbumsText = string.Join(", ", Albums.Where(item => item.IsSelected).Select(item => item.Name));
+            SelectAlbumsText = string.IsNullOrEmpty(SelectAlbumsText) ? "Выберите комплект чертежей..." : SelectAlbumsText;
+
             if(string.IsNullOrEmpty(PrintParamName)) {
                 ErrorText = "Не был выбран параметр комплекта чертежей.";
                 return false;
