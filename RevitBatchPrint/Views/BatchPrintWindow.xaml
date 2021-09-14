@@ -26,7 +26,16 @@
             <TextBlock Text="Комплект чертежей" Margin="10,10,10,0"/>
             <ComboBox Margin="10" 
                       ItemsSource="{Binding Path=Albums}"
-                      SelectedItem="{Binding Path=SelectedAlbum}"/>
+                      SelectedItem="{Binding Path=SelectedAlbum}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding IsSelected}" Width="20" />
+                            <TextBlock Text="{Binding DisplayData}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
         </StackPanel>
 
         <GroupBox Grid.Row="2" Header="Настройки принтера" Padding="10">

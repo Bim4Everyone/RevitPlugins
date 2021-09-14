@@ -44,7 +44,7 @@ namespace RevitBatchPrint.ViewModels {
                 this.RaiseAndSetIfChanged(ref _printParamName, value);
                 if(!string.IsNullOrEmpty(PrintParamName)) {
                     List<(string, int)> printParamValues = _repository.GetPrintParamValues(PrintParamName);
-                    Albums = new ObservableCollection<PrintAlbumViewModel>(printParamValues.Select(item => new PrintAlbumViewModel() { Name = item.Item1, Count = item.Item2 }));
+                    Albums = new ObservableCollection<PrintAlbumViewModel>(printParamValues.Select(item => new PrintAlbumViewModel(item.Item1) { Count = item.Item2 }));
                     SelectedAlbum = Albums.FirstOrDefault();
                 }
             }
