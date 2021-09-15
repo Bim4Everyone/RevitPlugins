@@ -51,6 +51,11 @@ namespace RevitBatchPrint.Models {
                 .OrderBy(item => item, new ViewSheetComparer())
                 .ToList();
 
+            // Получаем сообщение со всеми листами
+            // у которых есть виды с отключенной подрезкой видов
+            AddErrorCropView(viewSheets);
+
+            var printErrors = new List<(ViewSheet ViewSheet, string Message)>();
             foreach(ViewSheet viewSheet in viewSheets) {
                 var printSettings = GetPrintSettings(viewSheet);
                 bool hasFormatName = PrinterSettings.HasFormatName(printSettings.Format.Name);
@@ -65,12 +70,12 @@ namespace RevitBatchPrint.Models {
                 try {
                     using(Transaction transaction = new Transaction(_revitRepository.Document, "PrintSettings")) {
                         transaction.Start();
-                        
+
                         PrintManager.PrintSetup.CurrentPrintSetting = PrintManager.PrintSetup.InSession;
-                        
+
                         PaperSize paperSize = _revitRepository.GetPaperSizeByName(printSettings.Format.Name);
                         if(paperSize is null) {
-                            throw new Exception($"Не был найден формат листа.{Environment.NewLine}Возможно принтер \"{PrinterName}\" не поддерживает пользовательские форматы.");
+                            throw new Exception($"Не были найдены форматы листа принтера.");
                         }
 
                         PrintParameters.PaperSize = paperSize;
@@ -85,13 +90,46 @@ namespace RevitBatchPrint.Models {
                         PrintManager.SubmitPrint(viewSheet);
                     }
                 } catch(Exception ex) {
-                    Errors.Add($"{viewSheet.Name}: \"{ex.Message}\".");
+                    printErrors.Add((viewSheet, ex.Message));
                 } finally {
                     if(!hasFormatName) {
                         PrinterSettings.RemoveFormat(printSettings.Format.Name);
                     }
                 }
             }
+
+            AddExceptionError(printErrors);
+        }
+
+        private void AddExceptionError(List<(ViewSheet ViewSheet, string Message)> printErrors) {
+            IEnumerable<string> messages = printErrors
+                .GroupBy(item => item.Message)
+                .OrderBy(item => item.Key)
+                .Where(item => item.Any())
+                .Select(item => GetMessage(item.Key, item.Select(viewSheet => viewSheet.ViewSheet)));
+
+            if(messages.Any()) {
+                Errors.Add(string.Join(Environment.NewLine, messages));
+            }
+        }
+
+        private void AddErrorCropView(List<ViewSheet> viewSheets) {
+            IEnumerable<string> messages = viewSheets
+                .Select(item => (ViewSheet: item, ViewsWithoutCrop: _revitRepository.GetViewsWithoutCrop(item)))
+                .Where(item => item.ViewsWithoutCrop.Count > 0)
+                .Select(item => GetMessage(item.ViewSheet, item.ViewsWithoutCrop));
+
+            Errors.Add("Листы у которые есть виды с отключенной подрезкой:" + Environment.NewLine + string.Join(Environment.NewLine, messages));
+        }
+
+        private string GetMessage(string message, IEnumerable<ViewSheet> viewSheets) {
+            string separator = Environment.NewLine + "    - ";
+            return $"   {message}:{separator}{string.Join(separator, viewSheets.Select(item => item.SheetNumber))}";
+        }
+
+        private string GetMessage(ViewSheet viewSheet, List<View> views) {
+            string separator = Environment.NewLine + "        - ";
+            return $"    {viewSheet.SheetNumber}:{separator}{string.Join(separator, views.Select(item => item.Name))}";
         }
 
         private PrintSettings GetPrintSettings(ViewSheet viewSheet) {
