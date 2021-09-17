@@ -59,6 +59,19 @@ namespace Superfilter.ViewModels {
             get => Elements.Count;
         }
 
+
+        public IEnumerable<Element> GetSelectedElements() {
+            if(IsSelected == true) {
+                return Elements;
+            }
+
+            if(IsSelected == null) {
+                return Parameters.SelectMany(item => item.GetSelectedElements());
+            }
+
+            return Enumerable.Empty<Element>();
+        }
+
         private IEnumerable<ParametersViewModel> GetParamsViewModel() {
             return Elements
                 .SelectMany(element => element.GetOrderedParameters().Where(param => param.HasValue))

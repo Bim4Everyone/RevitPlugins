@@ -46,5 +46,13 @@ namespace Superfilter.ViewModels {
         }
 
         public ObservableCollection<Element> Elements { get; }
+
+        public IEnumerable<Element> GetSelectedElements() {
+            if(IsSelected == true) {
+                return Elements;
+            }
+
+            return Enumerable.Empty<Element>();
+        }
     }
 }

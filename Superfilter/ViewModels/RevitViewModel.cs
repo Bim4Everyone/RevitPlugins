@@ -120,18 +120,13 @@ namespace Superfilter.ViewModels {
 
         private void SetSelectedElement(object p) {
             IEnumerable<Element> elements = CategoryViewModels
-                .Where(item => item.IsSelected == true)
-                .SelectMany(item => item.Parameters)
-                .Where(item => item.IsSelected == true)
-                .SelectMany(item => item.Values)
-                .Where(param => param.IsSelected == true)
-                .SelectMany(value => value.Elements);
+                .SelectMany(item => item.GetSelectedElements());
 
             _revitRepository.SetSelectedElements(elements);
         }
 
         private bool CanSetSelectedElement(object p) {
-            return CategoryViewModels.Any(item => item.IsSelected == true);
+            return CategoryViewModels.Any(item => item.IsSelected == true || item.IsSelected == null);
         }
 
         #endregion

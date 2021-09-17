@@ -48,6 +48,14 @@ namespace Superfilter.ViewModels {
 
         public ObservableCollection<ParameterViewModel> Values { get; }
 
+        public IEnumerable<Element> GetSelectedElements() {
+            if(IsSelected == true || IsSelected == null) {
+                return Values.SelectMany(item => item.GetSelectedElements());
+            }
+
+            return Enumerable.Empty<Element>();
+        }
+
         private static IEnumerable<ParameterViewModel> GetParamViewModels(IEnumerable<Parameter> parameters) {
             return parameters
                 .GroupBy(param => param, new ParameterValueComparer())
