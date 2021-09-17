@@ -7,7 +7,21 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <ListView ItemsSource="{Binding CategoryViewModelsView}" SelectedItem="{Binding CategoryViewModel}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto" MinWidth="120"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Text="{Binding Filter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Grid.Column="1" Content="{Binding ButtonFilterName}" Command="{Binding SelectCategoriesCommand}"/>
+        </Grid>
+
+        <ListView Grid.Row="1" ItemsSource="{Binding CategoryViewModelsView}" SelectedItem="{Binding CategoryViewModel}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="#">
