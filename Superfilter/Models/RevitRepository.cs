@@ -43,7 +43,8 @@ namespace Superfilter.Models {
                 .ToElements();
 
             var elementTypes = elements
-                .SelectMany(item => item.GetValidTypes())
+                .Select(item => item.GetTypeId())
+                .Where(item => item != ElementId.InvalidElementId)
                 .Select(item => _document.GetElement(item));
 
             return elements.Union(elementTypes).ToList();
