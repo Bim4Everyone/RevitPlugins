@@ -46,7 +46,12 @@ namespace dosymep.WPF.ViewModels {
                 return;
             }
 
-            IsSelected = children.Any(item => item.IsSelected == true) ? null : IsSelected;
+
+            isSelected = children.Any(item => item.IsSelected == true || item.IsSelected == null);
+            if(isSelected == true) {
+                IsSelected = null;
+                return;
+            }
         }
     }
 }
