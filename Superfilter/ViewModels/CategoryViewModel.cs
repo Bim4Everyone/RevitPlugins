@@ -5,10 +5,13 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Data;
+using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Revit.Comparators;
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using Superfilter.Models;
@@ -17,12 +20,20 @@ using Superfilter.Views;
 namespace Superfilter.ViewModels {
     internal class CategoryViewModel : SelectableObjectViewModel<Category> {
         private ParamsView _paramsView;
-        private ObservableCollection<ParametersViewModel> parameters;
+        private ObservableCollection<ParametersViewModel> _parameters;
+
+        private string _filterValue;
+        private string _buttonFilterName;
+        private bool _currentSelection = true;
+        private ICollectionView _parametersView;
 
         public CategoryViewModel(Category category, IEnumerable<Element> elements)
             : base(category) {
             Category = category;
             Elements = new ObservableCollection<Element>(elements);
+            
+            SelectCommand = new RelayCommand(Select, CanSelect);
+            ChangeCurrentSelection();
         }
 
         public Category Category { get; }
@@ -38,16 +49,21 @@ namespace Superfilter.ViewModels {
             }
         }
 
-        public ObservableCollection<ParametersViewModel> Parameters {
+        public ICommand SelectCommand { get; }
+
+        public ICollectionView ParametersView {
             get {
-                if(parameters == null) {
-                    parameters = new ObservableCollection<ParametersViewModel>(GetParamsViewModel());
-                    foreach(ParametersViewModel item in parameters) {
+                if(_parameters == null) {
+                    _parameters = new ObservableCollection<ParametersViewModel>(GetParamsViewModel());
+                    foreach(ParametersViewModel item in _parameters) {
                         item.PropertyChanged += ParametersViewModelPropertyChanged;
                     }
+
+                    _parametersView = CollectionViewSource.GetDefaultView(_parameters);
+                    _parametersView.Filter = item => Filter(item as ParametersViewModel);
                 }
 
-                return parameters;
+                return _parametersView;
             }
         }
 
@@ -59,14 +75,13 @@ namespace Superfilter.ViewModels {
             get => Elements.Count;
         }
 
-
         public IEnumerable<Element> GetSelectedElements() {
             if(IsSelected == true) {
                 return Elements;
             }
 
             if(IsSelected == null) {
-                return Parameters.SelectMany(item => item.GetSelectedElements());
+                return _parameters.SelectMany(item => item.GetSelectedElements());
             }
 
             return Enumerable.Empty<Element>();
@@ -82,8 +97,59 @@ namespace Superfilter.ViewModels {
 
         private void ParametersViewModelPropertyChanged(object sender, PropertyChangedEventArgs e) {
             if(e.PropertyName.Equals(nameof(ParameterViewModel.IsSelected))) {
-                UpdateSelection(parameters);
+                UpdateSelection(_parameters);
             }
         }
+
+        #region Filter
+
+        public string FilterValue {
+            get => _filterValue;
+            set {
+                _filterValue = value;
+                OnPropertyChanged(nameof(FilterValue));
+                ParametersView.Refresh();
+            }
+        }
+
+        public string ButtonFilterName {
+            get => _buttonFilterName;
+            set {
+                _buttonFilterName = value;
+                OnPropertyChanged(nameof(ButtonFilterName));
+            }
+        }
+
+        private bool Filter(ParametersViewModel param) {
+            if(string.IsNullOrEmpty(FilterValue)) {
+                return true;
+            }
+
+            return param.DisplayData.IndexOf(FilterValue, StringComparison.CurrentCultureIgnoreCase) >= 0;
+        }
+
+        #endregion
+
+        #region SelectCommand
+
+        private void Select(object p) {
+            ChangeCurrentSelection();
+
+            IEnumerable<ParametersViewModel> @params = ParametersView.OfType<ParametersViewModel>();
+            foreach(ParametersViewModel param in @params) {
+                param.IsSelected = _currentSelection;
+            }
+        }
+
+        private bool CanSelect(object p) {
+            return ParametersView.CanFilter;
+        }
+
+        private void ChangeCurrentSelection() {
+            _currentSelection = !_currentSelection;
+            ButtonFilterName = _currentSelection ? "Убрать выделение" : "Выделить всё";
+        }
+
+        #endregion
     }
 }

@@ -7,7 +7,21 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <TreeView ItemsSource="{Binding Parameters}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto" MinWidth="120"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Text="{Binding FilterValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Grid.Column="1" Content="{Binding ButtonFilterName}" Command="{Binding SelectCommand}"/>
+        </Grid>
+
+        <TreeView Grid.Row="1" ItemsSource="{Binding ParametersView}">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Values}">
                     <CheckBox IsChecked="{Binding IsSelected}">
