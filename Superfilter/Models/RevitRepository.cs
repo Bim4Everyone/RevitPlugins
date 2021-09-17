@@ -39,9 +39,14 @@ namespace Superfilter.Models {
         }
 
         public IList<Element> GetElements(View view) {
-            return new FilteredElementCollector(_document, view.Id)
-                .WhereElementIsNotElementType()
+            var elements = new FilteredElementCollector(_document, view.Id)
                 .ToElements();
+
+            var elementTypes = elements
+                .SelectMany(item => item.GetValidTypes())
+                .Select(item => _document.GetElement(item));
+
+            return elements.Union(elementTypes).ToList();
         }
 
         public IList<Element> GetElements(Category category) {
@@ -74,6 +79,14 @@ namespace Superfilter.Models {
 
         public void SetSelectedElements(IEnumerable<Element> elements) {
             _uiDocument.Selection.SetElementIds(elements.Select(item => item.Id).ToList());
+        }
+
+        public void SetSelectedElements(IEnumerable<ElementId> elements) {
+            _uiDocument.Selection.SetElementIds(elements.ToList());
+        }
+
+        public IEnumerable<Element> GetElements(IEnumerable<ElementId> elements) {
+            return elements.Select(item => _document.GetElement(item));
         }
 
         public IList<ParameterElement> GetParameterElements() {

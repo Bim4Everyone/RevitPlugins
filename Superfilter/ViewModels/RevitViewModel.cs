@@ -122,7 +122,20 @@ namespace Superfilter.ViewModels {
             IEnumerable<Element> elements = CategoryViewModels
                 .SelectMany(item => item.GetSelectedElements());
 
-            _revitRepository.SetSelectedElements(elements);
+            IEnumerable<ElementType> elementTypes = elements.OfType<ElementType>();
+            var elementIdsFromTypes = elementTypes
+                .SelectMany(item => item.GetDependentElements(new ElementIsElementTypeFilter(true)));
+
+            var categories = CategoryViewModels
+                .Where(item => item.IsSelected == true || item.IsSelected == null)
+                .Select(item => item.Category.Id);
+
+            var allElements = CategoryViewModels.SelectMany(item => item.Elements);
+            var elementsFromTypes = _revitRepository.GetElements(elementIdsFromTypes)
+                .Where(item => categories.Contains(item.Category.Id))
+                .Where(item => allElements.Any(element => element.Id == item.Id));
+
+            _revitRepository.SetSelectedElements(elements.Except(elementTypes).Union(elementsFromTypes));
         }
 
         private bool CanSetSelectedElement(object p) {
