@@ -10,13 +10,13 @@
         <TreeView ItemsSource="{Binding Parameters}">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Values}">
-                    <CheckBox IsChecked="{Binding Selected}">
-                        <TextBlock Text="{Binding Name}"/>
+                    <CheckBox IsChecked="{Binding IsSelected}">
+                        <TextBlock Text="{Binding DisplayData}"/>
                     </CheckBox>
                     <HierarchicalDataTemplate.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox IsChecked="{Binding Selected}">
-                                <TextBlock Text="{Binding DisplayValue}"/>
+                            <CheckBox IsChecked="{Binding IsSelected}">
+                                <TextBlock Text="{Binding DisplayData}"/>
                             </CheckBox>
                         </DataTemplate>
                     </HierarchicalDataTemplate.ItemTemplate>

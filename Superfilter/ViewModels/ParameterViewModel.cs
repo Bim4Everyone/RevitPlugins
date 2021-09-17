@@ -5,13 +5,14 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.WPF.ViewModels;
 
 namespace Superfilter.ViewModels {
-    internal class ParameterViewModel : BaseViewModel {
-        private bool _selected;
+    internal class ParameterViewModel : SelectableObjectViewModel<Parameter> {
         private readonly Parameter _parameter;
 
-        public ParameterViewModel(Parameter parameter, IEnumerable<Parameter> parameters) {
+        public ParameterViewModel(Parameter parameter, IEnumerable<Parameter> parameters)
+            : base(parameter) {
             _parameter = parameter;
             Elements = new ObservableCollection<Element>(parameters.Select(item => item.Element));
         }
@@ -30,7 +31,7 @@ namespace Superfilter.ViewModels {
             }
         }
 
-        public string DisplayValue {
+        public override string DisplayData {
             get {
                 try {
                     return _parameter.AsValueString() ?? $"Без значения";
@@ -42,14 +43,6 @@ namespace Superfilter.ViewModels {
 
         public int Count {
             get => Elements.Count;
-        }
-
-        public bool Selected {
-            get => _selected;
-            set {
-                _selected = value;
-                OnPropertyChanged(nameof(Selected));
-            }
         }
 
         public ObservableCollection<Element> Elements { get; }

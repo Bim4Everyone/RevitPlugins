@@ -18,7 +18,7 @@ using Superfilter.Models;
 namespace Superfilter.ViewModels {
     internal abstract class RevitViewModel : BaseViewModel {
         protected readonly RevitRepository _revitRepository;
-        
+
         private string _name;
         private string _filter;
         private string _buttonFilterName;
@@ -38,7 +38,7 @@ namespace Superfilter.ViewModels {
             ChangeCurrentSelection();
         }
 
-        public string Name {
+        public string DisplayData {
             get => _name;
             set => _name = value;
         }
@@ -83,7 +83,7 @@ namespace Superfilter.ViewModels {
                 return true;
             }
 
-            return category.Name.IndexOf(Filter, StringComparison.CurrentCultureIgnoreCase) >= 0;
+            return category.DisplayData.IndexOf(Filter, StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
 
         #endregion
@@ -95,7 +95,7 @@ namespace Superfilter.ViewModels {
 
             IEnumerable<CategoryViewModel> categories = CategoryViewModelsView.OfType<CategoryViewModel>();
             foreach(CategoryViewModel category in categories) {
-                category.Selected = _currentSelection;
+                category.IsSelected = _currentSelection;
             }
         }
 
@@ -113,12 +113,19 @@ namespace Superfilter.ViewModels {
         #region SelectElements
 
         private void SetSelectedElement(object p) {
-            IEnumerable<Element> elements = CategoryViewModels.Where(item => item.Selected).SelectMany(item => item.Elements);
+            IEnumerable<Element> elements = CategoryViewModels
+                .Where(item => item.IsSelected == true)
+                .SelectMany(item => item.Parameters)
+                .Where(item => item.IsSelected == true)
+                .SelectMany(item => item.Values)
+                .Where(param => param.IsSelected == true)
+                .SelectMany(value => value.Elements);
+
             _revitRepository.SetSelectedElements(elements);
         }
 
         private bool CanSetSelectedElement(object p) {
-            return CategoryViewModels.Any(item => item.Selected);
+            return CategoryViewModels.Any(item => item.IsSelected == true);
         }
 
         #endregion

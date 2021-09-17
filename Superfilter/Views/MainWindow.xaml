@@ -23,7 +23,7 @@
         <ComboBox Grid.Row="0" Grid.ColumnSpan="3" Margin="10" ItemsSource="{Binding RevitViewModels}" SelectedItem="{Binding RevitViewModel}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name}"/>
+                    <TextBlock Text="{Binding DisplayData}"/>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>

@@ -20,7 +20,7 @@ namespace Superfilter.ViewModels.Revit {
                 .Where(item => item.Category != null && item.Category.Parent == null)
                 .GroupBy(item => item.Category, new CategoryComparer())
                 .Select(item => new CategoryViewModel(item.Key, item))
-                .OrderBy(item => item.Name);
+                .OrderBy(item => item.DisplayData);
         }
     }
 }
