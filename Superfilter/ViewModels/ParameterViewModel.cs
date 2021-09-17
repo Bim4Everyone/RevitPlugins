@@ -33,10 +33,6 @@ namespace Superfilter.ViewModels {
         public string DisplayValue {
             get {
                 try {
-                    if(_parameter.StorageType == StorageType.ElementId) {
-                        return _parameter.Element.Document.GetElement(_parameter.AsElementId())?.Name ?? $"Без значения";
-                    }
-
                     return _parameter.AsValueString() ?? $"Без значения";
                 } catch {
                     return $"Без значения";
