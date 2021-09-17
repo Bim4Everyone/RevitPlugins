@@ -41,7 +41,7 @@
 
         <GridSplitter  Grid.Row="2" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
-        <local:ParamsView Grid.Row="2" Grid.Column="2" Margin="10,0,10,10" DataContext="{Binding RevitViewModel.CategoryViewModel}"/>
+        <ContentControl Grid.Row="2" Grid.Column="2" Margin="10,0,10,10" Content="{Binding RevitViewModel.ParamsView}"/>
 
         <StackPanel Grid.Row="4" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="ОК" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding RevitViewModel.SelectElements}"/>

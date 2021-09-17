@@ -12,14 +12,14 @@ namespace dosymep.WPF.ViewModels {
 
         public SelectableObjectViewModel(T objectData) {
             ObjectData = objectData;
-            DisplayData = ObjectData.ToString();
+            DisplayData = ObjectData?.ToString();
         }
 
         public SelectableObjectViewModel(T objectData, bool isSelected) {
             ObjectData = objectData;
             IsSelected = isSelected;
 
-            DisplayData = ObjectData.ToString();
+            DisplayData = ObjectData?.ToString();
         }
 
         public T ObjectData { get; }

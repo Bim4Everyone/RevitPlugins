@@ -14,6 +14,7 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.Commands;
 
 using Superfilter.Models;
+using Superfilter.Views;
 
 namespace Superfilter.ViewModels {
     internal abstract class RevitViewModel : BaseViewModel {
@@ -47,8 +48,13 @@ namespace Superfilter.ViewModels {
             get => _categoryViewModel;
             set {
                 _categoryViewModel = value;
+                OnPropertyChanged(nameof(ParamsView));
                 OnPropertyChanged(nameof(CategoryViewModel));
             }
+        }
+
+        public ParamsView ParamsView { 
+            get { return CategoryViewModel.ParamsView; }
         }
 
         public ICommand SelectElements { get; }

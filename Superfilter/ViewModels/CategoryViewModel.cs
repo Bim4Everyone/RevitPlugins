@@ -9,9 +9,11 @@ using dosymep.Revit.Comparators;
 using dosymep.WPF.ViewModels;
 
 using Superfilter.Models;
+using Superfilter.Views;
 
 namespace Superfilter.ViewModels {
     internal class CategoryViewModel : SelectableObjectViewModel<Category> {
+        private ParamsView _paramsView;
         private ObservableCollection<ParametersViewModel> parameters;
 
         public CategoryViewModel(Category category, IEnumerable<Element> elements)
@@ -22,6 +24,16 @@ namespace Superfilter.ViewModels {
 
         public Category Category { get; }
         public ObservableCollection<Element> Elements { get; }
+
+        public ParamsView ParamsView {
+            get {
+                if(_paramsView == null) {
+                    _paramsView = new ParamsView() { DataContext = this };
+                }
+
+                return _paramsView;
+            }
+        }
 
         public ObservableCollection<ParametersViewModel> Parameters {
             get {
