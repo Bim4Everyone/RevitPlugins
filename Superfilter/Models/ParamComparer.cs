@@ -13,11 +13,11 @@ namespace Superfilter.Models {
                 return false;
             }
 
-            return x.Id == y.Id;
+            return x.Definition.Name.Equals(y.Definition.Name);
         }
 
         public int GetHashCode(Parameter obj) {
-            return obj?.Id.GetHashCode() ?? 0;
+            return obj?.Definition.Name.GetHashCode() ?? 0;
         }
     }
 }
