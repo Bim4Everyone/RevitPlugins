@@ -54,7 +54,7 @@ namespace Superfilter.ViewModels {
         }
 
         public ParamsView ParamsView { 
-            get { return CategoryViewModel.ParamsView; }
+            get { return CategoryViewModel?.ParamsView; }
         }
 
         public ICommand SelectElements { get; }

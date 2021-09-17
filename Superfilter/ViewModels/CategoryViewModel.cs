@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -39,6 +42,9 @@ namespace Superfilter.ViewModels {
             get {
                 if(parameters == null) {
                     parameters = new ObservableCollection<ParametersViewModel>(GetParamsViewModel());
+                    foreach(ParametersViewModel item in parameters) {
+                        item.PropertyChanged += ParametersViewModelPropertyChanged;
+                    }
                 }
 
                 return parameters;
@@ -59,6 +65,12 @@ namespace Superfilter.ViewModels {
                 .GroupBy(param => param, new ParamComparer())
                 .Select(param => new ParametersViewModel(param.Key.Definition, param))
                 .OrderBy(param => param.DisplayData);
+        }
+
+        private void ParametersViewModelPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if(e.PropertyName.Equals(nameof(ParameterViewModel.IsSelected))) {
+                UpdateSelection(parameters);
+            }
         }
     }
 }

@@ -32,5 +32,21 @@ namespace dosymep.WPF.ViewModels {
                 OnPropertyChanged(nameof(IsSelected));
             }
         }
+
+        protected void UpdateSelection<TIn>(IEnumerable<SelectableObjectViewModel<TIn>> children) {
+            bool isSelected = children.All(item => item.IsSelected == true);
+            if(isSelected == true) {
+                IsSelected = true;
+                return;
+            }
+
+            isSelected = children.All(item => item.IsSelected == false);
+            if(isSelected == true) {
+                IsSelected = false;
+                return;
+            }
+
+            IsSelected = children.Any(item => item.IsSelected == true) ? null : IsSelected;
+        }
     }
 }

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -15,7 +17,11 @@ namespace Superfilter.ViewModels {
         public ParametersViewModel(Definition definition, IEnumerable<Parameter> parameters)
             : base(definition) {
             _definition = definition;
+            
             Values = new ObservableCollection<ParameterViewModel>(GetParamViewModels(parameters));
+            foreach(ParameterViewModel item in Values) {
+                item.PropertyChanged += ParameterViewModelPropertyChanged;
+            }
         }
 
         public override string DisplayData {
@@ -30,8 +36,12 @@ namespace Superfilter.ViewModels {
             get => base.IsSelected;
             set {
                 base.IsSelected = value;
-                foreach(ParameterViewModel parameter in Values) {
-                    parameter.IsSelected = value;
+                if(base.IsSelected.HasValue) {
+                    foreach(ParameterViewModel item in Values) {
+                        item.PropertyChanged -= ParameterViewModelPropertyChanged;
+                        item.IsSelected = base.IsSelected;
+                        item.PropertyChanged += ParameterViewModelPropertyChanged;
+                    }
                 }
             }
         }
@@ -43,6 +53,12 @@ namespace Superfilter.ViewModels {
                 .GroupBy(param => param, new ParameterValueComparer())
                 .Select(item => new ParameterViewModel(item.Key, item))
                 .OrderBy(item => item.Value);
+        }
+
+        private void ParameterViewModelPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if(e.PropertyName.Equals(nameof(ParameterViewModel.IsSelected))) {
+                UpdateSelection(Values);
+            }
         }
     }
 }
