@@ -17,7 +17,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Наименование" DisplayMemberBinding="{Binding Path=Name}" />
+                    <GridViewColumn Header="Наименование" DisplayMemberBinding="{Binding Path=Name}" Width="240" />
                     <GridViewColumn Header="Количество"  DisplayMemberBinding="{Binding Path=Count}" />
                 </GridView>
             </ListView.View>
