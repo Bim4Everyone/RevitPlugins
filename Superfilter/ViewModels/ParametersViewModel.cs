@@ -60,7 +60,7 @@ namespace Superfilter.ViewModels {
             return parameters
                 .GroupBy(param => param, new ParameterValueComparer())
                 .Select(item => new ParameterViewModel(item.Key, item))
-                .OrderBy(item => item.Value);
+                .OrderBy(item => item);
         }
 
         private void ParameterViewModelPropertyChanged(object sender, PropertyChangedEventArgs e) {

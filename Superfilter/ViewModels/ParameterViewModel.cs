@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -8,7 +9,7 @@ using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 namespace Superfilter.ViewModels {
-    internal class ParameterViewModel : SelectableObjectViewModel<Parameter> {
+    internal class ParameterViewModel : SelectableObjectViewModel<Parameter>, IComparable<ParameterViewModel> {
         private readonly Parameter _parameter;
 
         public ParameterViewModel(Parameter parameter, IEnumerable<Parameter> parameters)
@@ -53,6 +54,14 @@ namespace Superfilter.ViewModels {
             }
 
             return Enumerable.Empty<Element>();
+        }
+
+        public int CompareTo(ParameterViewModel other) {
+            if(_parameter.StorageType == other._parameter.StorageType) {
+                return Comparer<object>.Default.Compare(Value, other.Value);
+            }
+
+            return _parameter.StorageType.CompareTo(other._parameter.StorageType);
         }
     }
 }
