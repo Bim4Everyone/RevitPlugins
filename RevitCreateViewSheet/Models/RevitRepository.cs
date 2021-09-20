@@ -49,7 +49,7 @@ namespace RevitCreateViewSheet.Models {
         public List<string> GetAlbumsBlueprints() {
             return GetViewSheets()
                 .Select(item => (string) item.GetParamValueOrDefault(SharedParamsConfig.Instance.AlbumBlueprints))
-                .Where(item => !item.EndsWith("BIM"))
+                .Where(item => item?.EndsWith("BIM") == false)
                 .OrderBy(item => item)
                 .Distinct()
                 .ToList();
@@ -73,7 +73,7 @@ namespace RevitCreateViewSheet.Models {
 
         public int GetLastViewSheetIndex(string albumBlueprints) {
             ViewSheet viewSheet = GetViewSheets()
-                .Where(item => ((string) item.GetParamValueOrDefault(SharedParamsConfig.Instance.AlbumBlueprints)).Equals(albumBlueprints))
+                .Where(item => ((string) item.GetParamValueOrDefault(SharedParamsConfig.Instance.AlbumBlueprints))?.Equals(albumBlueprints) == true)
                 .OrderBy(item => item, new ViewSheetComparer())
                 .LastOrDefault();
 
