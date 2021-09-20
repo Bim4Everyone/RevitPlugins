@@ -13,6 +13,10 @@ namespace Superfilter.Models {
                 return false;
             }
 
+            if(x.Definition == null || y.Definition == null) {
+                return false;
+            }
+
             if(x.HasValue == y.HasValue) {
                 return true;
             }
@@ -37,11 +41,16 @@ namespace Superfilter.Models {
         }
 
         public int GetHashCode(Parameter obj) {
+            if(obj == null) {
+                return 0;
+            }
+
+            if(obj.Definition == null) {
+                return 0;
+            }
+
             if(obj.HasValue) {
-                try {
-                    return obj?.AsValueString()?.GetHashCode() ?? 0;
-                } catch {
-                }
+                return obj.AsValueString()?.GetHashCode() ?? 0;
             }
 
             return "Без значения".GetHashCode();

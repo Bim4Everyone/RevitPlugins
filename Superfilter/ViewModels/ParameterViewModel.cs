@@ -10,7 +10,9 @@ using dosymep.WPF.ViewModels;
 
 namespace Superfilter.ViewModels {
     internal class ParameterViewModel : SelectableObjectViewModel<Parameter>, IComparable<ParameterViewModel> {
+        private const string _defaultValue = "Без значения";
         private readonly Parameter _parameter;
+
 
         public ParameterViewModel(Parameter parameter, IEnumerable<Parameter> parameters)
             : base(parameter) {
@@ -20,25 +22,25 @@ namespace Superfilter.ViewModels {
 
         public object Value {
             get {
-                try {
-                    if(_parameter.StorageType == StorageType.ElementId) {
-                        return _parameter.Element.Document.GetElement(_parameter.AsElementId())?.Name ?? $"Без значения";
-                    }
-
-                    return _parameter.AsObject() ?? "Без значения";
-                } catch {
-                    return "Без значения";
+                if(_parameter.Definition == null) {
+                    return _defaultValue;
                 }
+
+                if(_parameter.StorageType == StorageType.ElementId) {
+                    return _parameter.Element.Document.GetElement(_parameter.AsElementId())?.Name ?? _defaultValue;
+                }
+
+                return _parameter.AsObject() ?? _defaultValue;
             }
         }
 
         public override string DisplayData {
             get {
-                try {
-                    return _parameter.AsValueString() ?? $"Без значения";
-                } catch {
-                    return $"Без значения";
+                if(_parameter.Definition == null) {
+                    return _defaultValue;
                 }
+
+                return _parameter.AsValueString() ?? _defaultValue;
             }
         }
 
@@ -57,6 +59,14 @@ namespace Superfilter.ViewModels {
         }
 
         public int CompareTo(ParameterViewModel other) {
+            if(other == null || other._parameter.Definition == null) {
+                return 1;
+            }
+
+            if(_parameter.Definition == null) {
+                return -1;
+            }
+
             if(_parameter.StorageType == other._parameter.StorageType) {
                 return Comparer<object>.Default.Compare(Value, other.Value);
             }
