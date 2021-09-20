@@ -47,7 +47,10 @@ namespace Superfilter.Models {
                 .Where(item => item != ElementId.InvalidElementId)
                 .Select(item => _document.GetElement(item));
 
-            return elements.Union(elementTypes).ToList();
+            return elements
+                .Union(elementTypes)
+                .Distinct(new ElementComparer())
+                .ToList();
         }
 
         public IList<Element> GetElements(Category category) {
