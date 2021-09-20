@@ -29,6 +29,7 @@ namespace Superfilter.ViewModels {
         public RevitViewModel(Application application, Document document) {
             _revitRepository = new RevitRepository(application, document);
 
+            ShowElements = new RelayCommand(ShowElement, CanShowElement);
             SelectElements = new RelayCommand(SetSelectedElement, CanSetSelectedElement);
             SelectCategoriesCommand = new RelayCommand(SelectCategories, CanSelectCategories);
 
@@ -57,6 +58,7 @@ namespace Superfilter.ViewModels {
             get { return CategoryViewModel?.ParamsView; }
         }
 
+        public ICommand ShowElements { get; }
         public ICommand SelectElements { get; }
         public ICommand SelectCategoriesCommand { get; }
 
@@ -119,6 +121,32 @@ namespace Superfilter.ViewModels {
         #region SelectElements
 
         private void SetSelectedElement(object p) {
+            _revitRepository.SetSelectedElements(GetSelectedElements());
+        }
+
+        private bool CanSetSelectedElement(object p) {
+            return IsSelectedCategory();
+        }
+
+        #endregion
+
+        #region ShowElements
+
+        private void ShowElement(object p) {
+            _revitRepository.ShowElements(GetSelectedElements());
+        }
+
+        private bool CanShowElement(object p) {
+            return IsSelectedCategory();
+        }
+
+        #endregion
+
+        private bool IsSelectedCategory() {
+            return CategoryViewModels.Any(item => item.IsSelected == true || item.IsSelected == null);
+        }
+
+        private IEnumerable<Element> GetSelectedElements() {
             IEnumerable<Element> elements = CategoryViewModels
                 .SelectMany(item => item.GetSelectedElements());
 
@@ -139,13 +167,8 @@ namespace Superfilter.ViewModels {
                 .Where(item => categories.ContainsKey(item.Category.Id))
                 .Where(item => allElements.ContainsKey(item.Id));
 
-            _revitRepository.SetSelectedElements(elements.Except(elementTypes).Union(elementsFromTypes));
+            var selectedElements = elements.Except(elementTypes).Union(elementsFromTypes);
+            return selectedElements;
         }
-
-        private bool CanSetSelectedElement(object p) {
-            return CategoryViewModels.Any(item => item.IsSelected == true || item.IsSelected == null);
-        }
-
-        #endregion
     }
 }
