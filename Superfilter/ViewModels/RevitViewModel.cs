@@ -128,12 +128,16 @@ namespace Superfilter.ViewModels {
 
             var categories = CategoryViewModels
                 .Where(item => item.IsSelected == true || item.IsSelected == null)
-                .Select(item => item.Category.Id);
+                .ToDictionary(item => item.Category.Id);
 
-            var allElements = CategoryViewModels.SelectMany(item => item.Elements);
+            var allElements = CategoryViewModels
+                .SelectMany(item => item.Elements)
+                .ToDictionary(item => item.Id);
+
             var elementsFromTypes = _revitRepository.GetElements(elementIdsFromTypes)
-                .Where(item => categories.Contains(item.Category.Id))
-                .Where(item => allElements.Any(element => element.Id == item.Id));
+                .Where(item => item.Category != null)
+                .Where(item => categories.ContainsKey(item.Category.Id))
+                .Where(item => allElements.ContainsKey(item.Id));
 
             _revitRepository.SetSelectedElements(elements.Except(elementTypes).Union(elementsFromTypes));
         }
