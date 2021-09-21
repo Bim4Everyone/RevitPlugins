@@ -162,6 +162,7 @@ namespace Superfilter.ViewModels {
 
         private void ShowElement(object p) {
             _revitRepository.ShowElements(ViewViewModel.Elements);
+            _revitRepository.SetSelectedElements(ViewViewModel.Elements);
         }
 
         private bool CanShowElement(object p) {
