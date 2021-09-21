@@ -68,9 +68,22 @@ namespace Superfilter.Models {
         }
 
         public IList<Element> GetSelectedElements() {
-            return _uiDocument.Selection.GetElementIds()
+            var selectedElements = _uiDocument.Selection.GetElementIds()
                 .Select(item => _document.GetElement(item))
                 .ToList();
+
+            return selectedElements
+                .OfType<Group>()
+                .SelectMany(item => GetElements(item))
+                .Union(selectedElements)
+                .ToList();
+        }
+
+        public IEnumerable<Element> GetElements(Group group) {
+            var children = GetElements(group.GetMemberIds());
+            var reqursive = children.OfType<Group>().SelectMany(item => GetElements(item));
+
+            return children.Union(reqursive);
         }
 
         public IList<Category> GetCategories() {
