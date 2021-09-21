@@ -39,7 +39,7 @@ namespace Superfilter.ViewModels {
             SelectElements = new RelayCommand(SetSelectedElement, CanSetSelectedElement);
             SelectCategoriesCommand = new RelayCommand(SelectCategories, CanSelectCategories);
 
-            CategoryViewModels = new ObservableCollection<CategoryViewModel>(GetCategoryViewModels());
+            CategoryViewModels = new ObservableCollection<CategoryViewModel>(GetCategoryViewModels().Where(item => item.Count > 0));
             foreach(var category in CategoryViewModels) {
                 category.PropertyChanged += Category_PropertyChanged;
             }

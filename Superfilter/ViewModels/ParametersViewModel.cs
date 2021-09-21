@@ -17,7 +17,7 @@ namespace Superfilter.ViewModels {
         public ParametersViewModel(Definition definition, IEnumerable<Parameter> parameters)
             : base(definition) {
             _definition = definition;
-            
+
             Values = new ObservableCollection<ParameterViewModel>(GetParamViewModels(parameters));
             foreach(ParameterViewModel item in Values) {
                 item.PropertyChanged += ParameterViewModelPropertyChanged;

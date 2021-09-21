@@ -54,7 +54,7 @@ namespace Superfilter.ViewModels {
         public ICollectionView ParametersView {
             get {
                 if(_parameters == null) {
-                    _parameters = new ObservableCollection<ParametersViewModel>(GetParamsViewModel());
+                    _parameters = new ObservableCollection<ParametersViewModel>(GetParamsViewModel().Where(item => item.Count > 1));
                     foreach(ParametersViewModel item in _parameters) {
                         item.PropertyChanged += ParametersViewModelPropertyChanged;
                     }
@@ -72,7 +72,7 @@ namespace Superfilter.ViewModels {
         }
 
         public int Count {
-            get => Elements.Count;
+            get => Elements.Count - Elements.OfType<ElementType>().Count();
         }
 
         public IEnumerable<Element> GetSelectedElements() {
