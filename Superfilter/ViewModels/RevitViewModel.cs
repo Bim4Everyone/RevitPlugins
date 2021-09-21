@@ -25,6 +25,8 @@ namespace Superfilter.ViewModels {
         private string _buttonFilterName;
         private bool _currentSelection = true;
         private CategoryViewModel _categoryViewModel;
+        private ViewViewModel _viewViewModel;
+        private ObservableCollection<ViewViewModel> _viewViewModels;
 
         public RevitViewModel(Application application, Document document) {
             _revitRepository = new RevitRepository(application, document);
@@ -34,6 +36,10 @@ namespace Superfilter.ViewModels {
             SelectCategoriesCommand = new RelayCommand(SelectCategories, CanSelectCategories);
 
             CategoryViewModels = new ObservableCollection<CategoryViewModel>(GetCategoryViewModels());
+            foreach(var category in CategoryViewModels) {
+                category.PropertyChanged += Category_PropertyChanged;
+            }
+
             CategoryViewModelsView = CollectionViewSource.GetDefaultView(CategoryViewModels);
             CategoryViewModelsView.Filter = item => FilterCategory(item as CategoryViewModel);
 
@@ -54,8 +60,24 @@ namespace Superfilter.ViewModels {
             }
         }
 
-        public ParamsView ParamsView { 
+        public ParamsView ParamsView {
             get { return CategoryViewModel?.ParamsView; }
+        }
+
+        public ViewViewModel ViewViewModel {
+            get => _viewViewModel;
+            set {
+                _viewViewModel = value;
+                OnPropertyChanged(nameof(ViewViewModel));
+            }
+        }
+
+        public ObservableCollection<ViewViewModel> ViewViewModels {
+            get => _viewViewModels;
+            set {
+                _viewViewModels = value;
+                OnPropertyChanged(nameof(ViewViewModels));
+            }
         }
 
         public ICommand ShowElements { get; }
@@ -133,14 +155,28 @@ namespace Superfilter.ViewModels {
         #region ShowElements
 
         private void ShowElement(object p) {
-            _revitRepository.ShowElements(GetSelectedElements());
+            _revitRepository.ShowElements(ViewViewModel.Elements);
         }
 
         private bool CanShowElement(object p) {
-            return IsSelectedCategory();
+            return ViewViewModel != null && IsSelectedCategory();
         }
 
         #endregion
+
+        private void Category_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if(e.PropertyName.Equals(nameof(CategoryViewModel.IsSelected))) {
+                var elements = GetSelectedElements().ToList();
+                var viewViewModels = elements
+                    .Where(item=> item.OwnerViewId != ElementId.InvalidElementId)
+                    .GroupBy(item => item.OwnerViewId)
+                    .Select(item => new ViewViewModel((View) _revitRepository.GetElement(item.Key), item))
+                    .OrderBy(item => item.Name);
+
+                ViewViewModels = new ObservableCollection<ViewViewModel>(viewViewModels);
+                ViewViewModel = ViewViewModels.FirstOrDefault();
+            }
+        }
 
         private bool IsSelectedCategory() {
             return CategoryViewModels.Any(item => item.IsSelected == true || item.IsSelected == null);
@@ -169,6 +205,28 @@ namespace Superfilter.ViewModels {
 
             var selectedElements = elements.Except(elementTypes).Union(elementsFromTypes);
             return selectedElements;
+        }
+    }
+
+    internal class ViewViewModel : BaseViewModel {
+        public ViewViewModel(View view, IEnumerable<Element> elements) {
+            View = view;
+            Elements = elements.ToList();
+        }
+
+        public View View { get; }
+        public List<Element> Elements { get; }
+
+        public string Name {
+            get { return View?.Name ?? "Без вида"; }
+        }
+
+        public int Count {
+            get { return Elements.Count; }
+        }
+
+        public override string ToString() {
+            return Name;
         }
     }
 }

@@ -97,6 +97,10 @@ namespace Superfilter.Models {
             _uiDocument.ShowElements(elements.ToList());
         }
 
+        public Element GetElement(ElementId elementId) {
+            return _document.GetElement(elementId);
+        }
+
         public IEnumerable<Element> GetElements(IEnumerable<ElementId> elements) {
             return elements.Select(item => _document.GetElement(item));
         }

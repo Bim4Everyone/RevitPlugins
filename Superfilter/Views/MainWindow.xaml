@@ -34,7 +34,19 @@
         <ContentControl Grid.Row="1" Grid.Column="2" Margin="10,0,10,10" Content="{Binding RevitViewModel.ParamsView}"/>
 
         <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <!--<Button Content="Показать" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding RevitViewModel.ShowElements}"/>-->
+            <ComboBox Margin="10" Width="250" 
+                      SelectedItem="{Binding RevitViewModel.ViewViewModel}"
+                      ItemsSource="{Binding RevitViewModel.ViewViewModels}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel Width="240">
+                            <TextBlock Text="{Binding Name}"/>
+                            <TextBlock HorizontalAlignment="Right" Text="{Binding Count}"/>
+                        </DockPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Button Content="Показать" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding RevitViewModel.ShowElements}"/>
             <Button Content="Выделить" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding RevitViewModel.SelectElements}"/>
             <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
         </StackPanel>
