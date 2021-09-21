@@ -5,8 +5,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -28,6 +30,8 @@ namespace Superfilter.ViewModels {
         private ViewViewModel _viewViewModel;
         private ObservableCollection<ViewViewModel> _viewViewModels;
 
+        private readonly Delay _delay;
+
         public RevitViewModel(Application application, Document document) {
             _revitRepository = new RevitRepository(application, document);
 
@@ -44,6 +48,8 @@ namespace Superfilter.ViewModels {
             CategoryViewModelsView.Filter = item => FilterCategory(item as CategoryViewModel);
 
             ChangeCurrentSelection();
+
+            _delay = new Delay(250, UpdateShowViews);
         }
 
         public string DisplayData {
@@ -164,22 +170,27 @@ namespace Superfilter.ViewModels {
 
         #endregion
 
+
         private void Category_PropertyChanged(object sender, PropertyChangedEventArgs e) {
             if(e.PropertyName.Equals(nameof(CategoryViewModel.IsSelected))) {
-                var elements = GetSelectedElements().ToList();
-                var viewViewModels = elements
-                    .Where(item=> item.OwnerViewId != ElementId.InvalidElementId)
-                    .GroupBy(item => item.OwnerViewId)
-                    .Select(item => new ViewViewModel((View) _revitRepository.GetElement(item.Key), item))
-                    .OrderBy(item => item.Name);
-
-                ViewViewModels = new ObservableCollection<ViewViewModel>(viewViewModels);
-                ViewViewModel = ViewViewModels.FirstOrDefault();
+                _delay.Action();
             }
         }
 
         private bool IsSelectedCategory() {
             return CategoryViewModels.Any(item => item.IsSelected == true || item.IsSelected == null);
+        }
+
+        private void UpdateShowViews() {
+            var elements = GetSelectedElements().ToList();
+            var viewViewModels = elements
+                .Where(item => item.OwnerViewId != ElementId.InvalidElementId)
+                .GroupBy(item => item.OwnerViewId)
+                .Select(item => new ViewViewModel((View) _revitRepository.GetElement(item.Key), item))
+                .OrderBy(item => item.Name);
+
+            ViewViewModels = new ObservableCollection<ViewViewModel>(viewViewModels);
+            ViewViewModel = ViewViewModels.FirstOrDefault();
         }
 
         private IEnumerable<Element> GetSelectedElements() {
@@ -227,6 +238,29 @@ namespace Superfilter.ViewModels {
 
         public override string ToString() {
             return Name;
+        }
+    }
+
+    internal class Delay {
+        private readonly Action _action;
+        private readonly DispatcherTimer _timer;
+
+        public Delay(int interval, Action action) {
+            _action = action;
+            
+            _timer = new DispatcherTimer();
+            _timer.Interval = new TimeSpan(0, 0, 0, 0, interval);
+            _timer.Tick += _timer_Tick;
+        }
+
+        private void _timer_Tick(object sender, EventArgs e) {
+            _timer.Stop();
+            _action();
+        }
+
+        public void Action() {
+            _timer.Stop();
+            _timer.Start();
         }
     }
 }
