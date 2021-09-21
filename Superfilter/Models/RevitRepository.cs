@@ -76,6 +76,7 @@ namespace Superfilter.Models {
                 .OfType<Group>()
                 .SelectMany(item => GetElements(item))
                 .Union(selectedElements)
+                .Distinct(new ElementComparer())
                 .ToList();
         }
 
@@ -83,7 +84,7 @@ namespace Superfilter.Models {
             var children = GetElements(group.GetMemberIds());
             var reqursive = children.OfType<Group>().SelectMany(item => GetElements(item));
 
-            return children.Union(reqursive);
+            return children.Union(reqursive).Distinct(new ElementComparer());
         }
 
         public IList<Category> GetCategories() {
