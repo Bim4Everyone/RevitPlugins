@@ -15,6 +15,8 @@ using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
+using dosymep;
+
 using RevitCopyStandarts.ViewModels;
 
 #endregion
@@ -31,7 +33,7 @@ namespace RevitCopyStandarts {
             Application application = uiApplication.Application;
             Document document = uiDocument.Document;
 
-            //AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
             try {
                 new PyRevitCommand().Execute(commandData.Application);
             } catch(Exception ex) {
@@ -41,20 +43,10 @@ namespace RevitCopyStandarts {
                 System.Windows.MessageBox.Show(ex.Message, "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
 #endif
             } finally {
-                //AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
+                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
             }
 
             return Result.Succeeded;
-        }
-
-        private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args) {
-            var assemblyName = new AssemblyName(args.Name);
-            string assemblyPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), assemblyName.Name + ".dll");
-            if(File.Exists(assemblyPath)) {
-                return Assembly.LoadFrom(assemblyPath);
-            }
-
-            return null;
         }
     }
 
