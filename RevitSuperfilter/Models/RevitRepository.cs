@@ -72,9 +72,15 @@ namespace RevitSuperfilter.Models {
                 .Select(item => _document.GetElement(item))
                 .ToList();
 
+            var elementTypes = selectedElements
+                .Select(item => item.GetTypeId())
+                .Where(item => item != ElementId.InvalidElementId)
+                .Select(item => _document.GetElement(item));
+
             return selectedElements
                 .OfType<Group>()
                 .SelectMany(item => GetElements(item))
+                .Union(elementTypes)
                 .Union(selectedElements)
                 .Distinct(new ElementComparer())
                 .ToList();
