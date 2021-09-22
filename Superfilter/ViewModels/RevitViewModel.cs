@@ -61,8 +61,8 @@ namespace Superfilter.ViewModels {
         public CategoryViewModel CategoryViewModel {
             get => _categoryViewModel;
             set {
-                this.RaisePropertyChanged(nameof(ParamsView));
                 this.RaiseAndSetIfChanged(ref _categoryViewModel, value);
+                this.RaisePropertyChanged(nameof(ParamsView));
             }
         }
 

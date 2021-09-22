@@ -27,7 +27,10 @@ namespace dosymep.WPF.ViewModels {
 
         public virtual bool? IsSelected {
             get => _isSelected;
-            set => this.RaiseAndSetIfChanged(ref _isSelected, value);
+            set {
+                _isSelected = value;
+                this.RaisePropertyChanged();
+            }
         }
 
         protected void UpdateSelection<TIn>(IEnumerable<SelectableObjectViewModel<TIn>> children) {
