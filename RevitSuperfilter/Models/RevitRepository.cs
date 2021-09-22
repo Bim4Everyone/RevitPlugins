@@ -8,7 +8,7 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-namespace Superfilter.Models {
+namespace RevitSuperfilter.Models {
     internal class RevitRepository {
         private readonly Application _application;
         private readonly UIApplication _uiApplication;

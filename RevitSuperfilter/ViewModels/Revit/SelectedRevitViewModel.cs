@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 
-using Superfilter.Models;
+using RevitSuperfilter.Models;
 
-namespace Superfilter.ViewModels.Revit {
+namespace RevitSuperfilter.ViewModels.Revit {
     internal class SelectedRevitViewModel : RevitViewModel {
         public SelectedRevitViewModel(Application application, Document document)
             : base(application, document) {

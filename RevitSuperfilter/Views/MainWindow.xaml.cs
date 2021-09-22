@@ -13,13 +13,21 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Superfilter.Views {
+namespace RevitSuperfilter.Views {
     /// <summary>
-    /// Interaction logic for CategoriesView.xaml
+    /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class CategoriesView : UserControl {
-        public CategoriesView() {
+    public partial class MainWindow : Window {
+        public MainWindow() {
             InitializeComponent();
+        }
+
+        private void ButtonOK_Click(object sender, RoutedEventArgs e) {
+            DialogResult = true;
+        }
+
+        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
+            DialogResult = false;
         }
     }
 }

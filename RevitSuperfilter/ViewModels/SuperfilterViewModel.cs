@@ -10,9 +10,9 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
-using Superfilter.ViewModels.Revit;
+using RevitSuperfilter.ViewModels.Revit;
 
-namespace Superfilter.ViewModels {
+namespace RevitSuperfilter.ViewModels {
     internal class SuperfilterViewModel : BaseViewModel {
         private RevitViewModel _revitViewModel;
 

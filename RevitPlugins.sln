@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitCopyViews", "RevitCopy
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitCreateViewSheet", "RevitCreateViewSheet\RevitCreateViewSheet.csproj", "{41FFB315-803C-4CDD-B783-82FAD825465D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Superfilter", "Superfilter\Superfilter.csproj", "{AEF99352-8D07-4269-B9D9-AA369EDE4CBD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitSuperfilter", "RevitSuperfilter\RevitSuperfilter.csproj", "{AEF99352-8D07-4269-B9D9-AA369EDE4CBD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitServerFolders", "RevitServerFolders\RevitServerFolders.csproj", "{9781A7B1-452D-489D-BD54-44E17FAF323B}"
 EndProject

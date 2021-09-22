@@ -16,10 +16,10 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using Superfilter.Models;
-using Superfilter.Views;
+using RevitSuperfilter.Models;
+using RevitSuperfilter.Views;
 
-namespace Superfilter.ViewModels {
+namespace RevitSuperfilter.ViewModels {
     internal abstract class RevitViewModel : BaseViewModel {
         protected readonly RevitRepository _revitRepository;
 

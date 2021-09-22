@@ -8,7 +8,7 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
-namespace Superfilter.ViewModels {
+namespace RevitSuperfilter.ViewModels {
     internal class ParameterViewModel : SelectableObjectViewModel<Parameter>, IComparable<ParameterViewModel> {
         private const string _defaultValue = "Без значения";
         private readonly Parameter _parameter;

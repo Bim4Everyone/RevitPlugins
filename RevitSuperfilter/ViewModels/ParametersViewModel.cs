@@ -8,9 +8,9 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
-using Superfilter.Models;
+using RevitSuperfilter.Models;
 
-namespace Superfilter.ViewModels {
+namespace RevitSuperfilter.ViewModels {
     internal class ParametersViewModel : SelectableObjectViewModel<Definition> {
         private readonly Definition _definition;
 

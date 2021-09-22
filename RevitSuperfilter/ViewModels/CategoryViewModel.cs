@@ -14,10 +14,10 @@ using dosymep.Revit.Comparators;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using Superfilter.Models;
-using Superfilter.Views;
+using RevitSuperfilter.Models;
+using RevitSuperfilter.Views;
 
-namespace Superfilter.ViewModels {
+namespace RevitSuperfilter.ViewModels {
     internal class CategoryViewModel : SelectableObjectViewModel<Category> {
         private ParamsView _paramsView;
         private ObservableCollection<ParametersViewModel> _parameters;

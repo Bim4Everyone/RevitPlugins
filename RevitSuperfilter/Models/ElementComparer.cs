@@ -2,7 +2,7 @@
 
 using Autodesk.Revit.DB;
 
-namespace Superfilter.Models {
+namespace RevitSuperfilter.Models {
     internal class ElementComparer : IEqualityComparer<Element> {
         public bool Equals(Element x, Element y) {
             if(x == null && y == null) {

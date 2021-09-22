@@ -11,10 +11,10 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 
-using Superfilter.ViewModels;
-using Superfilter.Views;
+using RevitSuperfilter.ViewModels;
+using RevitSuperfilter.Views;
 
-namespace Superfilter {
+namespace RevitSuperfilter {
     [Transaction(TransactionMode.Manual)]
     public class SuperfilterCommand : IExternalCommand {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {

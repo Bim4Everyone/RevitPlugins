@@ -13,21 +13,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Superfilter.Views {
+namespace RevitSuperfilter.Views {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for ParamsView.xaml
     /// </summary>
-    public partial class MainWindow : Window {
-        public MainWindow() {
+    public partial class ParamsView : UserControl {
+        public ParamsView() {
             InitializeComponent();
-        }
-
-        private void ButtonOK_Click(object sender, RoutedEventArgs e) {
-            DialogResult = true;
-        }
-
-        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-            DialogResult = false;
         }
     }
 }

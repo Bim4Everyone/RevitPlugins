@@ -13,12 +13,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Superfilter.Views {
+namespace RevitSuperfilter.Views {
     /// <summary>
-    /// Interaction logic for ParamsView.xaml
+    /// Interaction logic for CategoriesView.xaml
     /// </summary>
-    public partial class ParamsView : UserControl {
-        public ParamsView() {
+    public partial class CategoriesView : UserControl {
+        public CategoriesView() {
             InitializeComponent();
         }
     }
