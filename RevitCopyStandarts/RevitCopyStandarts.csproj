@@ -18,6 +18,11 @@
 		<PlatformTarget>x64</PlatformTarget>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Compile Include="..\dosymep\AppDomainExtensions.cs" Link="dosymep\AppDomainExtensions.cs" />
+	  <Compile Include="..\dosymep\BaseViewModel.cs" Link="dosymep\BaseViewModel.cs" />
+	  <Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\RelayCommand.cs" />
+	</ItemGroup>
+	<ItemGroup>
 		<Reference Include="RevitAPI">
 			<HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
 			<Private>False</Private>
@@ -26,5 +31,8 @@
 			<HintPath>$(ProgramW6432)\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="dosymep\" />
 	</ItemGroup>
 </Project>

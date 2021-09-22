@@ -11,6 +11,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
+using dosymep;
+
 using RevitBatchPrint.Models;
 using RevitBatchPrint.ViewModels;
 using RevitBatchPrint.Views;

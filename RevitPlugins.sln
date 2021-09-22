@@ -19,6 +19,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Superfilter", "Superfilter\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitServerFolders", "RevitServerFolders\RevitServerFolders.csproj", "{9781A7B1-452D-489D-BD54-44E17FAF323B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dosymep", "dosymep", "{064729BC-2CB6-4910-9C93-C687F7E2B1CD}"
+	ProjectSection(SolutionItems) = preProject
+		dosymep\AppDomainExtensions.cs = dosymep\AppDomainExtensions.cs
+		dosymep\BaseViewModel.cs = dosymep\BaseViewModel.cs
+		dosymep\RelayCommand.cs = dosymep\RelayCommand.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

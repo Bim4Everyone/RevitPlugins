@@ -105,19 +105,12 @@ namespace Superfilter.ViewModels {
 
         public string FilterValue {
             get => _filterValue;
-            set {
-                _filterValue = value;
-                OnPropertyChanged(nameof(FilterValue));
-                ParametersView.Refresh();
-            }
+            set => this.RaiseAndSetIfChanged(ref _filterValue, value);
         }
 
         public string ButtonFilterName {
             get => _buttonFilterName;
-            set {
-                _buttonFilterName = value;
-                OnPropertyChanged(nameof(ButtonFilterName));
-            }
+            set => this.RaiseAndSetIfChanged(ref _buttonFilterName, value);
         }
 
         private bool Filter(ParametersViewModel param) {

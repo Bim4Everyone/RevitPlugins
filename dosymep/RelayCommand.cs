@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace RevitCopyStandarts {
-    public class RelayCommand : ICommand {
+namespace dosymep.WPF.Commands {
+    internal class RelayCommand : ICommand {
         private Action<object> execute;
         private Func<object, bool> canExecute;
 

@@ -11,6 +11,8 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.WPF.Commands;
+
 using RevitCopyStandarts.Commands;
 
 namespace RevitCopyStandarts.ViewModels {

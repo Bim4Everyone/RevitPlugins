@@ -14,6 +14,7 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 
 using dosymep.WPF.Commands;
+using dosymep.WPF.ViewModels;
 
 using Superfilter.Models;
 using Superfilter.Views;
@@ -60,9 +61,8 @@ namespace Superfilter.ViewModels {
         public CategoryViewModel CategoryViewModel {
             get => _categoryViewModel;
             set {
-                _categoryViewModel = value;
-                OnPropertyChanged(nameof(ParamsView));
-                OnPropertyChanged(nameof(CategoryViewModel));
+                this.RaisePropertyChanged(nameof(ParamsView));
+                this.RaiseAndSetIfChanged(ref _categoryViewModel, value);
             }
         }
 
@@ -72,18 +72,12 @@ namespace Superfilter.ViewModels {
 
         public ViewViewModel ViewViewModel {
             get => _viewViewModel;
-            set {
-                _viewViewModel = value;
-                OnPropertyChanged(nameof(ViewViewModel));
-            }
+            set => this.RaiseAndSetIfChanged(ref _viewViewModel, value);
         }
 
         public ObservableCollection<ViewViewModel> ViewViewModels {
             get => _viewViewModels;
-            set {
-                _viewViewModels = value;
-                OnPropertyChanged(nameof(ViewViewModels));
-            }
+            set => this.RaiseAndSetIfChanged(ref _viewViewModels, value);
         }
 
         public ICommand ShowElements { get; }
@@ -99,19 +93,12 @@ namespace Superfilter.ViewModels {
 
         public string Filter {
             get => _filter;
-            set {
-                _filter = value;
-                OnPropertyChanged(nameof(Filter));
-                CategoryViewModelsView.Refresh();
-            }
+            set => this.RaiseAndSetIfChanged(ref _filter, value);
         }
 
         public string ButtonFilterName {
             get => _buttonFilterName;
-            set {
-                _buttonFilterName = value;
-                OnPropertyChanged(nameof(ButtonFilterName));
-            }
+            set => this.RaiseAndSetIfChanged(ref _buttonFilterName, value);
         }
 
         private bool FilterCategory(CategoryViewModel category) {

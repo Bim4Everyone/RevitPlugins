@@ -18,6 +18,11 @@
 		<PlatformTarget>x64</PlatformTarget>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Compile Include="..\dosymep\AppDomainExtensions.cs" Link="dosymep\AppDomainExtensions.cs" />
+	  <Compile Include="..\dosymep\BaseViewModel.cs" Link="dosymep\BaseViewModel.cs" />
+	  <Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\RelayCommand.cs" />
+	</ItemGroup>
+	<ItemGroup>
 		<Reference Include="dosymep.Bim4Everyone">
 			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep.Bim4Everyone.dll</HintPath>
 			<Private>False</Private>

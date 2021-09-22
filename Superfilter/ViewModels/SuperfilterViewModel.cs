@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 
+using dosymep.WPF.ViewModels;
+
 using Superfilter.ViewModels.Revit;
 
 namespace Superfilter.ViewModels {
@@ -27,10 +29,7 @@ namespace Superfilter.ViewModels {
 
         public RevitViewModel RevitViewModel {
             get => _revitViewModel;
-            set {
-                _revitViewModel = value;
-                OnPropertyChanged(nameof(RevitViewModel));
-            }
+            set => this.RaiseAndSetIfChanged(ref _revitViewModel, value);
         }
 
         public ObservableCollection<RevitViewModel> RevitViewModels { get; }
