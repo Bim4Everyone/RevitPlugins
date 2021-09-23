@@ -2,6 +2,8 @@
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 namespace RevitSuperfilter.Models {
     internal class ParameterValueComparer : IEqualityComparer<Parameter> {
         public bool Equals(Parameter x, Parameter y) {
@@ -17,27 +19,52 @@ namespace RevitSuperfilter.Models {
                 return false;
             }
 
-            if(x.HasValue == y.HasValue) {
-                return true;
-            }
-
-            if(x.HasValue || y.HasValue) {
-                return false;
-            }
-
-            if(x.DisplayUnitType != y.DisplayUnitType) {
-                return false;
-            }
-
-            if(x.StorageType != y.StorageType) {
+            if(x.HasValue != y.HasValue) {
                 return false;
             }
 
             try {
-                return x.AsValueString()?.Equals(y.AsValueString(), System.StringComparison.CurrentCultureIgnoreCase) == true;
+                if(x.StorageType != y.StorageType) {
+                    return false;
+                }
             } catch {
-                return false;
+                // Не все параметры имеют тип возвращаемого значения
             }
+
+            try {
+                if(x.DisplayUnitType != y.DisplayUnitType) {
+                    return false;
+                }
+            } catch {
+                // Не все параметры имеют отображаемую единицу измерения
+            }
+
+            try {
+                string xValue = x.AsValueString();
+                string yValue = y.AsValueString();
+
+                if(string.IsNullOrEmpty(xValue)) {
+                    xValue = x.AsObject()?.ToString();
+                }
+
+                if(string.IsNullOrEmpty(yValue)) {
+                    yValue = y.AsObject()?.ToString();
+                }
+
+                if(string.IsNullOrEmpty(xValue) && string.IsNullOrEmpty(yValue)) {
+                    return true;
+                }
+
+                if(string.IsNullOrEmpty(xValue) || string.IsNullOrEmpty(yValue)) {
+                    return false;
+                }
+
+                return xValue.Equals(yValue);
+            } catch {
+                // Есть некоторые параметры, которые отваливаются при попытке получить эти значения
+            }
+
+            return false;
         }
 
         public int GetHashCode(Parameter obj) {
@@ -50,10 +77,15 @@ namespace RevitSuperfilter.Models {
             }
 
             if(obj.HasValue) {
-                return obj.AsValueString()?.GetHashCode() ?? 0;
+                string value = obj.AsValueString();
+                if(string.IsNullOrEmpty(value)) {
+                    value = obj.AsObject()?.ToString();
+                }
+
+                return value?.GetHashCode() ?? 0;
             }
 
-            return "Без значения".GetHashCode();
+            return 0;
         }
     }
 }

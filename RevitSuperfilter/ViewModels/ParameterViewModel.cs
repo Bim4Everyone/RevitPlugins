@@ -13,7 +13,6 @@ namespace RevitSuperfilter.ViewModels {
         private const string _defaultValue = "Без значения";
         private readonly Parameter _parameter;
 
-
         public ParameterViewModel(Parameter parameter, IEnumerable<Parameter> parameters)
             : base(parameter) {
             _parameter = parameter;
@@ -27,7 +26,7 @@ namespace RevitSuperfilter.ViewModels {
                 }
 
                 if(_parameter.StorageType == StorageType.ElementId) {
-                    return _parameter.Element.Document.GetElement(_parameter.AsElementId())?.Name ?? _defaultValue;
+                    return _parameter.AsValueString() ?? _defaultValue;
                 }
 
                 return _parameter.AsObject() ?? _defaultValue;
@@ -40,7 +39,17 @@ namespace RevitSuperfilter.ViewModels {
                     return _defaultValue;
                 }
 
-                return _parameter.AsValueString() ?? _defaultValue;
+                string value = _parameter.AsValueString();
+                if(!string.IsNullOrEmpty(value)) {
+                    return value;
+                }
+
+                value = _parameter.AsObject()?.ToString();
+                if(!string.IsNullOrEmpty(value)) {
+                    return value;
+                }
+
+                return _defaultValue;
             }
         }
 
