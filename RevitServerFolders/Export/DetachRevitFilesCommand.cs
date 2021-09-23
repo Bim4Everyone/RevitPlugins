@@ -71,8 +71,7 @@ namespace RevitServerFolders.Export {
         private List<string> GetFileList(IRevitServerClient client, RevitContents directory) {
             if(WithSubFolders) {
                 return AsyncHelper.RunSync(() => client.GetAllRevitContentsAsync(directory.Path))
-                    .SelectMany(item => item.Models)
-                    .Select(item => Path.Combine(directory.Path, item.Name))
+                    .SelectMany(item => item.Models.Select(model => Path.Combine(item.Path, model.Name)))
                     .ToList();
             }
 
