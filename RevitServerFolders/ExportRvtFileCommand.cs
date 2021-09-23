@@ -26,7 +26,7 @@ namespace RevitServerFolders {
                 var uiApplication = commandData.Application;
                 var application = uiApplication.Application;
 
-                var exportRvtFileViewModel = new ExportRvtFileViewModel(application.VersionNumber, ExportRvtFileConfig.GetExportRvtFileConfig());
+                var exportRvtFileViewModel = new ExportRvtFileViewModel(application.VersionNumber, application.GetRevitServerNetworkHosts(), ExportRvtFileConfig.GetExportRvtFileConfig());
 
                 var exportWindow = new ExportRvtFileWindow { DataContext = exportRvtFileViewModel };
                 new WindowInteropHelper(exportWindow) { Owner = uiApplication.MainWindowHandle };

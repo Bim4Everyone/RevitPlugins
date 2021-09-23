@@ -48,7 +48,7 @@ namespace RevitServerFolders.Export {
 
     public class ExportRvtFileViewModel : INotifyPropertyChanged, IDataErrorInfo {
         private string _serverName;
-        private List<string> _serverNames;
+        private IList<string> _serverNames;
 
         private bool _withRooms;
         private bool _withSubFolders;
@@ -66,9 +66,9 @@ namespace RevitServerFolders.Export {
 
         public ExportRvtFileViewModel() { }
 
-        public ExportRvtFileViewModel(string revitVersion, ExportRvtFileConfig exportRvtFileConfig) {
+        public ExportRvtFileViewModel(string revitVersion, IList<string> serverNames, ExportRvtFileConfig exportRvtFileConfig) {
             RevitVersion = revitVersion;
-            ServerNames = File.ReadAllLines($@"C:\ProgramData\Autodesk\Revit Server {RevitVersion}\Config\RSN.ini").ToList();
+            ServerNames = serverNames;
 
             ServerName = exportRvtFileConfig.ServerName ?? ServerNames?.FirstOrDefault();
             WithSubFolders = exportRvtFileConfig.WithSubFolders;
@@ -112,7 +112,7 @@ namespace RevitServerFolders.Export {
             }
         }
 
-        public List<string> ServerNames {
+        public IList<string> ServerNames {
             get => _serverNames;
             set {
                 _serverNames = value;
