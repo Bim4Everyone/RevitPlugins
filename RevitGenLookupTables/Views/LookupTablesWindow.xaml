@@ -7,6 +7,13 @@
         mc:Ignorable="d"
         Title="LookupTablesWindow" Height="450" Width="800">
     <Grid>
-        
+        <ListView ItemsSource="{Binding FamilyParams}">
+            <ListView.View>
+                <GridView >
+                    <GridViewColumn Header="Наименование"  DisplayMemberBinding="{Binding Name}"/>
+                    <GridViewColumn Header="Метаданные колонки" DisplayMemberBinding="{Binding ColumnMetaData}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
     </Grid>
 </Window>

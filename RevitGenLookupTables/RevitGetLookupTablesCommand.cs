@@ -11,20 +11,24 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 
+using RevitGenLookupTables.ViewModels;
 using RevitGenLookupTables.Views;
 
 namespace RevitGenLookupTables {
     [Transaction(TransactionMode.Manual)]
-    public class SuperfilterCommand : IExternalCommand {
+    public class RevitGenLookupTablesCommand : IExternalCommand {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
             AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
             try {
-                var window = new LookupTablesWindow();
+                var application = commandData.Application.Application;
+                var document = commandData.Application.ActiveUIDocument.Document;
+
+                var window = new LookupTablesWindow() { DataContext = new FamilyViewModel(new Models.RevitRepository(application, document)) };
                 new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
-                
+
                 window.ShowDialog();
             } catch(Exception ex) {
-#if DEBUG
+#if D2020 || D2021 || D2022
                 System.Windows.MessageBox.Show(ex.ToString(), "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
 #else
                 System.Windows.MessageBox.Show(ex.Message, "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);

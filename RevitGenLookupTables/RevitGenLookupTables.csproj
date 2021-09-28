@@ -43,8 +43,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="dosymep\" />
-	  <Folder Include="Models\" />
-	  <Folder Include="ViewModels\" />
 	</ItemGroup>
 
 	<ItemGroup>
