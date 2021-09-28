@@ -64,7 +64,28 @@ namespace RevitGenLookupTables.ViewModels {
         public ICommand GenerateCommand { get; }
 
         public IEnumerable<string> GetParamValues() {
-            return ParamValues?.Split(Environment.NewLine.ToArray(), StringSplitOptions.RemoveEmptyEntries);
+            return ParamValues?.Split(Environment.NewLine.ToArray(), StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>();
+        }
+
+        public string GetValueErrors() {
+            string[] values = GetParamValues().ToArray();
+            if(values.Length > 0) {
+                if(_storageType == StorageType.Integer) {
+                    bool result = values.All(item => int.TryParse(item, out _));
+                    if(!result) {
+                        return "Значение параметров должны быть целочисленными.";
+                    }
+                }
+
+                if(_storageType == StorageType.Double) {
+                    bool result = values.All(item => double.TryParse(item, out _) || double.TryParse(item, NumberStyles.Float, CultureInfo.InvariantCulture, out _));
+                    if(!result) {
+                        return "Значение параметров должны быть вещественными.";
+                    }
+                }
+            }
+
+            return null;
         }
 
         private void Generate(object param) {

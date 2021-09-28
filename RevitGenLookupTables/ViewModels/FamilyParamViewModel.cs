@@ -26,6 +26,10 @@ namespace RevitGenLookupTables.ViewModels {
             get { return _familyParameter.Definition.Name; }
         }
 
+        public StorageType StorageType {
+            get { return _familyParameter.StorageType; } 
+        }
+
         public string ColumnMetaData {
             get {
                 string unitType = "OTHER";
