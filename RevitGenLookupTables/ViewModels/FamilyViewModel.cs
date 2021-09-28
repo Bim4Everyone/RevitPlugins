@@ -13,6 +13,7 @@ namespace RevitGenLookupTables.ViewModels {
     internal class FamilyViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly Autodesk.Revit.DB.Family _family;
+        private FamilyParamViewModel _selectedFamilyParam;
 
         public FamilyViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
@@ -24,6 +25,11 @@ namespace RevitGenLookupTables.ViewModels {
 
         public string Name { get; }
         public ObservableCollection<FamilyParamViewModel> FamilyParams { get; }
+
+        public FamilyParamViewModel SelectedFamilyParam {
+            get => _selectedFamilyParam;
+            set => this.RaiseAndSetIfChanged(ref _selectedFamilyParam, value);
+        }
 
         private IEnumerable<FamilyParamViewModel> GetFamilyParams() {
             return _revitRepository.GetFamilyParams()

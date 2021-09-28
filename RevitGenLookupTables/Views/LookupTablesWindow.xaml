@@ -13,7 +13,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         
-        <ListView Grid.Column="0" ItemsSource="{Binding FamilyParams}">
+        <ListView Grid.Column="0" SelectedItem="{Binding SelectedFamilyParam}" ItemsSource="{Binding FamilyParams}">
             <ListView.View>
                 <GridView >
                     <GridViewColumn Header="Наименование"  DisplayMemberBinding="{Binding Name}"/>
@@ -23,6 +23,6 @@
         </ListView>
 
         <GridSplitter Grid.Column="1" ResizeDirection="Columns" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="3"/>
-        <local:ParamValuesView Grid.Column="2" Margin="10"/>
+        <local:ParamValuesView Grid.Column="2" Margin="10" DataContext="{Binding SelectedFamilyParam.FamilyParamValues}"/>
     </Grid>
 </Window>

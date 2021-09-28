@@ -18,6 +18,8 @@ namespace RevitGenLookupTables.ViewModels {
         public FamilyParamViewModel(RevitRepository revitRepository, FamilyParameter familyParameter) {
             _revitRepository = revitRepository;
             _familyParameter = familyParameter;
+
+            FamilyParamValues = new FamilyParamValuesViewModel(revitRepository);
         }
 
         public string Name {
@@ -43,5 +45,7 @@ namespace RevitGenLookupTables.ViewModels {
                 return $"##{unitType}##{displayUnitType}";
             }
         }
+
+        public FamilyParamValuesViewModel FamilyParamValues { get; }
     }
 }
