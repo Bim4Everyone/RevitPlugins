@@ -12,6 +12,11 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         
         <ListView Grid.Column="0" SelectedItem="{Binding SelectedFamilyParam}" ItemsSource="{Binding FamilyParams}">
             <ListView.View>
@@ -24,5 +29,10 @@
 
         <GridSplitter Grid.Column="1" ResizeDirection="Columns" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="3"/>
         <local:ParamValuesView Grid.Column="2" Margin="10" DataContext="{Binding SelectedFamilyParam.FamilyParamValues}"/>
+
+        <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="ОК" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding SaveTable}"/>
+            <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
+        </StackPanel>
     </Grid>
 </Window>

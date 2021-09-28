@@ -28,7 +28,9 @@
         <TextBox Grid.Column="3" Margin="0,0,0,10" Text="{Binding MaxValue}"/>
         <Label Grid.Column="4" Margin="0,0,0,10">Шаг </Label>
         <TextBox Grid.Column="5" Margin="0,0,0,10" Text="{Binding StepValue}"/>
-        <Button Grid.Column="6" Margin="10,0,0,10" Content="Генерировать" Command="{Binding GenerateCommand}"/>
+        <Button Grid.Column="6" Margin="10,0,0,10" Content="Генерировать" ToolTipService.ShowOnDisabled="True"
+                Command="{Binding GenerateCommand}"
+                ToolTip="{Binding ErrorText}"/>
 
         <TextBox Grid.Row="1" Grid.ColumnSpan="7" Text="{Binding ParamValues}"/>
     </Grid>

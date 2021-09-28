@@ -19,7 +19,7 @@ namespace RevitGenLookupTables.ViewModels {
             _revitRepository = revitRepository;
             _familyParameter = familyParameter;
 
-            FamilyParamValues = new FamilyParamValuesViewModel(revitRepository);
+            FamilyParamValues = new FamilyParamValuesViewModel(revitRepository, _familyParameter.StorageType);
         }
 
         public string Name {
