@@ -12,8 +12,8 @@ using RevitGenLookupTables.Models;
 
 namespace RevitGenLookupTables.ViewModels {
     internal class FamilyParamViewModel : BaseViewModel {
-        private readonly RevitRepository _revitRepository;
         private readonly FamilyParameter _familyParameter;
+        private readonly RevitRepository _revitRepository;
 
         public FamilyParamViewModel(RevitRepository revitRepository, FamilyParameter familyParameter) {
             _revitRepository = revitRepository;
@@ -43,7 +43,6 @@ namespace RevitGenLookupTables.ViewModels {
                         displayUnitType = UnitUtils.GetTypeCatalogString(_familyParameter.DisplayUnitType);
                     }
                 } catch {
-                   return $"##OTHER##";
                 }
 
                 return $"##{unitType}##{displayUnitType}";
