@@ -205,7 +205,7 @@ namespace RevitBatchPrint.ViewModels {
             if(PrintSettings.PaperPlacement == PaperPlacementType.Margins) {
                 printParameters.MarginType = PrintSettings.MarginType;
                 if(PrintSettings.MarginType == MarginType.UserDefined) {
-#if D2020 || R2020
+#if D2020 || R2020 || D2021 || R2021
                     printParameters.UserDefinedMarginX = PrintSettings.UserDefinedMarginX;
                     printParameters.UserDefinedMarginY = PrintSettings.UserDefinedMarginY;
 #else

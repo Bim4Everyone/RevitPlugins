@@ -87,7 +87,7 @@ namespace RevitBatchPrint.Models {
             return Document.GetParameterBindings()
                 .Where(item => item.Binding is InstanceBinding)
                 .Where(item => ((InstanceBinding) item.Binding).Categories.OfType<Category>().Any(category => category.Id == categoryId))
-#if D2020 || R2020
+#if D2020 || R2020 || D2021 || R2021
                 .Where(item => item.Definition.ParameterType == ParameterType.Text)
 #else
                 .Where(item => item.Definition.GetDataType() == SpecTypeId.String.Text)
