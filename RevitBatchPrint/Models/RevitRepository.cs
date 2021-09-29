@@ -87,7 +87,11 @@ namespace RevitBatchPrint.Models {
             return Document.GetParameterBindings()
                 .Where(item => item.Binding is InstanceBinding)
                 .Where(item => ((InstanceBinding) item.Binding).Categories.OfType<Category>().Any(category => category.Id == categoryId))
+#if D2020 || R2020
                 .Where(item => item.Definition.ParameterType == ParameterType.Text)
+#else
+                .Where(item => item.Definition.GetDataType() == SpecTypeId.String.Text)
+#endif
                 .Select(item => item.Definition.Name)
                 .OrderBy(item => item)
                 .Distinct()
@@ -174,8 +178,13 @@ namespace RevitBatchPrint.Models {
             double sheetWidth = (double) familyInstance.GetParamValueOrDefault(BuiltInParameter.SHEET_WIDTH);
             double sheetHeight = (double) familyInstance.GetParamValueOrDefault(BuiltInParameter.SHEET_HEIGHT);
 
+#if D2020 || R2020
             sheetWidth = UnitUtils.ConvertFromInternalUnits(sheetWidth, DisplayUnitType.DUT_MILLIMETERS);
             sheetHeight = UnitUtils.ConvertFromInternalUnits(sheetHeight, DisplayUnitType.DUT_MILLIMETERS);
+#else
+            sheetWidth = UnitUtils.ConvertFromInternalUnits(sheetWidth, UnitTypeId.Meters);
+            sheetHeight = UnitUtils.ConvertFromInternalUnits(sheetHeight, UnitTypeId.Meters);
+#endif
 
             return new PrintSettings() {
                 Format = Format.GetFormat((int) Math.Round(sheetWidth), (int) Math.Round(sheetHeight)),

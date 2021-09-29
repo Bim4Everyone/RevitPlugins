@@ -32,9 +32,15 @@ namespace RevitSuperfilter.Models {
             }
 
             try {
+#if D2020 || R2020
                 if(x.DisplayUnitType != y.DisplayUnitType) {
                     return false;
                 }
+#else
+                if(x.GetUnitTypeId() != y.GetUnitTypeId()) {
+                    return false;
+                }
+#endif
             } catch {
                 // Не все параметры имеют отображаемую единицу измерения
             }

@@ -195,7 +195,12 @@ namespace RevitCopyViews.ViewModels {
             var cultureInfo = (CultureInfo) CultureInfo.GetCultureInfo("ru-Ru").Clone();
             cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
 
+#if D2020 || R2020
             double elevation = UnitUtils.ConvertFromInternalUnits(revitView.Elevation, DisplayUnitType.DUT_METERS);
+#else
+            double elevation = UnitUtils.ConvertFromInternalUnits(revitView.Elevation, UnitTypeId.Meters);
+#endif
+
             if(elevation > 0) {
                 return "+" + elevation.ToString("F3", cultureInfo);
             }

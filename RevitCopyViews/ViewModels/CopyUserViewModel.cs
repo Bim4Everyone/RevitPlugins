@@ -151,7 +151,12 @@ namespace RevitCopyViews.ViewModels {
 
 
             var logicalFilter = new LogicalAndFilter(new[] {
-                new ElementParameterFilter(new FilterInverseRule(new FilterStringRule(new ParameterValueProvider(parameterElement.Id), new FilterStringEquals(), filterName, false)))
+#if D2020 || R2020
+            new ElementParameterFilter(new FilterInverseRule(new FilterStringRule(new ParameterValueProvider(parameterElement.Id), new FilterStringEquals(), filterName, true)))
+#else
+            new ElementParameterFilter(new FilterInverseRule(new FilterStringRule(new ParameterValueProvider(parameterElement.Id), new FilterStringEquals(), filterName)))
+#endif
+                
             });
 
             var categories = new[] {
