@@ -21,10 +21,10 @@ namespace RevitCopyViews {
             try {
                 Excecute(commandData);
             } catch(Exception ex) {
-#if DEBUG
-                System.Windows.MessageBox.Show(ex.ToString(), "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+#if D2020 || D2021 || D2022
+                TaskDialog.Show("Обновление отметок этажа.", ex.ToString());
 #else
-                System.Windows.MessageBox.Show(ex.Message, "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                TaskDialog.Show("Обновление отметок этажа.", ex.Message);
 #endif
             } finally {
                 AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;

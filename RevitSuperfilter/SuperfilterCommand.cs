@@ -27,10 +27,10 @@ namespace RevitSuperfilter {
 
                 window.ShowDialog();
             } catch(Exception ex) {
-#if DEBUG
-                System.Windows.MessageBox.Show(ex.ToString(), "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+#if D2020 || D2021 || D2022
+                TaskDialog.Show("Суперфильтр.", ex.ToString());
 #else
-                System.Windows.MessageBox.Show(ex.Message, "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                TaskDialog.Show("Суперфильтр.", ex.Message);
 #endif
             } finally {
                 AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;

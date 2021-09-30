@@ -45,7 +45,7 @@ namespace RevitBatchPrint {
                 
                 window.ShowDialog();
             } catch(Exception ex) {
-#if DEBUG
+#if D2020 || D2021 || D2022
                 TaskDialog.Show("Пакетная печать.", ex.ToString());
 #else
                 TaskDialog.Show("Пакетная печать.", ex.Message);
