@@ -177,9 +177,13 @@ namespace RevitBatchPrint.ViewModels {
         }
 
         public bool CanRevitPrint(object p) {
-            // HACK: Обновление текста выбора альбома лучше сделать в другом в более очевидном месте
-            SelectAlbumsText = string.Join(", ", Albums.Where(item => item.IsSelected).Select(item => item.Name));
-            SelectAlbumsText = string.IsNullOrEmpty(SelectAlbumsText) ? "Выберите комплект чертежей..." : SelectAlbumsText;
+            if(Albums == null) {
+                SelectAlbumsText = "Выберите комплект чертежей...";
+            } else {
+                // HACK: Обновление текста выбора альбома лучше сделать в другом в более очевидном месте
+                SelectAlbumsText = string.Join(", ", Albums.Where(item => item.IsSelected).Select(item => item.Name));
+                SelectAlbumsText = string.IsNullOrEmpty(SelectAlbumsText) ? "Выберите комплект чертежей..." : SelectAlbumsText;
+            }
 
             if(string.IsNullOrEmpty(PrintParamName)) {
                 ErrorText = "Не был выбран параметр комплекта чертежей.";
