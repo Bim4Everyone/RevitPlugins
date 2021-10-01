@@ -118,8 +118,10 @@ namespace RevitBatchPrint.Models {
                 .Select(item => (ViewSheet: item, ViewsWithoutCrop: _revitRepository.GetViewsWithoutCrop(item)))
                 .Where(item => item.ViewsWithoutCrop.Count > 0)
                 .Select(item => GetMessage(item.ViewSheet, item.ViewsWithoutCrop));
-
-            Errors.Add("Листы у которые есть виды с отключенной подрезкой:" + Environment.NewLine + string.Join(Environment.NewLine, messages));
+            
+            if(messages.Any()) {
+                Errors.Add("Листы у которые есть виды с отключенной подрезкой:" + Environment.NewLine + string.Join(Environment.NewLine, messages));
+            }
         }
 
         private string GetMessage(string message, IEnumerable<ViewSheet> viewSheets) {
