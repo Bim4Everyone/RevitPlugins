@@ -59,6 +59,10 @@ namespace RevitBatchPrint.ViewModels {
                 if(_printManager.HasPrinterName(value)) {
                     this.RaiseAndSetIfChanged(ref _printerName, value);
                 }
+
+                if(_printManager.HasPrinterName(Models.RevitRepository.DefaultPrinterName)) {
+                    this.RaiseAndSetIfChanged(ref _printerName, Models.RevitRepository.DefaultPrinterName);
+                }
             }
         }
 
