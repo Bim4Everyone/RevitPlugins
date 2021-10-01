@@ -38,8 +38,8 @@ namespace RevitBatchPrint.Models {
         /// </summary>
         public List<string> Errors { get; set; } = new List<string>();
 
-        public void Execute(PDFExportOptions exportParams) {
 #if D2022 || R2022
+        public void Execute(PDFExportOptions exportParams) {
             List<ViewSheet> viewSheets = _revitRepository.GetViewSheets(FilterParamName, FilterParamValue)
                 .OrderBy(item => item, new ViewSheetComparer())
                 .ToList();
@@ -54,10 +54,10 @@ namespace RevitBatchPrint.Models {
             } catch(Exception ex) {
                 Errors.Add("Ошибка экспорта в pdf: " + ex.Message);
             }
+    }
 #endif
-        }
 
-        private void AddErrorCropView(List<ViewSheet> viewSheets) {
+    private void AddErrorCropView(List<ViewSheet> viewSheets) {
             IEnumerable<string> messages = viewSheets
                 .Select(item => (ViewSheet: item, ViewsWithoutCrop: _revitRepository.GetViewsWithoutCrop(item)))
                 .Where(item => item.ViewsWithoutCrop.Count > 0)
