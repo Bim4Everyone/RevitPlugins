@@ -133,6 +133,8 @@ namespace RevitBatchPrint.ViewModels {
         }
 
         private void SetPrintConfig() {
+            _printSettings.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), _repository.Document.Title + ".pdf");
+
             var printSettingsConfig = PrintConfig.GetConfig().GetPrintSettingsConfig(GetDocumentName());
             if(printSettingsConfig != null) {
                 _printSettings.PrinterName = printSettingsConfig.PrinterName;
@@ -157,7 +159,6 @@ namespace RevitBatchPrint.ViewModels {
                 _printSettings.UserDefinedMarginX = printSettingsConfig.UserDefinedMarginX;
                 _printSettings.UserDefinedMarginY = printSettingsConfig.UserDefinedMarginY;
 
-
                 _printSettings.HiddenLineViews = printSettingsConfig.HiddenLineViews;
                 _printSettings.MaskCoincidentLines = printSettingsConfig.MaskCoincidentLines;
                 _printSettings.ViewLinksinBlue = printSettingsConfig.ViewLinksinBlue;
@@ -167,9 +168,7 @@ namespace RevitBatchPrint.ViewModels {
                 _printSettings.HideUnreferencedViewTags = printSettingsConfig.HideUnreferencedViewTags;
                 _printSettings.ReplaceHalftoneWithThinLines = printSettingsConfig.ReplaceHalftoneWithThinLines;
 
-                if(string.IsNullOrEmpty(printSettingsConfig.FolderName)) {
-                    _printSettings.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), _repository.Document.Title + ".pdf");
-                } else {
+                if(!string.IsNullOrEmpty(printSettingsConfig.FolderName)) {
                     _printSettings.FileName = Path.Combine(printSettingsConfig.FolderName, _repository.Document.Title + ".pdf");
                 }
             }
