@@ -16,6 +16,14 @@
                       SelectedValue="{Binding PrinterName}"/>
         </StackPanel>
 
+        <StackPanel Visibility="{Binding VisibilitySelectFile}">
+            <TextBlock Text="Путь до файла" Margin="10,0,10,0"/>
+            <DockPanel LastChildFill="True">
+                <Button DockPanel.Dock="Right" Margin="10" Width="50" Content="..." Command="{Binding SaveFileCommand}"/>
+                <TextBox DockPanel.Dock="Left" Margin="10" Text="{Binding FileName}"/>
+            </DockPanel>
+        </StackPanel>
+
         <GroupBox Header="Вывод на печать" Padding="10">
             <StackPanel>
                 <StackPanel>

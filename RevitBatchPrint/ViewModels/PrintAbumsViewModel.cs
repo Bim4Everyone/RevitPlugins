@@ -82,6 +82,7 @@ namespace RevitBatchPrint.ViewModels {
             SavePrintConfig();
 
             var revitPrintErrors = new List<string>();
+#if D2020 || R2020 || D2021 || R2021
             foreach(var album in Albums.Where(item => item.IsSelected)) {
                 var revitPrint = new RevitPrint(_repository);
                 revitPrint.PrinterName = _printSettings.PrinterName;
@@ -92,6 +93,37 @@ namespace RevitBatchPrint.ViewModels {
                 revitPrint.Execute(SetupPrintParams);
                 revitPrintErrors.AddRange(revitPrint.Errors);
             }
+#else
+            var revitPrint = new RevitPrint2022(_repository);
+            revitPrint.Folder = Path.GetDirectoryName(PrintSettings.FileName);
+            revitPrint.FilterParamName = PrintParamName;
+            revitPrint.FilterParamValue = SelectAlbumsText;
+
+            var exportOptions = new PDFExportOptions() {
+                FileName = Path.GetFileNameWithoutExtension(PrintSettings.FileName),
+                Combine = true,
+                StopOnError = false,
+                AlwaysUseRaster = false,
+                ColorDepth = PrintSettings.ColorDepth,
+                ExportQuality = PDFExportQualityType.DPI300,
+                RasterQuality = PrintSettings.RasterQuality,
+                PaperPlacement = PrintSettings.PaperPlacement,
+                HideScopeBoxes = PrintSettings.HideScopeBoxes,
+                ViewLinksInBlue = PrintSettings.ViewLinksinBlue,
+                HideCropBoundaries = PrintSettings.HideCropBoundaries,
+                HideReferencePlane = PrintSettings.HideReforWorkPlanes,
+                MaskCoincidentLines = PrintSettings.MaskCoincidentLines,
+                HideUnreferencedViewTags = PrintSettings.HideUnreferencedViewTags,
+                ReplaceHalftoneWithThinLines = PrintSettings.ReplaceHalftoneWithThinLines,
+                ZoomType = PrintSettings.ZoomType,
+                ZoomPercentage = PrintSettings.Zoom,
+                OriginOffsetX = PrintSettings.UserDefinedMarginX,
+                OriginOffsetY = PrintSettings.UserDefinedMarginY,
+            };
+
+            revitPrint.Execute(exportOptions);
+            revitPrintErrors.AddRange(revitPrint.Errors);
+#endif
 
             if(revitPrintErrors.Count > 0) {
                 TaskDialog.Show("Пакетная печать.", Environment.NewLine + "- " + string.Join(Environment.NewLine + "- ", revitPrintErrors));
@@ -134,6 +166,12 @@ namespace RevitBatchPrint.ViewModels {
                 _printSettings.HideScopeBoxes = printSettingsConfig.HideScopeBoxes;
                 _printSettings.HideUnreferencedViewTags = printSettingsConfig.HideUnreferencedViewTags;
                 _printSettings.ReplaceHalftoneWithThinLines = printSettingsConfig.ReplaceHalftoneWithThinLines;
+
+                if(string.IsNullOrEmpty(printSettingsConfig.FolderName)) {
+                    _printSettings.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), _repository.Document.Title + ".pdf");
+                } else {
+                    _printSettings.FileName = Path.Combine(printSettingsConfig.FolderName, _repository.Document.Title + ".pdf");
+                }
             }
         }
 
@@ -170,8 +208,19 @@ namespace RevitBatchPrint.ViewModels {
             printSettingsConfig.MaskCoincidentLines = _printSettings.MaskCoincidentLines;
             printSettingsConfig.ReplaceHalftoneWithThinLines = _printSettings.ReplaceHalftoneWithThinLines;
 
+
+#if D2020 || R2020 || D2021 || R2021
+            printSettingsConfig.FolderName = null;
+#else
+            printSettingsConfig.PrinterName = null;
+            if(!string.IsNullOrEmpty(_printSettings.FileName)) {
+                printSettingsConfig.FolderName = Path.GetDirectoryName(_printSettings.FileName);
+            }
+#endif
+            
             PrintConfig.SaveConfig(printConfig);
         }
+       
         private string GetDocumentName() {
             return Path.GetFileName(_repository.Document.PathName);
         }
@@ -197,6 +246,11 @@ namespace RevitBatchPrint.ViewModels {
 
             if(string.IsNullOrEmpty(PrintSettings.PrinterName)) {
                 ErrorText = "Не был выбран принтер.";
+                return false;
+            }
+
+            if(string.IsNullOrEmpty(PrintSettings.PrinterName)) {
+                ErrorText = "Выберите файл сохранения.";
                 return false;
             }
 

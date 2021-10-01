@@ -47,6 +47,7 @@ namespace RevitBatchPrint.Models {
     }
 
     public class PrintSettingsConfig {
+        public string FolderName { get; set; }
         public string DocumentName { get; set; }
         public string PrinterName { get; set; }
         public string PrintParamName { get; set; }

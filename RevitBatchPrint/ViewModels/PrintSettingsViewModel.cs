@@ -1,9 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Windows.Input;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
+
+using Microsoft.Win32;
 
 namespace RevitBatchPrint.ViewModels {
     internal class PrintSettingsViewModel : BaseViewModel {
@@ -26,8 +32,7 @@ namespace RevitBatchPrint.ViewModels {
         private bool _hideUnreferencedViewTags;
         private bool _hideCropBoundaries = true;
         private bool _replaceHalftoneWithThinLines;
-
-
+        private string _fileName;
         private readonly Models.Printing.PrintManager _printManager;
 
         public PrintSettingsViewModel() {
@@ -37,6 +42,15 @@ namespace RevitBatchPrint.ViewModels {
             if(_printManager.HasPrinterName(Models.RevitRepository.DefaultPrinterName)) {
                 PrinterName = Models.RevitRepository.DefaultPrinterName;
             }
+
+            SaveFileCommand = new RelayCommand(SaveFile);
+            VisibilitySelectFile = System.Windows.Visibility.Collapsed;
+            VisibilitySelectPrinter = System.Windows.Visibility.Collapsed;
+#if D2020 || R2020 || D2021 || R2021
+            VisibilitySelectPrinter = _printManager.HasPrinterName(Models.RevitRepository.DefaultPrinterName) ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+#else
+            VisibilitySelectFile = System.Windows.Visibility.Visible;
+#endif
         }
 
         public string PrinterName {
@@ -50,7 +64,7 @@ namespace RevitBatchPrint.ViewModels {
 
         public ObservableCollection<string> PrinterNames { get; }
 
-        public System.Windows.Visibility VisibilitySelectPrinter => _printManager.HasPrinterName(Models.RevitRepository.DefaultPrinterName) ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+        public System.Windows.Visibility VisibilitySelectPrinter { get; }
 
         public PaperPlacementType PaperPlacement {
             get => _paperPlacement;
@@ -124,8 +138,40 @@ namespace RevitBatchPrint.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _replaceHalftoneWithThinLines, value);
         }
 
+        public ICommand SaveFileCommand { get; }
+        public System.Windows.Visibility VisibilitySelectFile { get; }
+
+        public string FileName {
+            get => _fileName;
+            set {
+                try {
+                    if(Directory.Exists(Path.GetDirectoryName(value))) {
+                        this.RaiseAndSetIfChanged(ref _fileName, value);
+                    }
+                } catch {
+                    TaskDialog.Show("Ошибка", "Переданный путь не является верным");
+                }
+            }
+        }
+
         public Models.Printing.PrinterSettings GetPrinterSettings() {
             return _printManager.GetPrinterSettings(PrinterName);
+        }
+
+        private void SaveFile(object p) {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.FileName = Path.GetFileName(FileName);
+            openFileDialog.InitialDirectory = Path.GetDirectoryName(FileName);
+
+            openFileDialog.CheckFileExists = false;
+            openFileDialog.RestoreDirectory = true;
+
+            openFileDialog.DefaultExt = ".pdf";
+            openFileDialog.Filter = "pdf files (.pdf)|*.pdf";
+
+            if(openFileDialog.ShowDialog() == true) {
+                FileName = openFileDialog.FileName;
+            }
         }
     }
 }
