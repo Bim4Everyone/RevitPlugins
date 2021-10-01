@@ -62,7 +62,7 @@ namespace RevitBatchPrint.Models {
             string documentFileName = string.IsNullOrEmpty(Document.Title) ? "Без имени" : Document.Title;
 
             string viewName = viewSheet?.SheetNumber;
-            string fileName = string.IsNullOrEmpty(viewName) ? documentFileName : $"{documentFileName} ({viewName} - {viewSheet.Name})";
+            string fileName = string.IsNullOrEmpty(viewName) ? documentFileName : $"{documentFileName} ({viewName} - {ReplaceInvalidChars(viewSheet.Name)})";
             PrintManager.PrintToFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName + ".pdf");
             if(File.Exists(PrintManager.PrintToFileName)) {
                 File.Delete(PrintManager.PrintToFileName);
@@ -213,6 +213,15 @@ namespace RevitBatchPrint.Models {
         /// <returns>Возвращает ориентацию листа по его размеру.</returns>
         private static PageOrientationType GetFormatOrientation(int width, int height) {
             return width > height ? PageOrientationType.Landscape : PageOrientationType.Portrait;
+        }
+
+        /// <summary>
+        /// Заменяет запрещенные символы в имени файла на "_".
+        /// </summary>
+        /// <param name="filename">Наименование файла.</param>
+        /// <returns>Возвращает новое наименование файла без запрещенных символов.</returns>
+        private static string ReplaceInvalidChars(string filename) {
+            return string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
         }
     }
 }
