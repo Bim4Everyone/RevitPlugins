@@ -182,8 +182,8 @@ namespace RevitBatchPrint.Models {
             sheetWidth = UnitUtils.ConvertFromInternalUnits(sheetWidth, DisplayUnitType.DUT_MILLIMETERS);
             sheetHeight = UnitUtils.ConvertFromInternalUnits(sheetHeight, DisplayUnitType.DUT_MILLIMETERS);
 #else
-            sheetWidth = UnitUtils.ConvertFromInternalUnits(sheetWidth, UnitTypeId.Meters);
-            sheetHeight = UnitUtils.ConvertFromInternalUnits(sheetHeight, UnitTypeId.Meters);
+            sheetWidth = UnitUtils.ConvertFromInternalUnits(sheetWidth, UnitTypeId.Millimeters);
+            sheetHeight = UnitUtils.ConvertFromInternalUnits(sheetHeight, UnitTypeId.Millimeters);
 #endif
 
             return new PrintSettings() {
