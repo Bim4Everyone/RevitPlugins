@@ -168,7 +168,7 @@ namespace RevitGenLookupTables.ViewModels {
         }
 
         private static bool IsWholeNumber(double x) {
-            return Math.Abs(x % 1) < double.Epsilon;
+            return Math.Abs(x % 1) <= (double.Epsilon * 100);
         }
     }
 }
