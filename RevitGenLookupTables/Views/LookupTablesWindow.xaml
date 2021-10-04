@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitGenLookupTables.Views"
         mc:Ignorable="d"
-        Title="LookupTablesWindow" Height="450" Width="800">
+        Title="Таблица выбора" Height="850" Width="1500" WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>

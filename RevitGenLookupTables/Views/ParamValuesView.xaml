@@ -23,15 +23,16 @@
         </Grid.RowDefinitions>
 
         <Label Grid.Column="0" Margin="0,0,0,10">Старт </Label>
-        <TextBox Grid.Column="1" Margin="0,0,0,10" Text="{Binding MinValue}"/>
+        <TextBox Grid.Column="1" Margin="0,0,0,10" Text="{Binding MinValue, UpdateSourceTrigger=PropertyChanged}"/>
         <Label Grid.Column="2" Margin="0,0,0,10">Стоп </Label>
-        <TextBox Grid.Column="3" Margin="0,0,0,10" Text="{Binding MaxValue}"/>
+        <TextBox Grid.Column="3" Margin="0,0,0,10" Text="{Binding MaxValue, UpdateSourceTrigger=PropertyChanged}"/>
         <Label Grid.Column="4" Margin="0,0,0,10">Шаг </Label>
-        <TextBox Grid.Column="5" Margin="0,0,0,10" Text="{Binding StepValue}"/>
+        <TextBox Grid.Column="5" Margin="0,0,0,10" Text="{Binding StepValue, UpdateSourceTrigger=PropertyChanged}"/>
         <Button Grid.Column="6" Margin="10,0,0,10" Content="Генерировать" ToolTipService.ShowOnDisabled="True"
                 Command="{Binding GenerateCommand}"
                 ToolTip="{Binding ErrorText}"/>
 
-        <TextBox Grid.Row="1" Grid.ColumnSpan="7" Text="{Binding ParamValues}"/>
+        <TextBox Grid.Row="1" Grid.ColumnSpan="7" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Visible"
+                 Text="{Binding ParamValues, UpdateSourceTrigger=PropertyChanged}"/>
     </Grid>
 </UserControl>
