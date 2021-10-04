@@ -14,6 +14,8 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Microsoft.Win32;
+
 using RevitGenLookupTables.Models;
 
 namespace RevitGenLookupTables.ViewModels {
@@ -68,14 +70,21 @@ namespace RevitGenLookupTables.ViewModels {
             var combinations = familyParams
                 .Select(item => item.FamilyParamValues.GetParamValues())
                 .Combination();
-            
+
             foreach(var combination in combinations) {
                 builder.Append(";");
                 builder.AppendLine(string.Join(";", combination));
             }
 
-            File.WriteAllText(@"D:\Users\biseuv_o\Desktop\params.csv", builder.ToString(), Encoding.UTF8);
-            Process.Start(@"D:\Users\biseuv_o\Desktop\params.csv");
+            var saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Excel Worksheets|*.csv";
+            saveFileDialog.CheckFileExists = false;
+            saveFileDialog.RestoreDirectory = true;
+            saveFileDialog.FileName = Path.Combine(saveFileDialog.InitialDirectory, _revitRepository.DocumentName + ".csv");
+            if(saveFileDialog.ShowDialog() == true) {
+                File.WriteAllText(saveFileDialog.FileName, builder.ToString(), Encoding.UTF8);
+                Process.Start(saveFileDialog.FileName);
+            }
         }
 
         private bool CanSaveTable(object param) {
