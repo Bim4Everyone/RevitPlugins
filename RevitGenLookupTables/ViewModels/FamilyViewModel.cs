@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -59,16 +60,16 @@ namespace RevitGenLookupTables.ViewModels {
             var familyParams = FamilyParams.Where(item => !string.IsNullOrEmpty(item.FamilyParamValues.ParamValues)).ToList();
 
             var builder = new StringBuilder();
-            foreach(var familyParam in familyParams) {
-                builder.Append(";");
-                foreach(var paramValue in familyParam.FamilyParamValues.GetParamValues()) {
-                    builder.Append(Environment.NewLine);
-                    builder.Append(paramValue);
-                }
+            builder.Append(";");
+            builder.AppendLine(string.Join(";", familyParams.Select(item => item.Name + item.ColumnMetaData)));
+
+            var combinations = familyParams.Select(item => item.FamilyParamValues.GetParamValues()).Combination();
+            builder.Append(";");
+            foreach(var combination in combinations) {
+                builder.AppendLine(string.Join(";", combination));
             }
 
-
-            File.WriteAllText(@"D:\Users\biseuv_o\Desktop\params.csv", builder.ToString());
+            File.WriteAllText(@"D:\Users\biseuv_o\Desktop\params.csv", builder.ToString(), Encoding.UTF8);
             Process.Start(@"D:\Users\biseuv_o\Desktop\params.csv");
         }
 
@@ -81,6 +82,24 @@ namespace RevitGenLookupTables.ViewModels {
 
             ErrorText = null;
             return true;
+        }
+    }
+
+    internal static class CombinationExtensions {
+        public static IEnumerable<IEnumerable<T>> Combination<T>(this IEnumerable<IEnumerable<T>> listElements) {
+            int countElements = listElements.Count();
+            if(countElements > 1) {
+                IEnumerable<IEnumerable<T>> combinations = Combination(listElements.Skip(1));
+                foreach(T element in listElements.First()) {
+                    foreach(IEnumerable<T> combination in combinations) {
+                        yield return new[] { element }.Union(combination);
+                    }
+                }
+            } else if(countElements == 1) {
+                foreach(var element in listElements.First().Select(x => new[] { x })) {
+                    yield return element;
+                }
+            }
         }
     }
 }
