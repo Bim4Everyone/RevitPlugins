@@ -57,15 +57,20 @@ namespace RevitGenLookupTables.ViewModels {
         }
 
         private void SaveTable(object param) {
-            var familyParams = FamilyParams.Where(item => !string.IsNullOrEmpty(item.FamilyParamValues.ParamValues)).ToList();
+            var familyParams = FamilyParams
+                .Where(item => !string.IsNullOrEmpty(item.FamilyParamValues.ParamValues))
+                .ToList();
 
             var builder = new StringBuilder();
             builder.Append(";");
             builder.AppendLine(string.Join(";", familyParams.Select(item => item.Name + item.ColumnMetaData)));
 
-            var combinations = familyParams.Select(item => item.FamilyParamValues.GetParamValues()).Combination();
-            builder.Append(";");
+            var combinations = familyParams
+                .Select(item => item.FamilyParamValues.GetParamValues())
+                .Combination();
+            
             foreach(var combination in combinations) {
+                builder.Append(";");
                 builder.AppendLine(string.Join(";", combination));
             }
 
@@ -92,7 +97,7 @@ namespace RevitGenLookupTables.ViewModels {
                 IEnumerable<IEnumerable<T>> combinations = Combination(listElements.Skip(1));
                 foreach(T element in listElements.First()) {
                     foreach(IEnumerable<T> combination in combinations) {
-                        yield return new[] { element }.Union(combination);
+                        yield return new[] { element }.Concat(combination);
                     }
                 }
             } else if(countElements == 1) {
