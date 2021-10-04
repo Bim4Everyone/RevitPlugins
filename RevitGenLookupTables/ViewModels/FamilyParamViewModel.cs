@@ -43,6 +43,7 @@ namespace RevitGenLookupTables.ViewModels {
                         displayUnitType = UnitUtils.GetTypeCatalogString(_familyParameter.DisplayUnitType);
                     }
                 } catch {
+                    displayUnitType = "GENERAL";
                 }
 
                 return $"##{unitType}##{displayUnitType}";
