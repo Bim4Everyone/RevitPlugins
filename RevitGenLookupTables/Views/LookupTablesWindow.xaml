@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitGenLookupTables.Views"
         mc:Ignorable="d"
-        Title="Таблица выбора" Height="850" Width="1500" WindowStartupLocation="CenterOwner">
+        Title="Таблица выбора" Height="850" Width="1500" WindowStartupLocation="CenterOwner"
+        x:Name="_this">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -22,7 +23,7 @@
         <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
             <Button Height="25" Width="25" Margin="10" Content="↑" Command="{Binding UpFamilyParamCommand}"/>
             <Button Height="25" Width="25" Margin="10" Content="↓"  Command="{Binding DownFamilyParamCommand}"/>
-            <Button Height="25" Width="25" Margin="10" Content="+" Command="{Binding AddFamilyParamCommand}"/>
+            <Button Height="25" Width="25" Margin="10" Content="+" Command="{Binding AddFamilyParamCommand}" CommandParameter="{Binding ElementName=_this}"/>
             <Button Height="25" Width="25" Margin="10" Content="-"  Command="{Binding RemoveFamilyParamCommand}"/>
         </StackPanel>
 

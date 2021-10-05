@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -17,6 +18,7 @@ using dosymep.WPF.ViewModels;
 using Microsoft.Win32;
 
 using RevitGenLookupTables.Models;
+using RevitGenLookupTables.Views;
 
 namespace RevitGenLookupTables.ViewModels {
     internal class FamilyViewModel : BaseViewModel {
@@ -42,11 +44,6 @@ namespace RevitGenLookupTables.ViewModels {
 
             UpFamilyParamCommand = new RelayCommand(UpFamilyParam, CanUpFamilyParam);
             DownFamilyParamCommand = new RelayCommand(DownFamilyParam, CanDownFamilyParam);
-
-            SelectedFamilyParams.Add(FamilyParams[0]);
-            SelectedFamilyParams.Add(FamilyParams[1]);
-            SelectedFamilyParams.Add(FamilyParams[2]);
-            SelectedFamilyParams.Add(FamilyParams[3]);
         }
 
         public string Name { get; }
@@ -125,7 +122,15 @@ namespace RevitGenLookupTables.ViewModels {
         #region AddFamilyParamCommand
 
         private void AddFamilyParam(object param) {
+            var window = new FamilyParamsView();
+            window.Owner = (Window) param;
 
+            window.DataContext = new SelectFamilyParamsViewModel() { FamilyParams = FamilyParams };
+            if(window.ShowDialog() == true) {
+                var selected = ((SelectFamilyParamsViewModel) window.DataContext).SelectedFamilyParam;
+                FamilyParams.Remove(selected);
+                SelectedFamilyParams.Add(selected);
+            }
         }
 
         private bool CanAddFamilyParam(object param) {
@@ -137,6 +142,7 @@ namespace RevitGenLookupTables.ViewModels {
         #region RemoveFamilyParamCommand
 
         private void RemoveFamilyParam(object param) {
+            FamilyParams.Add(SelectedFamilyParam);
             SelectedFamilyParams.Remove(SelectedFamilyParam);
         }
 
