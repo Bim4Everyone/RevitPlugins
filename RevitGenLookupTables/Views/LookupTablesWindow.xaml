@@ -14,11 +14,19 @@
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
-        <ListView Grid.Column="0" SelectedItem="{Binding SelectedFamilyParam}" ItemsSource="{Binding FamilyParams}">
+
+        <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
+            <Button Height="25" Width="25" Margin="10" Content="↑" Command="{Binding UpFamilyParamCommand}"/>
+            <Button Height="25" Width="25" Margin="10" Content="↓"  Command="{Binding DownFamilyParamCommand}"/>
+            <Button Height="25" Width="25" Margin="10" Content="+" Command="{Binding AddFamilyParamCommand}"/>
+            <Button Height="25" Width="25" Margin="10" Content="-"  Command="{Binding RemoveFamilyParamCommand}"/>
+        </StackPanel>
+
+        <ListView Grid.Column="0" Grid.Row="1" SelectedItem="{Binding SelectedFamilyParam}" ItemsSource="{Binding SelectedFamilyParams}">
             <ListView.View>
                 <GridView >
                     <GridViewColumn Header="Наименование"  DisplayMemberBinding="{Binding Name}"/>
@@ -28,8 +36,8 @@
             </ListView.View>
         </ListView>
 
-        <GridSplitter Grid.Column="1" ResizeDirection="Columns" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="3"/>
-        <local:ParamValuesView Grid.Column="2" Margin="10" DataContext="{Binding SelectedFamilyParam.FamilyParamValues}"/>
+        <GridSplitter Grid.Column="1" Grid.RowSpan="2" ResizeDirection="Columns" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="3"/>
+        <local:ParamValuesView Grid.Column="2" Grid.RowSpan="2" Margin="10" DataContext="{Binding SelectedFamilyParam.FamilyParamValues}"/>
 
         <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />

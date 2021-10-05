@@ -31,13 +31,27 @@ namespace RevitGenLookupTables.ViewModels {
             _family = _revitRepository.GetMainFamily();
 
             Name = _revitRepository.DocumentName;
+
+            SelectedFamilyParams = new ObservableCollection<FamilyParamViewModel>();
             FamilyParams = new ObservableCollection<FamilyParamViewModel>(GetFamilyParams());
 
             SaveTableCommand = new RelayCommand(SaveTable, CanSaveTable);
+            
+            AddFamilyParamCommand = new RelayCommand(AddFamilyParam, CanAddFamilyParam);
+            RemoveFamilyParamCommand = new RelayCommand(RemoveFamilyParam, CanRemoveFamilyParam);
+
+            UpFamilyParamCommand = new RelayCommand(UpFamilyParam, CanUpFamilyParam);
+            DownFamilyParamCommand = new RelayCommand(DownFamilyParam, CanDownFamilyParam);
+
+            SelectedFamilyParams.Add(FamilyParams[0]);
+            SelectedFamilyParams.Add(FamilyParams[1]);
+            SelectedFamilyParams.Add(FamilyParams[2]);
+            SelectedFamilyParams.Add(FamilyParams[3]);
         }
 
         public string Name { get; }
         public ObservableCollection<FamilyParamViewModel> FamilyParams { get; }
+        public ObservableCollection<FamilyParamViewModel> SelectedFamilyParams { get; }
 
         public string ErrorText {
             get => _errorText;
@@ -45,6 +59,12 @@ namespace RevitGenLookupTables.ViewModels {
         }
 
         public ICommand SaveTableCommand { get; }
+
+        public ICommand AddFamilyParamCommand { get; }
+        public ICommand RemoveFamilyParamCommand { get; }
+
+        public ICommand UpFamilyParamCommand { get; }
+        public ICommand DownFamilyParamCommand { get; }
 
         public FamilyParamViewModel SelectedFamilyParam {
             get => _selectedFamilyParam;
@@ -57,6 +77,8 @@ namespace RevitGenLookupTables.ViewModels {
                 .Select(item => new FamilyParamViewModel(_revitRepository, item))
                 .OrderBy(item => item.Name);
         }
+
+        #region SaveTableCommand
 
         private void SaveTable(object param) {
             var familyParams = FamilyParams
@@ -97,6 +119,62 @@ namespace RevitGenLookupTables.ViewModels {
             ErrorText = null;
             return true;
         }
+
+        #endregion
+
+        #region AddFamilyParamCommand
+
+        private void AddFamilyParam(object param) {
+
+        }
+
+        private bool CanAddFamilyParam(object param) {
+            return FamilyParams.Count > 0;
+        }
+
+        #endregion
+
+        #region RemoveFamilyParamCommand
+
+        private void RemoveFamilyParam(object param) {
+            SelectedFamilyParams.Remove(SelectedFamilyParam);
+        }
+
+        private bool CanRemoveFamilyParam(object param) {
+            return SelectedFamilyParams.Count > 0 && SelectedFamilyParam != null;
+        }
+
+        #endregion
+
+        #region UpFamilyParamCommand
+
+        private void UpFamilyParam(object param) {
+            int index = SelectedFamilyParams.IndexOf(SelectedFamilyParam);
+            if(index > 0) {
+                SelectedFamilyParams.Move(index, index - 1);
+            }
+        }
+
+        private bool CanUpFamilyParam(object param) {
+            return SelectedFamilyParam != null;
+        }
+
+        #endregion
+
+        #region DownFamilyParamCommand
+
+        private void DownFamilyParam(object param) {
+            int index = SelectedFamilyParams.IndexOf(SelectedFamilyParam);
+            if(index < SelectedFamilyParams.Count - 1) {
+                SelectedFamilyParams.Move(index, index + 1);
+            }
+        }
+
+        private bool CanDownFamilyParam(object param) {
+            return SelectedFamilyParam != null;
+        }
+
+        #endregion
     }
 
     internal static class CombinationExtensions {
