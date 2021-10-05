@@ -27,17 +27,28 @@ namespace RevitGenLookupTables.ViewModels {
         }
 
         public StorageType StorageType {
-            get { return _familyParameter.StorageType; } 
+            get { return _familyParameter.StorageType; }
         }
 
         public string ColumnMetaData {
             get {
                 string unitType = "OTHER";
+#if D2020 || R2020
                 if(_familyParameter.Definition.UnitType != UnitType.UT_Undefined) {
                     unitType = UnitUtils.GetTypeCatalogString(_familyParameter.Definition.UnitType);
                 }
+#elif D2021 || R2021
+                if(UnitUtils.IsSpec(_familyParameter.Definition.GetSpecTypeId())) {
+                    unitType = UnitUtils.GetTypeCatalogStringForSpec(_familyParameter.Definition.GetSpecTypeId());
+                }
+#else
+                if(UnitUtils.IsMeasurableSpec(_familyParameter.Definition.GetDataType())) {
+                    unitType = UnitUtils.GetTypeCatalogStringForSpec(_familyParameter.Definition.GetDataType());
+                }
+#endif
 
                 string displayUnitType = string.Empty;
+#if D2020 || R2020
                 try {
                     if(_familyParameter.DisplayUnitType != DisplayUnitType.DUT_UNDEFINED) {
                         displayUnitType = UnitUtils.GetTypeCatalogString(_familyParameter.DisplayUnitType);
@@ -45,6 +56,11 @@ namespace RevitGenLookupTables.ViewModels {
                 } catch {
                     displayUnitType = "GENERAL";
                 }
+#else
+                if(UnitUtils.IsUnit(_familyParameter.GetUnitTypeId())) {
+                    displayUnitType = UnitUtils.GetTypeCatalogStringForUnit(_familyParameter.GetUnitTypeId());
+                }
+#endif
 
                 return $"##{unitType}##{displayUnitType}";
             }
