@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitGenLookupTables.Views"
         mc:Ignorable="d"
-        Title="FamilyParamsView" Height="450" Width="800" WindowStartupLocation="CenterOwner">
+        Title="Параметры семейства" Height="450" Width="800" WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
