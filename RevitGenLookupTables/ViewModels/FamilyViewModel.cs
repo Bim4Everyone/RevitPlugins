@@ -78,7 +78,7 @@ namespace RevitGenLookupTables.ViewModels {
         #region SaveTableCommand
 
         private void SaveTable(object param) {
-            var familyParams = FamilyParams
+            var familyParams = SelectedFamilyParams
                 .Where(item => !string.IsNullOrEmpty(item.FamilyParamValues.ParamValues))
                 .ToList();
 
