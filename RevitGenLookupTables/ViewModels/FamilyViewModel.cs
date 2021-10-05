@@ -101,7 +101,7 @@ namespace RevitGenLookupTables.ViewModels {
             saveFileDialog.RestoreDirectory = true;
             saveFileDialog.FileName = Path.Combine(saveFileDialog.InitialDirectory, _revitRepository.DocumentName + ".csv");
             if(saveFileDialog.ShowDialog() == true) {
-                File.WriteAllText(saveFileDialog.FileName, builder.ToString(), Encoding.UTF8);
+                File.WriteAllText(saveFileDialog.FileName, builder.ToString(), Encoding.GetEncoding(1251));
                 Process.Start(saveFileDialog.FileName);
             }
         }
