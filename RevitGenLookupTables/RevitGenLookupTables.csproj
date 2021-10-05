@@ -13,29 +13,34 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='D2020|x64'">
 		<RevitVersion>2020</RevitVersion>
-		<OutputPath>bin\x64\Debug\$(RevitVersion)</OutputPath>
+		<OutputPath>bin\x64\Debug</OutputPath>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='D2021|x64'">
 		<RevitVersion>2021</RevitVersion>
-		<OutputPath>bin\x64\Debug\$(RevitVersion)</OutputPath>
+		<OutputPath>bin\x64\Debug</OutputPath>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='D2022|x64'">
 		<RevitVersion>2022</RevitVersion>
-		<OutputPath>bin\x64\Debug\$(RevitVersion)</OutputPath>
+		<OutputPath>bin\x64\Debug</OutputPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='R2020|x64'">
 		<RevitVersion>2020</RevitVersion>
-		<OutputPath>bin\x64\Release\$(RevitVersion)</OutputPath>
+		<OutputPath>bin\x64\Release</OutputPath>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='R2021|x64'">
 		<RevitVersion>2021</RevitVersion>
-		<OutputPath>bin\x64\Release\$(RevitVersion)</OutputPath>
+		<OutputPath>bin\x64\Release</OutputPath>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='R2022|x64'">
 		<RevitVersion>2022</RevitVersion>
-		<OutputPath>bin\x64\Release\$(RevitVersion)</OutputPath>
+		<OutputPath>bin\x64\Release</OutputPath>
 	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(RevitVersion)'!='2020'">
+		<AssemblyName>$(AssemblyName)_$(RevitVersion)</AssemblyName>
+	</PropertyGroup>
+
 	<ItemGroup>
 	  <Compile Include="..\dosymep\AppDomainExtensions.cs" Link="dosymep\AppDomainExtensions.cs" />
 	  <Compile Include="..\dosymep\BaseViewModel.cs" Link="dosymep\BaseViewModel.cs" />
