@@ -54,11 +54,26 @@ namespace RevitGenLookupTables.ViewModels {
                         displayUnitType = UnitUtils.GetTypeCatalogString(_familyParameter.DisplayUnitType);
                     }
                 } catch {
-                    displayUnitType = "GENERAL";
+                    if(StorageType == StorageType.Integer
+                        || StorageType == StorageType.Double) {
+                        
+                        return "##NUMBER##GENERAL";
+                    }
+                    return "##OTHER##";
                 }
 #else
-                if(UnitUtils.IsUnit(_familyParameter.GetUnitTypeId())) {
-                    displayUnitType = UnitUtils.GetTypeCatalogStringForUnit(_familyParameter.GetUnitTypeId());
+                try {
+                    if(UnitUtils.IsUnit(_familyParameter.GetUnitTypeId())) {
+                        displayUnitType = UnitUtils.GetTypeCatalogStringForUnit(_familyParameter.GetUnitTypeId());
+                    }
+                } catch {
+                    if(StorageType == StorageType.Integer
+                        || StorageType == StorageType.Double) {
+                        
+                        return "##NUMBER##GENERAL";
+                    }
+
+                    return "##OTHER##";
                 }
 #endif
 
