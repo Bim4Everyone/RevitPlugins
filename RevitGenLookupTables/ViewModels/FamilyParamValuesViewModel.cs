@@ -64,7 +64,7 @@ namespace RevitGenLookupTables.ViewModels {
         public ICommand GenerateCommand { get; }
 
         public IEnumerable<string> GetParamValues() {
-            return ParamValues?.Split(Environment.NewLine.ToArray(), StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>();
+            return ParamValues?.Split(new[] { Environment.NewLine }, StringSplitOptions.None) ?? Enumerable.Empty<string>();
         }
 
         public string GetValueErrors() {
