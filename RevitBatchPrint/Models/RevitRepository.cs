@@ -61,7 +61,7 @@ namespace RevitBatchPrint.Models {
         public void UpdatePrintFileName(ViewSheet viewSheet) {
             string documentFileName = string.IsNullOrEmpty(Document.Title) ? "Без имени" : Document.Title;
 
-            string viewName = viewSheet?.SheetNumber;
+            string viewName = ReplaceInvalidChars(viewSheet?.SheetNumber);
             string fileName = string.IsNullOrEmpty(viewName) ? documentFileName : $"{documentFileName} ({viewName} - {ReplaceInvalidChars(viewSheet.Name)})";
             PrintManager.PrintToFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName + ".pdf");
             if(File.Exists(PrintManager.PrintToFileName)) {
@@ -221,6 +221,10 @@ namespace RevitBatchPrint.Models {
         /// <param name="filename">Наименование файла.</param>
         /// <returns>Возвращает новое наименование файла без запрещенных символов.</returns>
         private static string ReplaceInvalidChars(string filename) {
+            if(string.IsNullOrEmpty(filename)) {
+                return null;
+            }
+
             return string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
         }
     }
