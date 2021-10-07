@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Autodesk.Revit.ApplicationServices;
@@ -11,7 +9,6 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
-using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -56,10 +53,6 @@ namespace RevitCopyViews.ViewModels {
         public ICommand CopyUserCommand { get; }
 
         private void CopyUser(object p) {
-            var projectParameters = ProjectParameters.Create(Application);
-            projectParameters.SetupBrowserOrganization(Document);
-            projectParameters.SetupRevitParams(Document, ProjectParamsConfig.Instance.ViewGroup, ProjectParamsConfig.Instance.ProjectStage);
-
             var createdViews = new List<ElementId>();
             using(var transaction = new Transaction(Document)) {
                 transaction.Start("Копирование видов");

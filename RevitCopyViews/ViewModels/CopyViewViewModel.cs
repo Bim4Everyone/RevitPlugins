@@ -148,10 +148,6 @@ namespace RevitCopyViews.ViewModels {
         }
 
         private void CopyViews(object p) {
-            var projectParameters = ProjectParameters.Create(Application);
-            projectParameters.SetupBrowserOrganization(Document);
-            projectParameters.SetupRevitParams(Document, ProjectParamsConfig.Instance.ViewGroup, ProjectParamsConfig.Instance.ProjectStage);
-
             var createdViews = new List<ElementId>();
             using(var transaction = new Transaction(Document)) {
                 transaction.Start("Копирование видов");

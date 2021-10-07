@@ -13,6 +13,7 @@ using Autodesk.Revit.UI;
 using dosymep;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
 
 using RevitCopyViews.ViewModels;
@@ -44,6 +45,10 @@ namespace RevitCopyViews {
 
             var uiDocument = uiApplication.ActiveUIDocument;
             var document = uiDocument.Document;
+
+            var projectParameters = ProjectParameters.Create(application);
+            projectParameters.SetupBrowserOrganization(document);
+            projectParameters.SetupRevitParams(document, ProjectParamsConfig.Instance.ViewGroup, ProjectParamsConfig.Instance.ProjectStage);
 
             var selectedViews = uiDocument.Selection.GetElementIds().Select(item => document.GetElement(item)).OfType<View>().ToList();
             if(selectedViews.Count == 0) {
