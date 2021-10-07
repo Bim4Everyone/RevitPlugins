@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -11,9 +7,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
-using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
-using dosymep.Revit.Comparators;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -109,10 +103,7 @@ namespace RevitCreateViewSheet.ViewModels {
             return true;
         }
 
-        public void CreateViewSheets(object p) {
-            var projectParameters = ProjectParameters.Create(_revitRepository.Application);
-            projectParameters.SetupRevitParams(_revitRepository.Document, SharedParamsConfig.Instance.AlbumBlueprints, SharedParamsConfig.Instance.StampSheetNumber);
-            
+        public void CreateViewSheets(object p) {           
             int lastIndex = _revitRepository.GetLastViewSheetIndex(AlbumBlueprints);
             lastIndex++;
             using(var transaction = new Transaction(_revitRepository.Document)) {
