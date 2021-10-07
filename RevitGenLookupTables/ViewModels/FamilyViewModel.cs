@@ -107,7 +107,7 @@ namespace RevitGenLookupTables.ViewModels {
         }
 
         private bool CanSaveTable(object param) {
-            FamilyParamViewModel familyParam = FamilyParams.FirstOrDefault(item => !string.IsNullOrEmpty(item.FamilyParamValues.GetValueErrors()));
+            FamilyParamViewModel familyParam = SelectedFamilyParams.FirstOrDefault(item => !string.IsNullOrEmpty(item.FamilyParamValues.GetValueErrors()));
             if(familyParam != null) {
                 ErrorText = familyParam.Name + ": " + familyParam.FamilyParamValues.GetValueErrors();
                 return false;
