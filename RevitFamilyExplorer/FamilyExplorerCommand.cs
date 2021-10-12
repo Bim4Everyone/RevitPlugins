@@ -10,6 +10,7 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 
+using RevitFamilyExplorer.ViewModels;
 using RevitFamilyExplorer.Views;
 
 namespace RevitFamilyExplorer {
@@ -33,10 +34,15 @@ namespace RevitFamilyExplorer {
         }
 
         private void Execute(UIApplication uiApplication) {
+            DockablePane panel = null;
             var dockPanelId = new DockablePaneId(_dockPanelId);
-            var panel = uiApplication.GetDockablePane(dockPanelId);
-            if(panel == null) {
-                uiApplication.RegisterDockablePane(dockPanelId, "Обозреватель семейств", new FamilyExplorerPanelProvider());
+            try {
+                panel = uiApplication.GetDockablePane(dockPanelId);
+            } catch(Autodesk.Revit.Exceptions.ArgumentException) {
+                try {
+                    uiApplication.RegisterDockablePane(dockPanelId, "Обозреватель семейств", new FamilyExplorerPanelProvider());
+                } catch(Autodesk.Revit.Exceptions.ArgumentException) {
+                }
                 panel = uiApplication.GetDockablePane(dockPanelId);
             }
 
@@ -47,10 +53,13 @@ namespace RevitFamilyExplorer {
             }
         }
     }
-    
+
     internal class FamilyExplorerPanelProvider : IDockablePaneProvider {
         public void SetupDockablePane(DockablePaneProviderData data) {
-            data.FrameworkElement = new FamilyExplorerPanel();
+            var dataContext = new FamilyExplorerViewModel(new Models.FamilyRepository(@"D:\Temp\Familys"));
+            var panel = new FamilyExplorerPanel() { DataContext = dataContext };
+
+            data.FrameworkElement = panel;
             data.VisibleByDefault = true;
         }
     }
