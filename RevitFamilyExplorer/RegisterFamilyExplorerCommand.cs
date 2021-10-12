@@ -15,7 +15,7 @@ using RevitFamilyExplorer.Views;
 
 namespace RevitFamilyExplorer {
     [Transaction(TransactionMode.Manual)]
-    internal class RegisterFamilyExplorerCommand : IExternalCommand {
+    public class RegisterFamilyExplorerCommand : IExternalCommand {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
             AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
             try {

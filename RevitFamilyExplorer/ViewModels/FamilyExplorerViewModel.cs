@@ -17,10 +17,10 @@ namespace RevitFamilyExplorer.ViewModels {
             _familyRepository = familyRepository;
             Sections = new ObservableCollection<SectionViewModel> {
                 new SectionViewModel(_familyRepository.GetAR()) { Name = "AR" },
-                new SectionViewModel(_familyRepository.GetKR()) { Name = "AR" },
-                new SectionViewModel(_familyRepository.GetOV()) { Name = "AR" },
-                new SectionViewModel(_familyRepository.GetVK()) { Name = "AR" },
-                new SectionViewModel(_familyRepository.GetSS()) { Name = "AR" }
+                new SectionViewModel(_familyRepository.GetKR()) { Name = "KR" },
+                new SectionViewModel(_familyRepository.GetOV()) { Name = "OV" },
+                new SectionViewModel(_familyRepository.GetVK()) { Name = "VK" },
+                new SectionViewModel(_familyRepository.GetSS()) { Name = "SS" }
             };
         }
 

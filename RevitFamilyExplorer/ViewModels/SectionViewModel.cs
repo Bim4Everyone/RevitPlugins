@@ -6,20 +6,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using dosymep.WPF.ViewModels;
+
 namespace RevitFamilyExplorer.ViewModels {
-    internal class SectionViewModel {
+    internal class SectionViewModel : BaseViewModel {
         public SectionViewModel(IEnumerable<DirectoryInfo> sectionFolders) {
-            FamilyFiles = new ObservableCollection<FamilyFileViewModel>(GetFamilyFiles(sectionFolders));
+            Categories = new ObservableCollection<CategoryViewModel>(GetCategories(sectionFolders));
         }
 
         public string Name { get; set; }
-        public ObservableCollection<FamilyFileViewModel> FamilyFiles { get; }
+        public ObservableCollection<CategoryViewModel> Categories { get; }
 
-        private IEnumerable<FamilyFileViewModel> GetFamilyFiles(IEnumerable<DirectoryInfo> sectionFolders) {
-            return sectionFolders
-                .SelectMany(item => item.GetFiles("*.rfa"))
-                .Select(item => new FamilyFileViewModel(item))
-                .OrderBy(item => item.Name);
+        private IEnumerable<CategoryViewModel> GetCategories(IEnumerable<DirectoryInfo> sectionFolders) {
+            return sectionFolders.Select(item => new CategoryViewModel(item));
         }
     }
 }
