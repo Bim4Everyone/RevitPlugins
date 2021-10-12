@@ -8,9 +8,14 @@ using System.Threading.Tasks;
 
 using dosymep.WPF.ViewModels;
 
+using RevitFamilyExplorer.Views;
+
 namespace RevitFamilyExplorer.ViewModels {
     internal class SectionViewModel : BaseViewModel {
+        private readonly CategoriesView _categoriesView;
+
         public SectionViewModel(IEnumerable<DirectoryInfo> sectionFolders) {
+            _categoriesView = new CategoriesView() { DataContext = this };
             Categories = new ObservableCollection<CategoryViewModel>(GetCategories(sectionFolders));
         }
 
@@ -19,6 +24,10 @@ namespace RevitFamilyExplorer.ViewModels {
 
         private IEnumerable<CategoryViewModel> GetCategories(IEnumerable<DirectoryInfo> sectionFolders) {
             return sectionFolders.Select(item => new CategoryViewModel(item));
+        }
+
+        public CategoriesView CategoriesView {
+            get { return _categoriesView; }
         }
     }
 }

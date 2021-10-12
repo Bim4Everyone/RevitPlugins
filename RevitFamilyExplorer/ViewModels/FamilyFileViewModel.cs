@@ -5,9 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using dosymep.WPF.ViewModels;
+
 namespace RevitFamilyExplorer.ViewModels {
-    internal class FamilyFileViewModel {
-        private readonly FileInfo _familyFile;
+    internal class FamilyFileViewModel : BaseViewModel {
+        private FileInfo _familyFile;
 
         public FamilyFileViewModel(FileInfo familyFile) {
             _familyFile = familyFile;
@@ -15,6 +17,11 @@ namespace RevitFamilyExplorer.ViewModels {
 
         public string Name {
             get { return _familyFile.Name; }
+        }
+
+        public void Refresh(FileInfo newFileInfo) {
+            _familyFile = newFileInfo;
+            RaisePropertyChanged(nameof(Name));
         }
     }
 }

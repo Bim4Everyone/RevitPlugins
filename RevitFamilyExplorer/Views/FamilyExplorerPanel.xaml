@@ -18,7 +18,7 @@
 
             <TabControl.ContentTemplate>
                 <DataTemplate>
-                    <local:CategoriesView DataContext="{Binding}"/>
+                    <ContentControl Content="{Binding Path=CategoriesView}"/>
                 </DataTemplate>
             </TabControl.ContentTemplate>
         </TabControl>
