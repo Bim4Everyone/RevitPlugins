@@ -9,17 +9,18 @@
       Title="FamilyExplorerPanel">
 
     <Grid>
-        <TreeView ItemsSource="{Binding Sections}">
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Path=FamilyFiles}">
-                    <TextBlock Text="{Binding Name}"/>
-                    <HierarchicalDataTemplate.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Name}"/>
-                        </DataTemplate>
-                    </HierarchicalDataTemplate.ItemTemplate>
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
+        <TabControl ItemsSource="{Binding Path=Sections}">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <local:CategoriesView DataContext="{Binding}"/>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
     </Grid>
 </Page>
