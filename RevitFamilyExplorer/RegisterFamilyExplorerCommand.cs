@@ -10,11 +10,12 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 
+using RevitFamilyExplorer.ViewModels;
+using RevitFamilyExplorer.Views;
+
 namespace RevitFamilyExplorer {
     [Transaction(TransactionMode.Manual)]
-    public class FamilyExplorerCommand : IExternalCommand {
-        public static readonly Guid DockPanelId = new Guid("5469DADF-AF78-496F-BB93-B0E7B4D61EF6");
-
+    internal class RegisterFamilyExplorerCommand : IExternalCommand {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
             AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
             try {
@@ -31,13 +32,21 @@ namespace RevitFamilyExplorer {
         }
 
         public void Execute(UIApplication uiApplication) {
-            var dockPanelId = new DockablePaneId(DockPanelId);
-            DockablePane panel = uiApplication.GetDockablePane(dockPanelId);
-            if(panel.IsShown()) {
-                panel.Hide();
-            } else {
-                panel.Show();
+            var dockPanelId = new DockablePaneId(FamilyExplorerCommand.DockPanelId);
+            if(!DockablePane.PaneIsRegistered(dockPanelId)) {
+                uiApplication.RegisterDockablePane(dockPanelId, "Обозреватель семейств", new FamilyExplorerPanelProvider());
             }
+        }
+    }
+
+    internal class FamilyExplorerPanelProvider : IDockablePaneProvider {
+        public void SetupDockablePane(DockablePaneProviderData data) {
+            var dataContext = new FamilyExplorerViewModel(new Models.FamilyRepository(@"D:\Temp\Familys"));
+            var panel = new FamilyExplorerPanel() { DataContext = dataContext };
+
+            data.FrameworkElement = panel;
+            data.VisibleByDefault = true;
+            data.InitialState.DockPosition = DockPosition.Bottom;
         }
     }
 }
