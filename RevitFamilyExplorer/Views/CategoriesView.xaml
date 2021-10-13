@@ -15,7 +15,8 @@
 
                     <HierarchicalDataTemplate.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Path=FamilyTypes}">
-                            <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="{Binding ImageSource}" Width="16" Height="16"/>
                                 <TextBlock Text="{Binding Name}"/>
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger SourceObject="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}}" EventName="Expanded">

@@ -20,28 +20,26 @@ namespace RevitFamilyExplorer.ViewModels {
         private readonly RevitRepository _revitRepository;
 
         private bool _isLoaded;
+        private string _imageSource;
         private FileInfo _familyFile;
-        private BitmapSource _image;
-
-
 
         public FamilyFileViewModel(RevitRepository revitRepository, FileInfo familyFile) {
             _revitRepository = revitRepository;
-            _familyFile = familyFile;
-
-            //Image = ShellFile.FromFilePath(_familyFile.FullName).Thumbnail.BitmapSource;
+            
 
             ExpandCommand = new RelayCommand(Expand, CanExpand);
             FamilyTypes = new ObservableCollection<FamilyTypeViewModel>() { null };
+
+            Refresh(familyFile);
         }
 
         public string Name {
             get { return _familyFile.Name; }
         }
 
-        public BitmapSource Image {
-            get => _image;
-            set => this.RaiseAndSetIfChanged(ref _image, value);
+        public string ImageSource {
+            get => _imageSource;
+            set => this.RaiseAndSetIfChanged(ref _imageSource, value);
         }
 
         public ICommand ExpandCommand { get; }
@@ -49,10 +47,21 @@ namespace RevitFamilyExplorer.ViewModels {
 
         public void Refresh(FileInfo newFileInfo) {
             _familyFile = newFileInfo;
-            //Image = ShellFile.FromFilePath(_familyFile.FullName).Thumbnail.BitmapSource;
-
             RaisePropertyChanged(nameof(Name));
-            RaisePropertyChanged(nameof(Image));
+
+#if D2020 || R2020
+            ImageSource = _revitRepository.IsInsertedFamilyFile(newFileInfo) 
+                ? @"pack://application:,,,/RevitFamilyExplorer;component/Resources/insert.png" 
+                : @"pack://application:,,,/RevitFamilyExplorer;component/Resources/not-insert.png";
+#elif D2021 || R2021
+            ImageSource = _revitRepository.IsInsertedFamilyFile(newFileInfo) 
+                ? @"pack://application:,,,/RevitFamilyExplorer_2021;component/Resources/insert.png" 
+                : @"pack://application:,,,/RevitFamilyExplorer_2021;component/Resources/not-insert.png";
+#elif D2022 || R2022
+            ImageSource = _revitRepository.IsInsertedFamilyFile(newFileInfo) 
+                ? @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/insert.png" 
+                : @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/not-insert.png";
+#endif
         }
 
         private void Expand(object p) {

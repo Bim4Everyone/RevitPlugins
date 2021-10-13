@@ -25,7 +25,15 @@ namespace RevitFamilyExplorer.Models {
             get { return _uiApplication.ActiveUIDocument.Document; }
         }
 
-        internal IEnumerable<string> GetFamilyTypes(FileInfo familyFile) {
+        public bool IsInsertedFamilyFile(FileInfo familyFile) {
+            var families = new FilteredElementCollector(Document)
+                .OfClass(typeof(Family))
+                .ToElements();
+
+            return families.Any(item => item.Name.Equals(Path.GetFileNameWithoutExtension(familyFile.Name)));
+        }
+
+        public IEnumerable<string> GetFamilyTypes(FileInfo familyFile) {
             var familyDocument = Application.OpenDocumentFile(familyFile.FullName);
             try {
                 if(!familyDocument.IsFamilyDocument) {
