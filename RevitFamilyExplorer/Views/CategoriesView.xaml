@@ -13,7 +13,10 @@
                     <TextBlock Text="{Binding Name}"/>
                     <HierarchicalDataTemplate.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Name}"/>
+                            <StackPanel>
+                                <Image Source="{Binding Image}"/>
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
                         </DataTemplate>
                     </HierarchicalDataTemplate.ItemTemplate>
                 </HierarchicalDataTemplate>
