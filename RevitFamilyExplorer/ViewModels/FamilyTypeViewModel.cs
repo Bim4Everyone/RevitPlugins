@@ -13,15 +13,11 @@ using RevitFamilyExplorer.Models;
 namespace RevitFamilyExplorer.ViewModels {
     internal class FamilyTypeViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private readonly FamilyType _familyType;
-
-        public FamilyTypeViewModel(RevitRepository revitRepository, FamilyType familyType) {
+        public FamilyTypeViewModel(RevitRepository revitRepository, string familyTypeName) {
             _revitRepository = revitRepository;
-            _familyType = familyType;
+            Name = familyTypeName;
         }
 
-        public string Name {
-            get { return _familyType.Name; }
-        }
+        public string Name { get; }
     }
 }

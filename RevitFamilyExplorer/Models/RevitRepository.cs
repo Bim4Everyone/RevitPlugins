@@ -25,16 +25,20 @@ namespace RevitFamilyExplorer.Models {
             get { return _uiApplication.ActiveUIDocument.Document; }
         }
 
-        internal IEnumerable<FamilyType> GetFamilyTypes(FileInfo familyFile) {
+        internal IEnumerable<string> GetFamilyTypes(FileInfo familyFile) {
             var familyDocument = Application.OpenDocumentFile(familyFile.FullName);
             try {
                 if(!familyDocument.IsFamilyDocument) {
                     throw new ArgumentException($"Переданный файл не является документом семейства. {familyFile}");
                 }
 
-                return familyDocument.FamilyManager.Types.Cast<FamilyType>();
+                string baseName = familyDocument.OwnerFamily.Name;
+                return familyDocument.FamilyManager.Types
+                    .Cast<FamilyType>()
+                    .Select(item => string.IsNullOrEmpty(item.Name) ? baseName : item.Name)
+                    .ToList();
             } finally {
-                //familyDocument.Close(false);
+                familyDocument.Close(false);
             }
         }
     }
