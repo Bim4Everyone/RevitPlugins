@@ -10,13 +10,19 @@ using dosymep.WPF.ViewModels;
 
 using Microsoft.WindowsAPICodePack.Shell;
 
+using RevitFamilyExplorer.Models;
+
 namespace RevitFamilyExplorer.ViewModels {
     internal class FamilyFileViewModel : BaseViewModel {
+        private readonly RevitRepository _revitRepository;
+
         private FileInfo _familyFile;
         private BitmapSource _image;
 
-        public FamilyFileViewModel(FileInfo familyFile) {
+        public FamilyFileViewModel(RevitRepository revitRepository, FileInfo familyFile) {
+            _revitRepository = revitRepository;
             _familyFile = familyFile;
+
             //Image = ShellFile.FromFilePath(_familyFile.FullName).Thumbnail.BitmapSource;
         }
 

@@ -11,16 +11,19 @@ using RevitFamilyExplorer.Models;
 
 namespace RevitFamilyExplorer.ViewModels {
     internal class FamilyExplorerViewModel : BaseViewModel {
+        private readonly RevitRepository _revitRepository;
         private readonly FamilyRepository _familyRepository;
 
-        public FamilyExplorerViewModel(FamilyRepository familyRepository) {
+        public FamilyExplorerViewModel(RevitRepository revitRepository, FamilyRepository familyRepository) {
+            _revitRepository = revitRepository;
             _familyRepository = familyRepository;
+
             Sections = new ObservableCollection<SectionViewModel> {
-                new SectionViewModel(_familyRepository.GetAR()) { Name = "AR" },
-                new SectionViewModel(_familyRepository.GetKR()) { Name = "KR" },
-                new SectionViewModel(_familyRepository.GetOV()) { Name = "OV" },
-                new SectionViewModel(_familyRepository.GetVK()) { Name = "VK" },
-                new SectionViewModel(_familyRepository.GetSS()) { Name = "SS" }
+                new SectionViewModel(_revitRepository, _familyRepository.GetAR()) { Name = "AR" },
+                new SectionViewModel(_revitRepository, _familyRepository.GetKR()) { Name = "KR" },
+                new SectionViewModel(_revitRepository, _familyRepository.GetOV()) { Name = "OV" },
+                new SectionViewModel(_revitRepository, _familyRepository.GetVK()) { Name = "VK" },
+                new SectionViewModel(_revitRepository, _familyRepository.GetSS()) { Name = "SS" }
             };
         }
 

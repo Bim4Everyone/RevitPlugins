@@ -34,14 +34,20 @@ namespace RevitFamilyExplorer {
         public void Execute(UIApplication uiApplication) {
             var dockPanelId = new DockablePaneId(FamilyExplorerCommand.DockPanelId);
             if(!DockablePane.PaneIsRegistered(dockPanelId)) {
-                uiApplication.RegisterDockablePane(dockPanelId, "Обозреватель семейств", new FamilyExplorerPanelProvider());
+                uiApplication.RegisterDockablePane(dockPanelId, "Обозреватель семейств", new FamilyExplorerPanelProvider(uiApplication));
             }
         }
     }
 
     internal class FamilyExplorerPanelProvider : IDockablePaneProvider {
+        private readonly UIApplication _uiApplication;
+
+        public FamilyExplorerPanelProvider(UIApplication uiApplication) {
+            _uiApplication = uiApplication;
+        }
+
         public void SetupDockablePane(DockablePaneProviderData data) {
-            var dataContext = new FamilyExplorerViewModel(new Models.FamilyRepository(@"D:\Temp\Familys"));
+            var dataContext = new FamilyExplorerViewModel(new Models.RevitRepository(_uiApplication), new Models.FamilyRepository(@"D:\Temp\Familys"));
             var panel = new FamilyExplorerPanel() { DataContext = dataContext };
 
             data.FrameworkElement = panel;
