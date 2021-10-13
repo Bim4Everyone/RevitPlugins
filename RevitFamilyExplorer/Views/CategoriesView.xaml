@@ -12,12 +12,14 @@
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=FamilyFiles}">
                     <TextBlock Text="{Binding Name}"/>
                     <HierarchicalDataTemplate.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <Image Source="{Binding Image}"/>
-                                <TextBlock Text="{Binding Name}"/>
-                            </StackPanel>
-                        </DataTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Path=FamilyTypes}">
+                            <TextBlock Text="{Binding Name}"/>
+                            <HierarchicalDataTemplate.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}"/>
+                                </DataTemplate>
+                            </HierarchicalDataTemplate.ItemTemplate>
+                        </HierarchicalDataTemplate>
                     </HierarchicalDataTemplate.ItemTemplate>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
