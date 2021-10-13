@@ -23,6 +23,11 @@
                                         <i:InvokeCommandAction Command="{Binding ExpandCommand}" />
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
+                                <StackPanel.ToolTip>
+                                    <ToolTip Background="White">
+                                        <Image Source="{Binding FamilyIcon}"/>
+                                    </ToolTip>
+                                </StackPanel.ToolTip>
                             </StackPanel>
                             <HierarchicalDataTemplate.ItemTemplate>
                                 <DataTemplate>
