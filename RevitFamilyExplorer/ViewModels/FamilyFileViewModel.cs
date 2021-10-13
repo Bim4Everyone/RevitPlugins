@@ -5,8 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using Microsoft.WindowsAPICodePack.Shell;
@@ -17,8 +19,11 @@ namespace RevitFamilyExplorer.ViewModels {
     internal class FamilyFileViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
 
+        private bool _isLoaded;
         private FileInfo _familyFile;
         private BitmapSource _image;
+
+
 
         public FamilyFileViewModel(RevitRepository revitRepository, FileInfo familyFile) {
             _revitRepository = revitRepository;
@@ -26,7 +31,8 @@ namespace RevitFamilyExplorer.ViewModels {
 
             //Image = ShellFile.FromFilePath(_familyFile.FullName).Thumbnail.BitmapSource;
 
-            FamilyTypes = new ObservableCollection<FamilyTypeViewModel>(GetFamilySymbols());
+            ExpandCommand = new RelayCommand(Expand, CanExpand);
+            FamilyTypes = new ObservableCollection<FamilyTypeViewModel>() { null };
         }
 
         public string Name {
@@ -38,6 +44,7 @@ namespace RevitFamilyExplorer.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _image, value);
         }
 
+        public ICommand ExpandCommand { get; }
         public ObservableCollection<FamilyTypeViewModel> FamilyTypes { get; }
 
         public void Refresh(FileInfo newFileInfo) {
@@ -46,6 +53,19 @@ namespace RevitFamilyExplorer.ViewModels {
 
             RaisePropertyChanged(nameof(Name));
             RaisePropertyChanged(nameof(Image));
+        }
+
+        private void Expand(object p) {
+            _isLoaded = true;            
+            FamilyTypes.Clear();
+           
+            foreach(var familyType in GetFamilySymbols()) {
+                FamilyTypes.Add(familyType);
+            }
+        }
+
+        private bool CanExpand(object p) {
+            return !_isLoaded;
         }
 
         private IEnumerable<FamilyTypeViewModel> GetFamilySymbols() {
