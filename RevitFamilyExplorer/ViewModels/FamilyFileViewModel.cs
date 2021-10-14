@@ -96,6 +96,8 @@ namespace RevitFamilyExplorer.ViewModels {
                         foreach(var familyType in familyTypes) {
                             FamilyTypes.Add(familyType);
                         }
+
+                        _isLoaded = true;
                     });
                 });
         }
