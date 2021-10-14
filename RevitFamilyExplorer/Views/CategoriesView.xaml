@@ -25,9 +25,15 @@
                                 <Image Source="{Binding ImageSource}" Width="16" Height="16"/>
                                 <TextBlock Text="{Binding Name}"/>
                                 <i:Interaction.Triggers>
+                                    
                                     <i:EventTrigger SourceObject="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}}" EventName="Expanded">
                                         <i:InvokeCommandAction Command="{Binding ExpandCommand}" />
                                     </i:EventTrigger>
+
+                                    <i:EventTrigger EventName="MouseEnter">
+                                        <i:InvokeCommandAction Command="{Binding UpdateFamilyImageCommand}"/>
+                                    </i:EventTrigger>
+                                    
                                 </i:Interaction.Triggers>
                                 <StackPanel.ToolTip>
                                     <ToolTip Background="White">
@@ -51,6 +57,12 @@
                                                 <MenuItem Header="Разместить" Command="{Binding PlaceFamilySymbolCommand}"/>
                                             </ContextMenu>
                                         </StackPanel.ContextMenu>
+
+                                        <StackPanel.ToolTip>
+                                            <ToolTip Background="White">
+                                                <Image Source="{Binding FamilySymbolIcon}"/>
+                                            </ToolTip>
+                                        </StackPanel.ToolTip>
                                     </StackPanel>
                                 </DataTemplate>
                             </HierarchicalDataTemplate.ItemTemplate>

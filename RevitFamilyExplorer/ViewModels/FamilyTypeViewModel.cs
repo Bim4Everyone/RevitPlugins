@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 
 using Autodesk.Revit.DB;
 
@@ -17,6 +18,8 @@ namespace RevitFamilyExplorer.ViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly FamilyFileViewModel _parentFamily;
 
+        private BitmapSource _familySymbolIcon;
+
         public FamilyTypeViewModel(RevitRepository revitRepository, FamilyFileViewModel parentFamily, string familyTypeName) {
             _revitRepository = revitRepository;
             _parentFamily = parentFamily;
@@ -27,6 +30,11 @@ namespace RevitFamilyExplorer.ViewModels {
 
         public string Name { get; }
         public ICommand PlaceFamilySymbolCommand { get; }
+
+        public BitmapSource FamilySymbolIcon {
+            get => _familySymbolIcon;
+            set => this.RaiseAndSetIfChanged(ref _familySymbolIcon, value);
+        }
 
         private void PlaceFamilySymbol(object p) {
             _revitRepository.PlaceFamilySymbol(Name);

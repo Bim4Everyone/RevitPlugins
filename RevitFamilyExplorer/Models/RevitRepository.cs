@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -11,21 +13,13 @@ using Autodesk.Revit.UI;
 
 namespace RevitFamilyExplorer.Models {
     internal class RevitRepository {
-        public event Action ApplicationIdle;
-
         private readonly UIApplication _uiApplication;
-
         private readonly RevitExternalEvent _loadFamilyHandler;
-        private readonly ExternalEvent _loadFamilyExternalEvent;
 
 
         public RevitRepository(UIApplication uiApplication) {
             _uiApplication = uiApplication;
-
             _loadFamilyHandler = new RevitExternalEvent("Загрузка семейства");
-            _loadFamilyExternalEvent = ExternalEvent.Create(_loadFamilyHandler);
-
-            _uiApplication.Idling += (s, e) => ApplicationIdle?.Invoke();
         }
 
         public Application Application {
@@ -36,11 +30,20 @@ namespace RevitFamilyExplorer.Models {
             get { return _uiApplication.ActiveUIDocument.Document; }
         }
 
-        public void LoadFamily(FileInfo familyFile) {
+        public async Task LoadFamilyAsync(FileInfo familyFile) {
             _loadFamilyHandler.TransactionName = $"Загрузка семейства \"{familyFile.Name}\"";
             _loadFamilyHandler.ExternalAction = app => app.ActiveUIDocument.Document.LoadFamily(familyFile.FullName);
+            
+            await _loadFamilyHandler.Raise();
+        }
 
-            _loadFamilyExternalEvent.Raise();
+        public IEnumerable<FamilySymbol> GetFamilySymbols(FileInfo familyFile) {
+            var families = new FilteredElementCollector(Document)
+                .OfClass(typeof(Family))
+                .ToElements();
+
+            var family = (Family) families.FirstOrDefault(item => item.Name.Equals(Path.GetFileNameWithoutExtension(familyFile.Name)));
+            return family.GetFamilySymbolIds().Select(item => Document.GetElement(item)).OfType<FamilySymbol>();
         }
 
         public void PlaceFamilySymbol(string familySymbolName) {
@@ -79,6 +82,23 @@ namespace RevitFamilyExplorer.Models {
             } finally {
                 familyDocument.Close(false);
             }
+        }
+
+        public BitmapSource GetFamilySymbolIcon(FamilySymbol familySymbol) {
+            Bitmap bitmap = familySymbol.GetPreviewImage(new Size(96, 96));
+            var bitmapImage = new BitmapImage();
+
+            using(var memoryStream = new MemoryStream()) {
+                bitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+                
+                memoryStream.Position = default;                
+                bitmapImage.BeginInit();
+                bitmapImage.StreamSource = memoryStream;
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.EndInit();
+            }
+
+            return bitmapImage;
         }
     }
 }
