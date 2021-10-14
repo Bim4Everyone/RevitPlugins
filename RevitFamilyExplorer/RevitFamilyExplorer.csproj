@@ -41,8 +41,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\cant_place_family_symbol.png" />
 	  <None Remove="Resources\insert.png" />
 	  <None Remove="Resources\not-insert.png" />
+	  <None Remove="Resources\place_family_symbol.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -80,8 +82,10 @@
 	</ItemGroup>
 	
 	<ItemGroup>
+	  <Resource Include="Resources\cant_place_family_symbol.png" />
 	  <Resource Include="Resources\insert.png" />
 	  <Resource Include="Resources\not-insert.png" />
+	  <Resource Include="Resources\place_family_symbol.png" />
 	</ItemGroup>
 
 </Project>

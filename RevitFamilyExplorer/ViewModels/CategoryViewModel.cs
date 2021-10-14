@@ -49,8 +49,10 @@ namespace RevitFamilyExplorer.ViewModels {
         }
 
         private void _folderWatcher_Renamed(object sender, RenamedEventArgs e) {
-            var familyFile = FamilyFiles.FirstOrDefault(item => item.Name.Equals(e.OldName));
-            familyFile?.Refresh(new FileInfo(e.FullPath));
+            _dispatcher.Invoke(() => {
+                var familyFile = FamilyFiles.FirstOrDefault(item => item.Name.Equals(e.OldName));
+                familyFile?.Refresh(new FileInfo(e.FullPath));
+            });
         }
 
         private void _folderWatcher_Deleted(object sender, FileSystemEventArgs e) {

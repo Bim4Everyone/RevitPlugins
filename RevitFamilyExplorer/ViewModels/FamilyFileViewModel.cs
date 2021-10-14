@@ -85,9 +85,9 @@ namespace RevitFamilyExplorer.ViewModels {
         private void LoadFamilyAsync(object p) {
             _revitRepository.LoadFamilyAsync(_familyFile)
                 .ContinueWith(t => {
-                    RefreshImageSource();
-
                     _dispatcher.Invoke(() => {
+                        RefreshImageSource();
+
                         FamilyTypes.Clear();
                         var familyTypes = _revitRepository.GetFamilySymbols(_familyFile)
                             .Select(item => new FamilyTypeViewModel(_revitRepository, this, item.Name) { FamilySymbolIcon = _revitRepository.GetFamilySymbolIcon(item) })

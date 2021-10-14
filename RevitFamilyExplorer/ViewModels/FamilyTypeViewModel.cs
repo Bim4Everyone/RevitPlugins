@@ -18,7 +18,8 @@ namespace RevitFamilyExplorer.ViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly FamilyFileViewModel _parentFamily;
 
-        private BitmapSource _familySymbolIcon;
+        private string _imageSource;
+        private BitmapSource _familySymbolIcon; 
 
         public FamilyTypeViewModel(RevitRepository revitRepository, FamilyFileViewModel parentFamily, string familyTypeName) {
             _revitRepository = revitRepository;
@@ -26,10 +27,17 @@ namespace RevitFamilyExplorer.ViewModels {
            
             Name = familyTypeName;
             PlaceFamilySymbolCommand = new RelayCommand(PlaceFamilySymbol, CanPlaceFamilySymbol);
+
+            RefreshImageSource();
         }
 
         public string Name { get; }
         public ICommand PlaceFamilySymbolCommand { get; }
+
+        public string ImageSource {
+            get => _imageSource;
+            set => this.RaiseAndSetIfChanged(ref _imageSource, value);
+        }
 
         public BitmapSource FamilySymbolIcon {
             get => _familySymbolIcon;
@@ -42,6 +50,22 @@ namespace RevitFamilyExplorer.ViewModels {
 
         private bool CanPlaceFamilySymbol(object p) {
             return _parentFamily.IsInsertedFamilyFile();
+        }
+
+        private void RefreshImageSource() {
+#if D2020 || R2020
+            ImageSource = CanPlaceFamilySymbol(null) 
+                ? @"pack://application:,,,/RevitFamilyExplorer;component/Resources/place_family_symbol.png"
+                : @"pack://application:,,,/RevitFamilyExplorer;component/Resources/cant_place_family_symbol.png";
+#elif D2021 || R2021
+                        ImageSource = CanPlaceFamilySymbol(null) 
+                ? @"pack://application:,,,/RevitFamilyExplorer_2021;component/Resources/place_family_symbol.png"
+                : @"pack://application:,,,/RevitFamilyExplorer_2021;component/Resources/cant_place_family_symbol.png";
+#elif D2022 || R2022
+                        ImageSource = CanPlaceFamilySymbol(null) 
+                ? @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/place_family_symbol.png"
+                : @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/cant_place_family_symbol.png";
+#endif
         }
     }
 }

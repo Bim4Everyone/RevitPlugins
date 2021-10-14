@@ -14,7 +14,7 @@
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                 </Style>
             </TreeView.ItemContainerStyle>
-            
+
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=FamilyFiles}">
                     <TextBlock Text="{Binding Name}"/>
@@ -22,10 +22,24 @@
                     <HierarchicalDataTemplate.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Path=FamilyTypes}">
                             <StackPanel Orientation="Horizontal">
-                                <Image Source="{Binding ImageSource}" Width="16" Height="16"/>
-                                <TextBlock Text="{Binding Name}"/>
+                                <Button Margin="0,0,10,0" ToolTip="Загрузить" ToolTipService.ShowOnDisabled="True"
+                                        Command="{Binding LoadFamilyCommand}">
+                                    <Image Source="{Binding ImageSource}" Width="16" Height="16"/>
+                                    <Button.Resources>
+                                        <Style TargetType="Border">
+                                            <Setter Property="CornerRadius" Value="5"/>
+                                        </Style>
+                                    </Button.Resources>
+                                </Button>
+
+                                <TextBlock Text="{Binding Name}">
+                                    <TextBlock.ToolTip>
+                                        <Image Source="{Binding FamilyIcon}" Width="96" Height="96"/>
+                                    </TextBlock.ToolTip>
+                                </TextBlock>
+
                                 <i:Interaction.Triggers>
-                                    
+
                                     <i:EventTrigger SourceObject="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}}" EventName="Expanded">
                                         <i:InvokeCommandAction Command="{Binding ExpandCommand}" />
                                     </i:EventTrigger>
@@ -33,36 +47,34 @@
                                     <i:EventTrigger EventName="MouseEnter">
                                         <i:InvokeCommandAction Command="{Binding UpdateFamilyImageCommand}"/>
                                     </i:EventTrigger>
-                                    
-                                </i:Interaction.Triggers>
-                                <StackPanel.ToolTip>
-                                    <ToolTip Background="White">
-                                        <Image Source="{Binding FamilyIcon}"/>
-                                    </ToolTip>
-                                </StackPanel.ToolTip>
 
-                                <StackPanel.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem Header="Загрузить" Command="{Binding LoadFamilyCommand}"/>
-                                    </ContextMenu>
-                                </StackPanel.ContextMenu>
+                                </i:Interaction.Triggers>
                             </StackPanel>
 
                             <HierarchicalDataTemplate.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding Name}"/>
-                                        <StackPanel.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="Разместить" Command="{Binding PlaceFamilySymbolCommand}"/>
-                                            </ContextMenu>
-                                        </StackPanel.ContextMenu>
-
-                                        <StackPanel.ToolTip>
-                                            <ToolTip Background="White">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Margin="0,0,10,0" ToolTip="Разместить" ToolTipService.ShowOnDisabled="True"
+                                                Command="{Binding PlaceFamilySymbolCommand}">
+                                            <Image Source="{Binding ImageSource}" Width="16" Height="16"/>
+                                            <Button.Resources>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="CornerRadius" Value="5"/>
+                                                </Style>
+                                            </Button.Resources>
+                                        </Button>
+                                        
+                                        <TextBlock Text="{Binding Name}">
+                                            <TextBlock.ToolTip>
                                                 <Image Source="{Binding FamilySymbolIcon}"/>
-                                            </ToolTip>
-                                        </StackPanel.ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseMove">
+                                                <i:InvokeCommandAction Command="{Binding UpdateFamilyImageCommand}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
                                     </StackPanel>
                                 </DataTemplate>
                             </HierarchicalDataTemplate.ItemTemplate>
