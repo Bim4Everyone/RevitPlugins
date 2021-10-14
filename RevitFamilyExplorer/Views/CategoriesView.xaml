@@ -9,6 +9,12 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <TreeView ItemsSource="{Binding Categories}">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                </Style>
+            </TreeView.ItemContainerStyle>
+            
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=FamilyFiles}">
                     <TextBlock Text="{Binding Name}"/>
@@ -28,10 +34,24 @@
                                         <Image Source="{Binding FamilyIcon}"/>
                                     </ToolTip>
                                 </StackPanel.ToolTip>
+
+                                <StackPanel.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Загрузить" Command="{Binding LoadFamilyCommand}"/>
+                                    </ContextMenu>
+                                </StackPanel.ContextMenu>
                             </StackPanel>
+
                             <HierarchicalDataTemplate.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Name}"/>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}"/>
+                                        <StackPanel.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Разместить" Command="{Binding PlaceFamilySymbolCommand}"/>
+                                            </ContextMenu>
+                                        </StackPanel.ContextMenu>
+                                    </StackPanel>
                                 </DataTemplate>
                             </HierarchicalDataTemplate.ItemTemplate>
 

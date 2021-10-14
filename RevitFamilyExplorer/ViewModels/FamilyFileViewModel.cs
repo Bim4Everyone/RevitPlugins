@@ -27,8 +27,9 @@ namespace RevitFamilyExplorer.ViewModels {
         public FamilyFileViewModel(RevitRepository revitRepository, FileInfo familyFile) {
             _revitRepository = revitRepository;
 
-
             ExpandCommand = new RelayCommand(Expand, CanExpand);
+            LoadFamilyCommand = new RelayCommand(LoadFamily, CanLoadFamily);
+
             FamilyTypes = new ObservableCollection<FamilyTypeViewModel>() { null };
 
             Refresh(familyFile);
@@ -49,14 +50,19 @@ namespace RevitFamilyExplorer.ViewModels {
         }
 
         public ICommand ExpandCommand { get; }
+        public ICommand LoadFamilyCommand { get; }
         public ObservableCollection<FamilyTypeViewModel> FamilyTypes { get; }
+
+        public bool IsInsertedFamilyFile() {
+            return _revitRepository.IsInsertedFamilyFile(_familyFile);
+        }
 
         public void Refresh(FileInfo newFileInfo) {
             _familyFile = newFileInfo;
             RaisePropertyChanged(nameof(Name));
 
 #if D2020 || R2020
-            ImageSource = _revitRepository.IsInsertedFamilyFile(newFileInfo)
+            ImageSource = _revitRepository.IsInsertedFamilyFile(_familyFile)
                 ? @"pack://application:,,,/RevitFamilyExplorer;component/Resources/insert.png"
                 : @"pack://application:,,,/RevitFamilyExplorer;component/Resources/not-insert.png";
 #elif D2021 || R2021
@@ -85,9 +91,17 @@ namespace RevitFamilyExplorer.ViewModels {
             return !_isLoaded;
         }
 
+        private void LoadFamily(object p) {
+            _revitRepository.LoadFamily(_familyFile);
+        }
+
+        private bool CanLoadFamily(object p) {
+            return !_revitRepository.IsInsertedFamilyFile(_familyFile);
+        }
+
         private IEnumerable<FamilyTypeViewModel> GetFamilySymbols() {
             return _revitRepository.GetFamilyTypes(_familyFile)
-                .Select(item => new FamilyTypeViewModel(_revitRepository, item))
+                .Select(item => new FamilyTypeViewModel(_revitRepository, this, item))
                 .OrderBy(item => item.Name);
         }
     }
