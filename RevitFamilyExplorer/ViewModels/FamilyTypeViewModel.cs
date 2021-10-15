@@ -44,13 +44,17 @@ namespace RevitFamilyExplorer.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _familySymbolIcon, value);
         }
 
+        #region PlaceFamilySymbolCommand
+
         private void PlaceFamilySymbol(object p) {
-            _revitRepository.PlaceFamilySymbol(Name);
+            _revitRepository.PlaceFamilySymbol(_parentFamily.FileInfo, Name);
         }
 
         private bool CanPlaceFamilySymbol(object p) {
-            return _parentFamily.IsInsertedFamilyFile();
+            return _revitRepository.CanPlaceFamilySymbol(_parentFamily.FileInfo, Name);
         }
+
+        #endregion
 
         private void RefreshImageSource() {
 #if D2020 || R2020

@@ -38,6 +38,10 @@ namespace RevitFamilyExplorer.ViewModels {
             Refresh(familyFile);
         }
 
+        public FileInfo FileInfo {
+            get { return _familyFile; }
+        }
+
         public string Name {
             get { return _familyFile.Name; }
         }
@@ -57,10 +61,6 @@ namespace RevitFamilyExplorer.ViewModels {
         public ICommand UpdateFamilyImageCommand { get; }
         public ObservableCollection<FamilyTypeViewModel> FamilyTypes { get; }
 
-        public bool IsInsertedFamilyFile() {
-            return _revitRepository.IsInsertedFamilyFile(_familyFile);
-        }
-
         public void Refresh(FileInfo newFileInfo) {
             _familyFile = newFileInfo;
             RaisePropertyChanged(nameof(Name));
@@ -68,6 +68,8 @@ namespace RevitFamilyExplorer.ViewModels {
             RefreshImageSource();
             FamilyIcon = ShellFile.FromFilePath(_familyFile.FullName).Thumbnail.BitmapSource;
         }
+
+        #region ExpandCommand
 
         private void Expand(object p) {
             _isLoaded = true;
@@ -82,29 +84,22 @@ namespace RevitFamilyExplorer.ViewModels {
             return !_isLoaded;
         }
 
+        #endregion
+
+        #region LoadFamilyCommand
+
         private void LoadFamilyAsync(object p) {
             _revitRepository.LoadFamilyAsync(_familyFile)
-                .ContinueWith(t => {
-                    _dispatcher.Invoke(() => {
-                        RefreshImageSource();
-
-                        FamilyTypes.Clear();
-                        var familyTypes = _revitRepository.GetFamilySymbols(_familyFile)
-                            .Select(item => new FamilyTypeViewModel(_revitRepository, this, item.Name) { FamilySymbolIcon = _revitRepository.GetFamilySymbolIcon(item) })
-                            .OrderBy(item => item.Name);
-
-                        foreach(var familyType in familyTypes) {
-                            FamilyTypes.Add(familyType);
-                        }
-
-                        _isLoaded = true;
-                    });
-                });
+                .ContinueWith(t => RefreshImageSource(), TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private bool CanLoadFamily(object p) {
             return !_revitRepository.IsInsertedFamilyFile(_familyFile);
         }
+
+        #endregion
+
+        #region UpdateFamilyImageCommand
 
         private void UpdateFamilyImage(object p) {
             RefreshImageSource();
@@ -113,6 +108,8 @@ namespace RevitFamilyExplorer.ViewModels {
         private bool CanUpdateFamilyImage(object p) {
             return true;
         }
+
+        #endregion
 
         private void RefreshImageSource() {
 #if D2020 || R2020

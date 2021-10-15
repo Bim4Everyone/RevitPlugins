@@ -31,27 +31,123 @@ namespace RevitFamilyExplorer.Models {
         }
 
         public async Task LoadFamilyAsync(FileInfo familyFile) {
+            if(familyFile is null) {
+                throw new ArgumentNullException(nameof(familyFile));
+            }
+
             _loadFamilyHandler.TransactionName = $"Загрузка семейства \"{familyFile.Name}\"";
             _loadFamilyHandler.ExternalAction = app => app.ActiveUIDocument.Document.LoadFamily(familyFile.FullName);
-            
+
             await _loadFamilyHandler.Raise();
         }
 
-        public IEnumerable<FamilySymbol> GetFamilySymbols(FileInfo familyFile) {
+        public bool IsInsertedFamilyFile(FileInfo familyFile) {
+            if(familyFile is null) {
+                throw new ArgumentNullException(nameof(familyFile));
+            }
+
+            return GetFamily(familyFile) != null;
+        }
+
+        public IEnumerable<string> GetFamilyTypes(FileInfo familyFile) {
+            if(familyFile is null) {
+                throw new ArgumentNullException(nameof(familyFile));
+            }
+
+            Document familyDocument = Application.OpenDocumentFile(familyFile.FullName);
+            try {
+                if(!familyDocument.IsFamilyDocument) {
+                    throw new ArgumentException($"Переданный файл не является документом семейства. {familyFile}");
+                }
+
+                List<string> familyTypes = familyDocument.FamilyManager.Types
+                    .Cast<FamilyType>()
+                    .Where(item => !string.IsNullOrEmpty(item.Name.Trim()))
+                    .Select(item => item.Name)
+                    .ToList();
+
+                return familyTypes.Count == 0 ? (new[] { GetFamilyName(familyFile) }) : (IEnumerable<string>) familyTypes;
+            } finally {
+                familyDocument.Close(false);
+            }
+        }
+
+        public string GetFamilyName(FileInfo familyFile) {
+            if(familyFile is null) {
+                throw new ArgumentNullException(nameof(familyFile));
+            }
+
+            return Path.GetFileNameWithoutExtension(familyFile.Name);
+        }
+
+        public Family GetFamily(FileInfo familyFile) {
+            if(familyFile is null) {
+                throw new ArgumentNullException(nameof(familyFile));
+            }
+
             var families = new FilteredElementCollector(Document)
                 .OfClass(typeof(Family))
                 .ToElements();
 
-            var family = (Family) families.FirstOrDefault(item => item.Name.Equals(Path.GetFileNameWithoutExtension(familyFile.Name)));
-            return family.GetFamilySymbolIds().Select(item => Document.GetElement(item)).OfType<FamilySymbol>();
+            string familyName = GetFamilyName(familyFile);
+            return (Family) families.FirstOrDefault(item => item.Name.Equals(familyName));
         }
 
-        public void PlaceFamilySymbol(string familySymbolName) {
-            try {
-                FamilySymbol familySymbol = (FamilySymbol) new FilteredElementCollector(Document)
-                    .OfClass(typeof(FamilySymbol))
-                    .FirstOrDefault(item => item.Name.Equals(familySymbolName));
+        public IEnumerable<FamilySymbol> GetFamilySymbols(FileInfo familyFile) {
+            if(familyFile is null) {
+                throw new ArgumentNullException(nameof(familyFile));
+            }
 
+            Family family = GetFamily(familyFile);
+            if(family == null) {
+                return Enumerable.Empty<FamilySymbol>();
+            }
+
+            return family.GetFamilySymbolIds()
+                .Select(item => Document.GetElement(item))
+                .OfType<FamilySymbol>();
+        }
+
+        public FamilySymbol GetFamilySymbol(FileInfo familyFile, string familySymbolName) {
+            if(familyFile is null) {
+                throw new ArgumentNullException(nameof(familyFile));
+            }
+
+            if(string.IsNullOrEmpty(familySymbolName)) {
+                throw new ArgumentException($"'{nameof(familySymbolName)}' cannot be null or empty.", nameof(familySymbolName));
+            }
+
+            return GetFamilySymbols(familyFile).FirstOrDefault(item => item.Name.Equals(familySymbolName));
+        }
+
+        public bool CanPlaceFamilySymbol(FileInfo familyFile, string familySymbolName) {
+            if(familyFile is null) {
+                throw new ArgumentNullException(nameof(familyFile));
+            }
+
+            if(string.IsNullOrEmpty(familySymbolName)) {
+                throw new ArgumentException($"'{nameof(familySymbolName)}' cannot be null or empty.", nameof(familySymbolName));
+            }
+
+            FamilySymbol familySymbol = GetFamilySymbol(familyFile, familySymbolName);
+            if(familySymbol == null) {
+                return false;
+            }
+
+            return _uiApplication.ActiveUIDocument.CanPlaceElementType(familySymbol);
+        }
+
+        public void PlaceFamilySymbol(FileInfo familyFile, string familySymbolName) {
+            if(familyFile is null) {
+                throw new ArgumentNullException(nameof(familyFile));
+            }
+
+            if(string.IsNullOrEmpty(familySymbolName)) {
+                throw new ArgumentException($"'{nameof(familySymbolName)}' cannot be null or empty.", nameof(familySymbolName));
+            }
+
+            try {
+                FamilySymbol familySymbol = GetFamilySymbol(familyFile, familySymbolName);
                 if(familySymbol != null) {
                     _uiApplication.ActiveUIDocument.PromptForFamilyInstancePlacement(familySymbol);
                 }
@@ -60,38 +156,18 @@ namespace RevitFamilyExplorer.Models {
             }
         }
 
-        public bool IsInsertedFamilyFile(FileInfo familyFile) {
-            var families = new FilteredElementCollector(Document)
-                .OfClass(typeof(Family))
-                .ToElements();
-
-            return families.Any(item => item.Name.Equals(Path.GetFileNameWithoutExtension(familyFile.Name)));
-        }
-
-        public IEnumerable<string> GetFamilyTypes(FileInfo familyFile) {
-            var familyDocument = Application.OpenDocumentFile(familyFile.FullName);
-            try {
-                if(!familyDocument.IsFamilyDocument) {
-                    throw new ArgumentException($"Переданный файл не является документом семейства. {familyFile}");
-                }
-
-                return familyDocument.FamilyManager.Types
-                    .Cast<FamilyType>()
-                    .Select(item => string.IsNullOrEmpty(item.Name) ? familyDocument.Title : item.Name)
-                    .ToList();
-            } finally {
-                familyDocument.Close(false);
-            }
-        }
-
         public BitmapSource GetFamilySymbolIcon(FamilySymbol familySymbol) {
+            if(familySymbol is null) {
+                throw new ArgumentNullException(nameof(familySymbol));
+            }
+
             Bitmap bitmap = familySymbol.GetPreviewImage(new Size(96, 96));
             var bitmapImage = new BitmapImage();
 
             using(var memoryStream = new MemoryStream()) {
                 bitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
-                
-                memoryStream.Position = default;                
+
+                memoryStream.Position = default;
                 bitmapImage.BeginInit();
                 bitmapImage.StreamSource = memoryStream;
                 bitmapImage.CacheOption = BitmapCacheOption.OnLoad;

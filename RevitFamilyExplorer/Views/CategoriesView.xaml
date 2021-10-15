@@ -32,7 +32,7 @@
                                     </Button.Resources>
                                 </Button>
 
-                                <TextBlock Text="{Binding Name}">
+                                <TextBlock Margin="0,0,10,0" Text="{Binding Name}">
                                     <TextBlock.ToolTip>
                                         <Image Source="{Binding FamilyIcon}" Width="96" Height="96"/>
                                     </TextBlock.ToolTip>
@@ -63,8 +63,8 @@
                                                 </Style>
                                             </Button.Resources>
                                         </Button>
-                                        
-                                        <TextBlock Text="{Binding Name}">
+
+                                        <TextBlock Margin="0,0,10,0" Text="{Binding Name}">
                                             <TextBlock.ToolTip>
                                                 <Image Source="{Binding FamilySymbolIcon}"/>
                                             </TextBlock.ToolTip>
