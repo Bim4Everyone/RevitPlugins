@@ -19,20 +19,22 @@ namespace RevitFamilyExplorer.ViewModels {
         private readonly FamilyFileViewModel _parentFamily;
 
         private string _imageSource;
-        private BitmapSource _familySymbolIcon; 
+        private BitmapSource _familySymbolIcon;
 
         public FamilyTypeViewModel(RevitRepository revitRepository, FamilyFileViewModel parentFamily, string familyTypeName) {
             _revitRepository = revitRepository;
             _parentFamily = parentFamily;
-           
+
             Name = familyTypeName;
             PlaceFamilySymbolCommand = new RelayCommand(PlaceFamilySymbol, CanPlaceFamilySymbol);
+            UpdateFamilyImageCommand = new RelayCommand(UpdateFamilyImage, CanUpdateFamilyImage);
 
             RefreshImageSource();
         }
 
         public string Name { get; }
         public ICommand PlaceFamilySymbolCommand { get; }
+        public ICommand UpdateFamilyImageCommand { get; }
 
         public string ImageSource {
             get => _imageSource;
@@ -46,29 +48,42 @@ namespace RevitFamilyExplorer.ViewModels {
 
         #region PlaceFamilySymbolCommand
 
-        private void PlaceFamilySymbol(object p) {
-            _revitRepository.PlaceFamilySymbol(_parentFamily.FileInfo, Name);
+        private async void PlaceFamilySymbol(object p) {
+            await _revitRepository.PlaceFamilySymbolAsync(_parentFamily.FileInfo, Name);
         }
 
         private bool CanPlaceFamilySymbol(object p) {
-            return _revitRepository.CanPlaceFamilySymbol(_parentFamily.FileInfo, Name);
+            RefreshImageSource();
+            return true;
+        }
+
+        #endregion
+
+        #region UpdateFamilyImageCommand
+
+        private void UpdateFamilyImage(object p) {
+            RefreshImageSource();
+        }
+
+        private bool CanUpdateFamilyImage(object p) {
+            return true;
         }
 
         #endregion
 
         private void RefreshImageSource() {
 #if D2020 || R2020
-            ImageSource = CanPlaceFamilySymbol(null) 
-                ? @"pack://application:,,,/RevitFamilyExplorer;component/Resources/place_family_symbol.png"
-                : @"pack://application:,,,/RevitFamilyExplorer;component/Resources/cant_place_family_symbol.png";
+            ImageSource = _revitRepository.IsInsertedFamilySymbol(_parentFamily.FileInfo, Name)
+                ? @"pack://application:,,,/RevitFamilyExplorer;component/Resources/insert.png"
+                : @"pack://application:,,,/RevitFamilyExplorer;component/Resources/not-insert.png";
 #elif D2021 || R2021
                         ImageSource = CanPlaceFamilySymbol(null) 
-                ? @"pack://application:,,,/RevitFamilyExplorer_2021;component/Resources/place_family_symbol.png"
-                : @"pack://application:,,,/RevitFamilyExplorer_2021;component/Resources/cant_place_family_symbol.png";
+                ? @"pack://application:,,,/RevitFamilyExplorer_2021;component/Resources/insert.png"
+                : @"pack://application:,,,/RevitFamilyExplorer_2021;component/Resources/not-insert.png";
 #elif D2022 || R2022
                         ImageSource = CanPlaceFamilySymbol(null) 
-                ? @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/place_family_symbol.png"
-                : @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/cant_place_family_symbol.png";
+                ? @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/insert.png"
+                : @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/not-insert.png";
 #endif
         }
     }

@@ -15,11 +15,13 @@ namespace RevitFamilyExplorer.Models {
     internal class RevitRepository {
         private readonly UIApplication _uiApplication;
         private readonly RevitExternalEvent _loadFamilyHandler;
+        private readonly RevitExternalEvent _loadFamilySymbolHandler;
 
 
         public RevitRepository(UIApplication uiApplication) {
             _uiApplication = uiApplication;
             _loadFamilyHandler = new RevitExternalEvent("Загрузка семейства");
+            _loadFamilySymbolHandler = new RevitExternalEvent("Загрузка типоразмера");
         }
 
         public Application Application {
@@ -41,6 +43,13 @@ namespace RevitFamilyExplorer.Models {
             await _loadFamilyHandler.Raise();
         }
 
+        public async Task LoadFamilySymbolAsync(FileInfo familyFile, string familySymbolName) {
+            _loadFamilySymbolHandler.TransactionName = $"Загрузка типоразмера \"{familyFile.Name}\"";
+            _loadFamilySymbolHandler.ExternalAction = app => app.ActiveUIDocument.Document.LoadFamilySymbol(familyFile.FullName, familySymbolName);
+
+            await _loadFamilySymbolHandler.Raise();
+        }
+
         public bool IsInsertedFamilyFile(FileInfo familyFile) {
             if(familyFile is null) {
                 throw new ArgumentNullException(nameof(familyFile));
@@ -49,9 +58,22 @@ namespace RevitFamilyExplorer.Models {
             return GetFamily(familyFile) != null;
         }
 
+        public bool IsInsertedFamilySymbol(FileInfo familyFile, string familySymbolName) {
+            if(familyFile is null) {
+                throw new ArgumentNullException(nameof(familyFile));
+            }
+
+            return GetFamilySymbol(familyFile, familySymbolName) != null;
+        }
+
         public IEnumerable<string> GetFamilyTypes(FileInfo familyFile) {
             if(familyFile is null) {
                 throw new ArgumentNullException(nameof(familyFile));
+            }
+            
+            if(HasTableFamilySymbols(familyFile)) {
+                FileInfo tableFamilySymbols = GetTableFamilySymbols(familyFile);
+                return GetFamilySymbolsByTable(tableFamilySymbols);
             }
 
             Document familyDocument = Application.OpenDocumentFile(familyFile.FullName);
@@ -137,7 +159,7 @@ namespace RevitFamilyExplorer.Models {
             return _uiApplication.ActiveUIDocument.CanPlaceElementType(familySymbol);
         }
 
-        public void PlaceFamilySymbol(FileInfo familyFile, string familySymbolName) {
+        public async Task PlaceFamilySymbolAsync(FileInfo familyFile, string familySymbolName) {
             if(familyFile is null) {
                 throw new ArgumentNullException(nameof(familyFile));
             }
@@ -147,6 +169,7 @@ namespace RevitFamilyExplorer.Models {
             }
 
             try {
+                await LoadFamilySymbolAsync(familyFile, familySymbolName);
                 FamilySymbol familySymbol = GetFamilySymbol(familyFile, familySymbolName);
                 if(familySymbol != null) {
                     _uiApplication.ActiveUIDocument.PromptForFamilyInstancePlacement(familySymbol);
@@ -175,6 +198,26 @@ namespace RevitFamilyExplorer.Models {
             }
 
             return bitmapImage;
+        }
+
+        public bool HasTableFamilySymbols(FileInfo familyFile) {
+            if(familyFile is null) {
+                throw new ArgumentNullException(nameof(familyFile));
+            }
+
+            return GetTableFamilySymbols(familyFile).Exists;
+        }
+
+        private FileInfo GetTableFamilySymbols(FileInfo familyFile) {
+            return new FileInfo(Path.ChangeExtension(familyFile.FullName, ".txt"));
+        }
+
+        private IEnumerable<string> GetFamilySymbolsByTable(FileInfo tableFamilySymbols) {
+            return File.ReadAllLines(tableFamilySymbols.FullName)
+                .Select(item => item.Split(','))
+                .Select(item => item.FirstOrDefault())
+                .Where(item => !string.IsNullOrEmpty(item))
+                .OrderBy(item => item);
         }
     }
 }

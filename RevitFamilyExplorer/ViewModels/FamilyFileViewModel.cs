@@ -29,17 +29,21 @@ namespace RevitFamilyExplorer.ViewModels {
         public FamilyFileViewModel(RevitRepository revitRepository, FileInfo familyFile) {
             _revitRepository = revitRepository;
             _dispatcher = Dispatcher.CurrentDispatcher;
-
+            
             ExpandCommand = new RelayCommand(Expand, CanExpand);
             LoadFamilyCommand = new RelayCommand(LoadFamilyAsync, CanLoadFamily);
             UpdateFamilyImageCommand = new RelayCommand(UpdateFamilyImage, CanUpdateFamilyImage);
             
+            FileInfo = familyFile;
             FamilyTypes = new ObservableCollection<FamilyTypeViewModel>() { null };
-            Refresh(familyFile);
         }
 
         public FileInfo FileInfo {
             get { return _familyFile; }
+            set {
+                _familyFile = value;
+                RaisePropertyChanged(nameof(Name));
+            }
         }
 
         public string Name {
@@ -61,14 +65,6 @@ namespace RevitFamilyExplorer.ViewModels {
         public ICommand UpdateFamilyImageCommand { get; }
         public ObservableCollection<FamilyTypeViewModel> FamilyTypes { get; }
 
-        public void Refresh(FileInfo newFileInfo) {
-            _familyFile = newFileInfo;
-            RaisePropertyChanged(nameof(Name));
-
-            RefreshImageSource();
-            FamilyIcon = ShellFile.FromFilePath(_familyFile.FullName).Thumbnail.BitmapSource;
-        }
-
         #region ExpandCommand
 
         private void Expand(object p) {
@@ -88,12 +84,12 @@ namespace RevitFamilyExplorer.ViewModels {
 
         #region LoadFamilyCommand
 
-        private void LoadFamilyAsync(object p) {
-            _revitRepository.LoadFamilyAsync(_familyFile)
-                .ContinueWith(t => RefreshImageSource(), TaskScheduler.FromCurrentSynchronizationContext());
+        private async void LoadFamilyAsync(object p) {
+            await _revitRepository.LoadFamilyAsync(_familyFile);
         }
 
         private bool CanLoadFamily(object p) {
+            RefreshImageSource();
             return !_revitRepository.IsInsertedFamilyFile(_familyFile);
         }
 
@@ -125,6 +121,8 @@ namespace RevitFamilyExplorer.ViewModels {
                 ? @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/insert.png" 
                 : @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/not-insert.png";
 #endif
+            
+            FamilyIcon = ShellFile.FromFilePath(_familyFile.FullName).Thumbnail.BitmapSource;
         }
 
         private IEnumerable<FamilyTypeViewModel> GetFamilySymbols() {
