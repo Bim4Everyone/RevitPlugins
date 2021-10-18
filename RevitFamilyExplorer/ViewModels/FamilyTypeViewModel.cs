@@ -27,9 +27,6 @@ namespace RevitFamilyExplorer.ViewModels {
 
             Name = familyTypeName;
             PlaceFamilySymbolCommand = new RelayCommand(PlaceFamilySymbol, CanPlaceFamilySymbol);
-            UpdateFamilyImageCommand = new RelayCommand(UpdateFamilyImage, CanUpdateFamilyImage);
-
-            RefreshImageSource();
         }
 
         public string Name { get; }
@@ -54,18 +51,6 @@ namespace RevitFamilyExplorer.ViewModels {
 
         private bool CanPlaceFamilySymbol(object p) {
             RefreshImageSource();
-            return true;
-        }
-
-        #endregion
-
-        #region UpdateFamilyImageCommand
-
-        private void UpdateFamilyImage(object p) {
-            RefreshImageSource();
-        }
-
-        private bool CanUpdateFamilyImage(object p) {
             return true;
         }
 

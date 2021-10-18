@@ -32,7 +32,6 @@ namespace RevitFamilyExplorer.ViewModels {
             
             ExpandCommand = new RelayCommand(Expand, CanExpand);
             LoadFamilyCommand = new RelayCommand(LoadFamilyAsync, CanLoadFamily);
-            UpdateFamilyImageCommand = new RelayCommand(UpdateFamilyImage, CanUpdateFamilyImage);
             
             FileInfo = familyFile;
             FamilyTypes = new ObservableCollection<FamilyTypeViewModel>() { null };
@@ -62,7 +61,6 @@ namespace RevitFamilyExplorer.ViewModels {
 
         public ICommand ExpandCommand { get; }
         public ICommand LoadFamilyCommand { get; }
-        public ICommand UpdateFamilyImageCommand { get; }
         public ObservableCollection<FamilyTypeViewModel> FamilyTypes { get; }
 
         #region ExpandCommand
@@ -91,18 +89,6 @@ namespace RevitFamilyExplorer.ViewModels {
         private bool CanLoadFamily(object p) {
             RefreshImageSource();
             return !_revitRepository.IsInsertedFamilyFile(_familyFile);
-        }
-
-        #endregion
-
-        #region UpdateFamilyImageCommand
-
-        private void UpdateFamilyImage(object p) {
-            RefreshImageSource();
-        }
-
-        private bool CanUpdateFamilyImage(object p) {
-            return true;
         }
 
         #endregion

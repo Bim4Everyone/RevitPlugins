@@ -44,10 +44,6 @@
                                         <i:InvokeCommandAction Command="{Binding ExpandCommand}" />
                                     </i:EventTrigger>
 
-                                    <i:EventTrigger EventName="MouseEnter">
-                                        <i:InvokeCommandAction Command="{Binding UpdateFamilyImageCommand}"/>
-                                    </i:EventTrigger>
-
                                 </i:Interaction.Triggers>
                             </StackPanel>
 
@@ -65,12 +61,6 @@
                                         </Button>
 
                                         <TextBlock Margin="0,0,10,0" Text="{Binding Name}"/>
-
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="MouseMove">
-                                                <i:InvokeCommandAction Command="{Binding UpdateFamilyImageCommand}"/>
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
                                     </StackPanel>
                                 </DataTemplate>
                             </HierarchicalDataTemplate.ItemTemplate>
