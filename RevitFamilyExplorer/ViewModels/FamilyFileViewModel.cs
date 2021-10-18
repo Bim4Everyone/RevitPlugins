@@ -83,7 +83,11 @@ namespace RevitFamilyExplorer.ViewModels {
         #region LoadFamilyCommand
 
         private async void LoadFamilyAsync(object p) {
-            await _revitRepository.LoadFamilyAsync(_familyFile);
+            try {
+                await _revitRepository.LoadFamilyAsync(_familyFile);
+            } catch(OperationCanceledException) {
+            } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
+            }
         }
 
         private bool CanLoadFamily(object p) {

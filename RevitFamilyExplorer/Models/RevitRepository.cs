@@ -44,6 +44,14 @@ namespace RevitFamilyExplorer.Models {
         }
 
         public async Task LoadFamilySymbolAsync(FileInfo familyFile, string familySymbolName) {
+            if(familyFile is null) {
+                throw new ArgumentNullException(nameof(familyFile));
+            }
+
+            if(string.IsNullOrEmpty(familySymbolName)) {
+                throw new ArgumentException($"'{nameof(familySymbolName)}' cannot be null or empty.", nameof(familySymbolName));
+            }
+
             _loadFamilySymbolHandler.TransactionName = $"Загрузка типоразмера \"{familyFile.Name}\"";
             _loadFamilySymbolHandler.ExternalAction = app => app.ActiveUIDocument.Document.LoadFamilySymbol(familyFile.FullName, familySymbolName);
 
@@ -70,7 +78,7 @@ namespace RevitFamilyExplorer.Models {
             if(familyFile is null) {
                 throw new ArgumentNullException(nameof(familyFile));
             }
-            
+
             if(HasTableFamilySymbols(familyFile)) {
                 FileInfo tableFamilySymbols = GetTableFamilySymbols(familyFile);
                 return GetFamilySymbolsByTable(tableFamilySymbols);
@@ -168,36 +176,11 @@ namespace RevitFamilyExplorer.Models {
                 throw new ArgumentException($"'{nameof(familySymbolName)}' cannot be null or empty.", nameof(familySymbolName));
             }
 
-            try {
-                await LoadFamilySymbolAsync(familyFile, familySymbolName);
-                FamilySymbol familySymbol = GetFamilySymbol(familyFile, familySymbolName);
-                if(familySymbol != null) {
-                    _uiApplication.ActiveUIDocument.PromptForFamilyInstancePlacement(familySymbol);
-                }
-            } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
-
+            await LoadFamilySymbolAsync(familyFile, familySymbolName);
+            FamilySymbol familySymbol = GetFamilySymbol(familyFile, familySymbolName);
+            if(familySymbol != null) {
+                _uiApplication.ActiveUIDocument.PromptForFamilyInstancePlacement(familySymbol);
             }
-        }
-
-        public BitmapSource GetFamilySymbolIcon(FamilySymbol familySymbol) {
-            if(familySymbol is null) {
-                throw new ArgumentNullException(nameof(familySymbol));
-            }
-
-            Bitmap bitmap = familySymbol.GetPreviewImage(new Size(96, 96));
-            var bitmapImage = new BitmapImage();
-
-            using(var memoryStream = new MemoryStream()) {
-                bitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
-
-                memoryStream.Position = default;
-                bitmapImage.BeginInit();
-                bitmapImage.StreamSource = memoryStream;
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.EndInit();
-            }
-
-            return bitmapImage;
         }
 
         public bool HasTableFamilySymbols(FileInfo familyFile) {

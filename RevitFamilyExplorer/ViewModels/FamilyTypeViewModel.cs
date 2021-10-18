@@ -46,7 +46,11 @@ namespace RevitFamilyExplorer.ViewModels {
         #region PlaceFamilySymbolCommand
 
         private async void PlaceFamilySymbol(object p) {
-            await _revitRepository.PlaceFamilySymbolAsync(_parentFamily.FileInfo, Name);
+            try {
+                await _revitRepository.PlaceFamilySymbolAsync(_parentFamily.FileInfo, Name);
+            } catch(OperationCanceledException) {
+            } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
+            }
         }
 
         private bool CanPlaceFamilySymbol(object p) {
