@@ -103,15 +103,15 @@ namespace RevitFamilyExplorer.ViewModels {
                 ? @"pack://application:,,,/RevitFamilyExplorer;component/Resources/insert.png"
                 : @"pack://application:,,,/RevitFamilyExplorer;component/Resources/not-insert.png";
 #elif D2021 || R2021
-            ImageSource = _revitRepository.IsInsertedFamilyFile(newFileInfo) 
+            ImageSource = _revitRepository.IsInsertedFamilyFile(_familyFile) 
                 ? @"pack://application:,,,/RevitFamilyExplorer_2021;component/Resources/insert.png" 
                 : @"pack://application:,,,/RevitFamilyExplorer_2021;component/Resources/not-insert.png";
 #elif D2022 || R2022
-            ImageSource = _revitRepository.IsInsertedFamilyFile(newFileInfo) 
+            ImageSource = _revitRepository.IsInsertedFamilyFile(_familyFile) 
                 ? @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/insert.png" 
                 : @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/not-insert.png";
 #endif
-            
+
             FamilyIcon = ShellFile.FromFilePath(_familyFile.FullName).Thumbnail.BitmapSource;
         }
 
