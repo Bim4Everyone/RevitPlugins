@@ -15,9 +15,17 @@ namespace RevitRooms.ViewModels {
         private readonly Room _room;
         private readonly RevitRepository _revitRepository;
 
-        public RoomViewModel(Room room, RevitRepository revitRepository) {
+        public RoomViewModel(Room room, LevelViewModel levelViewModel, RevitRepository revitRepository) {
             _room = room;
             _revitRepository = revitRepository;
+
+            Level = levelViewModel;
         }
+
+        public string DisplayData {
+            get { return _room.Name; }
+        }
+
+        public LevelViewModel Level { get; }
     }
 }

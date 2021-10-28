@@ -7,15 +7,18 @@ using System.Threading.Tasks;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 
+using RevitRooms.Models;
+
 namespace RevitRooms.ViewModels.Revit {
     internal class ElementsRevitViewModel : RevitViewModel {
         public ElementsRevitViewModel(Application application, Document document)
             : base(application, document) {
         }
 
-        protected override IEnumerable<RoomViewModel> GetRoomViewModels() {
+        protected override IEnumerable<LevelViewModel> GetLevelViewModels() {
             return _revitRepository.GetAllRooms()
-                .Select(item => new RoomViewModel(item, _revitRepository));
+            .GroupBy(item => item.Level, new ElementComparer())
+            .Select(item => new LevelViewModel((Level) item.Key, _revitRepository, item));
         }
     }
 }

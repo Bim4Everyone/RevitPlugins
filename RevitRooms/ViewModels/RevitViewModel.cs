@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,9 +18,12 @@ namespace RevitRooms.ViewModels {
 
         public RevitViewModel(Application application, Document document) {
             _revitRepository = new RevitRepository(application, document);
+
+            Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
         }
 
         public string DisplayData { get; set; }
-        protected abstract IEnumerable<RoomViewModel> GetRoomViewModels();
+        public ObservableCollection<LevelViewModel> Levels { get; }
+        protected abstract IEnumerable<LevelViewModel> GetLevelViewModels();
     }
 }
