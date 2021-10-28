@@ -41,6 +41,10 @@ namespace RevitRooms.Models {
                 .ToList();
         }
 
+        public IList<Room> GetRoomsOnActiveView() {
+            return GetRoomsOnView(_document.ActiveView);
+        }
+
         public IList<Room> GetRoomsOnView(View view) {
             return new FilteredElementCollector(_document, view.Id)
                 .WhereElementIsNotElementType()
