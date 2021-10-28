@@ -13,6 +13,7 @@ using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.WPF.ViewModels;
 
 using RevitRooms.Models;
+using dosymep.Bim4Everyone.SharedParams;
 
 namespace RevitRooms.ViewModels {
     internal class RoomViewModel : BaseViewModel {
@@ -61,5 +62,18 @@ namespace RevitRooms.ViewModels {
 
         public LevelViewModel Level { get; }
         public PhaseViewModel Phase { get; }
+
+        public void UpdateSharedParams() {
+            _room.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaSpec, ProjectParamsConfig.Instance.ApartmentAreaSpec);
+            _room.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaMinSpec, ProjectParamsConfig.Instance.ApartmentAreaMinSpec);
+            _room.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaMaxSpec, ProjectParamsConfig.Instance.ApartmentAreaMaxSpec);
+
+            _room.SetParamValue(SharedParamsConfig.Instance.RoomGroupShortName, ProjectParamsConfig.Instance.RoomGroupShortName);
+            _room.SetParamValue(SharedParamsConfig.Instance.RoomSectionShortName, ProjectParamsConfig.Instance.RoomSectionShortName);
+            _room.SetParamValue(SharedParamsConfig.Instance.RoomTypeGroupShortName, ProjectParamsConfig.Instance.RoomTypeGroupShortName);
+            _room.SetParamValue(SharedParamsConfig.Instance.FireCompartmentShortName, ProjectParamsConfig.Instance.FireCompartmentShortName);
+
+            _room.SetParamValue(SharedParamsConfig.Instance.Level, Level.DisplayData.Replace(" этаж", string.Empty));
+        }
     }
 }
