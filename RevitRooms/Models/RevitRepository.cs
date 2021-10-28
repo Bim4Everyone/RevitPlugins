@@ -52,5 +52,10 @@ namespace RevitRooms.Models {
                 .OfType<Room>()
                 .ToList();
         }
+
+        public Phase GetPhase(Element element) {
+            ElementId phaseId = (ElementId) element.GetParamValueOrDefault(BuiltInParameter.ROOM_PHASE_ID);
+            return (Phase) _document.GetElement(phaseId);
+        }
     }
 }
