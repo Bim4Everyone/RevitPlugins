@@ -1,0 +1,52 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using Autodesk.Revit.ApplicationServices;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
+using Autodesk.Revit.UI;
+
+using dosymep.Revit;
+
+namespace RevitRooms.Models {
+    internal class RevitRepository {
+        private readonly Application _application;
+        private readonly UIApplication _uiApplication;
+
+        private readonly Document _document;
+        private readonly UIDocument _uiDocument;
+
+        public RevitRepository(Application application, Document document) {
+            _application = application;
+            _uiApplication = new UIApplication(application);
+
+            _document = document;
+            _uiDocument = new UIDocument(document);
+        }
+
+        public IList<Room> GetSelectedRooms() {
+            return _uiDocument.GetSelectedElements()
+                .OfType<Room>()
+                .ToList();
+        }
+
+        public IList<Room> GetAllRooms() {
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(Room))
+                .OfType<Room>()
+                .ToList();
+        }
+
+        public IList<Room> GetRoomsOnView(View view) {
+            return new FilteredElementCollector(_document, view.Id)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(Room))
+                .OfType<Room>()
+                .ToList();
+        }
+    }
+}
