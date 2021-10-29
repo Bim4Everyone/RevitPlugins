@@ -15,10 +15,16 @@ using RevitRooms.Models;
 namespace RevitRooms.ViewModels {
     internal class LevelViewModel : BaseViewModel, IComparable<LevelViewModel>, IEquatable<LevelViewModel> {
         private readonly Level _level;
+        private bool _isSelected;
 
         public LevelViewModel(Level level, RevitRepository revitRepository, IEnumerable<Room> rooms) {
             _level = level;
-            Rooms = new ObservableCollection<RoomViewModel>(rooms.Select(item => new RoomViewModel(item, this, revitRepository)));
+            Rooms = new ObservableCollection<RoomViewModel>(rooms.Select(item => new RoomViewModel(item, revitRepository)));
+        }
+
+        public bool IsSelected {
+            get => _isSelected;
+            set => this.RaiseAndSetIfChanged(ref _isSelected, value);
         }
 
         public string DisplayData {

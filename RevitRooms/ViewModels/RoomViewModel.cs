@@ -20,13 +20,11 @@ namespace RevitRooms.ViewModels {
         private readonly Room _room;
         private readonly RevitRepository _revitRepository;
 
-        public RoomViewModel(Room room, LevelViewModel levelViewModel, RevitRepository revitRepository) {
+        public RoomViewModel(Room room, RevitRepository revitRepository) {
             _room = room;
             _revitRepository = revitRepository;
 
-            Level = levelViewModel;
             Phase = new PhaseViewModel(_revitRepository.GetPhase(_room));
-
             if(RoomArea == null || RoomArea == 0) {
                 var segments = _room.GetBoundarySegments(new SpatialElementBoundaryOptions());
                 IsRedundant = segments.Count > 0;
@@ -55,7 +53,7 @@ namespace RevitRooms.ViewModels {
         }
 
         public string LevelName {
-            get { return Level.DisplayData; }
+            get { return _room.Level.Name; }
         }
 
         public double? RoomArea {
@@ -68,8 +66,6 @@ namespace RevitRooms.ViewModels {
 
         public bool? IsRedundant { get; }
         public bool? NotEnclosed { get; }
-
-        public LevelViewModel Level { get; }
         public PhaseViewModel Phase { get; }
 
         public void UpdateSharedParams() {
@@ -82,7 +78,7 @@ namespace RevitRooms.ViewModels {
             _room.SetParamValue(SharedParamsConfig.Instance.RoomTypeGroupShortName, ProjectParamsConfig.Instance.RoomTypeGroupShortName);
             _room.SetParamValue(SharedParamsConfig.Instance.FireCompartmentShortName, ProjectParamsConfig.Instance.FireCompartmentShortName);
 
-            _room.SetParamValue(SharedParamsConfig.Instance.Level, Level.DisplayData.Replace(" этаж", string.Empty));
+            _room.SetParamValue(SharedParamsConfig.Instance.Level, _room.Level.Name.Replace(" этаж", string.Empty));
         }
     }
 }

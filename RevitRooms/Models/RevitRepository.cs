@@ -62,6 +62,15 @@ namespace RevitRooms.Models {
             return (Phase) _document.GetElement(GetPhaseId(element));
         }
 
+        public IList<Phase> GetAdditionalPhases() {
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(Phase))
+                .Where(item => item.Name.Equals("Контур здания") || item.Name.Equals("Межквартирные перегородки"))
+                .OfType<Phase>()
+                .ToList();
+        }
+
         /// <summary>
         /// Удаляет все не размещенные помещения.
         /// </summary>
