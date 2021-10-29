@@ -4,7 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Квартирография" Height="550" Width="500">
+        Title="Квартирография" Height="550" Width="500" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
@@ -19,7 +19,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
+
         <ComboBox Grid.Row="0" Margin="10" 
                   ItemsSource="{Binding RevitViewModels}" 
                   SelectedItem="{Binding RevitViewModel}">
@@ -32,10 +32,10 @@
 
         <CheckBox Grid.Row="1" Margin="10" Content="Рассчитать площадь по пятну"
                   IsChecked="{Binding RevitViewModel.IsSpotCalcArea}"/>
-        
+
         <CheckBox x:Name="_checkArea" Grid.Row="2" Margin="10" Content="Проверить площадь помещений на изменения:"
                   IsChecked="{Binding RevitViewModel.IsCheckRoomsChanges}"/>
-        
+
         <StackPanel Grid.Row="3" Margin="0,5,10,0" Orientation="Horizontal" 
                     Visibility="{Binding ElementName=_checkArea,Path=IsChecked, Converter={StaticResource BoolToVis}}" >
             <TextBlock Margin="50,0,10,0" Text="Точность проверки"/>
@@ -47,7 +47,13 @@
             <TextBlock Text="Стадии:" Width="158"/>
             <ComboBox Margin="10,0,0,0"
                       ItemsSource="{Binding RevitViewModel.Phases}"
-                      SelectedItem="{Binding RevitViewModel.Phase}"/>
+                      SelectedItem="{Binding RevitViewModel.Phase}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding DisplayData}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
         </DockPanel>
 
         <DockPanel Grid.Row="5" Margin="10">
@@ -61,9 +67,16 @@
                   ItemsSource="{Binding RevitViewModel.Levels}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=IsSelected}" Header="#" Width="20"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Наименование" Width="380"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=Elevation}" Header="Уровень" Width="60"/>
+                    <GridViewColumn Width="30" Header="#">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=DisplayData}" Header="Наименование" Width="250"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Elevation}" Header="Уровень" Width="100"/>
+                    <!--<GridViewColumn DisplayMemberBinding="{Binding Path=RoomsCount}" Header="Количество" Width="100"/>-->
                 </GridView>
             </ListView.View>
         </ListView>

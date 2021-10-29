@@ -36,7 +36,7 @@ namespace RevitRooms.Models {
         public IList<Room> GetAllRooms() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
-                .OfClass(typeof(Room))
+                .OfCategory(BuiltInCategory.OST_Rooms)
                 .OfType<Room>()
                 .ToList();
         }
@@ -48,7 +48,7 @@ namespace RevitRooms.Models {
         public IList<Room> GetRoomsOnView(View view) {
             return new FilteredElementCollector(_document, view.Id)
                 .WhereElementIsNotElementType()
-                .OfClass(typeof(Room))
+                .OfCategory(BuiltInCategory.OST_Rooms)
                 .OfType<Room>()
                 .ToList();
         }

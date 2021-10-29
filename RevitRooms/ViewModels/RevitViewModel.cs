@@ -21,7 +21,8 @@ namespace RevitRooms.ViewModels {
             _revitRepository = new RevitRepository(application, document);
 
             Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
-            Phases = new ObservableCollection<PhaseViewModel>(Levels.SelectMany(item => item.Rooms).Select(item => item.Phase));
+            Phases = new ObservableCollection<PhaseViewModel>(Levels.SelectMany(item => item.Rooms).Select(item => item.Phase).Distinct());
+            Phase = Phases.FirstOrDefault();
 
             RoundAccuracy = 1;
             RoundAccuracyValues = new ObservableCollection<int>(Enumerable.Range(1, 3));
