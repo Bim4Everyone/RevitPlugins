@@ -15,11 +15,14 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
-        <ComboBox Grid.Row="0" Margin="10" ItemsSource="{Binding RevitViewModels}" SelectedItem="{Binding RevitViewModel}">
+        <ComboBox Grid.Row="0" Margin="10" 
+                  ItemsSource="{Binding RevitViewModels}" 
+                  SelectedItem="{Binding RevitViewModel}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding DisplayData}"/>
@@ -27,30 +30,45 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
 
-        <CheckBox Grid.Row="1" Margin="10" Content="Рассчитать площадь по пятну" />
-        <CheckBox x:Name="_checkArea" Grid.Row="2" Margin="10" Content="Проверить площадь помещений на изменения:" />
-        <StackPanel Grid.Row="3" Margin="0,5,10,0" Orientation="Horizontal" Visibility="{Binding ElementName=_checkArea,Path=IsChecked, Converter={StaticResource BoolToVis}}" >
+        <CheckBox Grid.Row="1" Margin="10" Content="Рассчитать площадь по пятну"
+                  IsChecked="{Binding RevitViewModel.IsSpotCalcArea}"/>
+        
+        <CheckBox x:Name="_checkArea" Grid.Row="2" Margin="10" Content="Проверить площадь помещений на изменения:"
+                  IsChecked="{Binding RevitViewModel.IsCheckRoomsChanges}"/>
+        
+        <StackPanel Grid.Row="3" Margin="0,5,10,0" Orientation="Horizontal" 
+                    Visibility="{Binding ElementName=_checkArea,Path=IsChecked, Converter={StaticResource BoolToVis}}" >
             <TextBlock Margin="50,0,10,0" Text="Точность проверки"/>
-            <TextBox Width="50"/>
+            <TextBox Width="50" Text="{Binding RevitViewModel.CheckRoomAccuracy}"/>
             <TextBlock Margin="10,0,0,0" Text="%"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="4" Margin="10" Orientation="Horizontal">
-            <TextBlock Text="Число знаков после запятой:"/>
-            <ComboBox Margin="10,0,0,0" Width="120" />
-        </StackPanel>
+        <DockPanel Grid.Row="4" Margin="10">
+            <TextBlock Text="Стадии:" Width="158"/>
+            <ComboBox Margin="10,0,0,0"
+                      ItemsSource="{Binding RevitViewModel.Phases}"
+                      SelectedItem="{Binding RevitViewModel.Phase}"/>
+        </DockPanel>
 
-        <ListView Grid.Row="5" Margin="10">
+        <DockPanel Grid.Row="5" Margin="10">
+            <TextBlock x:Name="_text" Text="Число знаков после запятой:"/>
+            <ComboBox Margin="10,0,0,0"
+                      ItemsSource="{Binding RevitViewModel.RoundAccuracyValues}"
+                    SelectedItem="{Binding RevitViewModel.RoundAccuracy}"/>
+        </DockPanel>
+
+        <ListView Grid.Row="6" Margin="10"
+                  ItemsSource="{Binding RevitViewModel.Levels}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn DisplayMemberBinding="{Binding Path=IsSelected}" Header="#" Width="20"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Уровень" Width="380"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=Elevation}" Header="Значение" Width="60"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Наименование" Width="380"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Elevation}" Header="Уровень" Width="60"/>
                 </GridView>
             </ListView.View>
         </ListView>
 
-        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Рассчитать" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding RevitViewModel.SelectElements}"/>
             <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
         </StackPanel>
