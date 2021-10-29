@@ -25,6 +25,10 @@ namespace RevitRooms.ViewModels {
             get { return _level.Name; }
         }
 
+        public bool IsLivingLevel {
+            get { return UnitUtils.ConvertFromInternalUnits(_level.Elevation, DisplayUnitType.DUT_METERS) > 2; }
+        }
+
         public string Elevation {
             get { return UnitUtils.ConvertFromInternalUnits(_level.Elevation, DisplayUnitType.DUT_METERS) + " " + UnitUtils.GetTypeCatalogString(DisplayUnitType.DUT_METERS); }
         }
@@ -45,8 +49,8 @@ namespace RevitRooms.ViewModels {
             return Equals(obj as LevelViewModel);
         }
 
-        public bool Equals(LevelViewModel level) {
-            return level == null ? false : _level.Id.Equals(level._level.Id);
+        public bool Equals(LevelViewModel other) {
+            return other != null && _level.Id.Equals(other._level.Id);
         }
 
         public override int GetHashCode() {
