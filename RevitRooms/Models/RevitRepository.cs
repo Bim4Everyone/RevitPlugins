@@ -57,5 +57,20 @@ namespace RevitRooms.Models {
             ElementId phaseId = (ElementId) element.GetParamValueOrDefault(BuiltInParameter.ROOM_PHASE_ID);
             return (Phase) _document.GetElement(phaseId);
         }
+
+        /// <summary>
+        /// Удаляет все не размещенные помещения.
+        /// </summary>
+        /// <remarks>Создает свою транзакцию.</remarks>
+        public void RemoveUnplacedRooms() {
+            var unplacedRooms = GetAllRooms().Where(item => item.Location == null);
+            using(var transaction = new Transaction(_document)) {
+                transaction.Start("Удаление не размещенных помещений");
+
+                _document.Delete(unplacedRooms.Select(item => item.Id).ToArray());
+
+                transaction.Commit();
+            }
+        }
     }
 }
