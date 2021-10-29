@@ -26,6 +26,12 @@ namespace RevitRooms.ViewModels {
 
             Level = levelViewModel;
             Phase = new PhaseViewModel(_revitRepository.GetPhase(_room));
+
+            if(RoomArea == null || RoomArea == 0) {
+                var segments = _room.GetBoundarySegments(new SpatialElementBoundaryOptions());
+                IsRedundant = segments.Count > 0;
+                NotEnclosed = segments.Count == 0;
+            }
         }
 
         public string DisplayData {
@@ -59,6 +65,9 @@ namespace RevitRooms.ViewModels {
         public bool IsPlaced {
             get { return _room.Location != null; }
         }
+
+        public bool? IsRedundant { get; }
+        public bool? NotEnclosed { get; }
 
         public LevelViewModel Level { get; }
         public PhaseViewModel Phase { get; }
