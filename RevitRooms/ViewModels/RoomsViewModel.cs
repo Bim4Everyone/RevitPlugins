@@ -13,10 +13,10 @@ using dosymep.WPF.ViewModels;
 using RevitRooms.ViewModels.Revit;
 
 namespace RevitRooms.ViewModels {
-    internal class RoomsProjectStageViewModel : BaseViewModel {
+    internal class RoomsViewModel : BaseViewModel {
         private RevitViewModel _revitViewModel;
 
-        public RoomsProjectStageViewModel(Application application, Document document) {
+        public RoomsViewModel(Application application, Document document) {
             RevitViewModels = new ObservableCollection<RevitViewModel> {
                 new ViewRevitViewModel(application, document) { DisplayData = "Выборка по текущему виду" },
                 new ElementsRevitViewModel(application, document) { DisplayData = "Выборка по всем элементам" },
