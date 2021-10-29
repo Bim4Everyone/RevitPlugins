@@ -53,9 +53,13 @@ namespace RevitRooms.Models {
                 .ToList();
         }
 
+        public IList<Room> GetRooms(IEnumerable<Phase> phases) {
+            var phaseIds = phases.Select(item => item.Id);
+            return GetAllRooms().Where(item => phaseIds.Contains(GetPhaseId(item))).ToList();
+        }
+
         public Phase GetPhase(Element element) {
-            ElementId phaseId = (ElementId) element.GetParamValueOrDefault(BuiltInParameter.ROOM_PHASE_ID);
-            return (Phase) _document.GetElement(phaseId);
+            return (Phase) _document.GetElement(GetPhaseId(element));
         }
 
         /// <summary>
@@ -71,6 +75,10 @@ namespace RevitRooms.Models {
 
                 transaction.Commit();
             }
+        }
+
+        public ElementId GetPhaseId(Element element) {
+            return (ElementId) element.GetParamValueOrDefault(BuiltInParameter.ROOM_PHASE_ID);
         }
     }
 }
