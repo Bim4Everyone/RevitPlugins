@@ -20,5 +20,13 @@ namespace RevitRooms.Views {
         public RoomsWindow() {
             InitializeComponent();
         }
+
+        private void ButtonOK_Click(object sender, RoutedEventArgs e) {
+            DialogResult = true;
+        }
+
+        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
+            DialogResult = false;
+        }
     }
 }
