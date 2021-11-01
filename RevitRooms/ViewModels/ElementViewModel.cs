@@ -88,11 +88,11 @@ namespace RevitRooms.ViewModels {
         }
 
         public static bool operator ==(ElementViewModel<TElement> left, ElementViewModel<TElement> right) {
-            return ReferenceEquals(left, right) ? true : left.Equals(right);
+            return ReferenceEquals(left, right) || left.Equals(right);
         }
 
         public static bool operator !=(ElementViewModel<TElement> left, ElementViewModel<TElement> right) {
-            return left.CompareTo(right) >= 0;
+            return !ReferenceEquals(left, right) && !left.Equals(right);
         }
 
         #endregion
