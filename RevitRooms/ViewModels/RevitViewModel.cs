@@ -10,6 +10,9 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -53,30 +56,6 @@ namespace RevitRooms.ViewModels {
         public ObservableCollection<LevelViewModel> Levels { get; }
 
         protected abstract IEnumerable<LevelViewModel> GetLevelViewModels();
-        protected virtual IEnumerable<RoomViewModel> GetAdditionalRoomsViewModels() {
-            var phases = _revitRepository.GetAdditionalPhases();
-            return _revitRepository.GetRooms(phases)
-                .Select(item => new RoomViewModel(item, _revitRepository));
-        }
-
-        private List<DoorViewModel> GetErrorDoorsViewModels(IEnumerable<RoomViewModel> rooms) {
-            return _revitRepository.GetDoors()
-                .Select(item => new DoorViewModel(item, _revitRepository))
-                .Where(item => item.Phase.Equals(Phase))
-                .Where(item => !item.IsSectionNameEqual)
-                .Where(item => rooms.Contains(item.FromRoom) || rooms.Contains(item.ToRoom))
-                .ToList();
-        }
-
-        private List<RoomViewModel> GetErrorRoomsGroup(IEnumerable<RoomViewModel> rooms) {
-            return rooms.Where(room => room.RoomGroup != null)
-                .Where(room => ContainGroups(room))
-                .GroupBy(room => room.RoomGroup)
-                .Where(group => IsGroupTypeEqual(group))
-                .SelectMany(items => items)
-                .ToList();
-        }
-
         private void Calculate(object p) {
             // Удаляем все не размещенные помещения
             _revitRepository.RemoveUnplacedRooms();
@@ -113,10 +92,12 @@ namespace RevitRooms.ViewModels {
 
             // Все помещения у которых
             // не заполнены обязательные параметры
-            var errorRooms = rooms.Where(item => item.Room == null 
-                || item.RoomSection == null 
+            var errorRooms = rooms.Where(item => item.Room == null
+                || item.RoomSection == null
                 || item.RoomGroup == null)
                 .ToList();
+
+            UpdateAreaSquare();
 
             foreach(var room in rooms) {
                 // Заполняем дублирующие
@@ -128,6 +109,40 @@ namespace RevitRooms.ViewModels {
         private bool CanCalculate(object p) {
             ErrorText = null;
             return true;
+        }
+
+        private void UpdateAreaSquare() {
+            var areas = _revitRepository.GetAreas();
+            foreach(var area in areas) {
+                double? squareArea = (double?) area.GetParamValueOrDefault(BuiltInParameter.ROOM_AREA);
+
+                squareArea = ConvertValueToSquareMeters(squareArea);
+                area.SetParamValue(SharedParamsConfig.Instance.RoomAreaWithRatio, squareArea.Value);
+            }
+        }
+
+        private IEnumerable<RoomViewModel> GetAdditionalRoomsViewModels() {
+            var phases = _revitRepository.GetAdditionalPhases();
+            return _revitRepository.GetRooms(phases)
+                .Select(item => new RoomViewModel(item, _revitRepository));
+        }
+
+        private List<DoorViewModel> GetErrorDoorsViewModels(IEnumerable<RoomViewModel> rooms) {
+            return _revitRepository.GetDoors()
+                .Select(item => new DoorViewModel(item, _revitRepository))
+                .Where(item => item.Phase.Equals(Phase))
+                .Where(item => !item.IsSectionNameEqual)
+                .Where(item => rooms.Contains(item.FromRoom) || rooms.Contains(item.ToRoom))
+                .ToList();
+        }
+
+        private List<RoomViewModel> GetErrorRoomsGroup(IEnumerable<RoomViewModel> rooms) {
+            return rooms.Where(room => room.RoomGroup != null)
+                .Where(room => ContainGroups(room))
+                .GroupBy(room => room.RoomGroup)
+                .Where(group => IsGroupTypeEqual(group))
+                .SelectMany(items => items)
+                .ToList();
         }
 
         private static bool IsGroupTypeEqual(IEnumerable<RoomViewModel> rooms) {
@@ -143,6 +158,14 @@ namespace RevitRooms.ViewModels {
 
         private static bool Contains(string source, string toCheck, StringComparison comp) {
             return source?.IndexOf(toCheck, comp) >= 0;
+        }
+
+        private int? GetRoomAccuracy() {
+            return int.TryParse(CheckRoomAccuracy, out int result) ? result : (int?) null;
+        }
+
+        private double ConvertValueToSquareMeters(double? value) {
+            return value.HasValue ? Math.Round(UnitUtils.ConvertFromInternalUnits(value.Value, DisplayUnitType.DUT_SQUARE_METERS), GetRoomAccuracy().Value) : 0;
         }
     }
 }

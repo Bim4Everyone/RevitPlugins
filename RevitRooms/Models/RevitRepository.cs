@@ -105,5 +105,13 @@ namespace RevitRooms.Models {
         public void SelectElement(Element element) {
             _uiDocument.SetSelectedElements(element);
         }
+
+        public IList<Area> GetAreas() {
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_Areas)
+                .OfType<Area>()
+                .ToList();
+        }
     }
 }
