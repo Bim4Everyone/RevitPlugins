@@ -16,6 +16,10 @@ namespace RevitRooms.ViewModels {
             _phase = phase;
         }
 
+        public Phase Element {
+            get { return _phase; }
+        }
+
         public string DisplayData {
             get { return _phase.Name; }
         }

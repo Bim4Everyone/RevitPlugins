@@ -19,7 +19,7 @@ namespace RevitRooms.ViewModels {
 
         public LevelViewModel(Level level, RevitRepository revitRepository, IEnumerable<Room> rooms) {
             _level = level;
-            Rooms = new ObservableCollection<RoomViewModel>(rooms.Select(item => new RoomViewModel(item, revitRepository)));
+            Rooms = new ObservableCollection<RoomViewModel>(rooms.Select(item => new RoomViewModel(item, revitRepository.GetPhase(item))).Where(item => item.IsPlaced));
         }
 
         public bool IsSelected {

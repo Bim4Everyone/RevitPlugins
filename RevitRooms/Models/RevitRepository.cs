@@ -71,6 +71,14 @@ namespace RevitRooms.Models {
                 .ToList();
         }
 
+        public IList<FamilyInstance> GetDoors() {
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_Doors)
+                .OfType<FamilyInstance>()
+                .ToList();
+        }
+
         /// <summary>
         /// Удаляет все не размещенные помещения.
         /// </summary>

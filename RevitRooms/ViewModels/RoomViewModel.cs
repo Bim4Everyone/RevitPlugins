@@ -16,15 +16,13 @@ using RevitRooms.Models;
 using dosymep.Bim4Everyone.SharedParams;
 
 namespace RevitRooms.ViewModels {
-    internal class RoomViewModel : BaseViewModel {
+    internal class RoomViewModel : BaseViewModel, IEquatable<RoomViewModel> {
         private readonly Room _room;
-        private readonly RevitRepository _revitRepository;
 
-        public RoomViewModel(Room room, RevitRepository revitRepository) {
+        public RoomViewModel(Room room, Phase phase) {
             _room = room;
-            _revitRepository = revitRepository;
+            Phase = new PhaseViewModel(phase);
 
-            Phase = new PhaseViewModel(_revitRepository.GetPhase(_room));
             if(RoomArea == null || RoomArea == 0) {
                 var segments = _room.GetBoundarySegments(new SpatialElementBoundaryOptions());
                 IsRedundant = segments.Count > 0;
@@ -39,15 +37,15 @@ namespace RevitRooms.ViewModels {
         public string RoomTypeGroupName {
             get { return (string) _room.GetParamValueOrDefault(ProjectParamsConfig.Instance.RoomTypeGroupName); }
         }
-        
+
         public string RoomName {
             get { return (string) _room.GetParamValueOrDefault(ProjectParamsConfig.Instance.RoomName); }
         }
-        
+
         public string RoomGroupName {
             get { return (string) _room.GetParamValueOrDefault(ProjectParamsConfig.Instance.RoomGroupName); }
         }
-        
+
         public string RoomSectionName {
             get { return (string) _room.GetParamValueOrDefault(ProjectParamsConfig.Instance.RoomSectionName); }
         }
@@ -79,6 +77,18 @@ namespace RevitRooms.ViewModels {
             _room.SetParamValue(SharedParamsConfig.Instance.FireCompartmentShortName, ProjectParamsConfig.Instance.FireCompartmentShortName);
 
             _room.SetParamValue(SharedParamsConfig.Instance.Level, _room.Level.Name.Replace(" этаж", string.Empty));
+        }
+
+        public override bool Equals(object obj) {
+            return Equals(obj as RoomViewModel);
+        }
+
+        public bool Equals(RoomViewModel other) {
+            return other != null && _room.Id == other._room.Id;
+        }
+
+        public override int GetHashCode() {
+            return -1737854931 + EqualityComparer<Room>.Default.GetHashCode(_room);
         }
     }
 }
