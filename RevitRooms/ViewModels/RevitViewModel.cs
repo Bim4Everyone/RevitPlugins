@@ -103,6 +103,10 @@ namespace RevitRooms.ViewModels {
                 // Заполняем дублирующие
                 // общие параметры
                 room.UpdateSharedParams();
+
+                // Обновление параметра
+                // площади с коэффициентом
+                UpdateRoomArea(room.Element);
             }
         }
 
@@ -113,12 +117,20 @@ namespace RevitRooms.ViewModels {
 
         private void UpdateAreaSquare() {
             var areas = _revitRepository.GetAreas();
-            foreach(var area in areas) {
-                double? squareArea = (double?) area.GetParamValueOrDefault(BuiltInParameter.ROOM_AREA);
 
-                squareArea = ConvertValueToSquareMeters(squareArea);
-                area.SetParamValue(SharedParamsConfig.Instance.RoomAreaWithRatio, squareArea.Value);
+            // TODO: Добавить учет этажей
+            foreach(var area in areas) {
+                UpdateRoomArea(area);
             }
+        }
+
+        private void UpdateRoomArea(Element element) {
+            double? squareArea = (double?) element.GetParamValueOrDefault(BuiltInParameter.ROOM_AREA);
+
+            squareArea = ConvertValueToSquareMeters(squareArea);
+            squareArea = ConvertValueToInternalUnits(squareArea.Value);
+
+            element.SetParamValue(SharedParamsConfig.Instance.RoomAreaWithRatio, squareArea.Value);
         }
 
         private IEnumerable<RoomViewModel> GetAdditionalRoomsViewModels() {
@@ -166,6 +178,10 @@ namespace RevitRooms.ViewModels {
 
         private double ConvertValueToSquareMeters(double? value) {
             return value.HasValue ? Math.Round(UnitUtils.ConvertFromInternalUnits(value.Value, DisplayUnitType.DUT_SQUARE_METERS), GetRoomAccuracy().Value) : 0;
+        }
+
+        private double ConvertValueToInternalUnits(double value) {
+            return UnitUtils.ConvertToInternalUnits(value, DisplayUnitType.DUT_SQUARE_METERS);
         }
     }
 }
