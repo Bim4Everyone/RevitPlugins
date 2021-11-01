@@ -68,9 +68,9 @@ namespace RevitRooms.ViewModels {
         }
 
         private List<RoomViewModel> GetErrorRoomsGroup(IEnumerable<RoomViewModel> rooms) {
-            return rooms.Where(room => room.RoomGroupName != null)
+            return rooms.Where(room => room.RoomGroup != null)
                 .Where(room => ContainGroups(room))
-                .GroupBy(room => room.RoomGroupName)
+                .GroupBy(room => room.RoomGroup)
                 .Where(group => IsGroupTypeEqual(group))
                 .SelectMany(items => items)
                 .ToList();
@@ -112,10 +112,16 @@ namespace RevitRooms.ViewModels {
 
             // Все помещения у которых
             // не заполнены обязательные параметры
-            var errorRooms = rooms.Where(item => item.RoomName == null 
-                || item.RoomSectionName == null 
-                || item.RoomGroupName == null)
+            var errorRooms = rooms.Where(item => item.Room == null 
+                || item.RoomSection == null 
+                || item.RoomGroup == null)
                 .ToList();
+
+            foreach(var room in rooms) {
+                // Заполняем дублирующие
+                // общие параметры
+                room.UpdateSharedParams();
+            }
         }
 
         private bool CanCalculate(object p) {
@@ -125,13 +131,13 @@ namespace RevitRooms.ViewModels {
 
         private static bool IsGroupTypeEqual(IEnumerable<RoomViewModel> rooms) {
             return rooms
-                .Select(group => group.RoomTypeGroupName)
+                .Select(group => group.RoomTypeGroup.Name)
                 .Distinct(StringComparer.CurrentCultureIgnoreCase).Count() != 1;
         }
 
         private static bool ContainGroups(RoomViewModel item) {
             return new[] { "апартаменты", "квартира", "гостиничный номер", "пентхаус" }
-                .Any(group => Contains(item.RoomGroupName, group, StringComparison.CurrentCultureIgnoreCase));
+                .Any(group => Contains(item.RoomGroup.Name, group, StringComparison.CurrentCultureIgnoreCase));
         }
 
         private static bool Contains(string source, string toCheck, StringComparison comp) {

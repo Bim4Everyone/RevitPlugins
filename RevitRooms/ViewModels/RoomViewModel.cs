@@ -34,20 +34,20 @@ namespace RevitRooms.ViewModels {
             get { return _room.Name; }
         }
 
-        public string RoomTypeGroupName {
-            get { return (string) _room.GetParamValueOrDefault(ProjectParamsConfig.Instance.RoomTypeGroupName); }
+        public Element RoomTypeGroup {
+            get { return GetParamElement(ProjectParamsConfig.Instance.RoomTypeGroupName); }
         }
 
-        public string RoomName {
-            get { return (string) _room.GetParamValueOrDefault(ProjectParamsConfig.Instance.RoomName); }
+        public Element Room {
+            get { return GetParamElement(ProjectParamsConfig.Instance.RoomName); }
         }
 
-        public string RoomGroupName {
-            get { return (string) _room.GetParamValueOrDefault(ProjectParamsConfig.Instance.RoomGroupName); }
+        public Element RoomGroup {
+            get { return GetParamElement(ProjectParamsConfig.Instance.RoomGroupName); }
         }
 
-        public string RoomSectionName {
-            get { return (string) _room.GetParamValueOrDefault(ProjectParamsConfig.Instance.RoomSectionName); }
+        public Element RoomSection {
+            get { return GetParamElement(ProjectParamsConfig.Instance.RoomSectionName); }
         }
 
         public string LevelName {
@@ -89,6 +89,11 @@ namespace RevitRooms.ViewModels {
 
         public override int GetHashCode() {
             return -1737854931 + EqualityComparer<Room>.Default.GetHashCode(_room);
+        }
+
+        private Element GetParamElement(RevitParam revitParam) {
+            ElementId elementId = (ElementId) _room.GetParamValueOrDefault(revitParam);
+            return elementId == null ? null : _room.Document.GetElement(elementId);
         }
     }
 }
