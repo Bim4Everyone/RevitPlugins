@@ -59,11 +59,20 @@ namespace RevitRooms.ViewModels {
                 .Select(item => new RoomViewModel(item, _revitRepository.GetPhase(item)));
         }
 
-        private List<DoorViewModel> GetErrorDoorsViewModels(List<RoomViewModel> rooms) {
+        private List<DoorViewModel> GetErrorDoorsViewModels(IEnumerable<RoomViewModel> rooms) {
             return _revitRepository.GetDoors()
                 .Select(item => new DoorViewModel(item, Phase.Element))
                 .Where(item => !item.IsSectionNameEqual)
                 .Where(item => rooms.Contains(item.FromRoom) || rooms.Contains(item.ToRoom))
+                .ToList();
+        }
+
+        private List<RoomViewModel> GetErrorRoomsGroup(IEnumerable<RoomViewModel> rooms) {
+            return rooms.Where(room => room.RoomGroupName != null)
+                .Where(room => ContainGroups(room))
+                .GroupBy(room => room.RoomGroupName)
+                .Where(group => IsGroupTypeEqual(group))
+                .SelectMany(items => items)
                 .ToList();
         }
 
@@ -86,27 +95,47 @@ namespace RevitRooms.ViewModels {
             // Получение всех помещений
             // по вспомогательным стадиям
             var additionalRooms = GetAdditionalRoomsViewModels();
-            
+
             // Следующие проверки
             // должны обрабатывать все помещения
             rooms = rooms.Union(additionalRooms).ToList();
 
             // Все помещений которые
             // избыточные или не окруженные
-            var redundantRooms = rooms.Union(additionalRooms)
-                .Where(item => item.IsRedundant == true || item.NotEnclosed == true)
+            var redundantRooms = rooms.Where(item => item.IsRedundant == true
+                || item.NotEnclosed == true)
                 .ToList();
 
             // Все помещения у которых
+            // не совпадают значения группы и типа группы
+            var groupErrorRooms = GetErrorRoomsGroup(rooms);
+
+            // Все помещения у которых
             // не заполнены обязательные параметры
-            var errorRooms = rooms.Union(additionalRooms)
-                .Where(item => item.RoomName == null || item.RoomSectionName == null || item.RoomGroupName == null)
+            var errorRooms = rooms.Where(item => item.RoomName == null 
+                || item.RoomSectionName == null 
+                || item.RoomGroupName == null)
                 .ToList();
         }
 
         private bool CanCalculate(object p) {
             ErrorText = null;
             return true;
+        }
+
+        private static bool IsGroupTypeEqual(IEnumerable<RoomViewModel> rooms) {
+            return rooms
+                .Select(group => group.RoomTypeGroupName)
+                .Distinct(StringComparer.CurrentCultureIgnoreCase).Count() != 1;
+        }
+
+        private static bool ContainGroups(RoomViewModel item) {
+            return new[] { "апартаменты", "квартира", "гостиничный номер", "пентхаус" }
+                .Any(group => Contains(item.RoomGroupName, group, StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        private static bool Contains(string source, string toCheck, StringComparison comp) {
+            return source?.IndexOf(toCheck, comp) >= 0;
         }
     }
 }
