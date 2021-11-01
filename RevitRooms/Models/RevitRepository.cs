@@ -97,5 +97,13 @@ namespace RevitRooms.Models {
         public ElementId GetPhaseId(Element element) {
             return (ElementId) element.GetParamValueOrDefault(BuiltInParameter.ROOM_PHASE_ID);
         }
+
+        public void ShowElement(Element element) {
+            _uiDocument.ShowElements(element);
+        }
+
+        public void SelectElement(Element element) {
+            _uiDocument.SetSelectedElements(element);
+        }
     }
 }

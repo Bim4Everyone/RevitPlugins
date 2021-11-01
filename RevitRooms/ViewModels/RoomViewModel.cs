@@ -16,22 +16,16 @@ using RevitRooms.Models;
 using dosymep.Bim4Everyone.SharedParams;
 
 namespace RevitRooms.ViewModels {
-    internal class RoomViewModel : BaseViewModel, IEquatable<RoomViewModel> {
-        private readonly Room _room;
-
-        public RoomViewModel(Room room, Phase phase) {
-            _room = room;
-            Phase = new PhaseViewModel(phase);
+    internal class RoomViewModel : ElementViewModel<Room> {
+        public RoomViewModel(Room room, RevitRepository revitRepository)
+            : base(room, revitRepository) {
+            Phase = new PhaseViewModel(revitRepository.GetPhase(room), revitRepository);
 
             if(RoomArea == null || RoomArea == 0) {
-                var segments = _room.GetBoundarySegments(new SpatialElementBoundaryOptions());
+                var segments = Element.GetBoundarySegments(new SpatialElementBoundaryOptions());
                 IsRedundant = segments.Count > 0;
                 NotEnclosed = segments.Count == 0;
             }
-        }
-
-        public string DisplayData {
-            get { return _room.Name; }
         }
 
         public Element RoomTypeGroup {
@@ -51,15 +45,15 @@ namespace RevitRooms.ViewModels {
         }
 
         public string LevelName {
-            get { return _room.Level.Name; }
+            get { return Element.Level.Name; }
         }
 
         public double? RoomArea {
-            get { return (double?) _room.GetParamValueOrDefault(BuiltInParameter.ROOM_AREA); }
+            get { return (double?) Element.GetParamValueOrDefault(BuiltInParameter.ROOM_AREA); }
         }
 
         public bool IsPlaced {
-            get { return _room.Location != null; }
+            get { return Element.Location != null; }
         }
 
         public bool? IsRedundant { get; }
@@ -67,33 +61,21 @@ namespace RevitRooms.ViewModels {
         public PhaseViewModel Phase { get; }
 
         public void UpdateSharedParams() {
-            _room.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaSpec, ProjectParamsConfig.Instance.ApartmentAreaSpec);
-            _room.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaMinSpec, ProjectParamsConfig.Instance.ApartmentAreaMinSpec);
-            _room.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaMaxSpec, ProjectParamsConfig.Instance.ApartmentAreaMaxSpec);
+            Element.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaSpec, ProjectParamsConfig.Instance.ApartmentAreaSpec);
+            Element.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaMinSpec, ProjectParamsConfig.Instance.ApartmentAreaMinSpec);
+            Element.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaMaxSpec, ProjectParamsConfig.Instance.ApartmentAreaMaxSpec);
 
-            _room.SetParamValue(SharedParamsConfig.Instance.RoomGroupShortName, ProjectParamsConfig.Instance.RoomGroupShortName);
-            _room.SetParamValue(SharedParamsConfig.Instance.RoomSectionShortName, ProjectParamsConfig.Instance.RoomSectionShortName);
-            _room.SetParamValue(SharedParamsConfig.Instance.RoomTypeGroupShortName, ProjectParamsConfig.Instance.RoomTypeGroupShortName);
-            _room.SetParamValue(SharedParamsConfig.Instance.FireCompartmentShortName, ProjectParamsConfig.Instance.FireCompartmentShortName);
+            Element.SetParamValue(SharedParamsConfig.Instance.RoomGroupShortName, ProjectParamsConfig.Instance.RoomGroupShortName);
+            Element.SetParamValue(SharedParamsConfig.Instance.RoomSectionShortName, ProjectParamsConfig.Instance.RoomSectionShortName);
+            Element.SetParamValue(SharedParamsConfig.Instance.RoomTypeGroupShortName, ProjectParamsConfig.Instance.RoomTypeGroupShortName);
+            Element.SetParamValue(SharedParamsConfig.Instance.FireCompartmentShortName, ProjectParamsConfig.Instance.FireCompartmentShortName);
 
-            _room.SetParamValue(SharedParamsConfig.Instance.Level, _room.Level.Name.Replace(" этаж", string.Empty));
-        }
-
-        public override bool Equals(object obj) {
-            return Equals(obj as RoomViewModel);
-        }
-
-        public bool Equals(RoomViewModel other) {
-            return other != null && _room.Id == other._room.Id;
-        }
-
-        public override int GetHashCode() {
-            return -1737854931 + EqualityComparer<Room>.Default.GetHashCode(_room);
+            Element.SetParamValue(SharedParamsConfig.Instance.Level, Element.Level.Name.Replace(" этаж", string.Empty));
         }
 
         private Element GetParamElement(RevitParam revitParam) {
-            ElementId elementId = (ElementId) _room.GetParamValueOrDefault(revitParam);
-            return elementId == null ? null : _room.Document.GetElement(elementId);
+            ElementId elementId = (ElementId) Element.GetParamValueOrDefault(revitParam);
+            return elementId == null ? null : Element.Document.GetElement(elementId);
         }
     }
 }

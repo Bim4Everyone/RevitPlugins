@@ -39,7 +39,7 @@ namespace RevitRooms.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public string DisplayData { get; set; }
+        public string Name { get; set; }
         public PhaseViewModel Phase { get; set; }
 
         public bool IsSpotCalcArea { get; set; }
@@ -56,12 +56,13 @@ namespace RevitRooms.ViewModels {
         protected virtual IEnumerable<RoomViewModel> GetAdditionalRoomsViewModels() {
             var phases = _revitRepository.GetAdditionalPhases();
             return _revitRepository.GetRooms(phases)
-                .Select(item => new RoomViewModel(item, _revitRepository.GetPhase(item)));
+                .Select(item => new RoomViewModel(item, _revitRepository));
         }
 
         private List<DoorViewModel> GetErrorDoorsViewModels(IEnumerable<RoomViewModel> rooms) {
             return _revitRepository.GetDoors()
-                .Select(item => new DoorViewModel(item, Phase.Element))
+                .Select(item => new DoorViewModel(item, _revitRepository))
+                .Where(item => item.Phase.Equals(Phase))
                 .Where(item => !item.IsSectionNameEqual)
                 .Where(item => rooms.Contains(item.FromRoom) || rooms.Contains(item.ToRoom))
                 .ToList();

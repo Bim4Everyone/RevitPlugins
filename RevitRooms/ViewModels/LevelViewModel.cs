@@ -13,13 +13,11 @@ using dosymep.WPF.ViewModels;
 using RevitRooms.Models;
 
 namespace RevitRooms.ViewModels {
-    internal class LevelViewModel : BaseViewModel, IComparable<LevelViewModel>, IEquatable<LevelViewModel> {
-        private readonly Level _level;
+    internal class LevelViewModel : ElementViewModel<Level> {
         private bool _isSelected;
 
-        public LevelViewModel(Level level, RevitRepository revitRepository, IEnumerable<Room> rooms) {
-            _level = level;
-            Rooms = new ObservableCollection<RoomViewModel>(rooms.Select(item => new RoomViewModel(item, revitRepository.GetPhase(item))).Where(item => item.IsPlaced));
+        public LevelViewModel(Level level, RevitRepository revitRepository, IEnumerable<Room> rooms) : base(level, revitRepository) {
+            Rooms = new ObservableCollection<RoomViewModel>(rooms.Select(item => new RoomViewModel(item, revitRepository)).Where(item => item.IsPlaced));
         }
 
         public bool IsSelected {
@@ -27,16 +25,12 @@ namespace RevitRooms.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _isSelected, value);
         }
 
-        public string DisplayData {
-            get { return _level.Name; }
-        }
-
         public bool IsLivingLevel {
-            get { return UnitUtils.ConvertFromInternalUnits(_level.Elevation, DisplayUnitType.DUT_METERS) > 2; }
+            get { return UnitUtils.ConvertFromInternalUnits(Element.Elevation, DisplayUnitType.DUT_METERS) > 2; }
         }
 
         public string Elevation {
-            get { return UnitUtils.ConvertFromInternalUnits(_level.Elevation, DisplayUnitType.DUT_METERS) + " " + UnitUtils.GetTypeCatalogString(DisplayUnitType.DUT_METERS); }
+            get { return UnitUtils.ConvertFromInternalUnits(Element.Elevation, DisplayUnitType.DUT_METERS) + " " + UnitUtils.GetTypeCatalogString(DisplayUnitType.DUT_METERS); }
         }
 
         public int RoomsCount {
@@ -44,25 +38,5 @@ namespace RevitRooms.ViewModels {
         }
 
         public ObservableCollection<RoomViewModel> Rooms { get; }
-
-        #region SystemOverrides
-
-        public int CompareTo(LevelViewModel other) {
-            return _level.Elevation.CompareTo(other._level.Elevation);
-        }
-
-        public override bool Equals(object obj) {
-            return Equals(obj as LevelViewModel);
-        }
-
-        public bool Equals(LevelViewModel other) {
-            return other != null && _level.Id.Equals(other._level.Id);
-        }
-
-        public override int GetHashCode() {
-            return -2121273300 + _level.Id.GetHashCode();
-        }
-
-        #endregion
     }
 }

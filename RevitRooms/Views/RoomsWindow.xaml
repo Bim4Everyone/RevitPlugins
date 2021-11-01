@@ -25,7 +25,7 @@
                   SelectedItem="{Binding RevitViewModel}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding DisplayData}"/>
+                    <TextBlock Text="{Binding Name}"/>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
@@ -50,7 +50,7 @@
                       SelectedItem="{Binding RevitViewModel.Phase}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding DisplayData}"/>
+                        <TextBlock Text="{Binding Name}"/>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
@@ -74,7 +74,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=DisplayData}" Header="Наименование" Width="250"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Наименование" Width="250"/>
                     <GridViewColumn DisplayMemberBinding="{Binding Path=Elevation}" Header="Уровень" Width="100"/>
                     <!--<GridViewColumn DisplayMemberBinding="{Binding Path=RoomsCount}" Header="Количество" Width="100"/>-->
                 </GridView>

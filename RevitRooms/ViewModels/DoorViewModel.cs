@@ -11,16 +11,17 @@ using dosymep.WPF.ViewModels;
 using RevitRooms.Models;
 
 namespace RevitRooms.ViewModels {
-    internal class DoorViewModel : BaseViewModel {
-        private readonly FamilyInstance _door;
+    internal class DoorViewModel : ElementViewModel<FamilyInstance> {
+        public DoorViewModel(FamilyInstance door, RevitRepository revitRepository) :
+            base(door, revitRepository) {
 
-        public DoorViewModel(FamilyInstance door, Phase phase) {
-            _door = door;
-
-            ToRoom = new RoomViewModel(_door.get_ToRoom(phase), phase);
-            FromRoom = new RoomViewModel(_door.get_FromRoom(phase), phase);
+            Phase = new PhaseViewModel(revitRepository.GetPhase(Element), revitRepository);
+            ToRoom = new RoomViewModel(Element.get_ToRoom(Phase.Element), revitRepository);
+            FromRoom = new RoomViewModel(Element.get_FromRoom(Phase.Element), revitRepository);
         }
 
+        public PhaseViewModel Phase { get; }
+        
         public RoomViewModel ToRoom { get; }
         public RoomViewModel FromRoom { get; }
 
