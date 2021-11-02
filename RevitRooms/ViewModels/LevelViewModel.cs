@@ -48,19 +48,16 @@ namespace RevitRooms.ViewModels {
             return RevitRepository.GetDoors()
                 .Select(item => new DoorViewModel(item, RevitRepository))
                 .Where(item => item.Phase.Equals(phase))
-                .Where(item => item.LevelId == Element.Id);
+                .Where(item => item.LevelId == Element.Id)
+                .Where(item => Rooms.Contains(item.ToRoom) || Rooms.Contains(item.FromRoom));
         }
 
         public IEnumerable<RoomViewModel> GetRoomViewModels(PhaseViewModel phase) {
-            var phases = RevitRepository.GetAdditionalPhases().Select(item => new PhaseViewModel(item, RevitRepository));
-            return GetAdditionalRooms(new[] { phase }.Union(phases));
+            return Rooms.Where(item => item.Phase == phase);
         }
 
-        private IEnumerable<RoomViewModel> GetAdditionalRooms(IEnumerable<PhaseViewModel> phases) {
-            return RevitRepository.GetAllRooms()
-                .Select(item => new RoomViewModel(item, RevitRepository))
-                .Where(item => item.LevelId == Element.Id)
-                .Where(item => phases.Contains(item.Phase));
+        public IEnumerable<RoomViewModel> GetRoomViewModels(IEnumerable<PhaseViewModel> phases) {
+            return Rooms.Where(item => phases.Contains(item.Phase));
         }
     }
 }

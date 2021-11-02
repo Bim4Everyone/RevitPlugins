@@ -51,9 +51,37 @@ namespace RevitRooms.ViewModels {
         public string LevelName {
             get { return Element.Level.Name; }
         }
-
+        
         public double? RoomArea {
             get { return (double?) Element.GetParamValueOrDefault(BuiltInParameter.ROOM_AREA); }
+        }
+
+        public bool? IsRoomLiving {
+            get { return Convert.ToInt32(Element.GetParamValueOrDefault(ProjectParamsConfig.Instance.IsRoomLiving)) == 1; }
+        }
+
+        public bool? IsRoomBalcony {
+            get { return Convert.ToInt32(Element.GetParamValueOrDefault(ProjectParamsConfig.Instance.IsRoomBalcony)) == 1; }
+        }
+        
+        public double? RoomAreaRatio {
+            get { return (double?) Element.GetParamValueOrDefault(ProjectParamsConfig.Instance.RoomAreaRatio); }
+        }
+
+        public double? Area {
+            get { return (double?) Element.GetParamValueOrDefault(SharedParamsConfig.Instance.RoomArea); }
+            set { Element.SetParamValue(SharedParamsConfig.Instance.RoomArea, value ?? 0); }
+        }
+
+        public double? AreaWithRatio {
+            get { return (double?) Element.GetParamValueOrDefault(SharedParamsConfig.Instance.RoomAreaWithRatio); }
+            set { Element.SetParamValue(SharedParamsConfig.Instance.RoomAreaWithRatio, value ?? 0); }
+        }
+
+        public double ComputeRoomAreaWithRatio() {
+            // RoomArea = 0 - по умолчанию
+            // RoomAreaRatio = 1 - по умолчанию
+            return ((RoomAreaRatio ?? 0) == 0 ? 1 : RoomAreaRatio.Value) * RoomArea ?? 0;
         }
 
         public bool IsPlaced {
@@ -73,7 +101,9 @@ namespace RevitRooms.ViewModels {
             Element.SetParamValue(SharedParamsConfig.Instance.RoomSectionShortName, ProjectParamsConfig.Instance.RoomSectionShortName);
             Element.SetParamValue(SharedParamsConfig.Instance.RoomTypeGroupShortName, ProjectParamsConfig.Instance.RoomTypeGroupShortName);
             Element.SetParamValue(SharedParamsConfig.Instance.FireCompartmentShortName, ProjectParamsConfig.Instance.FireCompartmentShortName);
+        }
 
+        public void UpdateLevelSharedParam() {
             Element.SetParamValue(SharedParamsConfig.Instance.Level, Element.Level.Name.Replace(" этаж", string.Empty));
         }
 

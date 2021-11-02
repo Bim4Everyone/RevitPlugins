@@ -113,5 +113,12 @@ namespace RevitRooms.Models {
                 .OfType<Area>()
                 .ToList();
         }
+
+        public Transaction StartTransaction(string transactionName) {
+            var transaction = new Transaction(_document, transactionName);
+            transaction.Start();
+
+            return transaction;
+        }
     }
 }
