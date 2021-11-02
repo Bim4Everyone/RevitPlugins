@@ -106,7 +106,7 @@ namespace RevitRooms.Models {
             _uiDocument.SetSelectedElements(element);
         }
 
-        public IList<Area> GetAreas() {
+        public IList<Area> GetAllAreas() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
                 .OfCategory(BuiltInCategory.OST_Areas)

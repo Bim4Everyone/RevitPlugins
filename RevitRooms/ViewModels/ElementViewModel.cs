@@ -13,7 +13,7 @@ using dosymep.WPF.ViewModels;
 using RevitRooms.Models;
 
 namespace RevitRooms.ViewModels {
-    internal abstract class ElementViewModel<TElement> : BaseViewModel, IComparable<ElementViewModel<TElement>>, IEquatable<ElementViewModel<TElement>>
+    internal abstract class ElementViewModel<TElement> : BaseViewModel, IElementViewModel<TElement>, IComparable<ElementViewModel<TElement>>, IEquatable<ElementViewModel<TElement>>
         where TElement : Element {
 
         public ElementViewModel(TElement element, RevitRepository revitRepository) {

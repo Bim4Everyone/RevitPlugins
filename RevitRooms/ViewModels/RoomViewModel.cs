@@ -44,6 +44,10 @@ namespace RevitRooms.ViewModels {
             get { return GetParamElement(ProjectParamsConfig.Instance.RoomSectionName); }
         }
 
+        public ElementId LevelId {
+            get { return Element.LevelId; }
+        }
+
         public string LevelName {
             get { return Element.Level.Name; }
         }

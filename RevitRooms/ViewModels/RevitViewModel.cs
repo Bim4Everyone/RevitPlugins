@@ -62,66 +62,69 @@ namespace RevitRooms.ViewModels {
 
             // Получение всех помещений
             // по заданной стадии
-            var rooms = Levels
-                .Where(item => item.IsSelected)
-                .SelectMany(item => item.Rooms)
-                .Where(item => item.Phase.Equals(Phase))
-                .ToList();
+            var levels = Levels.Where(item => item.IsSelected);
+            var errorElements = new List<IElementViewModel<Element>>();
+            foreach(var level in levels) {
+                var doors = level.GetDoors(Phase);
+                var rooms = level.GetRoomViewModels(Phase);
 
-            // Все двери у которых разное значение
-            // параметра Секции
-            var doors = GetErrorDoorsViewModels(rooms);
+                // Все двери
+                // с не совпадающей секцией
+                var notEqualSectionDoors = doors.Where(item => !item.IsSectionNameEqual);
+                errorElements.AddRange(notEqualSectionDoors);
 
-            // Получение всех помещений
-            // по вспомогательным стадиям
-            var additionalRooms = GetAdditionalRoomsViewModels();
+                // Все помещений которые
+                // избыточные или не окруженные
+                var redundantRooms = rooms.Where(item => item.IsRedundant == true || item.NotEnclosed == true);
+                errorElements.AddRange(redundantRooms);
 
-            // Следующие проверки
-            // должны обрабатывать все помещения
-            rooms = rooms.Union(additionalRooms).ToList();
+                // Все помещения у которых
+                // не заполнены обязательные параметры
+                var notFilledRequredParamRooms = rooms.Where(item => item.Room == null || item.RoomSection == null || item.RoomGroup == null);
+                errorElements.AddRange(notFilledRequredParamRooms);
 
-            // Все помещений которые
-            // избыточные или не окруженные
-            var redundantRooms = rooms.Where(item => item.IsRedundant == true
-                || item.NotEnclosed == true)
-                .ToList();
+                // Все помещения у которых
+                // не совпадают значения группы и типа группы
+                var notEqualGroupTypeRooms = rooms.Where(room => room.RoomGroup != null)
+                    .Where(room => ContainGroups(room))
+                    .GroupBy(room => room.RoomGroup)
+                    .Where(group => IsGroupTypeEqual(group))
+                    .SelectMany(items => items)
+                    .ToList();
 
-            // Все помещения у которых
-            // не совпадают значения группы и типа группы
-            var groupErrorRooms = GetErrorRoomsGroup(rooms);
-
-            // Все помещения у которых
-            // не заполнены обязательные параметры
-            var errorRooms = rooms.Where(item => item.Room == null
-                || item.RoomSection == null
-                || item.RoomGroup == null)
-                .ToList();
-
-            UpdateAreaSquare();
-
-            foreach(var room in rooms) {
-                // Заполняем дублирующие
-                // общие параметры
-                room.UpdateSharedParams();
-
-                // Обновление параметра
-                // площади с коэффициентом
-                UpdateRoomArea(room.Element);
+                errorElements.AddRange(errorElements);
             }
+
+            errorElements = errorElements.Distinct().ToList();
+            if(errorElements.Count > 0) {
+                return;
+            }
+
+            foreach(var level in levels) {
+                // Обновление параметра
+                // площади с коэффициентом у зон
+                foreach(var area in level.GetAreas()) {  
+                    UpdateRoomArea(area);
+                }
+
+                // Обновление значений в помещениях
+                foreach(var room in level.GetRoomViewModels(Phase)) {
+                    // Заполняем дублирующие
+                    // общие параметры
+                    room.UpdateSharedParams();
+
+                    // Обновление параметра
+                    // площади с коэффициентом
+                    UpdateRoomArea(room.Element);
+                }
+            }
+
+            levels.
         }
 
         private bool CanCalculate(object p) {
             ErrorText = null;
             return true;
-        }
-
-        private void UpdateAreaSquare() {
-            var areas = _revitRepository.GetAreas();
-
-            // TODO: Добавить учет этажей
-            foreach(var area in areas) {
-                UpdateRoomArea(area);
-            }
         }
 
         private void UpdateRoomArea(Element element) {
@@ -131,30 +134,6 @@ namespace RevitRooms.ViewModels {
             squareArea = ConvertValueToInternalUnits(squareArea.Value);
 
             element.SetParamValue(SharedParamsConfig.Instance.RoomAreaWithRatio, squareArea.Value);
-        }
-
-        private IEnumerable<RoomViewModel> GetAdditionalRoomsViewModels() {
-            var phases = _revitRepository.GetAdditionalPhases();
-            return _revitRepository.GetRooms(phases)
-                .Select(item => new RoomViewModel(item, _revitRepository));
-        }
-
-        private List<DoorViewModel> GetErrorDoorsViewModels(IEnumerable<RoomViewModel> rooms) {
-            return _revitRepository.GetDoors()
-                .Select(item => new DoorViewModel(item, _revitRepository))
-                .Where(item => item.Phase.Equals(Phase))
-                .Where(item => !item.IsSectionNameEqual)
-                .Where(item => rooms.Contains(item.FromRoom) || rooms.Contains(item.ToRoom))
-                .ToList();
-        }
-
-        private List<RoomViewModel> GetErrorRoomsGroup(IEnumerable<RoomViewModel> rooms) {
-            return rooms.Where(room => room.RoomGroup != null)
-                .Where(room => ContainGroups(room))
-                .GroupBy(room => room.RoomGroup)
-                .Where(group => IsGroupTypeEqual(group))
-                .SelectMany(items => items)
-                .ToList();
         }
 
         private static bool IsGroupTypeEqual(IEnumerable<RoomViewModel> rooms) {

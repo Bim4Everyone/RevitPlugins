@@ -25,6 +25,8 @@ namespace RevitRooms.ViewModels {
         public RoomViewModel ToRoom { get; }
         public RoomViewModel FromRoom { get; }
 
+        public ElementId LevelId => Element.LevelId;
+
         public bool IsSectionNameEqual {
             get { return ToRoom?.RoomSection?.Equals(FromRoom?.RoomSection) == true; }
         }
