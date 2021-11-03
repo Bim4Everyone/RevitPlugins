@@ -69,7 +69,24 @@ namespace RevitRooms.ViewModels {
             // Получение всех помещений
             // по заданной стадии
             var levels = Levels.Where(item => item.IsSelected);
-            var errorElements = new List<IElementViewModel<Element>>();
+
+            // Проверка всех элементов
+            // на выделенных уровнях
+            if(CheckElements(levels)) {
+                return;
+            }
+
+            // Расчет площадей помещений
+            CalculateAreas(phases, levels);
+        }
+
+        private bool CanCalculate(object p) {
+            ErrorText = null;
+            return true;
+        }
+
+        private bool CheckElements(IEnumerable<LevelViewModel> levels) {
+            var errorElements = new Dictionary<ElementId, InfoElementViewModel>();
             foreach(var level in levels) {
                 var doors = level.GetDoors(Phase);
                 var rooms = level.GetRoomViewModels(Phase);
@@ -77,17 +94,17 @@ namespace RevitRooms.ViewModels {
                 // Все двери
                 // с не совпадающей секцией
                 var notEqualSectionDoors = doors.Where(item => !item.IsSectionNameEqual);
-                errorElements.AddRange(notEqualSectionDoors);
+                AddElements("Не совпадают секции у дверей.", notEqualSectionDoors, errorElements);
 
                 // Все помещения которые
                 // избыточные или не окруженные
                 var redundantRooms = rooms.Where(item => item.IsRedundant == true || item.NotEnclosed == true);
-                errorElements.AddRange(redundantRooms);
+                AddElements("Избыточное или не окруженное помещение.", redundantRooms, errorElements);
 
                 // Все помещения у которых
                 // не заполнены обязательные параметры
                 var notFilledRequredParamRooms = rooms.Where(item => item.Room == null || item.RoomSection == null || item.RoomGroup == null);
-                errorElements.AddRange(notFilledRequredParamRooms);
+                AddElements("Не заполнены обязательные параметры у помещения.", notFilledRequredParamRooms, errorElements);
 
                 // Все помещения у которых
                 // не совпадают значения группы и типа группы
@@ -95,22 +112,20 @@ namespace RevitRooms.ViewModels {
                     .Where(room => ContainGroups(room))
                     .GroupBy(room => room.RoomGroup)
                     .Where(group => IsGroupTypeEqual(group))
-                    .SelectMany(items => items)
-                    .ToList();
+                    .SelectMany(items => items);
 
-                errorElements.AddRange(errorElements);
+                AddElements("Не совпадают значения параметров групп и типа групп параметры у помещения.", notEqualGroupTypeRooms, errorElements);
             }
 
-            errorElements = errorElements.Distinct().ToList();
-            //if(errorElements.Count > 0) {
-            //    return;
-            //}
+            return errorElements.Count > 0;
+        }
 
+        private void CalculateAreas(List<PhaseViewModel> phases, IEnumerable<LevelViewModel> levels) {
             using(var transaction = _revitRepository.StartTransaction("Расчет площадей")) {
                 // Надеюсь будет достаточно быстро отрабатывать :)
                 // Подсчет площадей помещений
                 foreach(var level in levels) {
-                    var rooms = level.GetRoomViewModels(Phase).Except(errorElements).Cast<RoomViewModel>().ToList();
+                    var rooms = level.GetRoomViewModels(Phase).ToList();
                     foreach(var section in rooms.GroupBy(item => item.RoomSection.Name)) {
                         foreach(var flat in section.GroupBy(item => item.RoomGroup.Name)) {
                             double apartmentArea = 0;
@@ -151,7 +166,7 @@ namespace RevitRooms.ViewModels {
                     }
                 }
 
-                var bigChangesRooms = new List<IElementViewModel<Element>>();
+                var bigChangesRooms = new Dictionary<ElementId, InfoElementViewModel>();
                 foreach(var level in levels) {
                     // Обновление параметра
                     // площади с коэффициентом у зон
@@ -182,7 +197,7 @@ namespace RevitRooms.ViewModels {
                         if(bool.TryParse(CheckRoomAccuracy, out bool result) && result && areaOldValue > 0) {
                             bool isBigChange = Math.Abs(areaOldValue - areaNewValue) / areaOldValue * 100 > GetRoomAccuracy();
                             if(isBigChange) {
-                                bigChangesRooms.Add(room);
+                                AddElement("Большие изменения в площади.", room, bigChangesRooms);
                             }
                         }
                     }
@@ -190,11 +205,6 @@ namespace RevitRooms.ViewModels {
 
                 transaction.Commit();
             }
-        }
-
-        private bool CanCalculate(object p) {
-            ErrorText = null;
-            return true;
         }
 
         private void UpdateRoomArea(Element element) {
@@ -231,6 +241,21 @@ namespace RevitRooms.ViewModels {
 
         private double ConvertValueToInternalUnits(double value) {
             return UnitUtils.ConvertToInternalUnits(value, DisplayUnitType.DUT_SQUARE_METERS);
+        }
+
+        private void AddElements(string infoText, IEnumerable<IElementViewModel<Element>> elements, Dictionary<ElementId, InfoElementViewModel> infoElements) {
+            foreach(var element in elements) {
+                AddElement(infoText, element, infoElements);
+            }
+        }
+
+        private void AddElement(string infoText, IElementViewModel<Element> element, Dictionary<ElementId, InfoElementViewModel> infoElements) {
+            if(!infoElements.TryGetValue(element.ElementId, out var value)) {
+                value = new InfoElementViewModel() { Element = element, Errors = new ObservableCollection<string>() };
+                infoElements.Add(element.ElementId, value);
+            }
+
+            value.Errors.Add(infoText);
         }
     }
 }
