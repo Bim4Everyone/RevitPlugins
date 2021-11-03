@@ -22,6 +22,7 @@ namespace RevitRooms.ViewModels {
     internal abstract class RevitViewModel : BaseViewModel {
         protected readonly RevitRepository _revitRepository;
         private string _errorText;
+        private bool _isCheckedSelected;
 
         public RevitViewModel(Application application, Document document) {
             _revitRepository = new RevitRepository(application, document);
@@ -37,6 +38,17 @@ namespace RevitRooms.ViewModels {
         }
 
         public ICommand CalculateCommand { get; }
+
+        public bool IsCheckedSelected {
+            get => _isCheckedSelected;
+            set {
+                this.RaiseAndSetIfChanged(ref _isCheckedSelected, value);
+                foreach(var level in Levels) {
+                    level.IsSelected = _isCheckedSelected;
+                }
+            }
+        }
+
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);

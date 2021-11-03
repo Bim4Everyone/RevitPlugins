@@ -67,7 +67,10 @@
                   ItemsSource="{Binding RevitViewModel.Levels}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Width="30" Header="#">
+                    <GridViewColumn Width="35">
+                        <DataGridColumnHeader>
+                            <CheckBox IsChecked="{Binding RevitViewModel.IsCheckedSelected}"/>
+                        </DataGridColumnHeader>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox IsChecked="{Binding IsSelected}"/>
