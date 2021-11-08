@@ -16,8 +16,8 @@ namespace RevitRooms.ViewModels {
     internal class LevelViewModel : ElementViewModel<Level> {
         private bool _isSelected;
 
-        public LevelViewModel(Level level, RevitRepository revitRepository, IEnumerable<Room> rooms) : base(level, revitRepository) {
-            Rooms = new ObservableCollection<RoomViewModel>(rooms.Select(item => new RoomViewModel(item, revitRepository)).Where(item => item.IsPlaced));
+        public LevelViewModel(Level level, RevitRepository revitRepository, IEnumerable<SpatialElement> spatialElements) : base(level, revitRepository) {
+            SpartialElements = new ObservableCollection<SpatialElementViewModel>(GetSpatialElements(revitRepository, spatialElements));
         }
 
         public bool IsSelected {
@@ -34,30 +34,29 @@ namespace RevitRooms.ViewModels {
         }
 
         public int RoomsCount {
-            get { return Rooms.Count; }
+            get { return SpartialElements.Count; }
         }
 
-        public ObservableCollection<RoomViewModel> Rooms { get; }
-
-        public IEnumerable<Area> GetAreas() {
-            return RevitRepository.GetAllAreas()
-            .Where(item => item.LevelId == Element.Id);
-        }
+        public ObservableCollection<SpatialElementViewModel> SpartialElements { get; }
 
         public IEnumerable<DoorViewModel> GetDoors(PhaseViewModel phase) {
             return RevitRepository.GetDoors()
                 .Select(item => new DoorViewModel(item, RevitRepository))
                 .Where(item => item.Phase.Equals(phase))
                 .Where(item => item.LevelId == Element.Id)
-                .Where(item => Rooms.Contains(item.ToRoom) || Rooms.Contains(item.FromRoom));
+                .Where(item => SpartialElements.Contains(item.ToRoom) || SpartialElements.Contains(item.FromRoom));
         }
 
-        public IEnumerable<RoomViewModel> GetRoomViewModels(PhaseViewModel phase) {
-            return Rooms.Where(item => item.Phase == phase);
+        public IEnumerable<SpatialElementViewModel> GetSpatialElementViewModels(PhaseViewModel phase) {
+            return SpartialElements.Where(item => item.Phase == phase);
         }
 
-        public IEnumerable<RoomViewModel> GetRoomViewModels(IEnumerable<PhaseViewModel> phases) {
-            return Rooms.Where(item => phases.Contains(item.Phase));
+        public IEnumerable<SpatialElementViewModel> GetSpatialElementViewModels(IEnumerable<PhaseViewModel> phases) {
+            return SpartialElements.Where(item => phases.Contains(item.Phase));
+        }
+
+        private static IEnumerable<SpatialElementViewModel> GetSpatialElements(RevitRepository revitRepository, IEnumerable<SpatialElement> spatialElements) {
+            return spatialElements.Select(item => new SpatialElementViewModel(item, revitRepository)).Where(item => item.Phase != null).Where(item => item.IsPlaced);
         }
     }
 }

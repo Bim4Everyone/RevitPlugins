@@ -19,43 +19,48 @@ namespace RevitRooms.Models {
         private readonly Document _document;
         private readonly UIDocument _uiDocument;
 
+        private readonly ElementFilter _filter;
+
         public RevitRepository(Application application, Document document) {
             _application = application;
             _uiApplication = new UIApplication(application);
 
             _document = document;
             _uiDocument = new UIDocument(document);
+
+            _filter = new ElementMulticategoryFilter(new[] { BuiltInCategory.OST_Rooms, BuiltInCategory.OST_Areas });
         }
 
-        public IList<Room> GetSelectedRooms() {
+        public IList<SpatialElement> GetSelectedSpatialElements() {
             return _uiDocument.GetSelectedElements()
-                .OfType<Room>()
+                .Where(item => _filter.PassesFilter(_document, item.Id))
+                .OfType<SpatialElement>()
                 .ToList();
         }
 
-        public IList<Room> GetAllRooms() {
+        public IList<SpatialElement> GetSpatialElements() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
-                .OfCategory(BuiltInCategory.OST_Rooms)
-                .OfType<Room>()
+                .WherePasses(_filter)
+                .OfType<SpatialElement>()
                 .ToList();
         }
 
-        public IList<Room> GetRoomsOnActiveView() {
-            return GetRoomsOnView(_document.ActiveView);
+        public IList<SpatialElement> GetRoomsOnActiveView() {
+            return GetSpatialElementsOnView(_document.ActiveView);
         }
 
-        public IList<Room> GetRoomsOnView(View view) {
+        public IList<SpatialElement> GetSpatialElementsOnView(View view) {
             return new FilteredElementCollector(_document, view.Id)
                 .WhereElementIsNotElementType()
-                .OfCategory(BuiltInCategory.OST_Rooms)
-                .OfType<Room>()
+                .WherePasses(_filter)
+                .OfType<SpatialElement>()
                 .ToList();
         }
 
-        public IList<Room> GetRooms(IEnumerable<Phase> phases) {
+        public IList<SpatialElement> GetRooms(IEnumerable<Phase> phases) {
             var phaseIds = phases.Select(item => item.Id);
-            return GetAllRooms().Where(item => phaseIds.Contains(GetPhaseId(item))).ToList();
+            return GetSpatialElements().Where(item => phaseIds.Contains(GetPhaseId(item))).ToList();
         }
 
         public Phase GetPhase(Element element) {
@@ -84,7 +89,7 @@ namespace RevitRooms.Models {
         /// </summary>
         /// <remarks>Создает свою транзакцию.</remarks>
         public void RemoveUnplacedRooms() {
-            var unplacedRooms = GetAllRooms().Where(item => item.Location == null);
+            var unplacedRooms = GetSpatialElements().Where(item => item.Location == null);
             using(var transaction = new Transaction(_document)) {
                 transaction.Start("Удаление не размещенных помещений");
 
@@ -95,7 +100,7 @@ namespace RevitRooms.Models {
         }
 
         public ElementId GetPhaseId(Element element) {
-            return (ElementId) element.GetParamValueOrDefault(BuiltInParameter.ROOM_PHASE_ID);
+            return (ElementId) element.GetParamValueOrDefault(BuiltInParameter.ROOM_PHASE_ID) ?? ElementId.InvalidElementId;
         }
 
         public void ShowElement(Element element) {
@@ -105,14 +110,6 @@ namespace RevitRooms.Models {
 
         public void SelectElement(Element element) {
             _uiDocument.SetSelectedElements(element);
-        }
-
-        public IList<Area> GetAllAreas() {
-            return new FilteredElementCollector(_document)
-                .WhereElementIsNotElementType()
-                .OfCategory(BuiltInCategory.OST_Areas)
-                .OfType<Area>()
-                .ToList();
         }
 
         public Transaction StartTransaction(string transactionName) {

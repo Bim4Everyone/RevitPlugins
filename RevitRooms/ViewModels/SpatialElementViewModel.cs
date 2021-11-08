@@ -16,10 +16,13 @@ using RevitRooms.Models;
 using dosymep.Bim4Everyone.SharedParams;
 
 namespace RevitRooms.ViewModels {
-    internal class RoomViewModel : ElementViewModel<Room> {
-        public RoomViewModel(Room room, RevitRepository revitRepository)
-            : base(room, revitRepository) {
-            Phase = new PhaseViewModel(revitRepository.GetPhase(room), revitRepository);
+    internal class SpatialElementViewModel : ElementViewModel<SpatialElement> {
+        public SpatialElementViewModel(SpatialElement element, RevitRepository revitRepository)
+            : base(element, revitRepository) {
+            var phase = revitRepository.GetPhase(element);
+            if(phase != null) {
+                Phase = new PhaseViewModel(phase, revitRepository);
+            }
 
             if(RoomArea == null || RoomArea == 0) {
                 var segments = Element.GetBoundarySegments(new SpatialElementBoundaryOptions());

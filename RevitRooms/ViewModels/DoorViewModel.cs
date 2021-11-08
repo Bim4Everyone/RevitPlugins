@@ -16,14 +16,14 @@ namespace RevitRooms.ViewModels {
             base(door, revitRepository) {
 
             Phase = new PhaseViewModel(revitRepository.GetPhase(Element), revitRepository);
-            ToRoom = new RoomViewModel(Element.get_ToRoom(Phase.Element), revitRepository);
-            FromRoom = new RoomViewModel(Element.get_FromRoom(Phase.Element), revitRepository);
+            ToRoom = new SpatialElementViewModel(Element.get_ToRoom(Phase.Element), revitRepository);
+            FromRoom = new SpatialElementViewModel(Element.get_FromRoom(Phase.Element), revitRepository);
         }
 
         public PhaseViewModel Phase { get; }
         
-        public RoomViewModel ToRoom { get; }
-        public RoomViewModel FromRoom { get; }
+        public SpatialElementViewModel ToRoom { get; }
+        public SpatialElementViewModel FromRoom { get; }
 
         public ElementId LevelId => Element.LevelId;
 

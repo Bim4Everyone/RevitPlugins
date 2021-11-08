@@ -31,7 +31,7 @@ namespace RevitRooms.ViewModels {
             Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
             AdditionalPhases = new ObservableCollection<PhaseViewModel>(_revitRepository.GetAdditionalPhases().Select(item => new PhaseViewModel(item, _revitRepository)));
             
-            Phases = new ObservableCollection<PhaseViewModel>(Levels.SelectMany(item => item.Rooms).Select(item => item.Phase).Distinct().Except(AdditionalPhases));
+            Phases = new ObservableCollection<PhaseViewModel>(Levels.SelectMany(item => item.SpartialElements).Select(item => item.Phase).Distinct().Except(AdditionalPhases));
             Phase = Phases.FirstOrDefault();
 
             RoundAccuracy = 1;
@@ -104,7 +104,7 @@ namespace RevitRooms.ViewModels {
             var errorElements = new Dictionary<ElementId, InfoElementViewModel>();
             foreach(var level in levels) {
                 var doors = level.GetDoors(Phase);
-                var rooms = level.GetRoomViewModels(Phase);
+                var rooms = level.GetSpatialElementViewModels(Phase);
 
                 // Все двери
                 // с не совпадающей секцией
@@ -141,7 +141,7 @@ namespace RevitRooms.ViewModels {
                 // Надеюсь будет достаточно быстро отрабатывать :)
                 // Подсчет площадей помещений
                 foreach(var level in levels) {
-                    var rooms = level.GetRoomViewModels(Phase).ToList();
+                    var rooms = level.GetSpatialElementViewModels(Phase).ToList();
                     foreach(var section in rooms.GroupBy(item => item.RoomSection.Name)) {
                         foreach(var flat in section.GroupBy(item => item.RoomGroup.Name)) {
                             double apartmentArea = 0;
@@ -184,36 +184,30 @@ namespace RevitRooms.ViewModels {
 
                 var bigChangesRooms = new Dictionary<ElementId, InfoElementViewModel>();
                 foreach(var level in levels) {
-                    // Обновление параметра
-                    // площади с коэффициентом у зон
-                    foreach(var area in level.GetAreas()) {
-                        UpdateRoomArea(area);
-                    }
-
-                    foreach(var room in level.GetRoomViewModels(phases)) {
+                    foreach(var spartialElement in level.GetSpatialElementViewModels(phases)) {
                         // Заполняем дублирующие
                         // общие параметры
-                        room.UpdateSharedParams();
+                        spartialElement.UpdateSharedParams();
                     }
 
                     // Обновление значений в помещениях
-                    foreach(var room in level.Rooms) {
+                    foreach(var spartialElement in level.SpartialElements) {
                         // Обновляем общий параметр этажа
-                        room.UpdateLevelSharedParam();
+                        spartialElement.UpdateLevelSharedParam();
 
                         // Обновление параметра
                         // площади с коэффициентом
-                        var roomAreaWithRatio = ConvertValueToSquareMeters(room.ComputeRoomAreaWithRatio());
-                        room.AreaWithRatio = ConvertValueToInternalUnits(roomAreaWithRatio);
+                        var roomAreaWithRatio = ConvertValueToSquareMeters(spartialElement.ComputeRoomAreaWithRatio());
+                        spartialElement.AreaWithRatio = ConvertValueToInternalUnits(roomAreaWithRatio);
 
-                        var areaOldValue = ConvertValueToSquareMeters(room.Area);
-                        var areaNewValue = ConvertValueToSquareMeters(room.RoomArea);
+                        var areaOldValue = ConvertValueToSquareMeters(spartialElement.Area);
+                        var areaNewValue = ConvertValueToSquareMeters(spartialElement.RoomArea);
 
-                        room.Area = areaNewValue;
+                        spartialElement.Area = areaNewValue;
                         if(bool.TryParse(CheckRoomAccuracy, out bool result) && result && areaOldValue > 0) {
                             bool isBigChange = Math.Abs(areaOldValue - areaNewValue) / areaOldValue * 100 > GetRoomAccuracy();
                             if(isBigChange) {
-                                AddElement("Большие изменения в площади.", room, bigChangesRooms);
+                                AddElement("Большие изменения в площади.", spartialElement, bigChangesRooms);
                             }
                         }
                     }
@@ -224,22 +218,13 @@ namespace RevitRooms.ViewModels {
             }
         }
 
-        private void UpdateRoomArea(Element element) {
-            double? squareArea = (double?) element.GetParamValueOrDefault(BuiltInParameter.ROOM_AREA);
-
-            squareArea = ConvertValueToSquareMeters(squareArea);
-            squareArea = ConvertValueToInternalUnits(squareArea.Value);
-
-            element.SetParamValue(SharedParamsConfig.Instance.RoomAreaWithRatio, squareArea.Value);
-        }
-
-        private static bool IsGroupTypeEqual(IEnumerable<RoomViewModel> rooms) {
+        private static bool IsGroupTypeEqual(IEnumerable<SpatialElementViewModel> rooms) {
             return rooms
                 .Select(group => group.RoomTypeGroup.Name)
                 .Distinct(StringComparer.CurrentCultureIgnoreCase).Count() != 1;
         }
 
-        private static bool ContainGroups(RoomViewModel item) {
+        private static bool ContainGroups(SpatialElementViewModel item) {
             return new[] { "апартаменты", "квартира", "гостиничный номер", "пентхаус" }
                 .Any(group => Contains(item.RoomGroup.Name, group, StringComparison.CurrentCultureIgnoreCase));
         }
