@@ -5,15 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Autodesk.Revit.DB;
-
 using dosymep.WPF.ViewModels;
 
 namespace RevitRooms.ViewModels {
-    internal class InfoElementViewModel : BaseViewModel {
-        public IElementViewModel<Element> Element { get; set; }
-        public ObservableCollection<string> Errors { get; set; }
-        
+    internal class InfoElementsViewModel : BaseViewModel {
+        public InfoElementViewModel InfoElement { get; set; }
+        public ObservableCollection<InfoElementViewModel> InfoElements { get; set; }
+
+
         public string ImageSource { get; } = "pack://application:,,,/Resources/icons8-show-property-96.png";
     }
 }

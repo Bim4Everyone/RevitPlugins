@@ -99,6 +99,7 @@ namespace RevitRooms.Models {
         }
 
         public void ShowElement(Element element) {
+            SelectElement(element);
             _uiDocument.ShowElements(element);
         }
 

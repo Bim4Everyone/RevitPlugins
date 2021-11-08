@@ -17,6 +17,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitRooms.Models;
+using RevitRooms.Views;
 
 namespace RevitRooms.ViewModels {
     internal abstract class RevitViewModel : BaseViewModel {
@@ -129,6 +130,7 @@ namespace RevitRooms.ViewModels {
                 AddElements("Не совпадают значения параметров групп и типа групп параметры у помещения.", notEqualGroupTypeRooms, errorElements);
             }
 
+            ShowInfoElementsWindow(errorElements);
             return errorElements.Count > 0;
         }
 
@@ -215,6 +217,7 @@ namespace RevitRooms.ViewModels {
                     }
                 }
 
+                ShowInfoElementsWindow(bigChangesRooms);
                 transaction.Commit();
             }
         }
@@ -268,6 +271,18 @@ namespace RevitRooms.ViewModels {
             }
 
             value.Errors.Add(infoText);
+        }
+
+        private void ShowInfoElementsWindow(Dictionary<ElementId, InfoElementViewModel> infoElements) {
+            if(infoElements.Count > 0) {
+                var window = new InfoElementsWindow() {
+                    DataContext = new InfoElementsViewModel() {
+                        InfoElements = new ObservableCollection<InfoElementViewModel>(infoElements.Values.Cast<InfoElementViewModel>())
+                    }
+                };
+
+                window.Show();
+            }            
         }
     }
 }
