@@ -167,6 +167,8 @@ namespace RevitRooms.ViewModels {
             using(var transaction = _revitRepository.StartTransaction("Расчет площадей")) {
                 // Надеюсь будет достаточно быстро отрабатывать :)
                 // Подсчет площадей помещений
+
+                var bigChangesRooms = new Dictionary<ElementId, InfoElementViewModel>();
                 foreach(var level in levels) {
                     var rooms = level.GetSpatialElementViewModels(Phase).ToList();
                     foreach(var section in rooms.GroupBy(item => item.RoomSection.Name)) {
@@ -204,10 +206,16 @@ namespace RevitRooms.ViewModels {
                             }
 
                             foreach(var room in flat) {
-                                room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentArea, ConvertValueToInternalUnits(apartmentLivingArea));
                                 room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaRatio, ConvertValueToInternalUnits(apartmentAreaRatio));
                                 room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentLivingArea, ConvertValueToInternalUnits(apartmentLivingArea));
                                 room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaNoBalcony, ConvertValueToInternalUnits(apartmentAreaNoBalcony));
+
+                                var areaOldValue = ConvertValueToSquareMeters((double?) room.Element.GetParamValueOrDefault(SharedParamsConfig.Instance.ApartmentArea));
+                                room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentArea, ConvertValueToInternalUnits(apartmentLivingArea));
+
+                                if(GetIsBigChanges(areaOldValue, apartmentLivingArea)) {
+                                    AddElement("Большие изменения в площади комнаты.", room, bigChangesRooms);
+                                }
 
                                 if(IsSpotCalcArea) {
                                     room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentFullArea, ConvertValueToInternalUnits(area));
@@ -218,8 +226,7 @@ namespace RevitRooms.ViewModels {
                         }
                     }
                 }
-
-                var bigChangesRooms = new Dictionary<ElementId, InfoElementViewModel>();
+                
                 foreach(var level in levels) {
                     foreach(var spartialElement in level.GetSpatialElementViewModels(phases)) {
                         // Заполняем дублирующие
@@ -241,11 +248,8 @@ namespace RevitRooms.ViewModels {
                         var areaNewValue = ConvertValueToSquareMeters(spartialElement.RoomArea);
 
                         spartialElement.Area = areaNewValue;
-                        if(bool.TryParse(CheckRoomAccuracy, out bool result) && result && areaOldValue > 0) {
-                            bool isBigChange = Math.Abs(areaOldValue - areaNewValue) / areaOldValue * 100 > GetRoomAccuracy();
-                            if(isBigChange) {
-                                AddElement("Большие изменения в площади.", spartialElement, bigChangesRooms);
-                            }
+                        if(GetIsBigChanges(areaOldValue, areaNewValue)) {
+                            AddElement("Большие изменения в площади помещения.", spartialElement, bigChangesRooms);
                         }
                     }
                 }
@@ -253,6 +257,12 @@ namespace RevitRooms.ViewModels {
                 ShowInfoElementsWindow(bigChangesRooms);
                 transaction.Commit();
             }
+        }
+
+        private bool GetIsBigChanges(double areaOldValue, double areaNewValue) {
+            return bool.TryParse(CheckRoomAccuracy, out bool result) && result && areaOldValue > 0
+                ? Math.Abs(areaOldValue - areaNewValue) / areaOldValue * 100 > GetRoomAccuracy()
+                : false;
         }
 
         private static bool IsGroupTypeEqual(IEnumerable<SpatialElementViewModel> rooms) {
