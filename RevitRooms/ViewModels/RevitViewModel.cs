@@ -172,8 +172,11 @@ namespace RevitRooms.ViewModels {
                             double apartmentAreaNoBalcony = 0;
 
                             double area = 0;
+                            int countRooms = 0;
 
                             foreach(var room in flat) {
+                                countRooms++;
+
                                 if(room.IsRoomBalcony == true) {
                                     apartmentLivingArea += ConvertValueToSquareMeters(room.RoomArea);
                                 }
@@ -199,6 +202,8 @@ namespace RevitRooms.ViewModels {
                                 if(IsSpotCalcArea) {
                                     room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentFullArea, ConvertValueToInternalUnits(area));
                                 }
+
+                                room.Element.SetParamValue(SharedParamsConfig.Instance.RoomsCount, ConvertValueToInternalUnits(countRooms));
                             }
                         }
                     }
