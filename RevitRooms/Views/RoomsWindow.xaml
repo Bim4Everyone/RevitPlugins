@@ -39,7 +39,7 @@
         <StackPanel Grid.Row="3" Margin="0,5,10,0" Orientation="Horizontal" 
                     Visibility="{Binding ElementName=_checkArea,Path=IsChecked, Converter={StaticResource BoolToVis}}" >
             <TextBlock Margin="50,0,10,0" Text="Точность проверки"/>
-            <TextBox Width="50" Text="{Binding RevitViewModel.CheckRoomAccuracy}"/>
+            <TextBox Width="50" Text="{Binding RevitViewModel.CheckRoomAccuracy, UpdateSourceTrigger=PropertyChanged}"/>
             <TextBlock Margin="10,0,0,0" Text="%"/>
         </StackPanel>
 
@@ -85,7 +85,7 @@
         </ListView>
 
         <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right">
-            <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
+            <TextBlock Margin="10" Text="{Binding RevitViewModel.ErrorText}" Foreground="Orange" />
             <Button Content="Рассчитать" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding RevitViewModel.CalculateCommand}"/>
             <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
         </StackPanel>

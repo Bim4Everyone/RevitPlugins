@@ -63,7 +63,7 @@ namespace RevitRooms.ViewModels {
 
         public bool IsSpotCalcArea { get; set; }
         public bool IsCheckRoomsChanges { get; set; }
-        public string CheckRoomAccuracy { get; set; }
+        public string CheckRoomAccuracy { get; set; } = "100";
 
         public int RoundAccuracy { get; set; }
         public ObservableCollection<int> RoundAccuracyValues { get; }
@@ -96,6 +96,28 @@ namespace RevitRooms.ViewModels {
         }
 
         private bool CanCalculate(object p) {
+            if(IsCheckRoomsChanges) {
+                if(!int.TryParse(CheckRoomAccuracy, out var сheckRoomAccuracy)) {
+                    ErrorText = "Точность проверки должна быть числом.";
+                    return false;
+                }
+
+                if(сheckRoomAccuracy <= 0 || сheckRoomAccuracy > 100) {
+                    ErrorText = "Точность проверки должна быть от 1 до 100.";
+                    return false;
+                }
+            }
+
+            if(Phase == null) {
+                ErrorText = "Выберите стадию.";
+                return false;
+            }
+
+            if(!Levels.Any(item => item.IsSelected)) {
+                ErrorText = "Выберите хотя бы один уровень.";
+                return false;
+            }
+
             ErrorText = null;
             return true;
         }
