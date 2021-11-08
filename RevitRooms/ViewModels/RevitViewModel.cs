@@ -153,6 +153,8 @@ namespace RevitRooms.ViewModels {
 
                 AddElements("Не совпадают значения параметров групп и типа групп параметры у помещения.", notEqualGroupTypeRooms, errorElements);
 
+                // Все помещений у которых
+                // найдены самопересечения
                 var countourIntersectRooms = rooms.Where(item => item.IsCountourIntersect == true);
                 AddElements("Найдены самопересечения в помещении.", countourIntersectRooms, errorElements);
             }
