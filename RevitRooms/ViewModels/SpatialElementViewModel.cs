@@ -28,6 +28,9 @@ namespace RevitRooms.ViewModels {
                 var segments = Element.GetBoundarySegments(new SpatialElementBoundaryOptions());
                 IsRedundant = segments.Count > 0;
                 NotEnclosed = segments.Count == 0;
+
+                var boundarySegment = segments.FirstOrDefault();
+                IsCountourIntersect = GetCountourIntersect(boundarySegment);
             }
         }
 
@@ -54,7 +57,7 @@ namespace RevitRooms.ViewModels {
         public string LevelName {
             get { return Element.Level.Name; }
         }
-        
+
         public double? RoomArea {
             get { return (double?) Element.GetParamValueOrDefault(BuiltInParameter.ROOM_AREA); }
         }
@@ -66,7 +69,7 @@ namespace RevitRooms.ViewModels {
         public bool? IsRoomBalcony {
             get { return Convert.ToInt32(Element.GetParamValueOrDefault(ProjectParamsConfig.Instance.IsRoomBalcony)) == 1; }
         }
-        
+
         public double? RoomAreaRatio {
             get { return (double?) Element.GetParamValueOrDefault(ProjectParamsConfig.Instance.RoomAreaRatio); }
         }
@@ -93,6 +96,8 @@ namespace RevitRooms.ViewModels {
 
         public bool? IsRedundant { get; }
         public bool? NotEnclosed { get; }
+        public bool? IsCountourIntersect { get; }
+
         public PhaseViewModel Phase { get; }
 
         public void UpdateSharedParams() {
@@ -113,6 +118,24 @@ namespace RevitRooms.ViewModels {
         private Element GetParamElement(RevitParam revitParam) {
             ElementId elementId = (ElementId) Element.GetParamValueOrDefault(revitParam);
             return elementId == null ? null : Element.Document.GetElement(elementId);
+        }
+
+        private bool? GetCountourIntersect(IList<BoundarySegment> boundarySegment) {
+            if(boundarySegment == null) {
+                return null;
+            }
+
+            var curves = boundarySegment.Select(item => item.GetCurve());
+            var array = new IntersectionResultArray();
+            foreach(var curve1 in curves) {
+                foreach(var curve2 in curves) {
+                    if(curve1.Intersect(curve2) == SetComparisonResult.Overlap) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }
