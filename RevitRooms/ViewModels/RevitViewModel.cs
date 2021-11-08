@@ -29,13 +29,16 @@ namespace RevitRooms.ViewModels {
             _revitRepository = new RevitRepository(application, document);
 
             Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
-            Phases = new ObservableCollection<PhaseViewModel>(Levels.SelectMany(item => item.Rooms).Select(item => item.Phase).Distinct());
+            AdditionalPhases = new ObservableCollection<PhaseViewModel>(_revitRepository.GetAdditionalPhases().Select(item => new PhaseViewModel(item, _revitRepository)));
+            
+            Phases = new ObservableCollection<PhaseViewModel>(Levels.SelectMany(item => item.Rooms).Select(item => item.Phase).Distinct().Except(AdditionalPhases));
             Phase = Phases.FirstOrDefault();
 
             RoundAccuracy = 1;
             RoundAccuracyValues = new ObservableCollection<int>(Enumerable.Range(1, 3));
 
             CalculateCommand = new RelayCommand(Calculate, CanCalculate);
+
         }
 
         public ICommand CalculateCommand { get; }
@@ -67,6 +70,7 @@ namespace RevitRooms.ViewModels {
 
         public ObservableCollection<PhaseViewModel> Phases { get; }
         public ObservableCollection<LevelViewModel> Levels { get; }
+        public ObservableCollection<PhaseViewModel> AdditionalPhases { get; }
 
         protected abstract IEnumerable<LevelViewModel> GetLevelViewModels();
         private void Calculate(object p) {
@@ -74,9 +78,7 @@ namespace RevitRooms.ViewModels {
             _revitRepository.RemoveUnplacedRooms();
 
             // Получаем список дополнительных стадий
-            var phases = _revitRepository.GetAdditionalPhases()
-                .Select(item => new PhaseViewModel(item, _revitRepository))
-                .ToList();
+            var phases = AdditionalPhases.ToList();
             phases.Add(Phase);
 
             // Получение всех помещений
