@@ -24,13 +24,13 @@ namespace RevitRooms.ViewModels {
                 Phase = new PhaseViewModel(phase, revitRepository);
             }
 
+            var segments = Element.GetBoundarySegments(new SpatialElementBoundaryOptions());
+            var segment = segments.FirstOrDefault();
+            IsCountourIntersect = GetCountourIntersect(segment);
+
             if(RoomArea == null || RoomArea == 0) {
-                var segments = Element.GetBoundarySegments(new SpatialElementBoundaryOptions());
                 IsRedundant = segments.Count > 0;
                 NotEnclosed = segments.Count == 0;
-
-                var boundarySegment = segments.FirstOrDefault();
-                IsCountourIntersect = GetCountourIntersect(boundarySegment);
             }
         }
 
@@ -125,11 +125,24 @@ namespace RevitRooms.ViewModels {
                 return null;
             }
 
-            var curves = boundarySegment.Select(item => item.GetCurve());
+            var curves = boundarySegment
+                .Select(item => item.GetCurve())
+                .ToArray();
+
             var array = new IntersectionResultArray();
-            foreach(var curve1 in curves) {
-                foreach(var curve2 in curves) {
-                    if(curve1.Intersect(curve2) == SetComparisonResult.Overlap) {
+
+            // идет проверка через один элемент
+            // потому что соседние элементы пересекаются между собой
+            for(int i = 0; i < curves.Length - 2; i++) {
+                var firstCurve = curves[i];
+                for(int j = i + 2; j < curves.Length; j++) {
+                    if(i == 0 && j == (curves.Length - 1)) {
+                        continue;
+                    }
+
+                    var secondCurve = curves[j];
+                    var intersect = firstCurve.Intersect(secondCurve, out array);
+                    if(intersect == SetComparisonResult.Overlap) {
                         return true;
                     }
                 }
