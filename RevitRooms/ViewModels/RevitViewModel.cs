@@ -175,8 +175,6 @@ namespace RevitRooms.ViewModels {
                             int countRooms = 0;
 
                             foreach(var room in flat) {
-                                countRooms++;
-
                                 if(room.IsRoomBalcony == true) {
                                     apartmentLivingArea += ConvertValueToSquareMeters(room.RoomArea);
                                 }
@@ -190,6 +188,13 @@ namespace RevitRooms.ViewModels {
 
                                 if(room.Phase.Name == "Межквартирные перегородки") {
                                     area += ConvertValueToSquareMeters(room.RoomArea);
+                                }
+
+                                if(Contains(room.Room.Name, "спальня", StringComparison.CurrentCultureIgnoreCase)
+                                    || Contains(room.Room.Name, "кабинет", StringComparison.CurrentCultureIgnoreCase)
+                                    || (Contains(room.Room.Name, "гостиная", StringComparison.CurrentCultureIgnoreCase)
+                                        && !Contains(room.Room.Name, "кухня-гостиная", StringComparison.CurrentCultureIgnoreCase))) {
+                                    countRooms++;
                                 }
                             }
 
