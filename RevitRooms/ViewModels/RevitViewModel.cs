@@ -258,7 +258,7 @@ namespace RevitRooms.ViewModels {
                         var areaOldValue = ConvertValueToSquareMeters(spartialElement.Area);
                         var areaNewValue = ConvertValueToSquareMeters(spartialElement.RoomArea);
 
-                        spartialElement.Area = areaNewValue;
+                        spartialElement.Area = ConvertValueToInternalUnits(areaNewValue);
                         if(GetIsBigChanges(areaOldValue, areaNewValue)) {
                             AddElement("Большие изменения в площади помещения.", spartialElement, bigChangesRooms);
                         }
