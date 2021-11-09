@@ -21,4 +21,11 @@ namespace RevitRooms.Views {
             InitializeComponent();
         }
     }
+
+    internal enum TypeInfo {
+        None,
+        Info,
+        Error,
+        Warning,
+    }
 }

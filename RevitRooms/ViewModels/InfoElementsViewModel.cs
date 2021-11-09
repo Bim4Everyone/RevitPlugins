@@ -9,10 +9,13 @@ using dosymep.WPF.ViewModels;
 
 namespace RevitRooms.ViewModels {
     internal class InfoElementsViewModel : BaseViewModel {
-        public InfoElementViewModel InfoElement { get; set; }
+        private InfoElementViewModel _infoElement;
+
+        public InfoElementViewModel InfoElement {
+            get => _infoElement; 
+            set => this.RaiseAndSetIfChanged(ref _infoElement, value);
+        }
+
         public ObservableCollection<InfoElementViewModel> InfoElements { get; set; }
-
-
-        public string ImageSource { get; } = "pack://application:,,,/Resources/icons8-show-property-96.png";
     }
 }

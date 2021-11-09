@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitRooms.Views"
         mc:Ignorable="d"
-        Title="InfoElementsWindow" Height="450" Width="800">
+        Title="Информация" Height="800" Width="1200">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -30,18 +30,22 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding Element.ElementId}" Header="ID" Width="100" />
-                    <GridViewColumn DisplayMemberBinding="{Binding Element.Name}" Header="Наименование" Width="200" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Element.ElementId}" Header="ID" Width="50" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Element.CategoryName}" Header="Категория" Width="100" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Element.Name}" Header="Наименование" Width="100" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Element.LevelName}" Header="Уровень" Width="100" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Element.PhaseName}" Header="Стадия" Width="100" />
                 </GridView>
             </ListView.View>
         </ListView>
 
-        <GridSplitter Grid.Column="1" />
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="3" />
 
-        <ListView Grid.Column="2" ItemsSource="{Binding InfoElement.Errors}">
+        <ListView Grid.Column="2" ItemsSource="{Binding Path=InfoElement.Messages}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn DisplayMemberBinding="{Binding}" Header="Описание" Width="500" />
+                    <GridViewColumn DisplayMemberBinding="{Binding TypeInfo}" Header="Тип" Width="100" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Message}" Header="Описание" Width="500" />
                 </GridView>
             </ListView.View>
         </ListView>

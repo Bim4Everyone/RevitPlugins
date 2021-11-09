@@ -54,7 +54,11 @@ namespace RevitRooms.ViewModels {
             get { return Element.LevelId; }
         }
 
-        public string LevelName {
+        public override string PhaseName {
+            get { return Phase.Name; }
+        }
+
+        public override string LevelName {
             get { return Element.Level.Name; }
         }
 

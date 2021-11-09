@@ -14,9 +14,12 @@ namespace RevitRooms.ViewModels {
         TElement Element { get; }
         RevitRepository RevitRepository { get; }
 
-        string Name { get; }
         ElementId ElementId { get; }
-        
+
+        string Name { get; }
+        string PhaseName { get; }
+        string LevelName { get; }
+        string CategoryName { get; }
 
         ICommand ShowElementCommand { get; }
         ICommand SelectElementCommand { get; }

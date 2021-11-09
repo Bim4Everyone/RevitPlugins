@@ -37,6 +37,10 @@ namespace RevitRooms.ViewModels {
             get { return SpartialElements.Count; }
         }
 
+        public override string LevelName {
+            get { return Name; }
+        }
+
         public ObservableCollection<SpatialElementViewModel> SpartialElements { get; }
 
         public IEnumerable<DoorViewModel> GetDoors(PhaseViewModel phase) {
