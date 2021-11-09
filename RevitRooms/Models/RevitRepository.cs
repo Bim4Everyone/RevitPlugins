@@ -99,6 +99,14 @@ namespace RevitRooms.Models {
             }
         }
 
+        public IList<Area> GetAllAreas() {
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_Areas)
+                .OfType<Area>()
+                .ToList();
+        }
+
         public ElementId GetPhaseId(Element element) {
             return (ElementId) element.GetParamValueOrDefault(BuiltInParameter.ROOM_PHASE_ID) ?? ElementId.InvalidElementId;
         }

@@ -254,8 +254,20 @@ namespace RevitRooms.ViewModels {
                     }
                 }
 
-                ShowInfoElementsWindow(bigChangesRooms);
+
+                // Обновление параметра округления у зон
+                foreach(var area in _revitRepository
+                                      .GetAllAreas()
+                                      .Select(item => new SpatialElementViewModel(item, _revitRepository))) {
+                    
+                    // Обновление параметра
+                    // площади с коэффициентом
+                    var roomAreaWithRatio = ConvertValueToSquareMeters(area.ComputeRoomAreaWithRatio());
+                    area.AreaWithRatio = ConvertValueToInternalUnits(roomAreaWithRatio);
+                }
+                
                 transaction.Commit();
+                ShowInfoElementsWindow(bigChangesRooms);
             }
         }
 
