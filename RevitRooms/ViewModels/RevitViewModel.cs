@@ -149,6 +149,10 @@ namespace RevitRooms.ViewModels {
                 AddElements("Не совпадают значения параметров групп и типа групп параметры у помещения.", notEqualGroupTypeRooms, errorElements);
             }
 
+            // Обрабатываем все зоны
+            var redundantAreas = GetAreas().Where(item => item.IsRedundant == true || item.NotEnclosed == true);
+            AddElements("Избыточное или не окруженное помещение.", redundantAreas, errorElements);
+
             // Ошибки, которые не останавливают выполнение скрипта
             var warningElements = new Dictionary<ElementId, InfoElementViewModel>();
             foreach(var level in levels) {
@@ -263,9 +267,7 @@ namespace RevitRooms.ViewModels {
 
 
                 // Обновление параметра округления у зон
-                foreach(var area in _revitRepository
-                                      .GetAllAreas()
-                                      .Select(item => new SpatialElementViewModel(item, _revitRepository))) {
+                foreach(var area in GetAreas()) {
 
                     // Обновление параметра
                     // площади с коэффициентом
@@ -276,6 +278,11 @@ namespace RevitRooms.ViewModels {
                 transaction.Commit();
                 ShowInfoElementsWindow(bigChangesRooms.Values);
             }
+        }
+
+        private IEnumerable<SpatialElementViewModel> GetAreas() {
+            return _revitRepository.GetAllAreas()
+                .Select(item => new SpatialElementViewModel(item, _revitRepository));
         }
 
         private bool GetIsBigChanges(double areaOldValue, double areaNewValue) {
