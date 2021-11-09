@@ -30,7 +30,7 @@ namespace RevitRooms.ViewModels {
 
             Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
             AdditionalPhases = new ObservableCollection<PhaseViewModel>(_revitRepository.GetAdditionalPhases().Select(item => new PhaseViewModel(item, _revitRepository)));
-            
+
             Phases = new ObservableCollection<PhaseViewModel>(Levels.SelectMany(item => item.SpartialElements).Select(item => item.Phase).Distinct().Except(AdditionalPhases));
             Phase = Phases.FirstOrDefault();
 
@@ -128,11 +128,6 @@ namespace RevitRooms.ViewModels {
                 var doors = level.GetDoors(Phase);
                 var rooms = level.GetSpatialElementViewModels(Phase);
 
-                // Все двери
-                // с не совпадающей секцией
-                var notEqualSectionDoors = doors.Where(item => !item.IsSectionNameEqual);
-                AddElements("Не совпадают секции у дверей.", notEqualSectionDoors, errorElements);
-
                 // Все помещения которые
                 // избыточные или не окруженные
                 var redundantRooms = rooms.Where(item => item.IsRedundant == true || item.NotEnclosed == true);
@@ -152,14 +147,26 @@ namespace RevitRooms.ViewModels {
                     .SelectMany(items => items);
 
                 AddElements("Не совпадают значения параметров групп и типа групп параметры у помещения.", notEqualGroupTypeRooms, errorElements);
+            }
+
+            // Ошибки, которые не останавливают выполнение скрипта
+            var warningElements = new Dictionary<ElementId, InfoElementViewModel>();
+            foreach(var level in levels) {
+                var doors = level.GetDoors(Phase);
+                var rooms = level.GetSpatialElementViewModels(Phase);
+
+                // Все двери
+                // с не совпадающей секцией
+                var notEqualSectionDoors = doors.Where(item => !item.IsSectionNameEqual);
+                AddElements("Не совпадают секции у дверей.", notEqualSectionDoors, warningElements);
 
                 // Все помещений у которых
                 // найдены самопересечения
                 var countourIntersectRooms = rooms.Where(item => item.IsCountourIntersect == true);
-                AddElements("Найдены самопересечения в помещении.", countourIntersectRooms, errorElements);
+                AddElements("Найдены самопересечения в помещении.", countourIntersectRooms, warningElements);
             }
 
-            ShowInfoElementsWindow(errorElements);
+            ShowInfoElementsWindow(warningElements.Values.Union(errorElements.Values));
             return errorElements.Count > 0;
         }
 
@@ -226,7 +233,7 @@ namespace RevitRooms.ViewModels {
                         }
                     }
                 }
-                
+
                 foreach(var level in levels) {
                     foreach(var spartialElement in level.GetSpatialElementViewModels(phases)) {
                         // Заполняем дублирующие
@@ -259,15 +266,15 @@ namespace RevitRooms.ViewModels {
                 foreach(var area in _revitRepository
                                       .GetAllAreas()
                                       .Select(item => new SpatialElementViewModel(item, _revitRepository))) {
-                    
+
                     // Обновление параметра
                     // площади с коэффициентом
                     var roomAreaWithRatio = ConvertValueToSquareMeters(area.ComputeRoomAreaWithRatio());
                     area.AreaWithRatio = ConvertValueToInternalUnits(roomAreaWithRatio);
                 }
-                
+
                 transaction.Commit();
-                ShowInfoElementsWindow(bigChangesRooms);
+                ShowInfoElementsWindow(bigChangesRooms.Values);
             }
         }
 
@@ -319,16 +326,16 @@ namespace RevitRooms.ViewModels {
             value.Errors.Add(infoText);
         }
 
-        private void ShowInfoElementsWindow(Dictionary<ElementId, InfoElementViewModel> infoElements) {
-            if(infoElements.Count > 0) {
+        private void ShowInfoElementsWindow(IEnumerable<InfoElementViewModel> infoElements) {
+            if(infoElements.Any()) {
                 var window = new InfoElementsWindow() {
                     DataContext = new InfoElementsViewModel() {
-                        InfoElements = new ObservableCollection<InfoElementViewModel>(infoElements.Values.Cast<InfoElementViewModel>())
+                        InfoElements = new ObservableCollection<InfoElementViewModel>(infoElements)
                     }
                 };
 
                 window.Show();
-            }            
+            }
         }
     }
 }
