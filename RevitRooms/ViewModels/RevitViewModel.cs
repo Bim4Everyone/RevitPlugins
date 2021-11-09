@@ -75,7 +75,7 @@ namespace RevitRooms.ViewModels {
         protected abstract IEnumerable<LevelViewModel> GetLevelViewModels();
         private void Calculate(object p) {
             // Удаляем все не размещенные помещения
-            _revitRepository.RemoveUnplacedRooms();
+            _revitRepository.RemoveUnplacedSpatialElements();
 
             // Получаем список дополнительных стадий
             var phases = AdditionalPhases.ToList();
