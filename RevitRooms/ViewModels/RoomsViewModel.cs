@@ -18,7 +18,7 @@ namespace RevitRooms.ViewModels {
 
         public RoomsViewModel(Application application, Document document) {
             RevitViewModels = new ObservableCollection<RevitViewModel> {
-                new ViewRevitViewModel(application, document) { Name = "Выборка по текущему виду" },
+                //new ViewRevitViewModel(application, document) { Name = "Выборка по текущему виду" },
                 new ElementsRevitViewModel(application, document) { Name = "Выборка по всем элементам" },
                 new SelectedRevitViewModel(application, document) { Name = "Выборка по выделенным элементам" }
             };
