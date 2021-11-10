@@ -88,7 +88,7 @@ namespace RevitRooms.ViewModels {
 
             // Проверка всех элементов
             // на выделенных уровнях
-            if(CheckElements(levels)) {
+            if(CheckElements(phases, levels)) {
                 return;
             }
 
@@ -123,10 +123,10 @@ namespace RevitRooms.ViewModels {
             return true;
         }
 
-        private bool CheckElements(IEnumerable<LevelViewModel> levels) {
+        private bool CheckElements(List<PhaseViewModel> phases, IEnumerable<LevelViewModel> levels) {
             var errorElements = new Dictionary<string, InfoElementViewModel>();
             foreach(var level in levels) {
-                var rooms = level.GetSpatialElementViewModels(Phase);
+                var rooms = level.GetSpatialElementViewModels(phases);
 
                 // Все помещения которые
                 // избыточные или не окруженные
@@ -152,8 +152,9 @@ namespace RevitRooms.ViewModels {
                 // Все помещения у которых
                 // не совпадают значения группы и типа группы
                 var notEqualGroupTypeRooms = rooms.Where(room => room.RoomGroup != null)
+                    .Where(room => room.Phase == Phase || room.PhaseName.Equals("Межквартирные перегородки", StringComparison.CurrentCultureIgnoreCase))
                     .Where(room => ContainGroups(room))
-                    .GroupBy(room => room.RoomGroup)
+                    .GroupBy(room => room.RoomGroup.Id)
                     .Where(group => IsGroupTypeEqual(group))
                     .SelectMany(items => items);
 
@@ -167,12 +168,12 @@ namespace RevitRooms.ViewModels {
             // Ошибки, которые не останавливают выполнение скрипта
             var warningElements = new Dictionary<string, InfoElementViewModel>();
             foreach(var level in levels) {
-                var doors = level.GetDoors(Phase);
-                var rooms = level.GetSpatialElementViewModels(Phase);
+                var doors = level.GetDoors(phases);
+                var rooms = level.GetSpatialElementViewModels(phases);
 
                 // Все двери
                 // с не совпадающей секцией
-                var notEqualSectionDoors = doors.Where(item => !item.IsSectionNameEqual);
+                var notEqualSectionDoors = doors.Where(room => room.Phase == Phase || room.PhaseName.Equals("Межквартирные перегородки", StringComparison.CurrentCultureIgnoreCase)).Where(item => !item.IsSectionNameEqual);
                 AddElements("Не совпадают секции у двери.", TypeInfo.Warning, notEqualSectionDoors, warningElements);
 
                 // Все помещений у которых
@@ -305,7 +306,7 @@ namespace RevitRooms.ViewModels {
         private static bool IsGroupTypeEqual(IEnumerable<SpatialElementViewModel> rooms) {
             return rooms
                 .Select(group => group.RoomTypeGroup.Name)
-                .Distinct(StringComparer.CurrentCultureIgnoreCase).Count() != 1;
+                .Distinct(StringComparer.CurrentCultureIgnoreCase).Count() > 1;
         }
 
         private static bool ContainGroups(SpatialElementViewModel item) {

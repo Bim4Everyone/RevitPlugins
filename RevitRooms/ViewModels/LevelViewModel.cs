@@ -43,9 +43,9 @@ namespace RevitRooms.ViewModels {
 
         public ObservableCollection<SpatialElementViewModel> SpartialElements { get; }
 
-        public IEnumerable<DoorViewModel> GetDoors(PhaseViewModel phase) {
+        public IEnumerable<DoorViewModel> GetDoors(IEnumerable<PhaseViewModel> phases) {
             return RevitRepository.GetDoors()
-                .Select(item => new DoorViewModel(item, phase, RevitRepository))
+                .SelectMany(item => phases.Select(phase => new DoorViewModel(item, phase, RevitRepository)))
                 .Where(item => item.LevelId == Element.Id)
                 .Where(item => SpartialElements.Contains(item.ToRoom) || SpartialElements.Contains(item.FromRoom));
         }
