@@ -298,9 +298,11 @@ namespace RevitRooms.ViewModels {
         }
 
         private bool GetIsBigChanges(double areaOldValue, double areaNewValue) {
-            return bool.TryParse(CheckRoomAccuracy, out bool result) && result && areaOldValue > 0
-                ? Math.Abs(areaOldValue - areaNewValue) / areaOldValue * 100 > GetRoomAccuracy()
-                : false;
+            if(IsCheckRoomsChanges) {
+                return Math.Abs(areaOldValue - areaNewValue) / areaOldValue * 100 > GetRoomAccuracy();
+            }
+
+            return false;
         }
 
         private static bool IsGroupTypeEqual(IEnumerable<SpatialElementViewModel> rooms) {
