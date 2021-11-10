@@ -13,13 +13,24 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <ListView Grid.Column="0" ItemsSource="{Binding InfoElements}" SelectedItem="{Binding InfoElement}">
+        <ListView Grid.Column="0" ItemsSource="{Binding Path=InfoElements}" SelectedItem="{Binding InfoElement}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding TypeInfo}" Header="Тип" Width="100" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Message}" Header="Описание" Width="500" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="3" />
+
+        <ListView Grid.Column="2" ItemsSource="{Binding InfoElement.Elements}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="#">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Command="{Binding Element.ShowElementCommand}">
+                                <Button Command="{Binding ShowElementCommand}">
                                     <Image Width="16" Height="16" Source="{Binding Element.ImageSource}" />
                                     <Button.Resources>
                                         <Style TargetType="Border">
@@ -30,22 +41,11 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding Element.ElementId}" Header="ID" Width="50" />
-                    <GridViewColumn DisplayMemberBinding="{Binding Element.CategoryName}" Header="Категория" Width="100" />
-                    <GridViewColumn DisplayMemberBinding="{Binding Element.Name}" Header="Наименование" Width="100" />
-                    <GridViewColumn DisplayMemberBinding="{Binding Element.LevelName}" Header="Уровень" Width="100" />
-                    <GridViewColumn DisplayMemberBinding="{Binding Element.PhaseName}" Header="Стадия" Width="100" />
-                </GridView>
-            </ListView.View>
-        </ListView>
-
-        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="3" />
-
-        <ListView Grid.Column="2" ItemsSource="{Binding Path=InfoElement.Messages}">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn DisplayMemberBinding="{Binding TypeInfo}" Header="Тип" Width="100" />
-                    <GridViewColumn DisplayMemberBinding="{Binding Message}" Header="Описание" Width="500" />
+                    <GridViewColumn DisplayMemberBinding="{Binding ElementId}" Header="ID" Width="50" />
+                    <GridViewColumn DisplayMemberBinding="{Binding CategoryName}" Header="Категория" Width="100" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Наименование" Width="100" />
+                    <GridViewColumn DisplayMemberBinding="{Binding LevelName}" Header="Уровень" Width="100" />
+                    <GridViewColumn DisplayMemberBinding="{Binding PhaseName}" Header="Стадия" Width="100" />
                 </GridView>
             </ListView.View>
         </ListView>
