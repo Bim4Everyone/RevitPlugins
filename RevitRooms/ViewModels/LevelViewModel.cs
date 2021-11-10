@@ -24,7 +24,7 @@ namespace RevitRooms.ViewModels {
             get => _isSelected;
             set => this.RaiseAndSetIfChanged(ref _isSelected, value);
         }
-
+#if D2020 || R2020
         public bool IsLivingLevel {
             get { return UnitUtils.ConvertFromInternalUnits(Element.Elevation, DisplayUnitType.DUT_METERS) > 2; }
         }
@@ -32,6 +32,15 @@ namespace RevitRooms.ViewModels {
         public string Elevation {
             get { return UnitUtils.ConvertFromInternalUnits(Element.Elevation, DisplayUnitType.DUT_METERS) + " " + UnitUtils.GetTypeCatalogString(DisplayUnitType.DUT_METERS); }
         }
+#elif D2021 || R2021 || D2022 || R2022
+        public bool IsLivingLevel {
+            get { return UnitUtils.ConvertFromInternalUnits(Element.Elevation, UnitTypeId.Meters) > 2; }
+        }
+
+        public string Elevation {
+            get { return UnitUtils.ConvertFromInternalUnits(Element.Elevation, UnitTypeId.Meters) + " " + UnitUtils.GetTypeCatalogStringForUnit(UnitTypeId.Meters); }
+        }
+#endif
 
         public int RoomsCount {
             get { return SpartialElements.Count; }

@@ -321,7 +321,7 @@ namespace RevitRooms.ViewModels {
         private int GetRoomAccuracy() {
             return int.TryParse(CheckRoomAccuracy, out int result) ? result : 100;
         }
-
+#if D2020 || R2020
         private double ConvertValueToSquareMeters(double? value) {
             return value.HasValue ? Math.Round(UnitUtils.ConvertFromInternalUnits(value.Value, DisplayUnitType.DUT_SQUARE_METERS), RoundAccuracy) : 0;
         }
@@ -329,6 +329,15 @@ namespace RevitRooms.ViewModels {
         private double ConvertValueToInternalUnits(double value) {
             return UnitUtils.ConvertToInternalUnits(value, DisplayUnitType.DUT_SQUARE_METERS);
         }
+#elif D2021 || R2021 || D2022 || R2022
+        private double ConvertValueToSquareMeters(double? value) {
+            return value.HasValue ? Math.Round(UnitUtils.ConvertFromInternalUnits(value.Value, UnitTypeId.SquareMeters), RoundAccuracy) : 0;
+        }
+
+        private double ConvertValueToInternalUnits(double value) {
+            return UnitUtils.ConvertToInternalUnits(value, UnitTypeId.SquareMeters);
+        }
+#endif
 
         private void AddElements(string infoText, TypeInfo typeInfo, IEnumerable<IElementViewModel<Element>> elements, Dictionary<string, InfoElementViewModel> infoElements) {
             foreach(var element in elements) {
