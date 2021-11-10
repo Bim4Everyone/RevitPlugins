@@ -45,8 +45,7 @@ namespace RevitRooms.ViewModels {
 
         public IEnumerable<DoorViewModel> GetDoors(PhaseViewModel phase) {
             return RevitRepository.GetDoors()
-                .Select(item => new DoorViewModel(item, RevitRepository))
-                .Where(item => item.Phase.Equals(phase))
+                .Select(item => new DoorViewModel(item, phase, RevitRepository))
                 .Where(item => item.LevelId == Element.Id)
                 .Where(item => SpartialElements.Contains(item.ToRoom) || SpartialElements.Contains(item.FromRoom));
         }

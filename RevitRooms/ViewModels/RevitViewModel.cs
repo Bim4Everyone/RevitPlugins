@@ -124,7 +124,7 @@ namespace RevitRooms.ViewModels {
         }
 
         private bool CheckElements(IEnumerable<LevelViewModel> levels) {
-            var errorElements = new Dictionary<ElementId, InfoElementViewModel>();
+            var errorElements = new Dictionary<string, InfoElementViewModel>();
             foreach(var level in levels) {
                 var rooms = level.GetSpatialElementViewModels(Phase);
 
@@ -165,7 +165,7 @@ namespace RevitRooms.ViewModels {
             AddElements("Избыточное или не окруженное помещение.", TypeInfo.Error, redundantAreas, errorElements);
 
             // Ошибки, которые не останавливают выполнение скрипта
-            var warningElements = new Dictionary<ElementId, InfoElementViewModel>();
+            var warningElements = new Dictionary<string, InfoElementViewModel>();
             foreach(var level in levels) {
                 var doors = level.GetDoors(Phase);
                 var rooms = level.GetSpatialElementViewModels(Phase);
@@ -190,7 +190,7 @@ namespace RevitRooms.ViewModels {
                 // Надеюсь будет достаточно быстро отрабатывать :)
                 // Подсчет площадей помещений
 
-                var bigChangesRooms = new Dictionary<ElementId, InfoElementViewModel>();
+                var bigChangesRooms = new Dictionary<string, InfoElementViewModel>();
                 foreach(var level in levels) {
                     var rooms = level.GetSpatialElementViewModels(Phase).ToList();
                     foreach(var section in rooms.GroupBy(item => item.RoomSection.Name)) {
@@ -329,19 +329,19 @@ namespace RevitRooms.ViewModels {
             return UnitUtils.ConvertToInternalUnits(value, DisplayUnitType.DUT_SQUARE_METERS);
         }
 
-        private void AddElements(string infoText, TypeInfo typeInfo, IEnumerable<IElementViewModel<Element>> elements, Dictionary<ElementId, InfoElementViewModel> infoElements) {
+        private void AddElements(string infoText, TypeInfo typeInfo, IEnumerable<IElementViewModel<Element>> elements, Dictionary<string, InfoElementViewModel> infoElements) {
             foreach(var element in elements) {
                 AddElement(infoText, typeInfo, element, infoElements);
             }
         }
 
-        private void AddElement(string infoText, TypeInfo typeInfo, IElementViewModel<Element> element, Dictionary<ElementId, InfoElementViewModel> infoElements) {
-            if(!infoElements.TryGetValue(element.ElementId, out var value)) {
-                value = new InfoElementViewModel() { Element = element, Messages = new ObservableCollection<InfoMessage>() };
-                infoElements.Add(element.ElementId, value);
+        private void AddElement(string infoText, TypeInfo typeInfo, IElementViewModel<Element> element, Dictionary<string, InfoElementViewModel> infoElements) {
+            if(!infoElements.TryGetValue(infoText, out var value)) {
+                value = new InfoElementViewModel() { Message = infoText, TypeInfo = typeInfo, Elements = new ObservableCollection<IElementViewModel<Element>>() };
+                infoElements.Add(infoText, value);
             }
 
-            value.Messages.Add(new InfoMessage() { Message = infoText, TypeInfo = typeInfo });
+            value.Elements.Add(element);
         }
 
         private void ShowInfoElementsWindow(string title, IEnumerable<InfoElementViewModel> infoElements) {
