@@ -192,6 +192,43 @@ namespace RevitRooms.ViewModels {
                 // Подсчет площадей помещений
 
                 var bigChangesRooms = new Dictionary<string, InfoElementViewModel>();
+
+                // Обновление параметра округления у зон
+                foreach(var area in GetAreas()) {
+
+                    // Обновление параметра
+                    // площади с коэффициентом
+                    var roomAreaWithRatio = ConvertValueToSquareMeters(area.ComputeRoomAreaWithRatio());
+                    area.AreaWithRatio = ConvertValueToInternalUnits(roomAreaWithRatio);
+                }
+
+                foreach(var level in levels) {
+                    foreach(var spartialElement in level.GetSpatialElementViewModels(phases)) {
+                        // Заполняем дублирующие
+                        // общие параметры
+                        spartialElement.UpdateSharedParams();
+                    }
+
+                    // Обновление значений в помещениях
+                    foreach(var spartialElement in level.SpartialElements) {
+                        // Обновляем общий параметр этажа
+                        spartialElement.UpdateLevelSharedParam();
+
+                        // Обновление параметра
+                        // площади с коэффициентом
+                        var roomAreaWithRatio = ConvertValueToSquareMeters(spartialElement.ComputeRoomAreaWithRatio());
+                        spartialElement.AreaWithRatio = ConvertValueToInternalUnits(roomAreaWithRatio);
+
+                        var areaOldValue = ConvertValueToSquareMeters(spartialElement.Area);
+                        var areaNewValue = ConvertValueToSquareMeters(spartialElement.RoomArea);
+
+                        spartialElement.Area = ConvertValueToInternalUnits(areaNewValue);
+                        if(GetIsBigChanges(areaOldValue, areaNewValue)) {
+                            AddElement("Большие изменения в площади помещения.", TypeInfo.Info, spartialElement, bigChangesRooms);
+                        }
+                    }
+                }
+
                 foreach(var level in levels) {
                     var rooms = level.GetSpatialElementViewModels(Phase).ToList();
                     foreach(var section in rooms.GroupBy(item => item.RoomSection.Name)) {
@@ -215,9 +252,11 @@ namespace RevitRooms.ViewModels {
 
                                 apartmentArea += ConvertValueToSquareMeters(room.RoomArea);
                                 apartmentAreaRatio += ConvertValueToSquareMeters(room.AreaWithRatio);
-
-                                if(room.Phase.Name == "Межквартирные перегородки") {
-                                    area += ConvertValueToSquareMeters(room.RoomArea);
+                                
+                                if(IsSpotCalcArea) {
+                                    area = level.GetSpatialElementViewModels(phases.FirstOrDefault(item => item.Name.Equals("Межквартирные перегородки", StringComparison.CurrentCultureIgnoreCase)))
+                                    .Where(item => item.RoomSection.Id == room.RoomSection.Id && item.RoomGroup.Id == room.RoomGroup.Id)
+                                    .Sum(item => ConvertValueToSquareMeters(item.RoomArea));
                                 }
 
                                 if(Contains(room.Room.Name, "спальня", StringComparison.CurrentCultureIgnoreCase)
@@ -248,43 +287,6 @@ namespace RevitRooms.ViewModels {
                             }
                         }
                     }
-                }
-
-                foreach(var level in levels) {
-                    foreach(var spartialElement in level.GetSpatialElementViewModels(phases)) {
-                        // Заполняем дублирующие
-                        // общие параметры
-                        spartialElement.UpdateSharedParams();
-                    }
-
-                    // Обновление значений в помещениях
-                    foreach(var spartialElement in level.SpartialElements) {
-                        // Обновляем общий параметр этажа
-                        spartialElement.UpdateLevelSharedParam();
-
-                        // Обновление параметра
-                        // площади с коэффициентом
-                        var roomAreaWithRatio = ConvertValueToSquareMeters(spartialElement.ComputeRoomAreaWithRatio());
-                        spartialElement.AreaWithRatio = ConvertValueToInternalUnits(roomAreaWithRatio);
-
-                        var areaOldValue = ConvertValueToSquareMeters(spartialElement.Area);
-                        var areaNewValue = ConvertValueToSquareMeters(spartialElement.RoomArea);
-
-                        spartialElement.Area = ConvertValueToInternalUnits(areaNewValue);
-                        if(GetIsBigChanges(areaOldValue, areaNewValue)) {
-                            AddElement("Большие изменения в площади помещения.", TypeInfo.Info, spartialElement, bigChangesRooms);
-                        }
-                    }
-                }
-
-
-                // Обновление параметра округления у зон
-                foreach(var area in GetAreas()) {
-
-                    // Обновление параметра
-                    // площади с коэффициентом
-                    var roomAreaWithRatio = ConvertValueToSquareMeters(area.ComputeRoomAreaWithRatio());
-                    area.AreaWithRatio = ConvertValueToInternalUnits(roomAreaWithRatio);
                 }
 
                 transaction.Commit();
