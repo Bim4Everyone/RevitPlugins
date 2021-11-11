@@ -11,7 +11,7 @@ namespace RevitRooms.Models.Calculation {
         }
 
         public override void CalculateParam(SpatialElementViewModel spatialElement) {
-            CalculationValue = ConvertValueToSquareMeters(spatialElement.ComputeRoomAreaWithRatio(), _accuracy);
+            CalculationValue = ConvertValueToSquareMeters(spatialElement.RoomArea, _accuracy);
         }
 
         protected override bool CheckSetParamValue(SpatialElementViewModel spatialElement) {
