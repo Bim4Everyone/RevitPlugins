@@ -10,7 +10,7 @@ namespace RevitRooms.Models.Calculation {
         }
 
         public override void CalculateParam(SpatialElementViewModel spatialElement) {
-            if(spatialElement.IsRoomBalcony == true && spatialElement.Phase.ElementId == Phase.Id) {
+            if(spatialElement.IsRoomBalcony != true && spatialElement.Phase.ElementId == Phase.Id) {
                 CalculationValue += ConvertValueToSquareMeters(spatialElement.RoomArea, _accuracy);
             }
         }

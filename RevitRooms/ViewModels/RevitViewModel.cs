@@ -199,6 +199,7 @@ namespace RevitRooms.ViewModels {
                     // Обновление параметра
                     // площади с коэффициентом
                     var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                    areaWithRatio.CalculateParam(spartialElement);
                     if(areaWithRatio.SetParamValue(spartialElement)) {
                         AddElement("Большие изменения в площади.", TypeInfo.Info, spartialElement, bigChangesRooms);
                     }
@@ -216,6 +217,7 @@ namespace RevitRooms.ViewModels {
                         // Обновление параметра
                         // площади с коэффициентом
                         var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                        areaWithRatio.CalculateParam(spartialElement);
                         if(areaWithRatio.SetParamValue(spartialElement)) {
                             AddElement("Большие изменения в площади.", TypeInfo.Info, spartialElement, bigChangesRooms);
                         }
@@ -239,7 +241,9 @@ namespace RevitRooms.ViewModels {
                                 apartmentArea.CalculateParam(room);
                                 apartmentAreaRatio.CalculateParam(room);
                                 apartmentLivingArea.CalculateParam(room);
-                             
+                                apartmentAreaNoBalcony.CalculateParam(room);
+
+
                                 if(IsSpotCalcArea) {
                                     apartmentFullArea.CalculateParam(room);
                                 }
@@ -254,7 +258,7 @@ namespace RevitRooms.ViewModels {
                                 }
 
                                 if(apartmentArea.SetParamValue(room)) {
-                                    AddElement("Большие изменения в площади комнат.", TypeInfo.Info, room, bigChangesRooms);
+                                    AddElement("Большие изменения в площади.", TypeInfo.Info, room, bigChangesRooms);
                                 }
 
                                 roomsCount.SetParamValue(room);
