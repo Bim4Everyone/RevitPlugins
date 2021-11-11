@@ -299,7 +299,7 @@ namespace RevitRooms.ViewModels {
 
         private static bool IsGroupTypeEqual(IEnumerable<SpatialElementViewModel> rooms) {
             return rooms
-                .Select(group => group.RoomTypeGroup.Name)
+                .Select(group => group.RoomTypeGroup?.Name)
                 .Distinct(StringComparer.CurrentCultureIgnoreCase).Count() > 1;
         }
 
