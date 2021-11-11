@@ -30,7 +30,7 @@ namespace RevitRooms.Models {
 
 #elif D2021 || R2021 || D2022 || R2022
         
-        protected double ConvertValueToSquareMeters(double? value) {
+        protected double ConvertValueToSquareMeters(double? value, int accuracy) {
             return value.HasValue ? Math.Round(UnitUtils.ConvertFromInternalUnits(value.Value, UnitTypeId.SquareMeters), accuracy) : 0;
         }
 
