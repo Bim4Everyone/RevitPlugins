@@ -198,6 +198,11 @@ namespace RevitRooms.ViewModels {
                 foreach(var spartialElement in GetAreas().Where(item => item.Phase == Phase)) {
                     // Обновление параметра
                     // площади с коэффициентом
+
+                    var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                    area.CalculateParam(spartialElement);
+                    area.SetParamValue(spartialElement);
+
                     var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
                     areaWithRatio.CalculateParam(spartialElement);
                     if(areaWithRatio.SetParamValue(spartialElement)) {
@@ -216,6 +221,10 @@ namespace RevitRooms.ViewModels {
 
                         // Обновление параметра
                         // площади с коэффициентом
+                        var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                        area.CalculateParam(spartialElement);
+                        area.SetParamValue(spartialElement);
+
                         var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
                         areaWithRatio.CalculateParam(spartialElement);
                         if(areaWithRatio.SetParamValue(spartialElement)) {

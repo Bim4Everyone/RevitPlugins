@@ -4,10 +4,10 @@ using dosymep.Bim4Everyone.SharedParams;
 using RevitRooms.ViewModels;
 
 namespace RevitRooms.Models.Calculation {
-    internal class AreaWithRatioCalculation : DoubleParamCalculation {
-        public AreaWithRatioCalculation(int percent, int accuracy)
+    internal class RoomAreaCalculation : DoubleParamCalculation {
+        public RoomAreaCalculation(int percent, int accuracy)
             : base(percent, accuracy) {
-            RevitParam = SharedParamsConfig.Instance.RoomAreaWithRatio;
+            RevitParam = SharedParamsConfig.Instance.RoomArea;
         }
 
         public override void CalculateParam(SpatialElementViewModel spatialElement) {

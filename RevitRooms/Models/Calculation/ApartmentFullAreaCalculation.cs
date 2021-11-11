@@ -17,5 +17,9 @@ namespace RevitRooms.Models.Calculation {
                 CalculationValue += ConvertValueToSquareMeters(spatialElement.Area, _accuracy);
             }
         }
+
+        protected override bool CheckSetParamValue(SpatialElementViewModel spatialElement) {
+            return base.CheckSetParamValue(spatialElement) || spatialElement.PhaseName.Equals("Межквартирные перегородки", StringComparison.CurrentCultureIgnoreCase);
+        }
     }
 }
