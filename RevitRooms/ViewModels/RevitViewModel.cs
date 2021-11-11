@@ -18,6 +18,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitRooms.Models;
+using RevitRooms.Models.Calculation;
 using RevitRooms.Views;
 
 namespace RevitRooms.ViewModels {
@@ -131,7 +132,7 @@ namespace RevitRooms.ViewModels {
                 // Все помещения которые
                 // избыточные или не окруженные
                 var redundantRooms = rooms.Where(item => item.IsRedundant == true || item.NotEnclosed == true);
-                AddElements("Избыточное или не окруженное помещение.", TypeInfo.Error, redundantRooms, errorElements);
+                AddElements("Избыточные или не окруженные.", TypeInfo.Error, redundantRooms, errorElements);
 
                 // Все помещения у которых
                 // не заполнены обязательные параметры
@@ -158,12 +159,12 @@ namespace RevitRooms.ViewModels {
                     .Where(group => IsGroupTypeEqual(group))
                     .SelectMany(items => items);
 
-                AddElements("Не совпадают значения параметров групп и типа групп параметры у помещения.", TypeInfo.Error, notEqualGroupTypeRooms, errorElements);
+                AddElements("Не совпадают значения параметров групп и типа групп параметра.", TypeInfo.Error, notEqualGroupTypeRooms, errorElements);
             }
 
             // Обрабатываем все зоны
             var redundantAreas = GetAreas().Where(item => item.IsRedundant == true || item.NotEnclosed == true);
-            AddElements("Избыточное или не окруженное помещение.", TypeInfo.Error, redundantAreas, errorElements);
+            AddElements("Избыточные или не окруженные.", TypeInfo.Error, redundantAreas, errorElements);
 
             // Ошибки, которые не останавливают выполнение скрипта
             var warningElements = new Dictionary<string, InfoElementViewModel>();
@@ -174,12 +175,12 @@ namespace RevitRooms.ViewModels {
                 // Все двери
                 // с не совпадающей секцией
                 var notEqualSectionDoors = doors.Where(room => room.Phase == Phase || room.PhaseName.Equals("Межквартирные перегородки", StringComparison.CurrentCultureIgnoreCase)).Where(item => !item.IsSectionNameEqual);
-                AddElements("Не совпадают секции у двери.", TypeInfo.Warning, notEqualSectionDoors, warningElements);
+                AddElements("Не совпадают секции.", TypeInfo.Warning, notEqualSectionDoors, warningElements);
 
                 // Все помещений у которых
                 // найдены самопересечения
                 var countourIntersectRooms = rooms.Where(item => item.IsCountourIntersect == true);
-                AddElements("Найдены самопересечения в помещении.", TypeInfo.Warning, countourIntersectRooms, warningElements);
+                AddElements("Найдены самопересечения.", TypeInfo.Warning, countourIntersectRooms, warningElements);
             }
 
             ShowInfoElementsWindow("Ошибки", warningElements.Values.Union(errorElements.Values));
@@ -194,12 +195,13 @@ namespace RevitRooms.ViewModels {
                 var bigChangesRooms = new Dictionary<string, InfoElementViewModel>();
 
                 // Обновление параметра округления у зон
-                foreach(var area in GetAreas()) {
-
+                foreach(var spartialElement in GetAreas().Where(item => item.Phase == Phase)) {
                     // Обновление параметра
                     // площади с коэффициентом
-                    var roomAreaWithRatio = ConvertValueToSquareMeters(area.ComputeRoomAreaWithRatio());
-                    area.AreaWithRatio = ConvertValueToInternalUnits(roomAreaWithRatio);
+                    var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                    if(areaWithRatio.SetParamValue(spartialElement)) {
+                        AddElement("Большие изменения в площади.", TypeInfo.Info, spartialElement, bigChangesRooms);
+                    }
                 }
 
                 foreach(var level in levels) {
@@ -207,83 +209,58 @@ namespace RevitRooms.ViewModels {
                         // Заполняем дублирующие
                         // общие параметры
                         spartialElement.UpdateSharedParams();
-                    }
 
-                    // Обновление значений в помещениях
-                    foreach(var spartialElement in level.SpartialElements) {
                         // Обновляем общий параметр этажа
                         spartialElement.UpdateLevelSharedParam();
 
                         // Обновление параметра
                         // площади с коэффициентом
-                        var roomAreaWithRatio = ConvertValueToSquareMeters(spartialElement.ComputeRoomAreaWithRatio());
-                        spartialElement.AreaWithRatio = ConvertValueToInternalUnits(roomAreaWithRatio);
-
-                        var areaOldValue = ConvertValueToSquareMeters(spartialElement.Area);
-                        var areaNewValue = ConvertValueToSquareMeters(spartialElement.RoomArea);
-
-                        spartialElement.Area = ConvertValueToInternalUnits(areaNewValue);
-                        if(GetIsBigChanges(areaOldValue, areaNewValue)) {
-                            AddElement("Большие изменения в площади помещения.", TypeInfo.Info, spartialElement, bigChangesRooms);
+                        var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                        if(areaWithRatio.SetParamValue(spartialElement)) {
+                            AddElement("Большие изменения в площади.", TypeInfo.Info, spartialElement, bigChangesRooms);
                         }
                     }
                 }
 
+                // Обработка параметров зависящих от квартир
                 foreach(var level in levels) {
-                    var rooms = level.GetSpatialElementViewModels(Phase).ToList();
+                    var rooms = level.GetSpatialElementViewModels(phases).ToList();
                     foreach(var section in rooms.GroupBy(item => item.RoomSection.Name)) {
                         foreach(var flat in section.GroupBy(item => item.RoomGroup.Name)) {
-                            double apartmentArea = 0;
-                            double apartmentAreaRatio = 0;
-                            double apartmentLivingArea = 0;
-                            double apartmentAreaNoBalcony = 0;
+                            var roomsCount = new RoomsCountCalculation() { Phase = Phase.Element };
+                            var apartmentArea = new ApartmentAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                            var apartmentFullArea = new ApartmentFullAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                            var apartmentAreaRatio = new ApartmentAreaRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                            var apartmentLivingArea = new ApartmentLivingAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                            var apartmentAreaNoBalcony = new ApartmentAreaNoBalconyCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
 
-                            double area = 0;
-                            int countRooms = 0;
-
+                            // Расчет параметров
                             foreach(var room in flat) {
-                                if(room.IsRoomBalcony == true) {
-                                    apartmentLivingArea += ConvertValueToSquareMeters(room.RoomArea);
-                                }
-
-                                if(room.IsRoomLiving == true) {
-                                    apartmentAreaNoBalcony += ConvertValueToSquareMeters(room.RoomArea);
-                                }
-
-                                apartmentArea += ConvertValueToSquareMeters(room.RoomArea);
-                                apartmentAreaRatio += ConvertValueToSquareMeters(room.AreaWithRatio);
-                                
+                                apartmentArea.CalculateParam(room);
+                                apartmentAreaRatio.CalculateParam(room);
+                                apartmentLivingArea.CalculateParam(room);
+                             
                                 if(IsSpotCalcArea) {
-                                    area = level.GetSpatialElementViewModels(phases.FirstOrDefault(item => item.Name.Equals("Межквартирные перегородки", StringComparison.CurrentCultureIgnoreCase)))
-                                    .Where(item => item.RoomSection.Id == room.RoomSection.Id && item.RoomGroup.Id == room.RoomGroup.Id)
-                                    .Sum(item => ConvertValueToSquareMeters(item.RoomArea));
+                                    apartmentFullArea.CalculateParam(room);
                                 }
 
-                                if(Contains(room.Room.Name, "спальня", StringComparison.CurrentCultureIgnoreCase)
-                                    || Contains(room.Room.Name, "кабинет", StringComparison.CurrentCultureIgnoreCase)
-                                    || (Contains(room.Room.Name, "гостиная", StringComparison.CurrentCultureIgnoreCase)
-                                        && !Contains(room.Room.Name, "кухня-гостиная", StringComparison.CurrentCultureIgnoreCase))) {
-                                    countRooms++;
-                                }
+                                roomsCount.CalculateParam(room);
                             }
 
+                            // Применение параметров
                             foreach(var room in flat) {
-                                room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaRatio, ConvertValueToInternalUnits(apartmentAreaRatio));
-                                room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentLivingArea, ConvertValueToInternalUnits(apartmentLivingArea));
-                                room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaNoBalcony, ConvertValueToInternalUnits(apartmentAreaNoBalcony));
-
-                                var areaOldValue = ConvertValueToSquareMeters((double?) room.Element.GetParamValueOrDefault(SharedParamsConfig.Instance.ApartmentArea));
-                                room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentArea, ConvertValueToInternalUnits(apartmentLivingArea));
-
-                                if(GetIsBigChanges(areaOldValue, apartmentLivingArea)) {
-                                    AddElement("Большие изменения в площади комнаты.", TypeInfo.Info, room, bigChangesRooms);
-                                }
-
                                 if(IsSpotCalcArea) {
-                                    room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentFullArea, ConvertValueToInternalUnits(area));
+                                    apartmentFullArea.SetParamValue(room);
                                 }
 
-                                room.Element.SetParamValue(SharedParamsConfig.Instance.RoomsCount, ConvertValueToInternalUnits(countRooms));
+                                if(apartmentArea.SetParamValue(room)) {
+                                    AddElement("Большие изменения в площади комнат.", TypeInfo.Info, room, bigChangesRooms);
+                                }
+
+                                roomsCount.SetParamValue(room);
+                                apartmentAreaRatio.SetParamValue(room);
+                                apartmentLivingArea.SetParamValue(room);
+                                apartmentAreaNoBalcony.SetParamValue(room);
                             }
                         }
                     }
@@ -325,6 +302,7 @@ namespace RevitRooms.ViewModels {
         private int GetRoomAccuracy() {
             return int.TryParse(CheckRoomAccuracy, out int result) ? result : 100;
         }
+
 #if D2020 || R2020
         private double ConvertValueToSquareMeters(double? value) {
             return value.HasValue ? Math.Round(UnitUtils.ConvertFromInternalUnits(value.Value, DisplayUnitType.DUT_SQUARE_METERS), RoundAccuracy) : 0;
