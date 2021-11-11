@@ -31,6 +31,7 @@ namespace RevitRooms.ViewModels {
         public SpatialElementViewModel FromRoom { get; }
 
         public ElementId LevelId => Element.LevelId;
+        public override string LevelName => RevitRepository.GetElement(Element.LevelId)?.Name;
 
         public bool IsSectionNameEqual {
             get { return ToRoom?.RoomSection?.Id == FromRoom?.RoomSection?.Id; }

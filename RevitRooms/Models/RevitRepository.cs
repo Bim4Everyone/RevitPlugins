@@ -31,6 +31,10 @@ namespace RevitRooms.Models {
             _filter = new ElementMulticategoryFilter(new[] { BuiltInCategory.OST_Rooms });
         }
 
+        public Element GetElement(ElementId elementId) {
+            return _document.GetElement(elementId);
+        }
+
         public IList<SpatialElement> GetSelectedSpatialElements() {
             return _uiDocument.GetSelectedElements()
                 .Where(item => _filter.PassesFilter(_document, item.Id))
