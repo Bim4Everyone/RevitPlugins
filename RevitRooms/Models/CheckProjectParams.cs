@@ -27,6 +27,7 @@ namespace RevitRooms.Models {
         }
 
         public CheckProjectParams CopyProjectParams() {
+#if D2020 || R2020 || D2021 || R2021
             _projectParameters.SetupRevitParams(_uiApplication.ActiveUIDocument.Document,
                 ProjectParamsConfig.Instance.IsRoomNumberFix,
                 SharedParamsConfig.Instance.RoomArea,
@@ -38,6 +39,7 @@ namespace RevitRooms.Models {
                 SharedParamsConfig.Instance.ApartmentFullArea,
                 SharedParamsConfig.Instance.ApartmentNumber,
                 SharedParamsConfig.Instance.ApartmentNumberExtra,
+                SharedParamsConfig.Instance.Level,
                 SharedParamsConfig.Instance.ApartmentGroupName,
                 SharedParamsConfig.Instance.RoomGroupShortName,
                 SharedParamsConfig.Instance.RoomAreaRatio,
@@ -46,14 +48,27 @@ namespace RevitRooms.Models {
                 SharedParamsConfig.Instance.RoomTypeGroupShortName,
                 SharedParamsConfig.Instance.ApartmentAreaSpec,
                 SharedParamsConfig.Instance.ApartmentAreaMinSpec,
-                SharedParamsConfig.Instance.ApartmentAreaMaxSpec,
+                SharedParamsConfig.Instance.ApartmentAreaMaxSpec);
+            //SharedParamsConfig.Instance.ApartmentAreaRatioFix,
+            //SharedParamsConfig.Instance.ApartmentAreaNoBalconyFix,
+            //SharedParamsConfig.Instance.ApartmentLivingAreaFix,
+            //SharedParamsConfig.Instance.ApartmentAreaFix,
+            //SharedParamsConfig.Instance.RoomAreaFix,
+            //SharedParamsConfig.Instance.RoomAreaWithRatioFix);
+#else
+            _projectParameters.SetupRevitParams(_uiApplication.ActiveUIDocument.Document,
+                ProjectParamsConfig.Instance.IsRoomNumberFix,
+                SharedParamsConfig.Instance.RoomArea,
+                SharedParamsConfig.Instance.RoomAreaWithRatio,
+                SharedParamsConfig.Instance.ApartmentAreaRatio,
+                SharedParamsConfig.Instance.ApartmentAreaNoBalcony,
+                SharedParamsConfig.Instance.ApartmentLivingArea,
+                SharedParamsConfig.Instance.ApartmentArea,
+                SharedParamsConfig.Instance.ApartmentFullArea,
+                SharedParamsConfig.Instance.ApartmentNumber,
+                SharedParamsConfig.Instance.ApartmentNumberExtra,
                 SharedParamsConfig.Instance.Level);
-                //SharedParamsConfig.Instance.ApartmentAreaRatioFix,
-                //SharedParamsConfig.Instance.ApartmentAreaNoBalconyFix,
-                //SharedParamsConfig.Instance.ApartmentLivingAreaFix,
-                //SharedParamsConfig.Instance.ApartmentAreaFix,
-                //SharedParamsConfig.Instance.RoomAreaFix,
-                //SharedParamsConfig.Instance.RoomAreaWithRatioFix);
+#endif
 
             return this;
         }
