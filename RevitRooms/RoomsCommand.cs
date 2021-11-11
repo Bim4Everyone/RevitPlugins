@@ -26,7 +26,6 @@ namespace RevitRooms {
                     .GetIsChecked();
 
                 if(!isChecked) {
-                    TaskDialog.Show("Квартирография Стадии П.", "Заполните атрибуты у квартир.");
                     return Result.Succeeded;
                 }
 

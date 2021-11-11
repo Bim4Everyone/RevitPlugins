@@ -81,6 +81,11 @@ namespace RevitRooms.Models {
         }
 
         public CheckProjectParams ReplaceKeySchedules(IEnumerable<KeyScheduleRule> keyScheduleRules) {
+            var openedView = keyScheduleRules.FirstOrDefault(item => item.ScheduleName.Equals(_uiApplication.ActiveUIDocument.ActiveView.Name));
+            if(openedView != null) {
+                throw new InvalidOperationException($"Закройте ключевую спецификацию \"{openedView.ScheduleName}\".");
+            }
+
             _projectParameters.SetupKeySchedules(_uiApplication.ActiveUIDocument.Document, true, keyScheduleRules);
             return this;
         }
