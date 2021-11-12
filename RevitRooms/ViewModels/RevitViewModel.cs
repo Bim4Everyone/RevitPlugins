@@ -32,7 +32,7 @@ namespace RevitRooms.ViewModels {
         public RevitViewModel(Application application, Document document) {
             _revitRepository = new RevitRepository(application, document);
 
-            Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
+            Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels().Where(item => item.SpartialElements.Count > 0));
             AdditionalPhases = new ObservableCollection<PhaseViewModel>(_revitRepository.GetAdditionalPhases().Select(item => new PhaseViewModel(item, _revitRepository)));
 
             Phases = new ObservableCollection<PhaseViewModel>(Levels.SelectMany(item => item.SpartialElements).Select(item => item.Phase).Distinct().Except(AdditionalPhases));
