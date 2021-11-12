@@ -235,7 +235,7 @@ namespace RevitRooms.ViewModels {
                 AddElements("Найдены самопересечения.", TypeInfo.Warning, countourIntersectRooms, warningElements);
             }
 
-            ShowInfoElementsWindow("Ошибки", warningElements.Values.Union(errorElements.Values));
+            ShowInfoElementsWindow("Информация", warningElements.Values.Union(errorElements.Values));
             return errorElements.Count > 0;
         }
 
@@ -258,7 +258,7 @@ namespace RevitRooms.ViewModels {
                     var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
                     areaWithRatio.CalculateParam(spartialElement);
                     if(areaWithRatio.SetParamValue(spartialElement)) {
-                        AddElement("Большие изменения в площади.", TypeInfo.Info, spartialElement, bigChangesRooms);
+                        AddElement("Большие изменения в площади зон.", TypeInfo.Info, spartialElement, bigChangesRooms);
                     }
                 }
 
@@ -280,7 +280,7 @@ namespace RevitRooms.ViewModels {
                         var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
                         areaWithRatio.CalculateParam(spartialElement);
                         if(areaWithRatio.SetParamValue(spartialElement)) {
-                            AddElement("Большие изменения в площади.", TypeInfo.Info, spartialElement, bigChangesRooms);
+                            AddElement("Большие изменения в площади помещений.", TypeInfo.Info, spartialElement, bigChangesRooms);
                         }
                     }
                 }
@@ -290,49 +290,35 @@ namespace RevitRooms.ViewModels {
                     var rooms = level.GetSpatialElementViewModels(phases).ToList();
                     foreach(var section in rooms.GroupBy(item => item.RoomSection.Name)) {
                         foreach(var flat in section.GroupBy(item => item.RoomGroup.Name)) {
-                            var roomsCount = new RoomsCountCalculation() { Phase = Phase.Element };
-                            var apartmentArea = new ApartmentAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
-                            var apartmentFullArea = new ApartmentFullAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
-                            var apartmentAreaRatio = new ApartmentAreaRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
-                            var apartmentLivingArea = new ApartmentLivingAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
-                            var apartmentAreaNoBalcony = new ApartmentAreaNoBalconyCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
-
-                            // Расчет параметров
-                            foreach(var room in flat) {
-                                apartmentArea.CalculateParam(room);
-                                apartmentAreaRatio.CalculateParam(room);
-                                apartmentLivingArea.CalculateParam(room);
-                                apartmentAreaNoBalcony.CalculateParam(room);
-
-
-                                if(IsSpotCalcArea) {
-                                    apartmentFullArea.CalculateParam(room);
+                            foreach(var calculation in GetParamCalculations()) {
+                                foreach(var room in flat) {
+                                    calculation.CalculateParam(room);
                                 }
 
-                                roomsCount.CalculateParam(room);
-                            }
-
-                            // Применение параметров
-                            foreach(var room in flat) {
-                                if(IsSpotCalcArea) {
-                                    apartmentFullArea.SetParamValue(room);
+                                foreach(var room in flat) {
+                                    if(calculation.SetParamValue(room) && calculation.RevitParam == SharedParamsConfig.Instance.ApartmentArea) {
+                                        AddElement("Большие изменения в площади квартир.", TypeInfo.Info, room, bigChangesRooms);
+                                    }
                                 }
-
-                                if(apartmentArea.SetParamValue(room)) {
-                                    AddElement("Большие изменения в площади.", TypeInfo.Info, room, bigChangesRooms);
-                                }
-
-                                roomsCount.SetParamValue(room);
-                                apartmentAreaRatio.SetParamValue(room);
-                                apartmentLivingArea.SetParamValue(room);
-                                apartmentAreaNoBalcony.SetParamValue(room);
                             }
                         }
                     }
                 }
 
                 transaction.Commit();
-                ShowInfoElementsWindow("Значительные изменения площадей", bigChangesRooms.Values);
+                ShowInfoElementsWindow("Информация", bigChangesRooms.Values);
+            }
+        }
+
+        private IEnumerable<IParamCalculation> GetParamCalculations() {
+            yield return new RoomsCountCalculation() { Phase = Phase.Element };
+            yield return new ApartmentAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+            yield return new ApartmentAreaRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+            yield return new ApartmentLivingAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+            yield return new ApartmentAreaNoBalconyCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+
+            if(IsSpotCalcArea) {
+                yield return new ApartmentFullAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
             }
         }
 

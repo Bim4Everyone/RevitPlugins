@@ -7,7 +7,7 @@ using dosymep.Bim4Everyone;
 using RevitRooms.ViewModels;
 
 namespace RevitRooms.Models.Calculation {
-    internal abstract class DoubleParamCalculation : ParamCalculation<double> {
+    internal abstract class DoubleParamCalculation : ParamCalculation<double>, IParamCalculation {
         protected readonly int _percent;
         protected readonly int _accuracy;
 

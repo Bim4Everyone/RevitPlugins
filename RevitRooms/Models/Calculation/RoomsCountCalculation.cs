@@ -25,9 +25,5 @@ namespace RevitRooms.Models.Calculation {
         private static bool Contains(string source, string toCheck, StringComparison comp) {
             return source?.IndexOf(toCheck, comp) >= 0;
         }
-
-        public void SetParamValue(SpatialElementViewModel spatialElement) {
-            spatialElement.Element.SetParamValue(RevitParam, ConvertValueToInternalUnits(CalculationValue));
-        }
     }
 }
