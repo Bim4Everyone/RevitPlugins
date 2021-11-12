@@ -39,7 +39,7 @@
         <StackPanel Grid.Row="3" Margin="0,5,10,0" Orientation="Horizontal" 
                     Visibility="{Binding ElementName=_checkArea,Path=IsChecked, Converter={StaticResource BoolToVis}}" >
             <TextBlock Margin="50,0,10,0" Text="Точность проверки"/>
-            <TextBox Width="50" Text="{Binding RevitViewModel.CheckRoomAccuracy, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox Width="50" Text="{Binding RevitViewModel.RoomAccuracy, UpdateSourceTrigger=PropertyChanged}"/>
             <TextBlock Margin="10,0,0,0" Text="%"/>
         </StackPanel>
 

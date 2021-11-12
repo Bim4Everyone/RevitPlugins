@@ -23,6 +23,7 @@ using RevitRooms.Views;
 
 namespace RevitRooms.ViewModels {
     internal abstract class RevitViewModel : BaseViewModel {
+        public Guid _id;
         protected readonly RevitRepository _revitRepository;
 
         private string _errorText;
@@ -41,6 +42,9 @@ namespace RevitRooms.ViewModels {
             RoundAccuracyValues = new ObservableCollection<int>(Enumerable.Range(1, 3));
 
             CalculateCommand = new RelayCommand(Calculate, CanCalculate);
+
+            // Установка конфигурации
+            SetRoomsConfig();
         }
 
         public ICommand CalculateCommand { get; }
@@ -75,6 +79,50 @@ namespace RevitRooms.ViewModels {
         public ObservableCollection<PhaseViewModel> AdditionalPhases { get; }
 
         protected abstract IEnumerable<LevelViewModel> GetLevelViewModels();
+
+        private void SetRoomsConfig() {
+            var roomsConfig = RoomsConfig.GetConfig();
+            var settings = roomsConfig.GetRoomsSettingsConfig(_revitRepository.DocumentName);
+            if(settings == null) {
+                return;
+            }
+
+            IsSpotCalcArea = settings.IsSpotCalcArea;
+            IsCheckRoomsChanges = settings.IsCheckRoomsChanges;
+
+            RoomAccuracy = settings.RoomAccuracy;
+            RoundAccuracy = settings.RoundAccuracy;
+
+            if(_revitRepository.GetElement(new ElementId(settings.PhaseElementId)) is Phase phase) {
+                if(phase == null || Phase?.ElementId == phase.Id) {
+                    return;
+                }
+
+                Phase = Phases.FirstOrDefault(item => item.ElementId == phase.Id) ?? Phases.FirstOrDefault();
+            }
+        }
+
+        private void SaveRoomsConfig() {
+            var roomsConfig = RoomsConfig.GetConfig();
+            var settings = roomsConfig.GetRoomsSettingsConfig(_revitRepository.DocumentName);
+            if(settings == null) {
+                settings = new RoomsSettingsConfig();
+                roomsConfig.AddRoomsSettingsConfig(settings);
+            }
+
+            settings.IsSpotCalcArea = IsSpotCalcArea;
+            settings.IsCheckRoomsChanges = IsCheckRoomsChanges;
+
+            settings.RoomAccuracy = RoomAccuracy;
+            settings.RoundAccuracy = RoundAccuracy;
+
+            settings.SelectedRoomId = _id;
+            settings.PhaseElementId = Phase.ElementId.IntegerValue;
+            settings.DocumentName = _revitRepository.DocumentName;
+
+            RoomsConfig.SaveConfig(roomsConfig);
+        }
+
         private void Calculate(object p) {
             // Удаляем все не размещенные помещения
             _revitRepository.RemoveUnplacedSpatialElements();
@@ -95,6 +143,10 @@ namespace RevitRooms.ViewModels {
 
             // Расчет площадей помещений
             CalculateAreas(phases, levels);
+
+            // Сохранение
+            // текущей конфигурации
+            SaveRoomsConfig();
         }
 
         private bool CanCalculate(object p) {

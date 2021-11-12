@@ -60,6 +60,9 @@
 			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\$(RevitVersion)\dosymep.Revit.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+		<Reference Include="pyRevitLabs.Json">
+		  <HintPath>C:\Users\biseuv_o\AppData\Roaming\pyRevit-Master\bin\pyRevitLabs.Json.dll</HintPath>
+		</Reference>
 		<Reference Include="RevitAPI">
 			<HintPath>$(ProgramW6432)\Autodesk\Revit $(RevitVersion)\RevitAPI.dll</HintPath>
 			<Private>False</Private>

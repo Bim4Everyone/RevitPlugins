@@ -10,6 +10,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
+using RevitRooms.Models;
 using RevitRooms.ViewModels.Revit;
 
 namespace RevitRooms.ViewModels {
@@ -18,12 +19,18 @@ namespace RevitRooms.ViewModels {
 
         public RoomsViewModel(Application application, Document document) {
             RevitViewModels = new ObservableCollection<RevitViewModel> {
-                //new ViewRevitViewModel(application, document) { Name = "Выборка по текущему виду" },
+                new ViewRevitViewModel(application, document) { Name = "Выборка по текущему виду" },
                 new ElementsRevitViewModel(application, document) { Name = "Выборка по всем элементам" },
                 new SelectedRevitViewModel(application, document) { Name = "Выборка по выделенным элементам" }
             };
 
             RevitViewModel = RevitViewModels[0];
+
+            var roomsConfig = RoomsConfig.GetConfig();
+            var settings = roomsConfig.GetRoomsSettingsConfig(document.Title);
+            if(settings != null) {
+                RevitViewModel = RevitViewModels.FirstOrDefault(item => item._id == settings.SelectedRoomId) ?? RevitViewModel;
+            }
         }
 
         public RevitViewModel RevitViewModel {
