@@ -123,6 +123,8 @@ namespace RevitRooms.Models {
                 if(taskDialog.Show() == TaskDialogResult.CommandLink1) {
                     return ReplaceKeySchedules(brokenKeySchedules.Select(item => item.KeyScheduleRule));
                 }
+
+                return this;
             }
 
             if(notFilledKeySchedules.Count > 0) {
