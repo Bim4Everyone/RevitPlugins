@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,20 +26,12 @@ namespace RevitRooms.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _isSelected, value);
         }
 #if D2020 || R2020
-        public bool IsLivingLevel {
-            get { return UnitUtils.ConvertFromInternalUnits(Element.Elevation, DisplayUnitType.DUT_METERS) > 2; }
-        }
-
         public string Elevation {
-            get { return UnitUtils.ConvertFromInternalUnits(Element.Elevation, DisplayUnitType.DUT_METERS) + " " + UnitUtils.GetTypeCatalogString(DisplayUnitType.DUT_METERS); }
+            get { return UnitUtils.ConvertFromInternalUnits(Element.Elevation, DisplayUnitType.DUT_METERS).ToString("0.000", CultureInfo.InvariantCulture); }
         }
 #elif D2021 || R2021 || D2022 || R2022
-        public bool IsLivingLevel {
-            get { return UnitUtils.ConvertFromInternalUnits(Element.Elevation, UnitTypeId.Meters) > 2; }
-        }
-
         public string Elevation {
-            get { return UnitUtils.ConvertFromInternalUnits(Element.Elevation, UnitTypeId.Meters) + " " + UnitUtils.GetTypeCatalogStringForUnit(UnitTypeId.Meters); }
+            get { return UnitUtils.ConvertFromInternalUnits(Element.Elevation, UnitTypeId.Meters).ToString("0.000", CultureInfo.InvariantCulture); }
         }
 #endif
 
