@@ -24,6 +24,7 @@ using RevitRooms.Views;
 namespace RevitRooms.ViewModels {
     internal abstract class RevitViewModel : BaseViewModel {
         protected readonly RevitRepository _revitRepository;
+
         private string _errorText;
         private bool _isCheckedSelected;
 
@@ -40,7 +41,6 @@ namespace RevitRooms.ViewModels {
             RoundAccuracyValues = new ObservableCollection<int>(Enumerable.Range(1, 3));
 
             CalculateCommand = new RelayCommand(Calculate, CanCalculate);
-
         }
 
         public ICommand CalculateCommand { get; }
@@ -65,7 +65,7 @@ namespace RevitRooms.ViewModels {
 
         public bool IsSpotCalcArea { get; set; }
         public bool IsCheckRoomsChanges { get; set; }
-        public string CheckRoomAccuracy { get; set; } = "100";
+        public string RoomAccuracy { get; set; } = "100";
 
         public int RoundAccuracy { get; set; }
         public ObservableCollection<int> RoundAccuracyValues { get; }
@@ -99,7 +99,7 @@ namespace RevitRooms.ViewModels {
 
         private bool CanCalculate(object p) {
             if(IsCheckRoomsChanges) {
-                if(!int.TryParse(CheckRoomAccuracy, out var сheckRoomAccuracy)) {
+                if(!int.TryParse(RoomAccuracy, out var сheckRoomAccuracy)) {
                     ErrorText = "Точность проверки должна быть числом.";
                     return false;
                 }
@@ -289,14 +289,6 @@ namespace RevitRooms.ViewModels {
                 .Select(item => new SpatialElementViewModel(item, _revitRepository));
         }
 
-        private bool GetIsBigChanges(double areaOldValue, double areaNewValue) {
-            if(IsCheckRoomsChanges) {
-                return Math.Abs(areaOldValue - areaNewValue) / areaOldValue * 100 > GetRoomAccuracy();
-            }
-
-            return false;
-        }
-
         private static bool IsGroupTypeEqual(IEnumerable<SpatialElementViewModel> rooms) {
             return rooms
                 .Select(group => group.RoomTypeGroup?.Name)
@@ -313,26 +305,8 @@ namespace RevitRooms.ViewModels {
         }
 
         private int GetRoomAccuracy() {
-            return int.TryParse(CheckRoomAccuracy, out int result) ? result : 100;
+            return int.TryParse(RoomAccuracy, out int result) ? result : 100;
         }
-
-#if D2020 || R2020
-        private double ConvertValueToSquareMeters(double? value) {
-            return value.HasValue ? Math.Round(UnitUtils.ConvertFromInternalUnits(value.Value, DisplayUnitType.DUT_SQUARE_METERS), RoundAccuracy) : 0;
-        }
-
-        private double ConvertValueToInternalUnits(double value) {
-            return UnitUtils.ConvertToInternalUnits(value, DisplayUnitType.DUT_SQUARE_METERS);
-        }
-#elif D2021 || R2021 || D2022 || R2022
-        private double ConvertValueToSquareMeters(double? value) {
-            return value.HasValue ? Math.Round(UnitUtils.ConvertFromInternalUnits(value.Value, UnitTypeId.SquareMeters), RoundAccuracy) : 0;
-        }
-
-        private double ConvertValueToInternalUnits(double value) {
-            return UnitUtils.ConvertToInternalUnits(value, UnitTypeId.SquareMeters);
-        }
-#endif
 
         private void AddElements(string infoText, TypeInfo typeInfo, IEnumerable<IElementViewModel<Element>> elements, Dictionary<string, InfoElementViewModel> infoElements) {
             foreach(var element in elements) {
