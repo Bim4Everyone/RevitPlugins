@@ -9,6 +9,7 @@ using System.Windows.Input;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
+using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
@@ -209,11 +210,13 @@ namespace RevitRooms.ViewModels {
                     .Where(room => room.Phase == Phase || room.PhaseName.Equals("Межквартирные перегородки", StringComparison.CurrentCultureIgnoreCase))
                     .Where(room => ContainGroups(room));
 
-                var notEqualGroupTypeRooms = GetFlats(checksRooms)
-                    .Where(group => IsGroupTypeEqual(group))
-                    .SelectMany(items => items);
-
-                AddElements($"Не совпадают значения параметров групп \"{notEqualGroupTypeRooms.FirstOrDefault()?.RoomGroup.Name}\" и типа групп.", TypeInfo.Error, notEqualGroupTypeRooms, errorElements);
+                foreach(var flat in GetFlats(checksRooms)) {
+                    if(IsGroupTypeEqual(flat)) {
+                        var roomGroup = flat.FirstOrDefault()?.RoomGroup.Name;
+                        var roomSection = flat.FirstOrDefault()?.RoomSection.Name;
+                        AddElements($"Не совпадают значения параметров групп \"{roomGroup} - {roomSection}\"и типа групп.", TypeInfo.Error, flat, errorElements);
+                    }
+                }
             }
 
             // Обрабатываем все зоны
@@ -307,13 +310,15 @@ namespace RevitRooms.ViewModels {
                 }
 
                 transaction.Commit();
-                ShowInfoElementsWindow("Информация", bigChangesRooms.Values);
+                if(!ShowInfoElementsWindow("Информация", bigChangesRooms.Values)) {
+                    TaskDialog.Show("Предупреждение!", "Расчет завершен!");
+                }
             }
         }
 
         private IEnumerable<IEnumerable<SpatialElementViewModel>> GetFlats(IEnumerable<SpatialElementViewModel> rooms) {
-            foreach(var section in rooms.GroupBy(item => item.RoomSection.Name)) {
-                foreach(var flat in section.GroupBy(item => item.RoomGroup.Name)) {
+            foreach(var section in rooms.GroupBy(item => item.RoomSection.Id)) {
+                foreach(var flat in section.GroupBy(item => item.RoomGroup.Id)) {
                     yield return flat;
                 }
             }
@@ -338,8 +343,8 @@ namespace RevitRooms.ViewModels {
 
         private static bool IsGroupTypeEqual(IEnumerable<SpatialElementViewModel> rooms) {
             return rooms
-                .Select(group => group.RoomTypeGroup?.Name)
-                .Distinct(StringComparer.CurrentCultureIgnoreCase).Count() > 1;
+                .Select(group => group.RoomTypeGroup?.Id)
+                .Distinct().Count() > 1;
         }
 
         private static bool ContainGroups(SpatialElementViewModel item) {
@@ -370,7 +375,7 @@ namespace RevitRooms.ViewModels {
             value.Elements.Add(element);
         }
 
-        private void ShowInfoElementsWindow(string title, IEnumerable<InfoElementViewModel> infoElements) {
+        private bool ShowInfoElementsWindow(string title, IEnumerable<InfoElementViewModel> infoElements) {
             if(NotShowWarnings) {
                 infoElements = infoElements.Where(item => item.TypeInfo != TypeInfo.Warning);
             }
@@ -384,7 +389,10 @@ namespace RevitRooms.ViewModels {
                 };
 
                 window.Show();
+                return true;
             }
+
+            return false;
         }
     }
 }
