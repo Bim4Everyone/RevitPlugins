@@ -80,6 +80,8 @@ namespace RevitRooms.ViewModels {
         public ObservableCollection<LevelViewModel> Levels { get; }
         public ObservableCollection<PhaseViewModel> AdditionalPhases { get; }
 
+        private List<InfoElementViewModel> InfoElements { get; set; } = new List<InfoElementViewModel>();
+
         protected abstract IEnumerable<LevelViewModel> GetLevelViewModels();
 
         private void SetRoomsConfig() {
@@ -240,7 +242,7 @@ namespace RevitRooms.ViewModels {
                 AddElements("Найдены самопересечения.", TypeInfo.Warning, countourIntersectRooms, warningElements);
             }
 
-            ShowInfoElementsWindow("Информация", warningElements.Values.Union(errorElements.Values));
+            InfoElements = warningElements.Values.Union(errorElements.Values).ToList();
             return errorElements.Count > 0;
         }
 
@@ -310,7 +312,8 @@ namespace RevitRooms.ViewModels {
                 }
 
                 transaction.Commit();
-                if(!ShowInfoElementsWindow("Информация", bigChangesRooms.Values)) {
+                InfoElements.AddRange(bigChangesRooms.Values);
+                if(!ShowInfoElementsWindow("Информация", InfoElements)) {
                     TaskDialog.Show("Предупреждение!", "Расчет завершен!");
                 }
             }
