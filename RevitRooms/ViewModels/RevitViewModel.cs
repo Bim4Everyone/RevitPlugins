@@ -212,7 +212,7 @@ namespace RevitRooms.ViewModels {
                     .Where(group => IsGroupTypeEqual(group))
                     .SelectMany(items => items);
 
-                AddElements("Не совпадают значения параметров групп и типа групп.", TypeInfo.Error, notEqualGroupTypeRooms, errorElements);
+                AddElements($"Не совпадают значения параметров групп \"{notEqualGroupTypeRooms.FirstOrDefault()?.RoomGroup.Name}\" и типа групп.", TypeInfo.Error, notEqualGroupTypeRooms, errorElements);
             }
 
             // Обрабатываем все зоны
