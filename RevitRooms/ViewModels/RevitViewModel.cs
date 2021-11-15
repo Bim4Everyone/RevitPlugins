@@ -204,14 +204,15 @@ namespace RevitRooms.ViewModels {
 
                 // Все помещения у которых
                 // не совпадают значения группы и типа группы
-                var notEqualGroupTypeRooms = rooms.Where(room => room.RoomGroup != null)
+                var checksRooms = rooms.Where(room => room.RoomGroup != null && room.RoomSection != null)
                     .Where(room => room.Phase == Phase || room.PhaseName.Equals("Межквартирные перегородки", StringComparison.CurrentCultureIgnoreCase))
-                    .Where(room => ContainGroups(room))
-                    .GroupBy(room => room.RoomGroup.Id)
+                    .Where(room => ContainGroups(room));
+
+                var notEqualGroupTypeRooms = GetFlats(checksRooms)
                     .Where(group => IsGroupTypeEqual(group))
                     .SelectMany(items => items);
 
-                AddElements("Не совпадают значения параметров групп и типа групп параметра.", TypeInfo.Error, notEqualGroupTypeRooms, errorElements);
+                AddElements("Не совпадают значения параметров групп и типа групп.", TypeInfo.Error, notEqualGroupTypeRooms, errorElements);
             }
 
             // Обрабатываем все зоны
@@ -288,17 +289,16 @@ namespace RevitRooms.ViewModels {
                 // Обработка параметров зависящих от квартир
                 foreach(var level in levels) {
                     var rooms = level.GetSpatialElementViewModels(phases).ToList();
-                    foreach(var section in rooms.GroupBy(item => item.RoomSection.Name)) {
-                        foreach(var flat in section.GroupBy(item => item.RoomGroup.Name)) {
-                            foreach(var calculation in GetParamCalculations()) {
-                                foreach(var room in flat) {
-                                    calculation.CalculateParam(room);
-                                }
+                    var flats = GetFlats(rooms);
+                    foreach(var flat in flats) {
+                        foreach(var calculation in GetParamCalculations()) {
+                            foreach(var room in flat) {
+                                calculation.CalculateParam(room);
+                            }
 
-                                foreach(var room in flat) {
-                                    if(IsCheckRoomsChanges && calculation.SetParamValue(room) && calculation.RevitParam == SharedParamsConfig.Instance.ApartmentArea) {
-                                        AddElement("Большие изменения в площади квартир.", TypeInfo.Info, room, bigChangesRooms);
-                                    }
+                            foreach(var room in flat) {
+                                if(IsCheckRoomsChanges && calculation.SetParamValue(room) && calculation.RevitParam == SharedParamsConfig.Instance.ApartmentArea) {
+                                    AddElement("Большие изменения в площади квартир.", TypeInfo.Info, room, bigChangesRooms);
                                 }
                             }
                         }
@@ -307,6 +307,14 @@ namespace RevitRooms.ViewModels {
 
                 transaction.Commit();
                 ShowInfoElementsWindow("Информация", bigChangesRooms.Values);
+            }
+        }
+
+        private IEnumerable<IEnumerable<SpatialElementViewModel>> GetFlats(IEnumerable<SpatialElementViewModel> rooms) {
+            foreach(var section in rooms.GroupBy(item => item.RoomSection.Name)) {
+                foreach(var flat in section.GroupBy(item => item.RoomGroup.Name)) {
+                    yield return flat;
+                }
             }
         }
 
