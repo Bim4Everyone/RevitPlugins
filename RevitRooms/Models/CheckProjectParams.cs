@@ -117,7 +117,11 @@ namespace RevitRooms.Models {
                 var taskDialog = new TaskDialog("Квартирография Стадии П.") {
                     AllowCancellation = true,
                     MainInstruction = "Были найдены некорректные ключевые спецификации.",
-                    MainContent = " - " + string.Join(Environment.NewLine + " - ", brokenKeySchedules.Select(item => item.TestingSchedule.Name))
+                    MainContent = " - " 
+                        + string.Join(Environment.NewLine + " - ", brokenKeySchedules.Select(item => item.TestingSchedule.Name)) 
+                        + Environment.NewLine 
+                        + Environment.NewLine 
+                        + "Проверьте название ключевого параметра и количество столбцов спецификации."
                 };
 
                 taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Заменить на спецификации из шаблона?");
