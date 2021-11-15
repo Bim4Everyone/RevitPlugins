@@ -24,7 +24,7 @@ namespace RevitRooms.ViewModels {
                 new SelectedRevitViewModel(application, document) { Name = "Выборка по выделенным элементам" }
             };
 
-            RevitViewModel = RevitViewModels[0];
+            RevitViewModel = RevitViewModels[1];
 
             var roomsConfig = RoomsConfig.GetConfig();
             var settings = roomsConfig.GetRoomsSettingsConfig(document.Title);
