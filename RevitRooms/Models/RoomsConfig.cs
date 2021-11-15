@@ -53,6 +53,8 @@ namespace RevitRooms.Models {
         public int RoundAccuracy { get; set; }
         public string RoomAccuracy { get; set; }
 
+        public bool NotShowWarnings { get; set; }
+        public bool IsCountRooms { get; set; }
         public bool IsSpotCalcArea { get; set; }
         public bool IsCheckRoomsChanges { get; set; }
 

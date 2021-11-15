@@ -92,6 +92,8 @@ namespace RevitRooms.ViewModels {
                 return;
             }
 
+            NotShowWarnings = settings.NotShowWarnings;
+            IsCountRooms = settings.IsCountRooms;
             IsSpotCalcArea = settings.IsSpotCalcArea;
             IsCheckRoomsChanges = settings.IsCheckRoomsChanges;
 
@@ -115,6 +117,8 @@ namespace RevitRooms.ViewModels {
                 roomsConfig.AddRoomsSettingsConfig(settings);
             }
 
+            settings.NotShowWarnings = NotShowWarnings;
+            settings.IsCountRooms = IsCountRooms;
             settings.IsSpotCalcArea = IsSpotCalcArea;
             settings.IsCheckRoomsChanges = IsCheckRoomsChanges;
 
