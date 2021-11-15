@@ -16,6 +16,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -34,17 +35,20 @@
         <CheckBox Grid.Row="1" Margin="10" Content="Рассчитать площадь по пятну"
                   IsChecked="{Binding RevitViewModel.IsSpotCalcArea}"/>
 
-        <CheckBox x:Name="_checkArea" Grid.Row="2" Margin="10" Content="Проверить площадь помещений на изменения:"
+        <CheckBox Grid.Row="2" Margin="10" Content="Рассчитать количество комнат"
+                  IsChecked="{Binding RevitViewModel.IsCountRooms}"/>
+
+        <CheckBox x:Name="_checkArea" Grid.Row="3" Margin="10" Content="Проверить площадь помещений на изменения:"
                   IsChecked="{Binding RevitViewModel.IsCheckRoomsChanges}"/>
 
-        <StackPanel Grid.Row="3" Margin="0,5,10,0" Orientation="Horizontal" 
+        <StackPanel Grid.Row="4" Margin="0,5,10,0" Orientation="Horizontal" 
                     Visibility="{Binding ElementName=_checkArea,Path=IsChecked, Converter={StaticResource BoolToVis}}" >
             <TextBlock Margin="50,0,10,0" Text="Точность проверки"/>
             <TextBox Width="50" Text="{Binding RevitViewModel.RoomAccuracy, UpdateSourceTrigger=PropertyChanged}"/>
             <TextBlock Margin="10,0,0,0" Text="%"/>
         </StackPanel>
 
-        <DockPanel Grid.Row="4" Margin="10">
+        <DockPanel Grid.Row="5" Margin="10">
             <TextBlock Text="Стадии:" Width="158"/>
             <ComboBox Margin="10,0,0,0"
                       ItemsSource="{Binding RevitViewModel.Phases}"
@@ -57,14 +61,14 @@
             </ComboBox>
         </DockPanel>
 
-        <DockPanel Grid.Row="5" Margin="10">
+        <DockPanel Grid.Row="6" Margin="10">
             <TextBlock x:Name="_text" Text="Число знаков после запятой:"/>
             <ComboBox Margin="10,0,0,0"
                       ItemsSource="{Binding RevitViewModel.RoundAccuracyValues}"
                     SelectedItem="{Binding RevitViewModel.RoundAccuracy}"/>
         </DockPanel>
 
-        <ListView Grid.Row="6" Margin="10"
+        <ListView Grid.Row="7" Margin="10"
                   ItemsSource="{Binding RevitViewModel.Levels}">
             <ListView.View>
                 <GridView>
@@ -85,10 +89,10 @@
             </ListView.View>
         </ListView>
 
-        <CheckBox Grid.Row="7" Margin="10" Content="Не показывать предупреждения"
+        <CheckBox Grid.Row="8" Margin="10" Content="Не показывать предупреждения"
                   IsChecked="{Binding RevitViewModel.NotShowWarnings}"/>
 
-        <StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="9" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock Margin="10" Text="{Binding RevitViewModel.ErrorText}" Foreground="Orange" />
             <Button Content="Рассчитать" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding RevitViewModel.CalculateCommand}"/>
             <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>

@@ -69,6 +69,7 @@ namespace RevitRooms.ViewModels {
         public PhaseViewModel Phase { get; set; }
 
         public bool NotShowWarnings { get; set; }
+        public bool IsCountRooms { get; set; }
         public bool IsSpotCalcArea { get; set; }
         public bool IsCheckRoomsChanges { get; set; }
         public string RoomAccuracy { get; set; } = "100";
@@ -328,11 +329,14 @@ namespace RevitRooms.ViewModels {
         }
 
         private IEnumerable<IParamCalculation> GetParamCalculations() {
-            yield return new RoomsCountCalculation() { Phase = Phase.Element };
             yield return new ApartmentAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
             yield return new ApartmentAreaRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
             yield return new ApartmentLivingAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
             yield return new ApartmentAreaNoBalconyCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+
+            if(IsCountRooms) {
+                yield return new RoomsCountCalculation() { Phase = Phase.Element };
+            }
 
             if(IsSpotCalcArea) {
                 yield return new ApartmentFullAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
