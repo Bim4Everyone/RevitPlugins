@@ -120,8 +120,8 @@ namespace RevitRooms.Models {
                     MainContent = " - " + string.Join(Environment.NewLine + " - ", brokenKeySchedules.Select(item => item.TestingSchedule.Name))
                 };
 
-                taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Заменить спецификации?");
-                taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Выход");
+                taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Заменить на спецификации из шаблона?");
+                taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Выход без изменений спецификаций");
                 if(taskDialog.Show() == TaskDialogResult.CommandLink1) {
                     return ReplaceKeySchedules(brokenKeySchedules.Select(item => item.KeyScheduleRule));
                 }
