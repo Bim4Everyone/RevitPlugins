@@ -58,5 +58,6 @@ namespace RevitRooms.Models {
         public bool IsSpotCalcArea { get; set; }
         public bool IsCheckRoomsChanges { get; set; }
 
+        public List<int> Levels { get; set; } = new List<int>();
     }
 }

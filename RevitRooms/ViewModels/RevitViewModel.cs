@@ -101,11 +101,14 @@ namespace RevitRooms.ViewModels {
             RoundAccuracy = settings.RoundAccuracy;
 
             if(_revitRepository.GetElement(new ElementId(settings.PhaseElementId)) is Phase phase) {
-                if(phase == null || Phase?.ElementId == phase.Id) {
-                    return;
+                if(!(phase == null || Phase?.ElementId == phase.Id)) {
+                    Phase = Phases.FirstOrDefault(item => item.ElementId == phase.Id) ?? Phases.FirstOrDefault();
                 }
 
-                Phase = Phases.FirstOrDefault(item => item.ElementId == phase.Id) ?? Phases.FirstOrDefault();
+            }
+
+            foreach(var level in Levels.Where(item => settings.Levels.Contains(item.ElementId.IntegerValue))) {
+                level.IsSelected = true;
             }
         }
 
@@ -128,6 +131,8 @@ namespace RevitRooms.ViewModels {
             settings.SelectedRoomId = _id;
             settings.PhaseElementId = Phase.ElementId.IntegerValue;
             settings.DocumentName = _revitRepository.DocumentName;
+
+            settings.Levels = Levels.Where(item => item.IsSelected).Select(item => item.ElementId.IntegerValue).ToList();
 
             RoomsConfig.SaveConfig(roomsConfig);
         }
