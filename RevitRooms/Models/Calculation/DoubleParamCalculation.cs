@@ -37,7 +37,7 @@ namespace RevitRooms.Models.Calculation {
 
         protected virtual bool IsBigChanges(Element element) {
             double oldValue = ConvertValueToSquareMeters((double?) element.GetParamValueOrDefault(RevitParam), _accuracy);
-            return Math.Abs(oldValue - CalculationValue) / oldValue * 100 > _percent;
+            return oldValue != 0 && Math.Abs(oldValue - CalculationValue) / oldValue * 100 > _percent;
         }
     }
 }

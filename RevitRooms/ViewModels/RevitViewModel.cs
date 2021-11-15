@@ -257,7 +257,7 @@ namespace RevitRooms.ViewModels {
 
                     var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
                     areaWithRatio.CalculateParam(spartialElement);
-                    if(areaWithRatio.SetParamValue(spartialElement)) {
+                    if(IsCheckRoomsChanges && areaWithRatio.SetParamValue(spartialElement)) {
                         AddElement("Большие изменения в площади зон.", TypeInfo.Info, spartialElement, bigChangesRooms);
                     }
                 }
@@ -279,7 +279,7 @@ namespace RevitRooms.ViewModels {
 
                         var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
                         areaWithRatio.CalculateParam(spartialElement);
-                        if(areaWithRatio.SetParamValue(spartialElement)) {
+                        if(IsCheckRoomsChanges && areaWithRatio.SetParamValue(spartialElement)) {
                             AddElement("Большие изменения в площади помещений.", TypeInfo.Info, spartialElement, bigChangesRooms);
                         }
                     }
@@ -296,7 +296,7 @@ namespace RevitRooms.ViewModels {
                                 }
 
                                 foreach(var room in flat) {
-                                    if(calculation.SetParamValue(room) && calculation.RevitParam == SharedParamsConfig.Instance.ApartmentArea) {
+                                    if(IsCheckRoomsChanges && calculation.SetParamValue(room) && calculation.RevitParam == SharedParamsConfig.Instance.ApartmentArea) {
                                         AddElement("Большие изменения в площади квартир.", TypeInfo.Info, room, bigChangesRooms);
                                     }
                                 }
