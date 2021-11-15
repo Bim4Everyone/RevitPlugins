@@ -152,6 +152,7 @@ namespace RevitRooms.ViewModels {
             // Проверка всех элементов
             // на выделенных уровнях
             if(CheckElements(phases, levels)) {
+                ShowInfoElementsWindow("Ошибки", InfoElements);
                 return;
             }
 
