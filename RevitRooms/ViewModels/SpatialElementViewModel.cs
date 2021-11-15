@@ -116,9 +116,11 @@ namespace RevitRooms.ViewModels {
         public void UpdateSharedParams() {
 #if D2020 || R2020 || D2021 || R2021
             Element.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaSpec, ProjectParamsConfig.Instance.ApartmentAreaSpec);
+            Element.SetParamValue(SharedParamsConfig.Instance.ApartmentGroupName, ProjectParamsConfig.Instance.ApartmentGroupName);
             Element.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaMinSpec, ProjectParamsConfig.Instance.ApartmentAreaMinSpec);
             Element.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaMaxSpec, ProjectParamsConfig.Instance.ApartmentAreaMaxSpec);
 
+            Element.SetParamValue(SharedParamsConfig.Instance.RoomAreaRatio, ProjectParamsConfig.Instance.RoomAreaRatio);
             Element.SetParamValue(SharedParamsConfig.Instance.RoomGroupShortName, ProjectParamsConfig.Instance.RoomGroupShortName);
             Element.SetParamValue(SharedParamsConfig.Instance.RoomSectionShortName, ProjectParamsConfig.Instance.RoomSectionShortName);
             Element.SetParamValue(SharedParamsConfig.Instance.RoomTypeGroupShortName, ProjectParamsConfig.Instance.RoomTypeGroupShortName);
