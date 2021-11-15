@@ -13,7 +13,7 @@ namespace RevitRooms.Models.Calculation {
 
         public override void CalculateParam(SpatialElementViewModel spatialElement) {
             if(spatialElement.Phase.ElementId == Phase.Id) {
-                CalculationValue += ConvertValueToSquareMeters(spatialElement.AreaWithRatio, _accuracy);
+                CalculationValue += ConvertValueToSquareMeters(spatialElement.Area, _accuracy);
             }
         }
     }
