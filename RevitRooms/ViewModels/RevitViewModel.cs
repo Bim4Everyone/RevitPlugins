@@ -265,7 +265,7 @@ namespace RevitRooms.ViewModels {
                 var bigChangesRooms = new Dictionary<string, InfoElementViewModel>();
 
                 // Обновление параметра округления у зон
-                foreach(var spartialElement in GetAreas().Where(item => item.Phase == Phase)) {
+                foreach(var spartialElement in GetAreas()) {
                     // Обновление параметра
                     // площади с коэффициентом
 
