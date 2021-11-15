@@ -67,6 +67,7 @@ namespace RevitRooms.ViewModels {
         public string Name { get; set; }
         public PhaseViewModel Phase { get; set; }
 
+        public bool NotShowWarnings { get; set; }
         public bool IsSpotCalcArea { get; set; }
         public bool IsCheckRoomsChanges { get; set; }
         public string RoomAccuracy { get; set; } = "100";
@@ -370,6 +371,10 @@ namespace RevitRooms.ViewModels {
         }
 
         private void ShowInfoElementsWindow(string title, IEnumerable<InfoElementViewModel> infoElements) {
+            if(NotShowWarnings) {
+                infoElements = infoElements.Where(item => item.TypeInfo != TypeInfo.Warning);
+            }
+
             if(infoElements.Any()) {
                 var window = new InfoElementsWindow() {
                     Title = title,
