@@ -12,7 +12,7 @@ using RevitRooms.Models;
 
 namespace RevitRooms.ViewModels {
     internal class DoorViewModel : ElementViewModel<FamilyInstance> {
-        public DoorViewModel(FamilyInstance door, PhaseViewModel phase,  RevitRepository revitRepository) :
+        public DoorViewModel(FamilyInstance door, PhaseViewModel phase, RevitRepository revitRepository) :
             base(door, revitRepository) {
 
             Phase = phase;
@@ -26,7 +26,7 @@ namespace RevitRooms.ViewModels {
         }
 
         public PhaseViewModel Phase { get; }
-        
+
         public SpatialElementViewModel ToRoom { get; }
         public SpatialElementViewModel FromRoom { get; }
 
@@ -34,7 +34,13 @@ namespace RevitRooms.ViewModels {
         public override string LevelName => RevitRepository.GetElement(Element.LevelId)?.Name;
 
         public bool IsSectionNameEqual {
-            get { return ToRoom?.RoomSection?.Id == FromRoom?.RoomSection?.Id; }
+            get {
+                if(ToRoom == null || FromRoom == null) {
+                    return true;
+                }
+
+                return ToRoom.RoomSection?.Id == FromRoom.RoomSection?.Id;
+            }
         }
     }
 }
