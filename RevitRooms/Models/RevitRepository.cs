@@ -127,8 +127,8 @@ namespace RevitRooms.Models {
         }
 
         public Transaction StartTransaction(string transactionName) {
-            var transaction = new Transaction(_document, transactionName);
-            transaction.Start();
+            var transaction = new Transaction(_document);
+            transaction.BIMStart(transactionName);
 
             return transaction;
         }
