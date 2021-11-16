@@ -199,21 +199,21 @@ namespace RevitRooms.ViewModels {
                 // Все помещения которые
                 // избыточные или не окруженные
                 var redundantRooms = rooms.Where(item => item.IsRedundant == true || item.NotEnclosed == true);
-                AddElements("Избыточные или не окруженные.", TypeInfo.Error, redundantRooms, errorElements);
+                AddElements(InfoElement.RedundantRooms, redundantRooms, errorElements);
 
                 // Все помещения у которых
                 // не заполнены обязательные параметры
                 foreach(var room in rooms) {
                     if(room.Room == null) {
-                        AddElement($"Не заполнен обязательный параметр \"{ProjectParamsConfig.Instance.RoomName.Name}\".", TypeInfo.Error, room, errorElements);
+                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomName.Name), room, errorElements);
                     }
 
                     if(room.RoomGroup == null) {
-                        AddElement($"Не заполнен обязательный параметр \"{ProjectParamsConfig.Instance.RoomGroupName.Name}\".", TypeInfo.Error, room, errorElements);
+                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomGroupName.Name), room, errorElements);
                     }
 
                     if(room.RoomSection == null) {
-                        AddElement($"Не заполнен обязательный параметр \"{ProjectParamsConfig.Instance.RoomSectionName.Name}\".", TypeInfo.Error, room, errorElements);
+                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name), room, errorElements);
                     }
                 }
 
@@ -227,14 +227,14 @@ namespace RevitRooms.ViewModels {
                     if(IsGroupTypeEqual(flat)) {
                         var roomGroup = flat.FirstOrDefault()?.RoomGroup.Name;
                         var roomSection = flat.FirstOrDefault()?.RoomSection.Name;
-                        AddElements($"Не совпадают значения параметров групп \"{roomGroup} - {roomSection}\"и типа групп.", TypeInfo.Error, flat, errorElements);
+                        AddElements(InfoElement.NotEqualGroupType.FormatMessage(roomGroup, roomSection), flat, errorElements);
                     }
                 }
             }
 
             // Обрабатываем все зоны
             var redundantAreas = GetAreas().Where(item => item.IsRedundant == true || item.NotEnclosed == true);
-            AddElements("Избыточные или не окруженные.", TypeInfo.Error, redundantAreas, errorElements);
+            AddElements(InfoElement.RedundantAreas, redundantAreas, errorElements);
 
             // Ошибки, которые не останавливают выполнение скрипта
             var warningElements = new Dictionary<string, InfoElementViewModel>();
@@ -245,12 +245,12 @@ namespace RevitRooms.ViewModels {
                 // Все двери
                 // с не совпадающей секцией
                 var notEqualSectionDoors = doors.Where(room => room.Phase == Phase || room.PhaseName.Equals("Межквартирные перегородки", StringComparison.CurrentCultureIgnoreCase)).Where(item => !item.IsSectionNameEqual);
-                AddElements("Не совпадают секции.", TypeInfo.Warning, notEqualSectionDoors, warningElements);
+                AddElements(InfoElement.NotEqualSectionDoors, notEqualSectionDoors, warningElements);
 
                 // Все помещений у которых
                 // найдены самопересечения
                 var countourIntersectRooms = rooms.Where(item => item.IsCountourIntersect == true);
-                AddElements("Найдены самопересечения.", TypeInfo.Warning, countourIntersectRooms, warningElements);
+                AddElements(InfoElement.CountourIntersectRooms, countourIntersectRooms, warningElements);
             }
 
             InfoElements = warningElements.Values.Union(errorElements.Values).ToList();
@@ -276,7 +276,7 @@ namespace RevitRooms.ViewModels {
                     var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
                     areaWithRatio.CalculateParam(spartialElement);
                     if(areaWithRatio.SetParamValue(spartialElement) && IsCheckRoomsChanges) {
-                        AddElement("Большие изменения в площади зон.", TypeInfo.Info, spartialElement, bigChangesRooms);
+                        AddElement(InfoElement.BigChangesAreas, spartialElement, bigChangesRooms);
                     }
                 }
 
@@ -298,7 +298,7 @@ namespace RevitRooms.ViewModels {
                         var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
                         areaWithRatio.CalculateParam(spartialElement);
                         if(areaWithRatio.SetParamValue(spartialElement) && IsCheckRoomsChanges) {
-                            AddElement("Большие изменения в площади помещений.", TypeInfo.Info, spartialElement, bigChangesRooms);
+                            AddElement(InfoElement.BigChangesRoomAreas, spartialElement, bigChangesRooms);
                         }
                     }
                 }
@@ -315,7 +315,7 @@ namespace RevitRooms.ViewModels {
 
                             foreach(var room in flat) {
                                 if(calculation.SetParamValue(room) && IsCheckRoomsChanges && calculation.RevitParam == SharedParamsConfig.Instance.ApartmentArea) {
-                                    AddElement("Большие изменения в площади квартир.", TypeInfo.Info, room, bigChangesRooms);
+                                    AddElement(InfoElement.BigChangesFlatAreas, room, bigChangesRooms);
                                 }
                             }
                         }
@@ -377,16 +377,16 @@ namespace RevitRooms.ViewModels {
             return int.TryParse(RoomAccuracy, out int result) ? result : 100;
         }
 
-        private void AddElements(string infoText, TypeInfo typeInfo, IEnumerable<IElementViewModel<Element>> elements, Dictionary<string, InfoElementViewModel> infoElements) {
+        private void AddElements(InfoElement infoElement, IEnumerable<IElementViewModel<Element>> elements, Dictionary<string, InfoElementViewModel> infoElements) {
             foreach(var element in elements) {
-                AddElement(infoText, typeInfo, element, infoElements);
+                AddElement(infoElement, element, infoElements);
             }
         }
 
-        private void AddElement(string infoText, TypeInfo typeInfo, IElementViewModel<Element> element, Dictionary<string, InfoElementViewModel> infoElements) {
-            if(!infoElements.TryGetValue(infoText, out var value)) {
-                value = new InfoElementViewModel() { Message = infoText, TypeInfo = typeInfo, Elements = new ObservableCollection<IElementViewModel<Element>>() };
-                infoElements.Add(infoText, value);
+        private void AddElement(InfoElement infoElement, IElementViewModel<Element> element, Dictionary<string, InfoElementViewModel> infoElements) {
+            if(!infoElements.TryGetValue(infoElement.Message, out var value)) {
+                value = new InfoElementViewModel() { Message = infoElement.Message, TypeInfo = infoElement.TypeInfo, Description = infoElement.Description, Elements = new ObservableCollection<IElementViewModel<Element>>() };
+                infoElements.Add(infoElement.Message, value);
             }
 
             value.Elements.Add(element);
