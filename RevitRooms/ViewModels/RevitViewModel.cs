@@ -269,6 +269,8 @@ namespace RevitRooms.ViewModels {
                     // Обновление параметра
                     // площади с коэффициентом
 
+                    spartialElement.UpdateLevelSharedParam();
+
                     var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
                     area.CalculateParam(spartialElement);
                     area.SetParamValue(spartialElement);
