@@ -66,7 +66,7 @@ namespace RevitRooms.ViewModels {
         
         public static InfoElement NotEqualSectionDoors { get; } = new InfoElement() {
             TypeInfo = TypeInfo.Warning,
-            Message = "Не совпадают секции между комнатами.",
+            Message = $"Проверка параметра \"{ProjectParamsConfig.Instance.RoomSectionName.Name}\" по дверям",
             Description = $"Обнаружены помещения принадлежащие разным секциям, но имеющие доступ друг к другу через двери. Проверьте корректность параметра \"{ProjectParamsConfig.Instance.RoomSectionName.Name}\" для помещений, соединенных данными дверьми."
         };
         
