@@ -430,6 +430,9 @@ namespace RevitRooms.ViewModels {
             return LabelUtils.GetLabelFor(DisplayUnitType.DUT_SQUARE_METERS);
         }
 #else
+        private string GetSquareMetersText() {
+            return LabelUtils.GetLabelForUnit(UnitTypeId.SquareMeters);
+        }
 #endif
     }
 }
