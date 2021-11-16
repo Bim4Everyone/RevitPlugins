@@ -339,7 +339,7 @@ namespace RevitRooms.ViewModels {
         }
 
         private string FormatMessage(double differences, double percentChange) {
-            return $"Изменение: \"{percentChange}% ({differences} {GetSquareMetersText()})\".";
+            return $"Изменение: {percentChange:F0}% ({differences:F} {GetSquareMetersText()}).";
         }
 
         private IEnumerable<IEnumerable<SpatialElementViewModel>> GetFlats(IEnumerable<SpatialElementViewModel> rooms) {
