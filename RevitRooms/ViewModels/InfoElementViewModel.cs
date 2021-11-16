@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
@@ -18,7 +19,22 @@ namespace RevitRooms.ViewModels {
         public string Description { get; set; }
 
         public TypeInfo TypeInfo { get; set; }
-        public ObservableCollection<IElementViewModel<Element>> Elements { get; set; }
+        public ObservableCollection<MessageElementViewModel> Elements { get; set; }
+    }
+
+    internal class MessageElementViewModel {
+        public string Description { get; set; }
+        public IElementViewModel<Element> Element { get; set; }
+
+        public ElementId ElementId { get; }
+
+        public string Name => Element.Name;
+        public string PhaseName => Element.PhaseName;
+        public string LevelName => Element.LevelName;
+        public string CategoryName => Element.CategoryName;
+
+        public ICommand ShowElementCommand => Element.ShowElementCommand;
+        public ICommand SelectElementCommand => Element.SelectElementCommand;
     }
 
     internal class InfoElement {

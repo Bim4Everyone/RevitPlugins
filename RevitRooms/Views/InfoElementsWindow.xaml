@@ -52,7 +52,7 @@
                     <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Наименование" Width="100" />
                     <GridViewColumn DisplayMemberBinding="{Binding LevelName}" Header="Уровень" Width="100" />
                     <GridViewColumn DisplayMemberBinding="{Binding PhaseName}" Header="Стадия" Width="200" />
-                    <GridViewColumn DisplayMemberBinding="{Binding PhaseName}" Header="Описание" Width="350" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Description}" Header="Описание" Width="350" />
                 </GridView>
             </ListView.View>
         </ListView>        

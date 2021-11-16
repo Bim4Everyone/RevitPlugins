@@ -205,15 +205,15 @@ namespace RevitRooms.ViewModels {
                 // не заполнены обязательные параметры
                 foreach(var room in rooms) {
                     if(room.Room == null) {
-                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomName.Name), room, errorElements);
+                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomName.Name), null, room, errorElements);
                     }
 
                     if(room.RoomGroup == null) {
-                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomGroupName.Name), room, errorElements);
+                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomGroupName.Name), null, room, errorElements);
                     }
 
                     if(room.RoomSection == null) {
-                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name), room, errorElements);
+                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name), null, room, errorElements);
                     }
                 }
 
@@ -271,14 +271,16 @@ namespace RevitRooms.ViewModels {
 
                     spartialElement.UpdateLevelSharedParam();
 
-                    var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
-                    area.CalculateParam(spartialElement);
-                    area.SetParamValue(spartialElement);
-
                     var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
                     areaWithRatio.CalculateParam(spartialElement);
-                    if(areaWithRatio.SetParamValue(spartialElement) && IsCheckRoomsChanges) {
-                        AddElement(InfoElement.BigChangesAreas, spartialElement, bigChangesRooms);
+                    areaWithRatio.SetParamValue(spartialElement);
+
+                    var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                    area.CalculateParam(spartialElement);
+                    if(area.SetParamValue(spartialElement) && IsCheckRoomsChanges) {
+                        var differences = areaWithRatio.GetDifferences();
+                        var percentChange = areaWithRatio.GetPercentChange();
+                        AddElement(InfoElement.BigChangesAreas, FormatMessage(differences, percentChange), spartialElement, bigChangesRooms);
                     }
                 }
 
@@ -291,16 +293,18 @@ namespace RevitRooms.ViewModels {
                         // Обновляем общий параметр этажа
                         spartialElement.UpdateLevelSharedParam();
 
+                        var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                        areaWithRatio.CalculateParam(spartialElement);
+                        areaWithRatio.SetParamValue(spartialElement);
+
                         // Обновление параметра
                         // площади с коэффициентом
                         var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
                         area.CalculateParam(spartialElement);
-                        area.SetParamValue(spartialElement);
-
-                        var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
-                        areaWithRatio.CalculateParam(spartialElement);
-                        if(areaWithRatio.SetParamValue(spartialElement) && IsCheckRoomsChanges) {
-                            AddElement(InfoElement.BigChangesRoomAreas, spartialElement, bigChangesRooms);
+                        if(area.SetParamValue(spartialElement) && IsCheckRoomsChanges) {
+                            var differences = areaWithRatio.GetDifferences();
+                            var percentChange = areaWithRatio.GetPercentChange();
+                            AddElement(InfoElement.BigChangesRoomAreas, FormatMessage(differences, percentChange), spartialElement, bigChangesRooms);
                         }
                     }
                 }
@@ -317,7 +321,9 @@ namespace RevitRooms.ViewModels {
 
                             foreach(var room in flat) {
                                 if(calculation.SetParamValue(room) && IsCheckRoomsChanges && calculation.RevitParam == SharedParamsConfig.Instance.ApartmentArea) {
-                                    AddElement(InfoElement.BigChangesFlatAreas, room, bigChangesRooms);
+                                    var differences = calculation.GetDifferences();
+                                    var percentChange = calculation.GetPercentChange();
+                                    AddElement(InfoElement.BigChangesFlatAreas, FormatMessage(differences, percentChange), room, bigChangesRooms);
                                 }
                             }
                         }
@@ -330,6 +336,10 @@ namespace RevitRooms.ViewModels {
                     TaskDialog.Show("Предупреждение!", "Расчет завершен!");
                 }
             }
+        }
+
+        private string FormatMessage(double differences, double percentChange) {
+            return $"Изменение: \"{percentChange}% ({differences} {GetSquareMetersText()})\".";
         }
 
         private IEnumerable<IEnumerable<SpatialElementViewModel>> GetFlats(IEnumerable<SpatialElementViewModel> rooms) {
@@ -381,17 +391,17 @@ namespace RevitRooms.ViewModels {
 
         private void AddElements(InfoElement infoElement, IEnumerable<IElementViewModel<Element>> elements, Dictionary<string, InfoElementViewModel> infoElements) {
             foreach(var element in elements) {
-                AddElement(infoElement, element, infoElements);
+                AddElement(infoElement, null, element, infoElements);
             }
         }
 
-        private void AddElement(InfoElement infoElement, IElementViewModel<Element> element, Dictionary<string, InfoElementViewModel> infoElements) {
+        private void AddElement(InfoElement infoElement, string message, IElementViewModel<Element> element, Dictionary<string, InfoElementViewModel> infoElements) {
             if(!infoElements.TryGetValue(infoElement.Message, out var value)) {
-                value = new InfoElementViewModel() { Message = infoElement.Message, TypeInfo = infoElement.TypeInfo, Description = infoElement.Description, Elements = new ObservableCollection<IElementViewModel<Element>>() };
+                value = new InfoElementViewModel() { Message = infoElement.Message, TypeInfo = infoElement.TypeInfo, Description = infoElement.Description, Elements = new ObservableCollection<MessageElementViewModel>() };
                 infoElements.Add(infoElement.Message, value);
             }
 
-            value.Elements.Add(element);
+            value.Elements.Add(new MessageElementViewModel() { Element = element, Description = message });
         }
 
         private bool ShowInfoElementsWindow(string title, IEnumerable<InfoElementViewModel> infoElements) {
@@ -414,5 +424,12 @@ namespace RevitRooms.ViewModels {
 
             return false;
         }
+
+#if D2020 || R2020
+        private string GetSquareMetersText() {
+            return LabelUtils.GetLabelFor(DisplayUnitType.DUT_SQUARE_METERS);
+        }
+#else
+#endif
     }
 }

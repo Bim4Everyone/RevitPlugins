@@ -10,5 +10,8 @@ namespace RevitRooms.Models.Calculation {
         RevitParam RevitParam { get; set; }
         bool SetParamValue(SpatialElementViewModel spatialElement);
         void CalculateParam(SpatialElementViewModel spatialElement);
+        
+        double GetDifferences();
+        double GetPercentChange();
     }
 }

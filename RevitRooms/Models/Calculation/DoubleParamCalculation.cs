@@ -36,8 +36,16 @@ namespace RevitRooms.Models.Calculation {
         }
 
         protected virtual bool IsBigChanges(Element element) {
-            double oldValue = ConvertValueToSquareMeters((double?) element.GetParamValueOrDefault(RevitParam), _accuracy);
-            return oldValue != 0 && Math.Abs(oldValue - CalculationValue) / Math.Abs(oldValue) * 100 > _percent;
+            OldValue = ConvertValueToSquareMeters((double?) element.GetParamValueOrDefault(RevitParam), _accuracy);
+            return OldValue != 0 && GetPercentChange() > _percent;
+        }
+
+        public double GetDifferences() {
+            return OldValue - CalculationValue;
+        }
+
+        public override double GetPercentChange() {
+            return Math.Abs(OldValue - CalculationValue) / Math.Abs(OldValue) * 100;
         }
     }
 }

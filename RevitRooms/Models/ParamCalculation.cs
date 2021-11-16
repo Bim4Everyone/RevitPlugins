@@ -12,7 +12,10 @@ using RevitRooms.ViewModels;
 
 namespace RevitRooms.Models {
     internal abstract class ParamCalculation<T> {
+        public T OldValue { get; protected set; }
         public T CalculationValue { get; protected set; }
+
+        public abstract double GetPercentChange();
         public abstract void CalculateParam(SpatialElementViewModel spatialElement);
 
         public Phase Phase { get; set; }
