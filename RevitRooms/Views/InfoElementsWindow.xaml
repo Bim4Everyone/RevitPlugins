@@ -31,7 +31,6 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Button Command="{Binding ShowElementCommand}">
-                                    <Image Width="16" Height="16" Source="{Binding Element.ImageSource}" />
                                     <Button.Resources>
                                         <Style TargetType="Border">
                                             <Setter Property="CornerRadius" Value="5"/>

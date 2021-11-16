@@ -16,7 +16,5 @@ namespace RevitRooms.ViewModels {
         public string Message { get; set; }
         public TypeInfo TypeInfo { get; set; }
         public ObservableCollection<IElementViewModel<Element>> Elements { get; set; }
-
-        public string ImageSource { get; } = "pack://application:,,,/Resources/icons8-show-property-96.png";
     }
 }
