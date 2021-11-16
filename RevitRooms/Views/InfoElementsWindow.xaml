@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitRooms.Views"
         mc:Ignorable="d"
-        Title="Информация" Height="800" Width="1550" WindowStartupLocation="CenterScreen">
+        Title="Информация" Height="1100" Width="1550" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -52,6 +52,7 @@
                     <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Наименование" Width="100" />
                     <GridViewColumn DisplayMemberBinding="{Binding LevelName}" Header="Уровень" Width="100" />
                     <GridViewColumn DisplayMemberBinding="{Binding PhaseName}" Header="Стадия" Width="200" />
+                    <GridViewColumn DisplayMemberBinding="{Binding PhaseName}" Header="Описание" Width="350" />
                 </GridView>
             </ListView.View>
         </ListView>        

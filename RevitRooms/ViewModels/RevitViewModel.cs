@@ -401,6 +401,7 @@ namespace RevitRooms.ViewModels {
                 var window = new InfoElementsWindow() {
                     Title = title,
                     DataContext = new InfoElementsViewModel() {
+                        InfoElement = infoElements.FirstOrDefault(),
                         InfoElements = new ObservableCollection<InfoElementViewModel>(infoElements)
                     }
                 };
