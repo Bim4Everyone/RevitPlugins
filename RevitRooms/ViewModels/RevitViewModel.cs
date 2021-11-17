@@ -462,6 +462,14 @@ namespace RevitRooms.ViewModels {
             return false;
         }
 
+        protected IEnumerable<SpatialElement> GetAdditionalElements(IList<SpatialElement> selectedElements) {
+            var levelIds = selectedElements.Select(item => item.LevelId).Distinct().ToArray();
+            var additionalPhases = _revitRepository.GetAdditionalPhases().Select(item => item.Id).ToArray();
+            return _revitRepository.GetSpatialElements()
+                .Where(item => levelIds.Contains(item.LevelId))
+                .Where(item => additionalPhases.Contains(_revitRepository.GetPhaseId(item)));
+        }
+
 #if D2020 || R2020
         private string GetSquareMetersText() {
             return LabelUtils.GetLabelFor(DisplayUnitType.DUT_SQUARE_METERS);
