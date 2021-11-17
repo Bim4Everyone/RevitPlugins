@@ -32,7 +32,7 @@ namespace RevitRooms.Models.Calculation {
         }
 
         protected virtual bool CheckSetParamValue(SpatialElementViewModel spatialElement) {
-            return spatialElement.Phase.ElementId == Phase.Id;
+            return spatialElement.Phase?.ElementId == Phase?.Id;
         }
 
         protected virtual bool IsBigChanges(Element element) {

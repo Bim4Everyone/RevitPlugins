@@ -28,7 +28,7 @@ namespace RevitRooms.Models {
             _document = document;
             _uiDocument = new UIDocument(document);
 
-            _filter = new ElementMulticategoryFilter(new[] { BuiltInCategory.OST_Rooms });
+            _filter = new ElementMulticategoryFilter(new[] { BuiltInCategory.OST_Rooms, BuiltInCategory.OST_Areas });
         }
 
         public string DocumentName => _document.Title;

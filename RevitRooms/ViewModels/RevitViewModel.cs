@@ -170,11 +170,11 @@ namespace RevitRooms.ViewModels {
 
                     spartialElement.UpdateLevelSharedParam();
 
-                    var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                    var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase?.Element };
                     areaWithRatio.CalculateParam(spartialElement);
                     areaWithRatio.SetParamValue(spartialElement);
 
-                    var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                    var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase?.Element };
                     area.CalculateParam(spartialElement);
                     if(area.SetParamValue(spartialElement) && IsCheckRoomsChanges) {
                         var differences = areaWithRatio.GetDifferences();
@@ -193,6 +193,10 @@ namespace RevitRooms.ViewModels {
         }
         
         private bool CanCalculateAreas(object p) {
+            if(!Levels.Any(item => item.IsSelected)) {
+                return false;
+            }
+
             return true;
         }
 
@@ -253,7 +257,7 @@ namespace RevitRooms.ViewModels {
         private bool CheckElements(List<PhaseViewModel> phases, IEnumerable<LevelViewModel> levels) {
             var errorElements = new Dictionary<string, InfoElementViewModel>();
             foreach(var level in levels) {
-                var rooms = level.GetSpatialElementViewModels(phases);
+                var rooms = level.GetRooms(phases);
 
                 // Все помещения которые
                 // избыточные или не окруженные
@@ -295,7 +299,7 @@ namespace RevitRooms.ViewModels {
             var warningElements = new Dictionary<string, InfoElementViewModel>();
             foreach(var level in levels) {
                 var doors = level.GetDoors(phases);
-                var rooms = level.GetSpatialElementViewModels(phases);
+                var rooms = level.GetRooms(phases);
 
                 // Все двери
                 // с не совпадающей секцией
@@ -319,7 +323,7 @@ namespace RevitRooms.ViewModels {
                 // Надеюсь будет достаточно быстро отрабатывать :)
                 // Подсчет площадей помещений
                 foreach(var level in levels) {
-                    foreach(var spartialElement in level.GetSpatialElementViewModels(phases)) {
+                    foreach(var spartialElement in level.GetRooms(phases)) {
                         // Заполняем дублирующие
                         // общие параметры
                         spartialElement.UpdateSharedParams();
@@ -345,7 +349,7 @@ namespace RevitRooms.ViewModels {
 
                 // Обработка параметров зависящих от квартир
                 foreach(var level in levels) {
-                    var rooms = level.GetSpatialElementViewModels(phases).ToList();
+                    var rooms = level.GetRooms(phases).ToList();
                     var flats = GetFlats(rooms);
                     foreach(var flat in flats) {
                         foreach(var calculation in GetParamCalculations()) {
@@ -400,8 +404,7 @@ namespace RevitRooms.ViewModels {
         }
 
         private IEnumerable<SpatialElementViewModel> GetAreas() {
-            return _revitRepository.GetAllAreas()
-                .Select(item => new SpatialElementViewModel(item, _revitRepository));
+            return Levels.Where(item => item.IsSelected).SelectMany(item => item.GetAreas());
         }
 
         private static bool IsGroupTypeEqual(IEnumerable<SpatialElementViewModel> rooms) {
