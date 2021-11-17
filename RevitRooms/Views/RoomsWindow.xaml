@@ -68,7 +68,7 @@
                     SelectedItem="{Binding RevitViewModel.RoundAccuracy}"/>
         </DockPanel>
 
-        <ListView Grid.Row="7" Margin="10"
+        <ListView Grid.Row="7" Margin="10" IsEnabled="{Binding RevitViewModel.IsAllowSelectLevels}"
                   ItemsSource="{Binding RevitViewModel.Levels}">
             <ListView.View>
                 <GridView>

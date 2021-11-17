@@ -14,6 +14,7 @@ namespace RevitRooms.ViewModels.Revit {
         public ElementsRevitViewModel(Application application, Document document)
             : base(application, document) {
             _id = new Guid("19723C2C-75ED-4B0A-8279-8493A949E52F");
+            IsAllowSelectLevels = true;
         }
 
         protected override IEnumerable<LevelViewModel> GetLevelViewModels() {

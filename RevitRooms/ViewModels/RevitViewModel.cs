@@ -29,6 +29,7 @@ namespace RevitRooms.ViewModels {
 
         private string _errorText;
         private bool _isCheckedSelected;
+        private bool _isAllowSelectLevels;
 
         public RevitViewModel(Application application, Document document) {
             _revitRepository = new RevitRepository(application, document);
@@ -63,6 +64,11 @@ namespace RevitRooms.ViewModels {
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        public bool IsAllowSelectLevels {
+            get => _isAllowSelectLevels;
+            set => this.RaiseAndSetIfChanged(ref _isAllowSelectLevels, value);
         }
 
         public string Name { get; set; }
