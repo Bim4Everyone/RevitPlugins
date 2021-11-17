@@ -37,7 +37,7 @@ namespace RevitRooms.ViewModels {
             Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels().OrderBy(item => item.Element.Elevation).Where(item => item.SpartialElements.Count > 0));
             AdditionalPhases = new ObservableCollection<PhaseViewModel>(_revitRepository.GetAdditionalPhases().Select(item => new PhaseViewModel(item, _revitRepository)));
 
-            Phases = new ObservableCollection<PhaseViewModel>(Levels.SelectMany(item => item.SpartialElements).Select(item => item.Phase).Distinct().Except(AdditionalPhases));
+            Phases = new ObservableCollection<PhaseViewModel>(Levels.SelectMany(item => item.SpartialElements).Select(item => item.Phase).Where(item => item != null).Distinct().Except(AdditionalPhases));
             Phase = Phases.FirstOrDefault();
 
             RoundAccuracy = 1;
