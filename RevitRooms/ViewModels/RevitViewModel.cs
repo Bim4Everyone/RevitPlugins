@@ -44,12 +44,14 @@ namespace RevitRooms.ViewModels {
             RoundAccuracyValues = new ObservableCollection<int>(Enumerable.Range(1, 3));
 
             CalculateCommand = new RelayCommand(Calculate, CanCalculate);
+            CalculateAreasCommand = new RelayCommand(CalculateAreas, CanCalculateAreas);
 
             // Установка конфигурации
             SetRoomsConfig();
         }
 
         public ICommand CalculateCommand { get; }
+        public ICommand CalculateAreasCommand { get; }
 
         public bool IsCheckedSelected {
             get => _isCheckedSelected;
@@ -141,6 +143,57 @@ namespace RevitRooms.ViewModels {
             settings.Levels = Levels.Where(item => item.IsSelected).Select(item => item.ElementId.IntegerValue).ToList();
 
             RoomsConfig.SaveConfig(roomsConfig);
+        }
+
+        private void CalculateAreas(object p) {
+            // Удаляем все не размещенные помещения
+            _revitRepository.RemoveUnplacedSpatialElements();
+
+            // Обрабатываем все зоны
+            var errorElements = new Dictionary<string, InfoElementViewModel>();
+            var redundantAreas = GetAreas().Where(item => item.IsRedundant == true || item.NotEnclosed == true);
+            AddElements(InfoElement.RedundantAreas, redundantAreas, errorElements);
+
+            InfoElements = errorElements.Values.ToList();
+            if(InfoElements.Count > 0) {
+                ShowInfoElementsWindow("Ошибки", InfoElements);
+                return;
+            }
+            
+            var bigChangesRooms = new Dictionary<string, InfoElementViewModel>();
+            using(var transaction = _revitRepository.StartTransaction("Расчет площадей")) {
+                // Надеюсь будет достаточно быстро отрабатывать :)
+                // Обновление параметра округления у зон
+                foreach(var spartialElement in GetAreas()) {
+                    // Обновление параметра
+                    // площади с коэффициентом
+
+                    spartialElement.UpdateLevelSharedParam();
+
+                    var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                    areaWithRatio.CalculateParam(spartialElement);
+                    areaWithRatio.SetParamValue(spartialElement);
+
+                    var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                    area.CalculateParam(spartialElement);
+                    if(area.SetParamValue(spartialElement) && IsCheckRoomsChanges) {
+                        var differences = areaWithRatio.GetDifferences();
+                        var percentChange = areaWithRatio.GetPercentChange();
+                        AddElement(InfoElement.BigChangesAreas, FormatMessage(differences, percentChange), spartialElement, bigChangesRooms);
+                    }
+                }
+
+                transaction.Commit();
+            }
+            
+            InfoElements.AddRange(bigChangesRooms.Values);
+            if(!ShowInfoElementsWindow("Информация", InfoElements)) {
+                TaskDialog.Show("Предупреждение!", "Расчет завершен!");
+            }
+        }
+        
+        private bool CanCalculateAreas(object p) {
+            return true;
         }
 
         private void Calculate(object p) {
@@ -238,10 +291,6 @@ namespace RevitRooms.ViewModels {
                 }
             }
 
-            // Обрабатываем все зоны
-            var redundantAreas = GetAreas().Where(item => item.IsRedundant == true || item.NotEnclosed == true);
-            AddElements(InfoElement.RedundantAreas, redundantAreas, errorElements);
-
             // Ошибки, которые не останавливают выполнение скрипта
             var warningElements = new Dictionary<string, InfoElementViewModel>();
             foreach(var level in levels) {
@@ -265,31 +314,10 @@ namespace RevitRooms.ViewModels {
 
         private void CalculateAreas(List<PhaseViewModel> phases, IEnumerable<LevelViewModel> levels) {
             using(var transaction = _revitRepository.StartTransaction("Расчет площадей")) {
-                // Надеюсь будет достаточно быстро отрабатывать :)
-                // Подсчет площадей помещений
-
                 var bigChangesRooms = new Dictionary<string, InfoElementViewModel>();
 
-                // Обновление параметра округления у зон
-                foreach(var spartialElement in GetAreas()) {
-                    // Обновление параметра
-                    // площади с коэффициентом
-
-                    spartialElement.UpdateLevelSharedParam();
-
-                    var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
-                    areaWithRatio.CalculateParam(spartialElement);
-                    areaWithRatio.SetParamValue(spartialElement);
-
-                    var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
-                    area.CalculateParam(spartialElement);
-                    if(area.SetParamValue(spartialElement) && IsCheckRoomsChanges) {
-                        var differences = areaWithRatio.GetDifferences();
-                        var percentChange = areaWithRatio.GetPercentChange();
-                        AddElement(InfoElement.BigChangesAreas, FormatMessage(differences, percentChange), spartialElement, bigChangesRooms);
-                    }
-                }
-
+                // Надеюсь будет достаточно быстро отрабатывать :)
+                // Подсчет площадей помещений
                 foreach(var level in levels) {
                     foreach(var spartialElement in level.GetSpatialElementViewModels(phases)) {
                         // Заполняем дублирующие

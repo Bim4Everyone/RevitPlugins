@@ -4,7 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Квартирография" Height="550" Width="500" WindowStartupLocation="CenterOwner">
+        Title="Квартирография" Height="650" Width="650" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
@@ -94,7 +94,8 @@
 
         <StackPanel Grid.Row="9" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock Margin="10" Text="{Binding RevitViewModel.ErrorText}" Foreground="Orange" />
-            <Button Content="Рассчитать" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding RevitViewModel.CalculateCommand}"/>
+            <Button Content="Рассчитать зоны" Height="25" Width="110" Margin="10" Click="ButtonOK_Click" Command="{Binding RevitViewModel.CalculateAreasCommand}"/>
+            <Button Content="Рассчитать помещения" Height="25" Width="150" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding RevitViewModel.CalculateCommand}"/>
             <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
         </StackPanel>
     </Grid>

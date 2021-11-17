@@ -97,7 +97,7 @@ namespace RevitRooms.Models {
         public void RemoveUnplacedSpatialElements() {
             var unplacedRooms = GetSpatialElements().Union(GetAllAreas()).Where(item => item.Location == null);
             using(var transaction = new Transaction(_document)) {
-                transaction.Start("Удаление не размещенных помещений");
+                transaction.Start("Удаление не размещенных помещений и зон");
 
                 _document.Delete(unplacedRooms.Select(item => item.Id).ToArray());
 
