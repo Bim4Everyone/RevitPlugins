@@ -19,6 +19,21 @@ namespace RevitRooms.ViewModels {
         public string Description { get; set; }
 
         public TypeInfo TypeInfo { get; set; }
+        public string TypeInfoText {
+            get {
+                switch(TypeInfo) {
+                    case TypeInfo.Error:
+                    return "Ошибка";
+                    case TypeInfo.Info:
+                    return "Информация";
+                    case TypeInfo.Warning:
+                    return "Предупреждение";
+                }
+
+                return "Неизвестно";
+            }
+        }
+
         public ObservableCollection<MessageElementViewModel> Elements { get; set; }
     }
 

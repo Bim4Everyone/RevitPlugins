@@ -21,7 +21,7 @@
         <ListView Grid.Column="0" Grid.RowSpan="2" ItemsSource="{Binding Path=InfoElements}" SelectedItem="{Binding InfoElement}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn DisplayMemberBinding="{Binding TypeInfo}" Header="Тип" Width="80" />
+                    <GridViewColumn DisplayMemberBinding="{Binding TypeInfoText}" Header="Тип" Width="80" />
                     <GridViewColumn DisplayMemberBinding="{Binding Message}" Header="Описание" Width="500" />
                 </GridView>
             </ListView.View>
