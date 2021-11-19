@@ -53,20 +53,24 @@
 
         <DockPanel Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Margin="10">
             <TextBlock Margin="0,0,10,0" Text="Префикс:"/>
-            <ComboBox IsEditable="True"/>
+            <TextBlock Text="{Binding RoomsNums.Prefix}"/>
         </DockPanel>
 
         <DockPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Margin="10">
             <TextBlock Margin="0,0,10,0"  Text="Суффикс:"/>
-            <ComboBox IsEditable="True"/>
+            <TextBlock Text="{Binding RoomsNums.Suffix}"/>
         </DockPanel>
 
-        <RadioButton Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Margin="10" GroupName="nums" Content="Нумерация групп помещений (квартир, МОП)"/>
-        <RadioButton x:Name="_roomsNums" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" Margin="10" GroupName="nums" Content="Нумерация помещений"/>
+        <RadioButton Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Margin="10" GroupName="nums" Content="Нумерация групп помещений (квартир, МОП)"
+                     IsChecked="{Binding RoomsNums.IsNumFlats}"/>
+        <RadioButton x:Name="_roomsNums" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" Margin="10" GroupName="nums" Content="Нумерация помещений"
+                     IsChecked="{Binding RoomsNums.IsNumRooms}"/>
         <RadioButton Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums" Content="Нумерация помещений в пределах каждой группы"
-                     Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"/>
+                     Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
+                     IsChecked="{Binding RoomsNums.IsNumRoomsGroup}"/>
         <RadioButton Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums" Content="Сквозная нумерация помещений в пределах секции"
-                     Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"/>
+                     Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
+                     IsChecked="{Binding RoomsNums.IsNumRoomsSection}"/>
 
         <DockPanel Grid.Row="6" Grid.Column="0" Margin="10" LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Секции для нумерации"/>

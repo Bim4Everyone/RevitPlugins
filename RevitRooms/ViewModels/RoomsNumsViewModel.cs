@@ -2,17 +2,23 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 
+using dosymep.WPF.ViewModels;
+
 using RevitRooms.Models;
 
 namespace RevitRooms.ViewModels {
-    internal abstract class RoomsNumsViewModel {
+    internal abstract class RoomsNumsViewModel : BaseViewModel {
         protected Guid _id;
+        private string _prefix;
+        private string _suffix;
+        private bool _isNumFlats;
+        private bool _isNumRooms;
+        private bool _isNumRoomsGroup;
+        private bool _isNumRoomsSection;
         protected readonly RevitRepository _revitRepository;
 
         public RoomsNumsViewModel(Application application, Document document) {
@@ -29,6 +35,36 @@ namespace RevitRooms.ViewModels {
 
         public string Name { get; set; }
         protected abstract IEnumerable<SpatialElementViewModel> GetSpartialElements();
+
+        public string Prefix {
+            get => _prefix;
+            set => this.RaiseAndSetIfChanged(ref _prefix, value);
+        }
+
+        public string Suffix {
+            get => _suffix;
+            set => this.RaiseAndSetIfChanged(ref _suffix, value);
+        }
+
+        public bool IsNumFlats {
+            get => _isNumFlats;
+            set => this.RaiseAndSetIfChanged(ref _isNumFlats, value);
+        }
+
+        public bool IsNumRooms {
+            get => _isNumRooms;
+            set => this.RaiseAndSetIfChanged(ref _isNumRooms, value);
+        }
+
+        public bool IsNumRoomsGroup {
+            get => _isNumRoomsGroup;
+            set => this.RaiseAndSetIfChanged(ref _isNumRoomsGroup, value);
+        }
+
+        public bool IsNumRoomsSection {
+            get => _isNumRoomsSection;
+            set => this.RaiseAndSetIfChanged(ref _isNumRoomsSection, value);
+        }
 
         public PhaseViewModel Phase { get; set; }
         public ObservableCollection<PhaseViewModel> Phases { get; }
