@@ -53,12 +53,12 @@
 
         <DockPanel Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Margin="10">
             <TextBlock Margin="0,0,10,0" Text="Префикс:"/>
-            <TextBlock Text="{Binding RoomsNums.Prefix}"/>
+            <TextBox Text="{Binding RoomsNums.Prefix}"/>
         </DockPanel>
 
         <DockPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Margin="10">
             <TextBlock Margin="0,0,10,0"  Text="Суффикс:"/>
-            <TextBlock Text="{Binding RoomsNums.Suffix}"/>
+            <TextBox Text="{Binding RoomsNums.Suffix}"/>
         </DockPanel>
 
         <RadioButton Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Margin="10" GroupName="nums" Content="Нумерация групп помещений (квартир, МОП)"
@@ -75,8 +75,7 @@
         <DockPanel Grid.Row="6" Grid.Column="0" Margin="10" LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Секции для нумерации"/>
 
-            <ListView Grid.Row="7" Margin="10"
-                  ItemsSource="{Binding RoomsNums.Sections}">
+            <ListView ItemsSource="{Binding RoomsNums.Sections}">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Width="35">
@@ -94,8 +93,7 @@
 
         <DockPanel Grid.Row="6" Grid.Column="1" Margin="10" LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Группы для нумерации"/>
-            <ListView Grid.Row="7" Margin="10"
-                  ItemsSource="{Binding RoomsNums.Groups}">
+            <ListView ItemsSource="{Binding RoomsNums.Groups}">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Width="35">
@@ -113,8 +111,7 @@
 
         <DockPanel Grid.Row="6" Grid.Column="2" Margin="10" LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Уровни для нумерации"/>
-            <ListView Grid.Row="7" Margin="10"
-                  ItemsSource="{Binding RoomsNums.Levels}">
+            <ListView ItemsSource="{Binding RoomsNums.Levels}">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Width="35">
