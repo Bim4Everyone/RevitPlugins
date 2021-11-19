@@ -30,6 +30,7 @@ namespace RevitRooms.Models {
 #if D2020 || R2020 || D2021 || R2021
             _projectParameters.SetupRevitParams(_uiApplication.ActiveUIDocument.Document,
                 ProjectParamsConfig.Instance.IsRoomNumberFix,
+                ProjectParamsConfig.Instance.NumberingOrder,
                 SharedParamsConfig.Instance.RoomArea,
                 SharedParamsConfig.Instance.RoomsCount,
                 SharedParamsConfig.Instance.RoomAreaWithRatio,
@@ -59,6 +60,7 @@ namespace RevitRooms.Models {
 #else
             _projectParameters.SetupRevitParams(_uiApplication.ActiveUIDocument.Document,
                 ProjectParamsConfig.Instance.IsRoomNumberFix,
+                ProjectParamsConfig.Instance.NumberingOrder,
                 SharedParamsConfig.Instance.RoomArea,
                 SharedParamsConfig.Instance.RoomsCount,
                 SharedParamsConfig.Instance.RoomAreaWithRatio,

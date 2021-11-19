@@ -11,6 +11,7 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 
+using RevitRooms.Models;
 using RevitRooms.ViewModels;
 using RevitRooms.Views;
 
@@ -20,6 +21,16 @@ namespace RevitRooms {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
             AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
             try {
+                var isChecked = new CheckProjectParams(commandData.Application)
+                    .CopyProjectParams()
+                    .CopyKeySchedules()
+                    .CheckKeySchedules()
+                    .GetIsChecked();
+
+                if(!isChecked) {
+                    return Result.Succeeded;
+                }
+
                 var window = new RoomsNumsWindows() { DataContext = new RoomNumsViewModel(commandData.Application.Application, commandData.Application.ActiveUIDocument.Document) };
                 new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
 

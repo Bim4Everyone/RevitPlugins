@@ -135,7 +135,13 @@
                 <Button Content="+" Width="25" Margin="5" />
                 <Button Content="-" Width="25" Margin="5" />
             </StackPanel>
-            <ListView />
+            <ListView ItemsSource="{Binding RoomsNums.SelectedNumberingOrders}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Наименование" Width="100"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
         </DockPanel>
 
         <StackPanel Grid.Row="7" Grid.ColumnSpan="4" Orientation="Horizontal" HorizontalAlignment="Right">

@@ -29,6 +29,8 @@ namespace RevitRooms.ViewModels {
             Levels = new ObservableCollection<IElementViewModel<Level>>(GetLevels());
             Groups = new ObservableCollection<IElementViewModel<Element>>(GetGroups());
             Sections = new ObservableCollection<IElementViewModel<Element>>(GetSections());
+            NumberingOrders = new ObservableCollection<NumberingOrderViewModel>(GetNumberingOrders());
+            SelectedNumberingOrders = new ObservableCollection<NumberingOrderViewModel>(NumberingOrders.Where(item => item.Order > 0));
 
             Phase = Phases.FirstOrDefault();
         }
@@ -73,6 +75,8 @@ namespace RevitRooms.ViewModels {
         public ObservableCollection<IElementViewModel<Level>> Levels { get; }
         public ObservableCollection<IElementViewModel<Element>> Groups { get; }
         public ObservableCollection<IElementViewModel<Element>> Sections { get; }
+        public ObservableCollection<NumberingOrderViewModel> NumberingOrders { get; }
+        public ObservableCollection<NumberingOrderViewModel> SelectedNumberingOrders { get; }
 
         private IEnumerable<PhaseViewModel> GetPhases() {
             return SpatialElements.Select(item => item.Phase)
@@ -106,6 +110,12 @@ namespace RevitRooms.ViewModels {
                 .Select(item => new ElementViewModel<Element>(item, _revitRepository))
                 .Distinct()
                 .OrderBy(item => item.Name);
+        }
+
+        private IEnumerable<NumberingOrderViewModel> GetNumberingOrders() {
+            return _revitRepository.GetNumberingOrders()
+                .Select(item => new NumberingOrderViewModel(item, _revitRepository))
+                .OrderBy(item => item.Order);
         }
     }
 }
