@@ -16,9 +16,17 @@ namespace RevitRooms.Views {
     /// <summary>
     /// Interaction logic for RoomsNums.xaml
     /// </summary>
-    public partial class RoomsNums : Window {
-        public RoomsNums() {
+    public partial class RoomsNumsWindows : Window {
+        public RoomsNumsWindows() {
             InitializeComponent();
+        }
+
+        private void ButtonOK_Click(object sender, RoutedEventArgs e) {
+            DialogResult = true;
+        }
+
+        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
+            DialogResult = false;
         }
     }
 }

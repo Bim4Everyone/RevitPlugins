@@ -74,10 +74,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="dosymep\" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <Resource Include="Resources\icons8-show-property-96.png" />
 	</ItemGroup>
 

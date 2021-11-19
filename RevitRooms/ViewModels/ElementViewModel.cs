@@ -13,8 +13,9 @@ using dosymep.WPF.ViewModels;
 using RevitRooms.Models;
 
 namespace RevitRooms.ViewModels {
-    internal abstract class ElementViewModel<TElement> : BaseViewModel, IElementViewModel<TElement>, IComparable<ElementViewModel<TElement>>, IEquatable<ElementViewModel<TElement>>
+    internal class ElementViewModel<TElement> : BaseViewModel, IElementViewModel<TElement>, IComparable<ElementViewModel<TElement>>, IEquatable<ElementViewModel<TElement>>
         where TElement : Element {
+        private bool _isSelected;
 
         public ElementViewModel(TElement element, RevitRepository revitRepository) {
             Element = element ?? throw new ArgumentNullException(nameof(element));
@@ -37,6 +38,13 @@ namespace RevitRooms.ViewModels {
 
         public ICommand ShowElementCommand { get; }
         public ICommand SelectElementCommand { get; }
+
+
+        public bool IsSelected {
+            get => _isSelected;
+            set => this.RaiseAndSetIfChanged(ref _isSelected, value);
+        }
+
 
         #region Commands
 

@@ -11,6 +11,8 @@ using RevitRooms.Models;
 
 namespace RevitRooms.ViewModels {
     internal interface IElementViewModel<out TElement> {
+        bool IsSelected { get; set; }
+
         TElement Element { get; }
         RevitRepository RevitRepository { get; }
 
