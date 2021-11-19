@@ -77,7 +77,8 @@ namespace RevitRooms.ViewModels {
         private IEnumerable<PhaseViewModel> GetPhases() {
             return SpatialElements.Select(item => item.Phase)
                 .Distinct()
-                .Except(_revitRepository.GetAdditionalPhases().Select(item => new PhaseViewModel(item, _revitRepository)));
+                .Except(_revitRepository.GetAdditionalPhases().Select(item => new PhaseViewModel(item, _revitRepository)))
+                .OrderBy(item => item.Name);
         }
 
         private IEnumerable<IElementViewModel<Level>> GetLevels() {
@@ -85,7 +86,8 @@ namespace RevitRooms.ViewModels {
                 .Select(item => _revitRepository.GetElement(item.LevelId))
                 .Where(item => item != null)
                 .Select(item => new ElementViewModel<Level>((Level) item, _revitRepository))
-                .Distinct();
+                .Distinct()
+                .OrderBy(item => item.Element.Elevation);
         }
 
         private IEnumerable<IElementViewModel<Element>> GetGroups() {
@@ -93,7 +95,8 @@ namespace RevitRooms.ViewModels {
                 .Select(item => item.RoomGroup)
                 .Where(item => item != null)
                 .Select(item => new ElementViewModel<Element>(item, _revitRepository))
-                .Distinct();
+                .Distinct()
+                .OrderBy(item => item.Name);
         }
 
         private IEnumerable<IElementViewModel<Element>> GetSections() {
@@ -101,7 +104,8 @@ namespace RevitRooms.ViewModels {
                 .Select(item => item.RoomSection)
                 .Where(item => item != null)
                 .Select(item => new ElementViewModel<Element>(item, _revitRepository))
-                .Distinct();
+                .Distinct()
+                .OrderBy(item => item.Name);
         }
     }
 }
