@@ -52,16 +52,6 @@ namespace RevitRooms.ViewModels {
             AddOrderCommand = new AddOrderCommand(this);
             RemoveOrderCommand = new RemoveOrderCommand(this);
             SaveOrderCommand = new SaveOrderCommand(this, _revitRepository);
-
-
-            SelectSectionsCommand = new RelayCommand(p => { SelectElements(p, true); });
-            UnselectSectionsCommand = new RelayCommand(p => { SelectElements(p, false); });
-
-            SelectGroupsCommand = new RelayCommand(p => { SelectElements(p, true); });
-            UnselectGroupsCommand = new RelayCommand(p => { SelectElements(p, false); });
-
-            SelectLevelsCommand = new RelayCommand(p => { SelectElements(p, true); });
-            UnselectLevelsCommand = new RelayCommand(p => { SelectElements(p, false); });
         }
 
         public string Name { get; set; }
@@ -109,15 +99,6 @@ namespace RevitRooms.ViewModels {
         public ICommand AddOrderCommand { get; }
         public ICommand RemoveOrderCommand { get; }
         public ICommand SaveOrderCommand { get; }
-
-        public ICommand SelectSectionsCommand { get; }
-        public ICommand UnselectSectionsCommand { get; }
-
-        public ICommand SelectGroupsCommand { get; }
-        public ICommand UnselectGroupsCommand { get; }
-
-        public ICommand SelectLevelsCommand { get; }
-        public ICommand UnselectLevelsCommand { get; }
 
         public PhaseViewModel Phase { get; set; }
         public ObservableCollection<PhaseViewModel> Phases { get; }
@@ -355,21 +336,6 @@ namespace RevitRooms.ViewModels {
             }
 
             return false;
-        }
-
-        private IEnumerable<IElementViewModel<Element>> GetElements(object param) {
-            if(param == null) {
-                return Enumerable.Empty<IElementViewModel<Element>>();
-            }
-
-            return (param as ObservableCollection<object>).Cast<IElementViewModel<Element>>();
-        }
-
-        private void SelectElements(object param, bool isSelect) {
-            var elements = GetElements(param);
-            foreach(var element in elements) {
-                element.IsSelected = isSelect;
-            }
         }
     }
 }

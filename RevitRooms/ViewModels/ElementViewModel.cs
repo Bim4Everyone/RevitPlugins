@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,9 @@ namespace RevitRooms.ViewModels {
 
             ShowElementCommand = new RelayCommand(ShowElement, CanShowElement);
             SelectElementCommand = new RelayCommand(SelectElement, CanSelectElement);
+
+            SelectElementsCommand = new RelayCommand(p => SelectElements(p, true));
+            UnselectElementsCommand = new RelayCommand(p => SelectElements(p, false));
         }
 
         public TElement Element { get; }
@@ -38,13 +42,14 @@ namespace RevitRooms.ViewModels {
 
         public ICommand ShowElementCommand { get; }
         public ICommand SelectElementCommand { get; }
-
+        
+        public ICommand SelectElementsCommand { get; }
+        public ICommand UnselectElementsCommand { get; }
 
         public bool IsSelected {
             get => _isSelected;
             set => this.RaiseAndSetIfChanged(ref _isSelected, value);
         }
-
 
         #region Commands
 
@@ -62,6 +67,21 @@ namespace RevitRooms.ViewModels {
 
         private bool CanSelectElement(object p) {
             return true;
+        }
+
+        private IEnumerable<IElementViewModel<Element>> GetElements(object param) {
+            if(param == null) {
+                return Enumerable.Empty<IElementViewModel<Element>>();
+            }
+
+            return (param as ObservableCollection<object>).Cast<IElementViewModel<Element>>();
+        }
+
+        private void SelectElements(object param, bool isSelect) {
+            var elements = GetElements(param);
+            foreach(var element in elements) {
+                element.IsSelected = isSelect;
+            }
         }
 
         #endregion

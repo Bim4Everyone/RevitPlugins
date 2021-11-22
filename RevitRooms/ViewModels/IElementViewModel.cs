@@ -25,5 +25,8 @@ namespace RevitRooms.ViewModels {
 
         ICommand ShowElementCommand { get; }
         ICommand SelectElementCommand { get; }
+
+        ICommand SelectElementsCommand { get; }
+        ICommand UnselectElementsCommand { get; }
     }
 }

@@ -87,12 +87,12 @@
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="Checked">
                                                 <i:InvokeCommandAction 
-                                                    Command="{Binding DataContext.RoomsNums.SelectSectionsCommand, ElementName=_this}" 
+                                                    Command="{Binding SelectElementsCommand}" 
                                                     CommandParameter="{Binding SelectedItems, ElementName=_sections}"/>
                                             </i:EventTrigger>
                                             <i:EventTrigger EventName="Unchecked">
                                                 <i:InvokeCommandAction
-                                                    Command="{Binding DataContext.RoomsNums.UnselectSectionsCommand, ElementName=_this}"
+                                                    Command="{Binding UnselectElementsCommand}"
                                                     CommandParameter="{Binding SelectedItems, ElementName=_sections}"/>
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
@@ -118,12 +118,12 @@
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="Checked">
                                                 <i:InvokeCommandAction 
-                                                    Command="{Binding DataContext.RoomsNums.SelectGroupsCommand, ElementName=_this}" 
+                                                    Command="{Binding SelectElementsCommand}" 
                                                     CommandParameter="{Binding SelectedItems, ElementName=_groups}"/>
                                             </i:EventTrigger>
                                             <i:EventTrigger EventName="Unchecked">
                                                 <i:InvokeCommandAction
-                                                    Command="{Binding DataContext.RoomsNums.UnselectGroupsCommand, ElementName=_this}"
+                                                    Command="{Binding UnselectElementsCommand}"
                                                     CommandParameter="{Binding SelectedItems, ElementName=_groups}"/>
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
@@ -149,12 +149,12 @@
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="Checked">
                                                 <i:InvokeCommandAction 
-                                                    Command="{Binding DataContext.RoomsNums.SelectLevelsCommand, ElementName=_this}" 
+                                                    Command="{Binding SelectElementsCommand}" 
                                                     CommandParameter="{Binding SelectedItems, ElementName=_levels}"/>
                                             </i:EventTrigger>
                                             <i:EventTrigger EventName="Unchecked">
                                                 <i:InvokeCommandAction
-                                                    Command="{Binding DataContext.RoomsNums.UnselectLevelsCommand, ElementName=_this}"
+                                                    Command="{Binding UnselectElementsCommand}"
                                                     CommandParameter="{Binding SelectedItems, ElementName=_levels}"/>
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
