@@ -28,7 +28,6 @@ namespace RevitRooms.ViewModels {
         protected readonly RevitRepository _revitRepository;
 
         private string _errorText;
-        private bool _isCheckedSelected;
         private bool _isAllowSelectLevels;
 
         public RevitViewModel(Application application, Document document) {
@@ -52,16 +51,6 @@ namespace RevitRooms.ViewModels {
 
         public ICommand CalculateCommand { get; }
         public ICommand CalculateAreasCommand { get; }
-
-        public bool IsCheckedSelected {
-            get => _isCheckedSelected;
-            set {
-                this.RaiseAndSetIfChanged(ref _isCheckedSelected, value);
-                foreach(var level in Levels) {
-                    level.IsSelected = _isCheckedSelected;
-                }
-            }
-        }
 
         public string ErrorText {
             get => _errorText;
