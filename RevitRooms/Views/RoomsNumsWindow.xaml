@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitRooms.Views"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
         Title="Нумерация помещений с приоритетом" Height="650" Width="850"
         x:Name="_this">
@@ -76,13 +77,26 @@
         <DockPanel Grid.Row="6" Grid.Column="0" Margin="10" LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Секции для нумерации"/>
 
-            <ListView ItemsSource="{Binding RoomsNums.Sections}">
+            <ListView x:Name="_sections" ItemsSource="{Binding RoomsNums.Sections}">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Width="35">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsSelected}"/>
+                                    <CheckBox IsChecked="{Binding IsSelected}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Checked">
+                                                <i:InvokeCommandAction 
+                                                    Command="{Binding DataContext.RoomsNums.SelectSectionsCommand, ElementName=_this}" 
+                                                    CommandParameter="{Binding SelectedItems, ElementName=_sections}"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="Unchecked">
+                                                <i:InvokeCommandAction
+                                                    Command="{Binding DataContext.RoomsNums.UnselectSectionsCommand, ElementName=_this}"
+                                                    CommandParameter="{Binding SelectedItems, ElementName=_sections}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </CheckBox>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -94,13 +108,26 @@
 
         <DockPanel Grid.Row="6" Grid.Column="1" Margin="10" LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Группы для нумерации"/>
-            <ListView ItemsSource="{Binding RoomsNums.Groups}">
+            <ListView x:Name="_groups" ItemsSource="{Binding RoomsNums.Groups}">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Width="35">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsSelected}"/>
+                                    <CheckBox IsChecked="{Binding IsSelected}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Checked">
+                                                <i:InvokeCommandAction 
+                                                    Command="{Binding DataContext.RoomsNums.SelectGroupsCommand, ElementName=_this}" 
+                                                    CommandParameter="{Binding SelectedItems, ElementName=_groups}"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="Unchecked">
+                                                <i:InvokeCommandAction
+                                                    Command="{Binding DataContext.RoomsNums.UnselectGroupsCommand, ElementName=_this}"
+                                                    CommandParameter="{Binding SelectedItems, ElementName=_groups}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </CheckBox>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -112,13 +139,26 @@
 
         <DockPanel Grid.Row="6" Grid.Column="2" Margin="10" LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Уровни для нумерации"/>
-            <ListView ItemsSource="{Binding RoomsNums.Levels}">
+            <ListView x:Name="_levels" ItemsSource="{Binding RoomsNums.Levels}">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Width="35">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsSelected}"/>
+                                    <CheckBox IsChecked="{Binding IsSelected}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Checked">
+                                                <i:InvokeCommandAction 
+                                                    Command="{Binding DataContext.RoomsNums.SelectLevelsCommand, ElementName=_this}" 
+                                                    CommandParameter="{Binding SelectedItems, ElementName=_levels}"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="Unchecked">
+                                                <i:InvokeCommandAction
+                                                    Command="{Binding DataContext.RoomsNums.UnselectLevelsCommand, ElementName=_this}"
+                                                    CommandParameter="{Binding SelectedItems, ElementName=_levels}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </CheckBox>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
