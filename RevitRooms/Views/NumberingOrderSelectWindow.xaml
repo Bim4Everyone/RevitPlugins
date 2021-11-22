@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitRooms.Views"
         mc:Ignorable="d"
-        Title="Выбор" Height="450" Width="800" WindowStartupLocation="CenterOwner">
+        Title="Выбор" Height="450" Width="800" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
