@@ -159,22 +159,24 @@ namespace RevitRooms.ViewModels {
 
             var workingObjects = SpatialElements
                 .Where(item => item.Phase == Phase)
-                .Where(item => levels.Contains(item.LevelId))
+                .Where(item => levels.Contains(item.LevelId));
+
+            if(CheckWorkingObjects(workingObjects)) {
+                return;
+            }
+
+            var orderedObjects = workingObjects
                 .Where(item => item.RoomGroup != null && groups.Contains(item.RoomGroup.Id))
                 .Where(item => item.RoomSection != null && sections.Contains(item.RoomSection.Id))
                 .OrderBy(item => item.RoomSection.Name)
                 .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
                 .ThenBy(item => GetDistance(item.Element));
 
-            if(CheckWorkingObjects(workingObjects)) {
-                return;
-            }
-
             if(IsNumFlats) {
                 using(var transaction = _revitRepository.StartTransaction("Нумерация групп помещений")) {
 
                     int flatCount = 1;
-                    foreach(var level in workingObjects.GroupBy(item => item.LevelId)) {
+                    foreach(var level in orderedObjects.GroupBy(item => item.LevelId)) {
                         foreach(var flat in level.GroupBy(item => item.RoomGroup.Id)) {
                             foreach(var room in flat) {
                                 room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentNumber, Prefix + flatCount + Suffix);
@@ -190,12 +192,12 @@ namespace RevitRooms.ViewModels {
                 }
             } else {
                 var selectedOrder = SelectedNumberingOrders.ToDictionary(item => item.ElementId, item => item.Order);
-                workingObjects = workingObjects
+                orderedObjects = orderedObjects
                     .ThenBy(item => GetOrder(selectedOrder, item.Room));
                 if(IsNumRoomsGroup) {
                     using(var transaction = _revitRepository.StartTransaction("Нумерация помещений по группе")) {
 
-                        foreach(var group in workingObjects.GroupBy(item => item.RoomGroup.Id)) {
+                        foreach(var group in orderedObjects.GroupBy(item => item.RoomGroup.Id)) {
                             foreach(var section in group.GroupBy(item => item.RoomSection.Id)) {
                                 int roomCount = 1;
                                 foreach(var room in section) {
@@ -212,7 +214,7 @@ namespace RevitRooms.ViewModels {
                 } else {
                     using(var transaction = _revitRepository.StartTransaction("Нумерация помещений по секции")) {
                         int roomCount = 1;
-                        foreach(var room in workingObjects) {
+                        foreach(var room in orderedObjects) {
                             room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER, Prefix + roomCount + Suffix);
                             roomCount++;
                         }
@@ -225,7 +227,7 @@ namespace RevitRooms.ViewModels {
             TaskDialog.Show("Предупреждение!", "Расчет завершен!");
         }
 
-        private bool CheckWorkingObjects(IOrderedEnumerable<SpatialElementViewModel> workingObjects) {
+        private bool CheckWorkingObjects(IEnumerable<SpatialElementViewModel> workingObjects) {
             var errorElements = new Dictionary<string, InfoElementViewModel>();
 
             // Все помещения которые
