@@ -10,6 +10,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
+using RevitRooms.Models;
 using RevitRooms.ViewModels.Revit.RoomsNums;
 
 namespace RevitRooms.ViewModels {
@@ -24,6 +25,12 @@ namespace RevitRooms.ViewModels {
             };
 
             RoomsNums = RoomsNumsViewModels[1];
+
+            var roomsConfig = RoomsNumsConfig.GetConfig();
+            var settings = roomsConfig.GetRoomsNumsSettingsConfig(document.Title);
+            if(settings != null) {
+                RoomsNums = RoomsNumsViewModels.FirstOrDefault(item => item._id == settings.SelectedRoomId) ?? RoomsNums;
+            }
         }
 
         public RoomsNumsViewModel RoomsNums {

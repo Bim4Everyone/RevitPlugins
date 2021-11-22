@@ -21,7 +21,7 @@ using Autodesk.Revit.UI;
 
 namespace RevitRooms.ViewModels {
     internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
-        protected Guid _id;
+        public Guid _id;
         private string _errorText;
         private string _prefix;
         private string _suffix;
@@ -52,6 +52,8 @@ namespace RevitRooms.ViewModels {
             AddOrderCommand = new AddOrderCommand(this);
             RemoveOrderCommand = new RemoveOrderCommand(this);
             SaveOrderCommand = new SaveOrderCommand(this, _revitRepository);
+
+            SetRoomsNumsConfig();
         }
 
         public string Name { get; set; }
@@ -224,6 +226,7 @@ namespace RevitRooms.ViewModels {
                 }
             }
 
+            SaveRoomsNumsConfig();
             TaskDialog.Show("Предупреждение!", "Расчет завершен!");
         }
 
@@ -336,6 +339,61 @@ namespace RevitRooms.ViewModels {
             }
 
             return false;
+        }
+
+        private void SetRoomsNumsConfig() {
+            var roomsConfig = RoomsNumsConfig.GetConfig();
+            var settings = roomsConfig.GetRoomsNumsSettingsConfig(_revitRepository.DocumentName);
+            if(settings == null) {
+                return;
+            }
+
+            IsNumFlats = settings.IsNumFlats;
+            IsNumRooms = settings.IsNumRooms;
+            IsNumRoomsGroup = settings.IsNumRoomsGroup;
+            IsNumRoomsSection = settings.IsNumRoomsSection;
+
+            if(_revitRepository.GetElement(new ElementId(settings.PhaseElementId)) is Phase phase) {
+                if(!(phase == null || Phase?.ElementId == phase.Id)) {
+                    Phase = Phases.FirstOrDefault(item => item.ElementId == phase.Id) ?? Phases.FirstOrDefault();
+                }
+            }
+
+            foreach(var level in Levels.Where(item => settings.Levels.Contains(item.ElementId.IntegerValue))) {
+                level.IsSelected = true;
+            }
+
+            foreach(var group in Groups.Where(item => settings.Groups.Contains(item.ElementId.IntegerValue))) {
+                group.IsSelected = true;
+            }
+
+            foreach(var section in Sections.Where(item => settings.Sections.Contains(item.ElementId.IntegerValue))) {
+                section.IsSelected = true;
+            }
+        }
+
+        private void SaveRoomsNumsConfig() {
+            var roomsConfig = RoomsNumsConfig.GetConfig();
+            var settings = roomsConfig.GetRoomsNumsSettingsConfig(_revitRepository.DocumentName);
+            if(settings == null) {
+                settings = new RoomsNumsSettings();
+                roomsConfig.AddRoomsNumsSettingsConfig(settings);
+            }
+
+            settings.IsNumFlats = IsNumFlats;
+            settings.IsNumRooms = IsNumRooms;
+            settings.IsNumRoomsGroup = IsNumRoomsGroup;
+            settings.IsNumRoomsSection = IsNumRoomsSection;
+
+            settings.SelectedRoomId = _id;
+            settings.PhaseElementId = Phase.ElementId.IntegerValue;
+            settings.DocumentName = _revitRepository.DocumentName;
+
+            settings.Levels = Levels.Where(item => item.IsSelected).Select(item => item.ElementId.IntegerValue).ToList();
+            settings.Groups = Groups.Where(item => item.IsSelected).Select(item => item.ElementId.IntegerValue).ToList();
+            settings.Sections = Sections.Where(item => item.IsSelected).Select(item => item.ElementId.IntegerValue).ToList();
+
+            RoomsNumsConfig.SaveConfig(roomsConfig);
         }
     }
 }
