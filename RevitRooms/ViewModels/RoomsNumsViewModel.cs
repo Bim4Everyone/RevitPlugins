@@ -15,6 +15,9 @@ using dosymep.WPF.ViewModels;
 
 using RevitRooms.Models;
 using RevitRooms.Commands;
+using RevitRooms.Views;
+using dosymep.Bim4Everyone.ProjectParams;
+using Autodesk.Revit.UI;
 
 namespace RevitRooms.ViewModels {
     internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
@@ -163,6 +166,10 @@ namespace RevitRooms.ViewModels {
                 .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
                 .ThenBy(item => GetDistance(item.Element));
 
+            if(CheckWorkingObjects(workingObjects)) {
+                return;
+            }
+
             if(IsNumFlats) {
                 using(var transaction = _revitRepository.StartTransaction("Нумерация групп помещений")) {
 
@@ -214,6 +221,35 @@ namespace RevitRooms.ViewModels {
                     }
                 }
             }
+
+            TaskDialog.Show("Предупреждение!", "Расчет завершен!");
+        }
+
+        private bool CheckWorkingObjects(IOrderedEnumerable<SpatialElementViewModel> workingObjects) {
+            var errorElements = new Dictionary<string, InfoElementViewModel>();
+
+            // Все помещения которые
+            // избыточные или не окруженные
+            var redundantRooms = workingObjects.Where(item => item.IsRedundant == true || item.NotEnclosed == true);
+            AddElements(InfoElement.RedundantRooms, redundantRooms, errorElements);
+
+            // Все помещения у которых
+            // не заполнены обязательные параметры
+            foreach(var room in workingObjects) {
+                if(room.Room == null) {
+                    AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomName.Name), null, room, errorElements);
+                }
+
+                if(room.RoomGroup == null) {
+                    AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomGroupName.Name), null, room, errorElements);
+                }
+
+                if(room.RoomSection == null) {
+                    AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name), null, room, errorElements);
+                }
+            }
+
+            return ShowInfoElementsWindow("Информация", errorElements.Values);
         }
 
         private bool CanNumerateRooms(object param) {
@@ -266,6 +302,38 @@ namespace RevitRooms.ViewModels {
             }
 
             return 0;
+        }
+
+        private void AddElements(InfoElement infoElement, IEnumerable<IElementViewModel<Element>> elements, Dictionary<string, InfoElementViewModel> infoElements) {
+            foreach(var element in elements) {
+                AddElement(infoElement, null, element, infoElements);
+            }
+        }
+
+        private void AddElement(InfoElement infoElement, string message, IElementViewModel<Element> element, Dictionary<string, InfoElementViewModel> infoElements) {
+            if(!infoElements.TryGetValue(infoElement.Message, out var value)) {
+                value = new InfoElementViewModel() { Message = infoElement.Message, TypeInfo = infoElement.TypeInfo, Description = infoElement.Description, Elements = new ObservableCollection<MessageElementViewModel>() };
+                infoElements.Add(infoElement.Message, value);
+            }
+
+            value.Elements.Add(new MessageElementViewModel() { Element = element, Description = message });
+        }
+
+        private bool ShowInfoElementsWindow(string title, IEnumerable<InfoElementViewModel> infoElements) {
+            if(infoElements.Any()) {
+                var window = new InfoElementsWindow() {
+                    Title = title,
+                    DataContext = new InfoElementsViewModel() {
+                        InfoElement = infoElements.FirstOrDefault(),
+                        InfoElements = new ObservableCollection<InfoElementViewModel>(infoElements)
+                    }
+                };
+
+                window.Show();
+                return true;
+            }
+
+            return false;
         }
     }
 }
