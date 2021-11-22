@@ -21,14 +21,8 @@ namespace RevitRooms.Commands {
                 .ToArray();
 
             foreach(var selected in selection) {
-                selected.Order = 0;
                 _numberingOrder.NumberingOrders.Add(selected);
                 _numberingOrder.SelectedNumberingOrders.Remove(selected);
-            }
-
-            int count = 0;
-            foreach(var order in _numberingOrder.SelectedNumberingOrders) {
-                order.Order = ++count;
             }
         }
     }

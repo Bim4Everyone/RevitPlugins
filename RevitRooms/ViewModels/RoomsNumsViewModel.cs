@@ -48,6 +48,7 @@ namespace RevitRooms.ViewModels {
             DownOrderCommand = new DownOrderCommand(this);
             AddOrderCommand = new AddOrderCommand(this);
             RemoveOrderCommand = new RemoveOrderCommand(this);
+            SaveOrderCommand = new SaveOrderCommand(this, _revitRepository);
         }
 
         public string Name { get; set; }
@@ -94,6 +95,7 @@ namespace RevitRooms.ViewModels {
         public ICommand DownOrderCommand { get; }
         public ICommand AddOrderCommand { get; }
         public ICommand RemoveOrderCommand { get; }
+        public ICommand SaveOrderCommand { get; }
 
         public PhaseViewModel Phase { get; set; }
         public ObservableCollection<PhaseViewModel> Phases { get; }

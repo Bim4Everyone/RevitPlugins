@@ -29,8 +29,7 @@ namespace RevitRooms.Commands {
 
             foreach(var selected in selection) {
                 if(selected.Index < _numberingOrder.SelectedNumberingOrders.Count - 1) {
-                    selected.Item.Order = selected.Index + 1;
-                    _numberingOrder.SelectedNumberingOrders.Move(selected.Index, selected.Item.Order);
+                    _numberingOrder.SelectedNumberingOrders.Move(selected.Index, selected.Index + 1);
                 }
             }
         }

@@ -33,11 +33,6 @@ namespace RevitRooms.Commands {
                 _numberingOrder.NumberingOrders.Remove(selected);
                 _numberingOrder.SelectedNumberingOrders.Add(selected);
             }
-
-            int count = 0;
-            foreach(var order in _numberingOrder.SelectedNumberingOrders) {
-                order.Order = ++count;
-            }
         }
     }
 }
