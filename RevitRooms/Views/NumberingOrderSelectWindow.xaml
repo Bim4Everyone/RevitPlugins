@@ -1,0 +1,30 @@
+﻿<Window x:Class="RevitRooms.Views.NumberingOrderSelectWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RevitRooms.Views"
+        mc:Ignorable="d"
+        Title="Выбор" Height="450" Width="800" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ListView x:Name="listbox" ItemsSource="{Binding NumberingOrders}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Наименование" Width="200"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
+            <Button Content="Выбрать" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click"
+                    Command="{Binding SelectCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}"/>
+            <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitRooms.Views"
         mc:Ignorable="d"
-        Title="Нумерация помещений с приоритетом" Height="650" Width="850">
+        Title="Нумерация помещений с приоритетом" Height="650" Width="850"
+        x:Name="_this">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
@@ -132,7 +133,7 @@
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
                 <Button Content="↑" Width="25" Margin="5" Command="{Binding RoomsNums.UpOrderCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}" />
                 <Button Content="↓" Width="25" Margin="5" Command="{Binding RoomsNums.DownOrderCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}" />
-                <Button Content="+" Width="25" Margin="5" Command="{Binding RoomsNums.AddOrderCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}" />
+                <Button Content="+" Width="25" Margin="5" Command="{Binding RoomsNums.AddOrderCommand}" CommandParameter="{Binding _this, ElementName=_this}" />
                 <Button Content="-" Width="25" Margin="5" Command="{Binding RoomsNums.RemoveOrderCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}" />
             </StackPanel>
             <ListView x:Name="listbox" ItemsSource="{Binding RoomsNums.SelectedNumberingOrders}">

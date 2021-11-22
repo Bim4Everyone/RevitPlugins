@@ -38,8 +38,8 @@ namespace RevitRooms.ViewModels {
             Levels = new ObservableCollection<IElementViewModel<Level>>(GetLevels());
             Groups = new ObservableCollection<IElementViewModel<Element>>(GetGroups());
             Sections = new ObservableCollection<IElementViewModel<Element>>(GetSections());
-            NumberingOrders = new ObservableCollection<NumberingOrderViewModel>(GetNumberingOrders());
-            SelectedNumberingOrders = new ObservableCollection<NumberingOrderViewModel>(NumberingOrders.Where(item => item.Order > 0));
+            NumberingOrders = new ObservableCollection<NumberingOrderViewModel>(GetNumberingOrders().Where(item => item.Order == 0));
+            SelectedNumberingOrders = new ObservableCollection<NumberingOrderViewModel>(GetNumberingOrders().Where(item => item.Order > 0));
 
             Phase = Phases.FirstOrDefault();
             NumerateRoomsCommand = new RelayCommand(NumerateRooms, CanNumerateRooms);
