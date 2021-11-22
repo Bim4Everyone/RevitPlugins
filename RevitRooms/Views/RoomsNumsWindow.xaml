@@ -146,7 +146,8 @@
 
         <StackPanel Grid.Row="7" Grid.ColumnSpan="4" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock Margin="10" Text="{Binding RoomsNums.ErrorText}" Foreground="Orange" />
-            <Button Content="Запуск" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click"/>
+            <Button Content="Запуск" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click"
+                    Command="{Binding RoomsNums.NumerateRoomsCommand}"/>
             <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
         </StackPanel>
     </Grid>
