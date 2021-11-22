@@ -14,9 +14,10 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitRooms.Models;
+using RevitRooms.Commands;
 
 namespace RevitRooms.ViewModels {
-    internal abstract class RoomsNumsViewModel : BaseViewModel {
+    internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
         protected Guid _id;
         private string _errorText;
         private string _prefix;
@@ -42,6 +43,11 @@ namespace RevitRooms.ViewModels {
 
             Phase = Phases.FirstOrDefault();
             NumerateRoomsCommand = new RelayCommand(NumerateRooms, CanNumerateRooms);
+
+            UpOrderCommand = new UpOrderCommand(this);
+            DownOrderCommand = new DownOrderCommand(this);
+            AddOrderCommand = new AddOrderCommand(this);
+            RemoveOrderCommand = new RemoveOrderCommand(this);
         }
 
         public string Name { get; set; }
@@ -83,6 +89,11 @@ namespace RevitRooms.ViewModels {
         }
 
         public ICommand NumerateRoomsCommand { get; }
+
+        public ICommand UpOrderCommand { get; }
+        public ICommand DownOrderCommand { get; }
+        public ICommand AddOrderCommand { get; }
+        public ICommand RemoveOrderCommand { get; }
 
         public PhaseViewModel Phase { get; set; }
         public ObservableCollection<PhaseViewModel> Phases { get; }
@@ -174,7 +185,7 @@ namespace RevitRooms.ViewModels {
                     .ThenBy(item => GetOrder(selectedOrder, item.Room));
                 if(IsNumRoomsGroup) {
                     using(var transaction = _revitRepository.StartTransaction("Нумерация помещений по группе")) {
-                       
+
                         foreach(var group in workingObjects.GroupBy(item => item.RoomGroup.Id)) {
                             foreach(var section in group.GroupBy(item => item.RoomSection.Id)) {
                                 int roomCount = 1;
@@ -184,7 +195,7 @@ namespace RevitRooms.ViewModels {
                                 }
                             }
 
-                            
+
                         }
 
                         transaction.Commit();

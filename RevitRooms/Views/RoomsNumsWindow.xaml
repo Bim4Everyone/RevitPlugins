@@ -130,12 +130,12 @@
         <DockPanel Grid.Row="6" Grid.Column="3" Margin="10" LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Приоритеты помещений"/>
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
-                <Button Content="↑" Width="25" Margin="5" />
-                <Button Content="↓" Width="25" Margin="5" />
-                <Button Content="+" Width="25" Margin="5" />
-                <Button Content="-" Width="25" Margin="5" />
+                <Button Content="↑" Width="25" Margin="5" Command="{Binding RoomsNums.UpOrderCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}" />
+                <Button Content="↓" Width="25" Margin="5" Command="{Binding RoomsNums.DownOrderCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}" />
+                <Button Content="+" Width="25" Margin="5" Command="{Binding RoomsNums.AddOrderCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}" />
+                <Button Content="-" Width="25" Margin="5" Command="{Binding RoomsNums.RemoveOrderCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}" />
             </StackPanel>
-            <ListView ItemsSource="{Binding RoomsNums.SelectedNumberingOrders}">
+            <ListView x:Name="listbox" ItemsSource="{Binding RoomsNums.SelectedNumberingOrders}">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Наименование" Width="100"/>
