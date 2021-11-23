@@ -198,14 +198,16 @@ namespace RevitRooms.ViewModels {
                             .ThenBy(item => GetDistance(item.Element));
 
                     int flatCount = startNumber;
-                    foreach(var level in orderedObjects.GroupBy(item => item.LevelId)) {
-                        foreach(var flat in level.GroupBy(item => item.RoomGroup.Id)) {
-                            foreach(var room in flat) {
-                                room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentNumber, Prefix + flatCount + Suffix);
-                            }
+                    foreach(var section in orderedObjects.GroupBy(item => item.RoomSection.Id)) {
+                        foreach(var level in section.GroupBy(item => item.LevelId)) {
+                            foreach(var group in level.GroupBy(item => item.RoomGroup.Id)) {
+                                foreach(var room in group) {
+                                    room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentNumber, Prefix + flatCount + Suffix);
+                                }
 
-                            flatCount++;
-                        }
+                                flatCount++;
+                            }
+                        }                        
                     }
 
                     transaction.Commit();
