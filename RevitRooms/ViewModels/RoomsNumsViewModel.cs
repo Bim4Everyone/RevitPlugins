@@ -171,11 +171,7 @@ namespace RevitRooms.ViewModels {
 
             var orderedObjects = workingObjects
                 .Where(item => item.RoomGroup != null && groups.Contains(item.RoomGroup.Id))
-                .Where(item => item.RoomSection != null && sections.Contains(item.RoomSection.Id))
-                .OrderBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
-                .ThenBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
-                .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
-                .ThenBy(item => GetDistance(item.Element));
+                .Where(item => item.RoomSection != null && sections.Contains(item.RoomSection.Id));
             
             var notFoundNames = GetNotFoundNames(orderedObjects);
             if(notFoundNames.Length > 0) {
@@ -185,6 +181,12 @@ namespace RevitRooms.ViewModels {
 
             if(IsNumFlats) {
                 using(var transaction = _revitRepository.StartTransaction("Нумерация групп помещений")) {
+
+                    orderedObjects = orderedObjects
+                        .OrderBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
+                            .ThenBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
+                            .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
+                            .ThenBy(item => GetDistance(item.Element));
 
                     int flatCount = 1;
                     foreach(var level in orderedObjects.GroupBy(item => item.LevelId)) {
@@ -203,10 +205,15 @@ namespace RevitRooms.ViewModels {
                 UpdateNumeringOrder();
 
                 var selectedOrder = SelectedNumberingOrders.ToDictionary(item => item.ElementId, item => item.Order);
-                orderedObjects = orderedObjects
-                    .ThenBy(item => GetOrder(selectedOrder, item.Room));
+
                 if(IsNumRoomsGroup) {
                     using(var transaction = _revitRepository.StartTransaction("Нумерация помещений по группе")) {
+                        orderedObjects = orderedObjects
+                            .OrderBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
+                            .ThenBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
+                            .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
+                            .ThenBy(item => GetOrder(selectedOrder, item.Room))
+                            .ThenBy(item => GetDistance(item.Element));
 
                         foreach(var group in orderedObjects.GroupBy(item => item.RoomGroup.Id)) {
                             foreach(var section in group.GroupBy(item => item.RoomSection.Id)) {
@@ -222,6 +229,13 @@ namespace RevitRooms.ViewModels {
                     }
                 } else {
                     using(var transaction = _revitRepository.StartTransaction("Нумерация помещений по секции")) {
+                        orderedObjects = orderedObjects
+                            .OrderBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
+                            .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
+                            .ThenBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
+                            .ThenBy(item => GetOrder(selectedOrder, item.Room))
+                            .ThenBy(item => GetDistance(item.Element));
+
                         int roomCount = 1;
                         foreach(var room in orderedObjects) {
                             room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER, Prefix + roomCount + Suffix);
@@ -267,7 +281,7 @@ namespace RevitRooms.ViewModels {
             }
         }
 
-        private string[] GetNotFoundNames(IOrderedEnumerable<SpatialElementViewModel> orderedObjects) {
+        private string[] GetNotFoundNames(IEnumerable<SpatialElementViewModel> orderedObjects) {
             return orderedObjects
                 .Select(item => item.Room.Name)
                 .Except(SelectedNumberingOrders.Select(item => item.Name))
