@@ -200,6 +200,8 @@ namespace RevitRooms.ViewModels {
                     transaction.Commit();
                 }
             } else {
+                UpdateNumeringOrder();
+
                 var selectedOrder = SelectedNumberingOrders.ToDictionary(item => item.ElementId, item => item.Order);
                 orderedObjects = orderedObjects
                     .ThenBy(item => GetOrder(selectedOrder, item.Room));
@@ -272,6 +274,13 @@ namespace RevitRooms.ViewModels {
                 .Distinct()
                 .OrderBy(item => item)
                 .ToArray();
+        }
+
+        private void UpdateNumeringOrder() {
+            int count = 0;
+            foreach(var order in SelectedNumberingOrders) {
+                order.Order = ++count;
+            }
         }
 
         private bool CheckWorkingObjects(IEnumerable<SpatialElementViewModel> workingObjects) {
