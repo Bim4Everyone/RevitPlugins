@@ -49,6 +49,7 @@ namespace RevitRooms.Models {
         public Guid SelectedRoomId { get; set; }
         public string DocumentName { get; set; }
 
+        public string StartNumber { get; set; }
         public bool IsNumFlats { get; set; }
         public bool IsNumRooms { get; set; }
         public bool IsNumRoomsGroup { get; set; }

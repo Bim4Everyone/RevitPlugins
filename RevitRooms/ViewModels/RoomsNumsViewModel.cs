@@ -29,6 +29,7 @@ namespace RevitRooms.ViewModels {
         private bool _isNumRooms;
         private bool _isNumRoomsGroup;
         private bool _isNumRoomsSection;
+        private string _startNumber;
         protected readonly RevitRepository _revitRepository;
 
         public System.Windows.Window ParentWindow { get; set; }
@@ -55,6 +56,7 @@ namespace RevitRooms.ViewModels {
             RemoveOrderCommand = new RemoveOrderCommand(this);
             SaveOrderCommand = new SaveOrderCommand(this, _revitRepository);
 
+            StartNumber = "1";
             SetRoomsNumsConfig();
         }
 
@@ -69,6 +71,11 @@ namespace RevitRooms.ViewModels {
         public string Prefix {
             get => _prefix;
             set => this.RaiseAndSetIfChanged(ref _prefix, value);
+        }
+
+        public string StartNumber {
+            get => _startNumber;
+            set => this.RaiseAndSetIfChanged(ref _startNumber, value);
         }
 
         public string Suffix {
@@ -157,6 +164,8 @@ namespace RevitRooms.ViewModels {
         private void NumerateRooms(object param) {
             _revitRepository.RemoveUnplacedSpatialElements();
 
+            var startNumber = GetStartNumber();
+
             var levels = Levels.Where(item => item.IsSelected).Select(item => item.ElementId).ToArray();
             var groups = Groups.Where(item => item.IsSelected).Select(item => item.ElementId).ToArray();
             var sections = Sections.Where(item => item.IsSelected).Select(item => item.ElementId).ToArray();
@@ -172,7 +181,7 @@ namespace RevitRooms.ViewModels {
             var orderedObjects = workingObjects
                 .Where(item => item.RoomGroup != null && groups.Contains(item.RoomGroup.Id))
                 .Where(item => item.RoomSection != null && sections.Contains(item.RoomSection.Id));
-            
+
             var notFoundNames = GetNotFoundNames(orderedObjects);
             if(notFoundNames.Length > 0) {
                 ShowNotFoundNames(notFoundNames);
@@ -188,7 +197,7 @@ namespace RevitRooms.ViewModels {
                             .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
                             .ThenBy(item => GetDistance(item.Element));
 
-                    int flatCount = 1;
+                    int flatCount = startNumber;
                     foreach(var level in orderedObjects.GroupBy(item => item.LevelId)) {
                         foreach(var flat in level.GroupBy(item => item.RoomGroup.Id)) {
                             foreach(var room in flat) {
@@ -217,7 +226,7 @@ namespace RevitRooms.ViewModels {
 
                         foreach(var group in orderedObjects.GroupBy(item => item.RoomGroup.Id)) {
                             foreach(var section in group.GroupBy(item => item.RoomSection.Id)) {
-                                int roomCount = 1;
+                                int roomCount = startNumber;
                                 foreach(var room in section) {
                                     room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER, Prefix + roomCount + Suffix);
                                     roomCount++;
@@ -236,7 +245,7 @@ namespace RevitRooms.ViewModels {
                             .ThenBy(item => GetOrder(selectedOrder, item.Room))
                             .ThenBy(item => GetDistance(item.Element));
 
-                        int roomCount = 1;
+                        int roomCount = startNumber;
                         foreach(var room in orderedObjects) {
                             room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER, Prefix + roomCount + Suffix);
                             roomCount++;
@@ -329,6 +338,16 @@ namespace RevitRooms.ViewModels {
         }
 
         private bool CanNumerateRooms(object param) {
+            if(!int.TryParse(StartNumber, out var value)) {
+                ErrorText = "Начальный номер должен быть числом.";
+                return false;
+            }
+
+            if(value < 1) {
+                ErrorText = "Начальный номер должен быть положительным числом.";
+                return false;
+            }
+
             if(Phase == null) {
                 ErrorText = "Выберите стадию.";
                 return false;
@@ -367,6 +386,10 @@ namespace RevitRooms.ViewModels {
 
             ErrorText = null;
             return true;
+        }
+
+        private int GetStartNumber() {
+            return int.TryParse(StartNumber, out var value) ? value : 0;
         }
 
         private double GetDistance(Element element) {
@@ -425,6 +448,7 @@ namespace RevitRooms.ViewModels {
                 return;
             }
 
+            StartNumber = settings.StartNumber ?? "1";
             IsNumFlats = settings.IsNumFlats;
             IsNumRooms = settings.IsNumRooms;
             IsNumRoomsGroup = settings.IsNumRoomsGroup;
@@ -457,6 +481,7 @@ namespace RevitRooms.ViewModels {
                 roomsConfig.AddRoomsNumsSettingsConfig(settings);
             }
 
+            settings.StartNumber = StartNumber;
             settings.IsNumFlats = IsNumFlats;
             settings.IsNumRooms = IsNumRooms;
             settings.IsNumRoomsGroup = IsNumRoomsGroup;
