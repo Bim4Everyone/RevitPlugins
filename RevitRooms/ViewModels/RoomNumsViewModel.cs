@@ -17,11 +17,11 @@ namespace RevitRooms.ViewModels {
     internal class RoomNumsViewModel : BaseViewModel {
         private RoomsNumsViewModel _roomsNums;
 
-        public RoomNumsViewModel(Application application, Document document) {
+        public RoomNumsViewModel(Application application, Document document, System.Windows.Window window) {
             RoomsNumsViewModels = new ObservableCollection<RoomsNumsViewModel> {
-                new ViewRevitViewModel(application, document) { Name = "Выборка по текущему виду" },
-                new ElementsRevitViewModel(application, document) { Name = "Выборка по всем элементам" },
-                new SelectedRevitViewModel(application, document) { Name = "Выборка по выделенным элементам" }
+                new ViewRevitViewModel(application, document) { Name = "Выборка по текущему виду", ParentWindow = window },
+                new ElementsRevitViewModel(application, document) { Name = "Выборка по всем элементам", ParentWindow = window },
+                new SelectedRevitViewModel(application, document) { Name = "Выборка по выделенным элементам", ParentWindow = window }
             };
 
             RoomsNums = RoomsNumsViewModels[1];

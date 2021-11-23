@@ -31,9 +31,10 @@ namespace RevitRooms {
                     return Result.Succeeded;
                 }
 
-                var window = new RoomsNumsWindows() { DataContext = new RoomNumsViewModel(commandData.Application.Application, commandData.Application.ActiveUIDocument.Document) };
+                var window = new RoomsNumsWindows();
+                window.DataContext = new RoomNumsViewModel(commandData.Application.Application, commandData.Application.ActiveUIDocument.Document, window);
+                
                 new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
-
                 window.ShowDialog();
 
             } catch(Exception ex) {

@@ -31,6 +31,8 @@ namespace RevitRooms.ViewModels {
         private bool _isNumRoomsSection;
         protected readonly RevitRepository _revitRepository;
 
+        public System.Windows.Window ParentWindow { get; set; }
+
         public RoomsNumsViewModel(Application application, Document document) {
             _revitRepository = new RevitRepository(application, document);
 
@@ -134,7 +136,7 @@ namespace RevitRooms.ViewModels {
                 .Where(item => item != null)
                 .Select(item => new ElementViewModel<Element>(item, _revitRepository))
                 .Distinct()
-                .OrderBy(item => item.Name);
+                .OrderBy(item => item.Element, new dosymep.Revit.Comparators.ElementComparer());
         }
 
         private IEnumerable<IElementViewModel<Element>> GetSections() {
@@ -143,7 +145,7 @@ namespace RevitRooms.ViewModels {
                 .Where(item => item != null)
                 .Select(item => new ElementViewModel<Element>(item, _revitRepository))
                 .Distinct()
-                .OrderBy(item => item.Name);
+                .OrderBy(item => item.Element, new dosymep.Revit.Comparators.ElementComparer());
         }
 
         private IEnumerable<NumberingOrderViewModel> GetNumberingOrders() {
@@ -174,6 +176,12 @@ namespace RevitRooms.ViewModels {
                 .ThenBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
                 .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
                 .ThenBy(item => GetDistance(item.Element));
+            
+            var notFoundNames = GetNotFoundNames(orderedObjects);
+            if(notFoundNames.Length > 0) {
+                TaskDialog.Show("Предупреждение!", "В списке приоритетов отсутствуют следующие наименования помещения: " + Environment.NewLine + " - " + string.Join(Environment.NewLine + " - ", notFoundNames));
+                return;
+            }
 
             if(IsNumFlats) {
                 using(var transaction = _revitRepository.StartTransaction("Нумерация групп помещений")) {
@@ -224,7 +232,20 @@ namespace RevitRooms.ViewModels {
             }
 
             SaveRoomsNumsConfig();
+
+            ParentWindow.DialogResult = true;
+            ParentWindow.Close();
+
             TaskDialog.Show("Предупреждение!", "Расчет завершен!");
+        }
+
+        private string[] GetNotFoundNames(IOrderedEnumerable<SpatialElementViewModel> orderedObjects) {
+            return orderedObjects
+                .Select(item => item.Room.Name)
+                .Except(SelectedNumberingOrders.Select(item => item.Name))
+                .Distinct()
+                .OrderBy(item => item)
+                .ToArray();
         }
 
         private bool CheckWorkingObjects(IEnumerable<SpatialElementViewModel> workingObjects) {
