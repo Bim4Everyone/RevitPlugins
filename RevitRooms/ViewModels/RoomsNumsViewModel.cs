@@ -226,12 +226,14 @@ namespace RevitRooms.ViewModels {
                             .ThenBy(item => GetOrder(selectedOrder, item.Room))
                             .ThenBy(item => GetDistance(item.Element));
 
-                        foreach(var level in orderedObjects.GroupBy(item => item.LevelId)) {
-                            foreach(var group in level.GroupBy(item => item.RoomGroup.Id)) {
-                                int roomCount = startNumber;
-                                foreach(var room in group) {
-                                    room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER, Prefix + roomCount + Suffix);
-                                    roomCount++;
+                        foreach(var section in orderedObjects.GroupBy(item => item.RoomSection.Id)) {
+                            foreach(var level in section.GroupBy(item => item.LevelId)) {
+                                foreach(var group in level.GroupBy(item => item.RoomGroup.Id)) {
+                                    int roomCount = startNumber;
+                                    foreach(var room in group) {
+                                        room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER, Prefix + roomCount + Suffix);
+                                        roomCount++;
+                                    }
                                 }
                             }
                         }
