@@ -80,11 +80,21 @@ namespace RevitRooms.Models {
         }
 
         public CheckProjectParams CopyKeySchedules() {
+            var viewSchedules = new FilteredElementCollector(_uiApplication.ActiveUIDocument.Document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_Schedules)
+                .ToElements();
+
+            bool result = GetKeyScheduleRules().Select(item => item.ScheduleName).Except(viewSchedules.Select(item => item.Name)).Any();
+            if(result) {
+                CheckActiveView(GetScheduleRules());
+            }
+
             // Последовательность обязательна
             // Копирование ключевых спецификаций должно происходить раньше
             // потому что в обычных спецификация есть зависимость на ключевые параметры ключевых спецификаций
             _projectParameters.SetupSchedules(_uiApplication.ActiveUIDocument.Document, false, GetKeyScheduleRules());
-            _projectParameters.SetupSchedules(_uiApplication.ActiveUIDocument.Document, false, GetScheduleRules());
+            _projectParameters.SetupSchedules(_uiApplication.ActiveUIDocument.Document, result, GetScheduleRules());
 
             return this;
         }
@@ -110,10 +120,7 @@ namespace RevitRooms.Models {
         }
 
         public CheckProjectParams ReplaceKeySchedules(IEnumerable<KeyScheduleRule> keyScheduleRules) {
-            var openedView = keyScheduleRules.Union(GetScheduleRules()).FirstOrDefault(item => item.ScheduleName.Equals(_uiApplication.ActiveUIDocument.ActiveView.Name));
-            if(openedView != null) {
-                throw new InvalidOperationException($"Для копирования спецификации закройте спецификацию \"{openedView.ScheduleName}\".");
-            }
+            CheckActiveView(keyScheduleRules.Union(GetScheduleRules()));
 
             // Последовательность обязательна
             // Копирование ключевых спецификаций должно происходить раньше
@@ -122,6 +129,13 @@ namespace RevitRooms.Models {
             _projectParameters.SetupSchedules(_uiApplication.ActiveUIDocument.Document, true, GetScheduleRules());
             
             return this;
+        }
+
+        private void CheckActiveView(IEnumerable<RevitScheduleRule> scheduleRules) {
+            var openedView = scheduleRules.FirstOrDefault(item => item.ScheduleName.Equals(_uiApplication.ActiveUIDocument.ActiveView.Name));
+            if(openedView != null) {
+                throw new InvalidOperationException($"Для копирования спецификации закройте спецификацию \"{openedView.ScheduleName}\".");
+            }
         }
 
         public CheckProjectParams CheckKeySchedules() {
