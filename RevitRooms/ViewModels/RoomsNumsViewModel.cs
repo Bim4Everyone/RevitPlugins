@@ -282,6 +282,10 @@ namespace RevitRooms.ViewModels {
         }
 
         private string[] GetNotFoundNames(IEnumerable<SpatialElementViewModel> orderedObjects) {
+            if(IsNumFlats) {
+                return new string[0];
+            }
+
             return orderedObjects
                 .Select(item => item.Room.Name)
                 .Except(SelectedNumberingOrders.Select(item => item.Name))
