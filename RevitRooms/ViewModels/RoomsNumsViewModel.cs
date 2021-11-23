@@ -179,7 +179,7 @@ namespace RevitRooms.ViewModels {
             
             var notFoundNames = GetNotFoundNames(orderedObjects);
             if(notFoundNames.Length > 0) {
-                TaskDialog.Show("Предупреждение!", "В списке приоритетов отсутствуют следующие наименования помещения: " + Environment.NewLine + " - " + string.Join(Environment.NewLine + " - ", notFoundNames));
+                ShowNotFoundNames(notFoundNames);
                 return;
             }
 
@@ -235,8 +235,34 @@ namespace RevitRooms.ViewModels {
 
             ParentWindow.DialogResult = true;
             ParentWindow.Close();
-
             TaskDialog.Show("Предупреждение!", "Расчет завершен!");
+        }
+
+        private bool ShowNotFoundNames(string[] notFoundNames) {
+            var taskDialog = new TaskDialog("Квартирография Стадии П.") {
+                AllowCancellation = true,
+                MainInstruction = "В списке приоритетов отсутствуют наименования помещений.",
+                MainContent = " - " + string.Join(Environment.NewLine + " - ", notFoundNames)
+            };
+
+            taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Добавить отсутствующие?");
+            taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Выход");
+            if(taskDialog.Show() == TaskDialogResult.CommandLink1) {
+                var selection = NumberingOrders
+                    .Where(item => notFoundNames.Contains(item.Name))
+                    .ToList();
+
+                SelectNumberingOrder(selection);
+            }
+
+            return notFoundNames.Length > 0;
+        }
+
+        public void SelectNumberingOrder(IEnumerable<NumberingOrderViewModel> selection) {
+            foreach(var selected in selection) {
+                NumberingOrders.Remove(selected);
+                SelectedNumberingOrders.Add(selected);
+            }
         }
 
         private string[] GetNotFoundNames(IOrderedEnumerable<SpatialElementViewModel> orderedObjects) {

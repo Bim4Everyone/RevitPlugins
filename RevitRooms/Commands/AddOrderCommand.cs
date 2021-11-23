@@ -29,10 +29,7 @@ namespace RevitRooms.Commands {
             window.ShowDialog();
 
             var selection = (window.DataContext as NumberingOrderSelectViewModel).SelectedNumberingOrders;
-            foreach(var selected in selection) {
-                _numberingOrder.NumberingOrders.Remove(selected);
-                _numberingOrder.SelectedNumberingOrders.Add(selected);
-            }
+            _numberingOrder.SelectNumberingOrder(selection);
         }
     }
 }
