@@ -5,8 +5,10 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.KeySchedules;
 using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Bim4Everyone.Schedules;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
 
@@ -78,19 +80,47 @@ namespace RevitRooms.Models {
         }
 
         public CheckProjectParams CopyKeySchedules() {
-            var keyScheduleRules = KeySchedulesConfig.Instance.GetKeyScheduleRules();
-            _projectParameters.SetupKeySchedules(_uiApplication.ActiveUIDocument.Document, false, keyScheduleRules);
+            // Последовательность обязательна
+            // Копирование ключевых спецификаций должно происходить раньше
+            // потому что в обычных спецификация есть зависимость на ключевые параметры ключевых спецификаций
+            _projectParameters.SetupSchedules(_uiApplication.ActiveUIDocument.Document, false, GetKeyScheduleRules());
+            _projectParameters.SetupSchedules(_uiApplication.ActiveUIDocument.Document, false, GetScheduleRules());
 
             return this;
         }
 
+        private static IEnumerable<KeyScheduleRule> GetKeyScheduleRules() {
+            yield return KeySchedulesConfig.Instance.FireCompartment;
+            yield return KeySchedulesConfig.Instance.RoomsGroups;
+            yield return KeySchedulesConfig.Instance.RoomsNames;
+            yield return KeySchedulesConfig.Instance.RoomsSections;
+            yield return KeySchedulesConfig.Instance.RoomsTypeGroup;
+        }
+
+        private static IEnumerable<RevitScheduleRule> GetScheduleRules() {
+            yield return SchedulesConfig.Instance.RoomsCheck;
+            yield return SchedulesConfig.Instance.RoomsCheckAreas;
+            yield return SchedulesConfig.Instance.RoomsCheckGroup;
+            yield return SchedulesConfig.Instance.RoomsCheckHeights;
+            yield return SchedulesConfig.Instance.RoomsCheckInvalidArea;
+            yield return SchedulesConfig.Instance.RoomsCheckName;
+            yield return SchedulesConfig.Instance.RoomsCheckParams;
+            yield return SchedulesConfig.Instance.RoomsCheckRemoves;
+            yield return SchedulesConfig.Instance.RoomsCheckSection;
+        }
+
         public CheckProjectParams ReplaceKeySchedules(IEnumerable<KeyScheduleRule> keyScheduleRules) {
-            var openedView = keyScheduleRules.FirstOrDefault(item => item.ScheduleName.Equals(_uiApplication.ActiveUIDocument.ActiveView.Name));
+            var openedView = keyScheduleRules.Union(GetScheduleRules()).FirstOrDefault(item => item.ScheduleName.Equals(_uiApplication.ActiveUIDocument.ActiveView.Name));
             if(openedView != null) {
-                throw new InvalidOperationException($"Для копирования ключевой спецификации закройте ключевую спецификацию \"{openedView.ScheduleName}\".");
+                throw new InvalidOperationException($"Для копирования спецификации закройте спецификацию \"{openedView.ScheduleName}\".");
             }
 
-            _projectParameters.SetupKeySchedules(_uiApplication.ActiveUIDocument.Document, true, keyScheduleRules);
+            // Последовательность обязательна
+            // Копирование ключевых спецификаций должно происходить раньше
+            // потому что в обычных спецификация есть зависимость на ключевые параметры ключевых спецификаций
+            _projectParameters.SetupSchedules(_uiApplication.ActiveUIDocument.Document, true, keyScheduleRules);
+            _projectParameters.SetupSchedules(_uiApplication.ActiveUIDocument.Document, true, GetScheduleRules());
+            
             return this;
         }
 
@@ -120,10 +150,13 @@ namespace RevitRooms.Models {
                     AllowCancellation = true,
                     MainInstruction = "Были найдены некорректные ключевые спецификации.",
                     MainContent = " - " 
-                        + string.Join(Environment.NewLine + " - ", brokenKeySchedules.Select(item => item.TestingSchedule.Name)) 
+                        + string.Join(Environment.NewLine + " - ", brokenKeySchedules.Select(item => item.TestingSchedule.Name))
                         + Environment.NewLine 
                         + Environment.NewLine 
                         + "Проверьте название ключевого параметра и количество столбцов спецификации."
+                        + Environment.NewLine
+                        + Environment.NewLine
+                        + "ВНИМАНИЕ! При замене ключевой спецификации будут удалены соответствующие ключевые значения у помещений и ключевой параметр из спецификаций!"
                 };
 
                 taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Заменить на спецификации из шаблона?");
@@ -160,7 +193,7 @@ namespace RevitRooms.Models {
                 .Cast<ViewSchedule>()
                 .ToList();
 
-            var keyScheduleRules = KeySchedulesConfig.Instance.GetKeyScheduleRules();
+            var keyScheduleRules = GetKeyScheduleRules();
             return keyScheduleRules
                 .Select(item => GetKeyScheduleTesting(item, viewSchedules))
                 .Where(item => item != null)
