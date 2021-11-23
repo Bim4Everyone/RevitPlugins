@@ -285,6 +285,11 @@ namespace RevitRooms.ViewModels {
                 return false;
             }
 
+            if(!SelectedNumberingOrders.Any()) {
+                ErrorText = "Настройте список приоритетов нумерации.";
+                return false;
+            }
+
             ErrorText = null;
             return true;
         }
