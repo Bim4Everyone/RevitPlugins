@@ -22,6 +22,10 @@ namespace RevitRooms.Commands {
                  .OrderByDescending(item => item.Index)
                  .ToArray();
 
+            if(selection.Length == 0) {
+                return;
+            }
+
             var max = selection.Max(item => item.Index);
             if(max >= _numberingOrder.SelectedNumberingOrders.Count - 1) {
                 return;

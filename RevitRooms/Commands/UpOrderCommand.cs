@@ -22,6 +22,10 @@ namespace RevitRooms.Commands {
                 .OrderBy(item => item.Index)
                 .ToArray();
 
+            if(selection.Length == 0) {
+                return;
+            }
+
             var min = selection.Min(item => item.Index);
             if(min <= 0) {
                 return;
