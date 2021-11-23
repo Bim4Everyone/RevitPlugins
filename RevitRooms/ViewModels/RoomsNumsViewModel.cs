@@ -170,7 +170,8 @@ namespace RevitRooms.ViewModels {
             var orderedObjects = workingObjects
                 .Where(item => item.RoomGroup != null && groups.Contains(item.RoomGroup.Id))
                 .Where(item => item.RoomSection != null && sections.Contains(item.RoomSection.Id))
-                .OrderBy(item => item.RoomSection.Name)
+                .OrderBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
+                .ThenBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
                 .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
                 .ThenBy(item => GetDistance(item.Element));
 
@@ -186,8 +187,6 @@ namespace RevitRooms.ViewModels {
 
                             flatCount++;
                         }
-
-
                     }
 
                     transaction.Commit();
@@ -207,8 +206,6 @@ namespace RevitRooms.ViewModels {
                                     roomCount++;
                                 }
                             }
-
-
                         }
 
                         transaction.Commit();
