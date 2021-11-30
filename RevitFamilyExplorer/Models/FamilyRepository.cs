@@ -13,30 +13,15 @@ namespace RevitFamilyExplorer.Models {
             _rootFolder = rootFolder;
         }
 
-        public IEnumerable<DirectoryInfo> GetAR() {
-            return GetSection("AR.txt");
+        public IEnumerable<FileInfo> GetSections() {
+            foreach(var filePath in Directory.EnumerateFiles(_rootFolder, "*.families")) {
+                yield return new FileInfo(filePath);
+            }
         }
 
-        public IEnumerable<DirectoryInfo> GetKR() {
-            return GetSection("KR.txt");
-        }
-
-        public IEnumerable<DirectoryInfo> GetOV() {
-            return GetSection("OV.txt");
-        }
-
-        public IEnumerable<DirectoryInfo> GetVK() {
-            return GetSection("VK.txt");
-        }
-
-        public IEnumerable<DirectoryInfo> GetSS() {
-            return GetSection("SS.txt");
-        }
-
-        private IEnumerable<DirectoryInfo> GetSection(string fileName) {
-            string filePath = Path.Combine(_rootFolder, fileName);
+        public IEnumerable<DirectoryInfo> GetSection(string filePath) {
             if(!File.Exists(filePath)) {
-                throw new FileNotFoundException($"Не был найден файл раздела: \"{fileName}\"");
+                throw new FileNotFoundException($"Не был найден файл раздела: \"{filePath}\"");
             }
 
             return File.ReadAllLines(filePath)
