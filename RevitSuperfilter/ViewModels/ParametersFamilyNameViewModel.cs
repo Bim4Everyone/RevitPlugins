@@ -45,8 +45,8 @@ namespace RevitSuperfilter.ViewModels {
 
         private IEnumerable<IParameterViewModel> GetParamsViewModel() {
             return ElementTypes
-                .Select(item => new ParameterFamilyNameViewModel(item, new[] { item }))
-                .Distinct()
+                .GroupBy(item => item, new Models.ElementTypeFamilyNameComparer())
+                .Select(item => new ParameterFamilyNameViewModel(item.Key, item))
                 .OrderBy(item => item.DisplayData);
         }
 
