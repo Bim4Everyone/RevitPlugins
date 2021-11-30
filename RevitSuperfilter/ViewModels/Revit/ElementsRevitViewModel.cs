@@ -17,7 +17,7 @@ namespace RevitSuperfilter.ViewModels.Revit {
 
         protected override IEnumerable<CategoryViewModel> GetCategoryViewModels() {
             return _revitRepository.GetAllElements()
-                .Where(item => item.Category != null && item.Category.Parent == null)
+                .Where(item => item.Category != null)
                 .GroupBy(item => item.Category, new CategoryComparer())
                 .Select(item => new CategoryViewModel(item.Key, item, _revitRepository))
                 .OrderBy(item => item.DisplayData);
