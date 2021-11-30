@@ -11,14 +11,14 @@ using dosymep.WPF.ViewModels;
 using RevitSuperfilter.Models;
 
 namespace RevitSuperfilter.ViewModels {
-    internal class ParametersViewModel : SelectableObjectViewModel<Definition> {
+    internal class ParametersViewModel : SelectableObjectViewModel<Definition>, IParametersViewModel {
         private readonly Definition _definition;
 
         public ParametersViewModel(Definition definition, IEnumerable<Parameter> parameters)
             : base(definition) {
             _definition = definition;
 
-            Values = new ObservableCollection<ParameterViewModel>(GetParamViewModels(parameters));
+            Values = new ObservableCollection<IParameterViewModel>(GetParamViewModels(parameters));
             foreach(ParameterViewModel item in Values) {
                 item.PropertyChanged += ParameterViewModelPropertyChanged;
             }
@@ -37,7 +37,7 @@ namespace RevitSuperfilter.ViewModels {
             set {
                 base.IsSelected = value;
                 if(base.IsSelected.HasValue) {
-                    foreach(ParameterViewModel item in Values) {
+                    foreach(IParameterViewModel item in Values) {
                         item.PropertyChanged -= ParameterViewModelPropertyChanged;
                         item.IsSelected = base.IsSelected;
                         item.PropertyChanged += ParameterViewModelPropertyChanged;
@@ -46,7 +46,7 @@ namespace RevitSuperfilter.ViewModels {
             }
         }
 
-        public ObservableCollection<ParameterViewModel> Values { get; }
+        public ObservableCollection<IParameterViewModel> Values { get; }
 
         public IEnumerable<Element> GetSelectedElements() {
             if(IsSelected == true || IsSelected == null) {
@@ -56,7 +56,7 @@ namespace RevitSuperfilter.ViewModels {
             return Enumerable.Empty<Element>();
         }
 
-        private static IEnumerable<ParameterViewModel> GetParamViewModels(IEnumerable<Parameter> parameters) {
+        private static IEnumerable<IParameterViewModel> GetParamViewModels(IEnumerable<Parameter> parameters) {
             return parameters
                 .GroupBy(param => param, new ParameterValueComparer())
                 .Select(item => new ParameterViewModel(item.Key, item))

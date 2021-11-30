@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using RevitSuperfilter;
 
 namespace dosymep.WPF.ViewModels {
-    internal class SelectableObjectViewModel<T> : BaseViewModel {
+    internal class SelectableObjectViewModel<T> : BaseViewModel, ISelectableElement {
         private bool? _isSelected = false;
 
         public SelectableObjectViewModel(T objectData) {
@@ -33,7 +33,7 @@ namespace dosymep.WPF.ViewModels {
             }
         }
 
-        protected void UpdateSelection<TIn>(IEnumerable<SelectableObjectViewModel<TIn>> children) {
+        protected void UpdateSelection(IEnumerable<ISelectableElement> children) {
             bool isSelected = children.All(item => item.IsSelected == true);
             if(isSelected == true) {
                 IsSelected = true;
@@ -53,5 +53,9 @@ namespace dosymep.WPF.ViewModels {
                 return;
             }
         }
+    }
+
+    internal interface ISelectableElement {
+        bool? IsSelected { get; set; }
     }
 }

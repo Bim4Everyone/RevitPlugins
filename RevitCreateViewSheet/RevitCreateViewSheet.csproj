@@ -46,11 +46,11 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="dosymep.Bim4Everyone">
-			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep.Bim4Everyone.dll</HintPath>
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\$(RevitVersion)\dosymep.Bim4Everyone.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="dosymep.Revit">
-			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep.Revit.dll</HintPath>
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\$(RevitVersion)\dosymep.Revit.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="RevitAPI">
