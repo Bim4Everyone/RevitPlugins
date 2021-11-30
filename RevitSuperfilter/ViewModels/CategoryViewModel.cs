@@ -20,18 +20,20 @@ using RevitSuperfilter.Views;
 namespace RevitSuperfilter.ViewModels {
     internal class CategoryViewModel : SelectableObjectViewModel<Category> {
         private ParamsView _paramsView;
-        private ObservableCollection<ParametersViewModel> _parameters;
+        private ObservableCollection<IParametersViewModel> _parameters;
 
         private string _filterValue;
         private string _buttonFilterName;
         private bool _currentSelection = true;
         private ICollectionView _parametersView;
+        private readonly RevitRepository _revitRepository;
 
-        public CategoryViewModel(Category category, IEnumerable<Element> elements)
+        public CategoryViewModel(Category category, IEnumerable<Element> elements, RevitRepository revitRepository)
             : base(category) {
             Category = category;
+            _revitRepository = revitRepository;
             Elements = new ObservableCollection<Element>(elements);
-            
+
             SelectCommand = new RelayCommand(Select, CanSelect);
             ChangeCurrentSelection();
         }
@@ -54,8 +56,8 @@ namespace RevitSuperfilter.ViewModels {
         public ICollectionView ParametersView {
             get {
                 if(_parameters == null) {
-                    _parameters = new ObservableCollection<ParametersViewModel>(GetParamsViewModel().Where(item => item.Count > 1));
-                    foreach(ParametersViewModel item in _parameters) {
+                    _parameters = new ObservableCollection<IParametersViewModel>(GetParamsViewModel().Where(item => item.Count > 1));
+                    foreach(IParametersViewModel item in _parameters) {
                         item.PropertyChanged += ParametersViewModelPropertyChanged;
                     }
 
@@ -87,12 +89,23 @@ namespace RevitSuperfilter.ViewModels {
             return Enumerable.Empty<Element>();
         }
 
-        private IEnumerable<ParametersViewModel> GetParamsViewModel() {
-            return Elements
+        private IEnumerable<IParametersViewModel> GetParamsViewModel() {
+            var elementTypes = Elements
+                .Select(item => item.GetTypeId())
+                .Distinct()
+                .Select(item => _revitRepository.GetElement(item))
+                .OfType<ElementType>();
+
+
+            var elementType = new ParametersTypeNameViewModel(ObjectData, elementTypes);
+            var family = new ParametersFamilyNameViewModel(ObjectData, elementTypes);
+            var paramViewModels = Elements
                 .SelectMany(element => element.GetOrderedParameters().Where(param => param.HasValue))
                 .GroupBy(param => param, new ParamComparer())
                 .Select(param => new ParametersViewModel(param.Key.Definition, param))
                 .OrderBy(param => param.DisplayData);
+
+            return new IParametersViewModel[] { family, elementType }.Union(paramViewModels);
         }
 
         private void ParametersViewModelPropertyChanged(object sender, PropertyChangedEventArgs e) {
