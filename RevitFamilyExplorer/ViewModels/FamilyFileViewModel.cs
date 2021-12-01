@@ -96,7 +96,7 @@ namespace RevitFamilyExplorer.ViewModels {
             bool isInsertedFamilyFile = _revitRepository.IsInsertedFamilyFile(_familyFile);
             RefreshImageSource(isInsertedFamilyFile);
             
-            return isInsertedFamilyFile;
+            return !isInsertedFamilyFile;
         }
 
         #endregion
