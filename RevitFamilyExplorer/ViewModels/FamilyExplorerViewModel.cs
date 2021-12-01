@@ -16,24 +16,31 @@ namespace RevitFamilyExplorer.ViewModels {
         private readonly FamilyRepository _familyRepository;
 
         private SectionViewModel _section;
+        private ObservableCollection<SectionViewModel> _sections;
 
         public FamilyExplorerViewModel(RevitRepository revitRepository, FamilyRepository familyRepository) {
             _revitRepository = revitRepository;
             _familyRepository = familyRepository;
-
-            Sections = new ObservableCollection<SectionViewModel>(GetSections());
         }
 
         public SectionViewModel Section {
             get => _section;
-            set => this.RaiseAndSetIfChanged(ref _section, value); 
+            set => this.RaiseAndSetIfChanged(ref _section, value);
         }
 
-        public ObservableCollection<SectionViewModel> Sections { get; }
+        public ObservableCollection<SectionViewModel> Sections {
+            get => _sections;
+            private set => this.RaiseAndSetIfChanged(ref _sections, value);
+        }
+
+        public void LoadSections() {
+            Sections = new ObservableCollection<SectionViewModel>(GetSections());
+            Section = Sections.FirstOrDefault();
+        }
 
         private IEnumerable<SectionViewModel> GetSections() {
-            return _familyRepository.GetSections()
-                .Select(item => new SectionViewModel(_revitRepository, _familyRepository.GetSection(item.FullName)) { Name = Path.GetFileNameWithoutExtension(item.Name) });
+            return _familyRepository.GetSectionsInternal()
+                .Select(item => new SectionViewModel(_revitRepository, _familyRepository.GetSectionInternal(item.FullName)) { Name = Path.GetFileNameWithoutExtension(item.Name) });
         }
     }
 }

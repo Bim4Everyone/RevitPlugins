@@ -53,10 +53,15 @@ namespace RevitFamilyExplorer {
             configPath = Path.Combine(configPath, _uiApplication.Application.VersionNumber);
             _dataContext = new FamilyExplorerViewModel(new Models.RevitRepository(_uiApplication), new Models.FamilyRepository(configPath));
             var panel = new FamilyExplorerPanel() { DataContext = _dataContext };
+            panel.Loaded += Panel_Loaded;
 
             data.FrameworkElement = panel;
             data.VisibleByDefault = false;
             data.InitialState.DockPosition = DockPosition.Floating;
+        }
+
+        private void Panel_Loaded(object sender, System.Windows.RoutedEventArgs e) {
+            _dataContext.LoadSections();
         }
     }
 }
