@@ -49,7 +49,7 @@ namespace RevitFamilyExplorer {
         }
 
         public void SetupDockablePane(DockablePaneProviderData data) {
-            var configPath = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\99.FamilyExplorer";
+            var configPath = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\99.FamilyExplorer";
             configPath = Path.Combine(configPath, _uiApplication.Application.VersionNumber);
             _dataContext = new FamilyExplorerViewModel(new Models.RevitRepository(_uiApplication), new Models.FamilyRepository(configPath));
             var panel = new FamilyExplorerPanel() { DataContext = _dataContext };
