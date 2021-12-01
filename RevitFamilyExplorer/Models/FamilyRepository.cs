@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 
 namespace RevitFamilyExplorer.Models {
     internal class FamilyRepository {
+        private readonly string[] _sort;
         private readonly string _rootFolder;
 
         public FamilyRepository(string rootFolder) {
             _rootFolder = rootFolder;
+            _sort = File.ReadAllLines(Path.Combine(_rootFolder, "sort.txt"));
         }
 
         public Task<IEnumerable<FileInfo>> GetSections() {
@@ -22,7 +24,9 @@ namespace RevitFamilyExplorer.Models {
         }
 
         public IEnumerable<FileInfo> GetSectionsInternal() {
-            foreach(var filePath in Directory.EnumerateFiles(_rootFolder, "*.families")) {
+            foreach(var filePath in Directory.EnumerateFiles(_rootFolder, "*.families")
+                .OrderBy(item => GetIndex(item))
+                .ThenBy(item => item)) {
                 yield return new FileInfo(filePath);
             }
         }
@@ -36,6 +40,10 @@ namespace RevitFamilyExplorer.Models {
                 .Select(item => new DirectoryInfo(item))
                 .Where(item => item.Exists)
                 .OrderBy(item => item.Name);
+        }
+
+        private int GetIndex(string filePath) {
+            return Array.IndexOf(_sort, Path.GetFileName(filePath));
         }
     }
 }
