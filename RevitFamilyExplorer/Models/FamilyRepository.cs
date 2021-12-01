@@ -12,7 +12,9 @@ namespace RevitFamilyExplorer.Models {
 
         public FamilyRepository(string rootFolder) {
             _rootFolder = rootFolder;
-            _sort = File.ReadAllLines(Path.Combine(_rootFolder, "sort.txt"));
+
+            string sortFile = Path.Combine(_rootFolder, "sort.txt");
+            _sort = File.Exists(sortFile) ? File.ReadAllLines(Path.Combine(_rootFolder, "sort.txt")) : new string[0];
         }
 
         public Task<IEnumerable<FileInfo>> GetSections() {
@@ -24,16 +26,18 @@ namespace RevitFamilyExplorer.Models {
         }
 
         public IEnumerable<FileInfo> GetSectionsInternal() {
-            foreach(var filePath in Directory.EnumerateFiles(_rootFolder, "*.families")
-                .OrderBy(item => GetIndex(item))
-                .ThenBy(item => item)) {
-                yield return new FileInfo(filePath);
+            if(Directory.Exists(_rootFolder)) {
+                foreach(var filePath in Directory.EnumerateFiles(_rootFolder, "*.families")
+                    .OrderBy(item => GetIndex(item))
+                    .ThenBy(item => item)) {
+                    yield return new FileInfo(filePath);
+                }
             }
         }
 
         public IEnumerable<DirectoryInfo> GetSectionInternal(string filePath) {
             if(!File.Exists(filePath)) {
-                throw new FileNotFoundException($"Не был найден файл раздела: \"{filePath}\"");
+                return Enumerable.Empty<DirectoryInfo>();
             }
 
             return File.ReadAllLines(filePath)
