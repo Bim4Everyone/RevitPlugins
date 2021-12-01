@@ -42,6 +42,7 @@ namespace RevitFamilyExplorer {
 
     internal class FamilyExplorerPanelProvider : IDockablePaneProvider {
         private readonly UIApplication _uiApplication;
+        private FamilyExplorerViewModel _dataContext;
 
         public FamilyExplorerPanelProvider(UIApplication uiApplication) {
             _uiApplication = uiApplication;
@@ -50,8 +51,8 @@ namespace RevitFamilyExplorer {
         public void SetupDockablePane(DockablePaneProviderData data) {
             var configPath = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\99.FamilyExplorer";
             configPath = Path.Combine(configPath, _uiApplication.Application.VersionNumber);
-            var dataContext = new FamilyExplorerViewModel(new Models.RevitRepository(_uiApplication), new Models.FamilyRepository(configPath));
-            var panel = new FamilyExplorerPanel() { DataContext = dataContext };
+            _dataContext = new FamilyExplorerViewModel(new Models.RevitRepository(_uiApplication), new Models.FamilyRepository(configPath));
+            var panel = new FamilyExplorerPanel() { DataContext = _dataContext };
 
             data.FrameworkElement = panel;
             data.VisibleByDefault = false;

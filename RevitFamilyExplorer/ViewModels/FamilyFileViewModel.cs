@@ -19,20 +19,18 @@ using RevitFamilyExplorer.Models;
 namespace RevitFamilyExplorer.ViewModels {
     internal class FamilyFileViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private readonly Dispatcher _dispatcher;
 
         private bool _isLoaded;
         private string _imageSource;
         private FileInfo _familyFile;
-        private BitmapSource _familyIcon; 
+        private BitmapSource _familyIcon;
 
         public FamilyFileViewModel(RevitRepository revitRepository, FileInfo familyFile) {
             _revitRepository = revitRepository;
-            _dispatcher = Dispatcher.CurrentDispatcher;
-            
+
             ExpandCommand = new RelayCommand(Expand, CanExpand);
             LoadFamilyCommand = new RelayCommand(LoadFamilyAsync, CanLoadFamily);
-            
+
             FileInfo = familyFile;
             FamilyTypes = new ObservableCollection<FamilyTypeViewModel>() { null };
         }
@@ -42,6 +40,10 @@ namespace RevitFamilyExplorer.ViewModels {
             set {
                 _familyFile = value;
                 RaisePropertyChanged(nameof(Name));
+
+                if(_familyFile != null) {
+                    FamilyIcon = ShellFile.FromFilePath(_familyFile.FullName).Thumbnail.BitmapSource;
+                }
             }
         }
 
@@ -91,28 +93,28 @@ namespace RevitFamilyExplorer.ViewModels {
         }
 
         private bool CanLoadFamily(object p) {
-            RefreshImageSource();
-            return !_revitRepository.IsInsertedFamilyFile(_familyFile);
+            bool isInsertedFamilyFile = _revitRepository.IsInsertedFamilyFile(_familyFile);
+            RefreshImageSource(isInsertedFamilyFile);
+            
+            return isInsertedFamilyFile;
         }
 
         #endregion
 
-        private void RefreshImageSource() {
+        private void RefreshImageSource(bool isInsertedFamilyFile) {
 #if D2020 || R2020
-            ImageSource = _revitRepository.IsInsertedFamilyFile(_familyFile)
+            ImageSource = isInsertedFamilyFile
                 ? @"pack://application:,,,/RevitFamilyExplorer;component/Resources/insert.png"
                 : @"pack://application:,,,/RevitFamilyExplorer;component/Resources/not-insert.png";
 #elif D2021 || R2021
-            ImageSource = _revitRepository.IsInsertedFamilyFile(_familyFile) 
+            ImageSource = isInsertedFamilyFile 
                 ? @"pack://application:,,,/RevitFamilyExplorer_2021;component/Resources/insert.png" 
                 : @"pack://application:,,,/RevitFamilyExplorer_2021;component/Resources/not-insert.png";
 #elif D2022 || R2022
-            ImageSource = _revitRepository.IsInsertedFamilyFile(_familyFile) 
+            ImageSource = isInsertedFamilyFile 
                 ? @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/insert.png" 
                 : @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/not-insert.png";
 #endif
-
-            FamilyIcon = ShellFile.FromFilePath(_familyFile.FullName).Thumbnail.BitmapSource;
         }
 
         private IEnumerable<FamilyTypeViewModel> GetFamilySymbols() {

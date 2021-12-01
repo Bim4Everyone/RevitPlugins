@@ -15,11 +15,18 @@ namespace RevitFamilyExplorer.ViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly FamilyRepository _familyRepository;
 
+        private SectionViewModel _section;
+
         public FamilyExplorerViewModel(RevitRepository revitRepository, FamilyRepository familyRepository) {
             _revitRepository = revitRepository;
             _familyRepository = familyRepository;
 
             Sections = new ObservableCollection<SectionViewModel>(GetSections());
+        }
+
+        public SectionViewModel Section {
+            get => _section;
+            set => this.RaiseAndSetIfChanged(ref _section, value); 
         }
 
         public ObservableCollection<SectionViewModel> Sections { get; }

@@ -10,7 +10,7 @@
       Background="White">
 
     <Grid>
-        <TabControl ItemsSource="{Binding Path=Sections}">
+        <TabControl ItemsSource="{Binding Path=Sections}" SelectedItem="{Binding Section}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}" />
