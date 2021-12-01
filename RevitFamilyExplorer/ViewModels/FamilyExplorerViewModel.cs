@@ -25,7 +25,10 @@ namespace RevitFamilyExplorer.ViewModels {
 
         public SectionViewModel Section {
             get => _section;
-            set => this.RaiseAndSetIfChanged(ref _section, value);
+            set {
+                this.RaiseAndSetIfChanged(ref _section, value);
+                _section?.LoadCategories();
+            }
         }
 
         public ObservableCollection<SectionViewModel> Sections {
@@ -40,7 +43,7 @@ namespace RevitFamilyExplorer.ViewModels {
 
         private IEnumerable<SectionViewModel> GetSections() {
             return _familyRepository.GetSectionsInternal()
-                .Select(item => new SectionViewModel(_revitRepository, _familyRepository.GetSectionInternal(item.FullName)) { Name = Path.GetFileNameWithoutExtension(item.Name) });
+                .Select(item => new SectionViewModel(_revitRepository, _familyRepository, item) { Name = Path.GetFileNameWithoutExtension(item.Name) });
         }
     }
 }
