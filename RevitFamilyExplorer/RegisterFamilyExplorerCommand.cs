@@ -49,19 +49,29 @@ namespace RevitFamilyExplorer {
         }
 
         public void SetupDockablePane(DockablePaneProviderData data) {
-            var configPath = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\99.FamilyExplorer";
-            configPath = Path.Combine(configPath, _uiApplication.Application.VersionNumber);
-            _dataContext = new FamilyExplorerViewModel(new Models.RevitRepository(_uiApplication), new Models.FamilyRepository(configPath));
-            var panel = new FamilyExplorerPanel() { DataContext = _dataContext };
-            panel.Loaded += Panel_Loaded;
+            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
+            try {
+                var configPath = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\99.FamilyExplorer";
+                configPath = Path.Combine(configPath, _uiApplication.Application.VersionNumber);
+                _dataContext = new FamilyExplorerViewModel(new Models.RevitRepository(_uiApplication), new Models.FamilyRepository(configPath));
+                var panel = new FamilyExplorerPanel() { DataContext = _dataContext };
+                panel.Loaded += Panel_Loaded;
 
-            data.FrameworkElement = panel;
-            data.VisibleByDefault = false;
-            data.InitialState.DockPosition = DockPosition.Floating;
+                data.FrameworkElement = panel;
+                data.VisibleByDefault = false;
+                data.InitialState.DockPosition = DockPosition.Floating;
+            } finally {
+                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
+            }
         }
 
         private void Panel_Loaded(object sender, System.Windows.RoutedEventArgs e) {
-            _dataContext.LoadSections();
+            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
+            try {
+                _dataContext.LoadSections();
+            } finally {
+                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
+            }
         }
     }
 }
