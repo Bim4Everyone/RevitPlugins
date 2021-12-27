@@ -49,6 +49,9 @@
 	<ItemGroup>
 	  <Folder Include="dosymep\" />
 	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<Reference Include="RevitAPI">
