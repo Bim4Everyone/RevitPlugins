@@ -117,7 +117,7 @@ namespace RevitCopyStandarts.ViewModels {
 
             return sourceDocument.ProjectInformation.Status
                 .Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(item => GetCopyStandartsCommand(sourceDocument, item));
+                .Select(item => GetCopyStandartsCommand(sourceDocument, item.Trim()));
         }
 
         private ICopyStandartsCommand GetCopyStandartsCommand(Document sourceDocument, string className) {
