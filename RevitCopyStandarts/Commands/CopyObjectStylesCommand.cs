@@ -88,7 +88,9 @@ namespace RevitCopyStandarts.Commands {
             }
 
             var targetLinePattern = new FilteredElementCollector(_target).OfClass(typeof(LinePatternElement)).ToElements().FirstOrDefault(item => item.Name.Equals(sourceLinePattern.Name));
-            targetCategory.SetLinePatternId(targetLinePattern.Id, graphicsStyleType);
+            if(targetLinePattern != null) {
+                targetCategory.SetLinePatternId(targetLinePattern.Id, graphicsStyleType);
+            }
         }
     }
 }
