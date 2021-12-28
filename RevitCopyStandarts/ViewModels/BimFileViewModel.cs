@@ -102,8 +102,9 @@ namespace RevitCopyStandarts.ViewModels {
                 };
 
                 commands.AddRange(GetOptionalStandarts(sourceDocument));
+                commands.AddRange(GetIdOptionalStandarts(sourceDocument));
                 commands.ForEach(command => command.Execute());
-                
+
                 System.Windows.MessageBox.Show("Копирование выполнено успешно!", "Сообщение", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
             } finally {
                 sourceDocument.Close(false);
@@ -131,6 +132,31 @@ namespace RevitCopyStandarts.ViewModels {
             }
 
             throw new ArgumentException($"Неизвестное наименование команды \"{className}\".");
+        }
+
+        private IEnumerable<ICopyStandartsCommand> GetIdOptionalStandarts(Document sourceDocument) {
+            if(string.IsNullOrEmpty(sourceDocument.ProjectInformation.ClientName)) {
+                return Enumerable.Empty<ICopyStandartsCommand>();
+            }
+
+            IEnumerable<Element> elements = sourceDocument.ProjectInformation.ClientName
+                .Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(item => GetElement(sourceDocument, item))
+                .Where(item => item != null);
+
+            return new[] { new CopyElementIdsCommand(sourceDocument, _targetDocument) { CopyElements = elements.ToList() } };
+        }
+
+        private Element GetElement(Document sourceDocument, string elementId) {
+            if(string.IsNullOrEmpty(elementId)) {
+                throw new ArgumentException("Идентификатор элемента не может быть пустым или null.", nameof(elementId));
+            }
+
+            if(!int.TryParse(elementId, out int result)) {
+                throw new ArgumentException("Идентификатор элемента должен быть числом.", nameof(elementId));
+            }
+
+            return sourceDocument.GetElement(new ElementId(result));
         }
     }
 
