@@ -25,6 +25,10 @@ namespace RevitCopyStandarts.Commands {
             return new FilteredElementCollector(_source);
         }
 
+        protected virtual IEnumerable<Element> GetElements() {
+            return GetFilteredElementCollector().ToElements();
+        }
+
         protected virtual ElementId CopyElement(Element element, CopyPasteOptions copyOptions) {
             return ElementTransformUtils.CopyElements(_source, new[] { element.Id }, _target, Transform.Identity, copyOptions).First();
         }
@@ -37,18 +41,18 @@ namespace RevitCopyStandarts.Commands {
             return new CustomCopyHandler();
         }
 
-        protected virtual IEnumerable<Element> FilterElements(IList<Element> elements) {
+        protected virtual IEnumerable<Element> FilterElements(IEnumerable<Element> elements) {
             return elements.Where(item => item.ViewSpecific == false);
         }
 
         public void Execute() {
-            IList<Element> elements = GetFilteredElementCollector().ToElements();
             using(var transactionGroup = new TransactionGroup(_target)) {
                 transactionGroup.Start($"Копирование \"{Name}\"");
 
                 CopyPasteOptions copyOptions = new CopyPasteOptions();
                 //copyOptions.SetDuplicateTypeNamesHandler(GetDuplicateTypeNamesHandler());
 
+                IEnumerable<Element> elements = GetElements();
                 foreach(Element element in FilterElements(elements)) {
                     using(var transaction = new Transaction(_target)) {
                         transaction.Start($"Копирование \"{Name} - {element.Name}\"");

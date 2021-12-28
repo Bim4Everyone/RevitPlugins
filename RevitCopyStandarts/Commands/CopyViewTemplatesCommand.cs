@@ -20,7 +20,7 @@ namespace RevitCopyStandarts.Commands {
                 .WhereElementIsNotElementType();
         }
 
-        protected override IEnumerable<Element> FilterElements(IList<Element> elements) {
+        protected override IEnumerable<Element> FilterElements(IEnumerable<Element> elements) {
             return elements.Cast<View>().Where(item => item.IsTemplate);
         }
     }

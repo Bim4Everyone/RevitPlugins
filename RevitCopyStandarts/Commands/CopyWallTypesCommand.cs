@@ -15,7 +15,7 @@ namespace RevitCopyStandarts.Commands {
 
         public override string Name { get; set; } = "Типы стен";
 
-        protected override IEnumerable<Element> FilterElements(IList<Element> elements) {
+        protected override IEnumerable<Element> FilterElements(IEnumerable<Element> elements) {
             return elements.Cast<WallType>().Where(item => item.ViewSpecific == false && item.Kind == WallKind.Basic);
         }
 
