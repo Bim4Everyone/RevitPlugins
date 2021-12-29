@@ -13,6 +13,8 @@ using RevitSetLevelSection.Models;
 namespace RevitSetLevelSection.ViewModels {
     internal class FillLevelParamViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        
+        private bool _isEnabled;
 
         public FillLevelParamViewModel(RevitRepository revitRepository) {
             if(revitRepository is null) {
@@ -25,5 +27,10 @@ namespace RevitSetLevelSection.ViewModels {
 
         public RevitParam RevitParam { get; set; }
         public string Name => $"Заполнить \"{RevitParam.Name}\"";
+
+        public bool IsEnabled {
+            get => _isEnabled;
+            set => this.RaiseAndSetIfChanged(ref _isEnabled, value);
+        }
     }
 }

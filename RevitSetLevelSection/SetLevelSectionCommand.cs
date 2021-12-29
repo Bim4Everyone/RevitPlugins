@@ -7,6 +7,7 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 
+using RevitSetLevelSection.Models;
 using RevitSetLevelSection.ViewModels;
 using RevitSetLevelSection.Views;
 
@@ -16,7 +17,8 @@ namespace RevitSetLevelSection {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
             AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
             try {
-                var viewModel = new MainViewModel();
+                var repository = new RevitRepository(commandData.Application.Application, commandData.Application.ActiveUIDocument.Document);
+                var viewModel = new MainViewModel(repository);
 
                 var window = new MainWindow() { DataContext = viewModel };
                 new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
