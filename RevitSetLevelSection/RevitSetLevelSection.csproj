@@ -49,7 +49,6 @@
 
   <ItemGroup>
     <Folder Include="dosymep\" />
-    <Folder Include="Models\" />
   </ItemGroup>
 
 	<ItemGroup>
