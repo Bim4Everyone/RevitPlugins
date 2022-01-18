@@ -83,8 +83,8 @@ namespace RevitRooms.ViewModels {
         protected abstract IEnumerable<LevelViewModel> GetLevelViewModels();
 
         private void SetRoomsConfig() {
-            var roomsConfig = RoomsConfig.GetConfig();
-            var settings = roomsConfig.GetRoomsSettingsConfig(_revitRepository.DocumentName);
+            var roomsConfig = RoomsConfig.GetRoomsConfig();
+            var settings = roomsConfig.GetSettings(_revitRepository.Document);
             if(settings == null) {
                 return;
             }
@@ -110,11 +110,10 @@ namespace RevitRooms.ViewModels {
         }
 
         private void SaveRoomsConfig() {
-            var roomsConfig = RoomsConfig.GetConfig();
-            var settings = roomsConfig.GetRoomsSettingsConfig(_revitRepository.DocumentName);
+            var roomsConfig = RoomsConfig.GetRoomsConfig();
+            var settings = roomsConfig.GetSettings(_revitRepository.Document);
             if(settings == null) {
-                settings = new RoomsSettingsConfig();
-                roomsConfig.AddRoomsSettingsConfig(settings);
+                settings = roomsConfig.AddSettings(_revitRepository.Document);
             }
 
             settings.NotShowWarnings = NotShowWarnings;
@@ -131,7 +130,7 @@ namespace RevitRooms.ViewModels {
 
             settings.Levels = Levels.Where(item => item.IsSelected).Select(item => item.ElementId.IntegerValue).ToList();
 
-            RoomsConfig.SaveConfig(roomsConfig);
+            roomsConfig.SaveProjectConfig();
         }
 
         private void CalculateAreas(object p) {
