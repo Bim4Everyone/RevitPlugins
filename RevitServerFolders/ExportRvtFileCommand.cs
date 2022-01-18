@@ -86,7 +86,7 @@ namespace RevitServerFolders {
         }
 
         private static void SaveExportRvtFileConfig(ExportRvtFileViewModel exportRvtFileViewModel) {
-            ExportRvtFileConfig.SaveExportRvtFileConfig(new ExportRvtFileConfig() {
+            new ExportRvtFileConfig() {
                 ServerName = exportRvtFileViewModel.ServerName,
                 WithRooms = exportRvtFileViewModel.WithRooms,
                 WithNwcFiles = exportRvtFileViewModel.WithNwcFiles,
@@ -96,7 +96,7 @@ namespace RevitServerFolders {
                 WithSubFolders = exportRvtFileViewModel.WithSubFolders,
                 CleanTargetNwcFolder = exportRvtFileViewModel.CleanTargetNwcFolder,
                 CleanTargetRvtFolder = exportRvtFileViewModel.CleanTargetRvtFolder
-            });
+            }.SaveProjectConfig();
         }
     }
 }
