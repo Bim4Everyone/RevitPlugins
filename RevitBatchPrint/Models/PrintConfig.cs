@@ -7,48 +7,30 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Serializers;
+
 using pyRevitLabs.Json;
 
 namespace RevitBatchPrint.Models {
-    public class PrintConfig {
-        public List<PrintSettingsConfig> PrintSettings { get; set; } = new List<PrintSettingsConfig>();
+    public class PrintConfig : ProjectConfig<PrintSettingsConfig> {
+        [JsonIgnore]
+        public override string ProjectConfigPath { get; set; }
 
-        public void AddPrintSettings(PrintSettingsConfig printSettingsConfig) {
-            if(PrintSettings.Count > 10) {
-                foreach(int index in Enumerable.Range(0, PrintSettings.Count - 10)) {
-                    PrintSettings.RemoveAt(index);
-                }
-            }
+        [JsonIgnore]
+        public override IConfigSerializer Serializer { get; set; }
 
-            PrintSettings.Add(printSettingsConfig);
-        }
-
-        public PrintSettingsConfig GetPrintSettingsConfig(string documentName) {
-            documentName = string.IsNullOrEmpty(documentName) ? "Без имени.rvt" : documentName;
-            return PrintSettings.FirstOrDefault(item => documentName.Equals(item.DocumentName));
-        }
-
-        private static string GetConfigPath() {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dosymep", "RevitBatchPrint", "PrintConfig.json");
-        }
-
-        public static PrintConfig GetConfig() {
-            if(File.Exists(GetConfigPath())) {
-                return JsonConvert.DeserializeObject<PrintConfig>(File.ReadAllText(GetConfigPath()));
-            }
-
-            return new PrintConfig();
-        }
-
-        public static void SaveConfig(PrintConfig config) {
-            Directory.CreateDirectory(Path.GetDirectoryName(GetConfigPath()));
-            File.WriteAllText(GetConfigPath(), JsonConvert.SerializeObject(config));
+        public static PrintConfig GetPrintConfig() {
+            return new ProjectConfigBuilder()
+                .SetSerializer(new ConfigSerializer())
+                .SetPluginName(nameof(RevitBatchPrint))
+                .SetProjectConfigName(nameof(PrintConfig) + ".json")
+                .Build<PrintConfig>();
         }
     }
 
-    public class PrintSettingsConfig {
+    public class PrintSettingsConfig : ProjectSettings {
         public string FolderName { get; set; }
-        public string DocumentName { get; set; }
         public string PrinterName { get; set; }
         public string PrintParamName { get; set; }
         public List<string> SelectedAlbums { get; set; } = new List<string>();
@@ -66,7 +48,6 @@ namespace RevitBatchPrint.Models {
         public double UserDefinedMarginX { get; set; }
         public double UserDefinedMarginY { get; set; }
 
-
         public bool MaskCoincidentLines { get; set; }
         public bool ViewLinksinBlue { get; set; }
         public bool HideReforWorkPlanes { get; set; }
@@ -74,5 +55,6 @@ namespace RevitBatchPrint.Models {
         public bool HideScopeBoxes { get; set; }
         public bool HideCropBoundaries { get; set; }
         public bool ReplaceHalftoneWithThinLines { get; set; }
+        public override string ProjectName { get; set; }
     }
 }
