@@ -188,11 +188,6 @@ namespace RevitCopyViews.ViewModels {
         }
 
         private bool CanCopyViews(object p) {
-            if(string.IsNullOrEmpty(Prefix)) {
-                ErrorText = "Не заполнен префикс.";
-                return false;
-            }
-
             if(string.IsNullOrEmpty(GroupView)) {
                 ErrorText = "Не заполнена группа видов.";
                 return false;
