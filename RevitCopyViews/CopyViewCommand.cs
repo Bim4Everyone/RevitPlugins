@@ -52,7 +52,7 @@ namespace RevitCopyViews {
 
             var selectedViews = uiDocument.Selection.GetElementIds().Select(item => document.GetElement(item)).OfType<View>().ToList();
             if(selectedViews.Count == 0) {
-                TaskDialog.Show("Предупреждение!", "Выберите виды, которые требуется копировать.");
+                TaskDialog.Show("Предупреждение!", "Выберите виды, которые требуется скопировать.");
                 return;
             }
 
