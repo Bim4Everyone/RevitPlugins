@@ -6,5 +6,6 @@ using System.Threading.Tasks;
 
 namespace RevitLintelPlacement.ViewModels.Interfaces {
     internal interface IConditionViewModel {
+        //TODO: должен быть метод Check
     }
 }

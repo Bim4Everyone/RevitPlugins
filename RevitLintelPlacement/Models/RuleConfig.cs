@@ -27,7 +27,7 @@ namespace RevitLintelPlacement.Models {
         }
 
         private static string GetConfigPath() {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dosymep", "RevitLintelPlacement", "PrintConfig.json");
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dosymep", "RevitLintelPlacement", "RevitLintelPlacement.json");
         }
 
         public static RuleConfig GetConfig() {
@@ -46,7 +46,7 @@ namespace RevitLintelPlacement.Models {
 
     public class RuleSettingsConfig {
         public string DocumentName { get; set; }
-        public ConditionSettingConfig ConditionSettingConfig { get; set; }
+        public List<ConditionSettingConfig> ConditionSettingsConfig { get; set; }
     }
 
     public class ConditionSettingConfig {
