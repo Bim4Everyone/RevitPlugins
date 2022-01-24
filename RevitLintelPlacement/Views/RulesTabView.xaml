@@ -14,12 +14,12 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <GroupBox Grid.Column="0" Header="Правила">
-            <ListBox>
+            <ListBox ItemsSource="{Binding RuleViewModelCollection}" SelectedItem="{Binding SelectedRuleViewModel}">
                 <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel>
-                            <CheckBox/>
-                            <TextBlock/>
+                    <DataTemplate DataType="vm:RuleViewModel">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding IsChecked}"/>
+                            <TextBlock Text="{Binding Name}" Margin="2,0"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
