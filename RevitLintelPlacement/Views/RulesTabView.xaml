@@ -39,7 +39,7 @@
                 </Grid>
             </Grid>
         </GroupBox>
-        <GroupBox Header="Название правила" Grid.Column="1">
+        <GroupBox Header="{Binding SelectedRuleViewModel.Name}" Grid.Column="1">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
