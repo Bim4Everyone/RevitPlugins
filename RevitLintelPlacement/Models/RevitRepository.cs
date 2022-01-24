@@ -3,7 +3,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 namespace RevitLintelPlacement.Models {
-    class RevitRepository {
+
+    internal class RevitRepository {
         private readonly Application _application;
         private readonly UIApplication _uiApplication;
 

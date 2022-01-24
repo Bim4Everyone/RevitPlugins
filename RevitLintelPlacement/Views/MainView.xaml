@@ -1,0 +1,38 @@
+﻿<Window x:Class="RevitLintelPlacement.Views.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RevitLintelPlacement.Views"
+        xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
+        mc:Ignorable="d"
+        Title="MainView" Height="450" Width="800"
+        d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=True}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ToolBar Grid.Row="0" >
+            <Button>настройки</Button>
+            <Separator></Separator>
+            <Button > расставить </Button>
+            <Separator/>
+            <Button > удалить</Button>
+            <Separator/>
+            <Button > обновить</Button>
+        </ToolBar>
+        <TabControl Grid.Row="1">
+            <TabItem Header="Правила" Height="22" VerticalAlignment="Top">
+                <local:RulesTabView DataContext="{Binding RuleCollectionViewModel}"/>
+            </TabItem>
+            <TabItem Header="Перемычки">
+                <local:LintelsTabView DataContext="{Binding LintelCollectionViewModel}"/>
+            </TabItem>
+        </TabControl>
+        <StatusBar Height="30" Grid.Row="2" HorizontalAlignment="Stretch">
+            <ProgressBar Width="200" Height="25" Margin="5,0"></ProgressBar>
+        </StatusBar>
+    </Grid>
+</Window>
