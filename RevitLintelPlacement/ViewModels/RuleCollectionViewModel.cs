@@ -12,6 +12,11 @@ namespace RevitLintelPlacement.ViewModels {
         private ObservableCollection<RuleViewModel> _ruleViewModelCollection;
         private RuleViewModel _selectedRuleViewModel;
 
+        public RuleCollectionViewModel() {
+            RuleViewModelCollection = new ObservableCollection<RuleViewModel>();
+            SelectedRuleViewModel = RuleViewModelCollection.FirstOrDefault();
+        }
+
         public ObservableCollection<RuleViewModel> RuleViewModelCollection {
             get => _ruleViewModelCollection;
             set => this.RaiseAndSetIfChanged(ref _ruleViewModelCollection, value);

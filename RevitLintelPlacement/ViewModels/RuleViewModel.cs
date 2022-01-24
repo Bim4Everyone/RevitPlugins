@@ -12,6 +12,10 @@ namespace RevitLintelPlacement.ViewModels {
         private string _name;
         private ConditionCollectionViewModel _conditionCollection;
 
+        public RuleViewModel() {
+            ConditionCollection = new ConditionCollectionViewModel();
+        }
+
         public bool IsChecked {
             get => _isChecked;
             set => this.RaiseAndSetIfChanged(ref _isChecked, value);

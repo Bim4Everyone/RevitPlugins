@@ -12,6 +12,11 @@ namespace RevitLintelPlacement.ViewModels {
         private RuleCollectionViewModel _ruleCollectionViewModel;
         private LintelCollectionViewModel _lintelCollectionViewModel;
 
+        public MainViewModel() {
+            RuleCollectionViewModel = new RuleCollectionViewModel();
+            LintelCollectionViewModel = new LintelCollectionViewModel();
+        }
+
         public RuleCollectionViewModel RuleCollectionViewModel {
             get => _ruleCollectionViewModel;
             set => this.RaiseAndSetIfChanged(ref _ruleCollectionViewModel, value);
