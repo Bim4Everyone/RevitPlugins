@@ -23,15 +23,15 @@
             <Separator/>
             <Button > обновить</Button>
         </ToolBar>
-        <TabControl Grid.Row="1">
-            <TabItem Header="Правила" Height="22" VerticalAlignment="Top">
+        <TabControl Grid.Row="1" Margin="0,5">
+            <TabItem Header="Правила">
                 <local:RulesTabView DataContext="{Binding RuleCollectionViewModel}"/>
             </TabItem>
-            <TabItem Header="Перемычки">
+            <TabItem  Header="Перемычки">
                 <local:LintelsTabView DataContext="{Binding LintelCollectionViewModel}"/>
             </TabItem>
         </TabControl>
-        <StatusBar Height="30" Grid.Row="2" HorizontalAlignment="Stretch">
+        <StatusBar Grid.Row="2" Height="30" HorizontalAlignment="Stretch">
             <ProgressBar Width="200" Height="25" Margin="5,0"></ProgressBar>
         </StatusBar>
     </Grid>

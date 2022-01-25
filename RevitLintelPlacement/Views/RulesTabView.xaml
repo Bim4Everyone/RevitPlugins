@@ -19,7 +19,7 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <ListBox ItemsSource="{Binding RuleViewModelCollection}" SelectedItem="{Binding SelectedRuleViewModel}" Grid.Row="0">
+                <ListBox Grid.Row="0" ItemsSource="{Binding RuleViewModelCollection}" SelectedItem="{Binding SelectedRuleViewModel}">
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="vm:RuleViewModel">
                             <StackPanel Orientation="Horizontal">
@@ -34,20 +34,19 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Button Margin="5,5" Grid.Column="0">+</Button>
-                    <Button Margin="5,5" Grid.Column="1">-</Button>
+                    <Button Grid.Column="0" Margin="5,5">+</Button>
+                    <Button Grid.Column="1" Margin="5,5">-</Button>
                 </Grid>
             </Grid>
         </GroupBox>
-        <GroupBox Header="{Binding SelectedRuleViewModel.Name}" Grid.Column="1">
+        <GroupBox Grid.Column="1" Header="{Binding SelectedRuleViewModel.Name}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <GroupBox Header="Условия" Grid.Column="0"></GroupBox>
-                <GroupBox Header="Параметры перемычки" Grid.Column="1"></GroupBox>
-                
+                <GroupBox Grid.Column="0" Header="Условия"></GroupBox>
+                <GroupBox Grid.Column="1" Header="Параметры перемычки"></GroupBox>
             </Grid>
         </GroupBox>
     </Grid>
