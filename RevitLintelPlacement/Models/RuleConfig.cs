@@ -50,18 +50,33 @@ namespace RevitLintelPlacement.Models {
     }
 
     public class ConditionSettingConfig {
+        public double OpeningWidthMin { get; set; }
+        public double OpeningWidthMax { get; set; }
+        public ConditionType ConditionType { get; set; }
 
         //TODO: возможно тут нужен материал, а не тип стены, еще не решили (выбрать между этим свойством и WallMaterialCollection)
         public List<string> WallTypeCollection { get; set; }
         public List<string> WallMaterialCollection { get; set; }
-        public double OpeningWidthMin { get; set; }
-        public double OpeningWidthMax { get; set; }
-        public ConditionType ConditionType { get; set; }
         //TODO: Добавить еще условий
     }
 
     public enum ConditionType {
         WallTypeCondition,
         OpeningWidth,
+    }
+
+    public enum LintelParameterType {
+        YesNoLintelParameter,
+        NumberParameter,
+        RotationParameter,
+    }
+
+    public class LintelParameterSettingConfig {
+        public bool IsChecked { get; set; }
+        public double RelationValue { get; set; }
+        public double NumberValue { get; set; }
+        public LintelParameterType LintelParameterType { get; set; }
+        public string Name { get; set; }
+        public string OpeninigParameterName { get; set; }
     }
 }
