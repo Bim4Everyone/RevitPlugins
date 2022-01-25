@@ -10,7 +10,7 @@ namespace RevitLintelPlacement {
     public class PlaceLintelCommand : IExternalCommand {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
             var mainViewModel = new MainViewModel();
-            var view = new MainView() { DataContext = mainViewModel };
+            var view = new MainWindow() { DataContext = mainViewModel };
             view.ShowDialog();
             return Result.Succeeded;
         }
