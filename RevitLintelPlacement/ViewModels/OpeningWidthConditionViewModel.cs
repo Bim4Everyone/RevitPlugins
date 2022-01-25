@@ -18,9 +18,9 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _minWidth, value);
         }
 
-        public double MaxWidth { 
-            get => _maxWidth; 
-            set => this.RaiseAndSetIfChanged(ref _maxWidth, value); 
+        public double MaxWidth {
+            get => _maxWidth;
+            set => this.RaiseAndSetIfChanged(ref _maxWidth, value);
         }
 
     }

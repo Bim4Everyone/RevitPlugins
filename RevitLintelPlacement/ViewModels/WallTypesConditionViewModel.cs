@@ -11,28 +11,13 @@ using RevitLintelPlacement.ViewModels.Interfaces;
 
 namespace RevitLintelPlacement.ViewModels {
     internal class WallTypesConditionViewModel : BaseViewModel, IConditionViewModel {
-        private ObservableCollection<WallTypeConditionViewModel> _wallTypeCollection;
+        private ObservableCollection<WallTypeConditionViewModel> _wallTypes;
 
-        ObservableCollection<WallTypeConditionViewModel> WallTypeCollection { 
-            get => _wallTypeCollection; 
-            set => this.RaiseAndSetIfChanged(ref _wallTypeCollection, value); 
+        ObservableCollection<WallTypeConditionViewModel> WallTypes {
+            get => _wallTypes;
+            set => this.RaiseAndSetIfChanged(ref _wallTypes, value);
         }
 
-    }
-
-    internal class WallTypeConditionViewModel : BaseViewModel {
-        private bool _isChecked;
-        private string _name;
-
-        public bool IsChecked {
-            get => _isChecked;
-            set => this.RaiseAndSetIfChanged(ref _isChecked, value);
-        }
-
-        public string Name { 
-            get => _name; 
-            set => this.RaiseAndSetIfChanged(ref _name, value); 
-        }
     }
 
 }

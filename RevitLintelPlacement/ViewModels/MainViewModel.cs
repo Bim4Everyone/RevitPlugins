@@ -9,22 +9,22 @@ using dosymep.WPF.ViewModels;
 namespace RevitLintelPlacement.ViewModels {
     internal class MainViewModel : BaseViewModel {
 
-        private RuleCollectionViewModel _ruleCollectionViewModel;
-        private LintelCollectionViewModel _lintelCollectionViewModel;
+        private RuleCollectionViewModel _rules;
+        private LintelCollectionViewModel _lintels;
 
         public MainViewModel() {
-            RuleCollectionViewModel = new RuleCollectionViewModel();
-            LintelCollectionViewModel = new LintelCollectionViewModel();
+            Rules = new RuleCollectionViewModel();
+            Lintels = new LintelCollectionViewModel();
         }
 
-        public RuleCollectionViewModel RuleCollectionViewModel {
-            get => _ruleCollectionViewModel;
-            set => this.RaiseAndSetIfChanged(ref _ruleCollectionViewModel, value);
+        public RuleCollectionViewModel Rules {
+            get => _rules;
+            set => this.RaiseAndSetIfChanged(ref _rules, value);
         }
 
-        public LintelCollectionViewModel LintelCollectionViewModel {
-            get => _lintelCollectionViewModel;
-            set => this.RaiseAndSetIfChanged(ref _lintelCollectionViewModel, value);
+        public LintelCollectionViewModel Lintels {
+            get => _lintels;
+            set => this.RaiseAndSetIfChanged(ref _lintels, value);
         }
     }
 }

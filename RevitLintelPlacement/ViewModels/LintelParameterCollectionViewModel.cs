@@ -11,11 +11,11 @@ using RevitLintelPlacement.ViewModels.Interfaces;
 
 namespace RevitLintelPlacement.ViewModels {
     internal class LintelParameterCollectionViewModel : BaseViewModel {
-        private ObservableCollection<ILintelParameterViewModel> _lintelParameterCollection;
+        private ObservableCollection<ILintelParameterViewModel> _lintelParameters;
 
-        ObservableCollection<ILintelParameterViewModel> LintelParameterCollection {
-            get => _lintelParameterCollection;
-            set => this.RaiseAndSetIfChanged(ref _lintelParameterCollection, value);
+        ObservableCollection<ILintelParameterViewModel> LintelParameters {
+            get => _lintelParameters;
+            set => this.RaiseAndSetIfChanged(ref _lintelParameters, value);
         }
     }
 }

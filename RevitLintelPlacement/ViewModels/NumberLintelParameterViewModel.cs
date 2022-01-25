@@ -10,17 +10,18 @@ using RevitLintelPlacement.ViewModels.Interfaces;
 
 namespace RevitLintelPlacement.ViewModels {
     internal class NumberLintelParameterViewModel : BaseViewModel, ILintelParameterViewModel {
-        private string _name;
         private double _value;
+        private string _name;
+
+        public double Value {
+            get => _value;
+            set => this.RaiseAndSetIfChanged(ref _value, value);
+        }
 
         public string Name {
             get => _name;
             set => this.RaiseAndSetIfChanged(ref _name, value);
         }
 
-        public double Value {
-            get => _value;
-            set => this.RaiseAndSetIfChanged(ref _value, value);
-        }
     }
 }

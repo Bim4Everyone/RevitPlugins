@@ -9,22 +9,22 @@ using dosymep.WPF.ViewModels;
 namespace RevitLintelPlacement.ViewModels {
     internal class RuleCollectionViewModel : BaseViewModel {
 
-        private ObservableCollection<RuleViewModel> _ruleViewModelCollection;
-        private RuleViewModel _selectedRuleViewModel;
+        private RuleViewModel _selectedRule;
+        private ObservableCollection<RuleViewModel> _rules;
 
         public RuleCollectionViewModel() {
-            RuleViewModelCollection = new ObservableCollection<RuleViewModel>();
-            SelectedRuleViewModel = RuleViewModelCollection.FirstOrDefault();
+            Rules = new ObservableCollection<RuleViewModel>();
+            SelectedRule = Rules.FirstOrDefault();
         }
 
-        public ObservableCollection<RuleViewModel> RuleViewModelCollection {
-            get => _ruleViewModelCollection;
-            set => this.RaiseAndSetIfChanged(ref _ruleViewModelCollection, value);
+        public RuleViewModel SelectedRule { 
+            get => _selectedRule; 
+            set => this.RaiseAndSetIfChanged(ref _selectedRule, value); 
         }
 
-        public RuleViewModel SelectedRuleViewModel { 
-            get => _selectedRuleViewModel; 
-            set => this.RaiseAndSetIfChanged(ref _selectedRuleViewModel, value); 
+        public ObservableCollection<RuleViewModel> Rules {
+            get => _rules;
+            set => this.RaiseAndSetIfChanged(ref _rules, value);
         }
     }
 }

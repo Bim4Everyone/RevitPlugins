@@ -10,11 +10,12 @@ namespace RevitLintelPlacement.ViewModels {
     internal class RuleViewModel : BaseViewModel {
         private bool _isChecked;
         private string _name;
-        private ConditionCollectionViewModel _conditionCollection;
-        private LintelParameterCollectionViewModel lintelParamters;
+        private ConditionCollectionViewModel _conditions;
+        private LintelParameterCollectionViewModel _lintelParameters;
 
         public RuleViewModel() {
-            ConditionCollection = new ConditionCollectionViewModel();
+            Conditions = new ConditionCollectionViewModel();
+            LintelParameters = new LintelParameterCollectionViewModel();
         }
 
         public bool IsChecked {
@@ -27,14 +28,14 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _name, value);
         }
 
-        public ConditionCollectionViewModel ConditionCollection {
-            get => _conditionCollection;
-            set => this.RaiseAndSetIfChanged(ref _conditionCollection, value);
+        public ConditionCollectionViewModel Conditions {
+            get => _conditions;
+            set => this.RaiseAndSetIfChanged(ref _conditions, value);
         }
 
-        public LintelParameterCollectionViewModel LintelParamters {
-            get => lintelParamters;
-            set => this.RaiseAndSetIfChanged(ref lintelParamters, value);
+        public LintelParameterCollectionViewModel LintelParameters {
+            get => _lintelParameters;
+            set => this.RaiseAndSetIfChanged(ref _lintelParameters, value);
         }
     }
 }
