@@ -11,6 +11,7 @@ namespace RevitLintelPlacement.ViewModels {
         private bool _isChecked;
         private string _name;
         private ConditionCollectionViewModel _conditionCollection;
+        private LintelParameterCollectionViewModel lintelParamters;
 
         public RuleViewModel() {
             ConditionCollection = new ConditionCollectionViewModel();
@@ -26,9 +27,14 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _name, value);
         }
 
-        public ConditionCollectionViewModel ConditionCollection { 
-            get => _conditionCollection; 
-            set => this.RaiseAndSetIfChanged(ref _conditionCollection, value); 
+        public ConditionCollectionViewModel ConditionCollection {
+            get => _conditionCollection;
+            set => this.RaiseAndSetIfChanged(ref _conditionCollection, value);
+        }
+
+        public LintelParameterCollectionViewModel LintelParamters {
+            get => lintelParamters;
+            set => this.RaiseAndSetIfChanged(ref lintelParamters, value);
         }
     }
 }
