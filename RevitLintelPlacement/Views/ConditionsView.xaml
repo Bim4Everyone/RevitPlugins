@@ -63,6 +63,20 @@
                         </ListView>
                     </Expander>
                 </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:MaterialConditionsViewModel}">
+                    <Expander Header="Материал стен">
+                        <ListView ItemsSource="{Binding MaterialConditions}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:MaterialConditionViewModel}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox IsChecked="{Binding IsChecked}"></CheckBox>
+                                        <TextBlock Text="{Binding Name}"></TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Expander>
+                </DataTemplate>
             </ListBox.Resources>
         </ListBox>
     </Grid>

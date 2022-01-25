@@ -69,6 +69,7 @@ namespace RevitLintelPlacement.Models {
         OpeningWidth,
         WallMaterialClasses,
         ExclusionWallTypes,
+        WallMaterials
     }
 
     public enum LintelParameterType {

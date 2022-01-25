@@ -68,8 +68,8 @@ namespace RevitLintelPlacement.Models {
         #region Conditions
         private List<ConditionSettingConfig> InitializeBrickWallMaterialCondition() {
             var brickCondition = new ConditionSettingConfig() {
-                ConditionType = ConditionType.WallMaterialClasses,
-                WallMaterialClasses = new List<string>() { "Кирпич" },
+                ConditionType = ConditionType.WallMaterials,
+                WallMaterials = new List<string>() { "Кирпич" },
             };
 
             return new List<ConditionSettingConfig>() {
@@ -79,8 +79,8 @@ namespace RevitLintelPlacement.Models {
 
         private List<ConditionSettingConfig> InitializeNotBrickWallMaterialsCondition() {
             var notBrickCondition = new ConditionSettingConfig() {
-                ConditionType = ConditionType.WallMaterialClasses,
-                WallMaterialClasses = new List<string>() { "Газобетон", "ПГП", "ПСП" },
+                ConditionType = ConditionType.WallMaterials,
+                WallMaterials = new List<string>() { "Газобетон", "ПГП", "ПСП" },
             };
 
             return new List<ConditionSettingConfig>() {

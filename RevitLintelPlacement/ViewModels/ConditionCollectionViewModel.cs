@@ -72,6 +72,16 @@ namespace RevitLintelPlacement.ViewModels {
                         conditionViewModels.Add(conditionViewModel);
                         break;
                     }
+                    case ConditionType.WallMaterials: {
+                        var conditionViewModel = new MaterialConditionsViewModel();
+                        conditionViewModel.MaterialConditions = new ObservableCollection<MaterialConditionViewModel>(
+                            cs.WallMaterials.Select(m => new MaterialConditionViewModel() {
+                                Name = m,
+                                IsChecked = true
+                            }));
+                        conditionViewModels.Add(conditionViewModel);
+                        break;
+                    }
 
                     default:
                     break;
