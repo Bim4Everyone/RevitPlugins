@@ -45,8 +45,10 @@ namespace RevitLintelPlacement.Models {
     }
 
     public class RuleSettingsConfig {
+        public string Name { get; set; }
         public string DocumentName { get; set; }
         public List<ConditionSettingConfig> ConditionSettingsConfig { get; set; }
+        public List<LintelParameterSettingConfig> LintelParameterSettingsConfig { get; set; }
     }
 
     public class ConditionSettingConfig {
@@ -55,20 +57,25 @@ namespace RevitLintelPlacement.Models {
         public ConditionType ConditionType { get; set; }
 
         //TODO: возможно тут нужен материал, а не тип стены, еще не решили (выбрать между этим свойством и WallMaterialCollection)
-        public List<string> WallTypeCollection { get; set; }
-        public List<string> WallMaterialCollection { get; set; }
+        public List<string> WallTypes { get; set; }
+        public List<string> WallMaterialClasses { get; set; }
+        public List<string> MaterialClasses { get; set; }
+        public List<string> ExclusionWallTypes { get; set; }
         //TODO: Добавить еще условий
     }
 
     public enum ConditionType {
-        WallTypeCondition,
+        WallTypes,
         OpeningWidth,
+        WallMaterialClasses,
+        ExclusionWallTypes,
     }
 
     public enum LintelParameterType {
         YesNoLintelParameter,
         NumberParameter,
-        RotationParameter,
+        ReletiveOpeneingParameter,
+        RelativeWallParameter,
     }
 
     public class LintelParameterSettingConfig {
@@ -78,5 +85,6 @@ namespace RevitLintelPlacement.Models {
         public LintelParameterType LintelParameterType { get; set; }
         public string Name { get; set; }
         public string OpeninigParameterName { get; set; }
+        public string WallParameterName { get; set; }
     }
 }
