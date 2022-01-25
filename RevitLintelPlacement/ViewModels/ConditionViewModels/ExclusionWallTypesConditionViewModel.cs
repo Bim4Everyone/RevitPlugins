@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 
 using dosymep.WPF.ViewModels;
 
 using RevitLintelPlacement.ViewModels.Interfaces;
 
 namespace RevitLintelPlacement.ViewModels {
-    internal class WallTypesConditionViewModel : BaseViewModel, IConditionViewModel {
+    internal class ExclusionWallTypesConditionViewModel : BaseViewModel, IConditionViewModel {
         private ObservableCollection<WallTypeConditionViewModel> _wallTypes;
 
         public ObservableCollection<WallTypeConditionViewModel> WallTypes {

@@ -7,10 +7,10 @@
              xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance vm:RuleCollectionViewModel, IsDesignTimeCreatable=True}">
+             d:DataContext="{d:DesignInstance vm:RuleCollectionViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="300"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <GroupBox Grid.Column="0" Header="Правила">
@@ -19,7 +19,7 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <ListBox Grid.Row="0" ItemsSource="{Binding RuleViewModelCollection}" SelectedItem="{Binding SelectedRuleViewModel}">
+                <ListBox Grid.Row="0" ItemsSource="{Binding Rules}" SelectedItem="{Binding SelectedRule}">
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="vm:RuleViewModel">
                             <StackPanel Orientation="Horizontal">
@@ -39,13 +39,15 @@
                 </Grid>
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Column="1" Header="{Binding SelectedRuleViewModel.Name}">
+        <GroupBox Grid.Column="1" Header="{Binding SelectedRule.Name}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <GroupBox Grid.Column="0" Header="Условия"></GroupBox>
+                <GroupBox Grid.Column="0" Header="Условия">
+                    <local:ConditionsView DataContext="{Binding SelectedRule.Conditions}"/>
+                </GroupBox>
                 <GroupBox Grid.Column="1" Header="Параметры перемычки"></GroupBox>
             </Grid>
         </GroupBox>

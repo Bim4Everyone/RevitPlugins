@@ -7,7 +7,7 @@
         xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
         mc:Ignorable="d"
         Title="Перемычки" Height="450" Width="800"
-        d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=True}">
+        d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -25,10 +25,10 @@
         </ToolBar>
         <TabControl Grid.Row="1" Margin="0,5">
             <TabItem Header="Правила">
-                <local:RulesTabView DataContext="{Binding RuleCollectionViewModel}"/>
+                <local:RulesTabView DataContext="{Binding Rules}"/>
             </TabItem>
             <TabItem  Header="Перемычки">
-                <local:LintelsTabView DataContext="{Binding LintelCollectionViewModel}"/>
+                <local:LintelsTabView DataContext="{Binding Lintels}"/>
             </TabItem>
         </TabControl>
         <StatusBar Grid.Row="2" Height="30" HorizontalAlignment="Stretch">

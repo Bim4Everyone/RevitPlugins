@@ -9,11 +9,11 @@ using dosymep.WPF.ViewModels;
 
 using RevitLintelPlacement.ViewModels.Interfaces;
 
-namespace RevitLintelPlacement.ViewModels.ConditionViewModels {
+namespace RevitLintelPlacement.ViewModels {
     internal class MaterialClassesConditionViewModel : BaseViewModel, IConditionViewModel {
         private ObservableCollection<MaterialClassConditionViewModel> materialClassConditions;
 
-        ObservableCollection<MaterialClassConditionViewModel> MaterialClassConditions { 
+        public ObservableCollection<MaterialClassConditionViewModel> MaterialClassConditions { 
             get => materialClassConditions; 
             set => this.RaiseAndSetIfChanged(ref materialClassConditions, value); 
         }

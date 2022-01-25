@@ -47,8 +47,8 @@ namespace RevitLintelPlacement.Models {
     public class RuleSettingsConfig {
         public string Name { get; set; }
         public string DocumentName { get; set; }
-        public List<ConditionSettingConfig> ConditionSettingsConfig { get; set; }
-        public List<LintelParameterSettingConfig> LintelParameterSettingsConfig { get; set; }
+        public List<ConditionSettingConfig> ConditionSettingsConfig { get; set; } = new List<ConditionSettingConfig>();
+        public List<LintelParameterSettingConfig> LintelParameterSettingsConfig { get; set; } = new List<LintelParameterSettingConfig>();
     }
 
     public class ConditionSettingConfig {
@@ -56,10 +56,10 @@ namespace RevitLintelPlacement.Models {
         public double OpeningWidthMax { get; set; }
         public ConditionType ConditionType { get; set; }
 
-        //TODO: возможно тут нужен материал, а не тип стены, еще не решили (выбрать между этим свойством и WallMaterialCollection)
+        //TODO: возможно тут нужен материал, а не тип стены, еще не решили (выбрать между этим свойством и WallMaterials)
         public List<string> WallTypes { get; set; }
         public List<string> WallMaterialClasses { get; set; }
-        public List<string> MaterialClasses { get; set; }
+        public List<string> WallMaterials { get; set; }
         public List<string> ExclusionWallTypes { get; set; }
         //TODO: Добавить еще условий
     }

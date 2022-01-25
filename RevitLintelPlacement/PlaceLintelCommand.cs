@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
@@ -7,6 +8,7 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 
+using RevitLintelPlacement.Models;
 using RevitLintelPlacement.ViewModels;
 using RevitLintelPlacement.Views;
 
@@ -17,7 +19,8 @@ namespace RevitLintelPlacement {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
             AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
             try {
-                var mainViewModel = new MainViewModel();
+
+                var mainViewModel = new MainViewModel(GetRuleConfig());
                 var window = new MainWindow() { DataContext = mainViewModel };
                 new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
 
@@ -33,6 +36,19 @@ namespace RevitLintelPlacement {
             }
 
             return Result.Succeeded;
+        }
+
+        //TODO: тестовый вариант, возможно нужно будет хранить шаблон в отдельном файле или может с имененм шаблон
+        private RuleConfig GetRuleConfig() {
+            RuleConfig ruleConfig = RuleConfig.GetConfig();
+            if(!ruleConfig.RuleSettingsConfig.Any()) {
+                RulesTemplateInitializer rti = new RulesTemplateInitializer();
+                var rules = rti.GetTemplateRules();
+                foreach(var rule in rules) {
+                    ruleConfig.AddRulesSettings(rule);
+                }
+            }
+            return ruleConfig;
         }
     }
 }

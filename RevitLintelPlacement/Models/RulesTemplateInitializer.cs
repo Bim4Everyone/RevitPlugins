@@ -8,8 +8,8 @@ namespace RevitLintelPlacement.Models {
     internal class RulesTemplateInitializer {
 
         //TODO: уточнить все названия (материалов, классов материалов, типов стен)
-        public void Initialize() {
-            var rules = new List<RuleSettingsConfig>() {
+        public List<RuleSettingsConfig> GetTemplateRules() {
+            return new List<RuleSettingsConfig>() {
                 InitializeRuleToOpeningInBrickWall200_1100(),
                 InitializeRuleToOpeningInNotBrickWall400_1100(),
                 InitializeRuleToOpening1100_2500()
@@ -151,7 +151,7 @@ namespace RevitLintelPlacement.Models {
 
         #region Initializing Rules
         private RuleSettingsConfig InitializeRuleToOpeningInBrickWall200_1100() {
-            var ruleconfig = new RuleSettingsConfig() { Name = "АТР_Проем_в_кирпичной_стене_400_900" };
+            var ruleconfig = new RuleSettingsConfig() { Name = "АТР_Проем_в_кирпичной_стене_200_1100" };
             ruleconfig.ConditionSettingsConfig.AddRange(InitializeCommonConditions());
             ruleconfig.ConditionSettingsConfig.AddRange(InitializeConditionToOpening200_1100());
             ruleconfig.ConditionSettingsConfig.AddRange(InitializeBrickWallMaterialCondition());
@@ -162,7 +162,7 @@ namespace RevitLintelPlacement.Models {
         }
 
         private RuleSettingsConfig InitializeRuleToOpeningInNotBrickWall400_1100() {
-            var ruleconfig = new RuleSettingsConfig() { Name = "АТР_Проем_в_некирпичной_стене_400_900" };
+            var ruleconfig = new RuleSettingsConfig() { Name = "АТР_Проем_в_некирпичной_стене_400_1100" };
             ruleconfig.ConditionSettingsConfig.AddRange(InitializeCommonConditions());
             ruleconfig.ConditionSettingsConfig.AddRange(InitializeConditionToOpening400_1100());
             ruleconfig.ConditionSettingsConfig.AddRange(InitializeNotBrickWallMaterialsCondition());
@@ -173,7 +173,7 @@ namespace RevitLintelPlacement.Models {
         }
 
         private RuleSettingsConfig InitializeRuleToOpening1100_2500() {
-            var ruleconfig = new RuleSettingsConfig() { Name = "АТР_Проем_в_некирпичной_стене_400_900" };
+            var ruleconfig = new RuleSettingsConfig() { Name = "АТР_Проем_в_стене_1100_2500" };
             ruleconfig.ConditionSettingsConfig.AddRange(InitializeCommonConditions());
             ruleconfig.ConditionSettingsConfig.AddRange(InitializeConditionToOpening1100_2500());
             ruleconfig.LintelParameterSettingsConfig.AddRange(InitializeCommonLintelParametrs());

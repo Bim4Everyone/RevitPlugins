@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using dosymep.WPF.ViewModels;
 
+using RevitLintelPlacement.Models;
+
 namespace RevitLintelPlacement.ViewModels {
     internal class MainViewModel : BaseViewModel {
 
@@ -13,7 +15,11 @@ namespace RevitLintelPlacement.ViewModels {
         private LintelCollectionViewModel _lintels;
 
         public MainViewModel() {
-            Rules = new RuleCollectionViewModel();
+
+        }
+
+        public MainViewModel(RuleConfig ruleConfig) {
+            Rules = new RuleCollectionViewModel(ruleConfig);
             Lintels = new LintelCollectionViewModel();
         }
 
