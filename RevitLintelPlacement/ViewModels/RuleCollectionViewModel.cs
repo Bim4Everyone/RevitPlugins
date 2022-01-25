@@ -41,7 +41,7 @@ namespace RevitLintelPlacement.ViewModels {
                 var ruleViewModel = new RuleViewModel() {
                     Name = rs.Name,
                     Conditions = new ConditionCollectionViewModel(rs.ConditionSettingsConfig),
-                    IsChecked=true
+                    IsChecked = true
                 };
 
 

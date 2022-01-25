@@ -11,11 +11,11 @@ using RevitLintelPlacement.ViewModels.Interfaces;
 
 namespace RevitLintelPlacement.ViewModels {
     internal class MaterialClassesConditionViewModel : BaseViewModel, IConditionViewModel {
-        private ObservableCollection<MaterialClassConditionViewModel> materialClassConditions;
+        private ObservableCollection<MaterialClassConditionViewModel> _materialClassConditions;
 
         public ObservableCollection<MaterialClassConditionViewModel> MaterialClassConditions { 
-            get => materialClassConditions; 
-            set => this.RaiseAndSetIfChanged(ref materialClassConditions, value); 
+            get => _materialClassConditions; 
+            set => this.RaiseAndSetIfChanged(ref _materialClassConditions, value); 
         }
     }
 
