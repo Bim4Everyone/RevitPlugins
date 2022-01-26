@@ -19,8 +19,8 @@ namespace RevitLintelPlacement.ViewModels {
 
         }
 
-        public RuleCollectionViewModel(RuleConfig ruleConfig) {
-            Rules = new ObservableCollection<RuleViewModel>(MapRuleSettingsToRuleViewModels(ruleConfig.RuleSettingsConfig));
+        public RuleCollectionViewModel(IEnumerable<RulesSettigs> rulesSettings) {
+            Rules = new ObservableCollection<RuleViewModel>(GetRuleViewModels(rulesSettings));
             SelectedRule = Rules.FirstOrDefault();
         }
 
@@ -35,21 +35,18 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         //TODO: возможно, правила из шаблона нужно сделать нередактируемыми
-        private IEnumerable<RuleViewModel> MapRuleSettingsToRuleViewModels(List<RuleSetting> ruleSettings) {
-            var ruleViewModels = new List<RuleViewModel>();
-            foreach(var rs in ruleSettings) {
-                var ruleViewModel = new RuleViewModel() {
-                    Name = rs.Name,
-                    Conditions = new ConditionCollectionViewModel(rs.ConditionSettingsConfig),
-                    IsChecked = true
-                };
-
-
-                ruleViewModels.Add(ruleViewModel);
+        private IEnumerable<RuleViewModel> GetRuleViewModels(IEnumerable<RulesSettigs> ruleSettings) {
+            
+            foreach(var rules in ruleSettings) {
+                foreach(var rule in rules.RuleSettings) {
+                    yield return new RuleViewModel() {
+                        Name = rule.Name,
+                        IsSystem = rules.IsSystem,
+                        Conditions = new ConditionCollectionViewModel(rule.ConditionSettingsConfig),
+                        IsChecked = true
+                    };
+                }
             }
-            return ruleViewModels;
         }
-
-        
     }
 }

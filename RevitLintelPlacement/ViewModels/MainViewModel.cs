@@ -18,8 +18,8 @@ namespace RevitLintelPlacement.ViewModels {
 
         }
 
-        public MainViewModel(RuleConfig ruleConfig) {
-            Rules = new RuleCollectionViewModel(ruleConfig);
+        public MainViewModel(IEnumerable<RulesSettigs> rulesSettings) {
+            Rules = new RuleCollectionViewModel(rulesSettings);
             Lintels = new LintelCollectionViewModel();
         }
 

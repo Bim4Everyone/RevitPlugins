@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Windows.Interop;
 
@@ -20,7 +21,7 @@ namespace RevitLintelPlacement {
             AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
             try {
 
-                var mainViewModel = new MainViewModel(RuleConfig.GetConfig());
+                var mainViewModel = new MainViewModel(RuleConfig.GetConfig().GetRuleSettingsConfig(commandData.Application.ActiveUIDocument.Document.Title));
                 var window = new MainWindow() { DataContext = mainViewModel };
                 new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
 

@@ -19,76 +19,72 @@ namespace RevitLintelPlacement.ViewModels {
 
         }
 
-        public ConditionCollectionViewModel(List<ConditionSetting> conditionSettings) {
+        public ConditionCollectionViewModel(IEnumerable<ConditionSetting> conditionSettings) {
 
-            Conditions = new ObservableCollection<IConditionViewModel>(MapConditionSettingsToConditionViewModels(conditionSettings));
+            Conditions = new ObservableCollection<IConditionViewModel>(GetConditionViewModels(conditionSettings));
         }
 
         public ObservableCollection<IConditionViewModel> Conditions {
             get => _conditions;
             set => this.RaiseAndSetIfChanged(ref _conditions, value);
         }
-
         
-        
-        private List<IConditionViewModel> MapConditionSettingsToConditionViewModels(List<ConditionSetting> conditionSettingss) {
-            var conditionViewModels = new List<IConditionViewModel>();
+        private IEnumerable<IConditionViewModel> GetConditionViewModels(IEnumerable<ConditionSetting> conditionSettingss) {
             foreach(var cs in conditionSettingss) {
                 switch(cs.ConditionType) {
                     case ConditionType.OpeningWidth: {
-                        var conditionViewModel = new OpeningWidthConditionViewModel();
-                        conditionViewModel.MinWidth = cs.OpeningWidthMin;
-                        conditionViewModel.MaxWidth = cs.OpeningWidthMax;
-                        conditionViewModels.Add(conditionViewModel);
+                        yield return new OpeningWidthConditionViewModel() {
+                            MinWidth = cs.OpeningWidthMin,
+                            MaxWidth = cs.OpeningWidthMax
+                        };
                         break;
                     }
                     case ConditionType.WallMaterialClasses: {
-                        var conditionViewModel = new MaterialClassesConditionViewModel(); //TODO: надо еще добавлять кроме выбранных классов материалов еще те, которые есть в проекте (аналогично, с типами стен и материалами)
-                        conditionViewModel.MaterialClassConditions = new ObservableCollection<MaterialClassConditionViewModel>(
+                        yield return new MaterialClassesConditionViewModel() {
+                            MaterialClassConditions = new ObservableCollection<MaterialClassConditionViewModel>(
                             cs.WallMaterialClasses.Select(mc => new MaterialClassConditionViewModel() {
                                 Name = mc,
                                 IsChecked = true
-                            })); 
-                        conditionViewModels.Add(conditionViewModel);
+                            }))
+                        }; //TODO: надо еще добавлять кроме выбранных классов материалов еще те, которые есть в проекте (аналогично, с типами стен и материалами)
                         break;
                     }
                     case ConditionType.ExclusionWallTypes: {
-                        var conditionViewModel = new ExclusionWallTypesConditionViewModel();
-                        conditionViewModel.WallTypes = new ObservableCollection<WallTypeConditionViewModel>(
+                        yield return new ExclusionWallTypesConditionViewModel() {
+                            WallTypes = new ObservableCollection<WallTypeConditionViewModel>(
                             cs.ExclusionWallTypes.Select(ewt => new WallTypeConditionViewModel() {
                                 Name = ewt,
                                 IsChecked = true
-                            }));
-                        conditionViewModels.Add(conditionViewModel);
+                            }))
+                        };
                         break;
                     }
                     case ConditionType.WallTypes: {
-                        var conditionViewModel = new WallTypesConditionViewModel();
-                        conditionViewModel.WallTypes = new ObservableCollection<WallTypeConditionViewModel>(
+                        yield return new WallTypesConditionViewModel() {
+                            WallTypes = new ObservableCollection<WallTypeConditionViewModel>(
                             cs.WallTypes.Select(wt => new WallTypeConditionViewModel() {
                                 Name = wt,
                                 IsChecked = true
-                            }));
-                        conditionViewModels.Add(conditionViewModel);
+                            }))
+                        };
                         break;
                     }
                     case ConditionType.WallMaterials: {
-                        var conditionViewModel = new MaterialConditionsViewModel();
-                        conditionViewModel.MaterialConditions = new ObservableCollection<MaterialConditionViewModel>(
+                        yield return new MaterialConditionsViewModel() {
+                            MaterialConditions = new ObservableCollection<MaterialConditionViewModel>(
                             cs.WallMaterials.Select(m => new MaterialConditionViewModel() {
                                 Name = m,
                                 IsChecked = true
-                            }));
-                        conditionViewModels.Add(conditionViewModel);
+                            }))
+                        };
                         break;
                     }
 
                     default:
-                    break;
+                    throw new ArgumentException($"Следующий тип условия: {cs.ConditionType}, не найден.");
                 }
 
             }
-            return conditionViewModels;
         }
     }
 }

@@ -9,6 +9,7 @@ using dosymep.WPF.ViewModels;
 namespace RevitLintelPlacement.ViewModels {
     internal class RuleViewModel : BaseViewModel {
         private bool _isChecked;
+        private bool _isSystem;
         private string _name;
         private ConditionCollectionViewModel _conditions;
         private LintelParameterCollectionViewModel _lintelParameters;
@@ -21,6 +22,11 @@ namespace RevitLintelPlacement.ViewModels {
         public bool IsChecked {
             get => _isChecked;
             set => this.RaiseAndSetIfChanged(ref _isChecked, value);
+        }
+
+        public bool IsSystem { 
+            get => _isSystem;
+            set => this.RaiseAndSetIfChanged(ref _isSystem, value); 
         }
 
         public string Name {

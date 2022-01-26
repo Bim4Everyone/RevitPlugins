@@ -21,9 +21,9 @@ namespace RevitLintelPlacement.Models {
             RuleSettingsConfig.Add(ruleSettingConfig);
         }
 
-        public RulesSettigs GetRuleSettingsConfig(string documentName) {
+        public IEnumerable<RulesSettigs> GetRuleSettingsConfig(string documentName) {
             documentName = string.IsNullOrEmpty(documentName) ? "Без имени.rvt" : documentName;
-            return RuleSettingsConfig.FirstOrDefault(item => documentName.Equals(item.DocumentName));
+            return RuleSettingsConfig.Where(item => documentName.Equals(item.DocumentName) || item.IsSystem);
         }
 
         private static string GetConfigPath() {
@@ -40,7 +40,7 @@ namespace RevitLintelPlacement.Models {
             }
             var rulesSetting = new RulesTemplateInitializer().GetTemplateRules();
             ruleConfig.AddRulesSettings(rulesSetting);
-            return new RuleConfig();
+            return ruleConfig;
         }
 
         public static void SaveConfig(RuleConfig config) {
