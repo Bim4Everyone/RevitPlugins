@@ -35,7 +35,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         //TODO: возможно, правила из шаблона нужно сделать нередактируемыми
-        private IEnumerable<RuleViewModel> MapRuleSettingsToRuleViewModels(List<RuleSettingsConfig> ruleSettings) {
+        private IEnumerable<RuleViewModel> MapRuleSettingsToRuleViewModels(List<RuleSetting> ruleSettings) {
             var ruleViewModels = new List<RuleViewModel>();
             foreach(var rs in ruleSettings) {
                 var ruleViewModel = new RuleViewModel() {

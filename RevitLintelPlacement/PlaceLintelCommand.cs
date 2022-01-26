@@ -20,7 +20,7 @@ namespace RevitLintelPlacement {
             AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
             try {
 
-                var mainViewModel = new MainViewModel(GetRuleConfig());
+                var mainViewModel = new MainViewModel(RuleConfig.GetConfig());
                 var window = new MainWindow() { DataContext = mainViewModel };
                 new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
 
@@ -38,17 +38,5 @@ namespace RevitLintelPlacement {
             return Result.Succeeded;
         }
 
-        //TODO: тестовый вариант, возможно нужно будет хранить шаблон в отдельном файле или может с имененм шаблон
-        private RuleConfig GetRuleConfig() {
-            RuleConfig ruleConfig = RuleConfig.GetConfig();
-            if(!ruleConfig.RuleSettingsConfig.Any()) {
-                RulesTemplateInitializer rti = new RulesTemplateInitializer();
-                var rules = rti.GetTemplateRules();
-                foreach(var rule in rules) {
-                    ruleConfig.AddRulesSettings(rule);
-                }
-            }
-            return ruleConfig;
-        }
     }
 }

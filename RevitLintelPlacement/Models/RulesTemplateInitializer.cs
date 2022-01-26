@@ -8,41 +8,45 @@ namespace RevitLintelPlacement.Models {
     internal class RulesTemplateInitializer {
 
         //TODO: уточнить все названия (материалов, классов материалов, типов стен)
-        public List<RuleSettingsConfig> GetTemplateRules() {
-            return new List<RuleSettingsConfig>() {
+        public RulesSettigs GetTemplateRules() {
+
+            var ruleSettingCollection = new RulesSettigs();
+            ruleSettingCollection.IsSystem = true;
+            ruleSettingCollection.RuleSettings = new List<RuleSetting>() { 
                 InitializeRuleToOpeningInBrickWall200_1100(),
                 InitializeRuleToOpeningInNotBrickWall400_1100(),
                 InitializeRuleToOpening1100_2500()
             };
+            return ruleSettingCollection;
         }
 
         #region Common Conditions and LintelParameters
 
-        private List<LintelParameterSettingConfig> InitializeCommonLintelParametrs() {
+        private List<LintelParameterSetting> InitializeCommonLintelParametrs() {
 
-            var leftOffsetParameter = new LintelParameterSettingConfig() {
+            var leftOffsetParameter = new LintelParameterSetting() {
                 LintelParameterType = LintelParameterType.NumberParameter,
                 Name = "Смещение_слева",
                 NumberValue = 250
             };
-            var rightOffsetParameter = new LintelParameterSettingConfig() {
+            var rightOffsetParameter = new LintelParameterSetting() {
                 LintelParameterType = LintelParameterType.NumberParameter,
                 Name = "Смещение_справа",
                 NumberValue = 250
             };
-            var thicknessParameter = new LintelParameterSettingConfig() {
+            var thicknessParameter = new LintelParameterSetting() {
                 LintelParameterType = LintelParameterType.RelativeWallParameter,
                 Name = "Половина толщины стены",
                 RelationValue = 0.5,
                 WallParameterName = "Толщина"
             };
-            var widthParameter = new LintelParameterSettingConfig() {
+            var widthParameter = new LintelParameterSetting() {
                 LintelParameterType = LintelParameterType.ReletiveOpeneingParameter,
                 Name = "ЭЛМТ_ширина проема",
                 RelationValue = 1,
                 OpeninigParameterName = "Ширина"
             };
-            return new List<LintelParameterSettingConfig> {
+            return new List<LintelParameterSetting> {
                 leftOffsetParameter,
                 rightOffsetParameter,
                 thicknessParameter,
@@ -50,98 +54,98 @@ namespace RevitLintelPlacement.Models {
             };
         }
 
-        private List<ConditionSettingConfig> InitializeCommonConditions() {
+        private List<ConditionSetting> InitializeCommonConditions() {
 
-            var wallExclusionTypeCondition = new ConditionSettingConfig() {
+            var wallExclusionTypeCondition = new ConditionSetting() {
                 ConditionType = ConditionType.ExclusionWallTypes,
                 ExclusionWallTypes = new List<string> { "Невозводимые" },
             };
-            var materialClasses = new ConditionSettingConfig() {
+            var materialClasses = new ConditionSetting() {
                 ConditionType = ConditionType.WallMaterialClasses,
                 WallMaterialClasses = new List<string>() { "Кладка" },
             };
-            return new List<ConditionSettingConfig>() { wallExclusionTypeCondition, materialClasses };
+            return new List<ConditionSetting>() { wallExclusionTypeCondition, materialClasses };
         }
 
         #endregion
 
         #region Conditions
-        private List<ConditionSettingConfig> InitializeBrickWallMaterialCondition() {
-            var brickCondition = new ConditionSettingConfig() {
+        private List<ConditionSetting> InitializeBrickWallMaterialCondition() {
+            var brickCondition = new ConditionSetting() {
                 ConditionType = ConditionType.WallMaterials,
                 WallMaterials = new List<string>() { "Кирпич" },
             };
 
-            return new List<ConditionSettingConfig>() {
+            return new List<ConditionSetting>() {
                brickCondition
             };
         }
 
-        private List<ConditionSettingConfig> InitializeNotBrickWallMaterialsCondition() {
-            var notBrickCondition = new ConditionSettingConfig() {
+        private List<ConditionSetting> InitializeNotBrickWallMaterialsCondition() {
+            var notBrickCondition = new ConditionSetting() {
                 ConditionType = ConditionType.WallMaterials,
                 WallMaterials = new List<string>() { "Газобетон", "ПГП", "ПСП" },
             };
 
-            return new List<ConditionSettingConfig>() {
+            return new List<ConditionSetting>() {
                notBrickCondition
             };
         }
 
-        private List<ConditionSettingConfig> InitializeConditionToOpening400_1100() {
-            var openingWidthCondition = new ConditionSettingConfig() {
+        private List<ConditionSetting> InitializeConditionToOpening400_1100() {
+            var openingWidthCondition = new ConditionSetting() {
                 ConditionType = ConditionType.OpeningWidth,
                 OpeningWidthMin = 400,
                 OpeningWidthMax = 1100,
             };
 
-            return new List<ConditionSettingConfig>() { openingWidthCondition };
+            return new List<ConditionSetting>() { openingWidthCondition };
         }
 
-        private List<ConditionSettingConfig> InitializeConditionToOpening200_1100() {
-            var openingWidthCondition = new ConditionSettingConfig() {
+        private List<ConditionSetting> InitializeConditionToOpening200_1100() {
+            var openingWidthCondition = new ConditionSetting() {
                 ConditionType = ConditionType.OpeningWidth,
                 OpeningWidthMin = 200,
                 OpeningWidthMax = 1100,
             };
 
-            return new List<ConditionSettingConfig>() { openingWidthCondition };
+            return new List<ConditionSetting>() { openingWidthCondition };
         }
 
-        private List<ConditionSettingConfig> InitializeConditionToOpening1100_2500() {
-            var openingWidthCondition = new ConditionSettingConfig() {
+        private List<ConditionSetting> InitializeConditionToOpening1100_2500() {
+            var openingWidthCondition = new ConditionSetting() {
                 ConditionType = ConditionType.OpeningWidth,
                 OpeningWidthMin = 1100,
                 OpeningWidthMax = 2500,
             };
 
-            return new List<ConditionSettingConfig>() { openingWidthCondition };
+            return new List<ConditionSetting>() { openingWidthCondition };
         }
 
         #endregion
 
         #region LintelParameters
-        private List<LintelParameterSettingConfig> InitializeLintelParametersToOpeninig200_1100() {
-            var yesNoLintelParameter = new LintelParameterSettingConfig() {
+        private List<LintelParameterSetting> InitializeLintelParametersToOpeninig200_1100() {
+            var yesNoLintelParameter = new LintelParameterSetting() {
                 LintelParameterType = LintelParameterType.YesNoLintelParameter,
                 Name = "Уголок",
                 IsChecked = false
             };
 
-            return new List<LintelParameterSettingConfig> {
+            return new List<LintelParameterSetting> {
                 yesNoLintelParameter
             };
 
         }
 
-        private List<LintelParameterSettingConfig> InitializeLintelParametersToOpeninig1100_2500() {
-            var yesNoLintelParameter = new LintelParameterSettingConfig() {
+        private List<LintelParameterSetting> InitializeLintelParametersToOpeninig1100_2500() {
+            var yesNoLintelParameter = new LintelParameterSetting() {
                 LintelParameterType = LintelParameterType.YesNoLintelParameter,
                 Name = "Уголок",
                 IsChecked = true
             };
 
-            return new List<LintelParameterSettingConfig> {
+            return new List<LintelParameterSetting> {
                 yesNoLintelParameter
             };
 
@@ -150,8 +154,8 @@ namespace RevitLintelPlacement.Models {
         #endregion
 
         #region Initializing Rules
-        private RuleSettingsConfig InitializeRuleToOpeningInBrickWall200_1100() {
-            var ruleconfig = new RuleSettingsConfig() { Name = "АТР_Проем_в_кирпичной_стене_200_1100" };
+        private RuleSetting InitializeRuleToOpeningInBrickWall200_1100() {
+            var ruleconfig = new RuleSetting() { Name = "АТР_Проем_в_кирпичной_стене_200_1100" };
             ruleconfig.ConditionSettingsConfig.AddRange(InitializeCommonConditions());
             ruleconfig.ConditionSettingsConfig.AddRange(InitializeConditionToOpening200_1100());
             ruleconfig.ConditionSettingsConfig.AddRange(InitializeBrickWallMaterialCondition());
@@ -161,8 +165,8 @@ namespace RevitLintelPlacement.Models {
             return ruleconfig;
         }
 
-        private RuleSettingsConfig InitializeRuleToOpeningInNotBrickWall400_1100() {
-            var ruleconfig = new RuleSettingsConfig() { Name = "АТР_Проем_в_некирпичной_стене_400_1100" };
+        private RuleSetting InitializeRuleToOpeningInNotBrickWall400_1100() {
+            var ruleconfig = new RuleSetting() { Name = "АТР_Проем_в_некирпичной_стене_400_1100" };
             ruleconfig.ConditionSettingsConfig.AddRange(InitializeCommonConditions());
             ruleconfig.ConditionSettingsConfig.AddRange(InitializeConditionToOpening400_1100());
             ruleconfig.ConditionSettingsConfig.AddRange(InitializeNotBrickWallMaterialsCondition());
@@ -172,8 +176,8 @@ namespace RevitLintelPlacement.Models {
             return ruleconfig;
         }
 
-        private RuleSettingsConfig InitializeRuleToOpening1100_2500() {
-            var ruleconfig = new RuleSettingsConfig() { Name = "АТР_Проем_в_стене_1100_2500" };
+        private RuleSetting InitializeRuleToOpening1100_2500() {
+            var ruleconfig = new RuleSetting() { Name = "АТР_Проем_в_стене_1100_2500" };
             ruleconfig.ConditionSettingsConfig.AddRange(InitializeCommonConditions());
             ruleconfig.ConditionSettingsConfig.AddRange(InitializeConditionToOpening1100_2500());
             ruleconfig.LintelParameterSettingsConfig.AddRange(InitializeCommonLintelParametrs());

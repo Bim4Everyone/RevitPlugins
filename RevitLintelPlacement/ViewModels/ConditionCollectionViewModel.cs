@@ -19,7 +19,7 @@ namespace RevitLintelPlacement.ViewModels {
 
         }
 
-        public ConditionCollectionViewModel(List<ConditionSettingConfig> conditionSettings) {
+        public ConditionCollectionViewModel(List<ConditionSetting> conditionSettings) {
 
             Conditions = new ObservableCollection<IConditionViewModel>(MapConditionSettingsToConditionViewModels(conditionSettings));
         }
@@ -31,7 +31,7 @@ namespace RevitLintelPlacement.ViewModels {
 
         
         
-        private List<IConditionViewModel> MapConditionSettingsToConditionViewModels(List<ConditionSettingConfig> conditionSettingss) {
+        private List<IConditionViewModel> MapConditionSettingsToConditionViewModels(List<ConditionSetting> conditionSettingss) {
             var conditionViewModels = new List<IConditionViewModel>();
             foreach(var cs in conditionSettingss) {
                 switch(cs.ConditionType) {
