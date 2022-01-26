@@ -9,6 +9,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone.KeySchedules;
+using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
 
 namespace RevitRooms.Models {
@@ -95,7 +97,7 @@ namespace RevitRooms.Models {
         /// </summary>
         /// <remarks>Создает свою транзакцию.</remarks>
         public void RemoveUnplacedSpatialElements() {
-            var unplacedRooms = GetSpatialElements().Union(GetAllAreas()).Where(item => item.Location == null);
+            var unplacedRooms = GetSpatialElements().Union(GetAllAreas()).Where(item => item.Location == null || item.Level == null);
             using(var transaction = new Transaction(_document)) {
                 transaction.Start("Удаление не размещенных помещений и зон");
 
@@ -131,6 +133,17 @@ namespace RevitRooms.Models {
             transaction.BIMStart(transactionName);
 
             return transaction;
+        }
+
+        public IList<Element> GetNumberingOrders() {
+            ViewSchedule viewSchedule = (ViewSchedule) new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_Schedules)
+                .FirstOrDefault(item => item.Name.Equals(KeySchedulesConfig.Instance.RoomsNames.ScheduleName));
+
+            return new FilteredElementCollector(_document, viewSchedule.Id)
+                .WhereElementIsNotElementType()
+                .ToElements();
         }
     }
 }

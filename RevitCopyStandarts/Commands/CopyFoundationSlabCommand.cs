@@ -14,7 +14,7 @@ namespace RevitCopyStandarts.Commands {
 
         public override string Name { get; set; } = "Параметры ребра плиты";
 
-        protected override IEnumerable<Element> FilterElements(IList<Element> elements) {
+        protected override IEnumerable<Element> FilterElements(IEnumerable<Element> elements) {
             return elements.Cast<FloorType>().Where(item => item.IsFoundationSlab);
         }
 

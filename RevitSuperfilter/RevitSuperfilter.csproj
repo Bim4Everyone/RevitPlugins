@@ -45,6 +45,10 @@
 	  <Compile Include="..\dosymep\BaseViewModel.cs" Link="dosymep\BaseViewModel.cs" />
 	  <Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\RelayCommand.cs" />
 	</ItemGroup>
+	
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
+	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="dosymep.Bim4Everyone">
 			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\$(RevitVersion)\dosymep.Bim4Everyone.dll</HintPath>

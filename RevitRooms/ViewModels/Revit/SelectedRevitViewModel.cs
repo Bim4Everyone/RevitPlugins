@@ -24,6 +24,7 @@ namespace RevitRooms.ViewModels.Revit {
             IEnumerable<SpatialElement> additionalElements = GetAdditionalElements(selectedElements);
 
             return selectedElements.Union(additionalElements)
+                .Where(item => item.Level != null)
                 .GroupBy(item => item.Level, new ElementComparer())
                 .Select(item => new LevelViewModel((Level) item.Key, _revitRepository, item));
         }

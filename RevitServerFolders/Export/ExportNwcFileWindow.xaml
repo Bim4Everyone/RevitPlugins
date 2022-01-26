@@ -29,7 +29,7 @@
         <Style TargetType="ComboBox" BasedOn="{StaticResource ValidationControlBaseStyle}"/>
         <Style TargetType="local:FilePathEditView" BasedOn="{StaticResource ValidationControlBaseStyle}"/>
     </Window.Resources>
-    <GroupBox Header ="Navisworks" Margin="0,10,0,0">
+    <GroupBox Header ="Navisworks (Вид: Navisworks)" Margin="0,10,0,0">
         <StackPanel>
             <CheckBox Margin="10" Content="Выгрузка помещений" IsChecked="{Binding Path=WithRooms, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <local:FilePathEditView Margin="0,10,0,10"

@@ -19,6 +19,7 @@ namespace RevitRooms.ViewModels.Revit {
 
         protected override IEnumerable<LevelViewModel> GetLevelViewModels() {
             return _revitRepository.GetSpatialElements()
+            .Where(item => item.Level != null)
             .GroupBy(item => item.Level, new ElementComparer())
             .Select(item => new LevelViewModel((Level) item.Key, _revitRepository, item));
         }

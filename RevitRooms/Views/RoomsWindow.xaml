@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
         Title="Квартирография" Height="650" Width="650" WindowStartupLocation="CenterOwner">
     <Window.Resources>
@@ -68,17 +69,27 @@
                     SelectedItem="{Binding RevitViewModel.RoundAccuracy}"/>
         </DockPanel>
 
-        <ListView Grid.Row="7" Margin="10" IsEnabled="{Binding RevitViewModel.IsAllowSelectLevels}"
+        <ListView x:Name="_levels" Grid.Row="7" Margin="10" IsEnabled="{Binding RevitViewModel.IsAllowSelectLevels}"
                   ItemsSource="{Binding RevitViewModel.Levels}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Width="35">
-                        <DataGridColumnHeader>
-                            <CheckBox IsChecked="{Binding RevitViewModel.IsCheckedSelected}"/>
-                        </DataGridColumnHeader>
+                    <GridViewColumn Width="35" Header="#">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsSelected}"/>
+                                <CheckBox IsChecked="{Binding IsSelected}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Checked">
+                                            <i:InvokeCommandAction 
+                                                    Command="{Binding SelectElementsCommand}" 
+                                                    CommandParameter="{Binding SelectedItems, ElementName=_levels}"/>
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="Unchecked">
+                                            <i:InvokeCommandAction
+                                                    Command="{Binding UnselectElementsCommand}"
+                                                    CommandParameter="{Binding SelectedItems, ElementName=_levels}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </CheckBox>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

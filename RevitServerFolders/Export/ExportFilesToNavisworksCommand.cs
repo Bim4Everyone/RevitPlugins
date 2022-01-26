@@ -33,7 +33,7 @@ namespace RevitServerFolders.Export {
             }
 
             if(!OptionalFunctionalityUtils.IsNavisworksExporterAvailable()) {
-                throw new Exception("Не установлено расширение экспорта в Navisworks.");
+                throw new InvalidOperationException("Не установлено расширение экспорта в Navisworks.");
             }
 
             if(CleanTargetFolder) {
@@ -49,9 +49,10 @@ namespace RevitServerFolders.Export {
                 var document = Application.OpenDocumentFile(fileName);
                 try {
                     var exportView = new FilteredElementCollector(document)
-                        .OfClass(typeof(View))
-                        .ToElements()
-                        .FirstOrDefault(item => item.Name.Equals("Navisworks"));
+                        .OfClass(typeof(View3D))
+                        .OfType<View3D>()
+                        .Where(item => !item.IsTemplate)
+                        .FirstOrDefault(item => item.Name.Equals("Navisworks", StringComparison.CurrentCultureIgnoreCase));
 
                     if(exportView == null) {
                         continue;

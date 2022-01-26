@@ -9,6 +9,8 @@ using System.Windows.Input;
 using dosymep.Views.Revit;
 using dosymep.WPF.Commands;
 
+using Microsoft.WindowsAPICodePack.Dialogs;
+
 using pyRevitLabs.Json;
 
 using RevitServerFolders.dosymep.Views.Revit;
@@ -189,21 +191,23 @@ namespace RevitServerFolders.Export {
         public ICommand SelectTargetNwcFolderCommand { get; set; }
 
         private void SelectTargetRvtFolder(object p) {
-            using(var dialog = new FolderBrowserDialog()) {
-                dialog.RootFolder = Environment.SpecialFolder.Desktop;
-                dialog.SelectedPath = TargetRvtFolder;
-                if(dialog.ShowDialog() == DialogResult.OK) {
-                    TargetRvtFolder = dialog.SelectedPath;
+            using(var dialog = new CommonOpenFileDialog()) {
+                dialog.IsFolderPicker = true;
+                dialog.Title = "Папка сохранения открепленных RVT-файлов";
+                dialog.InitialDirectory = TargetRvtFolder ?? Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
+                    TargetRvtFolder = dialog.FileName;
                 }
             }
         }
 
         private void SelectTargetNwcFolder(object p) {
-            using(var dialog = new FolderBrowserDialog()) {
-                dialog.RootFolder = Environment.SpecialFolder.Desktop;
-                dialog.SelectedPath = TargetNwcFolder;
-                if(dialog.ShowDialog() == DialogResult.OK) {
-                    TargetNwcFolder = dialog.SelectedPath;
+            using(var dialog = new CommonOpenFileDialog()) {
+                dialog.IsFolderPicker = true;
+                dialog.Title = "Папка сохранения NWC-файлов";
+                dialog.InitialDirectory = TargetNwcFolder ?? Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
+                    TargetNwcFolder = dialog.FileName;
                 }
             }
         }

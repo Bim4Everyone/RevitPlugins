@@ -50,13 +50,23 @@ namespace RevitCopyViews {
             projectParameters.SetupBrowserOrganization(document);
             projectParameters.SetupRevitParams(document, ProjectParamsConfig.Instance.ViewGroup, ProjectParamsConfig.Instance.ProjectStage);
 
-            var selectedViews = uiDocument.Selection.GetElementIds().Select(item => document.GetElement(item)).OfType<View>().ToList();
+            var selectedViews = uiDocument.Selection.GetElementIds()
+                .Select(item => document.GetElement(item))
+                .OfType<View>()
+                .Where(item => IsView(item))
+                .ToList();
+
             if(selectedViews.Count == 0) {
-                TaskDialog.Show("Предупреждение!", "Выберите виды, которые требуется копировать.");
+                TaskDialog.Show("Предупреждение!", "Выберите виды, которые требуется скопировать.");
                 return;
             }
 
-            var views = new FilteredElementCollector(document).OfClass(typeof(View)).ToElements();
+            var views = new FilteredElementCollector(document)
+                .OfClass(typeof(View))
+                .OfType<View>()
+                .Where(item => IsView(item))
+                .ToList();
+
             var groupViews = views
                  .Select(item => (string) item.GetParamValueOrDefault(ProjectParamsConfig.Instance.ViewGroup))
                  .Where(item => !string.IsNullOrEmpty(item))
@@ -76,6 +86,10 @@ namespace RevitCopyViews {
 
             new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
             window.ShowDialog();
+        }
+
+        private static bool IsView(View item) {
+            return item.Category?.Id != new ElementId(BuiltInCategory.OST_Schedules) && item.Category?.Id != new ElementId(BuiltInCategory.OST_Sheets);
         }
     }
 }

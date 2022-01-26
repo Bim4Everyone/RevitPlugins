@@ -60,7 +60,12 @@ namespace RevitCopyStandarts.Commands {
         }
 
         private ElementId CopyElement(View newLegend, View targetLegend) {
-            return ElementTransformUtils.CopyElements(newLegend, GetElements(newLegend).Select(item => item.Id).ToArray(), targetLegend, Transform.Identity, new CopyPasteOptions()).First();
+            var legends = GetElements(newLegend).Select(item => item.Id).ToArray();
+            if(legends.Length == 0) {
+                return ElementId.InvalidElementId;
+            }
+
+            return ElementTransformUtils.CopyElements(newLegend, legends, targetLegend, Transform.Identity, new CopyPasteOptions()).First();
         }
 
         private IEnumerable<Element> GetElements(Element view) {

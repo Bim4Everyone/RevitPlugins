@@ -15,16 +15,10 @@ using RevitRooms.Models;
 
 namespace RevitRooms.ViewModels {
     internal class LevelViewModel : ElementViewModel<Level> {
-        private bool _isSelected;
-
         public LevelViewModel(Level level, RevitRepository revitRepository, IEnumerable<SpatialElement> spatialElements) : base(level, revitRepository) {
             SpartialElements = new ObservableCollection<SpatialElementViewModel>(GetSpatialElements(revitRepository, spatialElements));
         }
 
-        public bool IsSelected {
-            get => _isSelected;
-            set => this.RaiseAndSetIfChanged(ref _isSelected, value);
-        }
 #if D2020 || R2020
         public string Elevation {
             get { return UnitUtils.ConvertFromInternalUnits(Element.Elevation, DisplayUnitType.DUT_METERS).ToString("0.000", CultureInfo.InvariantCulture); }
