@@ -21,7 +21,8 @@ namespace RevitLintelPlacement {
             AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
             try {
 
-                var mainViewModel = new MainViewModel(RuleConfig.GetConfig().GetRuleSettingsConfig(commandData.Application.ActiveUIDocument.Document.Title));
+                var mainViewModel = new MainViewModel(new RevitRepository(commandData.Application.Application, commandData.Application.ActiveUIDocument.Document), 
+                    RuleConfig.GetConfig().GetRuleSettingsConfig(commandData.Application.ActiveUIDocument.Document.Title));
                 var window = new MainWindow() { DataContext = mainViewModel };
                 new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
 

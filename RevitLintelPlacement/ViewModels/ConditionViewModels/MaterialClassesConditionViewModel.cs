@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -10,24 +13,23 @@ using RevitLintelPlacement.Models;
 using RevitLintelPlacement.ViewModels.Interfaces;
 
 namespace RevitLintelPlacement.ViewModels {
-    internal class MaterialConditionsViewModel : BaseViewModel, IConditionViewModel {
-        private readonly RevitRepository _revitRepository;
-        private ObservableCollection<MaterialConditionViewModel> _materialConditions;
+    internal class MaterialClassesConditionViewModel : BaseViewModel, IConditionViewModel {
 
-        public MaterialConditionsViewModel() {
+        private readonly RevitRepository _revitRepository;
+        private ObservableCollection<MaterialClassConditionViewModel> _materialClassConditions;
+
+        public ObservableCollection<MaterialClassConditionViewModel> MaterialClassConditions { 
+            get => _materialClassConditions; 
+            set => this.RaiseAndSetIfChanged(ref _materialClassConditions, value); 
+        }
+
+        public MaterialClassesConditionViewModel() {
 
         }
 
-        public MaterialConditionsViewModel(RevitRepository revitRepository) {
+        public MaterialClassesConditionViewModel(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
         }
-
-
-        public ObservableCollection<MaterialConditionViewModel> MaterialConditions {
-            get => _materialConditions;
-            set => this.RaiseAndSetIfChanged(ref _materialConditions, value);
-        }
-
 
         public bool Check(FamilyInstance elementInWall) {
             if(elementInWall == null || elementInWall.Id == ElementId.InvalidElementId)
@@ -36,14 +38,16 @@ namespace RevitLintelPlacement.ViewModels {
             if(elementInWall.Host == null || elementInWall.Host.GetType() != typeof(Wall))
                 throw new ArgumentNullException("На проверку передан некорректный элемент.");
 
-            var materials = _revitRepository.GetElements(elementInWall.Host.GetMaterialIds(true)); //TODO: может быть и true, проверить
+            var materials = _revitRepository.GetElements(elementInWall.Host.GetMaterialIds(false)); //TODO: может быть и true, проверить
             foreach(var m in materials) {
                 if(m as Material == null)
                     throw new ArgumentNullException("На проверку передан не материал.");
-                if(MaterialConditions.Any(mc => mc.IsChecked && mc.Name == ((Material) m).Name))
+                if(MaterialClassConditions.Any(mc => mc.IsChecked && mc.Name == ((Material)m).MaterialClass))
                     return true;
             }
             return false;
         }
     }
+
+   
 }

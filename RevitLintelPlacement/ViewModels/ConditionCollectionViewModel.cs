@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.ViewModels;
 
 using RevitLintelPlacement.Models;
@@ -13,14 +15,16 @@ using RevitLintelPlacement.ViewModels.Interfaces;
 
 namespace RevitLintelPlacement.ViewModels {
     internal class ConditionCollectionViewModel : BaseViewModel {
+        private readonly RevitRepository _revitRepository;
         private ObservableCollection<IConditionViewModel> _conditions;
 
         public ConditionCollectionViewModel() {
 
         }
 
-        public ConditionCollectionViewModel(IEnumerable<ConditionSetting> conditionSettings) {
+        public ConditionCollectionViewModel(RevitRepository revitRepository, IEnumerable<ConditionSetting> conditionSettings) {
 
+            this._revitRepository = revitRepository;
             Conditions = new ObservableCollection<IConditionViewModel>(GetConditionViewModels(conditionSettings));
         }
 
@@ -29,6 +33,10 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _conditions, value);
         }
         
+        public bool CheckConditions(FamilyInstance elementInWall) {
+            return Conditions.All(c => c.Check(elementInWall));
+        }
+
         private IEnumerable<IConditionViewModel> GetConditionViewModels(IEnumerable<ConditionSetting> conditionSettings) {
             foreach(var cs in conditionSettings) {
                 switch(cs.ConditionType) {
@@ -40,7 +48,7 @@ namespace RevitLintelPlacement.ViewModels {
                         break;
                     }
                     case ConditionType.WallMaterialClasses: {
-                        yield return new MaterialClassesConditionViewModel() {
+                        yield return new MaterialClassesConditionViewModel(_revitRepository) {
                             MaterialClassConditions = new ObservableCollection<MaterialClassConditionViewModel>(
                             cs.WallMaterialClasses.Select(mc => new MaterialClassConditionViewModel() {
                                 Name = mc,
@@ -70,7 +78,7 @@ namespace RevitLintelPlacement.ViewModels {
                         break;
                     }
                     case ConditionType.WallMaterials: {
-                        yield return new MaterialConditionsViewModel() {
+                        yield return new MaterialConditionsViewModel(_revitRepository) {
                             MaterialConditions = new ObservableCollection<MaterialConditionViewModel>(
                             cs.WallMaterials.Select(m => new MaterialConditionViewModel() {
                                 Name = m,
