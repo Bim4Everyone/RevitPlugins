@@ -39,17 +39,19 @@
                 </Grid>
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Column="1" Header="{Binding SelectedRule.Name}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <GroupBox Grid.Column="0" Header="Условия">
-                    <local:ConditionsView DataContext="{Binding SelectedRule.Conditions}"/>
-                </GroupBox>
-                <GroupBox Grid.Column="1" Header="Параметры перемычки"></GroupBox>
-            </Grid>
-        </GroupBox>
+        <Grid Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <GroupBox Grid.Column="0" Header="Условия">
+                <local:ConditionsView DataContext="{Binding SelectedRule.Conditions}"/>
+            </GroupBox>
+            <GridSplitter Grid.Column="1" Width="2" ShowsPreview="False"  HorizontalAlignment="Center" VerticalAlignment="Stretch" ></GridSplitter>
+            <GroupBox Grid.Column="2" Header="Параметры перемычки">
+                <local:LintelParmatersView DataContext="{Binding SelectedRule.LintelParameters}"/>
+            </GroupBox>
+        </Grid>
     </Grid>
 </UserControl>

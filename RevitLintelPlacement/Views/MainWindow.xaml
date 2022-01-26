@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:RevitLintelPlacement.Views"
         xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
         mc:Ignorable="d"
-        Title="Перемычки" Height="450" Width="800"
+        Title="Перемычки" Height="450" Width="1000"
         d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>

@@ -12,22 +12,22 @@
         <ListBox ItemsSource="{Binding Conditions}">
             <ListBox.Resources>
                 <DataTemplate DataType="{x:Type vm:OpeningWidthConditionViewModel}">
-                    <GroupBox Header="Ширина проема">
+                    <Expander Header="Ширина проема">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="от "></TextBlock>
-                            <TextBox Text="{Binding MinWidth}"></TextBox>
+                            <TextBlock Text="{Binding MinWidth}"></TextBlock>
                             <TextBlock Text=" до "></TextBlock>
-                            <TextBox Text="{Binding MaxWidth}"></TextBox>
+                            <TextBlock Text="{Binding MaxWidth}"></TextBlock>
                         </StackPanel>
-                    </GroupBox>
+                    </Expander>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:WallTypesConditionViewModel}">
                     <Expander Header="Типы стен">
-                        <ListBox ItemsSource="{Binding WallTypes}">
+                        <ListBox BorderThickness="0" ItemsSource="{Binding WallTypes}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate DataType="{x:Type vm:WallTypeConditionViewModel}">
                                     <StackPanel Orientation="Horizontal">
-                                        <CheckBox IsChecked="{Binding IsChecked}"></CheckBox>
+                                        <!--<CheckBox IsChecked="{Binding IsChecked}"></CheckBox>-->
                                         <TextBlock Text="{Binding Name}"></TextBlock>
                                     </StackPanel>
                                 </DataTemplate>
@@ -37,11 +37,11 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:ExclusionWallTypesConditionViewModel}">
                     <Expander Header="Исключенные типы стен">
-                        <ListBox ItemsSource="{Binding WallTypes}">
+                        <ListBox BorderThickness="0" ItemsSource="{Binding WallTypes}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate DataType="{x:Type vm:WallTypeConditionViewModel}">
                                     <StackPanel Orientation="Horizontal">
-                                        <CheckBox IsChecked="{Binding IsChecked}"></CheckBox>
+                                        <!--<CheckBox IsChecked="{Binding IsChecked}"></CheckBox>-->
                                         <TextBlock Text="{Binding Name}"></TextBlock>
                                     </StackPanel>
                                 </DataTemplate>
@@ -51,11 +51,11 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:MaterialClassesConditionViewModel}">
                     <Expander Header="Классы материла стен">
-                        <ListView ItemsSource="{Binding MaterialClassConditions}">
+                        <ListView BorderThickness="0" ItemsSource="{Binding MaterialClassConditions}">
                             <ListView.ItemTemplate>
                                 <DataTemplate DataType="{x:Type vm:MaterialClassConditionViewModel}">
                                     <StackPanel Orientation="Horizontal">
-                                        <CheckBox IsChecked="{Binding IsChecked}"></CheckBox>
+                                        <!--<CheckBox IsChecked="{Binding IsChecked}"></CheckBox>-->
                                         <TextBlock Text="{Binding Name}"></TextBlock>
                                     </StackPanel>
                                 </DataTemplate>
@@ -65,11 +65,11 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:MaterialConditionsViewModel}">
                     <Expander Header="Материал стен">
-                        <ListView ItemsSource="{Binding MaterialConditions}">
+                        <ListView BorderThickness="0" ItemsSource="{Binding MaterialConditions}" >
                             <ListView.ItemTemplate>
                                 <DataTemplate DataType="{x:Type vm:MaterialConditionViewModel}">
                                     <StackPanel Orientation="Horizontal">
-                                        <CheckBox IsChecked="{Binding IsChecked}"></CheckBox>
+                                        <!--<CheckBox IsChecked="{Binding IsChecked}"></CheckBox>-->
                                         <TextBlock Text="{Binding Name}"></TextBlock>
                                     </StackPanel>
                                 </DataTemplate>

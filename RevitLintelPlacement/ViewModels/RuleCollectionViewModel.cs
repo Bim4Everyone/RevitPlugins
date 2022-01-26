@@ -43,6 +43,7 @@ namespace RevitLintelPlacement.ViewModels {
                         Name = rule.Name,
                         IsSystem = rules.IsSystem,
                         Conditions = new ConditionCollectionViewModel(rule.ConditionSettingsConfig),
+                        LintelParameters = new LintelParameterCollectionViewModel(rule.LintelParameterSettingsConfig),
                         IsChecked = true
                     };
                 }

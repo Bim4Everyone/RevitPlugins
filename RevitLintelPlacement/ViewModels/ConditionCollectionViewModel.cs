@@ -29,8 +29,8 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _conditions, value);
         }
         
-        private IEnumerable<IConditionViewModel> GetConditionViewModels(IEnumerable<ConditionSetting> conditionSettingss) {
-            foreach(var cs in conditionSettingss) {
+        private IEnumerable<IConditionViewModel> GetConditionViewModels(IEnumerable<ConditionSetting> conditionSettings) {
+            foreach(var cs in conditionSettings) {
                 switch(cs.ConditionType) {
                     case ConditionType.OpeningWidth: {
                         yield return new OpeningWidthConditionViewModel() {

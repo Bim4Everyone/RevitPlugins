@@ -9,7 +9,7 @@ using dosymep.WPF.ViewModels;
 using RevitLintelPlacement.ViewModels.Interfaces;
 
 namespace RevitLintelPlacement.ViewModels {
-    internal class RelationLintelParameterViewModel : BaseViewModel, ILintelParameterViewModel {
+    internal class RelativeOpeningLintelParameterViewModel : BaseViewModel, ILintelParameterViewModel {
         private double _relationValue;
         private string _name;
         private string _openingParameterName;
@@ -25,8 +25,10 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         public string OpeningParameterName { 
-            get => _openingParameterName; 
-            private set => _openingParameterName = value; 
+            get => _openingParameterName;
+            set => this.RaiseAndSetIfChanged(ref _openingParameterName, value);
         }
     }
+
+
 }
