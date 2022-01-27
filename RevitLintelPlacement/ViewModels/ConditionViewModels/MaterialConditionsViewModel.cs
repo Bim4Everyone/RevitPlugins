@@ -34,12 +34,14 @@ namespace RevitLintelPlacement.ViewModels {
             if(elementInWall == null || elementInWall.Id == ElementId.InvalidElementId)
                 throw new ArgumentNullException(nameof(elementInWall));
 
-            if(elementInWall.Host == null || elementInWall.Host.GetType() != typeof(Wall))
-                throw new ArgumentNullException(nameof(elementInWall), "На проверку передан некорректный элемент.");
+            if(elementInWall.Host == null || !(elementInWall.Host is Wall wall))
+                return false;
+                //throw new ArgumentNullException(nameof(elementInWall), "На проверку передан некорректный элемент.");
 
-            var materials = _revitRepository.GetElements(elementInWall.Host.GetMaterialIds(true)); //TODO: может быть и true, проверить
+            var materials = _revitRepository.GetElements(wall.GetMaterialIds(true)); //TODO: может быть и true, проверить
             foreach(var m in materials) {
-                if(MaterialConditions.Any(mc => mc.IsChecked && mc.Name.Equals(((Material) m).Name, StringComparison.InvariantCultureIgnoreCase)))
+                //if(MaterialConditions.Any(mc => mc.IsChecked && mc.Name.Equals(((Material) m).Name, StringComparison.InvariantCultureIgnoreCase)))
+                if(MaterialConditions.Any(mc => mc.IsChecked && ((Material) m).Name.ToLower().Contains(mc.Name.ToLower())))
                     return true;
             }
             return false;

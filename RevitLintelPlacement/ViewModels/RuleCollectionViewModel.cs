@@ -40,8 +40,8 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _rules, value);
         }
 
-        public bool CheckConditions(FamilyInstance elementInWall) {
-            return Rules.Select(r => r.Conditions).All(c => c.CheckConditions(elementInWall));
+        public RuleViewModel GetRule(FamilyInstance elementInWall) {
+            return Rules.FirstOrDefault(r => r.Conditions.Conditions.All(c => c.Check(elementInWall)));
         }
 
         //TODO: возможно, правила из шаблона нужно сделать нередактируемыми

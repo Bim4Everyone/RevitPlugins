@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.ViewModels;
 
 using RevitLintelPlacement.Models;
@@ -25,6 +27,12 @@ namespace RevitLintelPlacement.ViewModels {
         public ObservableCollection<ILintelParameterViewModel> LintelParameters {
             get => _lintelParameters;
             set => this.RaiseAndSetIfChanged(ref _lintelParameters, value);
+        }
+
+        public void SetTo(FamilyInstance lintel, FamilyInstance elementInWall) {
+            foreach(var lintelParameter in LintelParameters) {
+                lintelParameter.SetTo(lintel, elementInWall);
+            }
         }
 
         private IEnumerable<ILintelParameterViewModel> GetLintelParameterViewModels(IEnumerable<LintelParameterSetting> lintelParameterSettings) {

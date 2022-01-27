@@ -51,7 +51,7 @@ namespace RevitLintelPlacement.Models {
 
             yield return new ConditionSetting() {
                 ConditionType = ConditionType.ExclusionWallTypes,
-                ExclusionWallTypes = new List<string> { "Невозводимые" },
+                ExclusionWallTypes = new List<string> { "Невозводим" },
             };
             yield return new ConditionSetting() {
                 ConditionType = ConditionType.WallMaterialClasses,
@@ -72,7 +72,7 @@ namespace RevitLintelPlacement.Models {
         private IEnumerable<ConditionSetting> InitializeNotBrickWallMaterialsCondition() {
             yield return new ConditionSetting() {
                 ConditionType = ConditionType.WallMaterials,
-                WallMaterials = new List<string>() { "Газобетон", "ПГП", "ПСП" },
+                WallMaterials = new List<string>() { "Газобетон", "Пазогребнев" },
             };
         }
 

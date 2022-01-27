@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.ViewModels;
 
 using RevitLintelPlacement.Models;
@@ -37,10 +39,57 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         public void CheckRules() {
-            //проверка проема на соответствие всем правилам (отфильтровываются ненужные проемы)
-            var elementInWalls = _revitRepository.GetAllElementsInWall();
+            var smth = _revitRepository.GetElementTest().GroupBy(e=>((FamilyInstance)e).Host.Name).ToList();
+
+            var elementInWalls = _revitRepository.GetAllElementsInWall().ToList();
+            Dictionary<ElementId, RuleViewModel> elementInWallIdRuleDict = new Dictionary<ElementId, RuleViewModel>();
+            Dictionary<Element, RuleViewModel> elementInWallRuleDict = new Dictionary<Element, RuleViewModel>();
+            Dictionary<ElementId, ElementId> lintelElementInWallDict = new Dictionary<ElementId, ElementId>();
             foreach(var elementInWall in elementInWalls) {
-                var smth = Rules.CheckConditions(elementInWall);
+                var rule = Rules.GetRule(elementInWall);
+                if(rule != null) {
+                    elementInWallIdRuleDict.Add(elementInWall.Id, rule); //соотношение элементов и правил
+                    elementInWallRuleDict.Add(elementInWall, rule); //соотношение элементов и правил
+                }
+            }
+            var lintels = _revitRepository.GetLintels();
+            //соотнести перемычки с проемами
+
+            //1. логика с помощью схемы -> проверить корректность расстановки
+
+            //2. геометрия
+            foreach(var lintel in lintels) {
+                var nearestElement = _revitRepository.GetNearestElement(lintel);
+                    if(nearestElement == ElementId.InvalidElementId)
+                    continue;
+                if(elementInWallIdRuleDict.ContainsKey(nearestElement)) {
+                    //lintelElementInWallDict.Add()
+                    lintelElementInWallDict.Add(lintel.Id, nearestElement);
+                    //проверить корректность расстановки
+                    elementInWallIdRuleDict.Remove(nearestElement);
+                }
+            }
+
+
+            //TODO: удалить потом
+            foreach(var lintel in lintels) {
+                if(lintel.SuperComponent != null && elementInWallIdRuleDict.ContainsKey(lintel.SuperComponent.Id)) {
+                    elementInWallIdRuleDict.Remove(lintel.SuperComponent.Id);
+                }
+            }
+
+            var lintelType = _revitRepository.GetLintelType();
+
+            //у оставшихся elementInWallRuleDict расставить перемычки
+
+            using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
+                foreach(var elementInWallId in elementInWallIdRuleDict.Keys) {
+                    var lintel = _revitRepository.PlaceLintel(lintelType, elementInWallId);
+                    var elementInWall = _revitRepository.GetElementById(elementInWallId) as FamilyInstance;
+                    elementInWallIdRuleDict[elementInWallId].LintelParameters.SetTo(lintel, elementInWall);
+                    //elementInWall.
+                }
+                t.Commit();
             }
         }
 

@@ -25,9 +25,10 @@ namespace RevitLintelPlacement.ViewModels {
                 throw new ArgumentNullException(nameof(elementInWall));
 
             if(elementInWall.Host == null || !(elementInWall.Host is Wall wall))
-                throw new ArgumentNullException(nameof(elementInWall), "На проверку передан некорректный элемент.");
+                return false;
+                //throw new ArgumentNullException(nameof(elementInWall), "На проверку передан некорректный элемент.");
 
-            return WallTypes.Any(wt => (wall.WallType.Name.Contains(wt.Name))); //TODO: или равно (уточнить)
+            return WallTypes.Any(wt => (wall.WallType.Name.ToLower().Contains(wt.Name.ToLower())));
         }
     }
 }

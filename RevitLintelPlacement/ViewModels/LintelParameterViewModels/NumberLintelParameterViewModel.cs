@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB;
+
+using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitLintelPlacement.ViewModels.Interfaces;
@@ -23,5 +26,11 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _name, value);
         }
 
+        public void SetTo(FamilyInstance lintel, FamilyInstance elementInWall) {
+            if(lintel is null) {
+                throw new ArgumentNullException(nameof(lintel));
+            }
+            lintel.SetParamValue(Name, Value);
+        }
     }
 }
