@@ -30,17 +30,16 @@ namespace RevitLintelPlacement.ViewModels {
 
 
         public bool Check(FamilyInstance elementInWall) {
+
             if(elementInWall == null || elementInWall.Id == ElementId.InvalidElementId)
-                throw new ArgumentNullException("На проверку не передан элемент.");
+                throw new ArgumentNullException(nameof(elementInWall));
 
             if(elementInWall.Host == null || elementInWall.Host.GetType() != typeof(Wall))
-                throw new ArgumentNullException("На проверку передан некорректный элемент.");
+                throw new ArgumentNullException(nameof(elementInWall), "На проверку передан некорректный элемент.");
 
             var materials = _revitRepository.GetElements(elementInWall.Host.GetMaterialIds(true)); //TODO: может быть и true, проверить
             foreach(var m in materials) {
-                if(m as Material == null)
-                    throw new ArgumentNullException("На проверку передан не материал.");
-                if(MaterialConditions.Any(mc => mc.IsChecked && mc.Name == ((Material) m).Name))
+                if(MaterialConditions.Any(mc => mc.IsChecked && mc.Name.Equals(((Material) m).Name, StringComparison.InvariantCultureIgnoreCase)))
                     return true;
             }
             return false;

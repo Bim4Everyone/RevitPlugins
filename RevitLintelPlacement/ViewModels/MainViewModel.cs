@@ -23,7 +23,7 @@ namespace RevitLintelPlacement.ViewModels {
             this._revitRepository = revitRepository;
             this._rulesSettings = rulesSettings;
             Lintels = new LintelCollectionViewModel();
-            Rules = new RuleCollectionViewModel(_revitRepository, rulesSettings);
+            Rules = new RuleCollectionViewModel(_revitRepository, _rulesSettings);
             CheckRules();
         }
         public RuleCollectionViewModel Rules {

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
+using dosymep.Revit;
 
 using RevitLintelPlacement.Models;
 using RevitLintelPlacement.ViewModels.Interfaces;
@@ -33,13 +34,15 @@ namespace RevitLintelPlacement.ViewModels {
 
         public bool Check(FamilyInstance elementInWall) {
             if(elementInWall == null || elementInWall.Id == ElementId.InvalidElementId)
-                throw new ArgumentNullException("На проверку не передан элемент.");
+                throw new ArgumentNullException(nameof(elementInWall));
 
-            double openingWidth;
+
+            //Todo: после установки 2021 версии поправить
 #if D2020 || R2020
-            openingWidth = UnitUtils.ConvertFromInternalUnits(elementInWall.Symbol.LookupParameter("Ширина").AsDouble(), DisplayUnitType.DUT_MILLIMETERS);
+            var elementWidth = (double) elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
+            double openingWidth = UnitUtils.ConvertFromInternalUnits(elementWidth, DisplayUnitType.DUT_MILLIMETERS);
 #else
-            openingWidth = UnitUtils.ConvertFromInternalUnits(elementInWall.Symbol.LookupParameter("Ширина").AsDouble(), UnitTypeId.Millimeters);
+            double openingWidth = UnitUtils.ConvertFromInternalUnits((double) elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM), UnitTypeId.Millimeters);
 #endif
             return MinWidth <= openingWidth && openingWidth < MaxWidth;
         }

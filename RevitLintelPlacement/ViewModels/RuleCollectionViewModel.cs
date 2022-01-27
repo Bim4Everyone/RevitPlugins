@@ -26,7 +26,7 @@ namespace RevitLintelPlacement.ViewModels {
         public RuleCollectionViewModel(RevitRepository revitRepository, IEnumerable<RulesSettigs> rulesSettings) {
             this._revitRepository = revitRepository;
             this._rulesSettings = rulesSettings;
-            Rules = new ObservableCollection<RuleViewModel>(GetRuleViewModels(rulesSettings));
+            Rules = new ObservableCollection<RuleViewModel>(GetRuleViewModels(_rulesSettings));
             SelectedRule = Rules.FirstOrDefault();
         }
 

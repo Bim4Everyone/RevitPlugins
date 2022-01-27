@@ -22,12 +22,12 @@ namespace RevitLintelPlacement.ViewModels {
 
         public bool Check(FamilyInstance elementInWall) {
             if(elementInWall == null || elementInWall.Id == ElementId.InvalidElementId)
-                throw new ArgumentNullException("На проверку не передан элемент.");
+                throw new ArgumentNullException(nameof(elementInWall));
 
-            if(elementInWall.Host == null || elementInWall.Host.GetType() != typeof(Wall))
-                throw new ArgumentNullException("На проверку передан некорректный элемент.");
+            if(elementInWall.Host == null || !(elementInWall.Host is Wall wall))
+                throw new ArgumentNullException(nameof(elementInWall), "На проверку передан некорректный элемент.");
 
-            return WallTypes.Any(wt => ((Wall) elementInWall.Host).WallType.Name.Contains(wt.Name)); //TODO: или равно (у Арсения уточнить)
+            return WallTypes.Any(wt => (wall.WallType.Name.Contains(wt.Name))); //TODO: или равно (уточнить)
         }
     }
 }

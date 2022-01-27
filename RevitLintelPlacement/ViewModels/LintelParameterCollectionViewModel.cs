@@ -61,7 +61,7 @@ namespace RevitLintelPlacement.ViewModels {
                         break;
                     }
                     default:
-                    throw new ArgumentException($"Следующий тип условия: {lp.LintelParameterType}, не найден.");
+                    throw new ArgumentException($"Следующий тип условия: \"{lp.LintelParameterType}\", не найден.");
                 }
 
             }

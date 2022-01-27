@@ -89,7 +89,7 @@ namespace RevitLintelPlacement.ViewModels {
                     }
 
                     default:
-                    throw new ArgumentException($"Следующий тип условия: {cs.ConditionType}, не найден.");
+                    throw new ArgumentException($"Следующий тип условия: \"{cs.ConditionType}\", не найден.");
                 }
 
             }
