@@ -24,11 +24,11 @@
             <Button > обновить</Button>
         </ToolBar>
         <TabControl Grid.Row="1" Margin="0,5">
-            <TabItem Header="Правила">
-                <local:RulesTabView DataContext="{Binding Rules}"/>
-            </TabItem>
             <TabItem  Header="Перемычки">
                 <local:LintelsTabView DataContext="{Binding Lintels}"/>
+            </TabItem>
+            <TabItem Header="Правила">
+                <local:RulesTabView DataContext="{Binding Rules}"/>
             </TabItem>
         </TabControl>
         <StatusBar Grid.Row="2" Height="30" HorizontalAlignment="Stretch">

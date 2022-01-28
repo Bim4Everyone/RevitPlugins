@@ -133,7 +133,40 @@ namespace RevitLintelPlacement.Models {
             return transaction;
         }
 
-        
+        public ViewOrientation3D GetOrientation3D() {
+            var view3D = _document.ActiveView as View3D;
+            return view3D.GetOrientation();
+        }
+
+        public void SelectAndShowElement(ElementId id, ViewOrientation3D orientation) {
+            var element = _document.GetElement(id);
+            //var view3D = new FilteredElementCollector(_document)
+            //    .OfClass(typeof(View3D))
+            //    .Cast<View3D>()
+            //    .FirstOrDefault(e => !e.IsTemplate);
+            //_uiDocument.ActiveView = view3D;
+            var view3D = _document.ActiveView as View3D;
+
+            using(var t = StartTransaction("Подрезка")) {
+                view3D.IsSectionBoxActive = false;
+                view3D.SetOrientation(orientation);
+                
+                t.Commit();
+            }
+
+            using(var t = StartTransaction("Подрезка")) {
+               
+                var bb = element.get_BoundingBox(view3D);
+                view3D.SetSectionBox(bb);
+                _uiDocument.ShowElements(element);
+                t.Commit();
+            }
+            //_uiDocument.Selection.SetElementIds(new List<ElementId> { id });
+            //var commandId = RevitCommandId.LookupCommandId("ID_VIEW_APPLY_SELECTION_BOX");
+            //if(!(commandId is null) && _uiDocument.Application.CanPostCommand(commandId)) {
+            //    _uiApplication.PostCommand(commandId);
+            //}
+        }
 
         private IEnumerable<string> GetMaterialClasses(Element element) {
             var materialIds = element.GetMaterialIds(false);

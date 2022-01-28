@@ -24,7 +24,7 @@ namespace RevitLintelPlacement.ViewModels {
         public MainViewModel(RevitRepository revitRepository, IEnumerable<RulesSettigs> rulesSettings) {
             this._revitRepository = revitRepository;
             this._rulesSettings = rulesSettings;
-            Lintels = new LintelCollectionViewModel();
+            Lintels = new LintelCollectionViewModel(_revitRepository);
             Rules = new RuleCollectionViewModel(_revitRepository, _rulesSettings);
             CheckRules();
         }
@@ -76,7 +76,16 @@ namespace RevitLintelPlacement.ViewModels {
             foreach(var lintel in lintels) {
                 if(lintel.SuperComponent != null && elementInWallIdRuleDict.ContainsKey(lintel.SuperComponent.Id)) {
                     elementInWallIdRuleDict.Remove(lintel.SuperComponent.Id);
+                    var elementInWall = (FamilyInstance)_revitRepository.GetElementById(lintel.SuperComponent.Id);
+                    //var lintelViewModel = new LintelInfoViewModel() {
+                    //    LintelId = lintel.Id,
+                    //    ElementInWallId = elementInWall.Id,
+                    //    WallTypeName = elementInWall.Host.Name,
+                    //    ElementInWallName = elementInWall.Name
+                    //};
+                    //Lintels.LintelInfos.Add(lintelViewModel);
                 }
+
             }
 
             var lintelType = _revitRepository.GetLintelType();
