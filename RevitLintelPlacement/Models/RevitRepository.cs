@@ -12,6 +12,8 @@ using dosymep.Revit;
 namespace RevitLintelPlacement.Models {
 
     internal class RevitRepository {
+        private readonly string _lintelTypeName = "155_Перемычка"; //TODO: название типа перемычки
+
         private readonly Application _application;
         private readonly UIApplication _uiApplication;
 
@@ -30,7 +32,7 @@ namespace RevitLintelPlacement.Models {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .WhereElementIsElementType()
-                .First(e => e.Name == "155_Перемычка") as FamilySymbol;
+                .First(e => e.Name == _lintelTypeName) as FamilySymbol; 
 
         }
 
@@ -39,24 +41,25 @@ namespace RevitLintelPlacement.Models {
         }
 
         public FamilyInstance PlaceLintel(FamilySymbol lintelType, ElementId elementInWallId) {
-            FamilyInstance lintel = null;
-            XYZ center;
+
             var elementInWall = _document.GetElement(elementInWallId) as FamilyInstance;
 
             if(!lintelType.IsActive)
                 lintelType.Activate();
-            center = GetLocationPoint(elementInWall);
-            lintel = _document.Create.NewFamilyInstance(center, lintelType, StructuralType.NonStructural);
+            XYZ center = GetLocationPoint(elementInWall);
+            FamilyInstance lintel = _document.Create.NewFamilyInstance(center, lintelType, StructuralType.NonStructural);
 
             RotateLintel(lintel, elementInWall, center);
             return lintel;
         }
 
+        //не работает, если нет геометрии у FamilyInsatnce
+        //пока проверка только по центру, нужно еще пытаться найти элементы на границах перемычки (ситуация, когда несколько проемов под ней)
         public ElementId GetNearestElement(FamilyInstance fi) {
             var view3D = new FilteredElementCollector(_document)
                 .OfClass(typeof(View3D))
                 .Cast<View3D>()
-                .First(v => !v.IsTemplate);
+                .First(v => !v.IsTemplate); //не любой 3D-вид подойдет (нужен со всей геометрией) //TODO: создать свой 3D-вид (для FindNearest и подрезки)
             var exclusionList = new List<ElementId> { fi.Id };
             exclusionList.AddRange(fi.GetDependentElements(new ElementClassFilter(typeof(FamilyInstance))));
             var exclusionFilter = new ExclusionFilter(exclusionList);
@@ -95,7 +98,7 @@ namespace RevitLintelPlacement.Models {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .OfClass(typeof(FamilyInstance))
-                .Where(e => e.Name == "155_Перемычка")
+                .Where(e => e.Name == _lintelTypeName)
                 .Cast<FamilyInstance>()
                 .ToList();
         }
@@ -111,16 +114,17 @@ namespace RevitLintelPlacement.Models {
                 .Cast<FamilyInstance>();
         }
 
+        //проверка, есть ли сверху элемента стена, у которой класс материала не кладка (в таком случает перемычку ставить не надо)
         public bool CheckUp(FamilyInstance elementInWall) {
-            if(elementInWall.Id == new ElementId(4815652)) {
-                var smrh = 3;
-            }
-            var viewPoint = GetLocationPoint(elementInWall);
+
+            XYZ viewPoint = GetLocationPoint(elementInWall);
             var wall = GetNearestElement(elementInWall, viewPoint, typeof(Wall), new XYZ(0, 0, 1));
-            if(wall == ElementId.InvalidElementId)
+            if(wall == ElementId.InvalidElementId) {
                 return false;
+            }
+
             foreach(var materialClass in GetMaterialClasses(_document.GetElement(wall))) {
-                if(materialClass.Equals("Кладка", StringComparison.InvariantCultureIgnoreCase))
+                if(materialClass.Equals("Кладка", StringComparison.InvariantCultureIgnoreCase)) //TODO: класс материала
                     return true;
             }
             return false;
@@ -138,29 +142,32 @@ namespace RevitLintelPlacement.Models {
             return view3D.GetOrientation();
         }
 
+        public bool IsActivView3D() {
+            return _document.ActiveView is View3D;
+        }
+
         public void SelectAndShowElement(ElementId id, ViewOrientation3D orientation) {
             var element = _document.GetElement(id);
-            //var view3D = new FilteredElementCollector(_document)
-            //    .OfClass(typeof(View3D))
-            //    .Cast<View3D>()
-            //    .FirstOrDefault(e => !e.IsTemplate);
-            //_uiDocument.ActiveView = view3D;
-            var view3D = _document.ActiveView as View3D;
+            var view3D = _document.ActiveView as View3D; //TODO: тут тоже нужен свой 3D вид, но лучше нижняя реализация с асинхронностью
 
-            using(var t = StartTransaction("Подрезка")) {
-                view3D.IsSectionBoxActive = false;
-                view3D.SetOrientation(orientation);
-                
-                t.Commit();
-            }
+            using(TransactionGroup tg = new TransactionGroup(_document)) {
+                tg.Start("BIM: Подрезка");
+                using(var t = StartTransaction("Подрезка")) {
+                    view3D.IsSectionBoxActive = false;
+                    view3D.SetOrientation(orientation);
+                    t.Commit();
+                }
 
-            using(var t = StartTransaction("Подрезка")) {
-               
-                var bb = element.get_BoundingBox(view3D);
-                view3D.SetSectionBox(bb);
-                _uiDocument.ShowElements(element);
-                t.Commit();
+                using(var t = StartTransaction("Подрезка")) {
+
+                    var bb = element.get_BoundingBox(view3D);
+                    view3D.SetSectionBox(bb);
+                    _uiDocument.ShowElements(element);
+                    t.Commit();
+                }
+                tg.Assimilate();
             }
+            // Если будет асинхронный Task
             //_uiDocument.Selection.SetElementIds(new List<ElementId> { id });
             //var commandId = RevitCommandId.LookupCommandId("ID_VIEW_APPLY_SELECTION_BOX");
             //if(!(commandId is null) && _uiDocument.Application.CanPostCommand(commandId)) {
@@ -175,7 +182,7 @@ namespace RevitLintelPlacement.Models {
             }
         }
 
-        //пока проверка только по центру, нужно еще пытаться найти элементы на границах перемычки (ситуация, когда несколько проемов под ней)
+       
         private ElementId GetNearestElement(FamilyInstance fi, XYZ viewPoint, Type elementType, XYZ direction) {
             //создавать свой 3D - вид
             var view3D = new FilteredElementCollector(_document)
@@ -195,7 +202,7 @@ namespace RevitLintelPlacement.Models {
             if(refWithContext == null)
                 return ElementId.InvalidElementId;
 
-            if(refWithContext.Proximity < 0.1) { //TODO: придумать расстояние, при котором считается еще, что перемычка над проемом
+            if(refWithContext.Proximity < 0.1) { 
                 return refWithContext.GetReference().ElementId;
             }
             return ElementId.InvalidElementId;
@@ -210,11 +217,11 @@ namespace RevitLintelPlacement.Models {
             var topElement = elementInWall.GetReferences(FamilyInstanceReferenceType.Top);
             var bottomLintel = lintel.GetReferences(FamilyInstanceReferenceType.CenterElevation);
 
-            var facade = new FilteredElementCollector(_document)
+            var elevation = new FilteredElementCollector(_document)
                 .OfClass(typeof(View))
                 .Cast<View>()
                 .First(v => v.ViewType == ViewType.Elevation);
-            _document.Create.NewAlignment(facade, topElement.First(), bottomLintel.First());
+            _document.Create.NewAlignment(elevation, topElement.First(), bottomLintel.First());
 
 
             //TODO: поискать другой способ
@@ -229,51 +236,78 @@ namespace RevitLintelPlacement.Models {
                .OfClass(typeof(View))
                .Cast<View>()
                .First(v => v.ViewType == ViewType.FloorPlan);
-            var isAlign = false;
 
 
             foreach(var reference in verticalLintelPlanes) {
                 foreach(var face in maxAreaFaces) {
                     try {
                         _document.Create.NewAlignment(plan, reference, face.Reference);
-                        isAlign = true;
-                        break;
+                       
                     } catch {
 
                     }
                 }
-                if(isAlign)
-                    break;
             }
 
         }
 
-        private bool RotateLintel(FamilyInstance lintel, FamilyInstance elementInWall, XYZ center) {
-            
-                var line = Line.CreateBound(center, new XYZ(center.X, center.Y, center.Z + 1));
-                ElementTransformUtils.RotateElement(_document, lintel.Id, line, GetAngle(elementInWall));
-                
+        /// <summary>
+        /// Поворачивает первый элемент на угол поворота второго элемента вокруг Oz
+        /// </summary>
+        /// <param name="lintel">вращаемый элемент</param>
+        /// <param name="elementInWall">повернутый элемент</param>
+        /// <param name="center">точка поворота</param>
+        private void RotateLintel(FamilyInstance lintel, FamilyInstance elementInWall, XYZ center) {
+            if(lintel is null) {
+                throw new ArgumentNullException(nameof(lintel));
+            }
 
-            return true;
+            if(elementInWall is null) {
+                throw new ArgumentNullException(nameof(elementInWall));
+            }
+
+            if(center is null) {
+                throw new ArgumentNullException(nameof(center));
+            }
+
+            var line = Line.CreateBound(center, new XYZ(center.X, center.Y, center.Z + 1));
+            ElementTransformUtils.RotateElement(_document, lintel.Id, line, GetAngle(elementInWall));
         }
 
+        /// <summary>
+        /// Возвращает угол поворота элемента вокруг Oz
+        /// </summary>
+        /// <param name="elementInWall">элемент</param>
+        /// <returns></returns>
         private double GetAngle(FamilyInstance elementInWall) {
+            if(elementInWall is null) {
+                throw new ArgumentNullException(nameof(elementInWall));
+            }
+
             var transform = elementInWall.GetTransform();
             var vectorX = transform.OfVector(transform.BasisX);
             return Math.PI + transform.BasisX.AngleOnPlaneTo(vectorX, transform.BasisZ);
         }
 
         private XYZ GetLocationPoint(FamilyInstance elementInWall) {
+            if(elementInWall is null) {
+                throw new ArgumentNullException(nameof(elementInWall));
+            }
+
             var topBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM); //TODO: возможно, не всегда этот параметр
             //var bottomBarHeight = elementInWall.get_Parameter(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
-            var levelHeight = ((Level) _document.GetElement(elementInWall.LevelId)).Elevation;
+            //var levelHeight = ((Level) _document.GetElement(elementInWall.LevelId)).Elevation;
             var location = ((LocationPoint) elementInWall.Location).Point;
-            var z = location.Z + topBarHeight; //+ bottomBarHeight.AsDouble(); //TODO: параметр!!!
+            var z = location.Z + topBarHeight; //+ bottomBarHeight.AsDouble(); //TODO: тут, наверное, нужен параметр, пока так
             return new XYZ(location.X, location.Y, z);
         }
 
         private XYZ GetViewStartPoint(FamilyInstance lintel, bool plusDirection) //изменить название метода
         {
+            if(lintel is null) {
+                throw new ArgumentNullException(nameof(lintel));
+            }
+
             var normal = new XYZ(0, 1, 0);
             var direction = lintel.GetTransform().OfVector(normal);
             var demiWidth = (double) lintel.GetParamValueOrDefault("Половина толщины стены"); //TODO: Параметр!
@@ -287,30 +321,29 @@ namespace RevitLintelPlacement.Models {
                 throw new ArgumentNullException(nameof(element));
             }
 
-            var orientedFaces = new List<Face>();
-            var option = new Options();
-            option.ComputeReferences = true;
-            foreach(GeometryObject geometryObject in element.get_Geometry(option)) {
+            foreach(GeometryObject geometryObject in element.get_Geometry(new Options() { ComputeReferences=true})) {
                 if(geometryObject is Solid solid) {
-                    var horizontalFacesFromSolid = GetOrientedFacesFromSolid(solid, orientation);
-                    if(horizontalFacesFromSolid != null)
-                        orientedFaces.AddRange(horizontalFacesFromSolid);
+                    foreach(var face in GetOrientedFacesFromSolid(solid, orientation))
+                        yield return face;
                 } else {
                     var geometryInstace = geometryObject as GeometryInstance;
                     if(geometryInstace == null)
                         continue;
 
                     foreach(var instObj in geometryInstace.GetInstanceGeometry()) {
-                        Solid solidFromGeomInst = instObj as Solid;
-                        if(solidFromGeomInst == null)
+                        if(!(instObj is Solid solidFromGeomInst)) {
                             continue;
+                        }
+
                         var horizontalFacesFromSolid = GetOrientedFacesFromSolid(solidFromGeomInst, orientation);
-                        if(horizontalFacesFromSolid != null)
-                            orientedFaces.AddRange(horizontalFacesFromSolid);
+                        if(horizontalFacesFromSolid != null) {
+                            foreach(var face in GetOrientedFacesFromSolid(solidFromGeomInst, orientation)) {
+                                yield return face;
+                            }
+                        }
                     }
-                }
+                }            
             }
-            return orientedFaces;
         }
 
         public IEnumerable<Element> GetElementTest() {

@@ -8,6 +8,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -18,7 +19,7 @@ namespace RevitLintelPlacement.ViewModels {
     internal class LintelCollectionViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private ObservableCollection<LintelInfoViewModel> _lintelInfos;
-        private ViewOrientation3D _orientation;
+        private ViewOrientation3D _orientation; //вряд ли здесь нужно хранить
         public LintelCollectionViewModel() {
 
         }
@@ -30,11 +31,10 @@ namespace RevitLintelPlacement.ViewModels {
             LintelsViewSource = new CollectionViewSource();
             LintelsViewSource.Source = LintelInfos;
             LintelsViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(LintelInfoViewModel.WallTypeName)));
-            SelectElementCommand = new RelayCommand(SelectElement, p => true);
-            _orientation = _revitRepository.GetOrientation3D();
+            SelectAndShowElementCommand = new RelayCommand(SelectElement, p => true);
         }
 
-        public ICommand SelectElementCommand { get; }
+        public ICommand SelectAndShowElementCommand { get; }
 
         public CollectionViewSource LintelsViewSource { get; set; }
 
@@ -44,9 +44,16 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         private void SelectElement(object p) {
+            
             if (p is ElementId id) {
-                
-                _revitRepository.SelectAndShowElement(id, _orientation);
+                if(_revitRepository.IsActivView3D()) {
+                    if(_orientation == null) {
+                        _orientation = _revitRepository.GetOrientation3D();
+                    }
+                    _revitRepository.SelectAndShowElement(id, _orientation);
+                } else {
+                    TaskDialog.Show("Revit","Перейдите на 3D вид");
+                }
             }
 
         }

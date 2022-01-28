@@ -17,7 +17,7 @@
         <ToolBar Grid.Row="0" >
             <Button>настройки</Button>
             <Separator></Separator>
-            <Button > расставить </Button>
+            <Button Command="{Binding PlaceLintelCommand}"> расставить </Button>
             <Separator/>
             <Button > удалить</Button>
             <Separator/>

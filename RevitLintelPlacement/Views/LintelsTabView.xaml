@@ -22,7 +22,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type vm:LintelInfoViewModel}">
                             <Button Content="{Binding LintelId}" Command="{Binding ElementName=LintelsView, 
-                                Path=DataContext.SelectElementCommand}" CommandParameter="{Binding LintelId}">
+                                Path=DataContext.SelectAndShowElementCommand}" CommandParameter="{Binding LintelId}">
                             </Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -30,7 +30,9 @@
                 <DataGridTemplateColumn Width="Auto" Header="Id Элемента">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type vm:LintelInfoViewModel}">
-                            <Button Content="{Binding ElementInWallId}"></Button>
+                            <Button Content="{Binding ElementInWallId}" Command="{Binding ElementName=LintelsView, 
+                                Path=DataContext.SelectAndShowElementCommand}" CommandParameter="{Binding LintelId}">
+                            </Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

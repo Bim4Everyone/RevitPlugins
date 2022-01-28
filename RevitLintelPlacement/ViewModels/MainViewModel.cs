@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitLintelPlacement.Models;
@@ -26,7 +28,8 @@ namespace RevitLintelPlacement.ViewModels {
             this._rulesSettings = rulesSettings;
             Lintels = new LintelCollectionViewModel(_revitRepository);
             Rules = new RuleCollectionViewModel(_revitRepository, _rulesSettings);
-            CheckRules();
+            InitializeLintels();
+            PlaceLintelCommand = new RelayCommand(CheckRules, p => true);
         }
         public RuleCollectionViewModel Rules {
             get => _rules;
@@ -38,23 +41,19 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _lintels, value);
         }
 
-        public void CheckRules() {
-            var smth = _revitRepository.GetElementTest().GroupBy(e=>((FamilyInstance)e).Host.Name).ToList();
-            var sm = _revitRepository.GetElementTest().ToList();
-            var elementInWalls = _revitRepository.GetAllElementsInWall().ToList();
+        public ICommand PlaceLintelCommand { get; set; }
+
+        public void CheckRules(object p) {
+            
             Dictionary<ElementId, RuleViewModel> elementInWallIdRuleDict = new Dictionary<ElementId, RuleViewModel>();
-            List<Element> elementInWallRuleDict = new List<Element>();
-            Dictionary<ElementId, ElementId> lintelElementInWallDict = new Dictionary<ElementId, ElementId>();
-            foreach(var elementInWall in elementInWalls) {
+            foreach(var elementInWall in _revitRepository.GetAllElementsInWall().ToList()) {
                 var rule = Rules.GetRule(elementInWall);
                 if(rule != null) {
                     elementInWallIdRuleDict.Add(elementInWall.Id, rule); //соотношение элементов и правил
-                    elementInWallRuleDict.Add(elementInWall); //соотношение элементов и правил
                 }
             }
-            var smth2 = elementInWallRuleDict.GroupBy(e => ((FamilyInstance) e).Host.Name).ToList();
             var lintels = _revitRepository.GetLintels();
-            //соотнести перемычки с проемами
+            //TODO: соотнести перемычки с проемами
 
             //1. логика с помощью схемы -> проверить корректность расстановки
 
@@ -64,29 +63,16 @@ namespace RevitLintelPlacement.ViewModels {
                     if(nearestElement == ElementId.InvalidElementId)
                     continue;
                 if(elementInWallIdRuleDict.ContainsKey(nearestElement)) {
-                    //lintelElementInWallDict.Add()
-                    lintelElementInWallDict.Add(lintel.Id, nearestElement);
-                    //проверить корректность расстановки
+ 
+                    //TODO: проверить корректность расстановки
+
                     elementInWallIdRuleDict.Remove(nearestElement);
                 }
             }
 
 
             //TODO: удалить потом
-            foreach(var lintel in lintels) {
-                if(lintel.SuperComponent != null && elementInWallIdRuleDict.ContainsKey(lintel.SuperComponent.Id)) {
-                    elementInWallIdRuleDict.Remove(lintel.SuperComponent.Id);
-                    var elementInWall = (FamilyInstance)_revitRepository.GetElementById(lintel.SuperComponent.Id);
-                    //var lintelViewModel = new LintelInfoViewModel() {
-                    //    LintelId = lintel.Id,
-                    //    ElementInWallId = elementInWall.Id,
-                    //    WallTypeName = elementInWall.Host.Name,
-                    //    ElementInWallName = elementInWall.Name
-                    //};
-                    //Lintels.LintelInfos.Add(lintelViewModel);
-                }
-
-            }
+           
 
             var lintelType = _revitRepository.GetLintelType();
 
@@ -110,6 +96,25 @@ namespace RevitLintelPlacement.ViewModels {
                     //elementInWall.
                 }
                 t.Commit();
+            }
+        }
+
+
+        //пока сопоставляются только перемычки в группе
+        private void InitializeLintels() {
+            var lintels = _revitRepository.GetLintels();
+            foreach(var lintel in lintels) {
+                if(lintel.SuperComponent != null) {
+                    var elementInWall = (FamilyInstance) _revitRepository.GetElementById(lintel.SuperComponent.Id);
+                    var lintelViewModel = new LintelInfoViewModel() {
+                        LintelId = lintel.Id,
+                        ElementInWallId = elementInWall.Id,
+                        WallTypeName = elementInWall.Host.Name,
+                        ElementInWallName = elementInWall.Name
+                    };
+                    Lintels.LintelInfos.Add(lintelViewModel);
+                }
+
             }
         }
 
