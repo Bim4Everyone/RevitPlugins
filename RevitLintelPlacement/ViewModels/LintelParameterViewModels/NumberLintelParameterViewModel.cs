@@ -30,7 +30,14 @@ namespace RevitLintelPlacement.ViewModels {
             if(lintel is null) {
                 throw new ArgumentNullException(nameof(lintel));
             }
-            lintel.SetParamValue(Name, Value);
+
+            //TODO: другие версии Revit
+#if D2020 || R2020
+            var value = UnitUtils.Convert(Value, DisplayUnitType.DUT_MILLIMETERS, DisplayUnitType.DUT_DECIMAL_FEET);
+            lintel.SetParamValue(Name, value);
+#endif
+            //lintel.SetParamValue(Name, Value);
+
         }
     }
 }

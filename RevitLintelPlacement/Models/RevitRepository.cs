@@ -26,36 +26,12 @@ namespace RevitLintelPlacement.Models {
             _uiDocument = new UIDocument(document);
         }
 
-        public IEnumerable<Element> GetElements(IEnumerable<ElementId> ids) {
-            foreach(var id in ids)
-                yield return _document.GetElement(id);
-        }
-
-        public IEnumerable<FamilyInstance> GetLintels() {
-
-            return new FilteredElementCollector(_document)
-                .OfCategory(BuiltInCategory.OST_GenericModel)
-                .OfClass(typeof(FamilyInstance))
-                .Where(e => e.Name == "155_Перемычка")
-                .Cast<FamilyInstance>()
-                .ToList();
-        }
-
         public FamilySymbol GetLintelType() {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .WhereElementIsElementType()
                 .First(e => e.Name == "155_Перемычка") as FamilySymbol;
 
-        }
-
-        public IEnumerable<FamilyInstance> GetAllElementsInWall() {
-            var categoryFilter = new ElementMulticategoryFilter(new List<BuiltInCategory> { BuiltInCategory.OST_Doors, BuiltInCategory.OST_Windows });
-
-            return new FilteredElementCollector(_document)
-                .WherePasses(categoryFilter)
-                .OfClass(typeof(FamilyInstance))
-                .Cast<FamilyInstance>();
         }
 
         public Element GetElementById(ElementId id) {
@@ -66,17 +42,16 @@ namespace RevitLintelPlacement.Models {
             FamilyInstance lintel = null;
             XYZ center;
             var elementInWall = _document.GetElement(elementInWallId) as FamilyInstance;
-           
-                if(!lintelType.IsActive)
-                    lintelType.Activate();
-                center = GetLocationPoint(elementInWall);
-                lintel = _document.Create.NewFamilyInstance(center, lintelType, StructuralType.NonStructural);
-              
+
+            if(!lintelType.IsActive)
+                lintelType.Activate();
+            center = GetLocationPoint(elementInWall);
+            lintel = _document.Create.NewFamilyInstance(center, lintelType, StructuralType.NonStructural);
+
             RotateLintel(lintel, elementInWall, center);
             return lintel;
         }
 
-        //пока проверка только по центру, нужно еще пытаться найти элементы на границах перемычки (ситуация, когда несколько проемов под ней)
         public ElementId GetNearestElement(FamilyInstance fi) {
             var view3D = new FilteredElementCollector(_document)
                 .OfClass(typeof(View3D))
@@ -98,7 +73,7 @@ namespace RevitLintelPlacement.Models {
 
             ReferenceWithContext neededRef = refWithContext1 == null ? refWithContext2 : refWithContext1;
 
-            if(refWithContext1!=null && refWithContext2 != null) {
+            if(refWithContext1 != null && refWithContext2 != null) {
                 neededRef = refWithContext1.Proximity > refWithContext2.Proximity
                 ? refWithContext2
                 : refWithContext1;
@@ -109,6 +84,48 @@ namespace RevitLintelPlacement.Models {
             return ElementId.InvalidElementId;
         }
 
+
+        public IEnumerable<Element> GetElements(IEnumerable<ElementId> ids) {
+            foreach(var id in ids)
+                yield return _document.GetElement(id);
+        }
+
+        public IEnumerable<FamilyInstance> GetLintels() {
+
+            return new FilteredElementCollector(_document)
+                .OfCategory(BuiltInCategory.OST_GenericModel)
+                .OfClass(typeof(FamilyInstance))
+                .Where(e => e.Name == "155_Перемычка")
+                .Cast<FamilyInstance>()
+                .ToList();
+        }
+
+        
+
+        public IEnumerable<FamilyInstance> GetAllElementsInWall() {
+            var categoryFilter = new ElementMulticategoryFilter(new List<BuiltInCategory> { BuiltInCategory.OST_Doors, BuiltInCategory.OST_Windows });
+
+            return new FilteredElementCollector(_document)
+                .WherePasses(categoryFilter)
+                .OfClass(typeof(FamilyInstance))
+                .Cast<FamilyInstance>();
+        }
+
+        public bool CheckUp(FamilyInstance elementInWall) {
+            if(elementInWall.Id == new ElementId(4815652)) {
+                var smrh = 3;
+            }
+            var viewPoint = GetLocationPoint(elementInWall);
+            var wall = GetNearestElement(elementInWall, viewPoint, typeof(Wall), new XYZ(0, 0, 1));
+            if(wall == ElementId.InvalidElementId)
+                return false;
+            foreach(var materialClass in GetMaterialClasses(_document.GetElement(wall))) {
+                if(materialClass.Equals("Кладка", StringComparison.InvariantCultureIgnoreCase))
+                    return true;
+            }
+            return false;
+        }
+
         public Transaction StartTransaction(string transactionName) {
             var transaction = new Transaction(_document);
             transaction.BIMStart(transactionName);
@@ -116,7 +133,42 @@ namespace RevitLintelPlacement.Models {
             return transaction;
         }
 
-        void LockLintel(FamilyInstance lintel, FamilyInstance elementInWall) {
+        
+
+        private IEnumerable<string> GetMaterialClasses(Element element) {
+            var materialIds = element.GetMaterialIds(false);
+            foreach(var id in materialIds) {
+                yield return ((Material) _document.GetElement(id)).MaterialClass;
+            }
+        }
+
+        //пока проверка только по центру, нужно еще пытаться найти элементы на границах перемычки (ситуация, когда несколько проемов под ней)
+        private ElementId GetNearestElement(FamilyInstance fi, XYZ viewPoint, Type elementType, XYZ direction) {
+            //создавать свой 3D - вид
+            var view3D = new FilteredElementCollector(_document)
+                .OfClass(typeof(View3D))
+                .Cast<View3D>()
+                .First(v => !v.IsTemplate);
+            view3D = (View3D)_document.ActiveView;
+            var exclusionList = new List<ElementId> { fi.Id };
+            exclusionList.AddRange(fi.GetDependentElements(new ElementClassFilter(typeof(FamilyInstance))));
+            var exclusionFilter = new ExclusionFilter(exclusionList);
+            var classFilter = new ElementClassFilter(typeof(Wall));
+            var logicalFilter = new LogicalAndFilter(new List<ElementFilter> { exclusionFilter, classFilter });
+            var refIntersector = new ReferenceIntersector(logicalFilter, FindReferenceTarget.All, view3D);
+
+            var refWithContext = refIntersector.FindNearest(viewPoint, direction);
+
+            if(refWithContext == null)
+                return ElementId.InvalidElementId;
+
+            if(refWithContext.Proximity < 0.1) { //TODO: придумать расстояние, при котором считается еще, что перемычка над проемом
+                return refWithContext.GetReference().ElementId;
+            }
+            return ElementId.InvalidElementId;
+        }
+
+        private void LockLintel(FamilyInstance lintel, FamilyInstance elementInWall) {
             
             var LeftRightElement = elementInWall.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
             var LeftRightLintel = lintel.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
@@ -179,21 +231,19 @@ namespace RevitLintelPlacement.Models {
         }
 
         private XYZ GetLocationPoint(FamilyInstance elementInWall) {
-            var topBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
+            var topBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM); //TODO: возможно, не всегда этот параметр
             //var bottomBarHeight = elementInWall.get_Parameter(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
             var levelHeight = ((Level) _document.GetElement(elementInWall.LevelId)).Elevation;
-            var z = levelHeight + topBarHeight; //+ bottomBarHeight.AsDouble();
             var location = ((LocationPoint) elementInWall.Location).Point;
+            var z = location.Z + topBarHeight; //+ bottomBarHeight.AsDouble(); //TODO: параметр!!!
             return new XYZ(location.X, location.Y, z);
         }
-
-       
 
         private XYZ GetViewStartPoint(FamilyInstance lintel, bool plusDirection) //изменить название метода
         {
             var normal = new XYZ(0, 1, 0);
             var direction = lintel.GetTransform().OfVector(normal);
-            var demiWidth = (double) lintel.GetParamValueOrDefault("Половина толщины стены");
+            var demiWidth = (double) lintel.GetParamValueOrDefault("Половина толщины стены"); //TODO: Параметр!
             if(plusDirection)
                 return ((LocationPoint) lintel.Location).Point + direction * demiWidth;
             return ((LocationPoint) lintel.Location).Point - direction * demiWidth;
@@ -233,21 +283,21 @@ namespace RevitLintelPlacement.Models {
         public IEnumerable<Element> GetElementTest() {
 
 
-            var element = _document.GetElement(new ElementId(7855887)) as FamilyInstance;
-            if(!(element.Host == null || !(element.Host is Wall wall1))) {
-                var materials = GetElements(wall1.GetMaterialIds(false)); //TODO: может быть и true, проверить
-                foreach(var m in materials) {
-                    if("Кладка".Equals(((Material) m).MaterialClass, StringComparison.InvariantCultureIgnoreCase)) {
-                        if(!wall1.Name.ToLower().Contains("невозводим")) {
-                            var elementWidth = (double) element.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
-                            double openingWidth = UnitUtils.ConvertFromInternalUnits(elementWidth, DisplayUnitType.DUT_MILLIMETERS);
-                            if(400 <= openingWidth && openingWidth < 2500)
-                                yield return element;
-                        }
-                    } //TODO: для английской версии дожен быть config
+            //var element = _document.GetElement(new ElementId(7855887)) as FamilyInstance;
+            //if(!(element.Host == null || !(element.Host is Wall wall1))) {
+            //    var materials = GetElements(wall1.GetMaterialIds(false)); //TODO: может быть и true, проверить
+            //    foreach(var m in materials) {
+            //        if("Кладка".Equals(((Material) m).MaterialClass, StringComparison.InvariantCultureIgnoreCase)) {
+            //            if(!wall1.Name.ToLower().Contains("невозводим")) {
+            //                var elementWidth = (double) element.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
+            //                double openingWidth = UnitUtils.ConvertFromInternalUnits(elementWidth, DisplayUnitType.DUT_MILLIMETERS);
+            //                if(400 <= openingWidth && openingWidth < 2500)
+            //                    yield return element;
+            //            }
+            //        } //TODO: для английской версии дожен быть config
 
-                }
-            }
+            //    }
+            //}
                
 
             var smth = GetAllElementsInWall();
@@ -258,9 +308,9 @@ namespace RevitLintelPlacement.Models {
                 foreach(var m in materials) {
                     if("Кладка".Equals(((Material) m).MaterialClass, StringComparison.InvariantCultureIgnoreCase)) {
                         if(!wall.Name.ToLower().Contains("невозводим")) {
-                            var elementWidth = (double) s.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
+                            var elementWidth = (double) s.GetParamValueOrDefault("ADSK_Размер_Ширина");
                             double openingWidth = UnitUtils.ConvertFromInternalUnits(elementWidth, DisplayUnitType.DUT_MILLIMETERS);
-                            if (400<= openingWidth && openingWidth< 2500)
+                            if (200<= openingWidth && openingWidth< 2500)
                                 yield return s;
                         }
                     } //TODO: для английской версии дожен быть config

@@ -40,18 +40,19 @@ namespace RevitLintelPlacement.ViewModels {
 
         public void CheckRules() {
             var smth = _revitRepository.GetElementTest().GroupBy(e=>((FamilyInstance)e).Host.Name).ToList();
-
+            var sm = _revitRepository.GetElementTest().ToList();
             var elementInWalls = _revitRepository.GetAllElementsInWall().ToList();
             Dictionary<ElementId, RuleViewModel> elementInWallIdRuleDict = new Dictionary<ElementId, RuleViewModel>();
-            Dictionary<Element, RuleViewModel> elementInWallRuleDict = new Dictionary<Element, RuleViewModel>();
+            List<Element> elementInWallRuleDict = new List<Element>();
             Dictionary<ElementId, ElementId> lintelElementInWallDict = new Dictionary<ElementId, ElementId>();
             foreach(var elementInWall in elementInWalls) {
                 var rule = Rules.GetRule(elementInWall);
                 if(rule != null) {
                     elementInWallIdRuleDict.Add(elementInWall.Id, rule); //соотношение элементов и правил
-                    elementInWallRuleDict.Add(elementInWall, rule); //соотношение элементов и правил
+                    elementInWallRuleDict.Add(elementInWall); //соотношение элементов и правил
                 }
             }
+            var smth2 = elementInWallRuleDict.GroupBy(e => ((FamilyInstance) e).Host.Name).ToList();
             var lintels = _revitRepository.GetLintels();
             //соотнести перемычки с проемами
 
@@ -84,9 +85,19 @@ namespace RevitLintelPlacement.ViewModels {
 
             using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
                 foreach(var elementInWallId in elementInWallIdRuleDict.Keys) {
-                    var lintel = _revitRepository.PlaceLintel(lintelType, elementInWallId);
                     var elementInWall = _revitRepository.GetElementById(elementInWallId) as FamilyInstance;
+                    if(!_revitRepository.CheckUp(elementInWall))
+                        continue;
+                    var lintel = _revitRepository.PlaceLintel(lintelType, elementInWallId);
                     elementInWallIdRuleDict[elementInWallId].LintelParameters.SetTo(lintel, elementInWall);
+                    var lintelViewModel = new LintelInfoViewModel() {
+                        LintelId = lintel.Id,
+                        ElementInWallId = elementInWall.Id,
+                        WallTypeName = elementInWall.Host.Name,
+                        ElementInWallName = elementInWall.Name
+                    };
+                    Lintels.LintelInfos.Add(lintelViewModel);
+
                     //elementInWall.
                 }
                 t.Commit();

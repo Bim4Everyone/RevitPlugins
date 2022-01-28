@@ -9,6 +9,6 @@
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance vm:LintelCollectionViewModel, IsDesignTimeCreatable=False}">
     <Grid>
-            
+        <DataGrid ItemsSource="{Binding LintelInfos}"></DataGrid>
     </Grid>
 </UserControl>

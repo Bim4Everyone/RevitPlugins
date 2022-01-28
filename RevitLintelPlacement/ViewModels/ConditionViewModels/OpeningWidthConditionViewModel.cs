@@ -39,7 +39,7 @@ namespace RevitLintelPlacement.ViewModels {
 
             //Todo: после установки 2021 версии поправить
 #if D2020 || R2020
-            var elementWidth = (double) elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
+            var elementWidth = (double) elementInWall.GetParamValueOrDefault("ADSK_Размер_Ширина");
             double openingWidth = UnitUtils.ConvertFromInternalUnits(elementWidth, DisplayUnitType.DUT_MILLIMETERS);
 #else
             double openingWidth = UnitUtils.ConvertFromInternalUnits((double) elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM), UnitTypeId.Millimeters);
