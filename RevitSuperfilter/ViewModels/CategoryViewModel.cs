@@ -62,7 +62,7 @@ namespace RevitSuperfilter.ViewModels {
                     }
 
                     _parametersView = CollectionViewSource.GetDefaultView(_parameters);
-                    _parametersView.Filter = item => Filter(item as ParametersViewModel);
+                    _parametersView.Filter = item => Filter(item as IParametersViewModel);
                 }
 
                 return _parametersView;
@@ -129,7 +129,7 @@ namespace RevitSuperfilter.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _buttonFilterName, value);
         }
 
-        private bool Filter(ParametersViewModel param) {
+        private bool Filter(IParametersViewModel param) {
             if(string.IsNullOrEmpty(FilterValue)) {
                 return true;
             }
