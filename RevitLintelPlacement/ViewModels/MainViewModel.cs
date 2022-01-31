@@ -77,7 +77,6 @@ namespace RevitLintelPlacement.ViewModels {
             var lintelType = _revitRepository.GetLintelType();
 
             //у оставшихся elementInWallRuleDict расставить перемычки
-
             using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
                 foreach(var elementInWallId in elementInWallIdRuleDict.Keys) {
                     var elementInWall = _revitRepository.GetElementById(elementInWallId) as FamilyInstance;
@@ -85,6 +84,7 @@ namespace RevitLintelPlacement.ViewModels {
                         continue;
                     var lintel = _revitRepository.PlaceLintel(lintelType, elementInWallId);
                     elementInWallIdRuleDict[elementInWallId].LintelParameters.SetTo(lintel, elementInWall);
+                    _revitRepository.LockLintel(lintel, elementInWall);
                     var lintelViewModel = new LintelInfoViewModel() {
                         LintelId = lintel.Id,
                         ElementInWallId = elementInWall.Id,

@@ -162,6 +162,7 @@ namespace RevitLintelPlacement.Models {
 
                     var bb = element.get_BoundingBox(view3D);
                     view3D.SetSectionBox(bb);
+                    _uiDocument.SetSelectedElements(element);
                     _uiDocument.ShowElements(element);
                     t.Commit();
                 }
@@ -208,11 +209,12 @@ namespace RevitLintelPlacement.Models {
             return ElementId.InvalidElementId;
         }
 
-        private void LockLintel(FamilyInstance lintel, FamilyInstance elementInWall) {
+        public void LockLintel(FamilyInstance lintel, FamilyInstance elementInWall) {
             
             var LeftRightElement = elementInWall.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
             var LeftRightLintel = lintel.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
-            _document.Create.NewAlignment(_document.ActiveView, LeftRightLintel.First(), LeftRightElement.First());
+            if (LeftRightElement.Any() && LeftRightLintel.Any())
+                _document.Create.NewAlignment(_document.ActiveView, LeftRightLintel.First(), LeftRightElement.First());
 
             var topElement = elementInWall.GetReferences(FamilyInstanceReferenceType.Top);
             var bottomLintel = lintel.GetReferences(FamilyInstanceReferenceType.CenterElevation);
@@ -221,34 +223,30 @@ namespace RevitLintelPlacement.Models {
                 .OfClass(typeof(View))
                 .Cast<View>()
                 .First(v => v.ViewType == ViewType.Elevation);
-            _document.Create.NewAlignment(elevation, topElement.First(), bottomLintel.First());
+            if (topElement.Any() && bottomLintel.Any())
+                _document.Create.NewAlignment(elevation, topElement.First(), bottomLintel.First());
 
-
-            //TODO: поискать другой способ
-            var elementInWallVerticalFaces = GetOrientedFaces(elementInWall.Host, Orientation.Horizontal);
-            var maxAreaFaces = elementInWallVerticalFaces
-                .Where(f => Math.Abs(f.Area - elementInWallVerticalFaces.Max(e => e.Area)) < 0.001).ToList();
             var leftL = lintel.GetReferences(FamilyInstanceReferenceType.Front);
             var rightL = lintel.GetReferences(FamilyInstanceReferenceType.Back);
-            var verticalLintelPlanes = new List<Reference> { leftL.First(), rightL.First() };
-
+            var wallReferences1 = HostObjectUtils.GetSideFaces((Wall) elementInWall.Host, ShellLayerType.Interior);
+            var wallReferences2 = HostObjectUtils.GetSideFaces((Wall) elementInWall.Host, ShellLayerType.Exterior);
             var plan = new FilteredElementCollector(_document)
                .OfClass(typeof(View))
                .Cast<View>()
                .First(v => v.ViewType == ViewType.FloorPlan);
 
-
-            foreach(var reference in verticalLintelPlanes) {
-                foreach(var face in maxAreaFaces) {
-                    try {
-                        _document.Create.NewAlignment(plan, reference, face.Reference);
-                       
-                    } catch {
-
-                    }
+            //возможно, ошибка возникает при устновке параметра половина толщины, поэтому нет геометричкого выравнивания
+            try {
+                if(leftL.Any() && wallReferences1.Any()) {
+                    _document.Create.NewAlignment(plan, leftL.First(), wallReferences1.First());
                 }
-            }
 
+                if(rightL.Any() && wallReferences2.Any()) {
+                    _document.Create.NewAlignment(plan, rightL.First(), wallReferences2.First());
+                }
+            } catch {
+
+            }
         }
 
         /// <summary>
