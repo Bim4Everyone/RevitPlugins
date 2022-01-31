@@ -40,6 +40,10 @@ namespace RevitLintelPlacement.Models {
             return _document.GetElement(id);
         }
 
+        public Category GetCategory(BuiltInCategory builtInCategory) {
+            return Category.GetCategory(_document, builtInCategory);
+        }
+
         public FamilyInstance PlaceLintel(FamilySymbol lintelType, ElementId elementInWallId) {
 
             var elementInWall = _document.GetElement(elementInWallId) as FamilyInstance;
@@ -176,6 +180,25 @@ namespace RevitLintelPlacement.Models {
             //}
         }
 
+        public FamilyInstance GetDimensionFamilyInstance(FamilyInstance fi) {
+            var dimensionids = fi.GetDependentElements(new ElementClassFilter(typeof(Dimension)));
+            if(dimensionids.Any()) {
+                foreach(var id in dimensionids) {
+                    var dimension = (Dimension) _document.GetElement(id);
+                    var references = dimension.References;
+                    foreach(Reference refer in references) {
+                        if(refer.ElementId == fi.Id)
+                            continue;
+                        if(_document.GetElement(refer.ElementId) is FamilyInstance allignFi)
+                            return allignFi;
+                    }
+                }
+            }
+            return null;
+
+        }
+
+
         private IEnumerable<string> GetMaterialClasses(Element element) {
             var materialIds = element.GetMaterialIds(false);
             foreach(var id in materialIds) {
@@ -203,7 +226,7 @@ namespace RevitLintelPlacement.Models {
             if(refWithContext == null)
                 return ElementId.InvalidElementId;
 
-            if(refWithContext.Proximity < 0.1) { 
+            if(refWithContext.Proximity < 0.01) { 
                 return refWithContext.GetReference().ElementId;
             }
             return ElementId.InvalidElementId;

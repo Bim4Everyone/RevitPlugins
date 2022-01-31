@@ -57,6 +57,8 @@ namespace RevitLintelPlacement.ViewModels {
 
             //1. логика с помощью схемы -> проверить корректность расстановки
 
+
+
             //2. геометрия
             foreach(var lintel in lintels) {
                 var nearestElement = _revitRepository.GetNearestElement(lintel);
@@ -100,7 +102,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
 
-        //пока сопоставляются только перемычки в группе
+        //сопоставляются перемычки в группе + перемычки, закрепленные с элементом
         private void InitializeLintels() {
             var lintels = _revitRepository.GetLintels();
             foreach(var lintel in lintels) {
@@ -113,6 +115,21 @@ namespace RevitLintelPlacement.ViewModels {
                         ElementInWallName = elementInWall.Name
                     };
                     Lintels.LintelInfos.Add(lintelViewModel);
+                }
+                var allignElement = _revitRepository.GetDimensionFamilyInstance(lintel);
+                if(allignElement != null) { 
+                    if (allignElement.Category.Name == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Name ||
+                        allignElement.Category.Name == _revitRepository.GetCategory(BuiltInCategory.OST_Windows).Name) {
+                        var elementInWall = (FamilyInstance) _revitRepository.GetElementById(allignElement.Id);
+                        var lintelViewModel = new LintelInfoViewModel() {
+                            LintelId = lintel.Id,
+                            ElementInWallId = elementInWall.Id,
+                            WallTypeName = elementInWall.Host.Name,
+                            ElementInWallName = elementInWall.Name
+                        };
+                        Lintels.LintelInfos.Add(lintelViewModel);
+                    }
+
                 }
 
             }
