@@ -269,6 +269,7 @@ namespace RevitLintelPlacement.Models {
                 }
             } catch {
 
+
             }
         }
 
@@ -307,7 +308,7 @@ namespace RevitLintelPlacement.Models {
 
             var transform = elementInWall.GetTransform();
             var vectorX = transform.OfVector(transform.BasisX);
-            return Math.PI + transform.BasisX.AngleOnPlaneTo(vectorX, transform.BasisZ);
+            return transform.BasisX.AngleOnPlaneTo(vectorX, transform.BasisZ);
         }
 
         private XYZ GetLocationPoint(FamilyInstance elementInWall) {
