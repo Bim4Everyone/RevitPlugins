@@ -12,6 +12,7 @@ using dosymep.Revit;
 namespace RevitLintelPlacement.Models {
 
     internal class RevitRepository {
+        private readonly string _view3DName = "3D_Перемычки"; 
         private readonly string _lintelTypeName = "155_Перемычка"; //TODO: название типа перемычки
 
         private readonly Application _application;
@@ -26,6 +27,7 @@ namespace RevitLintelPlacement.Models {
 
             _document = document;
             _uiDocument = new UIDocument(document);
+            CreateView3DIfNotExisted();
         }
 
         public FamilySymbol GetLintelType() {
@@ -61,9 +63,9 @@ namespace RevitLintelPlacement.Models {
         //пока проверка только по центру, нужно еще пытаться найти элементы на границах перемычки (ситуация, когда несколько проемов под ней)
         public ElementId GetNearestElement(FamilyInstance fi) {
             var view3D = new FilteredElementCollector(_document)
-                .OfClass(typeof(View3D))
-                .Cast<View3D>()
-                .First(v => !v.IsTemplate); //не любой 3D-вид подойдет (нужен со всей геометрией) //TODO: создать свой 3D-вид (для FindNearest и подрезки)
+              .OfClass(typeof(View3D))
+              .Cast<View3D>()
+              .First(v => !v.IsTemplate && v.Name == _view3DName); //не любой 3D-вид подойдет (нужен со всей геометрией) //TODO: создать свой 3D-вид (для FindNearest и подрезки)
             var exclusionList = new List<ElementId> { fi.Id };
             exclusionList.AddRange(fi.GetDependentElements(new ElementClassFilter(typeof(FamilyInstance))));
             var exclusionFilter = new ExclusionFilter(exclusionList);
@@ -143,7 +145,10 @@ namespace RevitLintelPlacement.Models {
         }
 
         public ViewOrientation3D GetOrientation3D() {
-            var view3D = _document.ActiveView as View3D;
+            var view3D = new FilteredElementCollector(_document)
+              .OfClass(typeof(View3D))
+              .Cast<View3D>()
+              .First(v => !v.IsTemplate && v.Name == _view3DName);
             return view3D.GetOrientation();
         }
 
@@ -153,7 +158,10 @@ namespace RevitLintelPlacement.Models {
 
         public void SelectAndShowElement(ElementId id, ViewOrientation3D orientation) {
             var element = _document.GetElement(id);
-            var view3D = _document.ActiveView as View3D; //TODO: тут тоже нужен свой 3D вид, но лучше нижняя реализация с асинхронностью
+            var view3D = new FilteredElementCollector(_document)
+              .OfClass(typeof(View3D))
+              .Cast<View3D>()
+              .First(v => !v.IsTemplate && v.Name == _view3DName); //TODO: тут тоже нужен свой 3D вид, но лучше нижняя реализация с асинхронностью
 
             using(TransactionGroup tg = new TransactionGroup(_document)) {
                 tg.Start("BIM: Подрезка");
@@ -199,6 +207,28 @@ namespace RevitLintelPlacement.Models {
 
         }
 
+        public void CreateView3DIfNotExisted() {
+            var view3D = new FilteredElementCollector(_document)
+              .OfClass(typeof(View3D))
+              .Cast<View3D>()
+              .FirstOrDefault(v => !v.IsTemplate && v.Name==_view3DName);
+            if(view3D != null) {
+                _uiDocument.ActiveView = view3D;
+                return;
+            }
+            using (Transaction t = new Transaction(_document)) {
+                t.BIMStart("Создание 3D-вида");
+                var type = new FilteredElementCollector(_document)
+                    .OfClass(typeof(ViewFamilyType))
+                    .Cast<ViewFamilyType>()
+                    .Where(v => v.ViewFamily == ViewFamily.ThreeDimensional)
+                    .First();
+                view3D = View3D.CreateIsometric(_document, type.Id);
+                view3D.Name = _view3DName;
+                t.Commit();
+            }
+            _uiDocument.ActiveView = view3D;
+        }
 
         private IEnumerable<string> GetMaterialClasses(Element element) {
             var materialIds = element.GetMaterialIds(false);
@@ -211,9 +241,9 @@ namespace RevitLintelPlacement.Models {
         private ElementId GetNearestElement(FamilyInstance fi, XYZ viewPoint, Type elementType, XYZ direction) {
             //создавать свой 3D - вид
             var view3D = new FilteredElementCollector(_document)
-                .OfClass(typeof(View3D))
-                .Cast<View3D>()
-                .First(v => !v.IsTemplate);
+              .OfClass(typeof(View3D))
+              .Cast<View3D>()
+              .First(v => !v.IsTemplate && v.Name == _view3DName);
             view3D = (View3D)_document.ActiveView;
             var exclusionList = new List<ElementId> { fi.Id };
             exclusionList.AddRange(fi.GetDependentElements(new ElementClassFilter(typeof(FamilyInstance))));
