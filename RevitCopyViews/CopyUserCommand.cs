@@ -57,7 +57,7 @@ namespace RevitCopyViews {
                 .ToList();
 
             if(selectedViews.Count == 0) {
-                TaskDialog.Show("Предупреждение!", "Не были найдены пользовательские виды, которые можно копировать.");
+                TaskDialog.Show("Предупреждение!", "Не были найдены виды начинающиеся на \"User_\".");
                 return;
             }
             

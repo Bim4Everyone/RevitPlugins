@@ -93,7 +93,10 @@ namespace RevitSuperfilter.ViewModels {
 
         public string Filter {
             get => _filter;
-            set => this.RaiseAndSetIfChanged(ref _filter, value);
+            set {
+                this.RaiseAndSetIfChanged(ref _filter, value);
+                CategoryViewModelsView.Refresh();
+            }
         }
 
         public string ButtonFilterName {

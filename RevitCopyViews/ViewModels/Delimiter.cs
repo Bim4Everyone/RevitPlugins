@@ -35,7 +35,7 @@ namespace RevitCopyViews.ViewModels {
         }
 
         public static string CreateViewName(SplittedViewName splittedViewName) {
-            var values = new[] { splittedViewName.Prefix, splittedViewName.ViewName, splittedViewName.Elevations, splittedViewName.Suffix };
+            var values = new[] { splittedViewName.Prefix, splittedViewName.ViewName, splittedViewName.Suffix, splittedViewName.Elevations };
             return string.Join(new string(new[] { _value }), values.Where(item => !string.IsNullOrEmpty(item)));
         }
 
@@ -61,15 +61,19 @@ namespace RevitCopyViews.ViewModels {
                 return null;
             }
 
+            // Первая попытка получить суффикс
             int index = originalName.LastIndexOf(_value);
             string suffix = index == -1 ? null : originalName.Substring(index, originalName.Length - index);
 
+            // Если не был получен elevation,
+            // тогда суффикс был верно получен
             string elevation = GetElevation(originalName);
             if(string.IsNullOrEmpty(elevation)) {
                 return suffix;
             }
 
-            return suffix.StartsWith(elevation) ? suffix.Replace(elevation, string.Empty) : suffix;
+            // Иначе надо взять значение без elevation
+            return GetSuffix(originalName.Replace(elevation, string.Empty));
         }
 
         private static string GetElevation(string originalName) {

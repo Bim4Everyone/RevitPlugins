@@ -41,22 +41,19 @@
 		<AssemblyName>$(AssemblyName)_$(RevitVersion)</AssemblyName>
 	</PropertyGroup>
 
-	<ItemGroup>
-	  <None Remove="Resources\icons8-show-property-96.png" />
-	</ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\dosymep\AppDomainExtensions.cs" Link="dosymep\AppDomainExtensions.cs" />
+    <Compile Include="..\dosymep\BaseViewModel.cs" Link="dosymep\BaseViewModel.cs" />
+    <Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\RelayCommand.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="dosymep\" />
+  </ItemGroup>
 
 	<ItemGroup>
-	  <Compile Include="..\dosymep\AppDomainExtensions.cs" Link="dosymep\AppDomainExtensions.cs" />
-	  <Compile Include="..\dosymep\BaseViewModel.cs" Link="dosymep\BaseViewModel.cs" />
-	  <Compile Include="..\dosymep\ConfigSerializer.cs" Link="dosymep\ConfigSerializer.cs" />
-	  <Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\RelayCommand.cs" />
+		<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
-	  <PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525" />
-	</ItemGroup>
-
 	<ItemGroup>
 		<Reference Include="dosymep.Bim4Everyone">
 			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\$(RevitVersion)\dosymep.Bim4Everyone.dll</HintPath>
@@ -66,9 +63,6 @@
 			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\$(RevitVersion)\dosymep.Revit.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
-		<Reference Include="pyRevitLabs.Json">
-		  <HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.Json.dll</HintPath>
-		</Reference>
 		<Reference Include="RevitAPI">
 			<HintPath>$(ProgramW6432)\Autodesk\Revit $(RevitVersion)\RevitAPI.dll</HintPath>
 			<Private>False</Private>
@@ -77,10 +71,6 @@
 			<HintPath>$(ProgramW6432)\Autodesk\Revit $(RevitVersion)\RevitAPIUI.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Resource Include="Resources\icons8-show-property-96.png" />
 	</ItemGroup>
 
 </Project>
