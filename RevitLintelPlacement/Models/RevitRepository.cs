@@ -124,7 +124,7 @@ namespace RevitLintelPlacement.Models {
             }
 
             foreach(var materialClass in GetMaterialClasses(_document.GetElement(wall))) {
-                if(materialClass.Equals("Кладка", StringComparison.InvariantCultureIgnoreCase)) //TODO: класс материала
+                if(materialClass.Equals("Кладка", StringComparison.CurrentCultureIgnoreCase)) //TODO: класс материала
                     return true;
             }
             return false;
@@ -353,7 +353,7 @@ namespace RevitLintelPlacement.Models {
             //if(!(element.Host == null || !(element.Host is Wall wall1))) {
             //    var materials = GetElements(wall1.GetMaterialIds(false)); //TODO: может быть и true, проверить
             //    foreach(var m in materials) {
-            //        if("Кладка".Equals(((Material) m).MaterialClass, StringComparison.InvariantCultureIgnoreCase)) {
+            //        if("Кладка".Equals(((Material) m).MaterialClass, StringComparison.CurrentCultureIgnoreCase)) {
             //            if(!wall1.Name.ToLower().Contains("невозводим")) {
             //                var elementWidth = (double) element.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
             //                double openingWidth = UnitUtils.ConvertFromInternalUnits(elementWidth, DisplayUnitType.DUT_MILLIMETERS);
@@ -364,7 +364,7 @@ namespace RevitLintelPlacement.Models {
 
             //    }
             //}
-               
+
 
             var smth = GetAllElementsInWall();
             foreach(var s in smth) {
@@ -372,7 +372,7 @@ namespace RevitLintelPlacement.Models {
                     continue;
                 var materials = GetElements(wall.GetMaterialIds(false)); //TODO: может быть и true, проверить
                 foreach(var m in materials) {
-                    if("Кладка".Equals(((Material) m).MaterialClass, StringComparison.InvariantCultureIgnoreCase)) {
+                    if("Кладка".Equals(((Material) m).MaterialClass, StringComparison.CurrentCultureIgnoreCase)) {
                         if(!wall.Name.ToLower().Contains("невозводим")) {
                             var elementWidth = (double) s.GetParamValueOrDefault("ADSK_Размер_Ширина");
                             double openingWidth = UnitUtils.ConvertFromInternalUnits(elementWidth, DisplayUnitType.DUT_MILLIMETERS);

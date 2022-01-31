@@ -42,7 +42,7 @@ namespace RevitLintelPlacement.ViewModels {
 
             var materials = _revitRepository.GetElements(wall.GetMaterialIds(false)); //TODO: может быть и true, проверить
             foreach(var m in materials) {
-                if(MaterialClassConditions.Any(mc => mc.IsChecked && mc.Name.Equals(((Material)m).MaterialClass, StringComparison.InvariantCultureIgnoreCase))) //TODO: для английской версии дожен быть config
+                if(MaterialClassConditions.Any(mc => mc.IsChecked && mc.Name.Equals(((Material)m).MaterialClass, StringComparison.CurrentCultureIgnoreCase))) //TODO: для английской версии дожен быть config
                     return true;
             }
             return false;

@@ -29,7 +29,7 @@ namespace RevitLintelPlacement.ViewModels {
             Lintels = new LintelCollectionViewModel(_revitRepository);
             Rules = new RuleCollectionViewModel(_revitRepository, _rulesSettings);
             InitializeLintels();
-            PlaceLintelCommand = new RelayCommand(CheckRules, p => true);
+            PlaceLintelCommand = new RelayCommand(PlaceLintels, p => true);
         }
         public RuleCollectionViewModel Rules {
             get => _rules;
@@ -43,7 +43,7 @@ namespace RevitLintelPlacement.ViewModels {
 
         public ICommand PlaceLintelCommand { get; set; }
 
-        public void CheckRules(object p) {
+        public void PlaceLintels(object p) {
             
             Dictionary<ElementId, RuleViewModel> elementInWallIdRuleDict = new Dictionary<ElementId, RuleViewModel>();
             foreach(var elementInWall in _revitRepository.GetAllElementsInWall().ToList()) {

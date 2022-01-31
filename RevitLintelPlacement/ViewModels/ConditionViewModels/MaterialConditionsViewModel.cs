@@ -40,7 +40,7 @@ namespace RevitLintelPlacement.ViewModels {
 
             var materials = _revitRepository.GetElements(wall.GetMaterialIds(true)); //TODO: может быть и true, проверить
             foreach(var m in materials) {
-                //if(MaterialConditions.Any(mc => mc.IsChecked && mc.Name.Equals(((Material) m).Name, StringComparison.InvariantCultureIgnoreCase)))
+                //if(MaterialConditions.Any(mc => mc.IsChecked && mc.Name.Equals(((Material) m).Name, StringComparison.CurrentCultureIgnoreCase)))
                 if(MaterialConditions.Any(mc => mc.IsChecked && ((Material) m).Name.ToLower().Contains(mc.Name.ToLower())))
                     return true;
             }

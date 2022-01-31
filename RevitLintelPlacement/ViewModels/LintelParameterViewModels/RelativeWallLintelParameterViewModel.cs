@@ -39,7 +39,7 @@ namespace RevitLintelPlacement.ViewModels {
             }
 
             if (elementInWall.Host==null || !(elementInWall.Host is Wall wall))
-                throw new ArgumentNullException(nameof(elementInWall), "Элемент не находится в стене");
+                throw new ArgumentNullException(nameof(elementInWall), "Элемент не находится в стене.");
 
             //TODO: разные версии Revit
             lintel.SetParamValue(Name, wall.Width*RelationValue);

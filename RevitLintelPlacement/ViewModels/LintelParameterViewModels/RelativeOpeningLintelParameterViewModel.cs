@@ -41,7 +41,7 @@ namespace RevitLintelPlacement.ViewModels {
                 throw new ArgumentNullException(nameof(elementInWall));
             }
 
-            var openingWidth = (double)elementInWall.GetParamValueOrDefault("ADSK_Размер_Ширина");
+            var openingWidth = (double)elementInWall.GetParamValueOrDefault("ADSK_Размер_Ширина"); //TODO: параметр
             lintel.SetParamValue(Name, openingWidth * RelationValue);
         }
     }
