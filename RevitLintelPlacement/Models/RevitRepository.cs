@@ -115,7 +115,8 @@ namespace RevitLintelPlacement.Models {
             return new FilteredElementCollector(_document)
                 .WherePasses(categoryFilter)
                 .OfClass(typeof(FamilyInstance))
-                .Cast<FamilyInstance>();
+                .Cast<FamilyInstance>()
+                .Where(e=>e.Host is Wall);
         }
 
         //проверка, есть ли сверху элемента стена, у которой класс материала не кладка (в таком случает перемычку ставить не надо)
@@ -273,6 +274,19 @@ namespace RevitLintelPlacement.Models {
             }
         }
 
+        public XYZ GetLocationPoint(FamilyInstance elementInWall) {
+            if(elementInWall is null) {
+                throw new ArgumentNullException(nameof(elementInWall));
+            }
+
+            var topBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM); //TODO: возможно, не всегда этот параметр
+            //var bottomBarHeight = elementInWall.get_Parameter(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
+            //var levelHeight = ((Level) _document.GetElement(elementInWall.LevelId)).Elevation;
+            var location = ((LocationPoint) elementInWall.Location).Point;
+            var z = location.Z + topBarHeight; //+ bottomBarHeight.AsDouble(); //TODO: тут, наверное, нужен параметр, пока так
+            return new XYZ(location.X, location.Y, z);
+        }
+
         /// <summary>
         /// Поворачивает первый элемент на угол поворота второго элемента вокруг Oz
         /// </summary>
@@ -311,18 +325,7 @@ namespace RevitLintelPlacement.Models {
             return transform.BasisX.AngleOnPlaneTo(vectorX, transform.BasisZ);
         }
 
-        private XYZ GetLocationPoint(FamilyInstance elementInWall) {
-            if(elementInWall is null) {
-                throw new ArgumentNullException(nameof(elementInWall));
-            }
 
-            var topBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM); //TODO: возможно, не всегда этот параметр
-            //var bottomBarHeight = elementInWall.get_Parameter(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
-            //var levelHeight = ((Level) _document.GetElement(elementInWall.LevelId)).Elevation;
-            var location = ((LocationPoint) elementInWall.Location).Point;
-            var z = location.Z + topBarHeight; //+ bottomBarHeight.AsDouble(); //TODO: тут, наверное, нужен параметр, пока так
-            return new XYZ(location.X, location.Y, z);
-        }
 
         private XYZ GetViewStartPoint(FamilyInstance lintel, bool plusDirection) //изменить название метода
         {

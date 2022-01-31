@@ -52,28 +52,13 @@ namespace RevitLintelPlacement.ViewModels {
                     elementInWallIdRuleDict.Add(elementInWall.Id, rule); //соотношение элементов и правил
                 }
             }
-            var lintels = _revitRepository.GetLintels();
-            //TODO: соотнести перемычки с проемами
 
-            //1. логика с помощью схемы -> проверить корректность расстановки
+            //поиск элементов, над которыми еще не стоит перемычка
+            foreach(var lintel in Lintels.LintelInfos) {
+                if(elementInWallIdRuleDict.ContainsKey(lintel.ElementInWallId))
+                    elementInWallIdRuleDict.Remove(lintel.ElementInWallId);
 
-
-
-            //2. геометрия
-            foreach(var lintel in lintels) {
-                var nearestElement = _revitRepository.GetNearestElement(lintel);
-                    if(nearestElement == ElementId.InvalidElementId)
-                    continue;
-                if(elementInWallIdRuleDict.ContainsKey(nearestElement)) {
- 
-                    //TODO: проверить корректность расстановки
-
-                    elementInWallIdRuleDict.Remove(nearestElement);
-                }
             }
-
-
-            //TODO: удалить потом
            
 
             var lintelType = _revitRepository.GetLintelType();
@@ -105,34 +90,63 @@ namespace RevitLintelPlacement.ViewModels {
         //сопоставляются перемычки в группе + перемычки, закрепленные с элементом
         private void InitializeLintels() {
             var lintels = _revitRepository.GetLintels();
+            
+            var elementLocationDict = _revitRepository
+                   .GetAllElementsInWall()
+                   .Where(e => e.Location != null)
+                   .ToDictionary(e => _revitRepository.GetLocationPoint(e));
+
             foreach(var lintel in lintels) {
+                //перемычки в группе c элементом
                 if(lintel.SuperComponent != null) {
                     var elementInWall = (FamilyInstance) _revitRepository.GetElementById(lintel.SuperComponent.Id);
-                    var lintelViewModel = new LintelInfoViewModel() {
-                        LintelId = lintel.Id,
-                        ElementInWallId = elementInWall.Id,
-                        WallTypeName = elementInWall.Host.Name,
-                        ElementInWallName = elementInWall.Name
-                    };
-                    Lintels.LintelInfos.Add(lintelViewModel);
+                    AddLintelToCollection(lintel, elementInWall);
+                    continue;
                 }
+
+                //перемычки, закрепленные с элементом
                 var allignElement = _revitRepository.GetDimensionFamilyInstance(lintel);
-                if(allignElement != null) { 
-                    if (allignElement.Category.Name == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Name ||
+                if(allignElement != null) {
+                    if(allignElement.Category.Name == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Name ||
                         allignElement.Category.Name == _revitRepository.GetCategory(BuiltInCategory.OST_Windows).Name) {
                         var elementInWall = (FamilyInstance) _revitRepository.GetElementById(allignElement.Id);
-                        var lintelViewModel = new LintelInfoViewModel() {
-                            LintelId = lintel.Id,
-                            ElementInWallId = elementInWall.Id,
-                            WallTypeName = elementInWall.Host.Name,
-                            ElementInWallName = elementInWall.Name
-                        };
-                        Lintels.LintelInfos.Add(lintelViewModel);
+                        AddLintelToCollection(lintel, elementInWall);
+                        continue;
                     }
 
                 }
 
+                //перемычки, геометрически находящиеся над проемом
+                var lintelLocation = ((LocationPoint) lintel.Location).Point;
+                XYZ nearestXYZ = elementLocationDict.First().Key;
+                var minDist = lintelLocation.DistanceTo(nearestXYZ);
+                foreach(var elementLocation in elementLocationDict.Keys) {
+                    var dist = lintelLocation.DistanceTo(elementLocation);
+                    if(dist < minDist) {
+                        minDist = dist;
+                        nearestXYZ = elementLocation;
+                    }
+                }
+
+                if(minDist < 1.6) { //TODO: другое число (может, половина ширины проема)
+                    var elementInWall = elementLocationDict[nearestXYZ];
+                    AddLintelToCollection(lintel, elementInWall);
+                    continue;
+                }
+
             }
+        }
+
+        private void AddLintelToCollection(FamilyInstance lintel, FamilyInstance elementInWall) {
+            
+            var lintelViewModel = new LintelInfoViewModel() {
+                LintelId = lintel.Id,
+                ElementInWallId = elementInWall.Id,
+                WallTypeName = elementInWall.Host.Name,
+                ElementInWallName = elementInWall.Name
+            };
+            Lintels.LintelInfos.Add(lintelViewModel);
+
         }
 
     }
