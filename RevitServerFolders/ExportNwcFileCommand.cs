@@ -66,13 +66,15 @@ namespace RevitServerFolders {
         }
 
         private static void SaveExportNwcFileConfig(ExportNwcFileViewModel exportNwcFileViewModel) {
-            ExportNwcFileConfig.SaveExportNwcFileConfig(new ExportNwcFileConfig() {
-                CleanTargetNwcFolder = exportNwcFileViewModel.CleanTargetNwcFolder,
-                SourceNwcFolder = exportNwcFileViewModel.SourceNwcFolder,
-                TargetNwcFolder = exportNwcFileViewModel.TargetNwcFolder,
-                WithRooms = exportNwcFileViewModel.WithRooms,
-                WithSubFolders = exportNwcFileViewModel.WithSubFolders
-            });
+            ExportNwcFileConfig exportConfig = ExportNwcFileConfig.GetExportNwcFileConfig();
+
+            exportConfig.CleanTargetNwcFolder = exportNwcFileViewModel.CleanTargetNwcFolder;
+            exportConfig.SourceNwcFolder = exportNwcFileViewModel.SourceNwcFolder;
+            exportConfig.TargetNwcFolder = exportNwcFileViewModel.TargetNwcFolder;
+            exportConfig.WithRooms = exportNwcFileViewModel.WithRooms;
+            exportConfig.WithSubFolders = exportNwcFileViewModel.WithSubFolders;
+            
+            exportConfig.SaveProjectConfig();
         }
     }
 }
