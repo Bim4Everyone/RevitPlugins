@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,37 +44,30 @@ namespace RevitLintelPlacement.ViewModels {
         public ICommand PlaceLintelCommand { get; set; }
 
         public void PlaceLintels(object p) {
-            
-            Dictionary<ElementId, RuleViewModel> elementInWallIdRuleDict = new Dictionary<ElementId, RuleViewModel>();
-            foreach(var elementInWall in _revitRepository.GetAllElementsInWall().ToList()) {
-                var rule = Rules.GetRule(elementInWall);
-                if(rule != null) {
-                    elementInWallIdRuleDict.Add(elementInWall.Id, rule);
-                }
-            }
+            var elementInWallIds = _revitRepository.GetAllElementsInWall()
+                .Select(e => e.Id)
+                .ToList();
 
-            //поиск элементов, над которыми еще не стоит перемычка
             foreach(var lintel in Lintels.LintelInfos) {
-                if(elementInWallIdRuleDict.ContainsKey(lintel.ElementInWallId))
-                    elementInWallIdRuleDict.Remove(lintel.ElementInWallId);
-
+                if(elementInWallIds.Contains(lintel.ElementInWallId))
+                    elementInWallIds.Remove(lintel.ElementInWallId);
             }
-           
 
             var lintelType = _revitRepository.GetLintelType();
 
-            //у оставшихся elementInWallRuleDict расставить перемычки
             using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
                 var view3D = _revitRepository.GetView3D();
-                foreach(var elementInWallId in elementInWallIdRuleDict.Keys) {
-                    
-                    var elementInWall = _revitRepository.GetElementById(elementInWallId) as FamilyInstance;
+                foreach(var elementId in elementInWallIds) {
+                    var elementInWall = (FamilyInstance) _revitRepository.GetElementById(elementId);
+                    var rule = Rules.GetRule(elementInWall);
+                    if(rule == null)
+                        continue;
                     if(!_revitRepository.CheckUp(view3D, elementInWall))
                         continue;
-                    var lintel = _revitRepository.PlaceLintel(lintelType, elementInWallId);
-                    elementInWallIdRuleDict[elementInWallId].LintelParameters.SetTo(lintel, elementInWall);
+                    var lintel = _revitRepository.PlaceLintel(lintelType, elementId);
+                    rule.LintelParameters.SetTo(lintel, elementInWall);
                     if(_revitRepository.CheckHorizontal(view3D, elementInWall, true)) {
-                        lintel.SetParamValue("ОпираниеСправа", 0);
+                        lintel.SetParamValue("ОпираниеСправа", 0); //ToDo: параметр
                     }
 
                     if(_revitRepository.CheckHorizontal(view3D, elementInWall, false)) {
@@ -87,8 +81,6 @@ namespace RevitLintelPlacement.ViewModels {
                         ElementInWallName = elementInWall.Name
                     };
                     Lintels.LintelInfos.Add(lintelViewModel);
-
-                    //elementInWall.
                 }
                 t.Commit();
             }
@@ -150,7 +142,7 @@ namespace RevitLintelPlacement.ViewModels {
                 ElementInWallId = elementInWall.Id,
                 WallTypeName = elementInWall.Host.Name,
                 ElementInWallName = elementInWall.Name,
-                Level = (_revitRepository.GetElementById(elementInWall.LevelId))?.Name
+                Level = _revitRepository.GetElementById(elementInWall.LevelId)?.Name
             };
             Lintels.LintelInfos.Add(lintelViewModel);
         }
