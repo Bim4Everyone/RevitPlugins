@@ -10,6 +10,8 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Serializers;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -135,7 +137,10 @@ namespace RevitBatchPrint.ViewModels {
         private void SetPrintConfig() {
             _printSettings.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), _repository.Document.Title + ".pdf");
 
-            var printSettingsConfig = PrintConfig.GetConfig().GetPrintSettingsConfig(GetDocumentName());
+            var printSettingsConfig = PrintConfig
+                .GetPrintConfig()
+                .GetSettings(_repository.Document);
+
             if(printSettingsConfig != null) {
                 _printSettings.PrinterName = printSettingsConfig.PrinterName;
                 if(PrintParamNames.Contains(printSettingsConfig.PrintParamName)) {
@@ -175,14 +180,12 @@ namespace RevitBatchPrint.ViewModels {
         }
 
         private void SavePrintConfig() {
-            var printConfig = PrintConfig.GetConfig();
-            var printSettingsConfig = printConfig.GetPrintSettingsConfig(Path.GetFileName(_repository.Document.PathName));
+            var printConfig = PrintConfig.GetPrintConfig();
+            var printSettingsConfig = printConfig.GetSettings(_repository.Document);
             if(printSettingsConfig == null) {
-                printSettingsConfig = new PrintSettingsConfig();
-                printConfig.AddPrintSettings(printSettingsConfig);
+                printSettingsConfig = printConfig.AddSettings(_repository.Document);
             }
 
-            printSettingsConfig.DocumentName = GetDocumentName();
             printSettingsConfig.PrinterName = _printSettings.PrinterName;
             printSettingsConfig.PrintParamName = PrintParamName;
             printSettingsConfig.SelectedAlbums = Albums.Where(item => item.IsSelected).Select(item => item.Name).ToList();
@@ -216,12 +219,8 @@ namespace RevitBatchPrint.ViewModels {
                 printSettingsConfig.FolderName = Path.GetDirectoryName(_printSettings.FileName);
             }
 #endif
-            
-            PrintConfig.SaveConfig(printConfig);
-        }
-       
-        private string GetDocumentName() {
-            return Path.GetFileName(_repository.Document.PathName);
+
+            printConfig.SaveProjectConfig();
         }
 
         public bool CanRevitPrint(object p) {
