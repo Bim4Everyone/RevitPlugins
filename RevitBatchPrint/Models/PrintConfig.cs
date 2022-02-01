@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
 
@@ -24,6 +25,7 @@ namespace RevitBatchPrint.Models {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())
                 .SetPluginName(nameof(RevitBatchPrint))
+                .SetRevitVersion(ModuleEnvironment.RevitVersion)
                 .SetProjectConfigName(nameof(PrintConfig) + ".json")
                 .Build<PrintConfig>();
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 
+using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
 
@@ -28,6 +29,7 @@ namespace RevitServerFolders.Export {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())
                 .SetPluginName(nameof(RevitServerFolders))
+                .SetRevitVersion(ModuleEnvironment.RevitVersion)
                 .SetProjectConfigName(nameof(ExportRvtFileConfig) + ".json")
                 .Build<ExportRvtFileConfig>();
         }
