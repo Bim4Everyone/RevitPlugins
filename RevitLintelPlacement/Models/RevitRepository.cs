@@ -265,10 +265,10 @@ namespace RevitLintelPlacement.Models {
 
         public void LockLintel(FamilyInstance lintel, FamilyInstance elementInWall) {
             
-            var LeftRightElement = elementInWall.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
-            var LeftRightLintel = lintel.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
-            if (LeftRightElement.Any() && LeftRightLintel.Any())
-                _document.Create.NewAlignment(_document.ActiveView, LeftRightLintel.First(), LeftRightElement.First());
+            var leftRightElement = elementInWall.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
+            var leftRightLintel = lintel.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
+            if (leftRightElement.Count > 0 && leftRightLintel.Count > 0)
+                _document.Create.NewAlignment(_document.ActiveView, leftRightLintel.First(), leftRightElement.First());
 
             var topElement = elementInWall.GetReferences(FamilyInstanceReferenceType.Top);
             var bottomLintel = lintel.GetReferences(FamilyInstanceReferenceType.CenterElevation);
@@ -277,7 +277,7 @@ namespace RevitLintelPlacement.Models {
                 .OfClass(typeof(View))
                 .Cast<View>()
                 .First(v => v.ViewType == ViewType.Elevation);
-            if (topElement.Any() && bottomLintel.Any())
+            if (topElement.Count > 0 && bottomLintel.Count > 0)
                 _document.Create.NewAlignment(elevation, topElement.First(), bottomLintel.First());
 
             var leftL = lintel.GetReferences(FamilyInstanceReferenceType.Front);
@@ -291,11 +291,11 @@ namespace RevitLintelPlacement.Models {
 
             //возможно, ошибка возникает при устновке параметра половина толщины, поэтому нет геометричкого выравнивания
             try {
-                if(leftL.Any() && wallReferences1.Any()) {
+                if(leftL.Count > 0 && wallReferences1.Count > 0) {
                     _document.Create.NewAlignment(plan, leftL.First(), wallReferences1.First());
                 }
 
-                if(rightL.Any() && wallReferences2.Any()) {
+                if(rightL.Count > 0 && wallReferences2.Count > 0) {
                     _document.Create.NewAlignment(plan, rightL.First(), wallReferences2.First());
                 }
             } catch {

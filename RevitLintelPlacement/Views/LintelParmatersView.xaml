@@ -21,14 +21,14 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="0 0 2 0" Text="{Binding Name}"></TextBlock>
                         <TextBlock Text="{Binding RelationValue, StringFormat=\= {0}}"></TextBlock>
-                        <TextBlock Margin="2 0 0 0" Text="{Binding OpeningParameterName, StringFormat=\ * Парметр проема ({0}) }"></TextBlock>
+                        <TextBlock Margin="2 0 0 0" Text="{Binding OpeningParameterName, StringFormat=\ * Параметр проема ({0}) }"></TextBlock>
                     </StackPanel>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:RelativeWallLintelParameterViewModel}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="0 0 2 0" Text="{Binding Name}"></TextBlock>
                         <TextBlock Text="{Binding RelationValue, StringFormat=\= {0}}"></TextBlock>
-                        <TextBlock Margin="2 0 0 0" Text="{Binding WallParameterName, StringFormat=\ * Парметр стены ({0}) }"></TextBlock>
+                        <TextBlock Margin="2 0 0 0" Text="{Binding WallParameterName, StringFormat=\ * Параметр стены ({0}) }"></TextBlock>
                     </StackPanel>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:YesNoLintelParameterViewModel}">

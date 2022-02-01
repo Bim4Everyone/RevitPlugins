@@ -15,7 +15,6 @@ using RevitLintelPlacement.Models;
 namespace RevitLintelPlacement.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private readonly IEnumerable<RulesSettigs> _rulesSettings;
         private RuleCollectionViewModel _rules;
         private LintelCollectionViewModel _lintels;
 
@@ -25,9 +24,8 @@ namespace RevitLintelPlacement.ViewModels {
 
         public MainViewModel(RevitRepository revitRepository, IEnumerable<RulesSettigs> rulesSettings) {
             this._revitRepository = revitRepository;
-            this._rulesSettings = rulesSettings;
             Lintels = new LintelCollectionViewModel(_revitRepository);
-            Rules = new RuleCollectionViewModel(_revitRepository, _rulesSettings);
+            Rules = new RuleCollectionViewModel(_revitRepository, rulesSettings);
             InitializeLintels();
             PlaceLintelCommand = new RelayCommand(PlaceLintels, p => true);
         }
@@ -47,6 +45,7 @@ namespace RevitLintelPlacement.ViewModels {
             
             Dictionary<ElementId, RuleViewModel> elementInWallIdRuleDict = new Dictionary<ElementId, RuleViewModel>();
             foreach(var elementInWall in _revitRepository.GetAllElementsInWall().ToList()) {
+                //if(elementInWall;e)
                 var rule = Rules.GetRule(elementInWall);
                 if(rule != null) {
                     elementInWallIdRuleDict.Add(elementInWall.Id, rule); //соотношение элементов и правил
@@ -133,12 +132,10 @@ namespace RevitLintelPlacement.ViewModels {
                     AddLintelToCollection(lintel, elementInWall);
                     continue;
                 }
-
             }
         }
 
         private void AddLintelToCollection(FamilyInstance lintel, FamilyInstance elementInWall) {
-            
             var lintelViewModel = new LintelInfoViewModel() {
                 LintelId = lintel.Id,
                 ElementInWallId = elementInWall.Id,
@@ -146,7 +143,6 @@ namespace RevitLintelPlacement.ViewModels {
                 ElementInWallName = elementInWall.Name
             };
             Lintels.LintelInfos.Add(lintelViewModel);
-
         }
 
     }

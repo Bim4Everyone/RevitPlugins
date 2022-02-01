@@ -52,7 +52,7 @@ namespace RevitLintelPlacement.ViewModels {
                         };
                         break;
                     }
-                    case LintelParameterType.ReletiveOpeneingParameter: {
+                    case LintelParameterType.RelativeOpeningParameter: {
                         yield return new RelativeOpeningLintelParameterViewModel() {
                             Name = lp.Name,
                             RelationValue = lp.RelationValue,

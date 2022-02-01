@@ -40,7 +40,7 @@ namespace RevitLintelPlacement.Models {
                 WallParameterName = "Толщина"
             };
             yield return new LintelParameterSetting() {
-                LintelParameterType = LintelParameterType.ReletiveOpeneingParameter,
+                LintelParameterType = LintelParameterType.RelativeOpeningParameter,
                 Name = "ЭЛМТ_ширина проема",
                 RelationValue = 1,
                 OpeninigParameterName = "Ширина"
@@ -70,18 +70,18 @@ namespace RevitLintelPlacement.Models {
         }
 
 
-        private IEnumerable<ConditionSetting> InitializeNotBrickWallMaterialsCondition() {
-            yield return new ConditionSetting() {
-                ConditionType = ConditionType.ExclusionWallTypes,
-                ExclusionWallTypes = new List<string>() { "Кирпич", "Невозводим" },
-            };
-        }
         //private IEnumerable<ConditionSetting> InitializeNotBrickWallMaterialsCondition() {
         //    yield return new ConditionSetting() {
-        //        ConditionType = ConditionType.WallMaterials,
-        //        WallMaterials = new List<string>() { "Газобетон", "Пазогребнев", "СПП" },
+        //        ConditionType = ConditionType.ExclusionWallTypes,
+        //        ExclusionWallTypes = new List<string>() { "Кирпич", "Невозводим" },
         //    };
         //}
+        private IEnumerable<ConditionSetting> InitializeNotBrickWallMaterialsCondition() {
+            yield return new ConditionSetting() {
+                ConditionType = ConditionType.WallMaterials,
+                WallMaterials = new List<string>() { "Газобетон", "Пазогребнев" },
+            };
+        }
 
         private IEnumerable<ConditionSetting> InitializeConditionToOpening400_1100() {
             yield return new ConditionSetting() {
@@ -134,8 +134,8 @@ namespace RevitLintelPlacement.Models {
             return new RuleSetting() {
                 Name = "АТР_Проем_в_кирпичной_стене_200_1100",
                 ConditionSettingsConfig = new List<ConditionSetting>(InitializeCommonConditions()
-                    .Union(InitializeConditionToOpening200_1100())),
-                    //.Union(InitializeBrickWallMaterialCondition())),
+                    .Union(InitializeConditionToOpening200_1100())
+                    .Union(InitializeBrickWallMaterialCondition())),
                 LintelParameterSettingsConfig = new List<LintelParameterSetting>(InitializeCommonLintelParametrs()
                     .Union(InitializeLintelParametersToOpeninig200_1100()))
             };

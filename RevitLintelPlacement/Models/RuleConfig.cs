@@ -86,7 +86,7 @@ namespace RevitLintelPlacement.Models {
     public enum LintelParameterType {
         YesNoLintelParameter,
         NumberParameter,
-        ReletiveOpeneingParameter,
+        RelativeOpeningParameter,
         RelativeWallParameter,
     }
 
