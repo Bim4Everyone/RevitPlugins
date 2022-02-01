@@ -74,13 +74,7 @@ namespace RevitLintelPlacement.ViewModels {
                         lintel.SetParamValue("ОпираниеСлева", 0);
                     }
                     _revitRepository.LockLintel(lintel, elementInWall);
-                    var lintelViewModel = new LintelInfoViewModel() {
-                        LintelId = lintel.Id,
-                        ElementInWallId = elementInWall.Id,
-                        WallTypeName = elementInWall.Host.Name,
-                        ElementInWallName = elementInWall.Name
-                    };
-                    Lintels.LintelInfos.Add(lintelViewModel);
+                    Lintels.LintelInfos.Add(new LintelInfoViewModel(_revitRepository, lintel, elementInWall));
                 }
                 t.Commit();
             }
@@ -90,61 +84,12 @@ namespace RevitLintelPlacement.ViewModels {
         //сопоставляются перемычки в группе + перемычки, закрепленные с элементом
         private void InitializeLintels() {
             var lintels = _revitRepository.GetLintels();
-            
-            var elementLocationDict = _revitRepository
-                   .GetAllElementsInWall()
-                   .Where(e => e.Location != null)
-                   .ToDictionary(e => _revitRepository.GetLocationPoint(e));
-
-            foreach(var lintel in lintels) {
-                //перемычки в группе c элементом
-                if(lintel.SuperComponent != null) {
-                    var elementInWall = (FamilyInstance) _revitRepository.GetElementById(lintel.SuperComponent.Id);
-                    AddLintelToCollection(lintel, elementInWall);
-                    continue;
-                }
-
-                //перемычки, закрепленные с элементом
-                var allignElement = _revitRepository.GetDimensionFamilyInstance(lintel);
-                if(allignElement != null) {
-                    if(allignElement.Category.Name == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Name ||
-                        allignElement.Category.Name == _revitRepository.GetCategory(BuiltInCategory.OST_Windows).Name) {
-                        var elementInWall = (FamilyInstance) _revitRepository.GetElementById(allignElement.Id);
-                        AddLintelToCollection(lintel, elementInWall);
-                        continue;
-                    }
-
-                }
-
-                //перемычки, геометрически находящиеся над проемом
-                var lintelLocation = ((LocationPoint) lintel.Location).Point;
-                XYZ nearestXYZ = elementLocationDict.First().Key;
-                var minDist = lintelLocation.DistanceTo(nearestXYZ);
-                foreach(var elementLocation in elementLocationDict.Keys) {
-                    var dist = lintelLocation.DistanceTo(elementLocation);
-                    if(dist < minDist) {
-                        minDist = dist;
-                        nearestXYZ = elementLocation;
-                    }
-                }
-
-                if(minDist < 1.6) { //TODO: другое число (может, половина ширины проема)
-                    var elementInWall = elementLocationDict[nearestXYZ];
-                    AddLintelToCollection(lintel, elementInWall);
-                    continue;
-                }
+            var correlator = new LintelElementCorrelator(_revitRepository);
+            var lintelInfos = lintels.Select(l =>
+            new LintelInfoViewModel(_revitRepository, l, correlator.Correlate(l)));
+            foreach(var lintelInfo in lintelInfos) {
+                Lintels.LintelInfos.Add(lintelInfo);
             }
-        }
-
-        private void AddLintelToCollection(FamilyInstance lintel, FamilyInstance elementInWall) {
-            var lintelViewModel = new LintelInfoViewModel() {
-                LintelId = lintel.Id,
-                ElementInWallId = elementInWall.Id,
-                WallTypeName = elementInWall.Host.Name,
-                ElementInWallName = elementInWall.Name,
-                Level = _revitRepository.GetElementById(elementInWall.LevelId)?.Name
-            };
-            Lintels.LintelInfos.Add(lintelViewModel);
         }
 
     }
