@@ -7,6 +7,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -45,10 +46,9 @@ namespace RevitLintelPlacement.ViewModels {
             
             Dictionary<ElementId, RuleViewModel> elementInWallIdRuleDict = new Dictionary<ElementId, RuleViewModel>();
             foreach(var elementInWall in _revitRepository.GetAllElementsInWall().ToList()) {
-                //if(elementInWall;e)
                 var rule = Rules.GetRule(elementInWall);
                 if(rule != null) {
-                    elementInWallIdRuleDict.Add(elementInWall.Id, rule); //соотношение элементов и правил
+                    elementInWallIdRuleDict.Add(elementInWall.Id, rule);
                 }
             }
 
@@ -64,12 +64,21 @@ namespace RevitLintelPlacement.ViewModels {
 
             //у оставшихся elementInWallRuleDict расставить перемычки
             using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
+                var view3D = _revitRepository.GetView3D();
                 foreach(var elementInWallId in elementInWallIdRuleDict.Keys) {
+                    
                     var elementInWall = _revitRepository.GetElementById(elementInWallId) as FamilyInstance;
-                    if(!_revitRepository.CheckUp(elementInWall))
+                    if(!_revitRepository.CheckUp(view3D, elementInWall))
                         continue;
                     var lintel = _revitRepository.PlaceLintel(lintelType, elementInWallId);
                     elementInWallIdRuleDict[elementInWallId].LintelParameters.SetTo(lintel, elementInWall);
+                    if(_revitRepository.CheckHorizontal(view3D, elementInWall, true)) {
+                        lintel.SetParamValue("ОпираниеСправа", 0);
+                    }
+
+                    if(_revitRepository.CheckHorizontal(view3D, elementInWall, false)) {
+                        lintel.SetParamValue("ОпираниеСлева", 0);
+                    }
                     _revitRepository.LockLintel(lintel, elementInWall);
                     var lintelViewModel = new LintelInfoViewModel() {
                         LintelId = lintel.Id,

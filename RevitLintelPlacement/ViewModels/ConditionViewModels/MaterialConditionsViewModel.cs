@@ -38,7 +38,7 @@ namespace RevitLintelPlacement.ViewModels {
                 return false;
                 //throw new ArgumentNullException(nameof(elementInWall), "На проверку передан некорректный элемент.");
 
-            var materials = _revitRepository.GetElements(wall.GetMaterialIds(true)); //TODO: может быть и true, проверить
+            var materials = _revitRepository.GetElements(wall.GetMaterialIds(false));
             foreach(var m in materials) {
                 //if(MaterialConditions.Any(mc => mc.IsChecked && mc.Name.Equals(((Material) m).Name, StringComparison.CurrentCultureIgnoreCase)))
                 if(MaterialConditions.Any(mc => mc.IsChecked && ((Material) m).Name.ToLower().Contains(mc.Name.ToLower())))

@@ -46,6 +46,13 @@ namespace RevitLintelPlacement.Models {
             return Category.GetCategory(_document, builtInCategory);
         }
 
+        public View3D GetView3D() {
+            return new FilteredElementCollector(_document)
+              .OfClass(typeof(View3D))
+              .Cast<View3D>()
+              .First(v => !v.IsTemplate && v.Name == _view3DName);
+        }
+
         public FamilyInstance PlaceLintel(FamilySymbol lintelType, ElementId elementInWallId) {
 
             var elementInWall = _document.GetElement(elementInWallId) as FamilyInstance;
@@ -122,16 +129,55 @@ namespace RevitLintelPlacement.Models {
         }
 
         //проверка, есть ли сверху элемента стена, у которой класс материала не кладка (в таком случает перемычку ставить не надо)
-        public bool CheckUp(FamilyInstance elementInWall) {
-
+        public bool CheckUp(View3D view3D, FamilyInstance elementInWall) {
             XYZ viewPoint = GetLocationPoint(elementInWall);
-            var wall = GetNearestElement(elementInWall, viewPoint, typeof(Wall), new XYZ(0, 0, 1));
-            if(wall == ElementId.InvalidElementId) {
+            var refWithContext = GetNearestWall(view3D, elementInWall, viewPoint, new XYZ(0, 0, 1), false);
+            if(refWithContext == null)
                 return false;
-            }
+            if(refWithContext.Proximity < 1) {
+                var wall = _document.GetElement(refWithContext.GetReference().ElementId);
+                if(!wall.Name.ToLower().Contains("железобетон")) { //TODO: часть названия типа стены
+                    refWithContext = GetNearestWall(view3D, elementInWall, viewPoint, new XYZ(0, 0, 1), true);
+                    if(refWithContext == null)
+                        return true;
+                    if(refWithContext.Proximity < 1) {
+                        wall = _document.GetElement(refWithContext.GetReference().ElementId);
+                        if(!wall.Name.ToLower().Contains("железобетон")) //TODO: часть названия типа стены
+                            return true;
+                    }
+                }
 
-            foreach(var materialClass in GetMaterialClasses(_document.GetElement(wall))) {
-                if(materialClass.Equals("Кладка", StringComparison.CurrentCultureIgnoreCase)) //TODO: класс материала
+            }
+            return false;
+
+            //XYZ viewPoint = GetLocationPoint(elementInWall);
+            //if(elementInWall.Host is Wall elementWall) {
+            //    var wallZ = elementWall.get_BoundingBox(view3D).Max.Z;
+            //    if(wallZ < viewPoint.Z)
+            //        return false;
+            //}
+            //var refWithContext = GetNearestWall(view3D, elementInWall, viewPoint, new XYZ(0, 0, 1), true);
+            //if(refWithContext == null)
+            //    return true;
+            //if(refWithContext.Proximity < 1) {
+            //    var wall = _document.GetElement(refWithContext.GetReference().ElementId);
+            //    if(!wall.Name.ToLower().Contains("железобетон")) //TODO: часть названия типа стены
+            //        return true;
+            //}
+            //return false;
+        }
+
+        public bool CheckHorizontal(View3D view3D, FamilyInstance elementInWall, bool isRight) {
+            XYZ viewPoint = GetLocationPoint(elementInWall);
+
+            var direction = elementInWall.GetTransform().OfVector(isRight? new XYZ(1, 0, 0) : new XYZ(-1, 0, 0));
+            var refWithContext = GetNearestWall(view3D, elementInWall, viewPoint, direction, true);
+            if(refWithContext == null)
+                return false;
+            var openingWidth = (double) elementInWall.GetParamValueOrDefault("ADSK_Размер_Ширина"); //ToDo: параметр
+            if(refWithContext.Proximity < openingWidth / 2 + 0.4) {
+                var wall = _document.GetElement(refWithContext.GetReference().ElementId);
+                if(wall.Name.ToLower().Contains("железобетон")) //TODO: часть названия типа стены
                     return true;
             }
             return false;
@@ -238,29 +284,18 @@ namespace RevitLintelPlacement.Models {
         }
 
        
-        private ElementId GetNearestElement(FamilyInstance fi, XYZ viewPoint, Type elementType, XYZ direction) {
-            //создавать свой 3D - вид
-            var view3D = new FilteredElementCollector(_document)
-              .OfClass(typeof(View3D))
-              .Cast<View3D>()
-              .First(v => !v.IsTemplate && v.Name == _view3DName);
-            view3D = (View3D)_document.ActiveView;
+        private ReferenceWithContext GetNearestWall(View3D view3D, FamilyInstance fi, XYZ viewPoint, XYZ direction, bool excludeHost) {
             var exclusionList = new List<ElementId> { fi.Id };
             exclusionList.AddRange(fi.GetDependentElements(new ElementClassFilter(typeof(FamilyInstance))));
+            if(fi.Host != null && excludeHost) {
+                exclusionList.Add(fi.Host.Id);
+            }
             var exclusionFilter = new ExclusionFilter(exclusionList);
             var classFilter = new ElementClassFilter(typeof(Wall));
             var logicalFilter = new LogicalAndFilter(new List<ElementFilter> { exclusionFilter, classFilter });
             var refIntersector = new ReferenceIntersector(logicalFilter, FindReferenceTarget.All, view3D);
 
-            var refWithContext = refIntersector.FindNearest(viewPoint, direction);
-
-            if(refWithContext == null)
-                return ElementId.InvalidElementId;
-
-            if(refWithContext.Proximity < 0.01) { 
-                return refWithContext.GetReference().ElementId;
-            }
-            return ElementId.InvalidElementId;
+            return refIntersector.FindNearest(viewPoint, direction);
         }
 
         public void LockLintel(FamilyInstance lintel, FamilyInstance elementInWall) {
@@ -308,12 +343,16 @@ namespace RevitLintelPlacement.Models {
             if(elementInWall is null) {
                 throw new ArgumentNullException(nameof(elementInWall));
             }
-
-            var topBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM); //TODO: возможно, не всегда этот параметр
-            //var bottomBarHeight = elementInWall.get_Parameter(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
-            //var levelHeight = ((Level) _document.GetElement(elementInWall.LevelId)).Elevation;
             var location = ((LocationPoint) elementInWall.Location).Point;
-            var z = location.Z + topBarHeight; //+ bottomBarHeight.AsDouble(); //TODO: тут, наверное, нужен параметр, пока так
+            var bottomBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
+            var height = elementInWall.GetParamValueOrDefault("ADSK_Размер_Высота"); //ToDo: параметр
+            double z;
+            if(height != null) {
+                z = (double)height + bottomBarHeight;
+            } else {
+                var topBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
+                z = location.Z + topBarHeight;
+            }
             return new XYZ(location.X, location.Y, z);
         }
 
@@ -425,7 +464,7 @@ namespace RevitLintelPlacement.Models {
             foreach(var s in smth) {
                 if(s.Host == null || !(s.Host is Wall wall))
                     continue;
-                var materials = GetElements(wall.GetMaterialIds(false)); //TODO: может быть и true, проверить
+                var materials = GetElements(wall.GetMaterialIds(false));
                 foreach(var m in materials) {
                     if("Кладка".Equals(((Material) m).MaterialClass, StringComparison.CurrentCultureIgnoreCase)) {
                         if(!wall.Name.ToLower().Contains("невозводим")) {
