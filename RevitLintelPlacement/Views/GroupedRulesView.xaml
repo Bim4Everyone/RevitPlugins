@@ -43,7 +43,7 @@
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
-                            <Button Grid.Row="1" Width="30">+</Button>
+                            <Button Grid.Row="1" Width="30" Command="{Binding AddRuleCommand}">+</Button>
                         </Grid>
                         
                     </StackPanel>
@@ -51,7 +51,7 @@
             </ListBox.ItemTemplate>
         </ListBox>
         <StackPanel Grid.Row="1">
-            <Button Width="30">+</Button>
+            <Button Width="30" Command="{Binding AddGroupedRuleCommand}">+</Button>
         </StackPanel>
     </Grid>
 </UserControl>

@@ -4,7 +4,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 namespace RevitLintelPlacement.ViewModels {
@@ -12,6 +14,10 @@ namespace RevitLintelPlacement.ViewModels {
         private string _name;
         private ObservableCollection<ConcreteRuleViewModel> _gruopedRules;
         private WallTypeConditionViewModel _groupingCondition;
+
+        public GroupedRuleViewModel() {
+            AddRuleCommand = new RelayCommand(AddRule, p => true);
+        }
 
         public string Name {
             get => _name;
@@ -28,6 +34,11 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _gruopedRules, value);
         }
 
+        public ICommand AddRuleCommand { get; set; }
+
+        private void AddRule(object p) {
+            Rules.Add(new ConcreteRuleViewModel());
+        }
 
     }
 
@@ -57,5 +68,6 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _lintelTypes, value);
         }
 
+       
     }
 }

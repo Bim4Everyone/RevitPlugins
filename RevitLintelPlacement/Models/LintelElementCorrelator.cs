@@ -49,8 +49,8 @@ namespace RevitLintelPlacement.Models {
         public FamilyInstance Correlate(RevitRepository revitRepository, FamilyInstance lintel, Dictionary<XYZ, FamilyInstance> elementLocationDict = null) {
             var allignElement = revitRepository.GetDimensionFamilyInstance(lintel);
             if(allignElement != null) {
-                if(allignElement.Category.Name == revitRepository.GetCategory(BuiltInCategory.OST_Doors).Name ||
-                    allignElement.Category.Name == revitRepository.GetCategory(BuiltInCategory.OST_Windows).Name) {
+                if(allignElement.Category.Id == revitRepository.GetCategory(BuiltInCategory.OST_Doors).Id ||
+                    allignElement.Category.Id == revitRepository.GetCategory(BuiltInCategory.OST_Windows).Id) {
                     return (FamilyInstance) revitRepository.GetElementById(allignElement.Id);
                 }
 

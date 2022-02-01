@@ -47,6 +47,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
+		<PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="dosymep.Bim4Everyone">
