@@ -179,7 +179,7 @@
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
                 <Button Content="↑" Width="25" ToolTip="Вверх" Margin="5" Command="{Binding RoomsNums.UpOrderCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}" />
                 <Button Content="↓" Width="25" ToolTip="Вниз" Margin="5" Command="{Binding RoomsNums.DownOrderCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}" />
-                <Button Content="+" Width="25" ToolTip="Добавить" Margin="5" Command="{Binding RoomsNums.AddOrderCommand}" CommandParameter="{Binding _this, ElementName=_this}" />
+                <Button Content="+" Width="25" ToolTip="Добавить" Margin="5" Command="{Binding RoomsNums.AddOrderCommand}" />
                 <Button Content="-" Width="25" ToolTip="Удалить" Margin="5" Command="{Binding RoomsNums.RemoveOrderCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}" />
                 <Button Content="*" Width="25" ToolTip="Сохранить" Margin="5" Command="{Binding RoomsNums.SaveOrderCommand}" />
             </StackPanel>
