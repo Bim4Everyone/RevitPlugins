@@ -31,8 +31,7 @@ namespace RevitRooms.Models {
 
     public class RoomsSettingsConfig : ProjectSettings {
         public Guid SelectedRoomId { get; set; }
-        public string DocumentName { get; set; }
-
+        
         public int PhaseElementId { get; set; }
         public int RoundAccuracy { get; set; }
         public string RoomAccuracy { get; set; }

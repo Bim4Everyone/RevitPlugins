@@ -126,7 +126,6 @@ namespace RevitRooms.ViewModels {
 
             settings.SelectedRoomId = _id;
             settings.PhaseElementId = Phase.ElementId.IntegerValue;
-            settings.DocumentName = _revitRepository.DocumentName;
 
             settings.Levels = Levels.Where(item => item.IsSelected).Select(item => item.ElementId.IntegerValue).ToList();
 
