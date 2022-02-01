@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RevitCopyViews.ViewModels"
              mc:Ignorable="d" 
-             Height="380" Width="580" WindowStartupLocation="CenterOwner" Title="Копирование видов">
-    <Grid>        
+             Height="450" Width="580" WindowStartupLocation="CenterOwner" Title="Копирование видов">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -15,27 +15,32 @@
             <RowDefinition Height="45"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <CheckBox Margin="10,10,10,10" Content="Копировать с детализацией" IsChecked="{Binding CopyWithDetail}" />
-            <CheckBox Margin="10,10,10,10" Content="С отметкой этажа" IsChecked="{Binding WithElevation}" />
-        </StackPanel>
+        <CheckBox Grid.Row="0" Margin="10,10,10,10" Content="Копировать с детализацией" IsChecked="{Binding CopyWithDetail}" />
 
-        <StackPanel Grid.Row="1">
-            <TextBlock Margin="10" Text="Префикс"/>
-            <CheckBox Margin="10,0,10,10" Content="Заменить" IsChecked="{Binding ReplacePrefix}" IsEnabled="{Binding IsAllowReplacePrefix}" />
-            <ComboBox Margin="10,0,10,0" ItemsSource="{Binding Prefixes}" Text="{Binding Prefix}" IsEditable="True" />
-        </StackPanel>
-
-        <StackPanel Grid.Row="2">
+        <StackPanel Grid.Row="1" Margin="0 0 0 20">
             <TextBlock Margin="10" Text="Группы видов"/>
             <ComboBox Margin="10,0,10,0" ItemsSource="{Binding GroupViews}" Text="{Binding GroupView}" IsEditable="True" />
         </StackPanel>
 
-        <StackPanel Grid.Row="3">
-            <TextBlock Margin="10" Text="Суффикс"/>
-            <CheckBox Margin="10,0,10,10" Content="Заменить" IsChecked="{Binding ReplaceSuffix}" IsEnabled="{Binding IsAllowReplaceSuffix}"/>
-            <ComboBox Margin="10,0,10,0" ItemsSource="{Binding Suffixes}" Text="{Binding Suffix}" IsEditable="True" />
-        </StackPanel>
+        <GroupBox Header="Настройки имени вида" Grid.Row="2">
+            <StackPanel>
+                <CheckBox Margin="10,10,10,10" Content="Добавить отметку уровня" IsChecked="{Binding WithElevation}" />
+
+                <StackPanel>
+                    <TextBlock Margin="10" Text="Префикс"/>
+                    <CheckBox Margin="10,0,10,10" Content="Заменить" IsChecked="{Binding ReplacePrefix}" IsEnabled="{Binding IsAllowReplacePrefix}" />
+                    <ComboBox Margin="10,0,10,0" ItemsSource="{Binding Prefixes}" Text="{Binding Prefix}" IsEditable="True" />
+                </StackPanel>
+
+                <StackPanel>
+                    <TextBlock Margin="10" Text="Суффикс"/>
+                    <CheckBox Margin="10,0,10,10" Content="Заменить" IsChecked="{Binding ReplaceSuffix}" IsEnabled="{Binding IsAllowReplaceSuffix}"/>
+                    <ComboBox Margin="10,0,10,10" ItemsSource="{Binding Suffixes}" Text="{Binding Suffix}" IsEditable="True" />
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <ContentControl Grid.Row="3"/>
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />

@@ -150,7 +150,7 @@ namespace RevitCopyViews.ViewModels {
         private void CopyViews(object p) {
             var createdViews = new List<ElementId>();
             using(var transaction = new Transaction(Document)) {
-                transaction.Start("Копирование видов");
+                transaction.BIMStart("Копирование видов");
 
                 foreach(RevitViewViewModel revitView in RevitViewViewModels) {
                     var copyOption = CopyWithDetail ? ViewDuplicateOption.WithDetailing : ViewDuplicateOption.Duplicate;
@@ -182,34 +182,12 @@ namespace RevitCopyViews.ViewModels {
             SplittedViewName splittedViewName = revitView.SplitName(splitViewOptions);
             splittedViewName.Prefix = Prefix;
             splittedViewName.Suffix = Suffix;
-            splittedViewName.Elevations = WithElevation ? GetElevation(revitView) : null;
+            splittedViewName.Elevations = WithElevation ? SplittedViewName.GetElevation(revitView.View) : null;
 
             return Delimiter.CreateViewName(splittedViewName);
         }
 
-        private string GetElevation(RevitViewViewModel revitView) {
-            var cultureInfo = (CultureInfo) CultureInfo.GetCultureInfo("ru-Ru").Clone();
-            cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
-
-#if D2020 || R2020
-            double elevation = UnitUtils.ConvertFromInternalUnits(revitView.Elevation, DisplayUnitType.DUT_METERS);
-#else
-            double elevation = UnitUtils.ConvertFromInternalUnits(revitView.Elevation, UnitTypeId.Meters);
-#endif
-
-            if(elevation > 0) {
-                return "+" + elevation.ToString("F3", cultureInfo);
-            }
-
-            return elevation.ToString("F3", cultureInfo);
-        }
-
         private bool CanCopyViews(object p) {
-            if(string.IsNullOrEmpty(Prefix)) {
-                ErrorText = "Не заполнен префикс.";
-                return false;
-            }
-
             if(string.IsNullOrEmpty(GroupView)) {
                 ErrorText = "Не заполнена группа видов.";
                 return false;
