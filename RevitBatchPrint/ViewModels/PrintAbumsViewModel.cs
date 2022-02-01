@@ -242,15 +242,17 @@ namespace RevitBatchPrint.ViewModels {
                 return false;
             }
 
+#if D2020 || R2020 || D2021 || R2021
             if(string.IsNullOrEmpty(PrintSettings.PrinterName)) {
                 ErrorText = "Не был выбран принтер.";
                 return false;
             }
-
-            if(string.IsNullOrEmpty(PrintSettings.PrinterName)) {
-                ErrorText = "Выберите файл сохранения.";
+#else 
+            if(string.IsNullOrEmpty(PrintSettings.FileName)) {
+                ErrorText = "Выберите файл сохранения pdf.";
                 return false;
             }
+#endif
 
             ErrorText = null;
             return true;
