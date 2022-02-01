@@ -31,6 +31,7 @@ namespace RevitLintelPlacement.ViewModels {
             LintelsViewSource = new CollectionViewSource();
             LintelsViewSource.Source = LintelInfos;
             LintelsViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(LintelInfoViewModel.WallTypeName)));
+            LintelsViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(LintelInfoViewModel.Level)));
             SelectAndShowElementCommand = new RelayCommand(SelectElement, p => true);
         }
 

@@ -149,7 +149,8 @@ namespace RevitLintelPlacement.ViewModels {
                 LintelId = lintel.Id,
                 ElementInWallId = elementInWall.Id,
                 WallTypeName = elementInWall.Host.Name,
-                ElementInWallName = elementInWall.Name
+                ElementInWallName = elementInWall.Name,
+                Level = (_revitRepository.GetElementById(elementInWall.LevelId))?.Name
             };
             Lintels.LintelInfos.Add(lintelViewModel);
         }

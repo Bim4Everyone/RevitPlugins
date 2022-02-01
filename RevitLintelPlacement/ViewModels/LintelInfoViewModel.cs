@@ -17,6 +17,7 @@ namespace RevitLintelPlacement.ViewModels {
         private ElementId _lintelId;
         private ElementId _elementInWallId;
         private string wallTypeName;
+        private string _level;
 
         public LintelInfoViewModel() {
 
@@ -44,7 +45,12 @@ namespace RevitLintelPlacement.ViewModels {
 
         public string WallTypeName {
             get => wallTypeName;
-            set => this.RaiseAndSetIfChanged(ref wallTypeName, value); 
+            set => this.RaiseAndSetIfChanged(ref wallTypeName, value);
+        }
+
+        public string Level { 
+            get => _level; 
+            set => this.RaiseAndSetIfChanged(ref _level, value); 
         }
     }
 }
