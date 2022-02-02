@@ -66,37 +66,27 @@ namespace RevitLintelPlacement.Models {
         public double OpeningWidthMin { get; set; }
         public double OpeningWidthMax { get; set; }
         public ConditionType ConditionType { get; set; }
-
-        //TODO: возможно тут нужен материал, а не тип стены, еще не решили (выбрать между этим свойством и WallMaterials)
         public List<string> WallTypes { get; set; }
-        public List<string> WallMaterialClasses { get; set; }
-        public List<string> WallMaterials { get; set; }
-        public List<string> ExclusionWallTypes { get; set; }
-        //TODO: Добавить еще условий
     }
 
     public enum ConditionType {
         WallTypes,
-        OpeningWidth,
-        WallMaterialClasses,
-        ExclusionWallTypes,
-        WallMaterials
+        OpeningWidth
     }
 
     public enum LintelParameterType {
-        YesNoLintelParameter,
-        NumberParameter,
-        RelativeOpeningParameter,
-        RelativeWallParameter,
+        TypeNameParameter,
+        LeftOffsetParameter,
+        RightOffsetParameter,
+        CornerParameter
     }
 
     public class LintelParameterSetting {
-        public bool IsChecked { get; set; }
-        public double RelationValue { get; set; }
-        public double NumberValue { get; set; }
+        public bool IsCornerChecked { get; set; }
+        public double Offset{ get; set; }
+        public double HalfThickness { get; set; }
+        public double OpeningWidth { get; set; }
         public LintelParameterType LintelParameterType { get; set; }
-        public string Name { get; set; }
-        public string OpeninigParameterName { get; set; }
-        public string WallParameterName { get; set; }
+        public string LintelTypeName { get; set; }
     }
 }

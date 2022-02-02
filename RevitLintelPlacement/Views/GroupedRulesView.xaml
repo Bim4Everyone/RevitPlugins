@@ -19,7 +19,7 @@
                 <DataTemplate DataType="{x:Type vm:GroupedRuleViewModel}">
                     <StackPanel Orientation="Horizontal">
                         <TextBox Width="200" Text="{Binding Name}"></TextBox>
-                        <ListBox Width="200" ItemsSource="{Binding GroupingCondition}">
+                        <ListBox Width="200" ItemsSource="{Binding WallTypes}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate DataType="{x:Type vm:WallTypeConditionViewModel}">
                                     <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Name}"></CheckBox>
@@ -37,8 +37,14 @@
                                         <StackPanel Orientation="Horizontal">
                                             <TextBox Width="80" Text="{Binding OpeningWidthCondition.MinWidth}"></TextBox>
                                             <TextBox Width="80" Text="{Binding OpeningWidthCondition.MaxWidth}"></TextBox>
-                                            <TextBox Width="80" Text="{Binding OffsetParameterViewModel.Value}"></TextBox>
-                                            <ComboBox Width="100" ItemsSource="{Binding LintelTypes}" SelectedItem="{Binding SelectedLintelType}"></ComboBox>
+                                            <TextBox Width="80" Text="{Binding LintelLeftOffsetParameter.LeftOffset}"></TextBox>
+                                            <ComboBox Width="100" ItemsSource="{Binding LintelTypes}" SelectedItem="{Binding SelectedLintelType}">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Name}"/>
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
                                         </StackPanel>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>

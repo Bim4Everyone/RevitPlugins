@@ -25,7 +25,7 @@ namespace RevitLintelPlacement.ViewModels {
         public ConditionCollectionViewModel(RevitRepository revitRepository, IEnumerable<ConditionSetting> conditionSettings) {
 
             this._revitRepository = revitRepository;
-            Conditions = new ObservableCollection<IConditionViewModel>(GetConditionViewModels(conditionSettings));
+            Conditions = new ObservableCollection<IConditionViewModel>(/*GetConditionViewModels(conditionSettings)*/);
         }
 
         public ObservableCollection<IConditionViewModel> Conditions {
@@ -37,62 +37,62 @@ namespace RevitLintelPlacement.ViewModels {
             return Conditions.All(c => c.Check(elementInWall));
         }
 
-        private IEnumerable<IConditionViewModel> GetConditionViewModels(IEnumerable<ConditionSetting> conditionSettings) {
-            foreach(var cs in conditionSettings) {
-                switch(cs.ConditionType) {
-                    case ConditionType.OpeningWidth: {
-                        yield return new OpeningWidthConditionViewModel() {
-                            MinWidth = cs.OpeningWidthMin,
-                            MaxWidth = cs.OpeningWidthMax
-                        };
-                        break;
-                    }
-                    case ConditionType.WallMaterialClasses: {
-                        yield return new MaterialClassesConditionViewModel(_revitRepository) {
-                            MaterialClassConditions = new ObservableCollection<MaterialClassConditionViewModel>(
-                            cs.WallMaterialClasses.Select(mc => new MaterialClassConditionViewModel() {
-                                Name = mc,
-                                IsChecked = true
-                            }))
-                        }; //TODO: надо еще добавлять кроме выбранных классов материалов еще те, которые есть в проекте (аналогично, с типами стен и материалами)
-                        break;
-                    }
-                    case ConditionType.ExclusionWallTypes: {
-                        yield return new ExclusionWallTypesConditionViewModel() {
-                            WallTypes = new ObservableCollection<WallTypeConditionViewModel>(
-                            cs.ExclusionWallTypes.Select(ewt => new WallTypeConditionViewModel() {
-                                Name = ewt,
-                                IsChecked = true
-                            }))
-                        };
-                        break;
-                    }
-                    case ConditionType.WallTypes: {
-                        yield return new WallTypesConditionViewModel() {
-                            WallTypes = new ObservableCollection<WallTypeConditionViewModel>(
-                            cs.WallTypes.Select(wt => new WallTypeConditionViewModel() {
-                                Name = wt,
-                                IsChecked = true
-                            }))
-                        };
-                        break;
-                    }
-                    case ConditionType.WallMaterials: {
-                        yield return new MaterialConditionsViewModel(_revitRepository) {
-                            MaterialConditions = new ObservableCollection<MaterialConditionViewModel>(
-                            cs.WallMaterials.Select(m => new MaterialConditionViewModel() {
-                                Name = m,
-                                IsChecked = true
-                            }))
-                        };
-                        break;
-                    }
+        //private IEnumerable<IConditionViewModel> GetConditionViewModels(IEnumerable<ConditionSetting> conditionSettings) {
+        //    //foreach(var cs in conditionSettings) {
+        //    //    switch(cs.ConditionType) {
+        //    //        case ConditionType.OpeningWidth: {
+        //    //            yield return new OpeningWidthConditionViewModel() {
+        //    //                MinWidth = cs.OpeningWidthMin,
+        //    //                MaxWidth = cs.OpeningWidthMax
+        //    //            };
+        //    //            break;
+        //    //        }
+        //    //        case ConditionType.WallMaterialClasses: {
+        //    //            yield return new MaterialClassesConditionViewModel(_revitRepository) {
+        //    //                MaterialClassConditions = new ObservableCollection<MaterialClassConditionViewModel>(
+        //    //                cs.WallMaterialClasses.Select(mc => new MaterialClassConditionViewModel() {
+        //    //                    Name = mc,
+        //    //                    IsChecked = true
+        //    //                }))
+        //    //            }; //TODO: надо еще добавлять кроме выбранных классов материалов еще те, которые есть в проекте (аналогично, с типами стен и материалами)
+        //    //            break;
+        //    //        }
+        //    //        case ConditionType.ExclusionWallTypes: {
+        //    //            yield return new ExclusionWallTypesConditionViewModel() {
+        //    //                WallTypes = new ObservableCollection<WallTypeConditionViewModel>(
+        //    //                cs.ExclusionWallTypes.Select(ewt => new WallTypeConditionViewModel() {
+        //    //                    Name = ewt,
+        //    //                    IsChecked = true
+        //    //                }))
+        //    //            };
+        //    //            break;
+        //    //        }
+        //    //        case ConditionType.WallTypes: {
+        //    //            yield return new WallTypesConditionViewModel() {
+        //    //                WallTypes = new ObservableCollection<WallTypeConditionViewModel>(
+        //    //                cs.WallTypes.Select(wt => new WallTypeConditionViewModel() {
+        //    //                    Name = wt,
+        //    //                    IsChecked = true
+        //    //                }))
+        //    //            };
+        //    //            break;
+        //    //        }
+        //    //        case ConditionType.WallMaterials: {
+        //    //            yield return new MaterialConditionsViewModel(_revitRepository) {
+        //    //                MaterialConditions = new ObservableCollection<MaterialConditionViewModel>(
+        //    //                cs.WallMaterials.Select(m => new MaterialConditionViewModel() {
+        //    //                    Name = m,
+        //    //                    IsChecked = true
+        //    //                }))
+        //    //            };
+        //    //            break;
+        //    //        }
 
-                    default:
-                    throw new ArgumentException($"Следующий тип условия: \"{cs.ConditionType}\", не найден.");
-                }
+        //    //        default:
+        //    //        throw new ArgumentException($"Следующий тип условия: \"{cs.ConditionType}\", не найден.");
+        //    //    }
 
-            }
-        }
+        //    //}
+        //}
     }
 }
