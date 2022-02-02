@@ -33,6 +33,7 @@ namespace RevitRooms.Models {
             _filter = new ElementMulticategoryFilter(new[] { BuiltInCategory.OST_Rooms, BuiltInCategory.OST_Areas });
         }
 
+        public Document Document => _document;
         public string DocumentName => _document.Title;
 
         public Element GetElement(ElementId elementId) {

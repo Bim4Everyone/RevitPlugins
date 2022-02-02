@@ -10,36 +10,7 @@ using dosymep.WPF.Commands;
 
 using Microsoft.WindowsAPICodePack.Dialogs;
 
-using pyRevitLabs.Json;
-
 namespace RevitServerFolders.Export {
-    public class ExportNwcFileConfig {
-        public bool WithRooms { get; set; }
-        public bool WithSubFolders { get; set; }
-
-        public string SourceNwcFolder { get; set; }
-        public string TargetNwcFolder { get; set; }
-
-        public bool CleanTargetNwcFolder { get; set; }
-
-        private static string GetConfigPath() {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dosymep", "RevitServerFolders", "ExportNwcFileConfig.json");
-        }
-
-        public static ExportNwcFileConfig GetExportNwcFileConfig() {
-            if(File.Exists(GetConfigPath())) {
-                return JsonConvert.DeserializeObject<ExportNwcFileConfig>(File.ReadAllText(GetConfigPath()));
-            }
-
-            return new ExportNwcFileConfig();
-        }
-
-        public static void SaveExportNwcFileConfig(ExportNwcFileConfig exportNwcFileConfig) {
-            Directory.CreateDirectory(Path.GetDirectoryName(GetConfigPath()));
-            File.WriteAllText(GetConfigPath(), JsonConvert.SerializeObject(exportNwcFileConfig));
-        }
-    }
-
     public class ExportNwcFileViewModel : INotifyPropertyChanged, IDataErrorInfo {
         private bool _withRooms;
         private bool _withSubFolders;

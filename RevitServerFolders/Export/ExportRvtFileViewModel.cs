@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -11,43 +10,9 @@ using dosymep.WPF.Commands;
 
 using Microsoft.WindowsAPICodePack.Dialogs;
 
-using pyRevitLabs.Json;
-
 using RevitServerFolders.dosymep.Views.Revit;
 
 namespace RevitServerFolders.Export {
-    public class ExportRvtFileConfig {
-        public string ServerName { get; set; }
-
-        public bool WithRooms { get; set; }
-        public bool WithNwcFiles { get; set; }
-        public bool WithSubFolders { get; set; }
-
-        public string SourceRvtFolder { get; set; }
-        public string TargetRvtFolder { get; set; }
-        public string TargetNwcFolder { get; set; }
-
-        public bool CleanTargetRvtFolder { get; set; }
-        public bool CleanTargetNwcFolder { get; set; }
-
-        private static string GetConfigPath() {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dosymep", "RevitServerFolders", "ExportRvtFileConfig.json");
-        }
-
-        public static ExportRvtFileConfig GetExportRvtFileConfig() {
-            if(File.Exists(GetConfigPath())) {
-                return JsonConvert.DeserializeObject<ExportRvtFileConfig>(File.ReadAllText(GetConfigPath()));
-            }
-
-            return new ExportRvtFileConfig();
-        }
-
-        public static void SaveExportRvtFileConfig(ExportRvtFileConfig exportRvtFileConfig) {
-            Directory.CreateDirectory(Path.GetDirectoryName(GetConfigPath()));
-            File.WriteAllText(GetConfigPath(), JsonConvert.SerializeObject(exportRvtFileConfig));
-        }
-    }
-
     public class ExportRvtFileViewModel : INotifyPropertyChanged, IDataErrorInfo {
         private string _serverName;
         private IList<string> _serverNames;

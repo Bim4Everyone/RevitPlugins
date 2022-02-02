@@ -26,8 +26,8 @@ namespace RevitRooms.ViewModels {
 
             RevitViewModel = RevitViewModels[1];
 
-            var roomsConfig = RoomsConfig.GetConfig();
-            var settings = roomsConfig.GetRoomsSettingsConfig(document.Title);
+            var roomsConfig = RoomsConfig.GetRoomsConfig();
+            var settings = roomsConfig.GetSettings(document);
             if(settings != null) {
                 RevitViewModel = RevitViewModels.FirstOrDefault(item => item._id == settings.SelectedRoomId) ?? RevitViewModel;
             }

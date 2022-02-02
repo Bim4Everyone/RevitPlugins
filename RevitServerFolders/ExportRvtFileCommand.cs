@@ -12,6 +12,9 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
 using dosymep;
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Serializers;
 
 using RevitServerFolders.Export;
 
@@ -86,17 +89,19 @@ namespace RevitServerFolders {
         }
 
         private static void SaveExportRvtFileConfig(ExportRvtFileViewModel exportRvtFileViewModel) {
-            ExportRvtFileConfig.SaveExportRvtFileConfig(new ExportRvtFileConfig() {
-                ServerName = exportRvtFileViewModel.ServerName,
-                WithRooms = exportRvtFileViewModel.WithRooms,
-                WithNwcFiles = exportRvtFileViewModel.WithNwcFiles,
-                SourceRvtFolder = exportRvtFileViewModel.SourceRvtFolder,
-                TargetNwcFolder = exportRvtFileViewModel.TargetNwcFolder,
-                TargetRvtFolder = exportRvtFileViewModel.TargetRvtFolder,
-                WithSubFolders = exportRvtFileViewModel.WithSubFolders,
-                CleanTargetNwcFolder = exportRvtFileViewModel.CleanTargetNwcFolder,
-                CleanTargetRvtFolder = exportRvtFileViewModel.CleanTargetRvtFolder
-            });
+            ExportRvtFileConfig exportConfig = ExportRvtFileConfig.GetExportRvtFileConfig();
+
+            exportConfig.ServerName = exportRvtFileViewModel.ServerName;
+            exportConfig.WithRooms = exportRvtFileViewModel.WithRooms;
+            exportConfig.WithNwcFiles = exportRvtFileViewModel.WithNwcFiles;
+            exportConfig.SourceRvtFolder = exportRvtFileViewModel.SourceRvtFolder;
+            exportConfig.TargetNwcFolder = exportRvtFileViewModel.TargetNwcFolder;
+            exportConfig.TargetRvtFolder = exportRvtFileViewModel.TargetRvtFolder;
+            exportConfig.WithSubFolders = exportRvtFileViewModel.WithSubFolders;
+            exportConfig.CleanTargetNwcFolder = exportRvtFileViewModel.CleanTargetNwcFolder;
+            exportConfig.CleanTargetRvtFolder = exportRvtFileViewModel.CleanTargetRvtFolder;
+            
+            exportConfig.SaveProjectConfig();
         }
     }
 }
