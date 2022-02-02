@@ -8,6 +8,6 @@ using Autodesk.Revit.DB;
 
 namespace RevitLintelPlacement.Models.Interfaces {
     internal interface ICorrelator {
-        FamilyInstance Correlate(RevitRepository revitRepository, FamilyInstance lintel, Dictionary<XYZ, FamilyInstance> elementLocationDict = null);
+        FamilyInstance Correlate(FamilyInstance lintel);
     }
 }

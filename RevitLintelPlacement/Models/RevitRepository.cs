@@ -150,21 +150,6 @@ namespace RevitLintelPlacement.Models {
             }
             return false;
 
-            //XYZ viewPoint = GetLocationPoint(elementInWall);
-            //if(elementInWall.Host is Wall elementWall) {
-            //    var wallZ = elementWall.get_BoundingBox(view3D).Max.Z;
-            //    if(wallZ < viewPoint.Z)
-            //        return false;
-            //}
-            //var refWithContext = GetNearestWall(view3D, elementInWall, viewPoint, new XYZ(0, 0, 1), true);
-            //if(refWithContext == null)
-            //    return true;
-            //if(refWithContext.Proximity < 1) {
-            //    var wall = _document.GetElement(refWithContext.GetReference().ElementId);
-            //    if(!wall.Name.ToLower().Contains("железобетон")) //TODO: часть названия типа стены
-            //        return true;
-            //}
-            //return false;
         }
 
         public bool CheckHorizontal(View3D view3D, FamilyInstance elementInWall, bool isRight) {
@@ -175,7 +160,7 @@ namespace RevitLintelPlacement.Models {
             if(refWithContext == null)
                 return false;
             var openingWidth = (double) elementInWall.GetParamValueOrDefault("ADSK_Размер_Ширина"); //ToDo: параметр
-            if(refWithContext.Proximity < openingWidth / 2 + 0.4) {
+            if(refWithContext.Proximity < (openingWidth / 2 + 0.4)) { 
                 var wall = _document.GetElement(refWithContext.GetReference().ElementId);
                 if(wall.Name.ToLower().Contains("железобетон")) //TODO: часть названия типа стены
                     return true;

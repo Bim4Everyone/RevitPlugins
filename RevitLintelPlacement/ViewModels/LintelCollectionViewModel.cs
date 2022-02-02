@@ -22,9 +22,6 @@ namespace RevitLintelPlacement.ViewModels {
         private ObservableCollection<LintelInfoViewModel> _lintelInfos;
         private ViewOrientation3D _orientation; //вряд ли здесь нужно хранить
 
-        public LintelCollectionViewModel() {
-
-        }
 
         public LintelCollectionViewModel(RevitRepository _revitRepository) {
 
@@ -59,9 +56,8 @@ namespace RevitLintelPlacement.ViewModels {
 
 
         private void ElementInWallKindFilter(object sender, FilterEventArgs e) {
-            if (e.Item is LintelInfoViewModel lintel) {
-                if(lintel.ElementInWallKind != SelectedElementKind)
-                    e.Accepted = false;
+            if(e.Item is LintelInfoViewModel lintel) { 
+                e.Accepted = lintel.ElementInWallKind == SelectedElementKind;
             }
         }
 
