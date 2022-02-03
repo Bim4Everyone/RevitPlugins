@@ -27,21 +27,24 @@ namespace RevitLintelPlacement.ViewModels {
 
         public LintelInfoViewModel(RevitRepository revitRepository, FamilyInstance lintel, FamilyInstance elementInWall) {
             this._revitRepository = revitRepository;
-            LintelId = lintel.Id;
-            ElementInWallId = elementInWall.Id;
-            WallTypeName = elementInWall.Host.Name;
-            ElementInWallName = elementInWall.Name;
-            Level = _revitRepository.GetElementById(elementInWall.LevelId)?.Name;
-            if(elementInWall.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Id) {
-                ElementInWallKind = ElementInWallKind.Door;
-            } else if (elementInWall.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Id) {
-                if(elementInWall.Symbol.Name.Contains("Отверстие")){
-                    ElementInWallKind = ElementInWallKind.Opening;
-                } else {
-                    ElementInWallKind = ElementInWallKind.Window;
+            if(elementInWall != null) {
+                ElementInWallId = elementInWall.Id;
+                ElementInWallName = elementInWall.Name;
+                WallTypeName = elementInWall.Host.Name;
+                if(elementInWall.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Id) {
+                    ElementInWallKind = ElementInWallKind.Door;
+                } else if(elementInWall.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Id) {
+                    if(elementInWall.Symbol.Name.Contains("Отверстие")) { //ToDO: название
+                        ElementInWallKind = ElementInWallKind.Opening;
+                    } else {
+                        ElementInWallKind = ElementInWallKind.Window;
+                    }
                 }
+            } else {
+                ElementInWallKind = ElementInWallKind.None;
             }
-
+            LintelId = lintel.Id;
+            Level = _revitRepository.GetElementById(lintel.LevelId)?.Name;
         }
 
         public string ElementInWallName {
@@ -80,6 +83,8 @@ namespace RevitLintelPlacement.ViewModels {
         [Description("Окна")]
         Window,
         [Description("Отверстия")]
-        Opening
+        Opening, 
+        [Description("Без элемента")]
+        None
     }
 }
