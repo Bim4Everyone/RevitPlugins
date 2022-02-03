@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitLintelPlacement.ViewModels.Interfaces;
@@ -20,7 +21,10 @@ namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels {
         }
 
         public void SetTo(FamilyInstance lintel, FamilyInstance elementInWall) {
-            throw new NotImplementedException();
+#if D2020 || R2020
+            var value = UnitUtils.Convert(RightOffset, DisplayUnitType.DUT_MILLIMETERS, DisplayUnitType.DUT_DECIMAL_FEET);
+            lintel.SetParamValue("ОпираниеСправа", value); //ToDo: параметр
+#endif
         }
     }
 }

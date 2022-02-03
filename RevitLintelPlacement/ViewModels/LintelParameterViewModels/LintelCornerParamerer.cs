@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitLintelPlacement.ViewModels.Interfaces;
@@ -20,7 +21,7 @@ namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels {
         }
 
         public void SetTo(FamilyInstance lintel, FamilyInstance elementInWall) {
-            throw new NotImplementedException();
+            lintel.SetParamValue("Уголок", IsCornerChecked ? 0 : 1); //ToDo: параметр
         }
     }
 }
