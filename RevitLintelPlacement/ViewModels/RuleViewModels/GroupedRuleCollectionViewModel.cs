@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -45,6 +47,21 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _groupedRules, value);
         }
 
+        public ConcreteRuleViewModel GetRule(FamilyInstance familyInstance) {
+            if(familyInstance is null) {
+                throw new ArgumentNullException(nameof(familyInstance));
+            }
+
+            foreach(var groupedRule in GroupedRules) {
+                var rule = groupedRule.GetRule(familyInstance);
+                if(rule != null) {
+                    return rule;
+                }
+            }
+
+            return null;
+        }
+
         private void AddGroupedRule(object p) {
             GroupedRules.Add(new GroupedRuleViewModel(_revitRepository));
         }
@@ -55,13 +72,13 @@ namespace RevitLintelPlacement.ViewModels {
             }
         }
 
-        private IEnumerable<ConcreteRuleViewModel> GetRuleViewModels(RulesSettigs ruleSettings) {
-            foreach(var groupedRule in ruleSettings.RuleSettings) {
-                foreach(var rule in groupedRule.Rules) {
-                    yield return new ConcreteRuleViewModel(_revitRepository, rule);
-                }
-            }
-        }
+        //private IEnumerable<ConcreteRuleViewModel> GetRuleViewModels(RulesSettigs ruleSettings) {
+        //    foreach(var groupedRule in ruleSettings.RuleSettings) {
+        //        foreach(var rule in groupedRule.Rules) {
+        //            yield return new ConcreteRuleViewModel(_revitRepository, rule);
+        //        }
+        //    }
+        //}
 
         private void SaveConfig(object p) {
             var config = RuleConfig.GetRuleConfig();

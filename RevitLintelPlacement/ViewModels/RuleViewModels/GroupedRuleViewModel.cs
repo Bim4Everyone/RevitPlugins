@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -71,6 +73,21 @@ namespace RevitLintelPlacement.ViewModels {
                 },
                 Rules = Rules.Select(r=>r.GetRuleSetting()).ToList()
             };
+        }
+
+        public ConcreteRuleViewModel GetRule(FamilyInstance familyInstance) {
+            if(familyInstance is null) {
+                throw new ArgumentNullException(nameof(familyInstance));
+            }
+
+            if (familyInstance.Host is Wall wall && 
+                WallTypes.WallTypes.Any(e=>e.Name.Equals(familyInstance.Name, StringComparison.CurrentCultureIgnoreCase))) {
+                foreach(var rule in Rules) {
+                    if(rule.CheckConditions(familyInstance))
+                        return rule;
+                }
+            }
+            return null;
         }
 
         private void AddRule(object p) {

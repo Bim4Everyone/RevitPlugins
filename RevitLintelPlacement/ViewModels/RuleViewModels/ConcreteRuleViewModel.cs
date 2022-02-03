@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.ViewModels;
 
 using RevitLintelPlacement.Models;
@@ -65,6 +67,10 @@ namespace RevitLintelPlacement.ViewModels {
         public List<LintelTypeNameParameter> LintelTypes {
             get => _lintelTypes;
             set => this.RaiseAndSetIfChanged(ref _lintelTypes, value);
+        }
+
+        public bool CheckConditions(FamilyInstance familyInstance) {
+            return _conditions.All(c => c.Check(familyInstance));
         }
 
         public RuleSetting GetRuleSetting() {

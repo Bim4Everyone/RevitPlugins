@@ -17,7 +17,7 @@ using RevitLintelPlacement.Models;
 namespace RevitLintelPlacement.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private RuleCollectionViewModel _rules;
+        //private RuleCollectionViewModel _rules;
         private LintelCollectionViewModel _lintels;
         private GroupedRuleCollectionViewModel _groupedRules;
 
@@ -33,10 +33,10 @@ namespace RevitLintelPlacement.ViewModels {
             InitializeLintels();
             PlaceLintelCommand = new RelayCommand(PlaceLintels, p => true);
         }
-        public RuleCollectionViewModel Rules {
-            get => _rules;
-            set => this.RaiseAndSetIfChanged(ref _rules, value);
-        }
+        //public RuleCollectionViewModel Rules {
+        //    get => _rules;
+        //    set => this.RaiseAndSetIfChanged(ref _rules, value);
+        //}
 
         public LintelCollectionViewModel Lintels {
             get => _lintels;
@@ -66,7 +66,7 @@ namespace RevitLintelPlacement.ViewModels {
                 var view3D = _revitRepository.GetView3D();
                 foreach(var elementId in elementInWallIds) {
                     var elementInWall = (FamilyInstance) _revitRepository.GetElementById(elementId);
-                    var rule = Rules.GetRule(elementInWall);
+                    var rule = GroupedRules.GetRule(elementInWall);
                     if(rule == null)
                         continue;
                     if(!_revitRepository.CheckUp(view3D, elementInWall))
