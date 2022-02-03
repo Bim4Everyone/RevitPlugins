@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -13,11 +14,11 @@ using RevitLintelPlacement.ViewModels.LintelParameterViewModels;
 namespace RevitLintelPlacement.ViewModels {
     internal class ConcreteRuleViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private LintelTypeNameParameter _selectedLintelType;
+        private string _selectedLintelType;
         private OpeningWidthConditionViewModel _openingWidthCondition;
         private LintelLeftOffsetParameter _lintelLeftOffsetParameter;
         private LintelRightOffsetParameter _lintelRightOffsetParameter;
-        private List<LintelTypeNameParameter> _lintelTypes;
+        private List<string> _lintelTypes;
         private List<IConditionViewModel> _conditions = new List<IConditionViewModel>();
         private List<ILintelParameterViewModel> _parameters = new List<ILintelParameterViewModel>();
 
@@ -38,7 +39,7 @@ namespace RevitLintelPlacement.ViewModels {
             AddConditions();
         }
 
-        public LintelTypeNameParameter SelectedLintelType {
+        public string SelectedLintelType {
             get => _selectedLintelType;
             set => this.RaiseAndSetIfChanged(ref _selectedLintelType, value);
         }
@@ -64,7 +65,7 @@ namespace RevitLintelPlacement.ViewModels {
 
         public LintelCornerParamerer CornerParamerer { get; set; }
 
-        public List<LintelTypeNameParameter> LintelTypes {
+        public List<string> LintelTypes {
             get => _lintelTypes;
             set => this.RaiseAndSetIfChanged(ref _lintelTypes, value);
         }
@@ -75,9 +76,16 @@ namespace RevitLintelPlacement.ViewModels {
 
         public RuleSetting GetRuleSetting() {
             return new RuleSetting() {
+                LintelTypeName=SelectedLintelType,
                 ConditionSettingsConfig = GetConditionSettings().ToList(),
                 LintelParameterSettingsConfig = GetParameterSettings().ToList()
             };
+        }
+
+        public void SetParametersTo(FamilyInstance lintel, FamilyInstance elementInWall) {
+            foreach(var parameter in _parameters) {
+                parameter.SetTo(lintel, elementInWall);
+            }
         }
 
         private IEnumerable<ConditionSetting> GetConditionSettings() {
@@ -94,12 +102,12 @@ namespace RevitLintelPlacement.ViewModels {
 
         private IEnumerable<LintelParameterSetting> GetParameterSettings() {
             foreach(var parameter in _parameters) {
-                if(parameter is LintelTypeNameParameter typeNameParameter) {
-                    yield return new LintelParameterSetting() {
-                        LintelParameterType = LintelParameterType.TypeNameParameter,
-                        LintelTypeName = typeNameParameter.Name
-                    };
-                }
+                //if(parameter is LintelTypeNameParameter typeNameParameter) {
+                //    yield return new LintelParameterSetting() {
+                //        LintelParameterType = LintelParameterType.TypeNameParameter,
+                //        LintelTypeName = typeNameParameter.Name
+                //    };
+                //}
                 if (parameter is LintelLeftOffsetParameter leftOffsetparameter) {
                     yield return new LintelParameterSetting() {
                         LintelParameterType = LintelParameterType.LeftOffsetParameter,
@@ -154,15 +162,19 @@ namespace RevitLintelPlacement.ViewModels {
                         };
                         break;
                     }
-                    case LintelParameterType.TypeNameParameter: {
-                        SelectedLintelType = new LintelTypeNameParameter() {
-                            Name = parameter.LintelTypeName
-                        };
-                        break;
-                    }
+                    //case LintelParameterType.TypeNameParameter: {
+                    //    SelectedLintelType = new LintelTypeNameParameter() {
+                    //        Name = parameter.LintelTypeName
+                    //    };
+                    //    break;
+                    //}
                 }
             }
-
+            LintelTypes = new List<string>(
+               _revitRepository.GetLintelTypes()
+               .Select(lt => lt.Name));
+            SelectedLintelType = LintelTypes.FirstOrDefault(lt=>lt
+            .Equals(ruleSetting.LintelTypeName, StringComparison.CurrentCultureIgnoreCase));
             OpeningWidthParameter = new OpeningWidthParameter();
             WallHalfThicknessParameter = new WallHalfThicknessParameter();
         }
@@ -174,11 +186,9 @@ namespace RevitLintelPlacement.ViewModels {
             LintelRightOffsetParameter = new LintelRightOffsetParameter();
             OpeningWidthParameter = new OpeningWidthParameter();
             WallHalfThicknessParameter = new WallHalfThicknessParameter();
-            LintelTypes = new List<LintelTypeNameParameter>(
+            LintelTypes = new List<string>(
                 _revitRepository.GetLintelTypes()
-                .Select(lt=>new LintelTypeNameParameter() {
-                    Name = lt.Name
-                }));
+                .Select(lt=>lt.Name));
             SelectedLintelType = LintelTypes.FirstOrDefault();
         }
 

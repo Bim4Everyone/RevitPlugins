@@ -80,8 +80,8 @@ namespace RevitLintelPlacement.ViewModels {
                 throw new ArgumentNullException(nameof(familyInstance));
             }
 
-            if (familyInstance.Host is Wall wall && 
-                WallTypes.WallTypes.Any(e=>e.Name.Equals(familyInstance.Name, StringComparison.CurrentCultureIgnoreCase))) {
+            if(familyInstance.Host is Wall wall &&
+                WallTypes.WallTypes.Any(e => e.IsChecked && e.Name.Equals(wall.Name, StringComparison.CurrentCultureIgnoreCase))) {
                 foreach(var rule in Rules) {
                     if(rule.CheckConditions(familyInstance))
                         return rule;
@@ -101,7 +101,7 @@ namespace RevitLintelPlacement.ViewModels {
                 .Select(w => new WallTypeConditionViewModel() {
                     Name = w.Name,
                     IsChecked = false
-                }));
+                }).OrderBy(e=>e.Name));
         }
     }
 }

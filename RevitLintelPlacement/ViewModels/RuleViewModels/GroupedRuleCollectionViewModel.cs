@@ -72,14 +72,6 @@ namespace RevitLintelPlacement.ViewModels {
             }
         }
 
-        //private IEnumerable<ConcreteRuleViewModel> GetRuleViewModels(RulesSettigs ruleSettings) {
-        //    foreach(var groupedRule in ruleSettings.RuleSettings) {
-        //        foreach(var rule in groupedRule.Rules) {
-        //            yield return new ConcreteRuleViewModel(_revitRepository, rule);
-        //        }
-        //    }
-        //}
-
         private void SaveConfig(object p) {
             var config = RuleConfig.GetRuleConfig();
             var settings = config.GetSettings(_revitRepository.GetDocumentName());

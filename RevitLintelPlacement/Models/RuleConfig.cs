@@ -41,6 +41,7 @@ namespace RevitLintelPlacement.Models {
     }
 
     public class RuleSetting {
+        public string LintelTypeName { get; set; }
         public List<ConditionSetting> ConditionSettingsConfig { get; set; } = new List<ConditionSetting>();
         public List<LintelParameterSetting> LintelParameterSettingsConfig { get; set; } = new List<LintelParameterSetting>();
     }
@@ -58,7 +59,6 @@ namespace RevitLintelPlacement.Models {
     }
 
     public enum LintelParameterType {
-        TypeNameParameter,
         LeftOffsetParameter,
         RightOffsetParameter,
         CornerParameter

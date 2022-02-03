@@ -34,11 +34,11 @@ namespace RevitLintelPlacement.Models {
             CreateView3DIfNotExisted();
         }
 
-        public FamilySymbol GetLintelType() {
+        public FamilySymbol GetLintelType(string lintelTypeName) {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .WhereElementIsElementType()
-                .First(e => e.Name == _lintelTypeName) as FamilySymbol; 
+                .First(e => e.Name == lintelTypeName) as FamilySymbol; 
         }
 
         public IEnumerable<FamilySymbol> GetLintelTypes() {
@@ -177,8 +177,11 @@ namespace RevitLintelPlacement.Models {
             var refWithContext = GetNearestWall(view3D, elementInWall, viewPoint, direction, true);
             if(refWithContext == null)
                 return false;
-            var openingWidth = (double) elementInWall.GetParamValueOrDefault("ADSK_Размер_Ширина"); //ToDo: параметр
-            if(refWithContext.Proximity < (openingWidth / 2 + 0.4)) { 
+            var elementWidth = elementInWall.GetParamValueOrDefault("ADSK_Размер_Ширина"); //Todo: параметр
+            if(elementWidth == null) {
+                elementWidth = elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
+            }
+            if(refWithContext.Proximity < ((double) elementWidth / 2 + 0.4)) { 
                 var wall = _document.GetElement(refWithContext.GetReference().ElementId);
                 if(wall.Name.ToLower().Contains("железобетон")) //TODO: часть названия типа стены
                     return true;

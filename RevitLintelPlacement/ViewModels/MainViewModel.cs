@@ -60,7 +60,7 @@ namespace RevitLintelPlacement.ViewModels {
                     elementInWallIds.Remove(lintel.ElementInWallId);
             }
 
-            var lintelType = _revitRepository.GetLintelType();
+            
 
             using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
                 var view3D = _revitRepository.GetView3D();
@@ -71,8 +71,9 @@ namespace RevitLintelPlacement.ViewModels {
                         continue;
                     if(!_revitRepository.CheckUp(view3D, elementInWall))
                         continue;
+                    var lintelType = _revitRepository.GetLintelType(rule.SelectedLintelType);
                     var lintel = _revitRepository.PlaceLintel(lintelType, elementId);
-                    rule.LintelParameters.SetTo(lintel, elementInWall);
+                    rule.SetParametersTo(lintel, elementInWall);
                     if(_revitRepository.CheckHorizontal(view3D, elementInWall, true)) {
                         lintel.SetParamValue("ОпираниеСправа", 0); //ToDo: параметр
                     }
@@ -80,7 +81,7 @@ namespace RevitLintelPlacement.ViewModels {
                     if(_revitRepository.CheckHorizontal(view3D, elementInWall, false)) {
                         lintel.SetParamValue("ОпираниеСлева", 0);
                     }
-                    _revitRepository.LockLintel(lintel, elementInWall);
+                    //_revitRepository.LockLintel(lintel, elementInWall);
                     Lintels.LintelInfos.Add(new LintelInfoViewModel(_revitRepository, lintel, elementInWall));
                 }
                 t.Commit();
