@@ -29,8 +29,7 @@ namespace RevitLintelPlacement.ViewModels {
             this._revitRepository = revitRepository;
             if (rulesSettings== null || rulesSettings.RuleSettings.Count == 0) {
                 GroupedRules = new ObservableCollection<GroupedRuleViewModel>();
-                var rule = new GroupedRuleViewModel(_revitRepository);
-                GroupedRules.Add(rule);
+                GroupedRules.Add(new GroupedRuleViewModel(_revitRepository));
             } else {
                 GroupedRules = new ObservableCollection<GroupedRuleViewModel>(
                 rulesSettings.RuleSettings.Select(r => new GroupedRuleViewModel(revitRepository, r))

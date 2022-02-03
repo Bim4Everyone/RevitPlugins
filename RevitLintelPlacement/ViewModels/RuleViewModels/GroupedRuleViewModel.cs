@@ -24,7 +24,7 @@ namespace RevitLintelPlacement.ViewModels {
             this._revitRepository = revitRepository;
             AddRuleCommand = new RelayCommand(AddRule, p => true);
             RemoveRuleCommand = new RelayCommand(RemoveRule, p => true);
-            if (groupedRuleSettings==null || groupedRuleSettings.Rules.Count == 0) {
+            if(groupedRuleSettings==null || groupedRuleSettings.Rules.Count == 0) {
                 Rules = new ObservableCollection<ConcreteRuleViewModel>();
                 var rule = new ConcreteRuleViewModel(revitRepository);
                 Rules.Add(rule);

@@ -23,9 +23,6 @@ namespace RevitLintelPlacement.ViewModels {
         private List<ILintelParameterViewModel> _parameters = new List<ILintelParameterViewModel>();
 
         public ConcreteRuleViewModel() {
-            InitializeEmptyGroupedRule();
-            AddParameters();
-            AddConditions();
         }
 
         public ConcreteRuleViewModel(RevitRepository revitRepository, RuleSetting ruleSetting = null) {
@@ -102,12 +99,6 @@ namespace RevitLintelPlacement.ViewModels {
 
         private IEnumerable<LintelParameterSetting> GetParameterSettings() {
             foreach(var parameter in _parameters) {
-                //if(parameter is LintelTypeNameParameter typeNameParameter) {
-                //    yield return new LintelParameterSetting() {
-                //        LintelParameterType = LintelParameterType.TypeNameParameter,
-                //        LintelTypeName = typeNameParameter.Name
-                //    };
-                //}
                 if (parameter is LintelLeftOffsetParameter leftOffsetparameter) {
                     yield return new LintelParameterSetting() {
                         LintelParameterType = LintelParameterType.LeftOffsetParameter,
@@ -160,12 +151,6 @@ namespace RevitLintelPlacement.ViewModels {
                         };
                         break;
                     }
-                    //case LintelParameterType.TypeNameParameter: {
-                    //    SelectedLintelType = new LintelTypeNameParameter() {
-                    //        Name = parameter.LintelTypeName
-                    //    };
-                    //    break;
-                    //}
                 }
             }
             LintelRightOffsetParameter.RightOffset = LintelLeftOffsetParameter.LeftOffset;
