@@ -15,7 +15,7 @@ using RevitLintelPlacement.ViewModels.Interfaces;
 namespace RevitLintelPlacement.ViewModels {
     internal class RuleCollectionViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private readonly IEnumerable<RulesSettigs> _rulesSettings;
+        private readonly RulesSettigs _rulesSettings;
         private RuleViewModel _selectedRule;
         private ObservableCollection<RuleViewModel> _rules;
 
@@ -23,7 +23,7 @@ namespace RevitLintelPlacement.ViewModels {
 
         }
 
-        public RuleCollectionViewModel(RevitRepository revitRepository, IEnumerable<RulesSettigs> rulesSettings) {
+        public RuleCollectionViewModel(RevitRepository revitRepository, RulesSettigs rulesSettings) {
             this._revitRepository = revitRepository;
             this._rulesSettings = rulesSettings;
             Rules = new ObservableCollection<RuleViewModel>(GetRuleViewModels(_rulesSettings));
@@ -44,19 +44,14 @@ namespace RevitLintelPlacement.ViewModels {
             return Rules.FirstOrDefault(r => r.Conditions.Conditions.All(c => c.Check(elementInWall)));
         }
 
-        //TODO: возможно, правила из шаблона нужно сделать нередактируемыми
-        private IEnumerable<RuleViewModel> GetRuleViewModels(IEnumerable<RulesSettigs> ruleSettings) {
-            
-            foreach(var rules in ruleSettings) {
-                foreach(var rule in rules.RuleSettings) {
-                    yield return new RuleViewModel() {
-                        Name = rule.Name,
-                        IsSystem = rules.IsSystem,
-                        Conditions = new ConditionCollectionViewModel(_revitRepository, rule.ConditionSettingsConfig),
-                        LintelParameters = new LintelParameterCollectionViewModel(rule.LintelParameterSettingsConfig),
-                        IsChecked = true
-                    };
-                }
+        private IEnumerable<RuleViewModel> GetRuleViewModels(RulesSettigs ruleSettings) {
+            foreach(var rule in ruleSettings.RuleSettings) {
+                yield return new RuleViewModel() {
+                    Name = rule.Name,
+                    //Conditions = new ConditionCollectionViewModel(_revitRepository, rule.ConditionSettingsConfig),
+                    //LintelParameters = new LintelParameterCollectionViewModel(rule.LintelParameterSettingsConfig),
+                    //IsChecked = true
+                };
             }
         }
     }

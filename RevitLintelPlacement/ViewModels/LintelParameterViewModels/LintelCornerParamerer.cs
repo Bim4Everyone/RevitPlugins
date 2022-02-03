@@ -11,7 +11,7 @@ using dosymep.WPF.ViewModels;
 using RevitLintelPlacement.ViewModels.Interfaces;
 
 namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels {
-    internal class CornerParamerer : BaseViewModel, ILintelParameterViewModel {
+    internal class LintelCornerParamerer : BaseViewModel, ILintelParameterViewModel {
         private bool _isCornerChecked;
 
         public bool IsCornerChecked {
