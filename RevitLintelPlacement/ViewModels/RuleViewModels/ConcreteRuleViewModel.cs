@@ -113,11 +113,9 @@ namespace RevitLintelPlacement.ViewModels {
                         LintelParameterType = LintelParameterType.LeftOffsetParameter,
                         Offset = leftOffsetparameter.LeftOffset
                     };
-                }
-                if (parameter is LintelRightOffsetParameter rightOffsetParameter) {
                     yield return new LintelParameterSetting() {
                         LintelParameterType = LintelParameterType.RightOffsetParameter,
-                        Offset = rightOffsetParameter.RightOffset
+                        Offset = leftOffsetparameter.LeftOffset
                     };
                 }
                 if (parameter is LintelCornerParamerer cornerParameter) {
@@ -170,6 +168,7 @@ namespace RevitLintelPlacement.ViewModels {
                     //}
                 }
             }
+            LintelRightOffsetParameter.RightOffset = LintelLeftOffsetParameter.LeftOffset;
             LintelTypes = new List<string>(
                _revitRepository.GetLintelTypes()
                .Select(lt => lt.Name));

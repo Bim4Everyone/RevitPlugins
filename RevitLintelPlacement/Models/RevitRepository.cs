@@ -357,7 +357,7 @@ namespace RevitLintelPlacement.Models {
                 z = (double)height + bottomBarHeight;
             } else {
                 var topBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
-                z = location.Z + topBarHeight;
+                z = /*location.Z +*/ topBarHeight;
             }
             return new XYZ(location.X, location.Y, z);
         }

@@ -86,7 +86,7 @@ namespace RevitLintelPlacement.Models {
             //    }
             //}
 
-            var nearestXYZ = _elementLocationDict.Keys.OrderBy(item => lintelLocation.DistanceTo(item)).Last();
+            var nearestXYZ = _elementLocationDict.Keys.OrderBy(item => lintelLocation.DistanceTo(item)).First();
             if(lintelLocation.DistanceTo(nearestXYZ) < 1.6) { //TODO: другое число (может, половина ширины проема)
                 return _elementLocationDict[nearestXYZ];
             }
