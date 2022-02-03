@@ -3,76 +3,111 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:behaviors="clr-namespace:RevitLintelPlacement.Behaviors"
              xmlns:local="clr-namespace:RevitLintelPlacement.Views"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="450" d:DesignWidth="1100"
              d:DataContext="{d:DesignInstance vm:GroupedRuleCollectionViewModel, IsDesignTimeCreatable=False}"
              Name="ucRules">
     <ScrollViewer Margin="5" MaxHeight="{Binding ElementName=ucRules, Path=ActualHeight}" CanContentScroll="False" HorizontalScrollBarVisibility="Auto">
         <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             
-            <ListBox Grid.Row="0" x:Name="lbGroupedRules" ItemsSource="{Binding GroupedRules}">
-                <ListBox.Resources>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent" />
-                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
-                    <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
-                </ListBox.Resources>
+            <DataGrid Grid.Row="0" CanUserResizeColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Width="208" Header="Название правила"></DataGridTextColumn>
+                    <DataGridTextColumn Width="350" Header="Типоразмеры стен"></DataGridTextColumn>
+                    <DataGridTextColumn Width="172" Header="Размеры проема"></DataGridTextColumn>
+                    <DataGridTextColumn Width="85" Header="Опирание"></DataGridTextColumn>
+                    <DataGridTextColumn Width="210" Header="Типоразмер перемычки"></DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+            <ListBox Grid.Row="1" Grid.Column="0" Focusable="False" IsTabStop="False" BorderThickness="0" x:Name="lbGroupedRules" ItemsSource="{Binding GroupedRules}">
+                <i:Interaction.Behaviors>
+                    <behaviors:DelegateMouseWheelBehavior/>
+                </i:Interaction.Behaviors>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="IsSelected" Value="{Binding Content.IsSelected, Mode=TwoWay, RelativeSource={RelativeSource Self}}"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <ContentPresenter/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:GroupedRuleViewModel}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Width="200" Height="20" Margin="5" VerticalContentAlignment="Center"  TextWrapping="Wrap" Text="{Binding Name}"></TextBox>
-                            <ListBox Grid.Column="1" MaxHeight="200" ItemsSource="{Binding WallTypes.WallTypes}">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate DataType="{x:Type vm:WallTypeConditionViewModel}">
-                                        <CheckBox IsChecked="{Binding IsChecked}">
-                                            <TextBlock Text="{Binding Name}"/>
-                                        </CheckBox>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                            <GridSplitter Grid.Column="2" Width="2" ShowsPreview="False"  HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>
-                            <Grid Grid.Column="3">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <ListBox Grid.Row="0" MinWidth="400" ItemsSource="{Binding Rules}">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate DataType="{x:Type vm:ConcreteRuleViewModel}">
-                                            <StackPanel Orientation="Horizontal">
-                                                <StackPanel Orientation="Horizontal" Margin="0 0 5 0">
-                                                    <TextBox Width="80" Margin="1,0" Text="{Binding OpeningWidthCondition.MinWidth}"></TextBox>
-                                                    <TextBox Width="80" Margin="1,0" Text="{Binding OpeningWidthCondition.MaxWidth}"></TextBox>
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBox Width="80" Margin="1,0" Text="{Binding LintelLeftOffsetParameter.LeftOffset}"></TextBox>
-                                                    <ComboBox MinWidth="200" Margin="1,0" ItemsSource="{Binding LintelTypes}" SelectedItem="{Binding SelectedLintelType}">
-                                                    </ComboBox>
-                                                </StackPanel>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
-                                <Button Grid.Row="1" Width="30" Height="20" Margin="0 3" VerticalAlignment="Top" Command="{Binding AddRuleCommand}">+</Button>
-                            </Grid>
-                        </Grid>
+                        <DockPanel>
+                            <Border Margin="2" BorderBrush="LightGray" BorderThickness="1">
+                                <Grid Margin="2" DockPanel.Dock="Left">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="350"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Height="20" Margin="5" VerticalContentAlignment="Center"  TextWrapping="Wrap" Text="{Binding Name}"></TextBox>
+                                    <ListBox Grid.Column="1" MaxHeight="200" ItemsSource="{Binding WallTypes.WallTypes}">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type vm:WallTypeConditionViewModel}">
+                                                <CheckBox IsChecked="{Binding IsChecked}">
+                                                    <TextBlock Text="{Binding Name}"/>
+                                                </CheckBox>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                    <Grid Grid.Column="2">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <ListBox Grid.Row="0" MinWidth="400" BorderThickness="0" Focusable="False" ItemsSource="{Binding Rules}">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate DataType="{x:Type vm:ConcreteRuleViewModel}">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <StackPanel Orientation="Horizontal" Margin="0 0 5 0">
+                                                            <TextBox Width="80" Margin="1,0" Text="{Binding OpeningWidthCondition.MinWidth}"></TextBox>
+                                                            <TextBox Width="80" Margin="1,0" Text="{Binding OpeningWidthCondition.MaxWidth}"></TextBox>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBox Width="80" Margin="1,0" Text="{Binding LintelLeftOffsetParameter.LeftOffset}"></TextBox>
+                                                            <ComboBox MinWidth="200" Margin="1,0" ItemsSource="{Binding LintelTypes}" SelectedItem="{Binding SelectedLintelType}">
+                                                            </ComboBox>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Grid.Row="1" Width="30" Height="20" Margin="2 3" VerticalAlignment="Top" Command="{Binding AddRuleCommand}">+</Button>
+                                            <Button Grid.Row="1" Width="30" Height="20" Margin="2 3" VerticalAlignment="Top" Command="{Binding RemoveRuleCommand}">-</Button>
+                                        </StackPanel>
+                                        
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                            <Button DockPanel.Dock="Left" Margin="5 0" Width="30" Height="30" Name="bDelete" Command="{Binding ElementName=ucRules, Path=DataContext.RevoveGroupedRuleCommand}" 
+                                    CommandParameter="{Binding ElementName=bDelete, Path=DataContext}" >-</Button>
+                        </DockPanel>
+                        
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+            <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Width="30" Margin="3" Command="{Binding AddGroupedRuleCommand}">+</Button>
-                <Button Width="30" Margin="3" Command="{Binding RevoveGroupedRuleCommand}" CommandParameter="{Binding ElementName=lbGroupedRules, Path=SelectedItem}">-</Button>
                 <Button Width="30" Margin="3" Command="{Binding SaveConfigCommand}" >!</Button>
             </StackPanel>
         </Grid>

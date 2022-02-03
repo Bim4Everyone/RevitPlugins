@@ -23,6 +23,7 @@ namespace RevitLintelPlacement.ViewModels {
         public GroupedRuleViewModel(RevitRepository revitRepository, GroupedRuleSettings groupedRuleSettings=null) {
             this._revitRepository = revitRepository;
             AddRuleCommand = new RelayCommand(AddRule, p => true);
+            RemoveRuleCommand = new RelayCommand(RemoveRule, p => true);
             if (groupedRuleSettings==null || groupedRuleSettings.Rules.Count == 0) {
                 Rules = new ObservableCollection<ConcreteRuleViewModel>();
                 var rule = new ConcreteRuleViewModel(revitRepository);
@@ -60,6 +61,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         public ICommand AddRuleCommand { get; set; }
+        public ICommand RemoveRuleCommand { get; set; }
 
         public GroupedRuleSettings GetGroupedRuleSetting() {
             return new GroupedRuleSettings() {
@@ -92,6 +94,11 @@ namespace RevitLintelPlacement.ViewModels {
 
         private void AddRule(object p) {
             Rules.Add(new ConcreteRuleViewModel(_revitRepository));
+        }
+        private void RemoveRule(object p) {
+            if(Rules.Count > 0) {
+                Rules.Remove(Rules.Last());
+            }
         }
 
         private void InitializeWallTypes() {

@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:RevitLintelPlacement.Views"
         xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
         mc:Ignorable="d"
-        Title="Перемычки" Height="450" Width="1000"
+        Title="Перемычки" Height="650" Width="1150"
+        MinHeight="650" MinWidth="1150"
         d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>
@@ -24,12 +25,12 @@
             <Button > обновить</Button>
         </ToolBar>
         <TabControl Grid.Row="1" Margin="0,5">
-            <TabItem  Header="Перемычки">
-                <local:LintelsTabView DataContext="{Binding Lintels}"/>
-            </TabItem>
             <TabItem Header="Правила">
                 <!--<local:RulesTabView DataContext="{Binding Rules}"/>-->
                 <local:GroupedRulesView DataContext="{Binding GroupedRules}"/>
+            </TabItem>
+            <TabItem  Header="Перемычки">
+                <local:LintelsTabView DataContext="{Binding Lintels}"/>
             </TabItem>
         </TabControl>
         <StatusBar Grid.Row="2" Height="30" HorizontalAlignment="Stretch">
