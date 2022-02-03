@@ -10,12 +10,12 @@ namespace RevitLintelPlacement.Models {
         //TODO: уточнить все названия (материалов, классов материалов, типов стен)
         public RulesSettigs GetTemplateRules() {
             return new RulesSettigs() {
-                IsSystem = true,
-                RuleSettings = new List<RuleSetting>() {
-                    //InitializeRuleToOpeningInBrickWall200_1100(),
-                    //InitializeRuleToOpeningInNotBrickWall400_1100(),
-                    //InitializeRuleToOpening1100_2500()
-                }
+                //IsSystem = true,
+                //RuleSettings = new List<RuleSetting>() {
+                //    //InitializeRuleToOpeningInBrickWall200_1100(),
+                //    //InitializeRuleToOpeningInNotBrickWall400_1100(),
+                //    //InitializeRuleToOpening1100_2500()
+                //}
             };
         }
 

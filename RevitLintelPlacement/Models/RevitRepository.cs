@@ -21,6 +21,10 @@ namespace RevitLintelPlacement.Models {
         private readonly Document _document;
         private readonly UIDocument _uiDocument;
 
+        public string GetDocumentName() {
+            return _document.Title;
+        }
+
         public RevitRepository(Application application, Document document) {
             _application = application;
             _uiApplication = new UIApplication(application);
@@ -35,6 +39,14 @@ namespace RevitLintelPlacement.Models {
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .WhereElementIsElementType()
                 .First(e => e.Name == _lintelTypeName) as FamilySymbol; 
+        }
+
+        public IEnumerable<FamilySymbol> GetLintelTypes() {
+            return new FilteredElementCollector(_document)
+                .OfCategory(BuiltInCategory.OST_GenericModel)
+                .WhereElementIsElementType()
+                .Where(e => e.Name == _lintelTypeName)
+                .Cast<FamilySymbol>();
 
         }
 
@@ -51,6 +63,12 @@ namespace RevitLintelPlacement.Models {
               .OfClass(typeof(View3D))
               .Cast<View3D>()
               .First(v => !v.IsTemplate && v.Name == _view3DName);
+        }
+
+        public IEnumerable<WallType> GetWallTypes() {
+            return new FilteredElementCollector(_document)
+                .OfClass(typeof(WallType))
+                .Cast<WallType>();
         }
 
         public FamilyInstance PlaceLintel(FamilySymbol lintelType, ElementId elementInWallId) {

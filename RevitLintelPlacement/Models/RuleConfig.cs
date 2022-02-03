@@ -5,59 +5,42 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
+
 using pyRevitLabs.Json;
 
 namespace RevitLintelPlacement.Models {
-    public class RuleConfig {
-        public List<RulesSettigs> RuleSettingsConfig { get; set; } = new List<RulesSettigs>();
+    public class RuleConfig : ProjectConfig<RulesSettigs> {
+        [JsonIgnore]
+        public override string ProjectConfigPath { get; set; }
 
-        public void AddRulesSettings(RulesSettigs ruleSettingConfig) {
-            if(RuleSettingsConfig.Count > 10) {
-                foreach(int index in Enumerable.Range(0, RuleSettingsConfig.Count - 10)) {
-                    RuleSettingsConfig.RemoveAt(index);
-                }
-            }
+        [JsonIgnore]
+        public override IConfigSerializer Serializer { get; set; }
 
-            RuleSettingsConfig.Add(ruleSettingConfig);
+        public static RuleConfig GetRuleConfig() {
+            return new ProjectConfigBuilder()
+                .SetSerializer(new ConfigSerializer())
+                .SetPluginName("RevitLintelPlacement")
+                .SetRevitVersion(ModuleEnvironment.RevitVersion)
+                .SetProjectConfigName(nameof(RuleConfig) + ".json")
+                .Build<RuleConfig>();
         }
 
-        public IEnumerable<RulesSettigs> GetRuleSettingsConfig(string documentName) {
-            documentName = string.IsNullOrEmpty(documentName) ? "Без имени.rvt" : documentName;
-            return RuleSettingsConfig.Where(item => documentName.Equals(item.DocumentName) || item.IsSystem);
-        }
-
-        private static string GetConfigPath() {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dosymep", "RevitLintelPlacement", "RevitLintelPlacement.json");
-        }
-
-
-        public static RuleConfig GetConfig() {
-            RuleConfig ruleConfig;
-            if(File.Exists(GetConfigPath())) {
-                ruleConfig= JsonConvert.DeserializeObject<RuleConfig>(File.ReadAllText(GetConfigPath()));
-            } else {
-                ruleConfig = new RuleConfig();
-            }
-            var rulesSetting = new RulesTemplateInitializer().GetTemplateRules();
-            ruleConfig.AddRulesSettings(rulesSetting);
-            return ruleConfig;
-        }
-
-        public static void SaveConfig(RuleConfig config) {
-            Directory.CreateDirectory(Path.GetDirectoryName(GetConfigPath()));
-            File.WriteAllText(GetConfigPath(), JsonConvert.SerializeObject(config.RuleSettingsConfig.Where(e => !e.IsSystem)));
-        }
     }
 
-    public class RulesSettigs {
-        public bool IsSystem { get; set; }
-        public string DocumentName { get; set; }
-        public List<RuleSetting> RuleSettings { get; set; } = new List<RuleSetting>();
+    public class RulesSettigs : ProjectSettings {
+        public override string ProjectName { get; set; }
+        public List<GroupedRuleSettings> RuleSettings { get; set; } = new List<GroupedRuleSettings>();
     }
 
+    public class GroupedRuleSettings {
+        public string Name { get; set; }
+        public ConditionSetting WallTypes { get; set; }
+        public List<RuleSetting> Rules { get; set; }
+    }
 
     public class RuleSetting {
-        public string Name { get; set; }
         public List<ConditionSetting> ConditionSettingsConfig { get; set; } = new List<ConditionSetting>();
         public List<LintelParameterSetting> LintelParameterSettingsConfig { get; set; } = new List<LintelParameterSetting>();
     }
@@ -89,4 +72,15 @@ namespace RevitLintelPlacement.Models {
         public LintelParameterType LintelParameterType { get; set; }
         public string LintelTypeName { get; set; }
     }
+
+    public class ConfigSerializer : IConfigSerializer {
+        public T Deserialize<T>(string text) {
+            return JsonConvert.DeserializeObject<T>(text);
+        }
+
+        public string Serialize<T>(T @object) {
+            return JsonConvert.SerializeObject(@object);
+        }
+    }
+
 }

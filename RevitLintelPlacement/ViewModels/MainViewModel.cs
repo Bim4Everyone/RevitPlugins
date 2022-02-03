@@ -19,15 +19,17 @@ namespace RevitLintelPlacement.ViewModels {
         private readonly RevitRepository _revitRepository;
         private RuleCollectionViewModel _rules;
         private LintelCollectionViewModel _lintels;
+        private GroupedRuleCollectionViewModel _groupedRules;
 
         public MainViewModel() {
 
         }
 
-        public MainViewModel(RevitRepository revitRepository, IEnumerable<RulesSettigs> rulesSettings) {
+        public MainViewModel(RevitRepository revitRepository, RulesSettigs rulesSettings) {
             this._revitRepository = revitRepository;
             Lintels = new LintelCollectionViewModel(_revitRepository);
-            Rules = new RuleCollectionViewModel(_revitRepository, rulesSettings);
+            //Rules = new RuleCollectionViewModel(_revitRepository, rulesSettings);
+            GroupedRules = new GroupedRuleCollectionViewModel(_revitRepository, rulesSettings);
             InitializeLintels();
             PlaceLintelCommand = new RelayCommand(PlaceLintels, p => true);
         }
@@ -39,6 +41,11 @@ namespace RevitLintelPlacement.ViewModels {
         public LintelCollectionViewModel Lintels {
             get => _lintels;
             set => this.RaiseAndSetIfChanged(ref _lintels, value);
+        }
+
+        public GroupedRuleCollectionViewModel GroupedRules {
+            get => _groupedRules;
+            set => this.RaiseAndSetIfChanged(ref _groupedRules, value);
         }
 
         public ICommand PlaceLintelCommand { get; set; }

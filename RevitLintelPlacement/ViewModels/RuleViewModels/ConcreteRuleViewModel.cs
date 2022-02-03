@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 
-using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitLintelPlacement.Models;
@@ -14,66 +9,33 @@ using RevitLintelPlacement.ViewModels.Interfaces;
 using RevitLintelPlacement.ViewModels.LintelParameterViewModels;
 
 namespace RevitLintelPlacement.ViewModels {
-    internal class GroupedRuleViewModel : BaseViewModel {
-        private string _name;
-        private ObservableCollection<ConcreteRuleViewModel> _gruopedRules;
-        private WallTypesConditionViewModel _groupingCondition;
-
-        public GroupedRuleViewModel() {
-            AddRuleCommand = new RelayCommand(AddRule, p => true);
-        }
-
-        public string Name {
-            get => _name;
-            set => this.RaiseAndSetIfChanged(ref _name, value);
-        }
-
-        public WallTypesConditionViewModel WallTypes {
-            get => _groupingCondition;
-            set => this.RaiseAndSetIfChanged(ref _groupingCondition, value);
-        }
-
-
-
-        public ObservableCollection<ConcreteRuleViewModel> Rules {
-            get => _gruopedRules;
-            set => this.RaiseAndSetIfChanged(ref _gruopedRules, value);
-        }
-
-        public ICommand AddRuleCommand { get; set; }
-
-        private void AddRule(object p) {
-            Rules.Add(new ConcreteRuleViewModel());
-        }
-
-    }
-
     internal class ConcreteRuleViewModel : BaseViewModel {
-        private string _name;
+        private readonly RevitRepository _revitRepository;
         private LintelTypeNameParameter _selectedLintelType;
         private OpeningWidthConditionViewModel _openingWidthCondition;
-        private NumberLintelParameterViewModel _offsetParameterViewModel;
         private LintelLeftOffsetParameter _lintelLeftOffsetParameter;
         private LintelRightOffsetParameter _lintelRightOffsetParameter;
-        private WallTypesConditionViewModel _wallTypesConditions;
         private List<LintelTypeNameParameter> _lintelTypes;
-        private List<IConditionViewModel> _conditions;
-        private List<ILintelParameterViewModel> _parameters;
+        private List<IConditionViewModel> _conditions = new List<IConditionViewModel>();
+        private List<ILintelParameterViewModel> _parameters = new List<ILintelParameterViewModel>();
 
         public ConcreteRuleViewModel() {
-
-        }
-
-        public ConcreteRuleViewModel(RuleSetting ruleSetting) {
-            InitializeRule(ruleSetting);
+            InitializeEmptyGroupedRule();
             AddParameters();
             AddConditions();
         }
 
-        public string Name {
-            get => _name;
-            set => this.RaiseAndSetIfChanged(ref _name, value);
+        public ConcreteRuleViewModel(RevitRepository revitRepository, RuleSetting ruleSetting = null) {
+            this._revitRepository = revitRepository;
+            if(ruleSetting == null) {
+                InitializeEmptyGroupedRule();
+            } else {
+                InitializeGroupedRule(ruleSetting);
+            }
+            AddParameters();
+            AddConditions();
         }
+
         public LintelTypeNameParameter SelectedLintelType {
             get => _selectedLintelType;
             set => this.RaiseAndSetIfChanged(ref _selectedLintelType, value);
@@ -82,11 +44,6 @@ namespace RevitLintelPlacement.ViewModels {
         public OpeningWidthConditionViewModel OpeningWidthCondition {
             get => _openingWidthCondition;
             set => this.RaiseAndSetIfChanged(ref _openingWidthCondition, value);
-        }
-
-        public NumberLintelParameterViewModel OffsetParameterViewModel {
-            get => _offsetParameterViewModel;
-            set => this.RaiseAndSetIfChanged(ref _offsetParameterViewModel, value);
         }
 
         public LintelLeftOffsetParameter LintelLeftOffsetParameter { 
@@ -103,31 +60,65 @@ namespace RevitLintelPlacement.ViewModels {
 
         public OpeningWidthParameter OpeningWidthParameter { get; set; }
 
-        public CornerParamerer CornerParamerer { get; set; }
+        public LintelCornerParamerer CornerParamerer { get; set; }
 
         public List<LintelTypeNameParameter> LintelTypes {
             get => _lintelTypes;
             set => this.RaiseAndSetIfChanged(ref _lintelTypes, value);
         }
 
-        public WallTypesConditionViewModel WallTypesConditions {
-            get => _wallTypesConditions;
-            set => this.RaiseAndSetIfChanged(ref _wallTypesConditions, value);
+        public RuleSetting GetRuleSetting() {
+            return new RuleSetting() {
+                ConditionSettingsConfig = GetConditionSettings().ToList(),
+                LintelParameterSettingsConfig = GetParameterSettings().ToList()
+            };
         }
 
-        private void InitializeRule(RuleSetting ruleSetting) {
-            Name = ruleSetting.Name;
+        private IEnumerable<ConditionSetting> GetConditionSettings() {
+            foreach(var condition in _conditions) {
+                if (condition is OpeningWidthConditionViewModel openingCondition) {
+                    yield return new ConditionSetting() {
+                        OpeningWidthMax = openingCondition.MaxWidth,
+                        OpeningWidthMin = openingCondition.MinWidth,
+                        ConditionType = ConditionType.OpeningWidth
+                    };
+                }
+            }
+        }
+
+        private IEnumerable<LintelParameterSetting> GetParameterSettings() {
+            foreach(var parameter in _parameters) {
+                if(parameter is LintelTypeNameParameter typeNameParameter) {
+                    yield return new LintelParameterSetting() {
+                        LintelParameterType = LintelParameterType.TypeNameParameter,
+                        LintelTypeName = typeNameParameter.Name
+                    };
+                }
+                if (parameter is LintelLeftOffsetParameter leftOffsetparameter) {
+                    yield return new LintelParameterSetting() {
+                        LintelParameterType = LintelParameterType.LeftOffsetParameter,
+                        Offset = leftOffsetparameter.LeftOffset
+                    };
+                }
+                if (parameter is LintelRightOffsetParameter rightOffsetParameter) {
+                    yield return new LintelParameterSetting() {
+                        LintelParameterType = LintelParameterType.RightOffsetParameter,
+                        Offset = rightOffsetParameter.RightOffset
+                    };
+                }
+                if (parameter is LintelCornerParamerer cornerParameter) {
+                    yield return new LintelParameterSetting() {
+                        LintelParameterType = LintelParameterType.CornerParameter,
+                        IsCornerChecked = cornerParameter.IsCornerChecked
+                    };
+                }
+            }
+        }
+
+        private void InitializeGroupedRule(RuleSetting ruleSetting) {
 
             foreach(var condition in ruleSetting.ConditionSettingsConfig) {
                 switch(condition.ConditionType) {
-                    case ConditionType.WallTypes: {
-                        WallTypesConditions = new WallTypesConditionViewModel() {
-                            WallTypes = new ObservableCollection<WallTypeConditionViewModel>(condition.WallTypes.Select(wt => new WallTypeConditionViewModel() {
-                                Name = wt,
-                                IsChecked = true
-                            }))};
-                        break;
-                    }
                     case ConditionType.OpeningWidth: {
                         OpeningWidthCondition = new OpeningWidthConditionViewModel() {
                             MaxWidth = condition.OpeningWidthMax,
@@ -141,7 +132,7 @@ namespace RevitLintelPlacement.ViewModels {
             foreach(var parameter in ruleSetting.LintelParameterSettingsConfig) {
                 switch(parameter.LintelParameterType) {
                     case LintelParameterType.CornerParameter:
-                    CornerParamerer = new CornerParamerer() {
+                    CornerParamerer = new LintelCornerParamerer() {
                         IsCornerChecked = parameter.IsCornerChecked
                     };
                     break;
@@ -170,6 +161,21 @@ namespace RevitLintelPlacement.ViewModels {
             WallHalfThicknessParameter = new WallHalfThicknessParameter();
         }
 
+        private void InitializeEmptyGroupedRule() {
+            CornerParamerer = new LintelCornerParamerer();
+            OpeningWidthCondition = new OpeningWidthConditionViewModel();
+            LintelLeftOffsetParameter = new LintelLeftOffsetParameter();
+            LintelRightOffsetParameter = new LintelRightOffsetParameter();
+            OpeningWidthParameter = new OpeningWidthParameter();
+            WallHalfThicknessParameter = new WallHalfThicknessParameter();
+            LintelTypes = new List<LintelTypeNameParameter>(
+                _revitRepository.GetLintelTypes()
+                .Select(lt=>new LintelTypeNameParameter() {
+                    Name = lt.Name
+                }));
+            SelectedLintelType = LintelTypes.FirstOrDefault();
+        }
+
         private void AddParameters() {
             _parameters = new List<ILintelParameterViewModel>();
             _parameters.Add(CornerParamerer);
@@ -181,7 +187,6 @@ namespace RevitLintelPlacement.ViewModels {
 
         private void AddConditions() {
             _conditions.Add(OpeningWidthCondition);
-            _conditions.Add(WallTypesConditions);
         }
 
     }
