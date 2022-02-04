@@ -67,6 +67,9 @@ namespace RevitLintelPlacement.ViewModels {
             LintelChecker lc = new LintelChecker(_revitRepository, _rulesSettings);
             var resultsForReport = lc.Check(Lintels.LintelInfos);
 
+            var elevation = _revitRepository.GetElevation();
+            var plan = _revitRepository.GetPlan();
+
             using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
                 var view3D = _revitRepository.GetView3D();
                 foreach(var elementId in elementInWallIds) {
@@ -86,7 +89,7 @@ namespace RevitLintelPlacement.ViewModels {
                     if(_revitRepository.CheckHorizontal(view3D, elementInWall, false)) {
                         lintel.SetParamValue("ОпираниеСлева", 0);
                     }
-                    _revitRepository.LockLintel(lintel, elementInWall);
+                    _revitRepository.LockLintel(elevation, plan, lintel, elementInWall);
                     Lintels.LintelInfos.Add(new LintelInfoViewModel(_revitRepository, lintel, elementInWall));
                 }
                 t.Commit();

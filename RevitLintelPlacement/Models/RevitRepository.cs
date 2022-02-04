@@ -154,6 +154,20 @@ namespace RevitLintelPlacement.Models {
                 .Where(e=>e.Host is Wall);
         }
 
+        public View GetElevation() {
+            return new FilteredElementCollector(_document)
+                .OfClass(typeof(View))
+                .Cast<View>()
+                .First(v => v.ViewType == ViewType.Elevation);
+        }
+
+        public View GetPlan() {
+            return new FilteredElementCollector(_document)
+               .OfClass(typeof(View))
+               .Cast<View>()
+               .First(v => v.ViewType == ViewType.FloorPlan);
+        }
+
         //проверка, есть ли сверху элемента стена, у которой класс материала не кладка (в таком случает перемычку ставить не надо)
         public bool CheckUp(View3D view3D, FamilyInstance elementInWall) {
             XYZ viewPoint = GetLocationPoint(elementInWall);
@@ -312,7 +326,7 @@ namespace RevitLintelPlacement.Models {
             return refIntersector.FindNearest(viewPoint, direction);
         }
 
-        public void LockLintel(FamilyInstance lintel, FamilyInstance elementInWall) {
+        public void LockLintel(View elevation, View plan, FamilyInstance lintel, FamilyInstance elementInWall) {
             
             var leftRightElement = elementInWall.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
             var leftRightLintel = lintel.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
@@ -322,35 +336,29 @@ namespace RevitLintelPlacement.Models {
             var topElement = elementInWall.GetReferences(FamilyInstanceReferenceType.Top);
             var bottomLintel = lintel.GetReferences(FamilyInstanceReferenceType.CenterElevation);
 
-            var elevation = new FilteredElementCollector(_document)
-                .OfClass(typeof(View))
-                .Cast<View>()
-                .First(v => v.ViewType == ViewType.Elevation);
+            
             if (topElement.Count > 0 && bottomLintel.Count > 0)
                 _document.Create.NewAlignment(elevation, topElement.First(), bottomLintel.First());
 
-            var leftL = lintel.GetReferences(FamilyInstanceReferenceType.Front);
-            var rightL = lintel.GetReferences(FamilyInstanceReferenceType.Back);
-            var wallReferences1 = HostObjectUtils.GetSideFaces((Wall) elementInWall.Host, ShellLayerType.Interior);
-            var wallReferences2 = HostObjectUtils.GetSideFaces((Wall) elementInWall.Host, ShellLayerType.Exterior);
-            var plan = new FilteredElementCollector(_document)
-               .OfClass(typeof(View))
-               .Cast<View>()
-               .First(v => v.ViewType == ViewType.FloorPlan);
+            //var leftL = lintel.GetReferences(FamilyInstanceReferenceType.Front);
+            //var rightL = lintel.GetReferences(FamilyInstanceReferenceType.Back);
+            //var wallReferences1 = HostObjectUtils.GetSideFaces((Wall) elementInWall.Host, ShellLayerType.Interior);
+            //var wallReferences2 = HostObjectUtils.GetSideFaces((Wall) elementInWall.Host, ShellLayerType.Exterior);
+            
 
             //возможно, ошибка возникает при устновке параметра половина толщины, поэтому нет геометричкого выравнивания
-            try {
-                if(leftL.Count > 0 && wallReferences1.Count > 0) {
-                    _document.Create.NewAlignment(plan, leftL.First(), wallReferences1.First());
-                }
+            //try {
+            //    if(leftL.Count > 0 && wallReferences1.Count > 0) {
+            //        _document.Create.NewAlignment(plan, leftL.First(), wallReferences1.First());
+            //    }
 
-                if(rightL.Count > 0 && wallReferences2.Count > 0) {
-                    _document.Create.NewAlignment(plan, rightL.First(), wallReferences2.First());
-                }
-            } catch {
+            //    if(rightL.Count > 0 && wallReferences2.Count > 0) {
+            //        _document.Create.NewAlignment(plan, rightL.First(), wallReferences2.First());
+            //    }
+            //} catch {
 
 
-            }
+            //}
         }
 
         public XYZ GetLocationPoint(FamilyInstance elementInWall) {
