@@ -28,11 +28,11 @@ namespace RevitLintelPlacement.Models {
         public IEnumerable<IResultHandler> Check(IEnumerable<LintelInfoViewModel> lintels) {
             foreach(var lintel in lintels) {
                 foreach(var checker in _checkers) {
-                    var resultHandler = checker.Check(lintel.Lintel, lintel.ElementInWall);
-                    resultHandler.Handle();
+                    var resultHandler = checker.Check(lintel.Lintel, lintel.ElementInWall); 
+                    resultHandler?.Handle();
                     if(resultHandler is LintelGeometricalDisplaced || resultHandler is LintelIsFixedWithoutElement)
                         yield return resultHandler;
-                    if(!(resultHandler is null)) // null возвращается в случае, если перемычка установлена корректно и/или ее не надо пытаться редактировать
+                    if(!(resultHandler is null)) // null возвращается в случае, если перемычка по данной проверке установлена корректно
                         break;
                 }
             }
@@ -43,7 +43,7 @@ namespace RevitLintelPlacement.Models {
     internal class LintelGroupChecker : IChecker {
         public IResultHandler Check(FamilyInstance lintel, FamilyInstance elementInWall) {
             if(lintel.GroupId != ElementId.InvalidElementId || lintel.SuperComponent != null)
-                return null;
+                return new LintelInGroup();
             return null;
         }
     }

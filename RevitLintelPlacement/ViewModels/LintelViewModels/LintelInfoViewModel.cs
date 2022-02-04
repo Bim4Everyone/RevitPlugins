@@ -28,6 +28,7 @@ namespace RevitLintelPlacement.ViewModels {
         public LintelInfoViewModel(RevitRepository revitRepository, FamilyInstance lintel, FamilyInstance elementInWall) {
             this._revitRepository = revitRepository;
             if(elementInWall != null) {
+                ElementInWall = elementInWall;
                 ElementInWallId = elementInWall.Id;
                 ElementInWallName = elementInWall.Name;
                 WallTypeName = elementInWall.Host.Name;
@@ -43,6 +44,7 @@ namespace RevitLintelPlacement.ViewModels {
             } else {
                 ElementInWallKind = ElementInWallKind.None;
             }
+            Lintel = lintel;
             LintelId = lintel.Id;
             Level = _revitRepository.GetElementById(lintel.LevelId)?.Name;
         }
@@ -75,6 +77,9 @@ namespace RevitLintelPlacement.ViewModels {
             get => _elementInWallId;
             set => this.RaiseAndSetIfChanged(ref _elementInWallId, value);
         }
+
+        public FamilyInstance Lintel { get; set; }
+        public FamilyInstance ElementInWall { get; set; }
     }
 
     public enum ElementInWallKind {

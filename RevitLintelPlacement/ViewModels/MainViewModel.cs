@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 using dosymep.WPF.Commands;
@@ -17,6 +18,8 @@ using RevitLintelPlacement.Models;
 namespace RevitLintelPlacement.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly RulesSettigs _rulesSettings;
+
         //private RuleCollectionViewModel _rules;
         private LintelCollectionViewModel _lintels;
         private GroupedRuleCollectionViewModel _groupedRules;
@@ -27,6 +30,7 @@ namespace RevitLintelPlacement.ViewModels {
 
         public MainViewModel(RevitRepository revitRepository, RulesSettigs rulesSettings) {
             this._revitRepository = revitRepository;
+            this._rulesSettings = rulesSettings;
             Lintels = new LintelCollectionViewModel(_revitRepository);
             //Rules = new RuleCollectionViewModel(_revitRepository, rulesSettings);
             GroupedRules = new GroupedRuleCollectionViewModel(_revitRepository, rulesSettings);
@@ -60,6 +64,9 @@ namespace RevitLintelPlacement.ViewModels {
                     elementInWallIds.Remove(lintel.ElementInWallId);
             }
 
+            LintelChecker lc = new LintelChecker(_revitRepository, _rulesSettings);
+            var resultsForReport = lc.Check(Lintels.LintelInfos);
+
             using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
                 var view3D = _revitRepository.GetView3D();
                 foreach(var elementId in elementInWallIds) {
@@ -83,6 +90,10 @@ namespace RevitLintelPlacement.ViewModels {
                     Lintels.LintelInfos.Add(new LintelInfoViewModel(_revitRepository, lintel, elementInWall));
                 }
                 t.Commit();
+            }
+            var message = new ReportMaker().MakeMessage(resultsForReport);
+            if(!string.IsNullOrEmpty(message)) {
+                TaskDialog.Show("Revit", message);
             }
         }
 

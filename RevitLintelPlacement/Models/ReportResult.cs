@@ -33,9 +33,9 @@ namespace RevitLintelPlacement.Models {
     }
 
 
-    //internal class LintelInGroup : IResultHandler {
-    //    public void Handle() {}
-    //}
+    internal class LintelInGroup : IResultHandler {
+        public void Handle() { }
+    }
 
     //internal class CorrectLintel : IResultHandler {
     //    public void Handle() {}
