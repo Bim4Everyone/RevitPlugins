@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 
@@ -21,7 +22,7 @@ namespace RevitLintelPlacement.Models {
         public static RuleConfig GetRuleConfig() {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())
-                .SetPluginName("RevitLintelPlacement")
+                .SetPluginName(nameof(RevitLintelPlacement))
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
                 .SetProjectConfigName(nameof(RuleConfig) + ".json")
                 .Build<RuleConfig>();
@@ -71,16 +72,6 @@ namespace RevitLintelPlacement.Models {
         public double OpeningWidth { get; set; }
         public LintelParameterType LintelParameterType { get; set; }
         public string LintelTypeName { get; set; }
-    }
-
-    public class ConfigSerializer : IConfigSerializer {
-        public T Deserialize<T>(string text) {
-            return JsonConvert.DeserializeObject<T>(text);
-        }
-
-        public string Serialize<T>(T @object) {
-            return JsonConvert.SerializeObject(@object);
-        }
     }
 
 }
