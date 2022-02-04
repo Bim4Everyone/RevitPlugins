@@ -84,6 +84,14 @@ namespace RevitLintelPlacement.Models {
             return lintel;
         }
 
+        public void DeleteLintel(FamilyInstance lintel) {
+            using(Transaction t = new Transaction(_document)) {
+                t.BIMStart("Удаление перемычки");
+                _document.Delete(lintel.Id);
+                t.Commit();
+            }
+        }
+
         //не работает, если нет геометрии у FamilyInsatnce
         //пока проверка только по центру, нужно еще пытаться найти элементы на границах перемычки (ситуация, когда несколько проемов под ней)
         public ElementId GetNearestElement(FamilyInstance fi) {
