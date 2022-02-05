@@ -19,25 +19,20 @@ namespace RevitLintelPlacement.ViewModels {
     internal class LintelCollectionViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private ElementInWallKind _selectedElementKind;
-        private ObservableCollection<LintelInfoViewModel> _lintelInfos;
         private ViewOrientation3D _orientation; //вряд ли здесь нужно хранить
+        private ObservableCollection<LintelInfoViewModel> _lintelInfos;
 
 
-        public LintelCollectionViewModel(RevitRepository _revitRepository) {
-
-            this._revitRepository = _revitRepository;
+        public LintelCollectionViewModel(RevitRepository revitRepository) {
+            this._revitRepository = revitRepository;
             LintelInfos = new ObservableCollection<LintelInfoViewModel>();
-            LintelsViewSource = new CollectionViewSource();
-            LintelsViewSource.Source = LintelInfos;
+            LintelsViewSource = new CollectionViewSource {Source = LintelInfos};
             LintelsViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(LintelInfoViewModel.WallTypeName)));
             LintelsViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(LintelInfoViewModel.Level)));
             LintelsViewSource.Filter += ElementInWallKindFilter;
             SelectAndShowElementCommand = new RelayCommand(SelectElement, p => true);
             SelectionElementKindChangedCommand = new RelayCommand(SelectionElementKindChanged, p => true);
-
         }
-
-
 
         public ElementInWallKind SelectedElementKind {
             get => _selectedElementKind;
@@ -54,7 +49,6 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _lintelInfos, value);
         }
 
-
         private void ElementInWallKindFilter(object sender, FilterEventArgs e) {
             if(e.Item is LintelInfoViewModel lintel) { 
                 e.Accepted = lintel.ElementInWallKind == SelectedElementKind;
@@ -62,23 +56,22 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         private void SelectElement(object p) {
-
-            if(p is ElementId id) {
-                if(_revitRepository.IsActivView3D()) {
-                    if(_orientation == null) {
-                        _orientation = _revitRepository.GetOrientation3D();
-                    }
-                    _revitRepository.SelectAndShowElement(id, _orientation);
-                } else {
-                    TaskDialog.Show("Revit", "Перейдите на 3D вид");
-                }
+            if(!(p is ElementId id)) {
+                return;
             }
 
+            if(_revitRepository.IsActiveView3D()) {
+                if(_orientation == null) {
+                    _orientation = _revitRepository.GetOrientation3D();
+                }
+                _revitRepository.SelectAndShowElement(id, _orientation);
+            } else {
+                TaskDialog.Show("Revit", "Перейдите на 3D вид");
+            }
         }
 
         private void SelectionElementKindChanged(object p) {
             LintelsViewSource.View.Refresh();
         }
-
     }
 }

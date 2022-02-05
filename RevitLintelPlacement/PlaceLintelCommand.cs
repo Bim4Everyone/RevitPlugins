@@ -24,8 +24,7 @@ namespace RevitLintelPlacement {
                 var ruleConfig = RuleConfig.GetRuleConfig().GetSettings(commandData.Application.ActiveUIDocument.Document.Title);
                 var mainViewModel = new MainViewModel(revitRepository, ruleConfig);
                 var window = new MainWindow() { DataContext = mainViewModel };
-                new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
-
+                WindowInteropHelper windowInteropHelper = new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
                 window.ShowDialog();
             } catch(Exception ex) {
 #if D2020 || D2021 || D2022
@@ -39,6 +38,5 @@ namespace RevitLintelPlacement {
 
             return Result.Succeeded;
         }
-
     }
 }

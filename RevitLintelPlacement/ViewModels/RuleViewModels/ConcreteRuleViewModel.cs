@@ -14,12 +14,12 @@ using RevitLintelPlacement.ViewModels.LintelParameterViewModels;
 namespace RevitLintelPlacement.ViewModels {
     internal class ConcreteRuleViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly List<IConditionViewModel> _conditions = new List<IConditionViewModel>();
         private string _selectedLintelType;
         private OpeningWidthConditionViewModel _openingWidthCondition;
         private LintelLeftOffsetParameter _lintelLeftOffsetParameter;
         private LintelRightOffsetParameter _lintelRightOffsetParameter;
         private List<string> _lintelTypes;
-        private List<IConditionViewModel> _conditions = new List<IConditionViewModel>();
         private List<ILintelParameterViewModel> _parameters = new List<ILintelParameterViewModel>();
 
         public ConcreteRuleViewModel() {
@@ -60,7 +60,7 @@ namespace RevitLintelPlacement.ViewModels {
 
         public OpeningWidthParameter OpeningWidthParameter { get; set; }
 
-        public LintelCornerParamerer CornerParamerer { get; set; }
+        public LintelCornerParameter CornerParameter { get; set; }
 
         public List<string> LintelTypes {
             get => _lintelTypes;
@@ -99,17 +99,17 @@ namespace RevitLintelPlacement.ViewModels {
 
         private IEnumerable<LintelParameterSetting> GetParameterSettings() {
             foreach(var parameter in _parameters) {
-                if (parameter is LintelLeftOffsetParameter leftOffsetparameter) {
+                if (parameter is LintelLeftOffsetParameter leftOffsetParameter) {
                     yield return new LintelParameterSetting() {
                         LintelParameterType = LintelParameterType.LeftOffsetParameter,
-                        Offset = leftOffsetparameter.LeftOffset
+                        Offset = leftOffsetParameter.LeftOffset
                     };
                     yield return new LintelParameterSetting() {
                         LintelParameterType = LintelParameterType.RightOffsetParameter,
-                        Offset = leftOffsetparameter.LeftOffset
+                        Offset = leftOffsetParameter.LeftOffset
                     };
                 }
-                if (parameter is LintelCornerParamerer cornerParameter) {
+                if (parameter is LintelCornerParameter cornerParameter) {
                     yield return new LintelParameterSetting() {
                         LintelParameterType = LintelParameterType.CornerParameter,
                         IsCornerChecked = cornerParameter.IsCornerChecked
@@ -135,7 +135,7 @@ namespace RevitLintelPlacement.ViewModels {
             foreach(var parameter in ruleSetting.LintelParameterSettingsConfig) {
                 switch(parameter.LintelParameterType) {
                     case LintelParameterType.CornerParameter:
-                    CornerParamerer = new LintelCornerParamerer() {
+                    CornerParameter = new LintelCornerParameter() {
                         IsCornerChecked = parameter.IsCornerChecked
                     };
                     break;
@@ -164,7 +164,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         private void InitializeEmptyGroupedRule() {
-            CornerParamerer = new LintelCornerParamerer();
+            CornerParameter = new LintelCornerParameter();
             OpeningWidthCondition = new OpeningWidthConditionViewModel();
             LintelLeftOffsetParameter = new LintelLeftOffsetParameter();
             LintelRightOffsetParameter = new LintelRightOffsetParameter();
@@ -177,12 +177,13 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         private void AddParameters() {
-            _parameters = new List<ILintelParameterViewModel>();
-            _parameters.Add(CornerParamerer);
-            _parameters.Add(OpeningWidthParameter);
-            _parameters.Add(WallHalfThicknessParameter);
-            _parameters.Add(LintelRightOffsetParameter);
-            _parameters.Add(LintelLeftOffsetParameter);
+            _parameters = new List<ILintelParameterViewModel> {
+                CornerParameter,
+                OpeningWidthParameter,
+                WallHalfThicknessParameter,
+                LintelRightOffsetParameter,
+                LintelLeftOffsetParameter
+            };
         }
 
         private void AddConditions() {

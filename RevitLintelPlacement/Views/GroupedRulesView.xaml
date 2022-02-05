@@ -99,7 +99,7 @@
                                     </Grid>
                                 </Grid>
                             </Border>
-                            <Button DockPanel.Dock="Left" Margin="5 0" Width="30" Height="30" Name="bDelete" Command="{Binding ElementName=ucRules, Path=DataContext.RevoveGroupedRuleCommand}" 
+                            <Button DockPanel.Dock="Left" Margin="5 0" Width="30" Height="30" Name="bDelete" Command="{Binding ElementName=ucRules, Path=DataContext.RemoveGroupedRuleCommand}" 
                                     CommandParameter="{Binding ElementName=bDelete, Path=DataContext}" >-</Button>
                         </DockPanel>
                         

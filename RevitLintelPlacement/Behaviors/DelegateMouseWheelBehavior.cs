@@ -9,11 +9,13 @@ namespace RevitLintelPlacement.Behaviors {
             base.OnAttached();
             AssociatedObject.PreviewMouseWheel += AssociatedObject_PreviewMouseWheel;
         }
+
         protected override void OnDetaching() {
             AssociatedObject.PreviewMouseWheel -= AssociatedObject_PreviewMouseWheel;
             base.OnDetaching();
         }
-        void AssociatedObject_PreviewMouseWheel(object sender, MouseWheelEventArgs e) {
+
+        private void AssociatedObject_PreviewMouseWheel(object sender, MouseWheelEventArgs e) {
             e.Handled = true;
             var e2 = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
             e2.RoutedEvent = UIElement.MouseWheelEvent;

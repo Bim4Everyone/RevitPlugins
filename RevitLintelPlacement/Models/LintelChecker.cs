@@ -13,10 +13,9 @@ using RevitLintelPlacement.ViewModels;
 
 namespace RevitLintelPlacement.Models {
     internal class LintelChecker {
+        private readonly List<IChecker> _checkers;
 
-        private List<IChecker> _checkers;
-
-        public LintelChecker(RevitRepository revitRepository, RulesSettigs rulesSettings) {
+        public LintelChecker(RevitRepository revitRepository, RulesSettings rulesSettings) {
             _checkers = new List<IChecker> {
             new LintelGroupChecker(),
             new ElementInWallChecker(revitRepository),
@@ -37,7 +36,6 @@ namespace RevitLintelPlacement.Models {
                 }
             }
         }
-
     }
 
     internal class LintelGroupChecker : IChecker {
@@ -54,14 +52,16 @@ namespace RevitLintelPlacement.Models {
         public ElementInWallChecker(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
         }
+
         public IResultHandler Check(FamilyInstance lintel, FamilyInstance elementInWall) {
-            if(elementInWall == null) {
-                if((int) lintel.GetParamValue("Фиксировать") == 1) { //Todo: параметр "Фиксировать"
-                    return new LintelIsFixedWithoutElement(lintel.Id);
-                }
-                return new LintelWithoutElement(_revitRepository, lintel);
+            if(elementInWall != null) {
+                return null;
             }
-            return null;
+
+            if((int) lintel.GetParamValue("Фиксировать") == 1) { //Todo: параметр "Фиксировать"
+                return new LintelIsFixedWithoutElement(lintel.Id);
+            }
+            return new LintelWithoutElement(_revitRepository, lintel);
         }
     }
 
@@ -69,7 +69,7 @@ namespace RevitLintelPlacement.Models {
         private readonly GroupedRuleCollectionViewModel _groupedRules;
         private readonly RevitRepository _revitRepository;
 
-        public LintelElementInWallChecker(RevitRepository revitRepository, RulesSettigs rulesSettings) {
+        public LintelElementInWallChecker(RevitRepository revitRepository, RulesSettings rulesSettings) {
             this._revitRepository = revitRepository;
             this._groupedRules = new GroupedRuleCollectionViewModel(_revitRepository, rulesSettings);
         }
@@ -77,10 +77,7 @@ namespace RevitLintelPlacement.Models {
         public IResultHandler Check(FamilyInstance lintel, FamilyInstance elementInWall) {
             var rule = _groupedRules.GetRule(elementInWall);
             if(rule == null) {
-                if((int) lintel.GetParamValue("Фиксировать") == 1) {
-                    return null;
-                }
-                return new ElementInWallWithoutRule(_revitRepository, lintel);
+                return (int) lintel.GetParamValue("Фиксировать") == 1 ? null : new ElementInWallWithoutRule(_revitRepository, lintel);
             } else {
                 //проверка корректности параметров перемычки
             }
@@ -99,17 +96,11 @@ namespace RevitLintelPlacement.Models {
             var lintelLocationPoint = ((LocationPoint) lintel.Location).Point;
             var elementInWallPoint = _revitRepository.GetLocationPoint(elementInWall);
 
-            var elementWidth = elementInWall.GetParamValueOrDefault("ADSK_Размер_Ширина"); //ToDo: параметр
-            if(elementWidth == null) {
-                elementWidth = elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
-            }
+            var elementWidth = elementInWall.GetParamValueOrDefault("ADSK_Размер_Ширина") ?? 
+                               elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM); //ToDo: параметр
 
-            if(lintelLocationPoint.DistanceTo(elementInWallPoint) < (double) elementWidth / 2) { //Todo: возможно, расстояние для проверки должно быть меньше
-                return null;
-            }
-
-            return new LintelGeometricalDisplaced(lintel.Id);
+            return lintelLocationPoint.DistanceTo(elementInWallPoint) < (double) elementWidth / 2 ? null : new LintelGeometricalDisplaced(lintel.Id);
+            //Todo: возможно, расстояние должно быть меньше
         }
     }
-
 }

@@ -10,33 +10,31 @@ using RevitLintelPlacement.Models.Interfaces;
 
 namespace RevitLintelPlacement.Models {
     internal class LintelElementCorrelator {
-        private RevitRepository _revitRepository;
         public List<ICorrelator> Correlators { get; set; }
         
         public LintelElementCorrelator(RevitRepository revitRepository) {
-            _revitRepository = revitRepository;
-            
-            Correlators = new List<ICorrelator>();
-            Correlators.Add(new GroupCorrelator(_revitRepository));
-            Correlators.Add(new DimensionCorrelator(_revitRepository));
-            Correlators.Add(new GeometricalCorrelator(_revitRepository));
+            RevitRepository revitRepository1 = revitRepository;
+
+            Correlators = new List<ICorrelator> {
+                new SuperComponentCorrelator(revitRepository1),
+                new DimensionCorrelator(revitRepository1),
+                new GeometricalCorrelator(revitRepository1)
+            };
         }
 
         public FamilyInstance Correlate(FamilyInstance lintel) {
-            foreach(var correlator in Correlators) {
-                var element = correlator.Correlate(lintel);
-                if(element != null)
-                    return element;
-            }
-            return null;
+            return Correlators.Select(correlator => correlator.Correlate(lintel))
+                .FirstOrDefault(element => element != null);
         }
     }
 
-    internal class GroupCorrelator : ICorrelator {
+    internal class SuperComponentCorrelator : ICorrelator {
         private readonly RevitRepository _revitRepository;
-        public GroupCorrelator(RevitRepository revitRepository) {
+
+        public SuperComponentCorrelator(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
         }
+
         public FamilyInstance Correlate(FamilyInstance lintel) {
             if(lintel.SuperComponent != null) {
                 return (FamilyInstance) _revitRepository.GetElementById(lintel.SuperComponent.Id);
@@ -53,44 +51,33 @@ namespace RevitLintelPlacement.Models {
         }
 
         public FamilyInstance Correlate(FamilyInstance lintel) {
-            var allignElement = _revitRepository.GetDimensionFamilyInstance(lintel);
-            if(allignElement != null) {
-                if(allignElement.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Id ||
-                    allignElement.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Windows).Id) {
-                    return (FamilyInstance) _revitRepository.GetElementById(allignElement.Id);
-                }
+            var alignElement = _revitRepository.GetDimensionFamilyInstance(lintel);
+            if(alignElement == null) {
+                return null;
+            }
 
+            if(alignElement.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Id ||
+               alignElement.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Windows).Id) {
+                return (FamilyInstance) _revitRepository.GetElementById(alignElement.Id);
             }
             return null;
         }
     }
 
     internal class GeometricalCorrelator : ICorrelator {
-        private Dictionary<XYZ, FamilyInstance> _elementLocationDict;
+        private readonly Dictionary<XYZ, FamilyInstance> _elementLocationDict;
+
         public GeometricalCorrelator(RevitRepository revitRepository) {
             _elementLocationDict = revitRepository
                   .GetAllElementsInWall()
                   .Where(e => e.Location != null)
-                  .ToDictionary(e => revitRepository.GetLocationPoint(e));
+                  .ToDictionary(revitRepository.GetLocationPoint);
         }
 
         public FamilyInstance Correlate(FamilyInstance lintel) {
             var lintelLocation = ((LocationPoint) lintel.Location).Point;
-            //XYZ nearestXYZ = _elementLocationDict.First().Key;
-            //var minDist = lintelLocation.DistanceTo(nearestXYZ);
-            //foreach(var elementLocation in _elementLocationDict.Keys) {
-            //    var dist = lintelLocation.DistanceTo(elementLocation);
-            //    if(dist < minDist) {
-            //        minDist = dist;
-            //        nearestXYZ = elementLocation;
-            //    }
-            //}
-
-            var nearestXYZ = _elementLocationDict.Keys.OrderBy(item => lintelLocation.DistanceTo(item)).First();
-            if(lintelLocation.DistanceTo(nearestXYZ) < 1.6) { //TODO: другое число (может, половина ширины проема)
-                return _elementLocationDict[nearestXYZ];
-            }
-            return null;
+            var nearestPoint = _elementLocationDict.Keys.OrderBy(item => lintelLocation.DistanceTo(item)).First();
+            return lintelLocation.DistanceTo(nearestPoint) < 1.6 ? _elementLocationDict[nearestPoint] : null;
         }
     }
 }

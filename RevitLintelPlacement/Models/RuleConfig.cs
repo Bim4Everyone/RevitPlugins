@@ -12,7 +12,7 @@ using dosymep.Serializers;
 using pyRevitLabs.Json;
 
 namespace RevitLintelPlacement.Models {
-    public class RuleConfig : ProjectConfig<RulesSettigs> {
+    public class RuleConfig : ProjectConfig<RulesSettings> {
         [JsonIgnore]
         public override string ProjectConfigPath { get; set; }
 
@@ -30,7 +30,7 @@ namespace RevitLintelPlacement.Models {
 
     }
 
-    public class RulesSettigs : ProjectSettings {
+    public class RulesSettings : ProjectSettings {
         public override string ProjectName { get; set; }
         public List<GroupedRuleSettings> RuleSettings { get; set; } = new List<GroupedRuleSettings>();
     }
@@ -68,10 +68,7 @@ namespace RevitLintelPlacement.Models {
     public class LintelParameterSetting {
         public bool IsCornerChecked { get; set; }
         public double Offset{ get; set; }
-        public double HalfThickness { get; set; }
-        public double OpeningWidth { get; set; }
         public LintelParameterType LintelParameterType { get; set; }
-        public string LintelTypeName { get; set; }
     }
 
 }

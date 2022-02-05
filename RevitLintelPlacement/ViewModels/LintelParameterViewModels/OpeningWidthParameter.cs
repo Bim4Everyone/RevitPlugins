@@ -13,6 +13,7 @@ using RevitLintelPlacement.ViewModels.Interfaces;
 
 namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels {
     internal class OpeningWidthParameter : ILintelParameterViewModel {
+
         public void SetTo(FamilyInstance lintel, FamilyInstance elementInWall) {
             if(lintel is null) {
                 throw new ArgumentNullException(nameof(lintel));

@@ -18,9 +18,8 @@ using RevitLintelPlacement.Models;
 namespace RevitLintelPlacement.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private readonly RulesSettigs _rulesSettings;
+        private readonly RulesSettings _rulesSettings;
 
-        //private RuleCollectionViewModel _rules;
         private LintelCollectionViewModel _lintels;
         private GroupedRuleCollectionViewModel _groupedRules;
 
@@ -28,19 +27,14 @@ namespace RevitLintelPlacement.ViewModels {
 
         }
 
-        public MainViewModel(RevitRepository revitRepository, RulesSettigs rulesSettings) {
+        public MainViewModel(RevitRepository revitRepository, RulesSettings rulesSettings) {
             this._revitRepository = revitRepository;
             this._rulesSettings = rulesSettings;
             Lintels = new LintelCollectionViewModel(_revitRepository);
-            //Rules = new RuleCollectionViewModel(_revitRepository, rulesSettings);
             GroupedRules = new GroupedRuleCollectionViewModel(_revitRepository, rulesSettings);
             InitializeLintels();
             PlaceLintelCommand = new RelayCommand(PlaceLintels, p => true);
         }
-        //public RuleCollectionViewModel Rules {
-        //    get => _rules;
-        //    set => this.RaiseAndSetIfChanged(ref _rules, value);
-        //}
 
         public LintelCollectionViewModel Lintels {
             get => _lintels;

@@ -14,10 +14,10 @@ using RevitLintelPlacement.Models;
 namespace RevitLintelPlacement.ViewModels {
     internal class LintelInfoViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private string elementInWallName;
+        private string _elementInWallName;
         private ElementId _lintelId;
         private ElementId _elementInWallId;
-        private string wallTypeName;
+        private string _wallTypeName;
         private string _level;
         private ElementInWallKind _elementInWallKind;
 
@@ -35,11 +35,9 @@ namespace RevitLintelPlacement.ViewModels {
                 if(elementInWall.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Id) {
                     ElementInWallKind = ElementInWallKind.Door;
                 } else if(elementInWall.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Id) {
-                    if(elementInWall.Symbol.Name.Contains("Отверстие")) { //ToDO: название
-                        ElementInWallKind = ElementInWallKind.Opening;
-                    } else {
-                        ElementInWallKind = ElementInWallKind.Window;
-                    }
+                    ElementInWallKind = elementInWall.Symbol.Name.Contains("Отверстие") ? 
+                        ElementInWallKind.Opening : 
+                        ElementInWallKind.Window;
                 }
             } else {
                 ElementInWallKind = ElementInWallKind.None;
@@ -50,12 +48,13 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         public string ElementInWallName {
-            get => elementInWallName;
-            set => this.RaiseAndSetIfChanged(ref elementInWallName, value);
+            get => _elementInWallName;
+            set => this.RaiseAndSetIfChanged(ref _elementInWallName, value);
         }
+
         public string WallTypeName {
-            get => wallTypeName;
-            set => this.RaiseAndSetIfChanged(ref wallTypeName, value);
+            get => _wallTypeName;
+            set => this.RaiseAndSetIfChanged(ref _wallTypeName, value);
         }
 
         public string Level {

@@ -17,7 +17,7 @@ namespace RevitLintelPlacement.ViewModels {
     internal class GroupedRuleViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private string _name;
-        private ObservableCollection<ConcreteRuleViewModel> _gruopedRules;
+        private ObservableCollection<ConcreteRuleViewModel> _groupedRules;
         private WallTypesConditionViewModel _groupingCondition;
 
         public GroupedRuleViewModel(RevitRepository revitRepository, GroupedRuleSettings groupedRuleSettings=null) {
@@ -39,10 +39,8 @@ namespace RevitLintelPlacement.ViewModels {
                 Name = groupedRuleSettings.Name;
                 Rules = new ObservableCollection<ConcreteRuleViewModel>(
                     groupedRuleSettings.Rules
-                    .Select(r => new ConcreteRuleViewModel(_revitRepository, r)
-                    ));
+                    .Select(r => new ConcreteRuleViewModel(_revitRepository, r)));
             }
-
         }
 
         public string Name {
@@ -56,8 +54,8 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         public ObservableCollection<ConcreteRuleViewModel> Rules {
-            get => _gruopedRules;
-            set => this.RaiseAndSetIfChanged(ref _gruopedRules, value);
+            get => _groupedRules;
+            set => this.RaiseAndSetIfChanged(ref _groupedRules, value);
         }
 
         public ICommand AddRuleCommand { get; set; }

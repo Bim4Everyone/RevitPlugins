@@ -10,9 +10,11 @@ using RevitLintelPlacement.Models.Interfaces;
 
 namespace RevitLintelPlacement.Models {
     internal class ReportResult : IResultHandler {
+
         public ReportResult(ElementId id) {
             LintelId = id;
         }
+
         public ElementId LintelId { get; }
 
         public void Handle() { }
@@ -32,7 +34,6 @@ namespace RevitLintelPlacement.Models {
         }
     }
 
-
     internal class LintelInGroup : IResultHandler {
         public void Handle() { }
     }
@@ -42,7 +43,7 @@ namespace RevitLintelPlacement.Models {
     //}
 
     internal class LintelIsFixedWithoutElement : ReportResult {
-        public LintelIsFixedWithoutElement(ElementId id) :base(id) {}
+        public LintelIsFixedWithoutElement(ElementId id) : base(id) { }
     }
 
     internal class LintelWithoutElement : LintelForDeletionResult {
@@ -54,6 +55,6 @@ namespace RevitLintelPlacement.Models {
     }
 
     internal class LintelGeometricalDisplaced : ReportResult {
-        public LintelGeometricalDisplaced(ElementId id) :base(id) {}
+        public LintelGeometricalDisplaced(ElementId id) : base(id) { }
     }
 }
