@@ -11,6 +11,12 @@
              d:DesignHeight="450" d:DesignWidth="1100"
              d:DataContext="{d:DesignInstance vm:GroupedRuleCollectionViewModel, IsDesignTimeCreatable=False}"
              Name="ucRules">
+    <UserControl.Resources>
+        <Style TargetType="Button">
+            <Setter Property="BorderBrush" Value="Transparent"></Setter>
+            <Setter Property="Background" Value="Transparent"></Setter>
+        </Style>
+    </UserControl.Resources>
     <ScrollViewer Margin="5" MaxHeight="{Binding ElementName=ucRules, Path=ActualHeight}" CanContentScroll="False" HorizontalScrollBarVisibility="Auto">
         <Grid>
             <Grid.ColumnDefinitions>
@@ -92,23 +98,31 @@
                                             </ListBox.ItemTemplate>
                                         </ListBox>
                                         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Button Grid.Row="1" Width="30" Height="20" Margin="2 3" VerticalAlignment="Top" Command="{Binding AddRuleCommand}">+</Button>
-                                            <Button Grid.Row="1" Width="30" Height="20" Margin="2 3" VerticalAlignment="Top" Command="{Binding RemoveRuleCommand}">-</Button>
+                                            <Button Width="30" Height="20" Margin="2 3" VerticalAlignment="Top" Command="{Binding AddRuleCommand}">
+                                                <Image Source="../Resources/icons8-add.png"></Image>
+                                            </Button>
+                                            <Button Width="30" Height="20" Margin="2 3" VerticalAlignment="Top" Command="{Binding RemoveRuleCommand}">
+                                                <Image Source="../Resources/icons8-remove.png"></Image>
+                                            </Button>
                                         </StackPanel>
                                         
                                     </Grid>
                                 </Grid>
                             </Border>
                             <Button DockPanel.Dock="Left" Margin="5 0" Width="30" Height="30" Name="bDelete" Command="{Binding ElementName=ucRules, Path=DataContext.RemoveGroupedRuleCommand}" 
-                                    CommandParameter="{Binding ElementName=bDelete, Path=DataContext}" >-</Button>
+                                    CommandParameter="{Binding ElementName=bDelete, Path=DataContext}" >
+                                <Image Source="../Resources/icons8-remove.png"></Image>
+                            </Button>
                         </DockPanel>
                         
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
             <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Width="30" Margin="3" Command="{Binding AddGroupedRuleCommand}">+</Button>
-                <Button Width="30" Margin="3" Command="{Binding SaveConfigCommand}" >!</Button>
+                <Button Width="30" Margin="3" Command="{Binding AddGroupedRuleCommand}">
+                    <Image Source="../Resources/icons8-add.png"></Image>
+                </Button>
+                <!--<Button Width="30" Margin="3" Command="{Binding SaveConfigCommand}" >!</Button>-->
             </StackPanel>
         </Grid>
     </ScrollViewer>
