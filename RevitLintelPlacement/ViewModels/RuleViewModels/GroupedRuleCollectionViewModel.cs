@@ -25,7 +25,6 @@ namespace RevitLintelPlacement.ViewModels {
         public GroupedRuleCollectionViewModel(RevitRepository revitRepository, RulesSettings rulesSettings = null) {
             AddGroupedRuleCommand = new RelayCommand(AddGroupedRule, p => true);
             RemoveGroupedRuleCommand = new RelayCommand(RemoveGroupedRule, p => true);
-            SaveConfigCommand = new RelayCommand(SaveConfig, p => true);
             this._revitRepository = revitRepository;
             if (rulesSettings== null || rulesSettings.RuleSettings.Count == 0) {
                 GroupedRules = new ObservableCollection<GroupedRuleViewModel>();
@@ -39,7 +38,6 @@ namespace RevitLintelPlacement.ViewModels {
 
         public ICommand AddGroupedRuleCommand { get; set; }
         public ICommand RemoveGroupedRuleCommand { get; set; }
-        public ICommand SaveConfigCommand { get; set; }
 
         public ObservableCollection<GroupedRuleViewModel> GroupedRules {
             get => _groupedRules; 
@@ -55,6 +53,18 @@ namespace RevitLintelPlacement.ViewModels {
                 .FirstOrDefault(rule => rule != null);
         }
 
+        public void SaveConfig() {
+            var config = RuleConfig.GetRuleConfig();
+            var settings = config.GetSettings(_revitRepository.GetDocumentName()) ??
+                           config.AddSettings(_revitRepository.GetDocumentName());
+            settings.RuleSettings = new List<GroupedRuleSettings>();
+            foreach(var rule in GroupedRules) {
+                settings.RuleSettings.Add(rule.GetGroupedRuleSetting());
+            }
+
+            config.SaveProjectConfig();
+        }
+
         private void AddGroupedRule(object p) {
             GroupedRules.Add(new GroupedRuleViewModel(_revitRepository));
         }
@@ -63,18 +73,6 @@ namespace RevitLintelPlacement.ViewModels {
             if(p is GroupedRuleViewModel rule) {
                 GroupedRules.Remove(rule);
             }
-        }
-
-        private void SaveConfig(object p) {
-            var config = RuleConfig.GetRuleConfig();
-            var settings = config.GetSettings(_revitRepository.GetDocumentName()) ?? 
-                           config.AddSettings(_revitRepository.GetDocumentName());
-            settings.RuleSettings = new List<GroupedRuleSettings>();
-            foreach(var rule in GroupedRules) {
-                settings.RuleSettings.Add(rule.GetGroupedRuleSetting());
-            }
-
-            config.SaveProjectConfig();
         }
     }
 }

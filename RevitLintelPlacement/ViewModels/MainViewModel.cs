@@ -49,6 +49,8 @@ namespace RevitLintelPlacement.ViewModels {
         public ICommand PlaceLintelCommand { get; set; }
 
         public void PlaceLintels(object p) {
+            GroupedRules.SaveConfig();
+
             var elementInWallIds = _revitRepository.GetAllElementsInWall()
                 .Select(e => e.Id)
                 .ToList();
