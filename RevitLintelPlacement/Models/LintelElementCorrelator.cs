@@ -76,8 +76,10 @@ namespace RevitLintelPlacement.Models {
 
         public FamilyInstance Correlate(FamilyInstance lintel) {
             var lintelLocation = ((LocationPoint) lintel.Location).Point;
-            var nearestPoint = _elementLocationDict.Keys.OrderBy(item => lintelLocation.DistanceTo(item)).First();
-            return lintelLocation.DistanceTo(nearestPoint) < 1.6 ? _elementLocationDict[nearestPoint] : null;
+            var nearestPoint = _elementLocationDict.Keys.OrderBy(item => lintelLocation.DistanceTo(item)).FirstOrDefault();
+            return nearestPoint != null
+                ? lintelLocation.DistanceTo(nearestPoint) < 1.6 ? _elementLocationDict[nearestPoint] : null
+                : null;
         }
     }
 }
