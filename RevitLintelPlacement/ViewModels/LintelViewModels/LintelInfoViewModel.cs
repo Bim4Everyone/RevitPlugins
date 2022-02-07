@@ -34,8 +34,8 @@ namespace RevitLintelPlacement.ViewModels {
                 WallTypeName = elementInWall.Host.Name;
                 if(elementInWall.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Id) {
                     ElementInWallKind = ElementInWallKind.Door;
-                } else if(elementInWall.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Id) {
-                    ElementInWallKind = elementInWall.Symbol.Name.Contains("Отверстие") ? 
+                } else if(elementInWall.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Windows).Id) {
+                    ElementInWallKind = elementInWall.Symbol.Family.Name.Contains("Отверстие") ? 
                         ElementInWallKind.Opening : 
                         ElementInWallKind.Window;
                 }

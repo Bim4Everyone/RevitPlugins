@@ -7,18 +7,28 @@
              xmlns:extensions="clr-namespace:RevitLintelPlacement.Extensions"
              xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:converters="clr-namespace:RevitLintelPlacement.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              Name="LintelsView"
              d:DataContext="{d:DesignInstance vm:LintelCollectionViewModel, IsDesignTimeCreatable=False}">
+    <UserControl.Resources>
+        <converters:EnumConverter x:Key="EnumConverter"/>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <ListBox Grid.Row="0"
+                 SelectionMode="Single"
             ItemsSource="{Binding Source={extensions:EnumToItemsSource {x:Type vm:ElementInWallKind}}}" 
-                 SelectedItem="{Binding SelectedElementKind}">
+                 SelectedItem="{Binding SelectedElementKind, Converter={StaticResource EnumConverter}, ConverterParameter={x:Type vm:ElementInWallKind}}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}">
                     <Setter Property="Template">
@@ -32,7 +42,7 @@
             </ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type vm:ElementInWallKind}">
-                    <RadioButton Content="{Binding}">
+                    <RadioButton Margin="5" FontSize="14" Content="{Binding}">
                         <RadioButton.IsChecked>
                             <Binding Path="IsSelected"
                              RelativeSource="{RelativeSource AncestorType=ListBoxItem}"
