@@ -31,6 +31,8 @@ namespace RevitLintelPlacement.ViewModels {
             LintelsViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(LintelInfoViewModel.Level)));
             LintelsViewSource.Filter += ElementInWallKindFilter;
             SelectAndShowElementCommand = new RelayCommand(SelectElement, p => true);
+            SelectNextCommand = new RelayCommand(SelectNext, p => true);
+            SelectPreviousCommand = new RelayCommand(SelectPrevious, p => true);
             SelectionElementKindChangedCommand = new RelayCommand(SelectionElementKindChanged, p => true);
         }
 
@@ -41,6 +43,8 @@ namespace RevitLintelPlacement.ViewModels {
 
         public ICommand SelectionElementKindChangedCommand { get; }
         public ICommand SelectAndShowElementCommand { get; }
+        public ICommand SelectNextCommand { get; }
+        public ICommand SelectPreviousCommand { get; }
 
         public CollectionViewSource LintelsViewSource { get; set; }
 
@@ -56,7 +60,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         private void SelectElement(object p) {
-            if(!(p is ElementId id)) {
+            if(!(p is ElementId id) || p == null) {
                 return;
             }
 
@@ -67,6 +71,22 @@ namespace RevitLintelPlacement.ViewModels {
                 _revitRepository.SelectAndShowElement(id, _orientation);
             } else {
                 TaskDialog.Show("Revit", "Перейдите на 3D вид");
+            }
+        }
+
+        private void SelectNext(object p) {
+            LintelsViewSource.View.MoveCurrentToNext();
+            var lintelInfo = LintelsViewSource.View.CurrentItem;
+            if (lintelInfo is LintelInfoViewModel lintel) {
+                SelectElement(lintel.LintelId);
+            }
+        }
+
+        private void SelectPrevious(object p) {
+            LintelsViewSource.View.MoveCurrentToPrevious();
+            var lintelInfo = LintelsViewSource.View.CurrentItem;
+            if(lintelInfo is LintelInfoViewModel lintel) {
+                SelectElement(lintel.LintelId);
             }
         }
 
