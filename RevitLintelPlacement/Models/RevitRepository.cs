@@ -205,6 +205,7 @@ namespace RevitLintelPlacement.Models {
                 using(var t = StartTransaction("Подрезка")) {
 
                     var bb = element.get_BoundingBox(view3D);
+                    bb.Max = new XYZ(bb.Max.X, bb.Max.Y, bb.Max.Z + 1);
                     view3D.SetSectionBox(bb);
                     _uiDocument.SetSelectedElements(element);
                     _uiDocument.ShowElements(element);
