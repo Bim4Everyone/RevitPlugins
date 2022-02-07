@@ -84,8 +84,8 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Width="Auto" Header="Название типоразмера проема" Binding="{Binding ElementInWallName}" ></DataGridTextColumn>
-                <DataGridTextColumn Width="Auto" Header="Название типоразмера основы" Binding="{Binding WallTypeName}" ></DataGridTextColumn>
+                <DataGridTextColumn Width="580" Header="Название типоразмера проема" Binding="{Binding ElementInWallName}" ></DataGridTextColumn>
+                <DataGridTextColumn Width="370" Header="Название типоразмера основы" Binding="{Binding WallTypeName}" ></DataGridTextColumn>
             </DataGrid.Columns>
             <DataGrid.GroupStyle>
                 <GroupStyle>
@@ -150,6 +150,11 @@
             <DataGrid.CellStyle>
                 <Style TargetType="DataGridCell">
                     <Setter Property="Foreground" Value="DimGray"></Setter>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="LightGray"></Setter>
+                        </Trigger>
+                    </Style.Triggers>
                 </Style>
             </DataGrid.CellStyle>
         </DataGrid>

@@ -30,7 +30,7 @@ namespace RevitLintelPlacement.ViewModels {
             if(elementInWall != null) {
                 ElementInWall = elementInWall;
                 ElementInWallId = elementInWall.Id;
-                ElementInWallName = elementInWall.Name;
+                ElementInWallName =  $"{elementInWall.Symbol.Family.Name}: {elementInWall.Name}" ;
                 WallTypeName = elementInWall.Host.Name;
                 if(elementInWall.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Id) {
                     ElementInWallKind = ElementInWallKind.Door;
