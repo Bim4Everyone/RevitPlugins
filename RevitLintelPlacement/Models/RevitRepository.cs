@@ -134,7 +134,7 @@ namespace RevitLintelPlacement.Models {
         public bool CheckUp(View3D view3D, FamilyInstance elementInWall) {
             XYZ viewPoint = GetLocationPoint(elementInWall);
             ReferenceWithContext refWithContext = 
-                GetNearestWall(view3D, elementInWall, viewPoint, new XYZ(0, 0, 1), false);
+                GetNearestWallOrColumn(view3D, elementInWall, new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z-0.1), new XYZ(0, 0, 1), false); //чтобы точка точно была под гранью стены
             if(refWithContext == null)
                 return false;
             if(!(refWithContext.Proximity < 1)) {
@@ -144,7 +144,7 @@ namespace RevitLintelPlacement.Models {
             if(wall.Name.ToLower().Contains("железобетон")) {             //TODO: часть названия типа стены
                 return false;
             }
-            refWithContext = GetNearestWall(view3D, elementInWall, viewPoint, new XYZ(0, 0, 1), true);
+            refWithContext = GetNearestWallOrColumn(view3D, elementInWall, viewPoint, new XYZ(0, 0, 1), true);
             if(refWithContext == null)
                 return true;
             if(!(refWithContext.Proximity < 1)) {
@@ -154,19 +154,25 @@ namespace RevitLintelPlacement.Models {
             return !wall.Name.ToLower().Contains("железобетон");
         }
 
-        public bool CheckHorizontal(View3D view3D, FamilyInstance elementInWall, bool isRight) {
+        public bool CheckHorizontal(View3D view3D, FamilyInstance elementInWall, bool isRight, out double offset) {
+            offset = 0;
             XYZ viewPoint = GetLocationPoint(elementInWall);
             var direction = elementInWall.GetTransform().OfVector(isRight? new XYZ(1, 0, 0) : new XYZ(-1, 0, 0));
-            ReferenceWithContext refWithContext = GetNearestWall(view3D, elementInWall, viewPoint, direction, true);
+            ReferenceWithContext refWithContext = GetNearestWallOrColumn(view3D, elementInWall, viewPoint, direction, true);
             if(refWithContext == null)
                 return false;
             var elementWidth = elementInWall.GetParamValueOrDefault("ADSK_Размер_Ширина") ?? 
                                elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM); //Todo: параметр
-            if(!(refWithContext.Proximity < ((double) elementWidth / 2 + 0.4))) {// 0.4 фута примерно = 100 см
+            if(refWithContext.Proximity > ((double) elementWidth / 2 + 0.4)) {// 0.4 фута примерно = 100 см
                 return false;
             }
-            var wall = _document.GetElement(refWithContext.GetReference().ElementId);
-            return wall.Name.ToLower().Contains("железобетон");  //TODO: часть названия типа стены
+            offset = refWithContext.Proximity - (double) elementWidth / 2;
+            var wallOrColumn = _document.GetElement(refWithContext.GetReference().ElementId);
+            if (wallOrColumn is Wall wall)
+                return wall.Name.ToLower().Contains("железобетон");  //TODO: часть названия типа стены
+            if(wallOrColumn is FamilyInstance column)
+                return column.Name.ToLower().Contains("бетон");
+            return false;
         }
 
         public Transaction StartTransaction(string transactionName) {
@@ -205,7 +211,8 @@ namespace RevitLintelPlacement.Models {
                 using(var t = StartTransaction("Подрезка")) {
 
                     var bb = element.get_BoundingBox(view3D);
-                    bb.Max = new XYZ(bb.Max.X, bb.Max.Y, bb.Max.Z + 1);
+                    bb.Max = new XYZ(bb.Max.X+1, bb.Max.Y+1, bb.Max.Z + 1);
+                    bb.Min = new XYZ(bb.Min.X - 1, bb.Min.Y - 1, bb.Min.Z - 1);
                     view3D.SetSectionBox(bb);
                     _uiDocument.SetSelectedElements(element);
                     _uiDocument.ShowElements(element);
@@ -270,7 +277,7 @@ namespace RevitLintelPlacement.Models {
         }
 
        
-        private ReferenceWithContext GetNearestWall(View3D view3D, FamilyInstance fi, XYZ viewPoint, XYZ direction, bool excludeHost) {
+        private ReferenceWithContext GetNearestWallOrColumn(View3D view3D, FamilyInstance fi, XYZ viewPoint, XYZ direction, bool excludeHost) {
             var exclusionList = new List<ElementId> { fi.Id };
             exclusionList.AddRange(fi.GetDependentElements(new ElementClassFilter(typeof(FamilyInstance))));
             if(fi.Host != null && excludeHost) {
@@ -278,8 +285,10 @@ namespace RevitLintelPlacement.Models {
             }
             var exclusionFilter = new ExclusionFilter(exclusionList);
             var classFilter = new ElementClassFilter(typeof(Wall));
-            var logicalFilter = new LogicalAndFilter(new List<ElementFilter> { exclusionFilter, classFilter });
-            var refIntersector = new ReferenceIntersector(logicalFilter, FindReferenceTarget.All, view3D);
+            var categoryFilter = new ElementCategoryFilter(BuiltInCategory.OST_StructuralColumns);
+            var logicalAndFilter = new LogicalAndFilter(new List<ElementFilter> { exclusionFilter, classFilter });
+            var logicalOrFilter = new LogicalOrFilter(new List<ElementFilter> { logicalAndFilter, categoryFilter });
+            var refIntersector = new ReferenceIntersector(logicalOrFilter, FindReferenceTarget.All, view3D);
 
             return refIntersector.FindNearest(viewPoint, direction);
         }
@@ -294,9 +303,12 @@ namespace RevitLintelPlacement.Models {
             var topElement = elementInWall.GetReferences(FamilyInstanceReferenceType.Top);
             var bottomLintel = lintel.GetReferences(FamilyInstanceReferenceType.CenterElevation);
 
-            
-            if (topElement.Count > 0 && bottomLintel.Count > 0)
-                _document.Create.NewAlignment(elevation, topElement.First(), bottomLintel.First());
+            try {
+                if(topElement.Count > 0 && bottomLintel.Count > 0)
+                    _document.Create.NewAlignment(elevation, topElement.First(), bottomLintel.First());
+            } catch 
+            { }
+           
 
             //var leftL = lintel.GetReferences(FamilyInstanceReferenceType.Front);
             //var rightL = lintel.GetReferences(FamilyInstanceReferenceType.Back);
