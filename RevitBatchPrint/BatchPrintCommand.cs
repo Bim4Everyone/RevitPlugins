@@ -1,4 +1,4 @@
-#region Namespaces
+п»ї#region Namespaces
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -46,9 +46,9 @@ namespace RevitBatchPrint {
                 window.ShowDialog();
             } catch(Exception ex) {
 #if D2020 || D2021 || D2022
-                TaskDialog.Show("Пакетная печать.", ex.ToString());
+                TaskDialog.Show("РџР°РєРµС‚РЅР°СЏ РїРµС‡Р°С‚СЊ.", ex.ToString());
 #else
-                TaskDialog.Show("Пакетная печать.", ex.Message);
+                TaskDialog.Show("РџР°РєРµС‚РЅР°СЏ РїРµС‡Р°С‚СЊ.", ex.Message);
 #endif
             }
         }
