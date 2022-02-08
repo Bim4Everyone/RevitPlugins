@@ -1,4 +1,4 @@
-#region Namespaces
+п»ї#region Namespaces
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -38,9 +38,9 @@ namespace RevitCopyStandarts {
                 new PyRevitCommand().Execute(commandData.Application);
             } catch(Exception ex) {
 #if D2020 || D2021 || D2022
-                TaskDialog.Show("Копирование стандартов.", ex.ToString());
+                TaskDialog.Show("РљРѕРїРёСЂРѕРІР°РЅРёРµ СЃС‚Р°РЅРґР°СЂС‚РѕРІ.", ex.ToString());
 #else
-                TaskDialog.Show("Копирование стандартов.", ex.Message);
+                TaskDialog.Show("РљРѕРїРёСЂРѕРІР°РЅРёРµ СЃС‚Р°РЅРґР°СЂС‚РѕРІ.", ex.Message);
 #endif
             } finally {
                 AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
@@ -56,7 +56,7 @@ namespace RevitCopyStandarts {
             Application application = uiApplication.Application;
             Document document = uiDocument.Document;
 
-            var mainWindow = new MainWindow() { BimCategories = new ViewModels.BimCategoriesViewModel(@"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Шаблоны и настройки", document, application) };
+            var mainWindow = new MainWindow() { BimCategories = new ViewModels.BimCategoriesViewModel(@"T:\РџСЂРѕРµРєС‚РЅС‹Р№ РёРЅСЃС‚РёС‚СѓС‚\РћС‚РґРµР» СЃС‚Р°РЅРґР°СЂС‚РёР·Р°С†РёРё BIM Рё RD\BIM-Р РµСЃСѓСЂСЃС‹\5-РќР°РґСЃС‚СЂРѕР№РєРё\РЁР°Р±Р»РѕРЅС‹ Рё РЅР°СЃС‚СЂРѕР№РєРё", document, application) };
             new WindowInteropHelper(mainWindow) { Owner = uiApplication.MainWindowHandle };
             mainWindow.ShowDialog();
         }
