@@ -13,16 +13,16 @@ namespace RevitLintelPlacement.Models {
         }
 
         private IEnumerable<string> MakeMessages(IEnumerable<IResultHandler> resultHandlers) {
-            foreach(var type in resultHandlers.GroupBy(r => r.GetType())) {
-                switch (type.First())
+            foreach(var code in resultHandlers.GroupBy(r => r.Code)) {
+                switch (code.Key)
                 {
-                    case LintelIsFixedWithoutElement _:
+                    case ResultCode.LintelIsFixedWithoutElement:
                         yield return $"Под данными фиксированными перемычками отсутствует проем: " +
-                                     $"{string.Join(", ", type.Select(e => ((LintelIsFixedWithoutElement) e).LintelId))}";
+                                     $"{string.Join(", ", code.Select(e => ((ReportResult) e).LintelId))}";
                         break;
-                    case LintelGeometricalDisplaced _:
+                    case ResultCode.LintelGeometricalDisplaced:
                         yield return $"Следующие перемычки смещены от проема: " +
-                                     $"{string.Join(", ", type.Select(e => ((LintelGeometricalDisplaced) e).LintelId))}";
+                                     $"{string.Join(", ", code.Select(e => ((ReportResult) e).LintelId))}";
                         break;
                 }
             }

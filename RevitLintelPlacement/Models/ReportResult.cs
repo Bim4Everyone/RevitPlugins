@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 using RevitLintelPlacement.Models.Interfaces;
+using RevitLintelPlacement.ViewModels;
 
 namespace RevitLintelPlacement.Models {
     internal class ReportResult : IResultHandler {
@@ -15,8 +16,8 @@ namespace RevitLintelPlacement.Models {
             LintelId = id;
         }
 
+        public ResultCode Code { get; set; }
         public ElementId LintelId { get; }
-
         public void Handle() { }
     }
 
@@ -29,32 +30,61 @@ namespace RevitLintelPlacement.Models {
             this._lintel = lintel;
         }
 
+        public ResultCode Code { get; set; }
+
         public void Handle() {
             _revitRepository.DeleteLintel(_lintel);
         }
     }
 
-    internal class LintelInGroup : IResultHandler {
+    internal class EmptyResult : IResultHandler {
+        public ResultCode Code { get; set; }
+
         public void Handle() { }
     }
 
-    //internal class CorrectLintel : IResultHandler {
-    //    public void Handle() {}
-    //}
+    internal class WrongLintelParameters : IResultHandler {
+        private readonly IEnumerable<ParameterCheckResult> _parameterResults;
+        private readonly ConcreteRuleViewModel _rule;
+        private readonly FamilyInstance _lintel;
+        private readonly FamilyInstance _elementInWall;
 
-    internal class LintelIsFixedWithoutElement : ReportResult {
-        public LintelIsFixedWithoutElement(ElementId id) : base(id) { }
+        public WrongLintelParameters(IEnumerable<ParameterCheckResult> parameterResults, ConcreteRuleViewModel rule, FamilyInstance lintel, FamilyInstance elementInWall) {
+            this._parameterResults = parameterResults;
+            this._rule = rule;
+            this._lintel = lintel;
+            this._elementInWall = elementInWall;
+        }
+
+        public ResultCode Code { get; set; } = ResultCode.WorngLintelParameters;
+
+        public void Handle() {
+            foreach(var result in _parameterResults) {
+                switch(result){
+                    case ParameterCheckResult.WrongLintelThickness: {
+                        _rule.WallHalfThicknessParameter.SetTo(_lintel, _elementInWall);
+                        break;
+                    }
+                }
+            }
+            
+        }
     }
 
-    internal class LintelWithoutElement : LintelForDeletionResult {
-        public LintelWithoutElement(RevitRepository revitRepository, FamilyInstance lintel) : base(revitRepository, lintel) { }
+
+    internal enum ResultCode {
+        Correct,
+        LintelInGroup,
+        LintelIsFixedWithoutElement,
+        LintelWithoutElement,
+        ElementInWallWithoutRule,
+        LintelGeometricalDisplaced,
+        LintelWithWrongWallAbove,
+        WorngLintelParameters
     }
 
-    internal class ElementInWallWithoutRule : LintelForDeletionResult {
-        public ElementInWallWithoutRule(RevitRepository revitRepository, FamilyInstance lintel) : base(revitRepository, lintel) {}
-    }
-
-    internal class LintelGeometricalDisplaced : ReportResult {
-        public LintelGeometricalDisplaced(ElementId id) : base(id) { }
+    internal enum ParameterCheckResult {
+        Correct,
+        WrongLintelThickness,
     }
 }
