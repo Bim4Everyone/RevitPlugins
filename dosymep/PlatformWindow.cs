@@ -35,10 +35,14 @@ namespace dosymep.WPF.Views {
 
             PlatformWindowConfig config = GetProjectConfig();
             if(config.Maximized.HasValue) {
-                Top = config.Top;
-                Left = config.Left;
-                Width = config.Width;
-                Height = config.Height;
+                Top = config.Top ?? Top;
+                Left = config.Left ?? Left;
+                
+                if(ResizeMode == ResizeMode.CanResize) {
+                    Width = config.Width ?? Width;
+                    Height = config.Height ?? Height;
+                }
+
                 WindowState = config.Maximized.Value ? WindowState.Maximized : WindowState;
             }
         }
@@ -49,8 +53,10 @@ namespace dosymep.WPF.Views {
             var config = GetProjectConfig();
             config.Top = Top;
             config.Left = Left;
-            config.Width = Width;
-            config.Height = Height;
+
+            config.Width = ResizeMode == ResizeMode.CanResize ? Width : (double?) null;
+            config.Height = ResizeMode == ResizeMode.CanResize ? Height : (double?) null;
+
             config.Maximized = WindowState == WindowState.Maximized;
             config.SaveProjectConfig();
         }
@@ -69,10 +75,10 @@ namespace dosymep.WPF.Views {
         [JsonIgnore] public override string ProjectConfigPath { get; set; }
         [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
 
-        public double Top { get; set; }
-        public double Left { get; set; }
-        public double Width { get; set; }
-        public double Height { get; set; }
+        public double? Top { get; set; }
+        public double? Left { get; set; }
+        public double? Width { get; set; }
+        public double? Height { get; set; }
         public bool? Maximized { get; set; }
     }
 }
