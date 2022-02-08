@@ -12,13 +12,18 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using dosymep.WPF.Views;
+
 namespace RevitSetLevelSection.Views {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window {
+    public partial class MainWindow : PlatformWindow {
         public MainWindow() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitSetLevelSection);
+        public override string ProjectConfigName => nameof(MainWindow);
     }
 }
