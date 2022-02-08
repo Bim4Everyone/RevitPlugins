@@ -12,14 +12,19 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using dosymep.WPF.Views;
+
 namespace RevitRooms.Views {
     /// <summary>
     /// Interaction logic for InfoElementsWindow.xaml
     /// </summary>
-    public partial class InfoElementsWindow : Window {
+    public partial class InfoElementsWindow : PlatformWindow {
         public InfoElementsWindow() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitRooms);
+        public override string ProjectConfigName => nameof(InfoElementsWindow);
     }
 
     internal enum TypeInfo {

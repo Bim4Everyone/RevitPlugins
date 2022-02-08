@@ -12,16 +12,21 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using dosymep.WPF.Views;
+
 using RevitBatchPrint.Models;
 
 namespace RevitBatchPrint.Views {
     /// <summary>
     /// Interaction logic for PrintViewSheetNames.xaml
     /// </summary>
-    public partial class BatchPrintWindow : Window {
+    public partial class BatchPrintWindow : PlatformWindow {
         public BatchPrintWindow() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitBatchPrint);
+        public override string ProjectConfigName => nameof(BatchPrintWindow);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;

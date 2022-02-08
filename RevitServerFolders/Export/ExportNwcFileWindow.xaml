@@ -1,13 +1,15 @@
-﻿<Window x:Class="RevitServerFolders.Export.ExportNwcFileWindow"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:RevitServerFolders.Export"
-             mc:Ignorable="d" 
-             Height="360" Width="640"
-            WindowStartupLocation="CenterOwner"
-        Title="Экспорт NWC-файла из RVT-файла" ResizeMode="NoResize">
+﻿<base:PlatformWindow
+    x:Class="RevitServerFolders.Export.ExportNwcFileWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:local="clr-namespace:RevitServerFolders.Export"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    mc:Ignorable="d" 
+    Height="360" Width="640"
+    WindowStartupLocation="CenterOwner"
+    Title="Экспорт NWC-файла из RVT-файла" ResizeMode="NoResize">
     <Window.DataContext>
         <local:ExportNwcFileViewModel/>
     </Window.DataContext>
@@ -53,4 +55,4 @@
             </Grid>
         </StackPanel>
     </GroupBox>
-</Window>
+</base:PlatformWindow>

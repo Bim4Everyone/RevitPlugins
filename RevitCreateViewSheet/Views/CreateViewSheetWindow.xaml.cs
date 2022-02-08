@@ -13,14 +13,19 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using dosymep.WPF.Views;
+
 namespace RevitCreateViewSheet.Views {
     /// <summary>
     /// Interaction logic for CreateViewSheetWindow.xaml
     /// </summary>
-    public partial class CreateViewSheetWindow : Window {
+    public partial class CreateViewSheetWindow : PlatformWindow {
         public CreateViewSheetWindow() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitCreateViewSheet);
+        public override string ProjectConfigName => nameof(CreateViewSheetWindow);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;

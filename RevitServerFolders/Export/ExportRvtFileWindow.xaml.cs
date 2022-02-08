@@ -13,14 +13,19 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using dosymep.WPF.Views;
+
 namespace RevitServerFolders.Export {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class ExportRvtFileWindow : Window {
+    public partial class ExportRvtFileWindow : PlatformWindow {
         public ExportRvtFileWindow() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitServerFolders);
+        public override string ProjectConfigName => nameof(ExportRvtFileWindow);
 
         private void _btOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;

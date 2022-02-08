@@ -12,14 +12,19 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using dosymep.WPF.Views;
+
 namespace RevitRooms.Views {
     /// <summary>
     /// Interaction logic for RoomsWindow.xaml
     /// </summary>
-    public partial class RoomsWindow : Window {
+    public partial class RoomsWindow : PlatformWindow {
         public RoomsWindow() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitRooms);
+        public override string ProjectConfigName => nameof(RoomsWindow);
 
         private void ButtonOK_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;

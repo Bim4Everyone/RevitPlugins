@@ -12,14 +12,19 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using dosymep.WPF.Views;
+
 namespace RevitRooms.Views {
     /// <summary>
     /// Interaction logic for RoomsNums.xaml
     /// </summary>
-    public partial class RoomsNumsWindows : Window {
+    public partial class RoomsNumsWindows : PlatformWindow {
         public RoomsNumsWindows() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitRooms);
+        public override string ProjectConfigName => nameof(RoomsNumsWindows);
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;

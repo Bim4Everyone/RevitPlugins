@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 using dosymep.WPF.Commands;
+using dosymep.WPF.Views;
 
 using RevitRooms.ViewModels;
 
@@ -21,10 +22,13 @@ namespace RevitRooms.Views {
     /// <summary>
     /// Interaction logic for NumberingOrderSelectWindow.xaml
     /// </summary>
-    public partial class NumberingOrderSelectWindow : Window {
+    public partial class NumberingOrderSelectWindow : PlatformWindow {
         public NumberingOrderSelectWindow() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitRooms);
+        public override string ProjectConfigName => nameof(NumberingOrderSelectWindow);
 
         private void ButtonOK_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;
