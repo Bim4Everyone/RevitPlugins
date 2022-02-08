@@ -13,14 +13,19 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using dosymep.WPF.Views;
+
 namespace RevitCopyViews.Views {
     /// <summary>
     /// Interaction logic for RenameViewWindow.xaml
     /// </summary>
-    public partial class RenameViewWindow : Window {
+    public partial class RenameViewWindow : PlatformWindow {
         public RenameViewWindow() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitCopyViews);
+        public override string ProjectConfigName => nameof(RenameViewWindow);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;
