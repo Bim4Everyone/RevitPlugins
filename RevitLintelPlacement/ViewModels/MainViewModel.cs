@@ -32,7 +32,6 @@ namespace RevitLintelPlacement.ViewModels {
             this._rulesSettings = rulesSettings;
             Lintels = new LintelCollectionViewModel(_revitRepository);
             GroupedRules = new GroupedRuleCollectionViewModel(_revitRepository, rulesSettings);
-            InitializeLintels();
             PlaceLintelCommand = new RelayCommand(PlaceLintels, p => true);
         }
 
@@ -78,11 +77,13 @@ namespace RevitLintelPlacement.ViewModels {
                     var lintelType = _revitRepository.GetLintelType(rule.SelectedLintelType);
                     var lintel = _revitRepository.PlaceLintel(lintelType, elementId);
                     rule.SetParametersTo(lintel, elementInWall);
-                    if(_revitRepository.CheckHorizontal(view3D, elementInWall, true)) {
+                    if(_revitRepository.CheckHorizontal(view3D, elementInWall, true, out double rightOffset)) {
+                        lintel.SetParamValue("Смещение_справа", rightOffset);
                         lintel.SetParamValue("ОпираниеСправа", 0); //ToDo: параметр
                     }
 
-                    if(_revitRepository.CheckHorizontal(view3D, elementInWall, false)) {
+                    if(_revitRepository.CheckHorizontal(view3D, elementInWall, false, out double leftOffset)) {
+                        lintel.SetParamValue("Смещение_слева", leftOffset);
                         lintel.SetParamValue("ОпираниеСлева", 0);
                     }
                     _revitRepository.LockLintel(elevation, plan, lintel, elementInWall);
@@ -97,16 +98,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
 
-        //сопоставляются перемычки в группе + перемычки, закрепленные с элементом
-        private void InitializeLintels() {
-            var lintels = _revitRepository.GetLintels();
-            var correlator = new LintelElementCorrelator(_revitRepository);
-            var lintelInfos = lintels.Select(l =>
-            new LintelInfoViewModel(_revitRepository, l, correlator.Correlate(l)));
-            foreach(var lintelInfo in lintelInfos) {
-                Lintels.LintelInfos.Add(lintelInfo);
-            }
-        }
+        
 
     }
 }

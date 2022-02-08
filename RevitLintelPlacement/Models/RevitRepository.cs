@@ -9,6 +9,8 @@ using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 
+using RevitLintelPlacement.ViewModels;
+
 namespace RevitLintelPlacement.Models {
 
     internal class RevitRepository {
@@ -95,9 +97,30 @@ namespace RevitLintelPlacement.Models {
                 yield return _document.GetElement(id);
         }
 
-        public IEnumerable<FamilyInstance> GetLintels() {
+        public IEnumerable<FamilyInstance> GetLintels(SampleMode sampleMode) {
+            FilteredElementCollector collector;
+            switch(sampleMode) {
+                case SampleMode.AllElements: {
+                    collector = new FilteredElementCollector(_document);
+                    break;
+                }
+                case SampleMode.CurrentView: {
+                    collector = new FilteredElementCollector(_document, _document.ActiveView.Id);
+                    break;
+                }
+                case SampleMode.SelectedElements: {
+                    var ids = _uiDocument.Selection.GetElementIds();
+                    if(ids.Count == 0) {
+                        return new List<FamilyInstance>();
+                    }
+                    collector = new FilteredElementCollector(_document, ids);
+                    break;
+                }
+                default:
+                throw new ArgumentException(nameof(sampleMode), $"Способ выборки \"{nameof(sampleMode)}\" не найден.");
+            }
 
-            return new FilteredElementCollector(_document)
+            return collector
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .OfClass(typeof(FamilyInstance))
                 .Where(e => e.Name == _lintelTypeName)
@@ -253,7 +276,7 @@ namespace RevitLintelPlacement.Models {
               .Cast<View3D>()
               .FirstOrDefault(v => !v.IsTemplate && v.Name==_view3DName);
             if(view3D != null) {
-                _uiDocument.ActiveView = view3D;
+                //_uiDocument.ActiveView = view3D;
                 return;
             }
             using (Transaction t = new Transaction(_document)) {
@@ -276,7 +299,10 @@ namespace RevitLintelPlacement.Models {
             }
         }
 
-       
+        public void SetActiveView() {
+            _uiDocument.ActiveView = GetView3D();
+        }
+
         private ReferenceWithContext GetNearestWallOrColumn(View3D view3D, FamilyInstance fi, XYZ viewPoint, XYZ direction, bool excludeHost) {
             var exclusionList = new List<ElementId> { fi.Id };
             exclusionList.AddRange(fi.GetDependentElements(new ElementClassFilter(typeof(FamilyInstance))));

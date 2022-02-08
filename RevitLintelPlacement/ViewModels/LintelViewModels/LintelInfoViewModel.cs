@@ -82,13 +82,15 @@ namespace RevitLintelPlacement.ViewModels {
     }
 
     public enum ElementInWallKind {
+        [Description("Все категории")]
+        All,
         [Description("Двери")]
         Door,
         [Description("Окна")]
         Window,
         [Description("Отверстия")]
         Opening, 
-        [Description("Без элемента")]
+        [Description("Без категории")]
         None
     }
 }
