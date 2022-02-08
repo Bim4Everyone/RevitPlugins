@@ -37,10 +37,15 @@ namespace dosymep.WPF.Views {
             if(config.Maximized.HasValue) {
                 Top = config.Top ?? Top;
                 Left = config.Left ?? Left;
-                
+
                 if(ResizeMode == ResizeMode.CanResize) {
                     Width = config.Width ?? Width;
                     Height = config.Height ?? Height;
+                }
+
+                if(!config.Maximized.Value) {
+                    SizeToFit();
+                    MoveIntoView();
                 }
 
                 WindowState = config.Maximized.Value ? WindowState.Maximized : WindowState;
@@ -68,6 +73,40 @@ namespace dosymep.WPF.Views {
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
                 .SetProjectConfigName(ProjectConfigName + ".json")
                 .Build<PlatformWindowConfig>();
+        }
+
+        protected virtual void SizeToFit() {
+            if(Height > System.Windows.SystemParameters.VirtualScreenHeight) {
+                Height = System.Windows.SystemParameters.VirtualScreenHeight;
+            }
+
+            if(Width > System.Windows.SystemParameters.VirtualScreenWidth) {
+                Width = System.Windows.SystemParameters.VirtualScreenWidth;
+            }
+        }
+
+        protected virtual void MoveIntoView() {
+            if(Top + Height / 2 >
+               System.Windows.SystemParameters.VirtualScreenHeight) {
+                Top =
+                    System.Windows.SystemParameters.VirtualScreenHeight -
+                    Height;
+            }
+
+            if(Left + Width / 2 >
+               System.Windows.SystemParameters.VirtualScreenWidth) {
+                Left =
+                    System.Windows.SystemParameters.VirtualScreenWidth -
+                    Width;
+            }
+
+            if(Top < 0) {
+                Top = 0;
+            }
+
+            if(Left < 0) {
+                Left = 0;
+            }
         }
     }
 
