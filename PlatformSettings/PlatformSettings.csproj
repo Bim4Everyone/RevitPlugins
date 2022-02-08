@@ -43,6 +43,8 @@
 	<ItemGroup>
 	  <Compile Include="..\dosymep\AppDomainExtensions.cs" Link="dosymep\AppDomainExtensions.cs" />
 	  <Compile Include="..\dosymep\BaseViewModel.cs" Link="dosymep\BaseViewModel.cs" />
+	  <Compile Include="..\dosymep\ConfigSerializer.cs" Link="dosymep\ConfigSerializer.cs" />
+	  <Compile Include="..\dosymep\PlatformWindow.cs" Link="dosymep\PlatformWindow.cs" />
 	  <Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\RelayCommand.cs" />
 	</ItemGroup>
 	<ItemGroup>
@@ -83,9 +85,6 @@
 	<ItemGroup>
 		<Content Include="Python\icon.png" />
 		<Content Include="Python\script.py" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="dosymep\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
