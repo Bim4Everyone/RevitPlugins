@@ -13,16 +13,22 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using dosymep.WPF.Views;
+
 using RevitCopyStandarts.ViewModels;
 
 namespace RevitCopyStandarts {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window {
+    public partial class MainWindow : PlatformWindow {
         public MainWindow() {
             InitializeComponent();
         }
+
+
+        public override string PluginName => nameof(RevitCopyStandarts);
+        public override string ProjectConfigName => nameof(MainWindow);
 
         public BimCategoriesViewModel BimCategories {
             get { return DataContext as BimCategoriesViewModel; }
