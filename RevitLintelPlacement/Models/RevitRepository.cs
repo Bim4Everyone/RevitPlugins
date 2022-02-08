@@ -72,6 +72,15 @@ namespace RevitLintelPlacement.Models {
                 .Cast<WallType>();
         }
 
+        public IEnumerable<Element> GetGenericModelFamilies() {
+            var categoryId = Category.GetCategory(_document, BuiltInCategory.OST_GenericModel).Id;
+            return new FilteredElementCollector(_document)
+                .OfClass(typeof(Family))
+                .Cast<Family>()
+                .Where(f => GetFamilyCategoryId(f) == categoryId)
+                .ToList();
+        }
+
         public FamilyInstance PlaceLintel(FamilySymbol lintelType, ElementId elementInWallId) {
             var elementInWall = _document.GetElement(elementInWallId) as FamilyInstance;
 
@@ -369,6 +378,14 @@ namespace RevitLintelPlacement.Models {
                 z = /*location.Z +*/ topBarHeight;
             }
             return new XYZ(location.X, location.Y, z);
+        }
+
+        private ElementId GetFamilyCategoryId(Family family) {
+            var typesId = family.GetFamilySymbolIds();
+            if(typesId.Count > 0) {
+                return _document.GetElement(typesId.First()).Category?.Id;
+            }
+            return ElementId.InvalidElementId;
         }
 
         /// <summary>
