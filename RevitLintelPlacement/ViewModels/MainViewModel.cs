@@ -27,7 +27,7 @@ namespace RevitLintelPlacement.ViewModels {
 
         }
 
-        public MainViewModel(RevitRepository revitRepository, RulesSettings rulesSettings) {
+        public MainViewModel(RevitRepository revitRepository, RulesSettings rulesSettings, LintelsConfig lintelsConfig, LintelsCommonConfig lintelsCommonConfig) {
             this._revitRepository = revitRepository;
             this._rulesSettings = rulesSettings;
             Lintels = new LintelCollectionViewModel(_revitRepository);
@@ -98,7 +98,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
 
-        
+
 
     }
 }

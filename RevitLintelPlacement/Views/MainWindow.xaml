@@ -14,18 +14,8 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <!--<ToolBar Grid.Row="0" >
-            <Button>настройки</Button>
-            <Separator></Separator>
-            <Button Command="{Binding PlaceLintelCommand}"> расставить </Button>
-            <Separator/>
-            <Button > удалить</Button>
-            <Separator/>
-            <Button > обновить</Button>
-        </ToolBar>-->
         <TabControl Grid.Row="0" Margin="0,5">
             <TabItem Header="Правила">
-                <!--<local:RulesTabView DataContext="{Binding Rules}"/>-->
                 <local:GroupedRulesView DataContext="{Binding GroupedRules}"/>
             </TabItem>
             <TabItem  Header="Перемычки">
@@ -35,9 +25,5 @@
         <StackPanel Grid.Row="1" HorizontalAlignment="Right">
             <Button Margin="20 10" Padding="5" FontSize="14" Command="{Binding PlaceLintelCommand}">Расставить</Button>
         </StackPanel>
-
-        <!--<StatusBar Grid.Row="2" Height="30" HorizontalAlignment="Stretch">
-            <ProgressBar Width="200" Height="25" Margin="5,0"></ProgressBar>
-        </StatusBar>-->
     </Grid>
 </Window>
