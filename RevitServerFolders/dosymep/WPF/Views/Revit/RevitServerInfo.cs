@@ -10,7 +10,7 @@ using dosymep.Async;
 using dosymep.Revit.ServerClient;
 using dosymep.WPF.Commands;
 
-namespace dosymep.Views.Revit {
+namespace dosymep.WPF.Views.Revit {
     public class RevitServerInfo : INotifyPropertyChanged {
         protected readonly IRevitServerClient _revitServerClient;
         private ObservableCollection<RevitServerInfo> _children = new ObservableCollection<RevitServerInfo>() { null };

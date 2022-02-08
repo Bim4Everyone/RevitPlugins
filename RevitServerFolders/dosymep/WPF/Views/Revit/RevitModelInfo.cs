@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 using dosymep.Revit.ServerClient;
 
-namespace dosymep.Views.Revit {
+namespace dosymep.WPF.Views.Revit {
     internal class RevitModelInfo : RevitServerInfo {
         public RevitModelInfo(IRevitServerClient revitServerClient)
             : base(revitServerClient) {

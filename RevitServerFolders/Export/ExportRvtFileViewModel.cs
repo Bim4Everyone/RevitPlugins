@@ -5,12 +5,10 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
 
-using dosymep.Views.Revit;
+using dosymep.WPF.Views.Revit;
 using dosymep.WPF.Commands;
 
 using Microsoft.WindowsAPICodePack.Dialogs;
-
-using RevitServerFolders.dosymep.Views.Revit;
 
 namespace RevitServerFolders.Export {
     public class ExportRvtFileViewModel : INotifyPropertyChanged, IDataErrorInfo {

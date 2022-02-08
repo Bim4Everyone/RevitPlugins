@@ -13,16 +13,19 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-using dosymep.Views.Revit;
+using dosymep.WPF.Views;
 
-namespace RevitServerFolders.dosymep.Views.Revit {
+namespace dosymep.WPF.Views.Revit {
     /// <summary>
     /// Interaction logic for RevitServerExplorerWindow.xaml
     /// </summary>
-    public partial class RevitServerExplorerWindow : Window {
+    public partial class RevitServerExplorerWindow : PlatformWindow {
         public RevitServerExplorerWindow() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitServerFolders);
+        public override string ProjectConfigName => nameof(RevitServerExplorerWindow);
 
         public RevitServerViewModel ViewModel {
             get { return _revitServerTree.DataContext as RevitServerViewModel; }

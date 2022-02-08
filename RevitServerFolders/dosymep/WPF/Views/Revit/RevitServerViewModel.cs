@@ -4,7 +4,7 @@ using System.Windows.Input;
 using dosymep.Revit.ServerClient;
 using dosymep.WPF.Commands;
 
-namespace dosymep.Views.Revit {
+namespace dosymep.WPF.Views.Revit {
     public class RevitServerViewModel {
         public RevitServerViewModel(string serverName, string serverVersion) {
             ServerName = serverName;
