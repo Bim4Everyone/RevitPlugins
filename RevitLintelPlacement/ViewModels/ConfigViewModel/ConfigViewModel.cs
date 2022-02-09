@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace RevitLintelPlacement.ViewModels {
     internal class ConfigViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly LintelsConfig _lintelsConfig;
-        private readonly LintelsCommonConfig _lintelsCommonConfig;
+        private LintelsCommonConfig _lintelsCommonConfig;
         private string _lintelThickness;
         private string _lintelWidth;
         private string _lintelRightOffset;
@@ -25,25 +26,30 @@ namespace RevitLintelPlacement.ViewModels {
         private string _openingHeight;
         private string _openingWidth;
         private string _openingFixation;
-        private string _reinforcedConcreteFilter;
+        private ObservableCollection<FilterViewModel> _reinforcedConcreteFilter;
         private string _holesFilter;
         private string _lintelsConfigPath;
-        private List<string> _rulesCongigPath = new List<string>();
+        private ObservableCollection<RulePathViewModel> _rulesCongigPath;
         private List<GenericModelFamilyViewModel> _lintelTypes;
 
         public ConfigViewModel() {
-            RulesCongigPaths = new List<string>();
+            RulesCongigPaths = new ObservableCollection<RulePathViewModel>();
         }
 
         public ConfigViewModel(RevitRepository revitRepository, LintelsConfig lintelsConfig, LintelsCommonConfig lintelsCommonConfig) {
             this._revitRepository = revitRepository;
             this._lintelsConfig = lintelsConfig;
             this._lintelsCommonConfig = lintelsCommonConfig;
-            RulesCongigPaths = new List<string>();
+            RulesCongigPaths = new ObservableCollection<RulePathViewModel>();
             LintelFamilies = new List<GenericModelFamilyViewModel>(revitRepository.GetGenericModelFamilies()
                 .Select(f => new GenericModelFamilyViewModel() { Name = f.Name }));
-            Initialize(lintelsConfig, lintelsCommonConfig);
+            Initialize();
             SaveConfigCommand = new RelayCommand(Save, p => true);
+            AddFilterCommand = new RelayCommand(AddFilter, p=>true);
+            RemoveFilterCommand = new RelayCommand(RemoveFilter, p => true);
+            AddRulePathCommand = new RelayCommand(AddRule, p => true);
+            RemoveRulePathCommand = new RelayCommand(RemoveRule, p => true);
+            SelectLintelsConfigCommand = new RelayCommand(SelectLintelsConfig, p=>true);
         }
 
         public string LintelThickness {
@@ -96,11 +102,10 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _openingFixation, value);
         }
 
-        public string ReinforcedConcreteFilter {
+        public ObservableCollection<FilterViewModel> ReinforcedConcreteFilter {
             get => _reinforcedConcreteFilter;
             set => this.RaiseAndSetIfChanged(ref _reinforcedConcreteFilter, value);
         }
-
         public string HolesFilter {
             get => _holesFilter;
             set => this.RaiseAndSetIfChanged(ref _holesFilter, value);
@@ -111,7 +116,7 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _lintelsConfigPath, value);
         }
 
-        public List<string> RulesCongigPaths {
+        public ObservableCollection<RulePathViewModel> RulesCongigPaths {
             get => _rulesCongigPath;
             set => this.RaiseAndSetIfChanged(ref _rulesCongigPath, value);
         }
@@ -122,24 +127,40 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         public ICommand SaveConfigCommand { get; set; }
+        public ICommand AddFilterCommand { get; set; }
+        public ICommand RemoveFilterCommand { get; set; }
+        public ICommand AddRulePathCommand { get; set; }
+        public ICommand RemoveRulePathCommand { get; set; }
+        public ICommand SelectLintelsConfigCommand { get; set; }
 
-        public void Initialize(LintelsConfig lintelsConfig, LintelsCommonConfig lintelsCommonConfig) {
-            LintelThickness = lintelsCommonConfig.LintelThickness;
-            LintelWidth = lintelsCommonConfig.LintelWidth;
-            LintelRightCorner = lintelsCommonConfig.LintelRightCorner;
-            LintelRightOffset = lintelsCommonConfig.LintelRightOffset;
-            LintelLeftCorner = lintelsCommonConfig.LintelLeftCorner;
-            LintelLeftOffset = lintelsCommonConfig.LintelLeftOffset;
-            LintelFixation = lintelsCommonConfig.LintelFixation;
-            OpeningHeight = lintelsCommonConfig.OpeningHeight;
-            OpeningWidth = lintelsCommonConfig.OpeningWidth;
-            OpeningFixation = lintelsCommonConfig.OpeningFixation;
-            ReinforcedConcreteFilter = lintelsCommonConfig.ReinforcedConcreteFilter;
-            HolesFilter = lintelsCommonConfig.HolesFilter;
-            LintelsConfigPath = lintelsConfig.LintelsConfigPath;
-            RulesCongigPaths = lintelsConfig.RulesCongigPaths;
+        public void Initialize() {
+            LintelThickness = _lintelsCommonConfig.LintelThickness;
+            LintelWidth = _lintelsCommonConfig.LintelWidth;
+            LintelRightCorner = _lintelsCommonConfig.LintelRightCorner;
+            LintelRightOffset = _lintelsCommonConfig.LintelRightOffset;
+            LintelLeftCorner = _lintelsCommonConfig.LintelLeftCorner;
+            LintelLeftOffset = _lintelsCommonConfig.LintelLeftOffset;
+            LintelFixation = _lintelsCommonConfig.LintelFixation;
+            OpeningHeight = _lintelsCommonConfig.OpeningHeight;
+            OpeningWidth = _lintelsCommonConfig.OpeningWidth;
+            OpeningFixation = _lintelsCommonConfig.OpeningFixation;
+            if (_lintelsCommonConfig.ReinforcedConcreteFilter==null || _lintelsCommonConfig.ReinforcedConcreteFilter.Count == 0) {
+                ReinforcedConcreteFilter = new ObservableCollection<FilterViewModel>(
+                new List<FilterViewModel> { new FilterViewModel() { Name = "Железобетон" } });
+            } else {
+                ReinforcedConcreteFilter = new ObservableCollection<FilterViewModel>(
+                new List<FilterViewModel>(_lintelsCommonConfig.ReinforcedConcreteFilter
+                .Select(e => new FilterViewModel() { Name = e })));
+            }
+            
+            HolesFilter = _lintelsCommonConfig.HolesFilter;
+            LintelsConfigPath = _lintelsConfig.LintelsConfigPath;
+            if (_lintelsConfig.RulesCongigPaths!=null && _lintelsConfig.RulesCongigPaths.Count > 0) {
+                RulesCongigPaths = new ObservableCollection<RulePathViewModel>(
+                    _lintelsConfig.RulesCongigPaths.Select(p => new RulePathViewModel() { Name = p }));
+            }
             foreach(var family in LintelFamilies) {
-                family.IsChecked = lintelsCommonConfig.LintelFamilies
+                family.IsChecked = _lintelsCommonConfig.LintelFamilies
                     .Any(f => f.Equals(family.Name, StringComparison.CurrentCultureIgnoreCase));
             }
         }
@@ -155,16 +176,86 @@ namespace RevitLintelPlacement.ViewModels {
             _lintelsCommonConfig.OpeningHeight = OpeningHeight;
             _lintelsCommonConfig.OpeningWidth = OpeningWidth;
             _lintelsCommonConfig.OpeningFixation = OpeningFixation;
-            _lintelsCommonConfig.ReinforcedConcreteFilter = ReinforcedConcreteFilter;
+            _lintelsCommonConfig.ReinforcedConcreteFilter = ReinforcedConcreteFilter.Select(e=>e.Name).ToList();
             _lintelsCommonConfig.HolesFilter = HolesFilter;
             _lintelsConfig.LintelsConfigPath = LintelsConfigPath;
-            _lintelsConfig.RulesCongigPaths = RulesCongigPaths;
+            _lintelsConfig.RulesCongigPaths = RulesCongigPaths.Select(e=>e.Name).ToList();
             _lintelsCommonConfig.LintelFamilies = LintelFamilies
                 .Where(e => e.IsChecked)
                 .Select(e => e.Name)
                 .ToList();
             _lintelsCommonConfig.Save(_lintelsConfig.LintelsConfigPath);
             _lintelsConfig.SaveProjectConfig();
+        }
+
+        private void AddFilter(object p) {
+            ReinforcedConcreteFilter.Add(new FilterViewModel());
+        }
+
+        private void RemoveFilter(object p) {
+            if(ReinforcedConcreteFilter.Count > 0) {
+                ReinforcedConcreteFilter.Remove(ReinforcedConcreteFilter.Last());
+            }
+        }
+        private void AddRule(object p) {
+            RulesCongigPaths.Add(new RulePathViewModel());
+        }
+
+        private void RemoveRule(object p) {
+            if(RulesCongigPaths.Count > 0) {
+                RulesCongigPaths.Remove(RulesCongigPaths.Last());
+            }
+        }
+
+        private void SelectLintelsConfig(object p) {
+            using(var dialog = new System.Windows.Forms.FolderBrowserDialog()) {
+                dialog.SelectedPath = System.IO.Path.GetDirectoryName(LintelsConfigPath);
+                if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+                    if(dialog.SelectedPath!= LintelsConfigPath) {
+                        LintelsConfigPath = dialog.SelectedPath;
+                        _lintelsCommonConfig = LintelsCommonConfig.GetLintelsCommonConfig(LintelsConfigPath);
+                        _lintelsConfig.LintelsConfigPath = LintelsConfigPath;
+                        Initialize();
+                    }
+                }
+
+            }
+        }
+
+    }
+
+    internal class FilterViewModel : BaseViewModel {
+        private string _name;
+
+        public string Name { 
+            get => _name; 
+            set => this.RaiseAndSetIfChanged(ref _name, value); 
+        }
+    }
+
+    internal class RulePathViewModel : BaseViewModel {
+        private string _name;
+
+        public RulePathViewModel() {
+            SelectPathCommand = new RelayCommand(SelectRulePath, p => true);
+        }
+
+        public string Name { 
+            get => _name; 
+            set => this.RaiseAndSetIfChanged(ref _name, value); 
+        }
+        public ICommand SelectPathCommand { get; set; }
+
+        private void SelectRulePath(object p) {
+            using(var dialog = new System.Windows.Forms.FolderBrowserDialog()) {
+                dialog.SelectedPath = System.IO.Path.GetDirectoryName(Name);
+                if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+                    if(dialog.SelectedPath != Name) {
+                        Name = dialog.SelectedPath;
+                    }
+                }
+
+            }
         }
     }
 }

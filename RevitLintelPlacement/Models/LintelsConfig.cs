@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
@@ -13,24 +15,14 @@ using pyRevitLabs.Json;
 
 namespace RevitLintelPlacement.Models {
     internal class LintelsConfig : ProjectConfig {
-        private readonly string _lintelsConfigPathDefault = @"C:\Test";
-        private readonly string _rulesConfigPathDefault = @"C:\TestRules";
-        private string _lintelsConfigPath;
-
         [JsonIgnore]
         public override string ProjectConfigPath { get; set; }
         [JsonIgnore]
         public override IConfigSerializer Serializer { get; set; }
 
-        public string LintelsConfigPath {
-            get {
-                if(string.IsNullOrEmpty(_lintelsConfigPath))
-                    return _lintelsConfigPathDefault;
-                return _lintelsConfigPath;
-            }
-            set => _lintelsConfigPath = value; }
+        public string LintelsConfigPath { get; set; } = @"C:\Test";
 
-        public List<string> RulesCongigPaths { get; set; } = new List<string>();
+        public List<string> RulesCongigPaths { get; set; } = new List<string> ();
 
         public static LintelsConfig GetLintelsConfig() {
             return new ProjectConfigBuilder()
@@ -53,9 +45,23 @@ namespace RevitLintelPlacement.Models {
         public string OpeningHeight { get; set; }
         public string OpeningWidth { get; set; }
         public string OpeningFixation { get; set; }
-        public string ReinforcedConcreteFilter { get; set; }
+        public List<string> ReinforcedConcreteFilter { get; set; } = new List<string>();
         public string HolesFilter { get; set; }
         public List<string> LintelFamilies { get; set; } = new List<string>();
+
+        [JsonIgnore]
+        public Dictionary<string, StorageType> ParamterType { get; set; } = new Dictionary<string, StorageType>() {
+            {nameof(LintelThickness), StorageType.Double },
+            {nameof(LintelWidth), StorageType.Double },
+            {nameof(LintelRightOffset), StorageType.Double },
+            {nameof(LintelLeftOffset), StorageType.Double },
+            {nameof(LintelLeftCorner), StorageType.Integer },
+            {nameof(LintelRightCorner), StorageType.Integer },
+            {nameof(LintelFixation), StorageType.Integer },
+            {nameof(OpeningHeight), StorageType.Double },
+            {nameof(OpeningWidth), StorageType.Double },
+            {nameof(OpeningFixation), StorageType.Integer }
+        };
 
         public static LintelsCommonConfig GetLintelsCommonConfig(string path) {
             if(File.Exists(GetConfigPath(path))) {

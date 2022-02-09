@@ -78,6 +78,7 @@
 			<HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.Json.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+		<Reference Include="System.Windows.Forms" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Resource Include="Resources\icons8-add.png" />
