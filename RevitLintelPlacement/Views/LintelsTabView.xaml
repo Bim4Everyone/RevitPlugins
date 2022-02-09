@@ -76,6 +76,7 @@
                   CanUserAddRows="False"
                   CanUserDeleteRows="False"
                   CanUserReorderColumns="False"
+                  IsReadOnly="True"
                   VirtualizingPanel.IsVirtualizingWhenGrouping="True"
             ItemsSource="{Binding LintelsViewSource.View, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
             <DataGrid.Columns >

@@ -91,17 +91,25 @@ namespace RevitLintelPlacement.ViewModels {
 
         private void SelectNext(object p) {
             LintelsViewSource.View.MoveCurrentToNext();
-            var lintelInfo = LintelsViewSource.View.CurrentItem;
-            if(lintelInfo is LintelInfoViewModel lintel) {
-                SelectElement(lintel.LintelId);
+            if(LintelsViewSource.View.IsCurrentAfterLast) {
+                LintelsViewSource.View.MoveCurrentToPrevious();
+            } else {
+                var lintelInfo = LintelsViewSource.View.CurrentItem;
+                if(lintelInfo is LintelInfoViewModel lintel) {
+                    SelectElement(lintel.LintelId);
+                }
             }
         }
 
         private void SelectPrevious(object p) {
             LintelsViewSource.View.MoveCurrentToPrevious();
-            var lintelInfo = LintelsViewSource.View.CurrentItem;
-            if(lintelInfo is LintelInfoViewModel lintel) {
-                SelectElement(lintel.LintelId);
+            if(LintelsViewSource.View.IsCurrentBeforeFirst) {
+                LintelsViewSource.View.MoveCurrentToNext();
+            } else {
+                var lintelInfo = LintelsViewSource.View.CurrentItem;
+                if(lintelInfo is LintelInfoViewModel lintel) {
+                    SelectElement(lintel.LintelId);
+                }
             }
         }
 
