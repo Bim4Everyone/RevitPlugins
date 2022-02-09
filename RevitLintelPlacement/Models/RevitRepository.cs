@@ -193,17 +193,20 @@ namespace RevitLintelPlacement.Models {
             ReferenceWithContext refWithContext = GetNearestWallOrColumn(view3D, elementInWall, viewPoint, direction, true);
             if(refWithContext == null)
                 return false;
-            var elementWidth = elementInWall.GetParamValueOrDefault("ADSK_Размер_Ширина") ?? 
-                               elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM); //Todo: параметр
+            var elementWidth = elementInWall.GetParamValueOrDefault("ADSK_Размер_Ширина") 
+                ?? elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM); //Todo: параметр
             if(refWithContext.Proximity > ((double) elementWidth / 2 + 0.4)) {// 0.4 фута примерно = 100 см
                 return false;
             }
             offset = refWithContext.Proximity - (double) elementWidth / 2;
             var wallOrColumn = _document.GetElement(refWithContext.GetReference().ElementId);
-            if (wallOrColumn is Wall wall)
+            if(wallOrColumn is Wall wall)
                 return wall.Name.ToLower().Contains("железобетон");  //TODO: часть названия типа стены
-            if(wallOrColumn is FamilyInstance column)
-                return column.Name.ToLower().Contains("бетон");
+            if(wallOrColumn.Category.Id == new ElementId(BuiltInCategory.OST_StructuralColumns))
+                return true;
+            if(wallOrColumn is RevitLinkInstance linkedInstance) {
+                return true; //ToDO: вставить проверку имени
+            }
             return false;
         }
 
@@ -320,9 +323,10 @@ namespace RevitLintelPlacement.Models {
             }
             var exclusionFilter = new ExclusionFilter(exclusionList);
             var classFilter = new ElementClassFilter(typeof(Wall));
+            var classFilter2 = new ElementClassFilter(typeof(RevitLinkInstance));
             var categoryFilter = new ElementCategoryFilter(BuiltInCategory.OST_StructuralColumns);
             var logicalAndFilter = new LogicalAndFilter(new List<ElementFilter> { exclusionFilter, classFilter });
-            var logicalOrFilter = new LogicalOrFilter(new List<ElementFilter> { logicalAndFilter, categoryFilter });
+            var logicalOrFilter = new LogicalOrFilter(new List<ElementFilter> { logicalAndFilter, categoryFilter, classFilter2 });
             var refIntersector = new ReferenceIntersector(logicalOrFilter, FindReferenceTarget.All, view3D);
 
             return refIntersector.FindNearest(viewPoint, direction);
