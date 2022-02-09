@@ -76,36 +76,30 @@ namespace dosymep.WPF.Views {
         }
 
         protected virtual void SizeToFit() {
-            if(Height > System.Windows.SystemParameters.VirtualScreenHeight) {
-                Height = System.Windows.SystemParameters.VirtualScreenHeight;
+            if(Height > SystemParameters.VirtualScreenHeight) {
+                Height = SystemParameters.VirtualScreenHeight;
             }
 
-            if(Width > System.Windows.SystemParameters.VirtualScreenWidth) {
-                Width = System.Windows.SystemParameters.VirtualScreenWidth;
+            if(Width > SystemParameters.VirtualScreenWidth) {
+                Width = SystemParameters.VirtualScreenWidth;
             }
         }
 
         protected virtual void MoveIntoView() {
-            if(Top + Height / 2 >
-               System.Windows.SystemParameters.VirtualScreenHeight) {
-                Top =
-                    System.Windows.SystemParameters.VirtualScreenHeight -
-                    Height;
+            if(Top < SystemParameters.WorkArea.Top) {
+                Top = SystemParameters.WorkArea.Top;
             }
 
-            if(Left + Width / 2 >
-               System.Windows.SystemParameters.VirtualScreenWidth) {
-                Left =
-                    System.Windows.SystemParameters.VirtualScreenWidth -
-                    Width;
+            if(Left < SystemParameters.WorkArea.Left) {
+                Left = SystemParameters.WorkArea.Left;
             }
 
-            if(Top < 0) {
-                Top = 0;
+            if((Top + Height) > SystemParameters.WorkArea.Height) {
+                Top = SystemParameters.WorkArea.Height - Height;
             }
 
-            if(Left < 0) {
-                Left = 0;
+            if((Left + Width) > SystemParameters.WorkArea.Width) {
+                Left = SystemParameters.WorkArea.Width - Width;
             }
         }
     }
