@@ -81,6 +81,12 @@ namespace RevitLintelPlacement.Models {
                 .ToList();
         }
 
+        public IEnumerable<RevitLinkType> GetLinkTypes() {
+            return new FilteredElementCollector(_document)
+                .OfClass(typeof(RevitLinkType))
+                .Cast<RevitLinkType>();
+        }
+
         public FamilyInstance PlaceLintel(FamilySymbol lintelType, ElementId elementInWallId) {
             var elementInWall = _document.GetElement(elementInWallId) as FamilyInstance;
 
@@ -137,11 +143,33 @@ namespace RevitLintelPlacement.Models {
                 .ToList();
         }
 
-        public IEnumerable<FamilyInstance> GetAllElementsInWall() {
+        public IEnumerable<FamilyInstance> GetAllElementsInWall(SampleMode sampleMode) {
             var categoryFilter = new ElementMulticategoryFilter(
                 new List<BuiltInCategory> { BuiltInCategory.OST_Doors, BuiltInCategory.OST_Windows });
 
-            return new FilteredElementCollector(_document)
+            FilteredElementCollector collector;
+            switch(sampleMode) {
+                case SampleMode.AllElements: {
+                    collector = new FilteredElementCollector(_document);
+                    break;
+                }
+                case SampleMode.CurrentView: {
+                    collector = new FilteredElementCollector(_document, _document.ActiveView.Id);
+                    break;
+                }
+                case SampleMode.SelectedElements: {
+                    var ids = _uiDocument.Selection.GetElementIds();
+                    if(ids.Count == 0) {
+                        return new List<FamilyInstance>();
+                    }
+                    collector = new FilteredElementCollector(_document, ids);
+                    break;
+                }
+                default:
+                throw new ArgumentException(nameof(sampleMode), $"Способ выборки \"{nameof(sampleMode)}\" не найден.");
+            }
+
+            return collector
                 .WherePasses(categoryFilter)
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()

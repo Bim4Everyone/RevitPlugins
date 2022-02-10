@@ -26,7 +26,7 @@ namespace RevitLintelPlacement.ViewModels {
             AddGroupedRuleCommand = new RelayCommand(AddGroupedRule, p => true);
             RemoveGroupedRuleCommand = new RelayCommand(RemoveGroupedRule, p => true);
             this._revitRepository = revitRepository;
-            if (rulesSettings== null || rulesSettings.RuleSettings.Count == 0) {
+            if(rulesSettings == null || rulesSettings.RuleSettings.Count == 0) {
                 GroupedRules = new ObservableCollection<GroupedRuleViewModel>();
                 GroupedRules.Add(new GroupedRuleViewModel(_revitRepository));
             } else {
@@ -36,11 +36,12 @@ namespace RevitLintelPlacement.ViewModels {
             }
         }
 
+        
         public ICommand AddGroupedRuleCommand { get; set; }
         public ICommand RemoveGroupedRuleCommand { get; set; }
 
         public ObservableCollection<GroupedRuleViewModel> GroupedRules {
-            get => _groupedRules; 
+            get => _groupedRules;
             set => this.RaiseAndSetIfChanged(ref _groupedRules, value);
         }
 

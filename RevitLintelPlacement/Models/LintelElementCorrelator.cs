@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 using RevitLintelPlacement.Models.Interfaces;
+using RevitLintelPlacement.ViewModels;
 
 namespace RevitLintelPlacement.Models {
     internal class LintelElementCorrelator {
@@ -69,7 +70,7 @@ namespace RevitLintelPlacement.Models {
 
         public GeometricalCorrelator(RevitRepository revitRepository) {
             _elementLocationDict = revitRepository
-                  .GetAllElementsInWall()
+                  .GetAllElementsInWall(SampleMode.AllElements)
                   .Where(e => e.Location != null)
                   .ToDictionary(revitRepository.GetLocationPoint);
         }

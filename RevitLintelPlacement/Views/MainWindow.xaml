@@ -5,16 +5,41 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitLintelPlacement.Views"
         xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
+        xmlns:converter="clr-namespace:RevitLintelPlacement.Converters"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:extensions="clr-namespace:RevitLintelPlacement.Extensions"
         mc:Ignorable="d"
         Title="Перемычки" Height="650" Width="1150"
         MinHeight="650" MinWidth="1150"
         d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
+    <Window.Resources>
+        <converter:EnumConverter x:Key="EnumConverter"/>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TabControl Grid.Row="0" Margin="0,5">
+        <GroupBox Grid.Row="0" Header="Связанные файлы">
+            <ListBox MaxHeight="100" BorderThickness="0" ItemsSource="{Binding Links}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:LinkViewModel}">
+                        <CheckBox IsChecked="{Binding IsChecked}">
+                            <TextBlock Text="{Binding Name}"></TextBlock>
+                        </CheckBox>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </GroupBox>
+        <StackPanel Grid.Row="1" Margin="10" Orientation="Horizontal">
+            <ComboBox Width="300" FontSize="14" Background="White" ItemsSource="{Binding Source={extensions:EnumToItemsSource {x:Type vm:SampleMode}}}"
+                  SelectedItem="{Binding SelectedSampleMode, Converter={StaticResource EnumConverter},
+            ConverterParameter={x:Type vm:SampleMode}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+            </ComboBox>
+        </StackPanel>
+        <TabControl Grid.Row="2" Margin="0,5">
             <TabItem Header="Правила">
                 <local:GroupedRulesView DataContext="{Binding GroupedRules}"/>
             </TabItem>
@@ -22,7 +47,7 @@
                 <local:LintelsTabView DataContext="{Binding Lintels}"/>
             </TabItem>
         </TabControl>
-        <StackPanel Grid.Row="1" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="3" HorizontalAlignment="Right">
             <Button Margin="20 10" Padding="5" FontSize="14" Command="{Binding PlaceLintelCommand}">Расставить</Button>
         </StackPanel>
     </Grid>

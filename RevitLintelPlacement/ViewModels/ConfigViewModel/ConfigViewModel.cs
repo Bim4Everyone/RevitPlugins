@@ -26,9 +26,9 @@ namespace RevitLintelPlacement.ViewModels {
         private string _openingHeight;
         private string _openingWidth;
         private string _openingFixation;
-        private ObservableCollection<FilterViewModel> _reinforcedConcreteFilter;
         private string _holesFilter;
         private string _lintelsConfigPath;
+        private ObservableCollection<FilterViewModel> _reinforcedConcreteFilter;
         private ObservableCollection<RulePathViewModel> _rulesCongigPath;
         private List<GenericModelFamilyViewModel> _lintelTypes;
 

@@ -19,9 +19,11 @@ namespace RevitLintelPlacement.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly RulesSettings _rulesSettings;
+        private SampleMode _selectedSampleMode;
 
         private LintelCollectionViewModel _lintels;
         private GroupedRuleCollectionViewModel _groupedRules;
+        private ObservableCollection<LinkViewModel> _links;
 
         public MainViewModel() {
 
@@ -33,6 +35,17 @@ namespace RevitLintelPlacement.ViewModels {
             Lintels = new LintelCollectionViewModel(_revitRepository);
             GroupedRules = new GroupedRuleCollectionViewModel(_revitRepository, rulesSettings);
             PlaceLintelCommand = new RelayCommand(PlaceLintels, p => true);
+            var links = _revitRepository.GetLinkTypes().ToList();
+            if(links.Count > 0) {
+                Links = new ObservableCollection<LinkViewModel>(links.Select(l => new LinkViewModel() { Name = l.Name }));
+            } else {
+                Links = new ObservableCollection<LinkViewModel>();
+            }
+        }
+
+        public SampleMode SelectedSampleMode {
+            get => _selectedSampleMode;
+            set => this.RaiseAndSetIfChanged(ref _selectedSampleMode, value);
         }
 
         public LintelCollectionViewModel Lintels {
@@ -47,10 +60,15 @@ namespace RevitLintelPlacement.ViewModels {
 
         public ICommand PlaceLintelCommand { get; set; }
 
+        public ObservableCollection<LinkViewModel> Links {
+            get => _links;
+            set => this.RaiseAndSetIfChanged(ref _links, value);
+        }
+
         public void PlaceLintels(object p) {
             GroupedRules.SaveConfig();
 
-            var elementInWallIds = _revitRepository.GetAllElementsInWall()
+            var elementInWallIds = _revitRepository.GetAllElementsInWall(SelectedSampleMode)
                 .Select(e => e.Id)
                 .ToList();
 
@@ -78,12 +96,16 @@ namespace RevitLintelPlacement.ViewModels {
                     var lintel = _revitRepository.PlaceLintel(lintelType, elementId);
                     rule.SetParametersTo(lintel, elementInWall);
                     if(_revitRepository.CheckHorizontal(view3D, elementInWall, true, out double rightOffset)) {
-                        lintel.SetParamValue("Смещение_справа", rightOffset);
+                        if(rightOffset > 0) {
+                            lintel.SetParamValue("Смещение_справа", rightOffset);
+                        }
                         lintel.SetParamValue("ОпираниеСправа", 0); //ToDo: параметр
                     }
 
                     if(_revitRepository.CheckHorizontal(view3D, elementInWall, false, out double leftOffset)) {
-                        lintel.SetParamValue("Смещение_слева", leftOffset);
+                        if(leftOffset > 0) {
+                            lintel.SetParamValue("Смещение_слева", leftOffset);
+                        }
                         lintel.SetParamValue("ОпираниеСлева", 0);
                     }
                     _revitRepository.LockLintel(elevation, plan, lintel, elementInWall);
@@ -96,9 +118,5 @@ namespace RevitLintelPlacement.ViewModels {
                 TaskDialog.Show("Revit", message);
             }
         }
-
-
-
-
     }
 }
