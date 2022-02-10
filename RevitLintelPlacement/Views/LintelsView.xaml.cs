@@ -17,8 +17,8 @@ namespace RevitLintelPlacement.Views {
     /// <summary>
     /// Логика взаимодействия для LintelsTabView.xaml
     /// </summary>
-    public partial class LintelsTabView : UserControl {
-        public LintelsTabView() {
+    public partial class LintelsView : Window {
+        public LintelsView() {
             InitializeComponent();
         }
     }

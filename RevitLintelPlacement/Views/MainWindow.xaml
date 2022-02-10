@@ -9,8 +9,8 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:extensions="clr-namespace:RevitLintelPlacement.Extensions"
         mc:Ignorable="d"
-        Title="Перемычки" Height="650" Width="1150"
-        MinHeight="650" MinWidth="1150"
+        Title="Перемычки" Height="670" Width="1150"
+        MinHeight="670" MinWidth="1150"
         d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
     <Window.Resources>
         <converter:EnumConverter x:Key="EnumConverter"/>
@@ -39,14 +39,15 @@
             ConverterParameter={x:Type vm:SampleMode}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
             </ComboBox>
         </StackPanel>
-        <TabControl Grid.Row="2" Margin="0,5">
+        <local:GroupedRulesView Grid.Row="2" DataContext="{Binding GroupedRules}"/>
+        <!--<TabControl Grid.Row="2" Margin="0,5">
             <TabItem Header="Правила">
                 <local:GroupedRulesView DataContext="{Binding GroupedRules}"/>
             </TabItem>
             <TabItem  Header="Перемычки">
                 <local:LintelsTabView DataContext="{Binding Lintels}"/>
             </TabItem>
-        </TabControl>
+        </TabControl>-->
         <StackPanel Grid.Row="3" HorizontalAlignment="Right">
             <Button Margin="20 10" Padding="5" FontSize="14" Command="{Binding PlaceLintelCommand}">Расставить</Button>
         </StackPanel>
