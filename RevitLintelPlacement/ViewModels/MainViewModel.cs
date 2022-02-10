@@ -19,7 +19,10 @@ using RevitLintelPlacement.Models;
 namespace RevitLintelPlacement.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private readonly RulesSettings _rulesSettings;
+        private readonly IEnumerable<GroupedRuleSettings> rules;
+        private readonly LintelsConfig _lintelsConfig;
+        private readonly LintelsCommonConfig lintelsCommonConfig;
+        private readonly List<GroupedRuleSettings> _rulesSettings;
         private SampleMode _selectedSampleMode;
 
         private LintelCollectionViewModel _lintels;
@@ -30,11 +33,14 @@ namespace RevitLintelPlacement.ViewModels {
 
         }
 
-        public MainViewModel(RevitRepository revitRepository, RulesSettings rulesSettings, LintelsConfig lintelsConfig, LintelsCommonConfig lintelsCommonConfig) {
+        public MainViewModel(RevitRepository revitRepository, IEnumerable<GroupedRuleSettings> rules, LintelsConfig lintelsConfig, LintelsCommonConfig lintelsCommonConfig) {
             this._revitRepository = revitRepository;
-            this._rulesSettings = rulesSettings;
+            this.rules = rules;
+            this._lintelsConfig = lintelsConfig;
+            this.lintelsCommonConfig = lintelsCommonConfig;
+            this._rulesSettings = rules.ToList();
             Lintels = new LintelCollectionViewModel(_revitRepository);
-            GroupedRules = new GroupedRuleCollectionViewModel(_revitRepository, rulesSettings);
+            GroupedRules = new GroupedRuleCollectionViewModel(_revitRepository, lintelsConfig, rules);
             PlaceLintelCommand = new RelayCommand(PlaceLintels, p => true);
             var links = _revitRepository.GetLinkTypes().ToList();
             if(links.Count > 0) {
@@ -67,7 +73,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         public void PlaceLintels(object p) {
-            GroupedRules.SaveConfig();
+            GroupedRules.Save(p);
 
             var elementInWallIds = _revitRepository.GetAllElementsInWall(SelectedSampleMode)
                 .Select(e => e.Id)
@@ -78,7 +84,7 @@ namespace RevitLintelPlacement.ViewModels {
                     elementInWallIds.Remove(lintel.ElementInWallId);
             }
 
-            LintelChecker lc = new LintelChecker(_revitRepository, _rulesSettings);
+            LintelChecker lc = new LintelChecker(_revitRepository, _lintelsConfig, _rulesSettings);
             var resultsForReport = lc.Check(Lintels.LintelInfos);
 
             var elevation = _revitRepository.GetElevation();

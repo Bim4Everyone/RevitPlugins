@@ -19,10 +19,12 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <GroupBox Grid.Row="0" Header="Связанные файлы">
+        <local:RulesToolBar Grid.Row="0" DataContext="{Binding GroupedRules}"></local:RulesToolBar>
+        <GroupBox Grid.Row="1" Header="Связанные файлы">
             <ListBox MaxHeight="100" BorderThickness="0" ItemsSource="{Binding Links}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:LinkViewModel}">
@@ -33,22 +35,14 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </GroupBox>
-        <StackPanel Grid.Row="1" Margin="10" Orientation="Horizontal">
+        <StackPanel Grid.Row="2" Margin="10" Orientation="Horizontal">
             <ComboBox Width="300" FontSize="14" Background="White" ItemsSource="{Binding Source={extensions:EnumToItemsSource {x:Type vm:SampleMode}}}"
                   SelectedItem="{Binding SelectedSampleMode, Converter={StaticResource EnumConverter},
             ConverterParameter={x:Type vm:SampleMode}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
             </ComboBox>
         </StackPanel>
-        <local:GroupedRulesView Grid.Row="2" DataContext="{Binding GroupedRules}"/>
-        <!--<TabControl Grid.Row="2" Margin="0,5">
-            <TabItem Header="Правила">
-                <local:GroupedRulesView DataContext="{Binding GroupedRules}"/>
-            </TabItem>
-            <TabItem  Header="Перемычки">
-                <local:LintelsTabView DataContext="{Binding Lintels}"/>
-            </TabItem>
-        </TabControl>-->
-        <StackPanel Grid.Row="3" HorizontalAlignment="Right">
+        <local:GroupedRulesView Grid.Row="3" DataContext="{Binding GroupedRules}"/>
+        <StackPanel Grid.Row="4" HorizontalAlignment="Right">
             <Button Margin="20 10" Padding="5" FontSize="14" Command="{Binding PlaceLintelCommand}">Расставить</Button>
         </StackPanel>
     </Grid>

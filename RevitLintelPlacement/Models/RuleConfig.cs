@@ -12,27 +12,32 @@ using dosymep.Serializers;
 using pyRevitLabs.Json;
 
 namespace RevitLintelPlacement.Models {
-    public class RuleConfig : ProjectConfig<RulesSettings> {
-        [JsonIgnore]
-        public override string ProjectConfigPath { get; set; }
+    public class RuleConfig {
 
-        [JsonIgnore]
-        public override IConfigSerializer Serializer { get; set; }
+        public List<GroupedRuleSettings> RuleSettings { get; set; } = new List<GroupedRuleSettings>();
 
-        public static RuleConfig GetRuleConfig() {
-            return new ProjectConfigBuilder()
-                .SetSerializer(new ConfigSerializer())
-                .SetPluginName(nameof(RevitLintelPlacement))
-                .SetRevitVersion(ModuleEnvironment.RevitVersion)
-                .SetProjectConfigName(nameof(RuleConfig) + ".json")
-                .Build<RuleConfig>();
+        public static RuleConfig GetRuleConfig(string path = null) {
+            if(path != null && File.Exists(GetConfigPath(path))) {
+                return JsonConvert.DeserializeObject<RuleConfig>(File.ReadAllText(GetConfigPath(path)));
+            }
+            return new RuleConfig();
         }
 
-    }
+        public static RuleConfig GetRuleFromFile(string path = null) {
+            if(path == null || File.Exists(path)) {
+                return JsonConvert.DeserializeObject<RuleConfig>(File.ReadAllText(path));
+            }
+            return new RuleConfig();
+        }
 
-    public class RulesSettings : ProjectSettings {
-        public override string ProjectName { get; set; }
-        public List<GroupedRuleSettings> RuleSettings { get; set; } = new List<GroupedRuleSettings>();
+        public void Save(string path) {
+            Directory.CreateDirectory(Path.GetDirectoryName(GetConfigPath(path)));
+            File.WriteAllText(GetConfigPath(path), JsonConvert.SerializeObject(this));
+        }
+
+        public static string GetConfigPath(string configPath) {
+            return Path.Combine(configPath, nameof(RevitLintelPlacement), nameof(RuleConfig) + ".json");
+        }
     }
 
     public class GroupedRuleSettings {

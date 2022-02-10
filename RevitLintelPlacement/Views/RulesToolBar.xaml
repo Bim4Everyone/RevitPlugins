@@ -1,0 +1,38 @@
+﻿<UserControl x:Class="RevitLintelPlacement.Views.RulesToolBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:behaviors="clr-namespace:RevitLintelPlacement.Behaviors"
+             xmlns:local="clr-namespace:RevitLintelPlacement.Views"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="1100"
+             d:DataContext="{d:DesignInstance vm:GroupedRuleCollectionViewModel, IsDesignTimeCreatable=False}">
+    <UserControl.Resources>
+        <Style TargetType="Button">
+            <Setter Property="BorderBrush" Value="Transparent"></Setter>
+            <Setter Property="Background" Value="Transparent"></Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <ToolBar Grid.Row="0" Height="30">
+            <Button ToolTip="Загрузить правила" Command="{Binding LoadCommand}">
+                <Image Source="../Resources/icons8-file.png"></Image>
+            </Button>
+            <Separator/>
+            <Button ToolTip="Сохранить" Command="{Binding SaveCommand}">
+                <Image Source="../Resources/icons8-save.png"/>
+            </Button>
+            <Separator/>
+            <Button ToolTip="Сохранить как" Command="{Binding SaveAsCommand}">
+                <Image Source="../Resources/icons8-save-as.png"/>
+            </Button>
+        </ToolBar>
+    </Grid>
+</UserControl>

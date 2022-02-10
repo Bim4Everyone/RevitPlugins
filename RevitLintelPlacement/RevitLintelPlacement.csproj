@@ -43,7 +43,10 @@
 	  <None Remove="Resources\icons8-add.png" />
 	  <None Remove="Resources\icons8-arrow-left.png" />
 	  <None Remove="Resources\icons8-arrow-next.png" />
+	  <None Remove="Resources\icons8-file.png" />
 	  <None Remove="Resources\icons8-remove.png" />
+	  <None Remove="Resources\icons8-save-as.png" />
+	  <None Remove="Resources\icons8-save.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -84,6 +87,9 @@
 	  <Resource Include="Resources\icons8-add.png" />
 	  <Resource Include="Resources\icons8-arrow-left.png" />
 	  <Resource Include="Resources\icons8-arrow-next.png" />
+	  <Resource Include="Resources\icons8-file.png" />
 	  <Resource Include="Resources\icons8-remove.png" />
+	  <Resource Include="Resources\icons8-save.png" />
+	  <Resource Include="Resources\icons8-save-as.png" />
 	</ItemGroup>
 </Project>
