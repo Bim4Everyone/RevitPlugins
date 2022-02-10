@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,7 +38,7 @@ namespace RevitLintelPlacement.ViewModels {
             PlaceLintelCommand = new RelayCommand(PlaceLintels, p => true);
             var links = _revitRepository.GetLinkTypes().ToList();
             if(links.Count > 0) {
-                Links = new ObservableCollection<LinkViewModel>(links.Select(l => new LinkViewModel() { Name = l.Name }));
+                Links = new ObservableCollection<LinkViewModel>(links.Select(l => new LinkViewModel() { Name =  Path.GetFileNameWithoutExtension(l.Name) }));
             } else {
                 Links = new ObservableCollection<LinkViewModel>();
             }
@@ -95,14 +96,14 @@ namespace RevitLintelPlacement.ViewModels {
                     var lintelType = _revitRepository.GetLintelType(rule.SelectedLintelType);
                     var lintel = _revitRepository.PlaceLintel(lintelType, elementId);
                     rule.SetParametersTo(lintel, elementInWall);
-                    if(_revitRepository.CheckHorizontal(view3D, elementInWall, true, out double rightOffset)) {
+                    if(_revitRepository.CheckHorizontal(view3D, elementInWall, true, Links.Where(l => l.IsChecked).Select(l => l.Name), out double rightOffset)) {
                         if(rightOffset > 0) {
                             lintel.SetParamValue("Смещение_справа", rightOffset);
                         }
                         lintel.SetParamValue("ОпираниеСправа", 0); //ToDo: параметр
                     }
 
-                    if(_revitRepository.CheckHorizontal(view3D, elementInWall, false, out double leftOffset)) {
+                    if(_revitRepository.CheckHorizontal(view3D, elementInWall, false, Links.Where(l=>l.IsChecked).Select(l=>l.Name), out double leftOffset)) {
                         if(leftOffset > 0) {
                             lintel.SetParamValue("Смещение_слева", leftOffset);
                         }

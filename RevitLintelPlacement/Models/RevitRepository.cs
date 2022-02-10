@@ -214,7 +214,7 @@ namespace RevitLintelPlacement.Models {
             return !wall.Name.ToLower().Contains("железобетон");
         }
 
-        public bool CheckHorizontal(View3D view3D, FamilyInstance elementInWall, bool isRight, out double offset) {
+        public bool CheckHorizontal(View3D view3D, FamilyInstance elementInWall, bool isRight, IEnumerable<string> linkNames, out double offset) {
             offset = 0;
             XYZ viewPoint = GetLocationPoint(elementInWall);
             var direction = elementInWall.GetTransform().OfVector(isRight? new XYZ(1, 0, 0) : new XYZ(-1, 0, 0));
@@ -233,7 +233,7 @@ namespace RevitLintelPlacement.Models {
             if(wallOrColumn.Category.Id == new ElementId(BuiltInCategory.OST_StructuralColumns))
                 return true;
             if(wallOrColumn is RevitLinkInstance linkedInstance) {
-                return true; //ToDO: вставить проверку имени
+                return linkNames.Any(l => l.Equals(linkedInstance.GetLinkDocument().Title, StringComparison.CurrentCultureIgnoreCase));
             }
             return false;
         }
