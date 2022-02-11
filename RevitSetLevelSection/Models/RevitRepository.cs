@@ -34,6 +34,14 @@ namespace RevitSetLevelSection.Models {
                 .OfType<DesignOption>()
                 .ToList();
         }
+        
+        public IEnumerable<RevitLinkInstance> GetLinkInstances() {
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(RevitLinkInstance))
+                .OfType<RevitLinkInstance>()
+                .ToList();
+        }
 
         public IEnumerable<FamilyInstance> GetMassElements(DesignOption designOption) {
             return new FilteredElementCollector(_document)

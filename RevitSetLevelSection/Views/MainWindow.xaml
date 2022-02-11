@@ -50,6 +50,17 @@
     </Window.Resources>
 
     <Grid>
-        <ItemsControl ItemsSource="{Binding FillParams}" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <ComboBox 
+            Grid.Row="0"
+            DisplayMemberPath="Name"
+            SelectedItem="{Binding LinkInstance}"
+            ItemsSource="{Binding LinkInstances}" />
+        
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding FillParams}" />
     </Grid>
 </base:PlatformWindow>
