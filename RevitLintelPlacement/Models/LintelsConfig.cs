@@ -20,7 +20,7 @@ namespace RevitLintelPlacement.Models {
         [JsonIgnore]
         public override IConfigSerializer Serializer { get; set; }
 
-        public string LintelsConfigPath { get; set; } = @"C:\Test";
+        public string LintelsConfigPath { get; set; } = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Отдел\Тестирование\Перемычки\TestConfig";
 
         public List<string> RulesCongigPaths { get; set; } = new List<string> ();
 
