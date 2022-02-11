@@ -59,7 +59,7 @@ namespace RevitLintelPlacement.Models {
                 return new EmptyResult { Code = ResultCode.Correct };
             }
 
-            if((int) lintel.GetParamValue("Фиксировать") == 1) { //Todo: параметр "Фиксировать"
+            if((int) lintel.GetParamValue("Фиксация Решения") == 1) { //Todo: параметр "Фиксировать"
                 return new ReportResult(lintel.Id) { Code = ResultCode.LintelIsFixedWithoutElement};
             }
             return new LintelForDeletionResult(_revitRepository, lintel) { Code = ResultCode.LintelWithoutElement };
@@ -96,7 +96,7 @@ namespace RevitLintelPlacement.Models {
         public IResultHandler Check(FamilyInstance lintel, FamilyInstance elementInWall) {
             var rule = _groupedRules.GetRule(elementInWall);
             if(rule == null) {
-                if ((int) lintel.GetParamValue("Фиксировать") == 1) {
+                if ((int) lintel.GetParamValue("Фиксация Решения") == 1) {
                     return new EmptyResult { Code = ResultCode.Correct };
                 } else {
                     return new LintelForDeletionResult(_revitRepository, lintel) { Code = ResultCode.ElementInWallWithoutRule };
@@ -111,7 +111,7 @@ namespace RevitLintelPlacement.Models {
         private ParameterCheckResult CheckWallThickness(FamilyInstance lintel, FamilyInstance elementInWall) {
             var wall = elementInWall.Host as Wall;
             var wallThickness = wall.Width;
-            var lintelThickness = ((double) lintel.GetParamValue("Половина толщины стены")) * 2; //ToDo: параметр
+            var lintelThickness = ((double) lintel.GetParamValue("ЭЛМТ_ширина")); //ToDo: параметр
             if(Math.Abs(lintelThickness - wallThickness) < 0.1) {
                 return ParameterCheckResult.Correct;
             }

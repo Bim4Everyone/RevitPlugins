@@ -15,7 +15,7 @@ namespace RevitLintelPlacement.Models {
 
     internal class RevitRepository {
         private readonly string _view3DName = "3D_Перемычки"; 
-        private readonly string _lintelTypeName = "155_Перемычка"; //TODO: название типа перемычки
+        private readonly string _lintelFamilyName = "155_Перемычка_v2"; //TODO: название типа перемычки
 
         private readonly Application _application;
         private readonly UIApplication _uiApplication;
@@ -47,8 +47,9 @@ namespace RevitLintelPlacement.Models {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .WhereElementIsElementType()
-                .Where(e => e.Name == _lintelTypeName)
-                .Cast<FamilySymbol>();
+                .OfClass(typeof(FamilySymbol))
+                .Cast<FamilySymbol>()
+                .Where(e => e.Family?.Name == _lintelFamilyName);
         }
 
         public Element GetElementById(ElementId id) {
@@ -138,8 +139,8 @@ namespace RevitLintelPlacement.Models {
             return collector
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .OfClass(typeof(FamilyInstance))
-                .Where(e => e.Name == _lintelTypeName)
                 .Cast<FamilyInstance>()
+                .Where(e => e.Symbol?.Family?.Name == _lintelFamilyName)
                 .ToList();
         }
 
@@ -197,7 +198,7 @@ namespace RevitLintelPlacement.Models {
                 GetNearestWallOrColumn(view3D, elementInWall, new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z-0.1), new XYZ(0, 0, 1), false); //чтобы точка точно была под гранью стены
             if(refWithContext == null)
                 return false;
-            if(!(refWithContext.Proximity < 1)) {
+            if(!(refWithContext.Proximity < 0.32)) { //10 см
                 return false;
             }
             var wall = _document.GetElement(refWithContext.GetReference().ElementId);
@@ -207,7 +208,7 @@ namespace RevitLintelPlacement.Models {
             refWithContext = GetNearestWallOrColumn(view3D, elementInWall, viewPoint, new XYZ(0, 0, 1), true);
             if(refWithContext == null)
                 return true;
-            if(!(refWithContext.Proximity < 1)) {
+            if(!(refWithContext.Proximity < 0.32)) {
                 return false;
             }
             wall = _document.GetElement(refWithContext.GetReference().ElementId);
@@ -375,24 +376,29 @@ namespace RevitLintelPlacement.Models {
                     _document.Create.NewAlignment(elevation, topElement.First(), bottomLintel.First());
             } catch 
             { }
-           
 
-            //var leftL = lintel.GetReferences(FamilyInstanceReferenceType.Front);
-            //var rightL = lintel.GetReferences(FamilyInstanceReferenceType.Back);
-            //var wallReferences1 = HostObjectUtils.GetSideFaces((Wall) elementInWall.Host, ShellLayerType.Interior);
-            //var wallReferences2 = HostObjectUtils.GetSideFaces((Wall) elementInWall.Host, ShellLayerType.Exterior);
-            
+
+            var leftL = lintel.GetReferences(FamilyInstanceReferenceType.Front);
+            var rightL = lintel.GetReferences(FamilyInstanceReferenceType.Back);
+            var wallReferences1 = HostObjectUtils.GetSideFaces((Wall) elementInWall.Host, ShellLayerType.Interior);
+            var wallReferences2 = HostObjectUtils.GetSideFaces((Wall) elementInWall.Host, ShellLayerType.Exterior);
+
 
             //возможно, ошибка возникает при устновке параметра половина толщины, поэтому нет геометричкого выравнивания
-            //try {
-            //    if(leftL.Count > 0 && wallReferences1.Count > 0) {
-            //        _document.Create.NewAlignment(plan, leftL.First(), wallReferences1.First());
-            //    }
+            try {
+                if(leftL.Count > 0 && wallReferences1.Count > 0) {
+                    _document.Create.NewAlignment(plan, leftL.First(), wallReferences1.First());
+                }               
+            } catch {
+                try {
+                    if(leftL.Count > 0 && wallReferences1.Count > 0) {
+                        _document.Create.NewAlignment(plan, leftL.First(), wallReferences2.First());
+                    }
 
-            //    if(rightL.Count > 0 && wallReferences2.Count > 0) {
-            //        _document.Create.NewAlignment(plan, rightL.First(), wallReferences2.First());
-            //    }
-            //} catch {}
+                } catch {
+
+                }
+            }
         }
 
         public XYZ GetLocationPoint(FamilyInstance elementInWall) {

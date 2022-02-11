@@ -27,7 +27,8 @@ namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels {
                 throw new ArgumentNullException(nameof(elementInWall), "Элемент не находится в стене.");
 
             //TODO: разные версии Revit
-            lintel.SetParamValue("Половина толщины стены", wall.Width / 2);
+            //lintel.SetParamValue("Половина толщины стены", wall.Width / 2);
+            lintel.SetParamValue("ЭЛМТ_ширина", wall.Width);
         }
     }
 }

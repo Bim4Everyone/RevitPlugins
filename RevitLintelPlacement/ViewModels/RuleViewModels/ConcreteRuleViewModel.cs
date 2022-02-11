@@ -60,7 +60,7 @@ namespace RevitLintelPlacement.ViewModels {
 
         public OpeningWidthParameter OpeningWidthParameter { get; set; }
 
-        public LintelCornerParameter CornerParameter { get; set; }
+        //public LintelCornerParameter CornerParameter { get; set; }
 
         public List<string> LintelTypes {
             get => _lintelTypes;
@@ -134,11 +134,11 @@ namespace RevitLintelPlacement.ViewModels {
 
             foreach(var parameter in ruleSetting.LintelParameterSettingsConfig) {
                 switch(parameter.LintelParameterType) {
-                    case LintelParameterType.CornerParameter:
-                    CornerParameter = new LintelCornerParameter() {
-                        IsCornerChecked = parameter.IsCornerChecked
-                    };
-                    break;
+                    //case LintelParameterType.CornerParameter:
+                    //CornerParameter = new LintelCornerParameter() {
+                    //    IsCornerChecked = parameter.IsCornerChecked
+                    //};
+                    //break;
                     case LintelParameterType.LeftOffsetParameter: {
                         LintelLeftOffsetParameter = new LintelLeftOffsetParameter() {
                             LeftOffset = parameter.Offset
@@ -164,7 +164,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         private void InitializeEmptyGroupedRule() {
-            CornerParameter = new LintelCornerParameter();
+            //CornerParameter = new LintelCornerParameter();
             OpeningWidthCondition = new OpeningWidthConditionViewModel();
             LintelLeftOffsetParameter = new LintelLeftOffsetParameter();
             LintelRightOffsetParameter = new LintelRightOffsetParameter();
@@ -178,7 +178,7 @@ namespace RevitLintelPlacement.ViewModels {
 
         private void AddParameters() {
             _parameters = new List<ILintelParameterViewModel> {
-                CornerParameter,
+                //CornerParameter,
                 OpeningWidthParameter,
                 WallHalfThicknessParameter,
                 LintelRightOffsetParameter,

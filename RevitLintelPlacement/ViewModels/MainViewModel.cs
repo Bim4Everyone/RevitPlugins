@@ -104,16 +104,20 @@ namespace RevitLintelPlacement.ViewModels {
                     rule.SetParametersTo(lintel, elementInWall);
                     if(_revitRepository.CheckHorizontal(view3D, elementInWall, true, Links.Where(l => l.IsChecked).Select(l => l.Name), out double rightOffset)) {
                         if(rightOffset > 0) {
-                            lintel.SetParamValue("Смещение_справа", rightOffset);
+                            lintel.SetParamValue("ОпираниеСправа", rightOffset);
+                        } else {
+                            lintel.SetParamValue("ОпираниеСправа", 0);
                         }
-                        lintel.SetParamValue("ОпираниеСправа", 0); //ToDo: параметр
+                        lintel.SetParamValue("УголокОпиранияСправа", 1); //ToDo: параметр
                     }
 
                     if(_revitRepository.CheckHorizontal(view3D, elementInWall, false, Links.Where(l=>l.IsChecked).Select(l=>l.Name), out double leftOffset)) {
                         if(leftOffset > 0) {
-                            lintel.SetParamValue("Смещение_слева", leftOffset);
+                            lintel.SetParamValue("ОпираниеСлева", leftOffset);
+                        } else {
+                            lintel.SetParamValue("ОпираниеСлева", 0);
                         }
-                        lintel.SetParamValue("ОпираниеСлева", 0);
+                        lintel.SetParamValue("УголокОпиранияСлева", 1);
                     }
                     _revitRepository.LockLintel(elevation, plan, lintel, elementInWall);
                     Lintels.LintelInfos.Add(new LintelInfoViewModel(_revitRepository, lintel, elementInWall));
