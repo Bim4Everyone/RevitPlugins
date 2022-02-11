@@ -27,11 +27,13 @@ namespace RevitLintelPlacement.ViewModels {
 
         public LintelInfoViewModel(RevitRepository revitRepository, FamilyInstance lintel, FamilyInstance elementInWall) {
             this._revitRepository = revitRepository;
+            Level = _revitRepository.GetElementById(lintel.LevelId)?.Name;
             if(elementInWall != null) {
                 ElementInWall = elementInWall;
                 ElementInWallId = elementInWall.Id;
                 ElementInWallName =  $"{elementInWall.Symbol.Family.Name}: {elementInWall.Name}" ;
                 WallTypeName = elementInWall.Host.Name;
+                Level = _revitRepository.GetElementById(elementInWall.LevelId)?.Name;
                 if(elementInWall.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Id) {
                     ElementInWallKind = ElementInWallKind.Door;
                 } else if(elementInWall.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Windows).Id) {
@@ -44,7 +46,6 @@ namespace RevitLintelPlacement.ViewModels {
             }
             Lintel = lintel;
             LintelId = lintel.Id;
-            Level = _revitRepository.GetElementById(lintel.LevelId)?.Name;
         }
 
         public string ElementInWallName {
