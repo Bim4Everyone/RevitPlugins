@@ -17,6 +17,7 @@ namespace RevitSetLevelSection.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private LinkInstanceViewModel _linkInstance;
+        private ObservableCollection<DesignOptionsViewModel> _designOptions;
 
         public MainViewModel(RevitRepository revitRepository) {
             if(revitRepository is null) {
@@ -26,17 +27,23 @@ namespace RevitSetLevelSection.ViewModels {
             _revitRepository = revitRepository;
             FillParams = new ObservableCollection<BaseViewModel>(GetFillParams());
             LinkInstances = new ObservableCollection<LinkInstanceViewModel>(GetLinkInstances());
-            DesignOptions = new ObservableCollection<DesingOptionsViewModel>(GetDesignOptions());
         }
 
         public LinkInstanceViewModel LinkInstance {
             get => _linkInstance;
-            set => this.RaiseAndSetIfChanged(ref _linkInstance, value);
+            set {
+                this.RaiseAndSetIfChanged(ref _linkInstance, value);
+                DesignOptions = new ObservableCollection<DesignOptionsViewModel>(LinkInstance.GetDesignOptions());
+            }
         }
 
         public ObservableCollection<BaseViewModel> FillParams { get; }
         public ObservableCollection<LinkInstanceViewModel> LinkInstances { get; }
-        public ObservableCollection<DesingOptionsViewModel> DesignOptions { get; }
+
+        public ObservableCollection<DesignOptionsViewModel> DesignOptions {
+            get => _designOptions;
+            set => this.RaiseAndSetIfChanged(ref _designOptions, value);
+        }
 
         private IEnumerable<BaseViewModel> GetFillParams() {
             //yield return new FillLevelParamViewModel(_revitRepository);
@@ -45,13 +52,9 @@ namespace RevitSetLevelSection.ViewModels {
             yield return new FillParamViewModel(_revitRepository) { RevitParam = SharedParamsConfig.Instance.RoomSectionShortName };
         }
 
-        private IEnumerable<DesingOptionsViewModel> GetDesignOptions() {
-            return _revitRepository.GetDesignOptions().Select(item => new DesingOptionsViewModel(item, _revitRepository));
-        }
-
         private IEnumerable<LinkInstanceViewModel> GetLinkInstances() {
             return _revitRepository.GetLinkInstances()
-                .Select(item => new LinkInstanceViewModel(item, _revitRepository));
+                .Select(item => new LinkInstanceViewModel((RevitLinkType) _revitRepository.GetElements(item.GetTypeId()), item));
         }
     }
 }

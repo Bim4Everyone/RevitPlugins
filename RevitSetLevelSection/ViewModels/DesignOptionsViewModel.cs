@@ -11,27 +11,27 @@ using dosymep.WPF.ViewModels;
 using RevitSetLevelSection.Models;
 
 namespace RevitSetLevelSection.ViewModels {
-    internal class DesingOptionsViewModel : BaseViewModel {
+    internal class DesignOptionsViewModel : BaseViewModel {
         private readonly DesignOption _designOption;
-        private readonly RevitRepository _revitRepository;
+        private readonly LinkInstanceRepository _linkInstanceRepository;
 
-        public DesingOptionsViewModel(DesignOption designOption, RevitRepository revitRepository) {
+        public DesignOptionsViewModel(DesignOption designOption, LinkInstanceRepository linkInstanceRepository) {
             if(designOption is null) {
                 throw new ArgumentNullException(nameof(designOption));
             }
 
-            if(revitRepository is null) {
-                throw new ArgumentNullException(nameof(revitRepository));
+            if(linkInstanceRepository is null) {
+                throw new ArgumentNullException(nameof(linkInstanceRepository));
             }
 
             _designOption = designOption;
-            _revitRepository = revitRepository;
+            _linkInstanceRepository = linkInstanceRepository;
         }
 
         public string Name => _designOption.Name;
 
         public IEnumerable<FamilyInstance> GetMassObjects() {
-            return _revitRepository.GetMassElements(_designOption);
+            return _linkInstanceRepository.GetMassElements(_designOption);
         }
     }
 }

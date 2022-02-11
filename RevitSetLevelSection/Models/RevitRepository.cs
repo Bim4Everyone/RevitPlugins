@@ -27,12 +27,11 @@ namespace RevitSetLevelSection.Models {
             _uiDocument = new UIDocument(document);
         }
 
-        public IEnumerable<DesignOption> GetDesignOptions() {
-            return new FilteredElementCollector(_document)
-                .WhereElementIsNotElementType()
-                .OfClass(typeof(DesignOption))
-                .OfType<DesignOption>()
-                .ToList();
+        public Document Document => _document;
+        public Application Application => _application;
+
+        public Element GetElements(ElementId elementId) {
+            return _document.GetElement(elementId);
         }
         
         public IEnumerable<RevitLinkInstance> GetLinkInstances() {
@@ -42,16 +41,7 @@ namespace RevitSetLevelSection.Models {
                 .OfType<RevitLinkInstance>()
                 .ToList();
         }
-
-        public IEnumerable<FamilyInstance> GetMassElements(DesignOption designOption) {
-            return new FilteredElementCollector(_document)
-                .WhereElementIsNotElementType()
-                .OfCategory(BuiltInCategory.OST_Mass)
-                .Where(item => item.DesignOption.Id == designOption.Id)
-                .OfType<FamilyInstance>()
-                .ToList();
-        }
-
+        
         public IEnumerable<Element> GetElements(FamilyInstance massElement, RevitParam revitParam) {
             var bbFilter = new BoundingBoxIntersectsFilter(GetOutline(massElement));
             var catFilter = new ElementMulticategoryFilter(GetCategories(revitParam));
@@ -62,8 +52,7 @@ namespace RevitSetLevelSection.Models {
                 .WherePasses(filter)
                 .ToList();
         }
-
-
+        
         public void UpdateElements(FamilyInstance massElement, RevitParam revitParam, IEnumerable<Element> elements) {
             var massParameter = massElement.GetParam(revitParam);
             using(var transaction = _document.StartTransaction("Установка уровня/секции")) {
