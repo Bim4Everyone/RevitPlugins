@@ -11,7 +11,7 @@ namespace RevitSetLevelSection.ViewModels {
         private readonly RevitRepository _revitRepository;
 
         private bool _isEnabled;
-        private DesingOptionsViewModel _desingOptions;
+        private DesingOptionsViewModel _designOptions;
 
         public FillParamViewModel(RevitRepository revitRepository) {
             if(revitRepository is null) {
@@ -29,9 +29,9 @@ namespace RevitSetLevelSection.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _isEnabled, value);
         }
 
-        public DesingOptionsViewModel DesingOptions {
-            get => _desingOptions;
-            set => this.RaiseAndSetIfChanged(ref _desingOptions, value);
+        public DesingOptionsViewModel DesignOptions {
+            get => _designOptions;
+            set => this.RaiseAndSetIfChanged(ref _designOptions, value);
         }
     }
 }

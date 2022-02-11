@@ -8,7 +8,8 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     mc:Ignorable="d"
     Title="Установка уровня/секции" Height="450" Width="800" WindowStartupLocation="CenterOwner"
-    x:Name="_this">
+    x:Name="_this"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
 
@@ -34,8 +35,8 @@
                 <ComboBox
                     Grid.Column="1"
                     IsEnabled="{Binding IsEnabled}"
-                    SelectedItem="{Binding DesingOptions}"
-                    ItemsSource="{Binding DataContext.DesingOptions, ElementName=_this}" >
+                    SelectedItem="{Binding DesignOptions}"
+                    ItemsSource="{Binding DataContext.DesignOptions, ElementName=_this}" >
 
                     <ComboBox.ItemTemplate>
                         <DataTemplate>

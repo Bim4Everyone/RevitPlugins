@@ -21,11 +21,11 @@ namespace RevitSetLevelSection.ViewModels {
 
             _revitRepository = revitRepository;
             FillParams = new ObservableCollection<BaseViewModel>(GetFillParams());
-            DesingOptions = new ObservableCollection<DesingOptionsViewModel>(GetDesignOptions());
+            DesignOptions = new ObservableCollection<DesingOptionsViewModel>(GetDesignOptions());
         }
 
         public ObservableCollection<BaseViewModel> FillParams { get; }
-        public ObservableCollection<DesingOptionsViewModel> DesingOptions { get; }
+        public ObservableCollection<DesingOptionsViewModel> DesignOptions { get; }
 
         private IEnumerable<BaseViewModel> GetFillParams() {
             yield return new FillLevelParamViewModel(_revitRepository);
