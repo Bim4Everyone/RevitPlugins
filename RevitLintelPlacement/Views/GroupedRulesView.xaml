@@ -22,19 +22,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <!--<ToolBar Grid.Row="0" Height="30">
-            <Button ToolTip="Загрузить правила" Command="{Binding LoadCommand}">
-                <Image Source="../Resources/icons8-file.png"></Image>
-            </Button>
-            <Separator/>
-            <Button ToolTip="Сохранить" Command="{Binding SaveCommand}">
-                <Image Source="../Resources/icons8-save.png"/>
-            </Button>
-            <Separator/>
-            <Button ToolTip="Сохранить как" Command="{Binding SaveAsCommand}">
-                <Image Source="../Resources/icons8-save-as.png"/>
-            </Button>
-        </ToolBar>-->
         <ScrollViewer Grid.Row="1" Margin="5" MaxHeight="{Binding ElementName=ucRules, Path=ActualHeight}" CanContentScroll="False" HorizontalScrollBarVisibility="Auto">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -103,11 +90,11 @@
                                                     <DataTemplate DataType="{x:Type vm:ConcreteRuleViewModel}">
                                                         <StackPanel Orientation="Horizontal">
                                                             <StackPanel Orientation="Horizontal" Margin="0 0 5 0">
-                                                                <TextBox Width="80" Margin="1,0" Text="{Binding OpeningWidthCondition.MinWidth}"></TextBox>
-                                                                <TextBox Width="80" Margin="1,0" Text="{Binding OpeningWidthCondition.MaxWidth}"></TextBox>
+                                                                <TextBox Width="80" Margin="1,0" Text="{Binding OpeningWidthCondition.MinWidth, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                                                <TextBox Width="80" Margin="1,0" Text="{Binding OpeningWidthCondition.MaxWidth, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                                                             </StackPanel>
                                                             <StackPanel Orientation="Horizontal">
-                                                                <TextBox Width="80" Margin="1,0" Text="{Binding LintelLeftOffsetParameter.LeftOffset}"></TextBox>
+                                                                <TextBox Width="80" Margin="1,0" Text="{Binding LintelLeftOffsetParameter.LeftOffset, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                                                                 <ComboBox MinWidth="200" Margin="1,0" ItemsSource="{Binding LintelTypes}" SelectedItem="{Binding SelectedLintelType}">
                                                                 </ComboBox>
                                                             </StackPanel>

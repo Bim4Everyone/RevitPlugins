@@ -19,7 +19,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <ToolBar Grid.Row="0" Height="30">
             <Button ToolTip="Загрузить правила" Command="{Binding LoadCommand}">
@@ -34,5 +34,15 @@
                 <Image Source="../Resources/icons8-save-as.png"/>
             </Button>
         </ToolBar>
+        <StackPanel Grid.Row="1" Margin="10" Orientation="Vertical" HorizontalAlignment="Left">
+            <TextBlock FontSize="14" Margin="5 0 0 5">Конфигурация настроек</TextBlock>
+            <ComboBox Width="300" Height="25" FontSize="14" ItemsSource="{Binding RulePaths}" SelectedItem="{Binding SelectedPath}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding PathSelectionChangedCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ComboBox>
+        </StackPanel>
     </Grid>
 </UserControl>

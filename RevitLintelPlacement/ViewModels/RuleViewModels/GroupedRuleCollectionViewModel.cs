@@ -31,12 +31,13 @@ namespace RevitLintelPlacement.ViewModels {
             SaveCommand = new RelayCommand(Save, p => true);
             SaveAsCommand = new RelayCommand(SaveAs, p => true);
             LoadCommand = new RelayCommand(Load, p => true);
+            PathSelectionChangedCommand = new RelayCommand(SelectionChanged, p => true);
             this._revitRepository = revitRepository;
             InitializeGroupRules(rules);
-            if (lintelsConfig.RulesCongigPaths==null || lintelsConfig.RulesCongigPaths.Count == 0) {
+            if(lintelsConfig.RulesCongigPaths == null || lintelsConfig.RulesCongigPaths.Count == 0) {
                 SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                RulePaths = new ObservableCollection<string>(new Collection<string> { SelectedPath});
-                
+                RulePaths = new ObservableCollection<string>(new Collection<string> { SelectedPath });
+
             } else {
                 RulePaths = new ObservableCollection<string>(lintelsConfig.RulesCongigPaths);
                 SelectedPath = RulePaths.FirstOrDefault();
@@ -48,6 +49,7 @@ namespace RevitLintelPlacement.ViewModels {
         public ICommand SaveCommand { get; set; }
         public ICommand SaveAsCommand { get; set; }
         public ICommand LoadCommand { get; set; }
+        public ICommand PathSelectionChangedCommand { get; set; }
 
         public ObservableCollection<GroupedRuleViewModel> GroupedRules {
             get => _groupedRules;
@@ -59,9 +61,9 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _rulePaths, value);
         }
 
-        public string SelectedPath { 
-            get => _selectedPath; 
-            set => this.RaiseAndSetIfChanged(ref _selectedPath, value); 
+        public string SelectedPath {
+            get => _selectedPath;
+            set => this.RaiseAndSetIfChanged(ref _selectedPath, value);
         }
 
         public ConcreteRuleViewModel GetRule(FamilyInstance familyInstance) {
@@ -87,7 +89,7 @@ namespace RevitLintelPlacement.ViewModels {
             config.Save(SelectedPath);
         }
 
-        
+
         private void SaveAs(object p) {
             using(var dialog = new System.Windows.Forms.FolderBrowserDialog()) {
                 dialog.SelectedPath = System.IO.Path.GetDirectoryName(SelectedPath);
@@ -137,6 +139,11 @@ namespace RevitLintelPlacement.ViewModels {
             if(p is GroupedRuleViewModel rule) {
                 GroupedRules.Remove(rule);
             }
+        }
+
+        private void SelectionChanged(object p) {
+            var config = RuleConfig.GetRuleConfig(SelectedPath);
+            InitializeGroupRules(config.RuleSettings);
         }
     }
 }
