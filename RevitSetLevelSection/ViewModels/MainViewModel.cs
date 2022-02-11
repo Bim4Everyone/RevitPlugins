@@ -39,7 +39,7 @@ namespace RevitSetLevelSection.ViewModels {
         public ObservableCollection<DesingOptionsViewModel> DesignOptions { get; }
 
         private IEnumerable<BaseViewModel> GetFillParams() {
-            yield return new FillLevelParamViewModel(_revitRepository);
+            //yield return new FillLevelParamViewModel(_revitRepository);
             yield return new FillParamViewModel(_revitRepository) { RevitParam = SharedParamsConfig.Instance.RoomArea };
             yield return new FillParamViewModel(_revitRepository) { RevitParam = SharedParamsConfig.Instance.RoomAreaRatio };
             yield return new FillParamViewModel(_revitRepository) { RevitParam = SharedParamsConfig.Instance.RoomSectionShortName };
