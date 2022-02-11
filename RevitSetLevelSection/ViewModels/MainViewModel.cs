@@ -5,10 +5,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitSetLevelSection.Models;
@@ -16,6 +18,8 @@ using RevitSetLevelSection.Models;
 namespace RevitSetLevelSection.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        
+        private string _errorText;
         private LinkInstanceViewModel _linkInstance;
         private ObservableCollection<DesignOptionsViewModel> _designOptions;
 
@@ -27,6 +31,15 @@ namespace RevitSetLevelSection.ViewModels {
             _revitRepository = revitRepository;
             FillParams = new ObservableCollection<BaseViewModel>(GetFillParams());
             LinkInstances = new ObservableCollection<LinkInstanceViewModel>(GetLinkInstances());
+
+            UpdateElementsCommand = new RelayCommand(UpdateElements, CanUpdateElement);
+        }
+
+        public ICommand UpdateElementsCommand { get; set; }
+        
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
         public LinkInstanceViewModel LinkInstance {
@@ -55,6 +68,15 @@ namespace RevitSetLevelSection.ViewModels {
         private IEnumerable<LinkInstanceViewModel> GetLinkInstances() {
             return _revitRepository.GetLinkInstances()
                 .Select(item => new LinkInstanceViewModel((RevitLinkType) _revitRepository.GetElements(item.GetTypeId()), item));
+        }
+        
+        private void UpdateElements(object param) {
+            
+        }
+
+        private bool CanUpdateElement(object param) {
+            ErrorText = null;
+            return true;
         }
     }
 }

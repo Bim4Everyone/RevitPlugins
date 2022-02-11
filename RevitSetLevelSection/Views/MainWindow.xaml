@@ -53,6 +53,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
         <ComboBox 
@@ -62,5 +63,11 @@
             ItemsSource="{Binding LinkInstances}" />
         
         <ItemsControl Grid.Row="1" ItemsSource="{Binding FillParams}" />
+        
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
+            <Button Content="ОК" Height="25" Width="150" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding UpdateElementsCommand}"/>
+            <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
+        </StackPanel>
     </Grid>
 </base:PlatformWindow>
