@@ -406,14 +406,15 @@ namespace RevitLintelPlacement.Models {
                 throw new ArgumentNullException(nameof(elementInWall));
             }
             var location = ((LocationPoint) elementInWall.Location).Point;
+            var level = _document.GetElement(elementInWall.LevelId) as Level;
             var bottomBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
             var height = elementInWall.GetParamValueOrDefault("ADSK_Размер_Высота"); //ToDo: параметр
             double z;
             if(height != null) {
-                z = (double)height + bottomBarHeight;
+                z = (double)height + bottomBarHeight + level.Elevation;
             } else {
                 var topBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
-                z = /*location.Z +*/ topBarHeight;
+                z = /*location.Z +*/ topBarHeight + level.Elevation;
             }
             return new XYZ(location.X, location.Y, z);
         }
