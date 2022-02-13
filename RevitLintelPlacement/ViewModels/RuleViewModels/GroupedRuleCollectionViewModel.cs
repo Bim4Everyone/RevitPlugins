@@ -82,10 +82,26 @@ namespace RevitLintelPlacement.ViewModels {
             } else {
                 config = RuleConfig.GetRuleConfig(SelectedPath);
             }
-            config.RuleSettings = new List<GroupedRuleSettings>();
-            foreach(var rule in GroupedRules) {
-                config.RuleSettings.Add(rule.GetGroupedRuleSetting());
+            if (GroupedRules == null || GroupedRules.Count == 0) {
+                config.RuleSettings = new List<GroupedRuleSettings>();
+            } else {
+                var newRules = new List<GroupedRuleSettings>();
+                foreach(var rule in GroupedRules) {
+                    var newRule = rule.GetGroupedRuleSetting();
+                    var oldRule = config.RuleSettings.FirstOrDefault(r => r.Name.Equals(rule.Name, StringComparison.CurrentCultureIgnoreCase));
+                    if(oldRule == null) {
+                        newRules.Add(newRule);
+                        continue;
+                    }
+                    var absentWalls = oldRule.WallTypes.WallTypes.Except(rule.WallTypes.WallTypes.Select(w => w.Name)).ToList();
+                    if(absentWalls.Count > 0) {
+                        newRule.WallTypes.WallTypes.AddRange(absentWalls);
+                    }
+                    newRules.Add(newRule);
+                }
+                config.RuleSettings = newRules;
             }
+
             config.Save(SelectedPath);
         }
 
