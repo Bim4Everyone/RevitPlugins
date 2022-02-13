@@ -22,7 +22,12 @@ namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels {
                 throw new ArgumentNullException(nameof(elementInWall));
             }
             var elementWidth = elementInWall.GetParamValueOrDefault("ADSK_Размер_Ширина") ?? 
-                               elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
+                               elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM)??
+                               elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
+
+            if(elementWidth == null)
+                throw new ArgumentException(nameof(elementInWall), $"У элемента {elementInWall.Id} отсутствует параметр \"ADSK_Размер_Ширина\".");
+
             lintel.SetParamValue("ЭЛМТ_ширина проема", (double) elementWidth); //Todo: параметр
         }
     }

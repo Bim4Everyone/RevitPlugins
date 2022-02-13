@@ -43,7 +43,14 @@ namespace RevitLintelPlacement.ViewModels {
             if (elementWidth == null) {
                 elementWidth = elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
             }
+            if(elementWidth == null) {
+                elementWidth = elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
+            }
+
+            if(elementWidth == null)
+                throw new ArgumentException(nameof(elementInWall), $"У элемента {elementInWall.Id} отсутствует параметр \"ADSK_Размер_Ширина\".");
             double openingWidth = UnitUtils.ConvertFromInternalUnits((double) elementWidth, DisplayUnitType.DUT_MILLIMETERS);
+            
 #else
             double openingWidth = UnitUtils.ConvertFromInternalUnits(
                 (double) elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM), UnitTypeId.Millimeters);
