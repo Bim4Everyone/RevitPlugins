@@ -23,14 +23,23 @@ namespace RevitLintelPlacement.Models {
         private readonly Document _document;
         private readonly UIDocument _uiDocument;
 
-        public RevitRepository(Application application, Document document) {
+        public RevitRepository(Application application, Document document, LintelsConfig lintelsConfig) {
             _application = application;
             _uiApplication = new UIApplication(application);
 
             _document = document;
             _uiDocument = new UIDocument(document);
+
+            LintelsConfig = lintelsConfig;
+            LintelsCommonConfig = LintelsCommonConfig.GetLintelsCommonConfig(lintelsConfig.LintelsConfigPath);
+            RuleConfig = RuleConfig.GetRuleConfig(lintelsConfig.RulesCongigPaths.FirstOrDefault());
+
             CreateView3DIfNotExisted();
         }
+
+        public LintelsConfig LintelsConfig { get; set; }
+        public LintelsCommonConfig LintelsCommonConfig { get; set; }
+        public RuleConfig RuleConfig { get; set; }
 
         public string GetDocumentName() {
             return _document.Title;

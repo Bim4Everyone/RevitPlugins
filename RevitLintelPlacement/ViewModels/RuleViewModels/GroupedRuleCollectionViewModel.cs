@@ -25,7 +25,7 @@ namespace RevitLintelPlacement.ViewModels {
 
         }
 
-        public GroupedRuleCollectionViewModel(RevitRepository revitRepository, LintelsConfig lintelsConfig, IEnumerable<GroupedRuleSettings> rules = null) {
+        public GroupedRuleCollectionViewModel(RevitRepository revitRepository) {
             AddGroupedRuleCommand = new RelayCommand(AddGroupedRule, p => true);
             RemoveGroupedRuleCommand = new RelayCommand(RemoveGroupedRule, p => true);
             SaveCommand = new RelayCommand(Save, p => true);
@@ -33,13 +33,13 @@ namespace RevitLintelPlacement.ViewModels {
             LoadCommand = new RelayCommand(Load, p => true);
             PathSelectionChangedCommand = new RelayCommand(SelectionChanged, p => true);
             this._revitRepository = revitRepository;
-            InitializeGroupRules(rules);
-            if(lintelsConfig.RulesCongigPaths == null || lintelsConfig.RulesCongigPaths.Count == 0) {
+            InitializeGroupRules(_revitRepository.RuleConfig.RuleSettings);
+            if(_revitRepository.LintelsConfig.RulesCongigPaths == null || _revitRepository.LintelsConfig.RulesCongigPaths.Count == 0) {
                 SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 RulePaths = new ObservableCollection<string>(new Collection<string> { SelectedPath });
 
             } else {
-                RulePaths = new ObservableCollection<string>(lintelsConfig.RulesCongigPaths);
+                RulePaths = new ObservableCollection<string>(_revitRepository.LintelsConfig.RulesCongigPaths);
                 SelectedPath = RulePaths.FirstOrDefault();
             }
         }
@@ -88,7 +88,7 @@ namespace RevitLintelPlacement.ViewModels {
                 var newRules = new List<GroupedRuleSettings>();
                 foreach(var rule in GroupedRules) {
                     var newRule = rule.GetGroupedRuleSetting();
-                    var oldRule = config.RuleSettings.FirstOrDefault(r => r.Name.Equals(rule.Name, StringComparison.CurrentCultureIgnoreCase));
+                    var oldRule = config.RuleSettings.FirstOrDefault(r => r.Name != null && r.Name.Equals(rule.Name, StringComparison.CurrentCultureIgnoreCase));
                     if(oldRule == null) {
                         newRules.Add(newRule);
                         continue;

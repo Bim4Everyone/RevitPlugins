@@ -15,12 +15,12 @@ namespace RevitLintelPlacement.Models {
     internal class LintelChecker {
         private readonly List<IChecker> _checkers;
 
-        public LintelChecker(RevitRepository revitRepository, LintelsConfig lintelsConfig, List<GroupedRuleSettings> rulesSettings) {
+        public LintelChecker(RevitRepository revitRepository) {
             _checkers = new List<IChecker> {
             new LintelGroupChecker(),
             new ElementInWallChecker(revitRepository),
             new LintelWallAboveChecker(revitRepository),
-            new LintelRuleChecker(revitRepository, lintelsConfig, rulesSettings),
+            new LintelRuleChecker(revitRepository),
             new GeometricalLintelChecker(revitRepository)
             };
         }
@@ -87,9 +87,9 @@ namespace RevitLintelPlacement.Models {
         private readonly GroupedRuleCollectionViewModel _groupedRules;
         private readonly RevitRepository _revitRepository;
 
-        public LintelRuleChecker(RevitRepository revitRepository, LintelsConfig lintelsConfig, List<GroupedRuleSettings> rulesSettings) {
+        public LintelRuleChecker(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
-            this._groupedRules = new GroupedRuleCollectionViewModel(_revitRepository, lintelsConfig, rulesSettings);
+            this._groupedRules = new GroupedRuleCollectionViewModel(_revitRepository);
             _view3D = _revitRepository.GetView3D();
         }
 

@@ -19,10 +19,6 @@ using RevitLintelPlacement.Models;
 namespace RevitLintelPlacement.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private readonly IEnumerable<GroupedRuleSettings> rules;
-        private readonly LintelsConfig _lintelsConfig;
-        private readonly LintelsCommonConfig lintelsCommonConfig;
-        private readonly List<GroupedRuleSettings> _rulesSettings;
         private SampleMode _selectedSampleMode;
 
         private LintelCollectionViewModel _lintels;
@@ -33,14 +29,10 @@ namespace RevitLintelPlacement.ViewModels {
 
         }
 
-        public MainViewModel(RevitRepository revitRepository, IEnumerable<GroupedRuleSettings> rules, LintelsConfig lintelsConfig, LintelsCommonConfig lintelsCommonConfig) {
+        public MainViewModel(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
-            this.rules = rules;
-            this._lintelsConfig = lintelsConfig;
-            this.lintelsCommonConfig = lintelsCommonConfig;
-            this._rulesSettings = rules.ToList();
             Lintels = new LintelCollectionViewModel(_revitRepository);
-            GroupedRules = new GroupedRuleCollectionViewModel(_revitRepository, lintelsConfig, rules);
+            GroupedRules = new GroupedRuleCollectionViewModel(_revitRepository);
             PlaceLintelCommand = new RelayCommand(PlaceLintels, p => true);
             var links = _revitRepository.GetLinkTypes().ToList();
             if(links.Count > 0) {
@@ -83,7 +75,7 @@ namespace RevitLintelPlacement.ViewModels {
                     elementInWallIds.Remove(lintel.ElementInWallId);
             }
 
-            LintelChecker lc = new LintelChecker(_revitRepository, _lintelsConfig, _rulesSettings);
+            LintelChecker lc = new LintelChecker(_revitRepository);
             var resultsForReport = lc.Check(Lintels.LintelInfos).ToList();
 
             var elevation = _revitRepository.GetElevation();

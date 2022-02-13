@@ -22,13 +22,10 @@ namespace RevitLintelPlacement {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
             AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
             try {
-                var revitRepository = new RevitRepository(commandData.Application.Application, commandData.Application.ActiveUIDocument.Document);
-                //var ruleConfig = RuleConfig.GetRuleConfig().GetSettings(commandData.Application.ActiveUIDocument.Document.Title);
-
                 var lintelsConfig = LintelsConfig.GetLintelsConfig();
-                var lintelsCommonConfig = LintelsCommonConfig.GetLintelsCommonConfig(lintelsConfig.LintelsConfigPath);
+                var revitRepository = new RevitRepository(commandData.Application.Application, commandData.Application.ActiveUIDocument.Document, lintelsConfig);
 
-                var configViewModel = new ConfigViewModel(revitRepository ,lintelsConfig, lintelsCommonConfig);
+                var configViewModel = new ConfigViewModel(revitRepository);
                 var window = new LintelsConfigView() { DataContext = configViewModel };
                 WindowInteropHelper windowInteropHelper = new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
                 window.ShowDialog();

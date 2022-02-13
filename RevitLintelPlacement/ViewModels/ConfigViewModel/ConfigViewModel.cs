@@ -14,8 +14,6 @@ using RevitLintelPlacement.Models;
 namespace RevitLintelPlacement.ViewModels {
     internal class ConfigViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private readonly LintelsConfig _lintelsConfig;
-        private LintelsCommonConfig _lintelsCommonConfig;
         private string _lintelThickness;
         private string _lintelWidth;
         private string _lintelRightOffset;
@@ -36,10 +34,8 @@ namespace RevitLintelPlacement.ViewModels {
             RulesCongigPaths = new ObservableCollection<RulePathViewModel>();
         }
 
-        public ConfigViewModel(RevitRepository revitRepository, LintelsConfig lintelsConfig, LintelsCommonConfig lintelsCommonConfig) {
+        public ConfigViewModel(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
-            this._lintelsConfig = lintelsConfig;
-            this._lintelsCommonConfig = lintelsCommonConfig;
             RulesCongigPaths = new ObservableCollection<RulePathViewModel>();
             LintelFamilies = new List<GenericModelFamilyViewModel>(revitRepository.GetGenericModelFamilies()
                 .Select(f => new GenericModelFamilyViewModel() { Name = f.Name }));
@@ -134,58 +130,60 @@ namespace RevitLintelPlacement.ViewModels {
         public ICommand SelectLintelsConfigCommand { get; set; }
 
         public void Initialize() {
-            LintelThickness = _lintelsCommonConfig.LintelThickness;
-            LintelWidth = _lintelsCommonConfig.LintelWidth;
-            LintelRightCorner = _lintelsCommonConfig.LintelRightCorner;
-            LintelRightOffset = _lintelsCommonConfig.LintelRightOffset;
-            LintelLeftCorner = _lintelsCommonConfig.LintelLeftCorner;
-            LintelLeftOffset = _lintelsCommonConfig.LintelLeftOffset;
-            LintelFixation = _lintelsCommonConfig.LintelFixation;
-            OpeningHeight = _lintelsCommonConfig.OpeningHeight;
-            OpeningWidth = _lintelsCommonConfig.OpeningWidth;
-            OpeningFixation = _lintelsCommonConfig.OpeningFixation;
-            if (_lintelsCommonConfig.ReinforcedConcreteFilter==null || _lintelsCommonConfig.ReinforcedConcreteFilter.Count == 0) {
+            LintelThickness = _revitRepository.LintelsCommonConfig.LintelThickness;
+            LintelWidth = _revitRepository.LintelsCommonConfig.LintelWidth;
+            LintelRightCorner = _revitRepository.LintelsCommonConfig.LintelRightCorner;
+            LintelRightOffset = _revitRepository.LintelsCommonConfig.LintelRightOffset;
+            LintelLeftCorner = _revitRepository.LintelsCommonConfig.LintelLeftCorner;
+            LintelLeftOffset = _revitRepository.LintelsCommonConfig.LintelLeftOffset;
+            LintelFixation = _revitRepository.LintelsCommonConfig.LintelFixation;
+            OpeningHeight = _revitRepository.LintelsCommonConfig.OpeningHeight;
+            OpeningWidth = _revitRepository.LintelsCommonConfig.OpeningWidth;
+            OpeningFixation = _revitRepository.LintelsCommonConfig.OpeningFixation;
+            if (_revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter==null ||
+                _revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter.Count == 0) {
                 ReinforcedConcreteFilter = new ObservableCollection<FilterViewModel>(
                 new List<FilterViewModel> { new FilterViewModel() { Name = "Железобетон" } });
             } else {
                 ReinforcedConcreteFilter = new ObservableCollection<FilterViewModel>(
-                new List<FilterViewModel>(_lintelsCommonConfig.ReinforcedConcreteFilter
+                new List<FilterViewModel>(_revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter
                 .Select(e => new FilterViewModel() { Name = e })));
             }
             
-            HolesFilter = _lintelsCommonConfig.HolesFilter;
-            LintelsConfigPath = _lintelsConfig.LintelsConfigPath;
-            if (_lintelsConfig.RulesCongigPaths!=null && _lintelsConfig.RulesCongigPaths.Count > 0) {
+            HolesFilter = _revitRepository.LintelsCommonConfig.HolesFilter;
+            LintelsConfigPath = _revitRepository.LintelsConfig.LintelsConfigPath;
+            if (_revitRepository.LintelsConfig.RulesCongigPaths!=null &&
+                _revitRepository.LintelsConfig.RulesCongigPaths.Count > 0) {
                 RulesCongigPaths = new ObservableCollection<RulePathViewModel>(
-                    _lintelsConfig.RulesCongigPaths.Select(p => new RulePathViewModel() { Name = p }));
+                    _revitRepository.LintelsConfig.RulesCongigPaths.Select(p => new RulePathViewModel() { Name = p }));
             }
             foreach(var family in LintelFamilies) {
-                family.IsChecked = _lintelsCommonConfig.LintelFamilies
+                family.IsChecked = _revitRepository.LintelsCommonConfig.LintelFamilies
                     .Any(f => f.Equals(family.Name, StringComparison.CurrentCultureIgnoreCase));
             }
         }
 
         private void Save(object p) {
-            _lintelsCommonConfig.LintelThickness = LintelThickness;
-            _lintelsCommonConfig.LintelWidth = LintelWidth;
-            _lintelsCommonConfig.LintelRightCorner = LintelRightCorner;
-            _lintelsCommonConfig.LintelRightOffset = LintelRightOffset;
-            _lintelsCommonConfig.LintelLeftCorner = LintelLeftCorner;
-            _lintelsCommonConfig.LintelLeftOffset = LintelLeftOffset;
-            _lintelsCommonConfig.LintelFixation = LintelFixation;
-            _lintelsCommonConfig.OpeningHeight = OpeningHeight;
-            _lintelsCommonConfig.OpeningWidth = OpeningWidth;
-            _lintelsCommonConfig.OpeningFixation = OpeningFixation;
-            _lintelsCommonConfig.ReinforcedConcreteFilter = ReinforcedConcreteFilter.Select(e=>e.Name).ToList();
-            _lintelsCommonConfig.HolesFilter = HolesFilter;
-            _lintelsConfig.LintelsConfigPath = LintelsConfigPath;
-            _lintelsConfig.RulesCongigPaths = RulesCongigPaths.Select(e=>e.Name).ToList();
-            _lintelsCommonConfig.LintelFamilies = LintelFamilies
+            _revitRepository.LintelsCommonConfig.LintelThickness = LintelThickness;
+            _revitRepository.LintelsCommonConfig.LintelWidth = LintelWidth;
+            _revitRepository.LintelsCommonConfig.LintelRightCorner = LintelRightCorner;
+            _revitRepository.LintelsCommonConfig.LintelRightOffset = LintelRightOffset;
+            _revitRepository.LintelsCommonConfig.LintelLeftCorner = LintelLeftCorner;
+            _revitRepository.LintelsCommonConfig.LintelLeftOffset = LintelLeftOffset;
+            _revitRepository.LintelsCommonConfig.LintelFixation = LintelFixation;
+            _revitRepository.LintelsCommonConfig.OpeningHeight = OpeningHeight;
+            _revitRepository.LintelsCommonConfig.OpeningWidth = OpeningWidth;
+            _revitRepository.LintelsCommonConfig.OpeningFixation = OpeningFixation;
+            _revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter = ReinforcedConcreteFilter.Select(e=>e.Name).ToList();
+            _revitRepository.LintelsCommonConfig.HolesFilter = HolesFilter;
+            _revitRepository.LintelsConfig.LintelsConfigPath = LintelsConfigPath;
+            _revitRepository.LintelsConfig.RulesCongigPaths = RulesCongigPaths.Select(e=>e.Name).ToList();
+            _revitRepository.LintelsCommonConfig.LintelFamilies = LintelFamilies
                 .Where(e => e.IsChecked)
                 .Select(e => e.Name)
                 .ToList();
-            _lintelsCommonConfig.Save(_lintelsConfig.LintelsConfigPath);
-            _lintelsConfig.SaveProjectConfig();
+            _revitRepository.LintelsCommonConfig.Save(_revitRepository.LintelsConfig.LintelsConfigPath);
+            _revitRepository.LintelsConfig.SaveProjectConfig();
         }
 
         private void AddFilter(object p) {
@@ -213,8 +211,8 @@ namespace RevitLintelPlacement.ViewModels {
                 if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
                     if(dialog.SelectedPath!= LintelsConfigPath) {
                         LintelsConfigPath = dialog.SelectedPath;
-                        _lintelsCommonConfig = LintelsCommonConfig.GetLintelsCommonConfig(LintelsConfigPath);
-                        _lintelsConfig.LintelsConfigPath = LintelsConfigPath;
+                        _revitRepository.LintelsCommonConfig = LintelsCommonConfig.GetLintelsCommonConfig(LintelsConfigPath);
+                        _revitRepository.LintelsConfig.LintelsConfigPath = LintelsConfigPath;
                         Initialize();
                     }
                 }
