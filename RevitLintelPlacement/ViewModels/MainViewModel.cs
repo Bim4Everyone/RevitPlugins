@@ -73,8 +73,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         public void PlaceLintels(object p) {
-            GroupedRules.Save(p);
-
+            //GroupedRules.Save(p);
             var elementInWallIds = _revitRepository.GetAllElementsInWall(SelectedSampleMode)
                 .Select(e => e.Id)
                 .ToList();
@@ -85,13 +84,20 @@ namespace RevitLintelPlacement.ViewModels {
             }
 
             LintelChecker lc = new LintelChecker(_revitRepository, _lintelsConfig, _rulesSettings);
-            var resultsForReport = lc.Check(Lintels.LintelInfos);
+            var resultsForReport = lc.Check(Lintels.LintelInfos).ToList();
 
             var elevation = _revitRepository.GetElevation();
             var plan = _revitRepository.GetPlan();
+            var view3D = _revitRepository.GetView3D();
+            using(Transaction t = _revitRepository.StartTransaction("Подготовка к расстановке перемычек")) {
+                if(view3D.IsSectionBoxActive) {
+                    view3D.IsSectionBoxActive = false;
+                }
+                t.Commit();
+            }
 
             using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
-                var view3D = _revitRepository.GetView3D();
+                
                 foreach(var elementId in elementInWallIds) {
                     var elementInWall = (FamilyInstance) _revitRepository.GetElementById(elementId);
                     var rule = GroupedRules.GetRule(elementInWall);
@@ -99,6 +105,10 @@ namespace RevitLintelPlacement.ViewModels {
                         continue;
                     if(!_revitRepository.CheckUp(view3D, elementInWall))
                         continue;
+                    if (string.IsNullOrEmpty(rule.SelectedLintelType)) {
+                        TaskDialog.Show("Revit", "В проект не загружено семейство перемычки.");
+                        return;
+                    }
                     var lintelType = _revitRepository.GetLintelType(rule.SelectedLintelType);
                     var lintel = _revitRepository.PlaceLintel(lintelType, elementId);
                     rule.SetParametersTo(lintel, elementInWall);
