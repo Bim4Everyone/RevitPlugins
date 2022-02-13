@@ -15,7 +15,6 @@ namespace RevitLintelPlacement.Models {
 
     internal class RevitRepository {
         private readonly string _view3DName = "3D_Перемычки"; 
-        private readonly string _lintelFamilyName = "155_Перемычка_v2"; //TODO: название типа перемычки
 
         private readonly Application _application;
         private readonly UIApplication _uiApplication;
@@ -58,7 +57,8 @@ namespace RevitLintelPlacement.Models {
                 .WhereElementIsElementType()
                 .OfClass(typeof(FamilySymbol))
                 .Cast<FamilySymbol>()
-                .Where(e => e.Family?.Name == _lintelFamilyName);
+                .Where(e => LintelsCommonConfig.LintelFamilies.Any(l => 
+                l.Equals(e.Family?.Name, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         public Element GetElementById(ElementId id) {
@@ -149,7 +149,7 @@ namespace RevitLintelPlacement.Models {
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
-                .Where(e => e.Symbol?.Family?.Name == _lintelFamilyName)
+                .Where(e => LintelsCommonConfig.LintelFamilies.Any(f => f.Equals(e.Symbol?.Family?.Name, StringComparison.CurrentCultureIgnoreCase)))
                 .ToList();
         }
 
@@ -183,7 +183,7 @@ namespace RevitLintelPlacement.Models {
                 .WherePasses(categoryFilter)
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
-                .Where(e=>e.Host is Wall);
+                .Where(e=>e.Host is Wall && e.Location!=null);
         }
 
         public View GetElevation() {
@@ -211,7 +211,7 @@ namespace RevitLintelPlacement.Models {
                 return false;
             }
             var wall = _document.GetElement(refWithContext.GetReference().ElementId);
-            if(wall.Name.ToLower().Contains("железобетон")) {             //TODO: часть названия типа стены
+            if(LintelsCommonConfig.ReinforcedConcreteFilter.Any(f=>wall.Name.ToLower().Contains(f))) {
                 return false;
             }
             refWithContext = GetNearestWallOrColumn(view3D, elementInWall, viewPoint, new XYZ(0, 0, 1), true);
@@ -221,7 +221,7 @@ namespace RevitLintelPlacement.Models {
                 return false;
             }
             wall = _document.GetElement(refWithContext.GetReference().ElementId);
-            return !wall.Name.ToLower().Contains("железобетон");
+            return !LintelsCommonConfig.ReinforcedConcreteFilter.Any(f => wall.Name.ToLower().Contains(f));
         }
 
         public bool CheckHorizontal(View3D view3D, FamilyInstance elementInWall, bool isRight, IEnumerable<string> linkNames, out double offset) {
@@ -231,7 +231,7 @@ namespace RevitLintelPlacement.Models {
             ReferenceWithContext refWithContext = GetNearestWallOrColumn(view3D, elementInWall, viewPoint, direction, true);
             if(refWithContext == null)
                 return false;
-            var elementWidth = elementInWall.GetParamValueOrDefault("ADSK_Размер_Ширина") 
+            var elementWidth = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningWidth) 
                 ?? elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM); //Todo: параметр
             if(refWithContext.Proximity > ((double) elementWidth / 2 + 0.4)) {// 0.4 фута примерно = 100 см
                 return false;
@@ -239,7 +239,7 @@ namespace RevitLintelPlacement.Models {
             offset = refWithContext.Proximity - (double) elementWidth / 2;
             var wallOrColumn = _document.GetElement(refWithContext.GetReference().ElementId);
             if(wallOrColumn is Wall wall)
-                return wall.Name.ToLower().Contains("железобетон");  //TODO: часть названия типа стены
+                return LintelsCommonConfig.ReinforcedConcreteFilter.Any(f => wall.Name.ToLower().Contains(f));  //TODO: часть названия типа стены
             if(wallOrColumn.Category.Id == new ElementId(BuiltInCategory.OST_StructuralColumns))
                 return true;
             if(wallOrColumn is RevitLinkInstance linkedInstance) {
@@ -417,7 +417,7 @@ namespace RevitLintelPlacement.Models {
             var location = ((LocationPoint) elementInWall.Location).Point;
             var level = _document.GetElement(elementInWall.LevelId) as Level;
             var bottomBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
-            var height = elementInWall.GetParamValueOrDefault("ADSK_Размер_Высота"); //ToDo: параметр
+            var height = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningHeight); //ToDo: параметр
             double z;
             if(height != null) {
                 z = (double)height + bottomBarHeight + level.Elevation;
@@ -484,7 +484,7 @@ namespace RevitLintelPlacement.Models {
 
             var normal = new XYZ(0, 1, 0);
             var direction = lintel.GetTransform().OfVector(normal);
-            var demiWidth = (double) lintel.GetParamValueOrDefault("Половина толщины стены"); //TODO: Параметр!
+            var demiWidth = (double) lintel.GetParamValueOrDefault(LintelsCommonConfig.LintelThickness) / 2; //TODO: Параметр!
             if(plusDirection)
                 return ((LocationPoint) lintel.Location).Point + direction * demiWidth;
             return ((LocationPoint) lintel.Location).Point - direction * demiWidth;

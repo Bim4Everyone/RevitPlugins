@@ -59,7 +59,7 @@ namespace RevitLintelPlacement.Models {
                 return new EmptyResult { Code = ResultCode.Correct };
             }
 
-            if((int) lintel.GetParamValue("Фиксация Решения") == 1) { //Todo: параметр "Фиксировать"
+            if((int) lintel.GetParamValue(_revitRepository.LintelsCommonConfig.LintelFixation) == 1) { //Todo: параметр "Фиксировать"
                 return new ReportResult(lintel.Id) { Code = ResultCode.LintelIsFixedWithoutElement};
             }
             return new LintelForDeletionResult(_revitRepository, lintel) { Code = ResultCode.LintelWithoutElement };
@@ -111,7 +111,7 @@ namespace RevitLintelPlacement.Models {
         private ParameterCheckResult CheckWallThickness(FamilyInstance lintel, FamilyInstance elementInWall) {
             var wall = elementInWall.Host as Wall;
             var wallThickness = wall.Width;
-            var lintelThickness = ((double) lintel.GetParamValue("ЭЛМТ_ширина")); //ToDo: параметр
+            var lintelThickness = ((double) lintel.GetParamValue(_revitRepository.LintelsCommonConfig.LintelThickness)); //ToDo: параметр
             if(Math.Abs(lintelThickness - wallThickness) < 0.1) {
                 return ParameterCheckResult.Correct;
             }
@@ -134,7 +134,7 @@ namespace RevitLintelPlacement.Models {
             var lintelLocationPoint = ((LocationPoint) lintel.Location).Point;
             var elementInWallPoint = _revitRepository.GetLocationPoint(elementInWall);
 
-            var elementWidth = elementInWall.GetParamValueOrDefault("ADSK_Размер_Ширина") ?? 
+            var elementWidth = elementInWall.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningWidth) ?? 
                                elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM); //ToDo: параметр
 
             if(lintelLocationPoint.DistanceTo(elementInWallPoint) < (double) elementWidth / 2) //Todo: возможно, расстояние должно быть меньше

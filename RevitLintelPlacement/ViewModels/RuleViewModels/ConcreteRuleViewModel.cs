@@ -109,12 +109,12 @@ namespace RevitLintelPlacement.ViewModels {
                         Offset = leftOffsetParameter.LeftOffset
                     };
                 }
-                if (parameter is LintelCornerParameter cornerParameter) {
-                    yield return new LintelParameterSetting() {
-                        LintelParameterType = LintelParameterType.CornerParameter,
-                        IsCornerChecked = cornerParameter.IsCornerChecked
-                    };
-                }
+                //if (parameter is LintelCornerParameter cornerParameter) {
+                //    yield return new LintelParameterSetting() {
+                //        LintelParameterType = LintelParameterType.CornerParameter,
+                //        IsCornerChecked = cornerParameter.IsCornerChecked
+                //    };
+                //}
             }
         }
 
@@ -123,7 +123,7 @@ namespace RevitLintelPlacement.ViewModels {
             foreach(var condition in ruleSetting.ConditionSettingsConfig) {
                 switch(condition.ConditionType) {
                     case ConditionType.OpeningWidth: {
-                        OpeningWidthCondition = new OpeningWidthConditionViewModel() {
+                        OpeningWidthCondition = new OpeningWidthConditionViewModel(_revitRepository) {
                             MaxWidth = condition.OpeningWidthMax,
                             MinWidth = condition.OpeningWidthMin
                         };
@@ -140,13 +140,13 @@ namespace RevitLintelPlacement.ViewModels {
                     //};
                     //break;
                     case LintelParameterType.LeftOffsetParameter: {
-                        LintelLeftOffsetParameter = new LintelLeftOffsetParameter() {
+                        LintelLeftOffsetParameter = new LintelLeftOffsetParameter(_revitRepository) {
                             LeftOffset = parameter.Offset
                         };
                         break;
                     }
                     case LintelParameterType.RightOffsetParameter: {
-                        LintelRightOffsetParameter = new LintelRightOffsetParameter() {
+                        LintelRightOffsetParameter = new LintelRightOffsetParameter(_revitRepository) {
                             RightOffset = parameter.Offset
                         };
                         break;
@@ -162,17 +162,17 @@ namespace RevitLintelPlacement.ViewModels {
             if(string.IsNullOrEmpty(SelectedLintelType)) {
                 SelectedLintelType = LintelTypes.FirstOrDefault();
             }
-            OpeningWidthParameter = new OpeningWidthParameter();
-            WallHalfThicknessParameter = new WallHalfThicknessParameter();
+            OpeningWidthParameter = new OpeningWidthParameter(_revitRepository);
+            WallHalfThicknessParameter = new WallHalfThicknessParameter(_revitRepository);
         }
 
         private void InitializeEmptyGroupedRule() {
             //CornerParameter = new LintelCornerParameter();
-            OpeningWidthCondition = new OpeningWidthConditionViewModel();
-            LintelLeftOffsetParameter = new LintelLeftOffsetParameter();
-            LintelRightOffsetParameter = new LintelRightOffsetParameter();
-            OpeningWidthParameter = new OpeningWidthParameter();
-            WallHalfThicknessParameter = new WallHalfThicknessParameter();
+            OpeningWidthCondition = new OpeningWidthConditionViewModel(_revitRepository);
+            LintelLeftOffsetParameter = new LintelLeftOffsetParameter(_revitRepository);
+            LintelRightOffsetParameter = new LintelRightOffsetParameter(_revitRepository);
+            OpeningWidthParameter = new OpeningWidthParameter(_revitRepository);
+            WallHalfThicknessParameter = new WallHalfThicknessParameter(_revitRepository);
             LintelTypes = new List<string>(
                 _revitRepository.GetLintelTypes()
                 .Select(lt=>lt.Name));

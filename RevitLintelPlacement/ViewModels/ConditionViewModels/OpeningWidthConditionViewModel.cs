@@ -14,12 +14,12 @@ using RevitLintelPlacement.ViewModels.Interfaces;
 
 namespace RevitLintelPlacement.ViewModels {
     internal class OpeningWidthConditionViewModel : BaseViewModel, IConditionViewModel {
-
+        private readonly RevitRepository _revitRepository;
         private double _minWidth;
         private double _maxWidth;
 
-        public OpeningWidthConditionViewModel() {
-
+        public OpeningWidthConditionViewModel(RevitRepository revitRepository) {
+            this._revitRepository = revitRepository;
         }
 
         public double MinWidth {
@@ -39,7 +39,7 @@ namespace RevitLintelPlacement.ViewModels {
 
             //Todo: после установки 2021 версии поправить
 #if D2020 || R2020
-            var elementWidth = elementInWall.GetParamValueOrDefault("ADSK_Размер_Ширина");
+            var elementWidth = elementInWall.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningWidth);
             if (elementWidth == null) {
                 elementWidth = elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
             }

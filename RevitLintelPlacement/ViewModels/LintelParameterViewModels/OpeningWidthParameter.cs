@@ -9,10 +9,16 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
+using RevitLintelPlacement.Models;
 using RevitLintelPlacement.ViewModels.Interfaces;
 
 namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels {
     internal class OpeningWidthParameter : ILintelParameterViewModel {
+        private readonly RevitRepository _revitRepository;
+
+        public OpeningWidthParameter(RevitRepository revitRepository) {
+            this._revitRepository = revitRepository;
+        }
 
         public void SetTo(FamilyInstance lintel, FamilyInstance elementInWall) {
             if(lintel is null) {
@@ -28,7 +34,7 @@ namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels {
 
             //TODO: разные версии Revit
             //lintel.SetParamValue("Половина толщины стены", wall.Width / 2);
-            lintel.SetParamValue("ЭЛМТ_ширина", wall.Width);
+            lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelThickness, wall.Width);
         }
     }
 }
