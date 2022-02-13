@@ -159,6 +159,9 @@ namespace RevitLintelPlacement.ViewModels {
                .Select(lt => lt.Name));
             SelectedLintelType = LintelTypes.FirstOrDefault(lt=>lt
             .Equals(ruleSetting.LintelTypeName, StringComparison.CurrentCultureIgnoreCase));
+            if(string.IsNullOrEmpty(SelectedLintelType)) {
+                SelectedLintelType = LintelTypes.FirstOrDefault();
+            }
             OpeningWidthParameter = new OpeningWidthParameter();
             WallHalfThicknessParameter = new WallHalfThicknessParameter();
         }
