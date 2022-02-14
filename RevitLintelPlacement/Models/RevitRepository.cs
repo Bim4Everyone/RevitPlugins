@@ -474,7 +474,28 @@ namespace RevitLintelPlacement.Models {
             return transform.BasisX.AngleOnPlaneTo(vectorX, transform.BasisZ);
         }
 
-
+        public bool CheckLintelType(FamilySymbol lintelType) {
+            if(lintelType.Family == null)
+                return false;
+            var familyDocument = _document.EditFamily(lintelType.Family);
+            var familyManger = familyDocument.FamilyManager;
+            var parameterNames = familyManger.GetParameters().Select(p => p.Definition.Name).ToList();
+            if(!parameterNames.Any(p=>p.Equals(LintelsCommonConfig.LintelFixation, StringComparison.CurrentCultureIgnoreCase)))
+                return false;
+            if(!parameterNames.Any(p => p.Equals(LintelsCommonConfig.LintelLeftCorner, StringComparison.CurrentCultureIgnoreCase)))
+                return false;
+            if(!parameterNames.Any(p => p.Equals(LintelsCommonConfig.LintelLeftOffset, StringComparison.CurrentCultureIgnoreCase)))
+                return false;
+            if(!parameterNames.Any(p => p.Equals(LintelsCommonConfig.LintelRightCorner, StringComparison.CurrentCultureIgnoreCase)))
+                return false;
+            if(!parameterNames.Any(p => p.Equals(LintelsCommonConfig.LintelRightOffset, StringComparison.CurrentCultureIgnoreCase)))
+                return false;
+            if(!parameterNames.Any(p => p.Equals(LintelsCommonConfig.LintelThickness, StringComparison.CurrentCultureIgnoreCase)))
+                return false;
+            if(!parameterNames.Any(p => p.Equals(LintelsCommonConfig.LintelWidth, StringComparison.CurrentCultureIgnoreCase)))
+                return false;
+            return true;
+        }
 
         private XYZ GetViewStartPoint(FamilyInstance lintel, bool plusDirection) //изменить название метода
         {

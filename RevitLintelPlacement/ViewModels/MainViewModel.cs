@@ -65,7 +65,13 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         public void PlaceLintels(object p) {
-            //GroupedRules.Save(p);
+            foreach(var type in _revitRepository.GetLintelTypes()) {
+                if(!_revitRepository.CheckLintelType(type)) {
+                    TaskDialog.Show("Revit", $"У семейства \"{type.Family.Name}\" отсутствуют параметры, необходимые для расстановки перемычек.");
+                    return;
+                }
+            }
+
             var elementInWallIds = _revitRepository.GetAllElementsInWall(SelectedSampleMode)
                 .Select(e => e.Id)
                 .ToList();
