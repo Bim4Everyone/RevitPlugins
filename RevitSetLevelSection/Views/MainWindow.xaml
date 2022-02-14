@@ -45,7 +45,7 @@
                 <TextBox
                     Grid.Column="1"
                     IsEnabled="{Binding IsEnabled}"
-                    Text="{Binding ParamValue}"
+                    Text="{Binding ParamValue, UpdateSourceTrigger=PropertyChanged}"
                     Visibility="{Binding DataContext.FromRevitParam, Converter={StaticResource BoolToHiddenConverter}, ElementName=_this}"/>
 
                 <ComboBox
