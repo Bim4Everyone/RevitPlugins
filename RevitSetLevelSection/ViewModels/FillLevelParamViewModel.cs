@@ -11,7 +11,7 @@ using dosymep.WPF.ViewModels;
 using RevitSetLevelSection.Models;
 
 namespace RevitSetLevelSection.ViewModels {
-    internal class FillLevelParamViewModel : BaseViewModel {
+    internal class FillLevelParamViewModel : FillParamViewModel {
         private readonly RevitRepository _revitRepository;
         
         private bool _isEnabled;
@@ -31,6 +31,10 @@ namespace RevitSetLevelSection.ViewModels {
         public bool IsEnabled {
             get => _isEnabled;
             set => this.RaiseAndSetIfChanged(ref _isEnabled, value);
+        }
+
+        public override void UpdateElements(bool fromProjectParam) {
+            
         }
     }
 }

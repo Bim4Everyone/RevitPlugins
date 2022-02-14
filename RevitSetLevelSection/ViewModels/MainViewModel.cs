@@ -30,7 +30,7 @@ namespace RevitSetLevelSection.ViewModels {
             }
 
             _revitRepository = revitRepository;
-            FillParams = new ObservableCollection<BaseViewModel>(GetFillParams());
+            FillParams = new ObservableCollection<FillParamViewModel>(GetFillParams());
             LinkInstances = new ObservableCollection<LinkInstanceViewModel>(GetLinkInstances());
 
             UpdateElementsCommand = new RelayCommand(UpdateElements, CanUpdateElement);
@@ -56,7 +56,7 @@ namespace RevitSetLevelSection.ViewModels {
             }
         }
 
-        public ObservableCollection<BaseViewModel> FillParams { get; }
+        public ObservableCollection<FillParamViewModel> FillParams { get; }
         public ObservableCollection<LinkInstanceViewModel> LinkInstances { get; }
 
         public ObservableCollection<DesignOptionsViewModel> DesignOptions {
@@ -64,7 +64,7 @@ namespace RevitSetLevelSection.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _designOptions, value);
         }
 
-        private IEnumerable<BaseViewModel> GetFillParams() {
+        private IEnumerable<FillParamViewModel> GetFillParams() {
             //yield return new FillLevelParamViewModel(_revitRepository);
             yield return new FillMassParamViewModel(_revitRepository) { RevitParam = SharedParamsConfig.Instance.BuildingWorksBlock };
             yield return new FillMassParamViewModel(_revitRepository) { RevitParam = SharedParamsConfig.Instance.BuildingWorksSection };
@@ -75,9 +75,11 @@ namespace RevitSetLevelSection.ViewModels {
             return _revitRepository.GetLinkInstances()
                 .Select(item => new LinkInstanceViewModel((RevitLinkType) _revitRepository.GetElements(item.GetTypeId()), item));
         }
-        
+
         private void UpdateElements(object param) {
-            
+            foreach(FillParamViewModel fillParamViewModel in FillParams) {
+                fillParamViewModel.UpdateElements(FromRevitParam);
+            }
         }
 
         private bool CanUpdateElement(object param) {

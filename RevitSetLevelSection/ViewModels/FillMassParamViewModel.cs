@@ -12,7 +12,7 @@ using dosymep.WPF.ViewModels;
 using RevitSetLevelSection.Models;
 
 namespace RevitSetLevelSection.ViewModels {
-    internal class FillMassParamViewModel : BaseViewModel {
+    internal class FillMassParamViewModel : FillParamViewModel {
         private readonly RevitRepository _revitRepository;
 
         private bool _isEnabled;
@@ -54,7 +54,7 @@ namespace RevitSetLevelSection.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _designOptions, value);
         }
 
-        public void UpdateElements(bool fromRevitParam) {
+        public override void UpdateElements(bool fromRevitParam) {
             if(fromRevitParam) {
                 _revitRepository.UpdateElements(RevitParam, ParamValue);
             } else {
