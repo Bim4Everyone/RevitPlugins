@@ -1,0 +1,43 @@
+﻿<Window x:Class="RevitLintelPlacement.Views.ReportView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RevitLintelPlacement.Views"
+        xmlns:vm ="clr-namespace:RevitLintelPlacement.ViewModels"
+        xmlns:converters="clr-namespace:RevitLintelPlacement.Converters"
+        mc:Ignorable="d"
+        Title="ReportView" Height="450" Width="800"
+        d:DataContext="{d:DesignInstance vm:ElementInfosViewModel, IsDesignTimeCreatable=False}"
+        Name="ReportWindow">
+    <Window.Resources>
+        <converters:EnumConverter x:Key="EnumConverter"/>
+        <converters:IndexConverter x:Key="IndexConverter"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <DataGrid CanUserAddRows="False"
+                  CanUserDeleteRows ="False"
+                  AutoGenerateColumns="False"
+                  CanUserReorderColumns="False"
+                  CanUserResizeRows="False"
+            ItemsSource="{Binding ElementIfos}">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Элемент">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type vm:ElementInfoViewModel}">
+                            <Button Name="bthElement" Content="{Binding ElementId}" Command="{Binding ElementName=ReportWindow, Path=DataContext.SelectElementCommand}"
+                                    CommandParameter="{Binding ElementName=bthElement, Path=DataContext}"></Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Тип предупреждения" Binding="{Binding TypeInfo, Converter={StaticResource EnumConverter}, ConverterParameter={x:Type vm:TypeInfo}}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Вид элемента" Binding="{Binding ElementType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Type vm:ElementType}}"></DataGridTextColumn>
+                <DataGridTextColumn Width="*" Header="Сообщение" Binding="{Binding Message}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>
