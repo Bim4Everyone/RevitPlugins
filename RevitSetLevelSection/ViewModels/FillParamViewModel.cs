@@ -17,7 +17,7 @@ namespace RevitSetLevelSection.ViewModels {
 
         private bool _isEnabled;
         private DesignOptionsViewModel _designOptions;
-        
+
         private string _paramValue;
         private RevitParam _revitParam;
 
@@ -56,15 +56,9 @@ namespace RevitSetLevelSection.ViewModels {
 
         public void UpdateElements(bool fromRevitParam) {
             if(fromRevitParam) {
-                _revitRepository.ProjectInfo.SetParamValue(RevitParam, ParamValue);
-                Parameter parameter = _revitRepository.ProjectInfo.GetParam(RevitParam);
-                IEnumerable<Element> elements = _revitRepository.GetElements(RevitParam);
-                _revitRepository.UpdateElements(parameter, RevitParam, elements);
+                _revitRepository.UpdateElements(RevitParam, ParamValue);
             } else {
-                foreach(FamilyInstance massObject in DesignOptions.GetMassObjects()) {
-                    IEnumerable<Element> elements = _revitRepository.GetElements(massObject, RevitParam);
-                    _revitRepository.UpdateElements(massObject, RevitParam, elements);
-                }
+                _revitRepository.UpdateElements(RevitParam, DesignOptions.GetMassObjects());
             }
         }
     }

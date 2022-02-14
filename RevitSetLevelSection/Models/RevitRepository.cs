@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -63,23 +64,33 @@ namespace RevitSetLevelSection.Models {
                 .ToList();
         }
 
-        public void UpdateElements(Parameter parameter, RevitParam revitParam, IEnumerable<Element> elements) {
+        public void UpdateElements(RevitParam revitParam, string paramValue) {
             using(Transaction transaction = _document.StartTransaction("Установка уровня/секции")) {
-                foreach(Element element in elements) {
-                    Parameter elementParam = element.GetParam(revitParam);
+                ProjectInfo.SetParamValue(revitParam, paramValue);
+                IEnumerable<Element> elements = GetElements(revitParam);
 
-                    if(parameter == null) {
-                        elementParam.RemoveValue();
-                    } else {
-                        elementParam.Set(parameter);
-                    }
+                foreach(Element element in elements) {
+                    element.SetParamValue(revitParam, paramValue);
                 }
+
+                transaction.Commit();
             }
         }
 
-        public void UpdateElements(FamilyInstance massElement, RevitParam revitParam, IEnumerable<Element> elements) {
-            Parameter massParameter = massElement.GetParam(revitParam);
-            UpdateElements(massParameter, revitParam, elements);
+        public void UpdateElements(RevitParam revitParam, IEnumerable<FamilyInstance> massElements) {
+            using(Transaction transaction = _document.StartTransaction("Установка уровня/секции")) {
+                foreach(FamilyInstance massObject in massElements) {
+                    Parameter massParameter = massObject.GetParam(revitParam);
+                    IEnumerable<Element> elements = GetElements(massObject, revitParam);
+                    
+                    foreach(Element element in elements) {
+                        Parameter parameter = element.GetParam(revitParam);
+                        parameter.Set(massParameter);
+                    }
+                }
+
+                transaction.Commit();
+            }
         }
 
         private Outline GetOutline(FamilyInstance massElement) {
