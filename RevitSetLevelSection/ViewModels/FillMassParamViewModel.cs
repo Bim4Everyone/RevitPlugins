@@ -44,7 +44,7 @@ namespace RevitSetLevelSection.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _paramValue, value);
         }
 
-        public bool IsEnabled {
+        public override bool IsEnabled {
             get => _isEnabled;
             set => this.RaiseAndSetIfChanged(ref _isEnabled, value);
         }
@@ -52,6 +52,18 @@ namespace RevitSetLevelSection.ViewModels {
         public DesignOptionsViewModel DesignOptions {
             get => _designOptions;
             set => this.RaiseAndSetIfChanged(ref _designOptions, value);
+        }
+
+        public override string GetErrorText(bool fromRevitParam) {
+            if(!IsEnabled) {
+                return null;
+            }
+            
+            if(fromRevitParam) {
+                return string.IsNullOrEmpty(ParamValue) ? "Заполните значение параметра документа." : null;
+            }
+
+            return DesignOptions == null ? "Выберите вариант с формообразующими." : null;
         }
 
         public override void UpdateElements(bool fromRevitParam) {

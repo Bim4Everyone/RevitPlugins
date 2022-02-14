@@ -28,9 +28,13 @@ namespace RevitSetLevelSection.ViewModels {
         public RevitParam RevitParam { get; set; }
         public string Name => $"Заполнить \"{RevitParam.Name}\"";
 
-        public bool IsEnabled {
+        public override bool IsEnabled {
             get => _isEnabled;
             set => this.RaiseAndSetIfChanged(ref _isEnabled, value);
+        }
+
+        public override string GetErrorText(bool fromRevitParam) {
+            return null;
         }
 
         public override void UpdateElements(bool fromProjectParam) {

@@ -18,7 +18,7 @@ using RevitSetLevelSection.Models;
 namespace RevitSetLevelSection.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        
+
         private string _errorText;
         private bool _fromRevitParam;
         private LinkInstanceViewModel _linkInstance;
@@ -37,7 +37,7 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         public ICommand UpdateElementsCommand { get; set; }
-        
+
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
@@ -66,14 +66,21 @@ namespace RevitSetLevelSection.ViewModels {
 
         private IEnumerable<FillParamViewModel> GetFillParams() {
             //yield return new FillLevelParamViewModel(_revitRepository);
-            yield return new FillMassParamViewModel(_revitRepository) { RevitParam = SharedParamsConfig.Instance.BuildingWorksBlock };
-            yield return new FillMassParamViewModel(_revitRepository) { RevitParam = SharedParamsConfig.Instance.BuildingWorksSection };
-            yield return new FillMassParamViewModel(_revitRepository) { RevitParam = SharedParamsConfig.Instance.EconomicFunction };
+            yield return new FillMassParamViewModel(_revitRepository) {
+                RevitParam = SharedParamsConfig.Instance.BuildingWorksBlock
+            };
+            yield return new FillMassParamViewModel(_revitRepository) {
+                RevitParam = SharedParamsConfig.Instance.BuildingWorksSection
+            };
+            yield return new FillMassParamViewModel(_revitRepository) {
+                RevitParam = SharedParamsConfig.Instance.EconomicFunction
+            };
         }
 
         private IEnumerable<LinkInstanceViewModel> GetLinkInstances() {
             return _revitRepository.GetLinkInstances()
-                .Select(item => new LinkInstanceViewModel((RevitLinkType) _revitRepository.GetElements(item.GetTypeId()), item));
+                .Select(item =>
+                    new LinkInstanceViewModel((RevitLinkType) _revitRepository.GetElements(item.GetTypeId()), item));
         }
 
         private void UpdateElements(object param) {
@@ -83,6 +90,25 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         private bool CanUpdateElement(object param) {
+            if(!FromRevitParam && LinkInstance == null) {
+                ErrorText = "Выберите связанный файл с формообразующими.";
+                return false;
+            }
+
+            if(!FillParams.Any(item => item.IsEnabled)) {
+                ErrorText = "Выберите хотя бы один параметр.";
+                return false;
+            }
+
+            string errorText = FillParams
+                .Select(item => item.GetErrorText(FromRevitParam))
+                .FirstOrDefault(item => !string.IsNullOrEmpty(item));
+
+            if(!string.IsNullOrEmpty(errorText)) {
+                ErrorText = errorText;
+                return false;
+            }
+
             ErrorText = null;
             return true;
         }
