@@ -29,6 +29,7 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         public string Name => _designOption.Name;
+        public int CountMassElements => GetMassObjects().Count();
 
         public IEnumerable<FamilyInstance> GetMassObjects() {
             return _linkInstanceRepository.GetMassElements(_designOption);

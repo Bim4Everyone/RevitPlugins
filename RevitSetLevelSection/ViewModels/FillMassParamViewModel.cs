@@ -58,12 +58,18 @@ namespace RevitSetLevelSection.ViewModels {
             if(!IsEnabled) {
                 return null;
             }
-            
+
             if(fromRevitParam) {
                 return string.IsNullOrEmpty(ParamValue) ? "Заполните значение параметра документа." : null;
             }
 
-            return DesignOptions == null ? "Выберите вариант с формообразующими." : null;
+            if(DesignOptions == null) {
+                return "Выберите вариант с формообразующими.";
+            }
+
+            return DesignOptions.CountMassElements == 0
+                ? $"В выбранном варианте \"{DesignOptions.Name}\" нет формообразующих."
+                : null;
         }
 
         public override void UpdateElements(bool fromRevitParam) {
