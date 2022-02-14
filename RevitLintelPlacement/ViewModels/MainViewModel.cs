@@ -74,8 +74,8 @@ namespace RevitLintelPlacement.ViewModels {
 
         public void PlaceLintels(object p) {
             foreach(var type in _revitRepository.GetLintelTypes()) {
-                if(!_revitRepository.CheckLintelType(type)) {
-                    TaskDialog.Show("Revit", $"У семейства \"{type.Family.Name}\" отсутствуют параметры, необходимые для расстановки перемычек.");
+                if(!_revitRepository.CheckLintelType(type, ElementInfos)) {
+                    ShowReport();
                     return;
                 }
             }
@@ -136,9 +136,13 @@ namespace RevitLintelPlacement.ViewModels {
             //if(!string.IsNullOrEmpty(message)) {
             //    TaskDialog.Show("Revit", message);
             //}
+            ShowReport();
+
+        }
+
+        private void ShowReport() {
             var view = new ReportView() { DataContext = ElementInfos };
             view.ShowDialog();
-
         }
     }
 }

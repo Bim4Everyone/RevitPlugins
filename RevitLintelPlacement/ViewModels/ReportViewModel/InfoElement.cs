@@ -19,13 +19,20 @@ namespace RevitLintelPlacement.ViewModels {
             ElementType = ElementType.Lintel
         };
 
+        public static InfoElement MissingLintelParameter => new InfoElement() {
+            Message = "У семейства \"{0}\" перемычки отсутсвует параметр \"{1}\".",
+            TypeInfo = TypeInfo.Error,
+            ElementType = ElementType.Lintel
+        };
+
         public string Message { get; set; }
         public TypeInfo TypeInfo { get; set; }
         public ElementType ElementType { get; set; }
         public InfoElement FormatMessage(params string[] args) {
             return new InfoElement() {
                 TypeInfo = TypeInfo,
-                Message = string.Format(Message, args)
+                Message = string.Format(Message, args),
+                ElementType = ElementType.Lintel
             };
         }
     }

@@ -474,27 +474,29 @@ namespace RevitLintelPlacement.Models {
             return transform.BasisX.AngleOnPlaneTo(vectorX, transform.BasisZ);
         }
 
-        public bool CheckLintelType(FamilySymbol lintelType) {
+        public bool CheckLintelType(FamilySymbol lintelType, ElementInfosViewModel elementInfos) {
             if(lintelType.Family == null)
                 return false;
             var familyDocument = _document.EditFamily(lintelType.Family);
             var familyManger = familyDocument.FamilyManager;
             var parameterNames = familyManger.GetParameters().Select(p => p.Definition.Name).ToList();
-            if(!parameterNames.Any(p=>p.Equals(LintelsCommonConfig.LintelFixation, StringComparison.CurrentCultureIgnoreCase)))
-                return false;
-            if(!parameterNames.Any(p => p.Equals(LintelsCommonConfig.LintelLeftCorner, StringComparison.CurrentCultureIgnoreCase)))
-                return false;
-            if(!parameterNames.Any(p => p.Equals(LintelsCommonConfig.LintelLeftOffset, StringComparison.CurrentCultureIgnoreCase)))
-                return false;
-            if(!parameterNames.Any(p => p.Equals(LintelsCommonConfig.LintelRightCorner, StringComparison.CurrentCultureIgnoreCase)))
-                return false;
-            if(!parameterNames.Any(p => p.Equals(LintelsCommonConfig.LintelRightOffset, StringComparison.CurrentCultureIgnoreCase)))
-                return false;
-            if(!parameterNames.Any(p => p.Equals(LintelsCommonConfig.LintelThickness, StringComparison.CurrentCultureIgnoreCase)))
-                return false;
-            if(!parameterNames.Any(p => p.Equals(LintelsCommonConfig.LintelWidth, StringComparison.CurrentCultureIgnoreCase)))
-                return false;
-            return true;
+            bool result = true;
+            var configParameterNames = new List<string>() {
+                LintelsCommonConfig.LintelFixation,
+                LintelsCommonConfig.LintelLeftCorner,
+                LintelsCommonConfig.LintelLeftOffset,
+                LintelsCommonConfig.LintelRightCorner,
+                LintelsCommonConfig.LintelRightOffset,
+                LintelsCommonConfig.LintelThickness,
+                LintelsCommonConfig.LintelWidth
+            };
+            foreach(var configParameter in configParameterNames) {
+                if(!parameterNames.Any(p => p.Equals(configParameter, StringComparison.CurrentCultureIgnoreCase))) {
+                    result = false;
+                    elementInfos.ElementIfos.Add(new ElementInfoViewModel(lintelType.Id, InfoElement.MissingLintelParameter.FormatMessage(lintelType?.Family?.Name, configParameter)));
+                }
+            }
+            return result;
         }
 
         private XYZ GetViewStartPoint(FamilyInstance lintel, bool plusDirection) //изменить название метода
