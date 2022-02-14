@@ -17,6 +17,9 @@ namespace RevitSetLevelSection.ViewModels {
 
         private bool _isEnabled;
         private DesignOptionsViewModel _designOptions;
+        
+        private string _paramValue;
+        private RevitParam _revitParam;
 
         public FillParamViewModel(RevitRepository revitRepository) {
             if(revitRepository is null) {
@@ -26,9 +29,20 @@ namespace RevitSetLevelSection.ViewModels {
             _revitRepository = revitRepository;
         }
 
-        public RevitParam RevitParam { get; set; }
+        public RevitParam RevitParam {
+            get => _revitParam;
+            set {
+                this.RaiseAndSetIfChanged(ref _revitParam, value);
+                ParamValue = (string) _revitRepository.ProjectInfo.GetParamValueOrDefault(RevitParam);
+            }
+        }
+
         public string Name => $"Заполнить \"{RevitParam.Name}\"";
-        public object ParamValue => _revitRepository.ProjectInfo.GetParamValueOrDefault(RevitParam);
+
+        public string ParamValue {
+            get => _paramValue;
+            set => this.RaiseAndSetIfChanged(ref _paramValue, value);
+        }
 
         public bool IsEnabled {
             get => _isEnabled;
@@ -42,6 +56,7 @@ namespace RevitSetLevelSection.ViewModels {
 
         public void UpdateElements(bool fromRevitParam) {
             if(fromRevitParam) {
+                _revitRepository.ProjectInfo.SetParamValue(RevitParam, ParamValue);
                 Parameter parameter = _revitRepository.ProjectInfo.GetParam(RevitParam);
                 IEnumerable<Element> elements = _revitRepository.GetElements(RevitParam);
                 _revitRepository.UpdateElements(parameter, RevitParam, elements);
