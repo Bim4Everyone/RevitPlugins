@@ -29,7 +29,7 @@
             </CheckBox>
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type vms:FillParamViewModel}">
+        <DataTemplate DataType="{x:Type vms:FillMassParamViewModel}">
             <Grid Margin="10">
 
                 <Grid.ColumnDefinitions>

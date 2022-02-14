@@ -12,7 +12,7 @@ using dosymep.WPF.ViewModels;
 using RevitSetLevelSection.Models;
 
 namespace RevitSetLevelSection.ViewModels {
-    internal class FillParamViewModel : BaseViewModel {
+    internal class FillMassParamViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
 
         private bool _isEnabled;
@@ -21,7 +21,7 @@ namespace RevitSetLevelSection.ViewModels {
         private string _paramValue;
         private RevitParam _revitParam;
 
-        public FillParamViewModel(RevitRepository revitRepository) {
+        public FillMassParamViewModel(RevitRepository revitRepository) {
             if(revitRepository is null) {
                 throw new ArgumentNullException(nameof(revitRepository));
             }
