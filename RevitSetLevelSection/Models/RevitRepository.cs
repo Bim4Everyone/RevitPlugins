@@ -30,6 +30,8 @@ namespace RevitSetLevelSection.Models {
         public Document Document => _document;
         public Application Application => _application;
 
+        public ProjectInfo ProjectInfo => _document.ProjectInformation;
+
         public Element GetElements(ElementId elementId) {
             return _document.GetElement(elementId);
         }
@@ -39,6 +41,14 @@ namespace RevitSetLevelSection.Models {
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(RevitLinkInstance))
                 .OfType<RevitLinkInstance>()
+                .ToList();
+        }
+        
+        public IEnumerable<Element> GetElements(RevitParam revitParam) {
+            var catFilter = new ElementMulticategoryFilter(GetCategories(revitParam));
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .WherePasses(catFilter)
                 .ToList();
         }
         
@@ -52,15 +62,24 @@ namespace RevitSetLevelSection.Models {
                 .WherePasses(filter)
                 .ToList();
         }
-        
-        public void UpdateElements(FamilyInstance massElement, RevitParam revitParam, IEnumerable<Element> elements) {
-            var massParameter = massElement.GetParam(revitParam);
-            using(var transaction = _document.StartTransaction("Установка уровня/секции")) {
-                foreach(var element in elements) {
-                    var elementParam = element.GetParam(revitParam);
-                    elementParam.Set(massParameter);
+
+        public void UpdateElements(Parameter parameter, RevitParam revitParam, IEnumerable<Element> elements) {
+            using(Transaction transaction = _document.StartTransaction("Установка уровня/секции")) {
+                foreach(Element element in elements) {
+                    Parameter elementParam = element.GetParam(revitParam);
+
+                    if(parameter == null) {
+                        elementParam.RemoveValue();
+                    } else {
+                        elementParam.Set(parameter);
+                    }
                 }
             }
+        }
+
+        public void UpdateElements(FamilyInstance massElement, RevitParam revitParam, IEnumerable<Element> elements) {
+            Parameter massParameter = massElement.GetParam(revitParam);
+            UpdateElements(massParameter, revitParam, elements);
         }
 
         private Outline GetOutline(FamilyInstance massElement) {

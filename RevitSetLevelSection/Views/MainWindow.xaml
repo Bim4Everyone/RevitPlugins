@@ -6,12 +6,22 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vms="clr-namespace:RevitSetLevelSection.ViewModels"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:converters="clr-namespace:dosymep.WPF.Converters"
     mc:Ignorable="d"
     Title="Установка уровня/секции" Height="450" Width="800" WindowStartupLocation="CenterOwner"
     x:Name="_this"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        
+        <converters:BoolToVisibilityConverter
+            x:Key="BoolToHiddenConverter"
+            TrueValue="Visible" FalseValue="Hidden" />
+        
+        <converters:BoolToVisibilityConverter
+            x:Key="InverseBoolToHiddenConverter"
+            TrueValue="Hidden" FalseValue="Visible" />
 
         <DataTemplate DataType="{x:Type vms:FillLevelParamViewModel}">
             <CheckBox Margin="10">
@@ -31,12 +41,18 @@
                 <CheckBox Grid.Column="0" IsChecked="{Binding IsEnabled}">
                     <TextBlock Text="{Binding Name}"/>
                 </CheckBox>
+                
+                <TextBlock
+                    Grid.Column="0"
+                    Text="{Binding ParamValue}"
+                    Visibility="{Binding DataContext.FromRevitParam, Converter={StaticResource BoolToHiddenConverter}, ElementName=_this}"/>
 
                 <ComboBox
                     Grid.Column="1"
                     IsEnabled="{Binding IsEnabled}"
                     SelectedItem="{Binding DesignOptions}"
-                    ItemsSource="{Binding DataContext.DesignOptions, ElementName=_this}" >
+                    ItemsSource="{Binding DataContext.DesignOptions, ElementName=_this}"
+                    Visibility="{Binding DataContext.FromRevitParam, Converter={StaticResource InverseBoolToHiddenConverter}, ElementName=_this}">
 
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
@@ -50,21 +66,61 @@
     </Window.Resources>
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.33*"/>
+            <ColumnDefinition Width="0.33*"/>
+            <ColumnDefinition Width="0.33*"/>
+        </Grid.ColumnDefinitions>
+        
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
-        <ComboBox 
+        <RadioButton
+            Grid.Column="1"
             Grid.Row="0"
+            Grid.ColumnSpan="2"
+            Margin="10"
+            Content="Заполнить параметры по сведениям из проекта"
+            HorizontalAlignment="Left"
+            IsChecked="{Binding FromRevitParam}" />
+        
+        <RadioButton
+            Grid.Column="1"
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
+            Margin="10"
+            HorizontalAlignment="Left"
+            Content="Заполнить параметры по формообразующим"
+            IsChecked="{Binding FromRevitParam, Converter={StaticResource InverseBooleanConverter}}" />
+        
+        <TextBlock
+            Grid.Column="0"
+            Grid.Row="2"
+            Margin="10"
+            Text="Связанный файл"/>
+        
+        <ComboBox
+            Grid.Column="1"
+            Grid.Row="2"
+            Grid.ColumnSpan="2"
+            Margin="10"
             DisplayMemberPath="Name"
             SelectedItem="{Binding LinkInstance}"
             ItemsSource="{Binding LinkInstances}" />
         
-        <ItemsControl Grid.Row="1" ItemsSource="{Binding FillParams}" />
+        <ItemsControl
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Grid.Row="3"
+            Margin="10"
+            ItemsSource="{Binding FillParams}" />
         
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
             <Button Content="ОК" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding UpdateElementsCommand}"/>
             <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>

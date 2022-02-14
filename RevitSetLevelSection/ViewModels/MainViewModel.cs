@@ -20,6 +20,7 @@ namespace RevitSetLevelSection.ViewModels {
         private readonly RevitRepository _revitRepository;
         
         private string _errorText;
+        private bool _fromRevitParam;
         private LinkInstanceViewModel _linkInstance;
         private ObservableCollection<DesignOptionsViewModel> _designOptions;
 
@@ -40,6 +41,11 @@ namespace RevitSetLevelSection.ViewModels {
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        public bool FromRevitParam {
+            get => _fromRevitParam;
+            set => this.RaiseAndSetIfChanged(ref _fromRevitParam, value);
         }
 
         public LinkInstanceViewModel LinkInstance {
