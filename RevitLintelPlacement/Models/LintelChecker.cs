@@ -15,13 +15,13 @@ namespace RevitLintelPlacement.Models {
     internal class LintelChecker {
         private readonly List<IChecker> _checkers;
 
-        public LintelChecker(RevitRepository revitRepository) {
+        public LintelChecker(RevitRepository revitRepository, ElementInfosViewModel elementInfos) {
             _checkers = new List<IChecker> {
             new LintelGroupChecker(),
-            new ElementInWallChecker(revitRepository),
+            new ElementInWallChecker(revitRepository, elementInfos),
             new LintelWallAboveChecker(revitRepository),
             new LintelRuleChecker(revitRepository),
-            new GeometricalLintelChecker(revitRepository)
+            new GeometricalLintelChecker(revitRepository, elementInfos)
             };
         }
 
@@ -49,9 +49,11 @@ namespace RevitLintelPlacement.Models {
 
     internal class ElementInWallChecker : IChecker {
         private readonly RevitRepository _revitRepository;
+        private readonly ElementInfosViewModel _elementInfos;
 
-        public ElementInWallChecker(RevitRepository revitRepository) {
+        public ElementInWallChecker(RevitRepository revitRepository, ElementInfosViewModel elementInfos) {
             this._revitRepository = revitRepository;
+            this._elementInfos = elementInfos;
         }
 
         public IResultHandler Check(FamilyInstance lintel, FamilyInstance elementInWall) {
@@ -60,6 +62,7 @@ namespace RevitLintelPlacement.Models {
             }
 
             if((int) lintel.GetParamValue(_revitRepository.LintelsCommonConfig.LintelFixation) == 1) { //Todo: параметр "Фиксировать"
+                _elementInfos.ElementIfos.Add(new ElementInfoViewModel(lintel.Id, InfoElement.LintelIsFixedWithoutElement));
                 return new ReportResult(lintel.Id) { Code = ResultCode.LintelIsFixedWithoutElement};
             }
             return new LintelForDeletionResult(_revitRepository, lintel) { Code = ResultCode.LintelWithoutElement };
@@ -125,9 +128,11 @@ namespace RevitLintelPlacement.Models {
 
     internal class GeometricalLintelChecker : IChecker {
         private readonly RevitRepository _revitRepository;
+        private readonly ElementInfosViewModel _elementInfos;
 
-        public GeometricalLintelChecker(RevitRepository revitRepository) {
+        public GeometricalLintelChecker(RevitRepository revitRepository, ElementInfosViewModel elementInfos) {
             this._revitRepository = revitRepository;
+            this._elementInfos = elementInfos;
         }
 
         public IResultHandler Check(FamilyInstance lintel, FamilyInstance elementInWall) {
@@ -138,9 +143,11 @@ namespace RevitLintelPlacement.Models {
                                elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM); //ToDo: параметр
 
             if(lintelLocationPoint.DistanceTo(elementInWallPoint) < (double) elementWidth / 2) //Todo: возможно, расстояние должно быть меньше
-                return new EmptyResult { Code = ResultCode.Correct }; 
-            else
+                return new EmptyResult { Code = ResultCode.Correct };
+            else {
+                _elementInfos.ElementIfos.Add(new ElementInfoViewModel(lintel.Id, InfoElement.LintelGeometricalDisplaced));
                 return new ReportResult(lintel.Id) { Code = ResultCode.LintelGeometricalDisplaced };
+            }
         }
     }
 }

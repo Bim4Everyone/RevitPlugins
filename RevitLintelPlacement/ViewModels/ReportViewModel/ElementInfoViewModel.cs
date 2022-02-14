@@ -9,12 +9,19 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
-namespace RevitLintelPlacement.ViewModels.ReportViewModel {
+namespace RevitLintelPlacement.ViewModels {
     internal class ElementInfoViewModel : BaseViewModel {
         private string _message;
         private ElementId _elementId;
         private TypeInfo _typeInfo;
         private ElementType _elementType;
+
+        public ElementInfoViewModel(ElementId elementId, InfoElement infoElement) {
+            ElementId = elementId;
+            Message = infoElement.Message;
+            ElementType = infoElement.ElementType;
+            TypeInfo = infoElement.TypeInfo;
+        }
 
         public TypeInfo TypeInfo {
             get => _typeInfo;

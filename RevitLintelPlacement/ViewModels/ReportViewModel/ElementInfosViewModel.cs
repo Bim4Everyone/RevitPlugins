@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 using dosymep.WPF.ViewModels;
 
-namespace RevitLintelPlacement.ViewModels.ReportViewModel {
+namespace RevitLintelPlacement.ViewModels {
     internal class ElementInfosViewModel : BaseViewModel {
         private ObservableCollection<ElementInfoViewModel> _elementIfos;
 
