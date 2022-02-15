@@ -43,11 +43,11 @@ namespace RevitLintelPlacement.ViewModels {
                 elementWidth = elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
             }
             if(elementWidth == null) {
-                _elementInfos.ElementIfos.Add(new ElementInfoViewModel(elementInWall.Id, 
+                _elementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id,
                     InfoElement.MissingOpeningParameter.FormatMessage(elementInWall.Name, _revitRepository.LintelsCommonConfig.OpeningWidth)));
                 return false;
             }
-                
+
             double openingWidth;
 #if D2020 || R2020
             openingWidth = UnitUtils.ConvertFromInternalUnits((double) elementWidth, DisplayUnitType.DUT_MILLIMETERS);

@@ -33,9 +33,9 @@ namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels {
                                elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
 
             if(elementWidth == null) {
-                _elementInfos.ElementIfos.Add(new ElementInfoViewModel(elementInWall.Id,
+                _elementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id,
                     InfoElement.MissingOpeningParameter.FormatMessage(elementInWall.Name, _revitRepository.LintelsCommonConfig.OpeningWidth)));
-                _elementInfos.ElementIfos.Add(new ElementInfoViewModel(lintel.Id,
+                _elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintel.Id,
                     InfoElement.UnsetLintelParamter.FormatMessage(lintel.Name, _revitRepository.LintelsCommonConfig.LintelWidth)));
             } else {
                 lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelWidth, (double) elementWidth);

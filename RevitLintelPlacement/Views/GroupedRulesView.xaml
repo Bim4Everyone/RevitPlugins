@@ -70,7 +70,7 @@
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBox Grid.Column="0" Height="20" Margin="5" VerticalContentAlignment="Center"  TextWrapping="Wrap" Text="{Binding Name}"></TextBox>
+                                        <TextBox Grid.Column="0" Height="20" Margin="5" VerticalContentAlignment="Center"  TextWrapping="Wrap" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                                         <ListBox Grid.Column="1" MaxHeight="200" ItemsSource="{Binding WallTypes.WallTypes}">
                                             <ListBox.ItemTemplate>
                                                 <DataTemplate DataType="{x:Type vm:WallTypeConditionViewModel}">

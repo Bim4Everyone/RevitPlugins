@@ -50,15 +50,30 @@ namespace RevitLintelPlacement.ViewModels {
             get => _elementId;
             set => this.RaiseAndSetIfChanged(ref _elementId, value);
         }
+
+        public override bool Equals(object obj) {
+            if(obj is ElementInfoViewModel elementInfo) {
+                return ElementId == elementInfo.ElementId
+                    && Message.Equals(elementInfo.Message, StringComparison.CurrentCultureIgnoreCase)
+                    && ElementType == elementInfo.ElementType
+                    && TypeInfo == elementInfo.TypeInfo;
+
+            }
+            return false;
+        }
+
+        public override int GetHashCode() {
+            return ElementId.IntegerValue + Message.Length + (int)TypeInfo + (int)ElementType;
+        }
     }
 
     internal enum TypeInfo {
-        [Description("Error")]
+        [Description("Ошибки")]
         Error,
-        [Description("Информация")]
-        Info,
-        [Description("Предупреждение")]
-        Warning
+        [Description("Предупреждения")]
+        Warning,
+        [Description("Сообщения")]
+        Info
     }
 
     internal enum ElementType {

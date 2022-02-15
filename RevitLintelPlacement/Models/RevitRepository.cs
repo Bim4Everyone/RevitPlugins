@@ -211,7 +211,7 @@ namespace RevitLintelPlacement.Models {
                 return false;
             }
             var wallOrColumn = _document.GetElement(refWithContext.GetReference().ElementId);
-            if(LintelsCommonConfig.ReinforcedConcreteFilter.Any(f => wallOrColumn.Name.ToLower().Contains(f))) {
+            if(LintelsCommonConfig.ReinforcedConcreteFilter.Any(f => wallOrColumn.Name.ToLower().Contains(f.ToLower()))) {
                 return false;
             }
             refWithContext = GetNearestWallOrColumn(view3D, elementInWall, viewPoint, new XYZ(0, 0, 1), true);
@@ -250,7 +250,7 @@ namespace RevitLintelPlacement.Models {
                 ?? elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
 
             if(elementWidth == null) {
-                elementInfos.ElementIfos.Add(new ElementInfoViewModel(elementInWall.Id,
+                elementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id,
                     InfoElement.MissingOpeningParameter.FormatMessage(elementInWall.Name, LintelsCommonConfig.OpeningWidth)));
                 return false;
             }
@@ -519,7 +519,7 @@ namespace RevitLintelPlacement.Models {
             foreach(var configParameter in configParameterNames) {
                 if(!parameterNames.Any(p => p.Equals(configParameter, StringComparison.CurrentCultureIgnoreCase))) {
                     result = false;
-                    elementInfos.ElementIfos.Add(new ElementInfoViewModel(lintelType.Id, InfoElement.MissingLintelParameter.FormatMessage(lintelType?.Family?.Name, configParameter)));
+                    elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintelType.Id, InfoElement.MissingLintelParameter.FormatMessage(lintelType?.Family?.Name, configParameter)));
                 }
             }
             return result;

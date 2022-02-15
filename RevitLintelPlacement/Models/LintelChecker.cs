@@ -15,12 +15,12 @@ namespace RevitLintelPlacement.Models {
     internal class LintelChecker {
         private readonly List<IChecker> _checkers;
 
-        public LintelChecker(RevitRepository revitRepository, ElementInfosViewModel elementInfos) {
+        public LintelChecker(RevitRepository revitRepository, GroupedRuleCollectionViewModel groupedRules, ElementInfosViewModel elementInfos) {
             _checkers = new List<IChecker> {
             new LintelGroupChecker(),
             new ElementInWallChecker(revitRepository, elementInfos),
             new LintelWallAboveChecker(revitRepository),
-            new LintelRuleChecker(revitRepository, elementInfos),
+            new LintelRuleChecker(revitRepository, groupedRules, elementInfos),
             new GeometricalLintelChecker(revitRepository, elementInfos)
             };
         }
@@ -60,7 +60,7 @@ namespace RevitLintelPlacement.Models {
             }
 
             if((int) lintel.GetParamValue(_revitRepository.LintelsCommonConfig.LintelFixation) == 1) {
-                _elementInfos.ElementIfos.Add(new ElementInfoViewModel(lintel.Id, InfoElement.LintelIsFixedWithoutElement));
+                _elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintel.Id, InfoElement.LintelIsFixedWithoutElement));
                 return new ReportResult(lintel.Id) { Code = ResultCode.LintelIsFixedWithoutElement};
             }
             return new LintelForDeletionResult(_revitRepository, lintel) { Code = ResultCode.LintelWithoutElement };
@@ -90,9 +90,9 @@ namespace RevitLintelPlacement.Models {
         private readonly GroupedRuleCollectionViewModel _groupedRules;
         private readonly RevitRepository _revitRepository;
 
-        public LintelRuleChecker(RevitRepository revitRepository, ElementInfosViewModel elementInfos) {
+        public LintelRuleChecker(RevitRepository revitRepository, GroupedRuleCollectionViewModel groupedRules, ElementInfosViewModel elementInfos) {
             this._revitRepository = revitRepository;
-            this._groupedRules = new GroupedRuleCollectionViewModel(_revitRepository, elementInfos);
+            this._groupedRules = groupedRules;
             _view3D = _revitRepository.GetView3D();
         }
 
@@ -142,7 +142,7 @@ namespace RevitLintelPlacement.Models {
             if(lintelLocationPoint.DistanceTo(elementInWallPoint) < 1) //ToDO: понять, что считать смещенной перемычкой - пока примерно 30 см
                 return new EmptyResult { Code = ResultCode.Correct };
             else {
-                _elementInfos.ElementIfos.Add(new ElementInfoViewModel(lintel.Id, InfoElement.LintelGeometricalDisplaced));
+                _elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintel.Id, InfoElement.LintelGeometricalDisplaced));
                 return new ReportResult(lintel.Id) { Code = ResultCode.LintelGeometricalDisplaced };
             }
         }

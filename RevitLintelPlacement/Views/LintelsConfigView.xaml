@@ -48,7 +48,9 @@
         <GroupBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Header="Путь к файлу настроек">
             <DockPanel HorizontalAlignment="Stretch">
                 <Button DockPanel.Dock="Right" Width="20" Height="25" Command="{Binding SelectLintelsConfigCommand}">...</Button>
-                <TextBox Text="{Binding LintelsConfigPath}" HorizontalAlignment="Stretch" Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DockPanel}, Path=ActualWidth, Converter={StaticResource WidthConverter}}"></TextBox>
+                <TextBox Text="{Binding LintelsConfigPath}" HorizontalAlignment="Stretch" 
+                         Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DockPanel}, Path=ActualWidth, 
+                    Converter={StaticResource WidthConverter}, ConverterParameter=30}"></TextBox>
             </DockPanel>
         </GroupBox>
         <GroupBox Grid.Row="1" Grid.Column="0" Header="Семейства перемычек">
@@ -109,7 +111,8 @@
                 <ListBox MaxHeight="80" HorizontalAlignment="Stretch" BorderBrush="Transparent" ItemsSource="{Binding ReinforcedConcreteFilter}">
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type vm:FilterViewModel}">
-                            <TextBox Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=ActualWidth, Converter={StaticResource WidthConverter}}" Text="{Binding Name}">
+                            <TextBox Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=ActualWidth, 
+                                Converter={StaticResource WidthConverter}, ConverterParameter=30}" Text="{Binding Name}">
                             </TextBox>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -135,9 +138,11 @@
                 <ListBox MaxHeight="80" BorderBrush="Transparent" BorderThickness="0" ItemsSource="{Binding RulesCongigPaths}">
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type vm:RulePathViewModel}">
-                            <DockPanel HorizontalAlignment="Stretch" Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=ActualWidth, Converter={StaticResource WidthConverter}}">
+                            <DockPanel HorizontalAlignment="Stretch" Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=ActualWidth, 
+                                Converter={StaticResource WidthConverter}, ConverterParameter=30}">
                                 <Button DockPanel.Dock="Right" Width="20" Height="25" Command="{Binding SelectPathCommand}">...</Button>
-                                <TextBox Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DockPanel}, Path=ActualWidth, Converter={StaticResource WidthConverter}}" 
+                                <TextBox Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DockPanel}, Path=ActualWidth, 
+                                    Converter={StaticResource WidthConverter}, ConverterParameter=30}" 
                                  Text="{Binding Name}"></TextBox>
                             </DockPanel>
                         </DataTemplate>

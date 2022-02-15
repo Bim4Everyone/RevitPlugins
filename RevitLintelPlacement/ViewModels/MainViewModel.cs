@@ -76,7 +76,7 @@ namespace RevitLintelPlacement.ViewModels {
 
         public void PlaceLintels(object p) {
             Lintels = new LintelCollectionViewModel(_revitRepository);
-            ElementInfos = new ElementInfosViewModel(_revitRepository);
+            ElementInfos.ElementInfos.Clear();
             foreach(var type in _revitRepository.GetLintelTypes()) {
                 if(!_revitRepository.CheckLintelType(type, ElementInfos)) {
                     ShowReport();
@@ -93,7 +93,7 @@ namespace RevitLintelPlacement.ViewModels {
                     elementInWallIds.Remove(lintel.ElementInWallId);
             }
 
-            LintelChecker lc = new LintelChecker(_revitRepository, ElementInfos);
+            LintelChecker lc = new LintelChecker(_revitRepository, GroupedRules, ElementInfos);
             lc.Check(Lintels.LintelInfos);
 
             var elevation = _revitRepository.GetElevation();
@@ -136,7 +136,7 @@ namespace RevitLintelPlacement.ViewModels {
                 }
                 t.Commit();
             }
-            if(ElementInfos.ElementIfos != null && ElementInfos.ElementIfos.Count > 0) {
+            if(ElementInfos.ElementInfos != null && ElementInfos.ElementInfos.Count > 0) {
                 ShowReport();
             }
         }
@@ -146,6 +146,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         private void ShowReport() {
+            ElementInfos.UpdateCollection();
             var view = new ReportView() { DataContext = ElementInfos };
             view.ShowDialog();
         }
