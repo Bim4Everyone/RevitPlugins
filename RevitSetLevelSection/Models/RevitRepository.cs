@@ -45,25 +45,6 @@ namespace RevitSetLevelSection.Models {
                 .ToList();
         }
         
-        public IEnumerable<Element> GetElements(RevitParam revitParam) {
-            var catFilter = new ElementMulticategoryFilter(GetCategories(revitParam));
-            return new FilteredElementCollector(_document)
-                .WhereElementIsNotElementType()
-                .WherePasses(catFilter)
-                .ToList();
-        }
-        
-        public IEnumerable<Element> GetElements(FamilyInstance massElement, RevitParam revitParam) {
-            var bbFilter = new BoundingBoxIntersectsFilter(GetOutline(massElement));
-            var catFilter = new ElementMulticategoryFilter(GetCategories(revitParam));
-
-            var filter = new LogicalAndFilter(new ElementFilter[] { bbFilter, catFilter });
-            return new FilteredElementCollector(_document)
-                .WhereElementIsNotElementType()
-                .WherePasses(filter)
-                .ToList();
-        }
-
         public void UpdateElements(RevitParam revitParam, string paramValue) {
             using(Transaction transaction = _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name} - По сведениям о проекте\"")) {
                 ProjectInfo.SetParamValue(revitParam, paramValue);
@@ -78,23 +59,51 @@ namespace RevitSetLevelSection.Models {
         }
 
         public void UpdateElements(RevitParam revitParam, IEnumerable<FamilyInstance> massElements) {
+            List<Element> elements = GetElements(revitParam);
             using(Transaction transaction = _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name} - по формообразующим\"")) {
                 foreach(FamilyInstance massObject in massElements) {
                     Parameter massParameter = massObject.GetParam(revitParam);
-                    IEnumerable<Element> elements = GetElements(massObject, revitParam);
-                    
                     foreach(Element element in elements) {
-                        Parameter parameter = element.GetParam(revitParam);
-                        parameter.Set(massParameter);
+                        if(IsIntersectCenterElement(massObject, element)) {
+                            Parameter parameter = element.GetParam(revitParam);
+                            parameter.Set(massParameter);
+                        } else {
+                            element.RemoveParamValue(revitParam);
+                        }
                     }
                 }
 
                 transaction.Commit();
             }
         }
+        
+        private List<Element> GetElements(RevitParam revitParam) {
+            var catFilter = new ElementMulticategoryFilter(GetCategories(revitParam));
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .WherePasses(catFilter)
+                .ToList();
+        }
 
-        private Outline GetOutline(FamilyInstance massElement) {
-            var boundingBox = massElement.get_BoundingBox(_document.ActiveView);
+        private bool IsIntersectCenterElement(FamilyInstance massElement, Element element) {
+            var outline = GetOutline(element);
+            var point = (outline.MaximumPoint - outline.MinimumPoint) / 2 + outline.MinimumPoint;
+
+            var massOutline = GetOutline(massElement);
+            return massOutline.MinimumPoint.X < point.X
+                   && massOutline.MinimumPoint.Y < point.Y
+                   && massOutline.MinimumPoint.Z < point.Z
+                   && massOutline.MaximumPoint.X > point.X
+                   && massOutline.MaximumPoint.Y > point.Y
+                   && massOutline.MaximumPoint.Z > point.Z;
+        }
+
+        private Outline GetOutline(Element element) {
+            var boundingBox = element.get_BoundingBox(_document.ActiveView);
+            if(boundingBox == null) {
+                return new Outline(XYZ.Zero, XYZ.Zero);
+            }
+
             return new Outline(boundingBox.Min, boundingBox.Max);
         }
 
