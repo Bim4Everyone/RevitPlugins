@@ -105,15 +105,26 @@
             Margin="20"
             Text="Связанный файл"/>
         
-        <ComboBox
+        <DockPanel
             Grid.Column="1"
             Grid.Row="2"
             Grid.ColumnSpan="2"
-            Margin="20"
-            DisplayMemberPath="Name"
-            SelectedItem="{Binding LinkInstance}"
-            ItemsSource="{Binding LinkInstances}"
-            IsEnabled="{Binding FromRevitParam, Converter={StaticResource InverseBooleanConverter}}"/>
+            Margin="10">
+            
+            <Button
+                Margin="10"
+                Content="Загрузить"
+                DockPanel.Dock="Right"
+                Width="70"
+                Command="{Binding LinkInstance.LoadLinkDocumentCommand}" />
+            
+            <ComboBox
+                Margin="10"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding LinkInstance}"
+                ItemsSource="{Binding LinkInstances}"
+                IsEnabled="{Binding FromRevitParam, Converter={StaticResource InverseBooleanConverter}}"/>
+        </DockPanel>
         
         <ItemsControl
             Grid.Column="0"
