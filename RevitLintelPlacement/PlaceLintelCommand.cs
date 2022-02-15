@@ -29,7 +29,7 @@ namespace RevitLintelPlacement {
                 window.ShowDialog();
             } catch(Exception ex) {
 #if D2020 || D2021 || D2022
-                TaskDialog.Show("Расстановщик перемычек.", ex.ToString()); //TODO: придумать название плагину
+                TaskDialog.Show("Расстановщик перемычек.", ex.ToString());
 #else
                 TaskDialog.Show("Расстановщик перемычек.", ex.Message);
 #endif

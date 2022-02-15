@@ -20,18 +20,16 @@ namespace RevitLintelPlacement.Models {
             new LintelGroupChecker(),
             new ElementInWallChecker(revitRepository, elementInfos),
             new LintelWallAboveChecker(revitRepository),
-            new LintelRuleChecker(revitRepository),
+            new LintelRuleChecker(revitRepository, elementInfos),
             new GeometricalLintelChecker(revitRepository, elementInfos)
             };
         }
 
-        public IEnumerable<IResultHandler> Check(IEnumerable<LintelInfoViewModel> lintels) {
+        public void Check(IEnumerable<LintelInfoViewModel> lintels) {
             foreach(var lintel in lintels) {
                 foreach(var checker in _checkers) {
                     var resultHandler = checker.Check(lintel.Lintel, lintel.ElementInWall); 
                     resultHandler?.Handle();
-                    if(resultHandler.Code == ResultCode.LintelGeometricalDisplaced || resultHandler.Code == ResultCode.LintelIsFixedWithoutElement)
-                        yield return resultHandler;
                     if(resultHandler.Code != ResultCode.Correct)
                         break;
                 }
@@ -61,7 +59,7 @@ namespace RevitLintelPlacement.Models {
                 return new EmptyResult { Code = ResultCode.Correct };
             }
 
-            if((int) lintel.GetParamValue(_revitRepository.LintelsCommonConfig.LintelFixation) == 1) { //Todo: параметр "Фиксировать"
+            if((int) lintel.GetParamValue(_revitRepository.LintelsCommonConfig.LintelFixation) == 1) {
                 _elementInfos.ElementIfos.Add(new ElementInfoViewModel(lintel.Id, InfoElement.LintelIsFixedWithoutElement));
                 return new ReportResult(lintel.Id) { Code = ResultCode.LintelIsFixedWithoutElement};
             }
@@ -72,13 +70,15 @@ namespace RevitLintelPlacement.Models {
     internal class LintelWallAboveChecker : IChecker {
         private readonly View3D _view3D;
         private readonly RevitRepository _revitRepository;
+        private List<string> _links;
 
         public LintelWallAboveChecker(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
             _view3D = _revitRepository.GetView3D();
+            List<string> links = _revitRepository.GetLinkTypes().Select(l=>l.Name).ToList();
         }
         public IResultHandler Check(FamilyInstance lintel, FamilyInstance elementInWall) {
-            if(_revitRepository.CheckUp(_view3D, elementInWall))
+            if(_revitRepository.CheckUp(_view3D, elementInWall, _links))
                 return new EmptyResult() { Code = ResultCode.Correct };
             else
                 return new LintelForDeletionResult(_revitRepository, lintel) { Code = ResultCode.LintelWithWrongWallAbove };
@@ -90,9 +90,9 @@ namespace RevitLintelPlacement.Models {
         private readonly GroupedRuleCollectionViewModel _groupedRules;
         private readonly RevitRepository _revitRepository;
 
-        public LintelRuleChecker(RevitRepository revitRepository) {
+        public LintelRuleChecker(RevitRepository revitRepository, ElementInfosViewModel elementInfos) {
             this._revitRepository = revitRepository;
-            this._groupedRules = new GroupedRuleCollectionViewModel(_revitRepository);
+            this._groupedRules = new GroupedRuleCollectionViewModel(_revitRepository, elementInfos);
             _view3D = _revitRepository.GetView3D();
         }
 
@@ -114,7 +114,7 @@ namespace RevitLintelPlacement.Models {
         private ParameterCheckResult CheckWallThickness(FamilyInstance lintel, FamilyInstance elementInWall) {
             var wall = elementInWall.Host as Wall;
             var wallThickness = wall.Width;
-            var lintelThickness = ((double) lintel.GetParamValue(_revitRepository.LintelsCommonConfig.LintelThickness)); //ToDo: параметр
+            var lintelThickness = ((double) lintel.GetParamValue(_revitRepository.LintelsCommonConfig.LintelThickness));
             if(Math.Abs(lintelThickness - wallThickness) < 0.1) {
                 return ParameterCheckResult.Correct;
             }
@@ -139,10 +139,7 @@ namespace RevitLintelPlacement.Models {
             var lintelLocationPoint = ((LocationPoint) lintel.Location).Point;
             var elementInWallPoint = _revitRepository.GetLocationPoint(elementInWall);
 
-            var elementWidth = elementInWall.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningWidth) ?? 
-                               elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM); //ToDo: параметр
-
-            if(lintelLocationPoint.DistanceTo(elementInWallPoint) < (double) elementWidth / 2) //Todo: возможно, расстояние должно быть меньше
+            if(lintelLocationPoint.DistanceTo(elementInWallPoint) < 1) //ToDO: понять, что считать смещенной перемычкой - пока примерно 30 см
                 return new EmptyResult { Code = ResultCode.Correct };
             else {
                 _elementInfos.ElementIfos.Add(new ElementInfoViewModel(lintel.Id, InfoElement.LintelGeometricalDisplaced));

@@ -15,11 +15,13 @@ using RevitLintelPlacement.ViewModels.Interfaces;
 namespace RevitLintelPlacement.ViewModels {
     internal class OpeningWidthConditionViewModel : BaseViewModel, IConditionViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly ElementInfosViewModel _elementInfos;
         private double _minWidth;
         private double _maxWidth;
 
-        public OpeningWidthConditionViewModel(RevitRepository revitRepository) {
+        public OpeningWidthConditionViewModel(RevitRepository revitRepository, ElementInfosViewModel elementInfos) {
             this._revitRepository = revitRepository;
+            this._elementInfos = elementInfos;
         }
 
         public double MinWidth {
@@ -36,23 +38,24 @@ namespace RevitLintelPlacement.ViewModels {
             if(elementInWall == null || elementInWall.Id == ElementId.InvalidElementId)
                 throw new ArgumentNullException(nameof(elementInWall));
 
-
-            //Todo: после установки 2021 версии поправить
-#if D2020 || R2020
             var elementWidth = elementInWall.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningWidth);
-            if (elementWidth == null) {
-                elementWidth = elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
-            }
             if(elementWidth == null) {
                 elementWidth = elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
             }
+            if(elementWidth == null) {
+                _elementInfos.ElementIfos.Add(new ElementInfoViewModel(elementInWall.Id, 
+                    InfoElement.MissingOpeningParameter.FormatMessage(elementInWall.Name, _revitRepository.LintelsCommonConfig.OpeningWidth)));
+                return false;
+            }
+                
+            double openingWidth;
+#if D2020 || R2020
+            openingWidth = UnitUtils.ConvertFromInternalUnits((double) elementWidth, DisplayUnitType.DUT_MILLIMETERS);
+#elif D2021 || R2021
+            openingWidth = UnitUtils.ConvertFromInternalUnits((double) elementWidth, UnitTypeId.Millimeters);
 
-            if(elementWidth == null)
-                throw new ArgumentException(nameof(elementInWall), $"У элемента {elementInWall.Id} отсутствует параметр \"ADSK_Размер_Ширина\".");
-            double openingWidth = UnitUtils.ConvertFromInternalUnits((double) elementWidth, DisplayUnitType.DUT_MILLIMETERS);
-            
 #else
-            double openingWidth = UnitUtils.ConvertFromInternalUnits(
+            openingWidth = UnitUtils.ConvertFromInternalUnits(
                 (double) elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM), UnitTypeId.Millimeters);
 #endif
             return MinWidth <= openingWidth && openingWidth < MaxWidth;

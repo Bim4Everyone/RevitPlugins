@@ -14,6 +14,7 @@ using RevitLintelPlacement.ViewModels.LintelParameterViewModels;
 namespace RevitLintelPlacement.ViewModels {
     internal class ConcreteRuleViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly ElementInfosViewModel _elementInfos;
         private readonly List<IConditionViewModel> _conditions = new List<IConditionViewModel>();
         private string _selectedLintelType;
         private OpeningWidthConditionViewModel _openingWidthCondition;
@@ -25,8 +26,9 @@ namespace RevitLintelPlacement.ViewModels {
         public ConcreteRuleViewModel() {
         }
 
-        public ConcreteRuleViewModel(RevitRepository revitRepository, RuleSetting ruleSetting = null) {
+        public ConcreteRuleViewModel(RevitRepository revitRepository, ElementInfosViewModel elementInfos, RuleSetting ruleSetting = null) {
             this._revitRepository = revitRepository;
+            this._elementInfos = elementInfos;
             if(ruleSetting == null) {
                 InitializeEmptyGroupedRule();
             } else {
@@ -123,7 +125,7 @@ namespace RevitLintelPlacement.ViewModels {
             foreach(var condition in ruleSetting.ConditionSettingsConfig) {
                 switch(condition.ConditionType) {
                     case ConditionType.OpeningWidth: {
-                        OpeningWidthCondition = new OpeningWidthConditionViewModel(_revitRepository) {
+                        OpeningWidthCondition = new OpeningWidthConditionViewModel(_revitRepository, _elementInfos) {
                             MaxWidth = condition.OpeningWidthMax,
                             MinWidth = condition.OpeningWidthMin
                         };
@@ -163,16 +165,16 @@ namespace RevitLintelPlacement.ViewModels {
                 SelectedLintelType = LintelTypes.FirstOrDefault();
             }
             OpeningWidthParameter = new OpeningWidthParameter(_revitRepository);
-            WallHalfThicknessParameter = new WallHalfThicknessParameter(_revitRepository);
+            WallHalfThicknessParameter = new WallHalfThicknessParameter(_revitRepository, _elementInfos);
         }
 
         private void InitializeEmptyGroupedRule() {
             //CornerParameter = new LintelCornerParameter();
-            OpeningWidthCondition = new OpeningWidthConditionViewModel(_revitRepository);
+            OpeningWidthCondition = new OpeningWidthConditionViewModel(_revitRepository, _elementInfos);
             LintelLeftOffsetParameter = new LintelLeftOffsetParameter(_revitRepository);
             LintelRightOffsetParameter = new LintelRightOffsetParameter(_revitRepository);
             OpeningWidthParameter = new OpeningWidthParameter(_revitRepository);
-            WallHalfThicknessParameter = new WallHalfThicknessParameter(_revitRepository);
+            WallHalfThicknessParameter = new WallHalfThicknessParameter(_revitRepository, _elementInfos);
             LintelTypes = new List<string>(
                 _revitRepository.GetLintelTypes()
                 .Select(lt=>lt.Name));

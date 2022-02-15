@@ -16,17 +16,19 @@ using RevitLintelPlacement.Models;
 namespace RevitLintelPlacement.ViewModels {
     internal class GroupedRuleViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly ElementInfosViewModel _elementInfos;
         private string _name;
         private ObservableCollection<ConcreteRuleViewModel> _groupedRules;
         private WallTypesConditionViewModel _groupingCondition;
 
-        public GroupedRuleViewModel(RevitRepository revitRepository, GroupedRuleSettings groupedRuleSettings=null) {
+        public GroupedRuleViewModel(RevitRepository revitRepository, ElementInfosViewModel elementInfos, GroupedRuleSettings groupedRuleSettings=null) {
             this._revitRepository = revitRepository;
+            this._elementInfos = elementInfos;
             AddRuleCommand = new RelayCommand(AddRule, p => true);
             RemoveRuleCommand = new RelayCommand(RemoveRule, p => true);
             if(groupedRuleSettings==null || groupedRuleSettings.Rules.Count == 0) {
                 Rules = new ObservableCollection<ConcreteRuleViewModel>();
-                var rule = new ConcreteRuleViewModel(revitRepository);
+                var rule = new ConcreteRuleViewModel(revitRepository, _elementInfos);
                 Rules.Add(rule);
                 InitializeWallTypes();
             } else {
@@ -39,7 +41,7 @@ namespace RevitLintelPlacement.ViewModels {
                 Name = groupedRuleSettings.Name;
                 Rules = new ObservableCollection<ConcreteRuleViewModel>(
                     groupedRuleSettings.Rules
-                    .Select(r => new ConcreteRuleViewModel(_revitRepository, r)));
+                    .Select(r => new ConcreteRuleViewModel(_revitRepository, _elementInfos, r)));
             }
         }
 
@@ -91,7 +93,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         private void AddRule(object p) {
-            Rules.Add(new ConcreteRuleViewModel(_revitRepository));
+            Rules.Add(new ConcreteRuleViewModel(_revitRepository, _elementInfos));
         }
         private void RemoveRule(object p) {
             if(Rules.Count > 0) {

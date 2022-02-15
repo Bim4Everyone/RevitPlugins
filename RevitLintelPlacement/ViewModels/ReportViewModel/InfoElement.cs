@@ -25,6 +25,18 @@ namespace RevitLintelPlacement.ViewModels {
             ElementType = ElementType.Lintel
         };
 
+        public static InfoElement MissingOpeningParameter => new InfoElement() {
+            Message = "У элемента \"{0}\" отсутсвует параметр \"{1}\".",
+            TypeInfo = TypeInfo.Error,
+            ElementType = ElementType.Opening
+        };
+
+        public static InfoElement UnsetLintelParamter => new InfoElement() {
+            Message = "У перемычки \"{0}\" не удалось установить значение параметра \"{1}\".",
+            TypeInfo = TypeInfo.Error,
+            ElementType = ElementType.Opening
+        };
+
         public string Message { get; set; }
         public TypeInfo TypeInfo { get; set; }
         public ElementType ElementType { get; set; }
@@ -32,7 +44,7 @@ namespace RevitLintelPlacement.ViewModels {
             return new InfoElement() {
                 TypeInfo = TypeInfo,
                 Message = string.Format(Message, args),
-                ElementType = ElementType.Lintel
+                ElementType = ElementType
             };
         }
     }

@@ -14,9 +14,11 @@ using RevitLintelPlacement.ViewModels.Interfaces;
 namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels {
     internal class WallHalfThicknessParameter : ILintelParameterViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly ElementInfosViewModel _elementInfos;
 
-        public WallHalfThicknessParameter(RevitRepository revitRepository) {
+        public WallHalfThicknessParameter(RevitRepository revitRepository, ElementInfosViewModel elementInfos) {
             this._revitRepository = revitRepository;
+            this._elementInfos = elementInfos;
         }
 
         public void SetTo(FamilyInstance lintel, FamilyInstance elementInWall) {
@@ -28,13 +30,16 @@ namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels {
                 throw new ArgumentNullException(nameof(elementInWall));
             }
             var elementWidth = elementInWall.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningWidth) ?? 
-                               elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM)??
                                elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
 
-            if(elementWidth == null)
-                throw new ArgumentException(nameof(elementInWall), $"У элемента {elementInWall.Id} отсутствует параметр \"ADSK_Размер_Ширина\".");
-
-            lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelWidth, (double) elementWidth); //Todo: параметр
+            if(elementWidth == null) {
+                _elementInfos.ElementIfos.Add(new ElementInfoViewModel(elementInWall.Id,
+                    InfoElement.MissingOpeningParameter.FormatMessage(elementInWall.Name, _revitRepository.LintelsCommonConfig.OpeningWidth)));
+                _elementInfos.ElementIfos.Add(new ElementInfoViewModel(lintel.Id,
+                    InfoElement.UnsetLintelParamter.FormatMessage(lintel.Name, _revitRepository.LintelsCommonConfig.LintelWidth)));
+            } else {
+                lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelWidth, (double) elementWidth);
+            }
         }
     }
 }

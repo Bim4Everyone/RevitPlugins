@@ -34,9 +34,10 @@ namespace RevitLintelPlacement.ViewModels {
         public MainViewModel(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
             ElementInfos = new ElementInfosViewModel(_revitRepository);
-            Lintels = new LintelCollectionViewModel(_revitRepository);
-            GroupedRules = new GroupedRuleCollectionViewModel(_revitRepository);
+            
+            GroupedRules = new GroupedRuleCollectionViewModel(_revitRepository, ElementInfos);
             PlaceLintelCommand = new RelayCommand(PlaceLintels, p => true);
+            ShowReportCommand = new RelayCommand(ShowReport, p=>true);
             var links = _revitRepository.GetLinkTypes().ToList();
             if(links.Count > 0) {
                 Links = new ObservableCollection<LinkViewModel>(links.Select(l => new LinkViewModel() { Name = Path.GetFileNameWithoutExtension(l.Name) }));
@@ -61,6 +62,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         public ICommand PlaceLintelCommand { get; set; }
+        public ICommand ShowReportCommand { get; set; }
 
         public ObservableCollection<LinkViewModel> Links {
             get => _links;
@@ -73,6 +75,8 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         public void PlaceLintels(object p) {
+            Lintels = new LintelCollectionViewModel(_revitRepository);
+            ElementInfos = new ElementInfosViewModel(_revitRepository);
             foreach(var type in _revitRepository.GetLintelTypes()) {
                 if(!_revitRepository.CheckLintelType(type, ElementInfos)) {
                     ShowReport();
@@ -90,17 +94,17 @@ namespace RevitLintelPlacement.ViewModels {
             }
 
             LintelChecker lc = new LintelChecker(_revitRepository, ElementInfos);
-            var resultsForReport = lc.Check(Lintels.LintelInfos).ToList();
+            lc.Check(Lintels.LintelInfos);
 
             var elevation = _revitRepository.GetElevation();
             var plan = _revitRepository.GetPlan();
             var view3D = _revitRepository.GetView3D();
-            using(Transaction t = _revitRepository.StartTransaction("Подготовка к расстановке перемычек")) {
-                if(view3D.IsSectionBoxActive) {
-                    view3D.IsSectionBoxActive = false;
-                }
-                t.Commit();
-            }
+            //using(Transaction t = _revitRepository.StartTransaction("Подготовка к расстановке перемычек")) {
+            //    if(view3D.IsSectionBoxActive) {
+            //        view3D.IsSectionBoxActive = false;
+            //    }
+            //    t.Commit();
+            //}
 
             using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
 
@@ -109,7 +113,7 @@ namespace RevitLintelPlacement.ViewModels {
                     var rule = GroupedRules.GetRule(elementInWall);
                     if(rule == null)
                         continue;
-                    if(!_revitRepository.CheckUp(view3D, elementInWall))
+                    if(!_revitRepository.CheckUp(view3D, elementInWall, Links.Where(l => l.IsChecked).Select(l => l.Name)))
                         continue;
                     if(string.IsNullOrEmpty(rule.SelectedLintelType)) {
                         TaskDialog.Show("Revit", "В проект не загружено семейство перемычки.");
@@ -118,12 +122,12 @@ namespace RevitLintelPlacement.ViewModels {
                     var lintelType = _revitRepository.GetLintelType(rule.SelectedLintelType);
                     var lintel = _revitRepository.PlaceLintel(lintelType, elementId);
                     rule.SetParametersTo(lintel, elementInWall);
-                    if(_revitRepository.CheckHorizontal(view3D, elementInWall, true, Links.Where(l => l.IsChecked).Select(l => l.Name), out double rightOffset)) {
+                    if(_revitRepository.DoesCornerNeeded(view3D, elementInWall, true, Links.Where(l => l.IsChecked).Select(l => l.Name), ElementInfos, out double rightOffset)) {
                         lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightOffset, rightOffset > 0 ? rightOffset : 0);
-                        lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightCorner, 1); //ToDo: параметр
+                        lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightCorner, 1);
                     }
 
-                    if(_revitRepository.CheckHorizontal(view3D, elementInWall, false, Links.Where(l => l.IsChecked).Select(l => l.Name), out double leftOffset)) {
+                    if(_revitRepository.DoesCornerNeeded(view3D, elementInWall, false, Links.Where(l => l.IsChecked).Select(l => l.Name), ElementInfos, out double leftOffset)) {
                         lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftOffset, leftOffset > 0 ? leftOffset : 0);
                         lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftCorner, 1);
                     }
@@ -132,12 +136,13 @@ namespace RevitLintelPlacement.ViewModels {
                 }
                 t.Commit();
             }
-            //var message = new ReportMaker().MakeMessage(resultsForReport);
-            //if(!string.IsNullOrEmpty(message)) {
-            //    TaskDialog.Show("Revit", message);
-            //}
-            ShowReport();
+            if(ElementInfos.ElementIfos != null && ElementInfos.ElementIfos.Count > 0) {
+                ShowReport();
+            }
+        }
 
+        private void ShowReport(object p) {
+            ShowReport();
         }
 
         private void ShowReport() {

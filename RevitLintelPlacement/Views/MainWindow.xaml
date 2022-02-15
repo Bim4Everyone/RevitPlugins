@@ -9,8 +9,9 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:extensions="clr-namespace:RevitLintelPlacement.Extensions"
         mc:Ignorable="d"
-        Title="Перемычки" Height="670" Width="1150"
-        MinHeight="670" MinWidth="1150"
+        Title="Перемычки" Height="770" Width="1150"
+        MinHeight="770" MinWidth="1150"
+        Name ="MainView"
         d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
     <Window.Resources>
         <converter:EnumConverter x:Key="EnumConverter"/>

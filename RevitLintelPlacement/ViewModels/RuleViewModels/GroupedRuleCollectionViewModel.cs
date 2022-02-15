@@ -17,6 +17,7 @@ using RevitLintelPlacement.Models;
 namespace RevitLintelPlacement.ViewModels {
     internal class GroupedRuleCollectionViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly ElementInfosViewModel _elementInfos;
         private ObservableCollection<GroupedRuleViewModel> _groupedRules;
         private ObservableCollection<string> _rulePaths;
         private string _selectedPath;
@@ -25,7 +26,7 @@ namespace RevitLintelPlacement.ViewModels {
 
         }
 
-        public GroupedRuleCollectionViewModel(RevitRepository revitRepository) {
+        public GroupedRuleCollectionViewModel(RevitRepository revitRepository, ElementInfosViewModel elementInfos) {
             AddGroupedRuleCommand = new RelayCommand(AddGroupedRule, p => true);
             RemoveGroupedRuleCommand = new RelayCommand(RemoveGroupedRule, p => true);
             SaveCommand = new RelayCommand(Save, p => true);
@@ -33,6 +34,7 @@ namespace RevitLintelPlacement.ViewModels {
             LoadCommand = new RelayCommand(Load, p => true);
             PathSelectionChangedCommand = new RelayCommand(SelectionChanged, p => true);
             this._revitRepository = revitRepository;
+            this._elementInfos = elementInfos;
             InitializeGroupRules(_revitRepository.RuleConfig.RuleSettings);
             if(_revitRepository.LintelsConfig.RulesCongigPaths == null || _revitRepository.LintelsConfig.RulesCongigPaths.Count == 0) {
                 SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -137,16 +139,16 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         private void AddGroupedRule(object p) {
-            GroupedRules.Add(new GroupedRuleViewModel(_revitRepository));
+            GroupedRules.Add(new GroupedRuleViewModel(_revitRepository, _elementInfos));
         }
 
         private void InitializeGroupRules(IEnumerable<GroupedRuleSettings> rules) {
             if(rules == null || rules.Count() == 0) {
                 GroupedRules = new ObservableCollection<GroupedRuleViewModel>();
-                GroupedRules.Add(new GroupedRuleViewModel(_revitRepository));
+                GroupedRules.Add(new GroupedRuleViewModel(_revitRepository, _elementInfos));
             } else {
                 GroupedRules = new ObservableCollection<GroupedRuleViewModel>(
-                rules.Select(r => new GroupedRuleViewModel(_revitRepository, r))
+                rules.Select(r => new GroupedRuleViewModel(_revitRepository, _elementInfos, r))
                 );
             }
         }
