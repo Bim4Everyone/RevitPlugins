@@ -36,6 +36,14 @@ namespace RevitSetLevelSection.Models {
         public Element GetElements(ElementId elementId) {
             return _document.GetElement(elementId);
         }
+
+        public IEnumerable<RevitLinkType> GetRevitLinkTypes() {
+            return new FilteredElementCollector(_document)
+                .WhereElementIsElementType()
+                .OfClass(typeof(RevitLinkType))
+                .OfType<RevitLinkType>()
+                .ToList();
+        }
         
         public IEnumerable<RevitLinkInstance> GetLinkInstances() {
             return new FilteredElementCollector(_document)

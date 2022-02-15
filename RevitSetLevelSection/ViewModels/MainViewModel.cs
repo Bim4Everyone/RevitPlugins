@@ -21,8 +21,7 @@ namespace RevitSetLevelSection.ViewModels {
 
         private string _errorText;
         private bool _fromRevitParam;
-        private LinkInstanceViewModel _linkInstance;
-        private ObservableCollection<DesignOptionsViewModel> _designOptions;
+        private LinkTypeViewModel _linkType;
 
         public MainViewModel(RevitRepository revitRepository) {
             if(revitRepository is null) {
@@ -30,8 +29,8 @@ namespace RevitSetLevelSection.ViewModels {
             }
 
             _revitRepository = revitRepository;
+            LinkTypes = new ObservableCollection<LinkTypeViewModel>(GetLinkTypes());
             FillParams = new ObservableCollection<FillParamViewModel>(GetFillParams());
-            LinkInstances = new ObservableCollection<LinkInstanceViewModel>(GetLinkInstances());
 
             UpdateElementsCommand = new RelayCommand(UpdateElements, CanUpdateElement);
         }
@@ -48,21 +47,13 @@ namespace RevitSetLevelSection.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _fromRevitParam, value);
         }
 
-        public LinkInstanceViewModel LinkInstance {
-            get => _linkInstance;
-            set {
-                this.RaiseAndSetIfChanged(ref _linkInstance, value);
-                DesignOptions = new ObservableCollection<DesignOptionsViewModel>(LinkInstance.GetDesignOptions());
-            }
+        public LinkTypeViewModel LinkType {
+            get => _linkType;
+            set => this.RaiseAndSetIfChanged(ref _linkType, value);
         }
 
+        public ObservableCollection<LinkTypeViewModel> LinkTypes { get; }
         public ObservableCollection<FillParamViewModel> FillParams { get; }
-        public ObservableCollection<LinkInstanceViewModel> LinkInstances { get; }
-
-        public ObservableCollection<DesignOptionsViewModel> DesignOptions {
-            get => _designOptions;
-            set => this.RaiseAndSetIfChanged(ref _designOptions, value);
-        }
 
         private IEnumerable<FillParamViewModel> GetFillParams() {
             //yield return new FillLevelParamViewModel(_revitRepository);
@@ -77,10 +68,10 @@ namespace RevitSetLevelSection.ViewModels {
             };
         }
 
-        private IEnumerable<LinkInstanceViewModel> GetLinkInstances() {
-            return _revitRepository.GetLinkInstances()
+        private IEnumerable<LinkTypeViewModel> GetLinkTypes() {
+            return _revitRepository.GetRevitLinkTypes()
                 .Select(item =>
-                    new LinkInstanceViewModel((RevitLinkType) _revitRepository.GetElements(item.GetTypeId()), item));
+                    new LinkTypeViewModel(item, _revitRepository));
         }
 
         private void UpdateElements(object param) {
@@ -90,8 +81,13 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         private bool CanUpdateElement(object param) {
-            if(!FromRevitParam && LinkInstance == null) {
+            if(!FromRevitParam && LinkType == null) {
                 ErrorText = "Выберите связанный файл с формообразующими.";
+                return false;
+            }
+
+            if(!LinkType.IsLoaded) {
+                ErrorText = "Загрузите выбранный связанный файл.";
                 return false;
             }
 

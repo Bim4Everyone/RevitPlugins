@@ -52,7 +52,7 @@
                     Grid.Column="1"
                     IsEnabled="{Binding IsEnabled}"
                     SelectedItem="{Binding DesignOptions}"
-                    ItemsSource="{Binding DataContext.DesignOptions, ElementName=_this}"
+                    ItemsSource="{Binding DataContext.LinkType.DesignOptions, ElementName=_this}"
                     Visibility="{Binding DataContext.FromRevitParam, Converter={StaticResource InverseBoolToHiddenConverter}, ElementName=_this}">
 
                     <ComboBox.ItemTemplate>
@@ -116,13 +116,13 @@
                 Content="Загрузить"
                 DockPanel.Dock="Right"
                 Width="70"
-                Command="{Binding LinkInstance.LoadLinkDocumentCommand}" />
+                Command="{Binding LinkType.LoadLinkDocumentCommand}" />
             
             <ComboBox
                 Margin="10"
                 DisplayMemberPath="Name"
-                SelectedItem="{Binding LinkInstance}"
-                ItemsSource="{Binding LinkInstances}"
+                SelectedItem="{Binding LinkType}"
+                ItemsSource="{Binding LinkTypes}"
                 IsEnabled="{Binding FromRevitParam, Converter={StaticResource InverseBooleanConverter}}"/>
         </DockPanel>
         
