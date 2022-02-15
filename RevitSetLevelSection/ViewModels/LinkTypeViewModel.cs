@@ -1,10 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -59,8 +61,16 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         private void LoadLinkDocument(object param) {
+            if(_revitLinkType.GetLinkedFileStatus() == LinkedFileStatus.InClosedWorkset) {
+                Workset workset = _revitRepository.GetWorkset(_revitLinkType);
+                TaskDialog.Show("Ошибка!", $"Откройте рабочий набор \"{workset.Name}\"." 
+                                         + Environment.NewLine
+                                         + "Загрузка связанного файла из закрытого рабочего набора не поддерживается!");
+                
+                return;
+            }
+            
             var loadResult = _revitLinkType.Load();
-
             IsLoaded = loadResult.LoadResult == LinkLoadResultType.LinkLoaded;
             if(IsLoaded) {
                 DesignOptions = new ObservableCollection<DesignOptionsViewModel>(GetDesignOptions());

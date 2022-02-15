@@ -131,5 +131,9 @@ namespace RevitSetLevelSection.Models {
                 .Select(item => item.Id)
                 .ToArray();
         }
+
+        public Workset GetWorkset(RevitLinkType revitLinkType) {
+            return _document.GetWorksetTable().GetWorkset(revitLinkType.WorksetId);
+        }
     }
 }
