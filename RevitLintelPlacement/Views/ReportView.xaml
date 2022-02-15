@@ -19,25 +19,27 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DataGrid CanUserAddRows="False"
+        <ScrollViewer Grid.Row="1" MaxHeight="{Binding ElementName=ReportWindow, Path=ActualHeight}" CanContentScroll="False" HorizontalScrollBarVisibility="Auto">
+            <DataGrid CanUserAddRows="False"
                   CanUserDeleteRows ="False"
                   AutoGenerateColumns="False"
                   CanUserReorderColumns="False"
                   CanUserResizeRows="False"
             ItemsSource="{Binding ElementIfos}">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Элемент">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type vm:ElementInfoViewModel}">
-                            <Button Name="bthElement" Content="{Binding ElementId}" Command="{Binding ElementName=ReportWindow, Path=DataContext.SelectElementCommand}"
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="Элемент">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate DataType="{x:Type vm:ElementInfoViewModel}">
+                                <Button Name="bthElement" Content="{Binding ElementId}" Command="{Binding ElementName=ReportWindow, Path=DataContext.SelectElementCommand}"
                                     CommandParameter="{Binding ElementName=bthElement, Path=DataContext}"></Button>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Тип предупреждения" Binding="{Binding TypeInfo, Converter={StaticResource EnumConverter}, ConverterParameter={x:Type vm:TypeInfo}}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Вид элемента" Binding="{Binding ElementType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Type vm:ElementType}}"></DataGridTextColumn>
-                <DataGridTextColumn Width="*" Header="Сообщение" Binding="{Binding Message}"/>
-            </DataGrid.Columns>
-        </DataGrid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Тип предупреждения" Binding="{Binding TypeInfo, Converter={StaticResource EnumConverter}, ConverterParameter={x:Type vm:TypeInfo}}"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Вид элемента" Binding="{Binding ElementType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Type vm:ElementType}}"></DataGridTextColumn>
+                    <DataGridTextColumn Width="Auto" Header="Сообщение" Binding="{Binding Message}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </ScrollViewer>
     </Grid>
 </Window>
