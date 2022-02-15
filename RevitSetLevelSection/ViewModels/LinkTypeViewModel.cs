@@ -63,7 +63,7 @@ namespace RevitSetLevelSection.ViewModels {
         private void LoadLinkDocument(object param) {
             if(_revitLinkType.GetLinkedFileStatus() == LinkedFileStatus.InClosedWorkset) {
                 Workset workset = _revitRepository.GetWorkset(_revitLinkType);
-                TaskDialog.Show("Ошибка!", $"Откройте рабочий набор \"{workset.Name}\"." 
+                TaskDialog.Show("Предупреждение!", $"Откройте рабочий набор \"{workset.Name}\"." 
                                          + Environment.NewLine
                                          + "Загрузка связанного файла из закрытого рабочего набора не поддерживается!");
                 
