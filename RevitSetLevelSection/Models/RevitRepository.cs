@@ -64,7 +64,7 @@ namespace RevitSetLevelSection.Models {
             
             using(Transaction transaction = _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
                 foreach(Element element in elements) {
-                    if(cashedElements.ContainsKey(element.Id)) {
+                    if(!cashedElements.ContainsKey(element.Id)) {
                         continue;
                     }
                     
