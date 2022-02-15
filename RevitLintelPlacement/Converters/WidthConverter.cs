@@ -9,11 +9,11 @@ using System.Windows.Data;
 namespace RevitLintelPlacement.Converters {
     internal class WidthConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            return value is double width ? width - 30 : value;
+            return value is double width ? width - (Int32.TryParse(parameter.ToString(), out int result) ? result : 0) : value;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            return value is int width ? width + 30 : value;
+            return value is int width ? width + (Int32.TryParse(parameter.ToString(), out int result) ? result : 0) : value;
         }
     }
 }
