@@ -14,7 +14,7 @@ using RevitLintelPlacement.ViewModels;
 namespace RevitLintelPlacement.Models {
 
     internal class RevitRepository {
-        private readonly string _view3DName = "3D_Перемычки"; 
+        private readonly string _view3DName = "3D_Перемычки";
 
         private readonly Application _application;
         private readonly UIApplication _uiApplication;
@@ -48,7 +48,7 @@ namespace RevitLintelPlacement.Models {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .WhereElementIsElementType()
-                .First(e => e.Name == lintelTypeName) as FamilySymbol; 
+                .First(e => e.Name == lintelTypeName) as FamilySymbol;
         }
 
         public IEnumerable<FamilySymbol> GetLintelTypes() {
@@ -57,7 +57,7 @@ namespace RevitLintelPlacement.Models {
                 .WhereElementIsElementType()
                 .OfClass(typeof(FamilySymbol))
                 .Cast<FamilySymbol>()
-                .Where(e => LintelsCommonConfig.LintelFamilies.Any(l => 
+                .Where(e => LintelsCommonConfig.LintelFamilies.Any(l =>
                 l.Equals(e.Family?.Name, StringComparison.CurrentCultureIgnoreCase)));
         }
 
@@ -183,7 +183,7 @@ namespace RevitLintelPlacement.Models {
                 .WherePasses(categoryFilter)
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
-                .Where(e=>e.Host is Wall && e.Location!=null);
+                .Where(e => e.Host is Wall && e.Location != null);
         }
 
         public View GetElevation() {
@@ -201,45 +201,72 @@ namespace RevitLintelPlacement.Models {
         }
 
         //проверка, есть ли сверху элемента стена, у которой тип железобетон (в таком случает перемычку ставить не надо)
-        public bool CheckUp(View3D view3D, FamilyInstance elementInWall) {
+        public bool CheckUp(View3D view3D, FamilyInstance elementInWall, IEnumerable<string> linkNames) {
             XYZ viewPoint = GetLocationPoint(elementInWall);
-            ReferenceWithContext refWithContext = 
-                GetNearestWallOrColumn(view3D, elementInWall, new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z-0.1), new XYZ(0, 0, 1), false); //чтобы точка точно была под гранью стены
+            ReferenceWithContext refWithContext =
+                GetNearestWallOrColumn(view3D, elementInWall, new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z - 0.1), new XYZ(0, 0, 1), false); //чтобы точка точно была под гранью стены
             if(refWithContext == null)
                 return false;
-            if(!(refWithContext.Proximity < 0.32)) { //10 см
+            if(refWithContext.Proximity > 0.32) { //10 см
                 return false;
             }
-            var wall = _document.GetElement(refWithContext.GetReference().ElementId);
-            if(LintelsCommonConfig.ReinforcedConcreteFilter.Any(f=>wall.Name.ToLower().Contains(f))) {
+            var wallOrColumn = _document.GetElement(refWithContext.GetReference().ElementId);
+            if(LintelsCommonConfig.ReinforcedConcreteFilter.Any(f => wallOrColumn.Name.ToLower().Contains(f))) {
                 return false;
             }
             refWithContext = GetNearestWallOrColumn(view3D, elementInWall, viewPoint, new XYZ(0, 0, 1), true);
             if(refWithContext == null)
                 return true;
-            if(!(refWithContext.Proximity < 0.32)) {
+            if(refWithContext.Proximity > 0.32) {
                 return false;
             }
-            wall = _document.GetElement(refWithContext.GetReference().ElementId);
-            return !LintelsCommonConfig.ReinforcedConcreteFilter.Any(f => wall.Name.ToLower().Contains(f));
+            wallOrColumn = _document.GetElement(refWithContext.GetReference().ElementId);
+            if(wallOrColumn is Wall wall)
+                return !LintelsCommonConfig.ReinforcedConcreteFilter.Any(f => wall.Name.ToLower().Contains(f.ToLower()));
+            if(wallOrColumn.Category.Id == new ElementId(BuiltInCategory.OST_StructuralColumns))
+                return false;
+            if(wallOrColumn is RevitLinkInstance linkedInstance) {
+                return !linkNames.Any(l => l.Equals(linkedInstance.GetLinkDocument().Title, StringComparison.CurrentCultureIgnoreCase));
+            }
+            return true;
         }
 
-        public bool CheckHorizontal(View3D view3D, FamilyInstance elementInWall, bool isRight, IEnumerable<string> linkNames, out double offset) {
+        public bool DoesCornerNeeded(View3D view3D, FamilyInstance elementInWall, bool isRight, IEnumerable<string> linkNames, ElementInfosViewModel elementInfos, out double offset) {
             offset = 0;
+            //получение предполагаемой точки вставки перемычки,
+            //из которой проводится поиск жб-элементов
             XYZ viewPoint = GetLocationPoint(elementInWall);
-            var direction = elementInWall.GetTransform().OfVector(isRight? new XYZ(1, 0, 0) : new XYZ(-1, 0, 0));
+
+            //направление, в котором будет проводиться поиск
+            var direction = elementInWall.GetTransform().OfVector(isRight ? new XYZ(1, 0, 0) : new XYZ(-1, 0, 0));
+
+            //получение ссылки на ближайшую жб-стену, колонну или связанный файл и расстояние до них
             ReferenceWithContext refWithContext = GetNearestWallOrColumn(view3D, elementInWall, viewPoint, direction, true);
+
+            //Если жб-стены или колонны не найдены, то уголок не нужен
             if(refWithContext == null)
                 return false;
-            var elementWidth = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningWidth) 
-                ?? elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM); //Todo: параметр
+            var elementWidth = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningWidth)
+                ?? elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
+
+            if(elementWidth == null) {
+                elementInfos.ElementIfos.Add(new ElementInfoViewModel(elementInWall.Id,
+                    InfoElement.MissingOpeningParameter.FormatMessage(elementInWall.Name, LintelsCommonConfig.OpeningWidth)));
+                return false;
+            }
+
+            //если расстояне больше половины ширины проема + 100 мм - уголок не нужен
             if(refWithContext.Proximity > ((double) elementWidth / 2 + 0.4)) {// 0.4 фута примерно = 100 см
                 return false;
             }
+
+            //получение смещения от края проема
             offset = refWithContext.Proximity - (double) elementWidth / 2;
+
+            //получение ближайшего элемента и его проверка
             var wallOrColumn = _document.GetElement(refWithContext.GetReference().ElementId);
             if(wallOrColumn is Wall wall)
-                return LintelsCommonConfig.ReinforcedConcreteFilter.Any(f => wall.Name.ToLower().Contains(f));  //TODO: часть названия типа стены
+                return LintelsCommonConfig.ReinforcedConcreteFilter.Any(f => wall.Name.ToLower().Contains(f.ToLower()));
             if(wallOrColumn.Category.Id == new ElementId(BuiltInCategory.OST_StructuralColumns))
                 return true;
             if(wallOrColumn is RevitLinkInstance linkedInstance) {
@@ -284,7 +311,7 @@ namespace RevitLintelPlacement.Models {
                 using(var t = StartTransaction("Подрезка")) {
 
                     var bb = element.get_BoundingBox(view3D);
-                    bb.Max = new XYZ(bb.Max.X+1, bb.Max.Y+1, bb.Max.Z + 1);
+                    bb.Max = new XYZ(bb.Max.X + 1, bb.Max.Y + 1, bb.Max.Z + 1);
                     bb.Min = new XYZ(bb.Min.X - 1, bb.Min.Y - 1, bb.Min.Z - 1);
                     view3D.SetSectionBox(bb);
                     _uiDocument.SetSelectedElements(element);
@@ -324,12 +351,12 @@ namespace RevitLintelPlacement.Models {
             var view3D = new FilteredElementCollector(_document)
               .OfClass(typeof(View3D))
               .Cast<View3D>()
-              .FirstOrDefault(v => !v.IsTemplate && v.Name==_view3DName);
+              .FirstOrDefault(v => !v.IsTemplate && v.Name == _view3DName);
             if(view3D != null) {
                 //_uiDocument.ActiveView = view3D;
                 return;
             }
-            using (Transaction t = new Transaction(_document)) {
+            using(Transaction t = new Transaction(_document)) {
                 t.BIMStart("Создание 3D-вида");
                 var type = new FilteredElementCollector(_document)
                     .OfClass(typeof(ViewFamilyType))
@@ -371,10 +398,10 @@ namespace RevitLintelPlacement.Models {
         }
 
         public void LockLintel(View elevation, View plan, FamilyInstance lintel, FamilyInstance elementInWall) {
-            
+
             var leftRightElement = elementInWall.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
             var leftRightLintel = lintel.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
-            if (leftRightElement.Count > 0 && leftRightLintel.Count > 0)
+            if(leftRightElement.Count > 0 && leftRightLintel.Count > 0)
                 _document.Create.NewAlignment(_document.ActiveView, leftRightLintel.First(), leftRightElement.First());
 
             var topElement = elementInWall.GetReferences(FamilyInstanceReferenceType.Top);
@@ -383,8 +410,7 @@ namespace RevitLintelPlacement.Models {
             try {
                 if(topElement.Count > 0 && bottomLintel.Count > 0)
                     _document.Create.NewAlignment(elevation, topElement.First(), bottomLintel.First());
-            } catch 
-            { }
+            } catch { }
 
 
             var leftL = lintel.GetReferences(FamilyInstanceReferenceType.Front);
@@ -397,7 +423,7 @@ namespace RevitLintelPlacement.Models {
             try {
                 if(leftL.Count > 0 && wallReferences1.Count > 0) {
                     _document.Create.NewAlignment(plan, leftL.First(), wallReferences1.First());
-                }               
+                }
             } catch {
                 try {
                     if(leftL.Count > 0 && wallReferences1.Count > 0) {
@@ -420,7 +446,7 @@ namespace RevitLintelPlacement.Models {
             var height = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningHeight); //ToDo: параметр
             double z;
             if(height != null) {
-                z = (double)height + bottomBarHeight + level.Elevation;
+                z = (double) height + bottomBarHeight + level.Elevation;
             } else {
                 var topBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
                 z = /*location.Z +*/ topBarHeight + level.Elevation;
@@ -498,83 +524,5 @@ namespace RevitLintelPlacement.Models {
             }
             return result;
         }
-
-        private XYZ GetViewStartPoint(FamilyInstance lintel, bool plusDirection) //изменить название метода
-        {
-            if(lintel is null) {
-                throw new ArgumentNullException(nameof(lintel));
-            }
-
-            var normal = new XYZ(0, 1, 0);
-            var direction = lintel.GetTransform().OfVector(normal);
-            var demiWidth = (double) lintel.GetParamValueOrDefault(LintelsCommonConfig.LintelThickness) / 2; //TODO: Параметр!
-            if(plusDirection)
-                return ((LocationPoint) lintel.Location).Point + direction * demiWidth;
-            return ((LocationPoint) lintel.Location).Point - direction * demiWidth;
-        }
-
-        private IEnumerable<Face> GetOrientedFaces(Element element, Orientation orientation) {
-            if(element is null) {
-                throw new ArgumentNullException(nameof(element));
-            }
-
-            foreach(GeometryObject geometryObject in element.get_Geometry(new Options() { ComputeReferences=true})) {
-                if(geometryObject is Solid solid) {
-                    foreach(var face in GetOrientedFacesFromSolid(solid, orientation))
-                        yield return face;
-                } else {
-                    var geometryInstance = geometryObject as GeometryInstance;
-                    if(geometryInstance == null)
-                        continue;
-
-                    foreach(var instObj in geometryInstance.GetInstanceGeometry()) {
-                        if(!(instObj is Solid solidFromGeomInst)) {
-                            continue;
-                        }
-
-                        var horizontalFacesFromSolid = GetOrientedFacesFromSolid(solidFromGeomInst, orientation);
-                        if(horizontalFacesFromSolid != null) {
-                            foreach(var face in GetOrientedFacesFromSolid(solidFromGeomInst, orientation)) {
-                                yield return face;
-                            }
-                        }
-                    }
-                }            
-            }
-        }
-
-        private IEnumerable<Face> GetOrientedFacesFromSolid(Solid solid, Orientation orientation) {
-            if(solid is null) {
-                throw new ArgumentNullException(nameof(solid));
-            }
-
-            foreach(Face face in solid.Faces) {
-                var normal = face.ComputeNormal(new UV(0.5, 0.5));
-                switch(orientation) {
-                    case Orientation.VerticalUp: {
-                        if(Math.Abs(normal.Z - 1) < 0.001)
-                            yield return face;
-                        break;
-                    }
-                    case Orientation.VerticalDown: {
-                        if(Math.Abs(normal.Z + 1) < 0.001)
-                            yield return face;
-                        break;
-                    }
-                    case Orientation.Horizontal: {
-                        if(Math.Abs(Math.Pow(normal.X, 2) + Math.Pow(normal.Y, 2) - 1) < 0.001)
-                            yield return face;
-                        break;
-                    }
-                }
-            }
-        }
-
-    }
-
-    enum Orientation {
-        VerticalUp,
-        VerticalDown,
-        Horizontal
     }
 }
