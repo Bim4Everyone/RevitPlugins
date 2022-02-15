@@ -46,7 +46,7 @@ namespace RevitSetLevelSection.Models {
         }
         
         public void UpdateElements(RevitParam revitParam, string paramValue) {
-            using(Transaction transaction = _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name} - По сведениям о проекте\"")) {
+            using(Transaction transaction = _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
                 ProjectInfo.SetParamValue(revitParam, paramValue);
                 IEnumerable<Element> elements = GetElements(revitParam);
 
@@ -60,7 +60,7 @@ namespace RevitSetLevelSection.Models {
 
         public void UpdateElements(RevitParam revitParam, IEnumerable<FamilyInstance> massElements) {
             List<Element> elements = GetElements(revitParam);
-            using(Transaction transaction = _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name} - по формообразующим\"")) {
+            using(Transaction transaction = _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
                 foreach(FamilyInstance massObject in massElements) {
                     Parameter massParameter = massObject.GetParam(revitParam);
                     foreach(Element element in elements) {
