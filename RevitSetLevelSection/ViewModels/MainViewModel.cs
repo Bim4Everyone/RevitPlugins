@@ -84,7 +84,7 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         private void UpdateElements(object param) {
-            foreach(FillParamViewModel fillParamViewModel in FillParams) {
+            foreach(FillParamViewModel fillParamViewModel in FillParams.Where(item => item.IsEnabled)) {
                 fillParamViewModel.UpdateElements(FromRevitParam);
             }
         }
