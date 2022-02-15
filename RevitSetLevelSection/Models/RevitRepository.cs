@@ -60,23 +60,31 @@ namespace RevitSetLevelSection.Models {
 
         public void UpdateElements(RevitParam revitParam, IEnumerable<FamilyInstance> massElements) {
             List<Element> elements = GetElements(revitParam);
+            var cashedElements = elements.ToDictionary(item => item.Id);
+            
             using(Transaction transaction = _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
-                foreach(FamilyInstance massObject in massElements) {
-                    Parameter massParameter = massObject.GetParam(revitParam);
-                    foreach(Element element in elements) {
+                foreach(Element element in elements) {
+                    if(cashedElements.ContainsKey(element.Id)) {
+                        continue;
+                    }
+                    
+                    foreach(FamilyInstance massObject in massElements) {
                         if(IsIntersectCenterElement(massObject, element)) {
-                            Parameter parameter = element.GetParam(revitParam);
-                            parameter.Set(massParameter);
-                        } else {
-                            element.RemoveParamValue(revitParam);
+                            element.SetParamValue(revitParam, massObject);
+                            cashedElements.Remove(element.Id);
+                            break;
                         }
                     }
+                }
+
+                foreach(Element element in cashedElements.Values) {
+                    element.RemoveParamValue(revitParam);
                 }
 
                 transaction.Commit();
             }
         }
-        
+
         private List<Element> GetElements(RevitParam revitParam) {
             var catFilter = new ElementMulticategoryFilter(GetCategories(revitParam));
             return new FilteredElementCollector(_document)
