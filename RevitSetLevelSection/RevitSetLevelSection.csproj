@@ -80,5 +80,9 @@
 			<Private>False</Private>
 		</Reference>
 	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="Resources\icons8-error-96.png" />
+	  <Resource Include="Resources\icons8-error-96.png" />
+	</ItemGroup>
 
 </Project>

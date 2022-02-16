@@ -13,7 +13,7 @@ using RevitSetLevelSection.Models;
 namespace RevitSetLevelSection.ViewModels {
     internal class DesignOptionsViewModel : BaseViewModel {
         private readonly DesignOption _designOption;
-        private readonly LinkInstanceRepository _linkInstanceRepository;
+        private readonly List<FamilyInstance> _massElements;
 
         public DesignOptionsViewModel(DesignOption designOption, LinkInstanceRepository linkInstanceRepository) {
             if(designOption is null) {
@@ -25,14 +25,14 @@ namespace RevitSetLevelSection.ViewModels {
             }
 
             _designOption = designOption;
-            _linkInstanceRepository = linkInstanceRepository;
+            _massElements = linkInstanceRepository.GetMassElements(_designOption).ToList();
         }
 
         public string Name => _designOption.Name;
-        public int CountMassElements => GetMassObjects().Count();
+        public int CountMassElements => _massElements.Count;
 
         public IEnumerable<FamilyInstance> GetMassObjects() {
-            return _linkInstanceRepository.GetMassElements(_designOption);
+            return _massElements;
         }
     }
 }
