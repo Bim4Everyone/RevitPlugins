@@ -10,7 +10,7 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.ViewModels;
 
 namespace RevitLintelPlacement.ViewModels {
-    internal class ElementInfoViewModel : BaseViewModel {
+    internal class ElementInfoViewModel : BaseViewModel, IEquatable<ElementInfoViewModel> {
         private string _message;
         private ElementId _elementId;
         private TypeInfo _typeInfo;
@@ -41,6 +41,8 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _elementType, value); 
         }
 
+        public bool IsCorrectValue => ElementId != ElementId.InvalidElementId;
+
         public string Message {
             get => _message;
             set => this.RaiseAndSetIfChanged(ref _message, value);
@@ -52,18 +54,24 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         public override bool Equals(object obj) {
-            if(obj is ElementInfoViewModel elementInfo) {
-                return ElementId == elementInfo.ElementId
-                    && Message.Equals(elementInfo.Message, StringComparison.CurrentCultureIgnoreCase)
-                    && ElementType == elementInfo.ElementType
-                    && TypeInfo == elementInfo.TypeInfo;
+            return Equals(obj as ElementInfoViewModel);
+        }
 
-            }
-            return false;
+        public bool Equals(ElementInfoViewModel other) {
+            return other != null &&
+                   TypeInfo == other.TypeInfo &&
+                   ElementType == other.ElementType &&
+                   Message == other.Message &&
+                   EqualityComparer<ElementId>.Default.Equals(ElementId, other.ElementId);
         }
 
         public override int GetHashCode() {
-            return ElementId.IntegerValue + Message.Length + (int)TypeInfo + (int)ElementType;
+            int hashCode = 897683154;
+            hashCode = hashCode * -1521134295 + TypeInfo.GetHashCode();
+            hashCode = hashCode * -1521134295 + ElementType.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Message);
+            hashCode = hashCode * -1521134295 + EqualityComparer<ElementId>.Default.GetHashCode(ElementId);
+            return hashCode;
         }
     }
 
@@ -80,6 +88,8 @@ namespace RevitLintelPlacement.ViewModels {
         [Description("Перемычка")]
         Lintel,
         [Description("Проем")]
-        Opening
+        Opening,
+        [Description("Настройки")]
+        Config
     }
 }
