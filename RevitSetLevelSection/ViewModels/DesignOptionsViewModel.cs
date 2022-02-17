@@ -23,10 +23,9 @@ namespace RevitSetLevelSection.ViewModels {
                 throw new ArgumentNullException(nameof(linkInstanceRepository));
             }
 
-            DesignOption designOption1 = designOption;
-            _massElements = linkInstanceRepository.GetMassElements(designOption1).ToList();
-
-            Name = designOption1.Name;
+            _massElements = linkInstanceRepository.GetMassElements(designOption).ToList();
+            
+            Name = designOption.Name;
         }
 
         public string Name { get; }
