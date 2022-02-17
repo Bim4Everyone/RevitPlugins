@@ -56,7 +56,7 @@ namespace RevitLintelPlacement.ViewModels {
 
 #else
             openingWidth = UnitUtils.ConvertFromInternalUnits(
-                (double) elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM), UnitTypeId.Millimeters);
+                (double) elementWidth, UnitTypeId.Millimeters);
 #endif
             return MinWidth <= openingWidth && openingWidth < MaxWidth;
         }

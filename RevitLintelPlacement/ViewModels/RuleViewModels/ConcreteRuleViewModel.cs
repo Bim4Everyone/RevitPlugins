@@ -82,6 +82,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         public void SetParametersTo(FamilyInstance lintel, FamilyInstance elementInWall) {
+            LintelRightOffsetParameter.RightOffset = LintelLeftOffsetParameter.LeftOffset;
             foreach(var parameter in _parameters) {
                 parameter.SetTo(lintel, elementInWall);
             }
