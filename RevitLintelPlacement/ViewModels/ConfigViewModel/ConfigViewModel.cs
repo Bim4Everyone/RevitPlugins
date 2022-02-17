@@ -151,12 +151,6 @@ namespace RevitLintelPlacement.ViewModels {
             }
             
             HolesFilter = _revitRepository.LintelsCommonConfig.HolesFilter;
-            LintelsConfigPath = _revitRepository.LintelsConfig.LintelsConfigPath;
-            if (_revitRepository.LintelsConfig.RulesCongigPaths!=null &&
-                _revitRepository.LintelsConfig.RulesCongigPaths.Count > 0) {
-                RulesCongigPaths = new ObservableCollection<RulePathViewModel>(
-                    _revitRepository.LintelsConfig.RulesCongigPaths.Select(p => new RulePathViewModel() { Name = p }));
-            }
             foreach(var family in LintelFamilies) {
                 family.IsChecked = _revitRepository.LintelsCommonConfig.LintelFamilies
                     .Any(f => f.Equals(family.Name, StringComparison.CurrentCultureIgnoreCase));
@@ -176,13 +170,11 @@ namespace RevitLintelPlacement.ViewModels {
             _revitRepository.LintelsCommonConfig.OpeningFixation = OpeningFixation;
             _revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter = ReinforcedConcreteFilter.Select(e=>e.Name).ToList();
             _revitRepository.LintelsCommonConfig.HolesFilter = HolesFilter;
-            _revitRepository.LintelsConfig.LintelsConfigPath = LintelsConfigPath;
-            _revitRepository.LintelsConfig.RulesCongigPaths = RulesCongigPaths.Select(e=>e.Name).ToList();
             _revitRepository.LintelsCommonConfig.LintelFamilies = LintelFamilies
                 .Where(e => e.IsChecked)
                 .Select(e => e.Name)
                 .ToList();
-            _revitRepository.LintelsCommonConfig.Save(_revitRepository.LintelsConfig.LintelsConfigPath);
+            _revitRepository.LintelsCommonConfig.Save(_revitRepository.GetDocumentName());
             _revitRepository.LintelsConfig.SaveProjectConfig();
         }
 
@@ -212,7 +204,6 @@ namespace RevitLintelPlacement.ViewModels {
                     if(dialog.SelectedPath!= LintelsConfigPath) {
                         LintelsConfigPath = dialog.SelectedPath;
                         _revitRepository.LintelsCommonConfig = LintelsCommonConfig.GetLintelsCommonConfig(LintelsConfigPath);
-                        _revitRepository.LintelsConfig.LintelsConfigPath = LintelsConfigPath;
                         Initialize();
                     }
                 }

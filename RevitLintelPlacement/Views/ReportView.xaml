@@ -51,6 +51,7 @@
                   CanUserResizeRows="False"
                       HorizontalGridLinesBrush="Transparent"
                       VerticalGridLinesBrush="Transparent"
+                      IsReadOnly="True"
             ItemsSource="{Binding ElementInfosViewSource.View}"
                       AlternationCount="2" AlternatingRowBackground="WhiteSmoke">
                 <DataGrid.Columns>
@@ -80,8 +81,18 @@
                     <DataGridTemplateColumn Header="Элемент">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate DataType="{x:Type vm:ElementInfoViewModel}">
-                                <Button Name="bthElement" Content="{Binding ElementId}" Command="{Binding ElementName=ReportWindow, Path=DataContext.SelectElementCommand}"
-                                    CommandParameter="{Binding ElementName=bthElement, Path=DataContext}"></Button>
+                                <Button Name="bthElement" Content="{Binding ElementId.IntegerValue}" Command="{Binding ElementName=ReportWindow, Path=DataContext.SelectElementCommand}"
+                                    CommandParameter="{Binding ElementName=bthElement, Path=DataContext}">
+                                    <Button.Style>
+                                        <Style TargetType="{x:Type Button}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCorrectValue}" Value="False">
+                                                    <Setter Property="IsEnabled" Value="False"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

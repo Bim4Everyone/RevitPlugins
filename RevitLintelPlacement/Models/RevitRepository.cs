@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
@@ -30,25 +32,28 @@ namespace RevitLintelPlacement.Models {
             _uiDocument = new UIDocument(document);
 
             LintelsConfig = lintelsConfig;
-            LintelsCommonConfig = LintelsCommonConfig.GetLintelsCommonConfig(lintelsConfig.LintelsConfigPath);
-            RuleConfig = RuleConfig.GetRuleConfig(lintelsConfig.RulesCongigPaths.FirstOrDefault());
-
+            LintelsCommonConfig = LintelsCommonConfig.GetLintelsCommonConfig(GetDocumentName());
+            RuleConfigs= RuleConfig.GetRuleConfigs(GetDocumentName());
             CreateView3DIfNotExisted();
         }
 
         public LintelsConfig LintelsConfig { get; set; }
         public LintelsCommonConfig LintelsCommonConfig { get; set; }
-        public RuleConfig RuleConfig { get; set; }
+        public Dictionary<string, RuleConfig> RuleConfigs { get; set; }
 
         public string GetDocumentName() {
-            return _document.Title;
+            var documentName = string.IsNullOrEmpty(_document.Title)
+                ? "Без имени"
+                : _document.Title.Split('_').FirstOrDefault();
+
+            return documentName;
         }
 
         public FamilySymbol GetLintelType(string lintelTypeName) {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .WhereElementIsElementType()
-                .First(e => e.Name == lintelTypeName) as FamilySymbol;
+                .FirstOrDefault(e => e.Name == lintelTypeName) as FamilySymbol;
         }
 
         public IEnumerable<FamilySymbol> GetLintelTypes() {
@@ -97,9 +102,7 @@ namespace RevitLintelPlacement.Models {
                 .Cast<RevitLinkType>();
         }
 
-        public FamilyInstance PlaceLintel(FamilySymbol lintelType, ElementId elementInWallId) {
-            var elementInWall = _document.GetElement(elementInWallId) as FamilyInstance;
-
+        public FamilyInstance PlaceLintel(FamilySymbol lintelType, FamilyInstance elementInWall) {
             if(!lintelType.IsActive)
                 lintelType.Activate();
             XYZ center = GetLocationPoint(elementInWall);
@@ -190,14 +193,14 @@ namespace RevitLintelPlacement.Models {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(View))
                 .Cast<View>()
-                .First(v => v.ViewType == ViewType.Elevation);
+                .FirstOrDefault(v => v.ViewType == ViewType.Elevation);
         }
 
         public View GetPlan() {
             return new FilteredElementCollector(_document)
                .OfClass(typeof(View))
                .Cast<View>()
-               .First(v => v.ViewType == ViewType.FloorPlan);
+               .FirstOrDefault(v => v.ViewType == ViewType.FloorPlan);
         }
 
         //проверка, есть ли сверху элемента стена, у которой тип железобетон (в таком случает перемычку ставить не надо)
@@ -419,19 +422,21 @@ namespace RevitLintelPlacement.Models {
             var wallReferences2 = HostObjectUtils.GetSideFaces((Wall) elementInWall.Host, ShellLayerType.Exterior);
 
 
-            //возможно, ошибка возникает при устновке параметра половина толщины, поэтому нет геометричкого выравнивания
+            // возможно, ошибка возникает при установке параметра половина толщины,
+            // поэтому нет геометричкого выравнивания
             try {
                 if(leftL.Count > 0 && wallReferences1.Count > 0) {
                     _document.Create.NewAlignment(plan, leftL.First(), wallReferences1.First());
                 }
-            } catch {
+            } catch (Exception e) {
+                Debug.WriteLine(e.Message);
                 try {
                     if(leftL.Count > 0 && wallReferences1.Count > 0) {
                         _document.Create.NewAlignment(plan, leftL.First(), wallReferences2.First());
                     }
 
-                } catch {
-
+                } catch (Exception ex) {
+                    Debug.WriteLine(ex.Message);
                 }
             }
         }
@@ -453,6 +458,82 @@ namespace RevitLintelPlacement.Models {
             }
             return new XYZ(location.X, location.Y, z);
         }
+
+
+        public bool CheckLintelType(FamilySymbol lintelType, ElementInfosViewModel elementInfos) {
+            if(lintelType.Family == null)
+                return false;
+            var familyDocument = _document.EditFamily(lintelType.Family);
+            try {
+                var familyManger = familyDocument.FamilyManager;
+                var parameterNames = familyManger.GetParameters().Select(p => p.Definition.Name).ToList();
+                bool result = true;
+                var configParameterNames = new List<string>() {
+                LintelsCommonConfig.LintelFixation,
+                LintelsCommonConfig.LintelLeftCorner,
+                LintelsCommonConfig.LintelLeftOffset,
+                LintelsCommonConfig.LintelRightCorner,
+                LintelsCommonConfig.LintelRightOffset,
+                LintelsCommonConfig.LintelThickness,
+                LintelsCommonConfig.LintelWidth
+                };
+                foreach(var configParameter in configParameterNames) {
+                    if(!parameterNames.Any(p => p.Equals(configParameter, StringComparison.CurrentCultureIgnoreCase))) {
+                        result = false;
+                        elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintelType.Id, InfoElement.MissingLintelParameter.FormatMessage(lintelType?.Family?.Name, configParameter)));
+                    }
+                }
+                return result;
+            } finally {
+                familyDocument.Close(false);
+            }
+        }
+
+        public bool CheckConfigParameters(ElementInfosViewModel elementInfos) {
+            bool result = true;
+            if(string.IsNullOrEmpty(LintelsCommonConfig.LintelFixation)) {
+                result = false;
+                AddBlankParameterInfo(elementInfos, nameof(LintelsCommonConfig.LintelFixation));
+            }
+            if(string.IsNullOrEmpty(LintelsCommonConfig.LintelLeftCorner)) {
+                result = false;
+                AddBlankParameterInfo(elementInfos, nameof(LintelsCommonConfig.LintelLeftCorner));
+            }
+            if(string.IsNullOrEmpty(LintelsCommonConfig.LintelLeftOffset)) {
+                result = false;
+                AddBlankParameterInfo(elementInfos, nameof(LintelsCommonConfig.LintelLeftOffset));
+            }
+            if(string.IsNullOrEmpty(LintelsCommonConfig.LintelRightCorner)) {
+                result = false;
+                AddBlankParameterInfo(elementInfos, nameof(LintelsCommonConfig.LintelRightCorner));
+            }
+            if(string.IsNullOrEmpty(LintelsCommonConfig.LintelRightOffset)) {
+                result = false;
+                AddBlankParameterInfo(elementInfos, nameof(LintelsCommonConfig.LintelRightOffset));
+            }
+            if(string.IsNullOrEmpty(LintelsCommonConfig.LintelThickness)) {
+                result = false;
+                AddBlankParameterInfo(elementInfos, nameof(LintelsCommonConfig.LintelThickness));
+            }
+            if(string.IsNullOrEmpty(LintelsCommonConfig.LintelWidth)) {
+                result = false;
+                AddBlankParameterInfo(elementInfos, nameof(LintelsCommonConfig.LintelWidth));
+            }
+            if(string.IsNullOrEmpty(LintelsCommonConfig.OpeningFixation)) {
+                result = false;
+                AddBlankParameterInfo(elementInfos, nameof(LintelsCommonConfig.OpeningFixation));
+            }
+            if(string.IsNullOrEmpty(LintelsCommonConfig.OpeningHeight)) {
+                result = false;
+                AddBlankParameterInfo(elementInfos, nameof(LintelsCommonConfig.OpeningHeight));
+            }
+            if(string.IsNullOrEmpty(LintelsCommonConfig.OpeningWidth)) {
+                result = false;
+                AddBlankParameterInfo(elementInfos, nameof(LintelsCommonConfig.OpeningWidth));
+            }
+            return result;
+        }
+
 
         private ElementId GetFamilyCategoryId(Family family) {
             var typesId = family.GetFamilySymbolIds();
@@ -500,29 +581,13 @@ namespace RevitLintelPlacement.Models {
             return transform.BasisX.AngleOnPlaneTo(vectorX, transform.BasisZ);
         }
 
-        public bool CheckLintelType(FamilySymbol lintelType, ElementInfosViewModel elementInfos) {
-            if(lintelType.Family == null)
-                return false;
-            var familyDocument = _document.EditFamily(lintelType.Family);
-            var familyManger = familyDocument.FamilyManager;
-            var parameterNames = familyManger.GetParameters().Select(p => p.Definition.Name).ToList();
-            bool result = true;
-            var configParameterNames = new List<string>() {
-                LintelsCommonConfig.LintelFixation,
-                LintelsCommonConfig.LintelLeftCorner,
-                LintelsCommonConfig.LintelLeftOffset,
-                LintelsCommonConfig.LintelRightCorner,
-                LintelsCommonConfig.LintelRightOffset,
-                LintelsCommonConfig.LintelThickness,
-                LintelsCommonConfig.LintelWidth
-            };
-            foreach(var configParameter in configParameterNames) {
-                if(!parameterNames.Any(p => p.Equals(configParameter, StringComparison.CurrentCultureIgnoreCase))) {
-                    result = false;
-                    elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintelType.Id, InfoElement.MissingLintelParameter.FormatMessage(lintelType?.Family?.Name, configParameter)));
-                }
-            }
-            return result;
+        private void AddBlankParameterInfo(ElementInfosViewModel elementInfos, string parameterName) {
+            var description = TypeDescriptor
+                .GetProperties(LintelsCommonConfig)[parameterName]
+                .Attributes
+                .OfType<DescriptionAttribute>()
+                .FirstOrDefault()?.Description;
+            elementInfos.ElementInfos.Add(new ElementInfoViewModel(ElementId.InvalidElementId, InfoElement.BlankParamter.FormatMessage(description)));
         }
     }
 }

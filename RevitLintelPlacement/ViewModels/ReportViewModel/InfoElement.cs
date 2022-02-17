@@ -37,6 +37,12 @@ namespace RevitLintelPlacement.ViewModels {
             ElementType = ElementType.Opening
         };
 
+        public static InfoElement BlankParamter => new InfoElement() {
+            Message = "В настройках не установлено значение параметра \"{0}\".",
+            TypeInfo = TypeInfo.Error,
+            ElementType = ElementType.Config
+        };
+
         public string Message { get; set; }
         public TypeInfo TypeInfo { get; set; }
         public ElementType ElementType { get; set; }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,7 @@ namespace RevitLintelPlacement.Models {
         [JsonIgnore]
         public override IConfigSerializer Serializer { get; set; }
 
-        public string LintelsConfigPath { get; set; } = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Отдел\Тестирование\Перемычки\TestConfig";
-
-        public List<string> RulesCongigPaths { get; set; } = new List<string> ();
+        //public List<string> RulesCongigPaths { get; set; } = new List<string> ();
 
         public static LintelsConfig GetLintelsConfig() {
             return new ProjectConfigBuilder()
@@ -35,16 +34,36 @@ namespace RevitLintelPlacement.Models {
     }
 
     internal class LintelsCommonConfig {
+        [Description("Толщина перемычки")]
         public string LintelThickness { get; set; }
+
+        [Description("Ширина перемычки")]
         public string LintelWidth { get; set; }
+
+        [Description("Опирание справа")]
         public string LintelRightOffset { get; set; }
+
+        [Description("Опирание слева")]
         public string LintelLeftOffset { get; set; }
+
+        [Description("Уголок слева")]
         public string LintelLeftCorner { get; set; }
+
+        [Description("Уголок справа")]
         public string LintelRightCorner { get; set; }
+
+        [Description("Фиксация решения")]
         public string LintelFixation { get; set; }
+
+        [Description("Высота проема")]
         public string OpeningHeight { get; set; }
+
+        [Description("Ширина проема")]
         public string OpeningWidth { get; set; }
+
+        [Description("Фиксация перемычки")]
         public string OpeningFixation { get; set; }
+
         public List<string> ReinforcedConcreteFilter { get; set; } = new List<string>();
         public string HolesFilter { get; set; }
         public List<string> LintelFamilies { get; set; } = new List<string>();
@@ -63,20 +82,34 @@ namespace RevitLintelPlacement.Models {
             {nameof(OpeningFixation), StorageType.Integer }
         };
 
-        public static LintelsCommonConfig GetLintelsCommonConfig(string path) {
-            if(File.Exists(GetConfigPath(path))) {
-                return JsonConvert.DeserializeObject<LintelsCommonConfig>(File.ReadAllText(GetConfigPath(path)));
+        public static LintelsCommonConfig GetLintelsCommonConfig(string documentName) {
+            if(File.Exists(GetDocumentConfigPath(documentName))) {
+                return JsonConvert.DeserializeObject<LintelsCommonConfig>(File.ReadAllText(GetDocumentConfigPath(documentName)));
+            }
+            if(File.Exists(GetConfigPath())) {
+                return JsonConvert.DeserializeObject<LintelsCommonConfig>(File.ReadAllText(GetConfigPath()));
             }
             return new LintelsCommonConfig();
         }
 
-        public void Save(string path) {
-            Directory.CreateDirectory(Path.GetDirectoryName(GetConfigPath(path)));
-            File.WriteAllText(GetConfigPath(path), JsonConvert.SerializeObject(this));
+        public void Save(string documentName) {
+            Directory.CreateDirectory(Path.GetDirectoryName(GetDocumentConfigPath(documentName)));
+            File.WriteAllText(GetDocumentConfigPath(documentName), JsonConvert.SerializeObject(this));
         }
 
-        public static string GetConfigPath(string configPath) {
-            return Path.Combine(configPath, nameof(RevitLintelPlacement), nameof(LintelsCommonConfig) + ".json");
+        private static string GetConfigPath() {
+            return Path.Combine(GetLintelsCommonConfigPath(), nameof(LintelsCommonConfig) + ".json");
+        }
+
+        private static string GetDocumentConfigPath(string documentName) {
+            return Path.Combine(GetLintelsCommonConfigPath(), documentName + ".json");
+        }
+
+        private static string GetLintelsCommonConfigPath() {
+            var projectConfigPath = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone";
+            var pluginName = nameof(RevitLintelPlacement);
+            var revitVersion = string.IsNullOrEmpty(ModuleEnvironment.RevitVersion) ? "2020" : ModuleEnvironment.RevitVersion;
+            return Path.Combine(projectConfigPath, revitVersion, "A101", pluginName);
         }
     }
 }

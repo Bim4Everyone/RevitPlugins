@@ -40,7 +40,7 @@
         </ToolBar>
         <StackPanel Grid.Row="1" Margin="10" Orientation="Vertical" HorizontalAlignment="Left">
             <TextBlock FontSize="14" Margin="5 0 0 5">Конфигурация настроек</TextBlock>
-            <ComboBox Width="300" Height="25" FontSize="14" ItemsSource="{Binding RulePaths}" SelectedItem="{Binding SelectedPath}">
+            <ComboBox Width="300" Height="25" FontSize="14" ItemsSource="{Binding RuleNames}" SelectedItem="{Binding SelectedName}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
                         <i:InvokeCommandAction Command="{Binding PathSelectionChangedCommand}"/>

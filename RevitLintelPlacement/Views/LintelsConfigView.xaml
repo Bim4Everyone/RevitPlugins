@@ -7,8 +7,8 @@
         xmlns:local="clr-namespace:RevitLintelPlacement.Views"
         xmlns:converters="clr-namespace:RevitLintelPlacement.Converters"
         xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
-        mc:Ignorable="d" Height="700" Width="900"
-        MinHeight="700" MinWidth="350"
+        mc:Ignorable="d" Height="480" Width="900"
+        MinHeight="480" MinWidth="350"
         Title="Настройки"
              d:DataContext="{d:DesignInstance vm:ConfigViewModel}">
     <Window.Resources>
@@ -45,14 +45,14 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <GroupBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Header="Путь к файлу настроек">
+        <!--<GroupBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Header="Путь к файлу настроек">
             <DockPanel HorizontalAlignment="Stretch">
                 <Button DockPanel.Dock="Right" Width="20" Height="25" Command="{Binding SelectLintelsConfigCommand}">...</Button>
                 <TextBox Text="{Binding LintelsConfigPath}" HorizontalAlignment="Stretch" 
                          Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DockPanel}, Path=ActualWidth, 
                     Converter={StaticResource WidthConverter}, ConverterParameter=30}"></TextBox>
             </DockPanel>
-        </GroupBox>
+        </GroupBox>-->
         <GroupBox Grid.Row="1" Grid.Column="0" Header="Семейства перемычек">
             <ListBox Height="200" Margin="10" ItemsSource="{Binding LintelFamilies}">
                 <ListBox.ItemTemplate>
@@ -133,7 +133,7 @@
                 </Grid>
             </StackPanel>
         </GroupBox>
-        <GroupBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="130" Header="Пути к файлам с правилами">
+        <!--<GroupBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="130" Header="Пути к файлам с правилами">
             <StackPanel>
                 <ListBox MaxHeight="80" BorderBrush="Transparent" BorderThickness="0" ItemsSource="{Binding RulesCongigPaths}">
                     <ListBox.ItemTemplate>
@@ -163,7 +163,7 @@
                     </Button>
                 </Grid>
             </StackPanel>
-        </GroupBox>
+        </GroupBox>-->
         <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Orientation="Horizontal">
             <Button Height="30" Width="70" Margin="5" Command="{Binding SaveConfigCommand}">Сохранить</Button>
             <Button Height="30" Width="70" Margin="5" Click="Button_Click">Отмена</Button>
