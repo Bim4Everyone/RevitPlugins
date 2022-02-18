@@ -106,6 +106,8 @@ namespace RevitLintelPlacement.Models {
                 }
                     
             } else {
+                var results = new List<ParameterCheckResult> { CheckLintelType(lintel, rule) };
+                return new WrongLintelParameters(_revitRepository, results, rule, lintel, elementInWall);
                 //проверка корректности параметров перемычки
             }
             return new EmptyResult() { Code = ResultCode.Correct };
@@ -121,9 +123,13 @@ namespace RevitLintelPlacement.Models {
             return ParameterCheckResult.WrongLintelThickness;
         }
 
-        //private ParameterCheckResult CheckOpeningWidth(FamilyInstance lintel, FamilyInstance elementInWall) {
-            
-        //}
+        private ParameterCheckResult CheckLintelType(FamilyInstance lintel, ConcreteRuleViewModel rule) {
+            if (lintel.Symbol.Name.Equals(rule.SelectedLintelType, StringComparison.CurrentCultureIgnoreCase)) {
+                return ParameterCheckResult.Correct;
+            }
+            return ParameterCheckResult.WrongLintelType;
+        }
+
     }
 
     internal class GeometricalLintelChecker : IChecker {

@@ -44,12 +44,14 @@ namespace RevitLintelPlacement.Models {
     }
 
     internal class WrongLintelParameters : IResultHandler {
+        private readonly RevitRepository _revitRepository;
         private readonly IEnumerable<ParameterCheckResult> _parameterResults;
         private readonly ConcreteRuleViewModel _rule;
         private readonly FamilyInstance _lintel;
         private readonly FamilyInstance _elementInWall;
 
-        public WrongLintelParameters(IEnumerable<ParameterCheckResult> parameterResults, ConcreteRuleViewModel rule, FamilyInstance lintel, FamilyInstance elementInWall) {
+        public WrongLintelParameters(RevitRepository revitRepository, IEnumerable<ParameterCheckResult> parameterResults, ConcreteRuleViewModel rule, FamilyInstance lintel, FamilyInstance elementInWall) {
+            this._revitRepository = revitRepository;
             this._parameterResults = parameterResults;
             this._rule = rule;
             this._lintel = lintel;
@@ -59,17 +61,24 @@ namespace RevitLintelPlacement.Models {
         public ResultCode Code { get; set; } = ResultCode.WorngLintelParameters;
 
         public void Handle() {
-            foreach(var result in _parameterResults) {
-                switch(result){
-                    case ParameterCheckResult.WrongLintelThickness: {
-                        _rule.WallHalfThicknessParameter.SetTo(_lintel, _elementInWall);
-                        break;
+            using(Transaction t  = _revitRepository.StartTransaction("Изменение параметров перемычки")) {
+                foreach(var result in _parameterResults) {
+                    switch(result) {
+                        case ParameterCheckResult.WrongLintelThickness: {
+                            _rule.WallHalfThicknessParameter.SetTo(_lintel, _elementInWall);
+                            break;
+                        }
+                        case ParameterCheckResult.WrongLintelType: {
+                            _lintel.ChangeTypeId(_revitRepository.GetLintelType(_rule.SelectedLintelType).Id);
+                            break;
+                        }
                     }
                 }
+                t.Commit();
             }
-            
         }
     }
+
 
 
     internal enum ResultCode {
@@ -86,5 +95,6 @@ namespace RevitLintelPlacement.Models {
     internal enum ParameterCheckResult {
         Correct,
         WrongLintelThickness,
+        WrongLintelType
     }
 }
