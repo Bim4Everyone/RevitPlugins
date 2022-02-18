@@ -8,7 +8,7 @@ namespace RevitLintelPlacement.ViewModels {
     internal class InfoElement {
 
         public static InfoElement LintelIsFixedWithoutElement => new InfoElement() { 
-            Message = "Под зафиксиованной перемычкой отсутствует проем.",
+            Message = "Под зафиксированной перемычкой отсутствует проем.",
             TypeInfo = TypeInfo.Warning,
             ElementType = ElementType.Lintel
         };
