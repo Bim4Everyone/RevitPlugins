@@ -39,7 +39,7 @@ namespace RevitSetLevelSection.ViewModels {
             }
         }
 
-        public string Name => $"Заполнить \"{RevitParam.Name}\"";
+        public string Name => $"Перенести \"{RevitParam.Name}\"";
 
         public string ParamValue {
             get => _paramValue;
