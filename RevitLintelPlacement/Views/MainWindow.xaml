@@ -43,7 +43,9 @@
             </ListBox>
         </GroupBox>
         <local:GroupedRulesView Grid.Row="3" DataContext="{Binding GroupedRules}"/>
-        <StackPanel Grid.Row="4" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="4" HorizontalAlignment="Right" Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center" Foreground="Orange" Text="{Binding GroupedRules.Message}"></TextBlock>
+            <TextBlock VerticalAlignment="Center" Foreground="Orange" Text="{Binding Message}" ></TextBlock>
             <Button Margin="20 10" Padding="5" FontSize="14" Command="{Binding PlaceLintelCommand}">Расставить</Button>
         </StackPanel>
     </Grid>

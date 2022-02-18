@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -26,6 +27,7 @@ namespace RevitLintelPlacement.ViewModels {
         private GroupedRuleCollectionViewModel _groupedRules;
         private ObservableCollection<LinkViewModel> _links;
         private ElementInfosViewModel _elementInfosViewModel;
+        private string _message;
 
         public MainViewModel() {
 
@@ -34,10 +36,10 @@ namespace RevitLintelPlacement.ViewModels {
         public MainViewModel(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
             ElementInfos = new ElementInfosViewModel(_revitRepository);
-            
+
             GroupedRules = new GroupedRuleCollectionViewModel(_revitRepository, ElementInfos);
             PlaceLintelCommand = new RelayCommand(PlaceLintels, p => true);
-            ShowReportCommand = new RelayCommand(ShowReport, p=>true);
+            ShowReportCommand = new RelayCommand(ShowReport, p => true);
             var links = _revitRepository.GetLinkTypes().ToList();
             if(links.Count > 0) {
                 Links = new ObservableCollection<LinkViewModel>(links.Select(l => new LinkViewModel() { Name = Path.GetFileNameWithoutExtension(l.Name) }));
@@ -49,6 +51,11 @@ namespace RevitLintelPlacement.ViewModels {
         public SampleMode SelectedSampleMode {
             get => _selectedSampleMode;
             set => this.RaiseAndSetIfChanged(ref _selectedSampleMode, value);
+        }
+
+        public string Message { 
+            get => _message;
+            set => this.RaiseAndSetIfChanged(ref _message, value); 
         }
 
         public LintelCollectionViewModel Lintels {
@@ -69,9 +76,9 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _links, value);
         }
 
-        public ElementInfosViewModel ElementInfos { 
-            get => _elementInfosViewModel; 
-            set => this.RaiseAndSetIfChanged(ref _elementInfosViewModel, value); 
+        public ElementInfosViewModel ElementInfos {
+            get => _elementInfosViewModel;
+            set => this.RaiseAndSetIfChanged(ref _elementInfosViewModel, value);
         }
 
         public void PlaceLintels(object p) {
@@ -88,15 +95,15 @@ namespace RevitLintelPlacement.ViewModels {
                 }
             }
             Lintels = new LintelCollectionViewModel(_revitRepository);
-            
-            
+
+
 
             var elementInWalls = _revitRepository.GetAllElementsInWall(SelectedSampleMode)
                 .ToList();
 
             foreach(var lintel in Lintels.LintelInfos) {
                 var element = elementInWalls.FirstOrDefault(e => e.Id == lintel.ElementInWallId);
-                if(element!=null) {
+                if(element != null) {
                     elementInWalls.Remove(element);
                 }
             }
@@ -112,8 +119,8 @@ namespace RevitLintelPlacement.ViewModels {
 
             var elevation = _revitRepository.GetElevation();
             var plan = _revitRepository.GetPlan();
-          
-            
+
+
             var links = Links.Where(l => l.IsChecked).Select(l => l.Name).ToList();
             using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
 
@@ -146,12 +153,13 @@ namespace RevitLintelPlacement.ViewModels {
                     _revitRepository.LockLintel(elevation, plan, lintel, elementInWall);
                     Lintels.LintelInfos.Add(new LintelInfoViewModel(_revitRepository, lintel, elementInWall));
                 }
-                
+
                 t.Commit();
             }
             if(ElementInfos.ElementInfos != null && ElementInfos.ElementInfos.Count > 0) {
                 ShowReport();
             }
+            ChangeMessage("Расстановка перемычек успешно завершена");
         }
 
         private void ShowReport(object p) {
@@ -162,6 +170,14 @@ namespace RevitLintelPlacement.ViewModels {
             ElementInfos.UpdateCollection();
             var view = new ReportView() { DataContext = ElementInfos };
             view.ShowDialog();
+        }
+
+        private async void ChangeMessage(string newMessage) {
+            Message = newMessage;
+            await Task.Run(()=> {
+                Thread.Sleep(3000);
+            });
+            Message = string.Empty;
         }
     }
 }

@@ -165,6 +165,7 @@
             </StackPanel>
         </GroupBox>-->
         <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center" Foreground="Orange" Text="{Binding Message}"></TextBlock>
             <Button Height="30" Width="70" Margin="5" Command="{Binding SaveConfigCommand}">Сохранить</Button>
             <Button Height="30" Width="70" Margin="5" Click="Button_Click">Отмена</Button>
         </StackPanel>

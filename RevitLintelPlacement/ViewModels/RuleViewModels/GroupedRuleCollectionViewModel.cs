@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -22,6 +23,7 @@ namespace RevitLintelPlacement.ViewModels {
         private ObservableCollection<GroupedRuleViewModel> _groupedRules;
         private ObservableCollection<string> _ruleNames;
         private string _selectedName;
+        private string _message;
 
         public GroupedRuleCollectionViewModel() {
 
@@ -46,6 +48,11 @@ namespace RevitLintelPlacement.ViewModels {
         public ICommand SaveAsCommand { get; set; }
         public ICommand LoadCommand { get; set; }
         public ICommand PathSelectionChangedCommand { get; set; }
+
+        public string Message { 
+            get => _message; 
+            set => this.RaiseAndSetIfChanged(ref _message, value);
+        }
 
         public ObservableCollection<GroupedRuleViewModel> GroupedRules {
             get => _groupedRules;
@@ -79,15 +86,17 @@ namespace RevitLintelPlacement.ViewModels {
                 switch(config.RulesType) {
                     case RulesType.Common: {
                         config.Save(_revitRepository.GetDocumentName());
+                        ChangeMessage("Файл успешно сохранен");
                         break;
                     }
                     case RulesType.Project: {
                         config.Save(_revitRepository.GetDocumentName());
+                        ChangeMessage("Файл успешно сохранен");
                         break;
                     }
                     case RulesType.User: {
                         config.SaveAs(config.Name);
-                        
+                        ChangeMessage("Файл успешно сохранен");
                         break;
                     }
                     default: {
@@ -108,6 +117,7 @@ namespace RevitLintelPlacement.ViewModels {
                     if(!_revitRepository.RuleConfigs.ContainsKey(config.Name)) {
                         _revitRepository.RuleConfigs.Add(config.Name, config);
                         RuleNames.Add(config.Name);
+                        ChangeMessage("Файл успешно сохранен");
                     }
                 }
             }
@@ -199,7 +209,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         private void InitializeRulePaths() {
-            if(_revitRepository.RuleConfigs?.Keys==null && _revitRepository.RuleConfigs?.Keys.Count() == 0) {
+            if(_revitRepository.RuleConfigs?.Keys == null && _revitRepository.RuleConfigs?.Keys.Count() == 0) {
                 throw new ArgumentException(nameof(_revitRepository.RuleConfigs), "Нет загруженных правил.");
             }
             RuleNames = new ObservableCollection<string>(_revitRepository.RuleConfigs.Keys);
@@ -208,11 +218,19 @@ namespace RevitLintelPlacement.ViewModels {
 
         private void SelectionChanged(object p) {
             var changedConfig = GenerateConfig();
-            if (changedConfig.Name!=null && _revitRepository.RuleConfigs.ContainsKey(changedConfig.Name)) {
+            if(changedConfig.Name != null && _revitRepository.RuleConfigs.ContainsKey(changedConfig.Name)) {
                 _revitRepository.RuleConfigs[changedConfig.Name] = changedConfig;
             }
             var config = _revitRepository.RuleConfigs[SelectedName];
             InitializeGroupRules();
+        }
+
+        private async void ChangeMessage(string newMessage) {
+            Message = newMessage;
+            await Task.Run(() => {
+                Thread.Sleep(3000);
+            });
+            Message = string.Empty;
         }
     }
 }

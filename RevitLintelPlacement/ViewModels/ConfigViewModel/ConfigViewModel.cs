@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -29,6 +30,7 @@ namespace RevitLintelPlacement.ViewModels {
         private ObservableCollection<FilterViewModel> _reinforcedConcreteFilter;
         private ObservableCollection<RulePathViewModel> _rulesCongigPath;
         private List<GenericModelFamilyViewModel> _lintelTypes;
+        private string _message;
 
         public ConfigViewModel() {
             RulesCongigPaths = new ObservableCollection<RulePathViewModel>();
@@ -41,11 +43,11 @@ namespace RevitLintelPlacement.ViewModels {
                 .Select(f => new GenericModelFamilyViewModel() { Name = f.Name }));
             Initialize();
             SaveConfigCommand = new RelayCommand(Save, p => true);
-            AddFilterCommand = new RelayCommand(AddFilter, p=>true);
+            AddFilterCommand = new RelayCommand(AddFilter, p => true);
             RemoveFilterCommand = new RelayCommand(RemoveFilter, p => true);
             AddRulePathCommand = new RelayCommand(AddRule, p => true);
             RemoveRulePathCommand = new RelayCommand(RemoveRule, p => true);
-            SelectLintelsConfigCommand = new RelayCommand(SelectLintelsConfig, p=>true);
+            SelectLintelsConfigCommand = new RelayCommand(SelectLintelsConfig, p => true);
         }
 
         public string LintelThickness {
@@ -98,10 +100,11 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _openingFixation, value);
         }
 
-        public ObservableCollection<FilterViewModel> ReinforcedConcreteFilter {
-            get => _reinforcedConcreteFilter;
-            set => this.RaiseAndSetIfChanged(ref _reinforcedConcreteFilter, value);
+        public string Message { 
+            get => _message; 
+            set => this.RaiseAndSetIfChanged(ref _message, value); 
         }
+
         public string HolesFilter {
             get => _holesFilter;
             set => this.RaiseAndSetIfChanged(ref _holesFilter, value);
@@ -111,15 +114,19 @@ namespace RevitLintelPlacement.ViewModels {
             get => _lintelsConfigPath;
             set => this.RaiseAndSetIfChanged(ref _lintelsConfigPath, value);
         }
+        public ObservableCollection<FilterViewModel> ReinforcedConcreteFilter {
+            get => _reinforcedConcreteFilter;
+            set => this.RaiseAndSetIfChanged(ref _reinforcedConcreteFilter, value);
+        }
 
         public ObservableCollection<RulePathViewModel> RulesCongigPaths {
             get => _rulesCongigPath;
             set => this.RaiseAndSetIfChanged(ref _rulesCongigPath, value);
         }
 
-        public List<GenericModelFamilyViewModel> LintelFamilies { 
-            get => _lintelTypes; 
-            set => this.RaiseAndSetIfChanged(ref _lintelTypes, value); 
+        public List<GenericModelFamilyViewModel> LintelFamilies {
+            get => _lintelTypes;
+            set => this.RaiseAndSetIfChanged(ref _lintelTypes, value);
         }
 
         public ICommand SaveConfigCommand { get; set; }
@@ -140,7 +147,7 @@ namespace RevitLintelPlacement.ViewModels {
             OpeningHeight = _revitRepository.LintelsCommonConfig.OpeningHeight;
             OpeningWidth = _revitRepository.LintelsCommonConfig.OpeningWidth;
             OpeningFixation = _revitRepository.LintelsCommonConfig.OpeningFixation;
-            if (_revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter==null ||
+            if(_revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter == null ||
                 _revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter.Count == 0) {
                 ReinforcedConcreteFilter = new ObservableCollection<FilterViewModel>(
                 new List<FilterViewModel> { new FilterViewModel() { Name = "Железобетон" } });
@@ -149,7 +156,7 @@ namespace RevitLintelPlacement.ViewModels {
                 new List<FilterViewModel>(_revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter
                 .Select(e => new FilterViewModel() { Name = e })));
             }
-            
+
             HolesFilter = _revitRepository.LintelsCommonConfig.HolesFilter;
             foreach(var family in LintelFamilies) {
                 family.IsChecked = _revitRepository.LintelsCommonConfig.LintelFamilies
@@ -168,7 +175,7 @@ namespace RevitLintelPlacement.ViewModels {
             _revitRepository.LintelsCommonConfig.OpeningHeight = OpeningHeight;
             _revitRepository.LintelsCommonConfig.OpeningWidth = OpeningWidth;
             _revitRepository.LintelsCommonConfig.OpeningFixation = OpeningFixation;
-            _revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter = ReinforcedConcreteFilter.Select(e=>e.Name).ToList();
+            _revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter = ReinforcedConcreteFilter.Select(e => e.Name).ToList();
             _revitRepository.LintelsCommonConfig.HolesFilter = HolesFilter;
             _revitRepository.LintelsCommonConfig.LintelFamilies = LintelFamilies
                 .Where(e => e.IsChecked)
@@ -176,6 +183,7 @@ namespace RevitLintelPlacement.ViewModels {
                 .ToList();
             _revitRepository.LintelsCommonConfig.Save(_revitRepository.GetDocumentName());
             _revitRepository.LintelsConfig.SaveProjectConfig();
+            ChangeMessage("Настройки успешно сохранены");
         }
 
         private void AddFilter(object p) {
@@ -201,7 +209,7 @@ namespace RevitLintelPlacement.ViewModels {
             using(var dialog = new System.Windows.Forms.FolderBrowserDialog()) {
                 dialog.SelectedPath = System.IO.Path.GetDirectoryName(LintelsConfigPath);
                 if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-                    if(dialog.SelectedPath!= LintelsConfigPath) {
+                    if(dialog.SelectedPath != LintelsConfigPath) {
                         LintelsConfigPath = dialog.SelectedPath;
                         _revitRepository.LintelsCommonConfig = LintelsCommonConfig.GetLintelsCommonConfig(LintelsConfigPath);
                         Initialize();
@@ -211,6 +219,13 @@ namespace RevitLintelPlacement.ViewModels {
             }
         }
 
+        private async void ChangeMessage(string  newMessage) {
+            Message = newMessage;
+            await Task.Run(() => {
+                Thread.Sleep(3000);
+            });
+            Message = string.Empty;
+        }
     }
 
     internal class FilterViewModel : BaseViewModel {
