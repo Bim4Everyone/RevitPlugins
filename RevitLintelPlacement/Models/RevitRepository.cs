@@ -84,7 +84,8 @@ namespace RevitLintelPlacement.Models {
         public IEnumerable<WallType> GetWallTypes() {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(WallType))
-                .Cast<WallType>();
+                .Cast<WallType>()
+                .Where(w=>w.Kind == WallKind.Basic);
         }
 
         public IEnumerable<Element> GetGenericModelFamilies() {
