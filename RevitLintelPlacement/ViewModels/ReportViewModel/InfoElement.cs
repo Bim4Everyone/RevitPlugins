@@ -43,6 +43,12 @@ namespace RevitLintelPlacement.ViewModels {
             ElementType = ElementType.Config
         };
 
+        public static InfoElement LackOfView => new InfoElement() {
+            Message = "В проекте не содержится ни одного вида \"{0}\".",
+            TypeInfo = TypeInfo.Error,
+            ElementType = ElementType.View
+        };
+
         public string Message { get; set; }
         public TypeInfo TypeInfo { get; set; }
         public ElementType ElementType { get; set; }

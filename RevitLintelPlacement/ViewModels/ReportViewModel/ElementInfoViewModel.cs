@@ -90,6 +90,8 @@ namespace RevitLintelPlacement.ViewModels {
         [Description("Проем")]
         Opening,
         [Description("Настройки")]
-        Config
+        Config,
+        [Description("Вид")]
+        View
     }
 }

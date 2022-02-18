@@ -118,8 +118,15 @@ namespace RevitLintelPlacement.ViewModels {
             lc.Check(Lintels.LintelInfos);
 
             var elevation = _revitRepository.GetElevation();
+            if(elevation == null) {
+                ElementInfos.ElementInfos.Add(new ElementInfoViewModel(ElementId.InvalidElementId, InfoElement.LackOfView.FormatMessage("Фасад")));
+                return;
+            }
             var plan = _revitRepository.GetPlan();
-
+            if(plan == null) {
+                ElementInfos.ElementInfos.Add(new ElementInfoViewModel(ElementId.InvalidElementId, InfoElement.LackOfView.FormatMessage("План")));
+                return;
+            }
 
             var links = Links.Where(l => l.IsChecked).Select(l => l.Name).ToList();
             using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
