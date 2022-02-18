@@ -221,7 +221,7 @@ namespace RevitLintelPlacement.Models {
             refWithContext = GetNearestWallOrColumn(view3D, elementInWall, viewPoint, new XYZ(0, 0, 1), true);
             if(refWithContext == null)
                 return true;
-            if(refWithContext.Proximity > 0.32) {
+            if(refWithContext.Proximity < 0.32) {
                 return false;
             }
             wallOrColumn = _document.GetElement(refWithContext.GetReference().ElementId);
