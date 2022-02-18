@@ -73,7 +73,7 @@
                     <ComboBox
                         DockPanel.Dock="Left"
                         IsEnabled="{Binding IsEnabled}"
-                        SelectedItem="{Binding DesignOptions}"
+                        SelectedItem="{Binding DesignOption}"
                         ItemsSource="{Binding DataContext.LinkType.DesignOptions, ElementName=_this}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>

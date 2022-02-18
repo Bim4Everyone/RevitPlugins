@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -15,24 +16,22 @@ using RevitSetLevelSection.Models;
 
 namespace RevitSetLevelSection.ViewModels {
     internal class FillMassParamViewModel : FillParamViewModel {
+        private readonly MainViewModel _mainViewModel;
         private readonly RevitRepository _revitRepository;
 
         private bool _isEnabled;
-        private DesignOptionsViewModel _designOptions;
+        private DesignOptionsViewModel _designOption;
 
         private string _paramValue;
         private RevitParam _revitParam;
         private string _errorText;
 
-        public FillMassParamViewModel(RevitRepository revitRepository) {
-            if(revitRepository is null) {
-                throw new ArgumentNullException(nameof(revitRepository));
-            }
-
-            _revitRepository = revitRepository;
+        public FillMassParamViewModel(MainViewModel mainViewModel, RevitRepository revitRepository) {
+            _mainViewModel = mainViewModel ?? throw new ArgumentNullException(nameof(mainViewModel));
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         }
 
-        public RevitParam RevitParam {
+        public override RevitParam RevitParam {
             get => _revitParam;
             set {
                 this.RaiseAndSetIfChanged(ref _revitParam, value);
@@ -54,10 +53,10 @@ namespace RevitSetLevelSection.ViewModels {
 
         public bool HasError => !string.IsNullOrEmpty(ErrorText);
 
-        public DesignOptionsViewModel DesignOptions {
-            get => _designOptions;
+        public DesignOptionsViewModel DesignOption {
+            get => _designOption;
             set {
-                this.RaiseAndSetIfChanged(ref _designOptions, value);
+                this.RaiseAndSetIfChanged(ref _designOption, value);
                 if(HasNotRussianLetters()) {
                     ErrorText =
                         "В данном варианте содержится формообразующий элемент со значением параметра содержащий запрещенные символы.";
@@ -84,12 +83,12 @@ namespace RevitSetLevelSection.ViewModels {
                 return string.IsNullOrEmpty(ParamValue) ? "Заполните значение параметра документа." : null;
             }
 
-            if(DesignOptions == null) {
+            if(DesignOption == null) {
                 return "Выберите вариант с формообразующими.";
             }
 
-            return DesignOptions.CountMassElements == 0
-                ? $"В выбранном варианте \"{DesignOptions.Name}\" нет формообразующих."
+            return DesignOption.CountMassElements == 0
+                ? $"В выбранном варианте \"{DesignOption.Name}\" нет формообразующих."
                 : null;
         }
 
@@ -97,16 +96,16 @@ namespace RevitSetLevelSection.ViewModels {
             if(fromRevitParam) {
                 _revitRepository.UpdateElements(RevitParam, ParamValue);
             } else {
-                _revitRepository.UpdateElements(RevitParam, DesignOptions.GetMassObjects());
+                _revitRepository.UpdateElements(RevitParam, DesignOption.GetMassObjects());
             }
         }
 
         private bool HasNotRussianLetters() {
-            if(DesignOptions == null) {
+            if(DesignOption == null) {
                 return false;
             }
-            
-            return DesignOptions.GetMassObjects()
+
+            return DesignOption.GetMassObjects()
                 .Any(item => HasNotRussianLetters((string) item.GetParamValueOrDefault(RevitParam)));
         }
 
@@ -116,6 +115,19 @@ namespace RevitSetLevelSection.ViewModels {
             }
 
             return !Regex.IsMatch(text, @"^[А-Яа-я0-9,\s]+$");
+        }
+
+        public override ParamSettings GetParamSettings() {
+            return new ParamSettings() {
+                IsEnabled = IsEnabled, ElementId = DesignOption?.Id, PropertyName = RevitParam.PropertyName
+            };
+        }
+
+        public override void SetParamSettings(ParamSettings paramSettings) {
+            IsEnabled = paramSettings.IsEnabled;
+            DesignOption = _mainViewModel.LinkType?.DesignOptions
+                               .FirstOrDefault(item => item.Id == paramSettings.ElementId)
+                           ?? _mainViewModel.LinkType?.DesignOptions.FirstOrDefault();
         }
     }
 }

@@ -24,10 +24,12 @@ namespace RevitSetLevelSection.ViewModels {
             }
 
             _massElements = linkInstanceRepository.GetMassElements(designOption).ToList();
-            
+
+            Id = designOption.Id.IntegerValue;
             Name = designOption.Name;
         }
 
+        public int Id { get; }
         public string Name { get; }
 
         public int CountMassElements => _massElements.Count;

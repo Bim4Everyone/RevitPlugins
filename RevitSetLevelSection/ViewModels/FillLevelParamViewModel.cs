@@ -13,7 +13,7 @@ using RevitSetLevelSection.Models;
 namespace RevitSetLevelSection.ViewModels {
     internal class FillLevelParamViewModel : FillParamViewModel {
         private readonly RevitRepository _revitRepository;
-        
+
         private bool _isEnabled;
 
         public FillLevelParamViewModel(RevitRepository revitRepository) {
@@ -22,10 +22,9 @@ namespace RevitSetLevelSection.ViewModels {
             }
 
             _revitRepository = revitRepository;
-            RevitParam = SharedParamsConfig.Instance.Level;
         }
 
-        public RevitParam RevitParam { get; set; }
+        public override RevitParam RevitParam { get; set; }
         public string Name => $"Заполнить \"{RevitParam.Name}\"";
 
         public override bool IsEnabled {
@@ -38,7 +37,18 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         public override void UpdateElements(bool fromProjectParam) {
-            
+
+        }
+
+        public override ParamSettings GetParamSettings() {
+            return new ParamSettings() {
+                IsEnabled = IsEnabled, 
+                PropertyName = RevitParam.PropertyName
+            };
+        }
+
+        public override void SetParamSettings(ParamSettings paramSettings) {
+            IsEnabled = paramSettings.IsEnabled;
         }
     }
 }

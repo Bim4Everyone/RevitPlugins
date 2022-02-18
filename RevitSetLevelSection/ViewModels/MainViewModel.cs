@@ -33,6 +33,8 @@ namespace RevitSetLevelSection.ViewModels {
             FillParams = new ObservableCollection<FillParamViewModel>(GetFillParams());
 
             UpdateElementsCommand = new RelayCommand(UpdateElements, CanUpdateElement);
+            
+            SetConfig();
         }
 
         public ICommand UpdateElementsCommand { get; set; }
@@ -56,14 +58,14 @@ namespace RevitSetLevelSection.ViewModels {
         public ObservableCollection<FillParamViewModel> FillParams { get; }
 
         private IEnumerable<FillParamViewModel> GetFillParams() {
-            //yield return new FillLevelParamViewModel(_revitRepository);
-            yield return new FillMassParamViewModel(_revitRepository) {
+            //yield return new FillLevelParamViewModel(_revitRepository) { RevitParam = SharedParamsConfig.Instance.Level };
+            yield return new FillMassParamViewModel(this, _revitRepository) {
                 RevitParam = SharedParamsConfig.Instance.BuildingWorksBlock
             };
-            yield return new FillMassParamViewModel(_revitRepository) {
+            yield return new FillMassParamViewModel(this, _revitRepository) {
                 RevitParam = SharedParamsConfig.Instance.BuildingWorksSection
             };
-            yield return new FillMassParamViewModel(_revitRepository) {
+            yield return new FillMassParamViewModel(this, _revitRepository) {
                 RevitParam = SharedParamsConfig.Instance.EconomicFunction
             };
         }
@@ -75,6 +77,7 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         private void UpdateElements(object param) {
+            SaveConfig();
             foreach(FillParamViewModel fillParamViewModel in FillParams.Where(item => item.IsEnabled)) {
                 fillParamViewModel.UpdateElements(FromRevitParam);
             }
@@ -107,6 +110,45 @@ namespace RevitSetLevelSection.ViewModels {
 
             ErrorText = null;
             return true;
+        }
+
+        private void SetConfig() {
+            SetLevelSectionSettings settings =
+                SetLevelSectionConfig.GetPrintConfig()
+                    .GetSettings(_revitRepository.Document);
+            if(settings == null) {
+                return;
+            }
+
+            FromRevitParam = settings.FromRevitParam;
+            LinkType = LinkTypes
+                           .FirstOrDefault(item => item.Id == settings.LinkFileId)
+                       ?? LinkTypes.FirstOrDefault();
+
+            foreach(FillParamViewModel fillParam in FillParams) {
+                ParamSettings paramSettings = settings.ParamSettings
+                    .FirstOrDefault(item => item.PropertyName.Equals(fillParam.RevitParam.PropertyName));
+
+                fillParam.SetParamSettings(paramSettings);
+            }
+        }
+
+        private void SaveConfig() {
+            SetLevelSectionConfig config = SetLevelSectionConfig.GetPrintConfig();
+            SetLevelSectionSettings settings = config.GetSettings(_revitRepository.Document);
+            if(settings == null) {
+                settings = config.AddSettings(_revitRepository.Document);
+            }
+
+            settings.LinkFileId = LinkType.Id;
+            settings.FromRevitParam = FromRevitParam;
+            settings.ParamSettings.Clear();
+            foreach(FillParamViewModel fillParam in FillParams) {
+                ParamSettings paramSettings = fillParam.GetParamSettings();
+                settings.ParamSettings.Add(paramSettings);
+            }
+            
+            config.SaveProjectConfig();
         }
     }
 }
