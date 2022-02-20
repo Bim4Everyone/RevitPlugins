@@ -132,6 +132,15 @@ namespace RevitLintelPlacement.ViewModels {
             using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
 
                 foreach(var elementInWall in elementInWalls) {
+                    var elementInWallFixation = elementInWall.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningFixation);
+                    if(elementInWallFixation == null) {
+                        ElementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id, InfoElement.MissingOpeningParameter.FormatMessage(
+                            elementInWall.Name, _revitRepository.LintelsCommonConfig.OpeningFixation)));
+                    } else {
+                        if((int) elementInWallFixation == 1) {
+                            continue;
+                        }
+                    }
                     var rule = GroupedRules.GetRule(elementInWall);
                     if(rule == null)
                         continue;
