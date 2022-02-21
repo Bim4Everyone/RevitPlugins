@@ -65,6 +65,7 @@ namespace RevitLintelPlacement.Models {
         public string OpeningFixation { get; set; }
 
         public List<string> ReinforcedConcreteFilter { get; set; } = new List<string>();
+        [Description("Фильтр отверстий")]
         public string HolesFilter { get; set; }
         public List<string> LintelFamilies { get; set; } = new List<string>();
 

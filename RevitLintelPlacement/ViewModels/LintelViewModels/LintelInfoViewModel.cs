@@ -31,15 +31,17 @@ namespace RevitLintelPlacement.ViewModels {
             if(elementInWall != null) {
                 ElementInWall = elementInWall;
                 ElementInWallId = elementInWall.Id;
-                ElementInWallName =  $"{elementInWall.Symbol.Family.Name}: {elementInWall.Name}" ;
+                ElementInWallName = $"{elementInWall.Symbol.Family.Name}: {elementInWall.Name}";
                 WallTypeName = elementInWall.Host.Name;
                 Level = _revitRepository.GetElementById(elementInWall.LevelId)?.Name;
                 if(elementInWall.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Id) {
                     ElementInWallKind = ElementInWallKind.Door;
-                } else if(elementInWall.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Windows).Id) {
-                    ElementInWallKind = elementInWall.Symbol.Family.Name.Contains("Отверстие") ? 
-                        ElementInWallKind.Opening : 
-                        ElementInWallKind.Window;
+                } else if(elementInWall.Symbol.Family.Name.ToLower().Contains(_revitRepository.LintelsCommonConfig.HolesFilter.ToLower())) {
+                    ElementInWallKind = ElementInWallKind.Opening;
+                } else if(elementInWall.Category.Id == new ElementId(BuiltInCategory.OST_Windows)) {
+                    ElementInWallKind = ElementInWallKind.Window;
+                } else {
+                    ElementInWallKind = ElementInWallKind.None;
                 }
             } else {
                 ElementInWallKind = ElementInWallKind.None;

@@ -100,9 +100,9 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _openingFixation, value);
         }
 
-        public string Message { 
-            get => _message; 
-            set => this.RaiseAndSetIfChanged(ref _message, value); 
+        public string Message {
+            get => _message;
+            set => this.RaiseAndSetIfChanged(ref _message, value);
         }
 
         public string HolesFilter {

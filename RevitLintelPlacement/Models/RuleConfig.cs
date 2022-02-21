@@ -65,8 +65,10 @@ namespace RevitLintelPlacement.Models {
             if(File.Exists(path)) {
                 try {
                     var loadedConfig = JsonConvert.DeserializeObject<RuleConfig>(File.ReadAllText(path));
-                    СonfigureConfig(loadedConfig, Path.GetFileNameWithoutExtension(path), RulesType.User);
-                    return loadedConfig;
+                    if(loadedConfig != null) {
+                        СonfigureConfig(loadedConfig, Path.GetFileNameWithoutExtension(path), RulesType.User);
+                        return loadedConfig;
+                    }
                 } catch {}
             }
             var emptyConfig = new RuleConfig();
@@ -77,8 +79,10 @@ namespace RevitLintelPlacement.Models {
         private static RuleConfig GeCommonConfig() {
             if(File.Exists(GetConfigPath())) {
                 var commonConfig = JsonConvert.DeserializeObject<RuleConfig>(File.ReadAllText(GetConfigPath()));
-                СonfigureConfig(commonConfig, nameof(RuleConfig), RulesType.Common);
-                return commonConfig;
+                if(commonConfig != null) {
+                    СonfigureConfig(commonConfig, nameof(RuleConfig), RulesType.Common);
+                    return commonConfig;
+                }
             }
             var emptyCommonConfig = new RuleConfig();
             СonfigureConfig(emptyCommonConfig, nameof(RuleConfig), RulesType.Common);
@@ -88,8 +92,10 @@ namespace RevitLintelPlacement.Models {
         private static RuleConfig GetProjectConfig(string documentName) {
             if(File.Exists(GetDocumentConfigPath(documentName))) {
                 var projectCpnfig = JsonConvert.DeserializeObject<RuleConfig>(File.ReadAllText(GetDocumentConfigPath(documentName)));
-                СonfigureConfig(projectCpnfig, documentName, RulesType.Project);
-                return projectCpnfig;
+                if(projectCpnfig != null) {
+                    СonfigureConfig(projectCpnfig, documentName, RulesType.Project);
+                    return projectCpnfig;
+                }
             }
             var emptyProjectConfig = new RuleConfig();
             СonfigureConfig(emptyProjectConfig, documentName, RulesType.Project);
@@ -98,12 +104,15 @@ namespace RevitLintelPlacement.Models {
 
         private static RuleConfig GetUserConfig(string file) {
             var userConfig = JsonConvert.DeserializeObject<RuleConfig>(File.ReadAllText(file));
+            if(userConfig == null) {
+                userConfig = new RuleConfig();
+            }
             СonfigureConfig(userConfig, Path.GetFileNameWithoutExtension(file), RulesType.User);
             return userConfig;
         }
 
         private static RuleConfig СonfigureConfig(RuleConfig ruleConfig, string name, RulesType rulesType) {
-            if(string.IsNullOrEmpty(ruleConfig.Name)) {
+            if(string.IsNullOrEmpty(ruleConfig?.Name)) {
                 ruleConfig.Name = name;
             }
             ruleConfig.RulesType = rulesType;

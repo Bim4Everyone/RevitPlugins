@@ -7,8 +7,8 @@
         xmlns:local="clr-namespace:RevitLintelPlacement.Views"
         xmlns:converters="clr-namespace:RevitLintelPlacement.Converters"
         xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
-        mc:Ignorable="d" Height="480" Width="900"
-        MinHeight="480" MinWidth="350"
+        mc:Ignorable="d" Height="550" Width="900"
+        MinHeight="550" MinWidth="350"
         Title="Настройки"
              d:DataContext="{d:DesignInstance vm:ConfigViewModel}">
     <Window.Resources>
@@ -45,25 +45,28 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <!--<GroupBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Header="Путь к файлу настроек">
-            <DockPanel HorizontalAlignment="Stretch">
-                <Button DockPanel.Dock="Right" Width="20" Height="25" Command="{Binding SelectLintelsConfigCommand}">...</Button>
-                <TextBox Text="{Binding LintelsConfigPath}" HorizontalAlignment="Stretch" 
-                         Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DockPanel}, Path=ActualWidth, 
-                    Converter={StaticResource WidthConverter}, ConverterParameter=30}"></TextBox>
-            </DockPanel>
-        </GroupBox>-->
-        <GroupBox Grid.Row="1" Grid.Column="0" Header="Семейства перемычек">
-            <ListBox Height="200" Margin="10" ItemsSource="{Binding LintelFamilies}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type vm:GenericModelFamilyViewModel}">
-                        <CheckBox IsChecked="{Binding IsChecked}">
-                            <TextBlock Text="{Binding Name}"/>
-                        </CheckBox>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </GroupBox>
+
+        <Grid Grid.Row="1" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0" Header="Семейства перемычек">
+                <ListBox  Height="200" Margin="10" ItemsSource="{Binding LintelFamilies}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:GenericModelFamilyViewModel}">
+                            <CheckBox IsChecked="{Binding IsChecked}">
+                                <TextBlock Text="{Binding Name}"/>
+                            </CheckBox>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </GroupBox>
+            <GroupBox Grid.Row="1"  Header="Фильтрация отверстий по имени семейства">
+                <TextBox  Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=GroupBox}, Path=ActualWidth, 
+                                Converter={StaticResource WidthConverter}, ConverterParameter=30}" Text="{Binding HolesFilter}"/>
+            </GroupBox>
+        </Grid>
         <GroupBox Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" Header="Характеристики перемычек и проёмов">
             <Grid>
                 <Grid.RowDefinitions>
@@ -133,37 +136,6 @@
                 </Grid>
             </StackPanel>
         </GroupBox>
-        <!--<GroupBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="130" Header="Пути к файлам с правилами">
-            <StackPanel>
-                <ListBox MaxHeight="80" BorderBrush="Transparent" BorderThickness="0" ItemsSource="{Binding RulesCongigPaths}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type vm:RulePathViewModel}">
-                            <DockPanel HorizontalAlignment="Stretch" Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=ActualWidth, 
-                                Converter={StaticResource WidthConverter}, ConverterParameter=30}">
-                                <Button DockPanel.Dock="Right" Width="20" Height="25" Command="{Binding SelectPathCommand}">...</Button>
-                                <TextBox Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DockPanel}, Path=ActualWidth, 
-                                    Converter={StaticResource WidthConverter}, ConverterParameter=30}" 
-                                 Text="{Binding Name}"></TextBox>
-                            </DockPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" HorizontalAlignment="Right" Width="30" Height="30" Background="Transparent" BorderBrush="Transparent"
-                        Command="{Binding AddRulePathCommand}">
-                        <Image Source="../Resources/icons8-add.png"/>
-                    </Button>
-                    <Button Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="30" Background="Transparent" BorderBrush="Transparent"
-                        Command="{Binding RemoveRulePathCommand}">
-                        <Image Source="../Resources/icons8-remove.png"/>
-                    </Button>
-                </Grid>
-            </StackPanel>
-        </GroupBox>-->
         <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Orientation="Horizontal">
             <TextBlock VerticalAlignment="Center" Foreground="Orange" Text="{Binding Message}"></TextBlock>
             <Button Height="30" Width="70" Margin="5" Command="{Binding SaveConfigCommand}">Сохранить</Button>

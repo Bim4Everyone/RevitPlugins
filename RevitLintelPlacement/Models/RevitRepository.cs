@@ -187,7 +187,12 @@ namespace RevitLintelPlacement.Models {
                 .WherePasses(categoryFilter)
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
-                .Where(e => e.Host is Wall && e.Location != null);
+                .Where(e => e.Host is Wall && e.Location != null)
+                .Union(
+                 collector.OfClass(typeof(FamilyInstance))
+                .Cast<FamilyInstance>()
+                .Where(f => f?.Symbol != null && f.Symbol?.Family != null && f.Symbol.Family.Name != null &&
+                f.Symbol.Family.Name.ToLower().Contains(LintelsCommonConfig.HolesFilter.ToLower())), new FamilyInstanceComparer());
         }
 
         public View GetElevation() {
@@ -531,6 +536,10 @@ namespace RevitLintelPlacement.Models {
             if(string.IsNullOrEmpty(LintelsCommonConfig.OpeningWidth)) {
                 result = false;
                 AddBlankParameterInfo(elementInfos, nameof(LintelsCommonConfig.OpeningWidth));
+            }
+            if(string.IsNullOrEmpty(LintelsCommonConfig.HolesFilter)) {
+                result = false;
+                AddBlankParameterInfo(elementInfos, nameof(LintelsCommonConfig.HolesFilter));
             }
             return result;
         }

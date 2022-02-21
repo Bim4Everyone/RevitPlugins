@@ -34,7 +34,7 @@ namespace RevitLintelPlacement.ViewModels {
                 Source = ElementInfos 
             };
             TypeInfoCheckedCommand = new RelayCommand(TypeInfoChecked, p => true);
-            ElementInfosViewSource.Filter += ElementInfosViewSource_Filter;
+            ElementInfosViewSource.Filter += ElementInfosViewSourceFilter;
         }
 
         public ICommand SelectElementCommand { get; set; }
@@ -82,7 +82,7 @@ namespace RevitLintelPlacement.ViewModels {
             }
         }
 
-        private void ElementInfosViewSource_Filter(object sender, FilterEventArgs e) {
+        private void ElementInfosViewSourceFilter(object sender, FilterEventArgs e) {
             if (e.Item is ElementInfoViewModel elementInfo) {
                 e.Accepted = TypeInfos
                     .Where(t => t.IsChecked)
