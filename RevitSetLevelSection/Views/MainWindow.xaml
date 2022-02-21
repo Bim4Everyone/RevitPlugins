@@ -8,7 +8,7 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:converters="clr-namespace:dosymep.WPF.Converters"
     mc:Ignorable="d"
-    Title="Перенести уровень/секцию" Height="450" Width="800" WindowStartupLocation="CenterOwner"
+    Title="Обновить уровень/секцию" Height="450" Width="800" WindowStartupLocation="CenterOwner"
     x:Name="_this"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 

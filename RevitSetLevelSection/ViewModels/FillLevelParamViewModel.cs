@@ -25,7 +25,7 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         public override RevitParam RevitParam { get; set; }
-        public string Name => $"Заполнить \"{RevitParam.Name}\"";
+        public string Name => $"Обновить \"{RevitParam.Name}\"";
 
         public override bool IsEnabled {
             get => _isEnabled;
