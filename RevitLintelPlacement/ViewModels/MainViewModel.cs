@@ -46,6 +46,18 @@ namespace RevitLintelPlacement.ViewModels {
             } else {
                 Links = new ObservableCollection<LinkViewModel>();
             }
+            CloseCommand = new RelayCommand(Close, p => true);
+            var settings = _revitRepository.LintelsConfig.GetSettings(_revitRepository.GetDocumentName());
+            if(settings != null) {
+                SelectedSampleMode = settings.SelectedModeRules;
+                if(settings.SelectedLinks != null && settings.SelectedLinks.Count > 0) {
+                    foreach(var link in Links) {
+                        if (settings.SelectedLinks.Any(sl=>sl.Equals(link.Name, StringComparison.CurrentCultureIgnoreCase))) {
+                            link.IsChecked = true;
+                        }
+                    }
+                }
+            } 
         }
 
         public SampleMode SelectedSampleMode {
@@ -70,6 +82,7 @@ namespace RevitLintelPlacement.ViewModels {
 
         public ICommand PlaceLintelCommand { get; set; }
         public ICommand ShowReportCommand { get; set; }
+        public ICommand CloseCommand { get; set; }
 
         public ObservableCollection<LinkViewModel> Links {
             get => _links;
@@ -194,6 +207,17 @@ namespace RevitLintelPlacement.ViewModels {
                 Thread.Sleep(3000);
             });
             Message = string.Empty;
+        }
+
+        private void Close(object p) {
+            var settings = _revitRepository.LintelsConfig.GetSettings(_revitRepository.GetDocumentName());
+            if(settings == null) {
+                settings = _revitRepository.LintelsConfig.AddSettings(_revitRepository.GetDocumentName());
+            }
+            settings.SelectedPath = GroupedRules.SelectedName;
+            settings.SelectedModeRules = SelectedSampleMode;
+            settings.SelectedLinks = Links.Where(l => l.IsChecked).Select(l => l.Name).ToList();
+            _revitRepository.LintelsConfig.SaveProjectConfig();
         }
     }
 }

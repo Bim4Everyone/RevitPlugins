@@ -28,6 +28,10 @@ namespace RevitLintelPlacement.ViewModels {
 
         public LintelCollectionViewModel(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
+            var config = revitRepository.LintelsConfig.GetSettings(_revitRepository.GetDocumentName());
+            if(config != null) {
+                SelectedSampleMode = config.SelectedModeNavigator;
+            }
             InitializeLintels(SelectedSampleMode);
             LintelsViewSource = new CollectionViewSource { Source = LintelInfos };
             LintelsViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(LintelInfoViewModel.Level)));
@@ -37,6 +41,7 @@ namespace RevitLintelPlacement.ViewModels {
             SelectPreviousCommand = new RelayCommand(SelectPrevious, p => true);
             SelectionElementKindChangedCommand = new RelayCommand(SelectionElementKindChanged, p => true);
             SampleModeChangedCommand = new RelayCommand(SampleModeChanged, p => true);
+            CloseCommand = new RelayCommand(Close, p => true);
             CountLintelInView = LintelsViewSource.View.Cast<LintelInfoViewModel>().Count();
         }
 
@@ -64,6 +69,7 @@ namespace RevitLintelPlacement.ViewModels {
         public ICommand SelectPreviousCommand { get; }
 
         public ICommand SampleModeChangedCommand { get; set; }
+        public ICommand CloseCommand { get; set; }
 
         public CollectionViewSource LintelsViewSource { get; set; }
 
@@ -136,6 +142,17 @@ namespace RevitLintelPlacement.ViewModels {
             LintelsViewSource.Source = LintelInfos;
             LintelsViewSource.View.Refresh();
             CountLintelInView = LintelsViewSource.View.Cast<LintelInfoViewModel>().Count();
+        }
+
+        private void Close(object p) {
+            LintelsSettings settings;
+            if(_revitRepository.LintelsConfig.GetSettings(_revitRepository.GetDocumentName()) == null) {
+                settings = _revitRepository.LintelsConfig.AddSettings(_revitRepository.GetDocumentName());
+            } else {
+                settings = _revitRepository.LintelsConfig.GetSettings(_revitRepository.GetDocumentName());
+            }
+            settings.SelectedModeNavigator = SelectedSampleMode;
+            _revitRepository.LintelsConfig.SaveProjectConfig();
         }
     }
 

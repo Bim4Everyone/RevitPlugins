@@ -14,14 +14,14 @@ using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 
+using RevitLintelPlacement.ViewModels;
+
 namespace RevitLintelPlacement.Models {
-    internal class LintelsConfig : ProjectConfig {
+    internal class LintelsConfig : ProjectConfig<LintelsSettings> {
         [JsonIgnore]
         public override string ProjectConfigPath { get; set; }
         [JsonIgnore]
         public override IConfigSerializer Serializer { get; set; }
-
-        //public List<string> RulesCongigPaths { get; set; } = new List<string> ();
 
         public static LintelsConfig GetLintelsConfig() {
             return new ProjectConfigBuilder()
@@ -32,6 +32,15 @@ namespace RevitLintelPlacement.Models {
                 .Build<LintelsConfig>();
         }
     }
+
+    internal class LintelsSettings : ProjectSettings {
+        public override string ProjectName { get; set; }
+        public SampleMode SelectedModeRules { get; set; }
+        public SampleMode SelectedModeNavigator { get; set; }
+        public string SelectedPath { get; set; }
+        public List<string> SelectedLinks { get; set; } = new List<string>();
+    }
+
 
     internal class LintelsCommonConfig {
         [Description("Толщина перемычки")]

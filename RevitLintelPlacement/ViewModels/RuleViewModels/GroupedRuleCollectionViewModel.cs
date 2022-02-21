@@ -48,6 +48,7 @@ namespace RevitLintelPlacement.ViewModels {
         public ICommand SaveAsCommand { get; set; }
         public ICommand LoadCommand { get; set; }
         public ICommand PathSelectionChangedCommand { get; set; }
+       
 
         public string Message { 
             get => _message; 
@@ -213,7 +214,12 @@ namespace RevitLintelPlacement.ViewModels {
                 throw new ArgumentException(nameof(_revitRepository.RuleConfigs), "Нет загруженных правил.");
             }
             RuleNames = new ObservableCollection<string>(_revitRepository.RuleConfigs.Keys);
-            SelectedName = _revitRepository.GetDocumentName();
+            var settings = _revitRepository.LintelsConfig.GetSettings(_revitRepository.GetDocumentName());
+            if(settings != null && !string.IsNullOrEmpty(settings.SelectedPath) && RuleNames.Contains(settings.SelectedPath)) {
+                SelectedName = settings.SelectedPath;
+            } else {
+                SelectedName = _revitRepository.GetDocumentName();
+            }
         }
 
         private void SelectionChanged(object p) {

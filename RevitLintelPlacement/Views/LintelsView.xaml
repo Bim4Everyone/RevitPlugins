@@ -19,6 +19,11 @@
         <converters:EnumConverter x:Key="EnumConverter"/>
         <converters:IndexConverter x:Key="IndexConverter"/>
     </Window.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding CloseCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Grid Margin="5 0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
