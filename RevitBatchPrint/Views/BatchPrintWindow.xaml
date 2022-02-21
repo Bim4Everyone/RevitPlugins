@@ -6,12 +6,14 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:views="clr-namespace:RevitBatchPrint.Views"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:vms="clr-namespace:RevitBatchPrint.ViewModels"
     mc:Ignorable="d"
-    Height="580" Width="850" 
+    Width="850" 
     WindowStartupLocation="CenterOwner"
     Title="Пакетная печать"
     SizeToContent="Height"
-    ResizeMode="NoResize">
+    ResizeMode="NoResize"
+    d:DataContext="{d:DesignInstance vms:PrintAbumsViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -20,18 +22,25 @@
             <RowDefinition Height="45"/>
         </Grid.RowDefinitions>
 
-        <StackPanel  Grid.Row="0" Visibility="{Binding ShowPrintParamSelect}">
+        <StackPanel 
+            Grid.Row="0" 
+            Visibility="{Binding ShowPrintParamSelect}">
+            
             <TextBlock Text="Параметр комплекта чертежей" Margin="10,10,10,0"/>
+            
             <ComboBox Margin="10"
                       ItemsSource="{Binding Path=PrintParamNames}"
                       SelectedItem="{Binding Path=PrintParamName}"/>
+            
         </StackPanel>
 
-        <StackPanel  Grid.Row="1">
+        <StackPanel Grid.Row="1">
             <TextBlock Text="Комплект чертежей" Margin="10,10,10,0"/>
             <Grid>
-                <ComboBox Margin="10" Grid.Column="1" Grid.Row="1" SelectionChanged="ComboBox_SelectionChanged"
-                      ItemsSource="{Binding Path=Albums}">
+                <ComboBox
+                    Margin="10"
+                    SelectionChanged="ComboBox_SelectionChanged"
+                    ItemsSource="{Binding Path=Albums}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
@@ -41,18 +50,34 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
-                <TextBlock Grid.Column="1" Grid.Row="1" IsHitTestVisible="False" VerticalAlignment="Center" Margin="15,0,15,0"
-                           Text="{Binding SelectAlbumsText}"/>
+                
+                <TextBlock
+                    IsHitTestVisible="False"
+                    VerticalAlignment="Center"
+                    Margin="15,0,15,0"
+                    Text="{Binding SelectAlbumsText}"/>
             </Grid>
         </StackPanel>
 
-        <GroupBox Grid.Row="2" Header="Настройки принтера" Padding="10">
-            <views:PrintSettingsView DataContext="{Binding PrintSettings}" />
+        <GroupBox
+            Grid.Row="2"
+            Header="Настройки принтера"
+            Padding="10">
+            <views:PrintSettingsView 
+                DataContext="{Binding PrintSettings}" />
         </GroupBox>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
-            <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80" Command="{Binding RevitPrintCommand}" />
+            
+            <Button 
+                Content="Экспорт" 
+                Margin="10"
+                Click="ButtonOk_Click" Width="80"
+                Command="{Binding RevitSaveCommand}"
+                Visibility="{Binding VisibilitySaveFile}"/>
+            
+            <Button Content="Печать" Margin="10" Click="ButtonOk_Click" Width="80" Command="{Binding RevitPrintCommand}" />
             <Button Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80"/>
         </StackPanel>
     </Grid>
