@@ -28,12 +28,12 @@ namespace RevitLintelPlacement.ViewModels {
             TypeInfos = new List<TypeInfoViewModel>();
             ElementInfos = new ObservableCollection<ElementInfoViewModel>();
             _orientation = _revitRepository.GetOrientation3D();
-            SelectElementCommand = new RelayCommand(SelectElement, p => true);
+            SelectElementCommand = new RelayCommand(async p => await SelectElement(p));
             InitializeTypeInfo();
-            ElementInfosViewSource = new CollectionViewSource() { 
+            ElementInfosViewSource = new CollectionViewSource() {
                 Source = ElementInfos 
             };
-            TypeInfoCheckedCommand = new RelayCommand(TypeInfoChecked, p => true);
+            TypeInfoCheckedCommand = new RelayCommand(TypeInfoChecked);
             ElementInfosViewSource.Filter += ElementInfosViewSourceFilter;
         }
 
@@ -63,12 +63,12 @@ namespace RevitLintelPlacement.ViewModels {
 
        
 
-        private void SelectElement(object p) {
+        private async Task SelectElement(object p) {
             if(p is ElementInfoViewModel elementInfo) {
                 if(_revitRepository.GetElementById(elementInfo.ElementId) is Autodesk.Revit.DB.ElementType elementType) {
                     TaskDialog.Show("Revit", "Невозможно подобрать вид для отображения элемента.");
                 } else {
-                    _revitRepository.SelectAndShowElement(elementInfo.ElementId, _orientation);
+                    await _revitRepository.SelectAndShowElement(elementInfo.ElementId, _orientation);
                 }
             }
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -11,6 +12,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 
+using RevitLintelPlacement.Handlers;
 using RevitLintelPlacement.ViewModels;
 
 namespace RevitLintelPlacement.Models {
@@ -23,6 +25,7 @@ namespace RevitLintelPlacement.Models {
 
         private readonly Document _document;
         private readonly UIDocument _uiDocument;
+        private readonly RevitEventHandler _revitEventHandler;
 
         public RevitRepository(Application application, Document document, LintelsConfig lintelsConfig) {
             _application = application;
@@ -30,6 +33,8 @@ namespace RevitLintelPlacement.Models {
 
             _document = document;
             _uiDocument = new UIDocument(document);
+
+            _revitEventHandler = new RevitEventHandler();
 
             LintelsConfig = lintelsConfig;
             LintelsCommonConfig = LintelsCommonConfig.GetLintelsCommonConfig(GetDocumentName());
@@ -302,39 +307,16 @@ namespace RevitLintelPlacement.Models {
             return _document.ActiveView is View3D;
         }
 
-        public void SelectAndShowElement(ElementId id, ViewOrientation3D orientation) {
-            var element = _document.GetElement(id);
-            var view3D = new FilteredElementCollector(_document)
-              .OfClass(typeof(View3D))
-              .Cast<View3D>()
-              .First(v => !v.IsTemplate && v.Name == _view3DName); //TODO: тут тоже нужен свой 3D вид, но лучше нижняя реализация с асинхронностью
-
-            using(TransactionGroup tg = new TransactionGroup(_document)) {
-                tg.Start("BIM: Подрезка");
-                using(var t = StartTransaction("Подрезка")) {
-                    view3D.IsSectionBoxActive = false;
-                    view3D.SetOrientation(orientation);
-                    t.Commit();
+        public async Task SelectAndShowElement(ElementId id, ViewOrientation3D orientation) {
+            _revitEventHandler.TransactAction = () => {
+                Task.Delay(5000);
+                _uiDocument.Selection.SetElementIds(new List<ElementId> { id });
+                var commandId = RevitCommandId.LookupCommandId("ID_VIEW_APPLY_SELECTION_BOX");
+                if(!(commandId is null) && _uiDocument.Application.CanPostCommand(commandId)) {
+                    _uiApplication.PostCommand(commandId);
                 }
-
-                using(var t = StartTransaction("Подрезка")) {
-
-                    var bb = element.get_BoundingBox(view3D);
-                    bb.Max = new XYZ(bb.Max.X + 1, bb.Max.Y + 1, bb.Max.Z + 1);
-                    bb.Min = new XYZ(bb.Min.X - 1, bb.Min.Y - 1, bb.Min.Z - 1);
-                    view3D.SetSectionBox(bb);
-                    _uiDocument.SetSelectedElements(element);
-                    _uiDocument.ShowElements(element);
-                    t.Commit();
-                }
-                tg.Assimilate();
-            }
-            // Если будет асинхронный Task
-            //_uiDocument.Selection.SetElementIds(new List<ElementId> { id });
-            //var commandId = RevitCommandId.LookupCommandId("ID_VIEW_APPLY_SELECTION_BOX");
-            //if(!(commandId is null) && _uiDocument.Application.CanPostCommand(commandId)) {
-            //    _uiApplication.PostCommand(commandId);
-            //}
+            };
+            await _revitEventHandler.Raise();
         }
 
         public FamilyInstance GetDimensionFamilyInstance(FamilyInstance fi) {

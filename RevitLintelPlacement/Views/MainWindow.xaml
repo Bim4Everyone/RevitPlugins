@@ -51,7 +51,7 @@
         <StackPanel Grid.Row="4" HorizontalAlignment="Right" Orientation="Horizontal">
             <TextBlock VerticalAlignment="Center" Foreground="Orange" Text="{Binding GroupedRules.Message}"></TextBlock>
             <TextBlock VerticalAlignment="Center" Foreground="Orange" Text="{Binding Message}" ></TextBlock>
-            <Button Margin="20 10" Padding="5" FontSize="14" Command="{Binding PlaceLintelCommand}">Расставить</Button>
+            <Button Margin="20 10" Padding="5" FontSize="14" Command="{Binding PlaceLintelCommand}" CommandParameter="{Binding ElementName=MainView}">Расставить</Button>
         </StackPanel>
     </Grid>
 </Window>

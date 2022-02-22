@@ -29,7 +29,7 @@ namespace RevitLintelPlacement {
                 var view = new LintelsView() { DataContext = lintelsView};
 
                 WindowInteropHelper windowInteropHelper = new WindowInteropHelper(view) { Owner = commandData.Application.MainWindowHandle };
-                view.ShowDialog();
+                view.Show();
             } catch(Exception ex) {
 #if D2020 || D2021 || D2022
                 TaskDialog.Show("Расстановщик перемычек.", ex.ToString());

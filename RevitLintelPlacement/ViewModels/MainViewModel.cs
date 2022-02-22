@@ -38,15 +38,15 @@ namespace RevitLintelPlacement.ViewModels {
             ElementInfos = new ElementInfosViewModel(_revitRepository);
 
             GroupedRules = new GroupedRuleCollectionViewModel(_revitRepository, ElementInfos);
-            PlaceLintelCommand = new RelayCommand(PlaceLintels, p => true);
-            ShowReportCommand = new RelayCommand(ShowReport, p => true);
+            PlaceLintelCommand = new RelayCommand(PlaceLintels);
+            ShowReportCommand = new RelayCommand(ShowReport);
             var links = _revitRepository.GetLinkTypes().ToList();
             if(links.Count > 0) {
                 Links = new ObservableCollection<LinkViewModel>(links.Select(l => new LinkViewModel() { Name = Path.GetFileNameWithoutExtension(l.Name) }));
             } else {
                 Links = new ObservableCollection<LinkViewModel>();
             }
-            CloseCommand = new RelayCommand(Close, p => true);
+            CloseCommand = new RelayCommand(Close);
             var settings = _revitRepository.LintelsConfig.GetSettings(_revitRepository.GetDocumentName());
             if(settings != null) {
                 SelectedSampleMode = settings.SelectedModeRules;
@@ -133,11 +133,13 @@ namespace RevitLintelPlacement.ViewModels {
             var elevation = _revitRepository.GetElevation();
             if(elevation == null) {
                 ElementInfos.ElementInfos.Add(new ElementInfoViewModel(ElementId.InvalidElementId, InfoElement.LackOfView.FormatMessage("Фасад")));
+                ShowReport();
                 return;
             }
             var plan = _revitRepository.GetPlan();
             if(plan == null) {
                 ElementInfos.ElementInfos.Add(new ElementInfoViewModel(ElementId.InvalidElementId, InfoElement.LackOfView.FormatMessage("План")));
+                ShowReport();
                 return;
             }
 
@@ -189,6 +191,9 @@ namespace RevitLintelPlacement.ViewModels {
                 ShowReport();
             }
             ChangeMessage("Расстановка перемычек успешно завершена");
+            if (p is MainWindow window) {
+                window.Close();
+            }
         }
 
         private void ShowReport(object p) {
@@ -198,7 +203,7 @@ namespace RevitLintelPlacement.ViewModels {
         private void ShowReport() {
             ElementInfos.UpdateCollection();
             var view = new ReportView() { DataContext = ElementInfos };
-            view.ShowDialog();
+            view.Show();
         }
 
         private async void ChangeMessage(string newMessage) {
