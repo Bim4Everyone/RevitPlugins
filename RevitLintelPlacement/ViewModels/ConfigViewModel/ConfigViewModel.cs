@@ -28,26 +28,23 @@ namespace RevitLintelPlacement.ViewModels {
         private string _holesFilter;
         private string _lintelsConfigPath;
         private ObservableCollection<FilterViewModel> _reinforcedConcreteFilter;
-        private ObservableCollection<RulePathViewModel> _rulesCongigPath;
         private List<GenericModelFamilyViewModel> _lintelTypes;
         private string _message;
+        private List<string> _lintelParameterNames;
 
-        public ConfigViewModel() {
-            RulesCongigPaths = new ObservableCollection<RulePathViewModel>();
-        }
+        public ConfigViewModel() {}
 
         public ConfigViewModel(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
-            RulesCongigPaths = new ObservableCollection<RulePathViewModel>();
             LintelFamilies = new List<GenericModelFamilyViewModel>(revitRepository.GetGenericModelFamilies()
                 .Select(f => new GenericModelFamilyViewModel() { Name = f.Name }));
             Initialize();
-            SaveConfigCommand = new RelayCommand(Save, p => true);
-            AddFilterCommand = new RelayCommand(AddFilter, p => true);
-            RemoveFilterCommand = new RelayCommand(RemoveFilter, p => true);
-            AddRulePathCommand = new RelayCommand(AddRule, p => true);
-            RemoveRulePathCommand = new RelayCommand(RemoveRule, p => true);
-            SelectLintelsConfigCommand = new RelayCommand(SelectLintelsConfig, p => true);
+            InitializeParameters();
+            SaveConfigCommand = new RelayCommand(Save);
+            AddFilterCommand = new RelayCommand(AddFilter);
+            RemoveFilterCommand = new RelayCommand(RemoveFilter);
+            SelectLintelsConfigCommand = new RelayCommand(SelectLintelsConfig);
+            FamilySelectionChangedCommand = new RelayCommand(FamilySelectionChanged);
         }
 
         public string LintelThickness {
@@ -119,14 +116,14 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _reinforcedConcreteFilter, value);
         }
 
-        public ObservableCollection<RulePathViewModel> RulesCongigPaths {
-            get => _rulesCongigPath;
-            set => this.RaiseAndSetIfChanged(ref _rulesCongigPath, value);
-        }
-
         public List<GenericModelFamilyViewModel> LintelFamilies {
             get => _lintelTypes;
             set => this.RaiseAndSetIfChanged(ref _lintelTypes, value);
+        }
+
+        public List<string> LintelParameterNames { 
+            get => _lintelParameterNames; 
+            set => this.RaiseAndSetIfChanged(ref _lintelParameterNames, value); 
         }
 
         public ICommand SaveConfigCommand { get; set; }
@@ -135,15 +132,9 @@ namespace RevitLintelPlacement.ViewModels {
         public ICommand AddRulePathCommand { get; set; }
         public ICommand RemoveRulePathCommand { get; set; }
         public ICommand SelectLintelsConfigCommand { get; set; }
+        public ICommand FamilySelectionChangedCommand { get; set; }
 
-        public void Initialize() {
-            LintelThickness = _revitRepository.LintelsCommonConfig.LintelThickness;
-            LintelWidth = _revitRepository.LintelsCommonConfig.LintelWidth;
-            LintelRightCorner = _revitRepository.LintelsCommonConfig.LintelRightCorner;
-            LintelRightOffset = _revitRepository.LintelsCommonConfig.LintelRightOffset;
-            LintelLeftCorner = _revitRepository.LintelsCommonConfig.LintelLeftCorner;
-            LintelLeftOffset = _revitRepository.LintelsCommonConfig.LintelLeftOffset;
-            LintelFixation = _revitRepository.LintelsCommonConfig.LintelFixation;
+        private void Initialize() {
             OpeningHeight = _revitRepository.LintelsCommonConfig.OpeningHeight;
             OpeningWidth = _revitRepository.LintelsCommonConfig.OpeningWidth;
             OpeningFixation = _revitRepository.LintelsCommonConfig.OpeningFixation;
@@ -162,6 +153,22 @@ namespace RevitLintelPlacement.ViewModels {
                 family.IsChecked = _revitRepository.LintelsCommonConfig.LintelFamilies
                     .Any(f => f.Equals(family.Name, StringComparison.CurrentCultureIgnoreCase));
             }
+        }
+
+        private void InitializeParameters() {
+            LintelParameterNames = _revitRepository
+                .GetParametersFromFamilies(LintelFamilies.Where(f => f.IsChecked).Select(f => f.Name).ToList())
+                .Distinct()
+                .OrderBy(p=>p)
+                .ToList();
+            LintelThickness = _revitRepository.LintelsCommonConfig.LintelThickness;
+            LintelWidth = _revitRepository.LintelsCommonConfig.LintelWidth;
+            LintelRightCorner = _revitRepository.LintelsCommonConfig.LintelRightCorner;
+            LintelRightOffset = _revitRepository.LintelsCommonConfig.LintelRightOffset;
+            LintelLeftCorner = _revitRepository.LintelsCommonConfig.LintelLeftCorner;
+            LintelLeftOffset = _revitRepository.LintelsCommonConfig.LintelLeftOffset;
+            LintelFixation = _revitRepository.LintelsCommonConfig.LintelFixation;
+
         }
 
         private void Save(object p) {
@@ -195,15 +202,6 @@ namespace RevitLintelPlacement.ViewModels {
                 ReinforcedConcreteFilter.Remove(ReinforcedConcreteFilter.Last());
             }
         }
-        private void AddRule(object p) {
-            RulesCongigPaths.Add(new RulePathViewModel());
-        }
-
-        private void RemoveRule(object p) {
-            if(RulesCongigPaths.Count > 0) {
-                RulesCongigPaths.Remove(RulesCongigPaths.Last());
-            }
-        }
 
         private void SelectLintelsConfig(object p) {
             using(var dialog = new System.Windows.Forms.FolderBrowserDialog()) {
@@ -219,12 +217,16 @@ namespace RevitLintelPlacement.ViewModels {
             }
         }
 
-        private async void ChangeMessage(string  newMessage) {
+        private async void ChangeMessage(string newMessage) {
             Message = newMessage;
             await Task.Run(() => {
                 Thread.Sleep(3000);
             });
             Message = string.Empty;
+        }
+
+        private void FamilySelectionChanged(object p) {
+            InitializeParameters();
         }
     }
 
@@ -234,32 +236,6 @@ namespace RevitLintelPlacement.ViewModels {
         public string Name { 
             get => _name; 
             set => this.RaiseAndSetIfChanged(ref _name, value); 
-        }
-    }
-
-    internal class RulePathViewModel : BaseViewModel {
-        private string _name;
-
-        public RulePathViewModel() {
-            SelectPathCommand = new RelayCommand(SelectRulePath, p => true);
-        }
-
-        public string Name { 
-            get => _name; 
-            set => this.RaiseAndSetIfChanged(ref _name, value); 
-        }
-        public ICommand SelectPathCommand { get; set; }
-
-        private void SelectRulePath(object p) {
-            using(var dialog = new System.Windows.Forms.FolderBrowserDialog()) {
-                dialog.SelectedPath = System.IO.Path.GetDirectoryName(Name);
-                if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-                    if(dialog.SelectedPath != Name) {
-                        Name = dialog.SelectedPath;
-                    }
-                }
-
-            }
         }
     }
 }

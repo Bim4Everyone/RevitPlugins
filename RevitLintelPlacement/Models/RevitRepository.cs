@@ -451,14 +451,13 @@ namespace RevitLintelPlacement.Models {
             return new XYZ(location.X, location.Y, z);
         }
 
-
         public bool CheckLintelType(FamilySymbol lintelType, ElementInfosViewModel elementInfos) {
             if(lintelType.Family == null)
                 return false;
             var familyDocument = _document.EditFamily(lintelType.Family);
             try {
-                var familyManger = familyDocument.FamilyManager;
-                var parameterNames = familyManger.GetParameters().Select(p => p.Definition.Name).ToList();
+                var familyManager = familyDocument.FamilyManager;
+                var parameterNames = familyManager.GetParameters().Select(p => p.Definition.Name).ToList();
                 bool result = true;
                 var configParameterNames = new List<string>() {
                 LintelsCommonConfig.LintelFixation,
@@ -478,6 +477,32 @@ namespace RevitLintelPlacement.Models {
                 return result;
             } finally {
                 familyDocument.Close(false);
+            }
+        }
+
+        public IEnumerable<string> GetParametersFromFamilies(IEnumerable<string> familyNames) {
+            var families = new FilteredElementCollector(_document)
+                .OfClass(typeof(Family))
+                .Cast<Family>()
+                .Where(f => familyNames.Any(n => n.Equals(f.Name, StringComparison.CurrentCultureIgnoreCase)))
+                .ToList();
+            foreach(var family in families) {
+                Document familyDocument = null; 
+                List<string> parameterNames = new List<string>();
+                try {
+                    familyDocument = _document.EditFamily(family);
+                    var familyManager = familyDocument.FamilyManager;
+                    parameterNames = familyManager.GetParameters().Where(p => !p.IsReadOnly).Select(p => p.Definition.Name).ToList();
+                } catch {
+
+                } finally {
+                    if(familyDocument != null) {
+                        familyDocument.Close(false);
+                    }
+                }
+                foreach(var parameterName in parameterNames) {
+                    yield return parameterName;
+                }
             }
         }
 
@@ -529,7 +554,6 @@ namespace RevitLintelPlacement.Models {
             }
             return result;
         }
-
 
         private ElementId GetFamilyCategoryId(Family family) {
             var typesId = family.GetFamilySymbolIds();
