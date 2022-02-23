@@ -75,7 +75,7 @@ namespace RevitLintelPlacement.Models {
         public LintelWallAboveChecker(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
             _view3D = _revitRepository.GetView3D();
-            List<string> links = _revitRepository.GetLinkTypes().Select(l=>l.Name).ToList();
+            _links = _revitRepository.GetLinkTypes().Select(l=>l.Name).ToList();
         }
         public IResultHandler Check(FamilyInstance lintel, FamilyInstance elementInWall) {
             if(_revitRepository.CheckUp(_view3D, elementInWall, _links))
@@ -103,7 +103,7 @@ namespace RevitLintelPlacement.Models {
         public IResultHandler Check(FamilyInstance lintel, FamilyInstance elementInWall) {
             var rule = _groupedRules.GetRule(elementInWall);
             if(rule == null) {
-                if ((int) lintel.GetParamValue("Фиксация Решения") == 1) {
+                if ((int) lintel.GetParamValue(_revitRepository.LintelsCommonConfig.LintelFixation) == 1) {
                     return new EmptyResult { Code = ResultCode.Correct };
                 } else {
                     return new LintelForDeletionResult(_revitRepository, lintel) { Code = ResultCode.ElementInWallWithoutRule };
@@ -118,7 +118,7 @@ namespace RevitLintelPlacement.Models {
                     CheckLintelRightOffset(lintel, elementInWall, rule, out double rightOffset),
                     CheckLintelLeftOffset(lintel, elementInWall, rule, out double leftOffset),
                 };
-                return new WrongLintelParameters(_revitRepository, results, rule, lintel, elementInWall, rightOffset, leftOffset);
+                return new WrongLintelParameters(_revitRepository, results, rule, lintel, elementInWall, rightOffset, leftOffset) { Code = ResultCode.Correct };
             }
         }
 
@@ -191,8 +191,6 @@ namespace RevitLintelPlacement.Models {
                 return ParameterCheckResult.WrongLintelLeftOffset;
             }
         }
-
-
     }
 
     internal class GeometricalLintelChecker : IChecker {

@@ -440,7 +440,7 @@ namespace RevitLintelPlacement.Models {
             var location = ((LocationPoint) elementInWall.Location).Point;
             var level = _document.GetElement(elementInWall.LevelId) as Level;
             var bottomBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
-            var height = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningHeight); //ToDo: параметр
+            var height = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningHeight);
             double z;
             if(height != null) {
                 z = (double) height + bottomBarHeight + level.Elevation;
