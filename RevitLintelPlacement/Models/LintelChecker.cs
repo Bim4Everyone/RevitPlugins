@@ -88,11 +88,13 @@ namespace RevitLintelPlacement.Models {
     internal class LintelRuleChecker : IChecker {
         private readonly View3D _view3D;
         private readonly GroupedRuleCollectionViewModel _groupedRules;
+        private readonly ElementInfosViewModel _elementInfos;
         private readonly RevitRepository _revitRepository;
 
         public LintelRuleChecker(RevitRepository revitRepository, GroupedRuleCollectionViewModel groupedRules, ElementInfosViewModel elementInfos) {
             this._revitRepository = revitRepository;
             this._groupedRules = groupedRules;
+            this._elementInfos = elementInfos;
             _view3D = _revitRepository.GetView3D();
         }
 
@@ -106,7 +108,11 @@ namespace RevitLintelPlacement.Models {
                 }
                     
             } else {
-                var results = new List<ParameterCheckResult> { CheckLintelType(lintel, rule) };
+                var results = new List<ParameterCheckResult> { 
+                    CheckLintelType(lintel, rule),
+                    CheckLintelThickness(lintel, elementInWall),
+                    CheckLintelWidth(lintel, elementInWall)
+                };
                 return new WrongLintelParameters(_revitRepository, results, rule, lintel, elementInWall);
                 //проверка корректности параметров перемычки
             }
@@ -130,6 +136,32 @@ namespace RevitLintelPlacement.Models {
             return ParameterCheckResult.WrongLintelType;
         }
 
+        private ParameterCheckResult CheckLintelThickness(FamilyInstance lintel, FamilyInstance elementInWall) {
+            var wall = elementInWall.Host as Wall;
+            var wallThickness = wall.Width;
+            var lintelThickness = (double) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelThickness);
+            if(Math.Abs(wallThickness - lintelThickness) < 0.01) {
+                return ParameterCheckResult.Correct;
+            } else {
+                return ParameterCheckResult.WrongLintelThickness;
+            }
+        }
+
+        private ParameterCheckResult CheckLintelWidth(FamilyInstance lintel, FamilyInstance elementInWall) {
+            var elementInWallWidth = elementInWall.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningWidth)
+                ?? elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
+            if(elementInWallWidth == null) {
+                _elementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id,
+                   InfoElement.MissingOpeningParameter.FormatMessage(elementInWall.Name, _revitRepository.LintelsCommonConfig.OpeningWidth)));
+                return ParameterCheckResult.Correct;
+            }
+            var lintelWidth = (double) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelWidth);
+            if(Math.Abs((double) elementInWallWidth - lintelWidth) < 0.01) {
+                return ParameterCheckResult.Correct;
+            } else {
+                return ParameterCheckResult.WrongLintelWidth;
+            }
+        }
     }
 
     internal class GeometricalLintelChecker : IChecker {

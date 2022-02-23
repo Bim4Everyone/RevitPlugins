@@ -119,11 +119,7 @@ namespace RevitLintelPlacement.Models {
         }
 
         public void DeleteLintel(FamilyInstance lintel) {
-            using(Transaction t = new Transaction(_document)) {
-                t.BIMStart("Удаление перемычки");
-                _document.Delete(lintel.Id);
-                t.Commit();
-            }
+            _document.Delete(lintel.Id);
         }
 
         public IEnumerable<Element> GetElements(IEnumerable<ElementId> ids) {

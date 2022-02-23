@@ -61,20 +61,21 @@ namespace RevitLintelPlacement.Models {
         public ResultCode Code { get; set; } = ResultCode.WorngLintelParameters;
 
         public void Handle() {
-            using(Transaction t  = _revitRepository.StartTransaction("Изменение параметров перемычки")) {
-                foreach(var result in _parameterResults) {
-                    switch(result) {
-                        case ParameterCheckResult.WrongLintelThickness: {
-                            _rule.WallHalfThicknessParameter.SetTo(_lintel, _elementInWall);
-                            break;
-                        }
-                        case ParameterCheckResult.WrongLintelType: {
-                            _lintel.ChangeTypeId(_revitRepository.GetLintelType(_rule.SelectedLintelType).Id);
-                            break;
-                        }
+            foreach(var result in _parameterResults) {
+                switch(result) {
+                    case ParameterCheckResult.WrongLintelThickness: {
+                        _rule.WallHalfThicknessParameter.SetTo(_lintel, _elementInWall);
+                        break;
+                    }
+                    case ParameterCheckResult.WrongLintelType: {
+                        _lintel.ChangeTypeId(_revitRepository.GetLintelType(_rule.SelectedLintelType).Id);
+                        break;
+                    }
+                    case ParameterCheckResult.WrongLintelWidth: {
+                        _rule.OpeningWidthParameter.SetTo(_lintel, _elementInWall);
+                        break;
                     }
                 }
-                t.Commit();
             }
         }
     }
@@ -95,6 +96,7 @@ namespace RevitLintelPlacement.Models {
     internal enum ParameterCheckResult {
         Correct,
         WrongLintelThickness,
-        WrongLintelType
+        WrongLintelType,
+        WrongLintelWidth
     }
 }
