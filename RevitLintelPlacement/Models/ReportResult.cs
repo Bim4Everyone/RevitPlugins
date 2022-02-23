@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 using RevitLintelPlacement.Models.Interfaces;
 using RevitLintelPlacement.ViewModels;
 
@@ -49,13 +51,22 @@ namespace RevitLintelPlacement.Models {
         private readonly ConcreteRuleViewModel _rule;
         private readonly FamilyInstance _lintel;
         private readonly FamilyInstance _elementInWall;
+        private readonly double _rightOffset;
+        private readonly double _leftOffset;
 
-        public WrongLintelParameters(RevitRepository revitRepository, IEnumerable<ParameterCheckResult> parameterResults, ConcreteRuleViewModel rule, FamilyInstance lintel, FamilyInstance elementInWall) {
+        public WrongLintelParameters(RevitRepository revitRepository, 
+            IEnumerable<ParameterCheckResult> parameterResults, 
+            ConcreteRuleViewModel rule, 
+            FamilyInstance lintel, 
+            FamilyInstance elementInWall,
+            double rightOffset, double leftOffset) {
             this._revitRepository = revitRepository;
             this._parameterResults = parameterResults;
             this._rule = rule;
             this._lintel = lintel;
             this._elementInWall = elementInWall;
+            this._rightOffset = rightOffset;
+            this._leftOffset = leftOffset;
         }
 
         public ResultCode Code { get; set; } = ResultCode.WorngLintelParameters;
@@ -73,6 +84,24 @@ namespace RevitLintelPlacement.Models {
                     }
                     case ParameterCheckResult.WrongLintelWidth: {
                         _rule.OpeningWidthParameter.SetTo(_lintel, _elementInWall);
+                        break;
+                    }
+                    case ParameterCheckResult.WrongLintelRightCorner: {
+                        _lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightOffset, _rightOffset > 0 ? _rightOffset : 0);
+                        _lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightCorner, 1);
+                        break;
+                    }
+                    case ParameterCheckResult.WrongLintelRightOffset: {
+                        _rule.LintelRightOffsetParameter.SetTo(_lintel, _elementInWall);
+                        break;
+                    }
+                    case ParameterCheckResult.WrongLintelLeftCorner: {
+                        _lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftOffset, _leftOffset > 0 ? _leftOffset : 0);
+                        _lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftCorner, 1);
+                        break;
+                    }
+                    case ParameterCheckResult.WrongLintelLeftOffset: {
+                        _rule.LintelLeftOffsetParameter.SetTo(_lintel, _elementInWall);
                         break;
                     }
                 }
@@ -97,6 +126,10 @@ namespace RevitLintelPlacement.Models {
         Correct,
         WrongLintelThickness,
         WrongLintelType,
-        WrongLintelWidth
+        WrongLintelWidth,
+        WrongLintelRightCorner,
+        WrongLintelRightOffset,
+        WrongLintelLeftCorner,
+        WrongLintelLeftOffset,
     }
 }

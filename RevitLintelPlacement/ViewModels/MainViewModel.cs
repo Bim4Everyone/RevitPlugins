@@ -129,8 +129,8 @@ namespace RevitLintelPlacement.ViewModels {
                 }
                 t.Commit();
             }
-
-            LintelChecker lc = new LintelChecker(_revitRepository, GroupedRules, ElementInfos);
+            var links = Links.Where(l => l.IsChecked).Select(l => l.Name).ToList();
+            LintelChecker lc = new LintelChecker(_revitRepository, GroupedRules, links, ElementInfos);
             using(Transaction t = _revitRepository.StartTransaction("Проверка расставленных перемычек")) {
                 lc.Check(Lintels.LintelInfos);
                 t.Commit();
@@ -150,7 +150,7 @@ namespace RevitLintelPlacement.ViewModels {
                 return;
             }
 
-            var links = Links.Where(l => l.IsChecked).Select(l => l.Name).ToList();
+            
             using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
 
                 foreach(var elementInWall in elementInWalls) {
@@ -166,7 +166,7 @@ namespace RevitLintelPlacement.ViewModels {
                     var rule = GroupedRules.GetRule(elementInWall);
                     if(rule == null)
                         continue;
-                    if(!_revitRepository.CheckUp(view3D, elementInWall, Links.Where(l => l.IsChecked).Select(l => l.Name)))
+                    if(!_revitRepository.CheckUp(view3D, elementInWall, links))
                         continue;
                     if(string.IsNullOrEmpty(rule.SelectedLintelType)) {
                         TaskDialog.Show("Предупреждение!", "В проект не загружено семейство перемычки.");
@@ -179,12 +179,11 @@ namespace RevitLintelPlacement.ViewModels {
                     }
                     var lintel = _revitRepository.PlaceLintel(lintelType, elementInWall);
                     rule.SetParametersTo(lintel, elementInWall);
-                    if(_revitRepository.DoesCornerNeeded(view3D, elementInWall, true, links, ElementInfos, out double rightOffset)) {
+                    if(_revitRepository.DoesRightCornerNeeded(view3D, elementInWall, links, ElementInfos, out double rightOffset)) {
                         lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightOffset, rightOffset > 0 ? rightOffset : 0);
                         lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightCorner, 1);
                     }
-
-                    if(_revitRepository.DoesCornerNeeded(view3D, elementInWall, false, links, ElementInfos, out double leftOffset)) {
+                    if(_revitRepository.DoesLeftCornerNeeded(view3D, elementInWall, links, ElementInfos, out double leftOffset)) {
                         lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftOffset, leftOffset > 0 ? leftOffset : 0);
                         lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftCorner, 1);
                     }

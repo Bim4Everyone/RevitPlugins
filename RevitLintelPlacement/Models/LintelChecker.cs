@@ -15,12 +15,12 @@ namespace RevitLintelPlacement.Models {
     internal class LintelChecker {
         private readonly List<IChecker> _checkers;
 
-        public LintelChecker(RevitRepository revitRepository, GroupedRuleCollectionViewModel groupedRules, ElementInfosViewModel elementInfos) {
+        public LintelChecker(RevitRepository revitRepository, GroupedRuleCollectionViewModel groupedRules, IEnumerable<string> links, ElementInfosViewModel elementInfos) {
             _checkers = new List<IChecker> {
             new LintelGroupChecker(),
             new ElementInWallChecker(revitRepository, elementInfos),
             new LintelWallAboveChecker(revitRepository),
-            new LintelRuleChecker(revitRepository, groupedRules, elementInfos),
+            new LintelRuleChecker(revitRepository, groupedRules, links, elementInfos),
             new GeometricalLintelChecker(revitRepository, elementInfos)
             };
         }
@@ -90,12 +90,14 @@ namespace RevitLintelPlacement.Models {
         private readonly GroupedRuleCollectionViewModel _groupedRules;
         private readonly ElementInfosViewModel _elementInfos;
         private readonly RevitRepository _revitRepository;
+        private readonly List<string> _linkNames;
 
-        public LintelRuleChecker(RevitRepository revitRepository, GroupedRuleCollectionViewModel groupedRules, ElementInfosViewModel elementInfos) {
+        public LintelRuleChecker(RevitRepository revitRepository, GroupedRuleCollectionViewModel groupedRules, IEnumerable<string> links, ElementInfosViewModel elementInfos) {
             this._revitRepository = revitRepository;
             this._groupedRules = groupedRules;
             this._elementInfos = elementInfos;
             _view3D = _revitRepository.GetView3D();
+            _linkNames = links.ToList();
         }
 
         public IResultHandler Check(FamilyInstance lintel, FamilyInstance elementInWall) {
@@ -108,25 +110,16 @@ namespace RevitLintelPlacement.Models {
                 }
                     
             } else {
-                var results = new List<ParameterCheckResult> { 
+                
+                var results = new List<ParameterCheckResult> {
                     CheckLintelType(lintel, rule),
                     CheckLintelThickness(lintel, elementInWall),
-                    CheckLintelWidth(lintel, elementInWall)
+                    CheckLintelWidth(lintel, elementInWall),
+                    CheckLintelRightOffset(lintel, elementInWall, rule, out double rightOffset),
+                    CheckLintelLeftOffset(lintel, elementInWall, rule, out double leftOffset),
                 };
-                return new WrongLintelParameters(_revitRepository, results, rule, lintel, elementInWall);
-                //проверка корректности параметров перемычки
+                return new WrongLintelParameters(_revitRepository, results, rule, lintel, elementInWall, rightOffset, leftOffset);
             }
-            return new EmptyResult() { Code = ResultCode.Correct };
-        }
-
-        private ParameterCheckResult CheckWallThickness(FamilyInstance lintel, FamilyInstance elementInWall) {
-            var wall = elementInWall.Host as Wall;
-            var wallThickness = wall.Width;
-            var lintelThickness = ((double) lintel.GetParamValue(_revitRepository.LintelsCommonConfig.LintelThickness));
-            if(Math.Abs(lintelThickness - wallThickness) < 0.1) {
-                return ParameterCheckResult.Correct;
-            }
-            return ParameterCheckResult.WrongLintelThickness;
         }
 
         private ParameterCheckResult CheckLintelType(FamilyInstance lintel, ConcreteRuleViewModel rule) {
@@ -162,6 +155,44 @@ namespace RevitLintelPlacement.Models {
                 return ParameterCheckResult.WrongLintelWidth;
             }
         }
+
+        private ParameterCheckResult CheckLintelRightOffset(FamilyInstance lintel, FamilyInstance elementInWall, ConcreteRuleViewModel rule, out double offset) {
+            if (_revitRepository.DoesRightCornerNeeded(_view3D, elementInWall, _linkNames, _elementInfos, out offset)) {
+                var lintelRightOffset = (double) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelRightOffset);
+                var lintelCorner = (int) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelRightCorner) == 1 ? true : false;
+                if(Math.Abs(lintelRightOffset - offset) < 0.01 && lintelCorner) {
+                    return ParameterCheckResult.Correct;
+                } else {
+                    return ParameterCheckResult.WrongLintelRightCorner;
+                }
+            } else {
+                var lintelRightOffset = (double) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelRightOffset);
+                if(Math.Abs(lintelRightOffset - rule.LintelRightOffsetParameter.RightOffset) < 0.01) {
+                    return ParameterCheckResult.Correct;
+                }
+                return ParameterCheckResult.WrongLintelRightOffset;
+            }
+        }
+
+        private ParameterCheckResult CheckLintelLeftOffset(FamilyInstance lintel, FamilyInstance elementInWall, ConcreteRuleViewModel rule, out double offset) {
+            if(_revitRepository.DoesLeftCornerNeeded(_view3D, elementInWall, _linkNames, _elementInfos, out offset)) {
+                var lintelLeftOffset = (double) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelLeftOffset);
+                var lintelCorner = (int) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelLeftCorner) == 1 ? true : false;
+                if(Math.Abs(lintelLeftOffset - offset) < 0.01 && lintelCorner) {
+                    return ParameterCheckResult.Correct;
+                } else {
+                    return ParameterCheckResult.WrongLintelLeftCorner;
+                }
+            } else {
+                var lintelLeftOffset = (double) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelLeftOffset);
+                if(Math.Abs(lintelLeftOffset - rule.LintelLeftOffsetParameter.LeftOffset) < 0.01) {
+                    return ParameterCheckResult.Correct;
+                }
+                return ParameterCheckResult.WrongLintelLeftOffset;
+            }
+        }
+
+
     }
 
     internal class GeometricalLintelChecker : IChecker {

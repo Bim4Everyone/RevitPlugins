@@ -241,14 +241,22 @@ namespace RevitLintelPlacement.Models {
             return true;
         }
 
-        public bool DoesCornerNeeded(View3D view3D, FamilyInstance elementInWall, bool isRight, IEnumerable<string> linkNames, ElementInfosViewModel elementInfos, out double offset) {
+        public bool DoesLeftCornerNeeded(View3D view3D, FamilyInstance elementInWall, IEnumerable<string> linkNames, ElementInfosViewModel elementInfos, out double offset) {
+            return DoesCornerNeeded(view3D, elementInWall, new XYZ(-1, 0, 0), linkNames, elementInfos, out offset);
+        }
+
+        public bool DoesRightCornerNeeded(View3D view3D, FamilyInstance elementInWall, IEnumerable<string> linkNames, ElementInfosViewModel elementInfos, out double offset) {
+            return DoesCornerNeeded(view3D, elementInWall, new XYZ(1, 0, 0), linkNames, elementInfos, out offset);
+        }
+
+        private bool DoesCornerNeeded(View3D view3D, FamilyInstance elementInWall, XYZ direction, IEnumerable<string> linkNames, ElementInfosViewModel elementInfos, out double offset) {
             offset = 0;
             //получение предполагаемой точки вставки перемычки,
             //из которой проводится поиск жб-элементов
             XYZ viewPoint = GetLocationPoint(elementInWall);
 
             //направление, в котором будет проводиться поиск
-            var direction = elementInWall.GetTransform().OfVector(isRight ? new XYZ(1, 0, 0) : new XYZ(-1, 0, 0));
+            direction = elementInWall.GetTransform().OfVector(direction);
 
             //получение ссылки на ближайшую жб-стену, колонну или связанный файл и расстояние до них
             ReferenceWithContext refWithContext = GetNearestWallOrColumn(view3D, elementInWall, viewPoint, direction, true);
