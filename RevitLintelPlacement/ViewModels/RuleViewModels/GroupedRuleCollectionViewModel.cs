@@ -107,6 +107,24 @@ namespace RevitLintelPlacement.ViewModels {
             }
         }
 
+        public string GetErrorText() {
+
+
+            for(int i = 0; i < GroupedRules.Count - 1; i++) {
+                for(int j = i + 1; j < GroupedRules.Count; j++) {
+                    var commonWallTypes = GroupedRules[i].WallTypes.WallTypes
+                    .Where(e => e.IsChecked)
+                    .Intersect(GroupedRules[j].WallTypes.WallTypes
+                    .Where(e => e.IsChecked)).ToList();
+                    if(commonWallTypes.Count > 0) {
+                        return $"У правил \"{GroupedRules[i].Name}\" и \"{GroupedRules[j].Name}\" " +
+                            $"выбраны следующие одинаковые типоразмеры стен: \"{string.Join(", ", commonWallTypes.Select(e => e.Name))}\"";
+                    }
+                }
+            }
+            return string.Empty;
+        }
+
         private void SaveAs(object p) {
             var vm = new SaveAsViewModel();
             var saveAsWindow = new SaveAsWindow() { DataContext = vm };

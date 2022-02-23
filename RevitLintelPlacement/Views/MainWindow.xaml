@@ -15,6 +15,7 @@
         d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
     <Window.Resources>
         <converter:EnumConverter x:Key="EnumConverter"/>
+        <converter:WidthConverter x:Key="WidthConverter"/>
     </Window.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
@@ -49,8 +50,11 @@
         </GroupBox>
         <local:GroupedRulesView Grid.Row="3" DataContext="{Binding GroupedRules}"/>
         <StackPanel Grid.Row="4" HorizontalAlignment="Right" Orientation="Horizontal">
-            <TextBlock VerticalAlignment="Center" Foreground="Orange" Text="{Binding GroupedRules.Message}"></TextBlock>
-            <TextBlock VerticalAlignment="Center" Foreground="Orange" Text="{Binding Message}" ></TextBlock>
+            <StackPanel>
+                <TextBlock VerticalAlignment="Center" Foreground="Green" Text="{Binding GroupedRules.Message}"></TextBlock>
+                <TextBlock VerticalAlignment="Center" Foreground="Orange" TextWrapping="Wrap" MaxWidth="{Binding RelativeSource={RelativeSource Mode=FindAncestor, 
+                AncestorType=Grid}, Path=ActualWidth, Converter={StaticResource WidthConverter}, ConverterParameter=115}" Text="{Binding ErrorText}" ></TextBlock>
+            </StackPanel>
             <Button Margin="20 10" Padding="5" FontSize="14" Command="{Binding PlaceLintelCommand}" CommandParameter="{Binding ElementName=MainView}">Расставить</Button>
         </StackPanel>
     </Grid>

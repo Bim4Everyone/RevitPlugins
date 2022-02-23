@@ -165,8 +165,8 @@ namespace RevitLintelPlacement.ViewModels {
             if(string.IsNullOrEmpty(SelectedLintelType)) {
                 SelectedLintelType = LintelTypes.FirstOrDefault();
             }
-            OpeningWidthParameter = new OpeningWidthParameter(_revitRepository);
-            WallHalfThicknessParameter = new WallHalfThicknessParameter(_revitRepository, _elementInfos);
+            OpeningWidthParameter = new OpeningWidthParameter(_revitRepository, _elementInfos);
+            WallHalfThicknessParameter = new WallHalfThicknessParameter(_revitRepository);
         }
 
         private void InitializeEmptyGroupedRule() {
@@ -174,8 +174,8 @@ namespace RevitLintelPlacement.ViewModels {
             OpeningWidthCondition = new OpeningWidthConditionViewModel(_revitRepository, _elementInfos);
             LintelLeftOffsetParameter = new LintelLeftOffsetParameter(_revitRepository);
             LintelRightOffsetParameter = new LintelRightOffsetParameter(_revitRepository);
-            OpeningWidthParameter = new OpeningWidthParameter(_revitRepository);
-            WallHalfThicknessParameter = new WallHalfThicknessParameter(_revitRepository, _elementInfos);
+            OpeningWidthParameter = new OpeningWidthParameter(_revitRepository, _elementInfos);
+            WallHalfThicknessParameter = new WallHalfThicknessParameter(_revitRepository);
             LintelTypes = new List<string>(
                 _revitRepository.GetLintelTypes()
                 .Select(lt=>lt.Name));

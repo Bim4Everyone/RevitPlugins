@@ -20,13 +20,14 @@ namespace RevitLintelPlacement.ViewModels {
         private string _name;
         private ObservableCollection<ConcreteRuleViewModel> _groupedRules;
         private WallTypesConditionViewModel _groupingCondition;
+        private string _errorText;
 
-        public GroupedRuleViewModel(RevitRepository revitRepository, ElementInfosViewModel elementInfos, GroupedRuleSettings groupedRuleSettings=null) {
+        public GroupedRuleViewModel(RevitRepository revitRepository, ElementInfosViewModel elementInfos, GroupedRuleSettings groupedRuleSettings = null) {
             this._revitRepository = revitRepository;
             this._elementInfos = elementInfos;
             AddRuleCommand = new RelayCommand(AddRule, p => true);
             RemoveRuleCommand = new RelayCommand(RemoveRule, p => true);
-            if(groupedRuleSettings==null || groupedRuleSettings.Rules.Count == 0) {
+            if(groupedRuleSettings == null || groupedRuleSettings.Rules.Count == 0) {
                 Rules = new ObservableCollection<ConcreteRuleViewModel>();
                 var rule = new ConcreteRuleViewModel(revitRepository, _elementInfos);
                 Rules.Add(rule);
@@ -48,6 +49,11 @@ namespace RevitLintelPlacement.ViewModels {
         public string Name {
             get => _name;
             set => this.RaiseAndSetIfChanged(ref _name, value);
+        }
+
+        public string ErrorText { 
+            get => _errorText; 
+            set => this.RaiseAndSetIfChanged(ref _errorText, value); 
         }
 
         public WallTypesConditionViewModel WallTypes {
@@ -73,7 +79,7 @@ namespace RevitLintelPlacement.ViewModels {
                     .Select(e => e.Name)
                     .ToList()
                 },
-                Rules = Rules.Select(r=>r.GetRuleSetting()).ToList()
+                Rules = Rules.Select(r => r.GetRuleSetting()).ToList()
             };
         }
 
@@ -108,7 +114,30 @@ namespace RevitLintelPlacement.ViewModels {
                 .Select(w => new WallTypeConditionViewModel() {
                     Name = w.Name,
                     IsChecked = false
-                }).OrderBy(e=>e.Name));
+                }).OrderBy(e => e.Name));
+        }
+
+        public bool UpdateErrorText() {
+            foreach(var rule in Rules) {
+                if(rule.OpeningWidthCondition.MinWidth > rule.OpeningWidthCondition.MaxWidth) {
+                    ErrorText = $"Минимальная ширина проема \"{rule.OpeningWidthCondition.MinWidth}\" " +
+                        $"должна быть меньше максимальной ширины \"{rule.OpeningWidthCondition.MaxWidth}\"";
+                    return false;
+                }
+                var index = Rules.IndexOf(rule);
+                if (index + 1 < Rules.Count) {
+                    for(int i = index + 1; i < Rules.Count; i++) {
+                        if(!(rule.OpeningWidthCondition.MinWidth > Rules[i].OpeningWidthCondition.MaxWidth
+                            || rule.OpeningWidthCondition.MaxWidth < Rules[i].OpeningWidthCondition.MinWidth)) {
+                            ErrorText = $"Проем \"{Rules[i].OpeningWidthCondition.MinWidth} - {Rules[i].OpeningWidthCondition.MaxWidth}\" " +
+                               $"пересекается с проемом \"{rule.OpeningWidthCondition.MinWidth} - {rule.OpeningWidthCondition.MaxWidth}\"";
+                            return false;
+                        }
+                    }
+                }
+            }
+            ErrorText = string.Empty;
+            return true;
         }
     }
 }

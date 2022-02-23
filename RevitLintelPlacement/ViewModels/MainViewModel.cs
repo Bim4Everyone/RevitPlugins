@@ -27,7 +27,7 @@ namespace RevitLintelPlacement.ViewModels {
         private GroupedRuleCollectionViewModel _groupedRules;
         private ObservableCollection<LinkViewModel> _links;
         private ElementInfosViewModel _elementInfosViewModel;
-        private string _message;
+        private string _errorText;
 
         public MainViewModel() {
 
@@ -52,12 +52,12 @@ namespace RevitLintelPlacement.ViewModels {
                 SelectedSampleMode = settings.SelectedModeRules;
                 if(settings.SelectedLinks != null && settings.SelectedLinks.Count > 0) {
                     foreach(var link in Links) {
-                        if (settings.SelectedLinks.Any(sl=>sl.Equals(link.Name, StringComparison.CurrentCultureIgnoreCase))) {
+                        if(settings.SelectedLinks.Any(sl => sl.Equals(link.Name, StringComparison.CurrentCultureIgnoreCase))) {
                             link.IsChecked = true;
                         }
                     }
                 }
-            } 
+            }
         }
 
         public SampleMode SelectedSampleMode {
@@ -65,9 +65,9 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedSampleMode, value);
         }
 
-        public string Message { 
-            get => _message;
-            set => this.RaiseAndSetIfChanged(ref _message, value); 
+        public string ErrorText { 
+            get => _errorText; 
+            set => this.RaiseAndSetIfChanged(ref _errorText, value); 
         }
 
         public LintelCollectionViewModel Lintels {
@@ -109,7 +109,9 @@ namespace RevitLintelPlacement.ViewModels {
             }
             Lintels = new LintelCollectionViewModel(_revitRepository);
 
-
+            if(!UpdateErrors()) {
+                return;
+            }
 
             var elementInWalls = _revitRepository.GetAllElementsInWall(SelectedSampleMode)
                 .ToList();
@@ -127,8 +129,13 @@ namespace RevitLintelPlacement.ViewModels {
                 }
                 t.Commit();
             }
+
             LintelChecker lc = new LintelChecker(_revitRepository, GroupedRules, ElementInfos);
-            lc.Check(Lintels.LintelInfos);
+            using(Transaction t = _revitRepository.StartTransaction("Проверка расставленных перемычек")) {
+                lc.Check(Lintels.LintelInfos);
+                t.Commit();
+            }
+
 
             var elevation = _revitRepository.GetElevation();
             if(elevation == null) {
@@ -190,8 +197,7 @@ namespace RevitLintelPlacement.ViewModels {
             if(ElementInfos.ElementInfos != null && ElementInfos.ElementInfos.Count > 0) {
                 ShowReport();
             }
-            ChangeMessage("Расстановка перемычек успешно завершена");
-            if (p is MainWindow window) {
+            if(p is MainWindow window) {
                 window.Close();
             }
         }
@@ -206,14 +212,6 @@ namespace RevitLintelPlacement.ViewModels {
             view.Show();
         }
 
-        private async void ChangeMessage(string newMessage) {
-            Message = newMessage;
-            await Task.Run(()=> {
-                Thread.Sleep(3000);
-            });
-            Message = string.Empty;
-        }
-
         private void Close(object p) {
             var settings = _revitRepository.LintelsConfig.GetSettings(_revitRepository.GetDocumentName());
             if(settings == null) {
@@ -223,6 +221,20 @@ namespace RevitLintelPlacement.ViewModels {
             settings.SelectedModeRules = SelectedSampleMode;
             settings.SelectedLinks = Links.Where(l => l.IsChecked).Select(l => l.Name).ToList();
             _revitRepository.LintelsConfig.SaveProjectConfig();
+        }
+
+        private bool UpdateErrors() {
+            var result = true;
+            foreach(var groupedRule in GroupedRules.GroupedRules) {
+                if(!groupedRule.UpdateErrorText()) {
+                    result = false;
+                }
+            }
+            ErrorText = GroupedRules.GetErrorText();
+            if(!string.IsNullOrEmpty(ErrorText)) {
+                result = false;
+            }
+            return result;
         }
     }
 }
