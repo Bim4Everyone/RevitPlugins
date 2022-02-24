@@ -9,7 +9,8 @@ using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 namespace RevitSuperfilter.ViewModels {
-    internal class ParameterViewModel : SelectableObjectViewModel<Parameter>, IComparable<ParameterViewModel>, IParameterViewModel {
+    internal class ParameterViewModel : SelectableObjectViewModel<Parameter>, IComparable<ParameterViewModel>,
+        IParameterViewModel {
         private const string _defaultValue = "Без значения";
         private readonly Parameter _parameter;
 
@@ -26,10 +27,10 @@ namespace RevitSuperfilter.ViewModels {
                 }
 
                 if(_parameter.StorageType == StorageType.ElementId) {
-                    return _parameter.AsValueString() ?? _defaultValue;
+                    return _parameter.AsValueString();
                 }
 
-                return _parameter.AsObject() ?? _defaultValue;
+                return _parameter.AsObject();
             }
         }
 
@@ -74,6 +75,10 @@ namespace RevitSuperfilter.ViewModels {
 
             if(_parameter.Definition == null) {
                 return -1;
+            }
+
+            if(!_parameter.HasValue && !other._parameter.HasValue) {
+                return 0;
             }
 
             if(_parameter.StorageType == other._parameter.StorageType) {
