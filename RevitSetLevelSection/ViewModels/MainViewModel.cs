@@ -78,8 +78,15 @@ namespace RevitSetLevelSection.ViewModels {
 
         private void UpdateElements(object param) {
             SaveConfig();
-            foreach(FillParamViewModel fillParamViewModel in FillParams.Where(item => item.IsEnabled)) {
-                fillParamViewModel.UpdateElements(FromRevitParam);
+         
+            using(var transactionGroup = 
+                  _revitRepository.StartTransactionGroup("Установка уровня/секции")) {
+                
+                foreach(FillParamViewModel fillParamViewModel in FillParams.Where(item => item.IsEnabled)) {
+                    fillParamViewModel.UpdateElements(FromRevitParam);
+                }
+
+                transactionGroup.Assimilate();
             }
         }
 

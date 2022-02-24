@@ -39,6 +39,10 @@ namespace RevitSetLevelSection.Models {
             return _document.GetElement(elementId);
         }
 
+        public TransactionGroup StartTransactionGroup(string transactionGroupName) {
+            return _document.StartTransactionGroup(transactionGroupName);
+        }
+
         public IEnumerable<RevitLinkType> GetRevitLinkTypes() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsElementType()
