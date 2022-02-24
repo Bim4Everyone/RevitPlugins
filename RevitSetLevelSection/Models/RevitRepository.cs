@@ -12,6 +12,8 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
+using InvalidOperationException = Autodesk.Revit.Exceptions.InvalidOperationException;
+
 namespace RevitSetLevelSection.Models {
     internal class RevitRepository {
         private readonly Application _application;
@@ -78,7 +80,15 @@ namespace RevitSetLevelSection.Models {
                     
                     foreach(FamilyInstance massObject in massElements) {
                         if(IsIntersectCenterElement(massObject, element)) {
-                            element.SetParamValue(revitParam, massObject);
+                            
+                            try {
+                                element.SetParamValue(revitParam, massObject);
+                            } catch(InvalidOperationException) {
+                                // решили что существует много вариантов,
+                                // когда параметр не может заполнится из-за настроек в ревите
+                                // Например: базовая стена внутри составной
+                            }
+
                             cashedElements.Remove(element.Id);
                             break;
                         }
