@@ -150,7 +150,7 @@ namespace RevitLintelPlacement.ViewModels {
                 return;
             }
 
-            
+            var lintels = new List<LintelInfoViewModel>();
             using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
 
                 foreach(var elementInWall in elementInWalls) {
@@ -187,12 +187,20 @@ namespace RevitLintelPlacement.ViewModels {
                         lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftOffset, leftOffset > 0 ? leftOffset : 0);
                         lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftCorner, 1);
                     }
-                    _revitRepository.LockLintel(elevation, plan, lintel, elementInWall);
-                    Lintels.LintelInfos.Add(new LintelInfoViewModel(_revitRepository, lintel, elementInWall));
+                    //_revitRepository.LockLintel(elevation, plan, lintel, elementInWall);
+                    lintels.Add(new LintelInfoViewModel(_revitRepository, lintel, elementInWall));
                 }
 
                 t.Commit();
             }
+            using(Transaction t = _revitRepository.StartTransaction("Закрепление перемычек")) {
+                foreach(var lintel in lintels) {
+                    _revitRepository.LockLintel(elevation, plan, lintel.Lintel, lintel.ElementInWall);
+                }
+                t.Commit();
+            }
+
+
             if(ElementInfos.ElementInfos != null && ElementInfos.ElementInfos.Count > 0) {
                 ShowReport();
             }

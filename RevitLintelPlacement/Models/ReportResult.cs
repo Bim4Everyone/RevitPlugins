@@ -92,6 +92,7 @@ namespace RevitLintelPlacement.Models {
                         break;
                     }
                     case ParameterCheckResult.WrongLintelRightOffset: {
+                        _rule.LintelRightOffsetParameter.RightOffset = _rule.LintelLeftOffsetParameter.LeftOffset;
                         _rule.LintelRightOffsetParameter.SetTo(_lintel, _elementInWall);
                         break;
                     }

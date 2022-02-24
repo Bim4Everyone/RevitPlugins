@@ -265,7 +265,7 @@ namespace RevitLintelPlacement.Models {
             if(refWithContext == null)
                 return false;
             var elementWidth = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningWidth)
-                ?? elementInWall.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
+                ?? elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
 
             if(elementWidth == null) {
                 elementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id,
@@ -393,7 +393,6 @@ namespace RevitLintelPlacement.Models {
         }
 
         public void LockLintel(View elevation, View plan, FamilyInstance lintel, FamilyInstance elementInWall) {
-
             var leftRightElement = elementInWall.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
             var leftRightLintel = lintel.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
             if(leftRightElement.Count > 0 && leftRightLintel.Count > 0)
@@ -403,8 +402,9 @@ namespace RevitLintelPlacement.Models {
             var bottomLintel = lintel.GetReferences(FamilyInstanceReferenceType.CenterElevation);
 
             try {
-                if(topElement.Count > 0 && bottomLintel.Count > 0)
+                if(topElement.Count > 0 && bottomLintel.Count > 0) {
                     _document.Create.NewAlignment(elevation, topElement.First(), bottomLintel.First());
+                }
             } catch { }
 
 
@@ -413,20 +413,24 @@ namespace RevitLintelPlacement.Models {
             var wallReferences1 = HostObjectUtils.GetSideFaces((Wall) elementInWall.Host, ShellLayerType.Interior);
             var wallReferences2 = HostObjectUtils.GetSideFaces((Wall) elementInWall.Host, ShellLayerType.Exterior);
 
-
             // возможно, ошибка возникает при установке параметра половина толщины,
             // поэтому нет геометричкого выравнивания
             try {
                 if(leftL.Count > 0 && wallReferences1.Count > 0) {
                     _document.Create.NewAlignment(plan, leftL.First(), wallReferences1.First());
                 }
+                if(rightL.Count > 0 && wallReferences2.Count > 0) {
+                    _document.Create.NewAlignment(plan, rightL.First(), wallReferences2.First());
+                }
             } catch (Exception e) {
                 Debug.WriteLine(e.Message);
                 try {
-                    if(leftL.Count > 0 && wallReferences1.Count > 0) {
+                    if(leftL.Count > 0 && wallReferences2.Count > 0) {
                         _document.Create.NewAlignment(plan, leftL.First(), wallReferences2.First());
                     }
-
+                    if(rightL.Count > 0 && wallReferences1.Count > 0) {
+                        _document.Create.NewAlignment(plan, rightL.First(), wallReferences1.First());
+                    }
                 } catch (Exception ex) {
                     Debug.WriteLine(ex.Message);
                 }
