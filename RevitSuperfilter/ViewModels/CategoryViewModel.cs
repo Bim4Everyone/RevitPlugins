@@ -100,7 +100,7 @@ namespace RevitSuperfilter.ViewModels {
             var elementType = new ParametersTypeNameViewModel(ObjectData, elementTypes);
             var family = new ParametersFamilyNameViewModel(ObjectData, elementTypes);
             var paramViewModels = Elements
-                .SelectMany(element => element.GetOrderedParameters().Where(param => param.HasValue))
+                .SelectMany(element => element.GetOrderedParameters())
                 .GroupBy(param => param, new ParamComparer())
                 .Select(param => new ParametersViewModel(param.Key.Definition, param))
                 .OrderBy(param => param.DisplayData);
