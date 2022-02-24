@@ -23,7 +23,7 @@ namespace RevitSuperfilter.ViewModels {
         public object Value {
             get {
                 if(_parameter.Definition == null) {
-                    return _defaultValue;
+                    return null;
                 }
 
                 if(_parameter.StorageType == StorageType.ElementId) {
