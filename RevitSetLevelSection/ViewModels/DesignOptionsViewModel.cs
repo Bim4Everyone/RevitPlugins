@@ -15,6 +15,7 @@ namespace RevitSetLevelSection.ViewModels {
         private readonly List<FamilyInstance> _massElements;
 
         public DesignOptionsViewModel(DesignOption designOption, LinkInstanceRepository linkInstanceRepository) {
+            
             if(designOption is null) {
                 throw new ArgumentNullException(nameof(designOption));
             }
@@ -27,10 +28,12 @@ namespace RevitSetLevelSection.ViewModels {
 
             Id = designOption.Id.IntegerValue;
             Name = designOption.Name;
+            Transform = linkInstanceRepository.Transform;
         }
 
         public int Id { get; }
         public string Name { get; }
+        public Transform Transform { get; }
 
         public int CountMassElements => _massElements.Count;
 

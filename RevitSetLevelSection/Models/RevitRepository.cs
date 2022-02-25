@@ -72,19 +72,22 @@ namespace RevitSetLevelSection.Models {
             }
         }
 
-        public void UpdateElements(RevitParam revitParam, IEnumerable<FamilyInstance> massElements) {
+        public void UpdateElements(RevitParam revitParam, Transform transform,
+            IEnumerable<FamilyInstance> massElements) {
             List<Element> elements = GetElements(revitParam);
             var cashedElements = elements.ToDictionary(item => item.Id);
-            
-            using(Transaction transaction = _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
+
+            using(Transaction transaction =
+                  _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
+                
                 foreach(Element element in elements) {
                     if(!cashedElements.ContainsKey(element.Id)) {
                         continue;
                     }
-                    
+
                     foreach(FamilyInstance massObject in massElements) {
-                        if(IsIntersectCenterElement(massObject, element)) {
-                            
+                        if(IsIntersectCenterElement(transform, massObject, element)) {
+
                             try {
                                 element.SetParamValue(revitParam, massObject);
                             } catch(InvalidOperationException) {
@@ -115,26 +118,21 @@ namespace RevitSetLevelSection.Models {
                 .ToList();
         }
 
-        private bool IsIntersectCenterElement(FamilyInstance massElement, Element element) {
-            var outline = GetOutline(element);
-            var point = (outline.MaximumPoint - outline.MinimumPoint) / 2 + outline.MinimumPoint;
+        private bool IsIntersectCenterElement(Transform transform, FamilyInstance massElement, Element element) {
+            var elementOutline = GetOutline(element, Transform.Identity);
+            var elementCenterPoint = (elementOutline.MaximumPoint - elementOutline.MinimumPoint) / 2 + elementOutline.MinimumPoint;
 
-            var massOutline = GetOutline(massElement);
-            return massOutline.MinimumPoint.X < point.X
-                   && massOutline.MinimumPoint.Y < point.Y
-                   && massOutline.MinimumPoint.Z < point.Z
-                   && massOutline.MaximumPoint.X > point.X
-                   && massOutline.MaximumPoint.Y > point.Y
-                   && massOutline.MaximumPoint.Z > point.Z;
+            var massOutline = GetOutline(massElement, transform);
+            return massOutline.Contains(elementCenterPoint, 0.01);
         }
 
-        private Outline GetOutline(Element element) {
-            var boundingBox = element.get_BoundingBox(_document.ActiveView);
+        private Outline GetOutline(Element element, Transform transform) {
+            var boundingBox = element.get_BoundingBox(null);
             if(boundingBox == null) {
                 return new Outline(XYZ.Zero, XYZ.Zero);
             }
 
-            return new Outline(boundingBox.Min, boundingBox.Max);
+            return new Outline(transform.OfPoint(boundingBox.Min), transform.OfPoint(boundingBox.Max));
         }
 
         private ElementId[] GetCategories(RevitParam revitParam) {

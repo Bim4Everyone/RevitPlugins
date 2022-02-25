@@ -96,7 +96,7 @@ namespace RevitSetLevelSection.ViewModels {
             if(fromRevitParam) {
                 _revitRepository.UpdateElements(RevitParam, ParamValue);
             } else {
-                _revitRepository.UpdateElements(RevitParam, DesignOption.GetMassObjects());
+                _revitRepository.UpdateElements(RevitParam, DesignOption.Transform, DesignOption.GetMassObjects());
             }
         }
 

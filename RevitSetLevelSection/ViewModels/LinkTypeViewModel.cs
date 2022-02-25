@@ -55,7 +55,7 @@ namespace RevitSetLevelSection.ViewModels {
             }
 
             var linkInstanceRepository =
-                new LinkInstanceRepository(_revitRepository.Application, linkInstance.GetLinkDocument());
+                new LinkInstanceRepository(_revitRepository.Application, linkInstance);
 
             return linkInstanceRepository.GetDesignOptions()
                 .Select(item => new DesignOptionsViewModel(item, linkInstanceRepository));

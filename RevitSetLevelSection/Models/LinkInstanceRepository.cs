@@ -14,12 +14,15 @@ namespace RevitSetLevelSection.Models {
 
         private readonly Document _document;
         
-        public LinkInstanceRepository(Application application, Document document) {
+        public LinkInstanceRepository(Application application, RevitLinkInstance linkInstance) {
             _application = application;
             _uiApplication = new UIApplication(application);
 
-            _document = document;
+            _document = linkInstance.GetLinkDocument();
+            Transform = linkInstance.GetTransform();
         }
+        
+        public Transform Transform { get; }
         
         public IEnumerable<DesignOption> GetDesignOptions() {
             return new FilteredElementCollector(_document)
