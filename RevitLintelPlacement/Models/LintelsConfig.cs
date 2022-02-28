@@ -76,7 +76,7 @@ namespace RevitLintelPlacement.Models {
         public List<string> ReinforcedConcreteFilter { get; set; } = new List<string>();
         [Description("Фильтр отверстий")]
         public string HolesFilter { get; set; }
-        public List<string> LintelFamilies { get; set; } = new List<string>();
+        public string LintelFamily { get; set; }
 
         [JsonIgnore]
         public Dictionary<string, StorageType> ParamterType { get; set; } = new Dictionary<string, StorageType>() {

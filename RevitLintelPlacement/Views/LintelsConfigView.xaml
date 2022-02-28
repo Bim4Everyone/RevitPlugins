@@ -57,13 +57,15 @@
                 <ListBox  Height="200" Margin="10" ItemsSource="{Binding LintelFamilies}">
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type vm:GenericModelFamilyViewModel}">
-                            <CheckBox IsChecked="{Binding IsChecked}">
+                            <CheckBox x:Name="chbFamily" IsChecked="{Binding IsChecked}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="Checked">
-                                        <i:InvokeCommandAction Command="{Binding ElementName=Config, Path=DataContext.FamilySelectionChangedCommand}"/>
+                                        <i:InvokeCommandAction Command="{Binding ElementName=Config, Path=DataContext.FamilySelectionChangedCommand}"
+                                                               CommandParameter="{Binding ElementName=chbFamily, Path=DataContext}"/>
                                     </i:EventTrigger>
                                     <i:EventTrigger EventName="Unchecked">
-                                        <i:InvokeCommandAction Command="{Binding ElementName=Config, Path=DataContext.FamilySelectionChangedCommand}"/>
+                                        <i:InvokeCommandAction Command="{Binding ElementName=Config, Path=DataContext.FamilySelectionChangedCommand}"
+                                                               CommandParameter="{Binding ElementName=chbFamily, Path=DataContext}"/>
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                                 <TextBlock Text="{Binding Name}"/>
@@ -77,12 +79,9 @@
                                 Converter={StaticResource WidthConverter}, ConverterParameter=30}" Text="{Binding HolesFilter}"/>
             </GroupBox>
         </Grid>
-        <GroupBox Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" Header="Характеристики перемычек и проёмов">
+        <GroupBox Grid.Row="1" Grid.Column="1" Header="Характеристики перемычек">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -97,33 +96,50 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
+                <Grid.Resources>
+                    <DataTemplate DataType="{x:Type vm:ParameterViewModel}">
+                            <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
+                </Grid.Resources>
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Толщина перемычки"></TextBlock>
-                <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelParameterNames}" SelectedItem="{Binding LintelThickness}"></ComboBox>
+                <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelThicknessParameters}" SelectedItem="{Binding LintelThickness}">
+                </ComboBox>
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Ширина перемычки"></TextBlock>
-                <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelParameterNames}" SelectedItem="{Binding LintelWidth}"></ComboBox>
+                <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelWidthParameters}" SelectedItem="{Binding LintelWidth}"></ComboBox>
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Опирание слева"></TextBlock>
-                <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelParameterNames}" SelectedItem="{Binding LintelLeftOffset}"></ComboBox>
+                <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelLeftOffsetParameters}" SelectedItem="{Binding LintelLeftOffset}"></ComboBox>
                 
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Опирание справа"></TextBlock>
-                <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelParameterNames}" SelectedItem="{Binding LintelRightOffset}"></ComboBox>
+                <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelRightOffsetParameters}" SelectedItem="{Binding LintelRightOffset}"></ComboBox>
 
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Уголок слева"></TextBlock>
-                <ComboBox Grid.Row="4" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelParameterNames}" SelectedItem="{Binding LintelLeftCorner}"></ComboBox>
+                <ComboBox Grid.Row="4" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelLeftCornerParameters}" SelectedItem="{Binding LintelLeftCorner}"></ComboBox>
                 
                 <TextBlock Grid.Row="5" Grid.Column="0" Text="Уголок справа"></TextBlock>
-                <ComboBox Grid.Row="5" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelParameterNames}" SelectedItem="{Binding LintelRightCorner}"></ComboBox>
+                <ComboBox Grid.Row="5" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelRightCornerParameters}" SelectedItem="{Binding LintelRightCorner}"></ComboBox>
 
                 <TextBlock Grid.Row="6" Grid.Column="0" Text="Фиксация решения"></TextBlock>
-                <ComboBox Grid.Row="6" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelParameterNames}" SelectedItem="{Binding LintelFixation}"></ComboBox>
-
-
-                <TextBlock Grid.Row="7" Grid.Column="0" Text="Высота проема"></TextBlock>
-                <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding OpeningHeight}"></TextBox>
-                <TextBlock Grid.Row="8" Grid.Column="0" Text="Ширина проема"></TextBlock>
-                <TextBox Grid.Row="8" Grid.Column="1" Text="{Binding OpeningWidth}"></TextBox>
-                <TextBlock Grid.Row="9" Grid.Column="0" Text="Фиксация перемычки"></TextBlock>
-                <TextBox Grid.Row="9" Grid.Column="1" Text="{Binding OpeningFixation}"></TextBox>
+                <ComboBox Grid.Row="6" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelFixationParameters}" SelectedItem="{Binding LintelFixation}"></ComboBox>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Row="2" Grid.Column="1" Header="Характеристики проемов">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Высота проема"></TextBlock>
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding OpeningHeight}"></TextBox>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Ширина проема"></TextBlock>
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding OpeningWidth}"></TextBox>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Фиксация перемычки"></TextBlock>
+                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding OpeningFixation}"></TextBox>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Row="2" Grid.Column="0" Header="Фильтрация ЖБ стен по имени типоразмера">

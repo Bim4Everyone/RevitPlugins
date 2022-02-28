@@ -9,7 +9,7 @@
         xmlns:converters="clr-namespace:RevitLintelPlacement.Converters"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
-        Title="ReportView" Height="450" Width="800"
+        Title="Отчет" Height="450" Width="800"
         d:DataContext="{d:DesignInstance vm:ElementInfosViewModel, IsDesignTimeCreatable=False}"
         Name="ReportWindow">
     <Window.Resources>

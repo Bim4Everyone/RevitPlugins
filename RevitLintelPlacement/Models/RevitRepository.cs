@@ -67,8 +67,7 @@ namespace RevitLintelPlacement.Models {
                 .WhereElementIsElementType()
                 .OfClass(typeof(FamilySymbol))
                 .Cast<FamilySymbol>()
-                .Where(e => LintelsCommonConfig.LintelFamilies.Any(l =>
-                l.Equals(e.Family?.Name, StringComparison.CurrentCultureIgnoreCase)));
+                .Where(e => LintelsCommonConfig.LintelFamily.Equals(e.Family?.Name, StringComparison.CurrentCultureIgnoreCase));
         }
 
         public Element GetElementById(ElementId id) {
@@ -154,7 +153,7 @@ namespace RevitLintelPlacement.Models {
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
-                .Where(e => LintelsCommonConfig.LintelFamilies.Any(f => f.Equals(e.Symbol?.Family?.Name, StringComparison.CurrentCultureIgnoreCase)))
+                .Where(e => LintelsCommonConfig.LintelFamily.Equals(e.Symbol?.Family?.Name, StringComparison.CurrentCultureIgnoreCase))
                 .ToList();
         }
 
@@ -484,29 +483,33 @@ namespace RevitLintelPlacement.Models {
             }
         }
 
-        public IEnumerable<string> GetParametersFromFamilies(IEnumerable<string> familyNames) {
-            var families = new FilteredElementCollector(_document)
+        public IEnumerable<ParameterViewModel> GetParametersFromFamilies(string familyName) {
+            var family = new FilteredElementCollector(_document)
                 .OfClass(typeof(Family))
                 .Cast<Family>()
-                .Where(f => familyNames.Any(n => n.Equals(f.Name, StringComparison.CurrentCultureIgnoreCase)))
-                .ToList();
-            foreach(var family in families) {
-                Document familyDocument = null; 
-                List<string> parameterNames = new List<string>();
-                try {
-                    familyDocument = _document.EditFamily(family);
-                    var familyManager = familyDocument.FamilyManager;
-                    parameterNames = familyManager.GetParameters().Where(p => !p.IsReadOnly).Select(p => p.Definition.Name).ToList();
-                } catch {
+                .FirstOrDefault(f => !string.IsNullOrEmpty(familyName) && familyName.Equals(f.Name, StringComparison.CurrentCultureIgnoreCase));
 
-                } finally {
-                    if(familyDocument != null) {
-                        familyDocument.Close(false);
-                    }
+            Document familyDocument = null;
+            List<ParameterViewModel> parameters = new List<ParameterViewModel>();
+            try {
+                familyDocument = _document.EditFamily(family);
+                var familyManager = familyDocument.FamilyManager;
+                parameters = familyManager.GetParameters()
+                    .Where(p => !p.IsReadOnly)
+                    .Select(p => new ParameterViewModel {
+                        Name = p.Definition.Name,
+                        StorageType = p.StorageType
+                    })
+                    .ToList();
+            } catch {
+
+            } finally {
+                if(familyDocument != null) {
+                    familyDocument.Close(false);
                 }
-                foreach(var parameterName in parameterNames) {
-                    yield return parameterName;
-                }
+            }
+            foreach(var parameter in parameters) {
+                yield return parameter;
             }
         }
 

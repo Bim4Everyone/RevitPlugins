@@ -7,6 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -15,24 +17,31 @@ using RevitLintelPlacement.Models;
 namespace RevitLintelPlacement.ViewModels {
     internal class ConfigViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private string _lintelThickness;
-        private string _lintelWidth;
-        private string _lintelRightOffset;
-        private string _lintelLeftOffset;
-        private string _lintelLeftCorner;
-        private string _lintelRightCorner;
-        private string _lintelFixation;
+        private ParameterViewModel _lintelThickness;
+        private ParameterViewModel _lintelWidth;
+        private ParameterViewModel _lintelRightOffset;
+        private ParameterViewModel _lintelLeftOffset;
+        private ParameterViewModel _lintelLeftCorner;
+        private ParameterViewModel _lintelRightCorner;
+        private ParameterViewModel _lintelFixation;
         private string _openingHeight;
         private string _openingWidth;
         private string _openingFixation;
         private string _holesFilter;
         private string _lintelsConfigPath;
+        private bool _canChangeSelection = true;
         private ObservableCollection<FilterViewModel> _reinforcedConcreteFilter;
         private List<GenericModelFamilyViewModel> _lintelTypes;
         private string _message;
-        private List<string> _lintelParameterNames;
+        private List<ParameterViewModel> _lintelThicknessParameters;
+        private List<ParameterViewModel> _lintelWidthParameters;
+        private List<ParameterViewModel> _lintelRightOffsetParameters;
+        private List<ParameterViewModel> _lintelLeftOffsetParameters;
+        private List<ParameterViewModel> _lintelLeftCornerParameters;
+        private List<ParameterViewModel> _lintelRightCornerParameters;
+        private List<ParameterViewModel> _lintelFixationParameters;
 
-        public ConfigViewModel() {}
+        public ConfigViewModel() { }
 
         public ConfigViewModel(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
@@ -44,40 +53,40 @@ namespace RevitLintelPlacement.ViewModels {
             AddFilterCommand = new RelayCommand(AddFilter);
             RemoveFilterCommand = new RelayCommand(RemoveFilter);
             SelectLintelsConfigCommand = new RelayCommand(SelectLintelsConfig);
-            FamilySelectionChangedCommand = new RelayCommand(FamilySelectionChanged);
+            FamilySelectionChangedCommand = new RelayCommand(FamilySelectionChanged, p => _canChangeSelection);
         }
 
-        public string LintelThickness {
+        public ParameterViewModel LintelThickness {
             get => _lintelThickness;
             set => this.RaiseAndSetIfChanged(ref _lintelThickness, value);
         }
 
-        public string LintelWidth {
+        public ParameterViewModel LintelWidth {
             get => _lintelWidth;
             set => this.RaiseAndSetIfChanged(ref _lintelWidth, value);
         }
 
-        public string LintelRightOffset {
+        public ParameterViewModel LintelRightOffset {
             get => _lintelRightOffset;
             set => this.RaiseAndSetIfChanged(ref _lintelRightOffset, value);
         }
 
-        public string LintelLeftOffset {
+        public ParameterViewModel LintelLeftOffset {
             get => _lintelLeftOffset;
             set => this.RaiseAndSetIfChanged(ref _lintelLeftOffset, value);
         }
 
-        public string LintelLeftCorner {
+        public ParameterViewModel LintelLeftCorner {
             get => _lintelLeftCorner;
             set => this.RaiseAndSetIfChanged(ref _lintelLeftCorner, value);
         }
 
-        public string LintelRightCorner {
+        public ParameterViewModel LintelRightCorner {
             get => _lintelRightCorner;
             set => this.RaiseAndSetIfChanged(ref _lintelRightCorner, value);
         }
 
-        public string LintelFixation {
+        public ParameterViewModel LintelFixation {
             get => _lintelFixation;
             set => this.RaiseAndSetIfChanged(ref _lintelFixation, value);
         }
@@ -121,9 +130,39 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _lintelTypes, value);
         }
 
-        public List<string> LintelParameterNames { 
-            get => _lintelParameterNames; 
-            set => this.RaiseAndSetIfChanged(ref _lintelParameterNames, value); 
+        public List<ParameterViewModel> LintelThicknessParameters {
+            get => _lintelThicknessParameters;
+            set => this.RaiseAndSetIfChanged(ref _lintelThicknessParameters, value);
+        }
+
+        public List<ParameterViewModel> LintelWidthParameters {
+            get => _lintelWidthParameters;
+            set => this.RaiseAndSetIfChanged(ref _lintelWidthParameters, value);
+        }
+
+        public List<ParameterViewModel> LintelRightOffsetParameters {
+            get => _lintelRightOffsetParameters;
+            set => this.RaiseAndSetIfChanged(ref _lintelRightOffsetParameters, value);
+        }
+
+        public List<ParameterViewModel> LintelLeftOffsetParameters {
+            get => _lintelLeftOffsetParameters;
+            set => _lintelLeftOffsetParameters = value;
+        }
+
+        public List<ParameterViewModel> LintelLeftCornerParameters {
+            get => _lintelLeftCornerParameters;
+            set => this.RaiseAndSetIfChanged(ref _lintelLeftCornerParameters, value);
+        }
+
+        public List<ParameterViewModel> LintelRightCornerParameters {
+            get => _lintelRightCornerParameters;
+            set => this.RaiseAndSetIfChanged(ref _lintelRightCornerParameters, value);
+        }
+
+        public List<ParameterViewModel> LintelFixationParameters { 
+            get => _lintelFixationParameters; 
+            set => this.RaiseAndSetIfChanged(ref _lintelFixationParameters, value); 
         }
 
         public ICommand SaveConfigCommand { get; set; }
@@ -149,45 +188,84 @@ namespace RevitLintelPlacement.ViewModels {
             }
 
             HolesFilter = _revitRepository.LintelsCommonConfig.HolesFilter;
-            foreach(var family in LintelFamilies) {
-                family.IsChecked = _revitRepository.LintelsCommonConfig.LintelFamilies
-                    .Any(f => f.Equals(family.Name, StringComparison.CurrentCultureIgnoreCase));
+            if(!string.IsNullOrEmpty(_revitRepository.LintelsCommonConfig.LintelFamily)) {
+                foreach(var family in LintelFamilies)
+                    family.IsChecked = _revitRepository.LintelsCommonConfig.LintelFamily.Equals(family.Name, StringComparison.CurrentCultureIgnoreCase);
             }
         }
 
         private void InitializeParameters() {
-            LintelParameterNames = _revitRepository
-                .GetParametersFromFamilies(LintelFamilies.Where(f => f.IsChecked).Select(f => f.Name).ToList())
-                .Distinct()
-                .OrderBy(p=>p)
+            var allParameters = _revitRepository
+                .GetParametersFromFamilies(LintelFamilies.FirstOrDefault(f => f.IsChecked)?.Name)
+                .OrderBy(p => p.Name)
                 .ToList();
-            LintelThickness = _revitRepository.LintelsCommonConfig.LintelThickness;
-            LintelWidth = _revitRepository.LintelsCommonConfig.LintelWidth;
-            LintelRightCorner = _revitRepository.LintelsCommonConfig.LintelRightCorner;
-            LintelRightOffset = _revitRepository.LintelsCommonConfig.LintelRightOffset;
-            LintelLeftCorner = _revitRepository.LintelsCommonConfig.LintelLeftCorner;
-            LintelLeftOffset = _revitRepository.LintelsCommonConfig.LintelLeftOffset;
-            LintelFixation = _revitRepository.LintelsCommonConfig.LintelFixation;
+            LintelThicknessParameters = allParameters
+                .Where(p => p.StorageType == _revitRepository.LintelsCommonConfig.ParamterType[nameof(LintelThickness)])
+                .ToList();
+            LintelWidthParameters = allParameters
+                .Where(p => p.StorageType == _revitRepository.LintelsCommonConfig.ParamterType[nameof(LintelWidth)])
+                .ToList();
+            LintelRightCornerParameters = allParameters
+                .Where(p => p.StorageType == _revitRepository.LintelsCommonConfig.ParamterType[nameof(LintelRightCorner)])
+                .ToList();
+            LintelRightOffsetParameters = allParameters
+                .Where(p => p.StorageType == _revitRepository.LintelsCommonConfig.ParamterType[nameof(LintelRightOffset)])
+                .ToList();
+            LintelLeftCornerParameters = allParameters
+                .Where(p => p.StorageType == _revitRepository.LintelsCommonConfig.ParamterType[nameof(LintelLeftCorner)])
+                .ToList();
+            LintelLeftOffsetParameters = allParameters
+                .Where(p => p.StorageType == _revitRepository.LintelsCommonConfig.ParamterType[nameof(LintelLeftOffset)])
+                .ToList();
+            LintelFixationParameters = allParameters
+                .Where(p => p.StorageType == _revitRepository.LintelsCommonConfig.ParamterType[nameof(LintelFixation)])
+                .ToList();
 
+            LintelThickness = new ParameterViewModel {
+                Name = _revitRepository.LintelsCommonConfig.LintelThickness,
+                StorageType = _revitRepository.LintelsCommonConfig.ParamterType[nameof(LintelThickness)]
+            };
+            LintelWidth = new ParameterViewModel {
+                Name = _revitRepository.LintelsCommonConfig.LintelWidth,
+                StorageType = _revitRepository.LintelsCommonConfig.ParamterType[nameof(LintelWidth)]
+            };
+            LintelRightCorner = new ParameterViewModel {
+                Name = _revitRepository.LintelsCommonConfig.LintelRightCorner,
+                StorageType = _revitRepository.LintelsCommonConfig.ParamterType[nameof(LintelRightCorner)]
+            };
+            LintelRightOffset = new ParameterViewModel {
+                Name = _revitRepository.LintelsCommonConfig.LintelRightOffset,
+                StorageType = _revitRepository.LintelsCommonConfig.ParamterType[nameof(LintelRightOffset)]
+            };
+            LintelLeftCorner = new ParameterViewModel {
+                Name = _revitRepository.LintelsCommonConfig.LintelLeftCorner,
+                StorageType = _revitRepository.LintelsCommonConfig.ParamterType[nameof(LintelLeftCorner)]
+            };
+            LintelLeftOffset = new ParameterViewModel {
+                Name = _revitRepository.LintelsCommonConfig.LintelLeftOffset,
+                StorageType = _revitRepository.LintelsCommonConfig.ParamterType[nameof(LintelLeftOffset)]
+            };
+            LintelFixation = new ParameterViewModel {
+                Name = _revitRepository.LintelsCommonConfig.LintelFixation,
+                StorageType = _revitRepository.LintelsCommonConfig.ParamterType[nameof(LintelFixation)]
+            };
         }
 
         private void Save(object p) {
-            _revitRepository.LintelsCommonConfig.LintelThickness = LintelThickness;
-            _revitRepository.LintelsCommonConfig.LintelWidth = LintelWidth;
-            _revitRepository.LintelsCommonConfig.LintelRightCorner = LintelRightCorner;
-            _revitRepository.LintelsCommonConfig.LintelRightOffset = LintelRightOffset;
-            _revitRepository.LintelsCommonConfig.LintelLeftCorner = LintelLeftCorner;
-            _revitRepository.LintelsCommonConfig.LintelLeftOffset = LintelLeftOffset;
-            _revitRepository.LintelsCommonConfig.LintelFixation = LintelFixation;
+            _revitRepository.LintelsCommonConfig.LintelThickness = LintelThickness.Name;
+            _revitRepository.LintelsCommonConfig.LintelWidth = LintelWidth.Name;
+            _revitRepository.LintelsCommonConfig.LintelRightCorner = LintelRightCorner.Name;
+            _revitRepository.LintelsCommonConfig.LintelRightOffset = LintelRightOffset.Name;
+            _revitRepository.LintelsCommonConfig.LintelLeftCorner = LintelLeftCorner.Name;
+            _revitRepository.LintelsCommonConfig.LintelLeftOffset = LintelLeftOffset.Name;
+            _revitRepository.LintelsCommonConfig.LintelFixation = LintelFixation.Name;
             _revitRepository.LintelsCommonConfig.OpeningHeight = OpeningHeight;
             _revitRepository.LintelsCommonConfig.OpeningWidth = OpeningWidth;
             _revitRepository.LintelsCommonConfig.OpeningFixation = OpeningFixation;
             _revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter = ReinforcedConcreteFilter.Select(e => e.Name).ToList();
             _revitRepository.LintelsCommonConfig.HolesFilter = HolesFilter;
-            _revitRepository.LintelsCommonConfig.LintelFamilies = LintelFamilies
-                .Where(e => e.IsChecked)
-                .Select(e => e.Name)
-                .ToList();
+            _revitRepository.LintelsCommonConfig.LintelFamily = LintelFamilies
+                .FirstOrDefault(e => e.IsChecked).Name;
             _revitRepository.LintelsCommonConfig.Save(_revitRepository.GetDocumentName());
             _revitRepository.LintelsConfig.SaveProjectConfig();
             ChangeMessage("Настройки успешно сохранены");
@@ -226,7 +304,15 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         private void FamilySelectionChanged(object p) {
-            InitializeParameters();
+            if(p is GenericModelFamilyViewModel newSelectedFamily) {
+                _canChangeSelection = false;
+                var oldSelectedFamily = LintelFamilies.FirstOrDefault(f => f.IsChecked && f != newSelectedFamily);
+                if(oldSelectedFamily != null) {
+                    oldSelectedFamily.IsChecked = false;
+                }
+                InitializeParameters();
+                _canChangeSelection = true;
+            }
         }
     }
 
@@ -236,6 +322,24 @@ namespace RevitLintelPlacement.ViewModels {
         public string Name { 
             get => _name; 
             set => this.RaiseAndSetIfChanged(ref _name, value); 
+        }
+    }
+
+    internal class ParameterViewModel : IEquatable<ParameterViewModel> {
+        public StorageType StorageType { get; set; } 
+        public string Name { get; set; }
+
+        public bool Equals(ParameterViewModel other) {
+            return other != null &&
+                   StorageType == other.StorageType &&
+                   Name == other.Name;
+        }
+
+        public override int GetHashCode() {
+            int hashCode = 897683154;
+            hashCode = hashCode * -1521134295 + StorageType.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+            return hashCode;
         }
     }
 }

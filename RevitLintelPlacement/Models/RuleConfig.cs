@@ -45,7 +45,9 @@ namespace RevitLintelPlacement.Models {
                 return ruleDictionary;
             foreach(var file in files) {
                 var userConfig = GetUserConfig(file);
-                ruleDictionary.Add(userConfig.Name, userConfig);
+                if(!ruleDictionary.ContainsKey(userConfig.Name)) {
+                    ruleDictionary.Add(userConfig.Name, userConfig);
+                }
             }
             return ruleDictionary;
         }
