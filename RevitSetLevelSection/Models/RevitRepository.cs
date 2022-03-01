@@ -124,9 +124,7 @@ namespace RevitSetLevelSection.Models {
                 return false;
             }
 
-            var elementOutline = GetOutline(element, Transform.Identity);
-            var elementCenterPoint = (elementOutline.MaximumPoint - elementOutline.MinimumPoint) / 2 +
-                                     elementOutline.MinimumPoint;
+            XYZ elementCenterPoint = GetCenterPoint(element);
             var line = GetLine(elementCenterPoint);
 
             var result = solid.IntersectWithCurve(line,
@@ -139,6 +137,17 @@ namespace RevitSetLevelSection.Models {
             return false;
         }
 
+        private XYZ GetCenterPoint(Element element) {
+            Solid solid = GetSolid(element, Transform.Identity);
+            if(solid != null) {
+                return solid.ComputeCentroid();
+            }
+
+            var elementOutline = GetOutline(element, Transform.Identity);
+            return (elementOutline.MaximumPoint - elementOutline.MinimumPoint) / 2
+                   + elementOutline.MinimumPoint;
+        }
+
         private Outline GetOutline(Element element, Transform transform) {
             var boundingBox = element.get_BoundingBox(null);
             if(boundingBox == null) {
@@ -149,17 +158,37 @@ namespace RevitSetLevelSection.Models {
         }
 
         private Solid GetSolid(Element element, Transform transform) {
-            var geometryElement = element.get_Geometry(new Options() { ComputeReferences = true });
+            var geometryElement = element.get_Geometry(new Options() {ComputeReferences = true});
             if(geometryElement == null) {
                 return null;
             }
-            
-            Solid solid = geometryElement.OfType<Solid>().FirstOrDefault(item => item.Volume > 0);
-            if(solid == null) {
+
+            List<Solid> solids = new List<Solid>();
+            foreach(GeometryObject geometryObject in geometryElement.OfType<GeometryObject>()) {
+                if(geometryObject is Solid solid) {
+                    solids.Add(solid);
+                } else if(geometryObject is GeometryInstance instance) {
+                    solids.AddRange(instance.GetInstanceGeometry().OfType<Solid>());
+                }
+            }
+
+            solids = solids
+                    .Where(item => item.Volume > 0)
+                    .ToList();
+
+            if(solids.Count == 0) {
                 return null;
             }
-            
-            return SolidUtils.CreateTransformed(solid, transform);
+
+            Solid resultSolid = solids.First();
+            solids.Remove(resultSolid);
+
+            foreach(Solid solid in solids) {
+                resultSolid =
+                    BooleanOperationsUtils.ExecuteBooleanOperation(resultSolid, solid, BooleanOperationsType.Union);
+            }
+
+            return SolidUtils.CreateTransformed(resultSolid, transform);
         }
 
         private Line GetLine(XYZ point) {

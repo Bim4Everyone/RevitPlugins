@@ -36,7 +36,7 @@ namespace RevitSetLevelSection.Models {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
                 .OfCategory(BuiltInCategory.OST_Mass)
-                .Where(item => item.DesignOption.Id == designOption.Id)
+                .Where(item => item.DesignOption?.Id == designOption.Id)
                 .OfType<FamilyInstance>()
                 .ToList();
         }
