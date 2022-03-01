@@ -119,11 +119,24 @@ namespace RevitSetLevelSection.Models {
         }
 
         private bool IsIntersectCenterElement(Transform transform, FamilyInstance massElement, Element element) {
-            var elementOutline = GetOutline(element, Transform.Identity);
-            var elementCenterPoint = (elementOutline.MaximumPoint - elementOutline.MinimumPoint) / 2 + elementOutline.MinimumPoint;
+            Solid solid = GetSolid(massElement, transform);
+            if(solid == null) {
+                return false;
+            }
 
-            var massOutline = GetOutline(massElement, transform);
-            return massOutline.Contains(elementCenterPoint, 0.01);
+            var elementOutline = GetOutline(element, Transform.Identity);
+            var elementCenterPoint = (elementOutline.MaximumPoint - elementOutline.MinimumPoint) / 2 +
+                                     elementOutline.MinimumPoint;
+            var line = GetLine(elementCenterPoint);
+
+            var result = solid.IntersectWithCurve(line,
+                new SolidCurveIntersectionOptions() {ResultType = SolidCurveIntersectionMode.CurveSegmentsInside});
+
+            if(result.ResultType == SolidCurveIntersectionMode.CurveSegmentsInside) {
+                return result.Any(item => item.Length > 0);
+            }
+
+            return false;
         }
 
         private Outline GetOutline(Element element, Transform transform) {
@@ -133,6 +146,27 @@ namespace RevitSetLevelSection.Models {
             }
 
             return new Outline(transform.OfPoint(boundingBox.Min), transform.OfPoint(boundingBox.Max));
+        }
+
+        private Solid GetSolid(Element element, Transform transform) {
+            var geometryElement = element.get_Geometry(new Options() { ComputeReferences = true });
+            if(geometryElement == null) {
+                return null;
+            }
+            
+            Solid solid = geometryElement.OfType<Solid>().FirstOrDefault(item => item.Volume > 0);
+            if(solid == null) {
+                return null;
+            }
+            
+            return SolidUtils.CreateTransformed(solid, transform);
+        }
+
+        private Line GetLine(XYZ point) {
+            XYZ start = point.Subtract(new XYZ(_application.ShortCurveTolerance, 0, 0));
+            XYZ finish = point.Add(new XYZ(_application.ShortCurveTolerance, 0, 0));
+
+            return Line.CreateBound(start, finish);
         }
 
         private ElementId[] GetCategories(RevitParam revitParam) {
