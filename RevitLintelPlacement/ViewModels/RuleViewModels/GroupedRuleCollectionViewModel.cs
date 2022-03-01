@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -40,6 +41,7 @@ namespace RevitLintelPlacement.ViewModels {
             SaveAsCommand = new RelayCommand(SaveAs, p => true);
             LoadCommand = new RelayCommand(Load, p => true);
             PathSelectionChangedCommand = new RelayCommand(SelectionChanged, p => true);
+            CreateNewRuleCommand = new RelayCommand(NewRule, p => true);
         }
 
         public ICommand AddGroupedRuleCommand { get; set; }
@@ -48,6 +50,7 @@ namespace RevitLintelPlacement.ViewModels {
         public ICommand SaveAsCommand { get; set; }
         public ICommand LoadCommand { get; set; }
         public ICommand PathSelectionChangedCommand { get; set; }
+        public ICommand CreateNewRuleCommand { get; set; }
        
 
         public string Message { 
@@ -100,6 +103,24 @@ namespace RevitLintelPlacement.ViewModels {
                         ChangeMessage("Файл успешно сохранен");
                         break;
                     }
+                    case RulesType.New: {
+                        var result = AskAboutNewFile();
+                        if (result == TaskDialogResult.CommandLink1) {
+                            config.Save(_revitRepository.GetDocumentName());
+                            config.Name = _revitRepository.GetDocumentName();
+                            _revitRepository.RuleConfigs[_revitRepository.GetDocumentName()] = config;
+                            SelectedName = _revitRepository.GetDocumentName();
+                            _revitRepository.RuleConfigs.Remove(string.Empty);
+                            InitializeRulePaths();
+                            InitializeGroupRules();
+                        } else {
+                            SaveAsCommand.Execute(null);
+                            _revitRepository.RuleConfigs.Remove(string.Empty);
+                            InitializeRulePaths();
+                            InitializeGroupRules();
+                        }
+                        break;
+                    }
                     default: {
                         throw new ArgumentNullException(nameof(config.RulesType), $"Следуюший тип правила \"{config.RulesType}\" не найден");
                     }
@@ -107,9 +128,33 @@ namespace RevitLintelPlacement.ViewModels {
             }
         }
 
+        public void NewRule(object p) {
+            var config = RuleConfig.CreateNewConfig();
+            if(_revitRepository.RuleConfigs.ContainsKey(config.Name)) {
+                _revitRepository.RuleConfigs[config.Name] = config;
+            } else {
+                _revitRepository.RuleConfigs.Add(config.Name, config);
+            }
+            InitializeRulePaths();
+            SelectedName = config.Name;
+            InitializeGroupRules();
+        }
+
+        public TaskDialogResult AskAboutNewFile() {
+            TaskDialog saveDialog = new TaskDialog("BIM");
+            saveDialog.MainInstruction = "Как вы хотите сохранить новый файл с правилами?";
+
+            // Add commmandLink options to task dialog
+            saveDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1,
+                                      "Сохранить правила в качестве правил проекта.");
+            saveDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2,
+                                      "Сохранить правила локально.");
+            saveDialog.CommonButtons = TaskDialogCommonButtons.Close;
+            saveDialog.DefaultButton = TaskDialogResult.Close;
+            return saveDialog.Show();
+        }
+
         public string GetErrorText() {
-
-
             for(int i = 0; i < GroupedRules.Count - 1; i++) {
                 for(int j = i + 1; j < GroupedRules.Count; j++) {
                     var commonWallTypes = GroupedRules[i].WallTypes.WallTypes
@@ -136,6 +181,7 @@ namespace RevitLintelPlacement.ViewModels {
                     if(!_revitRepository.RuleConfigs.ContainsKey(config.Name)) {
                         _revitRepository.RuleConfigs.Add(config.Name, config);
                         RuleNames.Add(config.Name);
+                        SelectedName = config.Name;
                         ChangeMessage("Файл успешно сохранен");
                     }
                 }

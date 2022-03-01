@@ -43,6 +43,7 @@
 	  <None Remove="Resources\icons8-add.png" />
 	  <None Remove="Resources\icons8-arrow-left.png" />
 	  <None Remove="Resources\icons8-arrow-next.png" />
+	  <None Remove="Resources\icons8-down.png" />
 	  <None Remove="Resources\icons8-error.png" />
 	  <None Remove="Resources\icons8-file.png" />
 	  <None Remove="Resources\icons8-info.png" />
@@ -91,6 +92,7 @@
 	  <Resource Include="Resources\icons8-add.png" />
 	  <Resource Include="Resources\icons8-arrow-left.png" />
 	  <Resource Include="Resources\icons8-arrow-next.png" />
+	  <Resource Include="Resources\icons8-down.png" />
 	  <Resource Include="Resources\icons8-error.png" />
 	  <Resource Include="Resources\icons8-warn.png" />
 	  <Resource Include="Resources\icons8-file.png" />

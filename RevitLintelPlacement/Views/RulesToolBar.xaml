@@ -22,8 +22,12 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <ToolBar Grid.Row="0" Height="30">
-            <Button ToolTip="Загрузить правила" Command="{Binding LoadCommand}">
+            <Button ToolTip="Создать новые правила" Command="{Binding CreateNewRuleCommand}">
                 <Image Source="../Resources/icons8-file.png"></Image>
+            </Button>
+            <Separator/>
+            <Button ToolTip="Загрузить правила" Command="{Binding LoadCommand}">
+                <Image Source="../Resources/icons8-down.png"></Image>
             </Button>
             <Separator/>
             <Button ToolTip="Сохранить" Command="{Binding SaveCommand}">
