@@ -10,6 +10,8 @@ using Autodesk.Revit.UI;
 
 using dosymep.WPF.ViewModels;
 
+using RevitMarkPlacement.ViewModels;
+
 namespace RevitMarkPlacement.Models {
     internal class RevitRepository : BaseViewModel {
         private readonly Application _application;
@@ -24,6 +26,21 @@ namespace RevitMarkPlacement.Models {
 
             _document = document;
             _uiDocument = new UIDocument(document);
+        }
+
+        public IEnumerable<string> GetSpotDimentionTypeNames(ISelectionMode selectionMode) {
+            return selectionMode.GetSpotDimentions(_document)
+                .Select(s => s.SpotDimensionType.Name)
+                .Distinct();
+        }
+
+        public IEnumerable<GlobalParameterViewModel> GetGlobalParameters() {
+            return GlobalParametersManager
+                .GetGlobalParametersOrdered(_document)
+                .Select(id=>_document.GetElement(id))
+                .Cast<GlobalParameter>()
+                .Where(p=>p.GetValue() is DoubleParameterValue)
+                .Select(p => new GlobalParameterViewModel(p.Name, Math.Round(UnitUtils.ConvertFromInternalUnits((p.GetValue() as DoubleParameterValue).Value, UnitTypeId.Millimeters))));
         }
     }
 }
