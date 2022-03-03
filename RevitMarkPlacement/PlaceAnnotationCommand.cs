@@ -12,6 +12,7 @@ using dosymep;
 
 using RevitMarkPlacement.Models;
 using RevitMarkPlacement.ViewModels;
+using RevitMarkPlacement.Views;
 
 namespace RevitMarkPlacement {
 
@@ -24,6 +25,8 @@ namespace RevitMarkPlacement {
                     new RevitRepository(
                         commandData.Application.Application, 
                         commandData.Application.ActiveUIDocument.Document));
+                var view = new MainWindow() { DataContext = viewModel };
+                view.ShowDialog();
             } catch(Exception ex) {
 #if D2020 || D2021 || D2022
                 TaskDialog.Show("Расстановка отметок.", ex.ToString());

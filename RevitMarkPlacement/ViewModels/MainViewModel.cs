@@ -5,7 +5,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitMarkPlacement.Models;
@@ -13,17 +15,17 @@ using RevitMarkPlacement.Models;
 namespace RevitMarkPlacement.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private SampleMode _selectedSampleMode;
-        private ObservableCollection<SpotDimentionViewModel> _spotDimetions;
         private int _floorCount;
-        private ParameterMode _selectedParameterMode;
-        private ObservableCollection<string> _floorParameterNames;
         private string _selectedParameterName;
-
+        private List<SelectionModeViewModel> _selectionModes;
+        private SelectionModeViewModel _selectedMode;
+        private List<IFloorHeightProvider> _floorHeightProviders;
+        private IFloorHeightProvider _selectedFloorHeightProvider;
 
         public MainViewModel(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
-
+            InitializeSelectionModes();
+            InitializeFloorHeightProvider();
         }
 
         public int FloorCount {
@@ -31,38 +33,46 @@ namespace RevitMarkPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _floorCount, value);
         }
 
-        public SampleMode SelectedSampleMode {
-            get => _selectedSampleMode;
-            set => this.RaiseAndSetIfChanged(ref _selectedSampleMode, value);
+        public string SelectedParameterName {
+            get => _selectedParameterName;
+            set => this.RaiseAndSetIfChanged(ref _selectedParameterName, value);
         }
 
-        public ParameterMode SelectedParameterMode {
-            get => _selectedParameterMode;
-            set => this.RaiseAndSetIfChanged(ref _selectedParameterMode, value);
+        public SelectionModeViewModel SelectedMode {
+            get => _selectedMode;
+            set => this.RaiseAndSetIfChanged(ref _selectedMode, value);
         }
 
-        public string SelectedParameterName { 
-            get => _selectedParameterName; 
-            set => this.RaiseAndSetIfChanged(ref _selectedParameterName, value); 
+        public List<IFloorHeightProvider> FloorHeightProviders {
+            get => _floorHeightProviders;
+            set => this.RaiseAndSetIfChanged(ref _floorHeightProviders, value);
         }
 
-        public ObservableCollection<SpotDimentionViewModel> SpotDimetions {
-            get => _spotDimetions;
-            set => this.RaiseAndSetIfChanged(ref _spotDimetions, value);
+        public IFloorHeightProvider SelectedFloorHeightProvider { 
+            get => _selectedFloorHeightProvider; 
+            set => this.RaiseAndSetIfChanged(ref _selectedFloorHeightProvider, value); 
         }
 
-        public ObservableCollection<string> FloorParameterNames {
-            get => _floorParameterNames;
-            set => this.RaiseAndSetIfChanged(ref _floorParameterNames, value);
+        public List<SelectionModeViewModel> SelectionModes {
+            get => _selectionModes;
+            set => this.RaiseAndSetIfChanged(ref _selectionModes, value);
         }
 
-    }
+        private void InitializeSelectionModes() {
+            SelectionModes = new List<SelectionModeViewModel>() {
+                new SelectionModeViewModel(_revitRepository, new AllElementsSelection(), "Создать по всему проекту"),
+                new SelectionModeViewModel(_revitRepository, new ElementsSelection(), "Создать по выбранным элементам")
+            };
+            SelectedMode = SelectionModes[1];
+        }
 
-    internal enum SampleMode {
-        [Description("Создать по всему проекту")]
-        AllElements,
-        [Description("Создать по выбранным элементам")]
-        SelectedElements
+        private void InitializeFloorHeightProvider() {
+            FloorHeightProviders = new List<IFloorHeightProvider>() {
+                new UserFloorHeightViewModel("Индивидуальная настройка"),
+                new GlobalFloorHeightViewModel(_revitRepository, "По глобальному параметру")
+            };
+            SelectedFloorHeightProvider = FloorHeightProviders[1];
+        }
     }
 
     internal enum ParameterMode {
@@ -70,20 +80,5 @@ namespace RevitMarkPlacement.ViewModels {
         Individual,
         [Description("По глобальному параметру")]
         GlobalParameter
-    }
-
-    internal class SpotDimentionViewModel : BaseViewModel {
-        private bool _isChecked;
-        private string _name;
-
-        public bool IsChecked {
-            get => _isChecked;
-            set => this.RaiseAndSetIfChanged(ref _isChecked, value);
-        }
-
-        public string Name { 
-            get => _name; 
-            set => _name = value; 
-        }
     }
 }
