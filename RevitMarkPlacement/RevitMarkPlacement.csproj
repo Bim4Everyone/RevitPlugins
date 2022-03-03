@@ -46,6 +46,9 @@
 		<Compile Include="..\dosymep\ConfigSerializer.cs" Link="dosymep\ConfigSerializer.cs" />
 		<Compile Include="..\dosymep\PlatformWindow.cs" Link="dosymep\PlatformWindow.cs" />
 		<Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\RelayCommand.cs" />
+		<Compile Include="..\dosymep\ConvertibleExtention.cs" Link="dosymep\ConvertibleExtention.cs" />
+		<Compile Include="..\dosymep\EnumConverter.cs" Link="dosymep\EnumConverter.cs" />
+		<Compile Include="..\dosymep\EnumToItemsSource.cs" Link="dosymep\EnumToItemsSource.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
