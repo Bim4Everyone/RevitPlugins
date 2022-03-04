@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -26,6 +28,7 @@ namespace RevitMarkPlacement.ViewModels {
             this._revitRepository = revitRepository;
             InitializeSelectionModes();
             InitializeFloorHeightProvider();
+            PlaceAnnotationCommand = new RelayCommand(PlaceAnnotation);
         }
 
         public int FloorCount {
@@ -58,6 +61,8 @@ namespace RevitMarkPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectionModes, value);
         }
 
+        public ICommand PlaceAnnotationCommand { get; set; }
+
         private void InitializeSelectionModes() {
             SelectionModes = new List<SelectionModeViewModel>() {
                 new SelectionModeViewModel(_revitRepository, new AllElementsSelection(), "Создать по всему проекту"),
@@ -72,6 +77,37 @@ namespace RevitMarkPlacement.ViewModels {
                 new GlobalFloorHeightViewModel(_revitRepository, "По глобальному параметру")
             };
             SelectedFloorHeightProvider = FloorHeightProviders[1];
+        }
+
+        private void PlaceAnnotation(object p) {
+            var spots = _revitRepository.GetSpotDimensions(SelectedMode.SelectionMode);
+            AnnotationManager am = null;
+            var rtam = new RightTopAnnotationManager(_revitRepository);
+            using(Transaction t = _revitRepository.StartTransaction("Обновление и расстановка аннотаций")) {
+                foreach(var spot in spots) {
+                    var orientation = _revitRepository.GetSpotOrientation(spot);
+                    switch(orientation) {
+                        case SpotOrientation.RightTop: {
+                            am = rtam;
+                            break;
+                        }
+                        case SpotOrientation.RightBottom: {
+                            am = null;
+                            break;
+                        }
+                        case SpotOrientation.LeftBottom: {
+                            am = null;
+                            break;
+                        }
+                        case SpotOrientation.LeftTop: {
+                            am = null;
+                            break;
+                        }
+                    }
+                    am?.UpdateAndPlaceAnnotation(spot, null, FloorCount, SelectedFloorHeightProvider.GetFloorHeight());
+                }
+                t.Commit();
+            }
         }
     }
 

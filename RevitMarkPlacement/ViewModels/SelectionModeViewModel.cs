@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -19,9 +21,8 @@ namespace RevitMarkPlacement.ViewModels {
             this._revitRepository = revitRepository;
             SelectionMode = selectionMode;
             Description = description;
-            GetSpotDimentionTypesCommand = new RelayCommand(GetSpotDimentionTypes);
-            PlaceAnnotationCommand = new RelayCommand(PlaceAnnotaions);
-            GetSpotDimentionTypes(null);
+            GetSpotDimensionTypesCommand = new RelayCommand(GetSpotDimensionTypes);
+            GetSpotDimensionTypes(null);
         }
         public string Description { get; set; }
         public List<string> SpotDimentionTypes { 
@@ -29,15 +30,14 @@ namespace RevitMarkPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _spotDimentionTypes, value); 
         }
         public ISelectionMode SelectionMode { get; set; }
-        public ICommand GetSpotDimentionTypesCommand { get; set; }
-        public ICommand PlaceAnnotationCommand { get; set; }
-        private void GetSpotDimentionTypes(object p) {
+        public ICommand GetSpotDimensionTypesCommand { get; set; }
+
+        public IEnumerable<SpotDimension> GetSpotDimensions() => _revitRepository.GetSpotDimensions(SelectionMode);
+
+        private void GetSpotDimensionTypes(object p) {
             SpotDimentionTypes = _revitRepository
                 .GetSpotDimentionTypeNames(SelectionMode)
                 .ToList();
-        }
-        private void PlaceAnnotaions(object p) {
-
         }
     }
 }
