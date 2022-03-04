@@ -154,16 +154,16 @@ namespace RevitLintelPlacement.ViewModels {
             using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
 
                 foreach(var elementInWall in elementInWalls) {
-                    var elementInWallFixation = elementInWall.LookupParameter(_revitRepository.LintelsCommonConfig.OpeningFixation);
-                    if(elementInWallFixation == null) {
-                        ElementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id, InfoElement.MissingOpeningParameter.FormatMessage(
-                            elementInWall.Name, _revitRepository.LintelsCommonConfig.OpeningFixation)));
-                    } else {
-                        var value = elementInWallFixation.AsInteger();
-                        if(elementInWallFixation.AsInteger() == 1) {
+                    var elementInWallFixation = elementInWall.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningFixation, 0);
+                    //if(elementInWallFixation == null) {
+                    //    ElementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id, InfoElement.MissingOpeningParameter.FormatMessage(
+                    //        elementInWall.Name, _revitRepository.LintelsCommonConfig.OpeningFixation)));
+                    //} else {
+                        var value = (int) elementInWallFixation;
+                        if(value == 1) {
                             continue;
                         }
-                    }
+                    //}
                     var rule = GroupedRules.GetRule(elementInWall);
                     if(rule == null)
                         continue;
@@ -188,10 +188,8 @@ namespace RevitLintelPlacement.ViewModels {
                         lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftOffset, leftOffset > 0 ? leftOffset : 0);
                         lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftCorner, 1);
                     }
-                    //_revitRepository.LockLintel(elevation, plan, lintel, elementInWall);
                     lintels.Add(new LintelInfoViewModel(_revitRepository, lintel, elementInWall));
                 }
-
                 t.Commit();
             }
             using(Transaction t = _revitRepository.StartTransaction("Закрепление перемычек")) {

@@ -38,9 +38,9 @@
                 <Image Source="../Resources/icons8-save-as.png"/>
             </Button>
             <Separator/>
-            <Button ToolTip="Просмотреть отчет" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path = DataContext.ShowReportCommand}">
+            <!--<Button ToolTip="Просмотреть отчет" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path = DataContext.ShowReportCommand}">
                 <Image Source="../Resources/icons8-report.png"/>
-            </Button>
+            </Button>-->
         </ToolBar>
         <StackPanel Grid.Row="1" Margin="10" Orientation="Vertical" HorizontalAlignment="Left">
             <TextBlock FontSize="14" Margin="5 0 0 5">Конфигурация настроек</TextBlock>

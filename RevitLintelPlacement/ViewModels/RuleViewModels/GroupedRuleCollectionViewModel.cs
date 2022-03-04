@@ -113,7 +113,7 @@ namespace RevitLintelPlacement.ViewModels {
                             _revitRepository.RuleConfigs.Remove(string.Empty);
                             InitializeRulePaths();
                             InitializeGroupRules();
-                        } else {
+                        } else if(result == TaskDialogResult.CommandLink2) {
                             SaveAsCommand.Execute(null);
                             _revitRepository.RuleConfigs.Remove(string.Empty);
                             InitializeRulePaths();

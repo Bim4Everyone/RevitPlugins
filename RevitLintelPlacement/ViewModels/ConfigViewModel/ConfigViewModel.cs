@@ -147,7 +147,7 @@ namespace RevitLintelPlacement.ViewModels {
 
         public List<ParameterViewModel> LintelLeftOffsetParameters {
             get => _lintelLeftOffsetParameters;
-            set => _lintelLeftOffsetParameters = value;
+            set => this.RaiseAndSetIfChanged(ref _lintelLeftOffsetParameters, value);
         }
 
         public List<ParameterViewModel> LintelLeftCornerParameters {
