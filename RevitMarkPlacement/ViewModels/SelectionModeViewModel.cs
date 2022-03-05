@@ -15,28 +15,34 @@ using RevitMarkPlacement.Models;
 namespace RevitMarkPlacement.ViewModels {
     internal class SelectionModeViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private List<string> _spotDimentionTypes;
+        private List<SpotDimensionTypeViewModel> _spotDimentionTypes;
 
         public SelectionModeViewModel(RevitRepository revitRepository, ISelectionMode selectionMode, string description) {
-            this._revitRepository = revitRepository;
-            SelectionMode = selectionMode;
+            _revitRepository = revitRepository;
+            
             Description = description;
-            GetSpotDimensionTypesCommand = new RelayCommand(GetSpotDimensionTypes);
+            SelectionMode = selectionMode;
+            
             GetSpotDimensionTypes(null);
+            GetSpotDimensionTypesCommand = new RelayCommand(GetSpotDimensionTypes);
         }
+        
         public string Description { get; set; }
-        public List<string> SpotDimentionTypes { 
-            get => _spotDimentionTypes; 
-            set => this.RaiseAndSetIfChanged(ref _spotDimentionTypes, value); 
-        }
         public ISelectionMode SelectionMode { get; set; }
         public ICommand GetSpotDimensionTypesCommand { get; set; }
+
+        public List<SpotDimensionTypeViewModel> SpotDimentionTypes {
+            get => _spotDimentionTypes;
+            set => this.RaiseAndSetIfChanged(ref _spotDimentionTypes, value);
+        }
+
 
         public IEnumerable<SpotDimension> GetSpotDimensions() => _revitRepository.GetSpotDimensions(SelectionMode);
 
         private void GetSpotDimensionTypes(object p) {
             SpotDimentionTypes = _revitRepository
                 .GetSpotDimentionTypeNames(SelectionMode)
+                .Select(item => new SpotDimensionTypeViewModel(item))
                 .ToList();
         }
     }
