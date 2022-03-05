@@ -134,11 +134,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Reference Include="WindowsBase" />
-		<Reference Include="PresentationCore" />
-		<Reference Include="PresentationFramework" />
-		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
-		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+		<Reference Include="WindowsBase"/>
+		<Reference Include="PresentationCore"/>
+		<Reference Include="PresentationFramework"/>
+		<PackageReference Include="Microsoft.CSharp" Version="4.7.0"/>
+		<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0"/>
+		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0"/>
 	</ItemGroup>
 </Project>

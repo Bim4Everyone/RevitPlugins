@@ -15,6 +15,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using DevExpress.Xpf.Core;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
@@ -23,6 +25,11 @@ using pyRevitLabs.Json;
 
 namespace dosymep.WPF.Views {
     public class PlatformWindow : Window {
+        public PlatformWindow() {
+            ApplicationThemeHelper.ApplicationThemeName = null;
+            ThemeManager.SetThemeName(this, Theme.Win10DarkName);
+        }
+
         /// <summary>
         /// Наименование плагина.
         /// </summary>
@@ -44,7 +51,7 @@ namespace dosymep.WPF.Views {
 
         protected override void OnClosing(CancelEventArgs e) {
             base.OnClosing(e);
-            
+
             PlatformWindowConfig config = GetProjectConfig();
             config.WindowPlacement = this.GetPlacement();
             config.SaveProjectConfig();
@@ -70,10 +77,10 @@ namespace dosymep.WPF.Views {
     public static class UnsafeNativeMethods {
         private const int SW_SHOWNORMAL = 1;
         private const int SW_SHOWMINIMIZED = 2;
-        
+
         [DllImport("user32.dll")]
         private static extern bool GetWindowPlacement(IntPtr hWnd, out WINDOWPLACEMENT lpwndpl);
-        
+
         [DllImport("user32.dll")]
         private static extern bool SetWindowPlacement(IntPtr hWnd, [In] ref WINDOWPLACEMENT lpwndpl);
 
@@ -84,7 +91,7 @@ namespace dosymep.WPF.Views {
         public static void SetPlacement(this Window window, WINDOWPLACEMENT placement) {
             SetPlacement(new WindowInteropHelper(window).Handle, placement);
         }
-        
+
         private static WINDOWPLACEMENT GetPlacement(IntPtr windowHandle) {
             GetWindowPlacement(windowHandle, out WINDOWPLACEMENT placement);
             return placement;
@@ -97,7 +104,7 @@ namespace dosymep.WPF.Views {
             SetWindowPlacement(windowHandle, ref placement);
         }
     }
-    
+
     // RECT structure required by WINDOWPLACEMENT structure
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]

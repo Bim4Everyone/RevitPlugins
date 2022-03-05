@@ -13,15 +13,15 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             var colorDepthType = (RasterQualityType?) value;
             switch(colorDepthType) {
                 case RasterQualityType.Low:
-                return "Низкое";
+                    return "Низкое";
                 case RasterQualityType.Medium:
-                return "Среднее";
+                    return "Среднее";
                 case RasterQualityType.High:
-                return "Высокое";
+                    return "Высокое";
                 case RasterQualityType.Presentation:
-                return "Презентационное";
+                    return "Презентационное";
                 default:
-                return null;
+                    return null;
             }
         }
 
@@ -29,15 +29,15 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             var marginType = (string) value;
             switch(marginType) {
                 case "Низкое":
-                return RasterQualityType.Low;
+                    return RasterQualityType.Low;
                 case "Среднее":
-                return RasterQualityType.Medium;
+                    return RasterQualityType.Medium;
                 case "Высокое":
-                return RasterQualityType.High;
+                    return RasterQualityType.High;
                 case "Презентационное":
-                return RasterQualityType.Presentation;
+                    return RasterQualityType.Presentation;
                 default:
-                return null;
+                    return null;
             }
         }
 
@@ -48,7 +48,7 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
 
     internal class RasterQualityTypeExtension : MarkupExtension {
         public override object ProvideValue(IServiceProvider serviceProvider) {
-            return new[] { "Низкое", "Среднее", "Высокое", "Презентационное" };
+            return new[] {"Низкое", "Среднее", "Высокое", "Презентационное"};
         }
     }
 }

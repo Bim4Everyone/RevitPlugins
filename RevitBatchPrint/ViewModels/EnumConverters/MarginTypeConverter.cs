@@ -13,13 +13,13 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             var marginType = (MarginType?) value;
             switch(marginType) {
                 case MarginType.NoMargin:
-                return "Без полей";
+                    return "Без полей";
                 case MarginType.PrinterLimit:
-                return "Пределы принтера";
+                    return "Пределы принтера";
                 case MarginType.UserDefined:
-                return "Пользовательские";
+                    return "Пользовательские";
                 default:
-                return null;
+                    return null;
             }
         }
 
@@ -27,13 +27,13 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             var marginType = (string) value;
             switch(marginType) {
                 case "Без полей":
-                return MarginType.NoMargin;
+                    return MarginType.NoMargin;
                 case "Пределы принтера":
-                return MarginType.PrinterLimit;
+                    return MarginType.PrinterLimit;
                 case "Пользовательские":
-                return MarginType.UserDefined;
+                    return MarginType.UserDefined;
                 default:
-                return null;
+                    return null;
             }
         }
 
@@ -44,7 +44,7 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
 
     internal class MarginTypeExtension : MarkupExtension {
         public override object ProvideValue(IServiceProvider serviceProvider) {
-            return new[] { "Без полей", "Пределы принтера", "Пользовательские" };
+            return new[] {"Без полей", "Пределы принтера", "Пользовательские"};
         }
     }
 }
