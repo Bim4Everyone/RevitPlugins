@@ -8,7 +8,7 @@ namespace RevitMarkPlacement.Models {
         public IEnumerable<SpotDimension> GetSpotDimentions(Document doc) {
             return new FilteredElementCollector(doc)
             .OfClass(typeof(SpotDimension))
-            .Cast<SpotDimension>();
+            .OfType<SpotDimension>();
         }
     }
 }
