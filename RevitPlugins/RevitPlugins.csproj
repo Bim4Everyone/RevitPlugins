@@ -54,6 +54,7 @@
 			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\$(RevitVersion)\dosymep.Bim4Everyone.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+		
 		<Reference Include="dosymep.Revit">
 			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\$(RevitVersion)\dosymep.Revit.dll</HintPath>
 			<Private>False</Private>
@@ -88,12 +89,10 @@
 			<HintPath>$(ProgramW6432)\Autodesk\Revit $(RevitVersion)\RevitAPIUI.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
-		<Reference Include="WindowsBase" />
-		
-		
 	</ItemGroup>
 
 	<ItemGroup>
+		<Reference Include="WindowsBase" />
 		<Reference Include="PresentationCore" />
 		<Reference Include="PresentationFramework" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
