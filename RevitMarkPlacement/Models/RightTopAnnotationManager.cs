@@ -15,7 +15,7 @@ namespace RevitMarkPlacement.Models {
             var elevSymbol = _revitRepository.GetElement(elevSymbolId) as FamilySymbol;
             var width = (double) elevSymbol.GetParamValueOrDefault("Длина полки");
             var height = (double) elevSymbol.GetParamValueOrDefault("Высота полки");
-            var textHieght = 1.7 *(double) spot.SpotDimensionType.GetParamValueOrDefault("Размер текста"); // умножение на 1,7 из-за рамки вокруг текста
+            var textHieght = 1.7 *(double) spot.SpotDimensionType.GetParamValueOrDefault(BuiltInParameter.TEXT_SIZE); // умножение на 1,7 из-за рамки вокруг текста
             var bb = spot.get_BoundingBox(spot.View);
             var scale = spot.View.Scale;
             return new XYZ(bb.Max.X - width * scale, bb.Max.Y, bb.Max.Z - (textHieght + height) * scale);

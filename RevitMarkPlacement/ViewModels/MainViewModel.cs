@@ -24,6 +24,7 @@ namespace RevitMarkPlacement.ViewModels {
         private SelectionModeViewModel _selectedMode;
         private List<IFloorHeightProvider> _floorHeightProviders;
         private IFloorHeightProvider _selectedFloorHeightProvider;
+        private string _errorText;
 
         public MainViewModel(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
@@ -42,6 +43,11 @@ namespace RevitMarkPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedParameterName, value);
         }
 
+        public string ErrorText { 
+            get => _errorText; 
+            set => this.RaiseAndSetIfChanged(ref _errorText, value); 
+        }
+
         public SelectionModeViewModel SelectedMode {
             get => _selectedMode;
             set => this.RaiseAndSetIfChanged(ref _selectedMode, value);
@@ -52,9 +58,9 @@ namespace RevitMarkPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _floorHeightProviders, value);
         }
 
-        public IFloorHeightProvider SelectedFloorHeightProvider { 
-            get => _selectedFloorHeightProvider; 
-            set => this.RaiseAndSetIfChanged(ref _selectedFloorHeightProvider, value); 
+        public IFloorHeightProvider SelectedFloorHeightProvider {
+            get => _selectedFloorHeightProvider;
+            set => this.RaiseAndSetIfChanged(ref _selectedFloorHeightProvider, value);
         }
 
         public List<SelectionModeViewModel> SelectionModes {
@@ -81,7 +87,7 @@ namespace RevitMarkPlacement.ViewModels {
         }
 
         private void PlaceAnnotation(object p) {
-            var spots = _revitRepository.GetSpotDimensions(SelectedMode.SelectionMode).ToList();           
+            var spots = _revitRepository.GetSpotDimensions(SelectedMode.SelectionMode).ToList();
             var annotations = _revitRepository.GetAnnotations().ToList();
             List<TemplateLevelMark> marks = new List<TemplateLevelMark>();
             var annotationManagers = GetAnnotationManagers();
