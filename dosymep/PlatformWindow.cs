@@ -24,12 +24,12 @@ using dosymep.Serializers;
 using pyRevitLabs.Json;
 
 namespace dosymep.WPF.Views {
-    public class PlatformWindow : Window {
+    public class PlatformWindow : dosymep.Xpf.Core.BaseWindow {
         public PlatformWindow() {
             ApplicationThemeHelper.ApplicationThemeName = null;
             ThemeManager.SetThemeName(this, Theme.Win10DarkName);
         }
-
+        
         /// <summary>
         /// Наименование плагина.
         /// </summary>
@@ -42,7 +42,7 @@ namespace dosymep.WPF.Views {
 
         protected override void OnSourceInitialized(EventArgs e) {
             base.OnSourceInitialized(e);
-
+            
             PlatformWindowConfig config = GetProjectConfig();
             if(config.WindowPlacement.HasValue) {
                 this.SetPlacement(config.WindowPlacement.Value);
