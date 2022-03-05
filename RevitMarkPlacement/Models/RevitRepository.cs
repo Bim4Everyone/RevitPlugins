@@ -116,6 +116,14 @@ namespace RevitMarkPlacement.Models {
             }
         }
 
+        public void DeleteElement(Element element) {
+            using(Transaction t = new Transaction(_document)) {
+                t.BIMStart("Удаление элемента");
+                _document.Delete(element.Id);
+                t.Commit();
+            }
+        }
+
         private bool IsNeededAnnotationSymbol(FamilySymbol symbol, string typeName, string familyName) {
             return symbol.Name.Equals(typeName, StringComparison.CurrentCultureIgnoreCase)
                     && symbol.Family.Name.Equals(familyName, StringComparison.CurrentCultureIgnoreCase);

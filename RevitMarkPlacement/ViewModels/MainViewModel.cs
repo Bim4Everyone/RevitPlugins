@@ -9,6 +9,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -80,37 +81,43 @@ namespace RevitMarkPlacement.ViewModels {
         }
 
         private void PlaceAnnotation(object p) {
-            var spots = _revitRepository.GetSpotDimensions(SelectedMode.SelectionMode).ToList();
-            AnnotationManager am = null;
-            var rightTop = new RightTopAnnotationManager(_revitRepository);
-            var leftTop = new LeftTopAnnotationManager(_revitRepository);
-            var leftBottom = new LeftBottomAnnotationManager(_revitRepository);
-            var rightBottom = new RightBottomAnnotationManager(_revitRepository);
+            var spots = _revitRepository.GetSpotDimensions(SelectedMode.SelectionMode).ToList();           
+            var annotations = _revitRepository.GetAnnotations().ToList();
+            List<TemplateLevelMark> marks = new List<TemplateLevelMark>();
+            var annotationManagers = GetAnnotationManagers();
+            foreach(var annotation in annotations) {
+                var spotId = (int) annotation.GetParamValueOrDefault("Id высотной отметки");
+                var spot = _revitRepository.GetElement(new ElementId(spotId)) as SpotDimension;
+                if(spot == null) {
+                    _revitRepository.DeleteElement(annotation);
+                }
+                if(spots.Contains(spot, new ElementNameEquatable<SpotDimension>())) {
+                    marks.Add(new TemplateLevelMark(spot, annotationManagers[_revitRepository.GetSpotOrientation(spot)], annotation));
+                }
+            }
+            marks.AddRange(spots
+                .Except(marks.Select(m => m.SpotDimension), new ElementNameEquatable<SpotDimension>())
+                .Select(s => new TemplateLevelMark(s, annotationManagers[_revitRepository.GetSpotOrientation(s)])));
+
             using(TransactionGroup t = _revitRepository.StartTransactionGroup("Обновление и расстановка аннотаций")) {
-                foreach(var spot in spots) {
-                    var orientation = _revitRepository.GetSpotOrientation(spot);
-                    switch(orientation) {
-                        case SpotOrientation.RightTop: {
-                            am = rightTop;
-                            break;
-                        }
-                        case SpotOrientation.RightBottom: {
-                            am = rightBottom;
-                            break;
-                        }
-                        case SpotOrientation.LeftBottom: {
-                            am = leftBottom;
-                            break;
-                        }
-                        case SpotOrientation.LeftTop: {
-                            am = leftTop;
-                            break;
-                        }
+                foreach(var mark in marks) {
+                    if(mark.Annotation == null) {
+                        mark.CreateAnnotation(FloorCount, SelectedFloorHeightProvider.GetFloorHeight());
+                    } else {
+                        mark.UpdateAnnotation(FloorCount, SelectedFloorHeightProvider.GetFloorHeight());
                     }
-                    am?.CreateAnnotation(spot, FloorCount, SelectedFloorHeightProvider.GetFloorHeight());
                 }
                 t.Assimilate();
             }
+        }
+
+        private Dictionary<SpotOrientation, AnnotationManager> GetAnnotationManagers() {
+            return new Dictionary<SpotOrientation, AnnotationManager> {
+                { SpotOrientation.RightTop, new RightTopAnnotationManager(_revitRepository) },
+                { SpotOrientation.LeftTop, new LeftTopAnnotationManager(_revitRepository) },
+                { SpotOrientation.LeftBottom, new LeftBottomAnnotationManager(_revitRepository) },
+                { SpotOrientation.RightBottom, new RightBottomAnnotationManager(_revitRepository) }
+            };
         }
     }
 }

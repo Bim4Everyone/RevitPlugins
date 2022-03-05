@@ -9,8 +9,7 @@ namespace RevitMarkPlacement.Models {
             _type = _revitRepository.GetAnnotationSymbolType(RevitRepository.TypeBottom, RevitRepository.FamilyBottom);
         }
 
-        protected override void SetParameters(FamilyInstance annotation, double level, int count, double typicalFloorHeight) {
-            base.SetParameters(annotation, level, count, typicalFloorHeight);
+        protected override void MirrorAnnotation(FamilyInstance annotation) {
             using(Transaction t = _revitRepository.StartTransaction("Поворот аннотации")) {
                 _revitRepository.MirrorAnnotation(annotation);
                 t.Commit();
