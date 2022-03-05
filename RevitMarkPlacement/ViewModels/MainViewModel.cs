@@ -80,41 +80,37 @@ namespace RevitMarkPlacement.ViewModels {
         }
 
         private void PlaceAnnotation(object p) {
-            var spots = _revitRepository.GetSpotDimensions(SelectedMode.SelectionMode);
+            var spots = _revitRepository.GetSpotDimensions(SelectedMode.SelectionMode).ToList();
             AnnotationManager am = null;
-            var rtam = new RightTopAnnotationManager(_revitRepository);
-            using(Transaction t = _revitRepository.StartTransaction("Обновление и расстановка аннотаций")) {
+            var rightTop = new RightTopAnnotationManager(_revitRepository);
+            var leftTop = new LeftTopAnnotationManager(_revitRepository);
+            var leftBottom = new LeftBottomAnnotationManager(_revitRepository);
+            var rightBottom = new RightBottomAnnotationManager(_revitRepository);
+            using(TransactionGroup t = _revitRepository.StartTransactionGroup("Обновление и расстановка аннотаций")) {
                 foreach(var spot in spots) {
                     var orientation = _revitRepository.GetSpotOrientation(spot);
                     switch(orientation) {
                         case SpotOrientation.RightTop: {
-                            am = rtam;
+                            am = rightTop;
                             break;
                         }
                         case SpotOrientation.RightBottom: {
-                            am = null;
+                            am = rightBottom;
                             break;
                         }
                         case SpotOrientation.LeftBottom: {
-                            am = null;
+                            am = leftBottom;
                             break;
                         }
                         case SpotOrientation.LeftTop: {
-                            am = null;
+                            am = leftTop;
                             break;
                         }
                     }
-                    am?.UpdateAndPlaceAnnotation(spot, null, FloorCount, SelectedFloorHeightProvider.GetFloorHeight());
+                    am?.CreateAnnotation(spot, FloorCount, SelectedFloorHeightProvider.GetFloorHeight());
                 }
-                t.Commit();
+                t.Assimilate();
             }
         }
-    }
-
-    internal enum ParameterMode {
-        [Description("Индивидульная настройка")]
-        Individual,
-        [Description("По глобальному параметру")]
-        GlobalParameter
     }
 }

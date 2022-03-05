@@ -4,9 +4,9 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 
 namespace RevitMarkPlacement.Models {
-    internal class RightTopAnnotationManager : AnnotationManager {
-        public RightTopAnnotationManager(RevitRepository revitRepository) : base(revitRepository) {
-            _type = _revitRepository.GetAnnotationSymbolType(RevitRepository.TypeTop, RevitRepository.FamilyTop);
+    internal class RightBottomAnnotationManager : AnnotationManager {
+        public RightBottomAnnotationManager(RevitRepository revitRepository) : base(revitRepository) {
+            _type = _revitRepository.GetAnnotationSymbolType(RevitRepository.TypeBottom, RevitRepository.FamilyBottom);
         }
 
         protected override XYZ GetPlacePoint(SpotDimension spot) {
@@ -15,14 +15,12 @@ namespace RevitMarkPlacement.Models {
             var elevSymbol = _revitRepository.GetElement(elevSymbolId) as FamilySymbol;
             var width = (double) elevSymbol.GetParamValueOrDefault("Длина полки");
             var height = (double) elevSymbol.GetParamValueOrDefault("Высота полки");
-            var textHieght = 1.7 *(double) spot.SpotDimensionType.GetParamValueOrDefault("Размер текста"); // умножение на 1,7 из-за рамки вокруг текста
             var bb = spot.get_BoundingBox(spot.View);
             var scale = spot.View.Scale;
-            return new XYZ(bb.Max.X - width * scale, bb.Max.Y, bb.Max.Z - (textHieght + height) * scale);
+            return new XYZ(bb.Max.X - width * scale, bb.Min.Y, bb.Min.Z + height * scale);
 #else
             return spot.LeaderEndPosition;
 #endif
         }
     }
-
 }

@@ -9,12 +9,18 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.Revit.Comparators;
 using dosymep.WPF.ViewModels;
 
 using RevitMarkPlacement.ViewModels;
 
 namespace RevitMarkPlacement.Models {
     internal class RevitRepository : BaseViewModel {
+        public const string FamilyTop = "ТипАн_Отметка_ТипЭт_Разрез_Вверх";
+        public const string FamilyBottom = "ТипАн_Отметка_ТипЭт_Разрез_Вниз";
+        public const string TypeTop = "Вверх";
+        public const string TypeBottom = "Вниз";
+
         private readonly Application _application;
         private readonly UIApplication _uiApplication;
 
@@ -29,19 +35,18 @@ namespace RevitMarkPlacement.Models {
             _uiDocument = new UIDocument(document);
         }
 
-        public IEnumerable<string> GetSpotDimentionTypeNames(ISelectionMode selectionMode) {
+        public IEnumerable<SpotDimensionType> GetSpotDimentionTypeNames(ISelectionMode selectionMode) {
             return selectionMode.GetSpotDimentions(_document)
-                .Select(s => s.SpotDimensionType.Name)
-                .Distinct();
+                .Select(s => s.SpotDimensionType)
+                .Distinct(new ElementNameEquatable<SpotDimensionType>());
         }
 
-        public IEnumerable<GlobalParameterViewModel> GetGlobalParameters() {
+        public IEnumerable<GlobalParameter> GetDoubleGlobalParameters() {
             return GlobalParametersManager
                 .GetGlobalParametersOrdered(_document)
-                .Select(id=>_document.GetElement(id))
+                .Select(id => _document.GetElement(id))
                 .Cast<GlobalParameter>()
-                .Where(p=>p.GetValue() is DoubleParameterValue)
-                .Select(p => new GlobalParameterViewModel(p.Name, GetValue(p)));
+                .Where(p => p.GetValue() is DoubleParameterValue);
         }
 
         public FamilyInstance CreateAnnotation(FamilySymbol symbol, XYZ point, View view) {
@@ -65,8 +70,8 @@ namespace RevitMarkPlacement.Models {
 
         public IEnumerable<AnnotationSymbol> GetAnnotations() {
             var familyNames = new List<string>(){
-                "ТипАн_Отметка_ТипЭт_Разрез_Вверх",
-                "ТипАн_Отметка_ТипЭт_Разрез_Вниз"
+                FamilyTop,
+                FamilyBottom
             };
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(FamilyInstance))
@@ -74,21 +79,16 @@ namespace RevitMarkPlacement.Models {
                 .Where(item => IsNeededAnnotationInstance(item, familyNames));
         }
 
-        public Transaction StartTransaction(string text) {
-            var t = new Transaction(_document);
+        public TransactionGroup StartTransactionGroup(string text) {
+            var t = new TransactionGroup(_document);
             t.BIMStart(text);
             return t;
         }
 
-        private bool IsNeededAnnotationSymbol(FamilySymbol symbol, string typeName, string familyName) {
-            return symbol.Name.Equals(typeName, StringComparison.CurrentCultureIgnoreCase)
-                    && symbol.Family.Name.Equals(familyName, StringComparison.CurrentCultureIgnoreCase);
-        }
-
-        private bool IsNeededAnnotationInstance(AnnotationSymbol instance, IEnumerable<string> familyNames) {
-            return instance.Symbol != null
-                    && instance.Symbol.Family != null
-                    && familyNames.Any(n => n.Equals(instance.Symbol.Family.Name, StringComparison.CurrentCultureIgnoreCase));
+        public Transaction StartTransaction(string text) {
+            var t = new Transaction(_document);
+            t.BIMStart(text);
+            return t;
         }
 
         public SpotOrientation GetSpotOrientation(SpotDimension spot) {
@@ -108,12 +108,23 @@ namespace RevitMarkPlacement.Models {
             }
         }
 
-        private double GetValue(GlobalParameter parameter) {
-#if D2020 || R2020
-            return Math.Round(UnitUtils.ConvertFromInternalUnits((parameter.GetValue() as DoubleParameterValue).Value, DisplayUnitType.DUT_MILLIMETERS));
-#else
-            return Math.Round(UnitUtils.ConvertFromInternalUnits((parameter.GetValue() as DoubleParameterValue).Value, UnitTypeId.Millimeters));
-#endif
+        public void MirrorAnnotation(FamilyInstance annotation) {
+            if(annotation.Location is LocationPoint point) {
+                Plane plane = Plane.CreateByNormalAndOrigin(new XYZ(1, 0, 0), point.Point);
+                ElementTransformUtils.MirrorElement(_document, annotation.Id, plane);
+                _document.Delete(annotation.Id);
+            }
+        }
+
+        private bool IsNeededAnnotationSymbol(FamilySymbol symbol, string typeName, string familyName) {
+            return symbol.Name.Equals(typeName, StringComparison.CurrentCultureIgnoreCase)
+                    && symbol.Family.Name.Equals(familyName, StringComparison.CurrentCultureIgnoreCase);
+        }
+
+        private bool IsNeededAnnotationInstance(AnnotationSymbol instance, IEnumerable<string> familyNames) {
+            return instance.Symbol != null
+                    && instance.Symbol.Family != null
+                    && familyNames.Contains(instance.Symbol.Family.Name, StringComparer.CurrentCultureIgnoreCase);
         }
     }
 
@@ -122,5 +133,15 @@ namespace RevitMarkPlacement.Models {
         RightTop,
         LeftBottom,
         RightBottom
+    }
+
+    internal class ElementNameEquatable<T> : IEqualityComparer<T> where T : Element {
+        public bool Equals(T x, T y) {
+            return x?.Id == y?.Id;
+        }
+
+        public int GetHashCode(T obj) {
+            return obj?.Id.GetHashCode() ?? 0;
+        }
     }
 }
