@@ -6,8 +6,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-using DevExpress.Mvvm.Native;
-
 namespace dosymep {
     internal class AppDomainExtensions {
         public static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args) {
@@ -17,10 +15,10 @@ namespace dosymep {
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 @"pyRevit\Extensions\BIM4Everyone.lib");
             
-            if(assemblyName.Name.StartsWith("DevExpress")) {
+            if(assemblyName.Name.StartsWith("DevExpress.")) {
                 assemblyPath = Path.Combine(assemblyPath, "devexpress_libs", "libs");
             }
-
+            
             assemblyPath = Path.Combine(assemblyPath, assemblyName.Name + ".dll");
             return File.Exists(assemblyPath) ? Assembly.LoadFrom(assemblyPath) : null;
         }

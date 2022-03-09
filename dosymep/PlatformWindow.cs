@@ -27,7 +27,7 @@ namespace dosymep.WPF.Views {
     public class PlatformWindow : dosymep.Xpf.Core.BaseWindow {
         public PlatformWindow() {
             ApplicationThemeHelper.ApplicationThemeName = null;
-            ThemeManager.SetThemeName(this, Theme.Win10DarkName);
+            ThemeManager.SetThemeName(this, Theme.Win10LightName);
         }
         
         /// <summary>
