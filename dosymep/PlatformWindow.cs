@@ -19,17 +19,14 @@ using DevExpress.Xpf.Core;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Serializers;
+using dosymep.SimpleServices;
 
 using pyRevitLabs.Json;
 
 namespace dosymep.WPF.Views {
-    public class PlatformWindow : dosymep.Xpf.Core.BaseWindow {
-        public PlatformWindow() {
-            ApplicationThemeHelper.ApplicationThemeName = null;
-            ThemeManager.SetThemeName(this, Theme.Win10LightName);
-        }
-        
+    public class PlatformWindow : Window {
         /// <summary>
         /// Наименование плагина.
         /// </summary>
@@ -40,9 +37,24 @@ namespace dosymep.WPF.Views {
         /// </summary>
         public virtual string ProjectConfigName { get; }
 
+        /// <summary>
+        /// Предоставляет доступ к настройкам темы платформы.
+        /// </summary>
+        private IUIThemeService UIThemeService => GetPlatformService<IUIThemeService>();
+
+        protected T GetPlatformService<T>() {
+            return ServicesProvider.GetPlatformService<T>();
+        }
+
         protected override void OnSourceInitialized(EventArgs e) {
             base.OnSourceInitialized(e);
-            
+
+            if(UIThemeService.HostTheme == UIThemes.Dark) {
+                ThemeManager.SetThemeName(this, Theme.Win10DarkName);
+            } else if(UIThemeService.HostTheme == UIThemes.Light) {
+                ThemeManager.SetThemeName(this, Theme.Win10LightName);
+            }
+
             PlatformWindowConfig config = GetProjectConfig();
             if(config.WindowPlacement.HasValue) {
                 this.SetPlacement(config.WindowPlacement.Value);
