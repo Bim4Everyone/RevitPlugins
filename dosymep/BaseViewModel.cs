@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
+using dosymep.Bim4Everyone.SimpleServices;
+
 namespace dosymep.WPF.ViewModels {
     internal class BaseViewModel : dosymep.Xpf.Core.BaseViewModel {
         protected void RaiseAndSetIfChanged<TRet>(ref TRet backingField, TRet newValue,
@@ -10,6 +12,10 @@ namespace dosymep.WPF.ViewModels {
                 backingField = newValue;
                 RaisePropertyChanged(propertyName);
             }
+        }
+
+        protected T GetPlatformService<T>() {
+            return ServicesProvider.GetPlatformService<T>();
         }
     }
 }
