@@ -15,11 +15,9 @@ using pyRevitLabs.Json;
 
 namespace RevitBatchPrint.Models {
     public class PrintConfig : ProjectConfig<PrintSettingsConfig> {
-        [JsonIgnore]
-        public override string ProjectConfigPath { get; set; }
+        [JsonIgnore] public override string ProjectConfigPath { get; set; }
 
-        [JsonIgnore]
-        public override IConfigSerializer Serializer { get; set; }
+        [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
 
         public static PrintConfig GetPrintConfig() {
             return new ProjectConfigBuilder()

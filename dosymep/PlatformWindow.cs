@@ -15,14 +15,22 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using DevExpress.Xpf.Core;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Serializers;
+using dosymep.SimpleServices;
 
 using pyRevitLabs.Json;
 
 namespace dosymep.WPF.Views {
     public class PlatformWindow : Window {
+        public PlatformWindow() {
+            UIThemeService.UIThemeChanged += OnUIThemeChanged;
+        }
+
         /// <summary>
         /// Наименование плагина.
         /// </summary>
@@ -33,8 +41,19 @@ namespace dosymep.WPF.Views {
         /// </summary>
         public virtual string ProjectConfigName { get; }
 
+        /// <summary>
+        /// Предоставляет доступ к настройкам темы платформы.
+        /// </summary>
+        private IUIThemeService UIThemeService => GetPlatformService<IUIThemeService>();
+
+        protected T GetPlatformService<T>() {
+            return ServicesProvider.GetPlatformService<T>();
+        }
+
         protected override void OnSourceInitialized(EventArgs e) {
             base.OnSourceInitialized(e);
+
+            UpdateTheme();
 
             PlatformWindowConfig config = GetProjectConfig();
             if(config.WindowPlacement.HasValue) {
@@ -45,6 +64,8 @@ namespace dosymep.WPF.Views {
         protected override void OnClosing(CancelEventArgs e) {
             base.OnClosing(e);
             
+            UIThemeService.UIThemeChanged -= OnUIThemeChanged;
+
             PlatformWindowConfig config = GetProjectConfig();
             config.WindowPlacement = this.GetPlacement();
             config.SaveProjectConfig();
@@ -58,6 +79,18 @@ namespace dosymep.WPF.Views {
                 .SetProjectConfigName(ProjectConfigName + ".json")
                 .Build<PlatformWindowConfig>();
         }
+        
+        private void OnUIThemeChanged(UIThemes obj) {
+            UpdateTheme();
+        }
+        
+        private void UpdateTheme() {
+            if(UIThemeService.HostTheme == UIThemes.Dark) {
+                //ThemeManager.SetThemeName(this, Theme.Win10DarkName);
+            } else if(UIThemeService.HostTheme == UIThemes.Light) {
+                //ThemeManager.SetThemeName(this, Theme.Win10LightName);
+            }
+        }
     }
 
     public class PlatformWindowConfig : ProjectConfig {
@@ -70,10 +103,10 @@ namespace dosymep.WPF.Views {
     public static class UnsafeNativeMethods {
         private const int SW_SHOWNORMAL = 1;
         private const int SW_SHOWMINIMIZED = 2;
-        
+
         [DllImport("user32.dll")]
         private static extern bool GetWindowPlacement(IntPtr hWnd, out WINDOWPLACEMENT lpwndpl);
-        
+
         [DllImport("user32.dll")]
         private static extern bool SetWindowPlacement(IntPtr hWnd, [In] ref WINDOWPLACEMENT lpwndpl);
 
@@ -84,7 +117,7 @@ namespace dosymep.WPF.Views {
         public static void SetPlacement(this Window window, WINDOWPLACEMENT placement) {
             SetPlacement(new WindowInteropHelper(window).Handle, placement);
         }
-        
+
         private static WINDOWPLACEMENT GetPlacement(IntPtr windowHandle) {
             GetWindowPlacement(windowHandle, out WINDOWPLACEMENT placement);
             return placement;
@@ -97,7 +130,7 @@ namespace dosymep.WPF.Views {
             SetWindowPlacement(windowHandle, ref placement);
         }
     }
-    
+
     // RECT structure required by WINDOWPLACEMENT structure
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]

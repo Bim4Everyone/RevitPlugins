@@ -61,7 +61,8 @@ namespace RevitBatchPrint.Models {
                 bool hasFormatName = PrinterSettings.HasFormatName(printSettings.Format.Name);
                 if(!hasFormatName) {
                     // создаем новый формат в Windows, если не был найден подходящий
-                    PrinterSettings.AddFormat(printSettings.Format.Name, new System.Drawing.Size(printSettings.Format.Width, printSettings.Format.Height));
+                    PrinterSettings.AddFormat(printSettings.Format.Name,
+                        new System.Drawing.Size(printSettings.Format.Width, printSettings.Format.Height));
 
                     // перезагружаем в ревите принтер, чтобы появились изменения
                     _revitRepository.ReloadPrintSettings(PrinterName);
@@ -118,9 +119,10 @@ namespace RevitBatchPrint.Models {
                 .Select(item => (ViewSheet: item, ViewsWithoutCrop: _revitRepository.GetViewsWithoutCrop(item)))
                 .Where(item => item.ViewsWithoutCrop.Count > 0)
                 .Select(item => GetMessage(item.ViewSheet, item.ViewsWithoutCrop));
-            
+
             if(messages.Any()) {
-                Errors.Add("Листы у которые есть виды с отключенной подрезкой:" + Environment.NewLine + string.Join(Environment.NewLine, messages));
+                Errors.Add("Листы у которые есть виды с отключенной подрезкой:" + Environment.NewLine +
+                           string.Join(Environment.NewLine, messages));
             }
         }
 

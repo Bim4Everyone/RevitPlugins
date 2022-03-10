@@ -39,7 +39,8 @@ namespace RevitBatchPrint.Models.Printing {
                 Flags = WinSpool.FormFlags.FORM_USER,
                 StringType = WinSpool.FormStringType.STRING_NONE,
                 Size = new SIZE(formatSize.Width * coeff, formatSize.Height * coeff),
-                ImageableArea = new RECT(visibleArea.Left * coeff, visibleArea.Top * coeff, visibleArea.Right * coeff, visibleArea.Bottom * coeff)
+                ImageableArea = new RECT(visibleArea.Left * coeff, visibleArea.Top * coeff, visibleArea.Right * coeff,
+                    visibleArea.Bottom * coeff)
             };
 
             ThrowWin32Exception(WinSpool.AddForm(_shPrinter, in options));
@@ -52,7 +53,8 @@ namespace RevitBatchPrint.Models.Printing {
         private WinSpool.SafeHPRINTER OpenPrinter2(string printerName) {
             var pDefault = new WinSpool.PRINTER_DEFAULTS();
             var pOptions = WinSpool.PRINTER_OPTIONS.Default;
-            ThrowWin32Exception(WinSpool.OpenPrinter2(printerName, out WinSpool.SafeHPRINTER phPrinter, pDefault, in pOptions));
+            ThrowWin32Exception(WinSpool.OpenPrinter2(printerName, out WinSpool.SafeHPRINTER phPrinter, pDefault,
+                in pOptions));
 
             return phPrinter;
         }

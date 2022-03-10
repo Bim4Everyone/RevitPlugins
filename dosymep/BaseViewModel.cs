@@ -2,19 +2,20 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace dosymep.WPF.ViewModels {
-    internal class BaseViewModel : INotifyPropertyChanged {
-        public event PropertyChangedEventHandler PropertyChanged;
+using dosymep.Bim4Everyone.SimpleServices;
 
-        protected void RaiseAndSetIfChanged<TRet>(ref TRet backingField, TRet newValue, [CallerMemberName] string propertyName = null) {
+namespace dosymep.WPF.ViewModels {
+    internal class BaseViewModel : dosymep.Xpf.Core.BaseViewModel {
+        protected void RaiseAndSetIfChanged<TRet>(ref TRet backingField, TRet newValue,
+            [CallerMemberName] string propertyName = null) {
             if(!EqualityComparer<TRet>.Default.Equals(backingField, newValue)) {
                 backingField = newValue;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                RaisePropertyChanged(propertyName);
             }
         }
 
-        protected void RaisePropertyChanged([CallerMemberName] string propertyName = null) {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        protected T GetPlatformService<T>() {
+            return ServicesProvider.GetPlatformService<T>();
         }
     }
 }

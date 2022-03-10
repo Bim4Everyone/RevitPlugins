@@ -13,13 +13,13 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             var colorDepthType = (ColorDepthType?) value;
             switch(colorDepthType) {
                 case ColorDepthType.Color:
-                return "Цвет";
+                    return "Цвет";
                 case ColorDepthType.GrayScale:
-                return "Оттенки серого";
+                    return "Оттенки серого";
                 case ColorDepthType.BlackLine:
-                return "Черные линии";
+                    return "Черные линии";
                 default:
-                return null;
+                    return null;
             }
         }
 
@@ -27,13 +27,13 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             var marginType = (string) value;
             switch(marginType) {
                 case "Цвет":
-                return ColorDepthType.Color;
+                    return ColorDepthType.Color;
                 case "Оттенки серого":
-                return ColorDepthType.GrayScale;
+                    return ColorDepthType.GrayScale;
                 case "Черные линии":
-                return ColorDepthType.BlackLine;
+                    return ColorDepthType.BlackLine;
                 default:
-                return null;
+                    return null;
             }
         }
 
@@ -41,10 +41,10 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             return this;
         }
     }
-   
+
     internal class ColorDepthTypeExtension : MarkupExtension {
         public override object ProvideValue(IServiceProvider serviceProvider) {
-            return new[] { "Цвет", "Оттенки серого", "Черные линии" };
+            return new[] {"Цвет", "Оттенки серого", "Черные линии"};
         }
     }
 }
