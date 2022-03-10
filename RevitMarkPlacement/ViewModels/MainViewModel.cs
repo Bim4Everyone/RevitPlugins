@@ -17,18 +17,27 @@ using RevitMarkPlacement.Models;
 
 namespace RevitMarkPlacement.ViewModels {
     internal class MainViewModel : BaseViewModel {
+        private const string _allElementsSelection = "Создать по всему проекту";
+        private const string _selectedElements = "Создать по выбранным элементам";
         private readonly RevitRepository _revitRepository;
+        private readonly AnnotationsConfig _config;
         private string _floorCount;
         private string _selectedParameterName;
-        private List<SelectionModeViewModel> _selectionModes;
-        private SelectionModeViewModel _selectedMode;
-        private List<IFloorHeightProvider> _floorHeightProviders;
-        private IFloorHeightProvider _selectedFloorHeightProvider;
         private string _errorText;
-        private string _userSettingErrorText;
+        private IFloorHeightProvider _selectedFloorHeightProvider;
+        private SelectionModeViewModel _selectedMode;
+        private AnnotationsSettings _settings;
+        private List<SelectionModeViewModel> _selectionModes;
+        private List<IFloorHeightProvider> _floorHeightProviders;
 
-        public MainViewModel(RevitRepository revitRepository) {
-            this._revitRepository = revitRepository;
+        public MainViewModel(RevitRepository revitRepository, AnnotationsConfig config) {
+            _revitRepository = revitRepository;
+            _config = config;
+            _settings = _revitRepository.GetSettings(_config);
+            if (_settings == null) {
+                _settings = _revitRepository.AddSettings(_config);
+            }
+            FloorCount = _settings.LevelCount.ToString();
             InitializeSelectionModes();
             InitializeFloorHeightProvider();
             PlaceAnnotationCommand = new RelayCommand(PlaceAnnotation, CanPlaceAnnotation);
@@ -73,18 +82,26 @@ namespace RevitMarkPlacement.ViewModels {
 
         private void InitializeSelectionModes() {
             SelectionModes = new List<SelectionModeViewModel>() {
-                new SelectionModeViewModel(_revitRepository, new AllElementsSelection(), "Создать по всему проекту"),
-                new SelectionModeViewModel(_revitRepository, new ElementsSelection(), "Создать по выбранным элементам")
+                new SelectionModeViewModel(_revitRepository, new AllElementsSelection(), _allElementsSelection),
+                new SelectionModeViewModel(_revitRepository, new ElementsSelection(), _selectedElements)
             };
-            SelectedMode = SelectionModes[1];
+            if(_settings.SelectionMode == SelectionMode.AllElements) {
+                SelectedMode = SelectionModes[0];
+            } else {
+                SelectedMode = SelectionModes[1];
+            }
         }
 
         private void InitializeFloorHeightProvider() {
             FloorHeightProviders = new List<IFloorHeightProvider>() {
-                new UserFloorHeightViewModel("Индивидуальная настройка"),
+                new UserFloorHeightViewModel("Индивидуальная настройка", _settings),
                 new GlobalFloorHeightViewModel(_revitRepository, "По глобальному параметру")
             };
-            SelectedFloorHeightProvider = FloorHeightProviders[1];
+            if(_settings.LevelHeightProvider == LevelHeightProvider.UserSettings) {
+                SelectedFloorHeightProvider = FloorHeightProviders[0];
+            } else {
+                SelectedFloorHeightProvider = FloorHeightProviders[1];
+            }
         }
 
         private void PlaceAnnotation(object p) {
@@ -116,6 +133,7 @@ namespace RevitMarkPlacement.ViewModels {
                 }
                 t.Assimilate();
             }
+            SaveConfig();
         }
 
         private bool CanPlaceAnnotation(object p) {
@@ -137,6 +155,26 @@ namespace RevitMarkPlacement.ViewModels {
             }
             ErrorText = null;
             return true;
+        }
+
+        private void SaveConfig() {
+            if(SelectedMode.Description == _allElementsSelection) {
+                _settings.SelectionMode = SelectionMode.AllElements;
+            } else {
+                _settings.SelectionMode = SelectionMode.SelectedElements;
+            }
+            _settings.LevelCount = int.Parse(FloorCount);
+            if(SelectedFloorHeightProvider is UserFloorHeightViewModel) {
+                _settings.LevelHeightProvider = LevelHeightProvider.UserSettings;
+            } else {
+                _settings.LevelHeightProvider = LevelHeightProvider.GlobalParameter;
+            }
+            foreach(var provider in FloorHeightProviders) {
+                if(provider is UserFloorHeightViewModel userFloorHeight) {
+                    _settings.LevelHeight = double.Parse(userFloorHeight.FloorHeight);
+                }
+            }
+            _config.SaveProjectConfig();
         }
 
         private Dictionary<SpotOrientation, AnnotationManager> GetAnnotationManagers() {

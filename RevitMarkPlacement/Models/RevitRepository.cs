@@ -124,6 +124,13 @@ namespace RevitMarkPlacement.Models {
             }
         }
 
+        public AnnotationsSettings GetSettings(AnnotationsConfig congig) {
+            return congig.GetSettings(_document);
+        }
+        public AnnotationsSettings AddSettings(AnnotationsConfig congig) {
+            return congig.AddSettings(_document);
+        }
+
         private bool IsNeededAnnotationSymbol(FamilySymbol symbol, string typeName, string familyName) {
             return symbol.Name.Equals(typeName, StringComparison.CurrentCultureIgnoreCase)
                     && symbol.Family.Name.Equals(familyName, StringComparison.CurrentCultureIgnoreCase);

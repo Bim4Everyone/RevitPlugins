@@ -12,14 +12,19 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using dosymep.WPF.Views;
+
 namespace RevitMarkPlacement.Views {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window {
+    public partial class MainWindow : PlatformWindow {
         public MainWindow() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitMarkPlacement);
+        public override string ProjectConfigName => nameof(MainWindow);
 
         private void Button_Click(object sender, RoutedEventArgs e) {
             this.Close();

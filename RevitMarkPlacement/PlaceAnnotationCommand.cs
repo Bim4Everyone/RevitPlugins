@@ -21,10 +21,11 @@ namespace RevitMarkPlacement {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
             AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
             try {
-                var viewModel = new MainViewModel(
-                    new RevitRepository(
-                        commandData.Application.Application, 
-                        commandData.Application.ActiveUIDocument.Document));
+                var config = AnnotationsConfig.GetAnnotationsConfig();
+                var revitRepository = new RevitRepository(
+                        commandData.Application.Application,
+                        commandData.Application.ActiveUIDocument.Document);
+                var viewModel = new MainViewModel(revitRepository, config);
                 var view = new MainWindow() { DataContext = viewModel };
                 view.ShowDialog();
             } catch(Exception ex) {
