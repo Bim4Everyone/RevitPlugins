@@ -36,8 +36,8 @@ namespace RevitMarkPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedGlobalParameter, value);
         }
 
-        public double GetFloorHeight() {
-            return SelectedGlobalParameter.Value;
+        public string GetFloorHeight() {
+            return SelectedGlobalParameter.Value.ToString();
         }
 
         private double GetValue(GlobalParameter parameter) {

@@ -18,22 +18,23 @@ using RevitMarkPlacement.Models;
 namespace RevitMarkPlacement.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private int _floorCount;
+        private string _floorCount;
         private string _selectedParameterName;
         private List<SelectionModeViewModel> _selectionModes;
         private SelectionModeViewModel _selectedMode;
         private List<IFloorHeightProvider> _floorHeightProviders;
         private IFloorHeightProvider _selectedFloorHeightProvider;
         private string _errorText;
+        private string _userSettingErrorText;
 
         public MainViewModel(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
             InitializeSelectionModes();
             InitializeFloorHeightProvider();
-            PlaceAnnotationCommand = new RelayCommand(PlaceAnnotation);
+            PlaceAnnotationCommand = new RelayCommand(PlaceAnnotation, CanPlaceAnnotation);
         }
 
-        public int FloorCount {
+        public string FloorCount {
             get => _floorCount;
             set => this.RaiseAndSetIfChanged(ref _floorCount, value);
         }
@@ -43,9 +44,9 @@ namespace RevitMarkPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedParameterName, value);
         }
 
-        public string ErrorText { 
-            get => _errorText; 
-            set => this.RaiseAndSetIfChanged(ref _errorText, value); 
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
         public SelectionModeViewModel SelectedMode {
@@ -108,13 +109,34 @@ namespace RevitMarkPlacement.ViewModels {
             using(TransactionGroup t = _revitRepository.StartTransactionGroup("Обновление и расстановка аннотаций")) {
                 foreach(var mark in marks) {
                     if(mark.Annotation == null) {
-                        mark.CreateAnnotation(FloorCount, SelectedFloorHeightProvider.GetFloorHeight());
+                        mark.CreateAnnotation(int.Parse(FloorCount), double.Parse(SelectedFloorHeightProvider.GetFloorHeight()));
                     } else {
-                        mark.UpdateAnnotation(FloorCount, SelectedFloorHeightProvider.GetFloorHeight());
+                        mark.UpdateAnnotation(int.Parse(FloorCount), double.Parse(SelectedFloorHeightProvider.GetFloorHeight()));
                     }
                 }
                 t.Assimilate();
             }
+        }
+
+        private bool CanPlaceAnnotation(object p) {
+            if(!int.TryParse(FloorCount, out int levelCount)) {
+                ErrorText = "Количество типовых этажей должно быть числом.";
+                return false;
+            }
+            if(levelCount < 1) {
+                ErrorText = "Количество типовых этажей должно быть неотрицательным.";
+                return false;
+            }
+            if(!double.TryParse(SelectedFloorHeightProvider.GetFloorHeight(), out double floorHeight)) {
+                ErrorText = "Высота типового этажа должна быть числом.";
+                return false;
+            }
+            if(floorHeight < 1) {
+                ErrorText = "Высота типового этажа должна быть неотрицательной.";
+                return false;
+            }
+            ErrorText = null;
+            return true;
         }
 
         private Dictionary<SpotOrientation, AnnotationManager> GetAnnotationManagers() {

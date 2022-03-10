@@ -76,7 +76,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <GroupBox Grid.Row="0" Margin="5" FontSize="14" Header="Количество этажей">
-                <TextBox Margin="5" Text="{Binding FloorCount}"></TextBox>
+                <TextBox Grid.Row="0" Margin="5" Text="{Binding FloorCount, UpdateSourceTrigger=PropertyChanged}"></TextBox>
             </GroupBox>
             <GroupBox Grid.Row="1" Margin="5" FontSize="14" Header="Высота этажа">
                 <ListBox BorderThickness="0" ItemsSource="{Binding FloorHeightProviders}" SelectedItem="{Binding SelectedFloorHeightProvider}">
@@ -97,7 +97,7 @@
                                 <RadioButton Margin="5" FontSize="14" Content="{Binding Description}" 
                                          IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}">
                                 </RadioButton>
-                                <TextBox Text="{Binding FloorHeight}"></TextBox>
+                                <TextBox Text="{Binding FloorHeight, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                             </StackPanel>
                         </DataTemplate>
                         <DataTemplate DataType="{x:Type vm:GlobalFloorHeightViewModel}">
@@ -121,9 +121,12 @@
                 </ListBox>
             </GroupBox>
         </Grid>
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Margin="5" Width="120" Height="30" Command="{Binding PlaceAnnotationCommand}">Создать/Обновить</Button>
-            <Button Margin="5" Width="120" Height="30" Click="Button_Click">Отмена</Button>
+        <StackPanel Grid.Row="3">
+            <TextBlock Margin="20 0" Foreground="Orange" Text="{Binding ErrorText}"/>
+            <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Margin="5" Width="120" Height="30" Command="{Binding PlaceAnnotationCommand}">Создать/Обновить</Button>
+                <Button Margin="5" Width="120" Height="30" Click="Button_Click">Отмена</Button>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>
