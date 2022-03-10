@@ -27,6 +27,10 @@ using pyRevitLabs.Json;
 
 namespace dosymep.WPF.Views {
     public class PlatformWindow : Window {
+        public PlatformWindow() {
+            UIThemeService.UIThemeChanged += OnUIThemeChanged;
+        }
+
         /// <summary>
         /// Наименование плагина.
         /// </summary>
@@ -49,11 +53,7 @@ namespace dosymep.WPF.Views {
         protected override void OnSourceInitialized(EventArgs e) {
             base.OnSourceInitialized(e);
 
-            if(UIThemeService.HostTheme == UIThemes.Dark) {
-                ThemeManager.SetThemeName(this, Theme.Win10DarkName);
-            } else if(UIThemeService.HostTheme == UIThemes.Light) {
-                ThemeManager.SetThemeName(this, Theme.Win10LightName);
-            }
+            UpdateTheme();
 
             PlatformWindowConfig config = GetProjectConfig();
             if(config.WindowPlacement.HasValue) {
@@ -63,6 +63,8 @@ namespace dosymep.WPF.Views {
 
         protected override void OnClosing(CancelEventArgs e) {
             base.OnClosing(e);
+            
+            UIThemeService.UIThemeChanged -= OnUIThemeChanged;
 
             PlatformWindowConfig config = GetProjectConfig();
             config.WindowPlacement = this.GetPlacement();
@@ -76,6 +78,18 @@ namespace dosymep.WPF.Views {
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
                 .SetProjectConfigName(ProjectConfigName + ".json")
                 .Build<PlatformWindowConfig>();
+        }
+        
+        private void OnUIThemeChanged(UIThemes obj) {
+            UpdateTheme();
+        }
+        
+        private void UpdateTheme() {
+            if(UIThemeService.HostTheme == UIThemes.Dark) {
+                ThemeManager.SetThemeName(this, Theme.Win10DarkName);
+            } else if(UIThemeService.HostTheme == UIThemes.Light) {
+                ThemeManager.SetThemeName(this, Theme.Win10LightName);
+            }
         }
     }
 
