@@ -28,6 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dosymep", "dosymep", "{0647
 		dosymep\RelayCommand.cs = dosymep\RelayCommand.cs
 		dosymep\BoolToVisibilityConverter.cs = dosymep\BoolToVisibilityConverter.cs
 		dosymep\InverseBooleanConverter.cs = dosymep\InverseBooleanConverter.cs
+		dosymep\BasePluginCommand.cs = dosymep\BasePluginCommand.cs
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitGenLookupTables", "RevitGenLookupTables\RevitGenLookupTables.csproj", "{65795232-ECD1-4811-A473-B718AE74E4E1}"
