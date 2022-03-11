@@ -10,6 +10,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep;
+using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
 
@@ -18,26 +19,12 @@ using RevitCreateViewSheet.Views;
 
 namespace RevitCreateViewSheet {
     [Transaction(TransactionMode.Manual)]
-    public class CreateViewSheetCommand : IExternalCommand {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            try {
-                Excecute(commandData);
-            } catch(Exception ex) {
-#if D2020 || D2021 || D2022
-                TaskDialog.Show("Менеджер листов.", ex.ToString());
-#else
-                TaskDialog.Show("Менеджер листов.", ex.Message);
-#endif
-            } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            }
-
-            return Result.Succeeded;
+    public class CreateViewSheetCommand  : BasePluginCommand {
+        public CreateViewSheetCommand() {
+            PluginName = "Пакетная печать";
         }
-
-        private void Excecute(ExternalCommandData commandData) {
-            var uiApplication = commandData.Application;
+        
+        protected override void Execute(UIApplication uiApplication) {
             var application = uiApplication.Application;
 
             var uiDocument = uiApplication.ActiveUIDocument;
@@ -47,7 +34,7 @@ namespace RevitCreateViewSheet {
             projectParameters.SetupRevitParams(document, SharedParamsConfig.Instance.AlbumBlueprints, SharedParamsConfig.Instance.StampSheetNumber);
 
             var window = new CreateViewSheetWindow() { DataContext = new AppViewModel(uiApplication) };
-            new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
+            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
             window.ShowDialog();
         }
     }

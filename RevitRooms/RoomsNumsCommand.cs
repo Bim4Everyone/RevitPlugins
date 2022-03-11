@@ -10,6 +10,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep;
+using dosymep.Bim4Everyone;
 
 using RevitRooms.Models;
 using RevitRooms.ViewModels;
@@ -17,37 +18,26 @@ using RevitRooms.Views;
 
 namespace RevitRooms {
     [Transaction(TransactionMode.Manual)]
-    public class RoomsNumsCommand : IExternalCommand {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            try {
-                var isChecked = new CheckProjectParams(commandData.Application)
-                    .CopyProjectParams()
-                    .CopyKeySchedules()
-                    .CheckKeySchedules()
-                    .GetIsChecked();
+    public class RoomsNumsCommand : BasePluginCommand {
+        public RoomsNumsCommand() {
+            PluginName = "Нумерация помещений с приоритетом";
+        }
 
-                if(!isChecked) {
-                    return Result.Succeeded;
-                }
+        protected override void Execute(UIApplication uiApplication) {
+            var isChecked = new CheckProjectParams(uiApplication)
+                .CopyProjectParams()
+                .CopyKeySchedules()
+                .CheckKeySchedules()
+                .GetIsChecked();
 
+            if(isChecked) {
                 var window = new RoomsNumsWindows();
-                window.DataContext = new RoomNumsViewModel(commandData.Application.Application, commandData.Application.ActiveUIDocument.Document, window);
-                
-                new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
+                window.DataContext = new RoomNumsViewModel(uiApplication.Application,
+                    uiApplication.ActiveUIDocument.Document, window);
+
+                var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
                 window.ShowDialog();
-
-            } catch(Exception ex) {
-#if D2020 || D2021 || D2022
-                TaskDialog.Show("Нумерация помещений с приоритетом.", ex.ToString());
-#else
-                TaskDialog.Show("Нумерация помещений с приоритетом.", ex.Message);
-#endif
-            } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
             }
-
-            return Result.Succeeded;
         }
     }
 }

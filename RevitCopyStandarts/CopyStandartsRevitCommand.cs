@@ -16,6 +16,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
 using dosymep;
+using dosymep.Bim4Everyone;
 
 using RevitCopyStandarts.ViewModels;
 
@@ -23,41 +24,27 @@ using RevitCopyStandarts.ViewModels;
 
 namespace RevitCopyStandarts {
     [Transaction(TransactionMode.Manual)]
-    public class CopyStandartsRevitCommand : IExternalCommand {
-        public Result Execute(
-          ExternalCommandData commandData,
-          ref string message,
-          ElementSet elements) {
-            UIApplication uiApplication = commandData.Application;
-            UIDocument uiDocument = uiApplication.ActiveUIDocument;
-            Application application = uiApplication.Application;
-            Document document = uiDocument.Document;
-
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            try {
-                new PyRevitCommand().Execute(commandData.Application);
-            } catch(Exception ex) {
-#if D2020 || D2021 || D2022
-                TaskDialog.Show("Копирование стандартов.", ex.ToString());
-#else
-                TaskDialog.Show("Копирование стандартов.", ex.Message);
-#endif
-            } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            }
-
-            return Result.Succeeded;
+    public class CopyStandartsRevitCommand : BasePluginCommand {
+        public CopyStandartsRevitCommand() {
+            PluginName = "Копирование стандартов.";
         }
-    }
-
-    public class PyRevitCommand {
-        public void Execute(UIApplication uiApplication) {
+        
+        protected override void Execute(UIApplication uiApplication) {
             UIDocument uiDocument = uiApplication.ActiveUIDocument;
             Application application = uiApplication.Application;
             Document document = uiDocument.Document;
 
-            var mainWindow = new MainWindow() { BimCategories = new ViewModels.BimCategoriesViewModel(@"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Шаблоны и настройки", document, application) };
-            new WindowInteropHelper(mainWindow) { Owner = uiApplication.MainWindowHandle };
+            var mainFolder =
+                @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Шаблоны и настройки";
+            
+            var mainWindow = new MainWindow() {
+                BimCategories = new BimCategoriesViewModel(mainFolder, document, application)
+            };
+            
+            var helper = new WindowInteropHelper(mainWindow) {
+                Owner = uiApplication.MainWindowHandle
+            };
+            
             mainWindow.ShowDialog();
         }
     }

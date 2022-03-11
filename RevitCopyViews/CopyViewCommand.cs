@@ -21,26 +21,12 @@ using RevitCopyViews.Views;
 
 namespace RevitCopyViews {
     [Transaction(TransactionMode.Manual)]
-    public class CopyViewCommand : IExternalCommand {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            try {
-                Excecute(commandData);
-            } catch(Exception ex) {
-#if D2020 || D2021 || D2022
-                TaskDialog.Show("Копирование видов.", ex.ToString());
-#else
-                TaskDialog.Show("Копирование видов.", ex.Message);
-#endif
-            } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            }
-
-            return Result.Succeeded;
+    public class CopyViewCommand : BasePluginCommand {
+        public CopyViewCommand() {
+            PluginName = "Копирование видов";
         }
 
-        private void Excecute(ExternalCommandData commandData) {
-            var uiApplication = commandData.Application;
+        protected override void Execute(UIApplication uiApplication) {
             var application = uiApplication.Application;
 
             var uiDocument = uiApplication.ActiveUIDocument;
@@ -84,7 +70,7 @@ namespace RevitCopyViews {
                 }
             };
 
-            new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
+            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
             window.ShowDialog();
         }
 

@@ -8,6 +8,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep;
+using dosymep.Bim4Everyone;
 
 using RevitLintelPlacement.Models;
 using RevitLintelPlacement.ViewModels;
@@ -16,28 +17,19 @@ using RevitLintelPlacement.Views;
 namespace RevitLintelPlacement {
 
     [Transaction(TransactionMode.Manual)]
-    public class PlaceLintelCommand : IExternalCommand {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            try {
-                var lintelsConfig = LintelsConfig.GetLintelsConfig();
-                var revitRepository = new RevitRepository(commandData.Application.Application, commandData.Application.ActiveUIDocument.Document, lintelsConfig);
+    public class PlaceLintelCommand  : BasePluginCommand {
+        public PlaceLintelCommand() {
+            PluginName = "Расстановщик перемычек";
+        }
+        
+        protected override void Execute(UIApplication uiApplication) {
+            var lintelsConfig = LintelsConfig.GetLintelsConfig();
+            var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document, lintelsConfig);
                
-                var mainViewModel = new MainViewModel(revitRepository);
-                var window = new MainWindow() { DataContext = mainViewModel };
-                WindowInteropHelper windowInteropHelper = new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
-                window.ShowDialog();
-            } catch(Exception ex) {
-#if D2020 || D2021 || D2022
-                TaskDialog.Show("Расстановщик перемычек.", ex.ToString());
-#else
-                TaskDialog.Show("Расстановщик перемычек.", ex.Message);
-#endif
-            } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            }
-
-            return Result.Succeeded;
+            var mainViewModel = new MainViewModel(revitRepository);
+            var window = new MainWindow() { DataContext = mainViewModel };
+            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
+            window.ShowDialog();
         }
     }
 }

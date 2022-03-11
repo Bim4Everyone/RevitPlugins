@@ -10,6 +10,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep;
+using dosymep.Bim4Everyone;
 
 using RevitLintelPlacement.Models;
 using RevitLintelPlacement.ViewModels;
@@ -18,28 +19,20 @@ using RevitLintelPlacement.Views;
 namespace RevitLintelPlacement {
 
     [Transaction(TransactionMode.Manual)]
-    public class ConfigurateLintelPluginCommand : IExternalCommand {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            try {
-                var lintelsConfig = LintelsConfig.GetLintelsConfig();
-                var revitRepository = new RevitRepository(commandData.Application.Application, commandData.Application.ActiveUIDocument.Document, lintelsConfig);
+    public class ConfigurateLintelPluginCommand : BasePluginCommand {
+        public ConfigurateLintelPluginCommand() {
+            PluginName = "Расстановщик перемычек";
+        }
 
-                var configViewModel = new ConfigViewModel(revitRepository);
-                var window = new LintelsConfigView() { DataContext = configViewModel };
-                WindowInteropHelper windowInteropHelper = new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
-                window.ShowDialog();
-            } catch(Exception ex) {
-#if D2020 || D2021 || D2022
-                TaskDialog.Show("Расстановщик перемычек.", ex.ToString()); //TODO: придумать название плагину
-#else
-                TaskDialog.Show("Расстановщик перемычек.", ex.Message);
-#endif
-            } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            }
+        protected override void Execute(UIApplication uiApplication) {
+            var lintelsConfig = LintelsConfig.GetLintelsConfig();
+            var revitRepository = new RevitRepository(uiApplication.Application,
+                uiApplication.ActiveUIDocument.Document, lintelsConfig);
 
-            return Result.Succeeded;
+            var configViewModel = new ConfigViewModel(revitRepository);
+            var window = new LintelsConfigView() {DataContext = configViewModel};
+            var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
+            window.ShowDialog();
         }
     }
 }
