@@ -102,7 +102,7 @@ namespace RevitMarkPlacement.ViewModels {
         private void InitializeFloorHeightProvider() {
             FloorHeightProviders = new List<IFloorHeightProvider>() {
                 new UserFloorHeightViewModel("Индивидуальная настройка", _settings),
-                new GlobalFloorHeightViewModel(_revitRepository, "По глобальному параметру")
+                new GlobalFloorHeightViewModel(_revitRepository, "По глобальному параметру", _settings)
             };
             if(_settings.LevelHeightProvider == LevelHeightProvider.UserSettings || !FloorHeightProviders[1].IsEnabled) {
                 SelectedFloorHeightProvider = FloorHeightProviders[0];
@@ -181,6 +181,9 @@ namespace RevitMarkPlacement.ViewModels {
                 if(provider is UserFloorHeightViewModel userFloorHeight) {
                     _settings.LevelHeight = double.Parse(userFloorHeight.FloorHeight);
                 }
+                if(provider is GlobalFloorHeightViewModel globalFloorHeight) {
+                    _settings.GlobalParameterId = globalFloorHeight.SelectedGlobalParameter.ElementId.IntegerValue;
+                }
             }
             _config.SaveProjectConfig();
         }
@@ -240,7 +243,7 @@ namespace RevitMarkPlacement.ViewModels {
                         result = false;
                     }
                 } finally {
-                    document.Close();
+                    document.Close(false);
                 }
             }
             return result;

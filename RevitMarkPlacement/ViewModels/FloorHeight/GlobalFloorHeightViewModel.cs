@@ -14,28 +14,34 @@ namespace RevitMarkPlacement.ViewModels {
 
     internal class GlobalFloorHeightViewModel : BaseViewModel, IFloorHeightProvider {
         private readonly RevitRepository _revitRepository;
+        private readonly AnnotationsSettings _settings;
         private bool _isEnabled;
         private GlobalParameterViewModel _selectedGlobalParameter;
 
-        public GlobalFloorHeightViewModel(RevitRepository revitRepository, string description) {
+        public GlobalFloorHeightViewModel(RevitRepository revitRepository, string description, AnnotationsSettings settings) {
             _revitRepository = revitRepository;
 
             Description = description;
-
+            _settings = settings;
             GlobalParameters = _revitRepository.GetDoubleGlobalParameters()
-                .Select(item => new GlobalParameterViewModel(item.Name, GetValue(item)))
+                .Select(item => new GlobalParameterViewModel(item.Name, GetValue(item), item.Id))
                 .ToList();
             if(GlobalParameters.Count > 0) {
-                SelectedGlobalParameter = GlobalParameters[0];
+                var configGlobalParameter = _revitRepository.GetElement(new ElementId(_settings.GlobalParameterId)) as GlobalParameter;
+                if(configGlobalParameter == null) {
+                    SelectedGlobalParameter = GlobalParameters[0];
+                } else {
+                    SelectedGlobalParameter = GlobalParameters.FirstOrDefault(item => item.ElementId == configGlobalParameter.Id) ?? GlobalParameters[0];
+                }
                 IsEnabled = true;
             } else {
                 IsEnabled = false;
             }
         }
 
-        public bool IsEnabled { 
-            get => _isEnabled; 
-            set => this.RaiseAndSetIfChanged(ref _isEnabled, value); 
+        public bool IsEnabled {
+            get => _isEnabled;
+            set => this.RaiseAndSetIfChanged(ref _isEnabled, value);
         }
 
         public string Description { get; }

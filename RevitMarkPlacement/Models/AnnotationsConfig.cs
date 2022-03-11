@@ -29,8 +29,9 @@ namespace RevitMarkPlacement.Models {
 
     internal class AnnotationsSettings : ProjectSettings {
         public override string ProjectName { get; set; }
-        public SelectionMode SelectionMode { get; set; } = SelectionMode.SelectedElements;
         public int LevelCount { get; set; } = 5;
+        public int GlobalParameterId { get; set; }
+        public SelectionMode SelectionMode { get; set; } = SelectionMode.SelectedElements;
         public LevelHeightProvider LevelHeightProvider { get; set; } = LevelHeightProvider.GlobalParameter;
         public double LevelHeight { get; set; } = 3000;
     }
