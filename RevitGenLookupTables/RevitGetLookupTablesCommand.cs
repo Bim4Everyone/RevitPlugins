@@ -10,34 +10,28 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep;
+using dosymep.Bim4Everyone;
 
 using RevitGenLookupTables.ViewModels;
 using RevitGenLookupTables.Views;
 
 namespace RevitGenLookupTables {
     [Transaction(TransactionMode.Manual)]
-    public class RevitGenLookupTablesCommand : IExternalCommand {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            try {
-                var application = commandData.Application.Application;
-                var document = commandData.Application.ActiveUIDocument.Document;
+    public class RevitGenLookupTablesCommand : BasePluginCommand {
+        public RevitGenLookupTablesCommand() {
+            PluginName = "Генерация таблицы выбора";
+        }
 
-                var window = new LookupTablesWindow() { DataContext = new FamilyViewModel(new Models.RevitRepository(application, document)) };
-                new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
+        protected override void Execute(UIApplication uiApplication) {
+            var application = uiApplication.Application;
+            var document = uiApplication.ActiveUIDocument.Document;
 
-                window.ShowDialog();
-            } catch(Exception ex) {
-#if D2020 || D2021 || D2022
-                System.Windows.MessageBox.Show(ex.ToString(), "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-#else
-                System.Windows.MessageBox.Show(ex.Message, "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-#endif
-            } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            }
+            var window = new LookupTablesWindow() {
+                DataContext = new FamilyViewModel(new Models.RevitRepository(application, document))
+            };
+            var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
 
-            return Result.Succeeded;
+            window.ShowDialog();
         }
     }
 }

@@ -9,32 +9,19 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep;
+using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 using RevitCopyViews.ViewModels;
 
 namespace RevitCopyViews {
     [Transaction(TransactionMode.Manual)]
-    public class UpdateElevationCommand : IExternalCommand {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            try {
-                Excecute(commandData);
-            } catch(Exception ex) {
-#if D2020 || D2021 || D2022
-                TaskDialog.Show("Обновление отметок этажа.", ex.ToString());
-#else
-                TaskDialog.Show("Обновление отметок этажа.", ex.Message);
-#endif
-            } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            }
-
-            return Result.Succeeded;
+    public class UpdateElevationCommand : BasePluginCommand {
+        public UpdateElevationCommand() {
+            PluginName = "Обновление отметок этажа";
         }
 
-        private void Excecute(ExternalCommandData commandData) {
-            var uiApplication = commandData.Application;
+        protected override void Execute(UIApplication uiApplication)  {
             var application = uiApplication.Application;
 
             var uiDocument = uiApplication.ActiveUIDocument;

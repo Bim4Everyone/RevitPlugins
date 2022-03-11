@@ -14,7 +14,7 @@ namespace dosymep.Bim4Everyone {
         }
         
         /// <summary>
-        /// Предоставляет доступ к логгеру платформы.
+        /// Предоставляет доступ к логгеру расширения.
         /// </summary>
         protected ILoggerService PluginLoggerService { get; private set; }
         
@@ -23,26 +23,32 @@ namespace dosymep.Bim4Everyone {
         /// </summary>
         protected ILoggerService LoggerService => GetPlatformService<ILoggerService>();
 
-
         /// <inheritdoc />
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
             PluginLoggerService = LoggerService.ForPluginContext(PluginName);
-            PluginLoggerService.Information("Запуск команды плагина.");
-            
+            PluginLoggerService.Information("Запуск команды расширения.");
+
             AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
             try {
                 Execute(commandData.Application);
-                return Result.Succeeded;
+            } catch(Exception ex) {
+#if D2020 || D2021 || D2022
+                TaskDialog.Show(PluginName, ex.ToString());
+#else
+                TaskDialog.Show(PluginName, ex.Message);
+#endif
             } finally {
-                PluginLoggerService.Information("Выход из команды плагина.");
+                PluginLoggerService.Information("Выход из команды расширения.");
                 AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
             }
+
+            return Result.Succeeded;
         }
 
         /// <summary>
-        /// Наименование плагина для логгера
+        /// Наименование расширения для логгера
         /// </summary>
-        protected string PluginName { get; } 
+        protected string PluginName { get; set; } 
 
         /// <summary>
         /// Метод команды Revit

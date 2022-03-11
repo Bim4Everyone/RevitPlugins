@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep;
+using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
 
@@ -15,35 +16,26 @@ using RevitSetLevelSection.Views;
 
 namespace RevitSetLevelSection {
     [Transaction(TransactionMode.Manual)]
-    public class SetLevelSectionCommand : IExternalCommand {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            try {
-                ProjectParameters projectParameters = ProjectParameters.Create(commandData.Application.Application);
-                projectParameters.SetupRevitParams(commandData.Application.ActiveUIDocument.Document,
-                    SharedParamsConfig.Instance.Level,
-                    SharedParamsConfig.Instance.BuildingWorksBlock,
-                    SharedParamsConfig.Instance.BuildingWorksSection,
-                    SharedParamsConfig.Instance.EconomicFunction);
+    public class SetLevelSectionCommand : BasePluginCommand {
+        public SetLevelSectionCommand() {
+            PluginName = "Назначение уровня/секции";
+        }
 
-                var repository = new RevitRepository(commandData.Application.Application, commandData.Application.ActiveUIDocument.Document);
-                var viewModel = new MainViewModel(repository);
+        protected override void Execute(UIApplication uiApplication) {
+            ProjectParameters projectParameters = ProjectParameters.Create(uiApplication.Application);
+            projectParameters.SetupRevitParams(uiApplication.ActiveUIDocument.Document,
+                SharedParamsConfig.Instance.Level,
+                SharedParamsConfig.Instance.BuildingWorksBlock,
+                SharedParamsConfig.Instance.BuildingWorksSection,
+                SharedParamsConfig.Instance.EconomicFunction);
 
-                var window = new MainWindow() { DataContext = viewModel };
-                new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
+            var repository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
+            var viewModel = new MainViewModel(repository);
 
-                window.ShowDialog();
-            } catch(Exception ex) {
-#if D2020 || D2021 || D2022
-                TaskDialog.Show("Назначение уровня/секции.", ex.ToString());
-#else
-                TaskDialog.Show("Назначение уровня/секции.", ex.Message);
-#endif
-            } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            }
+            var window = new MainWindow() {DataContext = viewModel};
+            var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
 
-            return Result.Succeeded;
+            window.ShowDialog();
         }
     }
 }
