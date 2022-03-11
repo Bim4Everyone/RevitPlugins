@@ -23,13 +23,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dosymep", "dosymep", "{0647
 	ProjectSection(SolutionItems) = preProject
 		dosymep\AppDomainExtensions.cs = dosymep\AppDomainExtensions.cs
 		dosymep\BaseViewModel.cs = dosymep\BaseViewModel.cs
-		dosymep\BoolToVisibilityConverter.cs = dosymep\BoolToVisibilityConverter.cs
-		dosymep\ConfigSerializer.cs = dosymep\ConfigSerializer.cs
-		dosymep\ConvertibleExtention.cs = dosymep\ConvertibleExtention.cs
-		dosymep\EnumConverter.cs = dosymep\EnumConverter.cs
-		dosymep\EnumToItemsSource.cs = dosymep\EnumToItemsSource.cs
-		dosymep\InverseBooleanConverter.cs = dosymep\InverseBooleanConverter.cs
-		dosymep\PlatformWindow.cs = dosymep\PlatformWindow.cs
 		dosymep\RelayCommand.cs = dosymep\RelayCommand.cs
 	EndProjectSection
 EndProject
@@ -47,8 +40,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitRooms", "RevitRooms\RevitRooms.csproj", "{5ED10BD4-7337-4DB1-8953-98489D09F507}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitLintelPlacement", "RevitLintelPlacement\RevitLintelPlacement.csproj", "{40E928EA-29EF-4831-BD9D-23B843BEF905}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitSetLevelSection", "RevitSetLevelSection\RevitSetLevelSection.csproj", "{4ABC3706-AF4D-48E1-AA42-87D379B742E1}"
 EndProject

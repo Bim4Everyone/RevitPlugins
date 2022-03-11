@@ -1,0 +1,106 @@
+﻿<Window x:Class="RevitLintelPlacement.Views.ReportView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RevitLintelPlacement.Views"
+        xmlns:extensions="clr-namespace:RevitLintelPlacement.Extensions"
+        xmlns:vm ="clr-namespace:RevitLintelPlacement.ViewModels"
+        xmlns:converters="clr-namespace:RevitLintelPlacement.Converters"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        mc:Ignorable="d"
+        Title="Отчет" Height="450" Width="800"
+        d:DataContext="{d:DesignInstance vm:ElementInfosViewModel, IsDesignTimeCreatable=False}"
+        Name="ReportWindow">
+    <Window.Resources>
+        <converters:EnumConverter x:Key="EnumConverter"/>
+        <converters:IndexConverter x:Key="IndexConverter"/>
+        <converters:WidthConverter x:Key="WidthConverter"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ListBox ItemsSource="{Binding TypeInfos}" Focusable="False" BorderThickness="0" BorderBrush="Transparent">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type vm:ElementInfoViewModel}">
+                    <CheckBox  Margin="5" FontSize="14" Content="{Binding TypeInfo, Converter={StaticResource EnumConverter}, ConverterParameter={x:Type vm:TypeInfo}}" IsChecked="{Binding IsChecked}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Checked">
+                                <i:InvokeCommandAction Command="{Binding ElementName=ReportWindow, Path=DataContext.TypeInfoCheckedCommand}"></i:InvokeCommandAction>
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="Unchecked">
+                                <i:InvokeCommandAction Command="{Binding ElementName=ReportWindow, Path=DataContext.TypeInfoCheckedCommand}"></i:InvokeCommandAction>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </CheckBox>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
+        <ScrollViewer Grid.Row="1" MaxHeight="{Binding ElementName=ReportWindow, Path=ActualHeight, Converter={StaticResource WidthConverter}, ConverterParameter=80}" CanContentScroll="False" HorizontalScrollBarVisibility="Auto">
+            <DataGrid CanUserAddRows="False"
+                  CanUserDeleteRows ="False"
+                  AutoGenerateColumns="False"
+                  CanUserReorderColumns="False"
+                  CanUserResizeRows="False"
+                      HorizontalGridLinesBrush="Transparent"
+                      VerticalGridLinesBrush="Transparent"
+                      IsReadOnly="True"
+            ItemsSource="{Binding ElementInfosViewSource.View}"
+                      AlternationCount="2" AlternatingRowBackground="WhiteSmoke">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate DataType="{x:Type vm:ElementInfoViewModel}">
+                                <Image Height="20">
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding TypeInfo}" Value="0">
+                                                    <Setter Property="Source" Value="../Resources/icons8-error.png"></Setter>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding TypeInfo}" Value="2">
+                                                    <Setter Property="Source" Value="../Resources/icons8-info.png"></Setter>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding TypeInfo}" Value="1">
+                                                    <Setter Property="Source" Value="../Resources/icons8-warn.png"></Setter>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Элемент">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate DataType="{x:Type vm:ElementInfoViewModel}">
+                                <Button Name="bthElement" Content="{Binding ElementId.IntegerValue}" Command="{Binding ElementName=ReportWindow, Path=DataContext.SelectElementCommand}"
+                                    CommandParameter="{Binding ElementName=bthElement, Path=DataContext}">
+                                    <Button.Style>
+                                        <Style TargetType="{x:Type Button}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCorrectValue}" Value="False">
+                                                    <Setter Property="IsEnabled" Value="False"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <!--<DataGridTextColumn Header="Тип предупреждения" Binding="{Binding TypeInfo, Converter={StaticResource EnumConverter}, ConverterParameter={x:Type vm:TypeInfo}}"></DataGridTextColumn>-->
+                    <DataGridTextColumn Header="Вид элемента" Binding="{Binding ElementType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Type vm:ElementType}}"></DataGridTextColumn>
+                    <DataGridTextColumn Width="Auto" Header="Сообщение" Binding="{Binding Message}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </ScrollViewer>
+    </Grid>
+</Window>
