@@ -29,5 +29,9 @@ namespace RevitFamilyExplorer {
                 panel.Show();
             }
         }
+        
+        public void ChangeVisiblePanel(UIApplication uiApplication) {
+            Execute(uiApplication);
+        }
     }
 }

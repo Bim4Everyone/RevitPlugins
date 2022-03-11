@@ -28,6 +28,10 @@ namespace RevitFamilyExplorer {
                 uiApplication.RegisterDockablePane(dockPanelId, "Обозреватель семейств", new FamilyExplorerPanelProvider(uiApplication));
             }
         }
+
+        public void RegisterPanel(UIApplication uiApplication) {
+            Execute(uiApplication);
+        }
     }
 
     internal class FamilyExplorerPanelProvider : IDockablePaneProvider {
