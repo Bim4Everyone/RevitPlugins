@@ -4,9 +4,8 @@
 		<TargetFramework>net48</TargetFramework>
 		<OutputType>Library</OutputType>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<UseWindowsForms>true</UseWindowsForms>
-		<UseWPF>true</UseWPF>
 		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+		<UseWPF>true</UseWPF>
 		<Platforms>x64</Platforms>
 		<Configurations>D2020;D2021;D2022;R2020;R2021;R2022</Configurations>
 	</PropertyGroup>
@@ -45,17 +44,56 @@
 	  <None Remove="Resources\icons8-show-property-96.png" />
 	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="..\dosymep\AppDomainExtensions.cs" Link="dosymep\AppDomainExtensions.cs" />
-    <Compile Include="..\dosymep\BaseViewModel.cs" Link="dosymep\BaseViewModel.cs" />
-    <Compile Include="..\dosymep\ConfigSerializer.cs" Link="dosymep\ConfigSerializer.cs" />
-    <Compile Include="..\dosymep\PlatformWindow.cs" Link="dosymep\PlatformWindow.cs" />
-    <Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\RelayCommand.cs" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Include="..\dosymep\AppDomainExtensions.cs" Link="dosymep\AppDomainExtensions.cs" />
+		<Compile Include="..\dosymep\BaseViewModel.cs" Link="dosymep\BaseViewModel.cs" />
+		<Compile Include="..\dosymep\BoolToVisibilityConverter.cs" Link="dosymep\BoolToVisibilityConverter.cs" />
+		<Compile Include="..\dosymep\ConfigSerializer.cs" Link="dosymep\ConfigSerializer.cs" />
+		<Compile Include="..\dosymep\InverseBooleanConverter.cs" Link="dosymep\InverseBooleanConverter.cs" />
+		<Compile Include="..\dosymep\PlatformWindow.cs" Link="dosymep\PlatformWindow.cs" />
+		<Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\RelayCommand.cs" />
+	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
-	  <PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525" />
+		<Reference Include="DevExpress.Data.Desktop.v21.2, Version=21.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Data.Desktop.v21.2.dll</HintPath>
+		</Reference>
+		<Reference Include="DevExpress.Data.v21.2, Version=21.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Data.v21.2.dll</HintPath>
+		</Reference>
+		<Reference Include="DevExpress.Dialogs.v21.2.Core, Version=21.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Dialogs.v21.2.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="DevExpress.Mvvm.v21.2, Version=21.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Mvvm.v21.2.dll</HintPath>
+		</Reference>
+		<Reference Include="DevExpress.Pdf.v21.2.Core, Version=21.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Pdf.v21.2.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="DevExpress.Pdf.v21.2.Drawing, Version=21.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Pdf.v21.2.Drawing.dll</HintPath>
+		</Reference>
+		<Reference Include="DevExpress.Printing.v21.2.Core, Version=21.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Printing.v21.2.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="DevExpress.Xpf.Core.v21.2, Version=21.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Xpf.Core.v21.2.dll</HintPath>
+		</Reference>
+		<Reference Include="DevExpress.Xpf.Dialogs.v21.2, Version=21.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Xpf.Dialogs.v21.2.dll</HintPath>
+		</Reference>
+		<Reference Include="DevExpress.Xpf.Grid.v21.2, Version=21.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Xpf.Grid.v21.2.dll</HintPath>
+		</Reference>
+		<Reference Include="DevExpress.Xpf.Grid.v21.2.Core, Version=21.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Xpf.Grid.v21.2.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="DevExpress.Xpf.Grid.v21.2.Extensions, Version=21.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Xpf.Grid.v21.2.Extensions.dll</HintPath>
+		</Reference>
+		<Reference Include="DevExpress.Xpf.Themes.Office2019Colorful.v21.2, Version=21.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Xpf.Themes.Office2019Colorful.v21.2.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -63,17 +101,36 @@
 			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\$(RevitVersion)\dosymep.Bim4Everyone.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+		
 		<Reference Include="dosymep.Revit">
 			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\$(RevitVersion)\dosymep.Revit.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+
+		<Reference Include="dosymep.SimpleServices">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep.SimpleServices.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+
+		<Reference Include="dosymep.Xpf.Core">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep.Xpf.Core.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+
+		<Reference Include="Ninject">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\Ninject.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		
 		<Reference Include="pyRevitLabs.Json">
 		  <HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.Json.dll</HintPath>
 		</Reference>
+		
 		<Reference Include="RevitAPI">
 			<HintPath>$(ProgramW6432)\Autodesk\Revit $(RevitVersion)\RevitAPI.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+		
 		<Reference Include="RevitAPIUI">
 			<HintPath>$(ProgramW6432)\Autodesk\Revit $(RevitVersion)\RevitAPIUI.dll</HintPath>
 			<Private>False</Private>
@@ -82,6 +139,16 @@
 
 	<ItemGroup>
 	  <Resource Include="Resources\icons8-show-property-96.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="WindowsBase" />
+		<Reference Include="PresentationCore" />
+		<Reference Include="PresentationFramework" />
+		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+		<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
+		<PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525"/>
+		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
 	</ItemGroup>
 
 </Project>

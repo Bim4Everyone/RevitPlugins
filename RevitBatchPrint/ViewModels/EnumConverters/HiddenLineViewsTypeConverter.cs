@@ -13,11 +13,11 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             var hiddenLineViewsType = (HiddenLineViewsType?) value;
             switch(hiddenLineViewsType) {
                 case HiddenLineViewsType.RasterProcessing:
-                return "Растровая обработка";
+                    return "Растровая обработка";
                 case HiddenLineViewsType.VectorProcessing:
-                return "Векторная обработка";
+                    return "Векторная обработка";
                 default:
-                return null;
+                    return null;
             }
         }
 
@@ -25,11 +25,11 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             var hiddenLineViewsType = (string) value;
             switch(hiddenLineViewsType) {
                 case "Растровая обработка":
-                return HiddenLineViewsType.RasterProcessing;
+                    return HiddenLineViewsType.RasterProcessing;
                 case "Векторная обработка":
-                return HiddenLineViewsType.VectorProcessing;
+                    return HiddenLineViewsType.VectorProcessing;
                 default:
-                return null;
+                    return null;
             }
         }
 
@@ -40,7 +40,7 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
 
     internal class HiddenLineViewsTypeExtension : MarkupExtension {
         public override object ProvideValue(IServiceProvider serviceProvider) {
-            return new[] { "Растровая обработка", "Векторная обработка" };
+            return new[] {"Растровая обработка", "Векторная обработка"};
         }
     }
 }

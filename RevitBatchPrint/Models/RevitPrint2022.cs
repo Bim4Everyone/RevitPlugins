@@ -57,14 +57,15 @@ namespace RevitBatchPrint.Models {
     }
 #endif
 
-    private void AddErrorCropView(List<ViewSheet> viewSheets) {
+        private void AddErrorCropView(List<ViewSheet> viewSheets) {
             IEnumerable<string> messages = viewSheets
                 .Select(item => (ViewSheet: item, ViewsWithoutCrop: _revitRepository.GetViewsWithoutCrop(item)))
                 .Where(item => item.ViewsWithoutCrop.Count > 0)
                 .Select(item => GetMessage(item.ViewSheet, item.ViewsWithoutCrop));
 
             if(messages.Any()) {
-                Errors.Add("Листы у которые есть виды с отключенной подрезкой:" + Environment.NewLine + string.Join(Environment.NewLine, messages));
+                Errors.Add("Листы у которые есть виды с отключенной подрезкой:" + Environment.NewLine +
+                           string.Join(Environment.NewLine, messages));
             }
         }
 

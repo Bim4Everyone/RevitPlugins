@@ -19,7 +19,7 @@ namespace RevitSuperfilter.ViewModels {
             _definition = definition;
 
             Values = new ObservableCollection<IParameterViewModel>(GetParamViewModels(parameters));
-            foreach(ParameterViewModel item in Values) {
+            foreach(IParameterViewModel item in Values) {
                 item.PropertyChanged += ParameterViewModelPropertyChanged;
             }
         }

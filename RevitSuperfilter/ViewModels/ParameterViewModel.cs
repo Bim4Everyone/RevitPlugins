@@ -11,7 +11,9 @@ using dosymep.WPF.ViewModels;
 namespace RevitSuperfilter.ViewModels {
     internal class ParameterViewModel : SelectableObjectViewModel<Parameter>, IComparable<ParameterViewModel>,
         IParameterViewModel {
+        private const string _emptyValue = "Пустое значение";
         private const string _defaultValue = "Без значения";
+        
         private readonly Parameter _parameter;
 
         public ParameterViewModel(Parameter parameter, IEnumerable<Parameter> parameters)
@@ -36,6 +38,10 @@ namespace RevitSuperfilter.ViewModels {
 
         public override string DisplayData {
             get {
+                if(!_parameter.HasValue) {
+                    return _defaultValue;
+                }
+                
                 if(_parameter.Definition == null) {
                     return _defaultValue;
                 }
@@ -50,7 +56,7 @@ namespace RevitSuperfilter.ViewModels {
                     return value;
                 }
 
-                return _defaultValue;
+                return _emptyValue;
             }
         }
 

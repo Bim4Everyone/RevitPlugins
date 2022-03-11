@@ -13,11 +13,11 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             var placementType = (PaperPlacementType?) value;
             switch(placementType) {
                 case PaperPlacementType.Center:
-                return "Центр";
+                    return "Центр";
                 case PaperPlacementType.Margins:
-                return "Смещение угла";
+                    return "Смещение угла";
                 default:
-                return null;
+                    return null;
             }
         }
 
@@ -25,11 +25,11 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             var placementType = (string) value;
             switch(placementType) {
                 case "Центр":
-                return PaperPlacementType.Center;
+                    return PaperPlacementType.Center;
                 case "Смещение угла":
-                return PaperPlacementType.Margins;
+                    return PaperPlacementType.Margins;
                 default:
-                return null;
+                    return null;
             }
         }
 
@@ -40,7 +40,7 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
 
     internal class PaperPlacementTypeExtension : MarkupExtension {
         public override object ProvideValue(IServiceProvider serviceProvider) {
-            return new[] { "Центр", "Смещение угла" };
+            return new[] {"Центр", "Смещение угла"};
         }
     }
 }
