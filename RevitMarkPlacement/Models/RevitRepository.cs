@@ -20,6 +20,13 @@ namespace RevitMarkPlacement.Models {
         public const string FamilyBottom = "ТипАн_Отметка_ТипЭт_Разрез_Вниз";
         public const string TypeTop = "Вверх";
         public const string TypeBottom = "Вниз";
+        public const string LevelCountParam = "Количество типовых этажей";
+        public const string FirstLevelOnParam = "Вкл_Уровень_1";
+        public const string SpotDimensionIdParam = "Id высотной отметки";
+        public const string TemplateLevelHeightParam = "Высота типового этажа";
+        public const string FirstLevelParam = "Уровень_1";
+        public const string ElevSymbolWidth = "Длина полки";
+        public const string ElevSymbolHeight = "Высота полки";
 
         private readonly Application _application;
         private readonly UIApplication _uiApplication;
@@ -129,6 +136,32 @@ namespace RevitMarkPlacement.Models {
         }
         public AnnotationsSettings AddSettings(AnnotationsConfig congig) {
             return congig.AddSettings(_document);
+        }
+
+        public Family GetTopAnnotaionFamily() {
+            return new FilteredElementCollector(_document)
+                .OfClass(typeof(Family))
+                .Cast<Family>()
+                .FirstOrDefault(item => item.Name.Equals(FamilyTop, StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        public Family GetBottomAnnotaionFamily() {
+            return new FilteredElementCollector(_document)
+                .OfClass(typeof(Family))
+                .Cast<Family>()
+                .FirstOrDefault(item => item.Name.Equals(FamilyBottom, StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        public Document GetFamilyDocument(Family family) {
+            return _document.EditFamily(family);
+        }
+
+        public IEnumerable<FamilySymbol> GetElevationSymbols() {
+            return new FilteredElementCollector(_document)
+            .OfClass(typeof(SpotDimension))
+            .OfType<SpotDimension>()
+            .Select(item => _document.GetElement((ElementId) item.SpotDimensionType.GetParamValueOrDefault(BuiltInParameter.SPOT_ELEV_SYMBOL)))
+            .OfType<FamilySymbol>();
         }
 
         private bool IsNeededAnnotationSymbol(FamilySymbol symbol, string typeName, string familyName) {

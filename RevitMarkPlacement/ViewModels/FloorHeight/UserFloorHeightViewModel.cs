@@ -17,6 +17,8 @@ namespace RevitMarkPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _floorHeight, value); 
         }
 
+        public bool IsEnabled => true;
+
         public string GetFloorHeight() {
             return FloorHeight;
         }

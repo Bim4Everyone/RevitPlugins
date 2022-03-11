@@ -55,14 +55,14 @@ namespace RevitMarkPlacement.Models {
         private void SetParameters(FamilyInstance annotation, SpotDimension spot, int count, double typicalFloorHeight) {
             using(Transaction t = _revitRepository.StartTransaction("Установка параметров")) {
                 var level = GetSpotDimensionLevel(spot);
-                annotation.SetParamValue("Количество типовых этажей", count);
-                annotation.SetParamValue("Вкл_Уровень_1", 0);
-                annotation.SetParamValue("Id высотной отметки", spot.Id.IntegerValue);
-                annotation.SetParamValue("Высота типового этажа", typicalFloorHeight / 1000);
+                annotation.SetParamValue(RevitRepository.LevelCountParam, count);
+                annotation.SetParamValue(RevitRepository.FirstLevelOnParam, 0);
+                annotation.SetParamValue(RevitRepository.SpotDimensionIdParam, spot.Id.IntegerValue);
+                annotation.SetParamValue(RevitRepository.TemplateLevelHeightParam, typicalFloorHeight / 1000);
 #if D2020 || R2020
-                annotation.SetParamValue("Уровень_1", UnitUtils.ConvertFromInternalUnits(level, DisplayUnitType.DUT_METERS));
+                annotation.SetParamValue(RevitRepository.FirstLevelParam, UnitUtils.ConvertFromInternalUnits(level, DisplayUnitType.DUT_METERS));
 #else
-                annotation.SetParamValue("Уровень_1", UnitUtils.ConvertFromInternalUnits(level, UnitTypeId.Meters));
+                annotation.SetParamValue(RevitRepository.FirstLevelParam, UnitUtils.ConvertFromInternalUnits(level, UnitTypeId.Meters));
 #endif
                 t.Commit();
             }

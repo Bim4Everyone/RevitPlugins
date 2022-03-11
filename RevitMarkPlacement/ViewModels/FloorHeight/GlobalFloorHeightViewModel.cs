@@ -14,6 +14,7 @@ namespace RevitMarkPlacement.ViewModels {
 
     internal class GlobalFloorHeightViewModel : BaseViewModel, IFloorHeightProvider {
         private readonly RevitRepository _revitRepository;
+        private bool _isEnabled;
         private GlobalParameterViewModel _selectedGlobalParameter;
 
         public GlobalFloorHeightViewModel(RevitRepository revitRepository, string description) {
@@ -24,8 +25,17 @@ namespace RevitMarkPlacement.ViewModels {
             GlobalParameters = _revitRepository.GetDoubleGlobalParameters()
                 .Select(item => new GlobalParameterViewModel(item.Name, GetValue(item)))
                 .ToList();
+            if(GlobalParameters.Count > 0) {
+                SelectedGlobalParameter = GlobalParameters[0];
+                IsEnabled = true;
+            } else {
+                IsEnabled = false;
+            }
+        }
 
-            SelectedGlobalParameter = GlobalParameters[0];
+        public bool IsEnabled { 
+            get => _isEnabled; 
+            set => this.RaiseAndSetIfChanged(ref _isEnabled, value); 
         }
 
         public string Description { get; }
@@ -37,7 +47,7 @@ namespace RevitMarkPlacement.ViewModels {
         }
 
         public string GetFloorHeight() {
-            return SelectedGlobalParameter.Value.ToString();
+            return SelectedGlobalParameter?.Value.ToString();
         }
 
         private double GetValue(GlobalParameter parameter) {

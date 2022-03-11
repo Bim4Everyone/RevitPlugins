@@ -26,8 +26,13 @@ namespace RevitMarkPlacement {
                         commandData.Application.Application,
                         commandData.Application.ActiveUIDocument.Document);
                 var viewModel = new MainViewModel(revitRepository, config);
-                var view = new MainWindow() { DataContext = viewModel };
-                view.ShowDialog();
+                if(!viewModel.CanPlaceAnnotation()) {
+                    var view = new ReportView() { DataContext = viewModel.InfoElementsViewModel };
+                    view.ShowDialog();
+                } else {
+                    var view = new MainWindow() { DataContext = viewModel };
+                    view.ShowDialog();
+                }
             } catch(Exception ex) {
 #if D2020 || D2021 || D2022
                 TaskDialog.Show("Расстановка отметок.", ex.ToString());
