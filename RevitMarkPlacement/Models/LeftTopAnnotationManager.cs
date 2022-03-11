@@ -5,7 +5,7 @@ using dosymep.Revit;
 
 namespace RevitMarkPlacement.Models {
     internal class LeftTopAnnotationManager : AnnotationManager {
-        public LeftTopAnnotationManager(RevitRepository revitRepository) : base(revitRepository) {
+        public LeftTopAnnotationManager(RevitRepository revitRepository, bool onlyUpdate) : base(revitRepository, onlyUpdate) {
             _type = _revitRepository.GetAnnotationSymbolType(RevitRepository.TypeTop, RevitRepository.FamilyTop);
         }
 

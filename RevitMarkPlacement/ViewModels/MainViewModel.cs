@@ -85,6 +85,8 @@ namespace RevitMarkPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectionModes, value);
         }
 
+        public bool OnlyUpdate { get; set; }
+
         public ICommand PlaceAnnotationCommand { get; set; }
 
         private void InitializeSelectionModes() {
@@ -111,14 +113,13 @@ namespace RevitMarkPlacement.ViewModels {
             }
         }
 
-        private void PlaceAnnotation(object p) {
-            
+        private void PlaceAnnotation(object p) {           
             var spots = _revitRepository.GetSpotDimensions(SelectedMode.SelectionMode).ToList();
             var annotations = _revitRepository.GetAnnotations().ToList();
             List<TemplateLevelMark> marks = new List<TemplateLevelMark>();
             var annotationManagers = GetAnnotationManagers();
             foreach(var annotation in annotations) {
-                var spotId = (int) annotation.GetParamValueOrDefault("Id высотной отметки");
+                var spotId = (int) annotation.GetParamValueOrDefault(RevitRepository.SpotDimensionIdParam);
                 var spot = _revitRepository.GetElement(new ElementId(spotId)) as SpotDimension;
                 if(spot == null) {
                     _revitRepository.DeleteElement(annotation);
@@ -133,9 +134,9 @@ namespace RevitMarkPlacement.ViewModels {
 
             using(TransactionGroup t = _revitRepository.StartTransactionGroup("Обновление и расстановка аннотаций")) {
                 foreach(var mark in marks) {
-                    if(mark.Annotation == null) {
+                    if(mark.Annotation == null && !OnlyUpdate) {
                         mark.CreateAnnotation(int.Parse(FloorCount), double.Parse(SelectedFloorHeightProvider.GetFloorHeight()));
-                    } else {
+                    } else if (mark.Annotation != null) {
                         mark.UpdateAnnotation(int.Parse(FloorCount), double.Parse(SelectedFloorHeightProvider.GetFloorHeight()));
                     }
                 }
@@ -182,7 +183,7 @@ namespace RevitMarkPlacement.ViewModels {
                     _settings.LevelHeight = double.Parse(userFloorHeight.FloorHeight);
                 }
                 if(provider is GlobalFloorHeightViewModel globalFloorHeight) {
-                    _settings.GlobalParameterId = globalFloorHeight.SelectedGlobalParameter.ElementId.IntegerValue;
+                    _settings.GlobalParameterId = globalFloorHeight?.SelectedGlobalParameter?.ElementId?.IntegerValue ?? -1;
                 }
             }
             _config.SaveProjectConfig();
@@ -190,10 +191,10 @@ namespace RevitMarkPlacement.ViewModels {
 
         private Dictionary<SpotOrientation, AnnotationManager> GetAnnotationManagers() {
             return new Dictionary<SpotOrientation, AnnotationManager> {
-                { SpotOrientation.RightTop, new RightTopAnnotationManager(_revitRepository) },
-                { SpotOrientation.LeftTop, new LeftTopAnnotationManager(_revitRepository) },
-                { SpotOrientation.LeftBottom, new LeftBottomAnnotationManager(_revitRepository) },
-                { SpotOrientation.RightBottom, new RightBottomAnnotationManager(_revitRepository) }
+                { SpotOrientation.RightTop, new RightTopAnnotationManager(_revitRepository, OnlyUpdate) },
+                { SpotOrientation.LeftTop, new LeftTopAnnotationManager(_revitRepository, OnlyUpdate) },
+                { SpotOrientation.LeftBottom, new LeftBottomAnnotationManager(_revitRepository, OnlyUpdate) },
+                { SpotOrientation.RightBottom, new RightBottomAnnotationManager(_revitRepository, OnlyUpdate) }
             };
         }
 

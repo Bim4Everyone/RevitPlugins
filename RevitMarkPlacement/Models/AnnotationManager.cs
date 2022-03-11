@@ -13,8 +13,11 @@ namespace RevitMarkPlacement.Models {
         protected readonly RevitRepository _revitRepository;
         protected FamilySymbol _type;
 
-        public AnnotationManager(RevitRepository revitRepository) {
+        public bool OnlyUpdate { get; }
+
+        public AnnotationManager(RevitRepository revitRepository, bool onlyUpdate) {
             _revitRepository = revitRepository;
+            OnlyUpdate = onlyUpdate;
         }
 
         public void CreateAnnotation(SpotDimension spot, int floorCount, double floorHeight) {
@@ -55,10 +58,13 @@ namespace RevitMarkPlacement.Models {
         private void SetParameters(FamilyInstance annotation, SpotDimension spot, int count, double typicalFloorHeight) {
             using(Transaction t = _revitRepository.StartTransaction("Установка параметров")) {
                 var level = GetSpotDimensionLevel(spot);
-                annotation.SetParamValue(RevitRepository.LevelCountParam, count);
+                if(!OnlyUpdate) {
+                    annotation.SetParamValue(RevitRepository.LevelCountParam, count);
+                    annotation.SetParamValue(RevitRepository.TemplateLevelHeightParam, typicalFloorHeight / 1000);
+                }
                 annotation.SetParamValue(RevitRepository.FirstLevelOnParam, 0);
                 annotation.SetParamValue(RevitRepository.SpotDimensionIdParam, spot.Id.IntegerValue);
-                annotation.SetParamValue(RevitRepository.TemplateLevelHeightParam, typicalFloorHeight / 1000);
+                
 #if D2020 || R2020
                 annotation.SetParamValue(RevitRepository.FirstLevelParam, UnitUtils.ConvertFromInternalUnits(level, DisplayUnitType.DUT_METERS));
 #else
