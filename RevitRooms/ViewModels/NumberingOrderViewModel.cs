@@ -17,7 +17,7 @@ namespace RevitRooms.ViewModels {
 
         public NumberingOrderViewModel(Element element, RevitRepository revitRepository)
             : base(element, revitRepository) {
-            Order = (int) Element.GetParamValueOrDefault(ProjectParamsConfig.Instance.NumberingOrder, 0);
+            Order = Element.GetParamValueOrDefault<int>(ProjectParamsConfig.Instance.NumberingOrder, 0);
         }
 
         public int Order {
