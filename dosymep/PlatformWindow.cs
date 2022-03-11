@@ -40,11 +40,16 @@ namespace dosymep.WPF.Views {
         /// Наименование файла конфигурации.
         /// </summary>
         public virtual string ProjectConfigName { get; }
+        
+        /// <summary>
+        /// Предоставляет доступ к логгеру платформы.
+        /// </summary>
+        protected ILoggerService LoggerService => GetPlatformService<ILoggerService>();
 
         /// <summary>
         /// Предоставляет доступ к настройкам темы платформы.
         /// </summary>
-        private IUIThemeService UIThemeService => GetPlatformService<IUIThemeService>();
+        protected IUIThemeService UIThemeService => GetPlatformService<IUIThemeService>();
 
         protected T GetPlatformService<T>() {
             return ServicesProvider.GetPlatformService<T>();
