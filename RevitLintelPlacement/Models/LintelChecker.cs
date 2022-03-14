@@ -28,7 +28,7 @@ namespace RevitLintelPlacement.Models {
         public void Check(IEnumerable<LintelInfoViewModel> lintels) {
             foreach(var lintel in lintels) {
                 foreach(var checker in _checkers) {
-                    var resultHandler = checker.Check(lintel.Lintel, lintel.ElementInWall); 
+                    var resultHandler = checker.Check(lintel.Lintel, lintel.ElementInWall);
                     resultHandler?.Handle();
                     if(resultHandler.Code != ResultCode.Correct)
                         break;
@@ -61,7 +61,7 @@ namespace RevitLintelPlacement.Models {
 
             if((int) lintel.GetParamValue(_revitRepository.LintelsCommonConfig.LintelFixation) == 1) {
                 _elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintel.Id, InfoElement.LintelIsFixedWithoutElement));
-                return new ReportResult(lintel.Id) { Code = ResultCode.LintelIsFixedWithoutElement};
+                return new ReportResult(lintel.Id) { Code = ResultCode.LintelIsFixedWithoutElement };
             }
             return new LintelForDeletionResult(_revitRepository, lintel) { Code = ResultCode.LintelWithoutElement };
         }
@@ -75,7 +75,7 @@ namespace RevitLintelPlacement.Models {
         public LintelWallAboveChecker(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
             _view3D = _revitRepository.GetView3D();
-            _links = _revitRepository.GetLinkTypes().Select(l=>l.Name).ToList();
+            _links = _revitRepository.GetLinkTypes().Select(l => l.Name).ToList();
         }
         public IResultHandler Check(FamilyInstance lintel, FamilyInstance elementInWall) {
             if(_revitRepository.CheckUp(_view3D, elementInWall, _links))
@@ -102,15 +102,12 @@ namespace RevitLintelPlacement.Models {
 
         public IResultHandler Check(FamilyInstance lintel, FamilyInstance elementInWall) {
             var rule = _groupedRules.GetRule(elementInWall);
+            if((int) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelFixation, 0) == 1) {
+                return new EmptyResult { Code = ResultCode.Correct };
+            }
             if(rule == null) {
-                if ((int) lintel.GetParamValue(_revitRepository.LintelsCommonConfig.LintelFixation) == 1) {
-                    return new EmptyResult { Code = ResultCode.Correct };
-                } else {
-                    return new LintelForDeletionResult(_revitRepository, lintel) { Code = ResultCode.ElementInWallWithoutRule };
-                }
-                    
+                return new LintelForDeletionResult(_revitRepository, lintel) { Code = ResultCode.ElementInWallWithoutRule };
             } else {
-                
                 var results = new List<ParameterCheckResult> {
                     CheckLintelType(lintel, rule),
                     CheckLintelThickness(lintel, elementInWall),
@@ -123,7 +120,7 @@ namespace RevitLintelPlacement.Models {
         }
 
         private ParameterCheckResult CheckLintelType(FamilyInstance lintel, ConcreteRuleViewModel rule) {
-            if (lintel.Symbol.Name.Equals(rule.SelectedLintelType, StringComparison.CurrentCultureIgnoreCase)) {
+            if(lintel.Symbol.Name.Equals(rule.SelectedLintelType, StringComparison.CurrentCultureIgnoreCase)) {
                 return ParameterCheckResult.Correct;
             }
             return ParameterCheckResult.WrongLintelType;
@@ -157,7 +154,7 @@ namespace RevitLintelPlacement.Models {
         }
 
         private ParameterCheckResult CheckLintelRightOffset(FamilyInstance lintel, FamilyInstance elementInWall, ConcreteRuleViewModel rule, out double offset) {
-            if (_revitRepository.DoesRightCornerNeeded(_view3D, elementInWall, _linkNames, _elementInfos, out offset)) {
+            if(_revitRepository.DoesRightCornerNeeded(_view3D, elementInWall, _linkNames, _elementInfos, out offset)) {
                 var lintelRightOffset = (double) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelRightOffset);
                 var lintelCorner = (int) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelRightCorner) == 1 ? true : false;
                 if(Math.Abs(lintelRightOffset - offset) < 0.01 && lintelCorner) {
