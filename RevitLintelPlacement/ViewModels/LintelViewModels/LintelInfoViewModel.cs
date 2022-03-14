@@ -34,10 +34,10 @@ namespace RevitLintelPlacement.ViewModels {
                 ElementInWallName = $"{elementInWall.Symbol.Family.Name}: {elementInWall.Name}";
                 WallTypeName = elementInWall.Host.Name;
                 Level = _revitRepository.GetElementById(elementInWall.LevelId)?.Name;
-                if(elementInWall.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Id) {
-                    ElementInWallKind = ElementInWallKind.Door;
-                } else if(elementInWall.Symbol.Family.Name.ToLower().Contains(_revitRepository.LintelsCommonConfig.HolesFilter.ToLower())) {
+                if(elementInWall.Symbol.Family.Name.ToLower().Contains(_revitRepository.LintelsCommonConfig.HolesFilter.ToLower())) {
                     ElementInWallKind = ElementInWallKind.Opening;
+                } else if(elementInWall.Category.Id == _revitRepository.GetCategory(BuiltInCategory.OST_Doors).Id) {
+                    ElementInWallKind = ElementInWallKind.Door;
                 } else if(elementInWall.Category.Id == new ElementId(BuiltInCategory.OST_Windows)) {
                     ElementInWallKind = ElementInWallKind.Window;
                 } else {
@@ -65,9 +65,9 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _level, value);
         }
 
-        public ElementInWallKind ElementInWallKind { 
-            get => _elementInWallKind; 
-            set => this.RaiseAndSetIfChanged(ref _elementInWallKind, value); 
+        public ElementInWallKind ElementInWallKind {
+            get => _elementInWallKind;
+            set => this.RaiseAndSetIfChanged(ref _elementInWallKind, value);
         }
 
         public ElementId LintelId {
@@ -92,7 +92,7 @@ namespace RevitLintelPlacement.ViewModels {
         [Description("Окна")]
         Window,
         [Description("Отверстия")]
-        Opening, 
+        Opening,
         [Description("Без категории")]
         None
     }
