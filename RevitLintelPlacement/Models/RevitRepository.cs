@@ -264,6 +264,7 @@ namespace RevitLintelPlacement.Models {
             if(refWithContext == null)
                 return false;
             var elementWidth = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningWidth)
+                ?? elementInWall.Symbol.GetParamValueOrDefault(LintelsCommonConfig.OpeningWidth)
                 ?? elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
 
             if(elementWidth == null) {

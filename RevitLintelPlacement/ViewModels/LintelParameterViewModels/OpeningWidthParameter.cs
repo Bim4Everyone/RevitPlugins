@@ -31,6 +31,7 @@ namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels {
                 throw new ArgumentNullException(nameof(elementInWall));
             }
             var elementWidth = elementInWall.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningWidth) ??
+                               elementInWall.Symbol.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningWidth) ??
                                elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
 
             if(elementWidth == null) {
