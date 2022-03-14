@@ -446,10 +446,10 @@ namespace RevitLintelPlacement.Models {
             var height = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningHeight);
             double z;
             if(height != null) {
-                z = (double) height + bottomBarHeight + level.Elevation;
+                z = (double) height + bottomBarHeight + level?.Elevation??0;
             } else {
                 var topBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
-                z = /*location.Z +*/ topBarHeight + level.Elevation;
+                z = /*location.Z +*/ topBarHeight + level?.Elevation??0;
             }
             return new XYZ(location.X, location.Y, z);
         }

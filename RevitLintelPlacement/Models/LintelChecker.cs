@@ -206,7 +206,7 @@ namespace RevitLintelPlacement.Models {
             var lintelLocationPoint = ((LocationPoint) lintel.Location).Point;
             var elementInWallPoint = _revitRepository.GetLocationPoint(elementInWall);
 
-            if(lintelLocationPoint.DistanceTo(elementInWallPoint) < 1) //ToDO: понять, что считать смещенной перемычкой - пока примерно 30 см
+            if(lintelLocationPoint.DistanceTo(elementInWallPoint) < 0.0001)
                 return new EmptyResult { Code = ResultCode.Correct };
             else {
                 _elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintel.Id, InfoElement.LintelGeometricalDisplaced));
