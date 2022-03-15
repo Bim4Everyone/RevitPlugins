@@ -19,7 +19,8 @@ namespace RevitSuperfilter.ViewModels.Revit {
             return _revitRepository.GetSelectedElements()
                 .Where(item => item.Category != null)
                 .GroupBy(item => item.Category, new CategoryComparer())
-                .Select(item => new CategoryViewModel(item.Key, item, _revitRepository));
+                .Select(item => new CategoryViewModel(item.Key, item, _revitRepository))
+                .OrderBy(item => item.DisplayData);
         }
     }
 }

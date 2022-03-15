@@ -17,25 +17,38 @@ using dosymep.WPF.ViewModels;
 
 using RevitBatchPrint.Models;
 
+using Visibility = System.Windows.Visibility;
+
 namespace RevitBatchPrint.ViewModels {
     internal class PrintAbumsViewModel : BaseViewModel {
         private ObservableCollection<PrintAlbumViewModel> _albums;
         private PrintSettingsViewModel _printSettings = new PrintSettingsViewModel();
 
-        private System.Windows.Visibility _showPrintParamSelect;
         private string _printParamName;
         private string _errorText;
         private string _selectAlbumsText;
         private readonly RevitRepository _repository;
+
+        private Visibility _visibilitySaveFile;
+        private Visibility _showPrintParamSelect;
 
         public PrintAbumsViewModel(UIApplication uiApplication) {
             _repository = new RevitRepository(uiApplication);
 
             PrintParamNames = new ObservableCollection<string>(_repository.GetPrintParamNames());
             PrintParamName = PrintParamNames.FirstOrDefault(item => RevitRepository.PrintParamNames.Contains(item));
-            ShowPrintParamSelect = string.IsNullOrEmpty(PrintParamName) ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+            ShowPrintParamSelect = string.IsNullOrEmpty(PrintParamName)
+                ? System.Windows.Visibility.Visible
+                : System.Windows.Visibility.Collapsed;
 
+            RevitSaveCommand = new RelayCommand(RevitSave, CanRevitSave);
             RevitPrintCommand = new RelayCommand(RevitPrint, CanRevitPrint);
+
+#if D2022 || R2022
+            VisibilitySaveFile = System.Windows.Visibility.Visible;
+#else
+            VisibilitySaveFile = System.Windows.Visibility.Collapsed;
+#endif
 
             SetPrintConfig();
         }
@@ -46,13 +59,16 @@ namespace RevitBatchPrint.ViewModels {
                 this.RaiseAndSetIfChanged(ref _printParamName, value);
                 if(!string.IsNullOrEmpty(PrintParamName)) {
                     List<(string, int)> printParamValues = _repository.GetPrintParamValues(PrintParamName);
-                    Albums = new ObservableCollection<PrintAlbumViewModel>(printParamValues.Select(item => new PrintAlbumViewModel(item.Item1) { Count = item.Item2 }));
+                    Albums = new ObservableCollection<PrintAlbumViewModel>(
+                        printParamValues.Select(item => new PrintAlbumViewModel(item.Item1) {Count = item.Item2}));
                 }
             }
         }
 
         public ObservableCollection<string> PrintParamNames { get; }
 
+
+        public ICommand RevitSaveCommand { get; }
         public ICommand RevitPrintCommand { get; }
 
         public ObservableCollection<PrintAlbumViewModel> Albums {
@@ -65,9 +81,14 @@ namespace RevitBatchPrint.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _printSettings, value);
         }
 
-        public System.Windows.Visibility ShowPrintParamSelect {
+        public Visibility ShowPrintParamSelect {
             get => _showPrintParamSelect;
             set => this.RaiseAndSetIfChanged(ref _showPrintParamSelect, value);
+        }
+
+        public Visibility VisibilitySaveFile {
+            get => _visibilitySaveFile;
+            set => this.RaiseAndSetIfChanged(ref _visibilitySaveFile, value);
         }
 
         public string ErrorText {
@@ -84,7 +105,6 @@ namespace RevitBatchPrint.ViewModels {
             SavePrintConfig();
 
             var revitPrintErrors = new List<string>();
-#if D2020 || R2020 || D2021 || R2021
             foreach(var album in Albums.Where(item => item.IsSelected)) {
                 var revitPrint = new RevitPrint(_repository);
                 revitPrint.PrinterName = _printSettings.PrinterName;
@@ -95,7 +115,51 @@ namespace RevitBatchPrint.ViewModels {
                 revitPrint.Execute(SetupPrintParams);
                 revitPrintErrors.AddRange(revitPrint.Errors);
             }
-#else
+
+            if(revitPrintErrors.Count > 0) {
+                TaskDialog.Show("Пакетная печать.",
+                    Environment.NewLine + "- " + string.Join(Environment.NewLine + "- ", revitPrintErrors));
+            } else {
+                TaskDialog.Show("Пакетная печать.", "Готово!");
+            }
+        }
+
+        public bool CanRevitPrint(object p) {
+            if(Albums == null) {
+                SelectAlbumsText = "Выберите комплект чертежей...";
+            } else {
+                // HACK: Обновление текста выбора альбома лучше сделать в другом в более очевидном месте
+                SelectAlbumsText = string.Join(", ", Albums.Where(item => item.IsSelected).Select(item => item.Name));
+                SelectAlbumsText = string.IsNullOrEmpty(SelectAlbumsText)
+                    ? "Выберите комплект чертежей..."
+                    : SelectAlbumsText;
+            }
+
+            if(string.IsNullOrEmpty(PrintParamName)) {
+                ErrorText = "Не был выбран параметр комплекта чертежей.";
+                return false;
+            }
+
+            if(Albums.All(item => item.IsSelected == false)) {
+                ErrorText = "Не был выбран комплект чертежей.";
+                return false;
+            }
+
+            if(string.IsNullOrEmpty(PrintSettings.PrinterName)) {
+                ErrorText = "Не был выбран принтер.";
+                return false;
+            }
+
+            ErrorText = null;
+            return true;
+        }
+
+        public void RevitSave(object p) {
+            SavePrintConfig();
+
+#if D2022 || R2022
+            var revitPrintErrors = new List<string>();
+
             var revitPrint = new RevitPrint2022(_repository);
             revitPrint.Folder = Path.GetDirectoryName(PrintSettings.FileName);
             revitPrint.FilterParamName = PrintParamName;
@@ -125,17 +189,38 @@ namespace RevitBatchPrint.ViewModels {
 
             revitPrint.Execute(exportOptions);
             revitPrintErrors.AddRange(revitPrint.Errors);
-#endif
-
+            
             if(revitPrintErrors.Count > 0) {
                 TaskDialog.Show("Пакетная печать.", Environment.NewLine + "- " + string.Join(Environment.NewLine + "- ", revitPrintErrors));
             } else {
                 TaskDialog.Show("Пакетная печать.", "Готово!");
             }
+#endif
+        }
+
+        public bool CanRevitSave(object p) {
+#if D2022 || R2022
+            if(string.IsNullOrEmpty(PrintParamName)) {
+                return false;
+            }
+
+            if(Albums.All(item => item.IsSelected == false)) {
+                return false;
+            }
+
+            if(string.IsNullOrEmpty(PrintSettings.FileName)) {
+                ErrorText = "Выберите файл сохранения pdf.";
+                return false;
+            }
+#endif
+
+            ErrorText = null;
+            return true;
         }
 
         private void SetPrintConfig() {
-            _printSettings.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), _repository.Document.Title + ".pdf");
+            _printSettings.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                _repository.Document.Title + ".pdf");
 
             var printSettingsConfig = PrintConfig
                 .GetPrintConfig()
@@ -148,7 +233,8 @@ namespace RevitBatchPrint.ViewModels {
 
                     if(Albums != null) {
                         foreach(var album in Albums) {
-                            album.IsSelected = printSettingsConfig.SelectedAlbums.Any(item => item?.Equals(album.Name) == true);
+                            album.IsSelected =
+                                printSettingsConfig.SelectedAlbums.Any(item => item?.Equals(album.Name) == true);
                         }
                     }
                 }
@@ -174,7 +260,8 @@ namespace RevitBatchPrint.ViewModels {
                 _printSettings.ReplaceHalftoneWithThinLines = printSettingsConfig.ReplaceHalftoneWithThinLines;
 
                 if(!string.IsNullOrEmpty(printSettingsConfig.FolderName)) {
-                    _printSettings.FileName = Path.Combine(printSettingsConfig.FolderName, _repository.Document.Title + ".pdf");
+                    _printSettings.FileName =
+                        Path.Combine(printSettingsConfig.FolderName, _repository.Document.Title + ".pdf");
                 }
             }
         }
@@ -188,7 +275,8 @@ namespace RevitBatchPrint.ViewModels {
 
             printSettingsConfig.PrinterName = _printSettings.PrinterName;
             printSettingsConfig.PrintParamName = PrintParamName;
-            printSettingsConfig.SelectedAlbums = Albums.Where(item => item.IsSelected).Select(item => item.Name).ToList();
+            printSettingsConfig.SelectedAlbums =
+                Albums.Where(item => item.IsSelected).Select(item => item.Name).ToList();
 
             printSettingsConfig.Zoom = _printSettings.Zoom;
             printSettingsConfig.ZoomType = _printSettings.ZoomType;
@@ -210,52 +298,11 @@ namespace RevitBatchPrint.ViewModels {
             printSettingsConfig.MaskCoincidentLines = _printSettings.MaskCoincidentLines;
             printSettingsConfig.ReplaceHalftoneWithThinLines = _printSettings.ReplaceHalftoneWithThinLines;
 
-
-#if D2020 || R2020 || D2021 || R2021
-            printSettingsConfig.FolderName = null;
-#else
-            printSettingsConfig.PrinterName = null;
             if(!string.IsNullOrEmpty(_printSettings.FileName)) {
                 printSettingsConfig.FolderName = Path.GetDirectoryName(_printSettings.FileName);
             }
-#endif
 
             printConfig.SaveProjectConfig();
-        }
-
-        public bool CanRevitPrint(object p) {
-            if(Albums == null) {
-                SelectAlbumsText = "Выберите комплект чертежей...";
-            } else {
-                // HACK: Обновление текста выбора альбома лучше сделать в другом в более очевидном месте
-                SelectAlbumsText = string.Join(", ", Albums.Where(item => item.IsSelected).Select(item => item.Name));
-                SelectAlbumsText = string.IsNullOrEmpty(SelectAlbumsText) ? "Выберите комплект чертежей..." : SelectAlbumsText;
-            }
-
-            if(string.IsNullOrEmpty(PrintParamName)) {
-                ErrorText = "Не был выбран параметр комплекта чертежей.";
-                return false;
-            }
-
-            if(Albums.All(item => item.IsSelected == false)) {
-                ErrorText = "Не был выбран комплект чертежей.";
-                return false;
-            }
-
-#if D2020 || R2020 || D2021 || R2021
-            if(string.IsNullOrEmpty(PrintSettings.PrinterName)) {
-                ErrorText = "Не был выбран принтер.";
-                return false;
-            }
-#else 
-            if(string.IsNullOrEmpty(PrintSettings.FileName)) {
-                ErrorText = "Выберите файл сохранения pdf.";
-                return false;
-            }
-#endif
-
-            ErrorText = null;
-            return true;
         }
 
         private void SetupPrintParams(PrintParameters printParameters) {

@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace RevitServerFolders.dosymep.Views.Revit {
+namespace dosymep.WPF.Views.Revit {
     /// <summary>
     /// Interaction logic for RevitServerExplorerView.xaml
     /// </summary>

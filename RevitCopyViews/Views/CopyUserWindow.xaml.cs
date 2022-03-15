@@ -13,14 +13,19 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using dosymep.WPF.Views;
+
 namespace RevitCopyViews.Views {
     /// <summary>
     /// Interaction logic for CopyUserView.xaml
     /// </summary>
-    public partial class CopyUserWindow : Window {
+    public partial class CopyUserWindow : PlatformWindow {
         public CopyUserWindow() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitCopyViews);
+        public override string ProjectConfigName => nameof(CopyUserWindow);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;

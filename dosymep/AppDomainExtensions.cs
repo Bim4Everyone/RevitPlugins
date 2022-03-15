@@ -10,7 +10,16 @@ namespace dosymep {
     internal class AppDomainExtensions {
         public static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args) {
             var assemblyName = new AssemblyName(args.Name);
-            var assemblyPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"pyRevit\Extensions\BIM4Everyone.lib", assemblyName.Name + ".dll");
+            
+            var assemblyPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                @"pyRevit\Extensions\BIM4Everyone.lib");
+            
+            if(assemblyName.Name.StartsWith("DevExpress.")) {
+                assemblyPath = Path.Combine(assemblyPath, "devexpress_libs", "libs");
+            }
+            
+            assemblyPath = Path.Combine(assemblyPath, assemblyName.Name + ".dll");
             return File.Exists(assemblyPath) ? Assembly.LoadFrom(assemblyPath) : null;
         }
     }

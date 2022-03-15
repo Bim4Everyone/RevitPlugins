@@ -9,8 +9,11 @@ using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 namespace RevitSuperfilter.ViewModels {
-    internal class ParameterViewModel : SelectableObjectViewModel<Parameter>, IComparable<ParameterViewModel>, IParameterViewModel {
+    internal class ParameterViewModel : SelectableObjectViewModel<Parameter>, IComparable<ParameterViewModel>,
+        IParameterViewModel {
+        private const string _emptyValue = "Пустое значение";
         private const string _defaultValue = "Без значения";
+        
         private readonly Parameter _parameter;
 
         public ParameterViewModel(Parameter parameter, IEnumerable<Parameter> parameters)
@@ -22,19 +25,23 @@ namespace RevitSuperfilter.ViewModels {
         public object Value {
             get {
                 if(_parameter.Definition == null) {
-                    return _defaultValue;
+                    return null;
                 }
 
                 if(_parameter.StorageType == StorageType.ElementId) {
-                    return _parameter.AsValueString() ?? _defaultValue;
+                    return _parameter.AsValueString();
                 }
 
-                return _parameter.AsObject() ?? _defaultValue;
+                return _parameter.AsObject();
             }
         }
 
         public override string DisplayData {
             get {
+                if(!_parameter.HasValue) {
+                    return _defaultValue;
+                }
+                
                 if(_parameter.Definition == null) {
                     return _defaultValue;
                 }
@@ -49,7 +56,7 @@ namespace RevitSuperfilter.ViewModels {
                     return value;
                 }
 
-                return _defaultValue;
+                return _emptyValue;
             }
         }
 
@@ -74,6 +81,10 @@ namespace RevitSuperfilter.ViewModels {
 
             if(_parameter.Definition == null) {
                 return -1;
+            }
+
+            if(!_parameter.HasValue && !other._parameter.HasValue) {
+                return 0;
             }
 
             if(_parameter.StorageType == other._parameter.StorageType) {

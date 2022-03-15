@@ -46,9 +46,12 @@ namespace RevitBatchPrint.ViewModels {
             SaveFileCommand = new RelayCommand(SaveFile);
             VisibilitySelectFile = System.Windows.Visibility.Collapsed;
             VisibilitySelectPrinter = System.Windows.Visibility.Collapsed;
-#if D2020 || R2020 || D2021 || R2021
-            VisibilitySelectPrinter = _printManager.HasPrinterName(Models.RevitRepository.DefaultPrinterName) ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
-#else
+
+            VisibilitySelectPrinter = _printManager.HasPrinterName(Models.RevitRepository.DefaultPrinterName)
+                ? System.Windows.Visibility.Collapsed
+                : System.Windows.Visibility.Visible;
+
+#if D2022 || R2022
             VisibilitySelectFile = System.Windows.Visibility.Visible;
 #endif
         }

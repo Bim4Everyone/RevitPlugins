@@ -8,6 +8,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep;
+using dosymep.Bim4Everyone;
 
 using RevitRooms.Models;
 using RevitRooms.ViewModels;
@@ -15,37 +16,25 @@ using RevitRooms.Views;
 
 namespace RevitRooms {
     [Transaction(TransactionMode.Manual)]
-    public class RoomsCommand : IExternalCommand {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            try {
-                var isChecked = new CheckProjectParams(commandData.Application)
-                    .CopyProjectParams()
-                    .CopyKeySchedules()
-                    .CheckKeySchedules()
-                    .GetIsChecked();
+    public class RoomsCommand : BasePluginCommand {
+        public RoomsCommand() {
+            PluginName = "Квартирография Стадии П";
+        }
 
-                if(!isChecked) {
-                    return Result.Succeeded;
-                }
+        protected override void Execute(UIApplication uiApplication) {
+            var isChecked = new CheckProjectParams(uiApplication)
+                .CopyProjectParams()
+                .CopyKeySchedules()
+                .CheckKeySchedules()
+                .GetIsChecked();
 
-                var viewModel = new RoomsViewModel(commandData.Application.Application, commandData.Application.ActiveUIDocument.Document);
-                var window = new RoomsWindow() { DataContext = viewModel };
-                new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
+            if(isChecked) {
+                var viewModel = new RoomsViewModel(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
+                var window = new RoomsWindow() {DataContext = viewModel};
+                var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
 
                 window.ShowDialog();
-
-            } catch(Exception ex) {
-#if D2020 || D2021 || D2022
-                TaskDialog.Show("Квартирография Стадии П.", ex.ToString());
-#else
-                TaskDialog.Show("Квартирография Стадии П.", ex.Message);
-#endif
-            } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
             }
-
-            return Result.Succeeded;
         }
     }
 }

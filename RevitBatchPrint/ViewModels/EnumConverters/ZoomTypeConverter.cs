@@ -13,11 +13,11 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             var zoomType = (ZoomType?) value;
             switch(zoomType) {
                 case ZoomType.Zoom:
-                return "Масштаб";
+                    return "Масштаб";
                 case ZoomType.FitToPage:
-                return "Вписать";
+                    return "Вписать";
                 default:
-                return null;
+                    return null;
             }
         }
 
@@ -25,11 +25,11 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
             var zoomType = (string) value;
             switch(zoomType) {
                 case "Масштаб":
-                return ZoomType.Zoom;
+                    return ZoomType.Zoom;
                 case "Вписать":
-                return ZoomType.FitToPage;
+                    return ZoomType.FitToPage;
                 default:
-                return null;
+                    return null;
             }
         }
 
@@ -40,7 +40,7 @@ namespace RevitBatchPrint.ViewModels.EnumConverters {
 
     internal class ZoomTypeExtension : MarkupExtension {
         public override object ProvideValue(IServiceProvider serviceProvider) {
-            return new[] { "Масштаб", "Вписать" };
+            return new[] {"Масштаб", "Вписать"};
         }
     }
 }

@@ -10,33 +10,27 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep;
+using dosymep.Bim4Everyone;
 
 using RevitFamilyExplorer.ViewModels;
 using RevitFamilyExplorer.Views;
 
 namespace RevitFamilyExplorer {
     [Transaction(TransactionMode.Manual)]
-    public class RegisterFamilyExplorerCommand : IExternalCommand {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            try {
-                Execute(commandData.Application);
-            } catch(Exception ex) {
-#if D2020 || D2021 || D2022
-                TaskDialog.Show("Обозреватель семейств.", ex.ToString());
-#endif
-            } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            }
-
-            return Result.Succeeded;
+    public class RegisterFamilyExplorerCommand  : BasePluginCommand {
+        public RegisterFamilyExplorerCommand() {
+            PluginName = "Обозреватель семейств";
         }
-
-        public void Execute(UIApplication uiApplication) {
+        
+        protected override void Execute(UIApplication uiApplication) {
             var dockPanelId = new DockablePaneId(FamilyExplorerCommand.DockPanelId);
             if(!DockablePane.PaneIsRegistered(dockPanelId)) {
                 uiApplication.RegisterDockablePane(dockPanelId, "Обозреватель семейств", new FamilyExplorerPanelProvider(uiApplication));
             }
+        }
+
+        public void RegisterPanel(UIApplication uiApplication) {
+            Execute(uiApplication);
         }
     }
 

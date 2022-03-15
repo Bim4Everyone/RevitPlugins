@@ -1,37 +1,17 @@
-﻿
-using System;
-
-using dosymep.Bim4Everyone;
+﻿using dosymep.Bim4Everyone;
 using dosymep.WPF.ViewModels;
 
 using RevitSetLevelSection.Models;
 
 namespace RevitSetLevelSection.ViewModels {
-    internal class FillParamViewModel : BaseViewModel {
-        private readonly RevitRepository _revitRepository;
+    internal abstract class FillParamViewModel : BaseViewModel {
+        public abstract bool IsEnabled { get; set; }
+        public abstract RevitParam RevitParam { get; set; }
 
-        private bool _isEnabled;
-        private DesingOptionsViewModel _desingOptions;
+        public abstract string GetErrorText(bool fromRevitParam);
+        public abstract void UpdateElements(bool fromProjectParam);
 
-        public FillParamViewModel(RevitRepository revitRepository) {
-            if(revitRepository is null) {
-                throw new ArgumentNullException(nameof(revitRepository));
-            }
-
-            _revitRepository = revitRepository;
-        }
-
-        public RevitParam RevitParam { get; set; }
-        public string Name => $"Заполнить \"{RevitParam.Name}\"";
-
-        public bool IsEnabled {
-            get => _isEnabled;
-            set => this.RaiseAndSetIfChanged(ref _isEnabled, value);
-        }
-
-        public DesingOptionsViewModel DesingOptions {
-            get => _desingOptions;
-            set => this.RaiseAndSetIfChanged(ref _desingOptions, value);
-        }
+        public abstract ParamSettings GetParamSettings();
+        public abstract void SetParamSettings(ParamSettings paramSettings);
     }
 }

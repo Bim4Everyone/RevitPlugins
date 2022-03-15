@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using dosymep.WPF.Views;
+
 using PlatformSettings.SharedParams;
 using PlatformSettings.TabExtensions;
 
@@ -21,10 +23,13 @@ namespace PlatformSettings {
     /// <summary>
     /// Interaction logic for SettingsWindow.xaml
     /// </summary>
-    public partial class SettingsWindow : Window {
+    public partial class SettingsWindow : PlatformWindow {
         public SettingsWindow() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(PlatformSettings);
+        public override string ProjectConfigName => nameof(SettingsWindow);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;

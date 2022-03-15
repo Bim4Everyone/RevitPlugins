@@ -31,7 +31,9 @@ namespace RevitBatchPrint.Models {
         /// <summary>
         /// Наименование параметров по которым должна быть фильтрация.
         /// </summary>
-        public static IReadOnlyList<string> PrintParamNames { get; set; } = new List<string>() { "Орг.ОбознчТома(Комплекта)", "Орг.КомплектЧертежей", "ADSK_Комплект чертежей" };
+        public static IReadOnlyList<string> PrintParamNames { get; set; } = new List<string>() {
+            "Орг.ОбознчТома(Комплекта)", "Орг.КомплектЧертежей", "ADSK_Комплект чертежей"
+        };
 
         /// <summary>
         /// Перезагружает менеджер принтера.
@@ -49,7 +51,7 @@ namespace RevitBatchPrint.Models {
             // если установлено другое значение
             // имя файла устанавливается ревитом
             PrintManager.PrintRange = PrintRange.Current;
-            
+
             PrintManager.Apply();
             UpdatePrintFileName(null);
         }
@@ -62,8 +64,11 @@ namespace RevitBatchPrint.Models {
             string documentFileName = string.IsNullOrEmpty(Document.Title) ? "Без имени" : Document.Title;
 
             string viewName = ReplaceInvalidChars(viewSheet?.SheetNumber);
-            string fileName = string.IsNullOrEmpty(viewName) ? documentFileName : $"{documentFileName} ({viewName} - {ReplaceInvalidChars(viewSheet.Name)})";
-            PrintManager.PrintToFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName + ".pdf");
+            string fileName = string.IsNullOrEmpty(viewName)
+                ? documentFileName
+                : $"{documentFileName} ({viewName} - {ReplaceInvalidChars(viewSheet.Name)})";
+            PrintManager.PrintToFileName =
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName + ".pdf");
             if(File.Exists(PrintManager.PrintToFileName)) {
                 File.Delete(PrintManager.PrintToFileName);
             }
@@ -86,7 +91,9 @@ namespace RevitBatchPrint.Models {
             var categoryId = new ElementId(BuiltInCategory.OST_Sheets);
             return Document.GetParameterBindings()
                 .Where(item => item.Binding is InstanceBinding)
-                .Where(item => ((InstanceBinding) item.Binding).Categories.OfType<Category>().Any(category => category.Id == categoryId))
+                .Where(item =>
+                    ((InstanceBinding) item.Binding).Categories.OfType<Category>()
+                    .Any(category => category.Id == categoryId))
 #if D2020 || R2020 || D2021 || R2021
                 .Where(item => item.Definition.ParameterType == ParameterType.Text)
 #else
@@ -105,7 +112,8 @@ namespace RevitBatchPrint.Models {
         /// <returns>Возвращает список возможных значений параметра группировки альбомов.</returns>
         public List<(string, int)> GetPrintParamValues(string printParamName) {
             if(string.IsNullOrEmpty(printParamName)) {
-                throw new ArgumentException($"'{nameof(printParamName)}' cannot be null or empty.", nameof(printParamName));
+                throw new ArgumentException($"'{nameof(printParamName)}' cannot be null or empty.",
+                    nameof(printParamName));
             }
 
             return GetViewSheets()
@@ -138,11 +146,13 @@ namespace RevitBatchPrint.Models {
         /// <returns>Возвращает отфильтрованный список листов по параметру группировки.</returns>
         public List<ViewSheet> GetViewSheets(string printParamName, string printParamValue) {
             if(string.IsNullOrEmpty(printParamName)) {
-                throw new ArgumentException($"'{nameof(printParamName)}' cannot be null or empty.", nameof(printParamName));
+                throw new ArgumentException($"'{nameof(printParamName)}' cannot be null or empty.",
+                    nameof(printParamName));
             }
 
             if(string.IsNullOrEmpty(printParamValue)) {
-                throw new ArgumentException($"'{nameof(printParamValue)}' cannot be null or empty.", nameof(printParamValue));
+                throw new ArgumentException($"'{nameof(printParamValue)}' cannot be null or empty.",
+                    nameof(printParamValue));
             }
 
             return GetViewSheets()

@@ -11,9 +11,9 @@ using dosymep.WPF.ViewModels;
 using RevitSetLevelSection.Models;
 
 namespace RevitSetLevelSection.ViewModels {
-    internal class FillLevelParamViewModel : BaseViewModel {
+    internal class FillLevelParamViewModel : FillParamViewModel {
         private readonly RevitRepository _revitRepository;
-        
+
         private bool _isEnabled;
 
         public FillLevelParamViewModel(RevitRepository revitRepository) {
@@ -22,15 +22,33 @@ namespace RevitSetLevelSection.ViewModels {
             }
 
             _revitRepository = revitRepository;
-            RevitParam = SharedParamsConfig.Instance.Level;
         }
 
-        public RevitParam RevitParam { get; set; }
-        public string Name => $"Заполнить \"{RevitParam.Name}\"";
+        public override RevitParam RevitParam { get; set; }
+        public string Name => $"Обновить \"{RevitParam.Name}\"";
 
-        public bool IsEnabled {
+        public override bool IsEnabled {
             get => _isEnabled;
             set => this.RaiseAndSetIfChanged(ref _isEnabled, value);
+        }
+
+        public override string GetErrorText(bool fromRevitParam) {
+            return null;
+        }
+
+        public override void UpdateElements(bool fromProjectParam) {
+
+        }
+
+        public override ParamSettings GetParamSettings() {
+            return new ParamSettings() {
+                IsEnabled = IsEnabled, 
+                PropertyName = RevitParam.PropertyName
+            };
+        }
+
+        public override void SetParamSettings(ParamSettings paramSettings) {
+            IsEnabled = paramSettings.IsEnabled;
         }
     }
 }

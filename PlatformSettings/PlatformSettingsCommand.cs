@@ -8,6 +8,8 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
+
 using PlatformSettings.TabExtensions;
 
 using pyRevitLabs.NLog;
@@ -17,16 +19,18 @@ using pyRevitLabs.PyRevit;
 
 namespace PlatformSettings {
     [Transaction(TransactionMode.Manual)]
-    public class PlatformSettingsCommand : IExternalCommand {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
-            return Execute(commandData) ? Result.Succeeded : Result.Cancelled;
+    public class PlatformSettingsCommand : BasePluginCommand {
+        public PlatformSettingsCommand() {
+            PluginName = "Настройки платформы";
         }
 
-        public bool Execute(ExternalCommandData commandData) {
-            var window = new SettingsWindow() { DataContext = new PlatformSettingsViewModel() };
-            new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
+        protected override void Execute(UIApplication uiApplication) {
+            OpenSettingsWindow(uiApplication);
+        }
+
+        public bool OpenSettingsWindow(UIApplication uiApplication) {
+            var window = new SettingsWindow() {DataContext = new PlatformSettingsViewModel()};
+            var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
 
             if(window.ShowDialog() == true) {
                 var settings = (PlatformSettingsViewModel) window.DataContext;

@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep;
+using dosymep.Bim4Everyone;
 
 using RevitServerFolders.Export;
 
@@ -14,38 +15,27 @@ using RevitServerFolders.Export;
 
 namespace RevitServerFolders {
     [Transaction(TransactionMode.Manual)]
-    public class ExportNwcFileCommand : IExternalCommand {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            try {
+    public class ExportNwcFileCommand : BasePluginCommand {
+        public ExportNwcFileCommand() {
+            PluginName = "Экспорт NWC в RVT";
+        }
 
-                var uiApplication = commandData.Application;
-                var application = uiApplication.Application;
+        protected override void Execute(UIApplication uiApplication) {
+            var application = uiApplication.Application;
 
-                var exportNwcFileViewModel = new ExportNwcFileViewModel(ExportNwcFileConfig.GetExportNwcFileConfig());
-                var exportWindow = new ExportNwcFileWindow { DataContext = exportNwcFileViewModel };
-                new WindowInteropHelper(exportWindow) { Owner = uiApplication.MainWindowHandle };
+            var exportNwcFileViewModel = new ExportNwcFileViewModel(ExportNwcFileConfig.GetExportNwcFileConfig());
+            var exportWindow = new ExportNwcFileWindow {DataContext = exportNwcFileViewModel};
+            var helper = new WindowInteropHelper(exportWindow) {Owner = uiApplication.MainWindowHandle};
 
-                if(exportWindow.ShowDialog() == true) {
-                    exportNwcFileViewModel = (ExportNwcFileViewModel) exportWindow.DataContext;
+            if(exportWindow.ShowDialog() == true) {
+                exportNwcFileViewModel = (ExportNwcFileViewModel) exportWindow.DataContext;
 
-                    SaveExportNwcFileConfig(exportNwcFileViewModel);
-                    UnloadAllLinks(exportNwcFileViewModel);
-                    ExportFilesToNavisworks(application, exportNwcFileViewModel);
+                SaveExportNwcFileConfig(exportNwcFileViewModel);
+                UnloadAllLinks(exportNwcFileViewModel);
+                ExportFilesToNavisworks(application, exportNwcFileViewModel);
 
-                    System.Windows.MessageBox.Show("Готово!", "Сообщение!", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-                }
-            } catch(Exception ex) {
-#if D2020 || D2021 || D2022
-                TaskDialog.Show("Экспорт NWC в RVT.", ex.ToString());
-#else
-                TaskDialog.Show("Экспорт NWC в RVT.", ex.Message);
-#endif
-            } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
+                TaskDialog.Show("Сообщение!", "Готово!");
             }
-
-            return Result.Succeeded;
         }
 
         private static void ExportFilesToNavisworks(Autodesk.Revit.ApplicationServices.Application application, ExportNwcFileViewModel exportNwcFileViewModel) {

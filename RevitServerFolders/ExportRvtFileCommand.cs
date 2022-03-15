@@ -22,40 +22,29 @@ using RevitServerFolders.Export;
 
 namespace RevitServerFolders {
     [Transaction(TransactionMode.Manual)]
-    public class ExportRvtFileCommand : IExternalCommand {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            try {
-                var uiApplication = commandData.Application;
-                var application = uiApplication.Application;
+    public class ExportRvtFileCommand : BasePluginCommand {
+        public ExportRvtFileCommand() {
+            PluginName = "Экспорт RVT из RS";
+        }
+        protected override void Execute(UIApplication uiApplication) {
+            var application = uiApplication.Application;
 
-                var exportRvtFileViewModel = new ExportRvtFileViewModel(application.VersionNumber, application.GetRevitServerNetworkHosts(), ExportRvtFileConfig.GetExportRvtFileConfig());
+            var exportRvtFileViewModel = new ExportRvtFileViewModel(application.VersionNumber, application.GetRevitServerNetworkHosts(), ExportRvtFileConfig.GetExportRvtFileConfig());
 
-                var exportWindow = new ExportRvtFileWindow { DataContext = exportRvtFileViewModel };
-                new WindowInteropHelper(exportWindow) { Owner = uiApplication.MainWindowHandle };
+            var exportWindow = new ExportRvtFileWindow { DataContext = exportRvtFileViewModel };
+            var helper = new WindowInteropHelper(exportWindow) { Owner = uiApplication.MainWindowHandle };
 
-                exportRvtFileViewModel.Owner = exportWindow;
-                if(exportWindow.ShowDialog() == true) {
-                    exportRvtFileViewModel = (ExportRvtFileViewModel) exportWindow.DataContext;
+            exportRvtFileViewModel.Owner = exportWindow;
+            if(exportWindow.ShowDialog() == true) {
+                exportRvtFileViewModel = (ExportRvtFileViewModel) exportWindow.DataContext;
 
-                    SaveExportRvtFileConfig(exportRvtFileViewModel);
-                    DetachRevitFiles(exportRvtFileViewModel);
-                    UnloadAllLinks(exportRvtFileViewModel);
-                    ExportFilesToNavisworks(application, exportRvtFileViewModel);
+                SaveExportRvtFileConfig(exportRvtFileViewModel);
+                DetachRevitFiles(exportRvtFileViewModel);
+                UnloadAllLinks(exportRvtFileViewModel);
+                ExportFilesToNavisworks(application, exportRvtFileViewModel);
 
-                    System.Windows.MessageBox.Show("Готово!", "Сообщение!", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-                }
-            } catch(Exception ex) {
-#if D2020 || D2021 || D2022
-                TaskDialog.Show("Экспорт RVT из RS.", ex.ToString());
-#else
-                TaskDialog.Show("Экспорт RVT из RS.", ex.Message);
-#endif
-            } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
+                TaskDialog.Show("Сообщение!", "Готово!");
             }
-
-            return Result.Succeeded;
         }
 
         private static void ExportFilesToNavisworks(Application application, ExportRvtFileViewModel exportRvtFileViewModel) {

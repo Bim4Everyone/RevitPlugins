@@ -59,6 +59,11 @@ namespace RevitCopyStandarts.ViewModels {
             { "DuctSystemType", "Autodesk.Revit.DB.Mechanical.MechanicalSystemType" },
             { "GutterType", "Autodesk.Revit.DB.Architecture.GutterType" },
             { "BuildingPadType", "Autodesk.Revit.DB.BuildingPadType" },
+            
+            { "Parameters", "Autodesk.Revit.DB.ParameterElement" },
+            { "GlobalParameters", "Autodesk.Revit.DB.GlobalParameter" },
+            { "SharedParameters", "Autodesk.Revit.DB.SharedParameterElement" },
+            { "ProjectParameters", "RevitCopyStandarts.Commands.CopyProjectParametersCommand" },
         };
 
 
