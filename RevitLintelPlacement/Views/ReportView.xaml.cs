@@ -12,13 +12,18 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using dosymep.WPF.Views;
+
 namespace RevitLintelPlacement.Views {
     /// <summary>
     /// Interaction logic for ReportView.xaml
     /// </summary>
-    public partial class ReportView : Window {
+    public partial class ReportView : PlatformWindow {
         public ReportView() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitLintelPlacement);
+        public override string ProjectConfigName => nameof(ReportView);
     }
 }

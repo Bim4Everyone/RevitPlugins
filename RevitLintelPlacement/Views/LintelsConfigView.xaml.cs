@@ -12,11 +12,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using dosymep.WPF.Views;
+
 namespace RevitLintelPlacement.Views {
     /// <summary>
     /// Interaction logic for LintelsConfigView.xaml
     /// </summary>
-    public partial class LintelsConfigView : Window {
+    public partial class LintelsConfigView : PlatformWindow {
         public LintelsConfigView() {
             InitializeComponent();
         }
@@ -24,5 +26,8 @@ namespace RevitLintelPlacement.Views {
         private void Button_Click(object sender, RoutedEventArgs e) {
             this.Close();
         }
+
+        public override string PluginName => nameof(RevitLintelPlacement);
+        public override string ProjectConfigName => nameof(LintelsConfigView);
     }
 }

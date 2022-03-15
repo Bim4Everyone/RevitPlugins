@@ -13,13 +13,19 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using dosymep.WPF.Views;
+
 namespace RevitLintelPlacement.Views {
     /// <summary>
     /// Логика взаимодействия для LintelsTabView.xaml
     /// </summary>
-    public partial class LintelsView : Window {
+    public partial class LintelsView : PlatformWindow {
+
         public LintelsView() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitLintelPlacement);
+        public override string ProjectConfigName => nameof(LintelsView);
     }
 }
