@@ -25,6 +25,7 @@ namespace RevitLintelPlacement.ViewModels {
         private ObservableCollection<string> _ruleNames;
         private string _selectedName;
         private string _message;
+        private bool _canSave;
 
         public GroupedRuleCollectionViewModel() {
 
@@ -37,11 +38,12 @@ namespace RevitLintelPlacement.ViewModels {
             InitializeGroupRules();
             AddGroupedRuleCommand = new RelayCommand(AddGroupedRule, p => true);
             RemoveGroupedRuleCommand = new RelayCommand(RemoveGroupedRule, p => true);
-            SaveCommand = new RelayCommand(Save, p => true);
-            SaveAsCommand = new RelayCommand(SaveAs, p => true);
+            SaveCommand = new RelayCommand(Save, p => CanSave);
+            SaveAsCommand = new RelayCommand(SaveAs, p => CanSave);
             LoadCommand = new RelayCommand(Load, p => true);
             PathSelectionChangedCommand = new RelayCommand(SelectionChanged, p => true);
             CreateNewRuleCommand = new RelayCommand(NewRule, p => true);
+            CanSave = true;
         }
 
         public ICommand AddGroupedRuleCommand { get; set; }
@@ -51,11 +53,16 @@ namespace RevitLintelPlacement.ViewModels {
         public ICommand LoadCommand { get; set; }
         public ICommand PathSelectionChangedCommand { get; set; }
         public ICommand CreateNewRuleCommand { get; set; }
-       
 
-        public string Message { 
-            get => _message; 
+
+        public string Message {
+            get => _message;
             set => this.RaiseAndSetIfChanged(ref _message, value);
+        }
+
+        public bool CanSave { 
+            get => _canSave; 
+            set => this.RaiseAndSetIfChanged(ref _canSave, value); 
         }
 
         public ObservableCollection<GroupedRuleViewModel> GroupedRules {
@@ -105,7 +112,7 @@ namespace RevitLintelPlacement.ViewModels {
                     }
                     case RulesType.New: {
                         var result = AskAboutNewFile();
-                        if (result == TaskDialogResult.CommandLink1) {
+                        if(result == TaskDialogResult.CommandLink1) {
                             config.Save(_revitRepository.GetDocumentName());
                             config.Name = _revitRepository.GetDocumentName();
                             _revitRepository.RuleConfigs[_revitRepository.GetDocumentName()] = config;

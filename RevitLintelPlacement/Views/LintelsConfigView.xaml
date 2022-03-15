@@ -169,9 +169,9 @@
                 </Grid>
             </StackPanel>
         </GroupBox>
-        <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Orientation="Horizontal">
-            <TextBlock VerticalAlignment="Center" Foreground="Orange" Text="{Binding Message}"></TextBlock>
-            <Button Height="30" Width="70" Margin="5" Command="{Binding SaveConfigCommand}">Сохранить</Button>
+        <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Width="Auto" HorizontalAlignment="Right" Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center" Foreground="Orange" Width="Auto" Margin="10 0" Text="{Binding Message}"></TextBlock>
+            <Button Height="30" Width="70" Margin="5" Command="{Binding SaveConfigCommand}" CommandParameter="{Binding ElementName=Config}">Сохранить</Button>
             <Button Height="30" Width="70" Margin="5" Click="Button_Click">Отмена</Button>
         </StackPanel>
     </Grid>

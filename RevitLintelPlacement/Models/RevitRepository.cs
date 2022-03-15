@@ -38,7 +38,7 @@ namespace RevitLintelPlacement.Models {
 
             LintelsConfig = lintelsConfig;
             LintelsCommonConfig = LintelsCommonConfig.GetLintelsCommonConfig(GetDocumentName());
-            RuleConfigs= RuleConfig.GetRuleConfigs(GetDocumentName());
+            RuleConfigs = RuleConfig.GetRuleConfigs(GetDocumentName());
             CreateView3DIfNotExisted();
         }
 
@@ -89,7 +89,7 @@ namespace RevitLintelPlacement.Models {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(WallType))
                 .Cast<WallType>()
-                .Where(w=>w.Kind == WallKind.Basic);
+                .Where(w => w.Kind == WallKind.Basic);
         }
 
         public IEnumerable<Element> GetGenericModelFamilies() {
@@ -157,7 +157,7 @@ namespace RevitLintelPlacement.Models {
                 .ToList();
         }
 
-        public IEnumerable<FamilyInstance> GetAllElementsInWall(SampleMode sampleMode) {
+        public IEnumerable<FamilyInstance> GetAllElementsInWall(SampleMode sampleMode, ElementInfosViewModel elementInfos) {
             var categoryFilter = new ElementMulticategoryFilter(
                 new List<BuiltInCategory> { BuiltInCategory.OST_Doors, BuiltInCategory.OST_Windows });
 
@@ -192,7 +192,8 @@ namespace RevitLintelPlacement.Models {
                  collector.OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
                 .Where(f => f?.Symbol != null && f.Symbol?.Family != null && f.Symbol.Family.Name != null &&
-                f.Symbol.Family.Name.ToLower().Contains(LintelsCommonConfig.HolesFilter.ToLower())), new FamilyInstanceComparer());
+                f.Symbol.Family.Name.ToLower().Contains(LintelsCommonConfig.HolesFilter.ToLower())), new FamilyInstanceComparer())
+                .Where(e => CheckElementInWallParameter(e, elementInfos));
         }
 
         public View GetElevation() {
@@ -422,7 +423,7 @@ namespace RevitLintelPlacement.Models {
                 if(rightL.Count > 0 && wallReferences2.Count > 0) {
                     _document.Create.NewAlignment(plan, rightL.First(), wallReferences2.First());
                 }
-            } catch (Exception e) {
+            } catch(Exception e) {
                 Debug.WriteLine(e.Message);
                 try {
                     if(leftL.Count > 0 && wallReferences2.Count > 0) {
@@ -431,10 +432,19 @@ namespace RevitLintelPlacement.Models {
                     if(rightL.Count > 0 && wallReferences1.Count > 0) {
                         _document.Create.NewAlignment(plan, rightL.First(), wallReferences1.First());
                     }
-                } catch (Exception ex) {
+                } catch(Exception ex) {
                     Debug.WriteLine(ex.Message);
                 }
             }
+        }
+
+        public bool CheckElementInWallParameter(FamilyInstance elementInWall, ElementInfosViewModel elementInfos) {
+            if(!elementInWall.IsExistsParam(LintelsCommonConfig.OpeningHeight) && !elementInWall.Symbol.IsExistsParam(LintelsCommonConfig.OpeningHeight)) {
+                elementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id,
+                    InfoElement.MissingOpeningParameter.FormatMessage(elementInWall.Name, LintelsCommonConfig.OpeningHeight)));
+                return false;
+            }
+            return true;
         }
 
         public XYZ GetLocationPoint(FamilyInstance elementInWall) {
@@ -443,14 +453,22 @@ namespace RevitLintelPlacement.Models {
             }
             var location = ((LocationPoint) elementInWall.Location).Point;
             var level = _document.GetElement(elementInWall.LevelId) as Level;
+            var height = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningHeight)
+               ?? elementInWall.Symbol.GetParamValueOrDefault(LintelsCommonConfig.OpeningHeight);
             var bottomBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
-            var height = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningHeight);
+            if(bottomBarHeight == 0) {
+                bottomBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_ELEVATION_PARAM);
+            }
+            if(bottomBarHeight == 0) {
+                bottomBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_FREE_HOST_OFFSET_PARAM);
+            }
+
             double z;
             if(height != null) {
-                z = (double) height + bottomBarHeight + level?.Elevation??0;
+                z = (double) height + (double) bottomBarHeight + (level?.Elevation ?? 0);
             } else {
                 var topBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
-                z = /*location.Z +*/ topBarHeight + level?.Elevation??0;
+                z = topBarHeight + (level?.Elevation ?? 0);
             }
             return new XYZ(location.X, location.Y, z);
         }

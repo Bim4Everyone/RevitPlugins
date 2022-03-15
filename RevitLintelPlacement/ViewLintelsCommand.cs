@@ -24,8 +24,8 @@ namespace RevitLintelPlacement {
             try {
                 var lintelsConfig = LintelsConfig.GetLintelsConfig();
                 var revitRepository = new RevitRepository(commandData.Application.Application, commandData.Application.ActiveUIDocument.Document, lintelsConfig);
-
-                var lintelsView = new LintelCollectionViewModel(revitRepository);
+                var elementInfos = new ElementInfosViewModel(revitRepository);
+                var lintelsView = new LintelCollectionViewModel(revitRepository, elementInfos);
                 var view = new LintelsView() { DataContext = lintelsView};
 
                 WindowInteropHelper windowInteropHelper = new WindowInteropHelper(view) { Owner = commandData.Application.MainWindowHandle };

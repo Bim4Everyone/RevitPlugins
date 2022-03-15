@@ -20,14 +20,16 @@ using RevitLintelPlacement.Models;
 namespace RevitLintelPlacement.ViewModels {
     internal class LintelCollectionViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly ElementInfosViewModel _elementInfos;
         private ElementInWallKind _selectedElementKind;
         private ViewOrientation3D _orientation; //вряд ли здесь нужно хранить
         private ObservableCollection<LintelInfoViewModel> _lintelInfos;
         private SampleMode selectedSampleMode;
         private int countLintelInView;
 
-        public LintelCollectionViewModel(RevitRepository revitRepository) {
+        public LintelCollectionViewModel(RevitRepository revitRepository, ElementInfosViewModel elementInfos) {
             this._revitRepository = revitRepository;
+            this._elementInfos = elementInfos;
             var config = revitRepository.LintelsConfig.GetSettings(_revitRepository.GetDocumentName());
             if(config != null) {
                 SelectedSampleMode = config.SelectedModeNavigator;
@@ -128,7 +130,7 @@ namespace RevitLintelPlacement.ViewModels {
         private void InitializeLintels(SampleMode sampleMode) {
             LintelInfos = new ObservableCollection<LintelInfoViewModel>();
             var lintels = _revitRepository.GetLintels(sampleMode);
-            var correlator = new LintelElementCorrelator(_revitRepository);
+            var correlator = new LintelElementCorrelator(_revitRepository, _elementInfos);
             var lintelInfos = lintels
                 .Select(l => new LintelInfoViewModel(_revitRepository, l, correlator.Correlate(l)))
                 .OrderBy(l => l.Level, new AlphanumericComparer());
