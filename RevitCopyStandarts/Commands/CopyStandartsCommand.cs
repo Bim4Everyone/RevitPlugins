@@ -10,9 +10,9 @@ using Autodesk.Revit.DB;
 using RevitCopyStandarts.ViewModels;
 
 namespace RevitCopyStandarts.Commands {
-    internal abstract class CopyStandartsCommand : ICopyStandartsCommand {
-        private readonly Document _source;
-        private readonly Document _target;
+    public abstract class CopyStandartsCommand : ICopyStandartsCommand {
+        protected readonly Document _source;
+        protected readonly Document _target;
 
         protected CopyStandartsCommand(Document source, Document target) {
             _source = source;
