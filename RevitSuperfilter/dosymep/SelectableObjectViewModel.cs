@@ -29,7 +29,7 @@ namespace dosymep.WPF.ViewModels {
             get => _isSelected;
             set {
                 _isSelected = value;
-                this.RaisePropertyChanged();
+                this.RaisePropertyChanged(nameof(IsSelected));
             }
         }
 
