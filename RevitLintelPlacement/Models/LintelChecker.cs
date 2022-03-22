@@ -112,8 +112,8 @@ namespace RevitLintelPlacement.Models {
                     CheckLintelType(lintel, rule),
                     CheckLintelThickness(lintel, elementInWall),
                     CheckLintelWidth(lintel, elementInWall),
-                    CheckLintelRightOffset(lintel, elementInWall, rule, out double rightOffset),
                     CheckLintelLeftOffset(lintel, elementInWall, rule, out double leftOffset),
+                    CheckLintelRightOffset(lintel, elementInWall, rule, out double rightOffset),
                 };
                 return new WrongLintelParameters(_revitRepository, results, rule, lintel, elementInWall, rightOffset, leftOffset) { Code = ResultCode.Correct };
             }
@@ -154,24 +154,6 @@ namespace RevitLintelPlacement.Models {
             }
         }
 
-        private ParameterCheckResult CheckLintelRightOffset(FamilyInstance lintel, FamilyInstance elementInWall, ConcreteRuleViewModel rule, out double offset) {
-            if(_revitRepository.DoesRightCornerNeeded(_view3D, elementInWall, _linkNames, _elementInfos, out offset)) {
-                var lintelRightOffset = (double) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelRightOffset);
-                var lintelCorner = (int) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelRightCorner) == 1 ? true : false;
-                if(Math.Abs(lintelRightOffset - offset) < 0.01 && lintelCorner) {
-                    return ParameterCheckResult.Correct;
-                } else {
-                    return ParameterCheckResult.WrongLintelRightCorner;
-                }
-            } else {
-                var lintelRightOffset = (double) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelRightOffset);
-                if(Math.Abs(lintelRightOffset - rule.LintelRightOffsetParameter.RightOffset) < 0.01) {
-                    return ParameterCheckResult.Correct;
-                }
-                return ParameterCheckResult.WrongLintelRightOffset;
-            }
-        }
-
         private ParameterCheckResult CheckLintelLeftOffset(FamilyInstance lintel, FamilyInstance elementInWall, ConcreteRuleViewModel rule, out double offset) {
             if(_revitRepository.DoesLeftCornerNeeded(_view3D, elementInWall, _linkNames, _elementInfos, out offset)) {
                 var lintelLeftOffset = (double) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelLeftOffset);
@@ -187,6 +169,24 @@ namespace RevitLintelPlacement.Models {
                     return ParameterCheckResult.Correct;
                 }
                 return ParameterCheckResult.WrongLintelLeftOffset;
+            }
+        }
+
+        private ParameterCheckResult CheckLintelRightOffset(FamilyInstance lintel, FamilyInstance elementInWall, ConcreteRuleViewModel rule, out double offset) {
+            if(_revitRepository.DoesRightCornerNeeded(_view3D, elementInWall, _linkNames, _elementInfos, out offset)) {
+                var lintelRightOffset = (double) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelRightOffset);
+                var lintelCorner = (int) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelRightCorner) == 1 ? true : false;
+                if(Math.Abs(lintelRightOffset - offset) < 0.01 && lintelCorner) {
+                    return ParameterCheckResult.Correct;
+                } else {
+                    return ParameterCheckResult.WrongLintelRightCorner;
+                }
+            } else {
+                var lintelRightOffset = (double) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelRightOffset);
+                if(Math.Abs(lintelRightOffset - rule.LintelRightOffsetParameter.RightOffset) < 0.01) {
+                    return ParameterCheckResult.Correct;
+                }
+                return ParameterCheckResult.WrongLintelRightOffset;
             }
         }
     }
