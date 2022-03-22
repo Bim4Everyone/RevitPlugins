@@ -77,9 +77,8 @@ namespace RevitBatchPrint.Models {
         public List<View> GetViewsWithoutCrop(ViewSheet viewSheet) {
             return viewSheet.GetAllPlacedViews()
                 .Select(item => Document.GetElement(item))
-                .Where(item => item.get_Parameter(BuiltInParameter.VIEWER_CROP_REGION) != null)
-                .Where(item => item.GetParam(BuiltInParameter.VIEWER_CROP_REGION).AsInteger() == 0)
                 .OfType<View>()
+                .Where(item => !item.CropBoxActive)
                 .ToList();
         }
 
