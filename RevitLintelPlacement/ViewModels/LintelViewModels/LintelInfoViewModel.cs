@@ -4,9 +4,11 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitLintelPlacement.Models;
@@ -22,7 +24,7 @@ namespace RevitLintelPlacement.ViewModels {
         private ElementInWallKind _elementInWallKind;
 
         public LintelInfoViewModel() {
-
+            RotateLintelCommand = new RelayCommand(RotateLintel);
         }
 
         public LintelInfoViewModel(RevitRepository revitRepository, FamilyInstance lintel, FamilyInstance elementInWall) {
@@ -48,7 +50,10 @@ namespace RevitLintelPlacement.ViewModels {
             }
             Lintel = lintel;
             LintelId = lintel.Id;
+            RotateLintelCommand = new RelayCommand(RotateLintel, CanRotateLintel);
         }
+
+
 
         public string ElementInWallName {
             get => _elementInWallName;
@@ -70,6 +75,8 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _elementInWallKind, value);
         }
 
+        public ICommand RotateLintelCommand { get; set; }
+
         public ElementId LintelId {
             get => _lintelId;
             set => this.RaiseAndSetIfChanged(ref _lintelId, value);
@@ -82,6 +89,14 @@ namespace RevitLintelPlacement.ViewModels {
 
         public FamilyInstance Lintel { get; set; }
         public FamilyInstance ElementInWall { get; set; }
+
+        private async void RotateLintel(object p) {
+            await _revitRepository.MirrorLintel(Lintel, ElementInWall);
+        }
+        
+        private bool CanRotateLintel(object p) {
+            return ElementInWall != null && Lintel != null;
+        }
     }
 
     public enum ElementInWallKind {

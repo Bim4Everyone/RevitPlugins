@@ -90,6 +90,15 @@
                   VirtualizingPanel.IsVirtualizingWhenGrouping="True"
             ItemsSource="{Binding LintelsViewSource.View, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
             <DataGrid.Columns >
+                <DataGridTemplateColumn >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type vm:LintelInfoViewModel}">
+                            <Button Height="20" Command="{Binding RotateLintelCommand}" CommandParameter="{Binding LintelId}">
+                                <Image Source="../Resources/icons8-reverce.png"/>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTemplateColumn Width="75" Header="Перемычка">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type vm:LintelInfoViewModel}">

@@ -49,6 +49,7 @@
 	  <None Remove="Resources\icons8-info.png" />
 	  <None Remove="Resources\icons8-remove.png" />
 	  <None Remove="Resources\icons8-report.png" />
+	  <None Remove="Resources\icons8-reverce.png" />
 	  <None Remove="Resources\icons8-save-as.png" />
 	  <None Remove="Resources\icons8-save.png" />
 	  <None Remove="Resources\icons8-warn.png" />
@@ -57,6 +58,7 @@
 		<Resource Include="Resources\icons8-arrow-next.png" />
 		<Resource Include="Resources\icons8-down.png" />
 		<Resource Include="Resources\icons8-error.png" />
+		<Resource Include="Resources\icons8-reverce.png" />
 		<Resource Include="Resources\icons8-warn.png" />
 		<Resource Include="Resources\icons8-file.png" />
 		<Resource Include="Resources\icons8-info.png" />
