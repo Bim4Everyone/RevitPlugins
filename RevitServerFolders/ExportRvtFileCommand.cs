@@ -55,6 +55,7 @@ namespace RevitServerFolders {
                     TargetFolderName = exportRvtFileViewModel.TargetNwcFolder,
 
                     WithRooms = exportRvtFileViewModel.WithRooms,
+                    WithLinkedFiles = exportRvtFileViewModel.WithLinkedFiles,
                     CleanTargetFolder = exportRvtFileViewModel.CleanTargetNwcFolder
                 }.Execute();
             }
@@ -70,6 +71,7 @@ namespace RevitServerFolders {
             new DetachRevitFilesCommand() {
                 ServerName = exportRvtFileViewModel.ServerName,
                 RevitVersion = exportRvtFileViewModel.RevitVersion,
+                WithLinkedFiles =exportRvtFileViewModel.WithLinkedFiles,
                 WithSubFolders = exportRvtFileViewModel.WithSubFolders,
                 FolderName = exportRvtFileViewModel.SourceRvtFolder,
                 TargetFolderName = exportRvtFileViewModel.TargetRvtFolder,
@@ -82,6 +84,7 @@ namespace RevitServerFolders {
 
             exportConfig.ServerName = exportRvtFileViewModel.ServerName;
             exportConfig.WithRooms = exportRvtFileViewModel.WithRooms;
+            exportConfig.WithLinkedFiles = exportRvtFileViewModel.WithLinkedFiles;
             exportConfig.WithNwcFiles = exportRvtFileViewModel.WithNwcFiles;
             exportConfig.SourceRvtFolder = exportRvtFileViewModel.SourceRvtFolder;
             exportConfig.TargetNwcFolder = exportRvtFileViewModel.TargetNwcFolder;

@@ -45,6 +45,7 @@ namespace RevitServerFolders {
                 TargetFolderName = exportNwcFileViewModel.TargetNwcFolder,
 
                 WithRooms = exportNwcFileViewModel.WithRooms,
+                WithLinkedFiles = exportNwcFileViewModel.WithLinkedFiles,
                 CleanTargetFolder = exportNwcFileViewModel.CleanTargetNwcFolder
             }.Execute();
         }
@@ -62,6 +63,7 @@ namespace RevitServerFolders {
             exportConfig.SourceNwcFolder = exportNwcFileViewModel.SourceNwcFolder;
             exportConfig.TargetNwcFolder = exportNwcFileViewModel.TargetNwcFolder;
             exportConfig.WithRooms = exportNwcFileViewModel.WithRooms;
+            exportConfig.WithLinkedFiles = exportNwcFileViewModel.WithLinkedFiles;
             exportConfig.WithSubFolders = exportNwcFileViewModel.WithSubFolders;
             
             exportConfig.SaveProjectConfig();

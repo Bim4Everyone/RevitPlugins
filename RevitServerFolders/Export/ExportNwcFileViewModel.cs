@@ -17,6 +17,7 @@ namespace RevitServerFolders.Export {
         private string _sourceNwcFolder;
         private string _targetNwcFolder;
         private bool _cleanTargetNwcFolder;
+        private bool _withLinkedFiles;
 
         public ExportNwcFileViewModel() { }
 
@@ -63,6 +64,14 @@ namespace RevitServerFolders.Export {
             set {
                 _cleanTargetNwcFolder = value;
                 OnPropertyChanged(nameof(CleanTargetNwcFolder));
+            }
+        }
+        
+        public bool WithLinkedFiles {
+            get => _withLinkedFiles;
+            set {
+                _withLinkedFiles = value;
+                OnPropertyChanged(nameof(WithLinkedFiles));
             }
         }
 

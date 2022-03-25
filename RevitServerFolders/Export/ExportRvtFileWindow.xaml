@@ -62,13 +62,18 @@
                 <CheckBox Margin="10" Content="Выгрузка помещений" 
                           IsChecked="{Binding Path=WithRooms, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           IsEnabled="{Binding ElementName=_withNwcFiles, Path=IsChecked, TargetNullValue=false}"/>
+                
+                <CheckBox Margin="10 0 10 10" Content="Выгрузка связанных файлов" 
+                          IsChecked="{Binding Path=WithLinkedFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          IsEnabled="{Binding ElementName=_withNwcFiles, Path=IsChecked, TargetNullValue=false}"/>
+                
                 <local:FilePathEditView Margin="0,0,0,10"
-                            LabelName="Папка сохранения NWC-файлов"
-                            CheckName="Очистить папку перед сохранением"
-                            IsChecked="{Binding Path=CleanTargetNwcFolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            FilePath="{Binding Path=TargetNwcFolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
-                            Command="{Binding Path=SelectTargetNwcFolderCommand}"
-                            IsEnabled="{Binding ElementName=_withNwcFiles, Path=IsChecked, TargetNullValue=false}"/>
+                                        LabelName="Папка сохранения NWC-файлов"
+                                        CheckName="Очистить папку перед сохранением"
+                                        IsChecked="{Binding Path=CleanTargetNwcFolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        FilePath="{Binding Path=TargetNwcFolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                                        Command="{Binding Path=SelectTargetNwcFolderCommand}"
+                                        IsEnabled="{Binding ElementName=_withNwcFiles, Path=IsChecked, TargetNullValue=false}"/>
             </StackPanel>
         </GroupBox>
         <Grid HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,10,10,10">

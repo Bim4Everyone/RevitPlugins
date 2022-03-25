@@ -26,12 +26,14 @@ namespace RevitServerFolders.Export {
         private bool _cleanTargetRvtFolder;
         private bool _cleanTargetNwcFolder;
         private string _error;
+        private bool _withLinkedFiles;
 
         private RevitServerViewModel _revitServerViewModel;
 
         public ExportRvtFileViewModel() { }
 
-        public ExportRvtFileViewModel(string revitVersion, IList<string> serverNames, ExportRvtFileConfig exportRvtFileConfig) {
+        public ExportRvtFileViewModel(string revitVersion, IList<string> serverNames,
+            ExportRvtFileConfig exportRvtFileConfig) {
             RevitVersion = revitVersion;
             ServerNames = serverNames;
 
@@ -60,8 +62,8 @@ namespace RevitServerFolders.Export {
             if(_revitServerViewModel == null || !ServerName.Equals(_revitServerViewModel.ServerName)) {
                 _revitServerViewModel = new RevitServerViewModel(ServerName, RevitVersion);
             }
-          
-            return new RevitServerExplorerWindow() { ViewModel = _revitServerViewModel, Owner = Owner };
+
+            return new RevitServerExplorerWindow() {ViewModel = _revitServerViewModel, Owner = Owner};
         }
 
         public string RevitVersion { get; }
@@ -108,6 +110,7 @@ namespace RevitServerFolders.Export {
                 OnPropertyChanged(nameof(SourceRvtFolder));
             }
         }
+
         public string TargetRvtFolder {
             get => _targetRvtFolder;
             set {
@@ -148,6 +151,14 @@ namespace RevitServerFolders.Export {
                 OnPropertyChanged(nameof(CleanTargetNwcFolder));
             }
         }
+        
+        public bool WithLinkedFiles {
+            get => _withLinkedFiles;
+            set {
+                _withLinkedFiles = value;
+                OnPropertyChanged(nameof(WithLinkedFiles));
+            }
+        }
 
         public ICommand SelectSourceRvtFolderCommand { get; set; }
         public ICommand SelectTargetRvtFolderCommand { get; set; }
@@ -157,7 +168,8 @@ namespace RevitServerFolders.Export {
             using(var dialog = new CommonOpenFileDialog()) {
                 dialog.IsFolderPicker = true;
                 dialog.Title = "Папка сохранения открепленных RVT-файлов";
-                dialog.InitialDirectory = TargetRvtFolder ?? Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                dialog.InitialDirectory =
+                    TargetRvtFolder ?? Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
                     TargetRvtFolder = dialog.FileName;
                 }
@@ -168,7 +180,8 @@ namespace RevitServerFolders.Export {
             using(var dialog = new CommonOpenFileDialog()) {
                 dialog.IsFolderPicker = true;
                 dialog.Title = "Папка сохранения NWC-файлов";
-                dialog.InitialDirectory = TargetNwcFolder ?? Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                dialog.InitialDirectory =
+                    TargetNwcFolder ?? Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
                     TargetNwcFolder = dialog.FileName;
                 }

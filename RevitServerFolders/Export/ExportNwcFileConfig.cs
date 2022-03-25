@@ -14,6 +14,7 @@ namespace RevitServerFolders.Export
         public override IConfigSerializer Serializer { get; set; }
         
         public bool WithRooms { get; set; }
+        public bool WithLinkedFiles { get; set; }
         public bool WithSubFolders { get; set; }
 
         public string SourceNwcFolder { get; set; }

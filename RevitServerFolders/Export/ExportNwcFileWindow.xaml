@@ -33,19 +33,26 @@
     </Window.Resources>
     <GroupBox Header ="Navisworks (Вид: Navisworks)" Margin="0,10,0,0">
         <StackPanel>
-            <CheckBox Margin="10" Content="Выгрузка помещений" IsChecked="{Binding Path=WithRooms, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <CheckBox Margin="10" Content="Выгрузка помещений"
+                      IsChecked="{Binding Path=WithRooms, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            
+            <CheckBox Margin="10 0 10 10"  Content="Выгрузка связанных файлов" 
+                      IsChecked="{Binding Path=WithLinkedFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            
             <local:FilePathEditView Margin="0,10,0,10"
-                            LabelName="Папка Revit файлов"
-                            CheckName="Включить файлы из вложенных папок"
-                            FilePath="{Binding Path=SourceNwcFolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
-                            IsChecked="{Binding Path=WithSubFolders, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            Command="{Binding Path=SelectSourceNwcFolderCommand}" />
+                                    LabelName="Папка Revit файлов"
+                                    CheckName="Включить файлы из вложенных папок"
+                                    FilePath="{Binding Path=SourceNwcFolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                                    IsChecked="{Binding Path=WithSubFolders, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Command="{Binding Path=SelectSourceNwcFolderCommand}" />
+            
             <local:FilePathEditView Margin="0,0,0,20"
-                            LabelName="Папка сохранения NWC файлов"
-                            CheckName="Очистить папку перед сохранением"
-                            FilePath="{Binding Path=TargetNwcFolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
-                            IsChecked="{Binding Path=CleanTargetNwcFolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            Command="{Binding Path=SelectTargetNwcFolderCommand}" />
+                                    LabelName="Папка сохранения NWC файлов"
+                                    CheckName="Очистить папку перед сохранением"
+                                    FilePath="{Binding Path=TargetNwcFolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                                    IsChecked="{Binding Path=CleanTargetNwcFolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Command="{Binding Path=SelectTargetNwcFolderCommand}" />
+            
             <Grid HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,10,10,00">
                 <Button Name="_btOk" Content="OK" Margin="0,0,90,10" Width="75" IsDefault="True" Click="_btOk_Click"
                         ToolTipService.ShowOnDisabled="True"

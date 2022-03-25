@@ -18,6 +18,7 @@ namespace RevitServerFolders.Export {
         public string ServerName { get; set; }
 
         public bool WithRooms { get; set; }
+        public bool WithLinkedFiles { get; set; }
         public bool WithNwcFiles { get; set; }
         public bool WithSubFolders { get; set; }
 
