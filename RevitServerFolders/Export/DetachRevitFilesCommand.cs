@@ -17,8 +17,6 @@ namespace RevitServerFolders.Export {
     public class DetachRevitFilesCommand {
         public string ServerName { get; set; }
         public string RevitVersion { get; set; }
-
-        public bool WithLinkedFiles { get; set; }
         public bool WithSubFolders { get; set; }
 
         public string FolderName { get; set; }
