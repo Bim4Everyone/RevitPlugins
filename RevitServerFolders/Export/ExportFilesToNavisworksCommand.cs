@@ -87,7 +87,7 @@ namespace RevitServerFolders.Export {
                 ConvertLights = false,
                 ExportRoomAsAttribute = false,
                 ConvertLinkedCADFormats = false,
-                ExportLinks = false,
+                ExportLinks = WithLinkedFiles,
                 ExportParts = false,
                 FindMissingMaterials = false,
                 DivideFileIntoLevels = true,
