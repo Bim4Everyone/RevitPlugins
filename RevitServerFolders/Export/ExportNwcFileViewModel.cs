@@ -24,6 +24,7 @@ namespace RevitServerFolders.Export {
         public ExportNwcFileViewModel(ExportNwcFileConfig exportNwcFileConfig) {
             WithRooms = exportNwcFileConfig.WithRooms;
             WithSubFolders = exportNwcFileConfig.WithSubFolders;
+            WithLinkedFiles = exportNwcFileConfig.WithLinkedFiles;
             SourceNwcFolder = exportNwcFileConfig.SourceNwcFolder;
             TargetNwcFolder = exportNwcFileConfig.TargetNwcFolder;
             CleanTargetNwcFolder = exportNwcFileConfig.CleanTargetNwcFolder;
