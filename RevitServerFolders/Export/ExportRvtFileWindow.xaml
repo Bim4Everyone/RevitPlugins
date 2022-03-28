@@ -7,7 +7,8 @@
     xmlns:local="clr-namespace:RevitServerFolders.Export"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     mc:Ignorable="d" 
-    Height="530" Width="640"
+    Width="640"
+    SizeToContent="Height"
     WindowStartupLocation="CenterScreen"
     Title="Экспорт RVT-файлов из Revit Server" ResizeMode="NoResize">
     <Window.DataContext>
