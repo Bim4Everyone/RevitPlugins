@@ -26,8 +26,12 @@ namespace RevitMarkPlacement.Views {
         public override string PluginName => nameof(RevitMarkPlacement);
         public override string ProjectConfigName => nameof(MainWindow);
 
-        private void Button_Click(object sender, RoutedEventArgs e) {
-            this.Close();
+        private void ButtonOk_Click(object sender, RoutedEventArgs e) {
+            DialogResult = true;
+        }
+
+        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
+            DialogResult = false;
         }
     }
 }

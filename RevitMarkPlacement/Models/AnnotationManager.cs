@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,83 +7,91 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 
 namespace RevitMarkPlacement.Models {
-    internal abstract class AnnotationManager {
-        protected readonly RevitRepository _revitRepository;
-        protected FamilySymbol _type;
+    internal class AnnotationManager {
+        private readonly RevitRepository _revitRepository;
+        private IAnnotationPosition _annotationPosition;
 
-        public bool OnlyUpdate { get; }
-
-        public AnnotationManager(RevitRepository revitRepository, bool onlyUpdate) {
+        public AnnotationManager(RevitRepository revitRepository, IAnnotationPosition annotationPosition) {
             _revitRepository = revitRepository;
-            OnlyUpdate = onlyUpdate;
+            _annotationPosition = annotationPosition;
         }
 
         public void CreateAnnotation(SpotDimension spot, int floorCount, double floorHeight) {
-            var annotation = PlaceAnnotation(spot, floorCount, floorHeight);
-            SetParameters(annotation, spot, floorCount, floorHeight);
-            MirrorAnnotation(annotation);
-        }
-
-        protected FamilyInstance PlaceAnnotation(SpotDimension spot, int floorCount, double floorHeight) {
-            FamilyInstance annotation = null;
+            FamilyInstance annotation;
             using(Transaction t = _revitRepository.StartTransaction("Создание аннотации")) {
-                var placePoint = GetPlacePoint(spot);
-                annotation = _revitRepository.CreateAnnotation(_type, placePoint, spot.View);
+                annotation = PlaceAnnotation(spot, floorCount, floorHeight);
+                SetParameters(annotation, spot, floorCount, floorHeight);
                 t.Commit();
             }
+            if(_annotationPosition.NeedFlip) {
+                _revitRepository.MirrorAnnotation(annotation, _annotationPosition.ViewRightDirection);
+            }
+        }
+
+        private FamilyInstance PlaceAnnotation(SpotDimension spot, int floorCount, double floorHeight) {
+            FamilyInstance annotation = null;
+            var placePoint = GetPlacePoint(spot);
+            annotation = _revitRepository.CreateAnnotation(_annotationPosition.FamilySymbol, placePoint, spot.View);
             return annotation;
         }
 
-        protected double GetSpotDimensionLevel(SpotDimension spot) {
-            double elevation = 0;
-            var references = spot.References;
-            foreach(Reference r in references) {
-                var element = _revitRepository.GetElement(r.ElementId);
-                if(element is Level level) {
-                    elevation = level.Elevation;
-                    break;
-                }
-                if(element is FamilyInstance familyInstance) {
-                    if(familyInstance.Location is LocationCurve locationCurve && locationCurve.Curve is Line line) {
-                        elevation = line.Origin.Z;
-                        break;
-                    }
-                }
-            }
-            return elevation;
+        private double GetSpotDimensionLevel(SpotDimension spot) {
+            return spot.GetParamValueOrDefault(BuiltInParameter.SPOT_ELEV_SINGLE_OR_UPPER_VALUE, 0.0);
         }
 
-        private void SetParameters(FamilyInstance annotation, SpotDimension spot, int count, double typicalFloorHeight) {
-            using(Transaction t = _revitRepository.StartTransaction("Установка параметров")) {
-                var level = GetSpotDimensionLevel(spot);
-                if(!OnlyUpdate) {
-                    annotation.SetParamValue(RevitRepository.LevelCountParam, count);
-                    annotation.SetParamValue(RevitRepository.TemplateLevelHeightParam, typicalFloorHeight / 1000);
-                }
-                annotation.SetParamValue(RevitRepository.FirstLevelOnParam, 0);
-                annotation.SetParamValue(RevitRepository.SpotDimensionIdParam, spot.Id.IntegerValue);
-                
+        private XYZ GetPlacePoint(SpotDimension spot) {
 #if D2020 || R2020
-                annotation.SetParamValue(RevitRepository.FirstLevelParam, UnitUtils.ConvertFromInternalUnits(level, DisplayUnitType.DUT_METERS));
+            var elevSymbolId = (ElementId) spot.SpotDimensionType.GetParamValueOrDefault(BuiltInParameter.SPOT_ELEV_SYMBOL);
+            var elevSymbol = _revitRepository.GetElement(elevSymbolId) as FamilySymbol;
+            var width = (double) elevSymbol.GetParamValueOrDefault(RevitRepository.ElevSymbolWidth);
+            var height = (double) elevSymbol.GetParamValueOrDefault(RevitRepository.ElevSymbolHeight);
+            var textHeight = 1.7 * (double) spot.SpotDimensionType.GetParamValueOrDefault(BuiltInParameter.TEXT_SIZE); // умножение на 1,7 из-за рамки вокруг текста
+            var bb = spot.get_BoundingBox(spot.View);
+            var scale = spot.View.Scale;
+            var dir = spot.View.RightDirection;
+            var bbDir = new XYZ((bb.Max - bb.Min).X, (bb.Max - bb.Min).Y, 0).Normalize();
+            XYZ max = bb.Max;
+            XYZ min = bb.Min;
+            if(Math.Abs(dir.AngleTo(bbDir) - Math.PI) > 0.01 && Math.Abs(dir.AngleTo(bbDir)) > 0.01) {
+                max = new XYZ(bb.Max.X, bb.Min.Y, bb.Max.Z);
+                min = new XYZ(bb.Min.X, bb.Max.Y, bb.Min.Z);
+            }
+            bbDir = new XYZ((max - min).X, (max - min).Y, 0).Normalize();
+            if(Math.Abs(dir.AngleTo(bbDir) - Math.PI) < 0.01) {
+                var temp = new XYZ(max.X, max.Y, min.Z);
+                max = new XYZ(min.X, min.Y, max.Z);
+                min = temp;
+            }
+            return _annotationPosition.GetPoint(min, max, width, height, textHeight, scale);
 #else
-                annotation.SetParamValue(RevitRepository.FirstLevelParam, UnitUtils.ConvertFromInternalUnits(level, UnitTypeId.Meters));
+            return spot.LeaderEndPosition;
 #endif
-                t.Commit();
-            }
         }
 
-        protected abstract XYZ GetPlacePoint(SpotDimension spot);
+        private void SetParameters(FamilyInstance annotation, SpotDimension spot, int count, double templateFloorHeight) {
+            var level = GetSpotDimensionLevel(spot);
+            annotation.SetParamValue(RevitRepository.LevelCountParam, count);
+            annotation.SetParamValue(RevitRepository.TemplateLevelHeightParam, templateFloorHeight / 1000);
+            annotation.SetParamValue(RevitRepository.FirstLevelOnParam, 0);
+            annotation.SetParamValue(RevitRepository.SpotDimensionIdParam, spot.Id.IntegerValue);
 
-        public void UpdateAnnotation(SpotDimension spot, AnnotationSymbol annotation, int floorCount, double floorHeight) {
-            using(Transaction t = _revitRepository.StartTransaction("Создание аннотации")) {
-                var placePoint = GetPlacePoint(spot);
-                ((LocationPoint) annotation.Location).Point = placePoint;
-                t.Commit();
-            }
-            SetParameters(annotation, spot, floorCount, floorHeight);
+#if D2020 || R2020
+            annotation.SetParamValue(RevitRepository.FirstLevelParam, UnitUtils.ConvertFromInternalUnits(level, DisplayUnitType.DUT_METERS));
+#else
+            annotation.SetParamValue(RevitRepository.FirstLevelParam, UnitUtils.ConvertFromInternalUnits(level, UnitTypeId.Meters));
+#endif
         }
-        protected virtual void MirrorAnnotation(FamilyInstance annotation) {}
-        protected virtual void UpdatePlacement(SpotDimension spot, AnnotationSymbol annotation) { }
-        protected virtual void UpdateValues(SpotDimension spot, AnnotationSymbol annotation, int floorCount, double floorHeight) { }
+
+        public void OverwriteAnnotation(SpotDimension spot, AnnotationSymbol annotation, int floorCount, double floorHeight) {
+            _revitRepository.DeleteElement(annotation);
+            CreateAnnotation(spot, floorCount, floorHeight);
+        }
+
+        public void UpdateAnnotation(SpotDimension spot, AnnotationSymbol annotation) {
+            var floorCount = (int) annotation.GetParamValueOrDefault(RevitRepository.LevelCountParam);
+            var floorHeight = (double) annotation.GetParamValueOrDefault(RevitRepository.TemplateLevelHeightParam);
+            OverwriteAnnotation(spot, annotation, floorCount, floorHeight * 1000);
+        }
+
     }
 }

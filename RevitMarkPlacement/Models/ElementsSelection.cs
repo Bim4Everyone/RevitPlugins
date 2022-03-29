@@ -13,7 +13,25 @@ namespace RevitMarkPlacement.Models {
 
     internal class ElementsSelection : ISelectionMode {
         public IEnumerable<SpotDimension> GetSpotDimentions(Document doc) {
-            return new UIDocument(doc).GetSelectedElements().OfType<SpotDimension>();
+            return new UIDocument(doc).GetSelectedElements()
+                .OfType<SpotDimension>()
+                .Where(IsCorrectSpot);
         }
+
+        private bool IsCorrectSpot(SpotDimension spot) {
+            return GetHasLeader(spot) &&
+                (string.IsNullOrEmpty(RevitRepository.FilterSpotName)
+             || spot.Name.EndsWith(RevitRepository.FilterSpotName, StringComparison.CurrentCultureIgnoreCase));
+        }
+
+#if D2020 || R2020
+        private static bool GetHasLeader(SpotDimension spot) {
+            return true;
+        }
+#else
+        private static bool GetHasLeader(SpotDimension spot) {
+            return spot.HasLeader;
+        }
+#endif
     }
 }

@@ -128,8 +128,8 @@
         <StackPanel Grid.Row="3">
             <TextBlock Margin="20 0" Foreground="Orange" Text="{Binding ErrorText}"/>
             <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Margin="5" Width="120" Height="30" Command="{Binding PlaceAnnotationCommand}">Создать/Обновить</Button>
-                <Button Margin="5" Width="120" Height="30" Click="Button_Click">Отмена</Button>
+                <Button Margin="5" Width="120" Height="30" Command="{Binding PlaceAnnotationCommand}"  Click="ButtonOk_Click">Создать/Обновить</Button>
+                <Button Margin="5" Width="120" Height="30" Click="ButtonCancel_Click">Отмена</Button>
             </StackPanel>
         </StackPanel>
     </Grid>

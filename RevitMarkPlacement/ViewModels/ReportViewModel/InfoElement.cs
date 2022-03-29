@@ -14,13 +14,13 @@ namespace RevitMarkPlacement.ViewModels {
         };
 
         public static InfoElement AnnotationParameterMissing => new InfoElement() {
-            Message = "У семейства \"{0}\" отсутствует параметр \"{1}\".",
+            Message = "У семейства \"{0}\" отсутствует значение параметра \"{1}\".",
             TypeInfo = TypeInfo.Error,
             ElementType = ElementType.Annotation
         };
 
         public static InfoElement ElevationParameterMissing => new InfoElement() {
-            Message = "У высотной отметки \"{0}\" отсутствует параметр \"{1}\".",
+            Message = "У высотной отметки \"{0}\" отсутствует значение параметра \"{1}\".",
             TypeInfo = TypeInfo.Error,
             ElementType = ElementType.SpotDimension
         };

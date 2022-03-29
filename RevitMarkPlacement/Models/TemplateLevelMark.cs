@@ -21,8 +21,12 @@ namespace RevitMarkPlacement.Models {
             AnnotationManager.CreateAnnotation(SpotDimension, levelCount, levelHeight);
         }
 
-        public void UpdateAnnotation(int levelCount, double levelHeight) {
-            AnnotationManager.UpdateAnnotation(SpotDimension, Annotation, levelCount, levelHeight);
+        public void OverwriteAnnotation(int levelCount, double levelHeight) {
+            AnnotationManager.OverwriteAnnotation(SpotDimension, Annotation, levelCount, levelHeight);
+        }
+
+        public void UpdateAnnotation() {
+            AnnotationManager.UpdateAnnotation(SpotDimension, Annotation);
         }
     }
 }

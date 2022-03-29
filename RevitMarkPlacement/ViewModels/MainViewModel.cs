@@ -85,8 +85,6 @@ namespace RevitMarkPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectionModes, value);
         }
 
-        public bool OnlyUpdate { get; set; }
-
         public ICommand PlaceAnnotationCommand { get; set; }
 
         private void InitializeSelectionModes() {
@@ -113,35 +111,9 @@ namespace RevitMarkPlacement.ViewModels {
             }
         }
 
-        private void PlaceAnnotation(object p) {           
-            var spots = _revitRepository.GetSpotDimensions(SelectedMode.SelectionMode).ToList();
-            var annotations = _revitRepository.GetAnnotations().ToList();
-            List<TemplateLevelMark> marks = new List<TemplateLevelMark>();
-            var annotationManagers = GetAnnotationManagers();
-            foreach(var annotation in annotations) {
-                var spotId = (int) annotation.GetParamValueOrDefault(RevitRepository.SpotDimensionIdParam);
-                var spot = _revitRepository.GetElement(new ElementId(spotId)) as SpotDimension;
-                if(spot == null) {
-                    _revitRepository.DeleteElement(annotation);
-                }
-                if(spots.Contains(spot, new ElementNameEquatable<SpotDimension>())) {
-                    marks.Add(new TemplateLevelMark(spot, annotationManagers[_revitRepository.GetSpotOrientation(spot)], annotation));
-                }
-            }
-            marks.AddRange(spots
-                .Except(marks.Select(m => m.SpotDimension), new ElementNameEquatable<SpotDimension>())
-                .Select(s => new TemplateLevelMark(s, annotationManagers[_revitRepository.GetSpotOrientation(s)])));
-
-            using(TransactionGroup t = _revitRepository.StartTransactionGroup("Обновление и расстановка аннотаций")) {
-                foreach(var mark in marks) {
-                    if(mark.Annotation == null && !OnlyUpdate) {
-                        mark.CreateAnnotation(int.Parse(FloorCount), double.Parse(SelectedFloorHeightProvider.GetFloorHeight()));
-                    } else if (mark.Annotation != null) {
-                        mark.UpdateAnnotation(int.Parse(FloorCount), double.Parse(SelectedFloorHeightProvider.GetFloorHeight()));
-                    }
-                }
-                t.Assimilate();
-            }
+        private void PlaceAnnotation(object p) {
+            var marks = new TemplateLevelMarkCollection(_revitRepository, SelectedMode.SelectionMode);
+            marks.CreateAnnotation(int.Parse(FloorCount), double.Parse(SelectedFloorHeightProvider.GetFloorHeight()));
             SaveConfig();
         }
 
@@ -187,15 +159,6 @@ namespace RevitMarkPlacement.ViewModels {
                 }
             }
             _config.SaveProjectConfig();
-        }
-
-        private Dictionary<SpotOrientation, AnnotationManager> GetAnnotationManagers() {
-            return new Dictionary<SpotOrientation, AnnotationManager> {
-                { SpotOrientation.RightTop, new RightTopAnnotationManager(_revitRepository, OnlyUpdate) },
-                { SpotOrientation.LeftTop, new LeftTopAnnotationManager(_revitRepository, OnlyUpdate) },
-                { SpotOrientation.LeftBottom, new LeftBottomAnnotationManager(_revitRepository, OnlyUpdate) },
-                { SpotOrientation.RightBottom, new RightBottomAnnotationManager(_revitRepository, OnlyUpdate) }
-            };
         }
 
         public bool CanPlaceAnnotation() {

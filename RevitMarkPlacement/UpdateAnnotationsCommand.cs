@@ -26,15 +26,13 @@ namespace RevitMarkPlacement {
                 var revitRepository = new RevitRepository(
                         commandData.Application.Application,
                         commandData.Application.ActiveUIDocument.Document);
-                var viewModel = new MainViewModel(revitRepository, config) {
-                    OnlyUpdate = true,
-                };
-                viewModel.SelectedMode = viewModel.SelectionModes[0];
+                var viewModel = new MainViewModel(revitRepository, config);
                 if(!viewModel.CanPlaceAnnotation()) {
                     var view = new ReportView() { DataContext = viewModel.InfoElementsViewModel };
                     view.ShowDialog();
                 } else {
-                    viewModel.PlaceAnnotationCommand.Execute(null);
+                    var marks = new TemplateLevelMarkCollection(revitRepository, new AllElementsSelection());
+                    marks.UpdateAnnotation();
                 }
             } catch(Exception ex) {
 #if D2020 || D2021 || D2022
