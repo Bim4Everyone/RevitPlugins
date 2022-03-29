@@ -210,7 +210,7 @@ namespace RevitSuperfilter.ViewModels {
         }
     }
 
-    internal class ViewViewModel : BaseViewModel {
+    internal class ViewViewModel {
         public ViewViewModel(View view, IEnumerable<Element> elements) {
             View = view;
             Elements = elements.ToList();
