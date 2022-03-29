@@ -6,6 +6,7 @@ using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Events;
 
 #endregion
 
@@ -47,6 +48,7 @@ namespace RevitServerFolders.Export {
 
             Directory.CreateDirectory(TargetFolderName);
             foreach(string fileName in Directory.EnumerateFiles(SourceFolderName, "*.rvt")) {
+                Application.FailuresProcessing += ApplicationOnFailuresProcessing;
                 var document = Application.OpenDocumentFile(fileName);
                 try {
                     var exportView = new FilteredElementCollector(document)
@@ -58,14 +60,32 @@ namespace RevitServerFolders.Export {
                     if(exportView == null) {
                         continue;
                     }
-
+                    
                     document.Export(TargetFolderName, GetFileName(fileName), GetExportOptions(exportView));
                     if(WithRooms) {
                         document.Export(TargetFolderName, GetRoomsFileName(fileName), GetRoomsExportOptions(exportView));
                     }
                 } finally {
                     document.Close(false);
+                    Application.FailuresProcessing -= ApplicationOnFailuresProcessing;
                 }
+            }
+        }
+
+        private void ApplicationOnFailuresProcessing(object sender, FailuresProcessingEventArgs e) {
+            var accessor = e.GetFailuresAccessor();
+            accessor.DeleteAllWarnings();
+            accessor.ResolveFailures(accessor.GetFailureMessages());
+            
+            ElementId[] elementIds = accessor.GetFailureMessages()
+                .SelectMany(item => item.GetFailingElementIds())
+                .ToArray();
+            
+            if(elementIds.Length > 0) {
+                accessor.DeleteElements(elementIds);
+                e.SetProcessingResult(FailureProcessingResult.ProceedWithCommit);
+            } else {
+                e.SetProcessingResult(FailureProcessingResult.Continue);
             }
         }
 
