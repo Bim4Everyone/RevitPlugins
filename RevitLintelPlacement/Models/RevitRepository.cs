@@ -270,7 +270,10 @@ namespace RevitLintelPlacement.Models {
 
             if(elementWidth == null) {
                 elementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id,
-                    InfoElement.MissingOpeningParameter.FormatMessage(elementInWall.Name, LintelsCommonConfig.OpeningWidth)));
+                    InfoElement.MissingOpeningParameter.FormatMessage(LintelsCommonConfig.OpeningWidth)) {
+                    Name = elementInWall.Name,
+                    LevelName = elementInWall.LevelId != null ? GetElementById(elementInWall.LevelId)?.Name : null
+                });
                 return false;
             }
 
@@ -380,7 +383,7 @@ namespace RevitLintelPlacement.Models {
                     var center = ((LocationPoint) lintel.Location).Point;
                     var line = Line.CreateBound(center, new XYZ(center.X, center.Y, center.Z + 1));
                     ElementTransformUtils.RotateElement(_document, lintel.Id, line, Math.PI);
-                    LockLintel(GetElevation(), GetPlan(), lintel, elementInWall);
+                    LockLintel(GetView3D(), GetElevation(), GetPlan(), lintel, elementInWall);
                     t.Commit();
                 }
             };
@@ -415,11 +418,11 @@ namespace RevitLintelPlacement.Models {
             return refIntersector.FindNearest(viewPoint, direction);
         }
 
-        public void LockLintel(View elevation, View plan, FamilyInstance lintel, FamilyInstance elementInWall) {
+        public void LockLintel(View3D view3D, View elevation, View plan, FamilyInstance lintel, FamilyInstance elementInWall) {
             var leftRightElement = elementInWall.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
             var leftRightLintel = lintel.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
             if(leftRightElement.Count > 0 && leftRightLintel.Count > 0)
-                _document.Create.NewAlignment(_document.ActiveView, leftRightLintel.First(), leftRightElement.First());
+                _document.Create.NewAlignment(view3D, leftRightLintel.First(), leftRightElement.First());
 
             var topElement = elementInWall.GetReferences(FamilyInstanceReferenceType.Top);
             var bottomLintel = lintel.GetReferences(FamilyInstanceReferenceType.CenterElevation);
@@ -463,7 +466,10 @@ namespace RevitLintelPlacement.Models {
         public bool CheckElementInWallParameter(FamilyInstance elementInWall, ElementInfosViewModel elementInfos) {
             if(!elementInWall.IsExistsParam(LintelsCommonConfig.OpeningHeight) && !elementInWall.Symbol.IsExistsParam(LintelsCommonConfig.OpeningHeight)) {
                 elementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id,
-                    InfoElement.MissingOpeningParameter.FormatMessage(elementInWall.Name, LintelsCommonConfig.OpeningHeight)));
+                    InfoElement.MissingOpeningParameter.FormatMessage(LintelsCommonConfig.OpeningHeight)) {
+                    Name = elementInWall.Name,
+                    LevelName = elementInWall.LevelId != null ? GetElementById(elementInWall.LevelId)?.Name : null
+                });
                 return false;
             }
             return true;
@@ -515,7 +521,9 @@ namespace RevitLintelPlacement.Models {
                 foreach(var configParameter in configParameterNames) {
                     if(!parameterNames.Any(p => p.Equals(configParameter, StringComparison.CurrentCultureIgnoreCase))) {
                         result = false;
-                        elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintelType.Id, InfoElement.MissingLintelParameter.FormatMessage(lintelType?.Family?.Name, configParameter)));
+                        elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintelType.Id, InfoElement.MissingLintelParameter.FormatMessage(configParameter)) { 
+                            Name = lintelType.Name
+                        });
                     }
                 }
                 return result;

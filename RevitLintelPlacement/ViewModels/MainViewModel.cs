@@ -185,7 +185,7 @@ namespace RevitLintelPlacement.ViewModels {
             }
             using(Transaction t = _revitRepository.StartTransaction("Закрепление перемычек")) {
                 foreach(var lintel in lintels) {
-                    _revitRepository.LockLintel(elevation, plan, lintel.Lintel, lintel.ElementInWall);
+                    _revitRepository.LockLintel(view3D, elevation, plan, lintel.Lintel, lintel.ElementInWall);
                 }
                 t.Commit();
             }
@@ -205,6 +205,8 @@ namespace RevitLintelPlacement.ViewModels {
 
         private void ShowReport() {
             ElementInfos.UpdateCollection();
+            ElementInfos.UpdateGroupedMessage();
+            ElementInfos.ElementInfosViewSource?.View?.Refresh();
             var view = new ReportView() { DataContext = ElementInfos };
             view.Show();
         }

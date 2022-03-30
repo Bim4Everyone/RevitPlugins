@@ -36,9 +36,15 @@ namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels {
 
             if(elementWidth == null) {
                 _elementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id,
-                    InfoElement.MissingOpeningParameter.FormatMessage(elementInWall.Name, _revitRepository.LintelsCommonConfig.OpeningWidth)));
+                    InfoElement.MissingOpeningParameter.FormatMessage(_revitRepository.LintelsCommonConfig.OpeningWidth)) {
+                    Name = elementInWall.Name,
+                    LevelName = elementInWall.LevelId != null ? _revitRepository.GetElementById(elementInWall.LevelId)?.Name : null
+                });
                 _elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintel.Id,
-                    InfoElement.UnsetLintelParamter.FormatMessage(lintel.Name, _revitRepository.LintelsCommonConfig.LintelWidth)));
+                    InfoElement.UnsetLintelParamter.FormatMessage(_revitRepository.LintelsCommonConfig.LintelWidth)) {
+                    Name = elementInWall.Name,
+                    LevelName = elementInWall.LevelId != null ? _revitRepository.GetElementById(elementInWall.LevelId)?.Name : null
+                });
             } else {
                 lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelWidth, (double) elementWidth);
             }

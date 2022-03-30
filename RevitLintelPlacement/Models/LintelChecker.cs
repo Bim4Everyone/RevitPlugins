@@ -60,7 +60,10 @@ namespace RevitLintelPlacement.Models {
             }
 
             if((int) lintel.GetParamValue(_revitRepository.LintelsCommonConfig.LintelFixation) == 1) {
-                _elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintel.Id, InfoElement.LintelIsFixedWithoutElement));
+                _elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintel.Id, InfoElement.LintelIsFixedWithoutElement) {
+                    Name = lintel.Name,
+                    LevelName = lintel?.LevelId != null ? _revitRepository.GetElementById(lintel?.LevelId).Name : null
+                });
                 return new ReportResult(lintel.Id) { Code = ResultCode.LintelIsFixedWithoutElement };
             }
             return new LintelForDeletionResult(_revitRepository, lintel) { Code = ResultCode.LintelWithoutElement };
@@ -143,7 +146,10 @@ namespace RevitLintelPlacement.Models {
                 ?? elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
             if(elementInWallWidth == null) {
                 _elementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id,
-                   InfoElement.MissingOpeningParameter.FormatMessage(elementInWall.Name, _revitRepository.LintelsCommonConfig.OpeningWidth)));
+                   InfoElement.MissingOpeningParameter.FormatMessage(_revitRepository.LintelsCommonConfig.OpeningWidth)) {
+                    Name = elementInWall.Name,
+                    LevelName = elementInWall.LevelId != null ? _revitRepository.GetElementById(elementInWall.LevelId)?.Name : null
+                });
                 return ParameterCheckResult.Correct;
             }
             var lintelWidth = (double) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelWidth);
@@ -207,7 +213,10 @@ namespace RevitLintelPlacement.Models {
             if(lintelLocationPoint.DistanceTo(elementInWallPoint) < 0.0001)
                 return new EmptyResult { Code = ResultCode.Correct };
             else {
-                _elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintel.Id, InfoElement.LintelGeometricalDisplaced));
+                _elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintel.Id, InfoElement.LintelGeometricalDisplaced) {
+                    Name = lintel.Name,
+                    LevelName = lintel.LevelId != null ? _revitRepository.GetElementById(lintel.LevelId)?.Name : null
+                });
                 return new ReportResult(lintel.Id) { Code = ResultCode.LintelGeometricalDisplaced };
             }
         }
