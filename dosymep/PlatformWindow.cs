@@ -40,7 +40,12 @@ namespace dosymep.WPF.Views {
         /// Наименование файла конфигурации.
         /// </summary>
         public virtual string ProjectConfigName { get; }
-        
+
+        /// <summary>
+        /// Предоставляет возможность применения темной темы
+        /// </summary>
+        protected bool AllowDarkTheme { get; set; }
+
         /// <summary>
         /// Предоставляет доступ к логгеру платформы.
         /// </summary>
@@ -68,7 +73,7 @@ namespace dosymep.WPF.Views {
 
         protected override void OnClosing(CancelEventArgs e) {
             base.OnClosing(e);
-            
+
             UIThemeService.UIThemeChanged -= OnUIThemeChanged;
 
             PlatformWindowConfig config = GetProjectConfig();
@@ -84,12 +89,17 @@ namespace dosymep.WPF.Views {
                 .SetProjectConfigName(ProjectConfigName + ".json")
                 .Build<PlatformWindowConfig>();
         }
-        
+
         private void OnUIThemeChanged(UIThemes obj) {
             UpdateTheme();
         }
-        
+
         private void UpdateTheme() {
+            if(!AllowDarkTheme) {
+                ThemeManager.SetThemeName(this, Theme.Win10LightName);
+                return;
+            }
+
             if(UIThemeService.HostTheme == UIThemes.Dark) {
                 ThemeManager.SetThemeName(this, Theme.Win10DarkName);
             } else if(UIThemeService.HostTheme == UIThemes.Light) {
