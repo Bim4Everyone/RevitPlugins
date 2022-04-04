@@ -26,7 +26,7 @@ using dosymep.SimpleServices;
 using pyRevitLabs.Json;
 
 namespace dosymep.WPF.Views {
-    public class PlatformWindow : Window {
+    public class PlatformWindow : dosymep.Xpf.Core.BaseWindow {
         public PlatformWindow() {
             UIThemeService.UIThemeChanged += OnUIThemeChanged;
         }
