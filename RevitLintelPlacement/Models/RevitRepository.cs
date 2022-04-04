@@ -157,7 +157,7 @@ namespace RevitLintelPlacement.Models {
                 .ToList();
         }
 
-        public IEnumerable<FamilyInstance> GetAllElementsInWall(SampleMode sampleMode, ElementInfosViewModel elementInfos) {
+        public IEnumerable<FamilyInstance> GetAllElementsInWall(SampleMode sampleMode, ElementInfosViewModel elementInfos, IEnumerable<string> wallTypes = null) {
             var categoryFilter = new ElementMulticategoryFilter(
                 new List<BuiltInCategory> { BuiltInCategory.OST_Doors, BuiltInCategory.OST_Windows });
 
@@ -317,7 +317,7 @@ namespace RevitLintelPlacement.Models {
 
         public async Task SelectAndShowElement(ElementId id, ViewOrientation3D orientation) {
             _revitEventHandler.TransactAction = () => {
-                _uiDocument.Selection.SetElementIds(new [] { id });
+                _uiDocument.Selection.SetElementIds(new[] { id });
                 var commandId = RevitCommandId.LookupCommandId("ID_VIEW_APPLY_SELECTION_BOX");
                 if(!(commandId is null) && _uiDocument.Application.CanPostCommand(commandId)) {
                     _uiApplication.PostCommand(commandId);
@@ -463,8 +463,10 @@ namespace RevitLintelPlacement.Models {
             }
         }
 
-        public bool CheckElementInWallParameter(FamilyInstance elementInWall, ElementInfosViewModel elementInfos) {
-            if(!elementInWall.IsExistsParam(LintelsCommonConfig.OpeningHeight) && !elementInWall.Symbol.IsExistsParam(LintelsCommonConfig.OpeningHeight)) {
+        public bool CheckElementInWallParameter(FamilyInstance elementInWall, ElementInfosViewModel elementInfos, IEnumerable<string> wallTypes = null) {
+            if(!elementInWall.IsExistsParam(LintelsCommonConfig.OpeningHeight)
+                && !elementInWall.Symbol.IsExistsParam(LintelsCommonConfig.OpeningHeight)
+                && (wallTypes == null || wallTypes.Any(w => w.Equals(elementInWall.Host.Name, StringComparison.CurrentCultureIgnoreCase)))) {
                 elementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id,
                     InfoElement.MissingOpeningParameter.FormatMessage(LintelsCommonConfig.OpeningHeight)) {
                     Name = elementInWall.Name,
@@ -521,7 +523,7 @@ namespace RevitLintelPlacement.Models {
                 foreach(var configParameter in configParameterNames) {
                     if(!parameterNames.Any(p => p.Equals(configParameter, StringComparison.CurrentCultureIgnoreCase))) {
                         result = false;
-                        elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintelType.Id, InfoElement.MissingLintelParameter.FormatMessage(configParameter)) { 
+                        elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintelType.Id, InfoElement.MissingLintelParameter.FormatMessage(configParameter)) {
                             Name = lintelType.Name
                         });
                     }

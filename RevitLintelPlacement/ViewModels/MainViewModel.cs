@@ -109,7 +109,9 @@ namespace RevitLintelPlacement.ViewModels {
             }
             Lintels = new LintelCollectionViewModel(_revitRepository, ElementInfos);
 
-            var elementInWalls = _revitRepository.GetAllElementsInWall(SelectedSampleMode, ElementInfos)
+            var wallTypeNames = GroupedRules.GroupedRules.SelectMany(item => item.WallTypes.WallTypes.Where(w => w.IsChecked).Select(w => w.Name)).ToList();
+
+            var elementInWalls = _revitRepository.GetAllElementsInWall(SelectedSampleMode, ElementInfos, wallTypeNames)
                 .ToList();
 
             foreach(var lintel in Lintels.LintelInfos) {

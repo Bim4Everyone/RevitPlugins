@@ -78,7 +78,9 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         public void UpdateCollection() {
-            ElementInfos = new ObservableCollection<ElementInfoViewModel>(ElementInfos.Distinct());
+            ElementInfos = new ObservableCollection<ElementInfoViewModel>(ElementInfos
+                .Distinct()
+                .OrderBy(e=>e.Name));
             ElementInfosViewSource.Source = ElementInfos;
         }
 
