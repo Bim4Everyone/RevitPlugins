@@ -27,6 +27,9 @@ using pyRevitLabs.Json;
 
 namespace dosymep.WPF.Views {
     public class PlatformWindow : dosymep.Xpf.Core.BaseWindow {
+        public static readonly DependencyProperty AllowDarkThemeProperty
+            = DependencyProperty.Register(nameof(AllowDarkTheme), typeof(bool), typeof(PlatformWindow));
+
         public PlatformWindow() {
             UIThemeService.UIThemeChanged += OnUIThemeChanged;
         }
@@ -44,7 +47,10 @@ namespace dosymep.WPF.Views {
         /// <summary>
         /// Предоставляет возможность применения темной темы
         /// </summary>
-        protected bool AllowDarkTheme { get; set; }
+        protected bool AllowDarkTheme {
+            get => (bool) GetValue(AllowDarkThemeProperty);
+            set => SetValue(AllowDarkThemeProperty, value);
+        }
 
         /// <summary>
         /// Предоставляет доступ к логгеру платформы.
@@ -55,6 +61,8 @@ namespace dosymep.WPF.Views {
         /// Предоставляет доступ к настройкам темы платформы.
         /// </summary>
         protected IUIThemeService UIThemeService => GetPlatformService<IUIThemeService>();
+
+
 
         protected T GetPlatformService<T>() {
             return ServicesProvider.GetPlatformService<T>();
