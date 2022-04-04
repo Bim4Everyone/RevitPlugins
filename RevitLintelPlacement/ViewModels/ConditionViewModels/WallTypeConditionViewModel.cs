@@ -16,9 +16,9 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _isChecked, value);
         }
 
-        public string Name { 
-            get => _name; 
-            set => this.RaiseAndSetIfChanged(ref _name, value); 
+        public string Name {
+            get => _name;
+            set => this.RaiseAndSetIfChanged(ref _name, value);
         }
 
         public bool Equals(WallTypeConditionViewModel other) {

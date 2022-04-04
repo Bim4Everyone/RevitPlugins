@@ -1,4 +1,6 @@
-﻿<Window x:Class="RevitLintelPlacement.Views.LintelsView"
+﻿<base:PlatformWindow
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    x:Class="RevitLintelPlacement.Views.LintelsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -12,7 +14,7 @@
              Height="650" Width="1150"
              MinHeight="650" MinWidth="1150"
              d:DesignHeight="450" d:DesignWidth="800"
-             Name="LintelView"
+             x:Name="LintelView"
              Title="Навигатор"
              d:DataContext="{d:DesignInstance vm:LintelCollectionViewModel, IsDesignTimeCreatable=False}">
     <Window.Resources>
@@ -88,6 +90,15 @@
                   VirtualizingPanel.IsVirtualizingWhenGrouping="True"
             ItemsSource="{Binding LintelsViewSource.View, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
             <DataGrid.Columns >
+                <DataGridTemplateColumn >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type vm:LintelInfoViewModel}">
+                            <Button Height="20" Command="{Binding RotateLintelCommand}" CommandParameter="{Binding LintelId}">
+                                <Image Source="../Resources/icons8-reverce.png"/>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTemplateColumn Width="75" Header="Перемычка">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type vm:LintelInfoViewModel}">
@@ -201,4 +212,4 @@
             </DockPanel>
         </Grid>
     </Grid>
-</Window>
+</base:PlatformWindow>

@@ -13,13 +13,12 @@ namespace RevitLintelPlacement.Models {
     internal class LintelElementCorrelator {
         public List<ICorrelator> Correlators { get; set; }
         
-        public LintelElementCorrelator(RevitRepository revitRepository) {
-            RevitRepository revitRepository1 = revitRepository;
+        public LintelElementCorrelator(RevitRepository revitRepository, ElementInfosViewModel elementInfos) {
 
             Correlators = new List<ICorrelator> {
-                new SuperComponentCorrelator(revitRepository1),
-                new DimensionCorrelator(revitRepository1),
-                new GeometricalCorrelator(revitRepository1)
+                new SuperComponentCorrelator(revitRepository),
+                new DimensionCorrelator(revitRepository),
+                new GeometricalCorrelator(revitRepository, elementInfos)
             };
         }
 
@@ -68,9 +67,9 @@ namespace RevitLintelPlacement.Models {
     internal class GeometricalCorrelator : ICorrelator {
         private readonly Dictionary<XYZ, FamilyInstance> _elementLocationDict;
 
-        public GeometricalCorrelator(RevitRepository revitRepository) {
+        public GeometricalCorrelator(RevitRepository revitRepository, ElementInfosViewModel elementInfos) {
             _elementLocationDict = revitRepository
-                  .GetAllElementsInWall(SampleMode.AllElements)
+                  .GetAllElementsInWall(SampleMode.AllElements, elementInfos)
                   .Where(e => e.Location != null)
                   .ToDictionary(revitRepository.GetLocationPoint);
         }

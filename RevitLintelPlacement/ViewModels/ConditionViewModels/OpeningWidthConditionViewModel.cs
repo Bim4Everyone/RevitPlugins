@@ -40,11 +40,17 @@ namespace RevitLintelPlacement.ViewModels {
 
             var elementWidth = elementInWall.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningWidth);
             if(elementWidth == null) {
+                elementWidth = elementInWall.Symbol.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningWidth);
+            }
+            if(elementWidth == null) {
                 elementWidth = elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
             }
             if(elementWidth == null) {
                 _elementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id,
-                    InfoElement.MissingOpeningParameter.FormatMessage(elementInWall.Name, _revitRepository.LintelsCommonConfig.OpeningWidth)));
+                    InfoElement.MissingOpeningParameter.FormatMessage(_revitRepository.LintelsCommonConfig.OpeningWidth)) {
+                    Name = elementInWall.Name,
+                    LevelName = elementInWall.LevelId != null ? _revitRepository.GetElementById(elementInWall.LevelId)?.Name : null
+                });
                 return false;
             }
 

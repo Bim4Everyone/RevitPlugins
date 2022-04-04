@@ -15,6 +15,8 @@ namespace RevitLintelPlacement.ViewModels {
         private ElementId _elementId;
         private TypeInfo _typeInfo;
         private ElementType _elementType;
+        private string _levelName;
+        private string _name;
 
         public ElementInfoViewModel(ElementId elementId, InfoElement infoElement) {
             ElementId = elementId;
@@ -36,9 +38,9 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _typeInfo, value);
         }
 
-        public ElementType ElementType { 
-            get => _elementType; 
-            set => this.RaiseAndSetIfChanged(ref _elementType, value); 
+        public ElementType ElementType {
+            get => _elementType;
+            set => this.RaiseAndSetIfChanged(ref _elementType, value);
         }
 
         public bool IsCorrectValue => ElementId != ElementId.InvalidElementId;
@@ -51,6 +53,16 @@ namespace RevitLintelPlacement.ViewModels {
         public ElementId ElementId {
             get => _elementId;
             set => this.RaiseAndSetIfChanged(ref _elementId, value);
+        }
+
+        public string LevelName {
+            get => _levelName;
+            set => this.RaiseAndSetIfChanged(ref _levelName, value);
+        }
+
+        public string Name { 
+            get => _name; 
+            set => this.RaiseAndSetIfChanged(ref _name, value); 
         }
 
         public override bool Equals(object obj) {

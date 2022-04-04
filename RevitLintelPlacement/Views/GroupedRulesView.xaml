@@ -36,8 +36,7 @@
 
                 <DataGrid Grid.Row="0" CanUserResizeColumns="False">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Width="208" Header="Название правила"></DataGridTextColumn>
-                        <DataGridTextColumn Width="350" Header="Типоразмеры стен"></DataGridTextColumn>
+                        <DataGridTextColumn Width="552" Header="Типоразмеры стен"></DataGridTextColumn>
                         <DataGridTextColumn Width="172" Header="Размеры проема"></DataGridTextColumn>
                         <DataGridTextColumn Width="85" Header="Опирание"></DataGridTextColumn>
                         <DataGridTextColumn Width="210" Header="Типоразмер перемычки"></DataGridTextColumn>
@@ -62,63 +61,88 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type vm:GroupedRuleViewModel}">
                             <DockPanel>
-                                <Border Margin="2" BorderBrush="LightGray" BorderThickness="1">
-                                    <Grid Margin="2" DockPanel.Dock="Left">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="200"/>
-                                            <ColumnDefinition Width="350"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
-                                        <TextBox Grid.Column="0" Height="20" Margin="5" VerticalContentAlignment="Center"  TextWrapping="Wrap" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                                        <ListBox Grid.Column="1" MaxHeight="200" ItemsSource="{Binding WallTypes.WallTypes}">
-                                            <ListBox.ItemTemplate>
-                                                <DataTemplate DataType="{x:Type vm:WallTypeConditionViewModel}">
-                                                    <CheckBox IsChecked="{Binding IsChecked}">
-                                                        <TextBlock Text="{Binding Name}"/>
-                                                    </CheckBox>
-                                                </DataTemplate>
-                                            </ListBox.ItemTemplate>
-                                        </ListBox>
-                                        <Grid Grid.Column="2">
+                                <Grid Margin="2" DockPanel.Dock="Left">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <GroupBox>
+                                        <GroupBox.Header>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Margin="5 0" VerticalAlignment="Center" Text="Правило:"></TextBlock>
+                                                <TextBox Height="20" MinWidth="150" Margin="5" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" TextWrapping="Wrap" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                            </StackPanel>
+                                        </GroupBox.Header>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="550"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto"/>
-                                                <RowDefinition />
+                                                <RowDefinition/>
+                                                <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
-                                            <ListBox Grid.Row="0" MinWidth="400" BorderThickness="0" Focusable="False" ItemsSource="{Binding Rules}">
+                                            <DockPanel LastChildFill="True">
+                                                <TextBlock DockPanel.Dock="Left" Margin="10 5" Text="Фильтр: "></TextBlock>
+                                                <TextBox MinWidth="150" Margin="1 5" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="TextChanged">
+                                                            <i:InvokeCommandAction Command="{Binding FilterWallsCommand}"></i:InvokeCommandAction>
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+                                                </TextBox>
+                                            </DockPanel>
+                                            <ListBox Grid.Column="0" Grid.Row="1" MaxHeight="200" ItemsSource="{Binding WallTypesViewSource.View}">
                                                 <ListBox.ItemTemplate>
-                                                    <DataTemplate DataType="{x:Type vm:ConcreteRuleViewModel}">
-                                                        <StackPanel Orientation="Horizontal">
-                                                            <StackPanel Orientation="Horizontal" Margin="0 0 5 0">
-                                                                <TextBox Width="80" Margin="1,0" Text="{Binding OpeningWidthCondition.MinWidth, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                                                                <TextBox Width="80" Margin="1,0" Text="{Binding OpeningWidthCondition.MaxWidth, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                                                            </StackPanel>
-                                                            <StackPanel Orientation="Horizontal">
-                                                                <TextBox Width="80" Margin="1,0" Text="{Binding LintelLeftOffsetParameter.LeftOffset, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                                                                <ComboBox MinWidth="200" Margin="1,0" ItemsSource="{Binding LintelTypes}" SelectedItem="{Binding SelectedLintelType}">
-                                                                </ComboBox>
-                                                            </StackPanel>
-                                                        </StackPanel>
+                                                    <DataTemplate DataType="{x:Type vm:WallTypeConditionViewModel}">
+                                                        <CheckBox IsChecked="{Binding IsChecked}">
+                                                            <TextBlock Text="{Binding Name}"/>
+                                                        </CheckBox>
                                                     </DataTemplate>
                                                 </ListBox.ItemTemplate>
                                             </ListBox>
-                                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                                                <Button Width="30" Height="20" Margin="2 3" VerticalAlignment="Top" Command="{Binding AddRuleCommand}">
-                                                    <Image Source="../Resources/icons8-add.png"></Image>
-                                                </Button>
-                                                <Button Width="30" Height="20" Margin="2 3" VerticalAlignment="Top" Command="{Binding RemoveRuleCommand}">
-                                                    <Image Source="../Resources/icons8-remove.png"></Image>
-                                                </Button>
-                                            </StackPanel>
+                                            <Grid Grid.Column="1" Grid.Row="1">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition />
+                                                </Grid.RowDefinitions>
+                                                <ListBox Grid.Row="0" MinWidth="400" BorderThickness="0" Focusable="False" ItemsSource="{Binding Rules}">
+                                                    <ListBox.ItemTemplate>
+                                                        <DataTemplate DataType="{x:Type vm:ConcreteRuleViewModel}">
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <StackPanel Orientation="Horizontal" Margin="0 0 5 0">
+                                                                    <TextBox Width="80" Margin="1,0" Text="{Binding OpeningWidthCondition.MinWidth, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                                                    <TextBox Width="80" Margin="1,0" Text="{Binding OpeningWidthCondition.MaxWidth, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                                                </StackPanel>
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <TextBox Width="80" Margin="1,0" Text="{Binding LintelLeftOffsetParameter.LeftOffset, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                                                    <ComboBox MinWidth="200" Margin="1,0" ItemsSource="{Binding LintelTypes}" SelectedItem="{Binding SelectedLintelType}">
+                                                                    </ComboBox>
+                                                                </StackPanel>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ListBox.ItemTemplate>
+                                                </ListBox>
+                                                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Button Width="30" Height="20" Margin="2 3" VerticalAlignment="Top" Command="{Binding AddRuleCommand}">
+                                                        <Image Source="../Resources/icons8-add.png"></Image>
+                                                    </Button>
+                                                    <Button Width="30" Height="20" Margin="2 3" VerticalAlignment="Top" Command="{Binding RemoveRuleCommand}">
+                                                        <Image Source="../Resources/icons8-remove.png"></Image>
+                                                    </Button>
+                                                </StackPanel>
 
+                                            </Grid>
+                                            <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Orange" Text="{Binding ErrorText}"/>
                                         </Grid>
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Orange" Text="{Binding ErrorText}"/>
-                                    </Grid>
-                                </Border>
+                                    </GroupBox>
+
+                                </Grid>
                                 <Button DockPanel.Dock="Left" Margin="5 0" Width="30" Height="30" Name="bDelete" Command="{Binding ElementName=ucRules, Path=DataContext.RemoveGroupedRuleCommand}" 
                                     CommandParameter="{Binding ElementName=bDelete, Path=DataContext}" >
                                     <Image Source="../Resources/icons8-remove.png"></Image>
@@ -132,7 +156,6 @@
                     <Button Width="30" Margin="3" Command="{Binding AddGroupedRuleCommand}">
                         <Image Source="../Resources/icons8-add.png"></Image>
                     </Button>
-                    <!--<Button Width="30" Margin="3" Command="{Binding SaveConfigCommand}" >!</Button>-->
                 </StackPanel>
             </Grid>
         </ScrollViewer>

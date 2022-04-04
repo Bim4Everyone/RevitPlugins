@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -49,7 +50,7 @@ namespace RevitLintelPlacement.ViewModels {
                 .Select(f => new GenericModelFamilyViewModel() { Name = f.Name }));
             Initialize();
             InitializeParameters();
-            SaveConfigCommand = new RelayCommand(Save);
+            SaveConfigCommand = new RelayCommand(Save, CanSave);
             AddFilterCommand = new RelayCommand(AddFilter);
             RemoveFilterCommand = new RelayCommand(RemoveFilter);
             SelectLintelsConfigCommand = new RelayCommand(SelectLintelsConfig);
@@ -160,9 +161,9 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _lintelRightCornerParameters, value);
         }
 
-        public List<ParameterViewModel> LintelFixationParameters { 
-            get => _lintelFixationParameters; 
-            set => this.RaiseAndSetIfChanged(ref _lintelFixationParameters, value); 
+        public List<ParameterViewModel> LintelFixationParameters {
+            get => _lintelFixationParameters;
+            set => this.RaiseAndSetIfChanged(ref _lintelFixationParameters, value);
         }
 
         public ICommand SaveConfigCommand { get; set; }
@@ -265,10 +266,33 @@ namespace RevitLintelPlacement.ViewModels {
             _revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter = ReinforcedConcreteFilter.Select(e => e.Name).ToList();
             _revitRepository.LintelsCommonConfig.HolesFilter = HolesFilter;
             _revitRepository.LintelsCommonConfig.LintelFamily = LintelFamilies
-                .FirstOrDefault(e => e.IsChecked).Name;
+                .FirstOrDefault(e => e.IsChecked)?.Name ?? string.Empty;
             _revitRepository.LintelsCommonConfig.Save(_revitRepository.GetDocumentName());
             _revitRepository.LintelsConfig.SaveProjectConfig();
-            ChangeMessage("Настройки успешно сохранены");
+            Message = "Настройки успешно сохранены";
+            if (p is Window window) {
+                window.Close();
+            }
+        }
+
+        private bool CanSave(object p) {
+            if(!string.IsNullOrEmpty(LintelThickness.Name)
+            && !string.IsNullOrEmpty(LintelWidth.Name)
+            && !string.IsNullOrEmpty(LintelRightCorner.Name)
+            && !string.IsNullOrEmpty(LintelRightOffset.Name)
+            && !string.IsNullOrEmpty(LintelLeftCorner.Name)
+            && !string.IsNullOrEmpty(LintelLeftOffset.Name)
+            && !string.IsNullOrEmpty(LintelFixation.Name)
+            && !string.IsNullOrEmpty(OpeningHeight)
+            && !string.IsNullOrEmpty(OpeningWidth)
+            && !string.IsNullOrEmpty(OpeningFixation)
+            && !string.IsNullOrEmpty(HolesFilter)
+            && !string.IsNullOrEmpty(LintelFamilies.FirstOrDefault(e => e.IsChecked)?.Name)) {
+                Message = string.Empty;
+                return true;
+            }
+            Message = "Все настройки должны быть заполнены";
+            return false;
         }
 
         private void AddFilter(object p) {
@@ -295,14 +319,6 @@ namespace RevitLintelPlacement.ViewModels {
             }
         }
 
-        private async void ChangeMessage(string newMessage) {
-            Message = newMessage;
-            await Task.Run(() => {
-                Thread.Sleep(3000);
-            });
-            Message = string.Empty;
-        }
-
         private void FamilySelectionChanged(object p) {
             if(p is GenericModelFamilyViewModel newSelectedFamily) {
                 _canChangeSelection = false;
@@ -319,14 +335,14 @@ namespace RevitLintelPlacement.ViewModels {
     internal class FilterViewModel : BaseViewModel {
         private string _name;
 
-        public string Name { 
-            get => _name; 
-            set => this.RaiseAndSetIfChanged(ref _name, value); 
+        public string Name {
+            get => _name;
+            set => this.RaiseAndSetIfChanged(ref _name, value);
         }
     }
 
     internal class ParameterViewModel : IEquatable<ParameterViewModel> {
-        public StorageType StorageType { get; set; } 
+        public StorageType StorageType { get; set; }
         public string Name { get; set; }
 
         public bool Equals(ParameterViewModel other) {

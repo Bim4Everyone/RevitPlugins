@@ -27,8 +27,8 @@ namespace RevitLintelPlacement {
         protected override void Execute(UIApplication uiApplication) {
             var lintelsConfig = LintelsConfig.GetLintelsConfig();
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document, lintelsConfig);
-
-            var lintelsView = new LintelCollectionViewModel(revitRepository);
+            var elementInfos = new ElementInfosViewModel(revitRepository);
+            var lintelsView = new LintelCollectionViewModel(revitRepository, elementInfos);
             var view = new LintelsView() { DataContext = lintelsView};
 
             var helper = new WindowInteropHelper(view) { Owner = uiApplication.MainWindowHandle };
