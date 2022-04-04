@@ -91,9 +91,9 @@ namespace dosymep.WPF.Views {
         
         private void UpdateTheme() {
             if(UIThemeService.HostTheme == UIThemes.Dark) {
-                //ThemeManager.SetThemeName(this, Theme.Win10DarkName);
+                ThemeManager.SetThemeName(this, Theme.Win10DarkName);
             } else if(UIThemeService.HostTheme == UIThemes.Light) {
-                //ThemeManager.SetThemeName(this, Theme.Win10LightName);
+                ThemeManager.SetThemeName(this, Theme.Win10LightName);
             }
         }
     }
