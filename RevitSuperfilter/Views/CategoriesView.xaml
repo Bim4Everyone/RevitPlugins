@@ -4,40 +4,32 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vms="clr-namespace:RevitSuperfilter.ViewModels"
-             mc:Ignorable="d" 
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxmvvm ="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance vms:CategoryViewModel, IsDesignTimeCreatable=False}">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="0,0,0,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto" MinWidth="120"/>
-            </Grid.ColumnDefinitions>
-            <Label Grid.Column="0">Фильтр: </Label>
-            <TextBox Grid.Column="1" Text="{Binding Filter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Button Grid.Column="2" Content="{Binding ButtonFilterName}" Command="{Binding SelectCategoriesCommand}"/>
-        </Grid>
-
-        <ListView Grid.Row="1" ItemsSource="{Binding CategoryViewModelsView}" SelectedItem="{Binding CategoryViewModel}">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="#">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsSelected}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Наименование" DisplayMemberBinding="{Binding Path=DisplayData}" Width="240" />
-                    <GridViewColumn Header="Количество"  DisplayMemberBinding="{Binding Path=Count}" />
-                </GridView>
-            </ListView.View>
-        </ListView>
-    </Grid>
+    <dxg:GridControl x:Name="_gridControl" ItemsSource="{Binding CategoryViewModelsView}" SelectedItem="{Binding CategoryViewModel}" SelectionMode="Row">
+        <dxg:GridControl.View>
+            <dxg:TableView x:Name="_gridView" AutoWidth="True"/>
+        </dxg:GridControl.View>
+        <dxg:GridColumn x:Name="_checkColumn" 
+                        FieldName="IsSelected"
+                        Width="43" MaxWidth="43" 
+                        MinWidth="43" AllowResizing="False" 
+                        AllowColumnFiltering="False" 
+                        AllowSorting="False" Header="" 
+                        ShowCheckBoxInHeader="True">
+            <dxg:GridColumn.CellTemplate>
+                <DataTemplate>
+                    <dxe:CheckEdit Name="PART_Editor" IsChecked="{Binding Row.IsSelected , Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" />
+                </DataTemplate>
+            </dxg:GridColumn.CellTemplate>
+        </dxg:GridColumn>
+        <dxg:GridColumn Header="Наименование" FieldName="DisplayData" AllowEditing="False"  ReadOnly="True"/>
+        <dxg:GridColumn Header="Количество" FieldName="Count"  AllowEditing="False" ReadOnly="True"/>
+    </dxg:GridControl>
 </UserControl>
