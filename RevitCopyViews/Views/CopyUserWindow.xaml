@@ -4,9 +4,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
-    mc:Ignorable="d" 
-    Height="160" Width="580" Title="Копирование пользователя" WindowStartupLocation="CenterOwner">
+    xmlns:base="clr-namespace:dosymep.WPF.Views" 
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    mc:Ignorable="d"
+    AllowDarkTheme="True"
+    ResizeMode="NoResize"
+    SizeToContent="Height"
+    Width="580" Title="Копирование пользователя" WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="80"/>
@@ -19,16 +23,16 @@
             <RowDefinition Height="45"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Column="0" Grid.Row="0" Text="Фамилия" Margin="10"/>
-        <TextBox Grid.Column="1" Grid.Row="0" Margin="10" Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}"/>
+        <dxe:TextEdit Grid.Column="0" Grid.Row="0" IsReadOnly="True" EditMode="InplaceActive" EditValue="Фамилия" Margin="10"/>
+        <dxe:TextEdit Grid.Column="1" Grid.Row="0" Margin="10" EditValue="{Binding LastName, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <TextBlock Grid.Column="0" Grid.Row="1" Text="Префикс" Margin="10"/>
-        <TextBox Grid.Column="1" Grid.Row="1" Margin="10" Text="{Binding Prefix, UpdateSourceTrigger=PropertyChanged}"/>
+        <dxe:TextEdit Grid.Column="0" Grid.Row="1" IsReadOnly="True" EditMode="InplaceActive" EditValue="Префикс" Margin="10"/>
+        <dxe:TextEdit Grid.Column="1" Grid.Row="1" Margin="10" EditValue="{Binding Prefix, UpdateSourceTrigger=PropertyChanged}"/>
 
         <StackPanel Grid.ColumnSpan="2" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
-            <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80" Command="{Binding CopyUserCommand}" />
-            <Button Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80"/>
+            <dxe:TextEdit Margin="10" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText, UpdateSourceTrigger=PropertyChanged}" Foreground="Orange" />
+            <dx:SimpleButton Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80" Command="{Binding CopyUserCommand}" />
+            <dx:SimpleButton Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80"/>
         </StackPanel>
     </Grid>
 </base:PlatformWindow>
