@@ -4,9 +4,20 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:base="clr-namespace:dosymep.WPF.Views" 
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     mc:Ignorable="d" 
-    Height="485" Width="500" WindowStartupLocation="CenterOwner" Title="Переименование видов">
+    AllowDarkTheme="True"
+    ResizeMode="NoResize"
+    SizeToContent="Height"
+    Width="600" WindowStartupLocation="CenterOwner" Title="Переименование видов">
+    <Window.InputBindings>
+        <KeyBinding Command="ApplicationCommands.Close" Key="Esc"/>
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Close" Executed="CloseCommandBinding_Executed" />
+    </Window.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -18,15 +29,15 @@
         <GroupBox Grid.Row="0" Header="Найти и заменить" Margin="10">
             <StackPanel>
                 <StackPanel>
-                    <TextBlock Margin="10" Text="Найти"/>
-                    <TextBox Margin="10,0,10,0" 
-                             Text="{Binding ReplaceOldText, UpdateSourceTrigger=PropertyChanged}" />
+                    <dxe:TextEdit EditMode="InplaceActive" IsReadOnly="True" Margin="10 5" EditValue="Найти"/>
+                    <dxe:TextEdit Margin="5,0,5,0" 
+                             EditValue="{Binding ReplaceOldText, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
 
                 <StackPanel>
-                    <TextBlock Margin="10" Text="Заменить"/>
-                    <TextBox Margin="10,0,10,10" 
-                             Text="{Binding ReplaceNewText, UpdateSourceTrigger=PropertyChanged}" />
+                    <dxe:TextEdit EditMode="InplaceActive" IsReadOnly="True" Margin="10 5" EditValue="Заменить"/>
+                    <dxe:TextEdit Margin="5,0,5,5" 
+                             EditValue="{Binding ReplaceNewText, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
             </StackPanel>
         </GroupBox>
@@ -34,37 +45,37 @@
         <GroupBox Grid.Row="2" Margin="10">
 
             <GroupBox.Header>
-                <CheckBox x:Name="_withPrefix" Content="Префиксы и суффиксы"
-                          IsChecked="{Binding WithPrefix}"/>
+                <dxe:CheckEdit x:Name="_withPrefix" Content="Префиксы и суффиксы"
+                          EditValue="{Binding WithPrefix, UpdateSourceTrigger=PropertyChanged}"/>
             </GroupBox.Header>
 
             <StackPanel IsEnabled="{Binding ElementName=_withPrefix, Path=IsChecked, TargetNullValue=false}">
                 <StackPanel>
-                    <TextBlock Margin="10" Text="Префикс"/>
-                    <CheckBox Margin="10,0,10,10" Content="Заменить" 
-                              IsChecked="{Binding ReplacePrefix}" 
-                              IsEnabled="{Binding IsAllowReplacePrefix}" />
-                    <ComboBox Margin="10,0,10,0" 
-                              ItemsSource="{Binding Prefixes}"
-                              Text="{Binding Prefix, UpdateSourceTrigger=PropertyChanged}" IsEditable="True" />
+                    <dxe:TextEdit EditMode="InplaceActive" IsReadOnly="True" Margin="10 5" EditValue="Префикс"/>
+                    <dxe:CheckEdit Margin="10,0,10,5" Content="Заменить" 
+                              EditValue="{Binding ReplacePrefix, UpdateSourceTrigger=PropertyChanged}" 
+                              IsEnabled="{Binding IsAllowReplacePrefix, UpdateSourceTrigger=PropertyChanged}" />
+                    <dxe:ComboBoxEdit Margin="10,0,10,0" 
+                              ItemsSource="{Binding Prefixes, UpdateSourceTrigger=PropertyChanged}"
+                              EditValue="{Binding Prefix, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
 
                 <StackPanel>
-                    <TextBlock Margin="10" Text="Суффикс"/>
-                    <CheckBox Margin="10,0,10,10" Content="Заменить"
-                              IsChecked="{Binding ReplaceSuffix}"
-                              IsEnabled="{Binding IsAllowReplaceSuffix}"/>
-                    <ComboBox Margin="10,0,10,10"
-                              ItemsSource="{Binding Suffixes}"
-                              Text="{Binding Suffix, UpdateSourceTrigger=PropertyChanged}" IsEditable="True" />
+                    <dxe:TextEdit EditMode="InplaceActive" IsReadOnly="True" Margin="10 5" EditValue="Суффикс"/>
+                    <dxe:CheckEdit Margin="10,0,10,5" Content="Заменить" 
+                              EditValue="{Binding ReplaceSuffix, UpdateSourceTrigger=PropertyChanged}" 
+                              IsEnabled="{Binding IsAllowReplaceSuffix, UpdateSourceTrigger=PropertyChanged}" />
+                    <dxe:ComboBoxEdit Margin="10,0,10,0" 
+                              ItemsSource="{Binding Suffixes, UpdateSourceTrigger=PropertyChanged}"
+                              EditValue="{Binding Suffix, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
-            <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80" Command="{Binding RenameViewCommand}" />
-            <Button Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80"/>
+            <dxe:TextEdit Margin="10" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText, UpdateSourceTrigger=PropertyChanged}" Foreground="Orange" />
+            <dx:SimpleButton Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80" Command="{Binding RenameViewCommand}" />
+            <dx:SimpleButton Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80"/>
         </StackPanel>
     </Grid>
 </base:PlatformWindow>

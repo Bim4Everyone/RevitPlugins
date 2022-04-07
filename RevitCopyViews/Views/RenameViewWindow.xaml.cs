@@ -34,5 +34,9 @@ namespace RevitCopyViews.Views {
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;
         }
+
+        private void CloseCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e) {
+            DialogResult = false;
+        }
     }
 }
