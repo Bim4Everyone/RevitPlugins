@@ -38,7 +38,7 @@ namespace RevitCopyStandarts {
                 @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Шаблоны и настройки";
             
             var mainWindow = new MainWindow() {
-                BimCategories = new BimCategoriesViewModel(mainFolder, document, application)
+                DataContext = new BimCategoriesViewModel(mainFolder, document, application)
             };
             
             var helper = new WindowInteropHelper(mainWindow) {

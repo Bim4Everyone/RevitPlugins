@@ -29,10 +29,5 @@ namespace RevitCopyStandarts {
 
         public override string PluginName => nameof(RevitCopyStandarts);
         public override string ProjectConfigName => nameof(MainWindow);
-
-        public BimCategoriesViewModel BimCategories {
-            get { return DataContext as BimCategoriesViewModel; }
-            set { DataContext = value; }
-        }
     }
 }

@@ -11,12 +11,14 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
+using dosymep.WPF.ViewModels;
 
 using RevitCopyStandarts.Commands;
 
 namespace RevitCopyStandarts.ViewModels {
-    public class BimFileViewModel {
+    internal class BimFileViewModel : BaseViewModel {
         private static readonly Dictionary<string, string> _commandsMap = new Dictionary<string, string>() {
             { "BrowserOrganization", "Autodesk.Revit.DB.BrowserOrganization" },
             { "ObjectStyles", "RevitCopyStandarts.Commands.CopyObjectStylesCommand" },
@@ -77,7 +79,7 @@ namespace RevitCopyStandarts.ViewModels {
             _application = application;
             _targetDocument = targetDocument;
 
-            CopyObjectsCommand = new RelayCommand(CopyObjects);
+            CopyObjectsCommand = new RelayCommand(CopyObjectsAsync);
         }
 
         public string Name {
@@ -93,8 +95,10 @@ namespace RevitCopyStandarts.ViewModels {
         }
 
         public ICommand CopyObjectsCommand { get; }
+        public INotificationService NotificationService
+            => GetPlatformService<INotificationService>();
 
-        private void CopyObjects(object p) {
+        private async void CopyObjectsAsync(object p) {
             Document sourceDocument = _application.OpenDocumentFile(_fileInfo.FullName);
             try {
                 var commands = new List<ICopyStandartsCommand>() {
@@ -110,7 +114,8 @@ namespace RevitCopyStandarts.ViewModels {
                 commands.AddRange(GetIdOptionalStandarts(sourceDocument));
                 commands.ForEach(command => command.Execute());
 
-                System.Windows.MessageBox.Show("Копирование выполнено успешно!", "Сообщение", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+
+                _ = await NotificationService.CreateNotification("Копирование стандартов", "Выполнение скрипта завершено успешно.").ShowAsync();
             } finally {
                 sourceDocument.Close(false);
             }
