@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 using dosymep.WPF.ViewModels;
 
@@ -8,6 +9,7 @@ namespace RevitWindowGapPlacement.ViewModels {
         private string _windowTitle;
         
         public ICommand PerformWindowCommand { get; }
+        public ObservableCollection<CommandViewModel> AdditionCommands { get; }
         
         public string ErrorText {
             get => _errorText;
