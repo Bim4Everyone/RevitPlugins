@@ -12,14 +12,19 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using dosymep.WPF.Views;
+
 namespace RevitGenLookupTables.Views {
     /// <summary>
     /// Interaction logic for FamilyParamsView.xaml
     /// </summary>
-    public partial class FamilyParamsView : Window {
+    public partial class FamilyParamsView : PlatformWindow {
         public FamilyParamsView() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitGenLookupTables);
+        public override string ProjectConfigName => nameof(FamilyParamsView);
 
         private void ButtonOK_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;

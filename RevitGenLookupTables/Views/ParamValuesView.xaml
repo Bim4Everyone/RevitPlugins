@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:RevitGenLookupTables.Views"
+             xmlns:local="clr-namespace:RevitGenLookupTables.Views" 
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -22,17 +24,19 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Label Grid.Column="0" Margin="0,0,0,10">Старт </Label>
-        <TextBox Grid.Column="1" Margin="0,0,0,10" Text="{Binding MinValue, UpdateSourceTrigger=PropertyChanged}"/>
-        <Label Grid.Column="2" Margin="0,0,0,10">Стоп </Label>
-        <TextBox Grid.Column="3" Margin="0,0,0,10" Text="{Binding MaxValue, UpdateSourceTrigger=PropertyChanged}"/>
-        <Label Grid.Column="4" Margin="0,0,0,10">Шаг </Label>
-        <TextBox Grid.Column="5" Margin="0,0,0,10" Text="{Binding StepValue, UpdateSourceTrigger=PropertyChanged}"/>
-        <Button Grid.Column="6" Margin="10,0,0,10" Content="Генерировать" ToolTipService.ShowOnDisabled="True"
+        <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="Старт" Grid.Column="0" Margin="0,0,3,10"/>
+        <dxe:TextEdit Grid.Column="1" Margin="0,0,0,10" EditValue="{Binding MinValue, UpdateSourceTrigger=PropertyChanged}"/>
+        <dxe:TextEdit Grid.Column="2" Margin="0,0,3,10" IsReadOnly="True" EditMode="InplaceActive" EditValue="Стоп"/>
+        <dxe:TextEdit Grid.Column="3" Margin="0,0,0,10" EditValue="{Binding MaxValue, UpdateSourceTrigger=PropertyChanged}"/>
+        <dxe:TextEdit Grid.Column="4" Margin="0,0,3,10" IsReadOnly="True" EditMode="InplaceActive" EditValue="Шаг"/>
+        <dxe:TextEdit Grid.Column="5" Margin="0,0,0,10" EditValue="{Binding StepValue, UpdateSourceTrigger=PropertyChanged}"/>
+        <dx:SimpleButton Grid.Column="6" Margin="10,0,0,10" Content="Генерировать" ToolTipService.ShowOnDisabled="True"
                 Command="{Binding GenerateCommand}"
                 ToolTip="{Binding ErrorText}"/>
 
-        <TextBox Grid.Row="1" Grid.ColumnSpan="7" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Visible"
-                 Text="{Binding ParamValues, UpdateSourceTrigger=PropertyChanged}"/>
+        <dxe:TextEdit Grid.Row="1" Grid.ColumnSpan="7" AcceptsReturn="True" VerticalScrollBarVisibility="Visible"
+                      VerticalContentAlignment="Top"
+                      HorizontalScrollBarVisibility="Visible"
+                      EditValue="{Binding ParamValues, UpdateSourceTrigger=PropertyChanged}"/>
     </Grid>
 </UserControl>

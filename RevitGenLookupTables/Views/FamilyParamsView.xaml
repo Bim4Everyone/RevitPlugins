@@ -1,30 +1,41 @@
-﻿<Window x:Class="RevitGenLookupTables.Views.FamilyParamsView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:RevitGenLookupTables.Views"
-        mc:Ignorable="d"
-        Title="Параметры семейства" Height="450" Width="800" WindowStartupLocation="CenterOwner">
+﻿<base:PlatformWindow  
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    x:Class="RevitGenLookupTables.Views.FamilyParamsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:RevitGenLookupTables.Views" 
+    xmlns:converter="clr-namespace:RevitGenLookupTables.Converters"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    mc:Ignorable="d"
+    Title="Параметры семейства" 
+    Height="450" Width="800" 
+    WindowStartupLocation="CenterOwner"
+    AllowDarkTheme="True">
+    <base:PlatformWindow.Resources>
+        <converter:StorageTypeConverter x:Key="StorageTypeConverter"/>
+    </base:PlatformWindow.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
-        <ListView Grid.Row="0" SelectedItem="{Binding SelectedFamilyParam}" ItemsSource="{Binding FamilyParams}">
-            <ListView.View>
-                <GridView >
-                    <GridViewColumn Header="Наименование"  DisplayMemberBinding="{Binding Name}"/>
-                    <GridViewColumn Header="Метаданные колонки" DisplayMemberBinding="{Binding ColumnMetaData}"/>
-                    <GridViewColumn Header="Тип данных параметра" DisplayMemberBinding="{Binding StorageType}"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
+
+        <dxg:GridControl Grid.Row="0" SelectedItem="{Binding SelectedFamilyParam}" ItemsSource="{Binding FamilyParams}" SelectionMode="Row">
+            <dxg:GridControl.View>
+                <dxg:TableView x:Name="_gridView" AutoWidth="True"/>
+            </dxg:GridControl.View>
+
+            <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False" Header="Наименование"  FieldName ="Name"/>
+            <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False" Header="Метаданные колонки" FieldName="ColumnMetaData"/>
+            <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False" Header="Тип данных параметра" Binding="{Binding StorageType, Converter={StaticResource StorageTypeConverter}}"/>
+
+        </dxg:GridControl>
         <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
-            <Button Content="ОК" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding SaveTableCommand}"/>
-            <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
+            <dxe:TextEdit Margin="10" EditMode="InplaceActive" IsReadOnly="True" EditValue="{Binding ErrorText}" Foreground="Orange" />
+            <dx:SimpleButton Content="ОК" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding SaveTableCommand}"/>
+            <dx:SimpleButton Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
         </StackPanel>
     </Grid>
-</Window>
+</base:PlatformWindow>

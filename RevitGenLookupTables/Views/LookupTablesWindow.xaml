@@ -5,11 +5,19 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:RevitGenLookupTables.Views"
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:base="clr-namespace:dosymep.WPF.Views" 
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:converter="clr-namespace:RevitGenLookupTables.Converters"
     mc:Ignorable="d"
     Title="Таблица выбора"
     Height="850" Width="1500" WindowStartupLocation="CenterOwner"
+    AllowDarkTheme="True"
     x:Name="_this">
+    <base:PlatformWindow.Resources>
+        <converter:StorageTypeConverter x:Key="StorageTypeConverter"/>
+    </base:PlatformWindow.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -24,29 +32,35 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
-            <Button Height="25" Width="25" Margin="10" Content="↑" Command="{Binding UpFamilyParamCommand}"/>
-            <Button Height="25" Width="25" Margin="10" Content="↓"  Command="{Binding DownFamilyParamCommand}"/>
-            <Button Height="25" Width="25" Margin="10" Content="+" Command="{Binding AddFamilyParamCommand}" CommandParameter="{Binding ElementName=_this}"/>
-            <Button Height="25" Width="25" Margin="10" Content="-"  Command="{Binding RemoveFamilyParamCommand}"/>
+            <dx:SimpleButton Height="25" Width="25" Margin="5" Command="{Binding UpFamilyParamCommand}" Glyph="{dx:DXImage 'SvgImages/Arrows/MoveUp.svg'}" GlyphHeight="16"/>
+            <dx:SimpleButton Height="25" Width="25" Margin="5" Command="{Binding DownFamilyParamCommand}" Glyph="{dx:DXImage 'SvgImages/Arrows/MoveDown.svg'}" GlyphHeight="16"/>
+            <dx:SimpleButton Height="25" Width="25" Margin="5" Command="{Binding AddFamilyParamCommand}" CommandParameter="{Binding ElementName=_this}" Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Add.svg'}" GlyphHeight="16"/>
+            <dx:SimpleButton Height="25" Width="25" Margin="5" Command="{Binding RemoveFamilyParamCommand}" Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}" GlyphHeight="16"/>
         </StackPanel>
 
-        <ListView Grid.Column="0" Grid.Row="1" SelectedItem="{Binding SelectedFamilyParam}" ItemsSource="{Binding SelectedFamilyParams}">
-            <ListView.View>
-                <GridView >
-                    <GridViewColumn Header="Наименование"  DisplayMemberBinding="{Binding Name}"/>
-                    <GridViewColumn Header="Метаданные колонки" DisplayMemberBinding="{Binding ColumnMetaData}"/>
-                    <GridViewColumn Header="Тип данных параметра" DisplayMemberBinding="{Binding StorageType}"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
+        <dxg:GridControl 
+            Grid.Column="0" 
+            Grid.Row="1" 
+            SelectedItem="{Binding SelectedFamilyParam}" 
+            ItemsSource="{Binding SelectedFamilyParams}"
+            SelectionMode="Row">
+            <dxg:GridControl.View>
+                <dxg:TableView x:Name="_gridView" AutoWidth="True"/>
+            </dxg:GridControl.View>
+
+            <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False" Header="Наименование" FieldName ="Name"/>
+            <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False" Header="Метаданные колонки" FieldName="ColumnMetaData"/>
+            <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False" Header="Тип данных параметра" Binding="{Binding StorageType, Converter={StaticResource StorageTypeConverter}}" />
+
+        </dxg:GridControl>
 
         <GridSplitter Grid.Column="1" Grid.RowSpan="2" ResizeDirection="Columns" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="3"/>
         <local:ParamValuesView Grid.Column="2" Grid.RowSpan="2" Margin="10" DataContext="{Binding SelectedFamilyParam.FamilyParamValues}"/>
 
         <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
-            <Button Content="ОК" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding SaveTableCommand}"/>
-            <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
+            <dxe:TextEdit Margin="10" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}" Foreground="Orange" />
+            <dx:SimpleButton Content="ОК" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding SaveTableCommand}"/>
+            <dx:SimpleButton Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
         </StackPanel>
     </Grid>
 </base:PlatformWindow>
