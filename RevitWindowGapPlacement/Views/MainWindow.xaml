@@ -5,9 +5,37 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:views="clr-namespace:RevitWindowGapPlacement.Views"
+    xmlns:vms="clr-namespace:RevitWindowGapPlacement.ViewModels"
     mc:Ignorable="d"
-    Title="Расстановка проемов окон"
+
+    Height="450" Width="800"
     WindowStartupLocation="CenterOwner"
-    Height="450" Width="800">
-    <Grid />
+
+    Title="{Binding CurrentViewModel.WindowTitle}"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <Window.Resources>
+        <DataTemplate DataType="vms:PlaceWindowGapViewModel">
+            <views:PlaceWindowGapView />
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ContentControl Grid.Row="0" Content="{Binding CurrentViewModel}" />
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
+
+            <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80"
+                    Command="{Binding CurrentViewModel.PerformWindowCommand}" />
+
+            <Button Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80" />
+        </StackPanel>
+    </Grid>
 </base:PlatformWindow>
