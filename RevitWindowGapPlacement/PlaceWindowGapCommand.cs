@@ -16,9 +16,14 @@ namespace RevitWindowGapPlacement {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            var window = new MainWindow() {DataContext = new MainViewModel()};
+            var window = new MainWindow() {
+                DataContext = new MainViewModel() {
+                    CurrentViewModel = new PlaceViewModel() {WindowTitle = PluginName}
+                }
+            };
+            
             var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
-
+            
             window.ShowDialog();
         }
     }
