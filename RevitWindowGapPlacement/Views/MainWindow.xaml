@@ -37,13 +37,16 @@
 
         <ContentControl Grid.Row="0" Content="{Binding CurrentViewModel}" />
 
+        <Border Grid.Row="1" Background="LightGray" BorderBrush="Gray" BorderThickness="0 1 0 0" />
+        
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Height="45">
             <TextBlock Margin="10" Text="{Binding CurrentViewModel.ErrorText}" Foreground="Orange" />
 
-            <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80"
+            <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80" Background="White"
                     Command="{Binding CurrentViewModel.PerformWindowCommand}" />
 
-            <Button Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80" />
+            <Button Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80" Background="White" />
         </StackPanel>
+        
     </Grid>
 </base:PlatformWindow>
