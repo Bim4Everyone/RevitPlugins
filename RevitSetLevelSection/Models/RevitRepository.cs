@@ -138,9 +138,13 @@ namespace RevitSetLevelSection.Models {
         }
 
         private XYZ GetCenterPoint(Element element) {
-            Solid solid = GetSolid(element, Transform.Identity);
-            if(solid != null) {
-                return solid.ComputeCentroid();
+            try {
+                Solid solid = GetSolid(element, Transform.Identity);
+                if(solid != null) {
+                    return solid.ComputeCentroid();
+                }
+            } catch {
+                
             }
 
             var elementOutline = GetOutline(element, Transform.Identity);
@@ -183,9 +187,13 @@ namespace RevitSetLevelSection.Models {
             Solid resultSolid = solids.First();
             solids.Remove(resultSolid);
 
-            foreach(Solid solid in solids) {
-                resultSolid =
-                    BooleanOperationsUtils.ExecuteBooleanOperation(resultSolid, solid, BooleanOperationsType.Union);
+            try {
+                foreach(Solid solid in solids) {
+                    resultSolid =
+                        BooleanOperationsUtils.ExecuteBooleanOperation(resultSolid, solid, BooleanOperationsType.Union);
+                }
+            } catch(InvalidOperationException) {
+                return null;
             }
 
             return SolidUtils.CreateTransformed(resultSolid, transform);
