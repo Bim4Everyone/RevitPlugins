@@ -3,7 +3,7 @@
 using dosymep.WPF.ViewModels;
 
 namespace RevitWindowGapPlacement.ViewModels {
-    internal class NavigatorWindowGapsViewModel : BaseViewModel {
+    internal class PlaceViewModel : BaseViewModel {
         private string _windowTitle;
         
         public ICommand PerformWindowCommand { get; }

@@ -16,16 +16,16 @@
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
-        <DataTemplate DataType="vms:PlaceWindowGapViewModel">
-            <views:PlaceWindowGapView />
+        <DataTemplate DataType="vms:PlaceViewModel">
+            <views:PlaceView />
         </DataTemplate>
         
-        <DataTemplate DataType="vms:NavigatorWindowGapsViewModel">
-            <views:NavigatorWindowGapsView />
+        <DataTemplate DataType="vms:NavigatorViewModel">
+            <views:NavigatorView />
         </DataTemplate>
         
-        <DataTemplate DataType="vms:SettingsWindowGapsViewModel">
-            <views:SettingsWindowGapsView />
+        <DataTemplate DataType="vms:SettingsViewModel">
+            <views:SettingsView />
         </DataTemplate>
     </Window.Resources>
 

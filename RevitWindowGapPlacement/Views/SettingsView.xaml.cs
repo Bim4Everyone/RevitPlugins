@@ -1,8 +1,8 @@
 ﻿using System.Windows.Controls;
 
 namespace RevitWindowGapPlacement.Views {
-    public partial class NavigatorWindowGapsView : UserControl {
-        public NavigatorWindowGapsView() {
+    public partial class SettingsView : UserControl {
+        public SettingsView() {
             InitializeComponent();
         }
     }
