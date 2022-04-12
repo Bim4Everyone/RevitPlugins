@@ -23,6 +23,10 @@
         <DataTemplate DataType="vms:NavigatorWindowGapsViewModel">
             <views:NavigatorWindowGapsView />
         </DataTemplate>
+        
+        <DataTemplate DataType="vms:SettingsWindowGapsViewModel">
+            <views:SettingsWindowGapsView />
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>
