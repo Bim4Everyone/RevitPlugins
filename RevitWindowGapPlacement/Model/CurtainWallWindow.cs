@@ -9,6 +9,10 @@ namespace RevitWindowGapPlacement.Model {
             _wall = wall;
         }
 
+        protected override Wall GetHostElement() {
+            return _wall;
+        }
+
         protected override XYZ GetLocation() {
             throw new System.NotImplementedException();
         }

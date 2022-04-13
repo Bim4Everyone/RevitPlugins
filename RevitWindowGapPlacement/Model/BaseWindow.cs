@@ -10,21 +10,23 @@ namespace RevitWindowGapPlacement.Model {
             _element = element;
             _revitRepository = revitRepository;
         }
+
         
         protected abstract XYZ GetLocation();
+        protected abstract Wall GetHostElement();
         protected abstract FamilyInstance UpdateParamsWindowGap(FamilyInstance windowGap);
         
         public FamilyInstance PlaceWindowGap(Document document, FamilySymbol windowGapType) {
-            Element host = GetHost();
             XYZ location = GetLocation();
+            Element hostElement = GetNearestElement();
             
-            FamilyInstance windowGap = document.Create.NewFamilyInstance(location, windowGapType, host, StructuralType.NonStructural);
+            FamilyInstance windowGap = document.Create.NewFamilyInstance(location, windowGapType, hostElement, StructuralType.NonStructural);
             return UpdateParamsWindowGap(windowGap);
         }
 
-
-        protected virtual Element GetHost() {
-            return null;
+        private Element GetNearestElement() {
+            var hostElement = GetHostElement();
+            return _revitRepository.GetNearestElement(hostElement);
         }
     }
 }
