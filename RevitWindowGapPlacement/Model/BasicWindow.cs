@@ -4,8 +4,8 @@ namespace RevitWindowGapPlacement.Model {
     internal class BasicWindow : BaseWindow {
         private readonly FamilyInstance _familyInstance;
 
-        public BasicWindow(FamilyInstance familyInstance)
-            : base(familyInstance) {
+        public BasicWindow(FamilyInstance familyInstance, RevitRepository revitRepository)
+            : base(familyInstance, revitRepository) {
             _familyInstance = familyInstance;
         }
 

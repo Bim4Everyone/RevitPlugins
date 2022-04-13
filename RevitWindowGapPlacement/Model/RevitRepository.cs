@@ -23,10 +23,10 @@ namespace RevitWindowGapPlacement.Model {
 
         public List<ICanPlaceWindowGap> GetPlaceableElements() {
             var walls = GetCurtainWalls()
-                .Select(item => new CurtainWallWindow(item));
+                .Select(item => new CurtainWallWindow(item, this));
 
             var windows = GetWindows()
-                .Select(item => new BasicWindow(item));
+                .Select(item => new BasicWindow(item, this));
 
             return Enumerable.Empty<ICanPlaceWindowGap>()
                 .Union(walls)

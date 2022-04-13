@@ -4,9 +4,11 @@ using Autodesk.Revit.DB.Structure;
 namespace RevitWindowGapPlacement.Model {
     internal abstract class BaseWindow : ICanPlaceWindowGap {
         private readonly Element _element;
+        protected readonly RevitRepository _revitRepository;
 
-        public BaseWindow(Element element) {
+        public BaseWindow(Element element, RevitRepository revitRepository) {
             _element = element;
+            _revitRepository = revitRepository;
         }
         
         protected abstract XYZ GetLocation();

@@ -4,8 +4,8 @@ namespace RevitWindowGapPlacement.Model {
     internal class CurtainWallWindow : BaseWindow {
         private readonly Wall _wall;
 
-        public CurtainWallWindow(Wall wall)
-            : base(wall) {
+        public CurtainWallWindow(Wall wall, RevitRepository revitRepository)
+            : base(wall, revitRepository) {
             _wall = wall;
         }
 
