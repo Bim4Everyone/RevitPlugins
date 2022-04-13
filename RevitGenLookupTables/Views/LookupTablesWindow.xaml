@@ -43,6 +43,7 @@
             Grid.Row="1" 
             SelectedItem="{Binding SelectedFamilyParam}" 
             ItemsSource="{Binding SelectedFamilyParams}"
+            SelectedItems="{Binding GridSelectedFamilyParams}"
             SelectionMode="Row">
             <dxg:GridControl.View>
                 <dxg:TableView x:Name="_gridView" AutoWidth="True"/>

@@ -9,5 +9,6 @@ namespace RevitGenLookupTables.ViewModels {
     internal class SelectFamilyParamsViewModel {
         public FamilyParamViewModel SelectedFamilyParam { get; set; }
         public ObservableCollection<FamilyParamViewModel> FamilyParams { get; set; }
+        public ObservableCollection<FamilyParamViewModel> SelectedFamilyParams { get; set; } = new ObservableCollection<FamilyParamViewModel>();
     }
 }

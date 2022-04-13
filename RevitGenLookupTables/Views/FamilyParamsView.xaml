@@ -22,7 +22,8 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <dxg:GridControl Grid.Row="0" SelectedItem="{Binding SelectedFamilyParam}" ItemsSource="{Binding FamilyParams}" SelectionMode="Row">
+        <dxg:GridControl Grid.Row="0" ItemsSource="{Binding FamilyParams}" SelectionMode="Row" SelectedItems="{Binding SelectedFamilyParams, UpdateSourceTrigger=PropertyChanged}"
+                         SelectedItem ="{Binding SelectedFamilyParam, UpdateSourceTrigger=PropertyChanged}">
             <dxg:GridControl.View>
                 <dxg:TableView x:Name="_gridView" AutoWidth="True"/>
             </dxg:GridControl.View>
