@@ -22,33 +22,35 @@ namespace RevitWindowGapPlacement.Model {
         public Document Document => UIDocument.Document;
         public UIDocument UIDocument => UIApplication.ActiveUIDocument;
 
-        public Element GetNearestElement(Wall hostElement) {
-            var bbFilter = new BoundingBoxIntersectsFilter(GetOutline(hostElement));
-            var walls = new FilteredElementCollector(Document)
-                .WhereElementIsNotElementType()
-                .OfCategory(BuiltInCategory.OST_Walls)
-                .WherePasses(bbFilter)
-                .OfType<Wall>()
-                .ToList();
+        public Wall GetNearestElement(Wall host, XYZ point, XYZ direction) {
+            var exclusionFilter =
+                new ExclusionFilter(new[] {host.Id});
 
-            if(walls.Count == 1) {
-                return walls[0];
+            var categoryFilter =
+                new ElementCategoryFilter(BuiltInCategory.OST_Walls);
+
+            var andFilter
+                = new LogicalAndFilter(new ElementFilter[] {exclusionFilter, categoryFilter});
+
+            var refIntersection =
+                new ReferenceIntersector(andFilter, FindReferenceTarget.All, (View3D) Document.ActiveView);
+
+            var positiveNearestElement
+                = refIntersection.FindNearest(point, direction);
+
+            var negativeNearestElement
+                = refIntersection.FindNearest(point, -direction);
+
+            var nearestElement = new[] {positiveNearestElement, negativeNearestElement}
+                .Where(item => item != null)
+                .OrderByDescending(item => positiveNearestElement.Proximity)
+                .FirstOrDefault();
+
+            if(nearestElement == null) {
+                return null;
             }
 
-            walls = walls
-                .Where(item => IsParallelWalls(hostElement, item))
-                .ToList();
-            
-            if(walls.Count == 1) {
-                return walls[0];
-            }
-
-            throw new Exception("Шо?");
-        }
-
-        private bool IsParallelWalls(Wall first, Wall second) {
-            double angle = first.Orientation.AngleTo(second.Orientation);
-            return Math.Abs(angle) < 0.001 || Math.Abs(angle - 180) < 0.001;
+            return (Wall) Document.GetElement(nearestElement.GetReference().ElementId);
         }
 
         public List<ICanPlaceWindowGap> GetPlaceableElements() {
@@ -92,16 +94,32 @@ namespace RevitWindowGapPlacement.Model {
                 .FirstOrDefault(item => item.Name.Equals("Окн_Проём_Прямоугольный"));
         }
 
+        public FamilySymbol GetWindowGapType(string ss) {
+            return new FilteredElementCollector(Document)
+                .WhereElementIsElementType()
+                .OfCategory(BuiltInCategory.OST_Windows)
+                .OfType<FamilySymbol>()
+                .FirstOrDefault(item => item.Name.Equals(ss));
+        }
+
         public void PlaceWindowGaps() {
             using(Transaction transaction = Document.StartTransaction("Расстановка проемов окон")) {
                 // Удаляем все расставленные до этого проемы окон
                 RemoveWindowGaps();
 
+
+                Document.Regenerate();
+
                 FamilySymbol windowGapType = GetWindowGapType();
+                if(!windowGapType.IsActive) {
+                    windowGapType.Activate();
+                }
 
                 // Заново расставляем проемы окон
                 foreach(ICanPlaceWindowGap placeableElement in GetPlaceableElements()) {
-                    placeableElement.PlaceWindowGap(Document, windowGapType);
+                    try {
+                        placeableElement.PlaceWindowGap(Document, windowGapType);
+                    } catch { }
                 }
 
                 transaction.Commit();
@@ -138,7 +156,7 @@ namespace RevitWindowGapPlacement.Model {
                 return new Outline(XYZ.Zero, XYZ.Zero);
             }
 
-            var offset = new XYZ(50, 50, 50);
+            var offset = new XYZ(0.1, 0.1, 0.1);
             return new Outline(boundingBox.Min - offset, boundingBox.Max + offset);
         }
     }

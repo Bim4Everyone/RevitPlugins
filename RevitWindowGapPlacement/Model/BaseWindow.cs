@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.DB;
+﻿using System.Linq;
+
+using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 
 namespace RevitWindowGapPlacement.Model {
@@ -11,22 +13,23 @@ namespace RevitWindowGapPlacement.Model {
             _revitRepository = revitRepository;
         }
 
-        
-        protected abstract XYZ GetLocation();
+
+        protected abstract XYZ GetPlaceLocation();
         protected abstract Wall GetHostElement();
         protected abstract FamilyInstance UpdateParamsWindowGap(FamilyInstance windowGap);
-        
-        public FamilyInstance PlaceWindowGap(Document document, FamilySymbol windowGapType) {
-            XYZ location = GetLocation();
-            Element hostElement = GetNearestElement();
-            
-            FamilyInstance windowGap = document.Create.NewFamilyInstance(location, windowGapType, hostElement, StructuralType.NonStructural);
-            return UpdateParamsWindowGap(windowGap);
-        }
 
-        private Element GetNearestElement() {
-            var hostElement = GetHostElement();
-            return _revitRepository.GetNearestElement(hostElement);
+        public FamilyInstance PlaceWindowGap(Document document, FamilySymbol windowGapType) {
+            XYZ location = GetPlaceLocation();
+            Wall hostElement = GetHostElement();
+
+            Reference face = HostObjectUtils
+                .GetSideFaces(hostElement, ShellLayerType.Exterior)
+                .FirstOrDefault();
+
+            FamilyInstance windowGap =
+                document.Create.NewFamilyInstance(face, location, XYZ.Zero, windowGapType);
+
+            return UpdateParamsWindowGap(windowGap);
         }
     }
 }

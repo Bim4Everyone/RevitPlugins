@@ -5,6 +5,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 
+using RevitWindowGapPlacement.Model;
 using RevitWindowGapPlacement.ViewModels;
 using RevitWindowGapPlacement.Views;
 
@@ -16,15 +17,8 @@ namespace RevitWindowGapPlacement {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            var window = new MainWindow() {
-                DataContext = new MainViewModel() {
-                    CurrentViewModel = new PlaceViewModel() {WindowTitle = PluginName}
-                }
-            };
-            
-            var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
-            
-            window.ShowDialog();
+            var revitRepository = new RevitRepository(uiApplication);
+            revitRepository.PlaceWindowGaps();
         }
     }
 }
