@@ -183,17 +183,31 @@ namespace RevitLintelPlacement.Models {
                 throw new ArgumentException(nameof(sampleMode), $"Способ выборки \"{nameof(sampleMode)}\" не найден.");
             }
 
-            return collector
+            var smth = collector.OfClass(typeof(FamilyInstance))
+                .Cast<FamilyInstance>()
+                .Where(f => f?.Symbol != null && f.Symbol?.Family != null && f.Symbol.Family.Name != null &&
+                f.Symbol.Family.Name.ToLower().Contains(LintelsCommonConfig.HolesFilter.ToLower())).ToList();
+
+            var smth2 = collector
                 .WherePasses(categoryFilter)
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
-                .Where(e => e.Host is Wall && e.Location != null)
-                .Union(
-                 collector.OfClass(typeof(FamilyInstance))
-                .Cast<FamilyInstance>()
-                .Where(f => f?.Symbol != null && f.Symbol?.Family != null && f.Symbol.Family.Name != null &&
-                f.Symbol.Family.Name.ToLower().Contains(LintelsCommonConfig.HolesFilter.ToLower())), new FamilyInstanceComparer())
-                .Where(e => CheckElementInWallParameter(e, elementInfos));
+                .Where(e => e.Host is Wall && e.Location != null).ToList();
+
+            return smth2.Union(smth, new FamilyInstanceComparer()).Where(e => CheckElementInWallParameter(e, elementInfos)).ToList();
+
+            //return collector
+            //    .WherePasses(categoryFilter)
+            //    .OfClass(typeof(FamilyInstance))
+            //    .Cast<FamilyInstance>()
+            //    .Where(e => e.Host is Wall && e.Location != null)
+            //    .ToList()
+            //    .Union(
+            //     collector.OfClass(typeof(FamilyInstance))
+            //    .Cast<FamilyInstance>()
+            //    .Where(f => f?.Symbol != null && f.Symbol?.Family != null && f.Symbol.Family.Name != null &&
+            //    f.Symbol.Family.Name.ToLower().Contains(LintelsCommonConfig.HolesFilter.ToLower())).ToList(), new FamilyInstanceComparer())
+            //    .Where(e => CheckElementInWallParameter(e, elementInfos));
         }
 
         public View GetElevation() {
@@ -485,6 +499,7 @@ namespace RevitLintelPlacement.Models {
             var level = _document.GetElement(elementInWall.LevelId) as Level;
             var height = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningHeight)
                ?? elementInWall.Symbol.GetParamValueOrDefault(LintelsCommonConfig.OpeningHeight);
+
             var bottomBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
             if(bottomBarHeight == 0) {
                 bottomBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_ELEVATION_PARAM);
