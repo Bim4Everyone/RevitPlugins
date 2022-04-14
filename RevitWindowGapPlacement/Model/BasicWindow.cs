@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.DB;
+﻿using System.Collections.Generic;
+
+using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
@@ -11,9 +13,17 @@ namespace RevitWindowGapPlacement.Model {
             _familyInstance = familyInstance;
         }
 
-        protected override Wall GetHostElement() {
+        protected override IEnumerable<Element> GetHostElements() {
             XYZ point = ((LocationPoint) _familyInstance.Location).Point;
-            return _revitRepository.GetNearestElement((Wall) _familyInstance.Host, point, ((Wall) _familyInstance.Host).Orientation);
+
+            XYZ orientation = XYZ.Zero;
+            if(_familyInstance.Host is Wall wall) {
+                orientation = wall.Orientation;
+            } else if(_familyInstance.Host is FamilyInstance familyInstance) {
+                orientation = familyInstance.HandOrientation;
+            }
+
+            return _revitRepository.GetNearestElements(_familyInstance.Host, point, orientation);
         }
 
         protected override XYZ GetPlaceLocation() {
@@ -29,13 +39,13 @@ namespace RevitWindowGapPlacement.Model {
             windowGap.SetParamValue(BuiltInParameter.WINDOW_HEIGHT, height);
             
             windowGap.SetParamValue("Смещение Сверху",
-                _familyInstance.Symbol.GetParamValue<string>("Четверть Сверху"));
+                _familyInstance.Symbol.GetParamValue<double>("Четверть Сверху"));
             
             windowGap.SetParamValue("Смещение Справа", 
-                _familyInstance.Symbol.GetParamValue<string>("Четверть Справа"));
+                _familyInstance.Symbol.GetParamValue<double>("Четверть Справа"));
             
             windowGap.SetParamValue("Смещение Слева",
-                _familyInstance.Symbol.GetParamValue<string>("Четверть Слева"));
+                _familyInstance.Symbol.GetParamValue<double>("Четверть Слева"));
             
             return windowGap;
         }

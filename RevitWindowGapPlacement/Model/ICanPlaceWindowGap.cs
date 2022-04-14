@@ -1,7 +1,9 @@
-﻿using Autodesk.Revit.DB;
+﻿using System.Collections.Generic;
+
+using Autodesk.Revit.DB;
 
 namespace RevitWindowGapPlacement.Model {
     internal interface ICanPlaceWindowGap {
-        FamilyInstance PlaceWindowGap(Document document, FamilySymbol windowGapType);
+        List<FamilyInstance> PlaceWindowGap(Document document, FamilySymbol windowGapType);
     }
 }

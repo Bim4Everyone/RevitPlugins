@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
@@ -15,21 +16,57 @@ namespace RevitWindowGapPlacement.Model {
 
 
         protected abstract XYZ GetPlaceLocation();
-        protected abstract Wall GetHostElement();
+        protected abstract IEnumerable<Element> GetHostElements();
         protected abstract FamilyInstance UpdateParamsWindowGap(FamilyInstance windowGap);
 
-        public FamilyInstance PlaceWindowGap(Document document, FamilySymbol windowGapType) {
+        public List<FamilyInstance> PlaceWindowGap(Document document, FamilySymbol windowGapType) {
+            return GetPlacedFamilyInstances(document, windowGapType).ToList();
+        }
+
+        private IEnumerable<FamilyInstance> GetPlacedFamilyInstances(Document document, FamilySymbol windowGapType) {
             XYZ location = GetPlaceLocation();
-            Wall hostElement = GetHostElement();
+            IEnumerable<Element> hostElements = GetHostElements().Distinct(new Sho());
 
-            Reference face = HostObjectUtils
-                .GetSideFaces(hostElement, ShellLayerType.Exterior)
-                .FirstOrDefault();
+            foreach(Element element in hostElements) {
+                if(element is HostObject hostObject) {
+                    Reference face = HostObjectUtils
+                        .GetSideFaces(hostObject, ShellLayerType.Exterior)
+                        .FirstOrDefault();
 
-            FamilyInstance windowGap =
-                document.Create.NewFamilyInstance(face, location, XYZ.Zero, windowGapType);
+                    FamilyInstance windowGap =
+                        document.Create.NewFamilyInstance(face, location, XYZ.Zero, windowGapType);
 
-            return UpdateParamsWindowGap(windowGap);
+                    yield return UpdateParamsWindowGap(windowGap);
+                }
+
+                if(element is FamilyInstance familyInstance) {
+                    var geometryInstance = familyInstance
+                        .get_Geometry(new Options() {View = document.ActiveView, ComputeReferences = true})
+                        .OfType<GeometryInstance>()
+                        .FirstOrDefault();
+
+                    if(geometryInstance != null) {
+                        var solid = geometryInstance.GetInstanceGeometry()
+                            .OfType<Solid>()
+                            .OrderByDescending(item => item.Volume)
+                            .FirstOrDefault();
+                        
+                        if(solid != null) {
+                            var face = solid.Faces
+                                .OfType<RuledFace>()
+                                .OrderByDescending(item => item.Area)
+                                .FirstOrDefault();
+
+                            if(face != null) {
+                                FamilyInstance windowGap =
+                                    document.Create.NewFamilyInstance(face, location, XYZ.Zero, windowGapType);
+
+                                yield return UpdateParamsWindowGap(windowGap);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

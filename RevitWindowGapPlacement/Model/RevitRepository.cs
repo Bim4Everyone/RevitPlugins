@@ -22,7 +22,48 @@ namespace RevitWindowGapPlacement.Model {
         public Document Document => UIDocument.Document;
         public UIDocument UIDocument => UIApplication.ActiveUIDocument;
 
-        public Wall GetNearestElement(Wall host, XYZ point, XYZ direction) {
+        public IEnumerable<Element> GetNearestElements(Element host, XYZ point, XYZ direction) {
+            ReferenceIntersector refIntersection = GetReferenceIntersector(host);
+
+            var positiveNearestElement
+                = refIntersection.FindNearest(point, direction);
+
+            var negativeNearestElement
+                = refIntersection.FindNearest(point, -direction);
+
+            var refNearestElement = new[] {
+                    new {Direction = direction, NearestElement = positiveNearestElement},
+                    new {Direction = -direction, NearestElement = negativeNearestElement}
+                }
+                .Where(item => item.NearestElement != null)
+                .Where(item => item.NearestElement.Proximity < 3.15) // один метр
+                .OrderBy(item => item.NearestElement.Proximity)
+                .FirstOrDefault();
+
+            if(refNearestElement == null) {
+                yield break;
+            }
+
+            ReferenceWithContext context
+                = refNearestElement.NearestElement;
+
+            host = Document.GetElement(context.GetReference().ElementId);
+            yield return host;
+
+            while(context != null) {
+                refIntersection = GetReferenceIntersector(host);
+                
+                point = point + refNearestElement.Direction * refNearestElement.NearestElement.Proximity;
+                context = refIntersection.FindNearest(point, refNearestElement.Direction);
+
+                if(context != null) {
+                    host = Document.GetElement(context.GetReference().ElementId);
+                    yield return host;
+                }
+            }
+        }
+
+        private ReferenceIntersector GetReferenceIntersector(Element host) {
             var exclusionFilter =
                 new ExclusionFilter(new[] {host.Id});
 
@@ -32,25 +73,16 @@ namespace RevitWindowGapPlacement.Model {
             var andFilter
                 = new LogicalAndFilter(new ElementFilter[] {exclusionFilter, categoryFilter});
 
-            var refIntersection =
-                new ReferenceIntersector(andFilter, FindReferenceTarget.All, (View3D) Document.ActiveView);
+            return new ReferenceIntersector(andFilter, FindReferenceTarget.All, (View3D) Document.ActiveView);
+        }
 
-            var positiveNearestElement
-                = refIntersection.FindNearest(point, direction);
+        public XYZ GetPlaceLocation(Element wall) {
+            LocationCurve location = (LocationCurve) wall.Location;
+            Line line = (Line) location.Curve;
+            double offset = wall.GetParamValue<double>(BuiltInParameter.WALL_BASE_OFFSET);
+            double height = wall.GetParamValue<double>(BuiltInParameter.WALL_USER_HEIGHT_PARAM);
 
-            var negativeNearestElement
-                = refIntersection.FindNearest(point, -direction);
-
-            var nearestElement = new[] {positiveNearestElement, negativeNearestElement}
-                .Where(item => item != null)
-                .OrderByDescending(item => positiveNearestElement.Proximity)
-                .FirstOrDefault();
-
-            if(nearestElement == null) {
-                return null;
-            }
-
-            return (Wall) Document.GetElement(nearestElement.GetReference().ElementId);
+            return line.Origin - ((line.GetEndPoint(0) - line.GetEndPoint(1)) / 2) + new XYZ(0, 0, height + offset);
         }
 
         public List<ICanPlaceWindowGap> GetPlaceableElements() {
@@ -117,9 +149,7 @@ namespace RevitWindowGapPlacement.Model {
 
                 // Заново расставляем проемы окон
                 foreach(ICanPlaceWindowGap placeableElement in GetPlaceableElements()) {
-                    try {
-                        placeableElement.PlaceWindowGap(Document, windowGapType);
-                    } catch { }
+                    placeableElement.PlaceWindowGap(Document, windowGapType);
                 }
 
                 transaction.Commit();
@@ -135,11 +165,11 @@ namespace RevitWindowGapPlacement.Model {
         }
 
         private bool IsWindow(FamilyInstance familyInstance) {
-            return familyInstance.Host is Wall && familyInstance.HostFace == null;
+            return (familyInstance.Host is Wall || familyInstance.Host is FamilyInstance) && familyInstance.HostFace == null;
         }
 
         private bool IsWindowGap(FamilyInstance familyInstance) {
-            return familyInstance.Host is Wall && familyInstance.HostFace != null;
+            return !IsWindow(familyInstance);
         }
 
         private void RemoveWindowGaps() {
