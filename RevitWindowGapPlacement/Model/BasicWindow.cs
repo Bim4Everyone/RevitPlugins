@@ -13,17 +13,10 @@ namespace RevitWindowGapPlacement.Model {
             _familyInstance = familyInstance;
         }
 
-        protected override IEnumerable<Element> GetHostElements() {
+        protected override IEnumerable<HostObject> GetHostElements() {
             XYZ point = ((LocationPoint) _familyInstance.Location).Point;
-
-            XYZ orientation = XYZ.Zero;
-            if(_familyInstance.Host is Wall wall) {
-                orientation = wall.Orientation;
-            } else if(_familyInstance.Host is FamilyInstance familyInstance) {
-                orientation = familyInstance.HandOrientation;
-            }
-
-            return _revitRepository.GetNearestElements(_familyInstance.Host, point, orientation);
+            return _revitRepository.GetNearestElements((HostObject) _familyInstance.Host, point,
+                ((Wall) _familyInstance.Host).Orientation);
         }
 
         protected override XYZ GetPlaceLocation() {

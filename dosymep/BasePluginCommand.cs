@@ -39,7 +39,6 @@ namespace dosymep.Bim4Everyone {
 #else
                 TaskDialog.Show(PluginName, ex.Message);
 #endif
-                throw;
             } finally {
                 AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
             }

@@ -22,7 +22,7 @@ namespace RevitWindowGapPlacement.Model {
         public Document Document => UIDocument.Document;
         public UIDocument UIDocument => UIApplication.ActiveUIDocument;
 
-        public IEnumerable<Element> GetNearestElements(Element host, XYZ point, XYZ direction) {
+        public IEnumerable<HostObject> GetNearestElements(HostObject host, XYZ point, XYZ direction) {
             ReferenceIntersector refIntersection = GetReferenceIntersector(host);
 
             var positiveNearestElement
@@ -47,17 +47,17 @@ namespace RevitWindowGapPlacement.Model {
             ReferenceWithContext context
                 = refNearestElement.NearestElement;
 
-            host = Document.GetElement(context.GetReference().ElementId);
+            host = (HostObject) Document.GetElement(context.GetReference().ElementId);
             yield return host;
 
             while(context != null) {
                 refIntersection = GetReferenceIntersector(host);
-                
+
                 point = point + refNearestElement.Direction * refNearestElement.NearestElement.Proximity;
                 context = refIntersection.FindNearest(point, refNearestElement.Direction);
 
                 if(context != null) {
-                    host = Document.GetElement(context.GetReference().ElementId);
+                    host = (HostObject) Document.GetElement(context.GetReference().ElementId);
                     yield return host;
                 }
             }
@@ -165,7 +165,7 @@ namespace RevitWindowGapPlacement.Model {
         }
 
         private bool IsWindow(FamilyInstance familyInstance) {
-            return (familyInstance.Host is Wall || familyInstance.Host is FamilyInstance) && familyInstance.HostFace == null;
+            return familyInstance.Host is Wall && familyInstance.HostFace == null;
         }
 
         private bool IsWindowGap(FamilyInstance familyInstance) {

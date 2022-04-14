@@ -13,7 +13,7 @@ namespace RevitWindowGapPlacement.Model {
             _wall = wall;
         }
 
-        protected override IEnumerable<Element> GetHostElements() {
+        protected override IEnumerable<HostObject> GetHostElements() {
             XYZ point = GetPlaceLocation();
             double height = _wall.GetParamValue<double>(BuiltInParameter.WALL_USER_HEIGHT_PARAM) / 2;
             return _revitRepository.GetNearestElements(_wall, point - new XYZ(0, 0, height), _wall.Orientation);

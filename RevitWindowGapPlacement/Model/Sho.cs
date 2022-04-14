@@ -3,8 +3,8 @@
 using Autodesk.Revit.DB;
 
 namespace RevitWindowGapPlacement.Model {
-    public class Sho : IEqualityComparer<Element> {
-        public bool Equals(Element x, Element y)
+    public class Sho : IEqualityComparer<HostObject> {
+        public bool Equals(HostObject x, HostObject y)
         {
             if (ReferenceEquals(x, y)) {
                 return true;
@@ -25,7 +25,7 @@ namespace RevitWindowGapPlacement.Model {
             return Equals(x.Id, y.Id);
         }
 
-        public int GetHashCode(Element obj)
+        public int GetHashCode(HostObject obj)
         {
             return (obj.Id != null ? obj.Id.GetHashCode() : 0);
         }
