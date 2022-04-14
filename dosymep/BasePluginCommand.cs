@@ -32,6 +32,14 @@ namespace dosymep.Bim4Everyone {
             try {
                 Execute(commandData.Application);
                 PluginLoggerService.Information("Выход из команды расширения.");
+            } catch(Exception ex) {
+                PluginLoggerService.Warning(ex, "Ошибка в команде расширения.");
+#if D2020 || D2021 || D2022
+                TaskDialog.Show(PluginName, ex.ToString());
+#else
+                TaskDialog.Show(PluginName, ex.Message);
+#endif
+                throw;
             } finally {
                 AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
             }
