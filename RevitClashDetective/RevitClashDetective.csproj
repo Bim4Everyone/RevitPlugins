@@ -49,7 +49,7 @@
 		<Compile Include="..\dosymep\PlatformWindow.cs" Link="dosymep\PlatformWindow.cs" />
 		<Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\RelayCommand.cs" />
 	</ItemGroup>
-	
+
 	<ItemGroup>
 		<Reference Include="DevExpress.Data.Desktop.v21.2, Version=21.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
 			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Data.Desktop.v21.2.dll</HintPath>
