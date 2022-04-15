@@ -31,7 +31,8 @@ namespace RevitServerFolders.Export {
             }
 
             if(string.IsNullOrEmpty(TargetFolderName)) {
-                throw new InvalidOperationException("Перед использованием укажите папку сохранения 3D видов Navisworks.");
+                throw new InvalidOperationException(
+                    "Перед использованием укажите папку сохранения 3D видов Navisworks.");
             }
 
             if(!OptionalFunctionalityUtils.IsNavisworksExporterAvailable()) {
@@ -55,15 +56,27 @@ namespace RevitServerFolders.Export {
                         .OfClass(typeof(View3D))
                         .OfType<View3D>()
                         .Where(item => !item.IsTemplate)
-                        .FirstOrDefault(item => item.Name.Equals("Navisworks", StringComparison.CurrentCultureIgnoreCase));
+                        .FirstOrDefault(item =>
+                            item.Name.Equals("Navisworks", StringComparison.CurrentCultureIgnoreCase));
 
                     if(exportView == null) {
                         continue;
                     }
-                    
+
+
+                    var hasElements = new FilteredElementCollector(document, exportView.Id)
+                        .WhereElementIsNotElementType()
+                        .Any(item =>
+                            item.get_Geometry(new Options() {View = exportView, ComputeReferences = true})?.Any() == true);
+
+                    if(!hasElements) {
+                        continue;
+                    }
+
                     document.Export(TargetFolderName, GetFileName(fileName), GetExportOptions(exportView));
                     if(WithRooms) {
-                        document.Export(TargetFolderName, GetRoomsFileName(fileName), GetRoomsExportOptions(exportView));
+                        document.Export(TargetFolderName, GetRoomsFileName(fileName),
+                            GetRoomsExportOptions(exportView));
                     }
                 } finally {
                     document.Close(false);
