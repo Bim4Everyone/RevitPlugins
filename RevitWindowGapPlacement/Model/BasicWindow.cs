@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -21,7 +22,20 @@ namespace RevitWindowGapPlacement.Model {
 
         protected override XYZ GetPlaceLocation() {
             double height = _familyInstance.Symbol.GetParamValue<double>(BuiltInParameter.WINDOW_HEIGHT);
-            return ((LocationPoint) _familyInstance.Location).Point.Add(new XYZ(0, 0, height));
+            XYZ point = new XYZ(0, 0, height);
+            
+            var wall = (Wall) _familyInstance.Host;
+            if(wall.CrossSection == WallCrossSection.SingleSlanted) {
+                var radian = wall.GetParamValue<double>(BuiltInParameter.WALL_SINGLE_SLANT_ANGLE_FROM_VERTICAL);
+                
+                LocationCurve location = (LocationCurve) wall.Location;
+                Line line = (Line) location.Curve;
+
+                point = Transform.CreateRotation(line.Direction, radian).OfVector(point);
+                return ((LocationPoint) _familyInstance.Location).Point.Add(point);
+            }
+            
+            return ((LocationPoint) _familyInstance.Location).Point.Add(point);
         }
 
         protected override FamilyInstance UpdateParamsWindowGap(FamilyInstance windowGap) {
