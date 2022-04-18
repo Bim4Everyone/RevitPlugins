@@ -37,7 +37,7 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         public override void UpdateElements(bool fromProjectParam) {
-
+            _revitRepository.SetLevelParam(RevitParam);
         }
 
         public override ParamSettings GetParamSettings() {
