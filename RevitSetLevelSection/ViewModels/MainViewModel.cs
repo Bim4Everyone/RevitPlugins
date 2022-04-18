@@ -141,7 +141,9 @@ namespace RevitSetLevelSection.ViewModels {
                 ParamSettings paramSettings = settings.ParamSettings
                     .FirstOrDefault(item => item.PropertyName.Equals(fillParam.RevitParam.PropertyName));
 
-                fillParam.SetParamSettings(paramSettings);
+                if(paramSettings != null) {
+                    fillParam.SetParamSettings(paramSettings);
+                }
             }
         }
 
