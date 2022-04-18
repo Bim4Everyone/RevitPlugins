@@ -5,9 +5,38 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitClashDetective.Views"
+        xmlns:vm="clr-namespace:RevitClashDetective.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Проверки на коллизии" Height="450" Width="800"
+        d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid>
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button Height="35" Width="35" Margin="10 10 0 10" BorderBrush="Transparent" Background="Transparent">
+                <Image Source="../Resources/icons8-plus.png" />
+            </Button>
+            <Button Height="35" Width="35" Margin="2 10 10 10" BorderBrush="Transparent" Background="Transparent">
+                <Image Source="../Resources/icons8-minus.png"/>
+            </Button>
+        </StackPanel>
+        <DataGrid Grid.Row="1">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Наименование"/>
+                <DataGridTemplateColumn Header="Фильтры основного файла" Width="*">
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Фильтры связанных файлов" Width="*">
+                    
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="8" Grid.ColumnSpan="4" Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock Margin="10"  Foreground="Orange" />
+            <Button Content="Запуск" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOk_Click"/>
+            <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
+        </StackPanel>
     </Grid>
 </base:PlatformWindow>

@@ -40,6 +40,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\icons8-minus.png" />
+	  <None Remove="Resources\icons8-plus.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Compile Include="..\dosymep\AppDomainExtensions.cs" Link="dosymep\AppDomainExtensions.cs" />
 		<Compile Include="..\dosymep\BasePluginCommand.cs" Link="dosymep\BasePluginCommand.cs" />
 		<Compile Include="..\dosymep\BaseViewModel.cs" Link="dosymep\BaseViewModel.cs" />
@@ -154,5 +159,10 @@
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
 		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Resources\icons8-minus.png" />
+	  <Resource Include="Resources\icons8-plus.png" />
 	</ItemGroup>
 </Project>
