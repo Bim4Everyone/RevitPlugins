@@ -58,13 +58,18 @@ namespace RevitSetLevelSection.ViewModels {
         public ObservableCollection<FillParamViewModel> FillParams { get; }
 
         private IEnumerable<FillParamViewModel> GetFillParams() {
-            //yield return new FillLevelParamViewModel(_revitRepository) { RevitParam = SharedParamsConfig.Instance.Level };
+            yield return new FillLevelParamViewModel(_revitRepository) {
+                RevitParam = SharedParamsConfig.Instance.Level
+            };
+            
             yield return new FillMassParamViewModel(this, _revitRepository) {
                 RevitParam = SharedParamsConfig.Instance.BuildingWorksBlock
             };
+            
             yield return new FillMassParamViewModel(this, _revitRepository) {
                 RevitParam = SharedParamsConfig.Instance.BuildingWorksSection
             };
+            
             yield return new FillMassParamViewModel(this, _revitRepository) {
                 RevitParam = SharedParamsConfig.Instance.EconomicFunction
             };
