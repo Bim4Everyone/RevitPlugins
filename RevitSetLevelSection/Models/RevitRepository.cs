@@ -128,8 +128,10 @@ namespace RevitSetLevelSection.Models {
                 List<Level> levels = GetLevels();
                 IEnumerable<Element> elements = GetElements(revitParam);
                 foreach(Element element in elements) {
-                    string paramValue = GetLevelName(element, levels);
-                    element.SetParamValue(revitParam, paramValue);
+                    try {
+                        string paramValue = GetLevelName(element, levels);
+                        element.SetParamValue(revitParam, paramValue);
+                    } catch { }
                 }
 
                 transaction.Commit();
