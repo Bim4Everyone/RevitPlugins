@@ -69,10 +69,6 @@ namespace RevitSetLevelSection.ViewModels {
             yield return new FillMassParamViewModel(this, _revitRepository) {
                 RevitParam = SharedParamsConfig.Instance.BuildingWorksSection
             };
-            
-            yield return new FillMassParamViewModel(this, _revitRepository) {
-                RevitParam = SharedParamsConfig.Instance.EconomicFunction
-            };
         }
 
         private IEnumerable<LinkTypeViewModel> GetLinkTypes() {
