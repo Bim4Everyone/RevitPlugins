@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitClashDetective.Views"
         xmlns:vm="clr-namespace:RevitClashDetective.ViewModels"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
         Title="Проверки на коллизии" Height="450" Width="800"
         d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
@@ -16,26 +17,44 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <Button Height="35" Width="35" Margin="10 10 0 10" BorderBrush="Transparent" Background="Transparent">
+            <Button Height="35" Width="35" Margin="10 10 0 10" BorderBrush="Transparent" Background="Transparent" Command="{Binding AddCheckCommand}">
                 <Image Source="../Resources/icons8-plus.png" />
             </Button>
-            <Button Height="35" Width="35" Margin="2 10 10 10" BorderBrush="Transparent" Background="Transparent">
+            <Button Height="35" Width="35" Margin="2 10 10 10" BorderBrush="Transparent" Background="Transparent" Command="{Binding RemoveCheckCommand}">
                 <Image Source="../Resources/icons8-minus.png"/>
             </Button>
         </StackPanel>
-        <DataGrid Grid.Row="1">
+        <DataGrid Grid.Row="1" 
+                  AutoGenerateColumns="False" 
+                  CanUserReorderColumns="False"
+                  CanUserDeleteRows="False"
+                  CanUserAddRows="False"
+                  VerticalGridLinesBrush="Transparent"
+                  HorizontalGridLinesBrush="Transparent"
+                  AlternatingRowBackground="WhiteSmoke"
+                  AlternationCount="2"
+                  ItemsSource="{Binding Checks}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Наименование"/>
+                <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"/>
                 <DataGridTemplateColumn Header="Фильтры основного файла" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type vm:CheckViewModel}">
+                            <local:ProviderCombobBox Providers="{Binding MainDocumentProviders}" SelectedProviders="{Binding SelectedMainDocProviders}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTemplateColumn Header="Фильтры связанных файлов" Width="*">
-                    
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type vm:CheckViewModel}">
+                            <local:ProviderCombobBox Providers="{Binding OtherDocumentProviders}" SelectedProviders="{Binding SelectedOtherDocProviders}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <StackPanel Grid.Row="8" Grid.ColumnSpan="4" Orientation="Horizontal" HorizontalAlignment="Right">
-            <TextBlock Margin="10"  Foreground="Orange" />
-            <Button Content="Запуск" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOk_Click"/>
+        <StackPanel Grid.Row="8" Grid.ColumnSpan="4" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <TextBlock Margin="10" VerticalAlignment="Center"  Foreground="Orange" Text="{Binding ErrorText}" />
+            <Button Content="Запуск" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOk_Click" Command="{Binding FindClashesCommand}"/>
             <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
         </StackPanel>
     </Grid>
