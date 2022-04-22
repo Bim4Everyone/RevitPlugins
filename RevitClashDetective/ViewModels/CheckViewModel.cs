@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+using Autodesk.Revit.UI;
+
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -15,16 +17,16 @@ namespace RevitClashDetective.ViewModels {
     internal class CheckViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private string _name;
-        private ObservableCollection<ProviderViewModel> _providers;
-        private ObservableCollection<ProviderViewModel> _otherDocumentProviders;
+        private ObservableCollection<ProvidersViewModel> _providers;
+        private ObservableCollection<ProvidersViewModel> _otherDocumentProviders;
         private string _selectedMainDocProviders;
         private string _selectedOtherDocProviders;
 
         public CheckViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
             Name = "Без имени";
-            MainDocumentProviders = new ObservableCollection<ProviderViewModel>();
-            OtherDocumentProviders = new ObservableCollection<ProviderViewModel>();
+            MainDocumentProviders = new ObservableCollection<ProvidersViewModel>();
+            OtherDocumentProviders = new ObservableCollection<ProvidersViewModel>();
             InitializeFilterProviders();
             SelectMainProviderCommand = new RelayCommand(SelectProvider);
         }
@@ -48,22 +50,36 @@ namespace RevitClashDetective.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedOtherDocProviders, value);
         }
 
-        public ObservableCollection<ProviderViewModel> MainDocumentProviders {
+        public ObservableCollection<ProvidersViewModel> MainDocumentProviders {
             get => _providers;
             set => this.RaiseAndSetIfChanged(ref _providers, value);
         }
 
-        public ObservableCollection<ProviderViewModel> OtherDocumentProviders {
+        public ObservableCollection<ProvidersViewModel> OtherDocumentProviders {
             get => _otherDocumentProviders;
             set => this.RaiseAndSetIfChanged(ref _otherDocumentProviders, value);
         }
 
+        public List<ClashModel> GetClashes() {
+            var mainProviders = MainDocumentProviders
+                .Where(item => item.IsSelected)
+                .SelectMany(item => item.Providers)
+                .ToList();
+            var otherProviders = OtherDocumentProviders
+                .Where(item => item.IsSelected)
+                .SelectMany(item => item.Providers)
+                .ToList();
+            var clashDetector = new ClashDetector(mainProviders, otherProviders);
+            return _revitRepository.GetClashes(clashDetector).ToList();
+        }
+
         private void InitializeFilterProviders() {
             var filters = _revitRepository.GetFilters();
+            var links = _revitRepository.GetRevitLinkInstances();
             foreach(var filter in filters) {
-                var mainProvider = new ProviderViewModel(filter);
+                var mainProvider = new ProvidersViewModel(_revitRepository, filter);
                 MainDocumentProviders.Add(mainProvider);
-                var otherProvider = new ProviderViewModel(filter);
+                var otherProvider = new ProvidersViewModel(_revitRepository, links, filter);
                 OtherDocumentProviders.Add(otherProvider);
             }
         }

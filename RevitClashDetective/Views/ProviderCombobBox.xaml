@@ -12,8 +12,11 @@
     <Grid>
         <ComboBox Name="cbMain" ItemsSource="{Binding ElementName=_this, Path=Providers}" SelectionChanged="cbMain_SelectionChanged">
             <ComboBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type vm:ProviderViewModel}">
-                    <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Content="{Binding Name}">
+                <DataTemplate DataType="{x:Type vm:ProvidersViewModel}">
+                    <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
+                        <CheckBox.Content>
+                            <TextBlock Text="{Binding Name}"/>
+                        </CheckBox.Content>
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="Checked">
                                 <i:InvokeCommandAction Command="{Binding ElementName=cbMain, Path=DataContext.SelectMainProviderCommand}"/>

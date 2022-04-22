@@ -7,11 +7,15 @@ using RevitClashDetective.Models;
 
 namespace RevitClashDetective.Models {
     internal class SetProvider : IProvider {
-        public List<Element> GetElements(Document doc) {
+        public List<Element> GetElements() {
             throw new NotImplementedException();
         }
 
-        public List<Solid> GetSolids(Document doc, Transform transform) {
+        public Outline GetOutline(Solid solid) {
+            throw new NotImplementedException();
+        }
+
+        public List<Solid> GetSolids(Element Element) {
             throw new NotImplementedException();
         }
     }

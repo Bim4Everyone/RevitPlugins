@@ -24,6 +24,7 @@ namespace RevitClashDetective.Models {
             _document = document;
             _uiDocument = new UIDocument(document);
         }
+        public Document Doc => _document;
 
         public List<ParameterFilterElement> GetFilters() {
             return new FilteredElementCollector(_document)
@@ -33,46 +34,21 @@ namespace RevitClashDetective.Models {
                 .ToList();
         }
 
-        private List<Solid> GetSolid(Element element) {
-            List<Solid> solids = new List<Solid>();
-            var option = new Options() { ComputeReferences = true };
-            foreach(GeometryObject geometryObject in element.get_Geometry(option)) {
-                if(geometryObject is Solid solid) {
-                    solids.Add(solid);
-                } else {
-                    var geometryInstace = geometryObject as GeometryInstance;
-                    if(geometryInstace == null)
-                        continue;
-
-                    foreach(var s in geometryInstace.GetInstanceGeometry().OfType<Solid>()) {
-                        solids.Add(s);
-                    }
-                }
-            }
-
-            return UniteSolids(solids);
+        public List<RevitLinkInstance> GetRevitLinkInstances() {
+            return new FilteredElementCollector(_document)
+                .OfClass(typeof(RevitLinkInstance))
+                .Cast<RevitLinkInstance>()
+                .ToList();
         }
 
-        private List<Solid> UniteSolids(List<Solid> solids) {
 
-            if(solids.Count == 0) {
-                return null;
-            }
-            Solid union = solids[0];
-            solids.RemoveAt(0);
+        public IEnumerable<ClashModel> GetClashes(ClashDetector detector) {
+            return detector.FindClashes(_document);
+        }
 
-            List<Solid> unitedSolids = new List<Solid>();
-
-            foreach(var s in solids) {
-                try {
-                    union = BooleanOperationsUtils.ExecuteBooleanOperation(union, s, BooleanOperationsType.Union);
-                } catch {
-                    unitedSolids.Add(union);
-                    union = s;
-                }
-            }
-
-            return unitedSolids;
+        public void SelectElements(IEnumerable<Element> elements) {
+            var selection = _uiApplication.ActiveUIDocument.Selection;
+            selection.SetElementIds(elements.Select(e => e.Id).ToList());
         }
     }
 }

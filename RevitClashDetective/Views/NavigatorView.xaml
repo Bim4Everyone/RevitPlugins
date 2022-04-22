@@ -1,0 +1,40 @@
+﻿<base:PlatformWindow  
+        xmlns:base="clr-namespace:dosymep.WPF.Views"
+        x:Class="RevitClashDetective.Views.NavigatorView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RevitClashDetective.Views"
+        mc:Ignorable="d"
+        Title="NavigatorView" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <DataGrid Grid.Row="0" 
+                  AutoGenerateColumns="False" 
+                  CanUserReorderColumns="False"
+                  CanUserDeleteRows="False"
+                  CanUserAddRows="False"
+                  VerticalGridLinesBrush="Transparent"
+                  HorizontalGridLinesBrush="Transparent"
+                  AlternatingRowBackground="WhiteSmoke"
+                  AlternationCount="2">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="ID">
+                    
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Уровень"/>
+                <DataGridTextColumn Header="Имя типа"/>
+                <DataGridTextColumn Header="Имя файлы"/>
+                <DataGridTemplateColumn Header="ID">
+
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Уровень"/>
+                <DataGridTextColumn Header="Имя типа"/>
+                <DataGridTextColumn Header="Имя файлы"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</base:PlatformWindow>

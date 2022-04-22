@@ -22,7 +22,7 @@ namespace RevitClashDetective.Views {
     /// </summary>
     public partial class ProviderCombobBox : UserControl {
         internal static readonly DependencyProperty ProvidersProperty =
-            DependencyProperty.Register(nameof(Providers), typeof(ObservableCollection<ProviderViewModel>), typeof(ProviderCombobBox));
+            DependencyProperty.Register(nameof(Providers), typeof(ObservableCollection<ProvidersViewModel>), typeof(ProviderCombobBox));
 
         internal static readonly DependencyProperty SelectedProvidersProperty =
             DependencyProperty.Register(nameof(SelectedProviders), typeof(string), typeof(ProviderCombobBox));
@@ -36,8 +36,8 @@ namespace RevitClashDetective.Views {
             set { SetValue(SelectedProvidersProperty, value); }
         }
 
-        internal ObservableCollection<ProviderViewModel> Providers {
-            get { return (ObservableCollection<ProviderViewModel>) GetValue(ProvidersProperty); }
+        internal ObservableCollection<ProvidersViewModel> Providers {
+            get { return (ObservableCollection<ProvidersViewModel>) GetValue(ProvidersProperty); }
             set { SetValue(ProvidersProperty, value); }
         }
 

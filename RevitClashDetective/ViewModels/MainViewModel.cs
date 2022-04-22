@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+
+using Autodesk.Revit.UI;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -24,9 +27,9 @@ namespace RevitClashDetective.ViewModels {
             RemoveCheckCommand = new RelayCommand(RemoveCheck);
             FindClashesCommand = new RelayCommand(FindClashes, CanFindClashes);
         }
-        public string ErrorText { 
-            get => _errorText; 
-            set => this.RaiseAndSetIfChanged(ref _errorText, value); 
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
         public ICommand AddCheckCommand { get; }
@@ -56,7 +59,10 @@ namespace RevitClashDetective.ViewModels {
         }
 
         private void FindClashes(object p) {
-
+            Stopwatch sw = Stopwatch.StartNew();
+            var clashes = Checks.SelectMany(item => item.GetClashes()).ToList();
+            TaskDialog.Show("Revit", $"Время: " + sw.Elapsed.ToString() + $". Количество: { clashes.Count}");
+            _revitRepository.SelectElements(clashes.Select(item => item.MainElement));
         }
 
         private bool CanFindClashes(object p) {
