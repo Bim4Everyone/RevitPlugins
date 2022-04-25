@@ -6,10 +6,10 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 
 namespace RevitWindowGapPlacement.Model {
-    internal class BasicParentWindow : ParentWindow {
+    internal class ParentBasicWindow : ParentWindow {
         private readonly FamilyInstance _parentWindow;
 
-        public BasicParentWindow(FamilyInstance parentWindow, RevitRepository revitRepository)
+        public ParentBasicWindow(FamilyInstance parentWindow, RevitRepository revitRepository)
             : base(parentWindow, revitRepository) {
             _parentWindow = parentWindow;
         }

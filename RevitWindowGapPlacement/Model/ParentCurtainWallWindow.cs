@@ -5,10 +5,10 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 
 namespace RevitWindowGapPlacement.Model {
-    internal class CurtainWallParentWindow : ParentWindow {
+    internal class ParentCurtainWallWindow : ParentWindow {
         private readonly Wall _curtainWall;
 
-        public CurtainWallParentWindow(Wall curtainWall, RevitRepository revitRepository)
+        public ParentCurtainWallWindow(Wall curtainWall, RevitRepository revitRepository)
             : base(curtainWall, revitRepository) {
             _curtainWall = curtainWall;
         }
