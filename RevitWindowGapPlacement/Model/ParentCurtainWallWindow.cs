@@ -20,7 +20,11 @@ namespace RevitWindowGapPlacement.Model {
         protected override Element GetHostObject() {
             return _curtainWall;
         }
-        
+
+        protected override HostObject GetNextHostObject() {
+            throw new System.NotImplementedException();
+        }
+
         protected override IEnumerable<HostObject> GetHostElements() {
             XYZ point = GetPlaceLocation();
             double height = _curtainWall.GetParamValue<double>(BuiltInParameter.WALL_USER_HEIGHT_PARAM) / 2;

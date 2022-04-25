@@ -18,5 +18,9 @@ namespace RevitWindowGapPlacement.Model {
         protected override Element GetHostObject() {
             throw new System.NotImplementedException();
         }
+
+        protected override HostObject GetNextHostObject() {
+            throw new System.NotImplementedException();
+        }
     }
 }

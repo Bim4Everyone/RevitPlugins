@@ -35,7 +35,11 @@ namespace RevitWindowGapPlacement.Model {
         protected override Element GetHostObject() {
             return _parentWindow.Host;
         }
-        
+
+        protected override HostObject GetNextHostObject() {
+            throw new NotImplementedException();
+        }
+
         protected override IEnumerable<HostObject> GetHostElements() {
             XYZ point = ((LocationPoint) _parentWindow.Location).Point;
             return _revitRepository.GetNearestElements((HostObject) _parentWindow.Host, point,

@@ -12,5 +12,6 @@ namespace RevitWindowGapPlacement.Model {
 
         protected abstract XYZ GetPlaceLocation();
         protected abstract Element GetHostObject();
+        protected abstract HostObject GetNextHostObject();
     }
 }
