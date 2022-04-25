@@ -7,7 +7,7 @@
              xmlns:local="clr-namespace:RevitLintelPlacement.Views"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="1100"
              d:DataContext="{d:DesignInstance vm:GroupedRuleCollectionViewModel, IsDesignTimeCreatable=False}"
              Name="ucRules">

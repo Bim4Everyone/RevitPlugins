@@ -9,10 +9,12 @@
         xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
         xmlns:converter="clr-namespace:RevitLintelPlacement.Converters"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:extensions="clr-namespace:RevitLintelPlacement.Extensions"
-        mc:Ignorable="d"
+        xmlns:extensions="clr-namespace:RevitLintelPlacement.Extensions" 
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    mc:Ignorable="d"
         Title="Перемычки" Height="770" Width="1150"
         MinHeight="770" MinWidth="1150"
+        AllowDarkTheme="True"
         x:Name ="MainView"
         d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
     <Window.Resources>
@@ -34,23 +36,28 @@
         </Grid.RowDefinitions>
         <local:RulesToolBar Grid.Row="0" DataContext="{Binding GroupedRules}"></local:RulesToolBar>
         <StackPanel Grid.Row="1" Margin="10 0" Orientation="Horizontal">
-            <ComboBox Width="300" FontSize="14" Height="25" Background="White" ItemsSource="{Binding Source={extensions:EnumToItemsSource {x:Type vm:SampleMode}}}"
-                  SelectedItem="{Binding SelectedSampleMode, Converter={StaticResource EnumConverter},
-            ConverterParameter={x:Type vm:SampleMode}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-            </ComboBox>
+            <dxe:ComboBoxEdit Width="300" FontSize="14" Height="25" IsTextEditable="False" ItemsSource="{Binding Source={extensions:EnumToItemsSource {x:Type vm:SampleMode}}}"
+                  EditValue="{Binding SelectedSampleMode, Converter={StaticResource EnumConverter},
+                  ConverterParameter={x:Type vm:SampleMode}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+            </dxe:ComboBoxEdit>
         </StackPanel>
         <GroupBox Grid.Row="2" Margin="10 5 0 10"   HorizontalAlignment="Stretch" Header="Связанные файлы" FontSize="14">
-            <ListBox MaxHeight="100" BorderThickness="0" 
+            <dxe:ListBoxEdit MaxHeight="100" BorderThickness="0" 
                      ToolTip="Выберите связанные файлы, содержащие конструктивные элементы"
-                     ItemsSource="{Binding Links}">
-                <ListBox.ItemTemplate>
+                     ItemsSource="{Binding Links}" DisplayMember="Name"
+                     SelectionMode="Multiple"
+                     EditValue="{Binding SelectedLinks, UpdateSourceTrigger=PropertyChanged}">
+                <dxe:ListBoxEdit.StyleSettings>
+                    <dxe:CheckedListBoxEditStyleSettings  />
+                </dxe:ListBoxEdit.StyleSettings>
+                <!--<dxe:ListBoxEdit.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:LinkViewModel}">
-                        <CheckBox IsChecked="{Binding IsChecked}">
+                        <dxe:CheckEdit EditValue="Name" IsChecked="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}">
                             <TextBlock Text="{Binding Name}"></TextBlock>
-                        </CheckBox>
+                        </dxe:CheckEdit>
                     </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                </dxe:ListBoxEdit.ItemTemplate>-->
+            </dxe:ListBoxEdit>
         </GroupBox>
         <local:GroupedRulesView Grid.Row="3" DataContext="{Binding GroupedRules}"/>
         <StackPanel Grid.Row="4" HorizontalAlignment="Right" Orientation="Horizontal" VerticalAlignment="Center">

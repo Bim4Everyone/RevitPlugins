@@ -28,6 +28,7 @@ namespace RevitLintelPlacement.ViewModels {
         private ObservableCollection<LinkViewModel> _links;
         private ElementInfosViewModel _elementInfosViewModel;
         private string _errorText;
+        private ObservableCollection<LinkViewModel> _selectedLinks;
 
         public MainViewModel() {
 
@@ -40,6 +41,7 @@ namespace RevitLintelPlacement.ViewModels {
             GroupedRules = new GroupedRuleCollectionViewModel(_revitRepository, ElementInfos);
             PlaceLintelCommand = new RelayCommand(PlaceLintels, CanPlace);
             ShowReportCommand = new RelayCommand(ShowReport);
+
             var links = _revitRepository.GetLinkTypes().ToList();
             if(links.Count > 0) {
                 Links = new ObservableCollection<LinkViewModel>(links.Select(l => new LinkViewModel() { Name = Path.GetFileNameWithoutExtension(l.Name) }));
@@ -53,7 +55,7 @@ namespace RevitLintelPlacement.ViewModels {
                 if(settings.SelectedLinks != null && settings.SelectedLinks.Count > 0) {
                     foreach(var link in Links) {
                         if(settings.SelectedLinks.Any(sl => sl.Equals(link.Name, StringComparison.CurrentCultureIgnoreCase))) {
-                            link.IsChecked = true;
+                            SelectedLinks.Add(link);
                         }
                     }
                 }
@@ -94,6 +96,8 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _elementInfosViewModel, value);
         }
 
+        public ObservableCollection<LinkViewModel> SelectedLinks { get; set; } = new ObservableCollection<LinkViewModel>();
+
         public void PlaceLintels(object p) {
             ElementInfos.ElementInfos.Clear();
             if(!_revitRepository.CheckConfigParameters(ElementInfos)) {
@@ -127,7 +131,7 @@ namespace RevitLintelPlacement.ViewModels {
                 }
                 t.Commit();
             }
-            var links = Links.Where(l => l.IsChecked).Select(l => l.Name).ToList();
+            var links = SelectedLinks.Select(l => l.Name).ToList();
             LintelChecker lc = new LintelChecker(_revitRepository, GroupedRules, links, ElementInfos);
             using(Transaction t = _revitRepository.StartTransaction("Проверка расставленных перемычек")) {
                 lc.Check(Lintels.LintelInfos);
@@ -220,7 +224,12 @@ namespace RevitLintelPlacement.ViewModels {
             }
             settings.SelectedPath = GroupedRules.SelectedName;
             settings.SelectedModeRules = SelectedSampleMode;
-            settings.SelectedLinks = Links.Where(l => l.IsChecked).Select(l => l.Name).ToList();
+            if(SelectedLinks != null) {
+                settings.SelectedLinks = SelectedLinks.Select(l => l.Name).ToList();
+            } else {
+                settings.SelectedLinks = new List<string>();
+            }
+            
             _revitRepository.LintelsConfig.SaveProjectConfig();
         }
 
