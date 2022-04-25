@@ -7,17 +7,11 @@ using Autodesk.Revit.DB.Structure;
 using dosymep.Revit;
 
 namespace RevitWindowGapPlacement.Model {
-    internal abstract class BaseWindow : ICanPlaceWindowGap {
-        private readonly Element _element;
-        protected readonly RevitRepository _revitRepository;
-
-        public BaseWindow(Element element, RevitRepository revitRepository) {
-            _element = element;
-            _revitRepository = revitRepository;
+    internal abstract class ParentWindow : BaseElement, ICanPlaceWindowGap {
+        protected ParentWindow(Element element, RevitRepository revitRepository)
+            : base(element, revitRepository) {
         }
 
-
-        protected abstract XYZ GetPlaceLocation();
         protected abstract IEnumerable<HostObject> GetHostElements();
         protected abstract FamilyInstance UpdateParamsWindowGap(FamilyInstance windowGap);
 
