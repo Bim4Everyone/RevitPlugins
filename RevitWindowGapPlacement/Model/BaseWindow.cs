@@ -4,6 +4,8 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 
+using dosymep.Revit;
+
 namespace RevitWindowGapPlacement.Model {
     internal abstract class BaseWindow : ICanPlaceWindowGap {
         private readonly Element _element;
@@ -35,6 +37,7 @@ namespace RevitWindowGapPlacement.Model {
                 FamilyInstance windowGap =
                     document.Create.NewFamilyInstance(face, location, XYZ.Zero, windowGapType);
 
+                windowGap.SetParamValue("Окно ID", _element.Id.IntegerValue);
                 yield return UpdateParamsWindowGap(windowGap);
             }
         }
