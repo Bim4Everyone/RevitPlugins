@@ -98,9 +98,9 @@ namespace RevitRooms.ViewModels {
         }
 
         public double ComputeRoomAreaWithRatio() {
-            // RoomArea = 0 - по умолчанию
+            // Area = 0 - по умолчанию
             // RoomAreaRatio = 1 - по умолчанию
-            return ((RoomAreaRatio ?? 0) == 0 ? 1 : RoomAreaRatio.Value) * RoomArea ?? 0;
+            return ((RoomAreaRatio ?? 0) == 0 ? 1 : RoomAreaRatio.Value) * Area ?? 0;
         }
 
         public bool IsPlaced {
