@@ -20,16 +20,15 @@ namespace RevitWindowGapPlacement.Model {
         }
 
         private IEnumerable<FamilyInstance> GetPlacedFamilyInstances(Document document, FamilySymbol windowGapType) {
-            XYZ location = GetPlaceLocation();
             IEnumerable<HostObject> hostElements = GetHostElements().Distinct(new Sho());
-
+            
             foreach(HostObject hostObject in hostElements) {
                 Reference face = HostObjectUtils
                     .GetSideFaces(hostObject, ShellLayerType.Exterior)
                     .FirstOrDefault();
 
                 FamilyInstance windowGap =
-                    document.Create.NewFamilyInstance(face, location, XYZ.Zero, windowGapType);
+                    document.Create.NewFamilyInstance(face, PlaceLocation, XYZ.Zero, windowGapType);
 
                 windowGap.SetParamValue("Окно ID", _element.Id.IntegerValue);
                 yield return UpdateParamsWindowGap(windowGap);

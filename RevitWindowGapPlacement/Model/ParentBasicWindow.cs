@@ -14,11 +14,20 @@ namespace RevitWindowGapPlacement.Model {
             _parentWindow = parentWindow;
         }
 
-        protected override XYZ GetPlaceLocation() {
-            double height = _parentWindow.Symbol.GetParamValue<double>(BuiltInParameter.WINDOW_HEIGHT);
-            XYZ point = new XYZ(0, 0, height);
-            
+        public override double Width 
+            => _parentWindow.Symbol.GetParamValue<double>(BuiltInParameter.WINDOW_WIDTH);
+        
+        public override double Height 
+            => _parentWindow.Symbol.GetParamValue<double>(BuiltInParameter.WINDOW_HEIGHT);
+
+        public void SetPLaceLocation(XYZ value) {
+            ((LocationPoint) _parentWindow.Location).Point = value;
+        }
+
+        protected XYZ GetPlaceLocation() {
+            XYZ point = new XYZ(0, 0, Height);
             var wall = (Wall) _parentWindow.Host;
+            
             if(wall.CrossSection == WallCrossSection.SingleSlanted) {
                 var radian = wall.GetParamValue<double>(BuiltInParameter.WALL_SINGLE_SLANT_ANGLE_FROM_VERTICAL);
                 
@@ -47,11 +56,8 @@ namespace RevitWindowGapPlacement.Model {
         }
 
         protected override FamilyInstance UpdateParamsWindowGap(FamilyInstance windowGap) {
-            double width = _parentWindow.Symbol.GetParamValue<double>(BuiltInParameter.WINDOW_WIDTH);
-            double height = _parentWindow.Symbol.GetParamValue<double>(BuiltInParameter.WINDOW_HEIGHT);
-            
-            windowGap.SetParamValue(BuiltInParameter.WINDOW_WIDTH, width);
-            windowGap.SetParamValue(BuiltInParameter.WINDOW_HEIGHT, height);
+            windowGap.SetParamValue(BuiltInParameter.WINDOW_WIDTH, Width);
+            windowGap.SetParamValue(BuiltInParameter.WINDOW_HEIGHT, Height);
             
             windowGap.SetParamValue("Смещение Сверху",
                 _parentWindow.Symbol.GetParamValue<double>("Четверть Сверху"));

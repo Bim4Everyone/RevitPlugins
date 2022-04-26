@@ -76,18 +76,34 @@ namespace RevitWindowGapPlacement.Model {
             return new ReferenceIntersector(andFilter, FindReferenceTarget.All, (View3D) Document.ActiveView);
         }
 
-        public XYZ GetPlaceLocation(Element wall) {
+        public HostObject GetNextHostObject(Wall wall, XYZ direction) {
+            throw new NotImplementedException();
+        }
+
+        public XYZ GetCenterLocationPoint(Wall wall) {
             LocationCurve location = (LocationCurve) wall.Location;
+
             Line line = (Line) location.Curve;
             double offset = wall.GetParamValue<double>(BuiltInParameter.WALL_BASE_OFFSET);
             double height = wall.GetParamValue<double>(BuiltInParameter.WALL_USER_HEIGHT_PARAM);
 
-            return line.Origin - ((line.GetEndPoint(0) - line.GetEndPoint(1)) / 2) + new XYZ(0, 0, height + offset);
+            var startPoint = line.GetEndPoint(0);
+            var finishPoint = line.GetEndPoint(1);
+
+            return line.Origin - (startPoint - finishPoint) / 2 + new XYZ(0, 0, height / 2 + offset);
         }
 
+        public HostObject GetNextHostObject(FamilyInstance familyInstance, XYZ direction) {
+            throw new NotImplementedException();
+        }
+        
+        public XYZ GetCenterLocationPoint(FamilyInstance familyInstance) {
+            return ((LocationPoint) familyInstance.Location).Point;
+        }
+        
         public List<ICanPlaceWindowGap> GetPlaceableElements() {
             var walls = GetCurtainWalls()
-                .Select(item => new ParentCurtainWallWindow(item, this));
+                .Select(item => new ParentCurtainWindow(item, this));
 
             var windows = GetWindows()
                 .Select(item => new ParentBasicWindow(item, this));

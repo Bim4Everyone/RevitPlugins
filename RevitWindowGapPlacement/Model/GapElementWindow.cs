@@ -2,18 +2,22 @@
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 namespace RevitWindowGapPlacement.Model {
-    internal class GapWindow : BaseElement {
+    internal class GapElementWindow : BaseElement {
         private readonly FamilyInstance _gapElement;
 
-        public GapWindow(FamilyInstance element, RevitRepository revitRepository)
+        public GapElementWindow(FamilyInstance element, RevitRepository revitRepository)
             : base(element, revitRepository) {
             _gapElement = element;
         }
-
-        protected override XYZ GetPlaceLocation() {
-            throw new System.NotImplementedException();
-        }
+        
+        public override double Width 
+            => _gapElement.GetParamValue<double>(BuiltInParameter.WINDOW_WIDTH);
+        
+        public override double Height 
+            => _gapElement.GetParamValue<double>(BuiltInParameter.WINDOW_HEIGHT);
 
         protected override Element GetHostObject() {
             throw new System.NotImplementedException();
