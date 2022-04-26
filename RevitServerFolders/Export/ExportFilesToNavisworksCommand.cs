@@ -7,12 +7,15 @@ using System.Linq;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
+using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Events;
 
 #endregion
 
 namespace RevitServerFolders.Export {
     public class ExportFilesToNavisworksCommand {
         public Application Application { get; set; }
+        public UIApplication UIApplication { get; set; }
 
         public string SourceFolderName { get; set; }
         public string TargetFolderName { get; set; }
@@ -50,6 +53,7 @@ namespace RevitServerFolders.Export {
             Directory.CreateDirectory(TargetFolderName);
             foreach(string fileName in Directory.EnumerateFiles(SourceFolderName, "*.rvt")) {
                 Application.FailuresProcessing += ApplicationOnFailuresProcessing;
+                UIApplication.DialogBoxShowing += UIApplicationOnDialogBoxShowing;
                 var document = Application.OpenDocumentFile(fileName);
                 try {
                     var exportView = new FilteredElementCollector(document)
@@ -81,8 +85,13 @@ namespace RevitServerFolders.Export {
                 } finally {
                     document.Close(false);
                     Application.FailuresProcessing -= ApplicationOnFailuresProcessing;
+                    UIApplication.DialogBoxShowing -= UIApplicationOnDialogBoxShowing;
                 }
             }
+        }
+
+        private void UIApplicationOnDialogBoxShowing(object sender, DialogBoxShowingEventArgs e) {
+            e.OverrideResult(1);
         }
 
         private void ApplicationOnFailuresProcessing(object sender, FailuresProcessingEventArgs e) {
