@@ -50,5 +50,35 @@ namespace RevitClashDetective.Models {
             var selection = _uiApplication.ActiveUIDocument.Selection;
             selection.SetElementIds(elements.Select(e => e.Id).ToList());
         }
+
+        public List<Category> GetCategories() {
+            return ParameterFilterUtilities.GetAllFilterableCategories()
+                .Select(item => Category.GetCategory(_document, item))
+                .OfType<Category>()
+                .ToList();
+        }
+
+        public List<ParameterModel> GetParameters(IEnumerable<Category> categories) {
+            var documents = new FilteredElementCollector(_document)
+                .OfClass(typeof(RevitLinkInstance))
+                .Cast<RevitLinkInstance>()
+                .Select(item => item.GetLinkDocument())
+                .ToList();
+            documents.Add(_document);
+            List<ParameterModel> parameters = new List<ParameterModel>();
+            var categoryIds = categories.Select(c => c.Id).ToList();
+            foreach(var doc in documents) {
+                var parameterIds = ParameterFilterUtilities.GetFilterableParametersInCommon(doc, categoryIds);
+                parameters.AddRange(parameterIds
+                    .Where(item => item.IntegerValue > 0)
+                    .Select(item => doc.GetElement(item))
+                    .OfType<ParameterElement>()
+                    .Select(item => new ParameterModel() { Name = item.GetDefinition().Name }));
+                parameters.AddRange(parameterIds
+                    .Where(item => item.IntegerValue < 0)
+                    .Select(item => new ParameterModel() { Name = LabelUtils.GetLabelFor((BuiltInParameter) item.IntegerValue) }));
+            }
+            return parameters;
+        }
     }
 }

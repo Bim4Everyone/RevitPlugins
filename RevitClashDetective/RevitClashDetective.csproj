@@ -41,6 +41,7 @@
 
 	<ItemGroup>
 	  <None Remove="Resources\icons8-minus.png" />
+	  <None Remove="Resources\icons8-new-copy-32.png" />
 	  <None Remove="Resources\icons8-plus.png" />
 	</ItemGroup>
 
@@ -164,6 +165,7 @@
 
 	<ItemGroup>
 	  <Resource Include="Resources\icons8-minus.png" />
+	  <Resource Include="Resources\icons8-new-copy-32.png" />
 	  <Resource Include="Resources\icons8-plus.png" />
 	</ItemGroup>
 </Project>
