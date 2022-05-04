@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 using Autodesk.Revit.DB;
 
@@ -22,7 +24,6 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         public override bool Equals(object obj) {
-            var smth = obj.GetType();
             return obj is ParameterViewModel model &&
                    Name == model.Name;
         }

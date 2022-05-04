@@ -7,6 +7,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitClashDetective.Views"
         xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.FilterCreatorViewModels"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
         Title="Фильтры" Height="450" Width="1000"
         x:Name="ViewFilterCreator"
@@ -34,14 +35,14 @@
                     <Button Background="Transparent" Margin="3" BorderThickness="0" Command="{Binding CreateCommand}" CommandParameter="{Binding ElementName=ViewFilterCreator}">
                         <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Actions/AddItem_16x16.png"/>
                     </Button>
-                    <Button Background="Transparent" Margin="3" BorderThickness="0" Command="{Binding RenameCommand}">
+                    <Button Background="Transparent" Margin="3" BorderThickness="0" Command="{Binding RenameCommand}" CommandParameter="{Binding ElementName=ViewFilterCreator}">
                         <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Edit/Edit_16x16.png"/>
                     </Button>
                     <Button Background="Transparent" Margin="3" BorderThickness="0" Command="{Binding DeleteCommand}">
                         <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Actions/DeleteList_16x16.png"/>
                     </Button>
                 </StackPanel>
-                <ListBox Grid.Row="1" ItemsSource="{Binding Filters}" SelectedItem="{Binding SelectedFilter, UpdateSourceTrigger=PropertyChanged}">
+                <ListBox Grid.Row="1" ItemsSource="{Binding Filters}" SelectedItem="{Binding SelectedFilter, UpdateSourceTrigger=PropertyChanged}"> 
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type vm:FilterViewModel}">
                             <TextBlock Text="{Binding Name}"/>
@@ -55,8 +56,8 @@
             <local:CategoryView DataContext="{Binding SelectedFilter, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
         </GroupBox>
         <GridSplitter Grid.Column="3" Grid.Row="1" ShowsPreview="False" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="2" ></GridSplitter>
-        <GroupBox Grid.Column="4" Grid.Row="1" Header="Критерии фильтрации" HorizontalAlignment="Stretch" Margin="5 0">
-            <local:CriterionView DataContext="{Binding SelectedFilter.Set, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <GroupBox Grid.Column="4" Grid.Row="1" Header="Критерии фильтрации" HorizontalAlignment="Stretch" Margin="5 0" VerticalContentAlignment="Top">
+            <local:CriterionView Height="Auto" Margin="5" DataContext="{Binding SelectedFilter.Set, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
         </GroupBox>
         <StackPanel Grid.Column="6" Grid.ColumnSpan="5" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Width="80" Height="30" FontSize="14" Margin="5">Сохранить</Button>

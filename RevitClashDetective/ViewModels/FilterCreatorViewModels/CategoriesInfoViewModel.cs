@@ -32,6 +32,19 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             set => this.RaiseAndSetIfChanged(ref _parameters, value); 
         }
 
+        public override bool Equals(object obj) {
+            return obj is CategoriesInfoViewModel model &&
+                   EqualityComparer<ObservableCollection<CategoryViewModel>>.Default.Equals(Categories, model.Categories) &&
+                   EqualityComparer<ObservableCollection<ParameterViewModel>>.Default.Equals(Parameters, model.Parameters);
+        }
+
+        public override int GetHashCode() {
+            int hashCode = 331271310;
+            hashCode = hashCode * -1521134295 + EqualityComparer<ObservableCollection<CategoryViewModel>>.Default.GetHashCode(Categories);
+            hashCode = hashCode * -1521134295 + EqualityComparer<ObservableCollection<ParameterViewModel>>.Default.GetHashCode(Parameters);
+            return hashCode;
+        }
+
         public void InitializeParameters() {
             Parameters = new ObservableCollection<ParameterViewModel>(
                 _revitRepository.GetParameters(Categories.Select(item=>item.Category))

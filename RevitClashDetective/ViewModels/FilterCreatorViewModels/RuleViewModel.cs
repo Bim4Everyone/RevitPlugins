@@ -14,12 +14,13 @@ using RevitClashDetective.ViewModels.FilterCreatorViewModels.Interfaces;
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
     internal class RuleViewModel : BaseViewModel, IСriterionViewModel {
         private readonly RevitRepository _revitRepository;
-        private CategoriesInfoViewModel categoriesInfo;
-        private ParameterViewModel _selectedParmaeter;
+        private CategoriesInfoViewModel _categoriesInfo;
+        private ParameterViewModel _selectedParameter;
 
         public RuleViewModel(RevitRepository revitRepository, CategoriesInfoViewModel categoriesInfo) {
             _revitRepository = revitRepository;
             CategoriesInfo = categoriesInfo;
+            SelectedParameter = CategoriesInfo.Parameters.FirstOrDefault();
 
             SelectionChangedCommand = new RelayCommand(SelectionChanged);
         }
@@ -27,13 +28,13 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public ICommand SelectionChangedCommand { get; set; }
 
         public ParameterViewModel SelectedParameter {
-            get => _selectedParmaeter;
-            set => this.RaiseAndSetIfChanged(ref _selectedParmaeter, value);
+            get => _selectedParameter;
+            set => this.RaiseAndSetIfChanged(ref _selectedParameter, value);
         }
 
         public CategoriesInfoViewModel CategoriesInfo {
-            get => categoriesInfo;
-            set => this.RaiseAndSetIfChanged(ref categoriesInfo, value);
+            get => _categoriesInfo;
+            set => this.RaiseAndSetIfChanged(ref _categoriesInfo, value);
         }
 
         private void SelectionChanged(object p) {

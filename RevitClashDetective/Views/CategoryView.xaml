@@ -15,33 +15,53 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal" Grid.Row="0">
-                <!--<Button Command="{Binding CreateCommand}">new</Button>
-                <Separator/>
-                <Button Command="{Binding DeleteCommand}">delete</Button>
-                <Separator/>-->
                 <TextBlock Text="Фильтр: " Margin="5 0" VerticalAlignment="Center"></TextBlock>
-                <TextBox Width="150" VerticalAlignment="Center" Margin="2" Text="{Binding FilterCategoryName, UpdateSourceTrigger=PropertyChanged}">
+                <TextBox MinWidth="150" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="2" Text="{Binding FilterCategoryName, UpdateSourceTrigger=PropertyChanged}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
                             <i:InvokeCommandAction Command="{Binding FilterTextChagedCommand}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
+                <CheckBox x:Name="_cbCategories" VerticalAlignment="Center">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Checked">
+                            <i:InvokeCommandAction Command="{Binding CheckCategoryCommand}" CommandParameter="{Binding ElementName=_cbCategories, Path=IsChecked}"/>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="Unchecked">
+                            <i:InvokeCommandAction Command="{Binding CheckCategoryCommand}" CommandParameter="{Binding ElementName=_cbCategories, Path=IsChecked}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <CheckBox.Style>
+                        <Style TargetType="{x:Type CheckBox}">
+                            <Style.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="ToolTip" Value="Отменить выбор"/>
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="False">
+                                    <Setter Property="ToolTip" Value="Выбрать все"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </CheckBox.Style>
+                </CheckBox>
             </StackPanel>
-            <ListBox x:Name="lbCat" Grid.Row="1" ItemsSource="{Binding CategoriesViewSource.View}">
+            <ListBox x:Name="lbCat" Grid.Row="1" ItemsSource="{Binding CategoriesViewSource.View}" SelectionMode="Extended">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:CategoryViewModel}">
-                        <CheckBox IsChecked="{Binding IsSelected}">
-                            <TextBlock Text="{Binding Name}"/>
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="Checked">
-                                    <i:InvokeCommandAction Command="{Binding ElementName=lbCat, Path=DataContext.SelectedcategoriesChangedCommand}"/>
-                                </i:EventTrigger>
-                                <i:EventTrigger EventName="Unchecked">
-                                    <i:InvokeCommandAction Command="{Binding ElementName=lbCat, Path=DataContext.SelectedcategoriesChangedCommand}"/>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </CheckBox>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" >
+                            <CheckBox IsChecked="{Binding IsSelected}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Checked">
+                                        <i:InvokeCommandAction Command="{Binding ElementName=lbCat, Path=DataContext.SelectedcategoriesChangedCommand}"/>
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="Unchecked">
+                                        <i:InvokeCommandAction Command="{Binding ElementName=lbCat, Path=DataContext.SelectedcategoriesChangedCommand}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </CheckBox>
+                            <TextBlock Margin="3 0" Text="{Binding Name}"/>
+                        </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

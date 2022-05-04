@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:RevitClashDetective.Views"
         xmlns:vm ="clr-namespace:RevitClashDetective.ViewModels.FilterCreatorViewModels"
         mc:Ignorable="d"
-        Title="Имя фильтра" Height="110" Width="300"
+        Title="Имя фильтра" Height="120" Width="430"
         WindowStartupLocation="CenterOwner"
         d:DataContext="{d:DesignInstance vm:FilterNameViewModel, IsDesignTimeCreatable=False}">
     <Grid>
@@ -19,7 +19,8 @@
             <TextBox DockPanel.Dock="Right" Margin="10 0" HorizontalAlignment="Stretch" Height="20" VerticalContentAlignment="Center" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"></TextBox>
         </DockPanel>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Width="80" Margin="5" Height="30" Click="ButtonOk_Click">ОК</Button>
+            <TextBlock VerticalAlignment="Center" Foreground="Orange" Text="{Binding ErrorText}"></TextBlock>
+            <Button Width="80" Margin="5" Height="30" Command="{Binding Create}" Click="ButtonOk_Click">ОК</Button>
             <Button Width="80" Margin="5" Height="30" Click="ButtonCancel_Click">Отмена</Button>
         </StackPanel>
     </Grid>

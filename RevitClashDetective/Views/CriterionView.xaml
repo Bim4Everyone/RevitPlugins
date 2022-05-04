@@ -7,6 +7,7 @@
              xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.FilterCreatorViewModels"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d"
+             Name="_this"
              d:DataContext="{d:DesignInstance vm:SetViewModel, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <Style TargetType="ListBoxItem">
@@ -18,69 +19,94 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style TargetType="{x:Type Border}" x:Key="border">
+            <Setter Property="BorderThickness" Value="4 1 1 1"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding SelectedEvaluator.Name}" Value="И">
+                    <Setter Property="BorderBrush" Value="Green"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding SelectedEvaluator.Name}" Value="ИЛИ">
+                    <Setter Property="BorderBrush" Value="MediumBlue"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <DataTemplate DataType="{x:Type vm:SetViewModel}">
+            <Border Margin="5" Style="{StaticResource border}">
+                <Grid >
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <DockPanel Grid.Row="0" LastChildFill="True" HorizontalAlignment="Stretch">
+                        <Button Margin="3" DockPanel.Dock="Right" Background="Transparent" BorderThickness="0"
+                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}, Mode=FindAncestor}, Path=DataContext.RemoveSetCommand}"
+                                CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}"> 
+                            <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Actions/Cancel_16x16.png"/>
+                        </Button>
+                        <Button Margin="3" DockPanel.Dock="Right" Command="{Binding AddSetCommand}">Добавить набор</Button>
+                        <Button Margin="3" DockPanel.Dock="Right" Command="{Binding AddRuleCommand}">Добавить правило</Button>
+                        <ComboBox Margin="3" DockPanel.Dock="Left" ItemsSource="{Binding Evaluators, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedEvaluator, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:EvaluatorViewModel}">
+                                    <TextBlock Text="{Binding Name, Mode=OneWay}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </DockPanel>
+                    <ListBox BorderThickness="0" BorderBrush="Transparent" Focusable="False" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Row="1" ItemsSource="{Binding Criterions, UpdateSourceTrigger=PropertyChanged}"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:RuleViewModel}">
+            <DockPanel LastChildFill="True" HorizontalAlignment="Stretch">
+                <ComboBox Width="200" Margin="3" DockPanel.Dock="Left" ItemsSource="{Binding CategoriesInfo.Parameters}" SelectedItem="{Binding SelectedParameter}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding SelectionChangedCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:ParameterViewModel}">
+                            <TextBlock Text="{Binding Name}"></TextBlock>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Button Margin="3" Width="16" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" DockPanel.Dock="Right"
+                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}, Mode=FindAncestor}, Path=DataContext.RemoveRuleCommand}"
+                                CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}">
+                    <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Actions/Close_16x16.png"/>
+                </Button>
+                <ComboBox Width="100" Margin="3" DockPanel.Dock="Left"></ComboBox>
+                <ComboBox Margin="3" DockPanel.Dock="Right"></ComboBox>
+            </DockPanel>
+        </DataTemplate>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0" HorizontalAlignment="Stretch">
-            <Button Margin="3" DockPanel.Dock="Right">-</Button>
-            <Button Margin="3" DockPanel.Dock="Right" Command="{Binding AddRuleCommand}">Добавить правило</Button>
-            <Button Margin="3" DockPanel.Dock="Right" Command="{Binding AddSetCommand}">Добавить набор</Button>
-            <ComboBox Margin="3" DockPanel.Dock="Left" ItemsSource="{Binding Evaluators, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedEvaluator, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name, Mode=OneWay}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-        </DockPanel>
-        <ListBox Grid.Row="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" ItemsSource="{Binding Criterions}" Focusable="False" >
-            <ListBox.Resources>
-                <DataTemplate DataType="{x:Type vm:SetViewModel}">
-                    <Border BorderThickness="1" BorderBrush="LightGray">
-                        <Grid Margin="3">
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <DockPanel Grid.Row="0" LastChildFill="True" HorizontalAlignment="Stretch">
-                                <Button Margin="3" DockPanel.Dock="Right">-</Button>
-                                <Button Margin="3" DockPanel.Dock="Right" Command="{Binding AddRuleCommand}">Добавить правило</Button>
-                                <Button Margin="3" DockPanel.Dock="Right" Command="{Binding AddSetCommand}">Добавить набор</Button>
-                                <ComboBox Margin="3" DockPanel.Dock="Left" ItemsSource="{Binding Evaluators, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedEvaluator, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate DataType="{x:Type vm:EvaluatorViewModel}">
-                                            <TextBlock Text="{Binding Name, Mode=OneWay}"/>
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-                            </DockPanel>
-                            <ListBox BorderThickness="0" BorderBrush="Transparent" Focusable="False" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Row="1" ItemsSource="{Binding Criterions}"/>
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:RuleViewModel}">
-                    <DockPanel LastChildFill="True" HorizontalAlignment="Stretch">
-                        <ComboBox Width="200" Margin="3" DockPanel.Dock="Left" ItemsSource="{Binding CategoriesInfo.Parameters}" SelectedItem="{Binding SelectedParameter}">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding SelectionChangedCommand}"/>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate DataType="{x:Type vm:ParameterViewModel}">
-                                    <TextBlock Text="{Binding Name}"></TextBlock>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                        <Button Margin="3" DockPanel.Dock="Right">-</Button>
-                        <ComboBox Width="100" Margin="3" DockPanel.Dock="Left"></ComboBox>
-                        <ComboBox Margin="3" DockPanel.Dock="Right"></ComboBox>
-                    </DockPanel>
-                </DataTemplate>
-            </ListBox.Resources>
-        </ListBox>
+        <Border Margin="5" Grid.Row="0" Style="{StaticResource border}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <DockPanel Grid.Row="0" HorizontalAlignment="Stretch">
+                    <Button Margin="3" DockPanel.Dock="Right" Command="{Binding AddRuleCommand}">Добавить правило</Button>
+                    <Button Margin="3" DockPanel.Dock="Right" Command="{Binding AddSetCommand}">Добавить набор</Button>
+                    <ComboBox Margin="3" DockPanel.Dock="Left" ItemsSource="{Binding Evaluators, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedEvaluator, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name, Mode=OneWay}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </DockPanel>
+                <ListBox x:Name="_lbCriterions" Grid.Row="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" 
+                 ItemsSource="{Binding Criterions, UpdateSourceTrigger=PropertyChanged}" Focusable="False" BorderBrush="Transparent">
+                </ListBox>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>
