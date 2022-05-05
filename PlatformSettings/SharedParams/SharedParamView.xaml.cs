@@ -43,7 +43,7 @@ namespace PlatformSettings.SharedParams {
             _revitParam = revitParam;
         }
         public string Description { get => _revitParam.Description; }
-        public StorageType SharedParamType { get => _revitParam.SharedParamType; }
+        public StorageType SharedParamType { get => _revitParam.StorageType; }
         
         public string Name {
             get => _revitParam.Name;
