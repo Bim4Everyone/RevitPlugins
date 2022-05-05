@@ -97,7 +97,7 @@ namespace RevitSetLevelSection.ViewModels {
                 return false;
             }
 
-            if(!LinkType.IsLoaded) {
+            if(LinkType != null && !LinkType.IsLoaded) {
                 ErrorText = "Загрузите выбранный связанный файл.";
                 return false;
             }
