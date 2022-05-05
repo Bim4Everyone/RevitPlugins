@@ -20,7 +20,7 @@
                 <ColumnDefinition Width="Auto" MinWidth="120"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0">Фильтр: </Label>
-            <TextBox Grid.Column="1" Text="{Binding Filter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox Grid.Column="1" Text="{Binding FilterValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Button Grid.Column="2" Content="{Binding ButtonFilterName}" Command="{Binding SelectCategoriesCommand}"/>
         </Grid>
 
