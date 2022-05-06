@@ -24,8 +24,20 @@ namespace RevitClashDetective.Models {
             _document = document;
             _uiDocument = new UIDocument(document);
         }
+
+        public Element Getelement(ElementId id) {
+            return _document.GetElement(id);
+        }
+
+        public FilteredElementCollector GetCollector() {
+            return new FilteredElementCollector(_document);
+        }
+
         public Document Doc => _document;
 
+        public LanguageType GetLanguage() {
+            return _application.Language;
+        }
         public List<ParameterFilterElement> GetFilters() {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(ParameterFilterElement))
@@ -58,27 +70,13 @@ namespace RevitClashDetective.Models {
                 .ToList();
         }
 
-        public List<ParameterModel> GetParameters(IEnumerable<Category> categories) {
-            var documents = new FilteredElementCollector(_document)
-                .OfClass(typeof(RevitLinkInstance))
-                .Cast<RevitLinkInstance>()
-                .Select(item => item.GetLinkDocument())
+        public List<ElementId> GetParameters(IEnumerable<Category> categories) {
+            return ParameterFilterUtilities
+                .GetFilterableParametersInCommon(_document, 
+                    categories.Select(c => c.Id).ToList())
                 .ToList();
-            documents.Add(_document);
-            List<ParameterModel> parameters = new List<ParameterModel>();
-            var categoryIds = categories.Select(c => c.Id).ToList();
-            foreach(var doc in documents) {
-                var parameterIds = ParameterFilterUtilities.GetFilterableParametersInCommon(doc, categoryIds);
-                parameters.AddRange(parameterIds
-                    .Where(item => item.IntegerValue > 0)
-                    .Select(item => doc.GetElement(item))
-                    .OfType<ParameterElement>()
-                    .Select(item => new ParameterModel() { Name = item.GetDefinition().Name }));
-                parameters.AddRange(parameterIds
-                    .Where(item => item.IntegerValue < 0)
-                    .Select(item => new ParameterModel() { Name = LabelUtils.GetLabelFor((BuiltInParameter) item.IntegerValue) }));
-            }
-            return parameters;
+
+            //TODO: для связанных документов
         }
     }
 }

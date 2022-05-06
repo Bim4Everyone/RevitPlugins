@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.FilterableValueProviders;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
     internal class CategoriesInfoViewModel : BaseViewModel {
@@ -27,9 +28,9 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
 
-        public ObservableCollection<ParameterViewModel> Parameters { 
-            get => _parameters; 
-            set => this.RaiseAndSetIfChanged(ref _parameters, value); 
+        public ObservableCollection<ParameterViewModel> Parameters {
+            get => _parameters;
+            set => this.RaiseAndSetIfChanged(ref _parameters, value);
         }
 
         public override bool Equals(object obj) {
@@ -46,10 +47,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         public void InitializeParameters() {
+            var parameterInitializer = new ParameterInitializer(_revitRepository);
             Parameters = new ObservableCollection<ParameterViewModel>(
-                _revitRepository.GetParameters(Categories.Select(item=>item.Category))
-                .OrderBy(item=>item.Name)
-                .Select(item => new ParameterViewModel(item.Name)));
+                _revitRepository.GetParameters(Categories.Select(item => item.Category))
+                .Select(item => new ParameterViewModel(new ParameterValueProvider(_revitRepository) { RevitParam = parameterInitializer.InitializeParameter(item) }))
+                .OrderBy(item => item.Name));
         }
     }
 }

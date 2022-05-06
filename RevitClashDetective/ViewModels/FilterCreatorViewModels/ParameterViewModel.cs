@@ -10,12 +10,17 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
+using RevitClashDetective.Models.Evaluators;
+using RevitClashDetective.Models.Interfaces;
+
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
     internal class ParameterViewModel : BaseViewModel {
+        private IFilterableValueProvider _filterableValueProvider;
         private string _name;
 
-        public ParameterViewModel(string name) {
-            Name = name;
+        public IFilterableValueProvider FilterableValueProvider {
+            get => _filterableValueProvider;
+            set => this.RaiseAndSetIfChanged(ref _filterableValueProvider, value);
         }
 
         public string Name {
@@ -23,13 +28,17 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             set => this.RaiseAndSetIfChanged(ref _name, value);
         }
 
-        public override bool Equals(object obj) {
-            return obj is ParameterViewModel model &&
-                   Name == model.Name;
+        public ParameterViewModel(IFilterableValueProvider filterableValueProvider) {
+            FilterableValueProvider = filterableValueProvider;
+            Name = FilterableValueProvider.Name;
         }
 
-        public override int GetHashCode() {
-            return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name);
+        public IEnumerable<RuleEvaluator> GetEvaluators() {
+            return FilterableValueProvider.GetRuleEvaluators();
+        }
+
+        public IEnumerable<object> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator) {
+            return FilterableValueProvider.GetValues(categories, ruleEvaluator);
         }
     }
 }

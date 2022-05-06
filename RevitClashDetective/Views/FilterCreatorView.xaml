@@ -32,13 +32,13 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <StackPanel  Orientation="Horizontal" Grid.Row="0">
-                    <Button Background="Transparent" Margin="3" BorderThickness="0" Command="{Binding CreateCommand}" CommandParameter="{Binding ElementName=ViewFilterCreator}">
+                    <Button MinHeight="20" Background="Transparent" Margin="3" BorderThickness="0" Command="{Binding CreateCommand}" CommandParameter="{Binding ElementName=ViewFilterCreator}">
                         <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Actions/AddItem_16x16.png"/>
                     </Button>
-                    <Button Background="Transparent" Margin="3" BorderThickness="0" Command="{Binding RenameCommand}" CommandParameter="{Binding ElementName=ViewFilterCreator}">
+                    <Button MinHeight="20" Background="Transparent" Margin="3" BorderThickness="0" Command="{Binding RenameCommand}" CommandParameter="{Binding ElementName=ViewFilterCreator}">
                         <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Edit/Edit_16x16.png"/>
                     </Button>
-                    <Button Background="Transparent" Margin="3" BorderThickness="0" Command="{Binding DeleteCommand}">
+                    <Button MinHeight="20" Background="Transparent" Margin="3" BorderThickness="0" Command="{Binding DeleteCommand}">
                         <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Actions/DeleteList_16x16.png"/>
                     </Button>
                 </StackPanel>

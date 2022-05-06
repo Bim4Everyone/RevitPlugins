@@ -43,7 +43,6 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public ICommand AddSetCommand { get; }
         public ICommand RemoveSetCommand { get; }
         public ICommand RemoveRuleCommand { get; }
-
         public ICommand SelectionChangedCommand { get; }
 
         public CategoriesInfoViewModel CategoryInfo {
