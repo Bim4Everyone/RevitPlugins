@@ -11,22 +11,15 @@ using DevExpress.Mvvm;
 using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
+using RevitClashDetective.Models.Evaluators;
+
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
     internal class EvaluatorViewModel : BaseViewModel {
-        private string _name;
+        private SetEvaluator _setEvaluator;
 
-        public string Name {
-            get => _name;
-            set => this.RaiseAndSetIfChanged(ref _name, value);
-        }
-
-        public override bool Equals(object obj) {
-            return obj is EvaluatorViewModel model
-                && Name == model.Name;
-        }
-
-        public override int GetHashCode() {
-            return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name);
+        public SetEvaluator SetEvaluator {
+            get => _setEvaluator;
+            set => this.RaiseAndSetIfChanged(ref _setEvaluator, value);
         }
     }
 }

@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:RevitClashDetective.Views"
              xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.FilterCreatorViewModels"
              xmlns:model="clr-namespace:RevitClashDetective.Models"
+             xmlns:setEvaluator="clr-namespace:RevitClashDetective.Models.Evaluators"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d"
              Name="_this"
@@ -23,10 +24,10 @@
         <Style TargetType="{x:Type Border}" x:Key="border">
             <Setter Property="BorderThickness" Value="4 1 1 1"/>
             <Style.Triggers>
-                <DataTrigger Binding="{Binding SelectedEvaluator.Name}" Value="И">
+                <DataTrigger Binding="{Binding SelectedEvaluator.SetEvaluator.Message}" Value="И">
                     <Setter Property="BorderBrush" Value="Green"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding SelectedEvaluator.Name}" Value="ИЛИ">
+                <DataTrigger Binding="{Binding SelectedEvaluator.SetEvaluator.Message}" Value="ИЛИ">
                     <Setter Property="BorderBrush" Value="MediumBlue"/>
                 </DataTrigger>
             </Style.Triggers>
@@ -49,7 +50,7 @@
                         <ComboBox Margin="3" DockPanel.Dock="Left" ItemsSource="{Binding Evaluators, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedEvaluator, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate DataType="{x:Type vm:EvaluatorViewModel}">
-                                    <TextBlock Text="{Binding Name, Mode=OneWay}"/>
+                                    <TextBlock Text="{Binding SetEvaluator.Message, Mode=OneWay}"/>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
@@ -117,8 +118,8 @@
                     <Button Margin="3" DockPanel.Dock="Right" Command="{Binding AddSetCommand}">Добавить набор</Button>
                     <ComboBox Margin="3" DockPanel.Dock="Left" ItemsSource="{Binding Evaluators, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedEvaluator, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch">
                         <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name, Mode=OneWay}"/>
+                            <DataTemplate DataType="{x:Type vm:EvaluatorViewModel}">
+                                <TextBlock Text="{Binding SetEvaluator.Message, Mode=OneWay}"/>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>

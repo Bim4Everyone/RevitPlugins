@@ -10,6 +10,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.Evaluators;
 using RevitClashDetective.ViewModels.FilterCreatorViewModels.Interfaces;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
@@ -32,10 +33,9 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
             Criterions = new ObservableCollection<IСriterionViewModel>();
             InitializeEmtyRule();
-            Evaluators = new ObservableCollection<EvaluatorViewModel>() {
-            new EvaluatorViewModel(){Name="И"},
-            new EvaluatorViewModel(){Name="ИЛИ"} };
+            Evaluators = new ObservableCollection<EvaluatorViewModel>(SetEvaluatorUtils.GetEvaluators().Select(item => new EvaluatorViewModel() { SetEvaluator = item }));
             SelectedEvaluator = Evaluators.FirstOrDefault();
+
 
         }
 
