@@ -6,5 +6,6 @@ using System.Threading.Tasks;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels.Interfaces {
     interface IСriterionViewModel {
+        void Renew();
     }
 }

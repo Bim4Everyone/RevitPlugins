@@ -88,5 +88,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                 Criterions.Remove(rule);
             }
         }
+
+        public void Renew() {
+            foreach(var criterion in Criterions) {
+                criterion.Renew();
+            }
+        }
     }
 }

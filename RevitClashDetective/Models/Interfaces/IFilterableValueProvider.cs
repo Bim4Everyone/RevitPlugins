@@ -12,6 +12,6 @@ namespace RevitClashDetective.Models.Interfaces {
     internal interface IFilterableValueProvider {
         string Name { get; }
         IEnumerable<RuleEvaluator> GetRuleEvaluators();
-        IEnumerable<object> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator);
+        IEnumerable<ParamValue> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator);
     }
 }

@@ -3,8 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-              xmlns:local="clr-namespace:RevitClashDetective.Views"
+             xmlns:local="clr-namespace:RevitClashDetective.Views"
              xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.FilterCreatorViewModels"
+             xmlns:model="clr-namespace:RevitClashDetective.Models"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d"
              Name="_this"
@@ -62,7 +63,7 @@
                 <ComboBox Width="200" Margin="3" DockPanel.Dock="Left" ItemsSource="{Binding CategoriesInfo.Parameters}" SelectedItem="{Binding SelectedParameter}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
-                            <i:InvokeCommandAction Command="{Binding SelectionChangedCommand}"/>
+                            <i:InvokeCommandAction Command="{Binding ParameterSelectionChangedCommand}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <ComboBox.ItemTemplate>
@@ -90,7 +91,13 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </ComboBox>
-                <ComboBox Margin="3" DockPanel.Dock="Right" ItemsSource="{Binding Values}"></ComboBox>
+                <ComboBox Margin="3" DockPanel.Dock="Right" ItemsSource="{Binding Values}" SelectedItem="{Binding SelectedValue}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type model:ParamValue}">
+                            <TextBlock Text="{Binding StringValue}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </DockPanel>
         </DataTemplate>
     </UserControl.Resources>

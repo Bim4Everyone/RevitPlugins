@@ -15,19 +15,20 @@ using RevitClashDetective.Models;
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
     internal class FilterViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private bool _isMassSelectionChanged;
         private string _name;
-        private CategoriesInfoViewModel _categoriesInfoViewModel;
-        private ObservableCollection<CategoryViewModel> _categories;
-        private CollectionViewSource _categoriesViewSource;
         private string _filterCategoryName;
-        private ObservableCollection<CategoryViewModel> _selectedCategories;
         private SetViewModel _set;
+        private CategoriesInfoViewModel _categoriesInfoViewModel;
+        private CollectionViewSource _categoriesViewSource;
+        private ObservableCollection<CategoryViewModel> _categories;
+        private ObservableCollection<CategoryViewModel> _selectedCategories;
 
         public FilterViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
             Name = "Без имени";
             InitializeCategories();
-            SelectedcategoriesChangedCommand = new RelayCommand(SelectedCategoriesChanged);
+            SelectedcategoriesChangedCommand = new RelayCommand(SelectedCategoriesChanged, p => !_isMassSelectionChanged);
             FilterTextChagedCommand = new RelayCommand(FilterTextChanged);
             CheckCategoryCommand = new RelayCommand(CheckCategory);
             InitializeSet();
@@ -71,7 +72,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public void InitializeCategories() {
             Categories = new ObservableCollection<CategoryViewModel>(
                 _revitRepository.GetCategories()
-                .Select(item => new CategoryViewModel(item)));
+                .Select(item => new CategoryViewModel(item))
+                .OrderBy(item=>item.Name));
             CategoriesViewSource = new CollectionViewSource() { Source = Categories };
             CategoriesViewSource.Filter += CategoryNameFilter;
             CategoriesViewSource?.View?.Refresh();
@@ -100,6 +102,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                 Categories.Where(item => item.IsSelected));
             _categoriesInfoViewModel.Categories = SelectedCategories;
             _categoriesInfoViewModel.InitializeParameters();
+            Set.Renew();
         }
 
         private void FilterTextChanged(object p) {
@@ -111,9 +114,12 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void CheckCategory(object p) {
+            _isMassSelectionChanged = true;
             foreach(var category in Categories) {
                 category.IsSelected = !(bool) p;
             }
+            _isMassSelectionChanged = false;
+            SelectedcategoriesChangedCommand.Execute(null);
         }
     }
 }

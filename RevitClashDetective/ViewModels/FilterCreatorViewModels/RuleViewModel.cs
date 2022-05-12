@@ -18,26 +18,14 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private readonly RevitRepository _revitRepository;
         private CategoriesInfoViewModel _categoriesInfo;
         private ParameterViewModel _selectedParameter;
+        private ParamValue _selectedValue;
         private ObservableCollection<RuleEvaluatorViewModel> _ruleEvaluators;
         private RuleEvaluatorViewModel _selectedRuleEvaluator;
-        private ObservableCollection<object> _values;
-        private object _selectedValue;
+        private ObservableCollection<ParamValue> _values;
 
         public RuleViewModel(RevitRepository revitRepository, CategoriesInfoViewModel categoriesInfo) {
             _revitRepository = revitRepository;
             CategoriesInfo = categoriesInfo;
-            SelectedParameter = CategoriesInfo.Parameters.FirstOrDefault();
-            if(SelectedParameter != null) {
-                RuleEvaluators = new ObservableCollection<RuleEvaluatorViewModel>(SelectedParameter.GetEvaluators().Select(item => new RuleEvaluatorViewModel(item)));
-                SelectedRuleEvaluator = RuleEvaluators.FirstOrDefault();
-                if(SelectedRuleEvaluator != null) {
-                    EvaluatorSelectionChanged(null);
-                }
-            } else {
-                RuleEvaluators = new ObservableCollection<RuleEvaluatorViewModel>();
-                SelectedRuleEvaluator = null;
-                Values = new ObservableCollection<object>();
-            }
 
             ParameterSelectionChangedCommand = new RelayCommand(ParameterSelectionChanged);
             EvaluatorSelectionChangedCommand = new RelayCommand(EvaluatorSelectionChanged);
@@ -66,34 +54,40 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             set => this.RaiseAndSetIfChanged(ref _ruleEvaluators, value);
         }
 
-        public ObservableCollection<object> Values {
+        public ObservableCollection<ParamValue> Values {
             get => _values;
             set => this.RaiseAndSetIfChanged(ref _values, value);
         }
 
-        public object SelectedValue { 
-            get => _selectedValue; 
-            set => this.RaiseAndSetIfChanged(ref _selectedValue, value); 
+        public ParamValue SelectedValue {
+            get => _selectedValue;
+            set => this.RaiseAndSetIfChanged(ref _selectedValue, value);
         }
 
-        private void Renew() {
+        public void Renew() {
+            SelectedParameter = null;
+            SelectedRuleEvaluator = null;
 
         }
 
         private void ParameterSelectionChanged(object p) {
-            if(SelectedParameter == null) {
-                SelectedParameter = CategoriesInfo.Parameters.FirstOrDefault();
+            if(SelectedParameter != null) {
+                RuleEvaluators = new ObservableCollection<RuleEvaluatorViewModel>(SelectedParameter.GetEvaluators().Select(item => new RuleEvaluatorViewModel(item)));
+                SelectedRuleEvaluator = RuleEvaluators.FirstOrDefault();
+                if(SelectedRuleEvaluator != null) {
+                    EvaluatorSelectionChanged(null);
+                }
             }
-            RuleEvaluators = new ObservableCollection<RuleEvaluatorViewModel>(SelectedParameter.GetEvaluators().Select(item => new RuleEvaluatorViewModel(item)));
-            SelectedRuleEvaluator = RuleEvaluators.FirstOrDefault();
-            if(SelectedRuleEvaluator != null) {
-                EvaluatorSelectionChanged(null);
-            }
+
 
         }
 
         private void EvaluatorSelectionChanged(object p) {
-            Values = new ObservableCollection<object>(SelectedParameter.GetValues(CategoriesInfo.Categories.Select(item => item.Category), SelectedRuleEvaluator.RuleEvaluator));
+            if(SelectedParameter != null && SelectedRuleEvaluator != null) {
+                Values = new ObservableCollection<ParamValue>(SelectedParameter.GetValues(CategoriesInfo.Categories.Select(item => item.Category), SelectedRuleEvaluator.RuleEvaluator));
+            } else {
+                Values = new ObservableCollection<ParamValue>();
+            }
         }
     }
 }

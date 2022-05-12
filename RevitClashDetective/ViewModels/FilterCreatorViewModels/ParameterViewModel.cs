@@ -10,6 +10,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
+using RevitClashDetective.Models;
 using RevitClashDetective.Models.Evaluators;
 using RevitClashDetective.Models.Interfaces;
 
@@ -37,7 +38,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             return FilterableValueProvider.GetRuleEvaluators();
         }
 
-        public IEnumerable<object> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator) {
+        public IEnumerable<ParamValue> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator) {
             return FilterableValueProvider.GetValues(categories, ruleEvaluator);
         }
     }

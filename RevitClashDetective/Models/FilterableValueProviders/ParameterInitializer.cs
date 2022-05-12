@@ -26,7 +26,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
 
 #endif
             } else {
-                var element = _revitRepository.Getelement(id);
+                var element = _revitRepository.GetElement(id);
                 if (element is SharedParameterElement sharedParameterElement) {
                     return SharedParamsConfig.Instance.CreateRevitParam(_revitRepository.Doc, sharedParameterElement.Name);
                 }

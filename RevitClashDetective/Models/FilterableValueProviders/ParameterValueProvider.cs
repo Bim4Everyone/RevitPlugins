@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
+using dosymep.Revit.Comparators;
 
 using RevitClashDetective.Models.Evaluators;
 using RevitClashDetective.Models.Interfaces;
@@ -27,15 +29,36 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
             return RuleEvaluatorUtils.GetRuleEvaluators(RevitParam.StorageType);
         }
 
-        public IEnumerable<object> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator) {
-            if(ruleEvaluator.Evaluator != RuleEvaluators.FilterHasNoValue || ruleEvaluator.Evaluator != RuleEvaluators.FilterHasNoValue) {
+        public IEnumerable<ParamValue> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator) {
+            if(ruleEvaluator.Evaluator != RuleEvaluators.FilterHasNoValue && ruleEvaluator.Evaluator != RuleEvaluators.FilterHasValue) {
                 var categoryFilter = new ElementMulticategoryFilter(categories.Select(item => item.Id).ToList());
-                return _revitRepository.GetCollector()
-                    .WherePasses(categoryFilter)
-                    .Select(item => item.GetParamValueOrDefault(RevitParam))
-                    .Distinct();
+                var collecotor = _revitRepository.GetClashCollector();
+                if(collecotor != null) {
+                    return collecotor
+                        .WherePasses(categoryFilter)
+                        .WhereElementIsNotElementType()
+                        .Select(GetElementParam)
+                        .Where(item => item!=null && item.Value != null)
+                        .Distinct()
+                        .OrderBy(item => item.Value);
+
+                }
+            }
+            return Enumerable.Empty<ParamValue>();
+        }
+
+        private ParamValue GetElementParam(Element item) {
+            if(item.IsExistsParam(RevitParam)) {
+                return new ParamValue(item.GetParamValueOrDefault(RevitParam), item.GetParamValueStringOrDefault(RevitParam));
+            } else {
+                var typeId = item.GetTypeId();
+                if(typeId != null) {
+                    var type = _revitRepository.GetElement(typeId);
+                    return new ParamValue(type.GetParamValueOrDefault(RevitParam), type.GetParamValueStringOrDefault(RevitParam));
+                }
             }
             return null;
         }
+
     }
 }

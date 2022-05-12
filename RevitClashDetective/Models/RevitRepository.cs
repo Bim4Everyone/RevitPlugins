@@ -25,12 +25,23 @@ namespace RevitClashDetective.Models {
             _uiDocument = new UIDocument(document);
         }
 
-        public Element Getelement(ElementId id) {
+        public Element GetElement(ElementId id) {
             return _document.GetElement(id);
         }
 
-        public FilteredElementCollector GetCollector() {
-            return new FilteredElementCollector(_document);
+        public FilteredElementCollector GetClashCollector() {
+            var view = GetNavisworksView();
+            if(view != null) {
+                return new FilteredElementCollector(_document, view.Id);
+            }
+            return null;
+        }
+
+        public View GetNavisworksView() {
+            return new FilteredElementCollector(_document)
+                .OfClass(typeof(View))
+                .Cast<View>()
+                .FirstOrDefault(item => item.Name == "Navisworks");
         }
 
         public Document Doc => _document;
@@ -72,7 +83,7 @@ namespace RevitClashDetective.Models {
 
         public List<ElementId> GetParameters(IEnumerable<Category> categories) {
             return ParameterFilterUtilities
-                .GetFilterableParametersInCommon(_document, 
+                .GetFilterableParametersInCommon(_document,
                     categories.Select(c => c.Id).ToList())
                 .ToList();
 
