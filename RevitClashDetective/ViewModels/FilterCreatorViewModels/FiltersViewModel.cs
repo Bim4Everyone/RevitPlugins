@@ -109,7 +109,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         private bool CanSave(object p) {
             if(Filters.Any(item => item.Set.IsEmty())) {
-                ErrorText = "Все поля в критериях фильрации должны быть закончены.";
+                ErrorText = "Все поля в критериях фильтрации должны быть заполнены.";
                 return false;
             }
             ErrorText = "";

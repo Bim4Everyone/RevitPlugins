@@ -9,7 +9,7 @@
         xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.FilterCreatorViewModels"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
-        Title="Фильтры" Height="450" Width="1000"
+        Title="Поисковые наборы" Height="450" Width="1000"
         x:Name="ViewFilterCreator"
         d:DataContext="{d:DesignInstance vm:FiltersViewModel, IsDesignTimeCreatable=False}">
     <Grid>
@@ -25,7 +25,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <GroupBox Grid.Column="0" Grid.Row="1" Header="Фильтры" Margin="5 0">
+        <GroupBox Grid.Column="0" Grid.Row="1" Header="Поисковые наборы" Margin="5 0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -60,8 +60,9 @@
             <local:CriterionView Height="Auto" Margin="5" DataContext="{Binding SelectedFilter.Set, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
         </GroupBox>
         <StackPanel Grid.Column="6" Grid.ColumnSpan="5" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Width="80" Height="30" FontSize="14" Margin="5" Command="{Binding SaveCommand}">Сохранить</Button>
-            <Button Width="80" Height="30" FontSize="14" Margin="5">Отмена</Button>
+            <TextBlock VerticalAlignment="Center" Margin="5" Foreground="Orange" Text="{Binding ErrorText}"/>
+            <Button Width="80" Height="30" FontSize="14" Margin="5" Command="{Binding SaveCommand}" Click="ButtonOk_Click">Сохранить</Button>
+            <Button Width="80" Height="30" FontSize="14" Margin="5" Click="ButtonCancel_Click">Отмена</Button>
         </StackPanel>
     </Grid>
 </base:PlatformWindow>
