@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using RevitClashDetective.Models.Interfaces;
+using RevitClashDetective.Models.RuleCreators.RevitRuleCreators;
+
 namespace RevitClashDetective.Models.Evaluators {
     internal class RuleEvaluatorUtils {
         public static IEnumerable<RuleEvaluator> GetRuleEvaluators(StorageType storageType) {
@@ -36,6 +39,33 @@ namespace RevitClashDetective.Models.Evaluators {
                 yield return new RuleEvaluator() { Evaluator = RuleEvaluators.FilterHasNoValue, Message = "без значения" };
             }
         }
+
+        public static IRevitRuleCreator GetRevitRuleCreator(RuleEvaluators ruleEvaluator) {
+            _evaluatorDictionary.TryGetValue(ruleEvaluator, out IRevitRuleCreator creator);
+            return creator;
+        }
+
+        private static Dictionary<RuleEvaluators, IRevitRuleCreator> _evaluatorDictionary = new Dictionary<RuleEvaluators, IRevitRuleCreator>() {
+            {RuleEvaluators.FilterStringBeginsWith,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterStringNotBeginsWith,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterStringContains,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterStringNotContains,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterStringEndsWith,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterStringNotEndsWith,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterStringEquals,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterStringGreater,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterStringGreaterOrEqual,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterStringLess,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterStringLessOrEqual,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterNumericEquals,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterNumericGreater,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterNumericGreaterOrEqual,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterNumericLess,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterNumericLessOrEqual,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterHasNoValue,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterHasValue,new RevitEqualsRuleCreator() },
+            {RuleEvaluators.FilterNotEquals,new RevitEqualsRuleCreator() },
+        };
     }
 
     internal enum RuleEvaluators {
@@ -60,7 +90,7 @@ namespace RevitClashDetective.Models.Evaluators {
         FilterNotEquals
     }
 
-    internal class RuleEvaluator { 
+    internal class RuleEvaluator {
         public string Message { get; set; }
         public RuleEvaluators Evaluator { get; set; }
     }

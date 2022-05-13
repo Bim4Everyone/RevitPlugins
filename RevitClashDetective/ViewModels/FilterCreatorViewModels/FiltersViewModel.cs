@@ -13,6 +13,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.Views;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
@@ -20,6 +21,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private readonly RevitRepository _revitRepository;
         private ObservableCollection<FilterViewModel> _filters;
         private FilterViewModel _selectedFilter;
+        private string _errorText;
 
         public FiltersViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
@@ -27,12 +29,20 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             CreateCommand = new RelayCommand(Create);
             DeleteCommand = new RelayCommand(Delete);
             RenameCommand = new RelayCommand(Rename);
+            SaveCommand = new RelayCommand(Save, CanSave);
             Filters = new ObservableCollection<FilterViewModel>();
+        }
+
+        public string ErrorText { 
+            get => _errorText; 
+            set => this.RaiseAndSetIfChanged(ref _errorText, value); 
         }
 
         public ICommand CreateCommand { get; }
         public ICommand DeleteCommand { get; }
         public ICommand RenameCommand { get; }
+
+        public ICommand SaveCommand { get; }
         public ICommand DataContextChangedCommand { get; }
 
         public FilterViewModel SelectedFilter {
@@ -43,6 +53,10 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public ObservableCollection<FilterViewModel> Filters {
             get => _filters;
             set => this.RaiseAndSetIfChanged(ref _filters, value);
+        }
+
+        public IEnumerable<Filter> GetFilters() {
+            return Filters.Select(item => item.GetFilter());
         }
 
         private void Create(object p) {
@@ -84,6 +98,22 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                     }
                 }
             }
+        }
+
+        private void Save(object p) {
+            var filters = GetFilters().ToList();
+            foreach(var filter in filters) {
+                filter.CreateRevitFilter();
+            }
+        }
+
+        private bool CanSave(object p) {
+            if(Filters.Any(item => item.Set.IsEmty())) {
+                ErrorText = "Все поля в критериях фильрации должны быть закончены.";
+                return false;
+            }
+            ErrorText = "";
+            return true;
         }
     }
 }

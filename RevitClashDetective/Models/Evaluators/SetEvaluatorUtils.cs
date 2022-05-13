@@ -4,12 +4,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB;
+
+using RevitClashDetective.Models.FilterCreators.RevitFilterCreators;
+using RevitClashDetective.Models.Interfaces;
+
 namespace RevitClashDetective.Models.Evaluators {
     internal class SetEvaluatorUtils {
         public static IEnumerable<SetEvaluator> GetEvaluators() {
             yield return new SetEvaluator() { Evaluator = SetEvaluators.And, Message = "И" };
             yield return new SetEvaluator() { Evaluator = SetEvaluators.Or, Message = "ИЛИ" };
         }
+
+        public static IRevitLogicalFilterCreator GetRevitLogicalFilterCreator(SetEvaluators evaluator) {
+            _evaluatorDictionary.TryGetValue(evaluator, out IRevitLogicalFilterCreator result);
+            return result;
+        }
+
+        private static Dictionary<SetEvaluators, IRevitLogicalFilterCreator> _evaluatorDictionary = new Dictionary<SetEvaluators, IRevitLogicalFilterCreator>() {
+            {SetEvaluators.And, new RevitLogicalAndFilterCreator() },
+            {SetEvaluators.Or, new RevitLogicalOrFilterCreator() },
+        };
     }
 
     internal class SetEvaluator {

@@ -8,9 +8,11 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit.Comparators;
 
 using RevitClashDetective.Models.Evaluators;
+using RevitClashDetective.Models.FilterGenerators;
 using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.FilterableValueProviders {
@@ -20,6 +22,8 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
         public RevitParam RevitParam { get; set; }
 
         public string Name => RevitParam.Name;
+
+        public IFilterGenerator FilterGenerator { get; }
 
         public ParameterValueProvider(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
@@ -38,7 +42,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
                         .WherePasses(categoryFilter)
                         .WhereElementIsNotElementType()
                         .Select(GetElementParam)
-                        .Where(item => item!=null && item.Value != null)
+                        .Where(item => item != null && item.Value != null)
                         .Distinct()
                         .OrderBy(item => item.Value);
 
@@ -60,5 +64,14 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
             return null;
         }
 
+        public FilterRule GetRule(IRevitRuleCreator creator, object value) {
+            ElementId id = null;
+            if(RevitParam is SystemParam systemParam) {
+                id = new ElementId(systemParam.SystemParamId);
+            } else {
+                id = RevitParam.GetRevitParamElement(_revitRepository.Doc).Id;
+            }
+            return creator.Create(RevitParam.StorageType, id, value);
+        }
     }
 }

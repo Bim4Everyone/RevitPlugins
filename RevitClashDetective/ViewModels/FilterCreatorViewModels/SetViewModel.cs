@@ -11,6 +11,8 @@ using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Evaluators;
+using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.ViewModels.FilterCreatorViewModels.Interfaces;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
@@ -93,6 +95,17 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             foreach(var criterion in Criterions) {
                 criterion.Renew();
             }
+        }
+
+        public ICriterion GetCriterion() {
+            return new Set() {
+                SetEvaluator = SelectedEvaluator.SetEvaluator,
+                Criteria = Criterions.Select(item => item.GetCriterion()).ToList()
+            };
+        }
+
+        public bool IsEmty() {
+            return Criterions.Any(item => item.IsEmty());
         }
     }
 }

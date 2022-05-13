@@ -11,6 +11,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.FilterModel;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
     internal class FilterViewModel : BaseViewModel {
@@ -73,7 +74,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             Categories = new ObservableCollection<CategoryViewModel>(
                 _revitRepository.GetCategories()
                 .Select(item => new CategoryViewModel(item))
-                .OrderBy(item=>item.Name));
+                .OrderBy(item => item.Name));
             CategoriesViewSource = new CollectionViewSource() { Source = Categories };
             CategoriesViewSource.Filter += CategoryNameFilter;
             CategoriesViewSource?.View?.Refresh();
@@ -89,6 +90,14 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         public override int GetHashCode() {
             return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name);
+        }
+
+        public Filter GetFilter() {
+            return new Filter(_revitRepository) {
+                Name = Name,
+                Set = (Set) Set.GetCriterion(),
+                CategoryIds = SelectedCategories.Select(item => item.Category.Id.IntegerValue).ToList()
+            };
         }
 
         private void CategoryNameFilter(object sender, FilterEventArgs e) {

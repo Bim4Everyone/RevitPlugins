@@ -11,6 +11,8 @@ using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Evaluators;
+using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.ViewModels.FilterCreatorViewModels.Interfaces;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
@@ -88,6 +90,14 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             } else {
                 Values = new ObservableCollection<ParamValue>();
             }
+        }
+
+        public ICriterion GetCriterion() {
+            return new Rule() { Evaluator = SelectedRuleEvaluator.RuleEvaluator, Provider = SelectedParameter.FilterableValueProvider, Value = SelectedValue };
+        }
+
+        public bool IsEmty() {
+            return SelectedParameter == null || SelectedRuleEvaluator == null || SelectedValue == null;
         }
     }
 }

@@ -9,6 +9,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 
+using dosymep.Revit;
+
 namespace RevitClashDetective.Models {
     internal class RevitRepository {
         private readonly Application _application;
@@ -88,6 +90,15 @@ namespace RevitClashDetective.Models {
                 .ToList();
 
             //TODO: для связанных документов
+        }
+
+        public void CreateFilter(IEnumerable<ElementId> categories, ElementFilter filter, string name) {
+            using(Transaction t = _document.StartTransaction("Создание фильтра")) {
+                ParameterFilterElement pfe = ParameterFilterElement.Create(_document, name, categories.ToList());
+                pfe.SetElementFilter(filter);
+                t.Commit();
+            }
+            
         }
     }
 }

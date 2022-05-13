@@ -60,7 +60,7 @@
             <local:CriterionView Height="Auto" Margin="5" DataContext="{Binding SelectedFilter.Set, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
         </GroupBox>
         <StackPanel Grid.Column="6" Grid.ColumnSpan="5" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Width="80" Height="30" FontSize="14" Margin="5">Сохранить</Button>
+            <Button Width="80" Height="30" FontSize="14" Margin="5" Command="{Binding SaveCommand}">Сохранить</Button>
             <Button Width="80" Height="30" FontSize="14" Margin="5">Отмена</Button>
         </StackPanel>
     </Grid>
