@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB;
+
 namespace RevitClashDetective.Models {
     internal class ParamValue {
         private string _stringValue;
@@ -19,7 +21,6 @@ namespace RevitClashDetective.Models {
                 StringValue = stringValue;
             }
         }
-        
 
         public override bool Equals(object obj) {
             return obj is ParamValue value &&
@@ -32,6 +33,15 @@ namespace RevitClashDetective.Models {
             hashCode = hashCode * -1521134295 + EqualityComparer<object>.Default.GetHashCode(Value);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(StringValue);
             return hashCode;
+        }
+    }
+
+    internal class ParamValueComparer : IComparer<ParamValue> {
+        public int Compare(ParamValue x, ParamValue y) {
+            if(x.Value is IComparable compX && y.Value is IComparable compY) {
+                return compX.CompareTo(compY);
+            }
+            return x.StringValue.CompareTo(y.StringValue);
         }
     }
 }

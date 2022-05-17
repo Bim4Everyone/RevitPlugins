@@ -42,9 +42,9 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
                         .WherePasses(categoryFilter)
                         .WhereElementIsNotElementType()
                         .Select(GetElementParam)
-                        .Where(item => item != null && item.Value != null)
+                        .Where(item => item != null && item.Value != null && item.Value as ElementId != ElementId.InvalidElementId)
                         .Distinct()
-                        .OrderBy(item => item.Value);
+                        .OrderBy(item => item, new ParamValueComparer());
 
                 }
             }
@@ -67,7 +67,9 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
         public FilterRule GetRule(IRevitRuleCreator creator, object value) {
             ElementId id = null;
             if(RevitParam is SystemParam systemParam) {
+#if D2020 || R2020
                 id = new ElementId(systemParam.SystemParamId);
+#endif
             } else {
                 id = RevitParam.GetRevitParamElement(_revitRepository.Doc).Id;
             }

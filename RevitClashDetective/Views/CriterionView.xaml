@@ -42,7 +42,7 @@
                     <DockPanel Grid.Row="0" LastChildFill="True" HorizontalAlignment="Stretch">
                         <Button Margin="3" DockPanel.Dock="Right" Background="Transparent" BorderThickness="0"
                                 Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}, Mode=FindAncestor}, Path=DataContext.RemoveSetCommand}"
-                                CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}"> 
+                                CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}">
                             <Image Source="pack:DockPanel//application:,,,/DevExpress.Images.v21.2;component/Office2013/Actions/Cancel_16x16.png"/>
                         </Button>
                         <Button Margin="3" DockPanel.Dock="Right" Command="{Binding AddRuleCommand}">Добавить правило</Button>
@@ -92,13 +92,29 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </ComboBox>
-                <ComboBox Margin="3" DockPanel.Dock="Right" ItemsSource="{Binding Values}" SelectedItem="{Binding SelectedValue}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type model:ParamValue}">
-                            <TextBlock Text="{Binding StringValue}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                <Grid DockPanel.Dock="Right" Margin="3">
+                    <ComboBox ItemsSource="{Binding Values}" SelectedItem="{Binding SelectedValue, UpdateSourceTrigger=PropertyChanged}" 
+                          DisplayMemberPath="StringValue" Text="{Binding StringValue}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type model:ParamValue}">
+                                <TextBlock Text="{Binding StringValue}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                        <ComboBox.Style>
+                            <Style TargetType="{x:Type ComboBox}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsValueEditable}" Value="True">
+                                        <Setter Property="IsEditable" Value="True"></Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsValueEditable}" Value="False">
+                                        <Setter Property="IsEditable" Value="False"></Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ComboBox.Style>
+                    </ComboBox>
+                </Grid>
+
             </DockPanel>
         </DataTemplate>
     </UserControl.Resources>

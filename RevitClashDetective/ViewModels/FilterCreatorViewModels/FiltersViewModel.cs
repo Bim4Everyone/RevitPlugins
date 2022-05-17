@@ -33,9 +33,9 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             Filters = new ObservableCollection<FilterViewModel>();
         }
 
-        public string ErrorText { 
-            get => _errorText; 
-            set => this.RaiseAndSetIfChanged(ref _errorText, value); 
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
         public ICommand CreateCommand { get; }
@@ -112,7 +112,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                 ErrorText = "Все поля в критериях фильтрации должны быть заполнены.";
                 return false;
             }
-            ErrorText = "";
+            ErrorText = string.Empty;
             return true;
         }
     }
