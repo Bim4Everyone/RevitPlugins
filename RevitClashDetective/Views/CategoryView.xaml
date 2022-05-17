@@ -19,7 +19,7 @@
                 <TextBox MinWidth="150" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="2" Text="{Binding FilterCategoryName, UpdateSourceTrigger=PropertyChanged}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
-                            <i:InvokeCommandAction Command="{Binding FilterTextChagedCommand}"/>
+                            <i:InvokeCommandAction Command="{Binding FilterTextChangedCommand}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
@@ -53,10 +53,10 @@
                             <CheckBox IsChecked="{Binding IsSelected}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="Checked">
-                                        <i:InvokeCommandAction Command="{Binding ElementName=lbCat, Path=DataContext.SelectedcategoriesChangedCommand}"/>
+                                        <i:InvokeCommandAction Command="{Binding ElementName=lbCat, Path=DataContext.SelectedCategoriesChangedCommand}"/>
                                     </i:EventTrigger>
                                     <i:EventTrigger EventName="Unchecked">
-                                        <i:InvokeCommandAction Command="{Binding ElementName=lbCat, Path=DataContext.SelectedcategoriesChangedCommand}"/>
+                                        <i:InvokeCommandAction Command="{Binding ElementName=lbCat, Path=DataContext.SelectedCategoriesChangedCommand}"/>
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </CheckBox>

@@ -36,9 +36,9 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
         public IEnumerable<ParamValue> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator) {
             if(ruleEvaluator.Evaluator != RuleEvaluators.FilterHasNoValue && ruleEvaluator.Evaluator != RuleEvaluators.FilterHasValue) {
                 var categoryFilter = new ElementMulticategoryFilter(categories.Select(item => item.Id).ToList());
-                var collecotor = _revitRepository.GetClashCollector();
-                if(collecotor != null) {
-                    return collecotor
+                var collector = _revitRepository.GetClashCollector();
+                if(collector != null) {
+                    return collector
                         .WherePasses(categoryFilter)
                         .WhereElementIsNotElementType()
                         .Select(GetElementParam)

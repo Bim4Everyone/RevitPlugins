@@ -28,11 +28,14 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public FilterViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
             Name = "Без имени";
+
             InitializeCategories();
-            SelectedcategoriesChangedCommand = new RelayCommand(SelectedCategoriesChanged, p => !_isMassSelectionChanged);
-            FilterTextChagedCommand = new RelayCommand(FilterTextChanged);
-            CheckCategoryCommand = new RelayCommand(CheckCategory);
             InitializeSet();
+
+            CheckCategoryCommand = new RelayCommand(CheckCategory);
+            FilterTextChangedCommand = new RelayCommand(FilterTextChanged);
+            SelectedCategoriesChangedCommand =
+                new RelayCommand(SelectedCategoriesChanged, p => !_isMassSelectionChanged);
         }
 
         public string Name {
@@ -45,9 +48,9 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             set => this.RaiseAndSetIfChanged(ref _filterCategoryName, value);
         }
 
-        public ICommand SelectedcategoriesChangedCommand { get; }
-        public ICommand FilterTextChagedCommand { get; }
         public ICommand CheckCategoryCommand { get; }
+        public ICommand FilterTextChangedCommand { get; }
+        public ICommand SelectedCategoriesChangedCommand { get; }
 
 
         public CollectionViewSource CategoriesViewSource {
@@ -69,27 +72,25 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             get => _selectedCategories;
             set => this.RaiseAndSetIfChanged(ref _selectedCategories, value);
         }
+        
+        private void InitializeSet() {
+            Set = new SetViewModel(_revitRepository, _categoriesInfoViewModel);
+        }
 
-        public void InitializeCategories() {
+        private void InitializeCategories() {
             Categories = new ObservableCollection<CategoryViewModel>(
                 _revitRepository.GetCategories()
-                .Select(item => new CategoryViewModel(item))
-                .OrderBy(item => item.Name));
-            CategoriesViewSource = new CollectionViewSource() { Source = Categories };
+                    .Select(item => new CategoryViewModel(item))
+                    .OrderBy(item => item.Name));
+            
+            CategoriesViewSource = new CollectionViewSource() {Source = Categories};
             CategoriesViewSource.Filter += CategoryNameFilter;
             CategoriesViewSource?.View?.Refresh();
+           
             SelectedCategories = new ObservableCollection<CategoryViewModel>(
-               Categories.Where(item => item.IsSelected));
+                Categories.Where(item => item.IsSelected));
+           
             _categoriesInfoViewModel = new CategoriesInfoViewModel(_revitRepository, SelectedCategories);
-        }
-
-        public override bool Equals(object obj) {
-            return obj is FilterViewModel model &&
-                   Name == model.Name;
-        }
-
-        public override int GetHashCode() {
-            return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name);
         }
 
         public Filter GetFilter() {
@@ -100,12 +101,20 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             };
         }
 
-        private void CategoryNameFilter(object sender, FilterEventArgs e) {
-            if(!string.IsNullOrEmpty(FilterCategoryName) && e.Item is CategoryViewModel category) {
-                e.Accepted = category.Name.ToLowerInvariant().Contains(FilterCategoryName.ToLowerInvariant());
+        private void CheckCategory(object p) {
+            _isMassSelectionChanged = true;
+            foreach(var category in Categories) {
+                category.IsSelected = !(bool) p;
             }
-        }
 
+            _isMassSelectionChanged = false;
+            SelectedCategoriesChangedCommand.Execute(null);
+        }
+        
+        private void FilterTextChanged(object p) {
+            CategoriesViewSource?.View?.Refresh();
+        }
+        
         private void SelectedCategoriesChanged(object p) {
             SelectedCategories = new ObservableCollection<CategoryViewModel>(
                 Categories.Where(item => item.IsSelected));
@@ -113,22 +122,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             _categoriesInfoViewModel.InitializeParameters();
             Set.Renew();
         }
-
-        private void FilterTextChanged(object p) {
-            CategoriesViewSource?.View?.Refresh();
-        }
-
-        private void InitializeSet() {
-            Set = new SetViewModel(_revitRepository, _categoriesInfoViewModel);
-        }
-
-        private void CheckCategory(object p) {
-            _isMassSelectionChanged = true;
-            foreach(var category in Categories) {
-                category.IsSelected = !(bool) p;
+        
+        private void CategoryNameFilter(object sender, FilterEventArgs e) {
+            if(!string.IsNullOrEmpty(FilterCategoryName) && e.Item is CategoryViewModel category) {
+                e.Accepted = category.Name.ToLowerInvariant().Contains(FilterCategoryName.ToLowerInvariant());
             }
-            _isMassSelectionChanged = false;
-            SelectedcategoriesChangedCommand.Execute(null);
         }
     }
 }

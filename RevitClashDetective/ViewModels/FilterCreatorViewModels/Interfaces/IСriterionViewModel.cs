@@ -9,7 +9,7 @@ using RevitClashDetective.Models.Interfaces;
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels.Interfaces {
     interface IСriterionViewModel {
         void Renew();
-        bool IsEmty();
+        bool IsEmpty();
         ICriterion GetCriterion();
     }
 }

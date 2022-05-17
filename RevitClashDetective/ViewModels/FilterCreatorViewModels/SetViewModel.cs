@@ -29,23 +29,22 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             CategoryInfo = categoriesInfo;
 
             AddRuleCommand = new RelayCommand(AddRule);
-            AddSetCommand = new RelayCommand(AddSet);
             RemoveRuleCommand = new RelayCommand(RemoveRule);
+            
+            AddSetCommand = new RelayCommand(AddSet);
             RemoveSetCommand = new RelayCommand(RemoveSet);
 
             Criterions = new ObservableCollection<IСriterionViewModel>();
-            InitializeEmtyRule();
+            InitializeEmptyRule();
+            
             Evaluators = new ObservableCollection<EvaluatorViewModel>(SetEvaluatorUtils.GetEvaluators().Select(item => new EvaluatorViewModel() { SetEvaluator = item }));
             SelectedEvaluator = Evaluators.FirstOrDefault();
-
-
         }
 
         public ICommand AddRuleCommand { get; }
         public ICommand AddSetCommand { get; }
         public ICommand RemoveSetCommand { get; }
         public ICommand RemoveRuleCommand { get; }
-        public ICommand SelectionChangedCommand { get; }
 
         public CategoriesInfoViewModel CategoryInfo {
             get => _categoryInfo;
@@ -67,7 +66,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             set => this.RaiseAndSetIfChanged(ref _evaluators, value);
         }
 
-        public void InitializeEmtyRule() {
+        public void InitializeEmptyRule() {
             Criterions.Add(new RuleViewModel(_revitRepository, _categoryInfo));
         }
 
@@ -80,15 +79,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void RemoveSet(object p) {
-            if(p is SetViewModel set) {
-                Criterions.Remove(set);
-            }
+            Criterions.Remove(p as SetViewModel);
         }
 
         private void RemoveRule(object p) {
-            if(p is RuleViewModel rule) {
-                Criterions.Remove(rule);
-            }
+            Criterions.Remove(p as RuleViewModel);
         }
 
         public void Renew() {
@@ -104,8 +99,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             };
         }
 
-        public bool IsEmty() {
-            return Criterions.Any(item => item.IsEmty());
+        public bool IsEmpty() {
+            return Criterions.Any(item => item.IsEmpty());
         }
     }
 }

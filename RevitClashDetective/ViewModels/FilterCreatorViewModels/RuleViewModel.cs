@@ -39,9 +39,9 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public ICommand ParameterSelectionChangedCommand { get; set; }
         public ICommand EvaluatorSelectionChangedCommand { get; set; }
 
-        public bool IsValueEditable { 
-            get => _isValueEditable; 
-            set => this.RaiseAndSetIfChanged(ref _isValueEditable, value); 
+        public bool IsValueEditable {
+            get => _isValueEditable;
+            set => this.RaiseAndSetIfChanged(ref _isValueEditable, value);
         }
 
         public ParameterViewModel SelectedParameter {
@@ -86,7 +86,10 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         private void ParameterSelectionChanged(object p) {
             if(SelectedParameter != null) {
-                RuleEvaluators = new ObservableCollection<RuleEvaluatorViewModel>(SelectedParameter.GetEvaluators().Select(item => new RuleEvaluatorViewModel(item)));
+                RuleEvaluators = new ObservableCollection<RuleEvaluatorViewModel>(
+                    SelectedParameter.GetEvaluators()
+                        .Select(item => new RuleEvaluatorViewModel(item)));
+
                 SelectedRuleEvaluator = RuleEvaluators.FirstOrDefault();
                 if(SelectedRuleEvaluator != null) {
                     EvaluatorSelectionChanged(null);
@@ -96,46 +99,45 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         private void EvaluatorSelectionChanged(object p) {
             if(SelectedParameter != null && SelectedRuleEvaluator != null) {
-                Values = new ObservableCollection<ParamValue>(SelectedParameter.GetValues(CategoriesInfo.Categories.Select(item => item.Category), SelectedRuleEvaluator.RuleEvaluator));
-                GetValueEditability();
+                Values = new ObservableCollection<ParamValue>(
+                    SelectedParameter.GetValues(
+                        CategoriesInfo.Categories
+                            .Select(item => item.Category), SelectedRuleEvaluator.RuleEvaluator));
+               
+                IsValueEditable = CanValueEdit();
             } else {
                 Values = new ObservableCollection<ParamValue>();
             }
         }
 
         public ICriterion GetCriterion() {
-            //if(SelectedValue != null) {
-            
-
-            return new Rule() { Evaluator = SelectedRuleEvaluator.RuleEvaluator, Provider = SelectedParameter.FilterableValueProvider, Value = SelectedValue };
-            //}
-            //InputValue = new ParamValue()
-            //return new Rule() { Evaluator = SelectedRuleEvaluator.RuleEvaluator, Provider = SelectedParameter.FilterableValueProvider, Value = InputValue };
+            return new Rule() {
+                Evaluator = SelectedRuleEvaluator.RuleEvaluator,
+                Provider = SelectedParameter.FilterableValueProvider,
+                Value = SelectedValue
+            };
         }
 
-        public bool IsEmty() {
-            return SelectedParameter == null || SelectedRuleEvaluator == null || (SelectedValue == null && StringValue == null);
+        public bool IsEmpty() {
+            return SelectedParameter == null || SelectedRuleEvaluator == null ||
+                   (SelectedValue == null && StringValue == null);
         }
 
-        private void GetValueEditability() {
-            if (SelectedRuleEvaluator.RuleEvaluator.Evaluator == Models.Evaluators.RuleEvaluators.FilterHasValue 
-                || SelectedRuleEvaluator.RuleEvaluator.Evaluator == Models.Evaluators.RuleEvaluators.FilterHasNoValue) {
-                IsValueEditable = false;
-                return;
+        private bool CanValueEdit() {
+            if(SelectedRuleEvaluator.RuleEvaluator.Evaluator == Models.Evaluators.RuleEvaluators.FilterHasValue
+               || SelectedRuleEvaluator.RuleEvaluator.Evaluator == Models.Evaluators.RuleEvaluators.FilterHasNoValue) {
+                return false;
             }
+
             if((SelectedRuleEvaluator.RuleEvaluator.Evaluator == Models.Evaluators.RuleEvaluators.FilterNotEquals
                 || SelectedRuleEvaluator.RuleEvaluator.Evaluator == Models.Evaluators.RuleEvaluators.FilterNumericEquals
                 || SelectedRuleEvaluator.RuleEvaluator.Evaluator == Models.Evaluators.RuleEvaluators.FilterStringEquals)
-                && SelectedParameter.FilterableValueProvider is ParameterValueProvider provider 
-                && provider.RevitParam.StorageType == Autodesk.Revit.DB.StorageType.ElementId ) {
-                IsValueEditable = false;
-                return;
+               && SelectedParameter.FilterableValueProvider is ParameterValueProvider provider
+               && provider.RevitParam.StorageType == Autodesk.Revit.DB.StorageType.ElementId) {
+                return false;
             }
-            IsValueEditable = true;
-        }
 
-        ////private void InitializeInputValue() {
-        ////    if (Selected)
-        ////}
+            return true;
+        }
     }
 }
