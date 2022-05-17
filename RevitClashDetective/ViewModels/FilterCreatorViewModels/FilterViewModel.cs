@@ -24,6 +24,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private CollectionViewSource _categoriesViewSource;
         private ObservableCollection<CategoryViewModel> _categories;
         private ObservableCollection<CategoryViewModel> _selectedCategories;
+        private bool _canSelectCategories;
+        private bool? _isAllCategoriesSelected;
 
         public FilterViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
@@ -46,6 +48,16 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public string FilterCategoryName {
             get => _filterCategoryName;
             set => this.RaiseAndSetIfChanged(ref _filterCategoryName, value);
+        }
+
+        public bool CanSelectCategories {
+            get => _canSelectCategories;
+            set => this.RaiseAndSetIfChanged(ref _canSelectCategories, value);
+        }
+
+        public bool? IsAllCategoriesSelected {
+            get => _isAllCategoriesSelected;
+            set => this.RaiseAndSetIfChanged(ref _isAllCategoriesSelected, value);
         }
 
         public ICommand CheckCategoryCommand { get; }
@@ -72,7 +84,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             get => _selectedCategories;
             set => this.RaiseAndSetIfChanged(ref _selectedCategories, value);
         }
-        
+
         private void InitializeSet() {
             Set = new SetViewModel(_revitRepository, _categoriesInfoViewModel);
         }
@@ -82,15 +94,18 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                 _revitRepository.GetCategories()
                     .Select(item => new CategoryViewModel(item))
                     .OrderBy(item => item.Name));
-            
-            CategoriesViewSource = new CollectionViewSource() {Source = Categories};
+
+            CategoriesViewSource = new CollectionViewSource() { Source = Categories };
             CategoriesViewSource.Filter += CategoryNameFilter;
             CategoriesViewSource?.View?.Refresh();
-           
+
             SelectedCategories = new ObservableCollection<CategoryViewModel>(
                 Categories.Where(item => item.IsSelected));
-           
+
             _categoriesInfoViewModel = new CategoriesInfoViewModel(_revitRepository, SelectedCategories);
+
+            CanSelectCategories = true;
+            IsAllCategoriesSelected = false;
         }
 
         public Filter GetFilter() {
@@ -103,29 +118,43 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         private void CheckCategory(object p) {
             _isMassSelectionChanged = true;
-            foreach(var category in Categories) {
-                category.IsSelected = !(bool) p;
+            foreach(var category in CategoriesViewSource.View.Cast<CategoryViewModel>()) {
+                category.IsSelected = (bool) p;
             }
 
             _isMassSelectionChanged = false;
             SelectedCategoriesChangedCommand.Execute(null);
         }
-        
+
         private void FilterTextChanged(object p) {
             CategoriesViewSource?.View?.Refresh();
+            CanSelectCategories = CategoriesViewSource.View.Cast<CategoryViewModel>().Count() > 0;
+            CheckAllCategoriesSelected();
         }
-        
+
         private void SelectedCategoriesChanged(object p) {
             SelectedCategories = new ObservableCollection<CategoryViewModel>(
                 Categories.Where(item => item.IsSelected));
             _categoriesInfoViewModel.Categories = SelectedCategories;
             _categoriesInfoViewModel.InitializeParameters();
             Set.Renew();
+            CheckAllCategoriesSelected();
         }
-        
+
         private void CategoryNameFilter(object sender, FilterEventArgs e) {
             if(!string.IsNullOrEmpty(FilterCategoryName) && e.Item is CategoryViewModel category) {
                 e.Accepted = category.Name.ToLowerInvariant().Contains(FilterCategoryName.ToLowerInvariant());
+            }
+        }
+
+        private void CheckAllCategoriesSelected() {
+            var filteredCategories = CategoriesViewSource.View.OfType<CategoryViewModel>();
+            if(filteredCategories.All(item=>item.IsSelected)) {
+                IsAllCategoriesSelected = true;
+            } else if(filteredCategories.Any(item => item.IsSelected)) {
+                IsAllCategoriesSelected = null;
+            } else {
+                IsAllCategoriesSelected = false;
             }
         }
     }

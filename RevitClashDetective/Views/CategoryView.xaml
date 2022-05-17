@@ -6,8 +6,13 @@
              xmlns:local="clr-namespace:RevitClashDetective.Views"
              xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.FilterCreatorViewModels"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:s="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance vm:FilterViewModel, IsDesignTimeCreatable=False}">
+    <UserControl.Resources>
+        <s:Boolean x:Key="True">True</s:Boolean>
+        <s:Boolean x:Key="False">False</s:Boolean>
+    </UserControl.Resources>
     <Grid>
         <Grid>
             <Grid.RowDefinitions>
@@ -23,13 +28,13 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
-                <CheckBox x:Name="_cbCategories" VerticalAlignment="Center">
+                <CheckBox x:Name="_cbCategories" VerticalAlignment="Center" IsEnabled="{Binding CanSelectCategories}" IsChecked="{Binding IsAllCategoriesSelected, Mode=OneWay}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Checked">
-                            <i:InvokeCommandAction Command="{Binding CheckCategoryCommand}" CommandParameter="{Binding ElementName=_cbCategories, Path=IsChecked}"/>
+                            <i:InvokeCommandAction Command="{Binding CheckCategoryCommand}" CommandParameter="{StaticResource True}"/>
                         </i:EventTrigger>
                         <i:EventTrigger EventName="Unchecked">
-                            <i:InvokeCommandAction Command="{Binding CheckCategoryCommand}" CommandParameter="{Binding ElementName=_cbCategories, Path=IsChecked}"/>
+                            <i:InvokeCommandAction Command="{Binding CheckCategoryCommand}" CommandParameter="{StaticResource False}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <CheckBox.Style>
