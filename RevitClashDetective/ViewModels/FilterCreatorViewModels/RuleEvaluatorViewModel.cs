@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using dosymep.WPF.ViewModels;
+
 using RevitClashDetective.Models.Evaluators;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
