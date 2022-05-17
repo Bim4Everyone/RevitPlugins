@@ -119,7 +119,7 @@ namespace RevitSetLevelSection.ViewModels {
 
         public override ParamSettings GetParamSettings() {
             return new ParamSettings() {
-                IsEnabled = IsEnabled, ElementId = DesignOption?.Id, PropertyName = RevitParam.PropertyName
+                IsEnabled = IsEnabled, ElementId = DesignOption?.Id, PropertyName = RevitParam.Id
             };
         }
 
