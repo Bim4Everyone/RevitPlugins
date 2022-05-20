@@ -97,10 +97,19 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void Save(object p) {
-            var filters = GetFilters().ToList();
-            foreach(var filter in filters) {
-                filter.CreateRevitFilter();
-            }
+            var filtersConfig = FiltersConfig.GetFiltersConfig();
+            filtersConfig.Filters = GetFilters().ToList();
+            filtersConfig.SaveProjectConfig();
+
+            //foreach(var filter in filters) {
+            //    filter
+
+            //    filter.Save();
+            //    var readFilter = filter.Read();
+            //    readFilter.RevitRepository = _revitRepository;
+            //    readFilter.Set.SetRevitRepository(_revitRepository);
+            //    readFilter.CreateRevitFilter();
+            //}
         }
 
         private bool CanSave(object p) {

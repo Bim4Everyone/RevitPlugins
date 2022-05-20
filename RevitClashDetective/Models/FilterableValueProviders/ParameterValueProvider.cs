@@ -11,32 +11,36 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit.Comparators;
 
+using pyRevitLabs.Json;
+
 using RevitClashDetective.Models.Evaluators;
 using RevitClashDetective.Models.FilterGenerators;
 using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.FilterableValueProviders {
     internal class ParameterValueProvider : IFilterableValueProvider {
-        private readonly RevitRepository _revitRepository;
 
         public RevitParam RevitParam { get; set; }
 
         public string Name => RevitParam.Name;
 
+        [JsonIgnore]
         public IFilterGenerator FilterGenerator { get; }
+        [JsonIgnore]
+        public RevitRepository RevitRepository { get; set; }
 
         public ParameterValueProvider(RevitRepository revitRepository) {
-            _revitRepository = revitRepository;
+            RevitRepository = revitRepository;
         }
 
         public IEnumerable<RuleEvaluator> GetRuleEvaluators() {
             return RuleEvaluatorUtils.GetRuleEvaluators(RevitParam.StorageType);
         }
 
-        public IEnumerable<ParamValue> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator) {
+        public IEnumerable<ParamValueViewModel> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator) {
             if(ruleEvaluator.Evaluator != RuleEvaluators.FilterHasNoValue && ruleEvaluator.Evaluator != RuleEvaluators.FilterHasValue) {
                 var categoryFilter = new ElementMulticategoryFilter(categories.Select(item => item.Id).ToList());
-                var collector = _revitRepository.GetClashCollector();
+                var collector = RevitRepository.GetClashCollector();
                 if(collector != null) {
                     return collector
                         .WherePasses(categoryFilter)
@@ -44,21 +48,22 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
                         .Select(GetElementParam)
                         .Where(item => item != null && item.Value != null && item.Value as ElementId != ElementId.InvalidElementId)
                         .Distinct()
-                        .OrderBy(item => item, new ParamValueComparer());
+                        .OrderBy(item => item.ParamValue);
 
                 }
             }
-            return Enumerable.Empty<ParamValue>();
+            return Enumerable.Empty<ParamValueViewModel>();
         }
 
-        private ParamValue GetElementParam(Element item) {
+        private ParamValueViewModel GetElementParam(Element item) {
+
             if(item.IsExistsParam(RevitParam)) {
-                return new ParamValue(item.GetParamValueOrDefault(RevitParam), item.GetParamValueStringOrDefault(RevitParam));
+                return new ParamValueViewModel(RevitParam, item);
             } else {
                 var typeId = item.GetTypeId();
                 if(typeId != null) {
-                    var type = _revitRepository.GetElement(typeId);
-                    return new ParamValue(type.GetParamValueOrDefault(RevitParam), type.GetParamValueStringOrDefault(RevitParam));
+                    var type = RevitRepository.GetElement(typeId);
+                    return new ParamValueViewModel(RevitParam, type);
                 }
             }
             return null;
@@ -71,7 +76,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
                 id = new ElementId(systemParam.SystemParamId);
 #endif
             } else {
-                id = RevitParam.GetRevitParamElement(_revitRepository.Doc).Id;
+                id = RevitParam.GetRevitParamElement(RevitRepository.Doc).Id;
             }
             return creator.Create(RevitParam.StorageType, id, value);
         }

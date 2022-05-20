@@ -36,7 +36,7 @@ namespace RevitClashDetective.Models {
             if(view != null) {
                 return new FilteredElementCollector(_document, view.Id);
             }
-            return null;
+            return new FilteredElementCollector(_document);
         }
 
         public View GetNavisworksView() {

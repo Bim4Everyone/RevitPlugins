@@ -96,7 +96,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             }
         }
 
-        public ICriterion GetCriterion() {
+        public Criterion GetCriterion() {
             return new Set() {
                 SetEvaluator = SelectedEvaluator.SetEvaluator,
                 Criteria = Criterions.Select(item => item.GetCriterion()).ToList()

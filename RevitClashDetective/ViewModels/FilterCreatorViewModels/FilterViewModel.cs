@@ -119,7 +119,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private void CheckCategory(object p) {
             _isMassSelectionChanged = true;
             foreach(var category in CategoriesViewSource.View.Cast<CategoryViewModel>()) {
-                category.IsSelected = (bool) p;
+                category.IsSelected = !IsAllCategoriesSelected == true;
             }
 
             _isMassSelectionChanged = false;
@@ -149,13 +149,22 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         private void CheckAllCategoriesSelected() {
             var filteredCategories = CategoriesViewSource.View.OfType<CategoryViewModel>();
-            if(filteredCategories.All(item=>item.IsSelected)) {
+            if(filteredCategories.All(item => item.IsSelected)) {
                 IsAllCategoriesSelected = true;
             } else if(filteredCategories.Any(item => item.IsSelected)) {
                 IsAllCategoriesSelected = null;
             } else {
                 IsAllCategoriesSelected = false;
             }
+        }
+
+        public override bool Equals(object obj) {
+            return obj is FilterViewModel model &&
+                   Name == model.Name;
+        }
+
+        public override int GetHashCode() {
+            return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name);
         }
     }
 }

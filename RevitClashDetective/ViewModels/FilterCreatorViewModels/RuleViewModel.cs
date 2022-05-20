@@ -21,10 +21,10 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private readonly RevitRepository _revitRepository;
         private CategoriesInfoViewModel _categoriesInfo;
         private ParameterViewModel _selectedParameter;
-        private ParamValue _selectedValue;
+        private ParamValueViewModel _selectedValue;
         private ObservableCollection<RuleEvaluatorViewModel> _ruleEvaluators;
         private RuleEvaluatorViewModel _selectedRuleEvaluator;
-        private ObservableCollection<ParamValue> _values;
+        private ObservableCollection<ParamValueViewModel> _values;
         private string _stringValue;
         private bool _isValueEditable;
 
@@ -64,12 +64,12 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             set => this.RaiseAndSetIfChanged(ref _ruleEvaluators, value);
         }
 
-        public ObservableCollection<ParamValue> Values {
+        public ObservableCollection<ParamValueViewModel> Values {
             get => _values;
             set => this.RaiseAndSetIfChanged(ref _values, value);
         }
 
-        public ParamValue SelectedValue {
+        public ParamValueViewModel SelectedValue {
             get => _selectedValue;
             set => this.RaiseAndSetIfChanged(ref _selectedValue, value);
         }
@@ -91,30 +91,27 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                         .Select(item => new RuleEvaluatorViewModel(item)));
 
                 SelectedRuleEvaluator = RuleEvaluators.FirstOrDefault();
-                if(SelectedRuleEvaluator != null) {
-                    EvaluatorSelectionChanged(null);
-                }
             }
         }
 
         private void EvaluatorSelectionChanged(object p) {
             if(SelectedParameter != null && SelectedRuleEvaluator != null) {
-                Values = new ObservableCollection<ParamValue>(
-                    SelectedParameter.GetValues(
+                Values = new ObservableCollection<ParamValueViewModel>(
+                     SelectedParameter.GetValues(
                         CategoriesInfo.Categories
                             .Select(item => item.Category), SelectedRuleEvaluator.RuleEvaluator));
                
                 IsValueEditable = CanValueEdit();
             } else {
-                Values = new ObservableCollection<ParamValue>();
+                Values = new ObservableCollection<ParamValueViewModel>();
             }
         }
 
-        public ICriterion GetCriterion() {
+        public Criterion GetCriterion() {
             return new Rule() {
                 Evaluator = SelectedRuleEvaluator.RuleEvaluator,
                 Provider = SelectedParameter.FilterableValueProvider,
-                Value = SelectedValue
+                Value = SelectedValue.ParamValue
             };
         }
 

@@ -93,11 +93,16 @@
                     </i:Interaction.Triggers>
                 </ComboBox>
                 <Grid DockPanel.Dock="Right" Margin="3">
-                    <ComboBox ItemsSource="{Binding Values}" SelectedItem="{Binding SelectedValue, UpdateSourceTrigger=PropertyChanged}" 
-                          DisplayMemberPath="StringValue" Text="{Binding StringValue}">
+                    <ComboBox SelectedItem="{Binding SelectedValue, UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding Values}"
+                          DisplayMemberPath="DisplayValue" Text="{Binding StringValue}" DropDownOpened="ComboBox_DropDownOpened" KeyDown="ComboBox_KeyDown" >
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling" />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
                         <ComboBox.ItemTemplate>
-                            <DataTemplate DataType="{x:Type model:ParamValue}">
-                                <TextBlock Text="{Binding StringValue}"/>
+                            <DataTemplate DataType="{x:Type model:ParamValueViewModel}">
+                                <TextBlock Text="{Binding ParamValue.DisplayValue}"/>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                         <ComboBox.Style>
@@ -132,7 +137,7 @@
                 <DockPanel Grid.Row="0" HorizontalAlignment="Stretch">
                     <Button Margin="3" DockPanel.Dock="Right" Command="{Binding AddRuleCommand}">Добавить правило</Button>
                     <Button Margin="3" DockPanel.Dock="Right" Command="{Binding AddSetCommand}">Добавить набор</Button>
-                    <ComboBox Margin="3" DockPanel.Dock="Left" ItemsSource="{Binding Evaluators, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedEvaluator, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch">
+                    <ComboBox Margin="3" DockPanel.Dock="Left" ItemsSource="{Binding Evaluators}" SelectedItem="{Binding SelectedEvaluator}" HorizontalAlignment="Stretch">
                         <ComboBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type vm:EvaluatorViewModel}">
                                 <TextBlock Text="{Binding SetEvaluator.Message, Mode=OneWay}"/>

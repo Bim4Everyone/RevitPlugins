@@ -38,7 +38,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             return FilterableValueProvider.GetRuleEvaluators();
         }
 
-        public IEnumerable<ParamValue> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator) {
+        public IEnumerable<ParamValueViewModel> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator) {
             return FilterableValueProvider.GetValues(categories, ruleEvaluator);
         }
     }

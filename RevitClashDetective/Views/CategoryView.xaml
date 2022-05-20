@@ -28,13 +28,10 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
-                <CheckBox x:Name="_cbCategories" VerticalAlignment="Center" IsEnabled="{Binding CanSelectCategories}" IsChecked="{Binding IsAllCategoriesSelected, Mode=OneWay}">
+                <CheckBox x:Name="_cbCategories" VerticalAlignment="Center"  IsEnabled="{Binding CanSelectCategories}" IsChecked="{Binding IsAllCategoriesSelected, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                     <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Checked">
-                            <i:InvokeCommandAction Command="{Binding CheckCategoryCommand}" CommandParameter="{StaticResource True}"/>
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="Unchecked">
-                            <i:InvokeCommandAction Command="{Binding CheckCategoryCommand}" CommandParameter="{StaticResource False}"/>
+                        <i:EventTrigger EventName="Click">
+                            <i:InvokeCommandAction Command="{Binding CheckCategoryCommand}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <CheckBox.Style>
@@ -51,7 +48,7 @@
                     </CheckBox.Style>
                 </CheckBox>
             </StackPanel>
-            <ListBox x:Name="lbCat" Grid.Row="1" ItemsSource="{Binding CategoriesViewSource.View}" SelectionMode="Extended">
+            <ListBox x:Name="lbCat" Grid.Row="1" ItemsSource="{Binding CategoriesViewSource.View, UpdateSourceTrigger=PropertyChanged}" SelectionMode="Extended">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:CategoryViewModel}">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" >

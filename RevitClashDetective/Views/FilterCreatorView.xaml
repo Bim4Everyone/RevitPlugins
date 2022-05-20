@@ -53,11 +53,13 @@
         </GroupBox>
         <GridSplitter Grid.Column="1" Grid.Row="1" ShowsPreview="False" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="2" ></GridSplitter>
         <GroupBox Grid.Column="2" Grid.Row="1" Header="Категории" MinWidth="200" Margin="5 0">
-            <local:CategoryView DataContext="{Binding SelectedFilter, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <ContentControl DataContext="{Binding SelectedFilter}" DataContextChanged="CategoryControl_DataContextChanged">
+
+            </ContentControl>
         </GroupBox>
         <GridSplitter Grid.Column="3" Grid.Row="1" ShowsPreview="False" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="2" ></GridSplitter>
         <GroupBox Grid.Column="4" Grid.Row="1" Header="Критерии фильтрации" HorizontalAlignment="Stretch" Margin="5 0" VerticalContentAlignment="Top">
-            <local:CriterionView Height="Auto" Margin="5" DataContext="{Binding SelectedFilter.Set, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+            <ContentControl DataContext="{Binding SelectedFilter.Set}" DataContextChanged="CriterionControl_DataContextChanged"/>
         </GroupBox>
         <StackPanel Grid.Column="6" Grid.ColumnSpan="5" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock VerticalAlignment="Center" Margin="5" Foreground="Orange" Text="{Binding ErrorText}"/>
