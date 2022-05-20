@@ -11,7 +11,7 @@ using dosymep.WPF.ViewModels;
 using RevitClashDetective.Models;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
-    internal class CategoryViewModel : BaseViewModel {
+    internal class CategoryViewModel : BaseViewModel, IEquatable<CategoryViewModel> {
         private string _name;
         private bool _isSelected;
 
@@ -31,5 +31,17 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         public Category Category { get; }
+
+        public override bool Equals(object obj) {
+            return Equals(obj as CategoryViewModel);
+        }
+
+        public bool Equals(CategoryViewModel other) {
+            return other != null && Name == other.Name;
+        }
+
+        public override int GetHashCode() {
+            return  539060726 + EqualityComparer<string>.Default.GetHashCode(Name);
+        }
     }
 }

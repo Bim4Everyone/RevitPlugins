@@ -83,6 +83,10 @@ namespace RevitClashDetective.Models {
                 .ToList();
         }
 
+        public Category GetCategory(BuiltInCategory builtInCategory) {
+            return Category.GetCategory(_document, builtInCategory);
+        }
+
         public List<ElementId> GetParameters(IEnumerable<Category> categories) {
             return ParameterFilterUtilities
                 .GetFilterableParametersInCommon(_document,

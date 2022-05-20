@@ -19,6 +19,11 @@ namespace RevitClashDetective.Models {
         public ParamValueViewModel(RevitParam revitParam, Element element) {
             ParamValue = GetParamValue(revitParam, element);
         }
+
+        public ParamValueViewModel(ParamValue paramValue) {
+            ParamValue = paramValue;
+        }
+
         public object Value => ParamValue.Value;
         public string DisplayValue => ParamValue.DisplayValue;
         public ParamValue ParamValue { get; set; }

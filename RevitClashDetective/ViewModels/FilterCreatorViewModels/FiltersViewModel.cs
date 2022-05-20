@@ -19,18 +19,23 @@ using RevitClashDetective.Views;
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
     internal class FiltersViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly FiltersConfig _config;
         private ObservableCollection<FilterViewModel> _filters;
         private FilterViewModel _selectedFilter;
         private string _errorText;
 
-        public FiltersViewModel(RevitRepository revitRepository) {
+        public FiltersViewModel(RevitRepository revitRepository, FiltersConfig config) {
             _revitRepository = revitRepository;
-
+            _config = config;
             CreateCommand = new RelayCommand(Create);
             DeleteCommand = new RelayCommand(Delete, CanDelete);
             RenameCommand = new RelayCommand(Rename, CanRename);
             SaveCommand = new RelayCommand(Save, CanSave);
+
+
             Filters = new ObservableCollection<FilterViewModel>();
+
+            InitializeFilters();
         }
 
         public string ErrorText {
@@ -56,6 +61,13 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         public IEnumerable<Filter> GetFilters() {
             return Filters.Select(item => item.GetFilter());
+        }
+
+        private void InitializeFilters() {
+            foreach(var filter in _config.Filters) {
+                filter.Set.SetRevitRepository(_revitRepository);
+                Filters.Add(new FilterViewModel(_revitRepository, filter));
+            }
         }
 
         private void Create(object p) {

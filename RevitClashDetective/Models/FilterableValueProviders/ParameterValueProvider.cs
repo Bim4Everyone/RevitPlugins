@@ -18,7 +18,7 @@ using RevitClashDetective.Models.FilterGenerators;
 using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.FilterableValueProviders {
-    internal class ParameterValueProvider : IFilterableValueProvider {
+    internal class ParameterValueProvider : IFilterableValueProvider, IEquatable<ParameterValueProvider> {
 
         public RevitParam RevitParam { get; set; }
 
@@ -79,6 +79,22 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
                 id = RevitParam.GetRevitParamElement(RevitRepository.Doc).Id;
             }
             return creator.Create(RevitParam.StorageType, id, value);
+        }
+
+        public override bool Equals(object obj) {
+            return Equals(obj as ParameterValueProvider);
+        }
+
+        public override int GetHashCode() {
+            int hashCode = 208823010;
+            hashCode = hashCode * -1521134295 + EqualityComparer<RevitParam>.Default.GetHashCode(RevitParam);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+            return hashCode;
+        }
+
+        public bool Equals(ParameterValueProvider other) {
+            return RevitParam?.StorageType == other?.RevitParam?.StorageType
+                && Name == other?.Name;
         }
     }
 }

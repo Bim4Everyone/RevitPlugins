@@ -8,6 +8,7 @@ using System.Windows;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
@@ -15,7 +16,7 @@ using RevitClashDetective.Models.Evaluators;
 using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
-    internal class ParameterViewModel : BaseViewModel {
+    internal class ParameterViewModel : BaseViewModel, IEquatable<ParameterViewModel> {
         private IFilterableValueProvider _filterableValueProvider;
         private string _name;
 
@@ -40,6 +41,22 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         public IEnumerable<ParamValueViewModel> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator) {
             return FilterableValueProvider.GetValues(categories, ruleEvaluator);
+        }
+
+        public override bool Equals(object obj) {
+            return Equals(obj as ParameterViewModel);
+        }
+
+        public override int GetHashCode() {
+            int hashCode = -613960101;
+            hashCode = hashCode * -1521134295 + EqualityComparer<IFilterableValueProvider>.Default.GetHashCode(FilterableValueProvider);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+            return hashCode;
+        }
+
+        public bool Equals(ParameterViewModel other) {
+            return other != null && EqualityComparer<IFilterableValueProvider>.Default.Equals(FilterableValueProvider, other.FilterableValueProvider) &&
+                   Name == other.Name;
         }
     }
 }

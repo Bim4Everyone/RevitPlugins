@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -38,6 +40,17 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             FilterTextChangedCommand = new RelayCommand(FilterTextChanged);
             SelectedCategoriesChangedCommand =
                 new RelayCommand(SelectedCategoriesChanged, p => !_isMassSelectionChanged);
+        }
+
+        public FilterViewModel(RevitRepository revitRepository, Filter filter) {
+            _revitRepository = revitRepository;
+
+            InitializeCategories(filter.CategoryIds);
+            InitializeSet(filter.Set);
+            Name = filter.Name;
+            SelectedCategories = new ObservableCollection<CategoryViewModel>(filter.CategoryIds
+                .Select(id => new CategoryViewModel(_revitRepository.GetCategory((BuiltInCategory) id))));
+
         }
 
         public string Name {
@@ -85,11 +98,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedCategories, value);
         }
 
-        private void InitializeSet() {
-            Set = new SetViewModel(_revitRepository, _categoriesInfoViewModel);
+        private void InitializeSet(Set set = null) {
+            Set = new SetViewModel(_revitRepository, _categoriesInfoViewModel, set);
         }
 
-        private void InitializeCategories() {
+        private void InitializeCategories(IEnumerable<int> ids = null) {
             Categories = new ObservableCollection<CategoryViewModel>(
                 _revitRepository.GetCategories()
                     .Select(item => new CategoryViewModel(item))
@@ -98,6 +111,12 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             CategoriesViewSource = new CollectionViewSource() { Source = Categories };
             CategoriesViewSource.Filter += CategoryNameFilter;
             CategoriesViewSource?.View?.Refresh();
+
+            if(ids != null) {
+                foreach(var category in Categories) {
+                    category.IsSelected = ids.Any(item => item==category.Category.Id.IntegerValue);
+                }
+            }
 
             SelectedCategories = new ObservableCollection<CategoryViewModel>(
                 Categories.Where(item => item.IsSelected));
