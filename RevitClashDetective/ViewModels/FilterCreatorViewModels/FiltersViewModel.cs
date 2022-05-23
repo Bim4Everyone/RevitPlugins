@@ -64,7 +64,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void InitializeFilters() {
-            foreach(var filter in _config.Filters) {
+            foreach(var filter in _config.Filters.OrderBy(item => item.Name)) {
                 filter.Set.SetRevitRepository(_revitRepository);
                 Filters.Add(new FilterViewModel(_revitRepository, filter));
             }
@@ -121,12 +121,12 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             }
 
             if(SelectedFilter != null) {
-                ErrorText = Filters.FirstOrDefault(item=>item.Set.GetErrorText()!=null)?.Set?.GetErrorText();
+                ErrorText = Filters.FirstOrDefault(item => item.Set.GetErrorText() != null)?.Set?.GetErrorText();
                 if(!string.IsNullOrEmpty(ErrorText)) {
                     return false;
                 }
             }
-            
+
             return true;
         }
     }

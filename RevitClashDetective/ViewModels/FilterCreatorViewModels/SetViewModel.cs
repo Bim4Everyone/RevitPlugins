@@ -29,7 +29,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             CategoryInfo = categoriesInfo;
 
             AddRuleCommand = new RelayCommand(AddRule);
-            RemoveRuleCommand = new RelayCommand(RemoveRule, CanRemoveRule);
+            RemoveRuleCommand = new RelayCommand(RemoveRule);
 
             AddSetCommand = new RelayCommand(AddSet);
             RemoveSetCommand = new RelayCommand(RemoveSet);
@@ -98,10 +98,6 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         private void RemoveRule(object p) {
             Criterions.Remove(p as RuleViewModel);
-        }
-
-        private bool CanRemoveRule(object p) {
-            return Criterions.OfType<RuleViewModel>().Count() > 1;
         }
 
         public void Renew() {
