@@ -120,5 +120,9 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public bool IsEmpty() {
             return Criterions.Any(item => item.IsEmpty());
         }
+
+        public string GetErrorText() {
+            return Criterions.FirstOrDefault(item => item.GetErrorText() != null)?.GetErrorText();
+        }
     }
 }

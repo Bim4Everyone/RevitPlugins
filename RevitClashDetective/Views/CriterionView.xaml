@@ -94,7 +94,7 @@
                 </ComboBox>
                 <Grid DockPanel.Dock="Right" Margin="3">
                     <ComboBox SelectedItem="{Binding SelectedValue, UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding Values}"
-                          DisplayMemberPath="DisplayValue" Text="{Binding StringValue}" DropDownOpened="ComboBox_DropDownOpened" KeyDown="ComboBox_KeyDown" >
+                          DisplayMemberPath="DisplayValue" Text="{Binding StringValue}" DropDownOpened="ComboBox_DropDownOpened" KeyDown="ComboBox_KeyDown">
                         <ComboBox.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <VirtualizingStackPanel IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling" />

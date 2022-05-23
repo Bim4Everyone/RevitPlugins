@@ -14,6 +14,7 @@ using RevitClashDetective.Models.Evaluators;
 using RevitClashDetective.Models.FilterableValueProviders;
 using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.Models.Interfaces;
+using RevitClashDetective.Models.Value;
 using RevitClashDetective.ViewModels.FilterCreatorViewModels.Interfaces;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
@@ -27,6 +28,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private ObservableCollection<ParamValueViewModel> _values;
         private string _stringValue;
         private bool _isValueEditable;
+        private bool isStringValueWrong;
 
         public RuleViewModel(RevitRepository revitRepository, CategoriesInfoViewModel categoriesInfo, Rule rule = null) {
             _revitRepository = revitRepository;
@@ -90,10 +92,17 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         private void InitializeRule(Rule rule) {
             SelectedParameter = new ParameterViewModel(rule.Provider);
+            if(!_categoriesInfo.Parameters.Contains(SelectedParameter)) {
+                _categoriesInfo.Parameters.Add(SelectedParameter);
+            }
             ParameterSelectionChanged(null);
             SelectedRuleEvaluator = new RuleEvaluatorViewModel(rule.Evaluator);
             EvaluatorSelectionChanged(null);
             SelectedValue = new ParamValueViewModel(rule.Value);
+            if(!Values.Contains(SelectedValue)) {
+                SelectedValue = null;
+                StringValue = rule.Value.DisplayValue;
+            }
         }
 
         private void ParameterSelectionChanged(object p) {
@@ -112,7 +121,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                      SelectedParameter.GetValues(
                         CategoriesInfo.Categories
                             .Select(item => item.Category), SelectedRuleEvaluator.RuleEvaluator));
-
+                StringValue = null;
                 IsValueEditable = CanValueEdit();
             } else {
                 Values = new ObservableCollection<ParamValueViewModel>();
@@ -123,7 +132,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             return new Rule() {
                 Evaluator = SelectedRuleEvaluator.RuleEvaluator,
                 Provider = SelectedParameter.FilterableValueProvider,
-                Value = SelectedValue.ParamValue
+                Value = SelectedValue?.ParamValue ?? SelectedParameter.FilterableValueProvider.GetParamValue(StringValue)
             };
         }
 
@@ -147,6 +156,14 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             }
 
             return true;
+        }
+
+        public string GetErrorText() {
+            if(SelectedValue != null) {
+                return null;
+            }
+
+            return SelectedParameter.FilterableValueProvider.GetErrorText(StringValue);
         }
     }
 }

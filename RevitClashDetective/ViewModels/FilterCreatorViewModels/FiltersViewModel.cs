@@ -112,16 +112,6 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             var filtersConfig = FiltersConfig.GetFiltersConfig();
             filtersConfig.Filters = GetFilters().ToList();
             filtersConfig.SaveProjectConfig();
-
-            //foreach(var filter in filters) {
-            //    filter
-
-            //    filter.Save();
-            //    var readFilter = filter.Read();
-            //    readFilter.RevitRepository = _revitRepository;
-            //    readFilter.Set.SetRevitRepository(_revitRepository);
-            //    readFilter.CreateRevitFilter();
-            //}
         }
 
         private bool CanSave(object p) {
@@ -130,7 +120,13 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                 return false;
             }
 
-            ErrorText = string.Empty;
+            if(SelectedFilter != null) {
+                ErrorText = Filters.FirstOrDefault(item=>item.Set.GetErrorText()!=null)?.Set?.GetErrorText();
+                if(!string.IsNullOrEmpty(ErrorText)) {
+                    return false;
+                }
+            }
+            
             return true;
         }
     }

@@ -16,6 +16,7 @@ using pyRevitLabs.Json;
 using RevitClashDetective.Models.Evaluators;
 using RevitClashDetective.Models.FilterGenerators;
 using RevitClashDetective.Models.Interfaces;
+using RevitClashDetective.Models.Value;
 
 namespace RevitClashDetective.Models.FilterableValueProviders {
     internal class ParameterValueProvider : IFilterableValueProvider, IEquatable<ParameterValueProvider> {
@@ -95,6 +96,26 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
         public bool Equals(ParameterValueProvider other) {
             return RevitParam?.StorageType == other?.RevitParam?.StorageType
                 && Name == other?.Name;
+        }
+
+        public string GetErrorText(string value) {
+            switch(RevitParam.StorageType) {
+                default: {
+                    throw new ArgumentOutOfRangeException(nameof(RevitParam.StorageType), $"У параметра {RevitParam.Name} не определен тип данных.");
+                }
+                case StorageType.Integer:
+                return int.TryParse(value, out int intRes) ? null : $"Значение параметра \"{Name}\" должно быть целым числом.";
+                case StorageType.Double:
+                return double.TryParse(value, out double doubleRes) ? null : $"Значение параметра \"{Name}\" должно быть вещественным числом.";
+                case StorageType.String:
+                return null;
+                case StorageType.ElementId:
+                return null;
+            }
+        }
+
+        public ParamValue GetParamValue(string value) {
+            return ParamValue.GetParamValue(RevitParam, value);
         }
     }
 }
