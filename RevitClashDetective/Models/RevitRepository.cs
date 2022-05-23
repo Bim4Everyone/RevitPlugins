@@ -31,15 +31,25 @@ namespace RevitClashDetective.Models {
             return _document.GetElement(id);
         }
 
-        public FilteredElementCollector GetClashCollector() {
-            var view = GetNavisworksView();
+        public Element GetElement(Document doc, ElementId id) {
+            return doc.GetElement(id);
+        }
+
+        private FilteredElementCollector GetCollector(Document doc) {
+            var view = GetNavisworksView(doc);
             if(view != null) {
                 return new FilteredElementCollector(_document, view.Id);
             }
             return new FilteredElementCollector(_document);
         }
 
-        public View GetNavisworksView() {
+        public List<Collector> GetCollectors() {
+            return GetDocuments()
+                .Select(item => new Collector(item))
+                .ToList();
+        }
+
+        public View GetNavisworksView(Document doc) {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(View))
                 .Cast<View>()
@@ -87,13 +97,22 @@ namespace RevitClashDetective.Models {
             return Category.GetCategory(_document, builtInCategory);
         }
 
-        public List<ElementId> GetParameters(IEnumerable<Category> categories) {
+        public List<ElementId> GetParameters(Document doc, IEnumerable<Category> categories) {
             return ParameterFilterUtilities
-                .GetFilterableParametersInCommon(_document,
+                .GetFilterableParametersInCommon(doc,
                     categories.Select(c => c.Id).ToList())
                 .ToList();
+        }
 
-            //TODO: для связанных документов
+        public IEnumerable<Document> GetDocuments() {
+            var linkedDocuments = new FilteredElementCollector(_document)
+                .OfClass(typeof(RevitLinkInstance))
+                .Cast<RevitLinkInstance>()
+                .Select(item => item.GetLinkDocument())
+                .Where(item=>item!=null)
+                .ToList();
+            linkedDocuments.Add(_document);
+            return linkedDocuments;
         }
 
         public void CreateFilter(IEnumerable<ElementId> categories, ElementFilter filter, string name) {

@@ -41,29 +41,29 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
         public IEnumerable<ParamValueViewModel> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator) {
             if(ruleEvaluator.Evaluator != RuleEvaluators.FilterHasNoValue && ruleEvaluator.Evaluator != RuleEvaluators.FilterHasValue) {
                 var categoryFilter = new ElementMulticategoryFilter(categories.Select(item => item.Id).ToList());
-                var collector = RevitRepository.GetClashCollector();
-                if(collector != null) {
-                    return collector
-                        .WherePasses(categoryFilter)
-                        .WhereElementIsNotElementType()
-                        .Select(GetElementParam)
-                        .Where(item => item != null && item.Value != null && item.Value as ElementId != ElementId.InvalidElementId)
-                        .Distinct()
-                        .OrderBy(item => item.ParamValue);
-
-                }
+                return RevitRepository.GetCollectors()
+                    .SelectMany(item => GetValues(item, categoryFilter))
+                    .Distinct()
+                    .OrderBy(item => item.ParamValue);
             }
             return Enumerable.Empty<ParamValueViewModel>();
         }
 
-        private ParamValueViewModel GetElementParam(Element item) {
+        private IEnumerable<ParamValueViewModel> GetValues(Collector collector, ElementMulticategoryFilter categoryFilter) {
+            return collector.RevitCollector.WherePasses(categoryFilter)
+                       .WhereElementIsNotElementType()
+                       .Select(item=>GetElementParam(collector.Document, item))
+                       .Where(item => item != null && item.Value != null && item.Value as ElementId != ElementId.InvalidElementId);
+        }
+
+        private ParamValueViewModel GetElementParam(Document doc, Element item) {
 
             if(item.IsExistsParam(RevitParam)) {
                 return new ParamValueViewModel(RevitParam, item);
             } else {
                 var typeId = item.GetTypeId();
                 if(typeId != null) {
-                    var type = RevitRepository.GetElement(typeId);
+                    var type = RevitRepository.GetElement(doc, typeId);
                     return new ParamValueViewModel(RevitParam, type);
                 }
             }
@@ -73,9 +73,8 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
         public FilterRule GetRule(IRevitRuleCreator creator, object value) {
             ElementId id = null;
             if(RevitParam is SystemParam systemParam) {
-#if D2020 || R2020
                 id = new ElementId(systemParam.SystemParamId);
-#endif
+
             } else {
                 id = RevitParam.GetRevitParamElement(RevitRepository.Doc).Id;
             }
@@ -88,7 +87,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
 
         public override int GetHashCode() {
             int hashCode = 208823010;
-            hashCode = hashCode * -1521134295 + EqualityComparer<RevitParam>.Default.GetHashCode(RevitParam);
+            hashCode = hashCode * -1521134295 + EqualityComparer<StorageType>.Default.GetHashCode(RevitParam.StorageType);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
             return hashCode;
         }

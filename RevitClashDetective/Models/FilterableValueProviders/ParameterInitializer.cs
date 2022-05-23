@@ -19,23 +19,19 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
         public ParameterInitializer(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
         }
-        public RevitParam InitializeParameter(ElementId id) {
+        public RevitParam InitializeParameter(Document doc, ElementId id) {
             if(id.IsSystemId()) {
-#if D2020 || R2020 || D2021 || R2021
                 return SystemParamsConfig.Instance.CreateRevitParam((BuiltInParameter) id.IntegerValue);
-#elif D2022 || R2022 
-                
-#endif
             } else {
-                var element = _revitRepository.GetElement(id);
+                var element = _revitRepository.GetElement(doc, id);
                 if (element is SharedParameterElement sharedParameterElement) {
-                    return SharedParamsConfig.Instance.CreateRevitParam(_revitRepository.Doc, sharedParameterElement.Name);
+                    return SharedParamsConfig.Instance.CreateRevitParam(doc, sharedParameterElement.Name);
                 }
                 if(element is ParameterElement parameterElement) {
-                    return ProjectParamsConfig.Instance.CreateRevitParam(_revitRepository.Doc, parameterElement.Name);
+                    return ProjectParamsConfig.Instance.CreateRevitParam(doc, parameterElement.Name);
                 }
             }
-            throw new ArgumentException(nameof(id), $"Невозможно преобразовать в параметр элемент с id - {id}.");
+            throw new ArgumentException(nameof(id), $"Невозможно преобразовать в параметр элемент с id = {id} в документе \"{doc.Title}\".");
         }
     }
 }

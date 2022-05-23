@@ -50,6 +50,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             Name = filter.Name;
             SelectedCategories = new ObservableCollection<CategoryViewModel>(filter.CategoryIds
                 .Select(id => new CategoryViewModel(_revitRepository.GetCategory((BuiltInCategory) id))));
+            CheckAllCategoriesSelected();
 
         }
 
