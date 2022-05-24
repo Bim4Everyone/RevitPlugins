@@ -17,6 +17,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal" Grid.Row="0">
@@ -48,7 +49,14 @@
                     </CheckBox.Style>
                 </CheckBox>
             </StackPanel>
-            <ListBox x:Name="lbCat" Grid.Row="1" ItemsSource="{Binding CategoriesViewSource.View, UpdateSourceTrigger=PropertyChanged}" SelectionMode="Extended">
+            <CheckBox Grid.Row="1" Margin="5" IsChecked="{Binding ShowOnlySelectedCategories}" Content="Скрыть неотмеченные категории">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <i:InvokeCommandAction Command="{Binding FilterTextChangedCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </CheckBox>
+            <ListBox x:Name="lbCat" Grid.Row="2" ItemsSource="{Binding CategoriesViewSource.View, UpdateSourceTrigger=PropertyChanged}" SelectionMode="Extended">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:CategoryViewModel}">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" >

@@ -14,9 +14,4 @@ namespace RevitClashDetective.Models.FilterCreators.RevitFilterCreators {
             return new LogicalAndFilter(elementFilters);
         }
     }
-    internal class RevitLogicalOrFilterCreator : IRevitLogicalFilterCreator {
-        public ElementLogicalFilter Create(IList<ElementFilter> elementFilters) {
-            return new LogicalOrFilter(elementFilters);
-        }
-    }
 }

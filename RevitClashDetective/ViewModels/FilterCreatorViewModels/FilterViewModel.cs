@@ -28,6 +28,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private ObservableCollection<CategoryViewModel> _selectedCategories;
         private bool _canSelectCategories;
         private bool? _isAllCategoriesSelected;
+        private bool _showOnlySelectedCategories;
 
         public FilterViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
@@ -52,6 +53,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                 .Select(id => new CategoryViewModel(_revitRepository.GetCategory((BuiltInCategory) id))));
             CheckAllCategoriesSelected();
 
+
+            CheckCategoryCommand = new RelayCommand(CheckCategory);
+            FilterTextChangedCommand = new RelayCommand(FilterTextChanged);
+            SelectedCategoriesChangedCommand =
+                new RelayCommand(SelectedCategoriesChanged, p => !_isMassSelectionChanged);
         }
 
         public string Name {
@@ -67,6 +73,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public bool CanSelectCategories {
             get => _canSelectCategories;
             set => this.RaiseAndSetIfChanged(ref _canSelectCategories, value);
+        }
+
+        public bool ShowOnlySelectedCategories { 
+            get => _showOnlySelectedCategories; 
+            set => this.RaiseAndSetIfChanged(ref _showOnlySelectedCategories, value); 
         }
 
         public bool? IsAllCategoriesSelected {
@@ -111,11 +122,12 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
             CategoriesViewSource = new CollectionViewSource() { Source = Categories };
             CategoriesViewSource.Filter += CategoryNameFilter;
+            CategoriesViewSource.Filter += SelectedCategoryFilter;
             CategoriesViewSource?.View?.Refresh();
 
             if(ids != null) {
                 foreach(var category in Categories) {
-                    category.IsSelected = ids.Any(item => item==category.Category.Id.IntegerValue);
+                    category.IsSelected = ids.Any(item => item == category.Category.Id.IntegerValue);
                 }
             }
 
@@ -127,6 +139,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             CanSelectCategories = true;
             IsAllCategoriesSelected = false;
         }
+
+
 
         public Filter GetFilter() {
             return new Filter(_revitRepository) {
@@ -152,6 +166,19 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             CheckAllCategoriesSelected();
         }
 
+        private void CategoryNameFilter(object sender, FilterEventArgs e) {
+            if(!string.IsNullOrEmpty(FilterCategoryName) && e.Item is CategoryViewModel category) {
+                e.Accepted = category.Name.ToLowerInvariant().Contains(FilterCategoryName.ToLowerInvariant());
+            }
+        }
+
+        private void SelectedCategoryFilter(object sender, FilterEventArgs e) {
+            if(e.Item is CategoryViewModel category && ShowOnlySelectedCategories && !category.IsSelected) {
+                e.Accepted = false;
+            }
+        }
+
+
         private void SelectedCategoriesChanged(object p) {
             SelectedCategories = new ObservableCollection<CategoryViewModel>(
                 Categories.Where(item => item.IsSelected));
@@ -159,12 +186,6 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             _categoriesInfoViewModel.InitializeParameters();
             Set.Renew();
             CheckAllCategoriesSelected();
-        }
-
-        private void CategoryNameFilter(object sender, FilterEventArgs e) {
-            if(!string.IsNullOrEmpty(FilterCategoryName) && e.Item is CategoryViewModel category) {
-                e.Accepted = category.Name.ToLowerInvariant().Contains(FilterCategoryName.ToLowerInvariant());
-            }
         }
 
         private void CheckAllCategoriesSelected() {

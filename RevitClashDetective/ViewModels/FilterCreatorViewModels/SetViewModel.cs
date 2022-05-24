@@ -79,7 +79,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             foreach(var set in criterions.OfType<Set>().Select(item => new SetViewModel(_revitRepository, _categoryInfo, item))) {
                 Criterions.Add(set);
             }
-            foreach(var rule in criterions.OfType<Rule>().Select(item=>new RuleViewModel(_revitRepository, _categoryInfo, item))) {
+            foreach(var rule in criterions.OfType<Rule>().Select(item => new RuleViewModel(_revitRepository, _categoryInfo, item))) {
                 Criterions.Add(rule);
             }
         }
@@ -114,7 +114,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         public bool IsEmpty() {
-            return Criterions.Any(item => item.IsEmpty());
+            return Criterions.Any(item => item.IsEmpty()) || _categoryInfo.Categories.Count == 0;
         }
 
         public string GetErrorText() {
