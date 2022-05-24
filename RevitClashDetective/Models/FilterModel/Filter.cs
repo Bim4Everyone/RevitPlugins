@@ -22,13 +22,11 @@ namespace RevitClashDetective.Models.FilterModel {
         public RevitRepository RevitRepository { get; set; }
         public List<int> CategoryIds { get; set; }
 
-        public void CreateRevitFilter() {
+        public ElementFilter GetRevitFilter(Document doc) {
             var generator = new RevitFilterGenerator();
             Set.FilterGenerator = generator;
-            Set.Generate();
-            var elementFilter = generator.Generate();
-            var ids = CategoryIds.Select(item => new ElementId(item));
-            RevitRepository.CreateFilter(ids, elementFilter, Name);
+            Set.Generate(doc);
+            return generator.Generate();
         }
     }
 }

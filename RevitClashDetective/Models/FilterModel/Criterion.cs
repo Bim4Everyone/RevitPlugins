@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Autodesk.Revit.DB;
+
 using pyRevitLabs.Json;
 
 using RevitClashDetective.Models.Interfaces;
@@ -14,7 +16,7 @@ namespace RevitClashDetective.Models.FilterModel {
             RevitRepository = revitRepository;
         }
 
-        public virtual IFilterGenerator Generate() {
+        public virtual IFilterGenerator Generate(Document doc) {
             throw new NotImplementedException();
         }
     }

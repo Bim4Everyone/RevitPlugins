@@ -13,14 +13,17 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.FilterModel;
 
 namespace RevitClashDetective.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private string _errorText;
+        private readonly FiltersConfig _filtersConfig;
         private readonly RevitRepository _revitRepository;
         private ObservableCollection<CheckViewModel> _checks;
 
-        public MainViewModel(RevitRepository revitRepository) {
+        public MainViewModel(FiltersConfig filtersConfig, RevitRepository revitRepository) {
+            _filtersConfig = filtersConfig;
             _revitRepository = revitRepository;
             InitializeEmptyCheck();
             AddCheckCommand = new RelayCommand(AddCheck);
@@ -44,12 +47,12 @@ namespace RevitClashDetective.ViewModels {
 
         private void InitializeEmptyCheck() {
             Checks = new ObservableCollection<CheckViewModel>() {
-                new CheckViewModel(_revitRepository)
+                new CheckViewModel(_revitRepository, _filtersConfig)
             };
         }
 
         private void AddCheck(object p) {
-            Checks.Add(new CheckViewModel(_revitRepository));
+            Checks.Add(new CheckViewModel(_revitRepository, _filtersConfig));
         }
 
         private void RemoveCheck(object p) {

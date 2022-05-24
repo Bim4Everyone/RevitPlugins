@@ -9,6 +9,7 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.FilterModel;
 
 namespace RevitClashDetective.ViewModels {
     internal class ProvidersViewModel : BaseViewModel {
@@ -16,13 +17,13 @@ namespace RevitClashDetective.ViewModels {
         private bool _isSelected;
         private string _name;
 
-        public ProvidersViewModel(RevitRepository revitRepository, List<RevitLinkInstance> links, ParameterFilterElement filter) {
+        public ProvidersViewModel(RevitRepository revitRepository, List<RevitLinkInstance> links, Filter filter) {
             _revitRepository = revitRepository;
             Name = filter.Name;
             InitializeProviders(filter, links);
         }
 
-        public ProvidersViewModel(RevitRepository revitRepository, ParameterFilterElement filter) {
+        public ProvidersViewModel(RevitRepository revitRepository, Filter filter) {
             _revitRepository = revitRepository;
             Name = filter.Name;
             Providers = new List<IProvider>();
@@ -41,7 +42,7 @@ namespace RevitClashDetective.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _name, value);
         }
 
-        private void InitializeProviders(ParameterFilterElement filter, List<RevitLinkInstance> links) {
+        private void InitializeProviders(Filter filter, List<RevitLinkInstance> links) {
             Providers = new List<IProvider>();
             foreach(var link in links) {
                 Providers.Add(new FilterProvider(link.GetLinkDocument(), filter, link.GetTransform()));

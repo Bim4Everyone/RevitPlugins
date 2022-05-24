@@ -20,6 +20,6 @@ namespace RevitClashDetective.Models.Interfaces {
         ParamValue GetParamValue(string value);
         IEnumerable<RuleEvaluator> GetRuleEvaluators();
         IEnumerable<ParamValueViewModel> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator);
-        FilterRule GetRule(IRevitRuleCreator creator, object value);
+        FilterRule GetRule(Document doc, IRevitRuleCreator creator, object value);
     }
 }

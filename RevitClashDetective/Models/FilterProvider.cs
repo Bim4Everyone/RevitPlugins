@@ -5,26 +5,28 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using RevitClashDetective.Models.FilterModel;
+
 namespace RevitClashDetective.Models {
     internal class FilterProvider : IProvider {
 
         private readonly Document _doc;
-        private readonly ParameterFilterElement _filterElement;
+        private readonly Filter _filter;
         private Transform _transform;
 
-        public FilterProvider(Document doc, ParameterFilterElement filterElement, Transform transform) {
+        public FilterProvider(Document doc, Filter filterElement, Transform transform) {
             _doc = doc;
-            _filterElement = filterElement;
+            _filter = filterElement;
             _transform = transform;
         }
 
 
         public List<Element> GetElements() {
-            var categories = _filterElement.GetCategories();
+            var categories = _filter.CategoryIds.Select(item => (BuiltInCategory)item).ToList();
 
             return new FilteredElementCollector(_doc)
                 .WherePasses(new ElementMulticategoryFilter(categories))
-                .WherePasses(_filterElement.GetElementFilter())
+                .WherePasses(_filter.GetRevitFilter(_doc))
                 .WhereElementIsNotElementType()
                 .Where(item => item.get_Geometry(new Options()) != null)
                 .ToList();

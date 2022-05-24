@@ -16,19 +16,19 @@ namespace RevitClashDetective.Models.FilterGenerators {
 
         public ElementFilter Filter { get; private set; }
 
-        public IFilterGenerator SetRuleFilter(Rule rule) {
+        public IFilterGenerator SetRuleFilter(Document doc, Rule rule) {
             var ruleCreator = RuleEvaluatorUtils.GetRevitRuleCreator(rule.Evaluator.Evaluator);
-            var revitRule = rule.Provider.GetRule(ruleCreator, rule.Value.Value);
+            var revitRule = rule.Provider.GetRule(doc, ruleCreator, rule.Value.Value);
             Filter = new ElementParameterFilter(revitRule, false);
             return this;
         }
 
-        public IFilterGenerator SetSetFilter(Set set) {
+        public IFilterGenerator SetSetFilter(Document doc, Set set) {
             var filters = new List<ElementFilter>();
             foreach(var criterion in set.Criteria) {
                 var revitFilterGenerator = new RevitFilterGenerator();
                 criterion.FilterGenerator = revitFilterGenerator;
-                criterion.Generate();
+                criterion.Generate(doc);
                 filters.Add(revitFilterGenerator.Generate());
             }
             var creator = SetEvaluatorUtils.GetRevitLogicalFilterCreator(set.SetEvaluator.Evaluator);

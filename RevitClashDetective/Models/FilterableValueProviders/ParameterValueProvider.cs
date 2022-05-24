@@ -70,13 +70,13 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
             return null;
         }
 
-        public FilterRule GetRule(IRevitRuleCreator creator, object value) {
+        public FilterRule GetRule(Document doc, IRevitRuleCreator creator, object value) {
             ElementId id = null;
             if(RevitParam is SystemParam systemParam) {
                 id = new ElementId(systemParam.SystemParamId);
 
             } else {
-                id = RevitParam.GetRevitParamElement(RevitRepository.Doc).Id;
+                id = RevitParam.GetRevitParamElement(doc).Id;
             }
             return creator.Create(RevitParam.StorageType, id, value);
         }

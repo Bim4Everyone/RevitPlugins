@@ -12,18 +12,21 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.FilterModel;
 
 namespace RevitClashDetective.ViewModels {
     internal class CheckViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly FiltersConfig _filtersConfig;
         private string _name;
         private ObservableCollection<ProvidersViewModel> _providers;
         private ObservableCollection<ProvidersViewModel> _otherDocumentProviders;
         private string _selectedMainDocProviders;
         private string _selectedOtherDocProviders;
 
-        public CheckViewModel(RevitRepository revitRepository) {
+        public CheckViewModel(RevitRepository revitRepository, FiltersConfig filtersConfig) {
             _revitRepository = revitRepository;
+            _filtersConfig = filtersConfig;
             Name = "Без имени";
             MainDocumentProviders = new ObservableCollection<ProvidersViewModel>();
             OtherDocumentProviders = new ObservableCollection<ProvidersViewModel>();
@@ -74,7 +77,7 @@ namespace RevitClashDetective.ViewModels {
         }
 
         private void InitializeFilterProviders() {
-            var filters = _revitRepository.GetFilters();
+            var filters = _filtersConfig.Filters;
             var links = _revitRepository.GetRevitLinkInstances();
             foreach(var filter in filters) {
                 var mainProvider = new ProvidersViewModel(_revitRepository, filter);

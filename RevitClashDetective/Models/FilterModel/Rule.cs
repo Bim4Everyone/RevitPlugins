@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB;
+
 using pyRevitLabs.Json;
 
 using RevitClashDetective.Models.Evaluators;
@@ -16,8 +18,8 @@ namespace RevitClashDetective.Models.FilterModel {
         public ParamValue Value { get; set; }
         public IFilterableValueProvider Provider { get; set; }
 
-        public override IFilterGenerator Generate() {
-            return FilterGenerator.SetRuleFilter(this);
+        public override IFilterGenerator Generate(Document doc) {
+            return FilterGenerator.SetRuleFilter(doc, this);
         }
 
         public override void SetRevitRepository(RevitRepository revitRepository) {

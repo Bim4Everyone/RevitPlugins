@@ -11,6 +11,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.ViewModels;
 using RevitClashDetective.Views;
 
@@ -20,7 +21,8 @@ namespace RevitClashDetective {
     public class DetectiveClashesCommand : BasePluginCommand {
         protected override void Execute(UIApplication uiApplication) {
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            var mainViewModlel = new MainViewModel(revitRepository);
+            var config = FiltersConfig.GetFiltersConfig();
+            var mainViewModlel = new MainViewModel(config, revitRepository);
             var window = new MainWindow() { DataContext = mainViewModlel };
             var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
             window.ShowDialog();
