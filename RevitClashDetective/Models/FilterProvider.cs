@@ -24,12 +24,13 @@ namespace RevitClashDetective.Models {
         public List<Element> GetElements() {
             var categories = _filter.CategoryIds.Select(item => (BuiltInCategory)item).ToList();
 
-            return new FilteredElementCollector(_doc)
+            var elements = new FilteredElementCollector(_doc)
                 .WherePasses(new ElementMulticategoryFilter(categories))
                 .WherePasses(_filter.GetRevitFilter(_doc))
                 .WhereElementIsNotElementType()
                 .Where(item => item.get_Geometry(new Options()) != null)
                 .ToList();
+            return elements;
         }
 
         public List<Solid> GetSolids(Element element) {

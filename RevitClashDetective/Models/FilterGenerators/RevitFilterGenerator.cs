@@ -32,7 +32,10 @@ namespace RevitClashDetective.Models.FilterGenerators {
                 filters.Add(revitFilterGenerator.Generate());
             }
             var creator = SetEvaluatorUtils.GetRevitLogicalFilterCreator(set.SetEvaluator.Evaluator);
-            Filter = creator.Create(filters);
+            if(filters.Count > 0) {
+                Filter = creator.Create(filters);
+            } else
+                Filter = new ElementIsElementTypeFilter(true);
             return this;
         }
 
