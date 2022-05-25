@@ -70,6 +70,7 @@ namespace RevitClashDetective.Models {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(RevitLinkInstance))
                 .Cast<RevitLinkInstance>()
+                .Where(item=>item.GetLinkDocument()!=null)
                 .ToList();
         }
 

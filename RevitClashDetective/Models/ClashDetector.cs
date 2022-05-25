@@ -18,6 +18,8 @@ namespace RevitClashDetective.Models {
 
         public IEnumerable<ClashModel> FindClashes(Document doc) {
             var mainElements = mainDocProviders.SelectMany(item => item.GetElements()).ToList();
+            if(mainElements.Count == 0)
+                yield break;
             foreach(var provider in otherProviders) {
                 foreach(var element in provider.GetElements()) {
                     var solids = provider.GetSolids(element);
