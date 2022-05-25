@@ -7,9 +7,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitClashDetective.Views"
         xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.Navigator"
+        xmlns:converter="clr-namespace:dosymep.WPF.Converters"
         mc:Ignorable="d"
         Title="Навигатор" Height="450" Width="800"
         d:DataContext="{d:DesignInstance vm:ClashesViewModel, IsDesignTimeCreatable=False}">
+    <base:PlatformWindow.Resources>
+        <converter:IndexConverter x:Key="IndexConverter"/>
+    </base:PlatformWindow.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -53,7 +57,7 @@
                 <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Arrows/Prev_32x32.png"/>
             </Button>
             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <TextBlock FontSize="14" VerticalAlignment="Center" Text="{Binding ClashesViewSource.View.CurrentPosition, StringFormat={}{0}/}" ></TextBlock>
+                <TextBlock FontSize="14" VerticalAlignment="Center" Text="{Binding ClashesViewSource.View.CurrentPosition, Converter={StaticResource IndexConverter}, StringFormat={}{0}/}" ></TextBlock>
                 <TextBlock FontSize="14" VerticalAlignment="Center" Text="{Binding ClashesViewSource.View.SourceCollection.Count}"></TextBlock>
             </StackPanel>
             <Button Grid.Column="2" HorizontalAlignment="Left" FontSize="20" Width="70"  BorderBrush="Transparent" Background="Transparent" Command="{Binding SelectNextCommand}">
