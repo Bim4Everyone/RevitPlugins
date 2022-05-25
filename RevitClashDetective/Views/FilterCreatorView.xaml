@@ -48,6 +48,11 @@
                             <TextBlock Text="{Binding Name}"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding SelectedFilterChangedCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                 </ListBox>
             </Grid>
         </GroupBox>

@@ -18,6 +18,7 @@ using RevitClashDetective.Models.FilterModel;
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
     internal class FilterViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly Filter _filter;
         private bool _isMassSelectionChanged;
         private string _name;
         private string _filterCategoryName;
@@ -45,20 +46,22 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         public FilterViewModel(RevitRepository revitRepository, Filter filter) {
             _revitRepository = revitRepository;
+            _filter = filter;
+            Name = _filter.Name;
 
-            InitializeCategories(filter.CategoryIds);
-            InitializeSet(filter.Set);
-            Name = filter.Name;
-            SelectedCategories = new ObservableCollection<CategoryViewModel>(filter.CategoryIds
+            InitializeCategories(_filter.CategoryIds);
+            InitializeSet(_filter.Set);
+
+            SelectedCategories = new ObservableCollection<CategoryViewModel>(_filter.CategoryIds
                 .Select(id => new CategoryViewModel(_revitRepository.GetCategory((BuiltInCategory) id))));
             CheckAllCategoriesSelected();
-
 
             CheckCategoryCommand = new RelayCommand(CheckCategory);
             FilterTextChangedCommand = new RelayCommand(FilterTextChanged);
             SelectedCategoriesChangedCommand =
                 new RelayCommand(SelectedCategoriesChanged, p => !_isMassSelectionChanged);
         }
+
 
         public string Name {
             get => _name;
@@ -85,6 +88,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             set => this.RaiseAndSetIfChanged(ref _isAllCategoriesSelected, value);
         }
 
+        public bool IsInitialized { get; set; }
+
         public ICommand CheckCategoryCommand { get; }
         public ICommand FilterTextChangedCommand { get; }
         public ICommand SelectedCategoriesChangedCommand { get; }
@@ -108,6 +113,13 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public ObservableCollection<CategoryViewModel> SelectedCategories {
             get => _selectedCategories;
             set => this.RaiseAndSetIfChanged(ref _selectedCategories, value);
+        }
+
+        public void InitializeFilter() {
+            if(_filter == null || IsInitialized)
+                return;
+            Set.Initialize();
+            IsInitialized = true;
         }
 
         private void InitializeSet(Set set = null) {

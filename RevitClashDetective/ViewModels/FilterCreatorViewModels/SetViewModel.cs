@@ -120,5 +120,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public string GetErrorText() {
             return Criterions.FirstOrDefault(item => item.GetErrorText() != null)?.GetErrorText();
         }
+
+        public void Initialize() {
+            foreach(var criterion in Criterions) {
+                criterion.Initialize();
+            }
+        }
     }
 }

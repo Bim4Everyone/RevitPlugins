@@ -20,6 +20,7 @@ using RevitClashDetective.ViewModels.FilterCreatorViewModels.Interfaces;
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
     internal class RuleViewModel : BaseViewModel, IСriterionViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly Rule _rule;
         private CategoriesInfoViewModel _categoriesInfo;
         private ParameterViewModel _selectedParameter;
         private ParamValueViewModel _selectedValue;
@@ -33,12 +34,12 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public RuleViewModel(RevitRepository revitRepository, CategoriesInfoViewModel categoriesInfo, Rule rule = null) {
             _revitRepository = revitRepository;
             CategoriesInfo = categoriesInfo;
-
+            _rule = rule;
             ParameterSelectionChangedCommand = new RelayCommand(ParameterSelectionChanged);
             EvaluatorSelectionChangedCommand = new RelayCommand(EvaluatorSelectionChanged);
 
-            if(rule != null) {
-                InitializeRule(rule);
+            if(_rule != null) {
+                InitializeRule();
             }
         }
 
@@ -90,20 +91,16 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             SelectedRuleEvaluator = null;
         }
 
-        private void InitializeRule(Rule rule) {
-            SelectedParameter = new ParameterViewModel(rule.Provider);
+        private void InitializeRule() {
+            SelectedParameter = new ParameterViewModel(_rule.Provider);
             if(!_categoriesInfo.Parameters.Contains(SelectedParameter)) {
                 _categoriesInfo.Parameters.Add(SelectedParameter);
             }
-            ParameterSelectionChanged(null);
-            SelectedRuleEvaluator = new RuleEvaluatorViewModel(rule.Evaluator);
-            EvaluatorSelectionChanged(null);
-            SelectedValue = new ParamValueViewModel(rule.Value);
-            if(!Values.Contains(SelectedValue)) {
-                SelectedValue = null;
-                StringValue = rule.Value.DisplayValue;
-            }
+            SelectedRuleEvaluator = new RuleEvaluatorViewModel(_rule.Evaluator);
+            SelectedValue = new ParamValueViewModel(_rule.Value);
         }
+
+
 
         private void ParameterSelectionChanged(object p) {
             if(SelectedParameter != null) {
@@ -164,6 +161,23 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             }
 
             return SelectedParameter.FilterableValueProvider.GetErrorText(StringValue);
+        }
+
+        public void Initialize() {
+            if(_rule != null) {
+                SelectedParameter = new ParameterViewModel(_rule.Provider);
+                if(!_categoriesInfo.Parameters.Contains(SelectedParameter)) {
+                    _categoriesInfo.Parameters.Add(SelectedParameter);
+                }
+                ParameterSelectionChanged(null);
+                SelectedRuleEvaluator = new RuleEvaluatorViewModel(_rule.Evaluator);
+                EvaluatorSelectionChanged(null);
+                SelectedValue = new ParamValueViewModel(_rule.Value);
+                if(!Values.Contains(SelectedValue)) {
+                    SelectedValue = null;
+                    StringValue = _rule.Value.DisplayValue;
+                }
+            }
         }
     }
 }

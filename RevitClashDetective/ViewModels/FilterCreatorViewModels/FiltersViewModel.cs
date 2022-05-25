@@ -31,11 +31,13 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             DeleteCommand = new RelayCommand(Delete, CanDelete);
             RenameCommand = new RelayCommand(Rename, CanRename);
             SaveCommand = new RelayCommand(Save, CanSave);
-
+            
 
             Filters = new ObservableCollection<FilterViewModel>();
 
             InitializeFilters();
+
+            SelectedFilterChangedCommand = new RelayCommand(SelectedFilterChanged, CanSelectedFilterChanged);
         }
 
         public string ErrorText {
@@ -46,6 +48,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public ICommand CreateCommand { get; }
         public ICommand DeleteCommand { get; }
         public ICommand RenameCommand { get; }
+        public ICommand SelectedFilterChangedCommand { get; }
 
         public ICommand SaveCommand { get; }
 
@@ -68,6 +71,14 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                 filter.Set.SetRevitRepository(_revitRepository);
                 Filters.Add(new FilterViewModel(_revitRepository, filter));
             }
+        }
+
+        private void SelectedFilterChanged(object p) {
+            SelectedFilter?.InitializeFilter();
+        }
+
+        private bool CanSelectedFilterChanged(object p) {
+            return SelectedFilter != null;
         }
 
         private void Create(object p) {
@@ -115,6 +126,9 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private bool CanSave(object p) {
+            if(SelectedFilter == null || !SelectedFilter.IsInitialized)
+                return false;
+
             if(Filters.Any(item => item.Set.IsEmpty())) {
                 ErrorText = "Все поля в критериях фильтрации должны быть заполнены.";
                 return false;

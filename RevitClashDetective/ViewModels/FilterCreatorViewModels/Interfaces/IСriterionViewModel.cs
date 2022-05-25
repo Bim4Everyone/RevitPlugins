@@ -12,6 +12,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels.Interfaces {
         void Renew();
         bool IsEmpty();
         string GetErrorText();
+        void Initialize();
         Criterion GetCriterion();
     }
 }

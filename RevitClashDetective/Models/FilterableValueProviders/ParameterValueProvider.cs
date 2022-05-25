@@ -74,7 +74,6 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
             ElementId id = null;
             if(RevitParam is SystemParam systemParam) {
                 id = new ElementId(systemParam.SystemParamId);
-
             } else {
                 id = RevitParam.GetRevitParamElement(doc).Id;
             }
