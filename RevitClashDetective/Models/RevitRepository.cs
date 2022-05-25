@@ -11,6 +11,8 @@ using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 
+using RevitClashDetective.Handlers;
+
 namespace RevitClashDetective.Models {
     internal class RevitRepository {
         private readonly Application _application;
@@ -18,6 +20,7 @@ namespace RevitClashDetective.Models {
 
         private readonly Document _document;
         private readonly UIDocument _uiDocument;
+        private readonly RevitEventHandler _revitEventHandler;
 
         public RevitRepository(Application application, Document document) {
             _application = application;
@@ -25,6 +28,8 @@ namespace RevitClashDetective.Models {
 
             _document = document;
             _uiDocument = new UIDocument(document);
+
+            _revitEventHandler = new RevitEventHandler();
         }
 
         public Element GetElement(ElementId id) {
@@ -33,14 +38,6 @@ namespace RevitClashDetective.Models {
 
         public Element GetElement(Document doc, ElementId id) {
             return doc.GetElement(id);
-        }
-
-        private FilteredElementCollector GetCollector(Document doc) {
-            var view = GetNavisworksView(doc);
-            if(view != null) {
-                return new FilteredElementCollector(_document, view.Id);
-            }
-            return new FilteredElementCollector(_document);
         }
 
         public List<Collector> GetCollectors() {
@@ -122,6 +119,17 @@ namespace RevitClashDetective.Models {
                 t.Commit();
             }
             
+        }
+
+        public async Task SelectAndShowElement(ElementId id) {
+            _revitEventHandler.TransactAction = () => {
+                _uiDocument.Selection.SetElementIds(new[] { id });
+                var commandId = RevitCommandId.LookupCommandId("ID_VIEW_APPLY_SELECTION_BOX");
+                if(!(commandId is null) && _uiDocument.Application.CanPostCommand(commandId)) {
+                    _uiApplication.PostCommand(commandId);
+                }
+            };
+            await _revitEventHandler.Raise();
         }
     }
 }

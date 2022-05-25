@@ -14,6 +14,8 @@ using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.ViewModels.Navigator;
+using RevitClashDetective.Views;
 
 namespace RevitClashDetective.ViewModels {
     internal class MainViewModel : BaseViewModel {
@@ -77,10 +79,11 @@ namespace RevitClashDetective.ViewModels {
         }
 
         private void FindClashes(object p) {
-            Stopwatch sw = Stopwatch.StartNew();
-            var clashes = Checks.SelectMany(item => item.GetClashes()).ToList();
-            TaskDialog.Show("Revit", $"Время: " + sw.Elapsed.ToString() + $". Количество: { clashes.Count}");
-            _revitRepository.SelectElements(clashes.Select(item => item.MainElement));
+            //Stopwatch sw = Stopwatch.StartNew();
+            //var clashes = Checks.SelectMany(item => item.GetClashes()).ToList();
+            //TaskDialog.Show("Revit", $"Время: " + sw.Elapsed.ToString() + $". Количество: { clashes.Count}");
+            var view = new NavigatorView() { DataContext = new ClashesViewModel(_revitRepository, Checks.SelectMany(item => item.GetClashes()).ToList()) };
+            view.Show();
             SaveConfig();
         }
 

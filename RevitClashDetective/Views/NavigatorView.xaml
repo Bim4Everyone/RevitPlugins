@@ -6,13 +6,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitClashDetective.Views"
+        xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.Navigator"
         mc:Ignorable="d"
-        Title="NavigatorView" Height="450" Width="800">
+        Title="Навигатор" Height="450" Width="800"
+        d:DataContext="{d:DesignInstance vm:ClashesViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DataGrid Grid.Row="0" 
+        <DataGrid Name="_dg"
+            Grid.Row="0" 
                   AutoGenerateColumns="False" 
                   CanUserReorderColumns="False"
                   CanUserDeleteRows="False"
@@ -20,21 +24,41 @@
                   VerticalGridLinesBrush="Transparent"
                   HorizontalGridLinesBrush="Transparent"
                   AlternatingRowBackground="WhiteSmoke"
-                  AlternationCount="2">
+                  AlternationCount="2"
+                  ItemsSource="{Binding ClashesViewSource.View}">
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="ID">
-                    
+                <DataGridTemplateColumn >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Name="bSelect" Content="Выбрать" Command="{Binding ElementName=_dg, Path=DataContext.SelectClashCommand}" 
+                                    CommandParameter="{Binding ElementName=bSelect, Path=DataContext}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Уровень"/>
-                <DataGridTextColumn Header="Имя типа"/>
-                <DataGridTextColumn Header="Имя файлы"/>
-                <DataGridTemplateColumn Header="ID">
-
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Уровень"/>
-                <DataGridTextColumn Header="Имя типа"/>
-                <DataGridTextColumn Header="Имя файлы"/>
+                <DataGridTextColumn Header="Уровень 1" Binding="{Binding FirstLevel}"/>
+                <DataGridTextColumn Header="Имя типа 1" Binding="{Binding FirstName}"/>
+                <DataGridTextColumn Header="Имя файла 1" Binding="{Binding FirstDocumentName}"/>
+                <DataGridTextColumn Header="Уровень 2" Binding="{Binding SecondLevel}"/>
+                <DataGridTextColumn Header="Имя типа 2" Binding="{Binding SecondName}"/>
+                <DataGridTextColumn Header="Имя файла 2" Binding="{Binding SecondDocumentName}"/>
             </DataGrid.Columns>
         </DataGrid>
+        <Grid Grid.Row="1" Height="30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Width="70" BorderBrush="Transparent" Background="Transparent" FontSize="20" HorizontalAlignment="Right" Command="{Binding SelectPreviousCommand}">
+                <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Arrows/Prev_32x32.png"/>
+            </Button>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <TextBlock FontSize="14" VerticalAlignment="Center" Text="{Binding ClashesViewSource.View.CurrentPosition, StringFormat={}{0}/}" ></TextBlock>
+                <TextBlock FontSize="14" VerticalAlignment="Center" Text="{Binding ClashesViewSource.View.SourceCollection.Count}"></TextBlock>
+            </StackPanel>
+            <Button Grid.Column="2" HorizontalAlignment="Left" FontSize="20" Width="70"  BorderBrush="Transparent" Background="Transparent" Command="{Binding SelectNextCommand}">
+                    <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Arrows/Next_32x32.png"/>
+             </Button>
+        </Grid>
     </Grid>
 </base:PlatformWindow>

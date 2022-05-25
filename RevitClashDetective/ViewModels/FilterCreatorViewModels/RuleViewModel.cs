@@ -29,7 +29,6 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private ObservableCollection<ParamValueViewModel> _values;
         private string _stringValue;
         private bool _isValueEditable;
-        private bool isStringValueWrong;
 
         public RuleViewModel(RevitRepository revitRepository, CategoriesInfoViewModel categoriesInfo, Rule rule = null) {
             _revitRepository = revitRepository;
