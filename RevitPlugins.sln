@@ -29,6 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dosymep", "dosymep", "{0647
 		dosymep\EnumConverter.cs = dosymep\EnumConverter.cs
 		dosymep\EnumToItemsSource.cs = dosymep\EnumToItemsSource.cs
 		dosymep\InverseBooleanConverter.cs = dosymep\InverseBooleanConverter.cs
+		dosymep\IndexConverter.cs = dosymep\IndexConverter.cs
 		dosymep\PlatformWindow.cs = dosymep\PlatformWindow.cs
 		dosymep\RelayCommand.cs = dosymep\RelayCommand.cs
 		dosymep\BasePluginCommand.cs = dosymep\BasePluginCommand.cs
