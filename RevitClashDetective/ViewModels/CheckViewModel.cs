@@ -23,14 +23,33 @@ namespace RevitClashDetective.ViewModels {
         private ObservableCollection<ProvidersViewModel> _otherDocumentProviders;
         private string _selectedMainDocProviders;
         private string _selectedOtherDocProviders;
+        private string errorText;
 
         public CheckViewModel(RevitRepository revitRepository, FiltersConfig filtersConfig) {
             _revitRepository = revitRepository;
             _filtersConfig = filtersConfig;
+
             Name = "Без имени";
+
             MainDocumentProviders = new ObservableCollection<ProvidersViewModel>();
             OtherDocumentProviders = new ObservableCollection<ProvidersViewModel>();
+
             InitializeFilterProviders();
+
+            SelectMainProviderCommand = new RelayCommand(SelectProvider);
+        }
+
+        public CheckViewModel(Check check, RevitRepository revitRepository, FiltersConfig filtersConfig) {
+            _revitRepository = revitRepository;
+            _filtersConfig = filtersConfig;
+
+            Name = check.Name;
+
+            MainDocumentProviders = new ObservableCollection<ProvidersViewModel>();
+            OtherDocumentProviders = new ObservableCollection<ProvidersViewModel>();
+
+            InitializeFilterProviders(check);
+
             SelectMainProviderCommand = new RelayCommand(SelectProvider);
         }
 
@@ -39,6 +58,11 @@ namespace RevitClashDetective.ViewModels {
         public string Name {
             get => _name;
             set => this.RaiseAndSetIfChanged(ref _name, value);
+        }
+
+        public string ErrorText {
+            get => errorText;
+            set => this.RaiseAndSetIfChanged(ref errorText, value);
         }
 
         public string SelectedMainDocProviders {
@@ -85,6 +109,36 @@ namespace RevitClashDetective.ViewModels {
                 var otherProvider = new ProvidersViewModel(_revitRepository, links, filter);
                 OtherDocumentProviders.Add(otherProvider);
             }
+        }
+
+        private void InitializeFilterProviders(Check check) {
+            InitializeFilterProviders();
+
+            foreach(var provider in MainDocumentProviders) {
+                provider.IsSelected = check.MainFilters.Any(item => item.Equals(provider.Name, StringComparison.CurrentCultureIgnoreCase));
+            }
+
+            foreach(var provider in OtherDocumentProviders) {
+                provider.IsSelected = check.OtherFilters.Any(item => item.Equals(provider.Name, StringComparison.CurrentCultureIgnoreCase));
+            }
+
+            var missedMainFilters = check.MainFilters
+                .Where(item => !MainDocumentProviders.Any(p => p.Name.Equals(item)))
+                .ToList();
+
+            if(missedMainFilters.Count > 0) {
+                ErrorText = $"Не найдены фильтры основного файла: {string.Join(", ", missedMainFilters)}";
+            }
+
+            var missedOtherFilters = check.OtherFilters
+                .Where(item => !OtherDocumentProviders.Any(p => p.Name.Equals(item)))
+                .ToList();
+
+            if(missedOtherFilters.Count > 0) {
+                ErrorText += Environment.NewLine + $"Не найдены фильтры связанных файлов: {string.Join(", ", missedOtherFilters)}";
+            }
+
+            SelectProvider(null);
         }
 
         private void SelectProvider(object p) {

@@ -35,6 +35,24 @@
                   AlternationCount="2"
                   ItemsSource="{Binding Checks}">
             <DataGrid.Columns>
+                <DataGridTemplateColumn Width="25">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Width="16" Height="16" ToolTip="{Binding ErrorText}" HorizontalAlignment="Center">
+                                <Image.Style>
+                                    <Style TargetType="Image">
+                                        <Setter Property="Source" Value="pack://application:,,,/DevExpress.Images.v21.2;component/Images/Status/Warning_16x16.png"></Setter>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ErrorText}" Value="{x:Null}">
+                                                <Setter Property="Source" Value="{x:Null}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Image.Style>
+                            </Image>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"/>
                 <DataGridTemplateColumn Header="Фильтры основного файла" Width="*">
                     <DataGridTemplateColumn.CellTemplate>

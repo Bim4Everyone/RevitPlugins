@@ -18,14 +18,20 @@ using RevitClashDetective.Models.FilterModel;
 namespace RevitClashDetective.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private string _errorText;
+        private readonly ChecksConfig _checksConfig;
         private readonly FiltersConfig _filtersConfig;
         private readonly RevitRepository _revitRepository;
         private ObservableCollection<CheckViewModel> _checks;
 
-        public MainViewModel(FiltersConfig filtersConfig, RevitRepository revitRepository) {
+        public MainViewModel(ChecksConfig checksConfig, FiltersConfig filtersConfig, RevitRepository revitRepository) {
+            _checksConfig = checksConfig;
             _filtersConfig = filtersConfig;
             _revitRepository = revitRepository;
-            InitializeEmptyCheck();
+            if(checksConfig.Checks.Count > 0) {
+                InitializeChecks();
+            } else {
+                InitializeEmptyCheck();
+            }
             AddCheckCommand = new RelayCommand(AddCheck);
             RemoveCheckCommand = new RelayCommand(RemoveCheck);
             FindClashesCommand = new RelayCommand(FindClashes, CanFindClashes);
@@ -45,11 +51,20 @@ namespace RevitClashDetective.ViewModels {
         }
 
 
+        private void InitializeChecks() {
+            Checks = new ObservableCollection<CheckViewModel>();
+            foreach (var check in _checksConfig.Checks) {
+                Checks.Add(new CheckViewModel(check, _revitRepository, _filtersConfig));
+            }
+        }
+
         private void InitializeEmptyCheck() {
             Checks = new ObservableCollection<CheckViewModel>() {
                 new CheckViewModel(_revitRepository, _filtersConfig)
             };
         }
+
+
 
         private void AddCheck(object p) {
             Checks.Add(new CheckViewModel(_revitRepository, _filtersConfig));
@@ -66,6 +81,19 @@ namespace RevitClashDetective.ViewModels {
             var clashes = Checks.SelectMany(item => item.GetClashes()).ToList();
             TaskDialog.Show("Revit", $"Время: " + sw.Elapsed.ToString() + $". Количество: { clashes.Count}");
             _revitRepository.SelectElements(clashes.Select(item => item.MainElement));
+            SaveConfig();
+        }
+
+        private void SaveConfig() {
+            _checksConfig.Checks = new List<Check>();
+            foreach(var check in Checks) {
+                _checksConfig.Checks.Add(new Check() {
+                    Name = check.Name,
+                    MainFilters = check.MainDocumentProviders.Where(item => item.IsSelected).Select(item => item.Name).ToList(),
+                    OtherFilters = check.OtherDocumentProviders.Where(item => item.IsSelected).Select(item => item.Name).ToList()
+                });
+            }
+            _checksConfig.SaveProjectConfig();
         }
 
         private bool CanFindClashes(object p) {

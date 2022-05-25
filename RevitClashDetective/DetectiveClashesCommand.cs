@@ -21,8 +21,9 @@ namespace RevitClashDetective {
     public class DetectiveClashesCommand : BasePluginCommand {
         protected override void Execute(UIApplication uiApplication) {
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            var config = FiltersConfig.GetFiltersConfig();
-            var mainViewModlel = new MainViewModel(config, revitRepository);
+            var filterConfig = FiltersConfig.GetFiltersConfig();
+            var checkConfig = ChecksConfig.GetFiltersConfig();
+            var mainViewModlel = new MainViewModel(checkConfig, filterConfig, revitRepository);
             var window = new MainWindow() { DataContext = mainViewModlel };
             var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
             window.ShowDialog();
