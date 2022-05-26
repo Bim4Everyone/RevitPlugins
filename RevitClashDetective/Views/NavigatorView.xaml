@@ -25,8 +25,8 @@
                   CanUserReorderColumns="False"
                   CanUserDeleteRows="False"
                   CanUserAddRows="False"
-                  VerticalGridLinesBrush="Transparent"
-                  HorizontalGridLinesBrush="Transparent"
+                  VerticalGridLinesBrush="LightGray"
+                  HorizontalGridLinesBrush="LightGray"
                   AlternatingRowBackground="WhiteSmoke"
                   AlternationCount="2"
                   ItemsSource="{Binding ClashesViewSource.View}">
@@ -40,9 +40,11 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Уровень 1" Binding="{Binding FirstLevel}"/>
+                <DataGridTextColumn Header="Категория 1" Binding="{Binding FirstCategory}"/>
                 <DataGridTextColumn Header="Имя типа 1" Binding="{Binding FirstName}"/>
                 <DataGridTextColumn Header="Имя файла 1" Binding="{Binding FirstDocumentName}"/>
                 <DataGridTextColumn Header="Уровень 2" Binding="{Binding SecondLevel}"/>
+                <DataGridTextColumn Header="Категория 2" Binding="{Binding SecondCategory}"/>
                 <DataGridTextColumn Header="Имя типа 2" Binding="{Binding SecondName}"/>
                 <DataGridTextColumn Header="Имя файла 2" Binding="{Binding SecondDocumentName}"/>
             </DataGrid.Columns>
