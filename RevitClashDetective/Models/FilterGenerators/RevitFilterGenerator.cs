@@ -18,8 +18,13 @@ namespace RevitClashDetective.Models.FilterGenerators {
 
         public IFilterGenerator SetRuleFilter(Document doc, Rule rule) {
             var ruleCreator = RuleEvaluatorUtils.GetRevitRuleCreator(rule.Evaluator.Evaluator);
-            var revitRule = rule.Provider.GetRule(doc, ruleCreator, rule.Value.Value);
-            Filter = new ElementParameterFilter(revitRule, false);
+            var revitRule = rule.Provider.GetRule(doc, ruleCreator, rule.Value);
+            if(revitRule == null) {
+                Filter = new ElementIsElementTypeFilter(false);
+            } else {
+                Filter = new ElementParameterFilter(revitRule, false);
+            }
+
             return this;
         }
 

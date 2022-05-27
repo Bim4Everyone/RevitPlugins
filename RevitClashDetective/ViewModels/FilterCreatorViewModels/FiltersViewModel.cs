@@ -85,7 +85,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             var newFilterName = new FilterNameViewModel(Filters.Select(f => f.Name));
             var view = new FilterNameView() { DataContext = newFilterName, Owner = p as Window };
             if(view.ShowDialog() == true) {
-                var newFilter = new FilterViewModel(_revitRepository) { Name = newFilterName.Name };
+                var newFilter = new FilterViewModel(_revitRepository) { Name = newFilterName.Name, IsInitialized = true };
                 Filters.Add(newFilter);
 
                 Filters = new ObservableCollection<FilterViewModel>(Filters.OrderBy(item => item.Name));

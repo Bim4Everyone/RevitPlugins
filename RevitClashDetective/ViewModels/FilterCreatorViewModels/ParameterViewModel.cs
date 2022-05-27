@@ -14,6 +14,7 @@ using dosymep.WPF.ViewModels;
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Evaluators;
 using RevitClashDetective.Models.Interfaces;
+using RevitClashDetective.Models.Value;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
     internal class ParameterViewModel : BaseViewModel, IEquatable<ParameterViewModel> {
@@ -39,7 +40,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             return FilterableValueProvider.GetRuleEvaluators();
         }
 
-        public IEnumerable<ParamValueViewModel> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator) {
+        public IEnumerable<ParamValue> GetValues(Category[] categories, RuleEvaluator ruleEvaluator) {
             return FilterableValueProvider.GetValues(categories, ruleEvaluator);
         }
 

@@ -17,9 +17,9 @@ namespace RevitClashDetective.Models.Interfaces {
         RevitRepository RevitRepository { get; set; }
         IFilterGenerator FilterGenerator { get; }
         string GetErrorText(string value);
-        ParamValue GetParamValue(string value);
+        ParamValue GetParamValue(int[] categories, string value);
         IEnumerable<RuleEvaluator> GetRuleEvaluators();
-        IEnumerable<ParamValueViewModel> GetValues(IEnumerable<Category> categories, RuleEvaluator ruleEvaluator);
-        FilterRule GetRule(Document doc, IRevitRuleCreator creator, object value);
+        IEnumerable<ParamValue> GetValues(Category[] categories, RuleEvaluator ruleEvaluator);
+        FilterRule GetRule(Document doc, IVisiter visiter, ParamValue paramValue);
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models.Interfaces;
-using RevitClashDetective.Models.RuleCreators.RevitRuleCreators;
+using RevitClashDetective.Models.Visiter;
 
 namespace RevitClashDetective.Models.Evaluators {
     internal class RuleEvaluatorUtils {
@@ -28,6 +28,17 @@ namespace RevitClashDetective.Models.Evaluators {
                 yield return new RuleEvaluator() { Evaluator = RuleEvaluators.FilterHasValue, Message = "имеет значение" };
                 yield return new RuleEvaluator() { Evaluator = RuleEvaluators.FilterHasNoValue, Message = "без значения" };
 
+            } else if(storageType == StorageType.ElementId) {
+                yield return new RuleEvaluator() { Evaluator = RuleEvaluators.FilterStringEquals, Message = "равно" };
+                yield return new RuleEvaluator() { Evaluator = RuleEvaluators.FilterNotEquals, Message = "не равно" };
+                yield return new RuleEvaluator() { Evaluator = RuleEvaluators.FilterStringContains, Message = "содержит" };
+                yield return new RuleEvaluator() { Evaluator = RuleEvaluators.FilterStringNotContains, Message = "не содержит" };
+                yield return new RuleEvaluator() { Evaluator = RuleEvaluators.FilterStringBeginsWith, Message = "начинается с" };
+                yield return new RuleEvaluator() { Evaluator = RuleEvaluators.FilterStringNotBeginsWith, Message = "не начинается с" };
+                yield return new RuleEvaluator() { Evaluator = RuleEvaluators.FilterStringEndsWith, Message = "заканчивается на" };
+                yield return new RuleEvaluator() { Evaluator = RuleEvaluators.FilterStringNotEndsWith, Message = "не заканчивается на" };
+                yield return new RuleEvaluator() { Evaluator = RuleEvaluators.FilterHasValue, Message = "имеет значение" };
+                yield return new RuleEvaluator() { Evaluator = RuleEvaluators.FilterHasNoValue, Message = "без значения" };
             } else {
                 yield return new RuleEvaluator() { Evaluator = RuleEvaluators.FilterNumericEquals, Message = "равно" };
                 yield return new RuleEvaluator() { Evaluator = RuleEvaluators.FilterNotEquals, Message = "не равно" };
@@ -40,31 +51,31 @@ namespace RevitClashDetective.Models.Evaluators {
             }
         }
 
-        public static IRevitRuleCreator GetRevitRuleCreator(RuleEvaluators ruleEvaluator) {
-            _evaluatorDictionary.TryGetValue(ruleEvaluator, out IRevitRuleCreator creator);
-            return creator;
+        public static IVisiter GetRevitRuleCreator(RuleEvaluators ruleEvaluator) {
+            _evaluatorDictionary.TryGetValue(ruleEvaluator, out IVisiter visiter);
+            return visiter;
         }
 
-        private static Dictionary<RuleEvaluators, IRevitRuleCreator> _evaluatorDictionary = new Dictionary<RuleEvaluators, IRevitRuleCreator>() {
-            {RuleEvaluators.FilterStringBeginsWith,new RevitBeginsWithRuleCreator() },
-            {RuleEvaluators.FilterStringNotBeginsWith,new RevitNotBeginsWithRuleCreator() },
-            {RuleEvaluators.FilterStringContains,new RevitContainsRuleCreator() },
-            {RuleEvaluators.FilterStringNotContains,new RevitNotContainsRuleCreator() },
-            {RuleEvaluators.FilterStringEndsWith,new RevitEndsWithRuleCreator() },
-            {RuleEvaluators.FilterStringNotEndsWith,new RevitNotEndsWithRuleCreator() },
-            {RuleEvaluators.FilterStringEquals,new RevitEqualsRuleCreator() },
-            {RuleEvaluators.FilterStringGreater,new RevitGreaterRuleCreator() },
-            {RuleEvaluators.FilterStringGreaterOrEqual,new RevitGreaterOrEqualRuleCreator() },
-            {RuleEvaluators.FilterStringLess,new RevitLessRuleCreator() },
-            {RuleEvaluators.FilterStringLessOrEqual,new RevitLessOrEqualRuleCreator() },
-            {RuleEvaluators.FilterNumericEquals,new RevitEqualsRuleCreator() },
-            {RuleEvaluators.FilterNumericGreater,new RevitGreaterRuleCreator() },
-            {RuleEvaluators.FilterNumericGreaterOrEqual,new RevitGreaterOrEqualRuleCreator() },
-            {RuleEvaluators.FilterNumericLess,new RevitLessRuleCreator() },
-            {RuleEvaluators.FilterNumericLessOrEqual,new RevitLessOrEqualRuleCreator() },
-            {RuleEvaluators.FilterHasNoValue,new RevitHasNoValueRuleCreator() },
-            {RuleEvaluators.FilterHasValue,new RevitHasValueRuleCreator() },
-            {RuleEvaluators.FilterNotEquals,new RevitNotEqualsRuleCreator() },
+        private static Dictionary<RuleEvaluators, IVisiter> _evaluatorDictionary = new Dictionary<RuleEvaluators, IVisiter>() {
+            {RuleEvaluators.FilterStringBeginsWith,new BeginsWithVisister() },
+            {RuleEvaluators.FilterStringNotBeginsWith,new NotBeginsWithVisister() },
+            {RuleEvaluators.FilterStringContains,new ContainsVisiter() },
+            {RuleEvaluators.FilterStringNotContains,new NotContainsVisister() },
+            {RuleEvaluators.FilterStringEndsWith,new EndsWithVisister() },
+            {RuleEvaluators.FilterStringNotEndsWith,new NotEndsWithVisister() },
+            {RuleEvaluators.FilterStringEquals,new EqualsVisiter() },
+            {RuleEvaluators.FilterStringGreater,new GreaterVisister() },
+            {RuleEvaluators.FilterStringGreaterOrEqual,new GreaterOrEqualVisister() },
+            {RuleEvaluators.FilterStringLess,new LessVisister() },
+            {RuleEvaluators.FilterStringLessOrEqual,new LessOrEqualVisister() },
+            {RuleEvaluators.FilterNumericEquals,new EqualsVisiter() },
+            {RuleEvaluators.FilterNumericGreater,new GreaterVisister() },
+            {RuleEvaluators.FilterNumericGreaterOrEqual,new GreaterOrEqualVisister() },
+            {RuleEvaluators.FilterNumericLess,new LessVisister() },
+            {RuleEvaluators.FilterNumericLessOrEqual,new LessOrEqualVisister() },
+            {RuleEvaluators.FilterHasNoValue,new HasNoValueVisister() },
+            {RuleEvaluators.FilterHasValue,new HasValueVisister() },
+            {RuleEvaluators.FilterNotEquals,new NotEqualsVisister() },
         };
     }
 

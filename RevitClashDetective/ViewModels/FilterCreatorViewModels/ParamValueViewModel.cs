@@ -15,11 +15,6 @@ using RevitClashDetective.Models.Value;
 
 namespace RevitClashDetective.Models {
     internal class ParamValueViewModel : BaseViewModel, IEquatable<ParamValueViewModel> {
-
-        public ParamValueViewModel(RevitParam revitParam, Element element) {
-            ParamValue = ParamValue.GetParamValue(revitParam, element);
-        }
-
         public ParamValueViewModel(ParamValue paramValue) {
             ParamValue = paramValue;
         }
