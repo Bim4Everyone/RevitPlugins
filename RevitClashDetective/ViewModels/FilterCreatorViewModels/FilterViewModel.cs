@@ -16,10 +16,11 @@ using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
-    internal class FilterViewModel : BaseViewModel {
+    internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel> {
         private readonly RevitRepository _revitRepository;
         private readonly Filter _filter;
         private bool _isMassSelectionChanged;
+        private string _id;
         private string _name;
         private string _filterCategoryName;
         private SetViewModel _set;
@@ -32,6 +33,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private bool _showOnlySelectedCategories;
 
         public FilterViewModel(RevitRepository revitRepository) {
+            _id = Guid.NewGuid().ToString();
             _revitRepository = revitRepository;
             Name = "Без имени";
 
@@ -45,6 +47,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         public FilterViewModel(RevitRepository revitRepository, Filter filter) {
+            _id = Guid.NewGuid().ToString();
             _revitRepository = revitRepository;
             _filter = filter;
             Name = _filter.Name;
@@ -78,9 +81,9 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             set => this.RaiseAndSetIfChanged(ref _canSelectCategories, value);
         }
 
-        public bool ShowOnlySelectedCategories { 
-            get => _showOnlySelectedCategories; 
-            set => this.RaiseAndSetIfChanged(ref _showOnlySelectedCategories, value); 
+        public bool ShowOnlySelectedCategories {
+            get => _showOnlySelectedCategories;
+            set => this.RaiseAndSetIfChanged(ref _showOnlySelectedCategories, value);
         }
 
         public bool? IsAllCategoriesSelected {
@@ -212,12 +215,15 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         public override bool Equals(object obj) {
-            return obj is FilterViewModel model &&
-                   Name == model.Name;
+            return Equals(obj as FilterViewModel);
         }
 
         public override int GetHashCode() {
-            return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name);
+            return 539060726 + EqualityComparer<string>.Default.GetHashCode(_id);
+        }
+
+        public bool Equals(FilterViewModel other) {
+            return other != null && _id == other._id;
         }
     }
 }

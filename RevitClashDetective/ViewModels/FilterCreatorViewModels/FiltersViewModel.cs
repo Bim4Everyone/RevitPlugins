@@ -112,6 +112,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             var view = new FilterNameView() { DataContext = newFilterName, Owner = p as Window };
             if(view.ShowDialog() == true) {
                 SelectedFilter.Name = newFilterName.Name;
+                Filters = new ObservableCollection<FilterViewModel>(Filters.OrderBy(item => item.Name));
+                SelectedFilter = Filters.FirstOrDefault(item => item.Name.Equals(newFilterName.Name, StringComparison.CurrentCultureIgnoreCase));
             }
         }
 
