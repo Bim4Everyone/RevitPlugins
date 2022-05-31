@@ -30,8 +30,12 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
         [JsonIgnore]
         public RevitRepository RevitRepository { get; set; }
 
-        public ParameterValueProvider(RevitRepository revitRepository) {
+        public string DisplayValue { get; set; }
+
+        public ParameterValueProvider(RevitRepository revitRepository, RevitParam revitParam, string displayValue = null) {
             RevitRepository = revitRepository;
+            RevitParam = revitParam;
+            DisplayValue = displayValue ?? revitParam.Name;
         }
 
         public IEnumerable<RuleEvaluator> GetRuleEvaluators() {
@@ -63,7 +67,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
             } else {
                 var typeId = item.GetTypeId();
                 if(typeId != null) {
-                    var type = RevitRepository.GetElement(doc, typeId);
+                    var type = doc.GetElement(typeId);
                     return ParamValue.GetParamValue(categories, RevitParam, type);
                 }
             }
@@ -82,12 +86,15 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
             int hashCode = 208823010;
             hashCode = hashCode * -1521134295 + EqualityComparer<StorageType>.Default.GetHashCode(RevitParam.StorageType);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(RevitParam.Id);
             return hashCode;
         }
 
         public bool Equals(ParameterValueProvider other) {
-            return RevitParam?.StorageType == other?.RevitParam?.StorageType
-                && Name == other?.Name;
+            return other != null
+                && RevitParam?.StorageType == other.RevitParam?.StorageType
+                && Name == other.Name
+                && RevitParam?.Id == other.RevitParam?.Id;
         }
 
         public string GetErrorText(string value) {

@@ -14,16 +14,11 @@ using dosymep.Revit;
 
 namespace RevitClashDetective.Models.FilterableValueProviders {
     internal class ParameterInitializer {
-        private readonly RevitRepository _revitRepository;
-
-        public ParameterInitializer(RevitRepository revitRepository) {
-            _revitRepository = revitRepository;
-        }
-        public RevitParam InitializeParameter(Document doc, ElementId id) {
+        public static RevitParam InitializeParameter(Document doc, ElementId id) {
             if(id.IsSystemId()) {
                 return SystemParamsConfig.Instance.CreateRevitParam((BuiltInParameter) id.IntegerValue);
             } else {
-                var element = _revitRepository.GetElement(doc, id);
+                var element = doc.GetElement(id);
                 if (element is SharedParameterElement sharedParameterElement) {
                     return SharedParamsConfig.Instance.CreateRevitParam(doc, sharedParameterElement.Name);
                 }

@@ -14,6 +14,7 @@ using RevitClashDetective.Models.Value;
 namespace RevitClashDetective.Models.Interfaces {
     internal interface IFilterableValueProvider {
         string Name { get; }
+        string DisplayValue { get; }
         RevitRepository RevitRepository { get; set; }
         IFilterGenerator FilterGenerator { get; }
         string GetErrorText(string value);

@@ -9,9 +9,13 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 
 using RevitClashDetective.Handlers;
+using RevitClashDetective.Models.FilterableValueProviders;
+
+using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
 
 namespace RevitClashDetective.Models {
     internal class RevitRepository {
@@ -70,7 +74,7 @@ namespace RevitClashDetective.Models {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(RevitLinkInstance))
                 .Cast<RevitLinkInstance>()
-                .Where(item=>item.GetLinkDocument()!=null)
+                .Where(item => item.GetLinkDocument() != null)
                 .ToList();
         }
 
@@ -95,11 +99,32 @@ namespace RevitClashDetective.Models {
             return Category.GetCategory(_document, builtInCategory);
         }
 
-        public List<ElementId> GetParameters(Document doc, IEnumerable<Category> categories) {
-            return ParameterFilterUtilities
-                .GetFilterableParametersInCommon(doc,
-                    categories.Select(c => c.Id).ToList())
-                .ToList();
+        public List<ParameterValueProvider> GetParameters(Document doc, IEnumerable<Category> categories) {
+            return categories
+            .SelectMany(item => ParameterFilterUtilities.GetFilterableParametersInCommon(doc, new[] { item.Id }).Select(p => GetParam(doc, item, p)))
+            .GroupBy(item => item.Name)
+            .Where(item => item.Count() > categories.Count() - 1)
+            .SelectMany(item => FilterParamProviders(item))
+            .ToList();
+        }
+
+        private ParameterValueProvider GetParam(Document doc, Category category, ElementId elementId) {
+            var revitParam = ParameterInitializer.InitializeParameter(doc, elementId);
+            if(elementId.IsSystemId()) {
+                return new ParameterValueProvider(this, revitParam, $"{revitParam.Name} ({category.Name})");
+            }
+            return new ParameterValueProvider(this, revitParam);
+        }
+
+        private IEnumerable<ParameterValueProvider> FilterParamProviders(IEnumerable<ParameterValueProvider> providers) {
+            if(providers.First().RevitParam is SystemParam) {
+                if(providers.All(item => item.RevitParam.Id.Equals(providers.First().RevitParam.Id, StringComparison.CurrentCultureIgnoreCase))) {
+                    providers.First().DisplayValue = providers.First().Name;
+                    return new [] { providers.First() };
+                }
+                return providers;
+            }
+            return new [] { providers.First() };
         }
 
         public IEnumerable<Document> GetDocuments() {
@@ -107,7 +132,7 @@ namespace RevitClashDetective.Models {
                 .OfClass(typeof(RevitLinkInstance))
                 .Cast<RevitLinkInstance>()
                 .Select(item => item.GetLinkDocument())
-                .Where(item=>item!=null)
+                .Where(item => item != null)
                 .ToList();
             linkedDocuments.Add(_document);
             return linkedDocuments;
@@ -119,7 +144,7 @@ namespace RevitClashDetective.Models {
                 pfe.SetElementFilter(filter);
                 t.Commit();
             }
-            
+
         }
 
         public async Task SelectAndShowElement(ElementId id) {

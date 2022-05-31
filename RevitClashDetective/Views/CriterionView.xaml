@@ -69,7 +69,7 @@
                     </i:Interaction.Triggers>
                     <ComboBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type vm:ParameterViewModel}">
-                            <TextBlock Text="{Binding Name}"></TextBlock>
+                            <TextBlock Text="{Binding FilterableValueProvider.DisplayValue}"></TextBlock>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>

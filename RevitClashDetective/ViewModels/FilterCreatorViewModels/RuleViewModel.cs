@@ -88,6 +88,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public void Renew() {
             SelectedParameter = null;
             SelectedRuleEvaluator = null;
+            StringValue = null;
         }
 
         private void InitializeRule() {
@@ -129,7 +130,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             return new Rule() {
                 Evaluator = SelectedRuleEvaluator.RuleEvaluator,
                 Provider = SelectedParameter.FilterableValueProvider,
-                Value = SelectedValue?.ParamValue ?? SelectedParameter.FilterableValueProvider.GetParamValue(CategoriesInfo.Categories.Select(item=>item.Category.Id.IntegerValue).ToArray(), StringValue)
+                Value = SelectedValue?.ParamValue ?? SelectedParameter.FilterableValueProvider.GetParamValue(CategoriesInfo.Categories.Select(item => item.Category.Id.IntegerValue).ToArray(), StringValue)
             };
         }
 
@@ -165,10 +166,10 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         public void Initialize() {
             if(_rule != null) {
-                SelectedParameter = new ParameterViewModel(_rule.Provider);
-                if(!_categoriesInfo.Parameters.Contains(SelectedParameter)) {
-                    _categoriesInfo.Parameters.Add(SelectedParameter);
+                if(!_categoriesInfo.Parameters.Any(item => item.FilterableValueProvider.Equals(_rule.Provider))) {
+                    _categoriesInfo.Parameters.Add(new ParameterViewModel(_rule.Provider));
                 }
+                SelectedParameter = _categoriesInfo.Parameters.First(item => item.FilterableValueProvider.Equals(_rule.Provider));
                 ParameterSelectionChanged(null);
                 SelectedRuleEvaluator = new RuleEvaluatorViewModel(_rule.Evaluator);
                 EvaluatorSelectionChanged(null);

@@ -34,11 +34,9 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         public void InitializeParameters() {
-            var parameterInitializer = new ParameterInitializer(_revitRepository);
             Parameters = new ObservableCollection<ParameterViewModel>(
                 _revitRepository.GetDocuments()
-                .SelectMany(item => _revitRepository.GetParameters(item, Categories.Select(c => c.Category))
-                    .Select(p => new ParameterValueProvider(_revitRepository) { RevitParam = parameterInitializer.InitializeParameter(item, p) }))
+                .SelectMany(item => _revitRepository.GetParameters(item, Categories.Select(c => c.Category)))
                 .Distinct()
                 .Select(item=>new ParameterViewModel(item))
                 .OrderBy(item=>item.Name));
