@@ -135,8 +135,14 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         public bool IsEmpty() {
-            return SelectedParameter == null || SelectedRuleEvaluator == null ||
-                   (SelectedValue == null && StringValue == null);
+            if(SelectedRuleEvaluator?.RuleEvaluator?.Evaluator != Models.Evaluators.RuleEvaluators.FilterHasNoValue
+                && SelectedRuleEvaluator?.RuleEvaluator?.Evaluator != Models.Evaluators.RuleEvaluators.FilterHasValue) {
+                return SelectedParameter == null || SelectedRuleEvaluator == null
+                    || (SelectedValue == null && StringValue == null);
+            } else {
+                return SelectedParameter == null || SelectedRuleEvaluator == null;
+            }
+
         }
 
         private bool CanValueEdit() {
@@ -158,6 +164,10 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         public string GetErrorText() {
             if(SelectedValue != null) {
+                return null;
+            }
+            if(SelectedRuleEvaluator.RuleEvaluator.Evaluator == Models.Evaluators.RuleEvaluators.FilterHasValue
+               || SelectedRuleEvaluator.RuleEvaluator.Evaluator == Models.Evaluators.RuleEvaluators.FilterHasNoValue) {
                 return null;
             }
 

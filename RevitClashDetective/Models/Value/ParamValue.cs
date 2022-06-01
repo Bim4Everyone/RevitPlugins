@@ -39,10 +39,10 @@ namespace RevitClashDetective.Models.Value {
         public static ParamValue GetParamValue(int[] categories, RevitParam revitParam, string value) {
             switch(revitParam.StorageType) {
                 case StorageType.Integer: {
-                    return new IntParamValue(int.Parse(value), value);
+                    return new IntParamValue(value != null ? int.Parse(value) : 0, value);
                 }
                 case StorageType.Double: {
-                    return new DoubleParamValue(double.Parse(value), value);
+                    return new DoubleParamValue(value != null ? double.Parse(value) : 0, value);
                 }
                 case StorageType.String: {
                     return new StringParamValue(value, value);

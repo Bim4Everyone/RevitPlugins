@@ -61,7 +61,6 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
         }
 
         private ParamValue GetElementParam(int[] categories, Document doc, Element item) {
-
             if(item.IsExistsParam(RevitParam)) {
                 return ParamValue.GetParamValue(categories, RevitParam, item);
             } else {
