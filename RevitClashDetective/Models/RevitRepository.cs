@@ -13,6 +13,7 @@ using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 
 using RevitClashDetective.Handlers;
+using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.FilterableValueProviders;
 
 using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
@@ -25,6 +26,7 @@ namespace RevitClashDetective.Models {
         private readonly Document _document;
         private readonly UIDocument _uiDocument;
         private readonly RevitEventHandler _revitEventHandler;
+        private List<string> _endings = new List<string> { "_отсоединено", "_detached" };
 
         public RevitRepository(Application application, Document document) {
             _application = application;
@@ -34,6 +36,44 @@ namespace RevitClashDetective.Models {
             _uiDocument = new UIDocument(document);
 
             _revitEventHandler = new RevitEventHandler();
+            _endings.Add(_application.Username);
+        }
+
+        public static string ProfilePath { get; } = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101";
+        public static List<BuiltInParameter> BaseLevelParameters = new List<BuiltInParameter>() {
+            BuiltInParameter.MULTISTORY_STAIRS_REF_LEVEL,
+            BuiltInParameter.DPART_BASE_LEVEL,
+            BuiltInParameter.STAIRS_BASE_LEVEL,
+            BuiltInParameter.FABRICATION_LEVEL_PARAM,
+            BuiltInParameter.TRUSS_ELEMENT_REFERENCE_LEVEL_PARAM,
+            BuiltInParameter.GROUP_LEVEL,
+            BuiltInParameter.SPACE_REFERENCE_LEVEL_PARAM,
+            BuiltInParameter.RBS_START_LEVEL_PARAM,
+            BuiltInParameter.STAIRS_RAILING_BASE_LEVEL_PARAM,
+            BuiltInParameter.IMPORT_BASE_LEVEL,
+            BuiltInParameter.STAIRS_BASE_LEVEL_PARAM,
+            BuiltInParameter.SCHEDULE_BASE_LEVEL_PARAM,
+            BuiltInParameter.FACEROOF_LEVEL_PARAM,
+            BuiltInParameter.ROOF_BASE_LEVEL_PARAM,
+            BuiltInParameter.ROOF_CONSTRAINT_LEVEL_PARAM,
+            BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM };
+
+        public string GetDocumentName() {
+            return GetDocumentName(_document);
+        }
+
+        public string GetDocumentName(Document doc) {
+            var title = doc.Title;
+            foreach(var ending in _endings) {
+                if(title.IndexOf(ending) > -1) {
+                    title = title.Substring(0, title.IndexOf(ending));
+                }
+            }
+            return title;
+        }
+
+        public string GetObjectName() {
+            return _document.Title.Split('_').FirstOrDefault();
         }
 
         public Element GetElement(ElementId id) {
@@ -120,11 +160,11 @@ namespace RevitClashDetective.Models {
             if(providers.First().RevitParam is SystemParam) {
                 if(providers.All(item => item.RevitParam.Id.Equals(providers.First().RevitParam.Id, StringComparison.CurrentCultureIgnoreCase))) {
                     providers.First().DisplayValue = providers.First().Name;
-                    return new [] { providers.First() };
+                    return new[] { providers.First() };
                 }
                 return providers;
             }
-            return new [] { providers.First() };
+            return new[] { providers.First() };
         }
 
         public IEnumerable<Document> GetDocuments() {
@@ -150,10 +190,19 @@ namespace RevitClashDetective.Models {
         public async Task SelectAndShowElement(ElementId id) {
             _revitEventHandler.TransactAction = () => {
                 _uiDocument.Selection.SetElementIds(new[] { id });
-                var commandId = RevitCommandId.LookupCommandId("ID_VIEW_APPLY_SELECTION_BOX");
+                var commandSelectId = RevitCommandId.LookupCommandId("ID_VIEW_APPLY_SELECTION_BOX");
+                if(!(commandSelectId is null) && _uiDocument.Application.CanPostCommand(commandSelectId)) {
+                    _uiApplication.PostCommand(commandSelectId);
+                }
+            };
+            await _revitEventHandler.Raise();
+            _revitEventHandler.TransactAction = () => {
+                _uiDocument.Selection.SetElementIds(new[] { id });
+                var commandId = RevitCommandId.LookupCommandId("ID_ZOOM_FIT");
                 if(!(commandId is null) && _uiDocument.Application.CanPostCommand(commandId)) {
                     _uiApplication.PostCommand(commandId);
                 }
+
             };
             await _revitEventHandler.Raise();
         }

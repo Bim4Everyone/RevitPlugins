@@ -24,6 +24,7 @@ namespace RevitClashDetective.ViewModels {
         private readonly FiltersConfig _filtersConfig;
         private readonly RevitRepository _revitRepository;
         private ObservableCollection<CheckViewModel> _checks;
+        private string _messageText;
 
         public MainViewModel(ChecksConfig checksConfig, FiltersConfig filtersConfig, RevitRepository revitRepository) {
             _checksConfig = checksConfig;
@@ -43,6 +44,11 @@ namespace RevitClashDetective.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
+        public string MessageText {
+            get => _messageText;
+            set => this.RaiseAndSetIfChanged(ref _messageText, value);
+        }
+
         public ICommand AddCheckCommand { get; }
         public ICommand RemoveCheckCommand { get; }
         public ICommand FindClashesCommand { get; }
@@ -55,8 +61,8 @@ namespace RevitClashDetective.ViewModels {
 
         private void InitializeChecks() {
             Checks = new ObservableCollection<CheckViewModel>();
-            foreach (var check in _checksConfig.Checks) {
-                Checks.Add(new CheckViewModel(check, _revitRepository, _filtersConfig));
+            foreach(var check in _checksConfig.Checks) {
+                Checks.Add(new CheckViewModel(_revitRepository, _filtersConfig, check));
             }
         }
 
@@ -65,8 +71,6 @@ namespace RevitClashDetective.ViewModels {
                 new CheckViewModel(_revitRepository, _filtersConfig)
             };
         }
-
-
 
         private void AddCheck(object p) {
             Checks.Add(new CheckViewModel(_revitRepository, _filtersConfig));
@@ -78,13 +82,14 @@ namespace RevitClashDetective.ViewModels {
             }
         }
 
-        private void FindClashes(object p) {
-            //Stopwatch sw = Stopwatch.StartNew();
-            //var clashes = Checks.SelectMany(item => item.GetClashes()).ToList();
-            //TaskDialog.Show("Revit", $"Время: " + sw.Elapsed.ToString() + $". Количество: { clashes.Count}");
-            var view = new NavigatorView() { DataContext = new ClashesViewModel(_revitRepository, Checks.SelectMany(item => item.GetClashes()).ToList()) };
-            view.Show();
+        private async void FindClashes(object p) {
+            foreach(var check in Checks) {
+                check.SaveClashes();
+            }
             SaveConfig();
+            MessageText = "Проверка на коллизии прошла успешно";
+            await Task.Delay(3000);
+            MessageText = null;
         }
 
         private void SaveConfig() {
@@ -99,7 +104,17 @@ namespace RevitClashDetective.ViewModels {
             _checksConfig.SaveProjectConfig();
         }
 
+        private bool HasSameNames() {
+            return Checks.Select(item => item.Name)
+                .GroupBy(item => item)
+                .Any(item => item.Count() > 1);
+        }
+
         private bool CanFindClashes(object p) {
+            if(HasSameNames()) {
+                ErrorText = $"У проверок должны быть разные имена.";
+                return false;
+            }
             var emptyCheck = Checks.FirstOrDefault(item => !item.IsFilterSelected);
             if(emptyCheck != null) {
                 ErrorText = $"У проверки \"{emptyCheck.Name}\" необходимо выбрать хотя бы один фильтр.";

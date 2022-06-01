@@ -1,37 +1,76 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
+using dosymep.Bim4Everyone;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.Clashes;
 
 namespace RevitClashDetective.ViewModels.Navigator {
     internal class ClashesViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private List<ClashViewModel> _clashes;
         private CollectionViewSource _clashesViewSource;
+        private string _selectedFile;
+        private string _message;
 
-        public ClashesViewModel(RevitRepository revitRepository, IEnumerable<ClashModel> clashModels) {
+        //public ClashesViewModel(RevitRepository revitRepository, IEnumerable<ClashModel> clashModels) {
+        //    _revitRepository = revitRepository;
+        //    Clashes = clashModels.Select(item => new ClashViewModel(item)).ToList();
+
+        //    ClashesViewSource = new CollectionViewSource() { Source = Clashes };
+        //    SelectClashCommand = new RelayCommand(SelectClash);
+        //    SelectNextCommand = new RelayCommand(SelectNext);
+        //    SelectPreviousCommand = new RelayCommand(SelectPrevious);
+        //    SaveCommand = new RelayCommand(SaveConfig);
+        //}
+
+        public ClashesViewModel(RevitRepository revitRepository, string selectedFile = null) {
             _revitRepository = revitRepository;
-            Clashes = clashModels.Select(item => new ClashViewModel(item)).ToList();
 
-            ClashesViewSource = new CollectionViewSource() { Source = Clashes };
+            if(selectedFile == null) {
+                InitializeFiles();
+            } else {
+                InitializeFiles(selectedFile);
+            }
+
+            ClashesViewSource = new CollectionViewSource();
+            InitializeClashesFromFile();
+
+            SelectionChangedCommand = new RelayCommand(SelectionChanged);
             SelectClashCommand = new RelayCommand(SelectClash);
             SelectNextCommand = new RelayCommand(SelectNext);
             SelectPreviousCommand = new RelayCommand(SelectPrevious);
-
+            SaveCommand = new RelayCommand(SaveConfig, CanSaveConfig);
         }
 
         public ICommand SelectClashCommand { get; }
         public ICommand SelectPreviousCommand { get; }
         public ICommand SelectNextCommand { get; }
+        public ICommand SaveCommand { get; }
+        public ICommand SelectionChangedCommand { get; }
+
+        public string[] FileNames { get; set; }
+
+        public bool IsColumnVisible => FileNames != null;
+
+        public string SelectedFile {
+            get => _selectedFile;
+            set => this.RaiseAndSetIfChanged(ref _selectedFile, value);
+        }
 
         public List<ClashViewModel> Clashes {
             get => _clashes;
@@ -43,9 +82,47 @@ namespace RevitClashDetective.ViewModels.Navigator {
             set => this.RaiseAndSetIfChanged(ref _clashesViewSource, value);
         }
 
+        public string Message {
+            get => _message;
+            set => this.RaiseAndSetIfChanged(ref _message, value);
+        }
+
+        private void InitializeFiles(string selectedFile) {
+            var profilePath = RevitRepository.ProfilePath;
+            FileNames = Directory.GetFiles(Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName()))
+                .Select(path => Path.GetFileNameWithoutExtension(path))
+                .Where(item => item.Equals(selectedFile, StringComparison.CurrentCultureIgnoreCase))
+                .ToArray();
+            SelectedFile = FileNames.FirstOrDefault();
+        }
+
+        private void InitializeFiles() {
+            var profilePath = RevitRepository.ProfilePath;
+            FileNames = Directory.GetFiles(Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName()))
+                .Select(path => Path.GetFileNameWithoutExtension(path))
+                .ToArray();
+            SelectedFile = FileNames.FirstOrDefault();
+        }
+
+        private void InitializeClashesFromFile() {
+            var documentNames = _revitRepository.GetDocuments().Select(item => item.Title).ToList();
+            if(SelectedFile != null) {
+                var config = ClashesConfig.GetFiltersConfig(_revitRepository.GetObjectName(), SelectedFile);
+                Clashes = config.Clashes.Select(item => new ClashViewModel(item))
+                    .Where(item => IsValid(documentNames, item))
+                    .ToList();
+                ClashesViewSource.Source = Clashes;
+            }
+        }
+
+        private bool IsValid(List<string> documentNames, ClashViewModel clash) {
+            var clashDocuments = new[] { clash.FirstDocumentName, clash.SecondDocumentName };
+            return clashDocuments.All(item => documentNames.Any(d => d.Contains(item)));
+        }
+
         private async void SelectClash(object p) {
             var clash = p as ClashViewModel;
-            await _revitRepository.SelectAndShowElement(clash.GetElementId());
+            await _revitRepository.SelectAndShowElement(clash.GetElementId(_revitRepository.Doc.Title));
         }
 
         private async void SelectNext(object p) {
@@ -54,7 +131,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 ClashesViewSource.View.MoveCurrentToPrevious();
             } else {
                 var clash = ClashesViewSource.View.CurrentItem as ClashViewModel;
-                await _revitRepository.SelectAndShowElement(clash.GetElementId());
+                await _revitRepository.SelectAndShowElement(clash.GetElementId(_revitRepository.GetDocumentName()));
 
             }
         }
@@ -65,8 +142,30 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 ClashesViewSource.View.MoveCurrentToNext();
             } else {
                 var clash = ClashesViewSource.View.CurrentItem as ClashViewModel;
-                await _revitRepository.SelectAndShowElement(clash.GetElementId());
+                await _revitRepository.SelectAndShowElement(clash.GetElementId(_revitRepository.Doc.Title));
             }
+        }
+
+        private async void SaveConfig(object p) {
+            var config = ClashesConfig.GetFiltersConfig(_revitRepository.GetObjectName(), SelectedFile);
+            config.Clashes = Clashes.Select(item => GetUpdatedClash(item)).ToList();
+            config.SaveProjectConfig();
+            Message = "Файл успешно сохранен";
+            await Task.Delay(3000);
+            Message = null;
+        }
+
+        private bool CanSaveConfig(object p) {
+            return SelectedFile != null;
+        }
+
+        private ClashModel GetUpdatedClash(ClashViewModel clash) {
+            clash.Clash.IsSolved = clash.IsSolved;
+            return clash.Clash;
+        }
+
+        private void SelectionChanged(object p) {
+            InitializeClashesFromFile();
         }
     }
 }

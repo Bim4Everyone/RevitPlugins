@@ -68,11 +68,21 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <DataGridTemplateColumn Width="Auto" >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type vm:CheckViewModel}">
+                            <Button Click="ButtonOk_Click" Command="{Binding ShowClashesCommand}" ToolTip="Показать отчет по коллизиям">
+                                <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Reports/Report_16x16.png"/>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <StackPanel Grid.Row="8" Grid.ColumnSpan="4" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
             <TextBlock Margin="10" VerticalAlignment="Center"  Foreground="Orange" Text="{Binding ErrorText}" />
-            <Button Content="Запуск" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOk_Click" Command="{Binding FindClashesCommand}"/>
+            <TextBlock Margin="10" VerticalAlignment="Center"  Foreground="Green" Text="{Binding MessageText}" />
+            <Button Content="Запуск" Height="25" Width="70" Margin="10" IsDefault="True" Command="{Binding FindClashesCommand}"/>
             <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
         </StackPanel>
     </Grid>
