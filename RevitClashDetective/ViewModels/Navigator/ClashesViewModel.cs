@@ -44,6 +44,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
             SelectNextCommand = new RelayCommand(SelectNext);
             SelectPreviousCommand = new RelayCommand(SelectPrevious);
             SaveCommand = new RelayCommand(SaveConfig, CanSaveConfig);
+
+            SelectionDataChangedCommand = new RelayCommand(SelectionDataChanged);
         }
 
         public ICommand SelectClashCommand { get; }
@@ -51,6 +53,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
         public ICommand SelectNextCommand { get; }
         public ICommand SaveCommand { get; }
         public ICommand SelectionChangedCommand { get; }
+        public ICommand SelectionDataChangedCommand { get; }
 
         public string[] FileNames { get; set; }
 
@@ -122,7 +125,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
             } else {
                 var clash = ClashesViewSource.View.CurrentItem as ClashViewModel;
                 await _revitRepository.SelectAndShowElement(clash.GetElementId(_revitRepository.GetDocumentName()));
-
             }
         }
 
@@ -156,6 +158,9 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private void SelectionChanged(object p) {
             InitializeClashesFromFile();
+        }
+        private void SelectionDataChanged(object p) {
+            var index = ClashesViewSource.View.CurrentPosition; // чтобы не сбивалась позиция при первом нажатии стрелок
         }
     }
 }

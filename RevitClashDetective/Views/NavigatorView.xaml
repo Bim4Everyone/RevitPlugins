@@ -53,6 +53,11 @@
                   AlternationCount="2"
                   Loaded="_dg_Loaded"
                   ItemsSource="{Binding ClashesViewSource.View}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding SelectionDataChangedCommand}"></i:InvokeCommandAction>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
             <DataGrid.CellStyle>
                 <Style TargetType="{x:Type DataGridCell}">
                     <Style.Triggers>
