@@ -190,21 +190,16 @@ namespace RevitClashDetective.Models {
         public async Task SelectAndShowElement(ElementId id) {
             _revitEventHandler.TransactAction = () => {
                 _uiDocument.Selection.SetElementIds(new[] { id });
+
                 var commandSelectId = RevitCommandId.LookupCommandId("ID_VIEW_APPLY_SELECTION_BOX");
-                if(!(commandSelectId is null) && _uiDocument.Application.CanPostCommand(commandSelectId)) {
+                if(!(commandSelectId is null) && _uiApplication.CanPostCommand(commandSelectId)) {
                     _uiApplication.PostCommand(commandSelectId);
                 }
             };
-            await _revitEventHandler.Raise();
-            _revitEventHandler.TransactAction = () => {
-                _uiDocument.Selection.SetElementIds(new[] { id });
-                var commandId = RevitCommandId.LookupCommandId("ID_ZOOM_FIT");
-                if(!(commandId is null) && _uiDocument.Application.CanPostCommand(commandId)) {
-                    _uiApplication.PostCommand(commandId);
-                }
 
-            };
             await _revitEventHandler.Raise();
+            await _revitEventHandler.Raise();
+
         }
     }
 }
