@@ -151,14 +151,6 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                 return false;
             }
 
-            if((SelectedRuleEvaluator.RuleEvaluator.Evaluator == Models.Evaluators.RuleEvaluators.FilterNotEquals
-                || SelectedRuleEvaluator.RuleEvaluator.Evaluator == Models.Evaluators.RuleEvaluators.FilterNumericEquals
-                || SelectedRuleEvaluator.RuleEvaluator.Evaluator == Models.Evaluators.RuleEvaluators.FilterStringEquals)
-               && SelectedParameter.FilterableValueProvider is ParameterValueProvider provider
-               && provider.RevitParam.StorageType == Autodesk.Revit.DB.StorageType.ElementId) {
-                return false;
-            }
-
             return true;
         }
 

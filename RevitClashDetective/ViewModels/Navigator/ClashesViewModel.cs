@@ -90,10 +90,13 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private void InitializeFiles() {
             var profilePath = RevitRepository.ProfilePath;
-            FileNames = Directory.GetFiles(Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName()))
-                .Select(path => Path.GetFileNameWithoutExtension(path))
-                .ToArray();
-            SelectedFile = FileNames.FirstOrDefault();
+            var path = Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName());
+            if(File.Exists(path)) {
+                FileNames = Directory.GetFiles(path)
+               .Select(item => Path.GetFileNameWithoutExtension(item))
+               .ToArray();
+                SelectedFile = FileNames.FirstOrDefault();
+            }
         }
 
         private void InitializeClashesFromFile() {
