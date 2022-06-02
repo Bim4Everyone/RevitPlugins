@@ -200,12 +200,15 @@ namespace RevitClashDetective.Models {
                 _uiDocument.ActiveView = _view;
             }
             _revitEventHandler.TransactAction = () => {
-                _uiDocument.Selection.SetElementIds(new[] { id });
+                //_uiDocument.Selection.SetElementIds(new[] { id });
 
-                var commandSelectId = RevitCommandId.LookupCommandId("ID_VIEW_APPLY_SELECTION_BOX");
-                if(!(commandSelectId is null) && _uiApplication.CanPostCommand(commandSelectId)) {
-                    _uiApplication.PostCommand(commandSelectId);
-                }
+                //var commandSelectId = RevitCommandId.LookupCommandId("ID_VIEW_APPLY_SELECTION_BOX");
+                //if(!(commandSelectId is null) && _uiApplication.CanPostCommand(commandSelectId)) {
+                //    _uiApplication.PostCommand(commandSelectId);
+                //}
+                SetViewOrientation(_document.GetElement(id).get_BoundingBox(_view));
+                _uiDocument.Selection.SetElementIds(new[] { id });
+                //_uiDocument.ShowElements(new[] { id });
             };
 
             await _revitEventHandler.Raise();
@@ -228,6 +231,19 @@ namespace RevitClashDetective.Models {
                 return providers;
             }
             return new[] { providers.First() };
+        }
+
+        private void SetViewOrientation(BoundingBoxXYZ bb) {
+            using(Transaction t = _document.StartTransaction("Подрезка")) {
+                bb.Max = bb.Max + new XYZ(1, 1, 1);
+                bb.Min = bb.Min - new XYZ(1, 1, 1);
+                _view.SetSectionBox(bb);
+                var uiView = _uiDocument.GetOpenUIViews().FirstOrDefault(item => item.ViewId == _view.Id);
+                if(uiView != null) {
+                    uiView.ZoomAndCenterRectangle(bb.Min - new XYZ(1, 1, 1), bb.Max + new XYZ(1, 1, 1));
+                }
+                t.Commit();
+            }
         }
     }
 }
