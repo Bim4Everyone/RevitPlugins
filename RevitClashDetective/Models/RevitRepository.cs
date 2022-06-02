@@ -26,7 +26,10 @@ namespace RevitClashDetective.Models {
         private readonly Document _document;
         private readonly UIDocument _uiDocument;
         private readonly RevitEventHandler _revitEventHandler;
+        private readonly RevitEventHandler _revitEventHandler2;
         private List<string> _endings = new List<string> { "_отсоединено", "_detached" };
+        private string _clashViewName = "BIM_Проверка на коллизии";
+        private View3D _view;
 
         public RevitRepository(Application application, Document document) {
             _application = application;
@@ -36,7 +39,10 @@ namespace RevitClashDetective.Models {
             _uiDocument = new UIDocument(document);
 
             _revitEventHandler = new RevitEventHandler();
+            _revitEventHandler2 = new RevitEventHandler();
             _endings.Add(_application.Username);
+
+            _view = GetClashView();
         }
 
         public static string ProfilePath { get; } = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101";
@@ -57,6 +63,25 @@ namespace RevitClashDetective.Models {
             BuiltInParameter.ROOF_BASE_LEVEL_PARAM,
             BuiltInParameter.ROOF_CONSTRAINT_LEVEL_PARAM,
             BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM };
+
+        public View3D GetClashView() {
+            var view = new FilteredElementCollector(_document)
+                .OfClass(typeof(View3D))
+                .Cast<View3D>()
+                .FirstOrDefault(item => item.Name.Equals(_clashViewName, StringComparison.CurrentCultureIgnoreCase));
+            if(view == null) {
+                using(Transaction t = _document.StartTransaction("Создание 3D-вида")) {
+                    var type = new FilteredElementCollector(_document)
+                        .OfClass(typeof(ViewFamilyType))
+                        .Cast<ViewFamilyType>()
+                        .First(v => v.ViewFamily == ViewFamily.ThreeDimensional);
+                    view = View3D.CreateIsometric(_document, type.Id);
+                    view.Name = _clashViewName;
+                    t.Commit();
+                }
+            }
+            return view;
+        }
 
         public string GetDocumentName() {
             return GetDocumentName(_document);
@@ -148,24 +173,7 @@ namespace RevitClashDetective.Models {
             .ToList();
         }
 
-        private ParameterValueProvider GetParam(Document doc, Category category, ElementId elementId) {
-            var revitParam = ParameterInitializer.InitializeParameter(doc, elementId);
-            if(elementId.IsSystemId()) {
-                return new ParameterValueProvider(this, revitParam, $"{revitParam.Name} ({category.Name})");
-            }
-            return new ParameterValueProvider(this, revitParam);
-        }
 
-        private IEnumerable<ParameterValueProvider> FilterParamProviders(IEnumerable<ParameterValueProvider> providers) {
-            if(providers.First().RevitParam is SystemParam) {
-                if(providers.All(item => item.RevitParam.Id.Equals(providers.First().RevitParam.Id, StringComparison.CurrentCultureIgnoreCase))) {
-                    providers.First().DisplayValue = providers.First().Name;
-                    return new[] { providers.First() };
-                }
-                return providers;
-            }
-            return new[] { providers.First() };
-        }
 
         public IEnumerable<Document> GetDocuments() {
             var linkedDocuments = new FilteredElementCollector(_document)
@@ -188,6 +196,9 @@ namespace RevitClashDetective.Models {
         }
 
         public async Task SelectAndShowElement(ElementId id) {
+            if(_document.ActiveView != _view) {
+                _uiDocument.ActiveView = _view;
+            }
             _revitEventHandler.TransactAction = () => {
                 _uiDocument.Selection.SetElementIds(new[] { id });
 
@@ -198,8 +209,25 @@ namespace RevitClashDetective.Models {
             };
 
             await _revitEventHandler.Raise();
-            await _revitEventHandler.Raise();
+        }
 
+        private ParameterValueProvider GetParam(Document doc, Category category, ElementId elementId) {
+            var revitParam = ParameterInitializer.InitializeParameter(doc, elementId);
+            if(elementId.IsSystemId()) {
+                return new ParameterValueProvider(this, revitParam, $"{revitParam.Name} ({category.Name})");
+            }
+            return new ParameterValueProvider(this, revitParam);
+        }
+
+        private IEnumerable<ParameterValueProvider> FilterParamProviders(IEnumerable<ParameterValueProvider> providers) {
+            if(providers.First().RevitParam is SystemParam) {
+                if(providers.All(item => item.RevitParam.Id.Equals(providers.First().RevitParam.Id, StringComparison.CurrentCultureIgnoreCase))) {
+                    providers.First().DisplayValue = providers.First().Name;
+                    return new[] { providers.First() };
+                }
+                return providers;
+            }
+            return new[] { providers.First() };
         }
     }
 }
