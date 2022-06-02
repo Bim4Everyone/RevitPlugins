@@ -83,7 +83,7 @@ namespace RevitClashDetective.ViewModels {
         }
 
         private async void FindClashes(object p) {
-            foreach(var check in Checks) {
+            foreach(var check in Checks.Where(item => item.IsSelected)) {
                 check.SaveClashes();
             }
             SaveConfig();

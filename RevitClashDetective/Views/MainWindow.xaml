@@ -35,6 +35,13 @@
                   AlternationCount="2"
                   ItemsSource="{Binding Checks}">
             <DataGrid.Columns>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsSelected,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"></CheckBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTemplateColumn Width="25">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>

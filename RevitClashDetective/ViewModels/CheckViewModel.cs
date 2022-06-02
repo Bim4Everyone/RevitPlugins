@@ -30,6 +30,7 @@ namespace RevitClashDetective.ViewModels {
         private ObservableCollection<ProvidersViewModel> _otherDocumentProviders;
         private bool _hasReport;
         private string _messageText;
+        private bool _isSelected;
 
         public CheckViewModel(RevitRepository revitRepository, FiltersConfig filtersConfig, Check check = null) {
             _revitRepository = revitRepository;
@@ -55,6 +56,11 @@ namespace RevitClashDetective.ViewModels {
         public ICommand SelectMainProviderCommand { get; }
         public ICommand ShowClashesCommand { get; }
         public bool IsFilterSelected => !string.IsNullOrEmpty(SelectedOtherDocProviders) && !string.IsNullOrEmpty(SelectedMainDocProviders);
+
+        public bool IsSelected { 
+            get => _isSelected; 
+            set => this.RaiseAndSetIfChanged(ref _isSelected, value); 
+        }
 
         public bool HasReport {
             get => _hasReport;
@@ -113,7 +119,7 @@ namespace RevitClashDetective.ViewModels {
             config.SaveProjectConfig();
             HasReport = true;
         }
-        
+
 
         private void InitializeFilterProviders() {
             var filters = _filtersConfig.Filters;

@@ -27,17 +27,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private string _selectedFile;
         private string _message;
 
-        //public ClashesViewModel(RevitRepository revitRepository, IEnumerable<ClashModel> clashModels) {
-        //    _revitRepository = revitRepository;
-        //    Clashes = clashModels.Select(item => new ClashViewModel(item)).ToList();
-
-        //    ClashesViewSource = new CollectionViewSource() { Source = Clashes };
-        //    SelectClashCommand = new RelayCommand(SelectClash);
-        //    SelectNextCommand = new RelayCommand(SelectNext);
-        //    SelectPreviousCommand = new RelayCommand(SelectPrevious);
-        //    SaveCommand = new RelayCommand(SaveConfig);
-        //}
-
         public ClashesViewModel(RevitRepository revitRepository, string selectedFile = null) {
             _revitRepository = revitRepository;
 
@@ -117,7 +106,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private bool IsValid(List<string> documentNames, ClashViewModel clash) {
             var clashDocuments = new[] { clash.FirstDocumentName, clash.SecondDocumentName };
-            return clashDocuments.All(item => documentNames.Any(d => d.Contains(item)));
+            return clashDocuments.All(item => documentNames.Any(d => d.Contains(item))) 
+                && clashDocuments.Any(item=> item.Contains(_revitRepository.GetDocumentName()));
         }
 
         private async void SelectClash(object p) {
