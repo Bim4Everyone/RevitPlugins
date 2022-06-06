@@ -111,7 +111,13 @@ namespace RevitLintelPlacement.Models {
             if(!lintelType.IsActive)
                 lintelType.Activate();
             XYZ center = GetLocationPoint(elementInWall);
-            FamilyInstance lintel = _document.Create.NewFamilyInstance(center, lintelType, StructuralType.NonStructural);
+            FamilyInstance lintel = null;
+            if(elementInWall.LevelId != null && elementInWall.LevelId != ElementId.InvalidElementId) {
+                lintel = _document.Create.NewFamilyInstance(center, lintelType, (Level)_document.GetElement(elementInWall.LevelId), StructuralType.NonStructural);
+            } else {
+                lintel = _document.Create.NewFamilyInstance(center, lintelType, StructuralType.NonStructural);
+            }
+             
 
             RotateLintel(lintel, elementInWall, center);
             return lintel;
@@ -183,17 +189,31 @@ namespace RevitLintelPlacement.Models {
                 throw new ArgumentException(nameof(sampleMode), $"Способ выборки \"{nameof(sampleMode)}\" не найден.");
             }
 
-            return collector
+            var smth = collector.OfClass(typeof(FamilyInstance))
+                .Cast<FamilyInstance>()
+                .Where(f => f?.Symbol != null && f.Symbol?.Family != null && f.Symbol.Family.Name != null &&
+                f.Symbol.Family.Name.ToLower().Contains(LintelsCommonConfig.HolesFilter.ToLower())).ToList();
+
+            var smth2 = collector
                 .WherePasses(categoryFilter)
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
-                .Where(e => e.Host is Wall && e.Location != null)
-                .Union(
-                 collector.OfClass(typeof(FamilyInstance))
-                .Cast<FamilyInstance>()
-                .Where(f => f?.Symbol != null && f.Symbol?.Family != null && f.Symbol.Family.Name != null &&
-                f.Symbol.Family.Name.ToLower().Contains(LintelsCommonConfig.HolesFilter.ToLower())), new FamilyInstanceComparer())
-                .Where(e => CheckElementInWallParameter(e, elementInfos));
+                .Where(e => e.Host is Wall && e.Location != null).ToList();
+
+            return smth2.Union(smth, new FamilyInstanceComparer()).Where(e => CheckElementInWallParameter(e, elementInfos)).ToList();
+
+            //return collector
+            //    .WherePasses(categoryFilter)
+            //    .OfClass(typeof(FamilyInstance))
+            //    .Cast<FamilyInstance>()
+            //    .Where(e => e.Host is Wall && e.Location != null)
+            //    .ToList()
+            //    .Union(
+            //     collector.OfClass(typeof(FamilyInstance))
+            //    .Cast<FamilyInstance>()
+            //    .Where(f => f?.Symbol != null && f.Symbol?.Family != null && f.Symbol.Family.Name != null &&
+            //    f.Symbol.Family.Name.ToLower().Contains(LintelsCommonConfig.HolesFilter.ToLower())).ToList(), new FamilyInstanceComparer())
+            //    .Where(e => CheckElementInWallParameter(e, elementInfos));
         }
 
         public View GetElevation() {
@@ -213,6 +233,7 @@ namespace RevitLintelPlacement.Models {
         //проверка, есть ли сверху элемента стена, у которой тип железобетон (в таком случает перемычку ставить не надо)
         public bool CheckUp(View3D view3D, FamilyInstance elementInWall, IEnumerable<string> linkNames) {
             XYZ viewPoint = GetLocationPoint(elementInWall);
+            viewPoint = new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z+(((Level) _document.GetElement(elementInWall.LevelId))?.Elevation ?? 0));
             ReferenceWithContext refWithContext =
                 GetNearestWallOrColumn(view3D, elementInWall, new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z - 0.32), new XYZ(0, 0, 1), false); //чтобы точка точно была под гранью стены
             if(refWithContext == null)
@@ -254,6 +275,7 @@ namespace RevitLintelPlacement.Models {
             //получение предполагаемой точки вставки перемычки,
             //из которой проводится поиск жб-элементов
             XYZ viewPoint = GetLocationPoint(elementInWall);
+            viewPoint = new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z + (((Level) _document.GetElement(elementInWall.LevelId))?.Elevation ?? 0));
 
             //направление, в котором будет проводиться поиск
             direction = elementInWall.GetTransform().OfVector(direction);
@@ -482,9 +504,10 @@ namespace RevitLintelPlacement.Models {
                 throw new ArgumentNullException(nameof(elementInWall));
             }
             var location = ((LocationPoint) elementInWall.Location).Point;
-            var level = _document.GetElement(elementInWall.LevelId) as Level;
+            //var level = _document.GetElement(elementInWall.LevelId) as Level;
             var height = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningHeight)
                ?? elementInWall.Symbol.GetParamValueOrDefault(LintelsCommonConfig.OpeningHeight);
+
             var bottomBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
             if(bottomBarHeight == 0) {
                 bottomBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_ELEVATION_PARAM);
@@ -495,10 +518,10 @@ namespace RevitLintelPlacement.Models {
 
             double z;
             if(height != null) {
-                z = (double) height + (double) bottomBarHeight + (level?.Elevation ?? 0);
+                z = (double) height + (double) bottomBarHeight /*+ (level?.Elevation ?? 0)*/;
             } else {
                 var topBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
-                z = topBarHeight + (level?.Elevation ?? 0);
+                z = topBarHeight /*+ (level?.Elevation ?? 0)*/;
             }
             return new XYZ(location.X, location.Y, z);
         }
