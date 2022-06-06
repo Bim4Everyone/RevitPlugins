@@ -24,7 +24,7 @@
             TrueValue="Hidden" FalseValue="Visible" />
 
         <DataTemplate DataType="{x:Type vms:FillLevelParamViewModel}">
-            <CheckBox Margin="10">
+            <CheckBox Margin="10" IsChecked="{Binding IsEnabled}">
                 <TextBlock Text="{Binding Name}"/>
             </CheckBox>
         </DataTemplate>

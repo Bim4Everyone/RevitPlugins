@@ -32,18 +32,19 @@ namespace RevitServerFolders {
 
                 SaveExportNwcFileConfig(exportNwcFileViewModel);
                 UnloadAllLinks(exportNwcFileViewModel);
-                ExportFilesToNavisworks(application, exportNwcFileViewModel);
+                ExportFilesToNavisworks(uiApplication, exportNwcFileViewModel);
 
                 TaskDialog.Show("Сообщение!", "Готово!");
             }
         }
 
-        private static void ExportFilesToNavisworks(Autodesk.Revit.ApplicationServices.Application application, ExportNwcFileViewModel exportNwcFileViewModel) {
+        private static void ExportFilesToNavisworks(UIApplication uiApplication,
+            ExportNwcFileViewModel exportNwcFileViewModel) {
             new ExportFilesToNavisworksCommand() {
-                Application = application,
+                Application = uiApplication.Application,
+                UIApplication = uiApplication,
                 SourceFolderName = exportNwcFileViewModel.SourceNwcFolder,
                 TargetFolderName = exportNwcFileViewModel.TargetNwcFolder,
-
                 WithRooms = exportNwcFileViewModel.WithRooms,
                 WithLinkedFiles = exportNwcFileViewModel.WithLinkedFiles,
                 CleanTargetFolder = exportNwcFileViewModel.CleanTargetNwcFolder

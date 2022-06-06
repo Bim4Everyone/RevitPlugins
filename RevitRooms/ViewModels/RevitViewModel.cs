@@ -157,13 +157,17 @@ namespace RevitRooms.ViewModels {
 
                     spartialElement.UpdateLevelSharedParam();
 
+                    // Расчет площади
+                    var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase?.Element };
+                    area.CalculateParam(spartialElement);
+                    bool isChangedArea = area.SetParamValue(spartialElement);
+                    
+                    // Площадь с коэффициентом зависит от площади
                     var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase?.Element };
                     areaWithRatio.CalculateParam(spartialElement);
                     areaWithRatio.SetParamValue(spartialElement);
-
-                    var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase?.Element };
-                    area.CalculateParam(spartialElement);
-                    if(area.SetParamValue(spartialElement) && IsCheckRoomsChanges) {
+                    
+                    if(isChangedArea && IsCheckRoomsChanges) {
                         var differences = areaWithRatio.GetDifferences();
                         var percentChange = areaWithRatio.GetPercentChange();
                         AddElement(InfoElement.BigChangesAreas, FormatMessage(differences, percentChange), spartialElement, bigChangesRooms);
@@ -318,18 +322,21 @@ namespace RevitRooms.ViewModels {
                         // Обновляем общий параметр этажа
                         spartialElement.UpdateLevelSharedParam();
 
-                        var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
+                        // Обновление параметра площади 
+                        var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) {Phase = Phase.Element};
+                        area.CalculateParam(spartialElement);
+                        bool isChangedRoomArea = area.SetParamValue(spartialElement);
+
+                        // Площадь с коэффициентном зависит от площади без коэффициента
+                        var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) {Phase = Phase.Element};
                         areaWithRatio.CalculateParam(spartialElement);
                         areaWithRatio.SetParamValue(spartialElement);
 
-                        // Обновление параметра
-                        // площади с коэффициентом
-                        var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase.Element };
-                        area.CalculateParam(spartialElement);
-                        if(area.SetParamValue(spartialElement) && IsCheckRoomsChanges) {
+                        if(isChangedRoomArea && IsCheckRoomsChanges) {
                             var differences = areaWithRatio.GetDifferences();
                             var percentChange = areaWithRatio.GetPercentChange();
-                            AddElement(InfoElement.BigChangesRoomAreas, FormatMessage(differences, percentChange), spartialElement, bigChangesRooms);
+                            AddElement(InfoElement.BigChangesRoomAreas, FormatMessage(differences, percentChange),
+                                spartialElement, bigChangesRooms);
                         }
                     }
                 }

@@ -29,8 +29,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dosymep", "dosymep", "{0647
 		dosymep\EnumConverter.cs = dosymep\EnumConverter.cs
 		dosymep\EnumToItemsSource.cs = dosymep\EnumToItemsSource.cs
 		dosymep\InverseBooleanConverter.cs = dosymep\InverseBooleanConverter.cs
+		dosymep\IndexConverter.cs = dosymep\IndexConverter.cs
 		dosymep\PlatformWindow.cs = dosymep\PlatformWindow.cs
 		dosymep\RelayCommand.cs = dosymep\RelayCommand.cs
+		dosymep\BasePluginCommand.cs = dosymep\BasePluginCommand.cs
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitGenLookupTables", "RevitGenLookupTables\RevitGenLookupTables.csproj", "{65795232-ECD1-4811-A473-B718AE74E4E1}"
@@ -53,6 +55,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitMarkPlacement", "RevitMarkPlacement\RevitMarkPlacement.csproj", "{8DF9A156-6ACD-4E5E-A2BA-0B748ABF225C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitSetLevelSection", "RevitSetLevelSection\RevitSetLevelSection.csproj", "{4ABC3706-AF4D-48E1-AA42-87D379B742E1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitClashDetective", "RevitClashDetective\RevitClashDetective.csproj", "{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -232,6 +236,18 @@ Global
 		{4ABC3706-AF4D-48E1-AA42-87D379B742E1}.R2021|x64.Build.0 = R2021|x64
 		{4ABC3706-AF4D-48E1-AA42-87D379B742E1}.R2022|x64.ActiveCfg = R2022|x64
 		{4ABC3706-AF4D-48E1-AA42-87D379B742E1}.R2022|x64.Build.0 = R2022|x64
+		{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}.D2020|x64.ActiveCfg = D2020|x64
+		{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}.D2020|x64.Build.0 = D2020|x64
+		{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}.D2021|x64.ActiveCfg = D2021|x64
+		{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}.D2021|x64.Build.0 = D2021|x64
+		{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}.D2022|x64.ActiveCfg = D2022|x64
+		{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}.D2022|x64.Build.0 = D2022|x64
+		{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}.R2020|x64.ActiveCfg = R2020|x64
+		{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}.R2020|x64.Build.0 = R2020|x64
+		{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}.R2021|x64.ActiveCfg = R2021|x64
+		{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}.R2021|x64.Build.0 = R2021|x64
+		{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}.R2022|x64.ActiveCfg = R2022|x64
+		{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}.R2022|x64.Build.0 = R2022|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

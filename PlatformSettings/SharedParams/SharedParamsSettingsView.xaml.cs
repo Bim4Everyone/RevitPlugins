@@ -47,7 +47,7 @@ namespace PlatformSettings.SharedParams {
             Name = revitParams.Name;
             Content = new SharedParamsSettingsView() { ViewModel = this };
 
-            SharedParams = new ObservableCollection<RevitParamViewModel>(_revitParamsConfig.GetSharedParams().Select(item => new RevitParamViewModel(item)));
+            SharedParams = new ObservableCollection<RevitParamViewModel>(_revitParamsConfig.GetRevitParams().Select(item => new RevitParamViewModel(item)));
             OnPropertyChanged(nameof(SharedParams));
 
             OpenFile = new RelayCommand(SelectConfigFile);

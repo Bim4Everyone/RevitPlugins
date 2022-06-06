@@ -7,12 +7,15 @@ using System.Linq;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
+using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Events;
 
 #endregion
 
 namespace RevitServerFolders.Export {
     public class ExportFilesToNavisworksCommand {
         public Application Application { get; set; }
+        public UIApplication UIApplication { get; set; }
 
         public string SourceFolderName { get; set; }
         public string TargetFolderName { get; set; }
@@ -31,7 +34,8 @@ namespace RevitServerFolders.Export {
             }
 
             if(string.IsNullOrEmpty(TargetFolderName)) {
-                throw new InvalidOperationException("Перед использованием укажите папку сохранения 3D видов Navisworks.");
+                throw new InvalidOperationException(
+                    "Перед использованием укажите папку сохранения 3D видов Navisworks.");
             }
 
             if(!OptionalFunctionalityUtils.IsNavisworksExporterAvailable()) {
@@ -49,27 +53,45 @@ namespace RevitServerFolders.Export {
             Directory.CreateDirectory(TargetFolderName);
             foreach(string fileName in Directory.EnumerateFiles(SourceFolderName, "*.rvt")) {
                 Application.FailuresProcessing += ApplicationOnFailuresProcessing;
+                UIApplication.DialogBoxShowing += UIApplicationOnDialogBoxShowing;
                 var document = Application.OpenDocumentFile(fileName);
                 try {
                     var exportView = new FilteredElementCollector(document)
                         .OfClass(typeof(View3D))
                         .OfType<View3D>()
                         .Where(item => !item.IsTemplate)
-                        .FirstOrDefault(item => item.Name.Equals("Navisworks", StringComparison.CurrentCultureIgnoreCase));
+                        .FirstOrDefault(item =>
+                            item.Name.Equals("Navisworks", StringComparison.CurrentCultureIgnoreCase));
 
                     if(exportView == null) {
                         continue;
                     }
-                    
+
+
+                    var hasElements = new FilteredElementCollector(document, exportView.Id)
+                        .WhereElementIsNotElementType()
+                        .Any(item =>
+                            item.get_Geometry(new Options() {View = exportView, ComputeReferences = true})?.Any() == true);
+
+                    if(!hasElements) {
+                        continue;
+                    }
+
                     document.Export(TargetFolderName, GetFileName(fileName), GetExportOptions(exportView));
                     if(WithRooms) {
-                        document.Export(TargetFolderName, GetRoomsFileName(fileName), GetRoomsExportOptions(exportView));
+                        document.Export(TargetFolderName, GetRoomsFileName(fileName),
+                            GetRoomsExportOptions(exportView));
                     }
                 } finally {
                     document.Close(false);
                     Application.FailuresProcessing -= ApplicationOnFailuresProcessing;
+                    UIApplication.DialogBoxShowing -= UIApplicationOnDialogBoxShowing;
                 }
             }
+        }
+
+        private void UIApplicationOnDialogBoxShowing(object sender, DialogBoxShowingEventArgs e) {
+            e.OverrideResult(1);
         }
 
         private void ApplicationOnFailuresProcessing(object sender, FailuresProcessingEventArgs e) {

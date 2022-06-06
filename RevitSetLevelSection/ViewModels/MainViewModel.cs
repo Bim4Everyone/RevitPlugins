@@ -58,15 +58,16 @@ namespace RevitSetLevelSection.ViewModels {
         public ObservableCollection<FillParamViewModel> FillParams { get; }
 
         private IEnumerable<FillParamViewModel> GetFillParams() {
-            //yield return new FillLevelParamViewModel(_revitRepository) { RevitParam = SharedParamsConfig.Instance.Level };
+            yield return new FillLevelParamViewModel(_revitRepository) {
+                RevitParam = SharedParamsConfig.Instance.Level
+            };
+            
             yield return new FillMassParamViewModel(this, _revitRepository) {
                 RevitParam = SharedParamsConfig.Instance.BuildingWorksBlock
             };
+            
             yield return new FillMassParamViewModel(this, _revitRepository) {
                 RevitParam = SharedParamsConfig.Instance.BuildingWorksSection
-            };
-            yield return new FillMassParamViewModel(this, _revitRepository) {
-                RevitParam = SharedParamsConfig.Instance.EconomicFunction
             };
         }
 
@@ -96,7 +97,7 @@ namespace RevitSetLevelSection.ViewModels {
                 return false;
             }
 
-            if(!LinkType.IsLoaded) {
+            if(LinkType != null && !LinkType.IsLoaded) {
                 ErrorText = "Загрузите выбранный связанный файл.";
                 return false;
             }
@@ -134,9 +135,11 @@ namespace RevitSetLevelSection.ViewModels {
 
             foreach(FillParamViewModel fillParam in FillParams) {
                 ParamSettings paramSettings = settings.ParamSettings
-                    .FirstOrDefault(item => item.PropertyName.Equals(fillParam.RevitParam.PropertyName));
+                    .FirstOrDefault(item => item.PropertyName.Equals(fillParam.RevitParam.Id));
 
-                fillParam.SetParamSettings(paramSettings);
+                if(paramSettings != null) {
+                    fillParam.SetParamSettings(paramSettings);
+                }
             }
         }
 

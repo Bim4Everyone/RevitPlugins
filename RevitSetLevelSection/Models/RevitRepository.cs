@@ -9,8 +9,12 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using DevExpress.Xpf.Core.FilteringUI;
+
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
+
+using RevitSetLevelSection.Models.LevelDefinitions;
 
 using InvalidOperationException = Autodesk.Revit.Exceptions.InvalidOperationException;
 
@@ -21,6 +25,64 @@ namespace RevitSetLevelSection.Models {
 
         private readonly Document _document;
         private readonly UIDocument _uiDocument;
+
+        private Dictionary<ElementId, LevelDefinition> _algorithms
+            = new Dictionary<ElementId, LevelDefinition>() {
+                {
+                    new ElementId(BuiltInCategory.OST_Walls),
+                    new LevelDefinition() {
+                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
+                    }
+                }, {
+                    new ElementId(BuiltInCategory.OST_Floors),
+                    new LevelDefinition() {BBPosition = new BBPositionTop(), LevelProvider = new LevelNearestProvider()}
+                }, {
+                    new ElementId(BuiltInCategory.OST_Doors),
+                    new LevelDefinition() {
+                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
+                    }
+                }, {
+                    new ElementId(BuiltInCategory.OST_Windows),
+                    new LevelDefinition() {
+                        BBPosition = new BBPositionMiddle(), LevelProvider = new LevelBottomProvider()
+                    }
+                }, {
+                    new ElementId(BuiltInCategory.OST_GenericModel),
+                    new LevelDefinition() {
+                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
+                    }
+                }, {
+                    new ElementId(BuiltInCategory.OST_Roofs),
+                    new LevelDefinition() {
+                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
+                    }
+                }, {
+                    new ElementId(BuiltInCategory.OST_Ceilings),
+                    new LevelDefinition() {
+                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
+                    }
+                }, {
+                    new ElementId(BuiltInCategory.OST_Columns),
+                    new LevelDefinition() {
+                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
+                    }
+                }, {
+                    new ElementId(BuiltInCategory.OST_Parts),
+                    new LevelDefinition() {
+                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
+                    }
+                }, {
+                    new ElementId(BuiltInCategory.OST_Gutter),
+                    new LevelDefinition() {
+                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
+                    }
+                }, {
+                    new ElementId(BuiltInCategory.OST_StairsRailing),
+                    new LevelDefinition() {
+                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
+                    }
+                },
+            };
 
         public RevitRepository(Application application, Document document) {
             _application = application;
@@ -58,7 +120,41 @@ namespace RevitSetLevelSection.Models {
                 .OfType<RevitLinkInstance>()
                 .ToList();
         }
-        
+
+        public void SetLevelParam(RevitParam revitParam) {
+            using(Transaction transaction =
+                  _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
+
+                List<Level> levels = GetLevels();
+                IEnumerable<Element> elements = GetElements(revitParam);
+                foreach(Element element in elements) {
+                    try {
+                        string paramValue = GetLevelName(element, levels);
+                        element.SetParamValue(revitParam, paramValue);
+                    } catch { }
+                }
+
+                transaction.Commit();
+            }
+        }
+
+        private List<Level> GetLevels() {
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_Levels)
+                .OfType<Level>()
+                .ToList();
+        }
+
+        private string GetLevelName(Element element, List<Level> levels) {
+            var outline = GetOutline(element, Transform.Identity);
+            if(_algorithms.TryGetValue(element.Category.Id, out var levelDefinition)) {
+                return levelDefinition.GetLevelName(outline, levels);
+            }
+
+            return null;
+        }
+
         public void UpdateElements(RevitParam revitParam, string paramValue) {
             using(Transaction transaction = _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
                 ProjectInfo.SetParamValue(revitParam, paramValue);
@@ -138,9 +234,13 @@ namespace RevitSetLevelSection.Models {
         }
 
         private XYZ GetCenterPoint(Element element) {
-            Solid solid = GetSolid(element, Transform.Identity);
-            if(solid != null) {
-                return solid.ComputeCentroid();
+            try {
+                Solid solid = GetSolid(element, Transform.Identity);
+                if(solid != null) {
+                    return solid.ComputeCentroid();
+                }
+            } catch {
+                
             }
 
             var elementOutline = GetOutline(element, Transform.Identity);
@@ -183,9 +283,13 @@ namespace RevitSetLevelSection.Models {
             Solid resultSolid = solids.First();
             solids.Remove(resultSolid);
 
-            foreach(Solid solid in solids) {
-                resultSolid =
-                    BooleanOperationsUtils.ExecuteBooleanOperation(resultSolid, solid, BooleanOperationsType.Union);
+            try {
+                foreach(Solid solid in solids) {
+                    resultSolid =
+                        BooleanOperationsUtils.ExecuteBooleanOperation(resultSolid, solid, BooleanOperationsType.Union);
+                }
+            } catch(InvalidOperationException) {
+                return null;
             }
 
             return SolidUtils.CreateTransformed(resultSolid, transform);
