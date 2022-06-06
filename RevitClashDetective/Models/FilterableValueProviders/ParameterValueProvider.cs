@@ -16,6 +16,7 @@ using pyRevitLabs.Json;
 using RevitClashDetective.Models.Evaluators;
 using RevitClashDetective.Models.FilterGenerators;
 using RevitClashDetective.Models.Interfaces;
+using RevitClashDetective.Models.Utils;
 using RevitClashDetective.Models.Value;
 
 namespace RevitClashDetective.Models.FilterableValueProviders {
@@ -54,10 +55,12 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
         }
 
         private IEnumerable<ParamValue> GetValues(int[] categories, Collector collector, ElementMulticategoryFilter categoryFilter) {
-            return collector.RevitCollector.WherePasses(categoryFilter)
-                       .WhereElementIsNotElementType()
-                       .Select(item => GetElementParam(categories, collector.Document, item))
-                       .Where(item => item != null && item.Value != null && item.Value as ElementId != ElementId.InvalidElementId);
+            return collector.RevitCollector
+                .WhereElementIsNotElementType()
+                .WherePasses(categoryFilter)
+                .Where(item => item != null)
+                .Select(item => GetElementParam(categories, collector.Document, item))
+                .Where(item => item != null && item.Value != null && item.Value as ElementId != ElementId.InvalidElementId);
         }
 
         private ParamValue GetElementParam(int[] categories, Document doc, Element item) {
@@ -103,8 +106,10 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
                 }
                 case StorageType.Integer:
                 return int.TryParse(value, out int intRes) ? null : $"Значение параметра \"{Name}\" должно быть целым числом.";
-                case StorageType.Double:
-                return double.TryParse(value, out double doubleRes) ? null : $"Значение параметра \"{Name}\" должно быть вещественным числом.";
+                case StorageType.Double: {
+                    var parser = new DoubleValueParser(RevitRepository, RevitParam);
+                    return parser.TryParse(value, out double res) ? null : $"Значение параметра \"{Name}\" должно быть вещественным числом.";
+                }
                 case StorageType.String:
                 return null;
                 case StorageType.ElementId:
@@ -113,7 +118,13 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
         }
 
         public ParamValue GetParamValue(int[] categories, string value) {
-            return ParamValue.GetParamValue(categories, RevitParam, value);
+            if(RevitParam.StorageType == StorageType.Double) {
+                var parser = new DoubleValueParser(RevitRepository, RevitParam);
+                if(parser.TryParse(value, out double res)) {
+                    return ParamValue.GetParamValue(categories, RevitParam, res.ToString(), value);
+                }
+            }
+            return ParamValue.GetParamValue(categories, RevitParam, value, value);
         }
     }
 }

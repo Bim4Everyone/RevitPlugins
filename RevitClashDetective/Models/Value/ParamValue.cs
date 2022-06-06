@@ -36,19 +36,19 @@ namespace RevitClashDetective.Models.Value {
             }
         }
 
-        public static ParamValue GetParamValue(int[] categories, RevitParam revitParam, string value) {
+        public static ParamValue GetParamValue(int[] categories, RevitParam revitParam, string value, string displayValue) {
             switch(revitParam.StorageType) {
                 case StorageType.Integer: {
-                    return new IntParamValue(value != null ? int.Parse(value) : 0, value);
+                    return new IntParamValue(value != null ? int.Parse(value) : 0, displayValue);
                 }
                 case StorageType.Double: {
-                    return new DoubleParamValue(value != null ? double.Parse(value) : 0, value);
+                    return new DoubleParamValue(value != null ? double.Parse(value) : 0, displayValue);
                 }
                 case StorageType.String: {
-                    return new StringParamValue(value, value);
+                    return new StringParamValue(value, displayValue);
                 }
                 case StorageType.ElementId: {
-                    return new ElementIdParamValue(categories, value, value);
+                    return new ElementIdParamValue(categories, value, displayValue);
                 }
                 default: {
                     throw new ArgumentOutOfRangeException(nameof(revitParam.StorageType), $"У параметра {revitParam.Name} не определен тип данных.");
@@ -92,7 +92,7 @@ namespace RevitClashDetective.Models.Value {
             TValue = value;
             DisplayValue = stringValue ?? TValue?.ToString();
         }
-
+        
         public T TValue { get; set; }
         public override object Value => TValue;
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -188,8 +189,8 @@ namespace RevitClashDetective.Models {
 
         public void CreateFilter(IEnumerable<ElementId> categories, ElementFilter filter, string name) {
             using(Transaction t = _document.StartTransaction("Создание фильтра")) {
-                ParameterFilterElement pfe = ParameterFilterElement.Create(_document, name, categories.ToList());
-                pfe.SetElementFilter(filter);
+                    ParameterFilterElement pfe = ParameterFilterElement.Create(_document, name, categories.ToList());
+                    pfe.SetElementFilter(filter);
                 t.Commit();
             }
 
@@ -200,15 +201,8 @@ namespace RevitClashDetective.Models {
                 _uiDocument.ActiveView = _view;
             }
             _revitEventHandler.TransactAction = () => {
-                //_uiDocument.Selection.SetElementIds(new[] { id });
-
-                //var commandSelectId = RevitCommandId.LookupCommandId("ID_VIEW_APPLY_SELECTION_BOX");
-                //if(!(commandSelectId is null) && _uiApplication.CanPostCommand(commandSelectId)) {
-                //    _uiApplication.PostCommand(commandSelectId);
-                //}
                 SetViewOrientation(_document.GetElement(id).get_BoundingBox(_view));
                 _uiDocument.Selection.SetElementIds(new[] { id });
-                //_uiDocument.ShowElements(new[] { id });
             };
 
             await _revitEventHandler.Raise();

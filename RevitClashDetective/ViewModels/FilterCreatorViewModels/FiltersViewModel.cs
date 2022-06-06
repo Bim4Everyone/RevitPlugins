@@ -68,6 +68,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         private void InitializeFilters() {
             foreach(var filter in _config.Filters.OrderBy(item => item.Name)) {
+                filter.RevitRepository = _revitRepository;
                 filter.Set.SetRevitRepository(_revitRepository);
                 Filters.Add(new FilterViewModel(_revitRepository, filter));
             }
