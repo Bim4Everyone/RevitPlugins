@@ -18,7 +18,7 @@ namespace RevitLintelPlacement.Views {
     /// <summary>
     /// Логика взаимодействия для MainView.xaml
     /// </summary>
-    public partial class MainWindow : PlatformWindow {
+    public partial class MainWindow {
         public MainWindow() {
             InitializeComponent();
         }

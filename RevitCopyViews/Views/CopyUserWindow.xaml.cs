@@ -19,7 +19,7 @@ namespace RevitCopyViews.Views {
     /// <summary>
     /// Interaction logic for CopyUserView.xaml
     /// </summary>
-    public partial class CopyUserWindow : PlatformWindow {
+    public partial class CopyUserWindow {
         public CopyUserWindow() {
             InitializeComponent();
         }

@@ -1,47 +1,47 @@
-﻿<base:PlatformWindow
+﻿<base:ThemedPlatformWindow
     x:Class="RevitBatchPrint.Views.BatchPrintWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:views="clr-namespace:RevitBatchPrint.Views"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:vms="clr-namespace:RevitBatchPrint.ViewModels" 
+    xmlns:vms="clr-namespace:RevitBatchPrint.ViewModels"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:converters="clr-namespace:RevitBatchPrint.Converters" 
+    xmlns:converters="clr-namespace:RevitBatchPrint.Converters"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     mc:Ignorable="d"
-    Width="850" 
+    Width="850"
     WindowStartupLocation="CenterOwner"
     Title="Пакетная печать"
     SizeToContent="Height"
     ResizeMode="NoResize"
-    AllowDarkTheme="True"
     d:DataContext="{d:DesignInstance vms:PrintAbumsViewModel, IsDesignTimeCreatable=False}">
-    <base:PlatformWindow.Resources>
-        <converters:SelectedAlbumsConverter x:Key="SelectedAlbumsConverter"/>
-    </base:PlatformWindow.Resources>
+    <base:ThemedPlatformWindow.Resources>
+        <converters:SelectedAlbumsConverter x:Key="SelectedAlbumsConverter" />
+    </base:ThemedPlatformWindow.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="45"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="45" />
         </Grid.RowDefinitions>
 
-        <StackPanel 
+        <StackPanel
             Grid.Row="0" Visibility="{Binding ShowPrintParamSelect}">
-            <dxe:TextEdit EditMode="InplaceActive" IsReadOnly="True" EditValue="Параметр комплекта чертежей" Margin="10,10,10,0"/>
-            
+            <dxe:TextEdit EditMode="InplaceActive" IsReadOnly="True" EditValue="Параметр комплекта чертежей"
+                          Margin="10,10,10,0" />
+
             <dxe:ComboBoxEdit Margin="10"
-                      IsTextEditable="False"  
-                      ItemsSource="{Binding Path=PrintParamNames}"
-                      SelectedItem="{Binding Path=PrintParamName}"/>
-            
+                              IsTextEditable="False"
+                              ItemsSource="{Binding Path=PrintParamNames}"
+                              SelectedItem="{Binding Path=PrintParamName}" />
+
         </StackPanel>
 
         <StackPanel Grid.Row="1">
-            <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="Комплект чертежей" Margin="10,10,10,0"/>
+            <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="Комплект чертежей" Margin="10,10,10,0" />
             <Grid>
                 <dxe:ComboBoxEdit
                     Margin="10"
@@ -61,22 +61,24 @@
             Grid.Row="2"
             Header="Настройки принтера"
             Padding="10">
-            <views:PrintSettingsView 
+            <views:PrintSettingsView
                 DataContext="{Binding PrintSettings}" />
         </GroupBox>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <dxe:TextEdit Margin="10" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}" Foreground="Orange" VerticalAlignment="Center" />
-            
-            <dx:SimpleButton 
-                Content="Экспорт" 
+            <dxe:TextEdit Margin="10" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
+                          Foreground="Orange" VerticalAlignment="Center" />
+
+            <dx:SimpleButton
+                Content="Экспорт"
                 Margin="10"
                 Click="ButtonOk_Click" Width="80"
                 Command="{Binding RevitSaveCommand}"
-                Visibility="{Binding VisibilitySaveFile}"/>
-            
-            <dx:SimpleButton Content="Печать" Margin="10" Click="ButtonOk_Click" Width="80" Command="{Binding RevitPrintCommand}" />
-            <dx:SimpleButton Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80"/>
+                Visibility="{Binding VisibilitySaveFile}" />
+
+            <dx:SimpleButton Content="Печать" Margin="10" Click="ButtonOk_Click" Width="80"
+                             Command="{Binding RevitPrintCommand}" />
+            <dx:SimpleButton Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80" />
         </StackPanel>
     </Grid>
-</base:PlatformWindow>
+</base:ThemedPlatformWindow>

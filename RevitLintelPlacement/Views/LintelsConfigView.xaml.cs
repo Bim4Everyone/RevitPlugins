@@ -18,7 +18,7 @@ namespace RevitLintelPlacement.Views {
     /// <summary>
     /// Interaction logic for LintelsConfigView.xaml
     /// </summary>
-    public partial class LintelsConfigView : PlatformWindow {
+    public partial class LintelsConfigView {
         public LintelsConfigView() {
             InitializeComponent();
         }

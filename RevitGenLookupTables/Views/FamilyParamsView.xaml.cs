@@ -18,7 +18,7 @@ namespace RevitGenLookupTables.Views {
     /// <summary>
     /// Interaction logic for FamilyParamsView.xaml
     /// </summary>
-    public partial class FamilyParamsView : PlatformWindow {
+    public partial class FamilyParamsView {
         public FamilyParamsView() {
             InitializeComponent();
         }

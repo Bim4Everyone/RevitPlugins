@@ -20,7 +20,7 @@ namespace RevitBatchPrint.Views {
     /// <summary>
     /// Interaction logic for PrintViewSheetNames.xaml
     /// </summary>
-    public partial class BatchPrintWindow : PlatformWindow {
+    public partial class BatchPrintWindow {
         public BatchPrintWindow() {
             InitializeComponent();
         }

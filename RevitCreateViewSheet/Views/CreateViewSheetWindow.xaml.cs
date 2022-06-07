@@ -19,7 +19,7 @@ namespace RevitCreateViewSheet.Views {
     /// <summary>
     /// Interaction logic for CreateViewSheetWindow.xaml
     /// </summary>
-    public partial class CreateViewSheetWindow : PlatformWindow {
+    public partial class CreateViewSheetWindow {
         public CreateViewSheetWindow() {
             InitializeComponent();
         }

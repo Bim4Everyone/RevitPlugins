@@ -19,7 +19,7 @@ namespace RevitCopyViews.Views {
     /// <summary>
     /// Interaction logic for RenameViewWindow.xaml
     /// </summary>
-    public partial class RenameViewWindow : PlatformWindow {
+    public partial class RenameViewWindow {
         public RenameViewWindow() {
             InitializeComponent();
         }
