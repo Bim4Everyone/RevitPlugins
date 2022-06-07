@@ -26,14 +26,7 @@ using dosymep.SimpleServices;
 using pyRevitLabs.Json;
 
 namespace dosymep.WPF.Views {
-    public class PlatformWindow : dosymep.Xpf.Core.BaseWindow {
-        public static readonly DependencyProperty AllowDarkThemeProperty
-            = DependencyProperty.Register(nameof(AllowDarkTheme), typeof(bool), typeof(PlatformWindow));
-
-        public PlatformWindow() {
-            UIThemeService.UIThemeChanged += OnUIThemeChanged;
-        }
-
+    public class PlatformWindow : Window {
         /// <summary>
         /// Наименование плагина.
         /// </summary>
@@ -45,24 +38,9 @@ namespace dosymep.WPF.Views {
         public virtual string ProjectConfigName { get; }
 
         /// <summary>
-        /// Предоставляет возможность применения темной темы
-        /// </summary>
-        protected bool AllowDarkTheme {
-            get => (bool) GetValue(AllowDarkThemeProperty);
-            set => SetValue(AllowDarkThemeProperty, value);
-        }
-
-        /// <summary>
         /// Предоставляет доступ к логгеру платформы.
         /// </summary>
         protected ILoggerService LoggerService => GetPlatformService<ILoggerService>();
-
-        /// <summary>
-        /// Предоставляет доступ к настройкам темы платформы.
-        /// </summary>
-        protected IUIThemeService UIThemeService => GetPlatformService<IUIThemeService>();
-
-
 
         protected T GetPlatformService<T>() {
             return ServicesProvider.GetPlatformService<T>();
@@ -70,8 +48,6 @@ namespace dosymep.WPF.Views {
 
         protected override void OnSourceInitialized(EventArgs e) {
             base.OnSourceInitialized(e);
-
-            UpdateTheme();
 
             PlatformWindowConfig config = GetProjectConfig();
             if(config.WindowPlacement.HasValue) {
@@ -81,8 +57,6 @@ namespace dosymep.WPF.Views {
 
         protected override void OnClosing(CancelEventArgs e) {
             base.OnClosing(e);
-
-            UIThemeService.UIThemeChanged -= OnUIThemeChanged;
 
             PlatformWindowConfig config = GetProjectConfig();
             config.WindowPlacement = this.GetPlacement();
@@ -96,23 +70,6 @@ namespace dosymep.WPF.Views {
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
                 .SetProjectConfigName(ProjectConfigName + ".json")
                 .Build<PlatformWindowConfig>();
-        }
-
-        private void OnUIThemeChanged(UIThemes obj) {
-            UpdateTheme();
-        }
-
-        private void UpdateTheme() {
-            if(!AllowDarkTheme) {
-                ThemeManager.SetThemeName(this, Theme.Win10LightName);
-                return;
-            }
-
-            if(UIThemeService.HostTheme == UIThemes.Dark) {
-                ThemeManager.SetThemeName(this, Theme.Win10DarkName);
-            } else if(UIThemeService.HostTheme == UIThemes.Light) {
-                ThemeManager.SetThemeName(this, Theme.Win10LightName);
-            }
         }
     }
 
