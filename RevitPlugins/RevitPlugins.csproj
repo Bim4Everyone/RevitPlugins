@@ -51,6 +51,7 @@
         <Compile Include="..\dosymep\InverseBooleanConverter.cs" Link="dosymep\InverseBooleanConverter.cs"/>
         <Compile Include="..\dosymep\PlatformWindow.cs" Link="dosymep\PlatformWindow.cs"/>
         <Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\RelayCommand.cs"/>
+		<Compile Include="..\dosymep\ThemedPlatformWindow.cs" Link="dosymep\ThemedPlatformWindow.cs" />
     </ItemGroup>
 
     <ItemGroup>
