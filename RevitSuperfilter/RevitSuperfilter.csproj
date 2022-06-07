@@ -103,6 +103,12 @@
 			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Xpf.Grid.v21.2.Extensions.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+		<Reference Include="DevExpress.Xpf.Layout.v21.2.Core">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Xpf.Layout.v21.2.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="DevExpress.Xpf.LayoutControl.v21.2">
+			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Xpf.LayoutControl.v21.2.dll</HintPath>
+		</Reference>
 		<Reference Include="DevExpress.Xpf.Themes.Office2019Colorful.v21.2, Version=21.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
 			<HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\devexpress_libs\libs\DevExpress.Xpf.Themes.Office2019Colorful.v21.2.dll</HintPath>
 			<Private>False</Private>
