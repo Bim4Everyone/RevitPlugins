@@ -53,6 +53,7 @@
 		<Compile Include="..\dosymep\BasePluginCommand.cs" Link="dosymep\BasePluginCommand.cs"/>
 		<Compile Include="..\dosymep\EnumConverter.cs" Link="dosymep\EnumConverter.cs"/>
 		<Compile Include="..\dosymep\EnumToItemsSource.cs" Link="dosymep\EnumToItemsSource.cs"/>
+		<Compile Include="..\dosymep\IndexConverter.cs" Link="dosymep\IndexConverter.cs"/>
 		<Compile Include="..\dosymep\InverseBooleanConverter.cs" Link="dosymep\InverseBooleanConverter.cs"/>
 		<Compile Include="..\dosymep\PlatformWindow.cs" Link="dosymep\PlatformWindow.cs"/>
 		<Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\RelayCommand.cs"/>

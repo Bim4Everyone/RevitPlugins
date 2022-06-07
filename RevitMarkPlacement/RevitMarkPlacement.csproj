@@ -53,20 +53,21 @@
 	  <None Remove="Resources\icons8-warn.png" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Compile Include="..\dosymep\AppDomainExtensions.cs" Link="dosymep\AppDomainExtensions.cs"/>
-		<Compile Include="..\dosymep\BaseViewModel.cs" Link="dosymep\BaseViewModel.cs"/>
-		<Compile Include="..\dosymep\BoolToVisibilityConverter.cs" Link="dosymep\BoolToVisibilityConverter.cs"/>
-		<Compile Include="..\dosymep\ConfigSerializer.cs" Link="dosymep\ConfigSerializer.cs"/>
-		<Compile Include="..\dosymep\ConvertibleExtention.cs" Link="dosymep\ConvertibleExtention.cs"/>
-		<Compile Include="..\dosymep\BasePluginCommand.cs" Link="dosymep\BasePluginCommand.cs"/>
-		<Compile Include="..\dosymep\EnumConverter.cs" Link="dosymep\EnumConverter.cs"/>
-		<Compile Include="..\dosymep\EnumToItemsSource.cs" Link="dosymep\EnumToItemsSource.cs"/>
-		<Compile Include="..\dosymep\InverseBooleanConverter.cs" Link="dosymep\InverseBooleanConverter.cs"/>
-		<Compile Include="..\dosymep\PlatformWindow.cs" Link="dosymep\PlatformWindow.cs"/>
-		<Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\RelayCommand.cs"/>
+    <ItemGroup>
+        <Compile Include="..\dosymep\AppDomainExtensions.cs" Link="dosymep\AppDomainExtensions.cs"/>
+        <Compile Include="..\dosymep\BaseViewModel.cs" Link="dosymep\BaseViewModel.cs"/>
+        <Compile Include="..\dosymep\BoolToVisibilityConverter.cs" Link="dosymep\BoolToVisibilityConverter.cs"/>
+        <Compile Include="..\dosymep\ConfigSerializer.cs" Link="dosymep\ConfigSerializer.cs"/>
+        <Compile Include="..\dosymep\ConvertibleExtention.cs" Link="dosymep\ConvertibleExtention.cs"/>
+        <Compile Include="..\dosymep\BasePluginCommand.cs" Link="dosymep\BasePluginCommand.cs"/>
+        <Compile Include="..\dosymep\EnumConverter.cs" Link="dosymep\EnumConverter.cs"/>
+        <Compile Include="..\dosymep\EnumToItemsSource.cs" Link="dosymep\EnumToItemsSource.cs"/>
+        <Compile Include="..\dosymep\IndexConverter.cs" Link="dosymep\IndexConverter.cs"/>
+        <Compile Include="..\dosymep\InverseBooleanConverter.cs" Link="dosymep\InverseBooleanConverter.cs"/>
+        <Compile Include="..\dosymep\PlatformWindow.cs" Link="dosymep\PlatformWindow.cs"/>
+        <Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\RelayCommand.cs"/>
 		<Compile Include="..\dosymep\ThemedPlatformWindow.cs" Link="dosymep\ThemedPlatformWindow.cs" />
-	</ItemGroup>
+    </ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
