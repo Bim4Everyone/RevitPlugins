@@ -1,0 +1,80 @@
+﻿<UserControl x:Class="RevitClashDetective.Views.CategoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RevitClashDetective.Views"
+             xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.FilterCreatorViewModels"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:s="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:FilterViewModel, IsDesignTimeCreatable=False}">
+    <UserControl.Resources>
+        <s:Boolean x:Key="True">True</s:Boolean>
+        <s:Boolean x:Key="False">False</s:Boolean>
+    </UserControl.Resources>
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal" Grid.Row="0">
+                <TextBlock Text="Фильтр: " Margin="5 0" VerticalAlignment="Center"></TextBlock>
+                <TextBox MinWidth="150" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="2" Text="{Binding FilterCategoryName, UpdateSourceTrigger=PropertyChanged}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="TextChanged">
+                            <i:InvokeCommandAction Command="{Binding FilterTextChangedCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
+                <CheckBox x:Name="_cbCategories" VerticalAlignment="Center"  IsEnabled="{Binding CanSelectCategories}" IsChecked="{Binding IsAllCategoriesSelected, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <i:InvokeCommandAction Command="{Binding CheckCategoryCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <CheckBox.Style>
+                        <Style TargetType="{x:Type CheckBox}">
+                            <Style.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="ToolTip" Value="Отменить выбор"/>
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="False">
+                                    <Setter Property="ToolTip" Value="Выбрать все"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </CheckBox.Style>
+                </CheckBox>
+            </StackPanel>
+            <CheckBox Grid.Row="1" Margin="5" IsChecked="{Binding ShowOnlySelectedCategories}" Content="Скрыть неотмеченные категории">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <i:InvokeCommandAction Command="{Binding FilterTextChangedCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </CheckBox>
+            <ListBox x:Name="lbCat" Grid.Row="2" ItemsSource="{Binding CategoriesViewSource.View, UpdateSourceTrigger=PropertyChanged}" SelectionMode="Extended">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:CategoryViewModel}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" >
+                            <CheckBox IsChecked="{Binding IsSelected}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Checked">
+                                        <i:InvokeCommandAction Command="{Binding ElementName=lbCat, Path=DataContext.SelectedCategoriesChangedCommand}"/>
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="Unchecked">
+                                        <i:InvokeCommandAction Command="{Binding ElementName=lbCat, Path=DataContext.SelectedCategoriesChangedCommand}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </CheckBox>
+                            <TextBlock Margin="3 0" Text="{Binding Name}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+    </Grid>
+</UserControl>

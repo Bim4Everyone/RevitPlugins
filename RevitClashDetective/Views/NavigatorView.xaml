@@ -1,0 +1,143 @@
+﻿<base:PlatformWindow  
+        xmlns:base="clr-namespace:dosymep.WPF.Views"
+        x:Class="RevitClashDetective.Views.NavigatorView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RevitClashDetective.Views"
+        xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.Navigator"
+        xmlns:converter="clr-namespace:dosymep.WPF.Converters"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        mc:Ignorable="d"
+        Title="Навигатор" Height="450" Width="800"
+        d:DataContext="{d:DesignInstance vm:ClashesViewModel, IsDesignTimeCreatable=False}">
+    <base:PlatformWindow.Resources>
+        <converter:IndexConverter x:Key="IndexConverter"/>
+        <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </base:PlatformWindow.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <ComboBox ItemsSource="{Binding FileNames}" SelectedItem="{Binding SelectedFile}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding SelectionChangedCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <ComboBox.Style>
+                    <Style TargetType="ComboBox">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding FileNames}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ComboBox.Style>
+            </ComboBox>
+        </StackPanel>
+        <DataGrid Name="_dg"
+            Grid.Row="1" 
+                  AutoGenerateColumns="False" 
+                  CanUserReorderColumns="False"
+                  CanUserDeleteRows="False"
+                  CanUserAddRows="False"
+                  VerticalGridLinesBrush="LightGray"
+                  HorizontalGridLinesBrush="LightGray"
+                  AlternatingRowBackground="WhiteSmoke"
+                  AlternationCount="2"
+                  Loaded="_dg_Loaded"
+                  ItemsSource="{Binding ClashesViewSource.View}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding SelectionDataChangedCommand}"></i:InvokeCommandAction>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <DataGrid.CellStyle>
+                <Style TargetType="{x:Type DataGridCell}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}" Value="True">
+                            <Setter Property="Background" Value="LightBlue"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.CellStyle>
+            <DataGrid.RowStyle>
+                <Style TargetType="{x:Type DataGridRow}">
+                    <Style.Triggers>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="True"/>
+                                <Condition Property="AlternationIndex" Value="1"/>
+                            </MultiTrigger.Conditions>
+                            <MultiTrigger.Setters>
+                                <Setter Property="Background" Value="LightBlue"/>
+                            </MultiTrigger.Setters>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="True"/>
+                                <Condition Property="AlternationIndex" Value="0"/>
+                            </MultiTrigger.Conditions>
+                            <MultiTrigger.Setters>
+                                <Setter Property="Background" Value="LightBlue"/>
+                            </MultiTrigger.Setters>
+                        </MultiTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Name="bSelect" Content="Выбрать" Command="{Binding ElementName=_dg, Path=DataContext.SelectClashCommand}" 
+                                    CommandParameter="{Binding ElementName=bSelect, Path=DataContext}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsSolved, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Уровень 1" Binding="{Binding FirstLevel}"/>
+                <DataGridTextColumn Header="Категория 1" Binding="{Binding FirstCategory}"/>
+                <DataGridTextColumn Header="Имя типа 1" Binding="{Binding FirstName}"/>
+                <DataGridTextColumn Header="Имя файла 1" Binding="{Binding FirstDocumentName}"/>
+                <DataGridTextColumn Header="Уровень 2" Binding="{Binding SecondLevel}"/>
+                <DataGridTextColumn Header="Категория 2" Binding="{Binding SecondCategory}"/>
+                <DataGridTextColumn Header="Имя типа 2" Binding="{Binding SecondName}"/>
+                <DataGridTextColumn Width="*" Header="Имя файла 2" Binding="{Binding SecondDocumentName}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Grid Grid.Row="2" Height="30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Width="70" BorderBrush="Transparent" Background="Transparent" FontSize="20" HorizontalAlignment="Right" Command="{Binding SelectPreviousCommand}">
+                <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Arrows/Prev_32x32.png"/>
+            </Button>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <TextBlock FontSize="14" VerticalAlignment="Center" Text="{Binding ClashesViewSource.View.CurrentPosition, Converter={StaticResource IndexConverter}, StringFormat={}{0}/}" ></TextBlock>
+                <TextBlock FontSize="14" VerticalAlignment="Center" Text="{Binding ClashesViewSource.View.SourceCollection.Count}"></TextBlock>
+            </StackPanel>
+            <Button Grid.Column="2" HorizontalAlignment="Left" FontSize="20" Width="70"  BorderBrush="Transparent" Background="Transparent" Command="{Binding SelectNextCommand}">
+                <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Arrows/Next_32x32.png"/>
+            </Button>
+        </Grid>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <TextBlock Margin="10" VerticalAlignment="Center" Foreground="Green" Text="{Binding Message}" />
+            <Button Content="Сохранить" Height="25" Width="70" Margin="10" IsDefault="True" Command="{Binding SaveCommand}"/>
+            <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
+        </StackPanel>
+    </Grid>
+</base:PlatformWindow>
