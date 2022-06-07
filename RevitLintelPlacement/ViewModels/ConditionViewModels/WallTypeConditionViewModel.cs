@@ -11,26 +11,23 @@ namespace RevitLintelPlacement.ViewModels {
         private bool _isChecked;
         private string _name;
 
-        public bool IsChecked {
-            get => _isChecked;
-            set => this.RaiseAndSetIfChanged(ref _isChecked, value);
-        }
-
         public string Name {
             get => _name;
             set => this.RaiseAndSetIfChanged(ref _name, value);
         }
 
+        public override bool Equals(object obj) {
+            return Equals(obj as WallTypeConditionViewModel);
+        }
+
         public bool Equals(WallTypeConditionViewModel other) {
-            return other != null &&
-                   Name == other.Name &&
-                   IsChecked == other.IsChecked;
+            return other != null
+                && Name == other.Name;
         }
 
         public override int GetHashCode() {
             int hashCode = 897683154;
             hashCode = hashCode * -1521134295 + Name.GetHashCode();
-            hashCode = hashCode * -1521134295 + IsChecked.GetHashCode();
             return hashCode;
         }
     }

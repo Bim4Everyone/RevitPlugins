@@ -8,10 +8,11 @@
         xmlns:local="clr-namespace:RevitLintelPlacement.Views"
         xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
         xmlns:converter="clr-namespace:RevitLintelPlacement.Converters"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:extensions="clr-namespace:RevitLintelPlacement.Extensions" 
-        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-    mc:Ignorable="d"
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
+        xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" 
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+        mc:Ignorable="d"
         Title="Перемычки" Height="770" Width="1150"
         MinHeight="770" MinWidth="1150"
         AllowDarkTheme="True"
@@ -20,12 +21,11 @@
     <Window.Resources>
         <converter:EnumConverter x:Key="EnumConverter"/>
         <converter:WidthConverter x:Key="WidthConverter"/>
+        <converter:LinksConverter x:Key="LinkConverter"/>
     </Window.Resources>
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Closing">
-            <i:InvokeCommandAction Command="{Binding CloseCommand}"/>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand EventName="Closing" Command="{Binding CloseCommand}"/>
+    </dxmvvm:Interaction.Behaviors>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -36,38 +36,36 @@
         </Grid.RowDefinitions>
         <local:RulesToolBar Grid.Row="0" DataContext="{Binding GroupedRules}"></local:RulesToolBar>
         <StackPanel Grid.Row="1" Margin="10 0" Orientation="Horizontal">
-            <dxe:ComboBoxEdit Width="300" FontSize="14" Height="25" IsTextEditable="False" ItemsSource="{Binding Source={extensions:EnumToItemsSource {x:Type vm:SampleMode}}}"
-                  EditValue="{Binding SelectedSampleMode, Converter={StaticResource EnumConverter},
-                  ConverterParameter={x:Type vm:SampleMode}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-            </dxe:ComboBoxEdit>
+            <dxe:ComboBoxEdit Width="300" 
+                              FontSize="14" 
+                              Height="25" 
+                              IsTextEditable="False" 
+                              ItemsSource="{Binding Source={extensions:EnumToItemsSource {x:Type vm:SampleMode}}}"
+                              EditValue="{Binding SelectedSampleMode, Converter={StaticResource EnumConverter},
+                              ConverterParameter={x:Type vm:SampleMode}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
         </StackPanel>
         <GroupBox Grid.Row="2" Margin="10 5 0 10"   HorizontalAlignment="Stretch" Header="Связанные файлы" FontSize="14">
-            <dxe:ListBoxEdit MaxHeight="100" BorderThickness="0" 
-                     ToolTip="Выберите связанные файлы, содержащие конструктивные элементы"
-                     ItemsSource="{Binding Links}" DisplayMember="Name"
-                     SelectionMode="Multiple"
-                     EditValue="{Binding SelectedLinks, UpdateSourceTrigger=PropertyChanged}">
+            <dxe:ListBoxEdit MaxHeight="100" 
+                             BorderThickness="0" 
+                             ToolTip="Выберите связанные файлы, содержащие конструктивные элементы"
+                             ItemsSource="{Binding Links}" 
+                             DisplayMember="Name"
+                             BorderBrush="Transparent"
+                             EditValue="{Binding SelectedLinks, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LinkConverter}}">
                 <dxe:ListBoxEdit.StyleSettings>
-                    <dxe:CheckedListBoxEditStyleSettings  />
+                    <dxe:CheckedListBoxEditStyleSettings />
                 </dxe:ListBoxEdit.StyleSettings>
-                <!--<dxe:ListBoxEdit.ItemTemplate>
-                    <DataTemplate DataType="{x:Type vm:LinkViewModel}">
-                        <dxe:CheckEdit EditValue="Name" IsChecked="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}">
-                            <TextBlock Text="{Binding Name}"></TextBlock>
-                        </dxe:CheckEdit>
-                    </DataTemplate>
-                </dxe:ListBoxEdit.ItemTemplate>-->
             </dxe:ListBoxEdit>
         </GroupBox>
         <local:GroupedRulesView Grid.Row="3" DataContext="{Binding GroupedRules}"/>
         <StackPanel Grid.Row="4" HorizontalAlignment="Right" Orientation="Horizontal" VerticalAlignment="Center">
             <StackPanel Orientation="Horizontal">
-                <TextBlock VerticalAlignment="Center" Foreground="Green" Text="{Binding GroupedRules.Message}" Width="Auto"></TextBlock>
-                <TextBlock VerticalAlignment="Center" Foreground="Orange" TextWrapping="Wrap" MaxWidth="{Binding RelativeSource={RelativeSource Mode=FindAncestor, 
-                AncestorType=Grid}, Path=ActualWidth, Converter={StaticResource WidthConverter}, ConverterParameter=115}" Text="{Binding ErrorText}" Width="Auto"></TextBlock>
+                <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" VerticalAlignment="Center" Foreground="Green" EditValue="{Binding GroupedRules.Message}" Width="Auto"></dxe:TextEdit>
+                <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" VerticalAlignment="Center" Foreground="Orange" TextWrapping="Wrap" MaxWidth="{Binding RelativeSource={RelativeSource Mode=FindAncestor, 
+                AncestorType=Grid}, Path=ActualWidth, Converter={StaticResource WidthConverter}, ConverterParameter=115}" EditValue="{Binding ErrorText}" Width="Auto"></dxe:TextEdit>
             </StackPanel>
-            <Button Margin="10" Width="100" FontSize="14" Command="{Binding PlaceLintelCommand}" CommandParameter="{Binding ElementName=MainView}">Расставить</Button>
-            <Button Margin="10" Width="100" FontSize="14" Click="ButtonCancel_Click">Отмена</Button>
+            <dx:SimpleButton Margin="10" Width="100" FontSize="14" Command="{Binding PlaceLintelCommand}" CommandParameter="{Binding ElementName=MainView}">Расставить</dx:SimpleButton>
+            <dx:SimpleButton Margin="10" Width="100" FontSize="14" Click="ButtonCancel_Click">Отмена</dx:SimpleButton>
         </StackPanel>
     </Grid>
 </base:PlatformWindow>

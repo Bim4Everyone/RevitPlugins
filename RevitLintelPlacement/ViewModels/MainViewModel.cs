@@ -28,7 +28,7 @@ namespace RevitLintelPlacement.ViewModels {
         private ObservableCollection<LinkViewModel> _links;
         private ElementInfosViewModel _elementInfosViewModel;
         private string _errorText;
-        private ObservableCollection<LinkViewModel> _selectedLinks;
+        private List<LinkViewModel> _selectedLinks = new List<LinkViewModel>();
 
         public MainViewModel() {
 
@@ -41,6 +41,8 @@ namespace RevitLintelPlacement.ViewModels {
             GroupedRules = new GroupedRuleCollectionViewModel(_revitRepository, ElementInfos);
             PlaceLintelCommand = new RelayCommand(PlaceLintels, CanPlace);
             ShowReportCommand = new RelayCommand(ShowReport);
+
+            SelectedLinks = new List<LinkViewModel>();
 
             var links = _revitRepository.GetLinkTypes().ToList();
             if(links.Count > 0) {
@@ -96,8 +98,8 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _elementInfosViewModel, value);
         }
 
-        public ObservableCollection<LinkViewModel> SelectedLinks { get; set; } = new ObservableCollection<LinkViewModel>();
-
+        public List<LinkViewModel> SelectedLinks { get => _selectedLinks;
+            set => _selectedLinks = value; }
         public void PlaceLintels(object p) {
             ElementInfos.ElementInfos.Clear();
             if(!_revitRepository.CheckConfigParameters(ElementInfos)) {
@@ -113,7 +115,7 @@ namespace RevitLintelPlacement.ViewModels {
             }
             Lintels = new LintelCollectionViewModel(_revitRepository, ElementInfos);
 
-            var wallTypeNames = GroupedRules.GroupedRules.SelectMany(item => item.WallTypes.WallTypes.Where(w => w.IsChecked).Select(w => w.Name)).ToList();
+            var wallTypeNames = GroupedRules.GroupedRules.SelectMany(item => item.SelectedWallTypes.Select(w => w.Name)).ToList();
 
             var elementInWalls = _revitRepository.GetAllElementsInWall(SelectedSampleMode, ElementInfos, wallTypeNames)
                 .ToList();
@@ -229,7 +231,7 @@ namespace RevitLintelPlacement.ViewModels {
             } else {
                 settings.SelectedLinks = new List<string>();
             }
-            
+
             _revitRepository.LintelsConfig.SaveProjectConfig();
         }
 

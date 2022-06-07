@@ -11,6 +11,7 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:converters="clr-namespace:RevitLintelPlacement.Converters"
              mc:Ignorable="d" 
+             AllowDarkTheme="True"
              Height="650" Width="1150"
              MinHeight="650" MinWidth="1150"
              d:DesignHeight="450" d:DesignWidth="800"
