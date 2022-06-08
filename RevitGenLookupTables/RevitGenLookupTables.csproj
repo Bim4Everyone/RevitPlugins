@@ -57,7 +57,10 @@
 	</ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="DevExpress.Wpf" Version="21.2.3" />
+		<PackageReference Include="DevExpress.Wpf" Version="21.2.3">
+			<PrivateAssets>all</PrivateAssets>
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</PackageReference>
         <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
     </ItemGroup>
 
