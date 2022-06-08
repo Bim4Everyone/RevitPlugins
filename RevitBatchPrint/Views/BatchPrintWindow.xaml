@@ -20,27 +20,27 @@
     <base:ThemedPlatformWindow.Resources>
         <converters:SelectedAlbumsConverter x:Key="SelectedAlbumsConverter" />
     </base:ThemedPlatformWindow.Resources>
-    <Grid>
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="45" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Margin="0 5" Visibility="{Binding ShowPrintParamSelect}" >
-            <dxe:TextEdit EditMode="InplaceActive" IsReadOnly="True" EditValue="Параметр комплекта чертежей" Margin="10 0" />
+            <dxe:TextEdit EditMode="InplaceActive" IsReadOnly="True" EditValue="Параметр комплекта чертежей"  />
 
-            <dxe:ComboBoxEdit Margin="10 5 10 0"
+            <dxe:ComboBoxEdit Margin="0 5 0 0"
                               IsTextEditable="False"
                               ItemsSource="{Binding Path=PrintParamNames}"
                               SelectedItem="{Binding Path=PrintParamName}" />
         </StackPanel>
 
         <StackPanel Grid.Row="1" Margin="0 5">
-            <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="Комплект чертежей" Margin="10 0" />
+            <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="Комплект чертежей"  />
             <Grid>
                 <dxe:ComboBoxEdit
-                    Margin="10 5 10 0"
+                    Margin="0 5 0 0"
                     NullText="Выберите комплект чертежей..."
                     SeparatorString=", "
                     IsTextEditable="False"
@@ -57,20 +57,20 @@
                 DataContext="{Binding PrintSettings}" />
 
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <dxe:TextEdit Margin="10" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
+        <StackPanel Grid.Row="3" Margin="0 10 0 0" Orientation="Horizontal" HorizontalAlignment="Right">
+            <dxe:TextEdit Margin="5 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
                           Foreground="Orange" VerticalAlignment="Center" />
 
             <dx:SimpleButton
                 Content="Экспорт"
-                Margin="10"
+                Margin="5 0"
                 Click="ButtonOk_Click" Width="80"
                 Command="{Binding RevitSaveCommand}"
                 Visibility="{Binding VisibilitySaveFile}" />
 
-            <dx:SimpleButton Content="Печать" Margin="10" Click="ButtonOk_Click" Width="80"
+            <dx:SimpleButton Content="Печать" Margin="5 0" Click="ButtonOk_Click" Width="80" Height="25"
                              Command="{Binding RevitPrintCommand}" />
-            <dx:SimpleButton Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80" />
+            <dx:SimpleButton Content="Отмена" Margin="5 0 0 0" Click="ButtonCancel_Click" Width="80" Height="25" />
         </StackPanel>
     </Grid>
 </base:ThemedPlatformWindow>
