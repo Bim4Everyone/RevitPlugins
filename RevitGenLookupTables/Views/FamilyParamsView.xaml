@@ -23,7 +23,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <dxg:GridControl Grid.Row="0" ItemsSource="{Binding FamilyParams}" SelectionMode="Row"
+        <dxg:GridControl Grid.Row="0" Margin="10" ItemsSource="{Binding FamilyParams}" SelectionMode="Row"
                          SelectedItems="{Binding SelectedFamilyParams, UpdateSourceTrigger=PropertyChanged}"
                          SelectedItem="{Binding SelectedFamilyParam, UpdateSourceTrigger=PropertyChanged}">
             <dxg:GridControl.View>
@@ -39,12 +39,12 @@
                             Binding="{Binding StorageType, Converter={StaticResource StorageTypeConverter}}" />
 
         </dxg:GridControl>
-        <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <dxe:TextEdit Margin="10" EditMode="InplaceActive" IsReadOnly="True" EditValue="{Binding ErrorText}"
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Margin="0 0 0 5" Orientation="Horizontal" HorizontalAlignment="Right">
+            <dxe:TextEdit Margin="10 0" EditMode="InplaceActive" IsReadOnly="True" EditValue="{Binding ErrorText}"
                           Foreground="Orange" />
-            <dx:SimpleButton Content="ОК" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click"
+            <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True" Click="ButtonOK_Click"
                              Command="{Binding SaveTableCommand}" />
-            <dx:SimpleButton Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true"
+            <dx:SimpleButton Content="Отмена" Height="25" Width="80" Margin="0 0 10 0" IsCancel="true"
                              Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>

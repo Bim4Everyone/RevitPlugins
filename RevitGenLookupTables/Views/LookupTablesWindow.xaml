@@ -23,15 +23,15 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <dx:SimpleButton Height="25" Width="25" Margin="5" Command="{Binding UpFamilyParamCommand}"
+        <StackPanel Grid.Row="0" Margin="0 5 0 0" Orientation="Horizontal">
+            <dx:SimpleButton Height="25" Width="25" Margin="11 0 5 0" Command="{Binding UpFamilyParamCommand}"
                              Glyph="{dx:DXImage 'SvgImages/Arrows/MoveUp.svg'}" GlyphHeight="16" />
-            <dx:SimpleButton Height="25" Width="25" Margin="5" Command="{Binding DownFamilyParamCommand}"
+            <dx:SimpleButton Height="25" Width="25" Margin="0 0 5 0" Command="{Binding DownFamilyParamCommand}"
                              Glyph="{dx:DXImage 'SvgImages/Arrows/MoveDown.svg'}" GlyphHeight="16" />
-            <dx:SimpleButton Height="25" Width="25" Margin="5" Command="{Binding AddFamilyParamCommand}"
+            <dx:SimpleButton Height="25" Width="25" Margin="0 0 5 0" Command="{Binding AddFamilyParamCommand}"
                              CommandParameter="{Binding ElementName=_this}"
                              Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Add.svg'}" GlyphHeight="16" />
-            <dx:SimpleButton Height="25" Width="25" Margin="5" Command="{Binding RemoveFamilyParamCommand}"
+            <dx:SimpleButton Height="25" Width="25" Margin="0 0 5 0" Command="{Binding RemoveFamilyParamCommand}"
                              Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}" GlyphHeight="16" />
         </StackPanel>
         <dxdo:DockLayoutManager Grid.Row="1">
@@ -62,13 +62,13 @@
                 </dxdo:LayoutControlItem>
             </dxdo:LayoutGroup>
         </dxdo:DockLayoutManager>
-        <StackPanel Grid.Row="2" Orientation="Horizontal"
+        <StackPanel Grid.Row="2" Margin="0 0 0 5" Orientation="Horizontal"
                     HorizontalAlignment="Right">
-            <dxe:TextEdit Margin="10" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
+            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
                           Foreground="Orange" />
-            <dx:SimpleButton Content="ОК" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click"
+            <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True" Click="ButtonOK_Click"
                              Command="{Binding SaveTableCommand}" />
-            <dx:SimpleButton Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true"
+            <dx:SimpleButton Content="Отмена" Height="25" Width="80" Margin="0 0 11 0" IsCancel="true"
                              Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
