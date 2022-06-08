@@ -9,7 +9,7 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:converter="clr-namespace:RevitGenLookupTables.Converters"
+    xmlns:converter="clr-namespace:RevitGenLookupTables.Converters" xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
     mc:Ignorable="d"
     Title="Таблица выбора"
     Height="850" Width="1500" WindowStartupLocation="CenterOwner"
@@ -18,19 +18,12 @@
         <converter:StorageTypeConverter x:Key="StorageTypeConverter" />
     </base:ThemedPlatformWindow.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
-        <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
             <dx:SimpleButton Height="25" Width="25" Margin="5" Command="{Binding UpFamilyParamCommand}"
                              Glyph="{dx:DXImage 'SvgImages/Arrows/MoveUp.svg'}" GlyphHeight="16" />
             <dx:SimpleButton Height="25" Width="25" Margin="5" Command="{Binding DownFamilyParamCommand}"
@@ -41,34 +34,35 @@
             <dx:SimpleButton Height="25" Width="25" Margin="5" Command="{Binding RemoveFamilyParamCommand}"
                              Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}" GlyphHeight="16" />
         </StackPanel>
+        <dxdo:DockLayoutManager Grid.Row="1">
+            <dxdo:LayoutGroup x:Name="layoutRoot" AllowSplitters="True">
+                <dxdo:LayoutControlItem>
+                    <dxg:GridControl
+                            MaxHeight="2000"
+                            SelectedItem="{Binding SelectedFamilyParam}"
+                            ItemsSource="{Binding SelectedFamilyParams}"
+                            SelectedItems="{Binding GridSelectedFamilyParams}"
+                            SelectionMode="Row">
+                        <dxg:GridControl.View>
+                            <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always" ShowGroupPanel="False"/>
+                        </dxg:GridControl.View>
 
-        <dxg:GridControl
-            Grid.Column="0"
-            Grid.Row="1"
-            SelectedItem="{Binding SelectedFamilyParam}"
-            ItemsSource="{Binding SelectedFamilyParams}"
-            SelectedItems="{Binding GridSelectedFamilyParams}"
-            SelectionMode="Row">
-            <dxg:GridControl.View>
-                <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always" ShowGroupPanel="False"/>
-            </dxg:GridControl.View>
-
-            <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False"
+                        <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False"
                             Header="Наименование" FieldName="Name" />
-            <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False"
+                        <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False"
                             Header="Метаданные колонки" FieldName="ColumnMetaData" />
-            <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False"
+                        <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False"
                             Header="Тип данных параметра"
                             Binding="{Binding StorageType, Converter={StaticResource StorageTypeConverter}}" />
-
-        </dxg:GridControl>
-
-        <GridSplitter Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" ResizeDirection="Columns"
-                      HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="3" />
-        <local:ParamValuesView Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Margin="10"
+                    </dxg:GridControl>
+                </dxdo:LayoutControlItem>
+                <dxdo:LayoutControlItem>
+                    <local:ParamValuesView Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
                                DataContext="{Binding SelectedFamilyParam.FamilyParamValues}" />
-
-        <StackPanel Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3" Orientation="Horizontal"
+                </dxdo:LayoutControlItem>
+            </dxdo:LayoutGroup>
+        </dxdo:DockLayoutManager>
+        <StackPanel Grid.Row="2" Orientation="Horizontal"
                     HorizontalAlignment="Right">
             <dxe:TextEdit Margin="10" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
                           Foreground="Orange" />
