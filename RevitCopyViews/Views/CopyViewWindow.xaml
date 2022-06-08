@@ -6,65 +6,58 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+    xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     mc:Ignorable="d"
     SizeToContent="Height"
     ResizeMode="NoResize"
     MinWidth="500"
     Width="500" WindowStartupLocation="CenterOwner" Title="Копирование видов">
-    <Grid>
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="45" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <dxe:CheckEdit
             Grid.Row="0"
-            Margin="10 5 0 0"
+            Margin="0 5"
             Content="Копировать с детализацией"
             EditValue="{Binding CopyWithDetail, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
         <StackPanel Grid.Row="1" Margin="0 0 0 5">
             <dxe:TextEdit
-                Margin="10 10 0 0"
                 IsReadOnly="True"
                 EditMode="InplaceActive"
                 EditValue="Группы видов" />
 
             <dxe:ComboBoxEdit
-                Margin="10,0,10,0"
-                IsTextEditable="False"
+                AutoComplete="True"
                 ItemsSource="{Binding GroupViews}"
                 EditValue="{Binding GroupView, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
 
-        <GroupBox Header="Настройки имени вида" Grid.Row="2" Margin="5 10 0 0">
-            <StackPanel>
-                <dxe:CheckEdit Margin="0" Content="Добавить отметку уровня"
-                               EditValue="{Binding WithElevation,
-                    UpdateSourceTrigger=PropertyChanged}" />
-                <StackPanel>
-                    <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" Margin="-4 5 0 0" EditValue="Префикс" />
-
+        <StackPanel Grid.Row="2" Margin="0 5">
+            <dxe:CheckEdit Content="Добавить отметку уровня"
+                               EditValue="{Binding WithElevation, UpdateSourceTrigger=PropertyChanged}" />
+            <lc:GroupBox Margin="0 5" Header="Префикс">
+                <StackPanel >
                     <dxe:CheckEdit
                         Content="Заменить"
                         EditValue="{Binding ReplacePrefix, UpdateSourceTrigger=PropertyChanged}"
                         IsEnabled="{Binding IsAllowReplacePrefix, UpdateSourceTrigger=PropertyChanged}" />
 
                     <dxe:ComboBoxEdit
+                        AutoComplete="True"
                         ItemsSource="{Binding Prefixes}"
                         EditValue="{Binding Prefix, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
+            </lc:GroupBox>
 
-                <StackPanel>
-                    <dxe:TextEdit
-                        IsReadOnly="True"
-                        EditMode="InplaceActive"
-                        Margin="-4 5 0 0"
-                        EditValue="Суффикс" />
+            <lc:GroupBox Margin="0 5 0 10" Header="Суффикс">
+                <StackPanel >
 
                     <dxe:CheckEdit
                         Content="Заменить"
@@ -72,31 +65,31 @@
                         IsEnabled="{Binding IsAllowReplaceSuffix, UpdateSourceTrigger=PropertyChanged}" />
 
                     <dxe:ComboBoxEdit
+                        AutoComplete="True"
                         ItemsSource="{Binding Suffixes}"
                         EditValue="{Binding Suffix, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
-            </StackPanel>
-        </GroupBox>
+            </lc:GroupBox>
+        </StackPanel>
 
-        <ContentControl Grid.Row="3" />
-
-        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
             <dxe:TextEdit
-                Margin="10"
+                Margin="5 0"
                 IsReadOnly="True"
                 EditMode="InplaceActive"
                 Foreground="Orange"
                 EditValue="{Binding ErrorText}" />
             <dx:SimpleButton
+                Margin="10 0"
                 Content="ОК"
-                Margin="10"
                 Width="80"
+                Height="25"
                 Click="ButtonOk_Click"
                 Command="{Binding CopyViewsCommand}" />
             <dx:SimpleButton
                 Content="Отмена"
-                Margin="10"
                 Width="80"
+                Height="25"
                 Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
