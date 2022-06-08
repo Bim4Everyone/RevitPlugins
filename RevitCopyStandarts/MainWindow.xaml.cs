@@ -21,7 +21,7 @@ namespace RevitCopyStandarts {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : PlatformWindow {
+    public partial class MainWindow  {
         public MainWindow() {
             InitializeComponent();
         }

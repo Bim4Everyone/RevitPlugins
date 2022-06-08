@@ -1,4 +1,4 @@
-﻿<base:PlatformWindow
+﻿<base:ThemedPlatformWindow
     x:Class="RevitCopyStandarts.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -54,4 +54,4 @@
             </dx:DXTabControl.ItemTemplate>
         </dx:DXTabControl>
     </Grid>
-</base:PlatformWindow>
+</base:ThemedPlatformWindow>
