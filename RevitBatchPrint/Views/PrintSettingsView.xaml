@@ -7,48 +7,46 @@
              xmlns:viewModels="clr-namespace:RevitBatchPrint.ViewModels"
              xmlns:enumConverters="clr-namespace:RevitBatchPrint.ViewModels.EnumConverters" 
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
-             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel>
-        <StackPanel
-            Visibility="{Binding VisibilitySelectPrinter}">
-            <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="Принтер" Margin="10,0,10,0"/>
-            <dxe:ComboBoxEdit Margin="10"
+        <StackPanel Margin="0 5" Visibility="{Binding VisibilitySelectPrinter}">
+            <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="Принтер"  Margin="10 0"/>
+            <dxe:ComboBoxEdit Margin="10 5 10 0"
                       IsTextEditable="False"
                       ItemsSource="{Binding PrinterNames}"
                       EditValue="{Binding PrinterName, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
-
-        <StackPanel Visibility="{Binding VisibilitySelectFile}">
-            <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="Путь до файла" Margin="10,0,10,0"/>
+        <StackPanel Margin="0 5" Visibility="{Binding VisibilitySelectFile}">
+            <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="Путь до файла" Margin="10 0"/>
             <DockPanel LastChildFill="True">
-                <dx:SimpleButton DockPanel.Dock="Right" Margin="10" Width="50" Content="..." Command="{Binding SaveFileCommand}"/>
-                <dxe:TextEdit DockPanel.Dock="Left" Margin="10" EditValue="{Binding FileName}"/>
+                <dx:SimpleButton DockPanel.Dock="Right" Margin="5 5 10 0" Width="50" Content="..." Command="{Binding SaveFileCommand}"/>
+                <dxe:TextEdit DockPanel.Dock="Left" Margin="10 5 5 0" EditValue="{Binding FileName}"/>
             </DockPanel>
         </StackPanel>
 
-        <GroupBox Header="Вывод на печать" Padding="10">
+        <lc:GroupBox Header="Вывод на печать" Padding="10" Margin="10 10 10 5">
             <StackPanel>
                 <StackPanel>
                     <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="Цвета" />
-                    <dxe:ComboBoxEdit Margin="0,10,0,0"
+                    <dxe:ComboBoxEdit Margin="0 5 0 0"
                               IsTextEditable="False"
                               EditValue="{Binding ColorDepth, Converter={enumConverters:ColorDepthTypeConverter}}"
                               ItemsSource="{Binding Source={enumConverters:ColorDepthTypeExtension}}"/>
                 </StackPanel>
                 
                 <StackPanel>
-                    <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="Качество изображения" Margin="0,10,0,0"/>
-                    <dxe:ComboBoxEdit Margin="0,10,0,0"
+                    <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="Качество изображения" Margin="0 10 0 0"/>
+                    <dxe:ComboBoxEdit Margin="0 5 0 0"
                               IsTextEditable="False"
                               EditValue="{Binding RasterQuality, Converter={enumConverters:RasterQualityTypeConverter}}"
                               ItemsSource="{Binding Source={enumConverters:RasterQualityTypeExtension}}"/>
                 </StackPanel>
             </StackPanel>
-        </GroupBox>
+        </lc:GroupBox>
 
-        <GroupBox Header="Параметры" Padding="10">
+        <lc:GroupBox Header="Параметры"  Margin="10 5" Padding="10">
             <StackPanel>
                 <dxe:CheckEdit Content="Выделить связи синим (только цветная печать)"
                           EditValue="{Binding ViewLinksinBlue, UpdateSourceTrigger=PropertyChanged}"/>
@@ -65,6 +63,6 @@
                 <dxe:CheckEdit Margin="0,10,0,0" Content="Заменить полутона тонкими линиями"
                           EditValue="{Binding ReplaceHalftoneWithThinLines, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
-        </GroupBox>
+        </lc:GroupBox>
     </StackPanel>
 </UserControl>
