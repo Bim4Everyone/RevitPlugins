@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -27,6 +28,12 @@ using pyRevitLabs.Json;
 
 namespace dosymep.WPF.Views {
     public class PlatformWindow : Window {
+        private readonly WindowInteropHelper _windowInteropHelper;
+        public PlatformWindow() {
+            _windowInteropHelper = new WindowInteropHelper(this) {
+                Owner = Process.GetCurrentProcess().MainWindowHandle
+            };
+        }
         /// <summary>
         /// Наименование плагина.
         /// </summary>

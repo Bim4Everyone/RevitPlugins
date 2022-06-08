@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -27,12 +28,16 @@ using pyRevitLabs.Json;
 
 namespace dosymep.WPF.Views {
     public class ThemedPlatformWindow : ThemedWindow {
+        private readonly WindowInteropHelper _windowInteropHelper;
 
         public ThemedPlatformWindow() {
             UIThemeService = GetPlatformService<IUIThemeService>();
             UIThemeUpdaterService = GetPlatformService<IUIThemeUpdaterService>();
 
             UIThemeService.UIThemeChanged += OnUIThemeChanged;
+            _windowInteropHelper = new WindowInteropHelper(this) {
+                Owner = Process.GetCurrentProcess().MainWindowHandle
+            };
         }
 
         /// <summary>
