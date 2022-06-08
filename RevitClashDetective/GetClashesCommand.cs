@@ -21,7 +21,6 @@ namespace RevitClashDetective {
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
             var mainViewModlel = new ClashesViewModel(revitRepository);
             var window = new NavigatorView() { DataContext = mainViewModlel };
-            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
             window.Show();
         }
     }

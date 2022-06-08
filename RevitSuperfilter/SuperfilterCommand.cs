@@ -26,8 +26,6 @@ namespace RevitSuperfilter {
             var viewModel = new SuperfilterViewModel(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
 
             var window = new MainWindow() { DataContext = viewModel };
-            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
-
             window.ShowDialog();
         }
     }

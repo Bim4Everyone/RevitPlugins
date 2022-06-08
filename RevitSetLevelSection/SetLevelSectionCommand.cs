@@ -33,8 +33,6 @@ namespace RevitSetLevelSection {
             var viewModel = new MainViewModel(repository);
 
             var window = new MainWindow() {DataContext = viewModel};
-            var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
-
             window.ShowDialog();
         }
     }

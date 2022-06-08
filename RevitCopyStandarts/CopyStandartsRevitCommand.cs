@@ -40,11 +40,6 @@ namespace RevitCopyStandarts {
             var mainWindow = new MainWindow() {
                 DataContext = new BimCategoriesViewModel(mainFolder, document, application)
             };
-            
-            var helper = new WindowInteropHelper(mainWindow) {
-                Owner = uiApplication.MainWindowHandle
-            };
-            
             mainWindow.ShowDialog();
         }
     }

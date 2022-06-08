@@ -31,7 +31,6 @@ namespace RevitLintelPlacement {
 
             var configViewModel = new ConfigViewModel(revitRepository);
             var window = new LintelsConfigView() {DataContext = configViewModel};
-            var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
             window.ShowDialog();
         }
     }

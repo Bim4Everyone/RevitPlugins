@@ -29,8 +29,6 @@ namespace RevitGenLookupTables {
             var window = new LookupTablesWindow() {
                 DataContext = new FamilyViewModel(new Models.RevitRepository(application, document))
             };
-            var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
-
             window.ShowDialog();
         }
     }

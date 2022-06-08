@@ -34,7 +34,6 @@ namespace RevitCreateViewSheet {
             projectParameters.SetupRevitParams(document, SharedParamsConfig.Instance.AlbumBlueprints, SharedParamsConfig.Instance.StampSheetNumber);
 
             var window = new CreateViewSheetWindow() { DataContext = new AppViewModel(uiApplication) };
-            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
             window.ShowDialog();
         }
     }

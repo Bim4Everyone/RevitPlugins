@@ -31,8 +31,6 @@ namespace RevitRooms {
             if(isChecked) {
                 var viewModel = new RoomsViewModel(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
                 var window = new RoomsWindow() {DataContext = viewModel};
-                var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
-
                 window.ShowDialog();
             }
         }

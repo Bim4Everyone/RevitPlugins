@@ -30,8 +30,6 @@ namespace PlatformSettings {
 
         public bool OpenSettingsWindow(UIApplication uiApplication) {
             var window = new SettingsWindow() {DataContext = new PlatformSettingsViewModel()};
-            var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
-
             if(window.ShowDialog() == true) {
                 var settings = (PlatformSettingsViewModel) window.DataContext;
                 settings.SaveSettings();

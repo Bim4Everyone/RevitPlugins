@@ -25,7 +25,6 @@ namespace RevitServerFolders {
 
             var exportNwcFileViewModel = new ExportNwcFileViewModel(ExportNwcFileConfig.GetExportNwcFileConfig());
             var exportWindow = new ExportNwcFileWindow {DataContext = exportNwcFileViewModel};
-            var helper = new WindowInteropHelper(exportWindow) {Owner = uiApplication.MainWindowHandle};
 
             if(exportWindow.ShowDialog() == true) {
                 exportNwcFileViewModel = (ExportNwcFileViewModel) exportWindow.DataContext;

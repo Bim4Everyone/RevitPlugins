@@ -25,8 +25,6 @@ namespace RevitBatchPrint {
         
         protected override void Execute(UIApplication uiApplication) {
             var window = new BatchPrintWindow() { DataContext = new PrintAbumsViewModel(uiApplication) };
-            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
-                
             window.ShowDialog();
         }
     }

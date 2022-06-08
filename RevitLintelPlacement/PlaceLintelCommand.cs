@@ -28,7 +28,6 @@ namespace RevitLintelPlacement {
                
             var mainViewModel = new MainViewModel(revitRepository);
             var window = new MainWindow() { DataContext = mainViewModel };
-            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
             window.ShowDialog();
         }
     }

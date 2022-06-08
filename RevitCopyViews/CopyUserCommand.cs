@@ -70,8 +70,6 @@ namespace RevitCopyViews {
                     RestrictedViewNames = restrictedViewNames
                 }
             };
-
-            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
             window.ShowDialog();
         }
     }

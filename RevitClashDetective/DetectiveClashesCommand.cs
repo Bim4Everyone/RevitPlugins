@@ -25,7 +25,6 @@ namespace RevitClashDetective {
             var checkConfig = ChecksConfig.GetFiltersConfig();
             var mainViewModlel = new MainViewModel(checkConfig, filterConfig, revitRepository);
             var window = new MainWindow() { DataContext = mainViewModlel };
-            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
             window.ShowDialog();
         }
     }
