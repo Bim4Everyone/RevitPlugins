@@ -50,7 +50,7 @@
             SelectedItems="{Binding GridSelectedFamilyParams}"
             SelectionMode="Row">
             <dxg:GridControl.View>
-                <dxg:TableView x:Name="_gridView" AutoWidth="True" />
+                <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always" ShowGroupPanel="False"/>
             </dxg:GridControl.View>
 
             <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False"

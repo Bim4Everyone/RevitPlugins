@@ -19,9 +19,9 @@ namespace RevitGenLookupTables.ViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly StorageType _storageType;
 
-        private double? _minValue;
-        private double? _maxValue;
-        private double? _stepValue;
+        private string _minValue;
+        private string _maxValue;
+        private string _stepValue;
         private string _paramValues;
         private string _errorText;
 
@@ -31,25 +31,35 @@ namespace RevitGenLookupTables.ViewModels {
 
             GenerateCommand = new RelayCommand(Generate, CanGenerate);
 
-            MinValue = 0;
-            MaxValue = 10;
-            StepValue = 1;
+            MinValueEdit = "0";
+            MaxValueEdit = "10";
+            StepValueEdit = "1";
+
+            CultureInfo = (CultureInfo) CultureInfo.GetCultureInfo("ru-ru").Clone();
+            CultureInfo.NumberFormat.NumberDecimalSeparator = ".";
         }
 
-        public double? MinValue {
+        public string MinValueEdit {
             get => _minValue;
             set => this.RaiseAndSetIfChanged(ref _minValue, value);
         }
 
-        public double? MaxValue {
+        public string MaxValueEdit {
             get => _maxValue;
             set => this.RaiseAndSetIfChanged(ref _maxValue, value);
         }
 
-        public double? StepValue {
+        public string StepValueEdit {
             get => _stepValue;
             set => this.RaiseAndSetIfChanged(ref _stepValue, value);
         }
+        public CultureInfo CultureInfo { get; }
+
+        public double? MinValue => GetDouble(MinValueEdit);
+
+        public double? MaxValue => GetDouble(MaxValueEdit);
+
+        public double? StepValue => GetDouble(StepValueEdit);
 
         public string ParamValues {
             get => _paramValues;
@@ -169,6 +179,13 @@ namespace RevitGenLookupTables.ViewModels {
 
         private static bool IsWholeNumber(double x) {
             return Math.Abs(x % 1) <= (double.Epsilon * 100);
+        }
+
+        private double? GetDouble(string value) {
+            if(double.TryParse(value, out double result)) {
+                return result;
+            }
+            return double.TryParse(value, NumberStyles.Number, CultureInfo, out result) ? result : (double?) null;
         }
     }
 }

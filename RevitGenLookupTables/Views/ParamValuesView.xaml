@@ -27,15 +27,15 @@
         <dxe:TextEdit Grid.Row="0" IsReadOnly="True" EditMode="InplaceActive" EditValue="Старт" Grid.Column="0"
                       Margin="0,0,3,10" />
         <dxe:TextEdit Grid.Row="0" Grid.Column="1" Margin="0,0,0,10"
-                      EditValue="{Binding MinValue, UpdateSourceTrigger=PropertyChanged}" />
+                      EditValue="{Binding MinValueEdit, UpdateSourceTrigger=PropertyChanged}" />
         <dxe:TextEdit Grid.Row="0" Grid.Column="2" Margin="0,0,3,10" IsReadOnly="True" EditMode="InplaceActive"
                       EditValue="Стоп" />
         <dxe:TextEdit Grid.Row="0" Grid.Column="3" Margin="0,0,0,10"
-                      EditValue="{Binding MaxValue, UpdateSourceTrigger=PropertyChanged}" />
+                      EditValue="{Binding MaxValueEdit, UpdateSourceTrigger=PropertyChanged}" />
         <dxe:TextEdit Grid.Row="0" Grid.Column="4" Margin="0,0,3,10" IsReadOnly="True" EditMode="InplaceActive"
                       EditValue="Шаг" />
         <dxe:TextEdit Grid.Row="0" Grid.Column="5" Margin="0,0,0,10"
-                      EditValue="{Binding StepValue, UpdateSourceTrigger=PropertyChanged}" />
+                      EditValue="{Binding StepValueEdit, UpdateSourceTrigger=PropertyChanged}" Mask="##,####" />
         <dx:SimpleButton Grid.Row="0" Grid.Column="6" Margin="10,0,0,10" Content="Генерировать"
                          ToolTipService.ShowOnDisabled="True"
                          Command="{Binding GenerateCommand}"
