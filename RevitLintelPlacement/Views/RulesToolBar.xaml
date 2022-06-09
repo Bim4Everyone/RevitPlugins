@@ -24,13 +24,13 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Height="28" Margin="5 5 0 0" Orientation="Horizontal">
-            <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Создать новые правила" Command="{Binding CreateNewRuleCommand}" Glyph="{dx:DXImage 'Office2013/Actions/AddItem_16x16.png'}"/>
+        <StackPanel Grid.Row="0" Height="28" Margin="0 5 0 0" Orientation="Horizontal">
+            <dx:SimpleButton Width="28" ToolTip="Создать новые правила" Command="{Binding CreateNewRuleCommand}" Glyph="{dx:DXImage 'Office2013/Actions/AddItem_16x16.png'}"/>
             <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Загрузить правила" Command="{Binding LoadCommand}" Glyph="{dx:DXImage 'Office2013/Actions/Download_16x16.png'}" />
             <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Сохранить" Command="{Binding SaveCommand}" Glyph="{dx:DXImage 'DevAV/Actions/Save_16x16.png'}"/>
             <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Сохранить как" Command="{Binding SaveAsCommand}" Glyph="{dx:DXImage 'DevAV/Actions/SaveAs_16x16.png'}"/> 
         </StackPanel>
-        <StackPanel Grid.Row="1" Margin="10" Orientation="Vertical" HorizontalAlignment="Left">
+        <StackPanel Grid.Row="1" Margin="0 10" Orientation="Vertical" HorizontalAlignment="Left">
             <dxe:ComboBoxEdit Width="300" Height="25" FontSize="14" IsTextEditable="False" ItemsSource="{Binding RuleNames}" SelectedItem="{Binding SelectedName}" >
                 <dxmvvm:Interaction.Behaviors>
                     <dxmvvm:EventToCommand EventName="SelectedIndexChanged" Command="{Binding PathSelectionChangedCommand}"/>

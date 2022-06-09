@@ -43,7 +43,7 @@
                         <RowDefinition/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <lc:GroupBox x:Name="groupBox1" MinimizeElementVisibility="Visible" Width="1025" Margin="6 4 0 0">
+                    <lc:GroupBox x:Name="groupBox1" MinimizeElementVisibility="Visible" Width="1025" Margin="0 4 0 0">
                         <lc:GroupBox.Header>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                                 <dxe:TextEdit VerticalAlignment="Center" IsReadOnly="True" EditMode="InplaceActive" EditValue="Правило:"/>
@@ -156,7 +156,7 @@
             <RowDefinition Height="23"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <dxg:GridControl Grid.Row="0" ShowBorder="False">
+        <dxg:GridControl Grid.Row="0" Margin="-13 0 0 0" ShowBorder="False">
             <dxg:GridControl.View>
                 <dxg:TableView  
                     AllowGrouping="False"
@@ -171,7 +171,7 @@
             <dxg:GridColumn AllowMoving="False" AllowEditing="False" AllowColumnFiltering="False" Width="85" Header="Опирание"/>
             <dxg:GridColumn AllowMoving="False" AllowEditing="False" AllowColumnFiltering="False" Width="210" Header="Типоразмер перемычки"/>
         </dxg:GridControl>
-        <ScrollViewer Grid.Row="1" Margin="5" MaxHeight="{Binding ElementName=ucRules, Path=ActualHeight}" CanContentScroll="False" HorizontalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="1" MaxHeight="{Binding ElementName=ucRules, Path=ActualHeight}" CanContentScroll="False" HorizontalScrollBarVisibility="Auto">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>

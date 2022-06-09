@@ -1,4 +1,4 @@
-﻿<base:ThemedPlatformWindow
+﻿<base:PlatformWindow
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     x:Class="RevitLintelPlacement.Views.LintelsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -227,4 +227,4 @@
             </DockPanel>
         </Grid>
     </Grid>
-</base:ThemedPlatformWindow>
+</base:PlatformWindow>
