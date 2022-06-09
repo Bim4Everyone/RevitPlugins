@@ -5,7 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vms="clr-namespace:RevitSuperfilter.ViewModels" 
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
-             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance vms:ParametersViewModel, IsDesignTimeCreatable=False}">
@@ -14,33 +16,17 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Grid Grid.Row="0" Margin="0,0,0,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto" MinWidth="120"/>
-            </Grid.ColumnDefinitions>
-            <dxe:TextEdit Grid.Column="0" EditMode="InplaceActive" EditValue="Фильтр:"/>
-            <dxe:TextEdit Grid.Column="1" EditValue="{Binding FilterValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <dx:SimpleButton Grid.Column="2" Content="{Binding ButtonFilterName}" Command="{Binding SelectCommand}"/>
-        </Grid>
-
-        <TreeView Grid.Row="1" ItemsSource="{Binding ParametersView}">
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Path=Values}">
-                    <dxe:CheckEdit EditValue="{Binding IsSelected}">
-                        <dxe:TextEdit EditMode="InplaceActive" EditValue="{Binding DisplayData, Mode=OneWay}" />
-                    </dxe:CheckEdit>
-                    <HierarchicalDataTemplate.ItemTemplate>
-                        <DataTemplate>
-                            <dxe:CheckEdit EditValue="{Binding IsSelected}">
-                                <dxe:TextEdit EditMode="InplaceActive" EditValue="{Binding DisplayData, Mode=OneWay}" />
-                            </dxe:CheckEdit>
-                        </DataTemplate>
-                    </HierarchicalDataTemplate.ItemTemplate>
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
+        <!--Command="{Binding SelectCommand}" CommandParameter="{Binding ElementName=_treeView, Path=FilteringContext}"-->
+        <dx:SimpleButton Name="_sb" Content="Выделить всё" Grid.Row="0" Click="SimpleButton_Click"/>
+        <dxg:TreeViewControl Name="_treeView"
+                             Grid.Row="1" 
+                             ItemsSource="{Binding ParametersView}"
+                             ChildNodesPath="Values"
+                             TreeViewFieldName="DisplayData"
+                             ShowSearchPanel="True"
+                             ShowCheckboxes="True"
+                             CheckBoxFieldName="IsSelected"
+                             FilterChanged="_treeView_FilterChanged">
+        </dxg:TreeViewControl>
     </Grid>
 </UserControl>
