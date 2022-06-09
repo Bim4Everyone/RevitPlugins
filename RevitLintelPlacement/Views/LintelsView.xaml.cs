@@ -23,6 +23,7 @@ namespace RevitLintelPlacement.Views {
 
         public LintelsView() {
             InitializeComponent();
+            _gridControl.GroupBy(_gridControl.Columns.Last());
         }
 
         public override string PluginName => nameof(RevitLintelPlacement);
