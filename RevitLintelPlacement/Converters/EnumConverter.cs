@@ -13,24 +13,19 @@ using RevitLintelPlacement.Extensions;
 namespace RevitLintelPlacement.Converters {
     internal class EnumConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            if(value == null || parameter == null) {
-                return string.Empty;
+            if(value == null) {
+                return null;
             }
-            foreach(var one in Enum.GetValues(parameter as Type)) {
-                if(value.Equals(one))
-                    return ((IConvertible) one).GetDescription();
+
+            if(value.GetType().IsEnum) {
+                return (value as IConvertible)?.GetDescription();
             }
-            return string.Empty;
+
+            return null;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            if(value == null)
-                return null;
-            foreach(var one in Enum.GetValues(parameter as Type)) {
-                if(value.ToString() == ((IConvertible) one).GetDescription())
-                    return one;
-            }
-            return null;
+            throw new NotImplementedException();
         }
     }
 }

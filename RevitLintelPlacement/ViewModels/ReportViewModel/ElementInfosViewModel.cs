@@ -20,7 +20,6 @@ namespace RevitLintelPlacement.ViewModels {
         private readonly RevitRepository _revitRepository;
         private ViewOrientation3D _orientation;
         private ObservableCollection<ElementInfoViewModel> _elementIfos;
-        private List<TypeInfoViewModel> _types;
         private CollectionViewSource _elementInfosViewSource;
         private ObservableCollection<GroupedDescriptionViewModel> _groupedDescriptions;
         private GroupedDescriptionViewModel _selectedGroupedDescription;
@@ -28,18 +27,17 @@ namespace RevitLintelPlacement.ViewModels {
 
         public ElementInfosViewModel(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
-            TypeInfos = new List<TypeInfoViewModel>();
             ElementInfos = new ObservableCollection<ElementInfoViewModel>();
             _orientation = _revitRepository.GetOrientation3D();
             SelectElementCommand = new RelayCommand(async p => await SelectElement(p));
-            
-            InitializeTypeInfo();
+
+            InitializeTypeInfos();
+
             ElementInfosViewSource = new CollectionViewSource() {
                 Source = ElementInfos
             };
             DescriptionCheckedCommand = new RelayCommand(DescriptionChecked);
             TypeInfoCheckedCommand = new RelayCommand(TypeInfoChecked);
-            //ElementInfosViewSource.Filter += TypeFilter;
             ElementInfosViewSource.Filter += MessageFilter;
         }
 
@@ -62,15 +60,13 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _groupedDescriptions, value);
         }
 
-        public CollectionViewSource DescriptionViewSoure { 
-            get => _descriptionViewSoure; 
-            set => this.RaiseAndSetIfChanged(ref _descriptionViewSoure, value); 
+        public CollectionViewSource DescriptionViewSoure {
+            get => _descriptionViewSoure;
+            set => this.RaiseAndSetIfChanged(ref _descriptionViewSoure, value);
         }
 
-        public List<TypeInfoViewModel> TypeInfos {
-            get => _types;
-            set => this.RaiseAndSetIfChanged(ref _types, value);
-        }
+        public List<object> SelectedObjects { get; set; } = new List<object>();
+        public List<TypeInfo> TypeInfos => SelectedObjects?.OfType<TypeInfo>()?.ToList() ?? new List<TypeInfo>();
 
         public CollectionViewSource ElementInfosViewSource {
             get => _elementInfosViewSource;
@@ -80,7 +76,7 @@ namespace RevitLintelPlacement.ViewModels {
         public void UpdateCollection() {
             ElementInfos = new ObservableCollection<ElementInfoViewModel>(ElementInfos
                 .Distinct()
-                .OrderBy(e=>e.Name));
+                .OrderBy(e => e.Name));
             ElementInfosViewSource.Source = ElementInfos;
         }
 
@@ -114,29 +110,26 @@ namespace RevitLintelPlacement.ViewModels {
             }
         }
 
-        private void InitializeTypeInfo() {
+        private void InitializeTypeInfos() {
             foreach(var value in Enum.GetValues(typeof(TypeInfo))) {
-                TypeInfos.Add(new TypeInfoViewModel() {
-                    TypeInfo = (TypeInfo) value,
-                    IsChecked = true
-                });
+                SelectedObjects.Add((object) value);
             }
         }
 
         private void TypeFilter(object sender, FilterEventArgs e) {
             if(e.Item is GroupedDescriptionViewModel description) {
                 if(!TypeInfos
-                    .Where(t => t.IsChecked)
-                    .Any(t => t.TypeInfo == description.TypeInfo)) {
+                    .Any(t => t == description.TypeInfo)) {
                     e.Accepted = false;
                 }
-
             }
         }
 
         private void MessageFilter(object sender, FilterEventArgs e) {
-            if(SelectedGroupedDescription == null)
+            if(SelectedGroupedDescription == null) {
+                e.Accepted = false;
                 return;
+            }
             if(e.Item is ElementInfoViewModel elementInfo) {
                 if(!elementInfo.Message.Equals(SelectedGroupedDescription.Message, StringComparison.CurrentCultureIgnoreCase)
                     || elementInfo.TypeInfo != SelectedGroupedDescription.TypeInfo) {
@@ -151,21 +144,6 @@ namespace RevitLintelPlacement.ViewModels {
 
         private void DescriptionChecked(object p) {
             ElementInfosViewSource.View.Refresh();
-        }
-    }
-
-    internal class TypeInfoViewModel : BaseViewModel {
-        private bool _isChecked;
-        private TypeInfo _typeInfo;
-
-        public bool IsChecked {
-            get => _isChecked;
-            set => this.RaiseAndSetIfChanged(ref _isChecked, value);
-        }
-
-        public TypeInfo TypeInfo {
-            get => _typeInfo;
-            set => this.RaiseAndSetIfChanged(ref _typeInfo, value);
         }
     }
 
