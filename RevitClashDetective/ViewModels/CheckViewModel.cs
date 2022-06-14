@@ -29,7 +29,6 @@ namespace RevitClashDetective.ViewModels {
         private ObservableCollection<ProvidersViewModel> _providers;
         private ObservableCollection<ProvidersViewModel> _otherDocumentProviders;
         private bool _hasReport;
-        private string _messageText;
         private bool _isSelected;
 
         public CheckViewModel(RevitRepository revitRepository, FiltersConfig filtersConfig, Check check = null) {
@@ -180,7 +179,6 @@ namespace RevitClashDetective.ViewModels {
             var view = new NavigatorView() { DataContext = new ClashesViewModel(_revitRepository, ReportName) };
             view.Show();
         }
-
 
         private bool CanShowClashes(object p) {
             return HasReport;
