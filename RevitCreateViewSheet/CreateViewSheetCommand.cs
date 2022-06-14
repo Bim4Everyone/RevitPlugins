@@ -21,7 +21,7 @@ namespace RevitCreateViewSheet {
     [Transaction(TransactionMode.Manual)]
     public class CreateViewSheetCommand  : BasePluginCommand {
         public CreateViewSheetCommand() {
-            PluginName = "Пакетная печать";
+            PluginName = "Менеджер листов";
         }
         
         protected override void Execute(UIApplication uiApplication) {

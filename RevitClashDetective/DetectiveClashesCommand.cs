@@ -19,6 +19,10 @@ namespace RevitClashDetective {
 
     [Transaction(TransactionMode.Manual)]
     public class DetectiveClashesCommand : BasePluginCommand {
+        public DetectiveClashesCommand() {
+            PluginName = "Поиск коллизий";
+        }
+
         protected override void Execute(UIApplication uiApplication) {
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
             var filterConfig = FiltersConfig.GetFiltersConfig();

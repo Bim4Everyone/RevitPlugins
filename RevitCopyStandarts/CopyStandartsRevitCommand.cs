@@ -26,7 +26,7 @@ namespace RevitCopyStandarts {
     [Transaction(TransactionMode.Manual)]
     public class CopyStandartsRevitCommand : BasePluginCommand {
         public CopyStandartsRevitCommand() {
-            PluginName = "Копирование стандартов.";
+            PluginName = "Копирование стандартов";
         }
         
         protected override void Execute(UIApplication uiApplication) {

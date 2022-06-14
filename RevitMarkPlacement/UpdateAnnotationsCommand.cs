@@ -9,6 +9,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep;
+using dosymep.Bim4Everyone;
 
 using RevitMarkPlacement.Models;
 using RevitMarkPlacement.ViewModels;
@@ -17,34 +18,23 @@ using RevitMarkPlacement.Views;
 namespace RevitMarkPlacement {
 
     [Transaction(TransactionMode.Manual)]
-    public class UpdateAnnotationsCommand : IExternalCommand {
+    public class UpdateAnnotationsCommand : BasePluginCommand {
+        public UpdateAnnotationsCommand() {
+            PluginName = "Расстановщик отметок";
+        }
 
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            try {
-                var config = AnnotationsConfig.GetAnnotationsConfig();
-                var revitRepository = new RevitRepository(
-                        commandData.Application.Application,
-                        commandData.Application.ActiveUIDocument.Document);
-                var viewModel = new MainViewModel(revitRepository, config);
-                if(!viewModel.CanPlaceAnnotation()) {
-                    var view = new ReportView() { DataContext = viewModel.InfoElementsViewModel };
-                    view.ShowDialog();
-                } else {
-                    var marks = new TemplateLevelMarkCollection(revitRepository, new AllElementsSelection());
-                    marks.UpdateAnnotation();
-                }
-            } catch(Exception ex) {
-#if D2020 || D2021 || D2022
-                TaskDialog.Show("Обновление отметок.", ex.ToString());
-#else
-                TaskDialog.Show("Обновление отметок.", ex.Message);
-#endif
-            } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
+        protected override void Execute(UIApplication uiApplication) {
+            var config = AnnotationsConfig.GetAnnotationsConfig();
+            var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
+
+            var viewModel = new MainViewModel(revitRepository, config);
+            if(!viewModel.CanPlaceAnnotation()) {
+                var view = new ReportView() { DataContext = viewModel.InfoElementsViewModel };
+                view.ShowDialog();
+            } else {
+                var marks = new TemplateLevelMarkCollection(revitRepository, new AllElementsSelection());
+                marks.UpdateAnnotation();
             }
-
-            return Result.Succeeded;
         }
     }
 }
