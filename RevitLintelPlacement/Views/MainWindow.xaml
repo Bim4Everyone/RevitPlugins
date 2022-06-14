@@ -39,9 +39,11 @@
                               FontSize="14"
                               Height="25"
                               IsTextEditable="False"
-                              ItemsSource="{Binding Source={extensions:EnumToItemsSource {x:Type vm:SampleMode}}}"
-                              EditValue="{Binding SelectedSampleMode, Converter={StaticResource EnumConverter},
-                              ConverterParameter={x:Type vm:SampleMode}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                              EditValue="{Binding SelectedSampleMode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" >
+                <dxmvvm:Interaction.Behaviors>
+                    <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type vm:SampleMode}"/>
+                </dxmvvm:Interaction.Behaviors>
+            </dxe:ComboBoxEdit>
         </StackPanel>
         <lc:GroupBox Grid.Row="2" Margin="0 5 0 10" HorizontalAlignment="Stretch" Header="Связанные файлы" FontSize="14">
             <dxe:ListBoxEdit MaxHeight="100"

@@ -40,24 +40,23 @@
                 HorizontalAlignment="Stretch"
                 Background="Transparent"
                 IsTextEditable="False"
-                ItemsSource="{Binding Source={extensions:EnumToItemsSource {x:Type vm:SampleMode}}}"
-                EditValue="{Binding SelectedSampleMode, Converter={StaticResource EnumConverter},
-                ConverterParameter={x:Type vm:SampleMode}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" >
+                EditValue="{Binding SelectedSampleMode, UpdateSourceTrigger=PropertyChanged}" >
             <dxmvvm:Interaction.Behaviors>
                 <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding SampleModeChangedCommand}"/>
+                <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type vm:SampleMode}"/>
             </dxmvvm:Interaction.Behaviors>
         </dxe:ComboBoxEdit>
 
         <dxe:ListBoxEdit 
-                Grid.Row="1"
+                 Grid.Row="1"
                  SelectionMode="Single"      
-                 ItemsSource="{Binding Source={extensions:EnumToItemsSource {x:Type vm:ElementInWallKind}}}"
-                 EditValue="{Binding SelectedElementKind, Converter={StaticResource EnumConverter}, ConverterParameter={x:Type vm:ElementInWallKind}}" >
+                 EditValue="{Binding SelectedElementKind, UpdateSourceTrigger=PropertyChanged}" >
             <dxe:ListBoxEdit.StyleSettings>
                 <dxe:RadioListBoxEditStyleSettings/>
             </dxe:ListBoxEdit.StyleSettings>
             <dxmvvm:Interaction.Behaviors>
                 <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding SelectionElementKindChangedCommand}"/>
+                <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type vm:ElementInWallKind}"/>
             </dxmvvm:Interaction.Behaviors>
             <dxe:ListBoxEdit.ItemsPanel>
                 <ItemsPanelTemplate>
