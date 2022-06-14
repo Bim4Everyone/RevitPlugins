@@ -12,12 +12,12 @@ namespace dosymep.Bim4Everyone {
         public BasePluginCommand() {
             PluginName = GetType().Name;
         }
-        
+
         /// <summary>
         /// Предоставляет доступ к логгеру расширения.
         /// </summary>
         protected ILoggerService PluginLoggerService { get; private set; }
-        
+
         /// <summary>
         /// Предоставляет доступ к логгеру платформы.
         /// </summary>
@@ -32,6 +32,16 @@ namespace dosymep.Bim4Everyone {
             try {
                 Execute(commandData.Application);
                 PluginLoggerService.Information("Выход из команды расширения.");
+            } catch(OperationCanceledException) {
+                PluginLoggerService.Warning("Отмена выполнения команды расширения.");
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
+            } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
+                PluginLoggerService.Warning("Отмена выполнения команды расширения.");
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
             } catch(Exception ex) {
                 PluginLoggerService.Warning(ex, "Ошибка в команде расширения.");
 #if D2020 || D2021 || D2022
@@ -39,6 +49,9 @@ namespace dosymep.Bim4Everyone {
 #else
                 TaskDialog.Show(PluginName, ex.Message);
 #endif
+                GetPlatformService<INotificationService>()
+                    .CreateFatalNotification(PluginName, "Выполнение скрипта завершено с ошибкой.")
+                    .ShowAsync();
             } finally {
                 AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
             }
@@ -49,7 +62,7 @@ namespace dosymep.Bim4Everyone {
         /// <summary>
         /// Наименование расширения для логгера
         /// </summary>
-        protected string PluginName { get; set; } 
+        protected string PluginName { get; set; }
 
         /// <summary>
         /// Метод команды Revit
