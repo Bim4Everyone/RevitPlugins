@@ -11,6 +11,7 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
 
 using RevitCopyViews.ViewModels;
 using RevitCopyViews.Views;
@@ -21,7 +22,7 @@ namespace RevitCopyViews {
         public RenameViewCommand() {
             PluginName = "Переименование видов";
         }
-        
+
         protected override void Execute(UIApplication uiApplication) {
             var application = uiApplication.Application;
 
@@ -39,9 +40,9 @@ namespace RevitCopyViews {
                 .Select(item => item.Name)
                 .OrderBy(item => item)
                 .Distinct()
-                .Except(selectedViews.Select(item=> item.Name))
+                .Except(selectedViews.Select(item => item.Name))
                 .ToList();
-           
+
             var window = new RenameViewWindow() {
                 DataContext = new RenameViewViewModel(selectedViews) {
                     Document = document,
@@ -51,7 +52,15 @@ namespace RevitCopyViews {
                     RestrictedViewNames = restrictedViewNames
                 }
             };
-            window.ShowDialog();
+            if(window.ShowDialog() == true) {
+                GetPlatformService<INotificationService>()
+                   .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                   .ShowAsync();
+            } else {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
+            }
         }
     }
 }

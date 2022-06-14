@@ -9,6 +9,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
 
 using PlatformSettings.TabExtensions;
 
@@ -25,11 +26,19 @@ namespace PlatformSettings {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            OpenSettingsWindow(uiApplication);
+            if(OpenSettingsWindow(uiApplication)) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
+            }
         }
 
         public bool OpenSettingsWindow(UIApplication uiApplication) {
-            var window = new SettingsWindow() {DataContext = new PlatformSettingsViewModel()};
+            var window = new SettingsWindow() { DataContext = new PlatformSettingsViewModel() };
             if(window.ShowDialog() == true) {
                 var settings = (PlatformSettingsViewModel) window.DataContext;
                 settings.SaveSettings();

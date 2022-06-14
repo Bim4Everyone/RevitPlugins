@@ -13,17 +13,18 @@ using dosymep;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
+using dosymep.SimpleServices;
 
 using RevitCreateViewSheet.ViewModels;
 using RevitCreateViewSheet.Views;
 
 namespace RevitCreateViewSheet {
     [Transaction(TransactionMode.Manual)]
-    public class CreateViewSheetCommand  : BasePluginCommand {
+    public class CreateViewSheetCommand : BasePluginCommand {
         public CreateViewSheetCommand() {
             PluginName = "Менеджер листов";
         }
-        
+
         protected override void Execute(UIApplication uiApplication) {
             var application = uiApplication.Application;
 
@@ -34,7 +35,15 @@ namespace RevitCreateViewSheet {
             projectParameters.SetupRevitParams(document, SharedParamsConfig.Instance.AlbumBlueprints, SharedParamsConfig.Instance.StampSheetNumber);
 
             var window = new CreateViewSheetWindow() { DataContext = new AppViewModel(uiApplication) };
-            window.ShowDialog();
+            if(window.ShowDialog() == true) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
+            }
         }
     }
 }

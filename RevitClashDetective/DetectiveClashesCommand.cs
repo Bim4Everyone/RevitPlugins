@@ -9,6 +9,7 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
@@ -29,7 +30,15 @@ namespace RevitClashDetective {
             var checkConfig = ChecksConfig.GetFiltersConfig();
             var mainViewModlel = new MainViewModel(checkConfig, filterConfig, revitRepository);
             var window = new MainWindow() { DataContext = mainViewModlel };
-            window.ShowDialog();
+            if(window.ShowDialog() == true) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
+            }
         }
     }
 }

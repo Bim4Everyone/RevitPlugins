@@ -10,6 +10,7 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
 
 using RevitMarkPlacement.Models;
 using RevitMarkPlacement.ViewModels;
@@ -30,10 +31,21 @@ namespace RevitMarkPlacement {
             var viewModel = new MainViewModel(revitRepository, config);
             if(!viewModel.CanPlaceAnnotation()) {
                 var view = new ReportView() { DataContext = viewModel.InfoElementsViewModel };
-                view.ShowDialog();
+                if(view.ShowDialog() == true) {
+                    GetPlatformService<INotificationService>()
+                        .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                        .ShowAsync();
+                } else {
+                    GetPlatformService<INotificationService>()
+                        .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                        .ShowAsync();
+                }
             } else {
                 var marks = new TemplateLevelMarkCollection(revitRepository, new AllElementsSelection());
                 marks.UpdateAnnotation();
+                GetPlatformService<INotificationService>()
+                   .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                   .ShowAsync();
             }
         }
     }

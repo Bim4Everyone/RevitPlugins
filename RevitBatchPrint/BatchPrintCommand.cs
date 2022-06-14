@@ -10,6 +10,7 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
 
 using RevitBatchPrint.ViewModels;
 using RevitBatchPrint.Views;
@@ -25,7 +26,15 @@ namespace RevitBatchPrint {
         
         protected override void Execute(UIApplication uiApplication) {
             var window = new BatchPrintWindow() { DataContext = new PrintAbumsViewModel(uiApplication) };
-            window.ShowDialog();
+            if(window.ShowDialog() == true) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
+            }
         }
     }
 }
