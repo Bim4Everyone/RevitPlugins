@@ -208,12 +208,13 @@
                 Content="Сохранить"
                 Width="80"
                 Height="25"
-                Command="{Binding SaveConfigCommand}"  CommandParameter="{Binding ElementName=Config}"/>
+                Command="{Binding SaveConfigCommand}"  CommandParameter="{Binding ElementName=Config}"
+                Click="SimpleButtonOK_Click"/>
             <dx:SimpleButton
                 Content="Отмена"
                 Width="80"
                 Height="25"
-                Click="Button_Click" />
+                Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
 </base:ThemedPlatformWindow>

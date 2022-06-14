@@ -29,5 +29,9 @@ namespace RevitLintelPlacement.Views {
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;
         }
+
+        private void SimpleButtonOK_Click(object sender, RoutedEventArgs e) {
+            DialogResult = true;
+        }
     }
 }

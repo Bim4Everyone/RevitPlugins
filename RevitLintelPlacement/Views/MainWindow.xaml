@@ -74,7 +74,8 @@
                 Width="80"
                 Height="25"
                 Command="{Binding PlaceLintelCommand}"
-                CommandParameter="{Binding ElementName=MainView}"/>
+                CommandParameter="{Binding ElementName=MainView}"
+                Click="SimpleButtonOK_Click"/>
             <dx:SimpleButton
                 Content="Отмена"
                 Width="80"
