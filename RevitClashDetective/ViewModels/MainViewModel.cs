@@ -36,9 +36,10 @@ namespace RevitClashDetective.ViewModels {
                 InitializeEmptyCheck();
             }
             AddCheckCommand = new RelayCommand(AddCheck);
-            RemoveCheckCommand = new RelayCommand(RemoveCheck);
+            RemoveCheckCommand = new RelayCommand(RemoveCheck, CanRemove);
             FindClashesCommand = new RelayCommand(FindClashes, CanFindClashes);
         }
+
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
@@ -78,8 +79,12 @@ namespace RevitClashDetective.ViewModels {
 
         private void RemoveCheck(object p) {
             if(Checks.Count > 0) {
-                Checks.RemoveAt(Checks.Count - 1);
+                Checks.Remove(p as CheckViewModel);
             }
+        }
+
+        private bool CanRemove(object p) {
+            return (p as CheckViewModel) != null;
         }
 
         private async void FindClashes(object p) {
@@ -88,11 +93,11 @@ namespace RevitClashDetective.ViewModels {
             }
             SaveConfig();
             MessageText = "Проверка на коллизии прошла успешно";
-            await Task.Delay(3000);
-            MessageText = null;
             foreach(var check in Checks) {
                 check.IsSelected = false;
             }
+            await Task.Delay(3000);
+            MessageText = null;
         }
 
         private void SaveConfig() {

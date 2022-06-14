@@ -20,11 +20,13 @@
             <Button Height="35" Width="35" Margin="10 10 0 10" BorderBrush="Transparent" Background="Transparent" Command="{Binding AddCheckCommand}">
                 <Image Source="../Resources/icons8-plus.png" />
             </Button>
-            <Button Height="35" Width="35" Margin="2 10 10 10" BorderBrush="Transparent" Background="Transparent" Command="{Binding RemoveCheckCommand}">
+            <Button Height="35" Width="35" Margin="2 10 10 10" BorderBrush="Transparent" Background="Transparent" Command="{Binding RemoveCheckCommand}"
+                    CommandParameter="{Binding ElementName=_dg, Path=SelectedItem}">
                 <Image Source="../Resources/icons8-minus.png"/>
             </Button>
         </StackPanel>
-        <DataGrid Grid.Row="1" 
+        <DataGrid x:Name="_dg"
+                  Grid.Row="1" 
                   AutoGenerateColumns="False" 
                   CanUserReorderColumns="False"
                   CanUserDeleteRows="False"
