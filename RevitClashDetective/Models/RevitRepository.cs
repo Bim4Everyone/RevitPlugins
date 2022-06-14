@@ -41,7 +41,7 @@ namespace RevitClashDetective.Models {
 
             _revitEventHandler = new RevitEventHandler();
             _revitEventHandler2 = new RevitEventHandler();
-            _endings.Add(_application.Username);
+            _endings.Add("_" + _application.Username);
 
             _view = GetClashView();
         }
@@ -64,6 +64,8 @@ namespace RevitClashDetective.Models {
             BuiltInParameter.ROOF_BASE_LEVEL_PARAM,
             BuiltInParameter.ROOF_CONSTRAINT_LEVEL_PARAM,
             BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM };
+
+        public Document Doc => _document;
 
         public View3D GetClashView() {
             var view = new FilteredElementCollector(_document)
@@ -123,11 +125,10 @@ namespace RevitClashDetective.Models {
                 .FirstOrDefault(item => item.Name == "Navisworks");
         }
 
-        public Document Doc => _document;
-
         public LanguageType GetLanguage() {
             return _application.Language;
         }
+
         public List<ParameterFilterElement> GetFilters() {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(ParameterFilterElement))
@@ -143,7 +144,6 @@ namespace RevitClashDetective.Models {
                 .Where(item => item.GetLinkDocument() != null)
                 .ToList();
         }
-
 
         public IEnumerable<ClashModel> GetClashes(ClashDetector detector) {
             return detector.FindClashes(_document);
@@ -174,8 +174,6 @@ namespace RevitClashDetective.Models {
             .ToList();
         }
 
-
-
         public IEnumerable<Document> GetDocuments() {
             var linkedDocuments = new FilteredElementCollector(_document)
                 .OfClass(typeof(RevitLinkInstance))
@@ -189,8 +187,8 @@ namespace RevitClashDetective.Models {
 
         public void CreateFilter(IEnumerable<ElementId> categories, ElementFilter filter, string name) {
             using(Transaction t = _document.StartTransaction("Создание фильтра")) {
-                    ParameterFilterElement pfe = ParameterFilterElement.Create(_document, name, categories.ToList());
-                    pfe.SetElementFilter(filter);
+                ParameterFilterElement pfe = ParameterFilterElement.Create(_document, name, categories.ToList());
+                pfe.SetElementFilter(filter);
                 t.Commit();
             }
 
