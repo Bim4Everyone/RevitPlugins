@@ -90,6 +90,9 @@ namespace RevitClashDetective.ViewModels {
             MessageText = "Проверка на коллизии прошла успешно";
             await Task.Delay(3000);
             MessageText = null;
+            foreach(var check in Checks) {
+                check.IsSelected = false;
+            }
         }
 
         private void SaveConfig() {
