@@ -5,30 +5,55 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RevitClashDetective.Views"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:vm="clr-namespace:RevitClashDetective.ViewModels"
+             xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.ClashDetective"
              mc:Ignorable="d"
              Name="_this"
-             MinWidth="100">
+             MinWidth="100"
+             d:DataContext="{d:DesignInstance vm:SelectionViewModel, IsDesignTimeCreatable=False}">
     <Grid>
-        <ComboBox Name="cbMain" ItemsSource="{Binding ElementName=_this, Path=Providers}" SelectionChanged="cbMain_SelectionChanged">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <ComboBox Grid.Column="0" ItemsSource="{Binding Files}">
             <ComboBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type vm:ProvidersViewModel}">
+                <DataTemplate DataType="{x:Type vm:FilterProviderViewModel}">
                     <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
                         <CheckBox.Content>
                             <TextBlock Text="{Binding Name}"/>
                         </CheckBox.Content>
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="Checked">
-                                <i:InvokeCommandAction Command="{Binding ElementName=cbMain, Path=DataContext.SelectMainProviderCommand}"/>
+                                <i:InvokeCommandAction Command="{Binding ElementName=_this, Path=DataContext.SelectFilesCommand}"/>
                             </i:EventTrigger>
                             <i:EventTrigger EventName="Unchecked">
-                                <i:InvokeCommandAction Command="{Binding ElementName=cbMain, Path=DataContext.SelectMainProviderCommand}"/>
+                                <i:InvokeCommandAction Command="{Binding ElementName=_this, Path=DataContext.SelectFilesCommand}"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </CheckBox>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <TextBlock IsHitTestVisible="False" TextWrapping="Wrap" Foreground="Black" VerticalAlignment="Center" Margin="5 0" Text="{Binding ElementName=_this, Path=SelectedProviders}"/>
+        <TextBlock Grid.Column="0" IsHitTestVisible="False" TextWrapping="Wrap" Foreground="Black" VerticalAlignment="Center" Margin="5 0" Text="{Binding SelectedFiles}"/>
+        <ComboBox Grid.Column="1" ItemsSource="{Binding Providers}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type vm:FilterProviderViewModel}">
+                    <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
+                        <CheckBox.Content>
+                            <TextBlock Text="{Binding Name}"/>
+                        </CheckBox.Content>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Checked">
+                                <i:InvokeCommandAction Command="{Binding ElementName=_this, Path=DataContext.SelectProvidersCommand}"/>
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="Unchecked">
+                                <i:InvokeCommandAction Command="{Binding ElementName=_this, Path=DataContext.SelectProvidersCommand}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </CheckBox>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBlock Grid.Column="1" IsHitTestVisible="False" TextWrapping="Wrap" Foreground="Black" VerticalAlignment="Center" Margin="5 0" Text="{Binding SelectedPoviders}"/>
     </Grid>
 </UserControl>

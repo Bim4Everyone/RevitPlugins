@@ -105,8 +105,8 @@ namespace RevitClashDetective.ViewModels {
             foreach(var check in Checks) {
                 _checksConfig.Checks.Add(new Check() {
                     Name = check.Name,
-                    MainFilters = check.MainDocumentProviders.Where(item => item.IsSelected).Select(item => item.Name).ToList(),
-                    OtherFilters = check.OtherDocumentProviders.Where(item => item.IsSelected).Select(item => item.Name).ToList()
+                    MainFilters = check.FirstSelection.Providers.Where(item => item.IsSelected).Select(item => item.Name).ToList(),
+                    OtherFilters = check.SecondSelection.Providers.Where(item => item.IsSelected).Select(item => item.Name).ToList()
                 });
             }
             _checksConfig.SaveProjectConfig();
@@ -128,6 +128,13 @@ namespace RevitClashDetective.ViewModels {
                 ErrorText = $"У проверки \"{emptyCheck.Name}\" необходимо выбрать хотя бы один фильтр.";
                 return false;
             }
+
+            emptyCheck = Checks.FirstOrDefault(item => !item.IsFilesSelected);
+            if(emptyCheck != null) {
+                ErrorText = $"У проверки \"{emptyCheck.Name}\" необходимо выбрать хотя бы один файл.";
+                return false;
+            }
+
             ErrorText = null;
             return true;
         }

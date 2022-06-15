@@ -1,4 +1,5 @@
-﻿<base:PlatformWindow  xmlns:base="clr-namespace:dosymep.WPF.Views"
+﻿<base:PlatformWindow  
+        xmlns:base="clr-namespace:dosymep.WPF.Views"
         x:Class="RevitClashDetective.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -63,17 +64,17 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"/>
-                <DataGridTemplateColumn Header="Фильтры основного файла" Width="*">
+                <DataGridTemplateColumn Header="Выбор А" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type vm:CheckViewModel}">
-                            <local:ProviderCombobBox Providers="{Binding MainDocumentProviders}" SelectedProviders="{Binding SelectedMainDocProviders}"/>
+                            <local:ProviderCombobBox DataContext="{Binding FirstSelection}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Фильтры связанных файлов" Width="*">
+                <DataGridTemplateColumn Header="Выбор В" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type vm:CheckViewModel}">
-                            <local:ProviderCombobBox Providers="{Binding OtherDocumentProviders}" SelectedProviders="{Binding SelectedOtherDocProviders}"/>
+                            <local:ProviderCombobBox DataContext="{Binding SecondSelection}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

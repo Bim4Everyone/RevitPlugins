@@ -21,29 +21,10 @@ namespace RevitClashDetective.Views {
     /// Interaction logic for ProviderCombobBox.xaml
     /// </summary>
     public partial class ProviderCombobBox : UserControl {
-        internal static readonly DependencyProperty ProvidersProperty =
-            DependencyProperty.Register(nameof(Providers), typeof(ObservableCollection<ProvidersViewModel>), typeof(ProviderCombobBox));
-
-        internal static readonly DependencyProperty SelectedProvidersProperty =
-            DependencyProperty.Register(nameof(SelectedProviders), typeof(string), typeof(ProviderCombobBox));
 
         public ProviderCombobBox() {
             InitializeComponent();
         }
 
-        internal string SelectedProviders {
-            get { return (string) GetValue(SelectedProvidersProperty); }
-            set { SetValue(SelectedProvidersProperty, value); }
-        }
-
-        internal ObservableCollection<ProvidersViewModel> Providers {
-            get { return (ObservableCollection<ProvidersViewModel>) GetValue(ProvidersProperty); }
-            set { SetValue(ProvidersProperty, value); }
-        }
-
-        private void cbMain_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            ComboBox comboBox = (ComboBox) sender;
-            comboBox.SelectedItem = null;
-        }
     }
 }

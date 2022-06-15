@@ -15,6 +15,7 @@ using dosymep.WPF.ViewModels;
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.ViewModels.ClashDetective;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
 
@@ -26,10 +27,10 @@ namespace RevitClashDetective.ViewModels {
         private string errorText;
         private string _selectedMainDocProviders;
         private string _selectedOtherDocProviders;
-        private ObservableCollection<ProvidersViewModel> _providers;
-        private ObservableCollection<ProvidersViewModel> _otherDocumentProviders;
         private bool _hasReport;
         private bool _isSelected;
+        private SelectionViewModel _firstSelection;
+        private SelectionViewModel _secondSelection;
 
         public CheckViewModel(RevitRepository revitRepository, FiltersConfig filtersConfig, Check check = null) {
             _revitRepository = revitRepository;
@@ -37,28 +38,25 @@ namespace RevitClashDetective.ViewModels {
 
             Name = check?.Name ?? "Без имени";
 
-            MainDocumentProviders = new ObservableCollection<ProvidersViewModel>();
-            OtherDocumentProviders = new ObservableCollection<ProvidersViewModel>();
-
 
             if(check == null) {
-                InitializeFilterProviders();
+                InitializeSelections();
                 HasReport = false;
             } else {
                 InitializeFilterProviders(check);
             }
 
-            SelectMainProviderCommand = new RelayCommand(SelectProvider);
             ShowClashesCommand = new RelayCommand(ShowClashes, CanShowClashes);
         }
 
         public ICommand SelectMainProviderCommand { get; }
         public ICommand ShowClashesCommand { get; }
-        public bool IsFilterSelected => !string.IsNullOrEmpty(SelectedOtherDocProviders) && !string.IsNullOrEmpty(SelectedMainDocProviders);
+        public bool IsFilterSelected => !string.IsNullOrEmpty(FirstSelection.SelectedPoviders) && !string.IsNullOrEmpty(SecondSelection.SelectedPoviders);
+        public bool IsFilesSelected => !string.IsNullOrEmpty(FirstSelection.SelectedFiles) && !string.IsNullOrEmpty(SecondSelection.SelectedFiles);
 
-        public bool IsSelected { 
-            get => _isSelected; 
-            set => this.RaiseAndSetIfChanged(ref _isSelected, value); 
+        public bool IsSelected {
+            get => _isSelected;
+            set => this.RaiseAndSetIfChanged(ref _isSelected, value);
         }
 
         public bool HasReport {
@@ -76,40 +74,27 @@ namespace RevitClashDetective.ViewModels {
             set => this.RaiseAndSetIfChanged(ref errorText, value);
         }
 
-        public string SelectedMainDocProviders {
-            get => _selectedMainDocProviders;
-            set => this.RaiseAndSetIfChanged(ref _selectedMainDocProviders, value);
+        public SelectionViewModel FirstSelection {
+            get => _firstSelection;
+            set => this.RaiseAndSetIfChanged(ref _firstSelection, value);
         }
 
-
-        public string SelectedOtherDocProviders {
-            get => _selectedOtherDocProviders;
-            set => this.RaiseAndSetIfChanged(ref _selectedOtherDocProviders, value);
-        }
-
-        public ObservableCollection<ProvidersViewModel> MainDocumentProviders {
-            get => _providers;
-            set => this.RaiseAndSetIfChanged(ref _providers, value);
-        }
-
-        public ObservableCollection<ProvidersViewModel> OtherDocumentProviders {
-            get => _otherDocumentProviders;
-            set => this.RaiseAndSetIfChanged(ref _otherDocumentProviders, value);
+        public SelectionViewModel SecondSelection { 
+            get => _secondSelection; 
+            set => this.RaiseAndSetIfChanged(ref _secondSelection, value); 
         }
 
         private string ReportName => $"{_revitRepository.GetDocumentName()}_{Name}";
 
         public List<ClashModel> GetClashes() {
-            var mainProviders = MainDocumentProviders
-                .Where(item => item.IsSelected)
-                .SelectMany(item => item.Providers)
+            var mainProviders =  FirstSelection
+                .GetProviders()
                 .ToList();
-            var otherProviders = OtherDocumentProviders
-                .Where(item => item.IsSelected)
-                .SelectMany(item => item.Providers)
+            var otherProviders = SecondSelection
+                .GetProviders()
                 .ToList();
             var clashDetector = new ClashDetector(_revitRepository, mainProviders, otherProviders);
-            return _revitRepository.GetClashes(clashDetector).ToList();
+            return clashDetector.FindClashes();
         }
 
         public void SaveClashes() {
@@ -120,59 +105,43 @@ namespace RevitClashDetective.ViewModels {
         }
 
 
-        private void InitializeFilterProviders() {
-            var filters = _filtersConfig.Filters;
-            var links = _revitRepository.GetRevitLinkInstances();
-            foreach(var filter in filters) {
-                var mainProvider = new ProvidersViewModel(_revitRepository, filter);
-                MainDocumentProviders.Add(mainProvider);
-                var otherProvider = new ProvidersViewModel(_revitRepository, links, filter);
-                OtherDocumentProviders.Add(otherProvider);
-            }
+        private void InitializeSelections() {
+            FirstSelection = new SelectionViewModel(_revitRepository, _filtersConfig);
+            SecondSelection = new SelectionViewModel(_revitRepository, _filtersConfig);
         }
 
         private void InitializeFilterProviders(Check check) {
-            InitializeFilterProviders();
+            InitializeSelections();
 
-            foreach(var provider in MainDocumentProviders) {
+            foreach(var provider in FirstSelection.Providers) {
                 provider.IsSelected = check.MainFilters.Any(item => item.Equals(provider.Name, StringComparison.CurrentCultureIgnoreCase));
             }
 
-            foreach(var provider in OtherDocumentProviders) {
+            foreach(var provider in SecondSelection.Providers) {
                 provider.IsSelected = check.OtherFilters.Any(item => item.Equals(provider.Name, StringComparison.CurrentCultureIgnoreCase));
             }
 
             var missedMainFilters = check.MainFilters
-                .Where(item => !MainDocumentProviders.Any(p => p.Name.Equals(item)))
+                .Where(item => !FirstSelection.Providers.Any(p => p.Name.Equals(item)))
                 .ToList();
 
             if(missedMainFilters.Count > 0) {
-                ErrorText = $"Не найдены фильтры основного файла: {string.Join(", ", missedMainFilters)}";
+                ErrorText = $"Не найдены поисковые набора первой выборки: {string.Join(", ", missedMainFilters)}";
             }
 
             var missedOtherFilters = check.OtherFilters
-                .Where(item => !OtherDocumentProviders.Any(p => p.Name.Equals(item)))
+                .Where(item => !SecondSelection.Providers.Any(p => p.Name.Equals(item)))
                 .ToList();
 
             if(missedOtherFilters.Count > 0) {
-                ErrorText += Environment.NewLine + $"Не найдены фильтры связанных файлов: {string.Join(", ", missedOtherFilters)}";
+                ErrorText += Environment.NewLine + $"Не найдены поисковые наборы второй выборки: {string.Join(", ", missedOtherFilters)}";
             }
             if(ClashesConfig.GetFiltersConfig(_revitRepository.GetObjectName(), ReportName).Clashes.Count > 0) {
                 HasReport = true;
             }
 
-            SelectProvider(null);
-        }
-
-        private void SelectProvider(object p) {
-            SelectedMainDocProviders = string.Join(", ",
-                MainDocumentProviders
-                .Where(item => item.IsSelected)
-                .Select(item => item.Name));
-            SelectedOtherDocProviders = string.Join(", ",
-                OtherDocumentProviders
-                .Where(item => item.IsSelected)
-                .Select(item => item.Name));
+            FirstSelection.SelectProviders(null);
+            SecondSelection.SelectProviders(null);
         }
 
         private void ShowClashes(object p) {

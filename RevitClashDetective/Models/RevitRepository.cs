@@ -118,11 +118,15 @@ namespace RevitClashDetective.Models {
                 .ToList();
         }
 
-        public View GetNavisworksView(Document doc) {
+        public View3D GetNavisworksView(Document doc) {
             return new FilteredElementCollector(_document)
-                .OfClass(typeof(View))
-                .Cast<View>()
+                .OfClass(typeof(View3D))
+                .Cast<View3D>()
                 .FirstOrDefault(item => item.Name == "Navisworks");
+        }
+
+        public View3D Get3DView(Document doc) {
+            return GetNavisworksView(doc) ?? new FilteredElementCollector(doc).OfClass(typeof(View3D)).Cast<View3D>().Where(item => !item.IsTemplate).FirstOrDefault();
         }
 
         public LanguageType GetLanguage() {
@@ -145,8 +149,15 @@ namespace RevitClashDetective.Models {
                 .ToList();
         }
 
-        public IEnumerable<ClashModel> GetClashes(ClashDetector detector) {
-            return detector.FindClashes(_document);
+        public List<DocInfo> GetDocInfos() {
+            var linkedDocuments = new FilteredElementCollector(_document)
+               .OfClass(typeof(RevitLinkInstance))
+               .Cast<RevitLinkInstance>()
+               .Where(item => item.GetLinkDocument() != null)
+               .Select(item => new DocInfo(GetDocumentName(item.GetLinkDocument()), item.GetLinkDocument(), item.GetTransform()))
+               .ToList();
+            linkedDocuments.Add(new DocInfo(GetDocumentName(), _document, Transform.Identity));
+            return linkedDocuments;
         }
 
         public void SelectElements(IEnumerable<Element> elements) {
@@ -194,13 +205,15 @@ namespace RevitClashDetective.Models {
 
         }
 
-        public async Task SelectAndShowElement(ElementId id) {
+        public async Task SelectAndShowElement(IEnumerable<ElementId> ids, BoundingBoxXYZ bb) {
             if(_document.ActiveView != _view) {
                 _uiDocument.ActiveView = _view;
             }
             _revitEventHandler.TransactAction = () => {
-                SetViewOrientation(_document.GetElement(id).get_BoundingBox(_view));
-                _uiDocument.Selection.SetElementIds(new[] { id });
+                SetViewOrientation(bb);
+                if(ids.Where(item => item != ElementId.InvalidElementId).Any()) {
+                    _uiDocument.Selection.SetElementIds(ids.Where(item => item != ElementId.InvalidElementId).ToArray());
+                }
             };
 
             await _revitEventHandler.Raise();
@@ -226,6 +239,8 @@ namespace RevitClashDetective.Models {
         }
 
         private void SetViewOrientation(BoundingBoxXYZ bb) {
+            if(bb == null)
+                return;
             using(Transaction t = _document.StartTransaction("Подрезка")) {
                 bb.Max = bb.Max + new XYZ(1, 1, 1);
                 bb.Min = bb.Min - new XYZ(1, 1, 1);

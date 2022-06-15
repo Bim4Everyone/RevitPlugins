@@ -103,7 +103,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             var documentNames = _revitRepository.GetDocuments().Select(item => item.Title).ToList();
             if(SelectedFile != null) {
                 var config = ClashesConfig.GetFiltersConfig(_revitRepository.GetObjectName(), SelectedFile);
-                Clashes = config.Clashes.Select(item => new ClashViewModel(item))
+                Clashes = config.Clashes.Select(item => new ClashViewModel(_revitRepository, item))
                     .Where(item => IsValid(documentNames, item))
                     .ToList();
                 ClashesViewSource.Source = Clashes;
@@ -112,13 +112,13 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private bool IsValid(List<string> documentNames, ClashViewModel clash) {
             var clashDocuments = new[] { clash.FirstDocumentName, clash.SecondDocumentName };
-            return clashDocuments.All(item => documentNames.Any(d => d.Contains(item))) 
-                && clashDocuments.Any(item=> item.Contains(_revitRepository.GetDocumentName()));
+            return clashDocuments.All(item => documentNames.Any(d => d.Contains(item)));
+                //&& clashDocuments.Any(item=> item.Contains(_revitRepository.GetDocumentName()));
         }
 
         private async void SelectClash(object p) {
             var clash = p as ClashViewModel;
-            await _revitRepository.SelectAndShowElement(clash.GetElementId(_revitRepository.Doc.Title));
+            await _revitRepository.SelectAndShowElement(clash.GetElementIds(_revitRepository.Doc.Title), clash.GetBoundingBox());
         }
 
         private async void SelectNext(object p) {
@@ -127,7 +127,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 ClashesViewSource.View.MoveCurrentToPrevious();
             } else {
                 var clash = ClashesViewSource.View.CurrentItem as ClashViewModel;
-                await _revitRepository.SelectAndShowElement(clash.GetElementId(_revitRepository.GetDocumentName()));
+                await _revitRepository.SelectAndShowElement(clash.GetElementIds(_revitRepository.GetDocumentName()), clash.GetBoundingBox());
             }
         }
 
@@ -137,7 +137,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 ClashesViewSource.View.MoveCurrentToNext();
             } else {
                 var clash = ClashesViewSource.View.CurrentItem as ClashViewModel;
-                await _revitRepository.SelectAndShowElement(clash.GetElementId(_revitRepository.Doc.Title));
+                await _revitRepository.SelectAndShowElement(clash.GetElementIds(_revitRepository.Doc.Title), clash.GetBoundingBox());
             }
         }
 

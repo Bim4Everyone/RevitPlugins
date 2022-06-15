@@ -16,8 +16,11 @@ using RevitClashDetective.Models.Clashes;
 namespace RevitClashDetective.ViewModels.Navigator {
     internal class ClashViewModel : BaseViewModel {
         private bool _isSolved;
+        private readonly RevitRepository _revitRepository;
 
-        public ClashViewModel(ClashModel clash) {
+        public ClashViewModel(RevitRepository revitRepository, ClashModel clash) {
+            _revitRepository = revitRepository;
+
             FirstCategory = clash.MainElement.Category;
             FirstName = clash.MainElement.Name;
             FirstDocumentName = clash.MainElement.DocumentName;
@@ -29,8 +32,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
             SecondDocumentName = clash.OtherElement.DocumentName;
 
             IsSolved = clash.IsSolved;
-
             Clash = clash;
+            Clash.SetRevitRepository(_revitRepository);
         }
 
         public bool IsSolved {
@@ -55,14 +58,18 @@ namespace RevitClashDetective.ViewModels.Navigator {
         public string SecondCategory { get; set; }
         public ClashModel Clash { get; }
 
-        public ElementId GetElementId(string docTitle) {
+        public IEnumerable<ElementId> GetElementIds(string docTitle) {
             if(docTitle.Contains(FirstDocumentName)) {
-                return new ElementId(Clash.MainElement.Id);
+                yield return new ElementId(Clash.MainElement.Id);
             }
             if(docTitle.Contains(SecondDocumentName)) {
-                return new ElementId(Clash.OtherElement.Id);
+                yield return new ElementId(Clash.OtherElement.Id);
             }
-            return ElementId.InvalidElementId;
+            //return ElementId.InvalidElementId;
+        }
+
+        public BoundingBoxXYZ GetBoundingBox() {
+            return Clash.GetClashBoundingBox();
         }
     }
 }
