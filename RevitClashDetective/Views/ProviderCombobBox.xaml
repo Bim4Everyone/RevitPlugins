@@ -43,7 +43,38 @@
                 </i:Interaction.Triggers>
             </CheckBox>
         </DataTemplate>
-        
+        <DataTemplate DataType="{x:Type vm:FilterProviderViewModel}">
+            <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
+                <CheckBox.Content>
+                    <TextBlock Text="{Binding Name}"/>
+                </CheckBox.Content>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Checked">
+                        <i:InvokeCommandAction Command="{Binding ElementName=_this, Path=DataContext.SelectProvidersCommand}"/>
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="Unchecked">
+                        <i:InvokeCommandAction Command="{Binding ElementName=_this, Path=DataContext.SelectProvidersCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </CheckBox>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SelectAllProvidersViewModel}">
+            <CheckBox IsChecked="{Binding ElementName=_this, Path=DataContext.IsAllProvidersSelected}">
+                <CheckBox.Content>
+                    <TextBlock Text="{Binding Name}"/>
+                </CheckBox.Content>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Checked">
+                        <i:InvokeCommandAction Command="{Binding SelectAllCommand}" 
+                                               CommandParameter="{Binding ElementName=_this, Path=DataContext.Providers}"/>
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="Unchecked">
+                        <i:InvokeCommandAction Command="{Binding UnselectAllCommand}" 
+                                               CommandParameter="{Binding ElementName=_this, Path=DataContext.Providers}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </CheckBox>
+        </DataTemplate>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -62,24 +93,16 @@
             </ComboBox.ItemsSource>
         </ComboBox>
         <TextBlock Grid.Column="0" IsHitTestVisible="False" TextWrapping="Wrap" Foreground="Black" VerticalAlignment="Center" Margin="5 0" Text="{Binding SelectedFiles}"/>
-        <ComboBox Grid.Column="1" ItemsSource="{Binding Providers}" SelectionChanged="ComboBox_SelectionChanged">
-            <ComboBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type vm:FilterProviderViewModel}">
-                    <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
-                        <CheckBox.Content>
-                            <TextBlock Text="{Binding Name}"/>
-                        </CheckBox.Content>
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="Checked">
-                                <i:InvokeCommandAction Command="{Binding ElementName=_this, Path=DataContext.SelectProvidersCommand}"/>
-                            </i:EventTrigger>
-                            <i:EventTrigger EventName="Unchecked">
-                                <i:InvokeCommandAction Command="{Binding ElementName=_this, Path=DataContext.SelectProvidersCommand}"/>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </CheckBox>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
+        <ComboBox Grid.Column="1" SelectionChanged="ComboBox_SelectionChanged">
+            <ComboBox.Resources>
+                <CollectionViewSource x:Key="comboBoxSource" Source="{Binding Path=Providers}" />
+            </ComboBox.Resources>
+            <ComboBox.ItemsSource>
+                <CompositeCollection>
+                    <vm:SelectAllProvidersViewModel Name="(Выбрать все)" IsSelected="False"/>
+                    <CollectionContainer Collection="{Binding Source={StaticResource comboBoxSource}}"/>
+                </CompositeCollection>
+            </ComboBox.ItemsSource>
         </ComboBox>
         <TextBlock Grid.Column="1" IsHitTestVisible="False" TextWrapping="Wrap" Foreground="Black" VerticalAlignment="Center" Margin="5 0" Text="{Binding SelectedPoviders}"/>
     </Grid>
