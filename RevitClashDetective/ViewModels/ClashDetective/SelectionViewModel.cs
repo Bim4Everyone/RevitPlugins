@@ -22,6 +22,7 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
         private List<IProviderViewModel> _providers;
         private string _selectedPoviders;
         private string _selectedFiles;
+        private bool? _isAllFilesSelected;
 
         public SelectionViewModel(RevitRepository revitRepository, FiltersConfig filterConfig) {
             _revitRepository = revitRepository;
@@ -38,9 +39,9 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
             set => this.RaiseAndSetIfChanged(ref _selectedPoviders, value);
         }
 
-        public string SelectedFiles { 
-            get => _selectedFiles; 
-            set => this.RaiseAndSetIfChanged(ref _selectedFiles, value); 
+        public string SelectedFiles {
+            get => _selectedFiles;
+            set => this.RaiseAndSetIfChanged(ref _selectedFiles, value);
         }
 
         public ICommand SelectProvidersCommand { get; }
@@ -49,6 +50,11 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
         public List<FileViewModel> Files {
             get => _files;
             set => this.RaiseAndSetIfChanged(ref _files, value);
+        }
+
+        public bool? IsAllFilesSelected {
+            get => _isAllFilesSelected;
+            set => this.RaiseAndSetIfChanged(ref _isAllFilesSelected, value);
         }
 
         public List<IProviderViewModel> Providers {
@@ -68,6 +74,7 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
                Providers
                .Where(item => item.IsSelected)
                .Select(item => item.Name));
+
         }
 
         public void SelectFiles(object p) {
@@ -75,6 +82,16 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
                Files
                .Where(item => item.IsSelected)
                .Select(item => item.Name));
+
+            if(Files.All(item => item.IsSelected)) {
+                IsAllFilesSelected = true;
+                return;
+            }
+            if(Files.Any(item => item.IsSelected)) {
+                IsAllFilesSelected = null;
+                return;
+            }
+            IsAllFilesSelected = false;
         }
 
         private void InitializeFiles() {
@@ -82,6 +99,8 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
                 .Select(item => new FileViewModel(_revitRepository, item.GetLinkDocument(), item.GetTransform()))
                 .ToList();
             Files.Add(new FileViewModel(_revitRepository, _revitRepository.Doc, Transform.Identity));
+
+            IsAllFilesSelected = false;
         }
 
         private void InitializeProviders() {
