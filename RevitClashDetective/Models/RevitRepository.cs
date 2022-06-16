@@ -71,7 +71,7 @@ namespace RevitClashDetective.Models {
             var view = new FilteredElementCollector(_document)
                 .OfClass(typeof(View3D))
                 .Cast<View3D>()
-                .FirstOrDefault(item => item.Name.Equals(_clashViewName, StringComparison.CurrentCultureIgnoreCase));
+                .FirstOrDefault(item => item.Name.Equals(_clashViewName + "_" + _application.Username, StringComparison.CurrentCultureIgnoreCase));
             if(view == null) {
                 using(Transaction t = _document.StartTransaction("Создание 3D-вида")) {
                     var type = new FilteredElementCollector(_document)
@@ -79,7 +79,7 @@ namespace RevitClashDetective.Models {
                         .Cast<ViewFamilyType>()
                         .First(v => v.ViewFamily == ViewFamily.ThreeDimensional);
                     view = View3D.CreateIsometric(_document, type.Id);
-                    view.Name = _clashViewName;
+                    view.Name = _clashViewName + "_" + _application.Username;
                     t.Commit();
                 }
             }
