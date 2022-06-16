@@ -15,7 +15,7 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <ComboBox Grid.Column="0" ItemsSource="{Binding Files}">
+        <ComboBox Grid.Column="0" ItemsSource="{Binding Files}" SelectionChanged="ComboBox_SelectionChanged">
             <ComboBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type vm:FilterProviderViewModel}">
                     <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
@@ -35,7 +35,7 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
         <TextBlock Grid.Column="0" IsHitTestVisible="False" TextWrapping="Wrap" Foreground="Black" VerticalAlignment="Center" Margin="5 0" Text="{Binding SelectedFiles}"/>
-        <ComboBox Grid.Column="1" ItemsSource="{Binding Providers}">
+        <ComboBox Grid.Column="1" ItemsSource="{Binding Providers}" SelectionChanged="ComboBox_SelectionChanged">
             <ComboBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type vm:FilterProviderViewModel}">
                     <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">

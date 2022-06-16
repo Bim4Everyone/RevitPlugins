@@ -26,5 +26,9 @@ namespace RevitClashDetective.Views {
             InitializeComponent();
         }
 
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            ComboBox comboBox = (ComboBox) sender;
+            comboBox.SelectedItem = null;
+        }
     }
 }
