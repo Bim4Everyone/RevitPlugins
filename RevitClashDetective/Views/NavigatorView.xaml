@@ -92,7 +92,7 @@
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTemplateColumn >
+                <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Name="bSelect" Content="Выбрать" Command="{Binding ElementName=_dg, Path=DataContext.SelectClashCommand}" 
@@ -107,14 +107,14 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Уровень 1" Binding="{Binding FirstLevel}"/>
-                <DataGridTextColumn Header="Категория 1" Binding="{Binding FirstCategory}"/>
-                <DataGridTextColumn Header="Имя типа 1" Binding="{Binding FirstName}"/>
-                <DataGridTextColumn Header="Имя файла 1" Binding="{Binding FirstDocumentName}"/>
-                <DataGridTextColumn Header="Уровень 2" Binding="{Binding SecondLevel}"/>
-                <DataGridTextColumn Header="Категория 2" Binding="{Binding SecondCategory}"/>
-                <DataGridTextColumn Header="Имя типа 2" Binding="{Binding SecondName}"/>
-                <DataGridTextColumn Width="*" Header="Имя файла 2" Binding="{Binding SecondDocumentName}"/>
+                <DataGridTextColumn IsReadOnly="True" Header="Уровень 1" Binding="{Binding FirstLevel}"/>
+                <DataGridTextColumn IsReadOnly="True" Header="Категория 1" Binding="{Binding FirstCategory}"/>
+                <DataGridTextColumn IsReadOnly="True" Header="Имя типа 1" Binding="{Binding FirstName}"/>
+                <DataGridTextColumn IsReadOnly="True" Header="Имя файла 1" Binding="{Binding FirstDocumentName}"/>
+                <DataGridTextColumn IsReadOnly="True" Header="Уровень 2" Binding="{Binding SecondLevel}"/>
+                <DataGridTextColumn IsReadOnly="True" Header="Категория 2" Binding="{Binding SecondCategory}"/>
+                <DataGridTextColumn IsReadOnly="True" Header="Имя типа 2" Binding="{Binding SecondName}"/>
+                <DataGridTextColumn IsReadOnly="True" Width="*" Header="Имя файла 2" Binding="{Binding SecondDocumentName}"/>
             </DataGrid.Columns>
         </DataGrid>
         <Grid Grid.Row="2" Height="30">

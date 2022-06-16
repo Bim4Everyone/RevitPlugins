@@ -164,6 +164,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
         }
         private void SelectionDataChanged(object p) {
             var index = ClashesViewSource.View.CurrentPosition; // чтобы не сбивалась позиция при первом нажатии стрелок
+            SelectClash(ClashesViewSource.View.CurrentItem);
         }
     }
 }
