@@ -20,6 +20,7 @@ using RevitClashDetective.Views;
 namespace RevitClashDetective.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private string _errorText;
+        private readonly CheckSettings _checksSettings;
         private readonly ChecksConfig _checksConfig;
         private readonly FiltersConfig _filtersConfig;
         private readonly RevitRepository _revitRepository;
@@ -27,10 +28,12 @@ namespace RevitClashDetective.ViewModels {
         private string _messageText;
 
         public MainViewModel(ChecksConfig checksConfig, FiltersConfig filtersConfig, RevitRepository revitRepository) {
-            _checksConfig = checksConfig;
             _filtersConfig = filtersConfig;
             _revitRepository = revitRepository;
-            if(checksConfig.Checks.Count > 0) {
+            _checksConfig = checksConfig;
+            _checksSettings = checksConfig.GetSettings(_revitRepository.Doc);
+
+            if(_checksSettings != null && _checksSettings.Checks.Count > 0) {
                 InitializeChecks();
             } else {
                 InitializeEmptyCheck();
@@ -62,7 +65,7 @@ namespace RevitClashDetective.ViewModels {
 
         private void InitializeChecks() {
             Checks = new ObservableCollection<CheckViewModel>();
-            foreach(var check in _checksConfig.Checks) {
+            foreach(var check in _checksSettings.Checks) {
                 Checks.Add(new CheckViewModel(_revitRepository, _filtersConfig, check));
             }
         }
@@ -101,12 +104,13 @@ namespace RevitClashDetective.ViewModels {
         }
 
         private void SaveConfig() {
-            _checksConfig.Checks = new List<Check>();
+            var checkSettings = _checksSettings ?? _checksConfig.AddSettings(_revitRepository.Doc);
+            checkSettings.Checks = new List<Check>();
             foreach(var check in Checks) {
-                _checksConfig.Checks.Add(new Check() {
+                checkSettings.Checks.Add(new Check() {
                     Name = check.Name,
-                    MainFilters = check.FirstSelection.Providers.Where(item => item.IsSelected).Select(item => item.Name).ToList(),
-                    OtherFilters = check.SecondSelection.Providers.Where(item => item.IsSelected).Select(item => item.Name).ToList()
+                    FirstSelection = check.FirstSelection.GetCheckSettings(),
+                    SecondSelection = check.SecondSelection.GetCheckSettings()
                 });
             }
             _checksConfig.SaveProjectConfig();

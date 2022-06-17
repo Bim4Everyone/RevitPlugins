@@ -18,6 +18,7 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
     internal class SelectionViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly FiltersConfig _filterConfig;
+        private readonly SelectionConfig _selectionConfig;
         private List<FileViewModel> _files;
         private List<IProviderViewModel> _providers;
         private string _selectedPoviders;
@@ -25,11 +26,18 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
         private bool? _isAllFilesSelected;
         private bool? _isAllProvidersSelected;
 
-        public SelectionViewModel(RevitRepository revitRepository, FiltersConfig filterConfig) {
+        public SelectionViewModel(RevitRepository revitRepository, FiltersConfig filterConfig, SelectionConfig selectionConfig = null) {
             _revitRepository = revitRepository;
             _filterConfig = filterConfig;
-            InitializeFiles();
-            InitializeProviders();
+            _selectionConfig = selectionConfig;
+            if(selectionConfig == null) {
+                InitializeFiles();
+                InitializeProviders();
+            } else {
+                InitializeFiles(selectionConfig);
+                InitializeProviders(selectionConfig);
+            }
+
 
             SelectProvidersCommand = new RelayCommand(SelectProviders);
             SelectFilesCommand = new RelayCommand(SelectFiles);
@@ -75,6 +83,13 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
                     .Select(p => p.GetProvider(item.Doc, item.Transform)));
         }
 
+        public SelectionConfig GetCheckSettings() {
+            return new SelectionConfig() {
+                Files = Files.Where(item => item.IsSelected).Select(item => item.Name).ToList(),
+                Filters = Providers.Where(item => item.IsSelected).Select(item => item.Name).ToList()
+            };
+        }
+
         public void SelectProviders(object p) {
             SelectedPoviders = string.Join(", ",
                Providers
@@ -93,13 +108,36 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
             AnalizeSelectedFiles();
         }
 
+        public string GetMissedFiles() {
+            var missedFiles = _selectionConfig.Files
+               .Where(item => !Files.Any(p => p.Name.Equals(item)))
+               .ToList();
+            return string.Join(",", missedFiles);
+        }
+
+        public string GetMissedFilters() {
+            var missedFilters = _selectionConfig.Filters
+               .Where(item => !Providers.Any(p => p.Name.Equals(item)))
+               .ToList();
+            return string.Join(",", missedFilters);
+        }
+
         private void InitializeFiles() {
             Files = _revitRepository.GetRevitLinkInstances()
                 .Select(item => new FileViewModel(_revitRepository, item.GetLinkDocument(), item.GetTransform()))
                 .ToList();
             Files.Add(new FileViewModel(_revitRepository, _revitRepository.Doc, Transform.Identity));
 
-            AnalizeSelectedFiles();
+            IsAllFilesSelected = false;
+        }
+
+        private void InitializeFiles(SelectionConfig selectionConfig) {
+            InitializeFiles();
+            foreach(var file in Files) {
+                file.IsSelected = selectionConfig.Files.Any(item => item.Equals(file.Name, StringComparison.CurrentCultureIgnoreCase));
+            }
+
+            SelectFiles(null);
         }
 
         private void InitializeProviders() {
@@ -107,7 +145,16 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
                 _filterConfig.Filters
                 .Select(item => new FilterProviderViewModel(_revitRepository, item)));
 
-            AnalizeSelectedProviders();
+            IsAllProvidersSelected = false;
+        }
+
+        private void InitializeProviders(SelectionConfig selectionConfig) {
+            InitializeProviders();
+            foreach(var provider in Providers) {
+                provider.IsSelected = selectionConfig.Filters.Any(item => item.Equals(provider.Name, StringComparison.CurrentCultureIgnoreCase));
+            }
+
+            SelectProviders(null);
         }
 
         private void AnalizeSelectedFiles() {

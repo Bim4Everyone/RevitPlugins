@@ -7,13 +7,17 @@ using System.Threading.Tasks;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 
+using pyRevitLabs.Json;
+
 using RevitClashDetective.Models.FilterModel;
 
 namespace RevitClashDetective.Models {
-    internal class ChecksConfig : ProjectConfig {
+    internal class ChecksConfig : ProjectConfig<CheckSettings> {
+        [JsonIgnore]
         public override string ProjectConfigPath { get; set; }
+        [JsonIgnore]
         public override IConfigSerializer Serializer { get; set; }
-        public List<Check> Checks { get; set; } = new List<Check>();
+
         public static ChecksConfig GetFiltersConfig() {
             return new ProjectConfigBuilder()
                 .SetSerializer(new RevitClashConfigSerializer())
@@ -24,9 +28,19 @@ namespace RevitClashDetective.Models {
         }
     }
 
+    internal class CheckSettings : ProjectSettings {
+        public override string ProjectName { get; set; }
+        public List<Check> Checks { get; set; } = new List<Check>();
+    }
+
     internal class Check {
         public string Name { get; set; }
-        public List<string> MainFilters { get; set; } = new List<string>();
-        public List<string> OtherFilters { get; set; } = new List<string>();
+        public SelectionConfig FirstSelection { get; set; }
+        public SelectionConfig SecondSelection { get; set; }
+    }
+
+    internal class SelectionConfig {
+        public List<string> Filters { get; set; } = new List<string>();
+        public List<string> Files { get; set; } = new List<string>();
     }
 }

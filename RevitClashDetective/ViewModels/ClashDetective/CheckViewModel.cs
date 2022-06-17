@@ -79,15 +79,15 @@ namespace RevitClashDetective.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _firstSelection, value);
         }
 
-        public SelectionViewModel SecondSelection { 
-            get => _secondSelection; 
-            set => this.RaiseAndSetIfChanged(ref _secondSelection, value); 
+        public SelectionViewModel SecondSelection {
+            get => _secondSelection;
+            set => this.RaiseAndSetIfChanged(ref _secondSelection, value);
         }
 
         private string ReportName => $"{_revitRepository.GetDocumentName()}_{Name}";
 
         public List<ClashModel> GetClashes() {
-            var mainProviders =  FirstSelection
+            var mainProviders = FirstSelection
                 .GetProviders()
                 .ToList();
             var otherProviders = SecondSelection
@@ -105,37 +105,32 @@ namespace RevitClashDetective.ViewModels {
         }
 
 
-        private void InitializeSelections() {
-            FirstSelection = new SelectionViewModel(_revitRepository, _filtersConfig);
-            SecondSelection = new SelectionViewModel(_revitRepository, _filtersConfig);
+        private void InitializeSelections(Check check = null) {
+            FirstSelection = new SelectionViewModel(_revitRepository, _filtersConfig, check?.FirstSelection);
+            SecondSelection = new SelectionViewModel(_revitRepository, _filtersConfig, check?.SecondSelection);
         }
 
         private void InitializeFilterProviders(Check check) {
-            InitializeSelections();
+            InitializeSelections(check);
 
-            foreach(var provider in FirstSelection.Providers) {
-                provider.IsSelected = check.MainFilters.Any(item => item.Equals(provider.Name, StringComparison.CurrentCultureIgnoreCase));
+            var firstFiles = FirstSelection.GetMissedFiles();
+            if(!string.IsNullOrEmpty(firstFiles)) {
+                ErrorText = $"Не найдены файлы первой выборки: {firstFiles}" + Environment.NewLine;
+            }
+            var firstFilters = FirstSelection.GetMissedFilters();
+            if(!string.IsNullOrEmpty(firstFilters)) {
+                ErrorText += $"Не найдены поисковые наборы первой выборки: {firstFilters}" + Environment.NewLine;
             }
 
-            foreach(var provider in SecondSelection.Providers) {
-                provider.IsSelected = check.OtherFilters.Any(item => item.Equals(provider.Name, StringComparison.CurrentCultureIgnoreCase));
+            var secondFiles = FirstSelection.GetMissedFiles();
+            if(!string.IsNullOrEmpty(secondFiles)) {
+                ErrorText += $"Не найдены файлы второй выборки: {secondFiles}" + Environment.NewLine;
+            }
+            var secondFilters = FirstSelection.GetMissedFilters();
+            if(!string.IsNullOrEmpty(secondFilters)) {
+                ErrorText = $"Не найдены поисковые наборы второй выборки: {secondFilters}" + Environment.NewLine;
             }
 
-            var missedMainFilters = check.MainFilters
-                .Where(item => !FirstSelection.Providers.Any(p => p.Name.Equals(item)))
-                .ToList();
-
-            if(missedMainFilters.Count > 0) {
-                ErrorText = $"Не найдены поисковые набора первой выборки: {string.Join(", ", missedMainFilters)}";
-            }
-
-            var missedOtherFilters = check.OtherFilters
-                .Where(item => !SecondSelection.Providers.Any(p => p.Name.Equals(item)))
-                .ToList();
-
-            if(missedOtherFilters.Count > 0) {
-                ErrorText += Environment.NewLine + $"Не найдены поисковые наборы второй выборки: {string.Join(", ", missedOtherFilters)}";
-            }
             if(ClashesConfig.GetFiltersConfig(_revitRepository.GetObjectName(), ReportName).Clashes.Count > 0) {
                 HasReport = true;
             }
