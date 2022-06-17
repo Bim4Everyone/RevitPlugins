@@ -80,6 +80,7 @@ namespace RevitClashDetective.Models {
                         .First(v => v.ViewFamily == ViewFamily.ThreeDimensional);
                     view = View3D.CreateIsometric(_document, type.Id);
                     view.Name = _clashViewName + "_" + _application.Username;
+                    view.AreAnnotationCategoriesHidden = true;
                     t.Commit();
                 }
             }
@@ -210,7 +211,7 @@ namespace RevitClashDetective.Models {
                 _uiDocument.ActiveView = _view;
             }
             _revitEventHandler.TransactAction = () => {
-                SetViewOrientation(bb);
+                SetSectionBox(bb);
                 if(ids.Where(item => item != ElementId.InvalidElementId).Any()) {
                     _uiDocument.Selection.SetElementIds(ids.Where(item => item != ElementId.InvalidElementId).ToArray());
                 }
@@ -238,7 +239,7 @@ namespace RevitClashDetective.Models {
             return new[] { providers.First() };
         }
 
-        private void SetViewOrientation(BoundingBoxXYZ bb) {
+        private void SetSectionBox(BoundingBoxXYZ bb) {
             if(bb == null)
                 return;
             using(Transaction t = _document.StartTransaction("Подрезка")) {
