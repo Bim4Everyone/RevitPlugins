@@ -14,6 +14,7 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitCopyViews.ViewModels;
 using RevitCopyViews.Views;
@@ -46,7 +47,7 @@ namespace RevitCopyViews {
                 TaskDialog.Show("Предупреждение!", "Не были найдены виды начинающиеся на \"User_\".");
                 return;
             }
-            
+
             var groupViews = views
                 .Select(item => (string) item.GetParamValueOrDefault(ProjectParamsConfig.Instance.ViewGroup))
                 .Where(item => !string.IsNullOrEmpty(item))
@@ -70,9 +71,15 @@ namespace RevitCopyViews {
                     RestrictedViewNames = restrictedViewNames
                 }
             };
-
-            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
-            window.ShowDialog();
+            if(window.ShowDialog() == true) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
+            }
         }
     }
 }

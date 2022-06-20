@@ -18,7 +18,7 @@ namespace RevitGenLookupTables.Views {
     /// <summary>
     /// Interaction logic for LookupTablesWindow.xaml
     /// </summary>
-    public partial class LookupTablesWindow : PlatformWindow {
+    public partial class LookupTablesWindow {
         public LookupTablesWindow() {
             InitializeComponent();
         }

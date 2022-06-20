@@ -15,6 +15,7 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitCopyViews.ViewModels;
 using RevitCopyViews.Views;
@@ -69,9 +70,15 @@ namespace RevitCopyViews {
                     RestrictedViewNames = views.Select(item => item.Name).ToList()
                 }
             };
-
-            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
-            window.ShowDialog();
+            if(window.ShowDialog() == true) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
+            }
         }
 
         private static bool IsView(View item) {

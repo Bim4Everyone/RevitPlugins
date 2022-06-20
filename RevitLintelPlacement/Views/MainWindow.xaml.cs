@@ -18,7 +18,7 @@ namespace RevitLintelPlacement.Views {
     /// <summary>
     /// Логика взаимодействия для MainView.xaml
     /// </summary>
-    public partial class MainWindow : PlatformWindow {
+    public partial class MainWindow {
         public MainWindow() {
             InitializeComponent();
         }
@@ -28,6 +28,10 @@ namespace RevitLintelPlacement.Views {
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;
+        }
+
+        private void SimpleButtonOK_Click(object sender, RoutedEventArgs e) {
+            DialogResult = true;
         }
     }
 }

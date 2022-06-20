@@ -30,8 +30,6 @@ namespace RevitLintelPlacement {
             var elementInfos = new ElementInfosViewModel(revitRepository);
             var lintelsView = new LintelCollectionViewModel(revitRepository, elementInfos);
             var view = new LintelsView() { DataContext = lintelsView};
-
-            var helper = new WindowInteropHelper(view) { Owner = uiApplication.MainWindowHandle };
             view.Show();
         }
     }

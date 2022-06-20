@@ -1,37 +1,57 @@
-﻿<base:PlatformWindow
+﻿<base:ThemedPlatformWindow
     x:Class="RevitCopyStandarts.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
-    WindowStartupLocation="CenterScreen" 
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:vms="clr-namespace:RevitCopyStandarts.ViewModels"
+    WindowStartupLocation="CenterScreen"
     Width="700"
     Height="400" Title="Копирование стандартов">
     <Grid>
-        <TabControl ItemsSource="{Binding BimCategories}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="_mainTabControl" Grid.ColumnSpan="4">
-            <TabControl.ItemTemplate>
+        <dx:DXTabControl ItemsSource="{Binding BimCategories}" HorizontalAlignment="Stretch"
+                         VerticalAlignment="Stretch" Name="_mainTabControl" Grid.ColumnSpan="4">
+            <dx:DXTabControl.ItemHeaderTemplate>
                 <DataTemplate>
-                    <TextBlock
-                    Text="{Binding Name}" />
+                    <TextBlock Text="{Binding Name}" />
                 </DataTemplate>
-            </TabControl.ItemTemplate>
-            <TabControl.ContentTemplate>
+            </dx:DXTabControl.ItemHeaderTemplate>
+            <dx:DXTabControl.ItemTemplate>
                 <DataTemplate>
-                    <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding BimFiles}" HorizontalGridLinesBrush="LightGray" VerticalGridLinesBrush="LightGray">
-                        <DataGrid.Columns>
-                            <DataGridTemplateColumn>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button Command="{Binding CopyObjectsCommand}">Копировать</Button>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Дата создания" Binding="{Binding CreationTime, StringFormat=\{0:HH:mm:ss dd.MM.yy\}}" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Дата редактирования" Binding="{Binding ModifiedTime, StringFormat=\{0:HH:mm:ss dd.MM.yy\}}" IsReadOnly="True"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    <dxg:GridControl SelectionMode="Row"
+                                     ItemsSource="{Binding BimFiles}">
+                        <dxg:GridControl.View>
+                            <dxg:TableView AutoWidth="True"
+                                           AllowEditing="False" />
+                        </dxg:GridControl.View>
+
+                        <dxg:GridColumn Width="Auto">
+                            <dxg:GridColumn.CellTemplate>
+                                <DataTemplate>
+                                    <dx:SimpleButton Command="{Binding Row.CopyObjectsCommand}">Копировать</dx:SimpleButton>
+                                </DataTemplate>
+                            </dxg:GridColumn.CellTemplate>
+                        </dxg:GridColumn>
+                        <dxg:GridColumn Header="Наименование" FieldName="Name" AllowEditing="False" ReadOnly="True"
+                                        Width="Auto" />
+                        <dxg:GridColumn Header="Дата создания" FieldName="CreationTime" AllowEditing="False"
+                                        ReadOnly="True">
+                            <dxg:GridColumn.EditSettings>
+                                <dxe:DateEditSettings DisplayFormat="HH:mm:ss dd.MM.yy" />
+                            </dxg:GridColumn.EditSettings>
+                        </dxg:GridColumn>
+                        <dxg:GridColumn Header="Дата редактирования" FieldName="ModifiedTime" AllowEditing="False"
+                                        ReadOnly="True">
+                            <dxg:GridColumn.EditSettings>
+                                <dxe:DateEditSettings DisplayFormat="HH:mm:ss dd.MM.yy" />
+                            </dxg:GridColumn.EditSettings>
+                        </dxg:GridColumn>
+                    </dxg:GridControl>
                 </DataTemplate>
-            </TabControl.ContentTemplate>
-        </TabControl>
+            </dx:DXTabControl.ItemTemplate>
+        </dx:DXTabControl>
     </Grid>
-</base:PlatformWindow>
+</base:ThemedPlatformWindow>

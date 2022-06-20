@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
+
+using DevExpress.Mvvm.DataAnnotations;
 
 using dosymep.WPF.ViewModels;
 
@@ -88,11 +91,11 @@ namespace RevitLintelPlacement.ViewModels {
     }
 
     internal enum TypeInfo {
-        [Description("Ошибки")]
+        [Display(Name = "Ошибки")]
         Error,
-        [Description("Предупреждения")]
+        [Display(Name = "Предупреждения")]
         Warning,
-        [Description("Сообщения")]
+        [Display(Name ="Сообщения")]
         Info
     }
 

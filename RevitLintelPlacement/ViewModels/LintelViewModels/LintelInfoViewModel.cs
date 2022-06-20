@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -100,15 +101,15 @@ namespace RevitLintelPlacement.ViewModels {
     }
 
     public enum ElementInWallKind {
-        [Description("Все категории")]
+        [Display(Name = "Все категории")]
         All,
-        [Description("Двери")]
+        [Display(Name = "Двери")]
         Door,
-        [Description("Окна")]
+        [Display(Name = "Окна")]
         Window,
-        [Description("Отверстия")]
+        [Display(Name = "Отверстия")]
         Opening,
-        [Description("Без категории")]
+        [Display(Name = "Без категории")]
         None
     }
 }

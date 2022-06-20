@@ -7,7 +7,7 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 
 namespace RevitCopyStandarts.ViewModels {
-    public sealed class BimCategoryViewModel {
+    internal sealed class BimCategoryViewModel {
         private readonly Document _mainDocument;
         private readonly Application _application;
 

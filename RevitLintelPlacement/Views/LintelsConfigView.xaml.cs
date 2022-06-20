@@ -18,16 +18,20 @@ namespace RevitLintelPlacement.Views {
     /// <summary>
     /// Interaction logic for LintelsConfigView.xaml
     /// </summary>
-    public partial class LintelsConfigView : PlatformWindow {
+    public partial class LintelsConfigView {
         public LintelsConfigView() {
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e) {
-            this.Close();
+        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
+            DialogResult = false;
         }
 
         public override string PluginName => nameof(RevitLintelPlacement);
         public override string ProjectConfigName => nameof(LintelsConfigView);
+
+        private void SimpleButtonOK_Click(object sender, RoutedEventArgs e) {
+            DialogResult = true;
+        }
     }
 }

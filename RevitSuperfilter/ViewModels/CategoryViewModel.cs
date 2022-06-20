@@ -33,9 +33,6 @@ namespace RevitSuperfilter.ViewModels {
             Category = category;
             _revitRepository = revitRepository;
             Elements = new ObservableCollection<Element>(elements);
-
-            SelectCommand = new RelayCommand(Select, CanSelect);
-            ChangeCurrentSelection();
         }
 
         public Category Category { get; }
@@ -50,8 +47,6 @@ namespace RevitSuperfilter.ViewModels {
                 return _paramsView;
             }
         }
-
-        public ICommand SelectCommand { get; }
 
         public ICollectionView ParametersView {
             get {
@@ -139,26 +134,5 @@ namespace RevitSuperfilter.ViewModels {
 
         #endregion
 
-        #region SelectCommand
-
-        private void Select(object p) {
-            ChangeCurrentSelection();
-
-            IEnumerable<ParametersViewModel> @params = ParametersView.OfType<ParametersViewModel>();
-            foreach(ParametersViewModel param in @params) {
-                param.IsSelected = _currentSelection;
-            }
-        }
-
-        private bool CanSelect(object p) {
-            return ParametersView.CanFilter;
-        }
-
-        private void ChangeCurrentSelection() {
-            _currentSelection = !_currentSelection;
-            ButtonFilterName = _currentSelection ? "Убрать выделение" : "Выделить всё";
-        }
-
-        #endregion
     }
 }

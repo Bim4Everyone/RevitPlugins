@@ -8,6 +8,7 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
 
 using RevitServerFolders.Export;
 
@@ -25,7 +26,6 @@ namespace RevitServerFolders {
 
             var exportNwcFileViewModel = new ExportNwcFileViewModel(ExportNwcFileConfig.GetExportNwcFileConfig());
             var exportWindow = new ExportNwcFileWindow {DataContext = exportNwcFileViewModel};
-            var helper = new WindowInteropHelper(exportWindow) {Owner = uiApplication.MainWindowHandle};
 
             if(exportWindow.ShowDialog() == true) {
                 exportNwcFileViewModel = (ExportNwcFileViewModel) exportWindow.DataContext;
@@ -34,7 +34,13 @@ namespace RevitServerFolders {
                 UnloadAllLinks(exportNwcFileViewModel);
                 ExportFilesToNavisworks(uiApplication, exportNwcFileViewModel);
 
-                TaskDialog.Show("Сообщение!", "Готово!");
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
             }
         }
 

@@ -15,6 +15,7 @@ using dosymep;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
+using dosymep.SimpleServices;
 
 using RevitServerFolders.Export;
 
@@ -32,7 +33,6 @@ namespace RevitServerFolders {
             var exportRvtFileViewModel = new ExportRvtFileViewModel(application.VersionNumber, application.GetRevitServerNetworkHosts(), ExportRvtFileConfig.GetExportRvtFileConfig());
 
             var exportWindow = new ExportRvtFileWindow { DataContext = exportRvtFileViewModel };
-            var helper = new WindowInteropHelper(exportWindow) { Owner = uiApplication.MainWindowHandle };
 
             exportRvtFileViewModel.Owner = exportWindow;
             if(exportWindow.ShowDialog() == true) {
@@ -43,7 +43,13 @@ namespace RevitServerFolders {
                 UnloadAllLinks(exportRvtFileViewModel);
                 ExportFilesToNavisworks(application, exportRvtFileViewModel);
 
-                TaskDialog.Show("Сообщение!", "Готово!");
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
             }
         }
 
@@ -90,7 +96,7 @@ namespace RevitServerFolders {
             exportConfig.WithSubFolders = exportRvtFileViewModel.WithSubFolders;
             exportConfig.CleanTargetNwcFolder = exportRvtFileViewModel.CleanTargetNwcFolder;
             exportConfig.CleanTargetRvtFolder = exportRvtFileViewModel.CleanTargetRvtFolder;
-            
+
             exportConfig.SaveProjectConfig();
         }
     }

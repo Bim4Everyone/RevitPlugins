@@ -22,17 +22,18 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dosymep", "dosymep", "{064729BC-2CB6-4910-9C93-C687F7E2B1CD}"
 	ProjectSection(SolutionItems) = preProject
 		dosymep\AppDomainExtensions.cs = dosymep\AppDomainExtensions.cs
+		dosymep\BasePluginCommand.cs = dosymep\BasePluginCommand.cs
 		dosymep\BaseViewModel.cs = dosymep\BaseViewModel.cs
 		dosymep\BoolToVisibilityConverter.cs = dosymep\BoolToVisibilityConverter.cs
 		dosymep\ConfigSerializer.cs = dosymep\ConfigSerializer.cs
 		dosymep\ConvertibleExtention.cs = dosymep\ConvertibleExtention.cs
 		dosymep\EnumConverter.cs = dosymep\EnumConverter.cs
 		dosymep\EnumToItemsSource.cs = dosymep\EnumToItemsSource.cs
-		dosymep\InverseBooleanConverter.cs = dosymep\InverseBooleanConverter.cs
 		dosymep\IndexConverter.cs = dosymep\IndexConverter.cs
+		dosymep\InverseBooleanConverter.cs = dosymep\InverseBooleanConverter.cs
 		dosymep\PlatformWindow.cs = dosymep\PlatformWindow.cs
 		dosymep\RelayCommand.cs = dosymep\RelayCommand.cs
-		dosymep\BasePluginCommand.cs = dosymep\BasePluginCommand.cs
+		dosymep\ThemedPlatformWindow.cs = dosymep\ThemedPlatformWindow.cs
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitGenLookupTables", "RevitGenLookupTables\RevitGenLookupTables.csproj", "{65795232-ECD1-4811-A473-B718AE74E4E1}"
@@ -56,7 +57,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitMarkPlacement", "Revit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitSetLevelSection", "RevitSetLevelSection\RevitSetLevelSection.csproj", "{4ABC3706-AF4D-48E1-AA42-87D379B742E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitClashDetective", "RevitClashDetective\RevitClashDetective.csproj", "{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitClashDetective", "RevitClashDetective\RevitClashDetective.csproj", "{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

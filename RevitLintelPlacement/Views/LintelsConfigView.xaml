@@ -1,180 +1,220 @@
-﻿<base:PlatformWindow  
-        xmlns:base="clr-namespace:dosymep.WPF.Views"
-        x:Class="RevitLintelPlacement.Views.LintelsConfigView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        xmlns:local="clr-namespace:RevitLintelPlacement.Views"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:converters="clr-namespace:RevitLintelPlacement.Converters"
-        xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
-        mc:Ignorable="d" Height="550" Width="900"
-        MinHeight="550" MinWidth="350"
-        Title="Настройки"
-        d:DataContext="{d:DesignInstance vm:ConfigViewModel}"
-        x:Name="Config">
+﻿<base:ThemedPlatformWindow
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    x:Class="RevitLintelPlacement.Views.LintelsConfigView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:local="clr-namespace:RevitLintelPlacement.Views"
+    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+    xmlns:converters="clr-namespace:RevitLintelPlacement.Converters"
+    xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    mc:Ignorable="d" Height="550" Width="900"
+    MinHeight="550" MinWidth="350"
+    Title="Настройки"
+    d:DataContext="{d:DesignInstance vm:ConfigViewModel}"
+    x:Name="Config">
     <Window.Resources>
-        <Style TargetType="TextBox">
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Padding" Value="5 0"/>
-            <Setter Property="Width" Value="200"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="Height" Value="25"/>
+        <Style x:Key="_gbLeft" TargetType="lc:GroupBox">
+            <Setter Property="Margin" Value="0 5 5 5" />
         </Style>
-        <Style TargetType="TextBlock">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="HorizontalAlignment" Value="Right"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Padding" Value="5 0"/>
-            <Setter Property="Width" Value="200"/>
+        <Style x:Key="_gbRight" TargetType="lc:GroupBox">
+            <Setter Property="Margin" Value="5 5 0 5" />
         </Style>
-        <Style TargetType="GroupBox">
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-        <converters:WidthConverter x:Key="WidthConverter"/>
+        <converters:WidthConverter x:Key="WidthConverter" />
     </Window.Resources>
-    <Grid>
+    <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Row="1" Grid.Column="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <GroupBox Grid.Row="0" Header="Семейства перемычек">
-                <ListBox  Height="200" Margin="10" ItemsSource="{Binding LintelFamilies}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type vm:GenericModelFamilyViewModel}">
-                            <CheckBox x:Name="chbFamily" IsChecked="{Binding IsChecked}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Checked">
-                                        <i:InvokeCommandAction Command="{Binding ElementName=Config, Path=DataContext.FamilySelectionChangedCommand}"
-                                                               CommandParameter="{Binding ElementName=chbFamily, Path=DataContext}"/>
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="Unchecked">
-                                        <i:InvokeCommandAction Command="{Binding ElementName=Config, Path=DataContext.FamilySelectionChangedCommand}"
-                                                               CommandParameter="{Binding ElementName=chbFamily, Path=DataContext}"/>
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                                <TextBlock Text="{Binding Name}"/>
-                            </CheckBox>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </GroupBox>
-            <GroupBox Grid.Row="1"  Header="Фильтрация отверстий по имени семейства">
-                <TextBox  Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=GroupBox}, Path=ActualWidth, 
-                                Converter={StaticResource WidthConverter}, ConverterParameter=30}" Text="{Binding HolesFilter}"/>
-            </GroupBox>
+            <lc:GroupBox Grid.Row="0" Style="{StaticResource _gbLeft}" Header="Семейства перемычек">
+                <dxe:ListBoxEdit Height="200" BorderBrush="Transparent" ItemsSource="{Binding LintelFamilies}"
+                                 DisplayMember="Name"
+                                 SelectedItem="{Binding SelectedFamily, UpdateSourceTrigger=PropertyChanged}">
+                    <dxe:ListBoxEdit.StyleSettings>
+                        <dxe:RadioListBoxEditStyleSettings Height="20" />
+                    </dxe:ListBoxEdit.StyleSettings>
+                    <dxmvvm:Interaction.Behaviors>
+                        <dxmvvm:EventToCommand EventName="SelectedIndexChanged"
+                                               Command="{Binding FamilySelectionChangedCommand}" />
+                    </dxmvvm:Interaction.Behaviors>
+                </dxe:ListBoxEdit>
+            </lc:GroupBox>
+            <lc:GroupBox Grid.Row="1" Style="{StaticResource _gbLeft}" Header="Фильтрация отверстий по имени семейства">
+                <dxe:TextEdit Margin="0 0 20 0" EditValue="{Binding HolesFilter}" />
+            </lc:GroupBox>
         </Grid>
-        <GroupBox Grid.Row="1" Grid.Column="1" Header="Характеристики перемычек">
+        <lc:GroupBox Grid.Row="1" Grid.Column="1" Style="{StaticResource _gbRight}" Header="Характеристики перемычек">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Grid.Resources>
                     <DataTemplate DataType="{x:Type vm:ParameterViewModel}">
-                            <TextBlock Text="{Binding Name}"/>
-                        </DataTemplate>
+                        <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding Name}" />
+                    </DataTemplate>
                 </Grid.Resources>
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Толщина перемычки"></TextBlock>
-                <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelThicknessParameters}" SelectedItem="{Binding LintelThickness}">
-                </ComboBox>
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Ширина перемычки"></TextBlock>
-                <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelWidthParameters}" SelectedItem="{Binding LintelWidth}"></ComboBox>
+                <dxe:TextEdit Grid.Row="0" Grid.Column="0" IsReadOnly="True" EditMode="InplaceActive"
+                              EditValue="Толщина перемычки" />
+                <dxe:ComboBoxEdit Grid.Row="0" Grid.Column="1" Margin="5"
+                                  ItemsSource="{Binding LintelThicknessParameters}" IsTextEditable="False"
+                                  DisplayMember="Name"
+                                  EditValue="{Binding LintelThickness, UpdateSourceTrigger=PropertyChanged}" />
 
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Опирание слева"></TextBlock>
-                <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelLeftOffsetParameters}" SelectedItem="{Binding LintelLeftOffset}"></ComboBox>
-                
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Опирание справа"></TextBlock>
-                <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelRightOffsetParameters}" SelectedItem="{Binding LintelRightOffset}"></ComboBox>
+                <dxe:TextEdit Grid.Row="1" Grid.Column="0" IsReadOnly="True" EditMode="InplaceActive"
+                              Text="Ширина перемычки" />
+                <dxe:ComboBoxEdit Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelWidthParameters}"
+                                  IsTextEditable="False" DisplayMember="Name"
+                                  EditValue="{Binding LintelWidth, UpdateSourceTrigger=PropertyChanged}" />
 
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="Уголок слева"></TextBlock>
-                <ComboBox Grid.Row="4" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelLeftCornerParameters}" SelectedItem="{Binding LintelLeftCorner}"></ComboBox>
-                
-                <TextBlock Grid.Row="5" Grid.Column="0" Text="Уголок справа"></TextBlock>
-                <ComboBox Grid.Row="5" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelRightCornerParameters}" SelectedItem="{Binding LintelRightCorner}"></ComboBox>
+                <dxe:TextEdit Grid.Row="2" Grid.Column="0" IsReadOnly="True" EditMode="InplaceActive"
+                              Text="Опирание слева" />
+                <dxe:ComboBoxEdit Grid.Row="2" Grid.Column="1" Margin="5"
+                                  ItemsSource="{Binding LintelLeftOffsetParameters}" IsTextEditable="False"
+                                  DisplayMember="Name"
+                                  EditValue="{Binding LintelLeftOffset, UpdateSourceTrigger=PropertyChanged}" />
 
-                <TextBlock Grid.Row="6" Grid.Column="0" Text="Фиксация решения"></TextBlock>
-                <ComboBox Grid.Row="6" Grid.Column="1" Margin="5" ItemsSource="{Binding LintelFixationParameters}" SelectedItem="{Binding LintelFixation}"></ComboBox>
+                <dxe:TextEdit Grid.Row="3" Grid.Column="0" IsReadOnly="True" EditMode="InplaceActive"
+                              Text="Опирание справа" />
+                <dxe:ComboBoxEdit Grid.Row="3" Grid.Column="1" Margin="5"
+                                  ItemsSource="{Binding LintelRightOffsetParameters}" IsTextEditable="False"
+                                  DisplayMember="Name"
+                                  EditValue="{Binding LintelRightOffset, UpdateSourceTrigger=PropertyChanged}" />
+
+                <dxe:TextEdit Grid.Row="4" Grid.Column="0" IsReadOnly="True" EditMode="InplaceActive"
+                              Text="Уголок слева" />
+                <dxe:ComboBoxEdit Grid.Row="4" Grid.Column="1" Margin="5"
+                                  ItemsSource="{Binding LintelLeftCornerParameters}" IsTextEditable="False"
+                                  DisplayMember="Name"
+                                  EditValue="{Binding LintelLeftCorner, UpdateSourceTrigger=PropertyChanged}" />
+
+                <dxe:TextEdit Grid.Row="5" Grid.Column="0" IsReadOnly="True" EditMode="InplaceActive"
+                              Text="Уголок справа" />
+                <dxe:ComboBoxEdit Grid.Row="5" Grid.Column="1" Margin="5"
+                                  ItemsSource="{Binding LintelRightCornerParameters}" IsTextEditable="False"
+                                  DisplayMember="Name"
+                                  EditValue="{Binding LintelRightCorner, UpdateSourceTrigger=PropertyChanged}" />
+
+                <dxe:TextEdit Grid.Row="6" Grid.Column="0" IsReadOnly="True" EditMode="InplaceActive"
+                              Text="Фиксация решения" />
+                <dxe:ComboBoxEdit Grid.Row="6" Grid.Column="1" Margin="5"
+                                  ItemsSource="{Binding LintelFixationParameters}" IsTextEditable="False"
+                                  DisplayMember="Name"
+                                  EditValue="{Binding LintelFixation, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
-        </GroupBox>
-        <GroupBox Grid.Row="2" Grid.Column="1" Header="Характеристики проемов">
+        </lc:GroupBox>
+        <lc:GroupBox Grid.Row="2" Grid.Column="1" Style="{StaticResource _gbRight}" VerticalAlignment="Stretch" Header="Характеристики проемов">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Высота проема"></TextBlock>
-                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding OpeningHeight}"></TextBox>
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Ширина проема"></TextBlock>
-                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding OpeningWidth}"></TextBox>
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Фиксация перемычки"></TextBlock>
-                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding OpeningFixation}"></TextBox>
+                <dxe:TextEdit Grid.Row="0" Grid.Column="0" Margin="5" IsReadOnly="True" EditMode="InplaceActive"
+                              Text="Высота проема">
+                </dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="0" Grid.Column="1" Margin="5"
+                              EditValue="{Binding OpeningHeight, UpdateSourceTrigger=PropertyChanged}">
+                </dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="1" Grid.Column="0" Margin="5" IsReadOnly="True" EditMode="InplaceActive"
+                              Text="Ширина проема">
+                </dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="1" Grid.Column="1" Margin="5"
+                              EditValue="{Binding OpeningWidth, UpdateSourceTrigger=PropertyChanged}">
+                </dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="2" Grid.Column="0" Margin="5" IsReadOnly="True" EditMode="InplaceActive"
+                              Text="Фиксация перемычки">
+                </dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="2" Grid.Column="1" Margin="5"
+                              EditValue="{Binding OpeningFixation, UpdateSourceTrigger=PropertyChanged}">
+                </dxe:TextEdit>
             </Grid>
-        </GroupBox>
-        <GroupBox Grid.Row="2" Grid.Column="0" Header="Фильтрация ЖБ стен по имени типоразмера">
-            <StackPanel Height="110">
-                <ListBox MaxHeight="80" HorizontalAlignment="Stretch" BorderBrush="Transparent" ItemsSource="{Binding ReinforcedConcreteFilter}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type vm:FilterViewModel}">
-                            <TextBox Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=ActualWidth, 
-                                Converter={StaticResource WidthConverter}, ConverterParameter=30}" Text="{Binding Name}">
-                            </TextBox>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-                <Grid>
+        </lc:GroupBox>
+        <lc:GroupBox Grid.Row="2" Grid.Column="0" Style="{StaticResource _gbLeft}" VerticalAlignment="Stretch"
+                  Header="Фильтрация ЖБ стен по имени типоразмера">
+            <DockPanel LastChildFill="True">
+                <Grid DockPanel.Dock="Top">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" HorizontalAlignment="Right" Width="30" Height="30" Background="Transparent" BorderBrush="Transparent"
-                        Command="{Binding AddFilterCommand}">
-                        <Image Source="../Resources/icons8-add.png"/>
-                    </Button>
-                    <Button Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="30" Background="Transparent" BorderBrush="Transparent"
-                        Command="{Binding RemoveFilterCommand}">
-                        <Image Source="../Resources/icons8-remove.png"/>
-                    </Button>
+                    <dx:SimpleButton Grid.Column="0" HorizontalAlignment="Right" Width="30" Height="30" Margin="5"
+                                     Command="{Binding AddFilterCommand}"
+                                     Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Add.svg'}" GlyphHeight="16">
+                    </dx:SimpleButton>
+                    <dx:SimpleButton Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="30" Margin="5"
+                                     Command="{Binding RemoveFilterCommand}"
+                                     Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}" GlyphHeight="16">
+                    </dx:SimpleButton>
                 </Grid>
-            </StackPanel>
-        </GroupBox>
-        <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Width="Auto" HorizontalAlignment="Right" Orientation="Horizontal">
-            <TextBlock VerticalAlignment="Center" Foreground="Orange" Width="Auto" Margin="10 0" Text="{Binding Message}"></TextBlock>
-            <Button Height="30" Width="70" Margin="5" Command="{Binding SaveConfigCommand}" CommandParameter="{Binding ElementName=Config}">Сохранить</Button>
-            <Button Height="30" Width="70" Margin="5" Click="Button_Click">Отмена</Button>
+                <dxe:ListBoxEdit HorizontalAlignment="Stretch" BorderBrush="Transparent"
+                                 
+                                 ItemsSource="{Binding ReinforcedConcreteFilter}">
+                    <dxe:ListBoxEdit.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:FilterViewModel}">
+                            <dxe:TextEdit Margin="0 3"
+                                          Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type lc:GroupBox}}, Path=ActualWidth, 
+                                Converter={StaticResource WidthConverter}, ConverterParameter=53}"
+                                          EditValue="{Binding Name, UpdateSourceTrigger=PropertyChanged}">
+                            </dxe:TextEdit>
+                        </DataTemplate>
+                    </dxe:ListBoxEdit.ItemTemplate>
+                </dxe:ListBoxEdit>
+            </DockPanel>
+        </lc:GroupBox>
+        <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 10 0 0" Width="Auto" HorizontalAlignment="Right"
+                    Orientation="Horizontal">
+            <dxe:TextEdit
+                Margin="5 0"
+                IsReadOnly="True"
+                EditMode="InplaceActive"
+                Foreground="Orange"
+                EditValue="{Binding Message}" />
+            <dx:SimpleButton
+                Margin="10 0"
+                Content="Сохранить"
+                Width="80"
+                Height="25"
+                Command="{Binding SaveConfigCommand}"  CommandParameter="{Binding ElementName=Config}"
+                Click="SimpleButtonOK_Click"/>
+            <dx:SimpleButton
+                Content="Отмена"
+                Width="80"
+                Height="25"
+                Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
-</base:PlatformWindow>
+</base:ThemedPlatformWindow>

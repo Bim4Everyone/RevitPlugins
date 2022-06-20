@@ -7,8 +7,10 @@ using System.Linq;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 
+using dosymep.WPF.ViewModels;
+
 namespace RevitCopyStandarts.ViewModels {
-    public sealed class BimCategoriesViewModel {
+    internal sealed class BimCategoriesViewModel : BaseViewModel {
         private readonly Document _mainDocument;
         private readonly Application _application;
 

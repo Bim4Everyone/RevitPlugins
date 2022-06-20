@@ -17,11 +17,14 @@ using RevitClashDetective.Views;
 namespace RevitClashDetective {
     [Transaction(TransactionMode.Manual)]
     public class GetClashesCommand : BasePluginCommand {
+        public GetClashesCommand() {
+            PluginName = "Поиск коллизий";
+        }
+
         protected override void Execute(UIApplication uiApplication) {
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
             var mainViewModlel = new ClashesViewModel(revitRepository);
             var window = new NavigatorView() { DataContext = mainViewModlel };
-            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
             window.Show();
         }
     }

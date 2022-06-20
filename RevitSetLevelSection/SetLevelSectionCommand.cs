@@ -9,6 +9,7 @@ using dosymep;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
+using dosymep.SimpleServices;
 
 using RevitSetLevelSection.Models;
 using RevitSetLevelSection.ViewModels;
@@ -31,10 +32,16 @@ namespace RevitSetLevelSection {
             var repository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
             var viewModel = new MainViewModel(repository);
 
-            var window = new MainWindow() {DataContext = viewModel};
-            var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
-
-            window.ShowDialog();
+            var window = new MainWindow() { DataContext = viewModel };
+            if(window.ShowDialog() == true) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
+            }
         }
     }
 }

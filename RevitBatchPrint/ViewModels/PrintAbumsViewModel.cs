@@ -31,10 +31,11 @@ namespace RevitBatchPrint.ViewModels {
 
         private Visibility _visibilitySaveFile;
         private Visibility _showPrintParamSelect;
+        private ObservableCollection<PrintAlbumViewModel> _selectedAlbums;
 
         public PrintAbumsViewModel(UIApplication uiApplication) {
             _repository = new RevitRepository(uiApplication);
-
+            SelectedAlbums = new ObservableCollection<PrintAlbumViewModel>();
             PrintParamNames = new ObservableCollection<string>(_repository.GetPrintParamNames());
             PrintParamName = PrintParamNames.FirstOrDefault(item => RevitRepository.PrintParamNames.Contains(item));
             ShowPrintParamSelect = string.IsNullOrEmpty(PrintParamName)
@@ -60,7 +61,8 @@ namespace RevitBatchPrint.ViewModels {
                 if(!string.IsNullOrEmpty(PrintParamName)) {
                     List<(string, int)> printParamValues = _repository.GetPrintParamValues(PrintParamName);
                     Albums = new ObservableCollection<PrintAlbumViewModel>(
-                        printParamValues.Select(item => new PrintAlbumViewModel(item.Item1) {Count = item.Item2}));
+                        printParamValues.Select(item => new PrintAlbumViewModel(item.Item1) { Count = item.Item2 }));
+                    SelectedAlbums = new ObservableCollection<PrintAlbumViewModel>();
                 }
             }
         }
@@ -74,6 +76,11 @@ namespace RevitBatchPrint.ViewModels {
         public ObservableCollection<PrintAlbumViewModel> Albums {
             get => _albums;
             set => this.RaiseAndSetIfChanged(ref _albums, value);
+        }
+
+        public ObservableCollection<PrintAlbumViewModel> SelectedAlbums {
+            get => _selectedAlbums;
+            set => this.RaiseAndSetIfChanged(ref _selectedAlbums, value);
         }
 
         public PrintSettingsViewModel PrintSettings {
@@ -105,7 +112,7 @@ namespace RevitBatchPrint.ViewModels {
             SavePrintConfig();
 
             var revitPrintErrors = new List<string>();
-            foreach(var album in Albums.Where(item => item.IsSelected)) {
+            foreach(var album in SelectedAlbums) {
                 var revitPrint = new RevitPrint(_repository);
                 revitPrint.PrinterName = _printSettings.PrinterName;
                 revitPrint.FilterParamName = PrintParamName;
@@ -129,7 +136,7 @@ namespace RevitBatchPrint.ViewModels {
                 SelectAlbumsText = "Выберите комплект чертежей...";
             } else {
                 // HACK: Обновление текста выбора альбома лучше сделать в другом в более очевидном месте
-                SelectAlbumsText = string.Join(", ", Albums.Where(item => item.IsSelected).Select(item => item.Name));
+                SelectAlbumsText = string.Join(", ", SelectedAlbums.Select(item => item.Name));
                 SelectAlbumsText = string.IsNullOrEmpty(SelectAlbumsText)
                     ? "Выберите комплект чертежей..."
                     : SelectAlbumsText;
@@ -140,7 +147,7 @@ namespace RevitBatchPrint.ViewModels {
                 return false;
             }
 
-            if(Albums.All(item => item.IsSelected == false)) {
+            if(SelectedAlbums.Count()==0) {
                 ErrorText = "Не был выбран комплект чертежей.";
                 return false;
             }
@@ -236,6 +243,7 @@ namespace RevitBatchPrint.ViewModels {
                             album.IsSelected =
                                 printSettingsConfig.SelectedAlbums.Any(item => item?.Equals(album.Name) == true);
                         }
+                        SelectedAlbums = new ObservableCollection<PrintAlbumViewModel>(Albums.Where(item => item.IsSelected));
                     }
                 }
 
@@ -276,7 +284,7 @@ namespace RevitBatchPrint.ViewModels {
             printSettingsConfig.PrinterName = _printSettings.PrinterName;
             printSettingsConfig.PrintParamName = PrintParamName;
             printSettingsConfig.SelectedAlbums =
-                Albums.Where(item => item.IsSelected).Select(item => item.Name).ToList();
+                SelectedAlbums.Select(item => item.Name).ToList();
 
             printSettingsConfig.Zoom = _printSettings.Zoom;
             printSettingsConfig.ZoomType = _printSettings.ZoomType;

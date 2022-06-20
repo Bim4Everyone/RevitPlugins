@@ -11,6 +11,7 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
 
 using RevitGenLookupTables.ViewModels;
 using RevitGenLookupTables.Views;
@@ -29,9 +30,15 @@ namespace RevitGenLookupTables {
             var window = new LookupTablesWindow() {
                 DataContext = new FamilyViewModel(new Models.RevitRepository(application, document))
             };
-            var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
-
-            window.ShowDialog();
+            if(window.ShowDialog() == true) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
+            }
         }
     }
 }

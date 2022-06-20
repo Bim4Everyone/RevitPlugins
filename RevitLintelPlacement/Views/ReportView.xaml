@@ -1,16 +1,17 @@
-﻿<base:PlatformWindow  
+﻿<base:ThemedPlatformWindow  
         xmlns:base="clr-namespace:dosymep.WPF.Views"
         x:Class="RevitLintelPlacement.Views.ReportView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:RevitLintelPlacement.Views"
-        xmlns:extensions="clr-namespace:RevitLintelPlacement.Extensions"
         xmlns:vm ="clr-namespace:RevitLintelPlacement.ViewModels"
         xmlns:converters="clr-namespace:RevitLintelPlacement.Converters"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:b="clr-namespace:RevitLintelPlacement.Behaviors"
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
+        xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" 
+        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
+        xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking" 
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
         mc:Ignorable="d"
         Title="Отчет" Height="450" Width="800"
         d:DataContext="{d:DesignInstance vm:ElementInfosViewModel, IsDesignTimeCreatable=False}"
@@ -19,161 +20,95 @@
         <converters:EnumConverter x:Key="EnumConverter"/>
         <converters:IndexConverter x:Key="IndexConverter"/>
         <converters:WidthConverter x:Key="WidthConverter"/>
-        <Style TargetType="{x:Type DataGrid}">
-            <Setter Property="CanUserAddRows" Value="False"/>
-            <Setter Property="CanUserDeleteRows" Value="False"/>
-            <Setter Property="IsReadOnly" Value="True"/>
-            <Setter Property="CanUserReorderColumns" Value="False"/>
-            <Setter Property="CanUserResizeRows" Value="False"/>
-            <Setter Property="CanUserSortColumns" Value="False"/>
-            <Setter Property="AutoGenerateColumns" Value="False"/>
-            <Setter Property="HorizontalGridLinesBrush" Value="Transparent"/>
-            <Setter Property="VerticalGridLinesBrush" Value="Transparent"/>
-            <Setter Property=" AlternationCount" Value="2"/>
-            <Setter Property="AlternatingRowBackground" Value="WhiteSmoke"/>
-        </Style>
     </Window.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="5"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <ListBox Grid.Column="0" Grid.Row="0"  ItemsSource="{Binding TypeInfos}" Focusable="False" BorderThickness="0" BorderBrush="Transparent">
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type vm:ElementInfoViewModel}">
-                    <CheckBox  Margin="5" FontSize="14" Content="{Binding TypeInfo, Converter={StaticResource EnumConverter}, ConverterParameter={x:Type vm:TypeInfo}}" IsChecked="{Binding IsChecked}">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="Checked">
-                                <i:InvokeCommandAction Command="{Binding ElementName=ReportWindow, Path=DataContext.TypeInfoCheckedCommand}"></i:InvokeCommandAction>
-                            </i:EventTrigger>
-                            <i:EventTrigger EventName="Unchecked">
-                                <i:InvokeCommandAction Command="{Binding ElementName=ReportWindow, Path=DataContext.TypeInfoCheckedCommand}"></i:InvokeCommandAction>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </CheckBox>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-            <ListBox.ItemsPanel>
+        <dxe:ListBoxEdit Grid.Row="0" 
+                         Margin="5 5 5 0"
+                         Focusable="False" 
+                         BorderThickness="0"
+                         EditValue="{Binding SelectedObjects}"
+                         BorderBrush="Transparent" AllowCollectionView="False">
+            <dxmvvm:Interaction.Behaviors>
+                <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type vm:TypeInfo}" SortMode="DisplayName" ImageSize="16,16"/>
+                <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding TypeInfoCheckedCommand}"/>
+            </dxmvvm:Interaction.Behaviors>
+            <dxe:ListBoxEdit.StyleSettings>
+                <dxe:CheckedListBoxEditStyleSettings/>
+            </dxe:ListBoxEdit.StyleSettings>
+            <dxe:ListBoxEdit.ItemsPanel>
                 <ItemsPanelTemplate>
                     <StackPanel Orientation="Horizontal"/>
                 </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-        </ListBox>
-        <ScrollViewer Grid.Column="0" Grid.Row="1">
-            <DataGrid ItemsSource="{Binding DescriptionViewSoure.View}"
-                  SelectedItem="{Binding SelectedGroupedDescription}"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  IsReadOnly="True"
-                  CanUserReorderColumns="False"
-                  CanUserResizeRows="False"
-                  CanUserSortColumns="False"
-                  AutoGenerateColumns="False">
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="Тип">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate  DataType="{x:Type vm:ElementInfoViewModel}">
-                                <Image Height="20">
-                                    <Image.Style>
-                                        <Style TargetType="Image">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding TypeInfo}" Value="0">
-                                                    <Setter Property="Source" Value="../Resources/icons8-error.png"></Setter>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding TypeInfo}" Value="2">
-                                                    <Setter Property="Source" Value="../Resources/icons8-info.png"></Setter>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding TypeInfo}" Value="1">
-                                                    <Setter Property="Source" Value="../Resources/icons8-warn.png"></Setter>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Image.Style>
-                                </Image>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Описание" Binding="{Binding Message}"></DataGridTextColumn>
-                </DataGrid.Columns>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction Command="{Binding DescriptionCheckedCommand}"></i:InvokeCommandAction>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </DataGrid>
-        </ScrollViewer>
+            </dxe:ListBoxEdit.ItemsPanel>
+        </dxe:ListBoxEdit>
 
-        <GridSplitter Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="3"/>
-
-        <ScrollViewer Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" MaxHeight="{Binding ElementName=ReportWindow, Path=ActualHeight, Converter={StaticResource WidthConverter}, ConverterParameter=80}" CanContentScroll="False" HorizontalScrollBarVisibility="Auto">
-            <DataGrid CanUserAddRows="False"
-                  CanUserDeleteRows ="False"
-                  AutoGenerateColumns="False"
-                  CanUserReorderColumns="False"
-                  CanUserResizeRows="False"
-                      HorizontalGridLinesBrush="Transparent"
-                      VerticalGridLinesBrush="Transparent"
-                      IsReadOnly="True"
-            ItemsSource="{Binding ElementInfosViewSource.View}"
-                      AlternationCount="2" AlternatingRowBackground="WhiteSmoke">
-                <i:Interaction.Behaviors>
-                    <b:DelegateMouseWheelBehavior></b:DelegateMouseWheelBehavior>
-                </i:Interaction.Behaviors>
-                <DataGrid.Columns>
-                    <!--<DataGridTemplateColumn>
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate DataType="{x:Type vm:ElementInfoViewModel}">
-                                    <Image Height="20">
+        <dxdo:DockLayoutManager Grid.Row="1">
+            <dxdo:LayoutGroup AllowSplitters="True">
+                
+                <dxdo:LayoutControlItem>
+                    <dxg:GridControl 
+                        SelectionMode="Row" 
+                        ItemsSource="{Binding DescriptionViewSoure.View}"
+                        SelectedItem="{Binding SelectedGroupedDescription}">
+                        <dxmvvm:Interaction.Behaviors>
+                            <dxmvvm:EventToCommand EventName="SelectionChanged" Command="{Binding DescriptionCheckedCommand}"/>
+                        </dxmvvm:Interaction.Behaviors>
+                        <dxg:GridControl.View>
+                            <dxg:TableView AllowGrouping="True"/>
+                        </dxg:GridControl.View>
+                        <dxg:GridColumn AllowGrouping="True" AllowEditing="False" ReadOnly="True" Width="Auto" Header="Тип" >
+                            <dxg:GridColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image Width="16" Height="16">
                                         <Image.Style>
                                             <Style TargetType="Image">
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding TypeInfo}" Value="0">
-                                                        <Setter Property="Source" Value="../Resources/icons8-error.png"></Setter>
+                                                    <DataTrigger Binding="{Binding Row.TypeInfo}" Value="0">
+                                                        <Setter Property="Source" Value="{dx:DXImage 'Images/Status/Error_32x32.png'}"/>
                                                     </DataTrigger>
-                                                    <DataTrigger Binding="{Binding TypeInfo}" Value="2">
-                                                        <Setter Property="Source" Value="../Resources/icons8-info.png"></Setter>
+                                                    <DataTrigger Binding="{Binding Row.TypeInfo}" Value="2">
+                                                        <Setter Property="Source" Value="{dx:DXImage 'Office2013/Support/Info_32x32.png'}"/>
                                                     </DataTrigger>
-                                                    <DataTrigger Binding="{Binding TypeInfo}" Value="1">
-                                                        <Setter Property="Source" Value="../Resources/icons8-warn.png"></Setter>
+                                                    <DataTrigger Binding="{Binding Row.TypeInfo}" Value="1">
+                                                        <Setter Property="Source" Value="{dx:DXImage 'Images/Status/Warning_32x32.png'}"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </Image.Style>
                                     </Image>
                                 </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>-->
-                    <DataGridTemplateColumn Header="Элемент">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate DataType="{x:Type vm:ElementInfoViewModel}">
-                                <Button Name="bthElement" Content="{Binding ElementId.IntegerValue}" Command="{Binding ElementName=ReportWindow, Path=DataContext.SelectElementCommand}"
-                                    CommandParameter="{Binding ElementName=bthElement, Path=DataContext}">
-                                    <Button.Style>
-                                        <Style TargetType="{x:Type Button}">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsCorrectValue}" Value="False">
-                                                    <Setter Property="IsEnabled" Value="False"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Button.Style>
-                                </Button>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <!--<DataGridTextColumn Header="Тип предупреждения" Binding="{Binding TypeInfo, Converter={StaticResource EnumConverter}, ConverterParameter={x:Type vm:TypeInfo}}"></DataGridTextColumn>-->
-                    <DataGridTextColumn Header="Вид элемента" Binding="{Binding ElementType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Type vm:ElementType}}"></DataGridTextColumn>
-                    <!--<DataGridTextColumn Width="Auto" Header="Сообщение" Binding="{Binding Message}"/>-->
-                    <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Уровень" Binding="{Binding LevelName}"></DataGridTextColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-        </ScrollViewer>
+                            </dxg:GridColumn.CellTemplate>
+                        </dxg:GridColumn>
+                        <dxg:GridColumn AllowGrouping="True" AllowEditing="False" ReadOnly="True" Width="*" Header="Описание" FieldName="Message"/>
+                    </dxg:GridControl>
+                </dxdo:LayoutControlItem>
+                
+                <dxdo:LayoutControlItem>
+                    <dxg:GridControl SelectionMode="Row" 
+                                     ItemsSource="{Binding ElementInfosViewSource.View}">
+                        <dxg:GridControl.View>
+                            <dxg:TableView SearchPanelAllowFilter="True" ShowGroupPanel="True" />
+                        </dxg:GridControl.View>
+                        <dxg:GridColumn Width="Auto" AllowGrouping="False">
+                            <dxg:GridColumn.CellTemplate>
+                                <DataTemplate>
+                                    <dx:SimpleButton Name="PART_Editor" 
+                                                     Content="{Binding Row.ElementId.IntegerValue}" 
+                                                     Command="{Binding ElementName=ReportWindow, Path=DataContext.SelectElementCommand}"
+                                                     CommandParameter="{Binding Row}"/>
+                                </DataTemplate>
+                            </dxg:GridColumn.CellTemplate>
+                        </dxg:GridColumn>
+                        <dxg:GridColumn AllowEditing="False" ReadOnly="True" Width="Auto" Header="Вид элемента" Binding="{Binding ElementType, Converter={StaticResource EnumConverter}}"/>
+                        <dxg:GridColumn AllowEditing="False" ReadOnly="True" Width="Auto" Header="Наименование" FieldName="Name"/>
+                        <dxg:GridColumn AllowEditing="False" ReadOnly="True" Width="*" Header="Уровень" FieldName="LevelName"/>
+                    </dxg:GridControl>
+                </dxdo:LayoutControlItem>
+            </dxdo:LayoutGroup>
+        </dxdo:DockLayoutManager>
     </Grid>
-
-</base:PlatformWindow>
+</base:ThemedPlatformWindow>

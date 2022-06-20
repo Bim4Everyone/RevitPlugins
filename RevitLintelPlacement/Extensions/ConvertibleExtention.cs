@@ -21,6 +21,7 @@ namespace RevitLintelPlacement.Extensions {
 
                 return descriptionAttribute?.Description ?? name;
             }
+            
             return null;
         }
     }

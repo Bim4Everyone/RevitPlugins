@@ -38,12 +38,13 @@ namespace RevitGenLookupTables.ViewModels {
             FamilyParams = new ObservableCollection<FamilyParamViewModel>(GetFamilyParams());
 
             SaveTableCommand = new RelayCommand(SaveTable, CanSaveTable);
-            
+
             AddFamilyParamCommand = new RelayCommand(AddFamilyParam, CanAddFamilyParam);
             RemoveFamilyParamCommand = new RelayCommand(RemoveFamilyParam, CanRemoveFamilyParam);
 
             UpFamilyParamCommand = new RelayCommand(UpFamilyParam, CanUpFamilyParam);
             DownFamilyParamCommand = new RelayCommand(DownFamilyParam, CanDownFamilyParam);
+
         }
 
         public string Name { get; }
@@ -67,6 +68,8 @@ namespace RevitGenLookupTables.ViewModels {
             get => _selectedFamilyParam;
             set => this.RaiseAndSetIfChanged(ref _selectedFamilyParam, value);
         }
+
+        public ObservableCollection<FamilyParamViewModel> GridSelectedFamilyParams { get; set; } = new ObservableCollection<FamilyParamViewModel>();
 
         private IEnumerable<FamilyParamViewModel> GetFamilyParams() {
             return _revitRepository.GetFamilyParams()
@@ -127,9 +130,12 @@ namespace RevitGenLookupTables.ViewModels {
 
             window.DataContext = new SelectFamilyParamsViewModel() { FamilyParams = FamilyParams };
             if(window.ShowDialog() == true) {
-                var selected = ((SelectFamilyParamsViewModel) window.DataContext).SelectedFamilyParam;
-                FamilyParams.Remove(selected);
-                SelectedFamilyParams.Add(selected);
+                var selectedParams = ((SelectFamilyParamsViewModel) window.DataContext).SelectedFamilyParams;
+                foreach(var selectedParam in selectedParams.ToList()) {
+                    SelectedFamilyParams.Add(selectedParam);
+                    FamilyParams.Remove(selectedParam);
+                }
+
             }
         }
 
@@ -142,8 +148,10 @@ namespace RevitGenLookupTables.ViewModels {
         #region RemoveFamilyParamCommand
 
         private void RemoveFamilyParam(object param) {
-            FamilyParams.Add(SelectedFamilyParam);
-            SelectedFamilyParams.Remove(SelectedFamilyParam);
+            foreach(var selectedParam in GridSelectedFamilyParams.ToList()) {
+                FamilyParams.Add(selectedParam);
+                SelectedFamilyParams.Remove(selectedParam);
+            }
         }
 
         private bool CanRemoveFamilyParam(object param) {
@@ -155,9 +163,15 @@ namespace RevitGenLookupTables.ViewModels {
         #region UpFamilyParamCommand
 
         private void UpFamilyParam(object param) {
-            int index = SelectedFamilyParams.IndexOf(SelectedFamilyParam);
-            if(index > 0) {
-                SelectedFamilyParams.Move(index, index - 1);
+            var sortedParams = GridSelectedFamilyParams
+                .Select(item => new { Param = item, Index = SelectedFamilyParams.IndexOf(item) })
+                .OrderBy(item => item.Index);
+
+            foreach(var sortedParam in sortedParams) {
+                if(sortedParam.Index == 0) {
+                    break;
+                }
+                SelectedFamilyParams.Move(sortedParam.Index, sortedParam.Index - 1);
             }
         }
 
@@ -170,9 +184,15 @@ namespace RevitGenLookupTables.ViewModels {
         #region DownFamilyParamCommand
 
         private void DownFamilyParam(object param) {
-            int index = SelectedFamilyParams.IndexOf(SelectedFamilyParam);
-            if(index < SelectedFamilyParams.Count - 1) {
-                SelectedFamilyParams.Move(index, index + 1);
+            var sortedParams = GridSelectedFamilyParams
+                .Select(item => new { Param = item, Index = SelectedFamilyParams.IndexOf(item) })
+                .OrderByDescending(item => item.Index);
+
+            foreach(var sortedParam in sortedParams) {
+                if(sortedParam.Index == SelectedFamilyParams.Count - 1) {
+                    break;
+                }
+                SelectedFamilyParams.Move(sortedParam.Index, sortedParam.Index + 1);
             }
         }
 

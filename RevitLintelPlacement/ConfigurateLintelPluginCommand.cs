@@ -11,6 +11,7 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
 
 using RevitLintelPlacement.Models;
 using RevitLintelPlacement.ViewModels;
@@ -30,9 +31,16 @@ namespace RevitLintelPlacement {
                 uiApplication.ActiveUIDocument.Document, lintelsConfig);
 
             var configViewModel = new ConfigViewModel(revitRepository);
-            var window = new LintelsConfigView() {DataContext = configViewModel};
-            var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
-            window.ShowDialog();
+            var window = new LintelsConfigView() { DataContext = configViewModel };
+            if(window.ShowDialog() == true) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
+            }
         }
     }
 }

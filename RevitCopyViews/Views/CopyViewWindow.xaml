@@ -1,52 +1,96 @@
-﻿<base:PlatformWindow
+﻿<base:ThemedPlatformWindow
     x:Class="RevitCopyViews.Views.CopyViewWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
-    mc:Ignorable="d" 
-    Height="450" Width="580" WindowStartupLocation="CenterOwner" Title="Копирование видов">
-    <Grid>
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+    xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    mc:Ignorable="d"
+    SizeToContent="Height"
+    ResizeMode="NoResize"
+    MinWidth="500"
+    Width="500" WindowStartupLocation="CenterOwner" Title="Копирование видов">
+    <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="45"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <CheckBox Grid.Row="0" Margin="10,10,10,10" Content="Копировать с детализацией" IsChecked="{Binding CopyWithDetail}" />
+        <dxe:CheckEdit
+            Grid.Row="0"
+            Margin="0 5"
+            Content="Копировать с детализацией"
+            EditValue="{Binding CopyWithDetail, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-        <StackPanel Grid.Row="1" Margin="0 0 0 20">
-            <TextBlock Margin="10" Text="Группы видов"/>
-            <ComboBox Margin="10,0,10,0" ItemsSource="{Binding GroupViews}" Text="{Binding GroupView}" IsEditable="True" />
+        <StackPanel Grid.Row="1" Margin="0 0 0 5">
+            <dxe:TextEdit
+                IsReadOnly="True"
+                EditMode="InplaceActive"
+                EditValue="Группы видов" />
+
+            <dxe:ComboBoxEdit
+                AutoComplete="True"
+                ItemsSource="{Binding GroupViews}"
+                EditValue="{Binding GroupView, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
 
-        <GroupBox Header="Настройки имени вида" Grid.Row="2">
-            <StackPanel>
-                <CheckBox Margin="10,10,10,10" Content="Добавить отметку уровня" IsChecked="{Binding WithElevation}" />
+        <StackPanel Grid.Row="2" Margin="0 5">
+            <dxe:CheckEdit Content="Добавить отметку уровня"
+                               EditValue="{Binding WithElevation, UpdateSourceTrigger=PropertyChanged}" />
+            <lc:GroupBox Margin="0 5" Header="Префикс">
+                <StackPanel >
+                    <dxe:CheckEdit
+                        Content="Заменить"
+                        EditValue="{Binding ReplacePrefix, UpdateSourceTrigger=PropertyChanged}"
+                        IsEnabled="{Binding IsAllowReplacePrefix, UpdateSourceTrigger=PropertyChanged}" />
 
-                <StackPanel>
-                    <TextBlock Margin="10" Text="Префикс"/>
-                    <CheckBox Margin="10,0,10,10" Content="Заменить" IsChecked="{Binding ReplacePrefix}" IsEnabled="{Binding IsAllowReplacePrefix}" />
-                    <ComboBox Margin="10,0,10,0" ItemsSource="{Binding Prefixes}" Text="{Binding Prefix}" IsEditable="True" />
+                    <dxe:ComboBoxEdit
+                        AutoComplete="True"
+                        ItemsSource="{Binding Prefixes}"
+                        EditValue="{Binding Prefix, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
+            </lc:GroupBox>
 
-                <StackPanel>
-                    <TextBlock Margin="10" Text="Суффикс"/>
-                    <CheckBox Margin="10,0,10,10" Content="Заменить" IsChecked="{Binding ReplaceSuffix}" IsEnabled="{Binding IsAllowReplaceSuffix}"/>
-                    <ComboBox Margin="10,0,10,10" ItemsSource="{Binding Suffixes}" Text="{Binding Suffix}" IsEditable="True" />
+            <lc:GroupBox Margin="0 5 0 10" Header="Суффикс">
+                <StackPanel >
+
+                    <dxe:CheckEdit
+                        Content="Заменить"
+                        EditValue="{Binding ReplaceSuffix, UpdateSourceTrigger=PropertyChanged}"
+                        IsEnabled="{Binding IsAllowReplaceSuffix, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <dxe:ComboBoxEdit
+                        AutoComplete="True"
+                        ItemsSource="{Binding Suffixes}"
+                        EditValue="{Binding Suffix, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
-            </StackPanel>
-        </GroupBox>
+            </lc:GroupBox>
+        </StackPanel>
 
-        <ContentControl Grid.Row="3"/>
-
-        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
-            <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
-            <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80" Command="{Binding CopyViewsCommand}" />
-            <Button Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80"/>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+            <dxe:TextEdit
+                Margin="5 0"
+                IsReadOnly="True"
+                EditMode="InplaceActive"
+                Foreground="Orange"
+                EditValue="{Binding ErrorText}" />
+            <dx:SimpleButton
+                Margin="10 0"
+                Content="ОК"
+                Width="80"
+                Height="25"
+                Click="ButtonOk_Click"
+                Command="{Binding CopyViewsCommand}" />
+            <dx:SimpleButton
+                Content="Отмена"
+                Width="80"
+                Height="25"
+                Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
-</base:PlatformWindow>
+</base:ThemedPlatformWindow>

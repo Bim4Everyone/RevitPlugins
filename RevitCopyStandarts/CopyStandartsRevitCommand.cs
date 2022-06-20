@@ -17,6 +17,7 @@ using Autodesk.Revit.UI.Selection;
 
 using dosymep;
 using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
 
 using RevitCopyStandarts.ViewModels;
 
@@ -26,9 +27,9 @@ namespace RevitCopyStandarts {
     [Transaction(TransactionMode.Manual)]
     public class CopyStandartsRevitCommand : BasePluginCommand {
         public CopyStandartsRevitCommand() {
-            PluginName = "Копирование стандартов.";
+            PluginName = "Копирование стандартов";
         }
-        
+
         protected override void Execute(UIApplication uiApplication) {
             UIDocument uiDocument = uiApplication.ActiveUIDocument;
             Application application = uiApplication.Application;
@@ -36,16 +37,19 @@ namespace RevitCopyStandarts {
 
             var mainFolder =
                 @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Шаблоны и настройки";
-            
+
             var mainWindow = new MainWindow() {
-                BimCategories = new BimCategoriesViewModel(mainFolder, document, application)
+                DataContext = new BimCategoriesViewModel(mainFolder, document, application)
             };
-            
-            var helper = new WindowInteropHelper(mainWindow) {
-                Owner = uiApplication.MainWindowHandle
-            };
-            
-            mainWindow.ShowDialog();
+            if(mainWindow.ShowDialog() == true) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
+            }
         }
     }
 }

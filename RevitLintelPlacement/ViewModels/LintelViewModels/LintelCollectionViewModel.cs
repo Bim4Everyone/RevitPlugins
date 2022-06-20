@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,9 +48,9 @@ namespace RevitLintelPlacement.ViewModels {
             CountLintelInView = LintelsViewSource.View.Cast<LintelInfoViewModel>().Count();
         }
 
-        public int CountLintelInView { 
-            get => countLintelInView; 
-            set => this.RaiseAndSetIfChanged(ref countLintelInView, value); 
+        public int CountLintelInView {
+            get => countLintelInView;
+            set => this.RaiseAndSetIfChanged(ref countLintelInView, value);
         }
 
         public ElementInWallKind SelectedElementKind {
@@ -159,11 +160,11 @@ namespace RevitLintelPlacement.ViewModels {
     }
 
     internal enum SampleMode {
-        [Description("Выборка по всем элементам")]
+        [Display(Name = "Выборка по всем элементам")]
         AllElements,
-        [Description("Выборка по выделенным элементам")]
+        [Display(Name = "Выборка по выделенным элементам")]
         SelectedElements,
-        [Description("Выборка по текущему виду")]
+        [Display(Name = "Выборка по текущему виду")]
         CurrentView
     }
 }

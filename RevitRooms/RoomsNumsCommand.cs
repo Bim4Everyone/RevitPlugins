@@ -11,6 +11,7 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
 
 using RevitRooms.Models;
 using RevitRooms.ViewModels;
@@ -34,9 +35,15 @@ namespace RevitRooms {
                 var window = new RoomsNumsWindows();
                 window.DataContext = new RoomNumsViewModel(uiApplication.Application,
                     uiApplication.ActiveUIDocument.Document, window);
-
-                var helper = new WindowInteropHelper(window) {Owner = uiApplication.MainWindowHandle};
-                window.ShowDialog();
+                if(window.ShowDialog() == true) {
+                    GetPlatformService<INotificationService>()
+                        .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                        .ShowAsync();
+                } else {
+                    GetPlatformService<INotificationService>()
+                        .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                        .ShowAsync();
+                }
             }
         }
     }
