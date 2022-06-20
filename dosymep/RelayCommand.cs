@@ -45,10 +45,13 @@ namespace dosymep.WPF.Commands {
                     .CreateFatalNotification("C#", "Ошибка выполнения команды.")
                     .ShowAsync();
 
+                GetPlatformService<ILoggerService>()
+                    .Warning(ex, "Ошибка выполнения команды.");
+
 #if D2020 || D2021 || D2022
                 TaskDialog.Show("Ошибка!", ex.ToString());
 #else
-                TaskDialog.Show("Ошибка!", ex.ToString());
+                TaskDialog.Show("Ошибка!", ex.Message);
 #endif
             }
         }
