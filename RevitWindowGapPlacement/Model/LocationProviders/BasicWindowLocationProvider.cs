@@ -10,8 +10,9 @@ namespace RevitWindowGapPlacement.Model.LocationProviders {
 
         public XYZ GetPlaceLocation(BaseElement baseElement) {
             XYZ point = new XYZ(0, 0, baseElement.Height);
-            var wall = (Wall) ((FamilyInstance) baseElement.Element).Host;
 
+#if REVIT_2022_OR_GREATER
+            var wall = (Wall) ((FamilyInstance) baseElement.Element).Host;
             if(wall.CrossSection == WallCrossSection.SingleSlanted) {
                 var radian = wall.GetParamValue<double>(BuiltInParameter.WALL_SINGLE_SLANT_ANGLE_FROM_VERTICAL);
 
@@ -20,6 +21,7 @@ namespace RevitWindowGapPlacement.Model.LocationProviders {
 
                 point = Transform.CreateRotation(line.Direction, radian).OfVector(point);
             }
+#endif
 
             return GetLocation(baseElement).Add(point);
         }

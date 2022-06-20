@@ -14,10 +14,10 @@ namespace RevitWindowGapPlacement.Model {
             _parentWindow = parentWindow;
         }
 
-        public override double Width 
+        public override double Width
             => _parentWindow.Symbol.GetParamValue<double>(BuiltInParameter.WINDOW_WIDTH);
-        
-        public override double Height 
+
+        public override double Height
             => _parentWindow.Symbol.GetParamValue<double>(BuiltInParameter.WINDOW_HEIGHT);
 
         public void SetPLaceLocation(XYZ value) {
@@ -27,7 +27,8 @@ namespace RevitWindowGapPlacement.Model {
         protected XYZ GetPlaceLocation() {
             XYZ point = new XYZ(0, 0, Height);
             var wall = (Wall) _parentWindow.Host;
-            
+
+#if REVIT_2022_OR_GREATER
             if(wall.CrossSection == WallCrossSection.SingleSlanted) {
                 var radian = wall.GetParamValue<double>(BuiltInParameter.WALL_SINGLE_SLANT_ANGLE_FROM_VERTICAL);
                 
@@ -37,7 +38,8 @@ namespace RevitWindowGapPlacement.Model {
                 point = Transform.CreateRotation(line.Direction, radian).OfVector(point);
                 return ((LocationPoint) _parentWindow.Location).Point.Add(point);
             }
-            
+#endif
+
             return ((LocationPoint) _parentWindow.Location).Point.Add(point);
         }
 
@@ -58,16 +60,16 @@ namespace RevitWindowGapPlacement.Model {
         protected override FamilyInstance UpdateParamsWindowGap(FamilyInstance windowGap) {
             windowGap.SetParamValue(BuiltInParameter.WINDOW_WIDTH, Width);
             windowGap.SetParamValue(BuiltInParameter.WINDOW_HEIGHT, Height);
-            
+
             windowGap.SetParamValue("Смещение Сверху",
                 _parentWindow.Symbol.GetParamValue<double>("Четверть Сверху"));
-            
-            windowGap.SetParamValue("Смещение Справа", 
+
+            windowGap.SetParamValue("Смещение Справа",
                 _parentWindow.Symbol.GetParamValue<double>("Четверть Справа"));
-            
+
             windowGap.SetParamValue("Смещение Слева",
                 _parentWindow.Symbol.GetParamValue<double>("Четверть Слева"));
-            
+
             return windowGap;
         }
     }
