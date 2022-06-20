@@ -12,7 +12,7 @@
     SizeToContent="Height"
     ResizeMode="NoResize"
     MinWidth="500"
-    Width="500" WindowStartupLocation="CenterOwner" Title="Копирование видов">
+    Width="600" WindowStartupLocation="CenterOwner" Title="Копирование видов">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

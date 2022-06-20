@@ -25,8 +25,6 @@ namespace RevitClashDetective.ViewModels {
         private readonly FiltersConfig _filtersConfig;
         private string _name;
         private string errorText;
-        private string _selectedMainDocProviders;
-        private string _selectedOtherDocProviders;
         private bool _hasReport;
         private bool _isSelected;
         private SelectionViewModel _firstSelection;
@@ -98,7 +96,7 @@ namespace RevitClashDetective.ViewModels {
         }
 
         public void SaveClashes() {
-            var config = ClashesConfig.GetFiltersConfig(_revitRepository.GetObjectName(), ReportName);
+            var config = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), ReportName);
             config.Clashes = GetClashes();
             config.SaveProjectConfig();
             HasReport = true;
@@ -131,7 +129,7 @@ namespace RevitClashDetective.ViewModels {
                 ErrorText = $"Не найдены поисковые наборы второй выборки: {secondFilters}" + Environment.NewLine;
             }
 
-            if(ClashesConfig.GetFiltersConfig(_revitRepository.GetObjectName(), ReportName).Clashes.Count > 0) {
+            if(ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), ReportName).Clashes.Count > 0) {
                 HasReport = true;
             }
 

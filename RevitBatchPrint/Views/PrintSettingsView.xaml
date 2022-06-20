@@ -21,8 +21,8 @@
         <StackPanel Margin="0 5" Visibility="{Binding VisibilitySelectFile}">
             <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="Путь до файла"/>
             <DockPanel LastChildFill="True">
-                <dx:SimpleButton DockPanel.Dock="Right" Margin="0 5 5 0" Width="50" Content="..." Command="{Binding SaveFileCommand}"/>
-                <dxe:TextEdit DockPanel.Dock="Left" Margin="5 5 0 0" EditValue="{Binding FileName}"/>
+                <dx:SimpleButton DockPanel.Dock="Right" Margin="0 5 0 0" Width="50" Content="..." Command="{Binding SaveFileCommand}"/>
+                <dxe:TextEdit DockPanel.Dock="Left" Margin="0 5 0 0" EditValue="{Binding FileName}"/>
             </DockPanel>
         </StackPanel>
 
