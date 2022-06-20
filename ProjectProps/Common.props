@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+        <OutputType>Library</OutputType>
+        <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+        <UseWPF>true</UseWPF>
+        <Platforms>x64</Platforms>
+        <Configurations>D2020;D2021;D2022;R2020;R2021;R2022</Configurations>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration.StartsWith(`D`))'">
+        <Optimization>false</Optimization>
+        <DebugSymbols>true</DebugSymbols>
+        <OutputPath>bin\x64\Debug</OutputPath>
+        <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration.StartsWith(`R`))'">
+        <Optimize>true</Optimize>
+        <DebugSymbols>false</DebugSymbols>
+        <OutputPath>bin\x64\Release</OutputPath>
+        <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='D2020' OR '$(Configuration)'=='R2020'">
+        <RevitVersion>2020</RevitVersion>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='D2021' OR '$(Configuration)'=='R2021'">
+        <RevitVersion>2021</RevitVersion>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='D2022' OR '$(Configuration)'=='R2022'">
+        <RevitVersion>2022</RevitVersion>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)'=='2020'">
+        <DefineConstants>$(DefineConstants);REVIT_2020;REVIT_2020_OR_GREATER</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)'>='2021'">
+        <DefineConstants>$(DefineConstants);REVIT_2021;REVIT_2021_OR_GREATER</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)'>='2022'">
+        <DefineConstants>$(DefineConstants);REVIT_2022;REVIT_2022_OR_GREATER</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)'>'2020'">
+        <AssemblyName>$(AssemblyName)_$(RevitVersion)</AssemblyName>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Version>$(RevitVersion).2.4</Version>
+        <FileVersion>$(RevitVersion).2.4</FileVersion>
+        <Company>dosymep</Company>
+        <Authors>dosymep, budaevaler</Authors>
+        <PackageTags>dosymep, revit</PackageTags>
+        <Copyright>Copyright © 2022</Copyright>
+        <PackageProjectUrl>https://github.com/dosymep/RevitPlugins.git</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/dosymep/RevitPlugins.git</RepositoryUrl>
+        <RepositoryType>Git</RepositoryType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="..\dosymep\AppDomainExtensions.cs" Link="dosymep\AppDomainExtensions.cs"/>
+        <Compile Include="..\dosymep\BaseViewModel.cs" Link="dosymep\BaseViewModel.cs"/>
+        <Compile Include="..\dosymep\BoolToVisibilityConverter.cs" Link="dosymep\BoolToVisibilityConverter.cs"/>
+        <Compile Include="..\dosymep\ConfigSerializer.cs" Link="dosymep\ConfigSerializer.cs"/>
+        <Compile Include="..\dosymep\ConvertibleExtention.cs" Link="dosymep\ConvertibleExtention.cs"/>
+        <Compile Include="..\dosymep\BasePluginCommand.cs" Link="dosymep\BasePluginCommand.cs"/>
+        <Compile Include="..\dosymep\EnumConverter.cs" Link="dosymep\EnumConverter.cs"/>
+        <Compile Include="..\dosymep\EnumToItemsSource.cs" Link="dosymep\EnumToItemsSource.cs"/>
+        <Compile Include="..\dosymep\IndexConverter.cs" Link="dosymep\IndexConverter.cs"/>
+        <Compile Include="..\dosymep\InverseBooleanConverter.cs" Link="dosymep\InverseBooleanConverter.cs"/>
+        <Compile Include="..\dosymep\PlatformWindow.cs" Link="dosymep\PlatformWindow.cs"/>
+        <Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\RelayCommand.cs"/>
+        <Compile Include="..\dosymep\ThemedPlatformWindow.cs" Link="dosymep\ThemedPlatformWindow.cs"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="dosymep.Bim4Everyone">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\$(RevitVersion)\dosymep.Bim4Everyone.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.Revit">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\$(RevitVersion)\dosymep.Revit.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.SimpleServices">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep.SimpleServices.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.Xpf.Core">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep.Xpf.Core.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="Ninject">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\Ninject.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="pyRevitLabs.Json">
+            <HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.Json.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="RevitAPI">
+            <HintPath>$(ProgramW6432)\Autodesk\Revit $(RevitVersion)\RevitAPI.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="RevitAPIUI">
+            <HintPath>$(ProgramW6432)\Autodesk\Revit $(RevitVersion)\RevitAPIUI.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="System.Web"/>
+        <Reference Include="WindowsBase"/>
+        <Reference Include="PresentationCore"/>
+        <Reference Include="PresentationFramework"/>
+        <Reference Include="System.ComponentModel.DataAnnotations"/>
+
+        <PackageReference Include="Microsoft.CSharp" Version="4.7.0"/>
+        <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0"/>
+
+        <PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525">
+            <PrivateAssets>all</PrivateAssets>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+
+        <PackageReference Include="DevExpress.Wpf" Version="21.2.3">
+            <PrivateAssets>all</PrivateAssets>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+
+        <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0">
+            <PrivateAssets>all</PrivateAssets>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+    </ItemGroup>
+</Project>
