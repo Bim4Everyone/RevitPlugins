@@ -10,9 +10,7 @@ namespace RevitMarkPlacement.Models {
     internal class PositionBuilder {
         private readonly SpotDimension _spot;
         private readonly IEnumerable<FamilySymbol> _symbols;
-        private bool _needFleep;
         private XYZ _plane;
-        private XYZ _point;
         private FamilySymbol _familySymbol;
         private BoundingBoxXYZ _bb;
 

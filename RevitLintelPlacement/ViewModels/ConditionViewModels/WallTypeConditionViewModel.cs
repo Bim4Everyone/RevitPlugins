@@ -8,7 +8,6 @@ using RevitLintelPlacement.ViewModels.Interfaces;
 
 namespace RevitLintelPlacement.ViewModels {
     internal class WallTypeConditionViewModel : BaseViewModel, IEquatable<WallTypeConditionViewModel> {
-        private bool _isChecked;
         private string _name;
 
         public string Name {
