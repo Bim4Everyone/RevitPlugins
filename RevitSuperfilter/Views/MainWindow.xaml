@@ -51,11 +51,9 @@
                               IsTextEditable="False">
                 <dxe:ComboBoxEdit.ItemTemplate>
                     <DataTemplate>
-                        <DockPanel Width="240">
-                            <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive"
-                                          EditValue="{Binding Name, Mode=OneWay}" />
-                            <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" HorizontalAlignment="Right"
-                                          EditValue="{Binding Count, Mode=OneWay}" />
+                        <DockPanel>
+                            <TextBlock Text="{Binding Name, Mode=OneWay}"/>
+                            <TextBlock Margin="10 0 0 0" Text="{Binding Count, Mode=OneWay}" />
                         </DockPanel>
                     </DataTemplate>
                 </dxe:ComboBoxEdit.ItemTemplate>
