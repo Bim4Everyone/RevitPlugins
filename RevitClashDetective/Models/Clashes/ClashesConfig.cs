@@ -19,7 +19,7 @@ namespace RevitClashDetective.Models.Clashes {
         public override IConfigSerializer Serializer { get; set; }
         public List<ClashModel> Clashes { get; set; } = new List<ClashModel>();
 
-        public static ClashesConfig GetFiltersConfig(string buildingName, string fileName) {
+        public static ClashesConfig GetClashesConfig(string buildingName, string fileName) {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())
                 .SetPluginName(Path.Combine(nameof(RevitClashDetective), buildingName))

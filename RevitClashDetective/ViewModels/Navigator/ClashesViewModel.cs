@@ -22,10 +22,11 @@ using RevitClashDetective.Models.Clashes;
 namespace RevitClashDetective.ViewModels.Navigator {
     internal class ClashesViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+
+        private string _message;
+        private string _selectedFile;
         private List<ClashViewModel> _clashes;
         private CollectionViewSource _clashesViewSource;
-        private string _selectedFile;
-        private string _message;
 
         public ClashesViewModel(RevitRepository revitRepository, string selectedFile = null) {
             _revitRepository = revitRepository;
@@ -102,7 +103,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private void InitializeClashesFromFile() {
             var documentNames = _revitRepository.GetDocuments().Select(item => item.Title).ToList();
             if(SelectedFile != null) {
-                var config = ClashesConfig.GetFiltersConfig(_revitRepository.GetObjectName(), SelectedFile);
+                var config = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), SelectedFile);
                 Clashes = config.Clashes.Select(item => new ClashViewModel(_revitRepository, item))
                     .Where(item => IsValid(documentNames, item))
                     .ToList();
@@ -113,7 +114,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private bool IsValid(List<string> documentNames, ClashViewModel clash) {
             var clashDocuments = new[] { clash.FirstDocumentName, clash.SecondDocumentName };
             return clashDocuments.All(item => documentNames.Any(d => d.Contains(item)));
-                //&& clashDocuments.Any(item=> item.Contains(_revitRepository.GetDocumentName()));
         }
 
         private async void SelectClash(object p) {
@@ -142,7 +142,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
         }
 
         private async void SaveConfig(object p) {
-            var config = ClashesConfig.GetFiltersConfig(_revitRepository.GetObjectName(), SelectedFile);
+            var config = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), SelectedFile);
             config.Clashes = Clashes.Select(item => GetUpdatedClash(item)).ToList();
             config.SaveProjectConfig();
             Message = "Файл успешно сохранен";
@@ -163,8 +163,10 @@ namespace RevitClashDetective.ViewModels.Navigator {
             InitializeClashesFromFile();
         }
         private void SelectionDataChanged(object p) {
-            var index = ClashesViewSource.View.CurrentPosition; // чтобы не сбивалась позиция при первом нажатии стрелок
-            SelectClash(ClashesViewSource.View.CurrentItem);
+            if(ClashesViewSource.View.CurrentPosition > -1
+                && ClashesViewSource.View.CurrentPosition < Clashes.Count) {
+                SelectClash(ClashesViewSource.View.CurrentItem);
+            }
         }
     }
 }
