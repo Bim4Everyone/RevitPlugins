@@ -59,6 +59,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitSetLevelSection", "Rev
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitClashDetective", "RevitClashDetective\RevitClashDetective.csproj", "{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectProps", "ProjectProps", "{036539D1-9384-4C6B-8A92-B9A50994DE8D}"
+	ProjectSection(SolutionItems) = preProject
+		ProjectProps\Common.props = ProjectProps\Common.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		D2020|x64 = D2020|x64
