@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,7 +28,8 @@ namespace RevitClashDetective {
 
         protected override void Execute(UIApplication uiApplication) {
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            var viewModlel = new FiltersViewModel(revitRepository, FiltersConfig.GetFiltersConfig());
+
+            var viewModlel = new FiltersViewModel(revitRepository, FiltersConfig.GetFiltersConfig(revitRepository.GetDocumentName()));
             var window = new FilterCreatorView() { DataContext = viewModlel };
             if(window.ShowDialog() == true) {
                 GetPlatformService<INotificationService>()

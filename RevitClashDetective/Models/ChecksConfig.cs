@@ -19,7 +19,7 @@ namespace RevitClashDetective.Models {
         public override IConfigSerializer Serializer { get; set; }
 
         public static ChecksConfig GetFiltersConfig() {
-            return new ProjectConfigBuilder()
+            return new dosymep.Bim4Everyone.ProjectConfigs.ProjectConfigBuilder()
                 .SetSerializer(new RevitClashConfigSerializer())
                 .SetPluginName(nameof(RevitClashDetective))
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)

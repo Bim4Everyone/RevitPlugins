@@ -123,7 +123,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void Save(object p) {
-            var filtersConfig = FiltersConfig.GetFiltersConfig();
+            var filtersConfig = FiltersConfig.GetFiltersConfig(_revitRepository.GetDocumentName());
             filtersConfig.Filters = GetFilters().ToList();
             filtersConfig.SaveProjectConfig();
         }
