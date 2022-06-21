@@ -27,7 +27,7 @@ namespace RevitClashDetective {
         protected override void Execute(UIApplication uiApplication) {
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
             var filterConfig = FiltersConfig.GetFiltersConfig(revitRepository.GetDocumentName());
-            var checkConfig = ChecksConfig.GetFiltersConfig();
+            var checkConfig = ChecksConfig.GetChecksConfig(revitRepository.GetDocumentName());
             var mainViewModlel = new MainViewModel(checkConfig, filterConfig, revitRepository);
             var window = new MainWindow() { DataContext = mainViewModlel };
             if(window.ShowDialog() == true) {

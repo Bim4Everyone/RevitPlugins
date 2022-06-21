@@ -20,7 +20,7 @@ using RevitClashDetective.Views;
 namespace RevitClashDetective.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private string _errorText;
-        private readonly CheckSettings _checksSettings;
+
         private readonly ChecksConfig _checksConfig;
         private readonly FiltersConfig _filtersConfig;
         private readonly RevitRepository _revitRepository;
@@ -31,9 +31,8 @@ namespace RevitClashDetective.ViewModels {
             _filtersConfig = filtersConfig;
             _revitRepository = revitRepository;
             _checksConfig = checksConfig;
-            _checksSettings = checksConfig.GetSettings(_revitRepository.Doc);
 
-            if(_checksSettings != null && _checksSettings.Checks.Count > 0) {
+            if(_checksConfig != null && _checksConfig.Checks.Count > 0) {
                 InitializeChecks();
             } else {
                 InitializeEmptyCheck();
@@ -65,7 +64,7 @@ namespace RevitClashDetective.ViewModels {
 
         private void InitializeChecks() {
             Checks = new ObservableCollection<CheckViewModel>();
-            foreach(var check in _checksSettings.Checks) {
+            foreach(var check in _checksConfig.Checks) {
                 Checks.Add(new CheckViewModel(_revitRepository, _filtersConfig, check));
             }
         }
@@ -104,10 +103,9 @@ namespace RevitClashDetective.ViewModels {
         }
 
         private void SaveConfig() {
-            var checkSettings = _checksSettings ?? _checksConfig.AddSettings(_revitRepository.Doc);
-            checkSettings.Checks = new List<Check>();
+            _checksConfig.Checks = new List<Check>();
             foreach(var check in Checks) {
-                checkSettings.Checks.Add(new Check() {
+                _checksConfig.Checks.Add(new Check() {
                     Name = check.Name,
                     FirstSelection = check.FirstSelection.GetCheckSettings(),
                     SecondSelection = check.SecondSelection.GetCheckSettings()
