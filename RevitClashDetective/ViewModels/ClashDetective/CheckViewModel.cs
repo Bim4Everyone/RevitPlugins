@@ -49,8 +49,8 @@ namespace RevitClashDetective.ViewModels {
 
         public ICommand SelectMainProviderCommand { get; }
         public ICommand ShowClashesCommand { get; }
-        public bool IsFilterSelected => !string.IsNullOrEmpty(FirstSelection.SelectedPoviders) && !string.IsNullOrEmpty(SecondSelection.SelectedPoviders);
-        public bool IsFilesSelected => !string.IsNullOrEmpty(FirstSelection.SelectedFiles) && !string.IsNullOrEmpty(SecondSelection.SelectedFiles);
+        public bool IsFilterSelected => FirstSelection.SelectedProviders.Any() && SecondSelection.SelectedProviders.Any();
+        public bool IsFilesSelected => FirstSelection.SelectedFiles.Any() && SecondSelection.SelectedFiles.Any();
 
         public bool IsSelected {
             get => _isSelected;
@@ -120,11 +120,11 @@ namespace RevitClashDetective.ViewModels {
                 ErrorText += $"Не найдены поисковые наборы первой выборки: {firstFilters}" + Environment.NewLine;
             }
 
-            var secondFiles = FirstSelection.GetMissedFiles();
+            var secondFiles = SecondSelection.GetMissedFiles();
             if(!string.IsNullOrEmpty(secondFiles)) {
                 ErrorText += $"Не найдены файлы второй выборки: {secondFiles}" + Environment.NewLine;
             }
-            var secondFilters = FirstSelection.GetMissedFilters();
+            var secondFilters = SecondSelection.GetMissedFilters();
             if(!string.IsNullOrEmpty(secondFilters)) {
                 ErrorText = $"Не найдены поисковые наборы второй выборки: {secondFilters}" + Environment.NewLine;
             }
@@ -132,9 +132,6 @@ namespace RevitClashDetective.ViewModels {
             if(ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), ReportName).Clashes.Count > 0) {
                 HasReport = true;
             }
-
-            FirstSelection.SelectProviders(null);
-            SecondSelection.SelectProviders(null);
         }
 
         private void ShowClashes(object p) {

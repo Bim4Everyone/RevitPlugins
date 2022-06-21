@@ -10,7 +10,6 @@ using RevitClashDetective.Models;
 
 namespace RevitClashDetective.ViewModels.ClashDetective.Interfaces {
     interface IProviderViewModel {
-        bool IsSelected { get; set; }
         string Name { get; }
         IProvider GetProvider(Document doc, Transform transform);
     }

@@ -5,105 +5,40 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RevitClashDetective.Views"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.ClashDetective"
+             xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.ClashDetective" 
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              mc:Ignorable="d"
              Name="_this"
              MinWidth="100"
              d:DataContext="{d:DesignInstance vm:SelectionViewModel, IsDesignTimeCreatable=False}">
-    <UserControl.Resources>
-        <DataTemplate DataType="{x:Type vm:FileViewModel}">
-            <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
-                <CheckBox.Content>
-                    <TextBlock Text="{Binding Name}"/>
-                </CheckBox.Content>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Checked">
-                        <i:InvokeCommandAction Command="{Binding ElementName=_this, Path=DataContext.SelectFilesCommand}"/>
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="Unchecked">
-                        <i:InvokeCommandAction Command="{Binding ElementName=_this, Path=DataContext.SelectFilesCommand}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </CheckBox>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:SelectAllFilesViewModel}">
-            <CheckBox IsChecked="{Binding ElementName=_this, Path=DataContext.IsAllFilesSelected}">
-                <CheckBox.Content>
-                    <TextBlock Text="{Binding Name}"/>
-                </CheckBox.Content>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Checked">
-                        <i:InvokeCommandAction Command="{Binding SelectAllCommand}" 
-                                               CommandParameter="{Binding ElementName=_this, Path=DataContext.Files}"/>
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="Unchecked">
-                        <i:InvokeCommandAction Command="{Binding UnselectAllCommand}" 
-                                               CommandParameter="{Binding ElementName=_this, Path=DataContext.Files}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </CheckBox>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:FilterProviderViewModel}">
-            <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
-                <CheckBox.Content>
-                    <TextBlock Text="{Binding Name}"/>
-                </CheckBox.Content>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Checked">
-                        <i:InvokeCommandAction Command="{Binding ElementName=_this, Path=DataContext.SelectProvidersCommand}"/>
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="Unchecked">
-                        <i:InvokeCommandAction Command="{Binding ElementName=_this, Path=DataContext.SelectProvidersCommand}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </CheckBox>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:SelectAllProvidersViewModel}">
-            <CheckBox IsChecked="{Binding ElementName=_this, Path=DataContext.IsAllProvidersSelected}">
-                <CheckBox.Content>
-                    <TextBlock Text="{Binding Name}"/>
-                </CheckBox.Content>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Checked">
-                        <i:InvokeCommandAction Command="{Binding SelectAllCommand}" 
-                                               CommandParameter="{Binding ElementName=_this, Path=DataContext.Providers}"/>
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="Unchecked">
-                        <i:InvokeCommandAction Command="{Binding UnselectAllCommand}" 
-                                               CommandParameter="{Binding ElementName=_this, Path=DataContext.Providers}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </CheckBox>
-        </DataTemplate>
-    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <ComboBox Grid.Column="0" SelectionChanged="ComboBox_SelectionChanged">
-            <ComboBox.Resources>
-                <CollectionViewSource x:Key="comboBoxSource" Source="{Binding Path=Files}" />
-            </ComboBox.Resources>
-            <ComboBox.ItemsSource>
-                <CompositeCollection>
-                    <vm:SelectAllFilesViewModel Name="(Выбрать все)" IsSelected="False"/>
-                    <CollectionContainer Collection="{Binding Source={StaticResource comboBoxSource}}"/>
-                </CompositeCollection>
-            </ComboBox.ItemsSource>
-        </ComboBox>
-        <TextBlock Grid.Column="0" IsHitTestVisible="False" TextWrapping="Wrap" Foreground="Black" VerticalAlignment="Center" Margin="5 0" Text="{Binding SelectedFiles}"/>
-        <ComboBox Grid.Column="1" SelectionChanged="ComboBox_SelectionChanged">
-            <ComboBox.Resources>
-                <CollectionViewSource x:Key="comboBoxSource" Source="{Binding Path=Providers}" />
-            </ComboBox.Resources>
-            <ComboBox.ItemsSource>
-                <CompositeCollection>
-                    <vm:SelectAllProvidersViewModel Name="(Выбрать все)" IsSelected="False"/>
-                    <CollectionContainer Collection="{Binding Source={StaticResource comboBoxSource}}"/>
-                </CompositeCollection>
-            </ComboBox.ItemsSource>
-        </ComboBox>
-        <TextBlock Grid.Column="1" IsHitTestVisible="False" TextWrapping="Wrap" Foreground="Black" VerticalAlignment="Center" Margin="5 0" Text="{Binding SelectedPoviders}"/>
+        <dxe:ComboBoxEdit Grid.Column="0"
+                          NullText="Выберите файлы"
+                          SeparatorString=", "
+                          IsTextEditable="False"
+                          TextWrapping="Wrap"
+                          DisplayMember="Name"
+                          ItemsSource="{Binding Files}"
+                          EditValue="{Binding SelectedFileObjects}">
+            <dxe:ComboBoxEdit.StyleSettings>
+                <dxe:CheckedComboBoxStyleSettings />
+            </dxe:ComboBoxEdit.StyleSettings>
+        </dxe:ComboBoxEdit>
+        <dxe:ComboBoxEdit Grid.Column="1"
+                          NullText="Выберите поисковые наборы"
+                          SeparatorString=", "
+                          IsTextEditable="False"
+                           TextWrapping="Wrap"
+                          DisplayMember="Name"
+                          ItemsSource="{Binding Providers}"
+                          EditValue="{Binding SelectedProvidersObjects}">
+            <dxe:ComboBoxEdit.StyleSettings>
+                <dxe:CheckedComboBoxStyleSettings />
+            </dxe:ComboBoxEdit.StyleSettings>
+        </dxe:ComboBoxEdit>
     </Grid>
 </UserControl>

@@ -1,4 +1,4 @@
-﻿<base:PlatformWindow  
+﻿<base:ThemedPlatformWindow  
         xmlns:base="clr-namespace:dosymep.WPF.Views"
         x:Class="RevitClashDetective.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -7,93 +7,105 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitClashDetective.Views"
         xmlns:vm="clr-namespace:RevitClashDetective.ViewModels"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        mc:Ignorable="d"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    mc:Ignorable="d"
         Title="Проверки на коллизии" Height="450" Width="800"
         d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
-    <Grid>
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <Button Height="35" Width="35" Margin="10 10 0 10" BorderBrush="Transparent" Background="Transparent" Command="{Binding AddCheckCommand}">
-                <Image Source="../Resources/icons8-plus.png" />
-            </Button>
-            <Button Height="35" Width="35" Margin="2 10 10 10" BorderBrush="Transparent" Background="Transparent" Command="{Binding RemoveCheckCommand}"
-                    CommandParameter="{Binding ElementName=_dg, Path=SelectedItem}">
-                <Image Source="../Resources/icons8-minus.png"/>
-            </Button>
+        
+        <StackPanel Grid.Row="0" Margin="0 0  0 10" Orientation="Horizontal">
+            <dx:SimpleButton 
+                Height="35" 
+                Width="35" 
+                Margin="0 0 10 0" 
+                Command="{Binding AddCheckCommand}"
+                Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Add.svg'}"/>
+            <dx:SimpleButton 
+                Height="35"
+                Width="35"
+
+                Command="{Binding RemoveCheckCommand}"
+                CommandParameter="{Binding ElementName=_dg, Path=SelectedItem}"
+                Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}"/>
         </StackPanel>
-        <DataGrid x:Name="_dg"
-                  Grid.Row="1" 
-                  AutoGenerateColumns="False" 
-                  CanUserReorderColumns="False"
-                  CanUserDeleteRows="False"
-                  CanUserAddRows="False"
-                  VerticalGridLinesBrush="Transparent"
-                  HorizontalGridLinesBrush="Transparent"
-                  AlternatingRowBackground="WhiteSmoke"
-                  AlternationCount="2"
-                  ItemsSource="{Binding Checks}">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsSelected,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"></CheckBox>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Width="25">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Image Width="16" Height="16" ToolTip="{Binding ErrorText}" HorizontalAlignment="Center">
-                                <Image.Style>
-                                    <Style TargetType="Image">
-                                        <Setter Property="Source" Value="pack://application:,,,/DevExpress.Images.v21.2;component/Images/Status/Warning_16x16.png"></Setter>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ErrorText}" Value="{x:Null}">
-                                                <Setter Property="Source" Value="{x:Null}"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Image.Style>
-                            </Image>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"/>
-                <DataGridTemplateColumn Header="Выбор А" Width="*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type vm:CheckViewModel}">
-                            <local:ProviderCombobBox DataContext="{Binding FirstSelection}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Выбор В" Width="*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type vm:CheckViewModel}">
-                            <local:ProviderCombobBox DataContext="{Binding SecondSelection}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Width="Auto" >
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type vm:CheckViewModel}">
-                            <Button Click="ButtonOk_Click" Command="{Binding ShowClashesCommand}" ToolTip="Показать отчет по коллизиям">
-                                <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Reports/Report_16x16.png"/>
-                            </Button>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-            <TextBlock Margin="10" VerticalAlignment="Center"  Foreground="Orange" Text="{Binding ErrorText}" />
-            <TextBlock Margin="10" VerticalAlignment="Center"  Foreground="Green" Text="{Binding MessageText}" />
-            <Button Content="Запуск" Height="25" Width="70" Margin="10" IsDefault="True" Command="{Binding FindClashesCommand}"/>
-            <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
+        
+        <dxg:GridControl x:Name="_dg"
+                         SelectionMode="Row"
+                         Grid.Row="1" 
+                         ItemsSource="{Binding Checks}">
+            <dxg:GridControl.View>
+                <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always" ShowGroupPanel="False"/>
+            </dxg:GridControl.View>
+
+            <dxg:GridColumn Header="" Width="Auto" FieldName="IsSelected"/>
+
+            <dxg:GridColumn Width="Auto">
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate>
+                        <Image Width="16" Height="16" ToolTip="{Binding Row.ErrorText}" HorizontalAlignment="Center">
+                            <Image.Style>
+                                <Style TargetType="{x:Type Image}">
+                                    <Setter Property="Source" Value="{dx:DXImage 'Images/Status/Warning_16x16.png'}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Row.ErrorText}" Value="{x:Null}">
+                                            <Setter Property="Source" Value="{x:Null}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Image.Style>
+                        </Image>
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+            </dxg:GridColumn>
+            
+            <dxg:GridColumn Header="Наименование" FieldName="Name" Width="Auto"/>
+            
+            <dxg:GridColumn Header="Выбор А" Width="*">
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate>
+                        <local:ProviderCombobBox DataContext="{Binding Row.FirstSelection}"/>
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+            </dxg:GridColumn>
+            
+            <dxg:GridColumn Header="Выбор В" Width="*">
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate DataType="{x:Type vm:CheckViewModel}">
+                        <local:ProviderCombobBox DataContext="{Binding Row.SecondSelection}"/>
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+            </dxg:GridColumn>
+            
+            <dxg:GridColumn Width="Auto" >
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate DataType="{x:Type vm:CheckViewModel}">
+                        <dx:SimpleButton Margin="3 0" Click="ButtonOk_Click" Command="{Binding Row.ShowClashesCommand}" ToolTip="Показать отчет по коллизиям"
+                                         Glyph="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Reports/Report_16x16.png"/>
+
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+            </dxg:GridColumn>
+
+        </dxg:GridControl>
+
+        <StackPanel Grid.Row="2" Margin="0 10 0 0" Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
+                          Foreground="Orange" />
+            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding MessageText}"
+                          Foreground="Green" />
+            <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True"
+                             Command="{Binding FindClashesCommand}" />
+            <dx:SimpleButton Content="Отмена" Height="25" Width="80"  IsCancel="true"
+                             Click="ButtonCancel_Click" />
         </StackPanel>
+        
     </Grid>
-</base:PlatformWindow>
+</base:ThemedPlatformWindow>
