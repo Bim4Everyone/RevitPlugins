@@ -1,4 +1,4 @@
-﻿    <base:PlatformWindow  
+﻿    <base:ThemedPlatformWindow  
         xmlns:base="clr-namespace:dosymep.WPF.Views"
         x:Class="RevitClashDetective.Views.FilterCreatorView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -7,12 +7,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitClashDetective.Views"
         xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.FilterCreatorViewModels"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
         mc:Ignorable="d"
         Title="Поисковые наборы" Height="450" Width="1000"
         x:Name="ViewFilterCreator"
         d:DataContext="{d:DesignInstance vm:FiltersViewModel, IsDesignTimeCreatable=False}">
-    <Grid>
+    <Grid Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.27*"/>
             <ColumnDefinition Width="Auto"/>
@@ -25,6 +26,32 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <dx:SimpleButton 
+                Height="32"
+                Width="32"
+                Margin="0 0 10 0"
+                ToolTip="Загрузить поисковые наборы"
+                Command="{Binding LoadCommand}"
+                Glyph="{dx:DXImage 'Office2013/Actions/Download_32x32.png'}"/>
+            
+            <dx:SimpleButton 
+                Height="32"
+                Width="32"
+                Margin="0 0 10 0"
+                ToolTip="Сохранить"
+                Command="{Binding SaveCommand}"
+                Glyph="{dx:DXImage 'DevAV/Actions/Save_32x32.png'}"/>
+
+            <dx:SimpleButton 
+                Height="32"
+                Width="32"
+                Margin="0 0 10 0"
+                ToolTip="Сохранить как"
+                Command="{Binding SaveAsCommand}"
+                Glyph="{dx:DXImage 'DevAV/Actions/SaveAs_32x32.png'}"/>
+
+        </StackPanel>
         <GroupBox Grid.Column="0" Grid.Row="1" Header="Поисковые наборы" Margin="5 0">
             <Grid>
                 <Grid.RowDefinitions>
@@ -66,10 +93,11 @@
         <GroupBox Grid.Column="4" Grid.Row="1" Header="Критерии фильтрации" HorizontalAlignment="Stretch" Margin="5 0" VerticalContentAlignment="Top">
             <ContentControl DataContext="{Binding SelectedFilter.Set}" DataContextChanged="CriterionControl_DataContextChanged"/>
         </GroupBox>
-        <StackPanel Grid.Column="6" Grid.ColumnSpan="5" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Column="0" Grid.ColumnSpan="5" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock VerticalAlignment="Center" Margin="5" Foreground="Green" Text="{Binding MessageText}"/>
             <TextBlock VerticalAlignment="Center" Margin="5" Foreground="Orange" Text="{Binding ErrorText}"/>
             <Button Width="80" Height="30" FontSize="14" Margin="5" Command="{Binding SaveCommand}" Click="ButtonOk_Click">Сохранить</Button>
             <Button Width="80" Height="30" FontSize="14" Margin="5" Click="ButtonCancel_Click">Отмена</Button>
         </StackPanel>
     </Grid>
-</base:PlatformWindow>
+</base:ThemedPlatformWindow>

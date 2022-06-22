@@ -23,26 +23,31 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private ObservableCollection<FilterViewModel> _filters;
         private FilterViewModel _selectedFilter;
         private string _errorText;
+        private string _messageText;
 
         public FiltersViewModel(RevitRepository revitRepository, FiltersConfig config) {
             _revitRepository = revitRepository;
             _config = config;
-            CreateCommand = new RelayCommand(Create);
-            DeleteCommand = new RelayCommand(Delete, CanDelete);
-            RenameCommand = new RelayCommand(Rename, CanRename);
-            SaveCommand = new RelayCommand(Save, CanSave);
-            
-
-            Filters = new ObservableCollection<FilterViewModel>();
 
             InitializeFilters();
 
             SelectedFilterChangedCommand = new RelayCommand(SelectedFilterChanged, CanSelectedFilterChanged);
+            CreateCommand = new RelayCommand(Create);
+            DeleteCommand = new RelayCommand(Delete, CanDelete);
+            RenameCommand = new RelayCommand(Rename, CanRename);
+            SaveCommand = new RelayCommand(Save, CanSave);
+            SaveAsCommand = new RelayCommand(SaveAs, CanSave);
+            LoadCommand = new RelayCommand(Load);
         }
 
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        public string MessageText {
+            get => _messageText;
+            set => this.RaiseAndSetIfChanged(ref _messageText, value);
         }
 
         public ICommand CreateCommand { get; }
@@ -51,6 +56,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public ICommand SelectedFilterChangedCommand { get; }
 
         public ICommand SaveCommand { get; }
+        public ICommand SaveAsCommand { get; }
+        public ICommand LoadCommand { get; }
 
         public FilterViewModel SelectedFilter {
             get => _selectedFilter;
@@ -67,10 +74,14 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void InitializeFilters() {
-            foreach(var filter in _config.Filters.OrderBy(item => item.Name)) {
+            Filters = new ObservableCollection<FilterViewModel>(InitializeFilters(_config));
+        }
+
+        private IEnumerable<FilterViewModel> InitializeFilters(FiltersConfig config) {
+            foreach(var filter in config.Filters.OrderBy(item => item.Name)) {
                 filter.RevitRepository = _revitRepository;
                 filter.Set.SetRevitRepository(_revitRepository);
-                Filters.Add(new FilterViewModel(_revitRepository, filter));
+                yield return new FilterViewModel(_revitRepository, filter);
             }
         }
 
@@ -122,10 +133,24 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             return SelectedFilter != null;
         }
 
-        private void Save(object p) {
+        private async void Save(object p) {
             var filtersConfig = FiltersConfig.GetFiltersConfig(_revitRepository.GetDocumentName());
             filtersConfig.Filters = GetFilters().ToList();
             filtersConfig.SaveProjectConfig();
+            MessageText = "Поисковые наборы успешно сохранены";
+            await Task.Delay(3000);
+            MessageText = null;
+        }
+
+        private async void SaveAs(object p) {
+            var filtersConfig = FiltersConfig.GetFiltersConfig(_revitRepository.GetDocumentName());
+            filtersConfig.Filters = GetFilters().ToList();
+            ConfigSaver cs = new ConfigSaver();
+            if(cs.Save(filtersConfig)) {
+                MessageText = "Поисковые наборы успешно сохранены";
+                await Task.Delay(3000);
+                MessageText = null;
+            }
         }
 
         private bool CanSave(object p) {
@@ -145,6 +170,20 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             }
 
             return true;
+        }
+
+        private async void Load(object p) {
+            var cl = new ConfigLoader();
+            var config = cl.Load<FiltersConfig>();
+            if(config == null) {
+                return;
+            }
+            var newFilters = InitializeFilters(config).ToList();
+            var nameResolver = new NameResolver<FilterViewModel>(Filters, newFilters);
+            Filters = new ObservableCollection<FilterViewModel>(nameResolver.GetCollection());
+            MessageText = "Файл поисковых наборов успешно загружен";
+            await Task.Delay(3000);
+            MessageText = null;
         }
     }
 }

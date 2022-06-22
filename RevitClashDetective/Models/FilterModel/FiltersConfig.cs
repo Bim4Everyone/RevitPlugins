@@ -2,11 +2,14 @@
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone;
 using System.IO;
+using pyRevitLabs.Json;
 
 namespace RevitClashDetective.Models.FilterModel {
     internal class FiltersConfig : ProjectConfig {
         public List<Filter> Filters { get; set; } = new List<Filter>();
+        [JsonIgnore]
         public override string ProjectConfigPath { get; set; }
+        [JsonIgnore]
         public override IConfigSerializer Serializer { get; set; }
         public static FiltersConfig GetFiltersConfig(string revitFileName) {
             return new ProjectConfigBuilder()

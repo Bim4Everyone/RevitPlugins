@@ -31,6 +31,7 @@ namespace RevitClashDetective {
 
             var viewModlel = new FiltersViewModel(revitRepository, FiltersConfig.GetFiltersConfig(revitRepository.GetDocumentName()));
             var window = new FilterCreatorView() { DataContext = viewModlel };
+            GetPlatformService<IRootWindowService>().RootWindow = window;
             if(window.ShowDialog() == true) {
                 GetPlatformService<INotificationService>()
                     .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")

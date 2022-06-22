@@ -18,7 +18,7 @@ namespace RevitClashDetective.Views {
     /// <summary>
     /// Interaction logic for FilterCreatorView.xaml
     /// </summary>
-    public partial class FilterCreatorView : PlatformWindow {
+    public partial class FilterCreatorView {
         public FilterCreatorView() {
             InitializeComponent();
         }

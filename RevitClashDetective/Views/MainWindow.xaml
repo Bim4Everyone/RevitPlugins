@@ -16,29 +16,61 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
+
         <StackPanel Grid.Row="0" Margin="0 0  0 10" Orientation="Horizontal">
             <dx:SimpleButton 
-                Height="35" 
+                Height="32"
+                Width="35"
+                Margin="0 0 10 0"
+                ToolTip="Загрузить проверки"
+                Command="{Binding LoadClashCommand}"
+                Glyph="{dx:DXImage 'Office2013/Actions/Download_32x32.png'}"/>
+            
+            <dx:SimpleButton 
+                Height="32"
+                Width="32"
+                Margin="0 0 10 0"
+                ToolTip="Cохранить"
+                Command="{Binding SaveClashesCommand}"
+                Glyph="{dx:DXImage 'DevAV/Actions/Save_32x32.png'}"/>
+
+            <dx:SimpleButton 
+                Height="32"
+                Width="32"
+                Margin="0 0 10 0"
+                ToolTip="Сохранить как"
+                Command="{Binding SaveAsClashesCommand}"
+                Glyph="{dx:DXImage 'DevAV/Actions/SaveAs_32x32.png'}"/>
+            
+            <dx:SimpleButton 
+                Height="32" 
                 Width="35" 
-                Margin="0 0 10 0" 
+                Margin="0 0 10 0"
+                ToolTip="Добавить проверку"
                 Command="{Binding AddCheckCommand}"
                 Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Add.svg'}"/>
+            
             <dx:SimpleButton 
-                Height="35"
+                Height="32"
                 Width="35"
-
+                ToolTip="Удалить проверку"
                 Command="{Binding RemoveCheckCommand}"
                 CommandParameter="{Binding ElementName=_dg, Path=SelectedItem}"
                 Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}"/>
+            
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="0 0  0 10" Orientation="Horizontal">
+           
         </StackPanel>
         
         <dxg:GridControl x:Name="_dg"
                          SelectionMode="Row"
-                         Grid.Row="1" 
+                         Grid.Row="2" 
                          ItemsSource="{Binding Checks}">
             <dxg:GridControl.View>
                 <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always" ShowGroupPanel="False"/>
@@ -95,7 +127,7 @@
 
         </dxg:GridControl>
 
-        <StackPanel Grid.Row="2" Margin="0 10 0 0" Orientation="Horizontal"
+        <StackPanel Grid.Row="3" Margin="0 10 0 0" Orientation="Horizontal"
                     HorizontalAlignment="Right">
             <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
                           Foreground="Orange" />

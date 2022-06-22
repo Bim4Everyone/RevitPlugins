@@ -14,9 +14,10 @@ using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.ViewModels.Interfaces;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
-    internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel> {
+    internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INamedViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly Filter _filter;
         private bool _isMassSelectionChanged;
