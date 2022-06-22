@@ -30,6 +30,7 @@ namespace RevitClashDetective {
             var checkConfig = ChecksConfig.GetChecksConfig(revitRepository.GetDocumentName());
             var mainViewModlel = new MainViewModel(checkConfig, filterConfig, revitRepository);
             var window = new MainWindow() { DataContext = mainViewModlel };
+            GetPlatformService<IRootWindowService>().RootWindow = window;
             if(window.ShowDialog() == true) {
                 GetPlatformService<INotificationService>()
                     .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")

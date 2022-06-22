@@ -1,27 +1,36 @@
-﻿<Window x:Class="RevitClashDetective.Views.FilterNameView"
+﻿<base:ThemedPlatformWindow  
+        xmlns:base="clr-namespace:dosymep.WPF.Views"
+        x:Class="RevitClashDetective.Views.FilterNameView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitClashDetective.Views"
-        xmlns:vm ="clr-namespace:RevitClashDetective.ViewModels.FilterCreatorViewModels"
+        xmlns:vm ="clr-namespace:RevitClashDetective.ViewModels.FilterCreatorViewModels" 
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
         mc:Ignorable="d"
-        Title="Имя фильтра" Height="120" Width="430"
+        Title="Имя фильтра" Height="120" Width="520"
         WindowStartupLocation="CenterOwner"
         d:DataContext="{d:DesignInstance vm:FilterNameViewModel, IsDesignTimeCreatable=False}">
-    <Grid>
+    <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" LastChildFill="True">
-            <TextBlock DockPanel.Dock="Left" Text="Имя: " VerticalAlignment="Center" Margin="10 0 0 0"/>
-            <TextBox DockPanel.Dock="Right" Margin="10 0" HorizontalAlignment="Stretch" Height="20" VerticalContentAlignment="Center" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <dxe:TextEdit DockPanel.Dock="Left" EditValue="Имя: " IsReadOnly="True" EditMode="InplaceActive" VerticalAlignment="Center" Margin="10 0 0 0"/>
+            <dxe:TextEdit DockPanel.Dock="Right" Margin="10 0 0 0" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" EditValue="{Binding Name}" />
         </DockPanel>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <TextBlock VerticalAlignment="Center" Foreground="Orange" Text="{Binding ErrorText}"></TextBlock>
-            <Button Width="80" Margin="5" Height="30" Command="{Binding Create}" Click="ButtonOk_Click">ОК</Button>
-            <Button Width="80" Margin="5" Height="30" Click="ButtonCancel_Click">Отмена</Button>
+
+        <StackPanel  Grid.Row="1" Margin="0 10 0 0" Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
+                          Foreground="Orange" />
+            <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True"
+                             Command="{Binding Create}"  Click="ButtonOk_Click"/>
+            <dx:SimpleButton Content="Отмена" Height="25" Width="80"  IsCancel="true"
+                             Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
-</Window>
+</base:ThemedPlatformWindow>
