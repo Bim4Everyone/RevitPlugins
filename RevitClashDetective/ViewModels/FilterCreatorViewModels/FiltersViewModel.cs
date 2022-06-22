@@ -9,6 +9,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.UI;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -106,10 +107,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void Delete(object p) {
-            var taskDialog = new TaskDialog("Revit");
-            taskDialog.MainContent = $"Удалить фильтр \"{SelectedFilter.Name}\"?";
-            taskDialog.CommonButtons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No;
-            if(taskDialog.Show() == TaskDialogResult.Yes) {
+            var dialog = GetPlatformService<IMessageBoxService>();
+            if(dialog.Show($"Удалить фильтр \"{SelectedFilter.Name}\"?", "BIM", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes) {
                 Filters.Remove(SelectedFilter);
                 SelectedFilter = Filters.FirstOrDefault();
             }
