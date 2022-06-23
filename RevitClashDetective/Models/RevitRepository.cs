@@ -82,9 +82,9 @@ namespace RevitClashDetective.Models {
                         .First(v => v.ViewFamily == ViewFamily.ThreeDimensional);
                     view = View3D.CreateIsometric(_document, type.Id);
                     view.Name = _clashViewName + "_" + _application.Username;
-                    var categories = new[] { new ElementId(BuiltInCategory.OST_Levels), 
-                        new ElementId(BuiltInCategory.OST_WallRefPlanes), 
-                        new ElementId(BuiltInCategory.OST_Grids), 
+                    var categories = new[] { new ElementId(BuiltInCategory.OST_Levels),
+                        new ElementId(BuiltInCategory.OST_WallRefPlanes),
+                        new ElementId(BuiltInCategory.OST_Grids),
                         new ElementId(BuiltInCategory.OST_VolumeOfInterest) };
 
                     foreach(var category in categories) {
@@ -236,6 +236,11 @@ namespace RevitClashDetective.Models {
                 SetSectionBox(bb);
                 if(ids.Where(item => item != ElementId.InvalidElementId).Any()) {
                     _uiDocument.Selection.SetElementIds(ids.Where(item => item != ElementId.InvalidElementId).ToArray());
+                } else {
+                    var border = _view.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_SectionBox)).FirstOrDefault();
+                    if(border != null) {
+                        _uiDocument.Selection.SetElementIds(new[] { border });
+                    }
                 }
             };
 
