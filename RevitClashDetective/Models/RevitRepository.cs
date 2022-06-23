@@ -10,6 +10,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 
@@ -80,7 +82,27 @@ namespace RevitClashDetective.Models {
                         .First(v => v.ViewFamily == ViewFamily.ThreeDimensional);
                     view = View3D.CreateIsometric(_document, type.Id);
                     view.Name = _clashViewName + "_" + _application.Username;
-                    view.AreAnnotationCategoriesHidden = true;
+                    var categories = new[] { new ElementId(BuiltInCategory.OST_Levels), 
+                        new ElementId(BuiltInCategory.OST_WallRefPlanes), 
+                        new ElementId(BuiltInCategory.OST_Grids), 
+                        new ElementId(BuiltInCategory.OST_VolumeOfInterest) };
+
+                    foreach(var category in categories) {
+                        if(view.CanCategoryBeHidden(category)) {
+                            view.SetCategoryHidden(category, true);
+                        }
+                    }
+
+                    var bimGroup = new FilteredElementCollector(_document)
+                        .OfClass(typeof(View3D))
+                        .Cast<View3D>()
+                        .Where(item => !item.IsTemplate)
+                        .Select(item => item.GetParamValueOrDefault<string>(ProjectParamsConfig.Instance.ViewGroup))
+                        .FirstOrDefault(item => item.Contains("BIM"));
+                    if(bimGroup != null) {
+                        view.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, bimGroup);
+                    }
+
                     t.Commit();
                 }
             }
