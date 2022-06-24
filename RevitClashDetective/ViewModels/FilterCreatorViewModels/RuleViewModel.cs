@@ -34,12 +34,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             _revitRepository = revitRepository;
             CategoriesInfo = categoriesInfo;
             _rule = rule;
-            ParameterSelectionChangedCommand = new RelayCommand(ParameterSelectionChanged);
-            EvaluatorSelectionChangedCommand = new RelayCommand(EvaluatorSelectionChanged);
 
             if(_rule != null) {
                 InitializeRule();
             }
+            PropertyChanged += RuleViewModelChanged;
         }
 
         public ICommand ParameterSelectionChangedCommand { get; set; }
@@ -89,46 +88,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             SelectedParameter = null;
             SelectedRuleEvaluator = null;
             StringValue = null;
-        }
-
-        private void InitializeRule() {
-            SelectedParameter = new ParameterViewModel(_rule.Provider);
-            if(!_categoriesInfo.Parameters.Contains(SelectedParameter)) {
-                _categoriesInfo.Parameters.Add(SelectedParameter);
-            }
-            SelectedRuleEvaluator = new RuleEvaluatorViewModel(_rule.Evaluator);
-            SelectedValue = new ParamValueViewModel(_rule.Value);
-            StringValue = SelectedValue.ParamValue.DisplayValue;
-        }
-
-
-
-        private void ParameterSelectionChanged(object p) {
-            if(SelectedParameter != null) {
-                RuleEvaluators = new ObservableCollection<RuleEvaluatorViewModel>(
-                    SelectedParameter.GetEvaluators()
-                        .Select(item => new RuleEvaluatorViewModel(item)));
-
-                if(SelectedRuleEvaluator!=null && SelectedRuleEvaluator.Equals(RuleEvaluators.FirstOrDefault())) {
-                    EvaluatorSelectionChanged(null);
-                } else {
-                    SelectedRuleEvaluator = RuleEvaluators.FirstOrDefault();
-                }
-            }
-        }
-
-        private void EvaluatorSelectionChanged(object p) {
-            if(SelectedParameter != null && SelectedRuleEvaluator != null) {
-                Values = new ObservableCollection<ParamValueViewModel>(
-                     SelectedParameter.GetValues(
-                        CategoriesInfo.Categories
-                            .Select(item => item.Category).ToArray(), SelectedRuleEvaluator.RuleEvaluator)
-                     .Select(item => new ParamValueViewModel(item)));
-                StringValue = null;
-                IsValueEditable = CanValueEdit();
-            } else {
-                Values = new ObservableCollection<ParamValueViewModel>();
-            }
+            SelectedValue = null;
         }
 
         public Criterion GetCriterion() {
@@ -145,20 +105,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             if(SelectedRuleEvaluator?.RuleEvaluator?.Evaluator != Models.Evaluators.RuleEvaluators.FilterHasNoValue
                 && SelectedRuleEvaluator?.RuleEvaluator?.Evaluator != Models.Evaluators.RuleEvaluators.FilterHasValue) {
                 return SelectedParameter == null || SelectedRuleEvaluator == null
-                    || (SelectedValue == null && StringValue == null);
+                    || (SelectedValue == null && string.IsNullOrEmpty(StringValue));
             } else {
                 return SelectedParameter == null || SelectedRuleEvaluator == null;
             }
 
-        }
-
-        private bool CanValueEdit() {
-            if(SelectedRuleEvaluator.RuleEvaluator.Evaluator == Models.Evaluators.RuleEvaluators.FilterHasValue
-               || SelectedRuleEvaluator.RuleEvaluator.Evaluator == Models.Evaluators.RuleEvaluators.FilterHasNoValue) {
-                return false;
-            }
-
-            return true;
         }
 
         public string GetErrorText() {
@@ -179,9 +130,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                     _categoriesInfo.Parameters.Add(new ParameterViewModel(_rule.Provider));
                 }
                 SelectedParameter = _categoriesInfo.Parameters.First(item => item.FilterableValueProvider.Equals(_rule.Provider));
-                ParameterSelectionChanged(null);
+                SelectedParameterChanged();
                 SelectedRuleEvaluator = new RuleEvaluatorViewModel(_rule.Evaluator);
-                EvaluatorSelectionChanged(null);
                 SelectedValue = new ParamValueViewModel(_rule.Value);
                 if(!Values.Contains(SelectedValue)) {
                     SelectedValue = null;
@@ -189,5 +139,62 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                 }
             }
         }
+
+        private bool CanValueEdit() {
+            if(SelectedRuleEvaluator.RuleEvaluator.Evaluator == Models.Evaluators.RuleEvaluators.FilterHasValue
+               || SelectedRuleEvaluator.RuleEvaluator.Evaluator == Models.Evaluators.RuleEvaluators.FilterHasNoValue) {
+                return false;
+            }
+
+            return true;
+        }
+
+        private void InitializeRule() {
+            SelectedParameter = new ParameterViewModel(_rule.Provider);
+
+            if(!_categoriesInfo.Parameters.Contains(SelectedParameter)) {
+                _categoriesInfo.Parameters.Add(SelectedParameter);
+            }
+            SelectedRuleEvaluator = new RuleEvaluatorViewModel(_rule.Evaluator);
+            SelectedValue = new ParamValueViewModel(_rule.Value);
+            StringValue = SelectedValue.ParamValue.DisplayValue;
+        }
+
+        private void RuleViewModelChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+            if(e.PropertyName == nameof(SelectedParameter)) {
+                SelectedParameterChanged();
+            }
+            if(e.PropertyName == nameof(SelectedRuleEvaluator)) {
+                EvaluatorSelectionChanged();
+            }
+        }
+        private void SelectedParameterChanged() {
+            if(SelectedParameter != null) {
+                RuleEvaluators = new ObservableCollection<RuleEvaluatorViewModel>(
+                    SelectedParameter.GetEvaluators()
+                        .Select(item => new RuleEvaluatorViewModel(item)));
+
+                if(SelectedRuleEvaluator != null && SelectedRuleEvaluator.Equals(RuleEvaluators.FirstOrDefault())) {
+                    EvaluatorSelectionChanged();
+                } else {
+                    SelectedRuleEvaluator = RuleEvaluators.FirstOrDefault();
+                }
+            }
+        }
+
+        private void EvaluatorSelectionChanged() {
+            if(SelectedParameter != null && SelectedRuleEvaluator != null) {
+                Values = new ObservableCollection<ParamValueViewModel>(
+                     SelectedParameter.GetValues(
+                        CategoriesInfo.Categories
+                            .Select(item => item.Category).ToArray(), SelectedRuleEvaluator.RuleEvaluator)
+                     .Select(item => new ParamValueViewModel(item)));
+                StringValue = null;
+                IsValueEditable = CanValueEdit();
+            } else {
+                Values = new ObservableCollection<ParamValueViewModel>();
+            }
+        }
+
     }
 }

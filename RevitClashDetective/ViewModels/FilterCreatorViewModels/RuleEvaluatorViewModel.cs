@@ -40,7 +40,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public override int GetHashCode() {
             int hashCode = 1953519430;
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-            hashCode = hashCode * -1521134295 + EqualityComparer<RuleEvaluator>.Default.GetHashCode(RuleEvaluator);
+            hashCode = hashCode * -1521134295 + EqualityComparer<RuleEvaluators>.Default.GetHashCode(RuleEvaluator.Evaluator);
             return hashCode;
         }
     }

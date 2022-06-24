@@ -13,7 +13,6 @@ using RevitClashDetective.Models;
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
     internal class CategoryViewModel : BaseViewModel, IEquatable<CategoryViewModel> {
         private string _name;
-        private bool _isSelected;
 
         public CategoryViewModel(Category category) {
             Category = category;
@@ -25,11 +24,6 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             set => this.RaiseAndSetIfChanged(ref _name, value);
         }
 
-        public bool IsSelected {
-            get => _isSelected;
-            set => this.RaiseAndSetIfChanged(ref _isSelected, value);
-        }
-
         public Category Category { get; }
 
         public override bool Equals(object obj) {
@@ -37,11 +31,13 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         public bool Equals(CategoryViewModel other) {
-            return other != null && Name == other.Name;
+            return other != null && Name == other.Name
+                && Category.Id == other.Category.Id;
         }
 
         public override int GetHashCode() {
-            return  539060726 + EqualityComparer<string>.Default.GetHashCode(Name);
+            return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name)
+                + EqualityComparer<int>.Default.GetHashCode(Category.Id.IntegerValue);
         }
     }
 }

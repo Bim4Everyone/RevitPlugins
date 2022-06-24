@@ -98,7 +98,7 @@ namespace RevitClashDetective.Models {
                         .Cast<View3D>()
                         .Where(item => !item.IsTemplate)
                         .Select(item => item.GetParamValueOrDefault<string>(ProjectParamsConfig.Instance.ViewGroup))
-                        .FirstOrDefault(item => item.Contains("BIM"));
+                        .FirstOrDefault(item => item != null && item.Contains("BIM"));
                     if(bimGroup != null) {
                         view.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, bimGroup);
                     }
@@ -142,7 +142,7 @@ namespace RevitClashDetective.Models {
         }
 
         public View3D GetNavisworksView(Document doc) {
-            return new FilteredElementCollector(_document)
+            return new FilteredElementCollector(doc)
                 .OfClass(typeof(View3D))
                 .Cast<View3D>()
                 .FirstOrDefault(item => item.Name == "Navisworks");
