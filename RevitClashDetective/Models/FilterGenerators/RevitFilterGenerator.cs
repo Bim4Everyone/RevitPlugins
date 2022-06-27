@@ -12,30 +12,47 @@ using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.FilterGenerators {
-    internal class RevitFilterGenerator : IFilterGenerator {
 
-        public ElementFilter Filter { get; private set; }
+    internal abstract class RevitFilterGenerator : IFilterGenerator {
+        public ElementFilter Filter { get; protected set; }
 
-        public IFilterGenerator SetRuleFilter(Document doc, Rule rule) {
+        public abstract IFilterGenerator SetRuleFilter(Document doc, Rule rule);
+
+        public abstract IFilterGenerator SetSetFilter(Document doc, Set set);
+
+        protected IFilterGenerator SetRuleFilter(Document doc, Rule rule, bool inverted) {
             var ruleCreator = RuleEvaluatorUtils.GetRevitRuleCreator(rule.Evaluator.Evaluator);
             var revitRule = rule.Provider.GetRule(doc, ruleCreator, rule.Value);
             if(revitRule == null) {
                 Filter = new ElementIsElementTypeFilter(false);
             } else {
-                Filter = new ElementParameterFilter(revitRule, false);
+                Filter = new ElementParameterFilter(revitRule, inverted);
             }
 
             return this;
         }
 
-        public IFilterGenerator SetSetFilter(Document doc, Set set) {
-            var filters = new List<ElementFilter>();
+        private protected IEnumerable<ElementFilter> GetFilters(Document doc, Set set, RevitFilterGenerator revitFilterGenerator) {
             foreach(var criterion in set.Criteria) {
-                var revitFilterGenerator = new RevitFilterGenerator();
                 criterion.FilterGenerator = revitFilterGenerator;
                 criterion.Generate(doc);
-                filters.Add(revitFilterGenerator.Generate());
+                yield return revitFilterGenerator.Generate();
             }
+        }
+
+        public ElementFilter Generate() {
+            return Filter;
+        }
+    }
+
+    internal class StraightRevitFilterGenerator : RevitFilterGenerator {
+
+        public override IFilterGenerator SetRuleFilter(Document doc, Rule rule) {
+            return SetRuleFilter(doc, rule, false);
+        }
+
+        public override IFilterGenerator SetSetFilter(Document doc, Set set) {
+            var filters = GetFilters(doc, set, new StraightRevitFilterGenerator()).ToList();
             var creator = SetEvaluatorUtils.GetRevitLogicalFilterCreator(set.SetEvaluator.Evaluator);
             if(filters.Count > 0) {
                 Filter = creator.Create(filters);
@@ -43,9 +60,22 @@ namespace RevitClashDetective.Models.FilterGenerators {
                 Filter = new ElementIsElementTypeFilter(true);
             return this;
         }
+    }
 
-        public ElementFilter Generate() {
-            return Filter;
+    internal class InvertedRevitFilterGenerator : RevitFilterGenerator {
+
+        public override IFilterGenerator SetRuleFilter(Document doc, Rule rule) {
+            return SetRuleFilter(doc, rule, true);
+        }
+
+        public override IFilterGenerator SetSetFilter(Document doc, Set set) {
+            var filters = GetFilters(doc, set, new InvertedRevitFilterGenerator()).ToList();
+            var creator = SetEvaluatorUtils.GetInvertedRevitLogicalFilterCreator(set.SetEvaluator.Evaluator);
+            if(filters.Count > 0) {
+                Filter = creator.Create(filters);
+            } else
+                Filter = new ElementIsElementTypeFilter(true);
+            return this;
         }
     }
 }

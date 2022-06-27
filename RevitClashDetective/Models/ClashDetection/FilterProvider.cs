@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using RevitClashDetective.Models.FilterGenerators;
 using RevitClashDetective.Models.FilterModel;
 
 namespace RevitClashDetective.Models {
@@ -26,7 +27,7 @@ namespace RevitClashDetective.Models {
 
             var elements = new FilteredElementCollector(Doc)
                 .WherePasses(new ElementMulticategoryFilter(categories))
-                .WherePasses(_filter.GetRevitFilter(Doc))
+                .WherePasses(_filter.GetRevitFilter(Doc, new StraightRevitFilterGenerator()))
                 .WhereElementIsNotElementType()
                 .Where(item => item.get_Geometry(new Options()) != null)
                 .ToList();

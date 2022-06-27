@@ -15,6 +15,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.ViewModels.SearchSet;
 using RevitClashDetective.Views;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
@@ -39,6 +40,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             SaveCommand = new RelayCommand(Save, CanSave);
             SaveAsCommand = new RelayCommand(SaveAs, CanSave);
             LoadCommand = new RelayCommand(Load);
+            CheckSearchSetCommand = new RelayCommand(CheckSearchSet);
         }
 
         public string ErrorText {
@@ -59,6 +61,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public ICommand SaveCommand { get; }
         public ICommand SaveAsCommand { get; }
         public ICommand LoadCommand { get; }
+        public ICommand CheckSearchSetCommand { get; }
 
         public FilterViewModel SelectedFilter {
             get => _selectedFilter;
@@ -183,6 +186,13 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             MessageText = "Файл поисковых наборов успешно загружен";
             await Task.Delay(3000);
             MessageText = null;
+        }
+
+        private void CheckSearchSet(object p) {
+            var filter = SelectedFilter.GetFilter();
+            var vm = new SearchSetsViewModel(_revitRepository, filter);
+            var view = new SearchSetView() { DataContext = vm };
+            view.Show();
         }
     }
 }

@@ -16,6 +16,15 @@ namespace RevitClashDetective.Models.FilterModel {
         public override IFilterGenerator Generate(Document doc) {
             return FilterGenerator.SetSetFilter(doc, this);
         }
+
+        public override IEnumerable<IFilterableValueProvider> GetProviders() {
+            foreach(var criterion in Criteria) {
+                foreach(var provider in criterion.GetProviders()) {
+                    yield return provider;
+                }
+            }
+        }
+
         public override void SetRevitRepository(RevitRepository revitRepository) {
             base.SetRevitRepository(revitRepository);
             foreach(var criterion in Criteria) {

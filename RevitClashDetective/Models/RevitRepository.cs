@@ -219,14 +219,12 @@ namespace RevitClashDetective.Models {
             return linkedDocuments;
         }
 
-        public void CreateFilter(IEnumerable<ElementId> categories, ElementFilter filter, string name) {
-            using(Transaction t = _document.StartTransaction("Создание фильтра")) {
-                ParameterFilterElement pfe = ParameterFilterElement.Create(_document, name, categories.ToList());
-                pfe.SetElementFilter(filter);
-                t.Commit();
-            }
-
+        public IEnumerable<Element> GetFilteredElements(Document doc, IEnumerable<ElementId> categories, ElementFilter filter) {
+            return new FilteredElementCollector(doc)
+                    .WherePasses(new ElementMulticategoryFilter(categories.ToList()))
+                    .WherePasses(filter);
         }
+
 
         public async Task SelectAndShowElement(IEnumerable<ElementId> ids, BoundingBoxXYZ bb) {
             if(_document.ActiveView != _view) {

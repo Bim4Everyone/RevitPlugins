@@ -22,6 +22,10 @@ namespace RevitClashDetective.Models.FilterModel {
             return FilterGenerator.SetRuleFilter(doc, this);
         }
 
+        public override IEnumerable<IFilterableValueProvider> GetProviders() {
+            yield return Provider;
+        }
+
         public override void SetRevitRepository(RevitRepository revitRepository) {
             base.SetRevitRepository(revitRepository);
             Provider.RevitRepository = revitRepository;

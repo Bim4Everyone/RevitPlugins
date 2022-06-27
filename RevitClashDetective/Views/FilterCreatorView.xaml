@@ -120,8 +120,9 @@
                           Foreground="Orange" />
             <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding MessageText}"
                           Foreground="Green" />
-            <dx:SimpleButton Content="Сохранить" Height="25" Width="80" Margin="10 0" IsDefault="True"
-                             Command="{Binding SaveCommand}" Click="ButtonOk_Click"/>
+            <dx:SimpleButton Content="Проверить" Height="25" Width="80" Margin="10 0" IsDefault="True"
+                             ToolTip="Проверить поисковый набор"
+                             Command="{Binding CheckSearchSetCommand}" Click="ButtonOk_Click"/>
             <dx:SimpleButton Content="Отмена" Height="25" Width="80"  IsCancel="true"
                              Click="ButtonCancel_Click" />
         </StackPanel>
