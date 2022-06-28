@@ -67,19 +67,17 @@ namespace RevitClashDetective.ViewModels.SearchSet {
                 return result;
             }
             var typeId = element.GetTypeId();
-            if(typeId == null)
+            if(typeId.IsNull())
                 return null;
             var type = _revitRepository.GetElement(typeId);
-            if(type == null)
-                return null;
             return GetParamValue(type, paramName);
         }
 
         private void AddCommonInfo() {
-            Columns.Add(new ColumnViewModel() { FieldName = "Id", Header = "Id" });
-            Columns.Add(new ColumnViewModel() { FieldName = "File", Header = "Файл" });
-            Columns.Add(new ColumnViewModel() { FieldName = "Category", Header = "Категория" });
-            Columns.Add(new ColumnViewModel() { FieldName = "Name", Header = "Имя типоразмера" });
+            Columns.Insert(0, new ColumnViewModel() { FieldName = "Name", Header = "Имя типоразмера" });
+            Columns.Insert(0, new ColumnViewModel() { FieldName = "Category", Header = "Категория" });
+            Columns.Insert(0, new ColumnViewModel() { FieldName = "Id", Header = "Id" });
+            Columns.Insert(0, new ColumnViewModel() { FieldName = "File", Header = "Файл" });
         }
     }
 }
