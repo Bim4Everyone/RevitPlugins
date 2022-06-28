@@ -222,6 +222,7 @@ namespace RevitClashDetective.Models {
         public IEnumerable<Element> GetFilteredElements(Document doc, IEnumerable<ElementId> categories, ElementFilter filter) {
             return new FilteredElementCollector(doc)
                     .WherePasses(new ElementMulticategoryFilter(categories.ToList()))
+                    .WhereElementIsNotElementType()
                     .WherePasses(filter);
         }
 

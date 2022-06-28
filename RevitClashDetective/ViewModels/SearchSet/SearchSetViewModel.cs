@@ -17,8 +17,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
     internal class SearchSetViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
 
-        public SearchSetViewModel(RevitRepository revitRepository, Filter filter, RevitFilterGenerator generator, string message) {
-            Message = message;
+        public SearchSetViewModel(RevitRepository revitRepository, Filter filter, RevitFilterGenerator generator) {
             _revitRepository = revitRepository;
             FilterGenerator = generator;
             Filter = filter;
@@ -34,10 +33,10 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             var docs = _revitRepository.GetDocuments().ToList();
             foreach(var doc in docs) {
                 var filter = Filter.GetRevitFilter(doc, FilterGenerator);
-                elements.AddRange(_revitRepository.GetFilteredElements(doc, Filter.CategoryIds.Select(item => new ElementId(item)), filter));
+                elements.AddRange(_revitRepository.GetFilteredElements(doc, Filter.CategoryIds.Select(item => new ElementId(item)), filter).Where(item=>item!=null && item.IsValidObject).ToList());
             }
 
-            Grid = new GridControlViewModel(_revitRepository, Filter.GetProviders(), elements);
+            Grid = new GridControlViewModel(_revitRepository, Filter, elements);
         }
     }
 }

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
@@ -13,24 +15,39 @@ using RevitClashDetective.Models.FilterModel;
 namespace RevitClashDetective.ViewModels.SearchSet {
     internal class SearchSetsViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private SearchSetViewModel _selectedSearchSet;
+        private SearchSetViewModel _searchSet;
+        private SearchSetViewModel _straightSearchSet;
+        private SearchSetViewModel _invertedSearchSet;
 
         public SearchSetsViewModel(RevitRepository revitRepository, Filter filter) {
             _revitRepository = revitRepository;
+
             Filter = filter;
-            SearchSets = new List<SearchSetViewModel>() {
-                new SearchSetViewModel(_revitRepository, Filter, new StraightRevitFilterGenerator(), "Поисковый набор"),
-                new SearchSetViewModel(_revitRepository, Filter, new InvertedRevitFilterGenerator(), "Инвертированный поисковый набор")
-            };
-            SelectedSearchSet = SearchSets.FirstOrDefault();
+            _straightSearchSet = new SearchSetViewModel(_revitRepository, Filter, new StraightRevitFilterGenerator());
+            _invertedSearchSet = new SearchSetViewModel(_revitRepository, Filter, new InvertedRevitFilterGenerator());
+
+            SearchSet = _straightSearchSet;
+
+            InversionChangedCommand = new RelayCommand(InversionChanged);
         }
 
-        public SearchSetViewModel SelectedSearchSet { 
-            get => _selectedSearchSet; 
-            set => this.RaiseAndSetIfChanged(ref _selectedSearchSet, value); 
+        public bool Inverted { get; set; }
+
+        public ICommand InversionChangedCommand { get; }
+
+        public SearchSetViewModel SearchSet {
+            get => _searchSet;
+            set => this.RaiseAndSetIfChanged(ref _searchSet, value);
         }
 
         public Filter Filter { get; }
-        public List<SearchSetViewModel> SearchSets { get; set; }
+
+        private void InversionChanged(object p) {
+            if(Inverted) {
+                SearchSet = _invertedSearchSet;
+            } else {
+                SearchSet = _straightSearchSet;
+            }
+        }
     }
 }

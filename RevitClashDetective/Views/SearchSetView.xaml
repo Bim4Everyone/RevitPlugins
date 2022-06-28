@@ -6,10 +6,12 @@
                             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                             xmlns:local="clr-namespace:RevitClashDetective.Views"
                             xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.SearchSet" 
+                            xmlns:m="clr-namespace:RevitClashDetective.Models.Value" 
                             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
                             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
                             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
-                            xmlns:dxci="http://schemas.devexpress.com/winfx/2008/xaml/core/internal"
+                            xmlns:dxci="http://schemas.devexpress.com/winfx/2008/xaml/core/internal" 
+                            xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                             mc:Ignorable="d"
                             Title="Проверка поискового набора" Height="450" Width="800"
                             d:DataContext="{d:DesignInstance vm:SearchSetsViewModel, IsDesignTimeCreatable=False}">
@@ -22,12 +24,15 @@
                     <DataTemplate>
                         <ContentControl>
                             <dxg:GridColumn FieldName="{Binding (dxci:DependencyObjectExtensions.DataContext).FieldName, RelativeSource={RelativeSource Self}}" 
-                                            Header="{Binding (dxci:DependencyObjectExtensions.DataContext).Header, RelativeSource={RelativeSource Self}}" />
+                                            Header="{Binding (dxci:DependencyObjectExtensions.DataContext).Header, RelativeSource={RelativeSource Self}}"/>
                         </ContentControl>
                     </DataTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
+        <DataTemplate DataType="{x:Type m:ParamValue}">
+            <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding DisplayValue}"/>
+        </DataTemplate>
     </base:ThemedPlatformWindow.Resources>
     
     <Grid Margin="10">
@@ -36,16 +41,16 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <dxe:ComboBoxEdit Grid.Row="0"
-            IsTextEditable="False"
-            DisplayMember="Message"
-            ItemsSource="{Binding SearchSets}"
-            SelectedItem="{Binding SelectedSearchSet}"/>
-
+        <dxe:CheckEdit EditValue="{Binding Inverted}" Content="Инвертировать">
+            <mvvm:Interaction.Triggers>
+                <mvvm:EventToCommand EventName="EditValueChanged" Command="{Binding InversionChangedCommand}"/>
+            </mvvm:Interaction.Triggers>
+        </dxe:CheckEdit>
+        
         <dxg:GridControl Grid.Row="1"
                          AutoGenerateColumns="AddNew"
-                         ItemsSource="{Binding SelectedSearchSet.Grid.Rows}"
-                         ColumnsSource="{Binding SelectedSearchSet.Grid.Columns}">
+                         ItemsSource="{Binding SearchSet.Grid.Rows}"
+                         ColumnsSource="{Binding SearchSet.Grid.Columns}">
             <dxg:GridControl.View>
                 <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always"/>
             </dxg:GridControl.View>

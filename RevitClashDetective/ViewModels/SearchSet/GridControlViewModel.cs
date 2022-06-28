@@ -9,21 +9,26 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
+using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.ViewModels.SearchSet {
-    internal class GridControlViewModel {
+    internal class GridControlViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly IEnumerable<IFilterableValueProvider> _providers;
+        private readonly List<int> _categoryIds;
         private readonly IEnumerable<Element> _elements;
 
         public ObservableCollection<ColumnViewModel> Columns { get; set; }
         public ObservableCollection<ExpandoObject> Rows { get; set; }
-        public GridControlViewModel(RevitRepository revitRepository, IEnumerable<IFilterableValueProvider> providers, IEnumerable<Element> elements) {
+        public GridControlViewModel(RevitRepository revitRepository, Filter filter, IEnumerable<Element> elements) {
             _revitRepository = revitRepository;
-            _providers = providers;
+            _providers = filter.GetProviders();
+            _categoryIds = filter.CategoryIds;
             _elements = elements;
             InitializeColumns();
             InitializeRows();
@@ -43,8 +48,13 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             Rows = new ObservableCollection<ExpandoObject>();
             foreach(var element in _elements) {
                 IDictionary<string, object> row = new ExpandoObject();
-                foreach(var column in Columns) {
-                    row.Add(column.FieldName, GetParamValue(element, column.FieldName));
+                foreach(var provider in _providers) {
+                    string value = provider.GetElementParamValue(_categoryIds.ToArray(), element).DisplayValue;
+                    if(double.TryParse(value, out double resultValue) && resultValue != 0) {
+                        AddValue(row, provider.Name, resultValue);
+                    } else if(!string.IsNullOrEmpty(value) && value != "0") {
+                        AddValue(row, provider.Name, value);
+                    }
                 }
                 row.Add("File", _revitRepository.GetDocumentName(element.Document));
                 row.Add("Category", element?.Category?.Name);
@@ -54,23 +64,12 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             }
         }
 
-        private object GetParamValue(Element element, string paramName) {
-            object result = null;
-            if(element.IsExistsParam(paramName)) {
-                result = element.GetParam(paramName).AsValueString();
-                if(string.IsNullOrEmpty((string) result)) {
-                    result = element.GetParamValueOrDefault(paramName);
-                }
+        private void AddValue<T>(IDictionary<string, object> row, string key, T value) {
+            if(!row.ContainsKey(key)) {
+                row.Add(key, value);
+            } else {
+                row[key] = value;
             }
-
-            if(result != null) {
-                return result;
-            }
-            var typeId = element.GetTypeId();
-            if(typeId.IsNull())
-                return null;
-            var type = _revitRepository.GetElement(typeId);
-            return GetParamValue(type, paramName);
         }
 
         private void AddCommonInfo() {

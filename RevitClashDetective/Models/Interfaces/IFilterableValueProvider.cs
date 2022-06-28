@@ -25,7 +25,7 @@ namespace RevitClashDetective.Models.Interfaces {
         ParamValue GetParamValueFormString(int[] categories, string value);
         IEnumerable<RuleEvaluator> GetRuleEvaluators();
         IEnumerable<ParamValue> GetValues(Category[] categories, RuleEvaluator ruleEvaluator);
-        ParamValue GetElementParamValue(int[] categories, Document doc, Element item);
+        ParamValue GetElementParamValue(int[] categories, Element item);
         FilterRule GetRule(Document doc, IVisiter visiter, ParamValue paramValue);
     }
 }

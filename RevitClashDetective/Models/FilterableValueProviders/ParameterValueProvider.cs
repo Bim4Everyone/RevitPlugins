@@ -70,17 +70,17 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
                 .WhereElementIsNotElementType()
                 .WherePasses(categoryFilter)
                 .Where(item => item != null)
-                .Select(item => GetElementParamValue(categories, collector.Document, item))
+                .Select(item => GetElementParamValue(categories, item))
                 .Where(item => item != null && item.Value != null && item.Value as ElementId != ElementId.InvalidElementId);
         }
 
-        public ParamValue GetElementParamValue(int[] categories, Document doc, Element item) {
+        public ParamValue GetElementParamValue(int[] categories, Element item) {
             if(item.IsExistsParam(RevitParam)) {
                 return ParamValue.GetParamValue(categories, RevitParam, item);
             } else {
                 var typeId = item.GetTypeId();
                 if(typeId != null) {
-                    var type = doc.GetElement(typeId);
+                    var type = item.Document.GetElement(typeId);
                     return ParamValue.GetParamValue(categories, RevitParam, type);
                 }
             }
@@ -119,7 +119,5 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
                 && Name == other.Name
                 && RevitParam?.Id == other.RevitParam?.Id;
         }
-
-        
     }
 }
