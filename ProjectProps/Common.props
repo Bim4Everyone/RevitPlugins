@@ -6,7 +6,7 @@
         <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
         <UseWPF>true</UseWPF>
         <Platforms>x64</Platforms>
-        <Configurations>D2020;D2021;D2022;R2020;R2021;R2022</Configurations>
+        <Configurations>D2020;D2021;D2022;D2023R2020;R2021;R2022;R2023</Configurations>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration.StartsWith(`D`))'">
@@ -35,6 +35,10 @@
         <RevitVersion>2022</RevitVersion>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)'=='D2023' OR '$(Configuration)'=='R2023'">
+        <RevitVersion>2023</RevitVersion>
+    </PropertyGroup>
+
     <PropertyGroup Condition="'$(RevitVersion)'=='2020'">
         <DefineConstants>$(DefineConstants);REVIT_2020</DefineConstants>
     </PropertyGroup>
@@ -47,6 +51,26 @@
         <DefineConstants>$(DefineConstants);REVIT_2022</DefineConstants>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(RevitVersion)'=='2023'">
+        <DefineConstants>$(DefineConstants);REVIT_2023</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)'&lt;='2020'">
+        <DefineConstants>$(DefineConstants);REVIT_2020_OR_LESS</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)'&lt;='2021'">
+        <DefineConstants>$(DefineConstants);REVIT_2021_OR_LESS</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)'&lt;='2022'">
+        <DefineConstants>$(DefineConstants);REVIT_2022_OR_LESS</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)'&lt;='2023'">
+        <DefineConstants>$(DefineConstants);REVIT_2023_OR_LESS</DefineConstants>
+    </PropertyGroup>
+
     <PropertyGroup Condition="'$(RevitVersion)'>='2020'">
         <DefineConstants>$(DefineConstants);REVIT_2020_OR_GREATER</DefineConstants>
     </PropertyGroup>
@@ -57,6 +81,10 @@
 
     <PropertyGroup Condition="'$(RevitVersion)'>='2022'">
         <DefineConstants>$(DefineConstants);REVIT_2022_OR_GREATER</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)'>='2023'">
+        <DefineConstants>$(DefineConstants);REVIT_2023_OR_GREATER</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(RevitVersion)'>'2020'">
