@@ -244,6 +244,30 @@ namespace RevitClashDetective.Models {
             await _revitEventHandler.Raise();
         }
 
+        public async void OpenFilterCreationWindow(string selectedFilter) {
+            _revitEventHandler.TransactAction = () => {
+                var command = new CreateFiltersCommand();
+                command.ExecuteCommand(_uiApplication, selectedFilter);
+            };
+            await _revitEventHandler.Raise();
+        }
+
+        public async void OpenClashDetectorWindow() {
+            _revitEventHandler.TransactAction = () => {
+                var command = new DetectiveClashesCommand();
+                command.ExecuteCommand(_uiApplication);
+            };
+            await _revitEventHandler.Raise();
+        }
+
+        public Transform GetLinkedDocumentTransform(string documTitle) {
+            if(documTitle.Equals(GetDocumentName(), StringComparison.CurrentCultureIgnoreCase))
+                return Transform.Identity;
+            return GetRevitLinkInstances()
+                .FirstOrDefault(item => GetDocumentName(item.GetLinkDocument()).Equals(documTitle, StringComparison.CurrentCultureIgnoreCase))
+                ?.GetTotalTransform();
+        }
+
         private ParameterValueProvider GetParam(Document doc, Category category, ElementId elementId) {
             var revitParam = ParameterInitializer.InitializeParameter(doc, elementId);
             if(elementId.IsSystemId()) {
@@ -276,22 +300,6 @@ namespace RevitClashDetective.Models {
                 }
                 t.Commit();
             }
-        }
-
-        public async void OpenFilterCreationWindow(string selectedFilter) {
-            _revitEventHandler.TransactAction = () => {
-                var command = new CreateFiltersCommand();
-                command.ExecuteCommand(_uiApplication, selectedFilter);
-            };
-            await _revitEventHandler.Raise();
-        }
-
-        public async void OpenClashDetectorWindow() {
-            _revitEventHandler.TransactAction = () => {
-                var command = new DetectiveClashesCommand();
-                command.ExecuteCommand(_uiApplication);
-            };
-            await _revitEventHandler.Raise();
         }
     }
 }

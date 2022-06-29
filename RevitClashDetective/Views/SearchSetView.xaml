@@ -43,6 +43,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <dxe:CheckEdit EditValue="{Binding Inverted}" Content="Инвертировать">
@@ -50,16 +51,25 @@
                 <mvvm:EventToCommand EventName="EditValueChanged" Command="{Binding InversionChangedCommand}"/>
             </mvvm:Interaction.Triggers>
         </dxe:CheckEdit>
-        
+
         <dxg:GridControl Grid.Row="1"
+                         x:Name="_gridControl"
+                         AllowCollectionView="False"
                          AutoGenerateColumns="AddNew"
-                         ItemsSource="{Binding SearchSet.Grid.Rows}"
+                         ItemsSource="{Binding SearchSet.Grid.Rows, UpdateSourceTrigger=PropertyChanged}"
                          ColumnsSource="{Binding SearchSet.Grid.Columns}"
                          Loaded="GridControl_Loaded">
+            <dxg:GridControl.GroupSummary>
+                <dxg:GridSummaryItem SummaryType="Count"/>
+            </dxg:GridControl.GroupSummary>
             <dxg:GridControl.View>
-                <dxg:TableView x:Name="_gridView" AutoWidth="True" />
+                <dxg:TableView  x:Name="_gridView" AutoWidth="True" DataNavigatorButtons="Navigation" ShowDataNavigator="True"/>
+
             </dxg:GridControl.View>
-        </dxg:GridControl>    
+            <mvvm:Interaction.Behaviors>
+                <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SearchSet.Grid.SelectCommand}" CommandParameter="{Binding ElementName=_gridControl, Path=SelectedItem}"/>
+            </mvvm:Interaction.Behaviors>
+        </dxg:GridControl>
 
     </Grid>
 </base:ThemedPlatformWindow>
