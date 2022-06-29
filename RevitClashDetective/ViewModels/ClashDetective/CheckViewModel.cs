@@ -136,7 +136,7 @@ namespace RevitClashDetective.ViewModels {
         }
 
         private void ShowClashes(object p) {
-            var view = new NavigatorView() { DataContext = new ClashesViewModel(_revitRepository, ReportName) };
+            var view = new NavigatorView() { DataContext = new ClashesViewModel(_revitRepository, ReportName) { OpenFromClashDetector = true } };
             view.Show();
         }
 

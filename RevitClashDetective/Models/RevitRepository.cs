@@ -285,5 +285,13 @@ namespace RevitClashDetective.Models {
             };
             await _revitEventHandler.Raise();
         }
+
+        public async void OpenClashDetectorWindow() {
+            _revitEventHandler.TransactAction = () => {
+                var command = new DetectiveClashesCommand();
+                command.ExecuteCommand(_uiApplication);
+            };
+            await _revitEventHandler.Raise();
+        }
     }
 }

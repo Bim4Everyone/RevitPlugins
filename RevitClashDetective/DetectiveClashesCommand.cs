@@ -25,6 +25,10 @@ namespace RevitClashDetective {
         }
 
         protected override void Execute(UIApplication uiApplication) {
+            ExecuteCommand(uiApplication);
+        }
+
+        public void ExecuteCommand(UIApplication uiApplication) {
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
             var filterConfig = FiltersConfig.GetFiltersConfig(revitRepository.GetDocumentName());
             var checkConfig = ChecksConfig.GetChecksConfig(revitRepository.GetDocumentName());

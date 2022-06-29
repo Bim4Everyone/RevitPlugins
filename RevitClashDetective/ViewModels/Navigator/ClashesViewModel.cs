@@ -27,6 +27,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private string _selectedFile;
         private List<ClashViewModel> _clashes;
         private CollectionViewSource _clashesViewSource;
+        private bool _openFromClashDetector;
 
         public ClashesViewModel(RevitRepository revitRepository, string selectedFile = null) {
             _revitRepository = revitRepository;
@@ -47,6 +48,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             SaveCommand = new RelayCommand(SaveConfig, CanSaveConfig);
 
             SelectionDataChangedCommand = new RelayCommand(SelectionDataChanged);
+            OpenClashDetectorCommand = new RelayCommand(OpenClashDetector, p => OpenFromClashDetector);
         }
 
         public ICommand SelectClashCommand { get; }
@@ -55,10 +57,16 @@ namespace RevitClashDetective.ViewModels.Navigator {
         public ICommand SaveCommand { get; }
         public ICommand SelectionChangedCommand { get; }
         public ICommand SelectionDataChangedCommand { get; }
+        public ICommand OpenClashDetectorCommand { get; }
 
         public string[] FileNames { get; set; }
 
         public bool IsColumnVisible => FileNames != null;
+
+        public bool OpenFromClashDetector {
+            get => _openFromClashDetector;
+            set => this.RaiseAndSetIfChanged(ref _openFromClashDetector, value);
+        }
 
         public string SelectedFile {
             get => _selectedFile;
@@ -162,11 +170,16 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private void SelectionChanged(object p) {
             InitializeClashesFromFile();
         }
+
         private void SelectionDataChanged(object p) {
             if(ClashesViewSource.View.CurrentPosition > -1
                 && ClashesViewSource.View.CurrentPosition < Clashes.Count) {
                 SelectClash(ClashesViewSource.View.CurrentItem);
             }
+        }
+
+        private void OpenClashDetector(object p) {
+            _revitRepository.OpenClashDetectorWindow();
         }
     }
 }

@@ -12,6 +12,11 @@
         mc:Ignorable="d"
         Title="Навигатор" Height="450" Width="800"
         d:DataContext="{d:DesignInstance vm:ClashesViewModel, IsDesignTimeCreatable=False}">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding OpenClashDetectorCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <base:PlatformWindow.Resources>
         <converter:IndexConverter x:Key="IndexConverter"/>
         <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
