@@ -26,7 +26,8 @@
                 <Setter.Value>
                     <DataTemplate>
                         <ContentControl>
-                            <dxg:GridColumn FieldName="{Binding (dxci:DependencyObjectExtensions.DataContext).FieldName, RelativeSource={RelativeSource Self}}" 
+                            <dxg:GridColumn AllowEditing="False"
+                                FieldName="{Binding (dxci:DependencyObjectExtensions.DataContext).FieldName, RelativeSource={RelativeSource Self}}" 
                                             Header="{Binding (dxci:DependencyObjectExtensions.DataContext).Header, RelativeSource={RelativeSource Self}}"/>
                         </ContentControl>
                     </DataTemplate>
@@ -53,7 +54,8 @@
         <dxg:GridControl Grid.Row="1"
                          AutoGenerateColumns="AddNew"
                          ItemsSource="{Binding SearchSet.Grid.Rows}"
-                         ColumnsSource="{Binding SearchSet.Grid.Columns}">
+                         ColumnsSource="{Binding SearchSet.Grid.Columns}"
+                         Loaded="GridControl_Loaded">
             <dxg:GridControl.View>
                 <dxg:TableView x:Name="_gridView" AutoWidth="True" />
             </dxg:GridControl.View>

@@ -23,5 +23,9 @@ namespace RevitClashDetective.Views {
 
         public override string PluginName => nameof(RevitClashDetective);
         public override string ProjectConfigName => nameof(SearchSetView);
+
+        private void GridControl_Loaded(object sender, RoutedEventArgs e) {
+            _gridView.BestFitColumns();
+        }
     }
 }
