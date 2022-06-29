@@ -15,6 +15,9 @@
                             mc:Ignorable="d"
                             Title="Проверка поискового набора" Height="450" Width="800"
                             d:DataContext="{d:DesignInstance vm:SearchSetsViewModel, IsDesignTimeCreatable=False}">
+    <mvvm:Interaction.Behaviors>
+        <mvvm:EventToCommand EventName="Closing" Command="{Binding CloseCommand}"/>
+    </mvvm:Interaction.Behaviors>
     <base:ThemedPlatformWindow.Resources>
         <Style TargetType="{x:Type dxg:GridControl}">
             <Setter Property="AutoGenerateColumns" Value="None"/>
@@ -52,7 +55,7 @@
                          ItemsSource="{Binding SearchSet.Grid.Rows}"
                          ColumnsSource="{Binding SearchSet.Grid.Columns}">
             <dxg:GridControl.View>
-                <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always"/>
+                <dxg:TableView x:Name="_gridView" AutoWidth="True" />
             </dxg:GridControl.View>
         </dxg:GridControl>    
 

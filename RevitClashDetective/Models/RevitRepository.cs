@@ -29,7 +29,6 @@ namespace RevitClashDetective.Models {
         private readonly Document _document;
         private readonly UIDocument _uiDocument;
         private readonly RevitEventHandler _revitEventHandler;
-        private readonly RevitEventHandler _revitEventHandler2;
         private List<string> _endings = new List<string> { "_отсоединено", "_detached" };
         private string _clashViewName = "BIM_Проверка на коллизии";
         private View3D _view;
@@ -42,7 +41,6 @@ namespace RevitClashDetective.Models {
             _uiDocument = new UIDocument(document);
 
             _revitEventHandler = new RevitEventHandler();
-            _revitEventHandler2 = new RevitEventHandler();
             _endings.Add("_" + _application.Username);
 
             _view = GetClashView();
@@ -278,6 +276,14 @@ namespace RevitClashDetective.Models {
                 }
                 t.Commit();
             }
+        }
+
+        public async void OpenFilterCreationWindow(string selectedFilter) {
+            _revitEventHandler.TransactAction = () => {
+                var command = new CreateFiltersCommand();
+                command.ExecuteCommand(_uiApplication, selectedFilter);
+            };
+            await _revitEventHandler.Raise();
         }
     }
 }

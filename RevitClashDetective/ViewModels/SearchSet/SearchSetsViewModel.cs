@@ -29,11 +29,13 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             SearchSet = _straightSearchSet;
 
             InversionChangedCommand = new RelayCommand(InversionChanged);
+            CloseCommand = new RelayCommand(Close);
         }
 
         public bool Inverted { get; set; }
 
         public ICommand InversionChangedCommand { get; }
+        public ICommand CloseCommand { get; }
 
         public SearchSetViewModel SearchSet {
             get => _searchSet;
@@ -48,6 +50,10 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             } else {
                 SearchSet = _straightSearchSet;
             }
+        }
+
+        private void Close(object p) {
+            _revitRepository.OpenFilterCreationWindow(Filter.Name);
         }
     }
 }

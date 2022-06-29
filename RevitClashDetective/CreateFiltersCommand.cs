@@ -27,10 +27,17 @@ namespace RevitClashDetective {
         }
 
         protected override void Execute(UIApplication uiApplication) {
+            ExecuteCommand(uiApplication);
+        }
+
+        public void ExecuteCommand(UIApplication uiApplication, string selectedFilter = null) {
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
 
             var viewModlel = new FiltersViewModel(revitRepository, FiltersConfig.GetFiltersConfig(revitRepository.GetDocumentName()));
             var window = new FilterCreatorView() { DataContext = viewModlel };
+            if(selectedFilter != null) {
+                viewModlel.SelectedFilter = viewModlel.Filters.FirstOrDefault(item => item.Name.Equals(selectedFilter, StringComparison.CurrentCultureIgnoreCase));
+            }
             GetPlatformService<IRootWindowService>().RootWindow = window;
             if(window.ShowDialog() == true) {
                 GetPlatformService<INotificationService>()
