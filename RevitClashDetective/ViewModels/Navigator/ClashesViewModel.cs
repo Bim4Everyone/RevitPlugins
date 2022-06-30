@@ -43,8 +43,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
             SelectionChangedCommand = new RelayCommand(SelectionChanged);
             SelectClashCommand = new RelayCommand(SelectClash);
-            SelectNextCommand = new RelayCommand(SelectNext);
-            SelectPreviousCommand = new RelayCommand(SelectPrevious);
             SaveCommand = new RelayCommand(SaveConfig, CanSaveConfig);
 
             SelectionDataChangedCommand = new RelayCommand(SelectionDataChanged);
@@ -52,8 +50,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
         }
 
         public ICommand SelectClashCommand { get; }
-        public ICommand SelectPreviousCommand { get; }
-        public ICommand SelectNextCommand { get; }
         public ICommand SaveCommand { get; }
         public ICommand SelectionChangedCommand { get; }
         public ICommand SelectionDataChangedCommand { get; }
@@ -126,27 +122,9 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private async void SelectClash(object p) {
             var clash = p as ClashViewModel;
+            if(clash == null)
+                return;
             await _revitRepository.SelectAndShowElement(clash.GetElementIds(_revitRepository.Doc.Title), clash.GetBoundingBox());
-        }
-
-        private async void SelectNext(object p) {
-            ClashesViewSource.View.MoveCurrentToNext();
-            if(ClashesViewSource.View.IsCurrentAfterLast) {
-                ClashesViewSource.View.MoveCurrentToPrevious();
-            } else {
-                var clash = ClashesViewSource.View.CurrentItem as ClashViewModel;
-                await _revitRepository.SelectAndShowElement(clash.GetElementIds(_revitRepository.GetDocumentName()), clash.GetBoundingBox());
-            }
-        }
-
-        private async void SelectPrevious(object p) {
-            ClashesViewSource.View.MoveCurrentToPrevious();
-            if(ClashesViewSource.View.IsCurrentBeforeFirst) {
-                ClashesViewSource.View.MoveCurrentToNext();
-            } else {
-                var clash = ClashesViewSource.View.CurrentItem as ClashViewModel;
-                await _revitRepository.SelectAndShowElement(clash.GetElementIds(_revitRepository.Doc.Title), clash.GetBoundingBox());
-            }
         }
 
         private async void SaveConfig(object p) {
