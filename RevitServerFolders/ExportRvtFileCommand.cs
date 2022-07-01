@@ -41,11 +41,9 @@ namespace RevitServerFolders {
                 SaveExportRvtFileConfig(exportRvtFileViewModel);
                 DetachRevitFiles(exportRvtFileViewModel);
                 UnloadAllLinks(exportRvtFileViewModel);
-                ExportFilesToNavisworks(application, exportRvtFileViewModel);
+                ExportFilesToNavisworks(uiApplication, exportRvtFileViewModel);
 
-                GetPlatformService<INotificationService>()
-                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                    .ShowAsync();
+                TaskDialog.Show("Предупреждение!", "Экспорт RVT из RS завершен.");
             } else {
                 GetPlatformService<INotificationService>()
                     .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
@@ -53,10 +51,11 @@ namespace RevitServerFolders {
             }
         }
 
-        private static void ExportFilesToNavisworks(Application application, ExportRvtFileViewModel exportRvtFileViewModel) {
+        private static void ExportFilesToNavisworks(UIApplication uiApplication, ExportRvtFileViewModel exportRvtFileViewModel) {
             if(exportRvtFileViewModel.WithNwcFiles) {
                 new ExportFilesToNavisworksCommand() {
-                    Application = application,
+                    Application = uiApplication.Application,
+                    UIApplication = uiApplication,
                     SourceFolderName = exportRvtFileViewModel.TargetRvtFolder,
                     TargetFolderName = exportRvtFileViewModel.TargetNwcFolder,
 

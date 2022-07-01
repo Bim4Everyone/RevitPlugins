@@ -14,11 +14,15 @@ namespace dosymep {
             var assemblyPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 @"pyRevit\Extensions\BIM4Everyone.lib");
+
+            if(assemblyName.Name.StartsWith("dosymep.")) {
+                assemblyPath = Path.Combine(assemblyPath, "dosymep_libs", "libs");
+            }
             
             if(assemblyName.Name.StartsWith("DevExpress.")) {
                 assemblyPath = Path.Combine(assemblyPath, "devexpress_libs", "libs");
             }
-            
+
             assemblyPath = Path.Combine(assemblyPath, assemblyName.Name + ".dll");
             return File.Exists(assemblyPath) ? Assembly.LoadFrom(assemblyPath) : null;
         }

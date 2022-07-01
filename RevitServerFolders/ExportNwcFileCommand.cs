@@ -34,9 +34,7 @@ namespace RevitServerFolders {
                 UnloadAllLinks(exportNwcFileViewModel);
                 ExportFilesToNavisworks(uiApplication, exportNwcFileViewModel);
 
-                GetPlatformService<INotificationService>()
-                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                    .ShowAsync();
+                TaskDialog.Show("Предупреждение!", "Экспорт NWC в RVT завершен.");
             } else {
                 GetPlatformService<INotificationService>()
                     .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
