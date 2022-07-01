@@ -9,7 +9,9 @@
              xmlns:s="clr-namespace:System;assembly=mscorlib" 
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:controls ="clr-namespace:RevitClashDetective.Controls"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib" 
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              x:Class="RevitClashDetective.Views.CategoryView"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance {x:Type vm:FilterViewModel}, IsDesignTimeCreatable=False}">
@@ -24,47 +26,60 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-
-            <dxe:SearchControl x:Name="searchControl" 
-                                            Grid.Row="0"
-                                            Margin="0"
-                                            HorizontalAlignment="Stretch" 
-                                            VerticalAlignment="Center" 
-                                            FilterCondition="Like"
-                                            FilterByColumnsMode="Custom"
-                                            NullText="Фильтр">
-                <dxe:SearchControl.ColumnProvider>
-                    <dxe:SelectorEditColumnProvider>
-                        <dxe:SelectorEditColumnProvider.CustomColumns>
-                            <sys:String>Name</sys:String>
-                        </dxe:SelectorEditColumnProvider.CustomColumns>
-                    </dxe:SelectorEditColumnProvider>
-                </dxe:SearchControl.ColumnProvider>
-            </dxe:SearchControl>
-
-            <dxe:CheckEdit Grid.Row="1" 
-                           EditValue="{Binding ShowOnlySelectedCategories}" 
-                           Content="Скрыть неотмеченные категории">
-                <dxmvvm:Interaction.Behaviors>
-                    <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding RefreshCommand}"/>
-                </dxmvvm:Interaction.Behaviors>
+            
+            <dxe:CheckEdit Name="_che"
+                           Grid.Row="1" 
+                           Content="Скрыть неотмеченные категории"
+                           Checked="_che_Checked"
+                           Unchecked="_che_Checked">
             </dxe:CheckEdit>
 
-            <dxe:ListBoxEdit 
-                x:Name="lbCat" 
+            <dxg:GridControl
+                x:Name="_dg"
                 Grid.Row="2"
-                DisplayMember="Name"
-                SelectionMode="Multiple"
-                ItemsSource="{Binding CategoriesView.View, UpdateSourceTrigger=PropertyChanged}"
-                EditValue="{Binding SelectedObjectCategories, UpdateSourceTrigger=PropertyChanged}"
-                FilterCriteria="{Binding ElementName=searchControl, Path=FilterCriteria}">
-                <dxe:ListBoxEdit.StyleSettings>
-                    <dxe:CheckedListBoxEditStyleSettings />
-                </dxe:ListBoxEdit.StyleSettings>
+                SelectionMode="Row"
+                ItemsSource="{Binding Categories, UpdateSourceTrigger=PropertyChanged}"
+                CustomRowFilter="_dg_CustomRowFilter"
+                >
+                <dxg:GridControl.View>
+                    <dxg:TableView 
+                        AutoWidth="True" 
+                        AllowGrouping="False" 
+                        SearchPanelAllowFilter="True" 
+                        ShowSearchPanelMode="Always" 
+                        ShowGroupPanel="False"
+                        IsSynchronizedWithCurrentItem="True">
+                    </dxg:TableView>
+                </dxg:GridControl.View>
+                <dxg:GridControl.Columns>
+                    <dxg:GridColumn x:Name="_checkColumn" 
+                                    FieldName="IsSelected"
+                                    Width="43" 
+                                    MaxWidth="43" 
+                                    MinWidth="43" 
+                                    AllowResizing="False" 
+                                    AllowSorting="False" 
+                                    Header=""
+                                    ShowCheckBoxInHeader="True">
+                        <dxg:GridColumn.CellTemplate>
+                            <DataTemplate DataType="{x:Type vm:CategoryViewModel}">
+                                <dxe:CheckEdit Name="PART_Editor" HorizontalAlignment="Center" Margin="0 -3 0 -3" EditValue="{Binding Row.IsSelected, UpdateSourceTrigger=PropertyChanged}">
+                                    <!--<dxmvvm:Interaction.Behaviors>
+                                        <dxmvvm:EventToCommand EventName="EditValueChanged" 
+                                                       Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type dxg:GridControl}}, Path=DataContext.SelectedCategoriesChangedCommand}"
+                                                               CommandParameter="{Binding ElementName=PART_Editor, Path=DataContext}"/>
+                                    </dxmvvm:Interaction.Behaviors>-->
+                                </dxe:CheckEdit>
+                            </DataTemplate>
+                        </dxg:GridColumn.CellTemplate>
+                    </dxg:GridColumn>
+                    <dxg:GridColumn ReadOnly="True" Header="Наименование" FieldName="Name"/>
+                </dxg:GridControl.Columns>
                 <dxmvvm:Interaction.Behaviors>
-                    <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding SelectedCategoriesChangedCommand}" />
+                    <dxmvvm:ReadOnlyDependencyPropertyBindingBehavior Property="VisibleItems" Binding="{Binding VisibleItems, Mode=OneWayToSource}"/>
                 </dxmvvm:Interaction.Behaviors>
-            </dxe:ListBoxEdit>
+            </dxg:GridControl>
+
         </Grid>
     </Grid>
 </UserControl>

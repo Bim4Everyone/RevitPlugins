@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 using Autodesk.Revit.DB;
 
@@ -20,6 +22,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
     internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INamedViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly Filter _filter;
+        private readonly Delay _delay;
+        private int _selectedCategoryCount;
         private string _id;
         private string _name;
         private SetViewModel _set;
@@ -28,7 +32,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private bool _canSelectCategories;
         private bool? _isAllCategoriesSelected;
         private bool _showOnlySelectedCategories;
-        private CollectionViewSource _categoriesView;
+        private bool _isMassSelection;
+
 
         public FilterViewModel(RevitRepository revitRepository) {
             _id = Guid.NewGuid().ToString();
@@ -38,9 +43,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             InitializeCategories();
             InitializeSet();
 
-            SelectedCategoriesChangedCommand =
-                new RelayCommand(SelectedCategoriesChanged, CanSelectedCategoriesChange);
-            RefreshCommand = new RelayCommand(RefreshView);
+
+            _delay = new Delay(250, SelectedCategoriesChanged);
         }
 
         public FilterViewModel(RevitRepository revitRepository, Filter filter) {
@@ -52,14 +56,9 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             InitializeCategories(_filter.CategoryIds);
             InitializeSet(_filter.Set);
 
-            SelectedObjectCategories = new List<object>(_filter.CategoryIds
-                .Select(id => new CategoryViewModel(_revitRepository.GetCategory((BuiltInCategory) id))));
 
-            SelectedCategoriesChangedCommand =
-                new RelayCommand(SelectedCategoriesChanged, CanSelectedCategoriesChange);
-            RefreshCommand = new RelayCommand(RefreshView);
+            _delay = new Delay(250, SelectedCategoriesChanged);
         }
-
 
         public string Name {
             get => _name;
@@ -76,6 +75,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             set => this.RaiseAndSetIfChanged(ref _showOnlySelectedCategories, value);
         }
 
+        public bool IsMassSelection { 
+            get => _isMassSelection; 
+            set => this.RaiseAndSetIfChanged(ref _isMassSelection, value);
+        }
+
         public bool? IsAllCategoriesSelected {
             get => _isAllCategoriesSelected;
             set => this.RaiseAndSetIfChanged(ref _isAllCategoriesSelected, value);
@@ -84,7 +88,6 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public bool IsInitialized { get; set; }
         public bool IsSelectedFilterChanged { get; set; }
 
-        public ICommand RefreshCommand { get; }
         public ICommand SelectedCategoriesChangedCommand { get; }
 
         public SetViewModel Set {
@@ -92,19 +95,14 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             set => this.RaiseAndSetIfChanged(ref _set, value);
         }
 
-        public CollectionViewSource CategoriesView {
-            get => _categoriesView;
-            set => this.RaiseAndSetIfChanged(ref _categoriesView, value);
-        }
-
         public ObservableCollection<CategoryViewModel> Categories {
             get => _categories;
             set => this.RaiseAndSetIfChanged(ref _categories, value);
         }
 
-        public IEnumerable<CategoryViewModel> SelectedCategories => SelectedObjectCategories?.OfType<CategoryViewModel>() ?? Enumerable.Empty<CategoryViewModel>();
+        public IEnumerable<CategoryViewModel> SelectedCategories => Categories?.Where(item => item.IsSelected) ?? Enumerable.Empty<CategoryViewModel>();
 
-        public List<object> SelectedObjectCategories { get; set; } = new List<object>();
+        public ObservableCollection<object> VisibleItems { get; set; }
 
         public void InitializeFilter() {
             IsSelectedFilterChanged = true;
@@ -124,19 +122,28 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                     .Select(item => new CategoryViewModel(item))
                     .OrderBy(item => item.Name));
 
-            CategoriesView = new CollectionViewSource() { Source = Categories };
-            CategoriesView.Filter += SelectedCategoryFilter;
-            CategoriesView?.View?.Refresh();
-
-            if(ids != null) {
-                SelectedObjectCategories = new List<object>(Categories
-                    .Where(item => ids.Any(id => id == item.Category.Id.IntegerValue)));
+            foreach(var category in Categories) {
+                category.PropertyChanged += Category_PropertyChanged;
             }
 
+            if(ids != null) {
+                foreach(var category in Categories
+                    .Where(item => ids.Any(id => id == item.Category.Id.IntegerValue))) {
+                    category.IsSelected = true;
+                }
+            }
+
+            _selectedCategoryCount = SelectedCategories.Count();
             _categoriesInfoViewModel = new CategoriesInfoViewModel(_revitRepository, SelectedCategories);
 
             CanSelectCategories = true;
             IsAllCategoriesSelected = false;
+        }
+
+        private void Category_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+            if(e.PropertyName.Equals(nameof(CategoryViewModel.IsSelected))){
+                _delay.Action();
+            }
         }
 
         public Filter GetFilter() {
@@ -147,28 +154,28 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             };
         }
 
-        private void RefreshView(object p) {
-            CategoriesView?.View?.Refresh();
-        }
-
         private void SelectedCategoryFilter(object sender, FilterEventArgs e) {
             if(e.Item is CategoryViewModel category && ShowOnlySelectedCategories && !SelectedCategories.Any(item => item.Equals(category))) {
                 e.Accepted = false;
             }
         }
 
-        private void SelectedCategoriesChanged(object p) {
+        private void SelectedCategoriesChanged() {
             _categoriesInfoViewModel.Categories = new ObservableCollection<CategoryViewModel>(SelectedCategories);
             _categoriesInfoViewModel.InitializeParameters();
             Set.Renew();
+            _selectedCategoryCount = SelectedCategories.Count();
         }
 
-        private bool CanSelectedCategoriesChange(object p) {
-            if(IsSelectedFilterChanged) {
-                IsSelectedFilterChanged = false;
+        private bool CanSelectedCategoriesChanged(object p) {
+            if(IsMassSelection && !AllItemsHasCommonSelection())
                 return false;
-            }
-            return true;
+            IsMassSelection = false;
+            return SelectedCategories.Count() != _selectedCategoryCount;
+        }
+
+        private bool AllItemsHasCommonSelection() {
+            return VisibleItems.All(item => ((CategoryViewModel) item).IsSelected) || VisibleItems.All(item => !((CategoryViewModel) item).IsSelected);
         }
 
         public override bool Equals(object obj) {
@@ -181,6 +188,30 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         public bool Equals(FilterViewModel other) {
             return other != null && _id == other._id;
+        }
+    }
+
+
+    internal class Delay {
+        private readonly Action _action;
+        private readonly DispatcherTimer _timer;
+
+        public Delay(int interval, Action action) {
+            _action = action;
+
+            _timer = new DispatcherTimer();
+            _timer.Interval = new TimeSpan(0, 0, 0, 0, interval);
+            _timer.Tick += _timer_Tick;
+        }
+
+        private void _timer_Tick(object sender, EventArgs e) {
+            _timer.Stop();
+            _action();
+        }
+
+        public void Action() {
+            _timer.Stop();
+            _timer.Start();
         }
     }
 }

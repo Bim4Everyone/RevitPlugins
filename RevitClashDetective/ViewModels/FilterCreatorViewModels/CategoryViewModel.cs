@@ -13,12 +13,17 @@ using RevitClashDetective.Models;
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
     internal class CategoryViewModel : BaseViewModel, IEquatable<CategoryViewModel> {
         private string _name;
+        private bool _isSelected;
 
         public CategoryViewModel(Category category) {
             Category = category;
             Name = Category.Name;
         }
 
+        public bool IsSelected { 
+            get => _isSelected; 
+            set => this.RaiseAndSetIfChanged(ref _isSelected, value); 
+        }
         public string Name {
             get => _name;
             set => this.RaiseAndSetIfChanged(ref _name, value);

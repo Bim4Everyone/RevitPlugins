@@ -10,7 +10,7 @@
         xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
         xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
         mc:Ignorable="d"
-        Title="Имя фильтра" Height="120" Width="520"
+        Title="Имя поискового набора" Height="120" Width="520"
         WindowStartupLocation="CenterOwner"
         d:DataContext="{d:DesignInstance vm:FilterNameViewModel, IsDesignTimeCreatable=False}">
     <Grid Margin="10">
