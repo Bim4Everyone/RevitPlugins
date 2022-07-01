@@ -23,16 +23,12 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly Filter _filter;
         private readonly Delay _delay;
-        private int _selectedCategoryCount;
         private string _id;
         private string _name;
         private SetViewModel _set;
         private CategoriesInfoViewModel _categoriesInfoViewModel;
         private ObservableCollection<CategoryViewModel> _categories;
-        private bool _canSelectCategories;
         private bool? _isAllCategoriesSelected;
-        private bool _showOnlySelectedCategories;
-        private bool _isMassSelection;
 
 
         public FilterViewModel(RevitRepository revitRepository) {
@@ -40,11 +36,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             _revitRepository = revitRepository;
             Name = "Без имени";
 
+            _delay = new Delay(250, SelectedCategoriesChanged);
+
+
             InitializeCategories();
             InitializeSet();
-
-
-            _delay = new Delay(250, SelectedCategoriesChanged);
         }
 
         public FilterViewModel(RevitRepository revitRepository, Filter filter) {
@@ -53,31 +49,15 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             _filter = filter;
             Name = _filter.Name;
 
+            _delay = new Delay(250, SelectedCategoriesChanged);
+
             InitializeCategories(_filter.CategoryIds);
             InitializeSet(_filter.Set);
-
-
-            _delay = new Delay(250, SelectedCategoriesChanged);
         }
 
         public string Name {
             get => _name;
             set => this.RaiseAndSetIfChanged(ref _name, value);
-        }
-
-        public bool CanSelectCategories {
-            get => _canSelectCategories;
-            set => this.RaiseAndSetIfChanged(ref _canSelectCategories, value);
-        }
-
-        public bool ShowOnlySelectedCategories {
-            get => _showOnlySelectedCategories;
-            set => this.RaiseAndSetIfChanged(ref _showOnlySelectedCategories, value);
-        }
-
-        public bool IsMassSelection { 
-            get => _isMassSelection; 
-            set => this.RaiseAndSetIfChanged(ref _isMassSelection, value);
         }
 
         public bool? IsAllCategoriesSelected {
@@ -122,10 +102,6 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                     .Select(item => new CategoryViewModel(item))
                     .OrderBy(item => item.Name));
 
-            foreach(var category in Categories) {
-                category.PropertyChanged += Category_PropertyChanged;
-            }
-
             if(ids != null) {
                 foreach(var category in Categories
                     .Where(item => ids.Any(id => id == item.Category.Id.IntegerValue))) {
@@ -133,11 +109,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                 }
             }
 
-            _selectedCategoryCount = SelectedCategories.Count();
-            _categoriesInfoViewModel = new CategoriesInfoViewModel(_revitRepository, SelectedCategories);
+            foreach(var category in Categories) {
+                category.PropertyChanged += Category_PropertyChanged;
+            }
 
-            CanSelectCategories = true;
-            IsAllCategoriesSelected = false;
+            _categoriesInfoViewModel = new CategoriesInfoViewModel(_revitRepository, SelectedCategories);
         }
 
         private void Category_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
@@ -154,28 +130,10 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             };
         }
 
-        private void SelectedCategoryFilter(object sender, FilterEventArgs e) {
-            if(e.Item is CategoryViewModel category && ShowOnlySelectedCategories && !SelectedCategories.Any(item => item.Equals(category))) {
-                e.Accepted = false;
-            }
-        }
-
         private void SelectedCategoriesChanged() {
             _categoriesInfoViewModel.Categories = new ObservableCollection<CategoryViewModel>(SelectedCategories);
             _categoriesInfoViewModel.InitializeParameters();
             Set.Renew();
-            _selectedCategoryCount = SelectedCategories.Count();
-        }
-
-        private bool CanSelectedCategoriesChanged(object p) {
-            if(IsMassSelection && !AllItemsHasCommonSelection())
-                return false;
-            IsMassSelection = false;
-            return SelectedCategories.Count() != _selectedCategoryCount;
-        }
-
-        private bool AllItemsHasCommonSelection() {
-            return VisibleItems.All(item => ((CategoryViewModel) item).IsSelected) || VisibleItems.All(item => !((CategoryViewModel) item).IsSelected);
         }
 
         public override bool Equals(object obj) {

@@ -109,7 +109,6 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             } else {
                 return SelectedParameter == null || SelectedRuleEvaluator == null;
             }
-
         }
 
         public string GetErrorText() {
