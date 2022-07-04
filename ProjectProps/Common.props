@@ -6,7 +6,7 @@
         <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
         <UseWPF>true</UseWPF>
         <Platforms>x64</Platforms>
-        <Configurations>D2020;D2021;D2022;D2023R2020;R2021;R2022;R2023</Configurations>
+        <Configurations>D2020;D2021;D2022;D2023;R2020;R2021;R2022;R2023</Configurations>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration.StartsWith(`D`))'">
