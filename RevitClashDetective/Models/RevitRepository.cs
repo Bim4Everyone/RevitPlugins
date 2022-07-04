@@ -181,6 +181,10 @@ namespace RevitClashDetective.Models {
             return linkedDocuments;
         }
 
+        public bool IsValidElement(Document doc, ElementId elementId) {
+            return doc.GetElement(elementId) != null;
+        }
+
         public void SelectElements(IEnumerable<Element> elements) {
             var selection = _uiApplication.ActiveUIDocument.Selection;
             selection.SetElementIds(elements.Select(e => e.Id).ToList());

@@ -33,22 +33,23 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel>
+        <DockPanel LastChildFill="True">
+            <DockPanel.Style>
+                <Style TargetType="DockPanel">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding FileNames}" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DockPanel.Style>
+            <dx:SimpleButton DockPanel.Dock="Left" ToolTip="Синхронизировать плагин с документом" Command="{Binding SelectionChangedCommand}" Glyph="{dx:DXImage 'Office2013/Actions/Refresh_32x32.png'}"/>
             <dxe:ComboBoxEdit IsTextEditable="False" ItemsSource="{Binding FileNames}" SelectedItem="{Binding SelectedFile}" >
                 <mvvm:Interaction.Behaviors>
                     <mvvm:EventToCommand EventName="EditValueChanged" Command="{Binding SelectionChangedCommand}"/>
                 </mvvm:Interaction.Behaviors>
-                <dxe:ComboBoxEdit.Style>
-                    <Style TargetType="dxe:ComboBoxEdit">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding FileNames}" Value="{x:Null}">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </dxe:ComboBoxEdit.Style>
             </dxe:ComboBoxEdit>
-        </StackPanel>
+        </DockPanel>
 
         <dxg:GridControl Name="_dg"
                   Grid.Row="1" 

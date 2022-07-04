@@ -34,7 +34,10 @@ namespace RevitClashDetective.Models.Clashes {
             BoundingBoxXYZ bb1 = null;
             BoundingBoxXYZ bb2 = null;
 
-            if(mainDoc != null && otherDoc != null) {
+            if(mainDoc != null 
+                && otherDoc != null 
+                && _revitRepository.IsValidElement(mainDoc.Doc, new ElementId(MainElement.Id)) 
+                && _revitRepository.IsValidElement(otherDoc.Doc, new ElementId(OtherElement.Id))) {
                 bb1 = SolidUtils.CreateTransformed(mainDoc.Doc.GetElement(new ElementId(MainElement.Id)).GetSolid(), mainDoc.Transform).GetBoundingBox().GetTransformedBoundingBox();
                 bb2 = SolidUtils.CreateTransformed(otherDoc.Doc.GetElement(new ElementId(OtherElement.Id)).GetSolid(), otherDoc.Transform).GetBoundingBox().GetTransformedBoundingBox();
                 if(bb1 == null && bb2 == null) {

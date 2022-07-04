@@ -117,7 +117,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private bool IsValid(List<string> documentNames, ClashViewModel clash) {
             var clashDocuments = new[] { clash.FirstDocumentName, clash.SecondDocumentName };
-            return clashDocuments.All(item => documentNames.Any(d => d.Contains(item)));
+            return clashDocuments.All(item => documentNames.Any(d => d.Contains(item))) && clash.GetBoundingBox() != null;
         }
 
         private async void SelectClash(object p) {
