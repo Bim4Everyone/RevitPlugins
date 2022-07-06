@@ -24,7 +24,6 @@ namespace RevitSuperfilter.ViewModels {
 
         private string _filterValue;
         private string _buttonFilterName;
-        private bool _currentSelection = true;
         private ICollectionView _parametersView;
         private readonly RevitRepository _revitRepository;
 

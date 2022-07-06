@@ -13,6 +13,7 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -124,7 +125,16 @@ namespace RevitClashDetective.ViewModels.Navigator {
             var clash = p as ClashViewModel;
             if(clash == null)
                 return;
-            await _revitRepository.SelectAndShowElement(clash.GetElementIds(_revitRepository.Doc.Title), clash.GetBoundingBox());
+            try {
+                await _revitRepository.SelectAndShowElement(clash.GetElementIds(_revitRepository.Doc.Title), clash.GetBoundingBox());
+            } catch(Exception ex) {
+                await GetPlatformService<INotificationService>()
+                    .CreateFatalNotification("C#", "Ошибка выполнения команды.")
+                   .ShowAsync();
+
+                GetPlatformService<ILoggerService>()
+                    .Warning(ex, "Ошибка выполнения команды.");
+            }
         }
 
         private async void SaveConfig(object p) {

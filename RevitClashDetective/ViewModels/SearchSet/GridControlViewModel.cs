@@ -47,9 +47,9 @@ namespace RevitClashDetective.ViewModels.SearchSet {
         public ICommand SelectNextCommand { get; }
         public ICommand SelectPreviousCommand { get; }
         public ICommand RenewCountCommand { get; }
-        public int ElementsCount { 
-            get => _elementsCount; 
-            set => this.RaiseAndSetIfChanged(ref _elementsCount, value); 
+        public int ElementsCount {
+            get => _elementsCount;
+            set => this.RaiseAndSetIfChanged(ref _elementsCount, value);
         }
 
         private void InitializeColumns() {
@@ -67,11 +67,14 @@ namespace RevitClashDetective.ViewModels.SearchSet {
                 IDictionary<string, object> row = new ExpandoObject();
                 foreach(var provider in _providers) {
                     string value = provider.GetElementParamValue(_categoryIds.ToArray(), element).DisplayValue;
-                    if(double.TryParse(value, out double resultValue) && resultValue != 0) {
+                    if((provider.StorageType == StorageType.Integer || provider.StorageType == StorageType.Double) 
+                        && double.TryParse(value, out double resultValue) 
+                        && resultValue != 0) {
                         AddValue(row, provider.Name, resultValue);
                     } else if(!string.IsNullOrEmpty(value) && value != "0") {
                         AddValue(row, provider.Name, value);
                     }
+
                 }
                 row.Add("File", _revitRepository.GetDocumentName(element.Document));
                 row.Add("Category", element?.Category?.Name);

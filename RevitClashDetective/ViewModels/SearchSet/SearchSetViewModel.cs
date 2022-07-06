@@ -33,7 +33,8 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             var docs = _revitRepository.GetDocuments().ToList();
             foreach(var doc in docs) {
                 var filter = Filter.GetRevitFilter(doc, FilterGenerator);
-                elements.AddRange(_revitRepository.GetFilteredElements(doc, Filter.CategoryIds.Select(item => new ElementId(item)), filter).Where(item=>item!=null && item.IsValidObject).ToList());
+                var elems = _revitRepository.GetFilteredElements(doc, Filter.CategoryIds.Select(item => new ElementId(item)), filter).Where(item => item != null && item.IsValidObject).ToList();
+                elements.AddRange(elems);
             }
 
             Grid = new GridControlViewModel(_revitRepository, Filter, elements);

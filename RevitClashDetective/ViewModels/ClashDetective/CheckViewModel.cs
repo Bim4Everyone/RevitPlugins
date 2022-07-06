@@ -86,12 +86,24 @@ namespace RevitClashDetective.ViewModels {
         private string ReportName => $"{_revitRepository.GetDocumentName()}_{Name}";
 
         public List<ClashModel> GetClashes() {
-            var mainProviders = FirstSelection
-                .GetProviders()
-                .ToList();
-            var otherProviders = SecondSelection
-                .GetProviders()
-                .ToList();
+            List<IProvider> mainProviders, otherProviders;
+
+            if(FirstSelection.SelectedFiles.Any(item => item.Name.Equals(_revitRepository.GetDocumentName()))) {
+                mainProviders = FirstSelection
+                    .GetProviders()
+                    .ToList();
+                otherProviders = SecondSelection
+                    .GetProviders()
+                    .ToList();
+            } else {
+                mainProviders = SecondSelection
+                    .GetProviders()
+                    .ToList();
+                otherProviders = FirstSelection
+                    .GetProviders()
+                    .ToList();
+            }
+
             var clashDetector = new ClashDetector(_revitRepository, mainProviders, otherProviders);
             return clashDetector.FindClashes();
         }

@@ -12,8 +12,10 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitClashDetective.Handlers;
 using RevitClashDetective.Models.Clashes;
@@ -166,8 +168,20 @@ namespace RevitClashDetective.Models {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(RevitLinkInstance))
                 .Cast<RevitLinkInstance>()
-                .Where(item => item.GetLinkDocument() != null)
+                .Where(item => item.GetLinkDocument() != null && IsParentLink(item))
                 .ToList();
+        }
+
+        private bool IsParentLink(RevitLinkInstance link) {
+            if(link.GetTypeId().IsNotNull()) {
+                var type = _document.GetElement(link.GetTypeId());
+                if(type is RevitLinkType linkType) {
+                    return !linkType.IsNestedLink;
+                } else {
+                    return false;
+                }
+            }
+            return false;
         }
 
         public List<DocInfo> GetDocInfos() {
@@ -253,7 +267,16 @@ namespace RevitClashDetective.Models {
                 var command = new CreateFiltersCommand();
                 command.ExecuteCommand(_uiApplication, selectedFilter);
             };
-            await _revitEventHandler.Raise();
+            try {
+                await _revitEventHandler.Raise();
+            } catch(Exception ex) {
+                await GetPlatformService<INotificationService>()
+                   .CreateFatalNotification("C#", "Ошибка выполнения команды.")
+                  .ShowAsync();
+
+                GetPlatformService<ILoggerService>()
+                    .Warning(ex, "Ошибка выполнения команды.");
+            }
         }
 
         public async void OpenClashDetectorWindow() {
@@ -261,7 +284,16 @@ namespace RevitClashDetective.Models {
                 var command = new DetectiveClashesCommand();
                 command.ExecuteCommand(_uiApplication);
             };
-            await _revitEventHandler.Raise();
+            try {
+                await _revitEventHandler.Raise();
+            } catch(Exception ex) {
+                await GetPlatformService<INotificationService>()
+                  .CreateFatalNotification("C#", "Ошибка выполнения команды.")
+                 .ShowAsync();
+
+                GetPlatformService<ILoggerService>()
+                    .Warning(ex, "Ошибка выполнения команды.");
+            }
         }
 
         public Transform GetLinkedDocumentTransform(string documTitle) {
@@ -295,15 +327,18 @@ namespace RevitClashDetective.Models {
             if(bb == null)
                 return;
             using(Transaction t = _document.StartTransaction("Подрезка")) {
-                bb.Max = bb.Max + new XYZ(1, 1, 1);
-                bb.Min = bb.Min - new XYZ(1, 1, 1);
+                bb.Max = bb.Max + new XYZ(5, 5, 5);
+                bb.Min = bb.Min - new XYZ(5, 5, 5);
                 _view.SetSectionBox(bb);
                 var uiView = _uiDocument.GetOpenUIViews().FirstOrDefault(item => item.ViewId == _view.Id);
                 if(uiView != null) {
-                    uiView.ZoomAndCenterRectangle(bb.Min - new XYZ(1, 1, 1), bb.Max + new XYZ(1, 1, 1));
+                    uiView.ZoomAndCenterRectangle(bb.Min, bb.Max);
                 }
                 t.Commit();
             }
+        }
+        protected T GetPlatformService<T>() {
+            return ServicesProvider.GetPlatformService<T>();
         }
     }
 }
