@@ -141,6 +141,12 @@ namespace RevitClashDetective.Models {
                 .ToList();
         }
 
+        public List<WorksetCollector> GetWorksetCollectors() {
+            return GetDocuments()
+                .Select(item => new WorksetCollector(item))
+                .ToList();
+        }
+
         public View3D GetNavisworksView(Document doc) {
             return new FilteredElementCollector(doc)
                 .OfClass(typeof(View3D))
@@ -217,11 +223,12 @@ namespace RevitClashDetective.Models {
 
         public List<ParameterValueProvider> GetParameters(Document doc, IEnumerable<Category> categories) {
             return categories
-            .SelectMany(item => ParameterFilterUtilities.GetFilterableParametersInCommon(doc, new[] { item.Id }).Select(p => GetParam(doc, item, p)))
-            .GroupBy(item => item.Name)
-            .Where(item => item.Count() > categories.Count() - 1)
-            .SelectMany(item => FilterParamProviders(item))
-            .ToList();
+                .SelectMany(item => ParameterFilterUtilities.GetFilterableParametersInCommon(doc, new[] { item.Id }).Select(p => GetParam(doc, item, p)))
+                .Where(item => item.RevitParam.Id != Enum.GetName(typeof(BuiltInParameter), BuiltInParameter.ELEM_PARTITION_PARAM))
+                .GroupBy(item => item.Name)
+                .Where(item => item.Count() > categories.Count() - 1)
+                .SelectMany(item => FilterParamProviders(item))
+                .ToList();
         }
 
         public IEnumerable<Document> GetDocuments() {
@@ -237,9 +244,9 @@ namespace RevitClashDetective.Models {
 
         public IEnumerable<Element> GetFilteredElements(Document doc, IEnumerable<ElementId> categories, ElementFilter filter) {
             return new FilteredElementCollector(doc)
-                    .WherePasses(new ElementMulticategoryFilter(categories.ToList()))
-                    .WhereElementIsNotElementType()
-                    .WherePasses(filter);
+                .WherePasses(new ElementMulticategoryFilter(categories.ToList()))
+                .WhereElementIsNotElementType()
+                .WherePasses(filter);
         }
 
 
@@ -337,6 +344,7 @@ namespace RevitClashDetective.Models {
                 t.Commit();
             }
         }
+
         protected T GetPlatformService<T>() {
             return ServicesProvider.GetPlatformService<T>();
         }

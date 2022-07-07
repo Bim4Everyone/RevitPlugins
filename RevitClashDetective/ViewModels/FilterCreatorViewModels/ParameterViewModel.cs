@@ -33,7 +33,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         public ParameterViewModel(IFilterableValueProvider filterableValueProvider) {
             FilterableValueProvider = new ProviderViewModel(filterableValueProvider);
-            Name = FilterableValueProvider.Name;
+            Name = FilterableValueProvider.DisplayValue;
         }
 
         public IEnumerable<RuleEvaluator> GetEvaluators() {

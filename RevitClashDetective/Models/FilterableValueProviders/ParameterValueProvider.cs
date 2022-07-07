@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SystemParams;
+using dosymep.Revit;
 using dosymep.Revit.Comparators;
 
 using pyRevitLabs.Json;
@@ -51,7 +51,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
         }
 
         public IEnumerable<RuleEvaluator> GetRuleEvaluators() {
-            return RuleEvaluatorUtils.GetRuleEvaluators(RevitParam.StorageType);
+            return RuleEvaluatorUtils.GetRuleEvaluators(StorageType);
         }
 
         public IEnumerable<ParamValue> GetValues(Category[] categories, RuleEvaluator ruleEvaluator) {
@@ -67,11 +67,11 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
 
         private IEnumerable<ParamValue> GetValues(int[] categories, Collector collector, ElementMulticategoryFilter categoryFilter) {
             return collector.RevitCollector
-                .WhereElementIsNotElementType()
-                .WherePasses(categoryFilter)
-                .Where(item => item != null)
-                .Select(item => GetElementParamValue(categories, item))
-                .Where(item => item != null && item.Value != null && item.Value as ElementId != ElementId.InvalidElementId);
+                        .WhereElementIsNotElementType()
+                        .WherePasses(categoryFilter)
+                        .Where(item => item != null)
+                        .Select(item => GetElementParamValue(categories, item))
+                        .Where(item => item != null && item.Value != null && item.Value as ElementId != ElementId.InvalidElementId);
         }
 
         public ParamValue GetElementParamValue(int[] categories, Element item) {
@@ -93,7 +93,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
 
         public ParamValue GetParamValueFormString(int[] categories, string value) {
             if(RevitParam.StorageType == StorageType.Double) {
-                if(DoubleValueParser.TryParse(value, UnitType,  out double res)) {
+                if(DoubleValueParser.TryParse(value, UnitType, out double res)) {
                     return ParamValue.GetParamValue(categories, RevitParam, res.ToString(), value);
                 }
             }
@@ -107,7 +107,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
 
         public override int GetHashCode() {
             int hashCode = 208823010;
-            hashCode = hashCode * -1521134295 + EqualityComparer<StorageType>.Default.GetHashCode(RevitParam.StorageType);
+            hashCode = hashCode * -1521134295 + EqualityComparer<StorageType>.Default.GetHashCode(StorageType);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(RevitParam.Id);
             return hashCode;
@@ -115,7 +115,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
 
         public bool Equals(ParameterValueProvider other) {
             return other != null
-                && RevitParam?.StorageType == other.RevitParam?.StorageType
+                && StorageType == other.StorageType
                 && Name == other.Name
                 && RevitParam?.Id == other.RevitParam?.Id;
         }

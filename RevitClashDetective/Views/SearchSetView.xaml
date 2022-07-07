@@ -63,7 +63,7 @@
                 <dxg:GridSummaryItem SummaryType="Count"/>
             </dxg:GridControl.GroupSummary>
             <dxg:GridControl.View>
-                <dxg:TableView  x:Name="_gridView" AutoWidth="True" DataNavigatorButtons="Navigation" ShowDataNavigator="True"/>
+                <dxg:TableView  x:Name="_gridView" AutoWidth="True" DataNavigatorButtons="Navigation" ShowDataNavigator="True" AllowMergedGrouping="True"/>
 
             </dxg:GridControl.View>
             <mvvm:Interaction.Behaviors>

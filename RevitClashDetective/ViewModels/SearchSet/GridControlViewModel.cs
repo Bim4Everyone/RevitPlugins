@@ -56,7 +56,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             Columns = new ObservableCollection<ColumnViewModel>(
                 _providers.Select(item => new ColumnViewModel() {
                     FieldName = item.Name,
-                    Header = $"Параметр: { item.Name}"
+                    Header = $"Параметр: { item.DisplayValue}"
                 }).GroupBy(item => item.FieldName)
                 .Select(item => item.First()));
         }
@@ -67,8 +67,8 @@ namespace RevitClashDetective.ViewModels.SearchSet {
                 IDictionary<string, object> row = new ExpandoObject();
                 foreach(var provider in _providers) {
                     string value = provider.GetElementParamValue(_categoryIds.ToArray(), element).DisplayValue;
-                    if((provider.StorageType == StorageType.Integer || provider.StorageType == StorageType.Double) 
-                        && double.TryParse(value, out double resultValue) 
+                    if((provider.StorageType == StorageType.Integer || provider.StorageType == StorageType.Double)
+                        && double.TryParse(value, out double resultValue)
                         && resultValue != 0) {
                         AddValue(row, provider.Name, resultValue);
                     } else if(!string.IsNullOrEmpty(value) && value != "0") {
@@ -77,7 +77,8 @@ namespace RevitClashDetective.ViewModels.SearchSet {
 
                 }
                 row.Add("File", _revitRepository.GetDocumentName(element.Document));
-                row.Add("Category", element?.Category?.Name);
+                row.Add("Category", element.Category?.Name);
+                row.Add("FamilyName", element.GetTypeId().IsNotNull() ? (element.Document.GetElement(element.GetTypeId()) as ElementType)?.FamilyName : null);
                 row.Add("Name", element.Name);
                 row.Add("Id", element.Id.IntegerValue);
                 Rows.Add((ExpandoObject) row);
@@ -94,6 +95,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
 
         private void AddCommonInfo() {
             Columns.Insert(0, new ColumnViewModel() { FieldName = "Name", Header = "Имя типоразмера" });
+            Columns.Insert(0, new ColumnViewModel() { FieldName = "FamilyName", Header = "Имя семейства" });
             Columns.Insert(0, new ColumnViewModel() { FieldName = "Category", Header = "Категория" });
             Columns.Insert(0, new ColumnViewModel() { FieldName = "Id", Header = "Id" });
             Columns.Insert(0, new ColumnViewModel() { FieldName = "File", Header = "Файл" });

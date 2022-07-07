@@ -40,7 +40,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             SaveCommand = new RelayCommand(Save, CanSave);
             SaveAsCommand = new RelayCommand(SaveAs, CanSave);
             LoadCommand = new RelayCommand(Load);
-            CheckSearchSetCommand = new RelayCommand(CheckSearchSet, CanCheckSearchSet);
+            CheckSearchSetCommand = new RelayCommand(CheckSearchSet, CanSave);
         }
 
         public string ErrorText {
@@ -190,6 +190,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void CheckSearchSet(object p) {
+            Save(null);
             var filter = SelectedFilter.GetFilter();
             var vm = new SearchSetsViewModel(_revitRepository, filter);
             var view = new SearchSetView() { DataContext = vm };

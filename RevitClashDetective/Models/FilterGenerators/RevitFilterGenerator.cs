@@ -24,7 +24,7 @@ namespace RevitClashDetective.Models.FilterGenerators {
             var ruleCreator = RuleEvaluatorUtils.GetRevitRuleCreator(rule.Evaluator.Evaluator);
             var revitRule = rule.Provider.GetRule(doc, ruleCreator, rule.Value);
             if(revitRule == null) {
-                Filter = new ElementIsElementTypeFilter(false);
+                Filter = new ElementIsElementTypeFilter(inverted);
             } else {
                 Filter = new ElementParameterFilter(revitRule, inverted);
             }
