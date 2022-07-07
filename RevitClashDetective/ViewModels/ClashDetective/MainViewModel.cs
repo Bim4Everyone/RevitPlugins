@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 using Autodesk.Revit.UI;
@@ -24,8 +25,9 @@ namespace RevitClashDetective.ViewModels {
         private readonly ChecksConfig _checksConfig;
         private readonly FiltersConfig _filtersConfig;
         private readonly RevitRepository _revitRepository;
-        private ObservableCollection<CheckViewModel> _checks;
+        private bool _canCancel = true;
         private string _messageText;
+        private ObservableCollection<CheckViewModel> _checks;
 
         public MainViewModel(ChecksConfig checksConfig, FiltersConfig filtersConfig, RevitRepository revitRepository) {
             _filtersConfig = filtersConfig;
@@ -44,6 +46,11 @@ namespace RevitClashDetective.ViewModels {
             SaveClashesCommand = new RelayCommand(SaveConfig);
             SaveAsClashesCommand = new RelayCommand(SaveAsConfig);
             LoadClashCommand = new RelayCommand(LoadConfig);
+        }
+
+        public bool CanCancel { 
+            get => _canCancel; 
+            set => this.RaiseAndSetIfChanged(ref _canCancel, value); 
         }
 
         public string ErrorText {
@@ -99,11 +106,17 @@ namespace RevitClashDetective.ViewModels {
         }
 
         private async void FindClashes(object p) {
-            foreach(var check in Checks.Where(item => item.IsSelected)) {
-                check.SaveClashes();
-            }
+            CanCancel = false;
             RenewConfig();
             _checksConfig.SaveProjectConfig();
+            try {
+                foreach(var check in Checks.Where(item => item.IsSelected)) {
+                    check.SaveClashes();
+                }
+            } catch(OperationCanceledException) {
+                (p as Window)?.Close();
+            }
+            CanCancel = true;
             MessageText = "Проверка на коллизии прошла успешно";
             foreach(var check in Checks) {
                 check.IsSelected = false;

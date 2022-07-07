@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
@@ -34,16 +35,18 @@ namespace RevitClashDetective.Models.ClashDetection {
         public List<ClashModel> GetClashes() {
             using(var pb = GetPlatformService<IProgressDialogService>()) {
                 pb.StepValue = 100;
-                pb.DisplayTitleFormat = "Идет расчет... Обработано [{0}\\{1}] элементов";
+                pb.DisplayTitleFormat = "Идёт расчёт... [{0}\\{1}]";
                 var progress = pb.CreateProgress();
                 pb.MaxValue = _secondElements.Count;
+                var ct = pb.CreateCancellationToken();
+
                 pb.Show();
 
-                return GetClashes(progress);
+                return GetClashes(progress, ct);
             }
         }
 
-        private List<ClashModel> GetClashes(IProgress<int> progress) {
+        private List<ClashModel> GetClashes(IProgress<int> progress, CancellationToken ct) {
             List<ClashModel> clashes = new List<ClashModel>();
 
             if(_mainElements.Count == 0) {
@@ -55,6 +58,7 @@ namespace RevitClashDetective.Models.ClashDetection {
             var count = 0;
             foreach(var element in _secondElements) {
                 progress.Report(count++);
+                ct.ThrowIfCancellationRequested();
 
                 var solids = _secondProvider.GetSolids(element)
                     .Select(item => SolidUtils.CreateTransformed(item, resultTransform));
