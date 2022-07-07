@@ -118,10 +118,10 @@ namespace RevitClashDetective.ViewModels {
             }
             CanCancel = true;
             MessageText = "Проверка на коллизии прошла успешно";
+            await Task.Delay(3000);
             foreach(var check in Checks) {
                 check.IsSelected = false;
             }
-            await Task.Delay(3000);
             MessageText = null;
         }
 
@@ -188,6 +188,10 @@ namespace RevitClashDetective.ViewModels {
             emptyCheck = Checks.FirstOrDefault(item => !item.IsFilesSelected);
             if(emptyCheck != null) {
                 ErrorText = $"У проверки \"{emptyCheck.Name}\" необходимо выбрать хотя бы один файл.";
+                return false;
+            }
+            if(Checks.All(item => !item.IsSelected)) {
+                ErrorText = $"Для поиска коллизий должна быть выбрана хотя бы одна проверка.";
                 return false;
             }
 
