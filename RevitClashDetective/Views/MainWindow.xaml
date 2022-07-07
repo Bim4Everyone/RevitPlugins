@@ -74,7 +74,7 @@
                          Grid.Row="2" 
                          ItemsSource="{Binding Checks}">
             <dxg:GridControl.View>
-                <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always" ShowGroupPanel="False"/>
+                <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always" ShowGroupPanel="False" CellValueChanging="_gridView_CellValueChanging"/>
             </dxg:GridControl.View>
 
             <dxg:GridColumn Header="" Width="Auto" FieldName="IsSelected"/>
@@ -97,13 +97,13 @@
                     </DataTemplate>
                 </dxg:GridColumn.CellTemplate>
             </dxg:GridColumn>
-            
-            <dxg:GridColumn Header="Наименование" FieldName="Name" Width="Auto"/>
-            
+
+            <dxg:GridColumn Header="Наименование" FieldName="Name" Width="Auto" />
+
             <dxg:GridColumn Header="Выбор А" Width="*">
                 <dxg:GridColumn.CellTemplate>
                     <DataTemplate>
-                        <local:ProviderCombobBox DataContext="{Binding Row.FirstSelection}"/>
+                        <local:ProviderCombobBox DataContext="{Binding Row.FirstSelection, UpdateSourceTrigger=PropertyChanged}"/>
                     </DataTemplate>
                 </dxg:GridColumn.CellTemplate>
             </dxg:GridColumn>
@@ -111,7 +111,7 @@
             <dxg:GridColumn Header="Выбор В" Width="*">
                 <dxg:GridColumn.CellTemplate>
                     <DataTemplate DataType="{x:Type vm:CheckViewModel}">
-                        <local:ProviderCombobBox DataContext="{Binding Row.SecondSelection}"/>
+                        <local:ProviderCombobBox DataContext="{Binding Row.SecondSelection, UpdateSourceTrigger=PropertyChanged}"/>
                     </DataTemplate>
                 </dxg:GridColumn.CellTemplate>
             </dxg:GridColumn>

@@ -23,7 +23,7 @@
                           TextWrapping="Wrap"
                           DisplayMember="Name"
                           ItemsSource="{Binding Files}"
-                          EditValue="{Binding SelectedFileObjects}">
+                          EditValue="{Binding SelectedFileObjects, UpdateSourceTrigger=PropertyChanged}">
             <dxe:ComboBoxEdit.StyleSettings>
                 <dxe:CheckedComboBoxStyleSettings />
             </dxe:ComboBoxEdit.StyleSettings>
@@ -35,7 +35,7 @@
                            TextWrapping="Wrap"
                           DisplayMember="Name"
                           ItemsSource="{Binding Providers}"
-                          EditValue="{Binding SelectedProvidersObjects}">
+                          EditValue="{Binding SelectedProvidersObjects, UpdateSourceTrigger=PropertyChanged}">
             <dxe:ComboBoxEdit.StyleSettings>
                 <dxe:CheckedComboBoxStyleSettings />
             </dxe:ComboBoxEdit.StyleSettings>
