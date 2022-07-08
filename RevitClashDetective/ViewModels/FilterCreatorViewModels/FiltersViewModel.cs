@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -140,7 +141,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void Save(object p) {
-            var filtersConfig = FiltersConfig.GetFiltersConfig(_revitRepository.GetDocumentName());
+            var filtersConfig = FiltersConfig.GetFiltersConfig(Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName()));
             filtersConfig.Filters = GetFilters().ToList();
             filtersConfig.SaveProjectConfig();
             MessageText = "Поисковые наборы успешно сохранены";
@@ -148,7 +149,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void SaveAs(object p) {
-            var filtersConfig = FiltersConfig.GetFiltersConfig(_revitRepository.GetDocumentName());
+            var filtersConfig = FiltersConfig.GetFiltersConfig(Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName()));
             filtersConfig.Filters = GetFilters().ToList();
             ConfigSaver cs = new ConfigSaver();
             if(cs.Save(filtersConfig)) {
