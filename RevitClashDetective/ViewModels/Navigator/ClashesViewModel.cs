@@ -121,28 +121,19 @@ namespace RevitClashDetective.ViewModels.Navigator {
             return clashDocuments.All(item => documentNames.Any(d => d.Contains(item))) && clash.GetBoundingBox() != null;
         }
 
-        private async void SelectClash(object p) {
+        private void SelectClash(object p) {
             var clash = p as ClashViewModel;
             if(clash == null)
                 return;
-            try {
-                await _revitRepository.SelectAndShowElement(clash.GetElementIds(_revitRepository.Doc.Title), clash.GetBoundingBox());
-            } catch(Exception ex) {
-                await GetPlatformService<INotificationService>()
-                    .CreateFatalNotification("C#", "Ошибка выполнения команды.")
-                   .ShowAsync();
 
-                GetPlatformService<ILoggerService>()
-                    .Warning(ex, "Ошибка выполнения команды.");
-            }
+            _revitRepository.SelectAndShowElement(clash.GetElementIds(_revitRepository.Doc.Title), clash.GetBoundingBox());
         }
 
-        private async void SaveConfig(object p) {
+        private void SaveConfig(object p) {
             var config = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), SelectedFile);
             config.Clashes = Clashes.Select(item => GetUpdatedClash(item)).ToList();
             config.SaveProjectConfig();
             Message = "Файл успешно сохранен";
-            await Task.Delay(3000);
             Message = null;
         }
 

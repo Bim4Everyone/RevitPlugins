@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 using Autodesk.Revit.UI;
 
@@ -48,9 +49,9 @@ namespace RevitClashDetective.ViewModels {
             LoadClashCommand = new RelayCommand(LoadConfig);
         }
 
-        public bool CanCancel { 
-            get => _canCancel; 
-            set => this.RaiseAndSetIfChanged(ref _canCancel, value); 
+        public bool CanCancel {
+            get => _canCancel;
+            set => this.RaiseAndSetIfChanged(ref _canCancel, value);
         }
 
         public string ErrorText {
@@ -105,24 +106,24 @@ namespace RevitClashDetective.ViewModels {
             return (p as CheckViewModel) != null;
         }
 
-        private async void FindClashes(object p) {
+        private void FindClashes(object p) {
             CanCancel = false;
             RenewConfig();
             _checksConfig.SaveProjectConfig();
-            try {
-                foreach(var check in Checks.Where(item => item.IsSelected)) {
-                    check.SaveClashes();
-                }
-            } catch(OperationCanceledException) {
-                (p as Window)?.Close();
+
+            foreach(var check in Checks.Where(item => item.IsSelected)) {
+                check.SaveClashes();
             }
+
             CanCancel = true;
             MessageText = "Проверка на коллизии прошла успешно";
-            await Task.Delay(3000);
-            foreach(var check in Checks) {
-                check.IsSelected = false;
-            }
-            MessageText = null;
+            Wait(() => {
+                foreach(var check in Checks) {
+                    check.IsSelected = false;
+                }
+                MessageText = null;
+                CanFindClashes(null);
+            });
         }
 
         private void RenewConfig() {
@@ -136,25 +137,23 @@ namespace RevitClashDetective.ViewModels {
             }
         }
 
-        private async void SaveConfig(object p) {
+        private void SaveConfig(object p) {
             RenewConfig();
             _checksConfig.SaveProjectConfig();
             MessageText = "Файл проверок успешно сохранен";
-            await Task.Delay(3000);
-            MessageText = null;
+            Wait(() => { MessageText = null; });
         }
 
-        private async void SaveAsConfig(object p) {
+        private void SaveAsConfig(object p) {
             RenewConfig();
             ConfigSaver s = new ConfigSaver();
             if(s.Save(_checksConfig)) {
                 MessageText = "Файл проверок успешно сохранен";
-                await Task.Delay(3000);
-                MessageText = null;
+                Wait(() => { MessageText = null; });
             }
         }
 
-        private async void LoadConfig(object p) {
+        private void LoadConfig(object p) {
             var cl = new ConfigLoader();
             var config = cl.Load<ChecksConfig>();
             if(config == null) {
@@ -164,8 +163,7 @@ namespace RevitClashDetective.ViewModels {
             var nameResolver = new NameResolver<CheckViewModel>(Checks, newChecks);
             Checks = new ObservableCollection<CheckViewModel>(nameResolver.GetCollection());
             MessageText = "Файл проверок успешно загружен";
-            await Task.Delay(3000);
-            MessageText = null;
+            Wait(() => { MessageText = null; });
         }
 
         private bool HasSameNames() {
@@ -197,6 +195,13 @@ namespace RevitClashDetective.ViewModels {
 
             ErrorText = null;
             return true;
+        }
+
+        private void Wait(Action action) {
+            var timer = new DispatcherTimer();
+            timer.Interval = new TimeSpan(0, 0, 0, 3);
+            timer.Tick += (s, a) => { action(); timer.Stop(); };
+            timer.Start();
         }
     }
 }

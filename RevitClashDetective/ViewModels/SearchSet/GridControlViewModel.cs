@@ -37,7 +37,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             InitializeRows();
             AddCommonInfo();
 
-            SelectCommand = new RelayCommand(async p => await SelectElement(p));
+            SelectCommand = new RelayCommand(p => SelectElement(p));
         }
 
         public ObservableCollection<ColumnViewModel> Columns { get; set; }
@@ -101,7 +101,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             Columns.Insert(0, new ColumnViewModel() { FieldName = "File", Header = "Файл" });
         }
 
-        private async Task SelectElement(object p) {
+        private void SelectElement(object p) {
             var row = p as ExpandoObject;
             if(row == null)
                 return;
@@ -114,7 +114,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
                 var element = GetElement(id, resultFile.ToString());
                 var bb = GetBoundingBox(element);
                 if(bb != null) {
-                    await _revitRepository.SelectAndShowElement(GetElementId(element), bb);
+                    _revitRepository.SelectAndShowElement(GetElementId(element), bb);
                 }
             }
         }

@@ -250,7 +250,7 @@ namespace RevitClashDetective.Models {
         }
 
 
-        public async Task SelectAndShowElement(IEnumerable<ElementId> ids, BoundingBoxXYZ bb) {
+        public void SelectAndShowElement(IEnumerable<ElementId> ids, BoundingBoxXYZ bb) {
             if(_document.ActiveView != _view) {
                 _uiDocument.ActiveView = _view;
             }
@@ -266,41 +266,25 @@ namespace RevitClashDetective.Models {
                 }
             };
 
-            await _revitEventHandler.Raise();
+            _revitEventHandler.Raise();
         }
 
-        public async void OpenFilterCreationWindow(string selectedFilter) {
+        public void OpenFilterCreationWindow(string selectedFilter) {
             _revitEventHandler.TransactAction = () => {
                 var command = new CreateFiltersCommand();
                 command.ExecuteCommand(_uiApplication, selectedFilter);
             };
-            try {
-                await _revitEventHandler.Raise();
-            } catch(Exception ex) {
-                await GetPlatformService<INotificationService>()
-                   .CreateFatalNotification("C#", "Ошибка выполнения команды.")
-                  .ShowAsync();
 
-                GetPlatformService<ILoggerService>()
-                    .Warning(ex, "Ошибка выполнения команды.");
-            }
+            _revitEventHandler.Raise();
         }
 
-        public async void OpenClashDetectorWindow() {
+        public void OpenClashDetectorWindow() {
             _revitEventHandler.TransactAction = () => {
                 var command = new DetectiveClashesCommand();
                 command.ExecuteCommand(_uiApplication);
             };
-            try {
-                await _revitEventHandler.Raise();
-            } catch(Exception ex) {
-                await GetPlatformService<INotificationService>()
-                  .CreateFatalNotification("C#", "Ошибка выполнения команды.")
-                 .ShowAsync();
 
-                GetPlatformService<ILoggerService>()
-                    .Warning(ex, "Ошибка выполнения команды.");
-            }
+            _revitEventHandler.Raise();
         }
 
         public Transform GetLinkedDocumentTransform(string documTitle) {

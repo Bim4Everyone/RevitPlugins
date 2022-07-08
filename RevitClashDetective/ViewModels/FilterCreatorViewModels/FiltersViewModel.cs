@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 using Autodesk.Revit.UI;
 
@@ -23,15 +24,17 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly FiltersConfig _config;
         private ObservableCollection<FilterViewModel> _filters;
-        private FilterViewModel _selectedFilter;
         private string _errorText;
         private string _messageText;
+        private DispatcherTimer _timer;
+        private FilterViewModel _selectedFilter;
 
         public FiltersViewModel(RevitRepository revitRepository, FiltersConfig config) {
             _revitRepository = revitRepository;
             _config = config;
 
             InitializeFilters();
+            InitializeTimer();
 
             SelectedFilterChangedCommand = new RelayCommand(SelectedFilterChanged, CanSelectedFilterChanged);
             CreateCommand = new RelayCommand(Create);
@@ -136,23 +139,21 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             return SelectedFilter != null;
         }
 
-        private async void Save(object p) {
+        private void Save(object p) {
             var filtersConfig = FiltersConfig.GetFiltersConfig(_revitRepository.GetDocumentName());
             filtersConfig.Filters = GetFilters().ToList();
             filtersConfig.SaveProjectConfig();
             MessageText = "Поисковые наборы успешно сохранены";
-            await Task.Delay(3000);
-            MessageText = null;
+            RefreshMessage();
         }
 
-        private async void SaveAs(object p) {
+        private void SaveAs(object p) {
             var filtersConfig = FiltersConfig.GetFiltersConfig(_revitRepository.GetDocumentName());
             filtersConfig.Filters = GetFilters().ToList();
             ConfigSaver cs = new ConfigSaver();
             if(cs.Save(filtersConfig)) {
                 MessageText = "Поисковые наборы успешно сохранены";
-                await Task.Delay(3000);
-                MessageText = null;
+                RefreshMessage();
             }
         }
 
@@ -175,7 +176,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             return true;
         }
 
-        private async void Load(object p) {
+        private void Load(object p) {
             var cl = new ConfigLoader();
             var config = cl.Load<FiltersConfig>();
             if(config == null) {
@@ -185,8 +186,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             var nameResolver = new NameResolver<FilterViewModel>(Filters, newFilters);
             Filters = new ObservableCollection<FilterViewModel>(nameResolver.GetCollection());
             MessageText = "Файл поисковых наборов успешно загружен";
-            await Task.Delay(3000);
-            MessageText = null;
+            RefreshMessage();
         }
 
         private void CheckSearchSet(object p) {
@@ -197,10 +197,14 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             view.Show();
         }
 
-        private bool CanCheckSearchSet(object p) {
-            return SelectedFilter != null
-                && !SelectedFilter.Set.IsEmpty()
-                && string.IsNullOrEmpty(SelectedFilter?.Set?.GetErrorText());
+        private void InitializeTimer() {
+            _timer = new DispatcherTimer();
+            _timer.Interval = new TimeSpan(0, 0, 0, 3);
+            _timer.Tick += (s, a) => { MessageText = null; _timer.Stop(); };
+        }
+
+        private void RefreshMessage() {
+            _timer.Start();
         }
     }
 }

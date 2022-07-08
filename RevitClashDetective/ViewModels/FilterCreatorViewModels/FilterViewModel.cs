@@ -38,7 +38,6 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
             _delay = new Delay(250, SelectedCategoriesChanged);
 
-
             InitializeCategories();
             InitializeSet();
         }
@@ -148,7 +147,6 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             return other != null && _id == other._id;
         }
     }
-
 
     internal class Delay {
         private readonly Action _action;
