@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 using Autodesk.Revit.DB;
 
@@ -29,6 +30,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private List<ClashViewModel> _clashes;
         private CollectionViewSource _clashesViewSource;
         private bool _openFromClashDetector;
+        private DispatcherTimer _timer;
 
         public ClashesViewModel(RevitRepository revitRepository, string selectedFile = null) {
             _revitRepository = revitRepository;
@@ -41,6 +43,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
             ClashesViewSource = new CollectionViewSource();
             InitializeClashesFromFile();
+            InitializeTimer();
 
             SelectionChangedCommand = new RelayCommand(SelectionChanged);
             SelectClashCommand = new RelayCommand(SelectClash);
@@ -134,7 +137,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             config.Clashes = Clashes.Select(item => GetUpdatedClash(item)).ToList();
             config.SaveProjectConfig();
             Message = "Файл успешно сохранен";
-            Message = null;
+            RefreshMessage();
         }
 
         private bool CanSaveConfig(object p) {
@@ -159,6 +162,16 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private void OpenClashDetector(object p) {
             _revitRepository.OpenClashDetectorWindow();
+        }
+
+        private void InitializeTimer() {
+            _timer = new DispatcherTimer();
+            _timer.Interval = new TimeSpan(0, 0, 0, 3);
+            _timer.Tick += (s, a) => { Message = null; _timer.Stop(); };
+        }
+
+        private void RefreshMessage() {
+            _timer.Start();
         }
     }
 }

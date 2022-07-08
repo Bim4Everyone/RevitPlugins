@@ -92,7 +92,7 @@
         <StackPanel Grid.Row="2" Margin="0 10 0 0" Orientation="Horizontal"
                     HorizontalAlignment="Right">
             <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding Message}"
-                          Foreground="Orange" />
+                          Foreground="Green" />
             <dx:SimpleButton Content="Сохранить" Height="25" Width="80" Margin="10 0" IsDefault="True"
                              Command="{Binding SaveCommand}" />
             <dx:SimpleButton Content="Отмена" Height="25" Width="80"  IsCancel="true"
