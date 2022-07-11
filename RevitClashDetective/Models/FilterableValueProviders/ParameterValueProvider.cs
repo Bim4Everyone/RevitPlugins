@@ -92,7 +92,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
         }
 
         public ParamValue GetParamValueFormString(int[] categories, string value) {
-            if(RevitParam.StorageType == StorageType.Double) {
+            if(RevitParam.StorageType == StorageType.Double && value != null) {
                 if(DoubleValueParser.TryParse(value, UnitType, out double res)) {
                     return ParamValue.GetParamValue(categories, RevitParam, res.ToString(), value);
                 }
