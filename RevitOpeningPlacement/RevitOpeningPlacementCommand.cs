@@ -13,6 +13,7 @@ using dosymep;
 using dosymep.Bim4Everyone;
 
 using RevitOpeningPlacement.ViewModels;
+using RevitOpeningPlacement.ViewModels.OpeningConfig;
 using RevitOpeningPlacement.Views;
 
 namespace RevitOpeningPlacement {

@@ -8,11 +8,15 @@ using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.ViewModels.Interfaces;
 
-namespace RevitOpeningPlacement.ViewModels.OpeningConfig.SizeViewModel {
-    internal class DiameterViewModel : BaseViewModel, ISizeViewModel {
+namespace RevitOpeningPlacement.ViewModels.OpeningConfig.SizeViewModels {
+    internal class SizeViewModel : BaseViewModel, ISizeViewModel {
         private double _value;
+        private string _name;
 
-        public string Name { get; set; } = "Диаметер";
+        public string Name { 
+            get => _name; 
+            set => this.RaiseAndSetIfChanged(ref _name, value); 
+        }
         public double Value {
             get => _value;
             set => this.RaiseAndSetIfChanged(ref _value, value);
