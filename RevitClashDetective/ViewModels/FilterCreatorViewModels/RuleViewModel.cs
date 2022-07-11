@@ -188,7 +188,6 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                         CategoriesInfo.Categories
                             .Select(item => item.Category).ToArray(), SelectedRuleEvaluator.RuleEvaluator)
                      .Select(item => new ParamValueViewModel(item)));
-                StringValue = null;
                 IsValueEditable = CanValueEdit();
             } else {
                 Values = new ObservableCollection<ParamValueViewModel>();
