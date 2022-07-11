@@ -154,11 +154,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             var filtersConfig = FiltersConfig.GetFiltersConfig(Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName()));
             filtersConfig.Filters = GetFilters().ToList();
             filtersConfig.RevitVersion = ModuleEnvironment.RevitVersion;
-            ConfigSaver cs = new ConfigSaver();
-            if(cs.Save(filtersConfig)) {
-                MessageText = "Поисковые наборы успешно сохранены";
-                RefreshMessage();
-            }
+
+            ConfigSaverService cs = new ConfigSaverService();
+            cs.Save(filtersConfig);
+            MessageText = "Поисковые наборы успешно сохранены";
+            RefreshMessage();
         }
 
         private bool CanSave(object p) {
@@ -181,11 +181,10 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void Load(object p) {
-            var cl = new ConfigLoader();
+            var cl = new ConfigLoaderService();
             var config = cl.Load<FiltersConfig>();
-            if(config == null) {
-                return;
-            }
+            cl.CheckConfig(config);
+
             var newFilters = InitializeFilters(config).ToList();
             var nameResolver = new NameResolver<FilterViewModel>(Filters, newFilters);
             Filters = new ObservableCollection<FilterViewModel>(nameResolver.GetCollection());

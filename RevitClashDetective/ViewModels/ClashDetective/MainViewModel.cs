@@ -148,19 +148,18 @@ namespace RevitClashDetective.ViewModels {
 
         private void SaveAsConfig(object p) {
             RenewConfig();
-            ConfigSaver s = new ConfigSaver();
-            if(s.Save(_checksConfig)) {
-                MessageText = "Файл проверок успешно сохранен";
-                Wait(() => { MessageText = null; });
-            }
+            ConfigSaverService s = new ConfigSaverService();
+            s.Save(_checksConfig);
+            MessageText = "Файл проверок успешно сохранен";
+            Wait(() => { MessageText = null; });
+
         }
 
         private void LoadConfig(object p) {
-            var cl = new ConfigLoader();
+            var cl = new ConfigLoaderService();
             var config = cl.Load<ChecksConfig>();
-            if(config == null) {
-                return;
-            }
+            cl.CheckConfig(config);
+
             var newChecks = InitializeChecks(config).ToList();
             var nameResolver = new NameResolver<CheckViewModel>(Checks, newChecks);
             Checks = new ObservableCollection<CheckViewModel>(nameResolver.GetCollection());
