@@ -4,10 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using pyRevitLabs.Json;
-
 using dosymep.Bim4Everyone.ProjectConfigs;
+using pyRevitLabs.Json;
 
 namespace dosymep.Serializers {
     internal class ConfigSerializer : IConfigSerializer {
