@@ -6,6 +6,7 @@ using pyRevitLabs.Json;
 
 namespace RevitClashDetective.Models.FilterModel {
     internal class FiltersConfig : ProjectConfig {
+        public string RevitVersion { get; set; }
         public List<Filter> Filters { get; set; } = new List<Filter>();
         [JsonIgnore]
         public override string ProjectConfigPath { get; set; }

@@ -14,6 +14,7 @@ using RevitClashDetective.Models.FilterModel;
 
 namespace RevitClashDetective.Models {
     internal class ChecksConfig : ProjectConfig {
+        public string RevitVersion { get; set; }
         public List<Check> Checks { get; set; } = new List<Check>();
         [JsonIgnore]
         public override string ProjectConfigPath { get; set; }

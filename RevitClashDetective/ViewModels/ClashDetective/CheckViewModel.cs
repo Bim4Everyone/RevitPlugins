@@ -9,6 +9,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 

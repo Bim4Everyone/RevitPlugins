@@ -11,6 +11,7 @@ using System.Windows.Threading;
 
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -135,6 +136,7 @@ namespace RevitClashDetective.ViewModels {
                     SecondSelection = check.SecondSelection.GetCheckSettings()
                 });
             }
+            _checksConfig.RevitVersion = ModuleEnvironment.RevitVersion;
         }
 
         private void SaveConfig(object p) {

@@ -17,7 +17,6 @@ namespace RevitClashDetective.Models.Clashes {
         [JsonIgnore]
         public override IConfigSerializer Serializer { get; set; }
         public List<ClashModel> Clashes { get; set; } = new List<ClashModel>();
-
         public static ClashesConfig GetClashesConfig(string revitFileName, string congfigName) {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())

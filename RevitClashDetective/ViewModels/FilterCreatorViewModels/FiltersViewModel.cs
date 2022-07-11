@@ -11,6 +11,7 @@ using System.Windows.Threading;
 
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -143,6 +144,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private void Save(object p) {
             var filtersConfig = FiltersConfig.GetFiltersConfig(Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName()));
             filtersConfig.Filters = GetFilters().ToList();
+            filtersConfig.RevitVersion = ModuleEnvironment.RevitVersion;
             filtersConfig.SaveProjectConfig();
             MessageText = "Поисковые наборы успешно сохранены";
             RefreshMessage();
@@ -151,6 +153,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private void SaveAs(object p) {
             var filtersConfig = FiltersConfig.GetFiltersConfig(Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName()));
             filtersConfig.Filters = GetFilters().ToList();
+            filtersConfig.RevitVersion = ModuleEnvironment.RevitVersion;
             ConfigSaver cs = new ConfigSaver();
             if(cs.Save(filtersConfig)) {
                 MessageText = "Поисковые наборы успешно сохранены";
