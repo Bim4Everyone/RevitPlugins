@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace RevitOpeningPlacement.ViewModels.Interfaces {
     internal interface IMepCategoryViewModel {
         string Name { get; set; }
+        string ImageSource { get; }
         ObservableCollection<ISizeViewModel> MinSizes { get; set; }
         ObservableCollection<IOffsetViewModel> Offsets { get; set; }
     }

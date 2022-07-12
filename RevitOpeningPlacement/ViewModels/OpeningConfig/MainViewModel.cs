@@ -47,7 +47,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             },
             Offsets = new ObservableCollection<IOffsetViewModel>() {
                 new OffsetViewModel()
-            }
+            },
+            ImageSource = "../Resources/pipe.png"
         };
 
         private MepCategoryViewModel GetRectangleDuct() => new MepCategoryViewModel {
@@ -58,7 +59,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             },
             Offsets = new ObservableCollection<IOffsetViewModel>() {
                 new OffsetViewModel()
-            }
+            },
+            ImageSource = "../Resources/rectangleDuct.png"
         };
 
         private MepCategoryViewModel GetRoundDuct() => new MepCategoryViewModel {
@@ -68,7 +70,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             },
             Offsets = new ObservableCollection<IOffsetViewModel>() {
                 new OffsetViewModel()
-            }
+            },
+            ImageSource = "../Resources/roundDuct.png"
         };
 
         private MepCategoryViewModel GetCableTray() => new MepCategoryViewModel {
@@ -79,7 +82,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             },
             Offsets = new ObservableCollection<IOffsetViewModel>() {
                 new OffsetViewModel()
-            }
+            },
+            ImageSource = "../Resources/tray.png"
         };
     }
 }

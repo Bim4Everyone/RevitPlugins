@@ -1,3 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<Import Project="..\ProjectProps\Common.props" />
+	<ItemGroup>
+	  <None Remove="Resources\pipe.png" />
+	  <None Remove="Resources\rectangleDuct.png" />
+	  <None Remove="Resources\roundDuct.png" />
+	  <None Remove="Resources\tray.png" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Resource Include="Resources\pipe.png" />
+	  <Resource Include="Resources\rectangleDuct.png" />
+	  <Resource Include="Resources\roundDuct.png" />
+	  <Resource Include="Resources\tray.png" />
+	</ItemGroup>
 </Project>

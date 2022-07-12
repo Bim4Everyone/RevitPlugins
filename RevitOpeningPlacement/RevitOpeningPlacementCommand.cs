@@ -20,7 +20,7 @@ namespace RevitOpeningPlacement {
     [Transaction(TransactionMode.Manual)]
     public class RevitOpeningPlacementCommand : BasePluginCommand {
         public RevitOpeningPlacementCommand() {
-            PluginName = "RevitOpeningPlacement";
+            PluginName = "Настройка заданий на отверстия";
         }
 
         protected override void Execute(UIApplication uiApplication) {

@@ -1,0 +1,63 @@
+﻿<UserControl x:Class="RevitOpeningPlacement.Views.SettingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RevitOpeningPlacement.Views" 
+             xmlns:vm="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig.MepCategories" 
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
+             xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol" 
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:MepCategoryViewModel, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <dxe:CheckEdit Grid.Row="0" Content="Фильтровать архитектурный ЖБ"/>
+            <lc:GroupBox Margin="0 5 0 0" Grid.Row="1" Header="Минимальные размеры">
+                <dxg:GridControl MinHeight="110" MaxHeight="2000" ItemsSource="{Binding MinSizes}">
+                    <dxg:GridControl.View>
+                        <dxg:TableView AutoWidth="True"  AllowGrouping="False" ShowGroupPanel="False" ShowSearchPanelMode="Always"/>
+                    </dxg:GridControl.View>
+                    <dxg:GridControl.Columns>
+                        <dxg:GridColumn Header="Параметер" FieldName="Name" ReadOnly="True"/>
+                        <dxg:GridColumn Header="Значение" FieldName="Value"/>
+                    </dxg:GridControl.Columns>
+                </dxg:GridControl>
+            </lc:GroupBox>
+            <lc:GroupBox Margin="0 5 0 0" Grid.Row="2" Header="Зазоры">
+                <DockPanel LastChildFill="True">
+                    <StackPanel Margin="0 0 0 5" DockPanel.Dock="Top" Orientation="Horizontal">
+                        <dx:SimpleButton 
+                        Height="32" 
+                        Width="35" 
+                        Margin="0 0 10 0"
+                        Command="{Binding AddOffsetCommand}"    
+                        Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Add.svg'}"/>
+                        <dx:SimpleButton 
+                        Height="32" 
+                        Width="35" 
+                        Margin="0 0 10 0"
+                        Command="{Binding RemoveOffsetCommand}" CommandParameter="{Binding ElementName=_offsetgrid, Path=SelectedItem}"
+                        Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}"/>
+                    </StackPanel>
+                    <dxg:GridControl SelectionMode="Row" DockPanel.Dock="Bottom" x:Name="_offsetgrid" MinHeight="110" MaxHeight="2000" ItemsSource="{Binding Offsets}">
+                        <dxg:GridControl.View>
+                            <dxg:TableView AutoWidth="True" AllowGrouping="False" ShowGroupPanel="False" ShowSearchPanelMode="Always"/>
+                        </dxg:GridControl.View>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn Header="От" FieldName="From"/>
+                            <dxg:GridColumn Header="До" FieldName="To"/>
+                            <dxg:GridColumn Header="Зазор" FieldName="Offset"/>
+                        </dxg:GridControl.Columns>
+                    </dxg:GridControl>
+                </DockPanel>
+            </lc:GroupBox>
+        </Grid>
+    </Grid>
+</UserControl>
