@@ -41,15 +41,8 @@ namespace RevitCopyStandarts {
             var mainWindow = new MainWindow() {
                 DataContext = new BimCategoriesViewModel(mainFolder, document, application)
             };
-            if(mainWindow.ShowDialog() == true) {
-                GetPlatformService<INotificationService>()
-                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                    .ShowAsync();
-            } else {
-                GetPlatformService<INotificationService>()
-                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                    .ShowAsync();
-            }
+            
+            mainWindow.ShowDialog();
         }
     }
 }
