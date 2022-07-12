@@ -9,6 +9,7 @@ using System.Windows.Input;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.ViewModels.Interfaces;
 using RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels;
 using RevitOpeningPlacement.ViewModels.OpeningConfig.SizeViewModels;
@@ -18,6 +19,14 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig.MepCategories {
         private string _name;
         private ObservableCollection<ISizeViewModel> _minSizes;
         private ObservableCollection<IOffsetViewModel> _offsets;
+
+        public MepCategoryViewModel(MepCategory mepCategory) {
+            Name = mepCategory.Name;
+            ImageSource = mepCategory.ImageSource;
+            MinSizes = new ObservableCollection<ISizeViewModel>(mepCategory.MinSizes.Select(item => new SizeViewModel(item)));
+            Offsets = new ObservableCollection<IOffsetViewModel>(mepCategory.Offsets.Select(item => new OffsetViewModel(item)));
+            Name = mepCategory.Name;
+        }
 
         public MepCategoryViewModel() {
             AddOffsetCommand = new RelayCommand(AddOffset);
@@ -42,6 +51,15 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig.MepCategories {
 
         public ICommand AddOffsetCommand { get; }
         public ICommand RemoveOffsetCommand { get; }
+
+        public MepCategory GetMepCategory() {
+            return new MepCategory() {
+                Name = Name,
+                ImageSource = ImageSource,
+                Offsets = Offsets.Select(item => item.GetOffset()).ToList(),
+                MinSizes = MinSizes.Select(item => item.GetSize()).ToList()
+            };
+        }
 
         private void AddOffset(object p) {
             Offsets.Add(new OffsetViewModel());

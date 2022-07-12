@@ -39,7 +39,7 @@
             <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
                           Foreground="Orange" />
             <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True"
-                             Click="ButtonOk_Click"/>
+                             Click="ButtonOk_Click" Command="{Binding SaveConfigCommand}"/>
             <dx:SimpleButton Content="Отмена" Height="25" Width="80"  IsCancel="true"
                              Click="ButtonCancel_Click" />
         </StackPanel>

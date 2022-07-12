@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using dosymep.WPF.ViewModels;
 
+using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.ViewModels.Interfaces;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels {
@@ -13,6 +14,16 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels {
         private double _from;
         private double _to;
         private double _offset;
+
+        public OffsetViewModel(Offset offset) {
+            To = offset.To;
+            From = offset.From;
+            Offset = offset.OffsetValue;
+        }
+
+        public OffsetViewModel() {
+
+        }
 
         public double From {
             get => _from;
@@ -22,9 +33,13 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels {
             get => _to;
             set => this.RaiseAndSetIfChanged(ref _to, value);
         }
-        public double Offset { 
-            get => _offset; 
-            set => this.RaiseAndSetIfChanged(ref _offset, value); 
+        public double Offset {
+            get => _offset;
+            set => this.RaiseAndSetIfChanged(ref _offset, value);
+        }
+
+        public Offset GetOffset() {
+            return new Offset() { From = From, To = To, OffsetValue = Offset };
         }
     }
 }
