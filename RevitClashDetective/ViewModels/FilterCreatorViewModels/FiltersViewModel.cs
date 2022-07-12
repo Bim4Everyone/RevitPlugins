@@ -1,19 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.ViewModels.SearchSet;
 using RevitClashDetective.Views;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
@@ -21,28 +26,36 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly FiltersConfig _config;
         private ObservableCollection<FilterViewModel> _filters;
-        private FilterViewModel _selectedFilter;
         private string _errorText;
+        private string _messageText;
+        private DispatcherTimer _timer;
+        private FilterViewModel _selectedFilter;
 
         public FiltersViewModel(RevitRepository revitRepository, FiltersConfig config) {
             _revitRepository = revitRepository;
             _config = config;
+
+            InitializeFilters();
+            InitializeTimer();
+
+            SelectedFilterChangedCommand = new RelayCommand(SelectedFilterChanged, CanSelectedFilterChanged);
             CreateCommand = new RelayCommand(Create);
             DeleteCommand = new RelayCommand(Delete, CanDelete);
             RenameCommand = new RelayCommand(Rename, CanRename);
             SaveCommand = new RelayCommand(Save, CanSave);
-            
-
-            Filters = new ObservableCollection<FilterViewModel>();
-
-            InitializeFilters();
-
-            SelectedFilterChangedCommand = new RelayCommand(SelectedFilterChanged, CanSelectedFilterChanged);
+            SaveAsCommand = new RelayCommand(SaveAs, CanSave);
+            LoadCommand = new RelayCommand(Load);
+            CheckSearchSetCommand = new RelayCommand(CheckSearchSet, CanSave);
         }
 
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        public string MessageText {
+            get => _messageText;
+            set => this.RaiseAndSetIfChanged(ref _messageText, value);
         }
 
         public ICommand CreateCommand { get; }
@@ -51,6 +64,10 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public ICommand SelectedFilterChangedCommand { get; }
 
         public ICommand SaveCommand { get; }
+        public ICommand SaveAsCommand { get; }
+        public ICommand LoadCommand { get; }
+        public ICommand CheckSearchSetCommand { get; }
+
 
         public FilterViewModel SelectedFilter {
             get => _selectedFilter;
@@ -67,10 +84,14 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void InitializeFilters() {
-            foreach(var filter in _config.Filters.OrderBy(item => item.Name)) {
+            Filters = new ObservableCollection<FilterViewModel>(InitializeFilters(_config));
+        }
+
+        private IEnumerable<FilterViewModel> InitializeFilters(FiltersConfig config) {
+            foreach(var filter in config.Filters.OrderBy(item => item.Name)) {
                 filter.RevitRepository = _revitRepository;
                 filter.Set.SetRevitRepository(_revitRepository);
-                Filters.Add(new FilterViewModel(_revitRepository, filter));
+                yield return new FilterViewModel(_revitRepository, filter);
             }
         }
 
@@ -95,10 +116,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void Delete(object p) {
-            var taskDialog = new TaskDialog("Revit");
-            taskDialog.MainContent = $"Удалить фильтр \"{SelectedFilter.Name}\"?";
-            taskDialog.CommonButtons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No;
-            if(taskDialog.Show() == TaskDialogResult.Yes) {
+            var dialog = GetPlatformService<IMessageBoxService>();
+            if(dialog.Show($"Удалить фильтр \"{SelectedFilter.Name}\"?", "BIM", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes) {
                 Filters.Remove(SelectedFilter);
                 SelectedFilter = Filters.FirstOrDefault();
             }
@@ -123,9 +142,23 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void Save(object p) {
-            var filtersConfig = FiltersConfig.GetFiltersConfig();
+            var filtersConfig = FiltersConfig.GetFiltersConfig(Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName()));
             filtersConfig.Filters = GetFilters().ToList();
+            filtersConfig.RevitVersion = ModuleEnvironment.RevitVersion;
             filtersConfig.SaveProjectConfig();
+            MessageText = "Поисковые наборы успешно сохранены";
+            RefreshMessage();
+        }
+
+        private void SaveAs(object p) {
+            var filtersConfig = FiltersConfig.GetFiltersConfig(Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName()));
+            filtersConfig.Filters = GetFilters().ToList();
+            filtersConfig.RevitVersion = ModuleEnvironment.RevitVersion;
+
+            ConfigSaverService cs = new ConfigSaverService();
+            cs.Save(filtersConfig);
+            MessageText = "Поисковые наборы успешно сохранены";
+            RefreshMessage();
         }
 
         private bool CanSave(object p) {
@@ -133,7 +166,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                 return false;
 
             if(Filters.Any(item => item.Set.IsEmpty())) {
-                ErrorText = "Все поля в критериях фильтрации должны быть заполнены.";
+                ErrorText = $"Все поля в фильтре \"{Filters.FirstOrDefault(item => item.Set.IsEmpty())?.Name}\" критериях фильтрации должны быть заполнены.";
                 return false;
             }
 
@@ -145,6 +178,36 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             }
 
             return true;
+        }
+
+        private void Load(object p) {
+            var cl = new ConfigLoaderService();
+            var config = cl.Load<FiltersConfig>();
+            cl.CheckConfig(config);
+
+            var newFilters = InitializeFilters(config).ToList();
+            var nameResolver = new NameResolver<FilterViewModel>(Filters, newFilters);
+            Filters = new ObservableCollection<FilterViewModel>(nameResolver.GetCollection());
+            MessageText = "Файл поисковых наборов успешно загружен";
+            RefreshMessage();
+        }
+
+        private void CheckSearchSet(object p) {
+            Save(null);
+            var filter = SelectedFilter.GetFilter();
+            var vm = new SearchSetsViewModel(_revitRepository, filter);
+            var view = new SearchSetView() { DataContext = vm };
+            view.Show();
+        }
+
+        private void InitializeTimer() {
+            _timer = new DispatcherTimer();
+            _timer.Interval = new TimeSpan(0, 0, 0, 3);
+            _timer.Tick += (s, a) => { MessageText = null; _timer.Stop(); };
+        }
+
+        private void RefreshMessage() {
+            _timer.Start();
         }
     }
 }

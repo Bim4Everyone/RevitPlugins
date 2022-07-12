@@ -44,12 +44,12 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         private bool CanCreate(object p) {
             if(string.IsNullOrEmpty(Name)) {
-                ErrorText = "Введите имя фильтра";
+                ErrorText = "Введите имя поискового набора.";
                 return false;
             }
 
             if(_oldFilterNames.Contains(Name) || Name == _currentName) {
-                ErrorText = "Фильтр с таким именем уже существует";
+                ErrorText = "Поисковый набор с таким именем уже существует.";
                 return false;
             }
             ErrorText = null;

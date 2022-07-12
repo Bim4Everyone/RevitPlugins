@@ -10,38 +10,71 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
         xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
         xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-    mc:Ignorable="d"
+        mc:Ignorable="d"
+        x:Name="_this"
         Title="Проверки на коллизии" Height="450" Width="800"
         d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
+
         <StackPanel Grid.Row="0" Margin="0 0  0 10" Orientation="Horizontal">
             <dx:SimpleButton 
-                Height="35" 
+                Height="32"
+                Width="35"
+                Margin="0 0 10 0"
+                ToolTip="Загрузить проверки"
+                Command="{Binding LoadClashCommand}"
+                Glyph="{dx:DXImage 'Office2013/Actions/Download_32x32.png'}"/>
+            
+            <dx:SimpleButton 
+                Height="32"
+                Width="32"
+                Margin="0 0 10 0"
+                ToolTip="Cохранить"
+                Command="{Binding SaveClashesCommand}"
+                Glyph="{dx:DXImage 'DevAV/Actions/Save_32x32.png'}"/>
+
+            <dx:SimpleButton 
+                Height="32"
+                Width="32"
+                Margin="0 0 10 0"
+                ToolTip="Сохранить как"
+                Command="{Binding SaveAsClashesCommand}"
+                Glyph="{dx:DXImage 'DevAV/Actions/SaveAs_32x32.png'}"/>
+            
+            <dx:SimpleButton 
+                Height="32" 
                 Width="35" 
-                Margin="0 0 10 0" 
+                Margin="0 0 10 0"
+                ToolTip="Добавить проверку"
                 Command="{Binding AddCheckCommand}"
                 Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Add.svg'}"/>
+            
             <dx:SimpleButton 
-                Height="35"
+                Height="32"
                 Width="35"
-
+                ToolTip="Удалить проверку"
                 Command="{Binding RemoveCheckCommand}"
                 CommandParameter="{Binding ElementName=_dg, Path=SelectedItem}"
                 Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}"/>
+            
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="0 0  0 10" Orientation="Horizontal">
+           
         </StackPanel>
         
         <dxg:GridControl x:Name="_dg"
                          SelectionMode="Row"
-                         Grid.Row="1" 
+                         Grid.Row="2" 
                          ItemsSource="{Binding Checks}">
             <dxg:GridControl.View>
-                <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always" ShowGroupPanel="False"/>
+                <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always" ShowGroupPanel="False" CellValueChanging="_gridView_CellValueChanging"/>
             </dxg:GridControl.View>
 
             <dxg:GridColumn Header="" Width="Auto" FieldName="IsSelected"/>
@@ -64,13 +97,13 @@
                     </DataTemplate>
                 </dxg:GridColumn.CellTemplate>
             </dxg:GridColumn>
-            
-            <dxg:GridColumn Header="Наименование" FieldName="Name" Width="Auto"/>
-            
+
+            <dxg:GridColumn Header="Наименование" FieldName="Name" Width="Auto" />
+
             <dxg:GridColumn Header="Выбор А" Width="*">
                 <dxg:GridColumn.CellTemplate>
                     <DataTemplate>
-                        <local:ProviderCombobBox DataContext="{Binding Row.FirstSelection}"/>
+                        <local:ProviderCombobBox DataContext="{Binding Row.FirstSelection, UpdateSourceTrigger=PropertyChanged}"/>
                     </DataTemplate>
                 </dxg:GridColumn.CellTemplate>
             </dxg:GridColumn>
@@ -78,7 +111,7 @@
             <dxg:GridColumn Header="Выбор В" Width="*">
                 <dxg:GridColumn.CellTemplate>
                     <DataTemplate DataType="{x:Type vm:CheckViewModel}">
-                        <local:ProviderCombobBox DataContext="{Binding Row.SecondSelection}"/>
+                        <local:ProviderCombobBox DataContext="{Binding Row.SecondSelection, UpdateSourceTrigger=PropertyChanged}"/>
                     </DataTemplate>
                 </dxg:GridColumn.CellTemplate>
             </dxg:GridColumn>
@@ -95,14 +128,14 @@
 
         </dxg:GridControl>
 
-        <StackPanel Grid.Row="2" Margin="0 10 0 0" Orientation="Horizontal"
+        <StackPanel Grid.Row="3" Margin="0 10 0 0" Orientation="Horizontal"
                     HorizontalAlignment="Right">
             <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
                           Foreground="Orange" />
             <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding MessageText}"
                           Foreground="Green" />
             <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True"
-                             Command="{Binding FindClashesCommand}" />
+                             Command="{Binding FindClashesCommand}" CommandParameter="{Binding ElementName=_this}"/>
             <dx:SimpleButton Content="Отмена" Height="25" Width="80"  IsCancel="true"
                              Click="ButtonCancel_Click" />
         </StackPanel>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,9 +27,18 @@ namespace RevitClashDetective {
         }
 
         protected override void Execute(UIApplication uiApplication) {
+            ExecuteCommand(uiApplication);
+        }
+
+        public void ExecuteCommand(UIApplication uiApplication, string selectedFilter = null) {
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            var viewModlel = new FiltersViewModel(revitRepository, FiltersConfig.GetFiltersConfig());
+
+            var viewModlel = new FiltersViewModel(revitRepository, FiltersConfig.GetFiltersConfig(Path.Combine(revitRepository.GetObjectName(), revitRepository.GetDocumentName())));
             var window = new FilterCreatorView() { DataContext = viewModlel };
+            if(selectedFilter != null) {
+                viewModlel.SelectedFilter = viewModlel.Filters.FirstOrDefault(item => item.Name.Equals(selectedFilter, StringComparison.CurrentCultureIgnoreCase));
+            }
+            GetPlatformService<IRootWindowService>().RootWindow = window;
             if(window.ShowDialog() == true) {
                 GetPlatformService<INotificationService>()
                     .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")

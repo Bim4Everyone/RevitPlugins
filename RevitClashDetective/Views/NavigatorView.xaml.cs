@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using DevExpress.Xpf.Grid;
+
 using dosymep.WPF.Views;
 
 using RevitClashDetective.ViewModels.Navigator;
@@ -20,7 +22,7 @@ namespace RevitClashDetective.Views {
     /// <summary>
     /// Interaction logic for NavigatorView.xaml
     /// </summary>
-    public partial class NavigatorView : PlatformWindow {
+    public partial class NavigatorView {
         public NavigatorView() {
             InitializeComponent();
         }
@@ -30,12 +32,6 @@ namespace RevitClashDetective.Views {
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             this.Close();
-        }
-
-        private void _dg_Loaded(object sender, RoutedEventArgs e) {
-            var dg = sender as DataGrid;
-            var vm = DataContext as ClashesViewModel;
-            dg.Columns[1].Visibility = vm.IsColumnVisible ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }

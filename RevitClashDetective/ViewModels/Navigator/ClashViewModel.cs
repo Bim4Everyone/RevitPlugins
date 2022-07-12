@@ -65,7 +65,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
             if(docTitle.Contains(SecondDocumentName)) {
                 yield return new ElementId(Clash.OtherElement.Id);
             }
-            //return ElementId.InvalidElementId;
         }
 
         public BoundingBoxXYZ GetBoundingBox() {

@@ -16,11 +16,16 @@ namespace RevitClashDetective.Models.Interfaces {
         string Name { get; }
         string DisplayValue { get; }
         RevitRepository RevitRepository { get; set; }
-        IFilterGenerator FilterGenerator { get; }
-        string GetErrorText(string value);
-        ParamValue GetParamValue(int[] categories, string value);
+#if D2020 || R2020
+        UnitType UnitType { get; }
+#else
+        ForgeTypeId UnitType { get; }
+#endif
+        StorageType StorageType { get; }
+        ParamValue GetParamValueFormString(int[] categories, string value);
         IEnumerable<RuleEvaluator> GetRuleEvaluators();
         IEnumerable<ParamValue> GetValues(Category[] categories, RuleEvaluator ruleEvaluator);
+        ParamValue GetElementParamValue(int[] categories, Element item);
         FilterRule GetRule(Document doc, IVisiter visiter, ParamValue paramValue);
     }
 }

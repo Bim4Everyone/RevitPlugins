@@ -11,58 +11,21 @@ using dosymep.Bim4Everyone.SystemParams;
 
 namespace RevitClashDetective.Models.Utils {
     internal class DoubleValueParser {
-        private readonly RevitRepository _revitRepository;
-        private readonly RevitParam _revitParam;
-
-        public DoubleValueParser(RevitRepository revitRepository, RevitParam revitParam) {
-            _revitRepository = revitRepository;
-            _revitParam = revitParam;
-        }
-
-        public bool TryParse(string value, out double result) {
-#if D2020 || R2020
-            var type = GetUnitType();
-            if(type == UnitType.UT_Undefined) {
-                return double.TryParse(value, out result);
-            }
-            return UnitFormatUtils.TryParse(new Units(UnitSystem.Metric), type, value, out result);
-#else
-            var type = GetUnitType();
-            if(string.IsNullOrEmpty(type.TypeId)) {
-                return double.TryParse(value, out result);
-            }
-            return UnitFormatUtils.TryParse(new Units(UnitSystem.Metric), type, value, out result);
-#endif
-        }
-
 
 #if D2020 || R2020
-        private UnitType GetUnitType() {
-            if(_revitParam is SystemParam p) {
-                return UnitTypeUtils.GetUnitType(p.SystemParamId);
-            } else {
-                var paramElement = _revitRepository.GetDocuments().Select(item => _revitParam.GetRevitParamElement(item)).FirstOrDefault(item => item != null);
-                if(paramElement != null) {
-                    return paramElement.GetDefinition().UnitType;
-                }
+        public static bool TryParse(string value, UnitType unitType, out double result) {
+
+            if(unitType == UnitType.UT_Undefined) {
+                return double.TryParse(value, out result);
             }
-            return UnitType.UT_Undefined;
+            return UnitFormatUtils.TryParse(new Units(UnitSystem.Metric), unitType, value, out result);
         }
 #else
-        private ForgeTypeId GetUnitType() {
-            if(_revitParam is SystemParam p) {
-                return UnitTypeUtils.GetUnitType(p.SystemParamId);
-            } else {
-                var paramElement = _revitRepository.GetDocuments().Select(item => _revitParam.GetRevitParamElement(item)).FirstOrDefault(item => item != null);
-                if(paramElement != null) {
-#if D2021 || R2021
-                    return paramElement.GetDefinition().GetSpecTypeId();
-#else
-                    return paramElement.GetDefinition().GetDataType();
-#endif
-                }
+        public static bool TryParse(string value, ForgeTypeId unitType, out double result) {
+            if(string.IsNullOrEmpty(unitType.TypeId)) {
+                return double.TryParse(value, out result);
             }
-            return new ForgeTypeId();
+            return UnitFormatUtils.TryParse(new Units(UnitSystem.Metric), unitType, value, out result);
         }
 #endif
     }

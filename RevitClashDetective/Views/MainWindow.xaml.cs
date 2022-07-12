@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using DevExpress.Xpf.Grid;
+
 using dosymep.WPF.Views;
 
 namespace RevitClashDetective.Views {
@@ -32,6 +34,10 @@ namespace RevitClashDetective.Views {
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;
+        }
+
+        private void _gridView_CellValueChanging(object sender, CellValueChangedEventArgs e) {
+            (sender as TableView).PostEditor();
         }
     }
 }

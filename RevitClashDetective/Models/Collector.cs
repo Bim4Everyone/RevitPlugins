@@ -15,4 +15,13 @@ namespace RevitClashDetective.Models {
         public Document Document { get; }
         public FilteredElementCollector RevitCollector { get; }
     }
+
+    internal class WorksetCollector {
+        public WorksetCollector(Document doc) {
+            Document = doc;
+            RevitCollector = new FilteredWorksetCollector(doc);
+        }
+        public Document Document { get; }
+        public FilteredWorksetCollector RevitCollector { get; }
+    }
 }

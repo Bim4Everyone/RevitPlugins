@@ -92,7 +92,7 @@ namespace RevitClashDetective.Models.Value {
             TValue = value;
             DisplayValue = stringValue ?? TValue?.ToString();
         }
-        
+
         public T TValue { get; set; }
         public override object Value => TValue;
 

@@ -9,6 +9,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -16,11 +17,12 @@ using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.ViewModels.ClashDetective;
+using RevitClashDetective.ViewModels.Interfaces;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
 
 namespace RevitClashDetective.ViewModels {
-    internal class CheckViewModel : BaseViewModel {
+    internal class CheckViewModel : BaseViewModel, INamedViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly FiltersConfig _filtersConfig;
         private string _name;
@@ -85,12 +87,24 @@ namespace RevitClashDetective.ViewModels {
         private string ReportName => $"{_revitRepository.GetDocumentName()}_{Name}";
 
         public List<ClashModel> GetClashes() {
-            var mainProviders = FirstSelection
-                .GetProviders()
-                .ToList();
-            var otherProviders = SecondSelection
-                .GetProviders()
-                .ToList();
+            List<IProvider> mainProviders, otherProviders;
+
+            if(FirstSelection.SelectedFiles.Any(item => item.Name.Equals(_revitRepository.GetDocumentName()))) {
+                mainProviders = FirstSelection
+                    .GetProviders()
+                    .ToList();
+                otherProviders = SecondSelection
+                    .GetProviders()
+                    .ToList();
+            } else {
+                mainProviders = SecondSelection
+                    .GetProviders()
+                    .ToList();
+                otherProviders = FirstSelection
+                    .GetProviders()
+                    .ToList();
+            }
+
             var clashDetector = new ClashDetector(_revitRepository, mainProviders, otherProviders);
             return clashDetector.FindClashes();
         }
@@ -135,7 +149,7 @@ namespace RevitClashDetective.ViewModels {
         }
 
         private void ShowClashes(object p) {
-            var view = new NavigatorView() { DataContext = new ClashesViewModel(_revitRepository, ReportName) };
+            var view = new NavigatorView() { DataContext = new ClashesViewModel(_revitRepository, ReportName) { OpenFromClashDetector = true } };
             view.Show();
         }
 

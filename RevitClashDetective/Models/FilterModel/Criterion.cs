@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -7,7 +8,7 @@ using pyRevitLabs.Json;
 using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.FilterModel {
-    internal class Criterion : ICriterion {
+    internal abstract class Criterion : ICriterion {
         [JsonIgnore]
         public RevitRepository RevitRepository { get; set; }
         [JsonIgnore]
@@ -15,9 +16,7 @@ namespace RevitClashDetective.Models.FilterModel {
         public virtual void SetRevitRepository(RevitRepository revitRepository) {
             RevitRepository = revitRepository;
         }
-
-        public virtual IFilterGenerator Generate(Document doc) {
-            throw new NotImplementedException();
-        }
+        public abstract IFilterGenerator Generate(Document doc);
+        public abstract IEnumerable<IFilterableValueProvider> GetProviders();
     }
 }

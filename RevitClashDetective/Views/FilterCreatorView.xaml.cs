@@ -14,11 +14,13 @@ using System.Windows.Shapes;
 
 using dosymep.WPF.Views;
 
+using RevitClashDetective.ViewModels.FilterCreatorViewModels;
+
 namespace RevitClashDetective.Views {
     /// <summary>
     /// Interaction logic for FilterCreatorView.xaml
     /// </summary>
-    public partial class FilterCreatorView : PlatformWindow {
+    public partial class FilterCreatorView {
         public FilterCreatorView() {
             InitializeComponent();
         }

@@ -5,10 +5,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -20,20 +23,20 @@ using RevitClashDetective.Views;
 namespace RevitClashDetective.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private string _errorText;
-        private readonly CheckSettings _checksSettings;
+
         private readonly ChecksConfig _checksConfig;
         private readonly FiltersConfig _filtersConfig;
         private readonly RevitRepository _revitRepository;
-        private ObservableCollection<CheckViewModel> _checks;
+        private bool _canCancel = true;
         private string _messageText;
+        private ObservableCollection<CheckViewModel> _checks;
 
         public MainViewModel(ChecksConfig checksConfig, FiltersConfig filtersConfig, RevitRepository revitRepository) {
             _filtersConfig = filtersConfig;
             _revitRepository = revitRepository;
             _checksConfig = checksConfig;
-            _checksSettings = checksConfig.GetSettings(_revitRepository.Doc);
 
-            if(_checksSettings != null && _checksSettings.Checks.Count > 0) {
+            if(_checksConfig != null && _checksConfig.Checks.Count > 0) {
                 InitializeChecks();
             } else {
                 InitializeEmptyCheck();
@@ -41,6 +44,15 @@ namespace RevitClashDetective.ViewModels {
             AddCheckCommand = new RelayCommand(AddCheck);
             RemoveCheckCommand = new RelayCommand(RemoveCheck, CanRemove);
             FindClashesCommand = new RelayCommand(FindClashes, CanFindClashes);
+
+            SaveClashesCommand = new RelayCommand(SaveConfig);
+            SaveAsClashesCommand = new RelayCommand(SaveAsConfig);
+            LoadClashCommand = new RelayCommand(LoadConfig);
+        }
+
+        public bool CanCancel {
+            get => _canCancel;
+            set => this.RaiseAndSetIfChanged(ref _canCancel, value);
         }
 
         public string ErrorText {
@@ -56,17 +68,22 @@ namespace RevitClashDetective.ViewModels {
         public ICommand AddCheckCommand { get; }
         public ICommand RemoveCheckCommand { get; }
         public ICommand FindClashesCommand { get; }
+        public ICommand SaveAsClashesCommand { get; }
+        public ICommand SaveClashesCommand { get; }
+        public ICommand LoadClashCommand { get; }
 
         public ObservableCollection<CheckViewModel> Checks {
             get => _checks;
             set => this.RaiseAndSetIfChanged(ref _checks, value);
         }
 
-
         private void InitializeChecks() {
-            Checks = new ObservableCollection<CheckViewModel>();
-            foreach(var check in _checksSettings.Checks) {
-                Checks.Add(new CheckViewModel(_revitRepository, _filtersConfig, check));
+            Checks = new ObservableCollection<CheckViewModel>(InitializeChecks(_checksConfig));
+        }
+
+        private IEnumerable<CheckViewModel> InitializeChecks(ChecksConfig config) {
+            foreach(var check in config.Checks) {
+                yield return new CheckViewModel(_revitRepository, _filtersConfig, check);
             }
         }
 
@@ -90,30 +107,64 @@ namespace RevitClashDetective.ViewModels {
             return (p as CheckViewModel) != null;
         }
 
-        private async void FindClashes(object p) {
+        private void FindClashes(object p) {
+            CanCancel = false;
+            RenewConfig();
+            _checksConfig.SaveProjectConfig();
+
             foreach(var check in Checks.Where(item => item.IsSelected)) {
                 check.SaveClashes();
             }
-            SaveConfig();
+
+            CanCancel = true;
             MessageText = "Проверка на коллизии прошла успешно";
-            foreach(var check in Checks) {
-                check.IsSelected = false;
-            }
-            await Task.Delay(3000);
-            MessageText = null;
+            Wait(() => {
+                foreach(var check in Checks) {
+                    check.IsSelected = false;
+                }
+                MessageText = null;
+                CanFindClashes(null);
+            });
         }
 
-        private void SaveConfig() {
-            var checkSettings = _checksSettings ?? _checksConfig.AddSettings(_revitRepository.Doc);
-            checkSettings.Checks = new List<Check>();
+        private void RenewConfig() {
+            _checksConfig.Checks = new List<Check>();
             foreach(var check in Checks) {
-                checkSettings.Checks.Add(new Check() {
+                _checksConfig.Checks.Add(new Check() {
                     Name = check.Name,
                     FirstSelection = check.FirstSelection.GetCheckSettings(),
                     SecondSelection = check.SecondSelection.GetCheckSettings()
                 });
             }
+            _checksConfig.RevitVersion = ModuleEnvironment.RevitVersion;
+        }
+
+        private void SaveConfig(object p) {
+            RenewConfig();
             _checksConfig.SaveProjectConfig();
+            MessageText = "Файл проверок успешно сохранен";
+            Wait(() => { MessageText = null; });
+        }
+
+        private void SaveAsConfig(object p) {
+            RenewConfig();
+            ConfigSaverService s = new ConfigSaverService();
+            s.Save(_checksConfig);
+            MessageText = "Файл проверок успешно сохранен";
+            Wait(() => { MessageText = null; });
+
+        }
+
+        private void LoadConfig(object p) {
+            var cl = new ConfigLoaderService();
+            var config = cl.Load<ChecksConfig>();
+            cl.CheckConfig(config);
+
+            var newChecks = InitializeChecks(config).ToList();
+            var nameResolver = new NameResolver<CheckViewModel>(Checks, newChecks);
+            Checks = new ObservableCollection<CheckViewModel>(nameResolver.GetCollection());
+            MessageText = "Файл проверок успешно загружен";
+            Wait(() => { MessageText = null; });
         }
 
         private bool HasSameNames() {
@@ -138,9 +189,20 @@ namespace RevitClashDetective.ViewModels {
                 ErrorText = $"У проверки \"{emptyCheck.Name}\" необходимо выбрать хотя бы один файл.";
                 return false;
             }
+            if(Checks.All(item => !item.IsSelected)) {
+                ErrorText = $"Для поиска коллизий должна быть выбрана хотя бы одна проверка.";
+                return false;
+            }
 
             ErrorText = null;
             return true;
+        }
+
+        private void Wait(Action action) {
+            var timer = new DispatcherTimer();
+            timer.Interval = new TimeSpan(0, 0, 0, 3);
+            timer.Tick += (s, a) => { action(); timer.Stop(); };
+            timer.Start();
         }
     }
 }

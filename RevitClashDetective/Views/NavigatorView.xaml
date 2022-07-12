@@ -1,4 +1,4 @@
-﻿<base:PlatformWindow  
+﻿<base:ThemedPlatformWindow  
         xmlns:base="clr-namespace:dosymep.WPF.Views"
         x:Class="RevitClashDetective.Views.NavigatorView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -8,136 +8,96 @@
         xmlns:local="clr-namespace:RevitClashDetective.Views"
         xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.Navigator"
         xmlns:converter="clr-namespace:dosymep.WPF.Converters"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        mc:Ignorable="d"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
+        xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" 
+        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    mc:Ignorable="d"
         Title="Навигатор" Height="450" Width="800"
         d:DataContext="{d:DesignInstance vm:ClashesViewModel, IsDesignTimeCreatable=False}">
-    <base:PlatformWindow.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding OpenClashDetectorCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <base:ThemedPlatformWindow.Resources>
         <converter:IndexConverter x:Key="IndexConverter"/>
         <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-    </base:PlatformWindow.Resources>
-    <Grid>
+    </base:ThemedPlatformWindow.Resources>
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <StackPanel>
-            <ComboBox ItemsSource="{Binding FileNames}" SelectedItem="{Binding SelectedFile}">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction Command="{Binding SelectionChangedCommand}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-                <ComboBox.Style>
-                    <Style TargetType="ComboBox">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding FileNames}" Value="{x:Null}">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ComboBox.Style>
-            </ComboBox>
-        </StackPanel>
-        <DataGrid Name="_dg"
-            Grid.Row="1" 
-                  AutoGenerateColumns="False" 
-                  CanUserReorderColumns="False"
-                  CanUserDeleteRows="False"
-                  CanUserAddRows="False"
-                  VerticalGridLinesBrush="LightGray"
-                  HorizontalGridLinesBrush="LightGray"
-                  AlternatingRowBackground="WhiteSmoke"
-                  AlternationCount="2"
-                  Loaded="_dg_Loaded"
+
+        <DockPanel LastChildFill="True">
+            <DockPanel.Style>
+                <Style TargetType="DockPanel">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding FileNames}" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DockPanel.Style>
+            <dx:SimpleButton DockPanel.Dock="Left" ToolTip="Синхронизировать плагин с документом" Command="{Binding SelectionChangedCommand}" Glyph="{dx:DXImage 'Office2013/Actions/Refresh_32x32.png'}"/>
+            <dxe:ComboBoxEdit IsTextEditable="False" ItemsSource="{Binding FileNames}" SelectedItem="{Binding SelectedFile}" >
+                <mvvm:Interaction.Behaviors>
+                    <mvvm:EventToCommand EventName="EditValueChanged" Command="{Binding SelectionChangedCommand}"/>
+                </mvvm:Interaction.Behaviors>
+            </dxe:ComboBoxEdit>
+        </DockPanel>
+
+        <dxg:GridControl Name="_dg"
+                  Grid.Row="1" 
                   ItemsSource="{Binding ClashesViewSource.View}">
+            <dxg:GridControl.GroupSummary>
+                <dxg:GridSummaryItem SummaryType="Count"/>
+            </dxg:GridControl.GroupSummary>
+            <mvvm:Interaction.Behaviors>
+                <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectionDataChangedCommand}"/>
+            </mvvm:Interaction.Behaviors>
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction Command="{Binding SelectionDataChangedCommand}"></i:InvokeCommandAction>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-            <DataGrid.CellStyle>
-                <Style TargetType="{x:Type DataGridCell}">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}" Value="True">
-                            <Setter Property="Background" Value="LightBlue"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </DataGrid.CellStyle>
-            <DataGrid.RowStyle>
-                <Style TargetType="{x:Type DataGridRow}">
-                    <Style.Triggers>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsSelected" Value="True"/>
-                                <Condition Property="AlternationIndex" Value="1"/>
-                            </MultiTrigger.Conditions>
-                            <MultiTrigger.Setters>
-                                <Setter Property="Background" Value="LightBlue"/>
-                            </MultiTrigger.Setters>
-                        </MultiTrigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsSelected" Value="True"/>
-                                <Condition Property="AlternationIndex" Value="0"/>
-                            </MultiTrigger.Conditions>
-                            <MultiTrigger.Setters>
-                                <Setter Property="Background" Value="LightBlue"/>
-                            </MultiTrigger.Setters>
-                        </MultiTrigger>
-                    </Style.Triggers>
-                </Style>
-            </DataGrid.RowStyle>
-            <DataGrid.Columns>
-                <DataGridTemplateColumn>
-                    <DataGridTemplateColumn.CellTemplate>
+            <dxg:GridControl.View>
+                <dxg:TableView Name="_gridView" AutoWidth="True" DataNavigatorButtons="Navigation" ShowDataNavigator="True"></dxg:TableView>
+            </dxg:GridControl.View>
+            <dxg:GridControl.Columns>
+                <dxg:GridColumn ReadOnly="True" Width="70" Header="">
+                    <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Name="bSelect" Content="Выбрать" Command="{Binding ElementName=_dg, Path=DataContext.SelectClashCommand}" 
-                                    CommandParameter="{Binding ElementName=bSelect, Path=DataContext}"/>
+                            <dx:SimpleButton Content="Выбрать" Command="{Binding ElementName=_dg, Path=DataContext.SelectClashCommand}" 
+                                    CommandParameter="{Binding Row}"/>
                         </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsSolved, UpdateSourceTrigger=PropertyChanged}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn IsReadOnly="True" Header="Уровень 1" Binding="{Binding FirstLevel}"/>
-                <DataGridTextColumn IsReadOnly="True" Header="Категория 1" Binding="{Binding FirstCategory}"/>
-                <DataGridTextColumn IsReadOnly="True" Header="Имя типа 1" Binding="{Binding FirstName}"/>
-                <DataGridTextColumn IsReadOnly="True" Header="Имя файла 1" Binding="{Binding FirstDocumentName}"/>
-                <DataGridTextColumn IsReadOnly="True" Header="Уровень 2" Binding="{Binding SecondLevel}"/>
-                <DataGridTextColumn IsReadOnly="True" Header="Категория 2" Binding="{Binding SecondCategory}"/>
-                <DataGridTextColumn IsReadOnly="True" Header="Имя типа 2" Binding="{Binding SecondName}"/>
-                <DataGridTextColumn IsReadOnly="True" Width="*" Header="Имя файла 2" Binding="{Binding SecondDocumentName}"/>
-            </DataGrid.Columns>
-        </DataGrid>
-        <Grid Grid.Row="2" Height="30">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Width="70" BorderBrush="Transparent" Background="Transparent" FontSize="20" HorizontalAlignment="Right" Command="{Binding SelectPreviousCommand}">
-                <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Arrows/Prev_32x32.png"/>
-            </Button>
-            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <TextBlock FontSize="14" VerticalAlignment="Center" Text="{Binding ClashesViewSource.View.CurrentPosition, Converter={StaticResource IndexConverter}, StringFormat={}{0}/}" ></TextBlock>
-                <TextBlock FontSize="14" VerticalAlignment="Center" Text="{Binding ClashesViewSource.View.SourceCollection.Count}"></TextBlock>
-            </StackPanel>
-            <Button Grid.Column="2" HorizontalAlignment="Left" FontSize="20" Width="70"  BorderBrush="Transparent" Background="Transparent" Command="{Binding SelectNextCommand}">
-                <Image Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Arrows/Next_32x32.png"/>
-            </Button>
-        </Grid>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-            <TextBlock Margin="10" VerticalAlignment="Center" Foreground="Green" Text="{Binding Message}" />
-            <Button Content="Сохранить" Height="25" Width="70" Margin="10" IsDefault="True" Command="{Binding SaveCommand}"/>
-            <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
+                <dxg:GridColumn Header="" Width="30" FieldName="IsSolved"/>
+                <dxg:GridColumn ReadOnly="True" Header="Уровень 1" FieldName="FirstLevel"/>
+                <dxg:GridColumn ReadOnly="True" Header="Категория 1" FieldName="FirstCategory"/>
+                <dxg:GridColumn ReadOnly="True" Header="Имя типа 1" FieldName="FirstName"/>
+                <dxg:GridColumn ReadOnly="True" Header="Имя файла 1" FieldName="FirstDocumentName"/>
+                <dxg:GridColumn ReadOnly="True" Header="Уровень 2" FieldName="SecondLevel"/>
+                <dxg:GridColumn ReadOnly="True" Header="Категория 2" FieldName="SecondCategory"/>
+                <dxg:GridColumn ReadOnly="True" Header="Имя типа 2" FieldName="SecondName"/>
+                <dxg:GridColumn ReadOnly="True" Header="Имя файла 2" FieldName="SecondDocumentName"/>
+            </dxg:GridControl.Columns>
+        </dxg:GridControl>
+
+        <StackPanel Grid.Row="2" Margin="0 10 0 0" Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding Message}"
+                          Foreground="Green" />
+            <dx:SimpleButton Content="Сохранить" Height="25" Width="80" Margin="10 0" IsDefault="True"
+                             Command="{Binding SaveCommand}" />
+            <dx:SimpleButton Content="Отмена" Height="25" Width="80"  IsCancel="true"
+                             Click="ButtonCancel_Click" />
         </StackPanel>
+
     </Grid>
-</base:PlatformWindow>
+</base:ThemedPlatformWindow>

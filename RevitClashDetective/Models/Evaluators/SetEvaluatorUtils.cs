@@ -21,9 +21,19 @@ namespace RevitClashDetective.Models.Evaluators {
             return result;
         }
 
+        public static IRevitLogicalFilterCreator GetInvertedRevitLogicalFilterCreator(SetEvaluators evaluator) {
+            _invertedEvaluatorDictionary.TryGetValue(evaluator, out IRevitLogicalFilterCreator result);
+            return result;
+        }
+
         private static Dictionary<SetEvaluators, IRevitLogicalFilterCreator> _evaluatorDictionary = new Dictionary<SetEvaluators, IRevitLogicalFilterCreator>() {
             {SetEvaluators.And, new RevitLogicalAndFilterCreator() },
             {SetEvaluators.Or, new RevitLogicalOrFilterCreator() },
+        };
+
+        private static Dictionary<SetEvaluators, IRevitLogicalFilterCreator> _invertedEvaluatorDictionary = new Dictionary<SetEvaluators, IRevitLogicalFilterCreator>() {
+            {SetEvaluators.And, new RevitLogicalOrFilterCreator() },
+            {SetEvaluators.Or, new RevitLogicalAndFilterCreator() },
         };
     }
 
