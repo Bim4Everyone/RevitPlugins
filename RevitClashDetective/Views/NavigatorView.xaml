@@ -1,36 +1,37 @@
-﻿<base:ThemedPlatformWindow  
-        xmlns:base="clr-namespace:dosymep.WPF.Views"
-        x:Class="RevitClashDetective.Views.NavigatorView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:RevitClashDetective.Views"
-        xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.Navigator"
-        xmlns:converter="clr-namespace:dosymep.WPF.Converters"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
-        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
-        xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" 
-        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
-        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+﻿<base:ThemedPlatformWindow
+    x:Class="RevitClashDetective.Views.NavigatorView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.Navigator"
+    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:converters="clr-namespace:dosymep.WPF.Converters"
+    xmlns:ui="clr-namespace:DevExpress.XtraScheduler.UI;assembly=DevExpress.XtraScheduler.v21.2"
+    
     mc:Ignorable="d"
-        Title="Навигатор" Height="450" Width="800"
-        d:DataContext="{d:DesignInstance vm:ClashesViewModel, IsDesignTimeCreatable=False}">
+    Title="Навигатор" Height="450" Width="800"
+    d:DataContext="{d:DesignInstance vm:ClashesViewModel, IsDesignTimeCreatable=False}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
-            <i:InvokeCommandAction Command="{Binding OpenClashDetectorCommand}"/>
+            <i:InvokeCommandAction Command="{Binding OpenClashDetectorCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <base:ThemedPlatformWindow.Resources>
-        <converter:IndexConverter x:Key="IndexConverter"/>
-        <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:IndexConverter x:Key="IndexConverter" />
+        <ui:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </base:ThemedPlatformWindow.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <DockPanel LastChildFill="True">
@@ -38,27 +39,30 @@
                 <Style TargetType="DockPanel">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding FileNames}" Value="{x:Null}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </DockPanel.Style>
-            <dx:SimpleButton DockPanel.Dock="Left" ToolTip="Синхронизировать плагин с документом" Command="{Binding SelectionChangedCommand}" Glyph="{dx:DXImage 'Office2013/Actions/Refresh_32x32.png'}"/>
-            <dxe:ComboBoxEdit IsTextEditable="False" ItemsSource="{Binding FileNames}" SelectedItem="{Binding SelectedFile}" >
+            <dx:SimpleButton DockPanel.Dock="Left" ToolTip="Синхронизировать плагин с документом"
+                             Command="{Binding SelectionChangedCommand}"
+                             Glyph="{dx:DXImage 'Office2013/Actions/Refresh_32x32.png'}" />
+            <dxe:ComboBoxEdit IsTextEditable="False" ItemsSource="{Binding FileNames}"
+                              SelectedItem="{Binding SelectedFile}">
                 <mvvm:Interaction.Behaviors>
-                    <mvvm:EventToCommand EventName="EditValueChanged" Command="{Binding SelectionChangedCommand}"/>
+                    <mvvm:EventToCommand EventName="EditValueChanged" Command="{Binding SelectionChangedCommand}" />
                 </mvvm:Interaction.Behaviors>
             </dxe:ComboBoxEdit>
         </DockPanel>
 
         <dxg:GridControl Name="_dg"
-                  Grid.Row="1" 
-                  ItemsSource="{Binding ClashesViewSource.View}">
+                         Grid.Row="1"
+                         ItemsSource="{Binding ClashesViewSource.View}">
             <dxg:GridControl.GroupSummary>
-                <dxg:GridSummaryItem SummaryType="Count"/>
+                <dxg:GridSummaryItem SummaryType="Count" />
             </dxg:GridControl.GroupSummary>
             <mvvm:Interaction.Behaviors>
-                <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectionDataChangedCommand}"/>
+                <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectionDataChangedCommand}" />
             </mvvm:Interaction.Behaviors>
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
@@ -66,26 +70,29 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
             <dxg:GridControl.View>
-                <dxg:TableView Name="_gridView" AutoWidth="True" DataNavigatorButtons="Navigation" ShowDataNavigator="True"></dxg:TableView>
+                <dxg:TableView Name="_gridView" AutoWidth="True" DataNavigatorButtons="Navigation"
+                               ShowDataNavigator="True">
+                </dxg:TableView>
             </dxg:GridControl.View>
             <dxg:GridControl.Columns>
                 <dxg:GridColumn ReadOnly="True" Width="70" Header="">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
-                            <dx:SimpleButton Content="Выбрать" Command="{Binding ElementName=_dg, Path=DataContext.SelectClashCommand}" 
-                                    CommandParameter="{Binding Row}"/>
+                            <dx:SimpleButton Content="Выбрать"
+                                             Command="{Binding ElementName=_dg, Path=DataContext.SelectClashCommand}"
+                                             CommandParameter="{Binding Row}" />
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
-                <dxg:GridColumn Header="" Width="30" FieldName="IsSolved"/>
-                <dxg:GridColumn ReadOnly="True" Header="Уровень 1" FieldName="FirstLevel"/>
-                <dxg:GridColumn ReadOnly="True" Header="Категория 1" FieldName="FirstCategory"/>
-                <dxg:GridColumn ReadOnly="True" Header="Имя типа 1" FieldName="FirstName"/>
-                <dxg:GridColumn ReadOnly="True" Header="Имя файла 1" FieldName="FirstDocumentName"/>
-                <dxg:GridColumn ReadOnly="True" Header="Уровень 2" FieldName="SecondLevel"/>
-                <dxg:GridColumn ReadOnly="True" Header="Категория 2" FieldName="SecondCategory"/>
-                <dxg:GridColumn ReadOnly="True" Header="Имя типа 2" FieldName="SecondName"/>
-                <dxg:GridColumn ReadOnly="True" Header="Имя файла 2" FieldName="SecondDocumentName"/>
+                <dxg:GridColumn Header="" Width="30" FieldName="IsSolved" />
+                <dxg:GridColumn ReadOnly="True" Header="Уровень 1" FieldName="FirstLevel" />
+                <dxg:GridColumn ReadOnly="True" Header="Категория 1" FieldName="FirstCategory" />
+                <dxg:GridColumn ReadOnly="True" Header="Имя типа 1" FieldName="FirstName" />
+                <dxg:GridColumn ReadOnly="True" Header="Имя файла 1" FieldName="FirstDocumentName" />
+                <dxg:GridColumn ReadOnly="True" Header="Уровень 2" FieldName="SecondLevel" />
+                <dxg:GridColumn ReadOnly="True" Header="Категория 2" FieldName="SecondCategory" />
+                <dxg:GridColumn ReadOnly="True" Header="Имя типа 2" FieldName="SecondName" />
+                <dxg:GridColumn ReadOnly="True" Header="Имя файла 2" FieldName="SecondDocumentName" />
             </dxg:GridControl.Columns>
         </dxg:GridControl>
 
@@ -95,7 +102,7 @@
                           Foreground="Green" />
             <dx:SimpleButton Content="Сохранить" Height="25" Width="80" Margin="10 0" IsDefault="True"
                              Command="{Binding SaveCommand}" />
-            <dx:SimpleButton Content="Отмена" Height="25" Width="80"  IsCancel="true"
+            <dx:SimpleButton Content="Отмена" Height="25" Width="80" IsCancel="true"
                              Click="ButtonCancel_Click" />
         </StackPanel>
 

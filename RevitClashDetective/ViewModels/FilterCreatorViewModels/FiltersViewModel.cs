@@ -19,6 +19,7 @@ using dosymep.WPF.ViewModels;
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.ViewModels.SearchSet;
+using RevitClashDetective.ViewModels.Services;
 using RevitClashDetective.Views;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {

@@ -4,9 +4,10 @@ using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 
+using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
 
-namespace RevitClashDetective.Models {
+namespace RevitClashDetective.ViewModels.Services {
     internal class ConfigLoaderService {
         public T Load<T>() where T : ProjectConfig, new() {
             var openWindow = GetPlatformService<IOpenFileDialogService>();

@@ -11,7 +11,6 @@ using System.Windows.Threading;
 
 using Autodesk.Revit.DB;
 
-using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;

@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models.FilterGenerators;
 using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.Interfaces;
 
-namespace RevitClashDetective.Models {
+namespace RevitClashDetective.Models.ClashDetection {
     internal class FilterProvider : IProvider {
 
         private readonly Filter _filter;

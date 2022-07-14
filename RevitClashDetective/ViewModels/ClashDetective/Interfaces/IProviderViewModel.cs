@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.ViewModels.ClashDetective.Interfaces {
     interface IProviderViewModel {

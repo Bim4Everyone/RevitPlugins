@@ -20,9 +20,9 @@ namespace RevitClashDetective.Views {
     /// <summary>
     /// Interaction logic for ProviderCombobBox.xaml
     /// </summary>
-    public partial class ProviderCombobBox : UserControl {
+    public partial class ProviderComboBox : UserControl {
 
-        public ProviderCombobBox() {
+        public ProviderComboBox() {
             InitializeComponent();
         }
 

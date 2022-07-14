@@ -1,20 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-using Autodesk.Revit.DB;
-
-using DevExpress.Dialogs.Core.ViewModel;
-
-using dosymep.Bim4Everyone;
-
-using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.Models.Value;
 
-namespace RevitClashDetective.Models {
-    internal class ParamValueViewModel : BaseViewModel, IEquatable<ParamValueViewModel> {
+namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
+    internal class ParamValueViewModel : DevExpress.Dialogs.Core.ViewModel.BaseViewModel, IEquatable<ParamValueViewModel> {
         public ParamValueViewModel(ParamValue paramValue) {
             ParamValue = paramValue;
         }

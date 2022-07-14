@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-using RevitClashDetective.Models;
+using RevitClashDetective.Models.Interfaces;
 
-namespace RevitClashDetective.Models {
+namespace RevitClashDetective.Models.ClashDetection {
     internal class SetProvider : IProvider {
         public Document Doc => throw new NotImplementedException();
 
