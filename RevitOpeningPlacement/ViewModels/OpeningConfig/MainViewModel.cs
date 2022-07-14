@@ -14,6 +14,7 @@ using RevitOpeningPlacement.ViewModels.Interfaces;
 using RevitOpeningPlacement.ViewModels.OpeningConfig.MepCategories;
 using RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels;
 using RevitOpeningPlacement.ViewModels.OpeningConfig.SizeViewModels;
+using RevitOpeningPlacement.ViewModels.Services;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
     internal class MainViewModel : BaseViewModel {
@@ -30,6 +31,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             }
 
             SaveConfigCommand = new RelayCommand(SaveConfig, CanSaveConfig);
+            SaveAsConfigCommand = new RelayCommand(SaveAsConfig, CanSaveConfig);
+            LoadConfigCommand = new RelayCommand(LoadConfig);
         }
 
         public ObservableCollection<IMepCategoryViewModel> MepCategories {
@@ -43,6 +46,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
         public ICommand SaveConfigCommand { get; }
+        public ICommand SaveAsConfigCommand { get; }
+        public ICommand LoadConfigCommand { get; }
+
 
         private void InitializeCategories() {
             MepCategories = new ObservableCollection<IMepCategoryViewModel>() {
@@ -100,10 +106,28 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         };
 
         private void SaveConfig(object p) {
+            GetOpeningConfig().SaveProjectConfig();
+        }
+
+        private void SaveAsConfig(object p) {
+            var config = GetOpeningConfig();
+            var css = new ConfigSaverService();
+            css.Save(config);
+        }
+
+        private void LoadConfig(object p) {
+            var cls = new ConfigLoaderService();
+            var config = cls.Load<Models.Configs.OpeningConfig>();
+            if(config != null) {
+                MepCategories = new ObservableCollection<IMepCategoryViewModel>(config.Categories.Select(item => new MepCategoryViewModel(item)));
+            }
+        }
+
+        private Models.Configs.OpeningConfig GetOpeningConfig() {
             var categories = MepCategories.Select(item => item.GetMepCategory()).ToList();
             var config = Models.Configs.OpeningConfig.GetOpeningConfig();
             config.Categories = categories;
-            config.SaveProjectConfig();
+            return config;
         }
 
         private bool CanSaveConfig(object p) {

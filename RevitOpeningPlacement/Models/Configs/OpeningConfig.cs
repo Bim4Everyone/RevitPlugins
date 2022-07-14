@@ -11,6 +11,7 @@ using pyRevitLabs.Json;
 
 namespace RevitOpeningPlacement.Models.Configs {
     internal class OpeningConfig : ProjectConfig {
+        public string RevitVersion { get; set; }
         [JsonIgnore]
         public override string ProjectConfigPath { get; set; }
         [JsonIgnore]
