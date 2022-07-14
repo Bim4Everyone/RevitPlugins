@@ -7,11 +7,12 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.ClashDetection;
 using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.ViewModels.ClashDetective.Interfaces;
 
 namespace RevitClashDetective.ViewModels.ClashDetective {

@@ -15,6 +15,7 @@ using dosymep.SimpleServices;
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.ViewModels;
+using RevitClashDetective.ViewModels.ClashDetective;
 using RevitClashDetective.Views;
 
 namespace RevitClashDetective {

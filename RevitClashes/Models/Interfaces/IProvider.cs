@@ -2,7 +2,7 @@
 
 using Autodesk.Revit.DB;
 
-namespace RevitClashDetective.Models {
+namespace RevitClashDetective.Models.Interfaces {
     internal interface IProvider {
         Document Doc { get; }
         /// <summary>

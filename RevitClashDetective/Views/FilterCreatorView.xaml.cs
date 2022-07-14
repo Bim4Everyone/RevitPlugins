@@ -12,8 +12,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-using dosymep.WPF.Views;
-
 using RevitClashDetective.ViewModels.FilterCreatorViewModels;
 
 namespace RevitClashDetective.Views {

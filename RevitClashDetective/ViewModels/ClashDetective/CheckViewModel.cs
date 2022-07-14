@@ -1,27 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
-using Autodesk.Revit.UI;
-
-using dosymep.Bim4Everyone;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.ClashDetection;
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.FilterModel;
-using RevitClashDetective.ViewModels.ClashDetective;
+using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.ViewModels.Interfaces;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
 
-namespace RevitClashDetective.ViewModels {
+namespace RevitClashDetective.ViewModels.ClashDetective {
     internal class CheckViewModel : BaseViewModel, INamedViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly FiltersConfig _filtersConfig;

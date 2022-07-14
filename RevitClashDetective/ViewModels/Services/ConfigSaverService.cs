@@ -4,7 +4,9 @@ using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 
-namespace RevitClashDetective.Models {
+using RevitClashDetective.Models;
+
+namespace RevitClashDetective.ViewModels.Services {
     internal class ConfigSaverService {
         public void Save(ProjectConfig config) {
             var saveWindow = GetPlatformService<ISaveFileDialogService>();

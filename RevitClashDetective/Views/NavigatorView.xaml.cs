@@ -14,8 +14,6 @@ using System.Windows.Shapes;
 
 using DevExpress.Xpf.Grid;
 
-using dosymep.WPF.Views;
-
 using RevitClashDetective.ViewModels.Navigator;
 
 namespace RevitClashDetective.Views {

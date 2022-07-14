@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-
-using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.WPF.Commands;
@@ -17,10 +11,9 @@ using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
-using RevitClashDetective.ViewModels.Navigator;
-using RevitClashDetective.Views;
+using RevitClashDetective.ViewModels.Services;
 
-namespace RevitClashDetective.ViewModels {
+namespace RevitClashDetective.ViewModels.ClashDetective {
     internal class MainViewModel : BaseViewModel {
         private string _errorText;
 

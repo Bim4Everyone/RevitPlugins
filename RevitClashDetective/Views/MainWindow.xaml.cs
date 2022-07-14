@@ -14,8 +14,6 @@ using System.Windows.Shapes;
 
 using DevExpress.Xpf.Grid;
 
-using dosymep.WPF.Views;
-
 namespace RevitClashDetective.Views {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

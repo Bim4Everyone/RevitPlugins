@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-using Autodesk.Revit.DB;
-
-using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.SimpleServices;
-
-using RevitClashDetective.Models.ClashDetection;
 using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.Interfaces;
 
-namespace RevitClashDetective.Models {
+namespace RevitClashDetective.Models.ClashDetection {
     internal class ClashDetector {
         private readonly RevitRepository _revitRepository;
         private readonly List<IProvider> _mainDocProviders;

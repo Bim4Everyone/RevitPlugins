@@ -11,6 +11,8 @@ using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 
 using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.Extensions;
+using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.ClashDetection {
     internal class ProvidersClashDetector {
