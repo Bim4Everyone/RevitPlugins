@@ -29,7 +29,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 InitializeCategories();
             }
 
-            SaveConfigCommand = new RelayCommand(SaveConfig);
+            SaveConfigCommand = new RelayCommand(SaveConfig, CanSaveConfig);
         }
 
         public ObservableCollection<IMepCategoryViewModel> MepCategories {
@@ -104,6 +104,11 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             var config = Models.Configs.OpeningConfig.GetOpeningConfig();
             config.Categories = categories;
             config.SaveProjectConfig();
+        }
+
+        private bool CanSaveConfig(object p) {
+            ErrorText = MepCategories.FirstOrDefault(item => !string.IsNullOrEmpty(item.GetErrorText()))?.GetErrorText();
+            return string.IsNullOrEmpty(ErrorText);
         }
     }
 }

@@ -5,6 +5,8 @@ namespace RevitOpeningPlacement.ViewModels.Interfaces {
         double From { get; set; }
         double To { get; set; }
         double Offset { get; set; }
+        string GetErrorText();
+        string GetIntersectText(IOffsetViewModel offset);
         Offset GetOffset();
     }
 }

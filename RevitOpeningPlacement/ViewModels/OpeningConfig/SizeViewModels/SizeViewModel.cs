@@ -32,6 +32,13 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig.SizeViewModels {
             set => this.RaiseAndSetIfChanged(ref _value, value);
         }
 
+        public string GetErrorText() {
+            if(Value < 0) {
+                return $"значение параметра \"{Name}\" должно быть неотрицательным.";
+            }
+            return null;
+        }
+
         public Size GetSize() {
             return new Size() { Name = Name, Value = Value };
         }

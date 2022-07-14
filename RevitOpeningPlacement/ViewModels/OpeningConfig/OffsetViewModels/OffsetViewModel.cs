@@ -38,8 +38,31 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels {
             set => this.RaiseAndSetIfChanged(ref _offset, value);
         }
 
+        public string GetErrorText() {
+            if(From < 0) {
+                return "значение параметра \"От\" должно быть неотрицательным.";
+            }
+            if(To < 0) {
+                return "значение параметра \"До\" должно быть неотрицательным.";
+            }
+            if(From > To) {
+                return "значение парметра \"От\" должно быть меньше значения параметра \"До\".";
+            }
+            if(Offset > To) {
+                return "значение \"Зазора\" должно быть меньше значения параметра \"До\".";
+            }
+            return null;
+        }
+
         public Offset GetOffset() {
             return new Offset() { From = From, To = To, OffsetValue = Offset };
+        }
+
+        public string GetIntersectText(IOffsetViewModel offset) {
+            if((offset.From >= From || offset.To >= From) && (offset.To <= To || offset.From <= To)) {
+                return $"пересекаются диапазоны значений параметров \"{From}\" - \"{To}\" с \"{offset.From}\" - \"{offset.To}\".";
+            }
+            return null;
         }
     }
 }

@@ -22,7 +22,7 @@
             <lc:GroupBox Margin="0 5 0 0" Grid.Row="1" Header="Минимальные размеры">
                 <dxg:GridControl MinHeight="110" MaxHeight="2000" ItemsSource="{Binding MinSizes}">
                     <dxg:GridControl.View>
-                        <dxg:TableView AutoWidth="True"  AllowGrouping="False" ShowGroupPanel="False" ShowSearchPanelMode="Always"/>
+                        <dxg:TableView AutoWidth="True" AllowGrouping="False" ShowGroupPanel="False" ShowSearchPanelMode="Always" CellValueChanging="TableView_CellValueChanging"/>
                     </dxg:GridControl.View>
                     <dxg:GridControl.Columns>
                         <dxg:GridColumn Header="Параметер" FieldName="Name" ReadOnly="True"/>
@@ -48,7 +48,7 @@
                     </StackPanel>
                     <dxg:GridControl SelectionMode="Row" DockPanel.Dock="Bottom" x:Name="_offsetgrid" MinHeight="110" MaxHeight="2000" ItemsSource="{Binding Offsets}">
                         <dxg:GridControl.View>
-                            <dxg:TableView AutoWidth="True" AllowGrouping="False" ShowGroupPanel="False" ShowSearchPanelMode="Always"/>
+                            <dxg:TableView AutoWidth="True" AllowGrouping="False" ShowGroupPanel="False" ShowSearchPanelMode="Always" CellValueChanging="TableView_CellValueChanging"/>
                         </dxg:GridControl.View>
                         <dxg:GridControl.Columns>
                             <dxg:GridColumn Header="От" FieldName="From"/>
