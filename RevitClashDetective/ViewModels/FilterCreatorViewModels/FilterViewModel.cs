@@ -15,10 +15,10 @@ using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
-using RevitClashDetective.ViewModels.Interfaces;
+using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
-    internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INamedViewModel {
+    internal class FilterViewModel : BaseViewModel, IEquatable<FilterViewModel>, INamedEntity {
         private readonly RevitRepository _revitRepository;
         private readonly Filter _filter;
         private readonly Delay _delay;

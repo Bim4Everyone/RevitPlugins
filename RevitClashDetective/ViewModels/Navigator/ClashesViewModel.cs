@@ -161,7 +161,11 @@ namespace RevitClashDetective.ViewModels.Navigator {
         }
 
         private void OpenClashDetector(object p) {
-            _revitRepository.OpenClashDetectorWindow();
+            Action action = () => {
+                var command = new DetectiveClashesCommand();
+                command.ExecuteCommand(_revitRepository.UiApplication);
+            };
+            _revitRepository.DoAction(action);
         }
 
         private void InitializeTimer() {

@@ -11,12 +11,11 @@ using RevitClashDetective.Models.ClashDetection;
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.Models.Interfaces;
-using RevitClashDetective.ViewModels.Interfaces;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
 
 namespace RevitClashDetective.ViewModels.ClashDetective {
-    internal class CheckViewModel : BaseViewModel, INamedViewModel {
+    internal class CheckViewModel : BaseViewModel, INamedEntity {
         private readonly RevitRepository _revitRepository;
         private readonly FiltersConfig _filtersConfig;
         private string _name;
