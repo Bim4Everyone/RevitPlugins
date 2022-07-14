@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 using Autodesk.Revit.UI;
 
@@ -20,7 +22,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private string _errorText;
+        private string _messageText;
         private ObservableCollection<IMepCategoryViewModel> _mepCategories;
+        private DispatcherTimer _timer; 
 
         public MainViewModel(UIApplication uiApplication, Models.Configs.OpeningConfig openingConfig) {
             _revitRepository = new RevitRepository(uiApplication);
@@ -29,6 +33,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             } else {
                 InitializeCategories();
             }
+
+            InitializeTimer();
 
             SaveConfigCommand = new RelayCommand(SaveConfig, CanSaveConfig);
             SaveAsConfigCommand = new RelayCommand(SaveAsConfig, CanSaveConfig);
@@ -43,6 +49,11 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        public string MessageText { 
+            get => _messageText; 
+            set => this.RaiseAndSetIfChanged(ref _messageText, value); 
         }
 
         public ICommand SaveConfigCommand { get; }
@@ -105,14 +116,33 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             ImageSource = "../Resources/tray.png"
         };
 
+        private void InitializeTimer() {
+            _timer = new DispatcherTimer();
+            _timer.Interval = new TimeSpan(0, 0, 0, 3);
+            _timer.Tick += (s, a) => {
+                MessageText = null;
+                _timer.Stop();
+            };
+        }
+        private Models.Configs.OpeningConfig GetOpeningConfig() {
+            var categories = MepCategories.Select(item => item.GetMepCategory()).ToList();
+            var config = Models.Configs.OpeningConfig.GetOpeningConfig();
+            config.Categories = categories;
+            return config;
+        }
+
         private void SaveConfig(object p) {
             GetOpeningConfig().SaveProjectConfig();
+            MessageText = "Файл настроек успешно сохранен.";
+            _timer.Start();
         }
 
         private void SaveAsConfig(object p) {
             var config = GetOpeningConfig();
             var css = new ConfigSaverService();
             css.Save(config);
+            MessageText = "Файл настроек успешно сохранен.";
+            _timer.Start();
         }
 
         private void LoadConfig(object p) {
@@ -121,13 +151,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             if(config != null) {
                 MepCategories = new ObservableCollection<IMepCategoryViewModel>(config.Categories.Select(item => new MepCategoryViewModel(item)));
             }
-        }
-
-        private Models.Configs.OpeningConfig GetOpeningConfig() {
-            var categories = MepCategories.Select(item => item.GetMepCategory()).ToList();
-            var config = Models.Configs.OpeningConfig.GetOpeningConfig();
-            config.Categories = categories;
-            return config;
+            MessageText = "Файл настроек успешно загружен.";
+            _timer.Start();
         }
 
         private bool CanSaveConfig(object p) {

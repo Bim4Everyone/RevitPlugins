@@ -7,7 +7,9 @@
              xmlns:vm="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig.MepCategories" 
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
              xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol" 
-             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance vm:MepCategoryViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
