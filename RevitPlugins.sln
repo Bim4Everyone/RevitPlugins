@@ -62,11 +62,133 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectProps", "ProjectProps", "{036539D1-9384-4C6B-8A92-B9A50994DE8D}"
 	ProjectSection(SolutionItems) = preProject
 		ProjectProps\Common.props = ProjectProps\Common.props
+		ProjectProps\RevitClashes.props = ProjectProps\RevitClashes.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitWindowGapPlacement", "RevitWindowGapPlacement\RevitWindowGapPlacement.csproj", "{997A6771-5EA7-4435-AC55-6578E052269C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitOpeningPlacement", "RevitOpeningPlacement\RevitOpeningPlacement.csproj", "{80EA241A-E858-41E8-B7DB-ABBD6199841D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitOpeningPlacement", "RevitOpeningPlacement\RevitOpeningPlacement.csproj", "{80EA241A-E858-41E8-B7DB-ABBD6199841D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RevitClashes", "RevitClashes", "{D1D5F8CC-CC58-4C3B-AC68-F2451FA3BFC6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Models", "Models", "{968DE2B9-F390-4B99-A796-A797FBB7847A}"
+	ProjectSection(SolutionItems) = preProject
+		RevitClashes\Models\ChecksConfig.cs = RevitClashes\Models\ChecksConfig.cs
+		RevitClashes\Models\Collector.cs = RevitClashes\Models\Collector.cs
+		RevitClashes\Models\ConfigLoader.cs = RevitClashes\Models\ConfigLoader.cs
+		RevitClashes\Models\ConfigSaver.cs = RevitClashes\Models\ConfigSaver.cs
+		RevitClashes\Models\DocInfo.cs = RevitClashes\Models\DocInfo.cs
+		RevitClashes\Models\NameResolver.cs = RevitClashes\Models\NameResolver.cs
+		RevitClashes\Models\ProjectConfigBuilder.cs = RevitClashes\Models\ProjectConfigBuilder.cs
+		RevitClashes\Models\RevitRepository.cs = RevitClashes\Models\RevitRepository.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ClashDetection", "ClashDetection", "{435BD787-178B-4358-82CA-FC242DDD4371}"
+	ProjectSection(SolutionItems) = preProject
+		RevitClashes\Models\ClashDetection\ClashDetector.cs = RevitClashes\Models\ClashDetection\ClashDetector.cs
+		RevitClashes\Models\ClashDetection\FilterProvider.cs = RevitClashes\Models\ClashDetection\FilterProvider.cs
+		RevitClashes\Models\ClashDetection\ProvidersClashDetector.cs = RevitClashes\Models\ClashDetection\ProvidersClashDetector.cs
+		RevitClashes\Models\ClashDetection\SetProvider.cs = RevitClashes\Models\ClashDetection\SetProvider.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clashes", "Clashes", "{4526DA81-105F-41F7-8EA9-EBC495EEEBD6}"
+	ProjectSection(SolutionItems) = preProject
+		RevitClashes\Models\Clashes\ClashesConfig.cs = RevitClashes\Models\Clashes\ClashesConfig.cs
+		RevitClashes\Models\Clashes\ClashModel.cs = RevitClashes\Models\Clashes\ClashModel.cs
+		RevitClashes\Models\Clashes\ElementModel.cs = RevitClashes\Models\Clashes\ElementModel.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Evaluators", "Evaluators", "{84024C31-F7A3-48D1-949D-A529A5C1ED42}"
+	ProjectSection(SolutionItems) = preProject
+		RevitClashes\Models\Evaluators\RuleEvaluators.cs = RevitClashes\Models\Evaluators\RuleEvaluators.cs
+		RevitClashes\Models\Evaluators\SetEvaluatorUtils.cs = RevitClashes\Models\Evaluators\SetEvaluatorUtils.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{A5EE8BFC-F18E-4A18-BC8D-4F63E63CE772}"
+	ProjectSection(SolutionItems) = preProject
+		RevitClashes\Models\Extensions\BoundingBoxExtensions.cs = RevitClashes\Models\Extensions\BoundingBoxExtensions.cs
+		RevitClashes\Models\Extensions\ElementExtensions.cs = RevitClashes\Models\Extensions\ElementExtensions.cs
+		RevitClashes\Models\Extensions\SolidExtension.cs = RevitClashes\Models\Extensions\SolidExtension.cs
+		RevitClashes\Models\Extensions\TransformExtension.cs = RevitClashes\Models\Extensions\TransformExtension.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FilterableValueProviders", "FilterableValueProviders", "{95CEC2DC-2DFC-49BB-9D30-0572B973DB96}"
+	ProjectSection(SolutionItems) = preProject
+		RevitClashes\Models\FilterableValueProviders\ParameterInitializer.cs = RevitClashes\Models\FilterableValueProviders\ParameterInitializer.cs
+		RevitClashes\Models\FilterableValueProviders\ParameterValueProvider.cs = RevitClashes\Models\FilterableValueProviders\ParameterValueProvider.cs
+		RevitClashes\Models\FilterableValueProviders\WorksetValueProvider.cs = RevitClashes\Models\FilterableValueProviders\WorksetValueProvider.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FilterCreators", "FilterCreators", "{15420EBA-B659-4405-B9A0-E85AC85D53AB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RevitFilterCreators", "RevitFilterCreators", "{9711B9A7-25AF-49F6-B828-FAA0C141EF3B}"
+	ProjectSection(SolutionItems) = preProject
+		RevitClashes\Models\FilterCreators\RevitFilterCreators\RevitLogicalAndFilterCreator.cs = RevitClashes\Models\FilterCreators\RevitFilterCreators\RevitLogicalAndFilterCreator.cs
+		RevitClashes\Models\FilterCreators\RevitFilterCreators\RevitLogicalOrFilterCreator.cs = RevitClashes\Models\FilterCreators\RevitFilterCreators\RevitLogicalOrFilterCreator.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FilterGenerators", "FilterGenerators", "{5122432D-5182-4CD9-ACAB-6A410A3B29A7}"
+	ProjectSection(SolutionItems) = preProject
+		RevitClashes\Models\FilterGenerators\RevitFilter.cs = RevitClashes\Models\FilterGenerators\RevitFilter.cs
+		RevitClashes\Models\FilterGenerators\RevitFilterGenerator.cs = RevitClashes\Models\FilterGenerators\RevitFilterGenerator.cs
+		RevitClashes\Models\FilterGenerators\RevitRule.cs = RevitClashes\Models\FilterGenerators\RevitRule.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FilterModel", "FilterModel", "{CCFFC2FF-46AE-43D5-88F7-25C3E1E86EDD}"
+	ProjectSection(SolutionItems) = preProject
+		RevitClashes\Models\FilterModel\Criterion.cs = RevitClashes\Models\FilterModel\Criterion.cs
+		RevitClashes\Models\FilterModel\Filter.cs = RevitClashes\Models\FilterModel\Filter.cs
+		RevitClashes\Models\FilterModel\FiltersConfig.cs = RevitClashes\Models\FilterModel\FiltersConfig.cs
+		RevitClashes\Models\FilterModel\RevitClashConfigSerializer.cs = RevitClashes\Models\FilterModel\RevitClashConfigSerializer.cs
+		RevitClashes\Models\FilterModel\RevitClashesSerializationBinder.cs = RevitClashes\Models\FilterModel\RevitClashesSerializationBinder.cs
+		RevitClashes\Models\FilterModel\Rule.cs = RevitClashes\Models\FilterModel\Rule.cs
+		RevitClashes\Models\FilterModel\Set.cs = RevitClashes\Models\FilterModel\Set.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interfaces", "Interfaces", "{47CEC06A-AA7E-4562-97B1-EBDAB13A4A3D}"
+	ProjectSection(SolutionItems) = preProject
+		RevitClashes\Models\Interfaces\ICriterion.cs = RevitClashes\Models\Interfaces\ICriterion.cs
+		RevitClashes\Models\Interfaces\IFilter.cs = RevitClashes\Models\Interfaces\IFilter.cs
+		RevitClashes\Models\Interfaces\IFilterableValueProvider.cs = RevitClashes\Models\Interfaces\IFilterableValueProvider.cs
+		RevitClashes\Models\Interfaces\IFilterGenerator.cs = RevitClashes\Models\Interfaces\IFilterGenerator.cs
+		RevitClashes\Models\Interfaces\IProvider.cs = RevitClashes\Models\Interfaces\IProvider.cs
+		RevitClashes\Models\Interfaces\IRevitLogicalFilterCreator.cs = RevitClashes\Models\Interfaces\IRevitLogicalFilterCreator.cs
+		RevitClashes\Models\Interfaces\IRevitRuleCreator.cs = RevitClashes\Models\Interfaces\IRevitRuleCreator.cs
+		RevitClashes\Models\Interfaces\IRule.cs = RevitClashes\Models\Interfaces\IRule.cs
+		RevitClashes\Models\Interfaces\IVisiter.cs = RevitClashes\Models\Interfaces\IVisiter.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{53A474C0-AD86-4DA3-B140-86344DF32811}"
+	ProjectSection(SolutionItems) = preProject
+		RevitClashes\Models\Utils\DoubleValueParser.cs = RevitClashes\Models\Utils\DoubleValueParser.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Value", "Value", "{D9C7C058-C70E-4F81-9CAD-C7CF7D952CCF}"
+	ProjectSection(SolutionItems) = preProject
+		RevitClashes\Models\Value\DoubleParamValue.cs = RevitClashes\Models\Value\DoubleParamValue.cs
+		RevitClashes\Models\Value\ElementIdParamValue.cs = RevitClashes\Models\Value\ElementIdParamValue.cs
+		RevitClashes\Models\Value\IntParamValue.cs = RevitClashes\Models\Value\IntParamValue.cs
+		RevitClashes\Models\Value\ParamValue.cs = RevitClashes\Models\Value\ParamValue.cs
+		RevitClashes\Models\Value\StringParamValue.cs = RevitClashes\Models\Value\StringParamValue.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Visiter", "Visiter", "{D9661EB6-ECF7-4E7F-B055-65A6313EDF8B}"
+	ProjectSection(SolutionItems) = preProject
+		RevitClashes\Models\Visiter\BeginsWithVisister.cs = RevitClashes\Models\Visiter\BeginsWithVisister.cs
+		RevitClashes\Models\Visiter\ContainsVisiter.cs = RevitClashes\Models\Visiter\ContainsVisiter.cs
+		RevitClashes\Models\Visiter\EndsWithVisister.cs = RevitClashes\Models\Visiter\EndsWithVisister.cs
+		RevitClashes\Models\Visiter\EqualsVisiter.cs = RevitClashes\Models\Visiter\EqualsVisiter.cs
+		RevitClashes\Models\Visiter\GreaterOrEqualVisister.cs = RevitClashes\Models\Visiter\GreaterOrEqualVisister.cs
+		RevitClashes\Models\Visiter\GreaterVisister.cs = RevitClashes\Models\Visiter\GreaterVisister.cs
+		RevitClashes\Models\Visiter\HasNoValueVisister.cs = RevitClashes\Models\Visiter\HasNoValueVisister.cs
+		RevitClashes\Models\Visiter\HasValueVisister.cs = RevitClashes\Models\Visiter\HasValueVisister.cs
+		RevitClashes\Models\Visiter\LessOrEqualVisister.cs = RevitClashes\Models\Visiter\LessOrEqualVisister.cs
+		RevitClashes\Models\Visiter\LessVisister.cs = RevitClashes\Models\Visiter\LessVisister.cs
+		RevitClashes\Models\Visiter\NotBeginsWithVisister.cs = RevitClashes\Models\Visiter\NotBeginsWithVisister.cs
+		RevitClashes\Models\Visiter\NotContainsVisister.cs = RevitClashes\Models\Visiter\NotContainsVisister.cs
+		RevitClashes\Models\Visiter\NotEndsWithVisister.cs = RevitClashes\Models\Visiter\NotEndsWithVisister.cs
+		RevitClashes\Models\Visiter\NotEqualsVisister.cs = RevitClashes\Models\Visiter\NotEqualsVisister.cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -355,6 +477,22 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{968DE2B9-F390-4B99-A796-A797FBB7847A} = {D1D5F8CC-CC58-4C3B-AC68-F2451FA3BFC6}
+		{435BD787-178B-4358-82CA-FC242DDD4371} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
+		{4526DA81-105F-41F7-8EA9-EBC495EEEBD6} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
+		{84024C31-F7A3-48D1-949D-A529A5C1ED42} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
+		{A5EE8BFC-F18E-4A18-BC8D-4F63E63CE772} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
+		{95CEC2DC-2DFC-49BB-9D30-0572B973DB96} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
+		{15420EBA-B659-4405-B9A0-E85AC85D53AB} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
+		{9711B9A7-25AF-49F6-B828-FAA0C141EF3B} = {15420EBA-B659-4405-B9A0-E85AC85D53AB}
+		{5122432D-5182-4CD9-ACAB-6A410A3B29A7} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
+		{CCFFC2FF-46AE-43D5-88F7-25C3E1E86EDD} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
+		{47CEC06A-AA7E-4562-97B1-EBDAB13A4A3D} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
+		{53A474C0-AD86-4DA3-B140-86344DF32811} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
+		{D9C7C058-C70E-4F81-9CAD-C7CF7D952CCF} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
+		{D9661EB6-ECF7-4E7F-B055-65A6313EDF8B} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2332A0ED-46BB-427C-AAD9-EFA10FA76316}

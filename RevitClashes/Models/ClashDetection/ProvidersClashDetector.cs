@@ -46,7 +46,7 @@ namespace RevitClashDetective.Models.ClashDetection {
             }
         }
 
-        private List<ClashModel> GetClashes(IProgress<int> progress, CancellationToken ct) {
+        public List<ClashModel> GetClashes(IProgress<int> progress, CancellationToken ct) {
             List<ClashModel> clashes = new List<ClashModel>();
 
             if(_mainElements.Count == 0) {
