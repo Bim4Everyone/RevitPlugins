@@ -24,7 +24,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private string _errorText;
         private string _messageText;
         private ObservableCollection<IMepCategoryViewModel> _mepCategories;
-        private DispatcherTimer _timer; 
+        private DispatcherTimer _timer;
 
         public MainViewModel(UIApplication uiApplication, Models.Configs.OpeningConfig openingConfig) {
             _revitRepository = new RevitRepository(uiApplication);
@@ -71,7 +71,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
         private MepCategoryViewModel GetPipeCategory() => new MepCategoryViewModel {
-            Name = "Трубы",
+            Name = RevitRepository.CategoryNames[Categories.Pipe],
             MinSizes = new ObservableCollection<ISizeViewModel>() {
                 new SizeViewModel(){Name ="Диаметр"}
             },
@@ -82,7 +82,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         };
 
         private MepCategoryViewModel GetRectangleDuct() => new MepCategoryViewModel {
-            Name = "Воздуховоды (прямоугольное сечение)",
+            Name = RevitRepository.CategoryNames[Categories.RectangleDuct],
             MinSizes = new ObservableCollection<ISizeViewModel>() {
                 new SizeViewModel(){Name ="Ширина"},
                 new SizeViewModel(){Name ="Высота"}
@@ -94,7 +94,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         };
 
         private MepCategoryViewModel GetRoundDuct() => new MepCategoryViewModel {
-            Name = "Воздуховоды (круглое сечение)",
+            Name = RevitRepository.CategoryNames[Categories.RoundDuct],
             MinSizes = new ObservableCollection<ISizeViewModel>() {
                 new SizeViewModel(){Name ="Диаметр"}
             },
@@ -105,7 +105,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         };
 
         private MepCategoryViewModel GetCableTray() => new MepCategoryViewModel {
-            Name = "Лотки",
+            Name = RevitRepository.CategoryNames[Categories.Tray],
             MinSizes = new ObservableCollection<ISizeViewModel>() {
                 new SizeViewModel(){Name ="Ширина"},
                 new SizeViewModel(){Name ="Высота"}
