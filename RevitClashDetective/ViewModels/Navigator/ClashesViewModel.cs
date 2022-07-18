@@ -102,8 +102,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
             var path = Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName());
             if(Directory.Exists(path)) {
                 FileNames = Directory.GetFiles(path)
-               .Select(item => Path.GetFileNameWithoutExtension(item))
-               .ToArray();
+                                   .Select(item => Path.GetFileNameWithoutExtension(item))
+                                   .ToArray();
                 SelectedFile = FileNames.FirstOrDefault();
             }
         }

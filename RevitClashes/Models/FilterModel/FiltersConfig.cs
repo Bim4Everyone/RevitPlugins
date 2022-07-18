@@ -15,7 +15,8 @@ namespace RevitClashDetective.Models.FilterModel {
         public static FiltersConfig GetFiltersConfig(string revitFileName) {
             return new ProjectConfigBuilder()
                 .SetSerializer(new RevitClashConfigSerializer())
-                .SetRelativePath(Path.Combine(nameof(RevitClashDetective), revitFileName))
+                .SetPluginName(nameof(RevitClashDetective))
+                .SetRelativePath(revitFileName)
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
                 .SetProjectConfigName(nameof(FiltersConfig) + ".json")
                 .Build<FiltersConfig>();
