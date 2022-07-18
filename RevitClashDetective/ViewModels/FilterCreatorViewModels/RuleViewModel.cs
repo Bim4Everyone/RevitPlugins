@@ -192,6 +192,5 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                 Values = new ObservableCollection<ParamValueViewModel>();
             }
         }
-
     }
 }
