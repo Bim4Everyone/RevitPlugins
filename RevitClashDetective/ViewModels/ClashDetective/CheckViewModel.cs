@@ -105,11 +105,12 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
 
         public void SaveClashes() {
             var config = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), ReportName);
-            config.Clashes = GetClashes();
+            var oldClashes = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), $"{_revitRepository.GetDocumentName()}_{Name}").Clashes;
+            var newClashes = GetClashes();
+            config.Clashes = ClashesMarker.MarkSolvedClashes(newClashes, oldClashes).ToList();
             config.SaveProjectConfig();
             HasReport = true;
         }
-
 
         private void InitializeSelections(Check check = null) {
             FirstSelection = new SelectionViewModel(_revitRepository, _filtersConfig, check?.FirstSelection);
