@@ -18,7 +18,7 @@ namespace RevitOpeningPlacement.Models {
     internal class FiltersInitializer {
         public static Filter GetPipeFilter(RevitClashDetective.Models.RevitRepository revitRepository, double minDiameter) {
             var revitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM));
-            return GetdMepFilter(RevitRepository.CategoryNames[Categories.Pipe],
+            return GetdMepFilter(RevitRepository.CategoryNames[MepCategoriesEnum.Pipe],
                                  revitRepository,
                                  BuiltInCategory.OST_PipeCurves,
                                  new[] { new ParamValuePair { RevitParam = revitParam, Value = minDiameter } });
@@ -26,7 +26,7 @@ namespace RevitOpeningPlacement.Models {
 
         public static Filter GetRoundDuctFilter(RevitClashDetective.Models.RevitRepository revitRepository, double minDiameter) {
             var revitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM));
-            return GetdMepFilter(RevitRepository.CategoryNames[Categories.RoundDuct],
+            return GetdMepFilter(RevitRepository.CategoryNames[MepCategoriesEnum.RoundDuct],
                                  revitRepository,
                                  BuiltInCategory.OST_DuctCurves,
                                  new[] { new ParamValuePair { RevitParam = revitParam, Value = minDiameter } });
@@ -43,7 +43,7 @@ namespace RevitOpeningPlacement.Models {
                 Value = minWidth
             };
 
-            return GetdMepFilter(RevitRepository.CategoryNames[Categories.RectangleDuct],
+            return GetdMepFilter(RevitRepository.CategoryNames[MepCategoriesEnum.RectangleDuct],
                                  revitRepository,
                                  BuiltInCategory.OST_DuctCurves,
                                  new[] { heightParamValuePair, widthParamValuePair });
@@ -60,7 +60,7 @@ namespace RevitOpeningPlacement.Models {
                 Value = minWidth
             };
 
-            return GetdMepFilter(RevitRepository.CategoryNames[Categories.Tray],
+            return GetdMepFilter(RevitRepository.CategoryNames[MepCategoriesEnum.Tray],
                                  revitRepository,
                                  BuiltInCategory.OST_CableTray,
                                  new[] { heightParamValuePair, widthParamValuePair });

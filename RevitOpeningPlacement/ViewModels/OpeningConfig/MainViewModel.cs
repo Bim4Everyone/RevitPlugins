@@ -51,9 +51,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public string MessageText { 
-            get => _messageText; 
-            set => this.RaiseAndSetIfChanged(ref _messageText, value); 
+        public string MessageText {
+            get => _messageText;
+            set => this.RaiseAndSetIfChanged(ref _messageText, value);
         }
 
         public ICommand SaveConfigCommand { get; }
@@ -71,9 +71,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
         private MepCategoryViewModel GetPipeCategory() => new MepCategoryViewModel {
-            Name = RevitRepository.CategoryNames[Categories.Pipe],
+            Name = RevitRepository.CategoryNames[MepCategoriesEnum.Pipe],
             MinSizes = new ObservableCollection<ISizeViewModel>() {
-                new SizeViewModel(){Name ="Диаметр"}
+                new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
             },
             Offsets = new ObservableCollection<IOffsetViewModel>() {
                 new OffsetViewModel()
@@ -82,10 +82,10 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         };
 
         private MepCategoryViewModel GetRectangleDuct() => new MepCategoryViewModel {
-            Name = RevitRepository.CategoryNames[Categories.RectangleDuct],
+            Name = RevitRepository.CategoryNames[MepCategoriesEnum.RectangleDuct],
             MinSizes = new ObservableCollection<ISizeViewModel>() {
-                new SizeViewModel(){Name ="Ширина"},
-                new SizeViewModel(){Name ="Высота"}
+                new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Width]},
+                new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Height]}
             },
             Offsets = new ObservableCollection<IOffsetViewModel>() {
                 new OffsetViewModel()
@@ -94,9 +94,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         };
 
         private MepCategoryViewModel GetRoundDuct() => new MepCategoryViewModel {
-            Name = RevitRepository.CategoryNames[Categories.RoundDuct],
+            Name = RevitRepository.CategoryNames[MepCategoriesEnum.RoundDuct],
             MinSizes = new ObservableCollection<ISizeViewModel>() {
-                new SizeViewModel(){Name ="Диаметр"}
+                new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
             },
             Offsets = new ObservableCollection<IOffsetViewModel>() {
                 new OffsetViewModel()
@@ -105,10 +105,10 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         };
 
         private MepCategoryViewModel GetCableTray() => new MepCategoryViewModel {
-            Name = RevitRepository.CategoryNames[Categories.Tray],
+            Name = RevitRepository.CategoryNames[MepCategoriesEnum.Tray],
             MinSizes = new ObservableCollection<ISizeViewModel>() {
-                new SizeViewModel(){Name ="Ширина"},
-                new SizeViewModel(){Name ="Высота"}
+                new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Width]},
+                new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Height]}
             },
             Offsets = new ObservableCollection<IOffsetViewModel>() {
                 new OffsetViewModel()

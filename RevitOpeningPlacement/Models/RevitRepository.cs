@@ -16,18 +16,30 @@ namespace RevitOpeningPlacement.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        public static Dictionary<Categories, string> CategoryNames => new Dictionary<Categories, string> {
-            {Categories.Pipe, "Трубы" },
-            {Categories.RectangleDuct, "Воздуховоды (прямоугольное сечение)" },
-            {Categories.RoundDuct, "Воздуховоды (круглое сечение)" },
-            {Categories.Tray, "Лотки" }
+        public static Dictionary<MepCategoriesEnum, string> CategoryNames => new Dictionary<MepCategoriesEnum, string> {
+            {MepCategoriesEnum.Pipe, "Трубы" },
+            {MepCategoriesEnum.RectangleDuct, "Воздуховоды (прямоугольное сечение)" },
+            {MepCategoriesEnum.RoundDuct, "Воздуховоды (круглое сечение)" },
+            {MepCategoriesEnum.Tray, "Лотки" }
+        };
+
+        public static Dictionary<Parameters, string> ParameterNames => new Dictionary<Parameters, string>() {
+            {Parameters.Diameter, "Диаметр" },
+            {Parameters.Height, "Высота" },
+            {Parameters.Width, "Ширина" }
         };
     }
 
-    internal enum Categories {
+    internal enum MepCategoriesEnum {
         Pipe,
         RectangleDuct,
         RoundDuct,
         Tray
+    }
+
+    internal enum Parameters {
+        Height,
+        Width,
+        Diameter
     }
 }
