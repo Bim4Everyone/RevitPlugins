@@ -24,7 +24,8 @@ namespace RevitClashDetective.Models {
         public static ChecksConfig GetChecksConfig(string revitFileName) {
             return new ProjectConfigBuilder()
                 .SetSerializer(new RevitClashConfigSerializer())
-                .SetRelativePath(Path.Combine(nameof(RevitClashDetective), revitFileName))
+                .SetPluginName(nameof(RevitClashDetective))
+                .SetRelativePath(revitFileName)
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
                 .SetProjectConfigName(nameof(ChecksConfig) + ".json")
                 .Build<ChecksConfig>();

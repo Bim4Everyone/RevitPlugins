@@ -9,7 +9,7 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 
 namespace RevitClashDetective.Models.Clashes {
-    internal class ElementModel {
+    internal class ElementModel : IEquatable<ElementModel> {
         private readonly RevitRepository _revitRepository;
 
         public ElementModel(RevitRepository revitRepository, Element element) {
@@ -41,6 +41,29 @@ namespace RevitClashDetective.Models.Clashes {
                 }
             }
             return element.LevelId == null ? null : element.Document.GetElement(element.LevelId)?.Name;
+        }
+
+        public override bool Equals(object obj) {
+            return Equals(obj as ElementModel);
+        }
+
+        public override int GetHashCode() {
+            int hashCode = 426527819;
+            hashCode = hashCode * -1521134295 + Id.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Category);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Level);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(DocumentName);
+            return hashCode;
+        }
+
+        public bool Equals(ElementModel other) {
+            return other != null 
+                && Id == other.Id 
+                && Name == other.Name 
+                && Category == other.Category 
+                && Level == other.Level 
+                && DocumentName == other.DocumentName;
         }
     }
 }

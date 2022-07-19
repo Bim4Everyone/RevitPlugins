@@ -15,7 +15,7 @@ using RevitClashDetective.Models.Clashes;
 
 namespace RevitClashDetective.ViewModels.Navigator {
     internal class ClashViewModel : BaseViewModel {
-        private bool _isSolved;
+        private ClashStatus _clashStatus;
         private readonly RevitRepository _revitRepository;
 
         public ClashViewModel(RevitRepository revitRepository, ClashModel clash) {
@@ -31,14 +31,15 @@ namespace RevitClashDetective.ViewModels.Navigator {
             SecondLevel = clash.OtherElement.Level;
             SecondDocumentName = clash.OtherElement.DocumentName;
 
-            IsSolved = clash.IsSolved;
+            ClashStatus = clash.ClashStatus;
             Clash = clash;
             Clash.SetRevitRepository(_revitRepository);
         }
 
-        public bool IsSolved {
-            get => _isSolved;
-            set => this.RaiseAndSetIfChanged(ref _isSolved, value);
+
+        public ClashStatus ClashStatus {
+            get => _clashStatus;
+            set => this.RaiseAndSetIfChanged(ref _clashStatus, value);
         }
 
         public string FirstName { get; }
@@ -69,6 +70,11 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         public BoundingBoxXYZ GetBoundingBox() {
             return Clash.GetClashBoundingBox();
+        }
+
+        public ClashModel GetClashModel() {
+            Clash.ClashStatus = ClashStatus;
+            return Clash;
         }
     }
 }

@@ -48,8 +48,17 @@ namespace RevitClashDetective.Models {
             _view = GetClashView();
         }
 
-        public static string ProfilePath { get; } = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101";
-        public static List<BuiltInParameter> BaseLevelParameters = new List<BuiltInParameter>() {
+        public static string ProfilePath {
+            get {
+                var path = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101";
+                if(!Directory.Exists(path)) {
+                    path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dosymep");
+                }
+                return path;
+            }
+        }
+
+        public static List<BuiltInParameter> BaseLevelParameters => new List<BuiltInParameter>() {
             BuiltInParameter.MULTISTORY_STAIRS_REF_LEVEL,
             BuiltInParameter.DPART_BASE_LEVEL,
             BuiltInParameter.STAIRS_BASE_LEVEL,
@@ -250,7 +259,6 @@ namespace RevitClashDetective.Models {
                 .WhereElementIsNotElementType()
                 .WherePasses(filter);
         }
-
 
         public void SelectAndShowElement(IEnumerable<ElementId> ids, BoundingBoxXYZ bb) {
             if(_document.ActiveView != _view) {

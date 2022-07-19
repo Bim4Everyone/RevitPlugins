@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using dosymep.Bim4Everyone.ProjectConfigs;
 
@@ -8,14 +10,21 @@ namespace RevitClashDetective.Models {
 
         private string _pluginName;
 
+        private string _relativePath;
+
         private string _projectConfigName;
 
         private IConfigSerializer _serializer;
 
         private string _revitVersion;
 
-        public ProjectConfigBuilder SetRelativePath(string pluginName) {
+        public ProjectConfigBuilder SetPluginName(string pluginName) {
             _pluginName = pluginName;
+            return this;
+        }
+
+        public ProjectConfigBuilder SetRelativePath(string relativePath) {
+            _relativePath = relativePath;
             return this;
         }
 
@@ -45,11 +54,15 @@ namespace RevitClashDetective.Models {
                 throw new InvalidOperationException("Перед конструированием объекта, требуется установить наименование плагина.");
             }
 
+            if(string.IsNullOrEmpty(_relativePath)) {
+                throw new InvalidOperationException("Перед конструированием объекта, требуется установить путь к файлу конфигурации относительно папки плагина.");
+            }
+
             if(string.IsNullOrEmpty(_projectConfigName)) {
                 throw new InvalidOperationException("Перед конструированием объекта, требуется установить наименование файла конфигурации проекта.");
             }
 
-            string projectConfigPath = GetConfigPath(_pluginName, _projectConfigName, _revitVersion);
+            string projectConfigPath = GetConfigPath(Path.Combine(_pluginName, _relativePath), _projectConfigName, _revitVersion);
             if(File.Exists(projectConfigPath)) {
                 string fileContent = File.ReadAllText(projectConfigPath);
 

@@ -102,8 +102,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
             var path = Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName());
             if(Directory.Exists(path)) {
                 FileNames = Directory.GetFiles(path)
-               .Select(item => Path.GetFileNameWithoutExtension(item))
-               .ToArray();
+                                   .Select(item => Path.GetFileNameWithoutExtension(item))
+                                   .ToArray();
                 SelectedFile = FileNames.FirstOrDefault();
             }
         }
@@ -134,7 +134,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private void SaveConfig(object p) {
             var config = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), SelectedFile);
-            config.Clashes = Clashes.Select(item => GetUpdatedClash(item)).ToList();
+            config.Clashes = Clashes.Select(item => item.GetClashModel()).ToList();
             config.SaveProjectConfig();
             Message = "Файл успешно сохранен";
             RefreshMessage();
@@ -142,11 +142,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private bool CanSaveConfig(object p) {
             return SelectedFile != null;
-        }
-
-        private ClashModel GetUpdatedClash(ClashViewModel clash) {
-            clash.Clash.IsSolved = clash.IsSolved;
-            return clash.Clash;
         }
 
         private void SelectionChanged(object p) {

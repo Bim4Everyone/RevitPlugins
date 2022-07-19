@@ -4,6 +4,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
+using dosymep.Revit;
 
 using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.Models.Visiter;
@@ -26,7 +27,7 @@ namespace RevitClashDetective.Models.Value {
                 var value = new FilteredElementCollector(doc)
                 .WherePasses(new ElementMulticategoryFilter(Categories.Select(item => new ElementId(item)).ToArray()))
                 .Select(item => GetValue(item, param))
-                .Where(item => item != null)
+                .Where(item => !item.IsNull())
                 .Select(item => doc.GetElement(item))
                 .FirstOrDefault(item => item.Name.Equals(TValue, StringComparison.CurrentCultureIgnoreCase));
                 if(value == null)
