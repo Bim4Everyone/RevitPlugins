@@ -74,7 +74,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig.MepCategories {
                 Name = Name,
                 ImageSource = ImageSource,
                 Offsets = Offsets.Select(item => item.GetOffset()).ToList(),
-                MinSizes = MinSizes.Select(item => item.GetSize()).ToList()
+                MinSizes = new SizeCollection(MinSizes.Select(item => item.GetSize()))
             };
         }
 

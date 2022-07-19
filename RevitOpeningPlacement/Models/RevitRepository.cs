@@ -16,11 +16,13 @@ namespace RevitOpeningPlacement.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        public static Dictionary<MepCategoriesEnum, string> CategoryNames => new Dictionary<MepCategoriesEnum, string> {
-            {MepCategoriesEnum.Pipe, "Трубы" },
-            {MepCategoriesEnum.RectangleDuct, "Воздуховоды (прямоугольное сечение)" },
-            {MepCategoriesEnum.RoundDuct, "Воздуховоды (круглое сечение)" },
-            {MepCategoriesEnum.Tray, "Лотки" }
+        public static Dictionary<BuiltInCategory, string> CategoryNames => new Dictionary<BuiltInCategory, string> {
+            {BuiltInCategory.OST_PipeCurves, "Трубы" },
+            {BuiltInCategory.OST_DuctCurves, "Воздуховоды (прямоугольное сечение)" },
+            {BuiltInCategory.OST_DuctCurves, "Воздуховоды (круглое сечение)" },
+            {BuiltInCategory.OST_CableTray, "Лотки" },
+            {BuiltInCategory.OST_Walls, "Стены" },
+            {BuiltInCategory.OST_Floors, "Перекрытия" }
         };
 
         public static Dictionary<Parameters, string> ParameterNames => new Dictionary<Parameters, string>() {
@@ -30,12 +32,6 @@ namespace RevitOpeningPlacement.Models {
         };
     }
 
-    internal enum MepCategoriesEnum {
-        Pipe,
-        RectangleDuct,
-        RoundDuct,
-        Tray
-    }
 
     internal enum Parameters {
         Height,

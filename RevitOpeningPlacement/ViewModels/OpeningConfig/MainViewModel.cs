@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
 
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.WPF.Commands;
@@ -71,7 +72,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
         private MepCategoryViewModel GetPipeCategory() => new MepCategoryViewModel {
-            Name = RevitRepository.CategoryNames[MepCategoriesEnum.Pipe],
+            Name = RevitRepository.CategoryNames[BuiltInCategory.OST_PipeCurves],
             MinSizes = new ObservableCollection<ISizeViewModel>() {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
             },
@@ -82,7 +83,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         };
 
         private MepCategoryViewModel GetRectangleDuct() => new MepCategoryViewModel {
-            Name = RevitRepository.CategoryNames[MepCategoriesEnum.RectangleDuct],
+            Name = RevitRepository.CategoryNames[BuiltInCategory.OST_DuctCurves],
             MinSizes = new ObservableCollection<ISizeViewModel>() {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Width]},
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Height]}
@@ -94,7 +95,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         };
 
         private MepCategoryViewModel GetRoundDuct() => new MepCategoryViewModel {
-            Name = RevitRepository.CategoryNames[MepCategoriesEnum.RoundDuct],
+            Name = RevitRepository.CategoryNames[BuiltInCategory.OST_DuctCurves],
             MinSizes = new ObservableCollection<ISizeViewModel>() {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
             },
@@ -105,7 +106,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         };
 
         private MepCategoryViewModel GetCableTray() => new MepCategoryViewModel {
-            Name = RevitRepository.CategoryNames[MepCategoriesEnum.Tray],
+            Name = RevitRepository.CategoryNames[BuiltInCategory.OST_CableTray],
             MinSizes = new ObservableCollection<ISizeViewModel>() {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Width]},
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Height]}
@@ -125,9 +126,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             };
         }
         private Models.Configs.OpeningConfig GetOpeningConfig() {
-            var categories = MepCategories.Select(item => item.GetMepCategory()).ToList();
             var config = Models.Configs.OpeningConfig.GetOpeningConfig();
-            config.Categories = categories;
+            config.Categories = new MepCategoryCollection(MepCategories.Select(item => item.GetMepCategory()));
             return config;
         }
 

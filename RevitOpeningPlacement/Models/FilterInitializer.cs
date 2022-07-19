@@ -16,9 +16,22 @@ using dosymep.Bim4Everyone;
 
 namespace RevitOpeningPlacement.Models {
     internal class FiltersInitializer {
+
+        public static Filter GetWallFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
+            return GetArchitectureFilter(RevitRepository.CategoryNames[BuiltInCategory.OST_Walls],
+                                 revitRepository,
+                                 BuiltInCategory.OST_Walls);
+        }
+
+        public static Filter GetFloorFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
+            return GetArchitectureFilter(RevitRepository.CategoryNames[BuiltInCategory.OST_Floors],
+                                 revitRepository,
+                                 BuiltInCategory.OST_Floors);
+        }
+
         public static Filter GetPipeFilter(RevitClashDetective.Models.RevitRepository revitRepository, double minDiameter) {
             var revitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM));
-            return GetdMepFilter(RevitRepository.CategoryNames[MepCategoriesEnum.Pipe],
+            return GetdMepFilter(RevitRepository.CategoryNames[BuiltInCategory.OST_PipeCurves],
                                  revitRepository,
                                  BuiltInCategory.OST_PipeCurves,
                                  new[] { new ParamValuePair { RevitParam = revitParam, Value = minDiameter } });
@@ -26,7 +39,7 @@ namespace RevitOpeningPlacement.Models {
 
         public static Filter GetRoundDuctFilter(RevitClashDetective.Models.RevitRepository revitRepository, double minDiameter) {
             var revitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM));
-            return GetdMepFilter(RevitRepository.CategoryNames[MepCategoriesEnum.RoundDuct],
+            return GetdMepFilter(RevitRepository.CategoryNames[BuiltInCategory.OST_DuctCurves],
                                  revitRepository,
                                  BuiltInCategory.OST_DuctCurves,
                                  new[] { new ParamValuePair { RevitParam = revitParam, Value = minDiameter } });
@@ -43,7 +56,7 @@ namespace RevitOpeningPlacement.Models {
                 Value = minWidth
             };
 
-            return GetdMepFilter(RevitRepository.CategoryNames[MepCategoriesEnum.RectangleDuct],
+            return GetdMepFilter(RevitRepository.CategoryNames[BuiltInCategory.OST_DuctCurves],
                                  revitRepository,
                                  BuiltInCategory.OST_DuctCurves,
                                  new[] { heightParamValuePair, widthParamValuePair });
@@ -60,7 +73,7 @@ namespace RevitOpeningPlacement.Models {
                 Value = minWidth
             };
 
-            return GetdMepFilter(RevitRepository.CategoryNames[MepCategoriesEnum.Tray],
+            return GetdMepFilter(RevitRepository.CategoryNames[BuiltInCategory.OST_CableTray],
                                  revitRepository,
                                  BuiltInCategory.OST_CableTray,
                                  new[] { heightParamValuePair, widthParamValuePair });
@@ -72,7 +85,21 @@ namespace RevitOpeningPlacement.Models {
                 Name = name,
                 Set = new Set() {
                     SetEvaluator = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And),
-                    Criteria = GetCriterions(revitRepository, paramValuePairs).ToList()
+                    Criteria = GetCriterions(revitRepository, paramValuePairs).ToList(),
+                    RevitRepository = revitRepository
+                },
+                RevitRepository = revitRepository
+            };
+        }
+
+        public static Filter GetArchitectureFilter(string name, RevitClashDetective.Models.RevitRepository revitRepository, BuiltInCategory category) {
+            return new Filter(revitRepository) {
+                CategoryIds = new List<int> { (int) category },
+                Name = name,
+                Set = new Set() {
+                    SetEvaluator = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And),
+                    Criteria = new List<Criterion>(),
+                    RevitRepository = revitRepository
                 },
                 RevitRepository = revitRepository
             };
@@ -84,7 +111,8 @@ namespace RevitOpeningPlacement.Models {
                 yield return new Rule() {
                     Provider = new ParameterValueProvider(revitRepository, paramValuePair.RevitParam),
                     Evaluator = RuleEvaluatorUtils.GetRuleEvaluators(paramValuePair.RevitParam.StorageType).FirstOrDefault(item => item.Evaluator == RuleEvaluators.FilterNumericGreater),
-                    Value = new DoubleParamValue(resultValue, paramValuePair.Value.ToString())
+                    Value = new DoubleParamValue(resultValue, paramValuePair.Value.ToString()),
+                    RevitRepository = revitRepository
                 };
             }
         }
