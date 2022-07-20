@@ -59,6 +59,13 @@ namespace RevitOpeningPlacement.Models {
             {OpeningType.WallRound, "Круглое" },
         };
 
+        public static string OpeningDiameter => "ADSK_Размер_Диаметр";
+        public static string OpeningThickness => "ADSK_Размер_Глубина";
+        public static List<BuiltInParameter> MepCurveDiameters => new List<BuiltInParameter>() {
+            BuiltInParameter.RBS_PIPE_DIAMETER_PARAM,
+            BuiltInParameter.RBS_CURVE_DIAMETER_PARAM
+        };
+
         public FamilySymbol GetOpeningType(OpeningType type) {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)

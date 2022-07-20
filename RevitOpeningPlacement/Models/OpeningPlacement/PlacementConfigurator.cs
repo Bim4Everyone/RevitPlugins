@@ -18,7 +18,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         public static IEnumerable<OpeningPlacer> GetPlacers(RevitRepository revitRepository, RevitClashDetective.Models.RevitRepository clashRevitRepository, MepCategoryCollection categories) {
             var pipeFilter = GetPipeFilter(clashRevitRepository, categories);
             var roundDuctFilter = GetRoundDuctFilter(clashRevitRepository, categories);
-            var rectangleDuct = GetRectangleDuctFilter(clashRevitRepository, categories);
+            var rectangleDuctFilter = GetRectangleDuctFilter(clashRevitRepository, categories);
             var trayFilter = GetTrayFilter(clashRevitRepository, categories);
 
             var wallFilter = FiltersInitializer.GetWallFilter(clashRevitRepository);
@@ -31,13 +31,16 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
                                         Clash = item,
                                         PointFinder = GetWallPointFinder(item.MainElement.GetElement() as MEPCurve, item.OtherElement.GetElement() as Wall),
                                         AngleFinder = new WallAngleFinder(item.OtherElement.GetElement() as Wall),
+                                        ParameterSetter = new RoundParameterSetter((item.MainElement.GetElement() as MEPCurve).Diameter, 
+                                                                                   (item.OtherElement.GetElement() as Wall).Width,
+                                                                                   categories[CategoryEnum.Pipe].Offsets),
                                         Type = revitRepository.GetOpeningType(OpeningType.WallRound)
                                     });
             //TODO: добавить все случаи
         }
 
         private static IPointFinder GetWallPointFinder(MEPCurve curve, Wall wall) {
-            if(curve.IsHorizontal()) {
+            if(curve.IsPerpendicular(wall)) {
                 return new HorizontalPointFinder(curve, wall);
             } else {
                 return new InclinedPointFinder();
