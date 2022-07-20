@@ -101,6 +101,28 @@ namespace RevitOpeningPlacement.Models {
                 ElementTransformUtils.RotateElement(_document, element.Id, Line.CreateBound(point, new XYZ(point.X, point.Y, point.Z + 1)), angle);
             }
         }
+
+        public IEnumerable<FamilyInstance> GetOpenings() {
+            return new FilteredElementCollector(_document)
+                .OfCategory(BuiltInCategory.OST_GenericModel)
+                .OfType<FamilyInstance>()
+                .OfType<FamilyInstance>()
+                .Where(item => TypeName.Any(n => n.Value.Equals(item.Name))
+                            && FamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
+                .ToList();
+        }
+
+        public string GetFamilyName(Element element) {
+            if(element is ElementType type) {
+                return type.FamilyName;
+            }
+            var typeId = element.GetTypeId();
+            if(typeId.IsNotNull()) {
+                type = _document.GetElement(typeId) as ElementType;
+                return type?.FamilyName;
+            }
+            return null;
+        }
     }
 
 

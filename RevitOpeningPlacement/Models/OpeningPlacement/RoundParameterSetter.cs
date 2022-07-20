@@ -36,7 +36,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             }
 
             if(familyInstance.IsExistsParam(RevitRepository.OpeningDiameter)) {
-                familyInstance.SetParamValue(RevitRepository.OpeningDiameter, _diameter + offset.Value);
+                familyInstance.SetParamValue(RevitRepository.OpeningDiameter, _diameter + offset.Value * 2);
             }
 
             if(familyInstance.IsExistsParam(RevitRepository.OpeningThickness)) {

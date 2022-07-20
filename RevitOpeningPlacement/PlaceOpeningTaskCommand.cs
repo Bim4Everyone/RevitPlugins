@@ -21,8 +21,8 @@ using RevitOpeningPlacement.Models.OpeningPlacement;
 namespace RevitOpeningPlacement {
 
     [Transaction(TransactionMode.Manual)]
-    public class RevitPlaceOpeningTaskCommand : BasePluginCommand {
-        public RevitPlaceOpeningTaskCommand() {
+    public class PlaceOpeningTaskCommand : BasePluginCommand {
+        public PlaceOpeningTaskCommand() {
             PluginName = "Настройка ";
         }
 
