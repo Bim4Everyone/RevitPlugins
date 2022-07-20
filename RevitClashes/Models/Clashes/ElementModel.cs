@@ -43,6 +43,15 @@ namespace RevitClashDetective.Models.Clashes {
             return element.LevelId == null ? null : element.Document.GetElement(element.LevelId)?.Name;
         }
 
+        public Element GetElement() {
+            var doc = _revitRepository.GetDocuments().FirstOrDefault(item => _revitRepository.GetDocumentName(item).Equals(DocumentName));
+            var id = new ElementId(Id);
+            if(doc != null && id.IsNotNull()) {
+                return doc.GetElement(id);
+            }
+            return null;
+        }
+
         public override bool Equals(object obj) {
             return Equals(obj as ElementModel);
         }
@@ -58,11 +67,11 @@ namespace RevitClashDetective.Models.Clashes {
         }
 
         public bool Equals(ElementModel other) {
-            return other != null 
-                && Id == other.Id 
-                && Name == other.Name 
-                && Category == other.Category 
-                && Level == other.Level 
+            return other != null
+                && Id == other.Id
+                && Name == other.Name
+                && Category == other.Category
+                && Level == other.Level
                 && DocumentName == other.DocumentName;
         }
     }
