@@ -37,7 +37,7 @@ namespace RevitOpeningPlacement.Models.Configs {
         }
         public List<MepCategory> Categories { get; set; } = new List<MepCategory>();
         public int Count => Categories.Count;
-        public MepCategory this[BuiltInCategory category] => Categories.FirstOrDefault(item => item.Name.Equals(RevitRepository.CategoryNames[category]));
+        public MepCategory this[CategoryEnum category] => Categories.FirstOrDefault(item => item.Name.Equals(RevitRepository.CategoryNames[category]));
         public IEnumerator<MepCategory> GetEnumerator() => Categories.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
     }

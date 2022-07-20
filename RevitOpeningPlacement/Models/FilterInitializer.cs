@@ -18,20 +18,20 @@ namespace RevitOpeningPlacement.Models {
     internal class FiltersInitializer {
 
         public static Filter GetWallFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
-            return GetArchitectureFilter(RevitRepository.CategoryNames[BuiltInCategory.OST_Walls],
+            return GetArchitectureFilter(RevitRepository.CategoryNames[CategoryEnum.Wall],
                                  revitRepository,
                                  BuiltInCategory.OST_Walls);
         }
 
         public static Filter GetFloorFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
-            return GetArchitectureFilter(RevitRepository.CategoryNames[BuiltInCategory.OST_Floors],
+            return GetArchitectureFilter(RevitRepository.CategoryNames[CategoryEnum.Floor],
                                  revitRepository,
                                  BuiltInCategory.OST_Floors);
         }
 
         public static Filter GetPipeFilter(RevitClashDetective.Models.RevitRepository revitRepository, double minDiameter) {
             var revitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM));
-            return GetdMepFilter(RevitRepository.CategoryNames[BuiltInCategory.OST_PipeCurves],
+            return GetdMepFilter(RevitRepository.CategoryNames[CategoryEnum.Pipe],
                                  revitRepository,
                                  BuiltInCategory.OST_PipeCurves,
                                  new[] { new ParamValuePair { RevitParam = revitParam, Value = minDiameter } });
@@ -39,7 +39,7 @@ namespace RevitOpeningPlacement.Models {
 
         public static Filter GetRoundDuctFilter(RevitClashDetective.Models.RevitRepository revitRepository, double minDiameter) {
             var revitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM));
-            return GetdMepFilter(RevitRepository.CategoryNames[BuiltInCategory.OST_DuctCurves],
+            return GetdMepFilter(RevitRepository.CategoryNames[CategoryEnum.RoundDuct],
                                  revitRepository,
                                  BuiltInCategory.OST_DuctCurves,
                                  new[] { new ParamValuePair { RevitParam = revitParam, Value = minDiameter } });
@@ -56,7 +56,7 @@ namespace RevitOpeningPlacement.Models {
                 Value = minWidth
             };
 
-            return GetdMepFilter(RevitRepository.CategoryNames[BuiltInCategory.OST_DuctCurves],
+            return GetdMepFilter(RevitRepository.CategoryNames[CategoryEnum.RectangleDuct],
                                  revitRepository,
                                  BuiltInCategory.OST_DuctCurves,
                                  new[] { heightParamValuePair, widthParamValuePair });
@@ -73,7 +73,7 @@ namespace RevitOpeningPlacement.Models {
                 Value = minWidth
             };
 
-            return GetdMepFilter(RevitRepository.CategoryNames[BuiltInCategory.OST_CableTray],
+            return GetdMepFilter(RevitRepository.CategoryNames[CategoryEnum.CableTray],
                                  revitRepository,
                                  BuiltInCategory.OST_CableTray,
                                  new[] { heightParamValuePair, widthParamValuePair });
