@@ -19,7 +19,7 @@ namespace RevitClashDetective.Models.Clashes {
             Name = element.Name;
             DocumentName = _revitRepository.GetDocumentName(element.Document);
             Category = element.Category.Name;
-            Level = GetLevel(element);
+            Level = revitRepository.GetLevel(element);
         }
 
         public ElementModel() {
@@ -32,16 +32,6 @@ namespace RevitClashDetective.Models.Clashes {
         public string Level { get; set; }
         public string DocumentName { get; set; }
 
-        private string GetLevel(Element element) {
-            string level;
-            foreach(var paramName in RevitRepository.BaseLevelParameters) {
-                level = element.IsExistsParam(paramName) ? element.GetParam(paramName).AsValueString() : null;
-                if(level != null) {
-                    return level;
-                }
-            }
-            return element.LevelId == null ? null : element.Document.GetElement(element.LevelId)?.Name;
-        }
 
         public Element GetElement() {
             var doc = _revitRepository.GetDocuments().FirstOrDefault(item => _revitRepository.GetDocumentName(item).Equals(DocumentName));

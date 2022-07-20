@@ -280,7 +280,7 @@ namespace RevitClashDetective.Models {
         }
 
         public void DoAction(Action action) {
-            _revitEventHandler.TransactAction = action; 
+            _revitEventHandler.TransactAction = action;
             _revitEventHandler.Raise();
         }
 
@@ -291,6 +291,16 @@ namespace RevitClashDetective.Models {
             return GetRevitLinkInstances()
                 .FirstOrDefault(item => GetDocumentName(item.GetLinkDocument()).Equals(documTitle, StringComparison.CurrentCultureIgnoreCase))
                 ?.GetTotalTransform();
+        }
+        public string GetLevel(Element element) {
+            string level;
+            foreach(var paramName in BaseLevelParameters) {
+                level = element.IsExistsParam(paramName) ? element.GetParam(paramName).AsValueString() : null;
+                if(level != null) {
+                    return level;
+                }
+            }
+            return element.LevelId == null ? null : element.Document.GetElement(element.LevelId)?.Name;
         }
 
         private ParameterValueProvider GetParam(Document doc, Category category, ElementId elementId) {
