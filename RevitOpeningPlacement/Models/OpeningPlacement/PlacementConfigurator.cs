@@ -9,6 +9,8 @@ using Autodesk.Revit.DB;
 using RevitClashDetective.Models.FilterModel;
 
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.Extensions;
+using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement {
     internal class PlacementConfigurator {
@@ -17,7 +19,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             var pipeFilter = GetPipeFilter(clashRevitRepository, categories);
             var roundDuctFilter = GetRoundDuctFilter(clashRevitRepository, categories);
             var rectangleDuct = GetRectangleDuctFilter(clashRevitRepository, categories);
-            var trayFilter = GetRectangleDuctFilter(clashRevitRepository, categories);
+            var trayFilter = GetTrayFilter(clashRevitRepository, categories);
 
             var wallFilter = FiltersInitializer.GetWallFilter(clashRevitRepository);
             var floorFilter = FiltersInitializer.GetFloorFilter(clashRevitRepository);
@@ -27,11 +29,19 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             return ClashInitializer.GetClashes(clashRevitRepository, pipeFilter, wallFilter)
                                     .Select(item => new OpeningPlacer(revitRepository) {
                                         Clash = item,
-                                        PointFinder = new HorizontalPointFinder(item.MainElement.GetElement() as MEPCurve, item.OtherElement.GetElement() as Wall),
+                                        PointFinder = GetWallPointFinder(item.MainElement.GetElement() as MEPCurve, item.OtherElement.GetElement() as Wall),
                                         AngleFinder = new WallAngleFinder(item.OtherElement.GetElement() as Wall),
                                         Type = revitRepository.GetOpeningType(OpeningType.WallRound)
                                     });
             //TODO: добавить все случаи
+        }
+
+        private static IPointFinder GetWallPointFinder(MEPCurve curve, Wall wall) {
+            if(curve.IsHorizontal()) {
+                return new HorizontalPointFinder(curve, wall);
+            } else {
+                return new InclinedPointFinder();
+            }
         }
 
         private static Filter GetPipeFilter(RevitClashDetective.Models.RevitRepository revitRepository, MepCategoryCollection categories) {
