@@ -84,6 +84,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
         public override int GetHashCode() {
             int hashCode = 635569250;
             hashCode = hashCode * -1521134295 + ClashStatus.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<int>.Default.GetHashCode(Clash.MainElement.Id);
+            hashCode = hashCode * -1521134295 + EqualityComparer<int>.Default.GetHashCode(Clash.OtherElement.Id);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FirstName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FirstDocumentName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FirstLevel);
@@ -97,7 +99,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         public bool Equals(ClashViewModel other) {
             return other != null
-                && ClashStatus == other.ClashStatus
+                && Clash.MainElement.Id == other.Clash.MainElement.Id
+                && Clash.OtherElement.Id == other.Clash.OtherElement.Id
                 && FirstName == other.FirstName
                 && FirstDocumentName == other.FirstDocumentName
                 && FirstLevel == other.FirstLevel
