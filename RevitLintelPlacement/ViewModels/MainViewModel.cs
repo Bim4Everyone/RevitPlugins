@@ -188,7 +188,7 @@ namespace RevitLintelPlacement.ViewModels {
                 pb.Show();
 
                 using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
-                    lintels = PlaceLintels(elementInWalls, view3D, links, progress).ToList();
+                    lintels = PlaceLintels(elementInWalls, view3D, links, progress, ct).ToList();
                     t.Commit();
                 }
             }
@@ -196,10 +196,11 @@ namespace RevitLintelPlacement.ViewModels {
             return lintels;
         }
 
-        private IEnumerable<LintelInfoViewModel> PlaceLintels(IEnumerable<FamilyInstance> elementInWalls, View3D view3D, IEnumerable<string> links, IProgress<int> progress) {
+        private IEnumerable<LintelInfoViewModel> PlaceLintels(IEnumerable<FamilyInstance> elementInWalls, View3D view3D, IEnumerable<string> links, IProgress<int> progress, CancellationToken ct) {
             int count = 0;
             foreach(var elementInWall in elementInWalls) {
                 progress.Report(count++);
+                ct.ThrowIfCancellationRequested();
                 var elementInWallFixation = elementInWall.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningFixation, 0);
                 var value = (int) elementInWallFixation;
                 if(value == 1) {
