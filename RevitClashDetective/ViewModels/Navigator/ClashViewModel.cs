@@ -14,7 +14,7 @@ using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
 
 namespace RevitClashDetective.ViewModels.Navigator {
-    internal class ClashViewModel : BaseViewModel {
+    internal class ClashViewModel : BaseViewModel, IEquatable<ClashViewModel> {
         private ClashStatus _clashStatus;
         private readonly RevitRepository _revitRepository;
 
@@ -75,6 +75,37 @@ namespace RevitClashDetective.ViewModels.Navigator {
         public ClashModel GetClashModel() {
             Clash.ClashStatus = ClashStatus;
             return Clash;
+        }
+
+        public override bool Equals(object obj) {
+            return Equals(obj as ClashViewModel);
+        }
+
+        public override int GetHashCode() {
+            int hashCode = 635569250;
+            hashCode = hashCode * -1521134295 + ClashStatus.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FirstName);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FirstDocumentName);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FirstLevel);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FirstCategory);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(SecondName);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(SecondLevel);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(SecondDocumentName);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(SecondCategory);
+            return hashCode;
+        }
+
+        public bool Equals(ClashViewModel other) {
+            return other != null
+                && ClashStatus == other.ClashStatus
+                && FirstName == other.FirstName
+                && FirstDocumentName == other.FirstDocumentName
+                && FirstLevel == other.FirstLevel
+                && FirstCategory == other.FirstCategory
+                && SecondName == other.SecondName
+                && SecondLevel == other.SecondLevel
+                && SecondDocumentName == other.SecondDocumentName
+                && SecondCategory == other.SecondCategory;
         }
     }
 }
