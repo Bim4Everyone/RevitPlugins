@@ -248,8 +248,8 @@ namespace RevitLintelPlacement.Models {
             refWithContext = GetNearestWallOrColumn(view3D, elementInWall, new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z - 0.32), new XYZ(0, 0, 1), true);
             if(refWithContext == null)
                 return true;
-            if(refWithContext.Proximity < 0.52) {
-                return false;
+            if(refWithContext.Proximity > 0.52) {
+                return true;
             }
             wallOrColumn = _document.GetElement(refWithContext.GetReference().ElementId);
             if(wallOrColumn is Wall wall)

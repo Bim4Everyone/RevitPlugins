@@ -12,6 +12,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -98,8 +99,11 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _elementInfosViewModel, value);
         }
 
-        public List<LinkViewModel> SelectedLinks { get => _selectedLinks;
-            set => _selectedLinks = value; }
+        public List<LinkViewModel> SelectedLinks {
+            get => _selectedLinks;
+            set => _selectedLinks = value;
+        }
+
         public void PlaceLintels(object p) {
             ElementInfos.ElementInfos.Clear();
             if(!_revitRepository.CheckConfigParameters(ElementInfos)) {
@@ -154,43 +158,8 @@ namespace RevitLintelPlacement.ViewModels {
                 return;
             }
 
-            var lintels = new List<LintelInfoViewModel>();
-            using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
+            var lintels = GetPlacedLintels(elementInWalls, view3D, links);
 
-                foreach(var elementInWall in elementInWalls) {
-                    var elementInWallFixation = elementInWall.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningFixation, 0);
-                    var value = (int) elementInWallFixation;
-                    if(value == 1) {
-                        continue;
-                    }
-                    var rule = GroupedRules.GetRule(elementInWall);
-                    if(rule == null)
-                        continue;
-                    if(!_revitRepository.CheckUp(view3D, elementInWall, links))
-                        continue;
-                    if(string.IsNullOrEmpty(rule.SelectedLintelType)) {
-                        TaskDialog.Show("Предупреждение!", "В проект не загружено семейство перемычки.");
-                        return;
-                    }
-                    var lintelType = _revitRepository.GetLintelType(rule.SelectedLintelType);
-                    if(lintelType == null) {
-                        TaskDialog.Show("Предупреждение!", $"В проект не загружено семейство с выбранным типоразмером \"{rule.SelectedLintelType}\".");
-                        return;
-                    }
-                    var lintel = _revitRepository.PlaceLintel(lintelType, elementInWall);
-                    rule.SetParametersTo(lintel, elementInWall);
-                    if(_revitRepository.DoesLeftCornerNeeded(view3D, elementInWall, links, ElementInfos, out double leftOffset)) {
-                        lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftOffset, leftOffset > 0 ? leftOffset : 0);
-                        lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftCorner, 1);
-                    }
-                    if(_revitRepository.DoesRightCornerNeeded(view3D, elementInWall, links, ElementInfos, out double rightOffset)) {
-                        lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightOffset, rightOffset > 0 ? rightOffset : 0);
-                        lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightCorner, 1);
-                    }
-                    lintels.Add(new LintelInfoViewModel(_revitRepository, lintel, elementInWall));
-                }
-                t.Commit();
-            }
             using(Transaction t = _revitRepository.StartTransaction("Закрепление перемычек")) {
                 foreach(var lintel in lintels) {
                     _revitRepository.LockLintel(view3D, elevation, plan, lintel.Lintel, lintel.ElementInWall);
@@ -206,6 +175,69 @@ namespace RevitLintelPlacement.ViewModels {
                 window.Close();
             }
         }
+
+        private IEnumerable<LintelInfoViewModel> GetPlacedLintels(IEnumerable<FamilyInstance> elementInWalls, View3D view3D, IEnumerable<string> links) {
+            List<LintelInfoViewModel> lintels;
+            using(var pb = GetPlatformService<IProgressDialogService>()) {
+                pb.StepValue = 10;
+                pb.DisplayTitleFormat = "Идёт расчёт... [{0}\\{1}]";
+                var progress = pb.CreateProgress();
+                pb.MaxValue = elementInWalls.Count();
+                var ct = pb.CreateCancellationToken();
+
+                pb.Show();
+
+                using(Transaction t = _revitRepository.StartTransaction("Расстановка перемычек")) {
+                    lintels = PlaceLintels(elementInWalls, view3D, links, progress, ct).ToList();
+                    t.Commit();
+                }
+            }
+
+            return lintels;
+        }
+
+        private IEnumerable<LintelInfoViewModel> PlaceLintels(IEnumerable<FamilyInstance> elementInWalls, View3D view3D, IEnumerable<string> links, IProgress<int> progress, CancellationToken ct) {
+            int count = 0;
+            foreach(var elementInWall in elementInWalls) {
+                progress.Report(count++);
+                ct.ThrowIfCancellationRequested();
+                var elementInWallFixation = elementInWall.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningFixation, 0);
+                var value = (int) elementInWallFixation;
+                if(value == 1) {
+                    continue;
+                }
+                var rule = GroupedRules.GetRule(elementInWall);
+                if(rule == null)
+                    continue;
+                if(!_revitRepository.CheckUp(view3D, elementInWall, links))
+                    continue;
+                if(string.IsNullOrEmpty(rule.SelectedLintelType)) {
+                    TaskDialog.Show("Предупреждение!", "В проект не загружено семейство перемычки.");
+                    yield break;
+                }
+                var lintelType = _revitRepository.GetLintelType(rule.SelectedLintelType);
+                if(lintelType == null) {
+                    TaskDialog.Show("Предупреждение!", $"В проект не загружено семейство с выбранным типоразмером \"{rule.SelectedLintelType}\".");
+                    yield break;
+                }
+                var lintel = _revitRepository.PlaceLintel(lintelType, elementInWall);
+                rule.SetParametersTo(lintel, elementInWall);
+                if(_revitRepository.DoesLeftCornerNeeded(view3D, elementInWall, links, ElementInfos, out double leftOffset)) {
+                    lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftOffset, leftOffset > 0 ? leftOffset : 0);
+                    lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftCorner, 1);
+                } else {
+                    lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftCorner, 0);
+                }
+                if(_revitRepository.DoesRightCornerNeeded(view3D, elementInWall, links, ElementInfos, out double rightOffset)) {
+                    lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightOffset, rightOffset > 0 ? rightOffset : 0);
+                    lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightCorner, 1);
+                } else {
+                    lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightCorner, 0);
+                }
+                yield return new LintelInfoViewModel(_revitRepository, lintel, elementInWall);
+            }
+        }
+
 
         private void ShowReport(object p) {
             ShowReport();
