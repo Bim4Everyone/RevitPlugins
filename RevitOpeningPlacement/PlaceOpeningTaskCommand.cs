@@ -30,6 +30,7 @@ namespace RevitOpeningPlacement {
             RevitClashDetective.Models.RevitRepository clashRevitRepository
                 = new RevitClashDetective.Models.RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
+
             var openingConfig = OpeningConfig.GetOpeningConfig();
             if(openingConfig.Categories.Count > 0) {
                 var placers = PlacementConfigurator.GetPlacers(revitRepository, clashRevitRepository, openingConfig.Categories)
@@ -57,6 +58,7 @@ namespace RevitOpeningPlacement {
                 foreach(var p in placers) {
                     p.Place();
                     progress.Report(count++);
+                    ct.ThrowIfCancellationRequested();
                 }
                 t.Commit();
             }
