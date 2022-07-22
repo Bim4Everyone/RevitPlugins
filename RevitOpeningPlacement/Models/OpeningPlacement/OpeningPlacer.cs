@@ -20,7 +20,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         public ClashModel Clash { get; set; }
         public IPointFinder PointFinder { get; set; }
         public IAngleFinder AngleFinder { get; set; }
-        public IParameterSetter ParameterSetter { get; set; }
+        public IParameterGetter ParameterGetter { get; set; }
         public FamilySymbol Type { get; set; }
         public void Place() {
             var point = PointFinder.GetPoint();
@@ -30,7 +30,13 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             var angle = AngleFinder.GetAngle();
             _revitRepository.RotateElement(opening, point, angle);
 
-            ParameterSetter.SetParameters(opening);
+            SetParamValues(opening);
+        }
+
+        private void SetParamValues(FamilyInstance opening) {
+            foreach(var paramValue in ParameterGetter.GetParamValues()) {
+                paramValue.Value.SetParamValue(opening, paramValue.ParamName);
+            }
         }
     }
 }

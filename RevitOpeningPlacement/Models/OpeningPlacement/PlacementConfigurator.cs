@@ -29,23 +29,14 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             return ClashInitializer.GetClashes(clashRevitRepository, pipeFilter, wallFilter)
                                     .Select(item => new OpeningPlacer(revitRepository) {
                                         Clash = item,
-                                        PointFinder = GetWallPointFinder(item.MainElement.GetElement() as MEPCurve, item.OtherElement.GetElement() as Wall),
+                                        PointFinder = new HorizontalPointFinder(item.MainElement.GetElement() as MEPCurve, item.OtherElement.GetElement() as Wall),
                                         AngleFinder = new WallAngleFinder(item.OtherElement.GetElement() as Wall),
-                                        ParameterSetter = new RoundParameterSetter((item.MainElement.GetElement() as MEPCurve).Diameter, 
-                                                                                   (item.OtherElement.GetElement() as Wall).Width,
-                                                                                   categories[CategoryEnum.Pipe].Offsets),
+                                        ParameterGetter = new RoundParamterGetter(item.MainElement.GetElement() as MEPCurve, item.OtherElement.GetElement() as Wall),
                                         Type = revitRepository.GetOpeningType(OpeningType.WallRound)
                                     });
             //TODO: добавить все случаи
         }
 
-        private static IPointFinder GetWallPointFinder(MEPCurve curve, Wall wall) {
-            if(curve.IsPerpendicular(wall)) {
-                return new HorizontalPointFinder(curve, wall);
-            } else {
-                return new InclinedPointFinder();
-            }
-        }
 
         private static Filter GetPipeFilter(RevitClashDetective.Models.RevitRepository revitRepository, MepCategoryCollection categories) {
             var minSizePipe = categories[CategoryEnum.Pipe]?.MinSizes[Parameters.Diameter];
