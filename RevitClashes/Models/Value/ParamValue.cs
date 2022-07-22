@@ -58,6 +58,8 @@ namespace RevitClashDetective.Models.Value {
 
         public abstract FilterRule GetFilterRule(IVisiter visiter, Document doc, RevitParam param);
 
+        public abstract void SetParamValue(Element element, string paramName);
+
         public virtual int CompareTo(ParamValue other) {
             return Comparer<object>.Default.Compare(Value, other.Value);
         }
@@ -91,6 +93,11 @@ namespace RevitClashDetective.Models.Value {
         public ParamValue(T value, string stringValue) {
             TValue = value;
             DisplayValue = stringValue ?? TValue?.ToString();
+        }
+
+        public ParamValue(T value) {
+            TValue = value;
+            DisplayValue = TValue?.ToString();
         }
 
         public T TValue { get; set; }
