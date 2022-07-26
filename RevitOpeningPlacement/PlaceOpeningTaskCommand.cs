@@ -33,7 +33,8 @@ namespace RevitOpeningPlacement {
 
             var openingConfig = OpeningConfig.GetOpeningConfig();
             if(openingConfig.Categories.Count > 0) {
-                var placers = PlacementConfigurator.GetPlacers(revitRepository, clashRevitRepository, openingConfig.Categories)
+                var placementConfigurator = new PlacementConfigurator(revitRepository, clashRevitRepository, openingConfig.Categories);
+                var placers = placementConfigurator.GetPlacers()
                                                    .ToList();
                 InitializeProgress(revitRepository, placers);
             }

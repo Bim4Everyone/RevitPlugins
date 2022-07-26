@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -8,13 +9,17 @@ namespace RevitOpeningPlacement.Models.Extensions {
     internal static class MepCurveExtention {
         public static bool IsHorizontal(this MEPCurve curve) {
             var line = (Line) ((LocationCurve) curve.Location).Curve;
-            return Math.Abs(line.GetEndPoint(0).Z - line.GetEndPoint(1).Z) < 0.0001;
+            return line.IsHorizontal();
         }
 
         public static bool IsPerpendicular(this MEPCurve curve, Wall wall) {
             var line = (Line) ((LocationCurve) curve.Location).Curve;
-            return Math.Abs(line.Direction.AngleTo(wall.Orientation)) < 0.0001
-                || Math.Abs(line.Direction.AngleTo(wall.Orientation) - Math.PI) < 0.0001;
+            return line.IsPerpendicular(wall.Orientation);
+        }
+
+        public static XYZ GetIntersectionWithFace(this MEPCurve curve, Face face) {
+            var line = (Line) ((LocationCurve) curve.Location).Curve;
+            return line.GetIntersectionWithFace(face);
         }
 
         public static double GetDiameter(this MEPCurve curve) {

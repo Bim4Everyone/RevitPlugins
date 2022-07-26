@@ -62,7 +62,7 @@ namespace RevitOpeningPlacement.Models {
         public static string OpeningDiameter => "ADSK_Размер_Диаметр";
         public static string OpeningThickness => "ADSK_Размер_Глубина";
         public static List<BuiltInParameter> MepCurveDiameters => new List<BuiltInParameter>() {
-            BuiltInParameter.RBS_PIPE_DIAMETER_PARAM,
+            BuiltInParameter.RBS_PIPE_OUTER_DIAMETER,
             BuiltInParameter.RBS_CURVE_DIAMETER_PARAM
         };
 

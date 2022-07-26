@@ -6,73 +6,91 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
+using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
 
 using RevitOpeningPlacement.Models.Configs;
-using RevitOpeningPlacement.Models.Extensions;
-using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement {
     internal class PlacementConfigurator {
+        private readonly RevitRepository _revitRepository;
+        private readonly RevitClashDetective.Models.RevitRepository _clashRevitRepository;
+        private readonly MepCategoryCollection _categories;
+        private readonly List<DocInfo> _docInfos;
 
-        public static IEnumerable<OpeningPlacer> GetPlacers(RevitRepository revitRepository, RevitClashDetective.Models.RevitRepository clashRevitRepository, MepCategoryCollection categories) {
-            var pipeFilter = GetPipeFilter(clashRevitRepository, categories);
-            var roundDuctFilter = GetRoundDuctFilter(clashRevitRepository, categories);
-            var rectangleDuctFilter = GetRectangleDuctFilter(clashRevitRepository, categories);
-            var trayFilter = GetTrayFilter(clashRevitRepository, categories);
+        public PlacementConfigurator(RevitRepository revitRepository, RevitClashDetective.Models.RevitRepository clashRevitRepository, MepCategoryCollection categories) {
+            _revitRepository = revitRepository;
+            _clashRevitRepository = clashRevitRepository;
+            _categories = categories;
+            _docInfos = _clashRevitRepository.GetDocInfos();
+        }
 
-            var wallFilter = FiltersInitializer.GetWallFilter(clashRevitRepository);
-            var floorFilter = FiltersInitializer.GetFloorFilter(clashRevitRepository);
+        public IEnumerable<OpeningPlacer> GetPlacers() {
+            var pipeFilter = GetPipeFilter();
+            var roundDuctFilter = GetRoundDuctFilter();
+            var rectangleDuctFilter = GetRectangleDuctFilter();
+            var trayFilter = GetTrayFilter();
 
+            var wallFilter = FiltersInitializer.GetWallFilter(_clashRevitRepository);
+            var floorFilter = FiltersInitializer.GetFloorFilter(_clashRevitRepository);
 
-
-            return ClashInitializer.GetClashes(clashRevitRepository, pipeFilter, wallFilter)
-                                    .Select(item => new OpeningPlacer(revitRepository) {
+            return ClashInitializer.GetClashes(_clashRevitRepository, pipeFilter, wallFilter)
+                                    .Select(item => new OpeningPlacer(_revitRepository) {
                                         Clash = item,
-                                        PointFinder = new HorizontalPointFinder(item.MainElement.GetElement() as MEPCurve, item.OtherElement.GetElement() as Wall),
-                                        AngleFinder = new WallAngleFinder(item.OtherElement.GetElement() as Wall),
-                                        ParameterGetter = new RoundParamterGetter(item.MainElement.GetElement() as MEPCurve, item.OtherElement.GetElement() as Wall),
-                                        Type = revitRepository.GetOpeningType(OpeningType.WallRound)
+                                        PointFinder = new HorizontalPointFinder(item.MainElement.GetElement() as MEPCurve,
+                                                                                item.OtherElement.GetElement() as Wall,
+                                                                                GetTransform(item.OtherElement.GetElement())),
+                                        AngleFinder = new WallAngleFinder(item.OtherElement.GetElement() as Wall, GetTransform(item.OtherElement.GetElement())),
+                                        ParameterGetter = new RoundCurveWithWallParamterGetter(item.MainElement.GetElement() as MEPCurve,
+                                                                                               item.OtherElement.GetElement() as Wall,
+                                                                                               GetTransform(item.OtherElement.GetElement())),
+                                        Type = _revitRepository.GetOpeningType(OpeningType.WallRound)
                                     });
             //TODO: добавить все случаи
         }
 
+        private Transform GetTransform(Element element) {
+            return _docInfos.FirstOrDefault(item => item.Name.Equals(_clashRevitRepository.GetDocumentName(element.Document), StringComparison.CurrentCultureIgnoreCase))?.Transform
+                ?? Transform.Identity;
+        }
 
-        private static Filter GetPipeFilter(RevitClashDetective.Models.RevitRepository revitRepository, MepCategoryCollection categories) {
-            var minSizePipe = categories[CategoryEnum.Pipe]?.MinSizes[Parameters.Diameter];
+        private Filter GetPipeFilter() {
+            var minSizePipe = _categories[CategoryEnum.Pipe]?.MinSizes[Parameters.Diameter];
             if(minSizePipe != null) {
-                return FiltersInitializer.GetPipeFilter(revitRepository, minSizePipe.Value);
+                return FiltersInitializer.GetPipeFilter(_clashRevitRepository, minSizePipe.Value);
             }
             return null;
         }
 
-        private static Filter GetRoundDuctFilter(RevitClashDetective.Models.RevitRepository revitRepository, MepCategoryCollection categories) {
-            var minSizeRoundDuct = categories[CategoryEnum.RoundDuct]?.MinSizes[Parameters.Diameter];
+        private Filter GetRoundDuctFilter() {
+            var minSizeRoundDuct = _categories[CategoryEnum.RoundDuct]?.MinSizes[Parameters.Diameter];
             if(minSizeRoundDuct != null) {
-                return FiltersInitializer.GetRoundDuctFilter(revitRepository, minSizeRoundDuct.Value);
+                return FiltersInitializer.GetRoundDuctFilter(_clashRevitRepository, minSizeRoundDuct.Value);
             }
             return null;
         }
 
-        private static Filter GetRectangleDuctFilter(RevitClashDetective.Models.RevitRepository revitRepository, MepCategoryCollection categories) {
-            var minSizesRectangleDuct = categories[CategoryEnum.RectangleDuct]?.MinSizes;
+        private Filter GetRectangleDuctFilter() {
+            var minSizesRectangleDuct = _categories[CategoryEnum.RectangleDuct]?.MinSizes;
             if(minSizesRectangleDuct != null) {
                 var height = minSizesRectangleDuct[Parameters.Height];
                 var width = minSizesRectangleDuct[Parameters.Width];
                 if(height != null && width != null) {
-                    return FiltersInitializer.GetRectangleDuctFilter(revitRepository, height.Value, width.Value);
+                    return FiltersInitializer.GetRectangleDuctFilter(_clashRevitRepository, height.Value, width.Value);
                 }
             }
             return null;
         }
 
-        private static Filter GetTrayFilter(RevitClashDetective.Models.RevitRepository revitRepository, MepCategoryCollection categories) {
-            var minSizesTray = categories[CategoryEnum.CableTray]?.MinSizes;
+        private Filter GetTrayFilter() {
+            var minSizesTray = _categories[CategoryEnum.CableTray]?.MinSizes;
             if(minSizesTray != null) {
                 var height = minSizesTray[Parameters.Height];
                 var width = minSizesTray[Parameters.Width];
                 if(height != null && width != null) {
-                    return FiltersInitializer.GetTrayFilter(revitRepository, height.Value, width.Value);
+                    return FiltersInitializer.GetTrayFilter(_clashRevitRepository, height.Value, width.Value);
                 }
             }
             return null;
