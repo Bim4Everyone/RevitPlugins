@@ -37,14 +37,15 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             var floorFilter = FiltersInitializer.GetFloorFilter(_clashRevitRepository);
 
             return ClashInitializer.GetClashes(_clashRevitRepository, pipeFilter, wallFilter)
+                                    .Where(item =>ClashChecker.CheckPipeWallClash(item))
                                     .Select(item => new OpeningPlacer(_revitRepository) {
                                         Clash = item,
-                                        PointFinder = new HorizontalPointFinder(item.MainElement.GetElement() as MEPCurve,
-                                                                                item.OtherElement.GetElement() as Wall,
+                                        PointFinder = new HorizontalPointFinder((MEPCurve) item.MainElement.GetElement(),
+                                                                                (Wall) item.OtherElement.GetElement(),
                                                                                 GetTransform(item.OtherElement.GetElement())),
                                         AngleFinder = new WallAngleFinder(item.OtherElement.GetElement() as Wall, GetTransform(item.OtherElement.GetElement())),
-                                        ParameterGetter = new RoundCurveWithWallParamterGetter(item.MainElement.GetElement() as MEPCurve,
-                                                                                               item.OtherElement.GetElement() as Wall,
+                                        ParameterGetter = new RoundCurveWithWallParamterGetter((MEPCurve) item.MainElement.GetElement(),
+                                                                                               (Wall) item.OtherElement.GetElement(),
                                                                                                GetTransform(item.OtherElement.GetElement())),
                                         Type = _revitRepository.GetOpeningType(OpeningType.WallRound)
                                     });

@@ -12,14 +12,28 @@ namespace RevitOpeningPlacement.Models.Extensions {
             return line.IsHorizontal();
         }
 
-        public static bool IsPerpendicular(this MEPCurve curve, Wall wall) {
+        public static bool IsVertical(this MEPCurve curve) {
             var line = (Line) ((LocationCurve) curve.Location).Curve;
-            return line.IsPerpendicular(wall.Orientation);
+            return line.IsVertical();
+        }
+
+        public static bool IsPerpendicular(this MEPCurve curve, Wall wall) {
+            var mepLine = (Line) ((LocationCurve) curve.Location).Curve;
+            var wallLine = (Line) ((LocationCurve) wall.Location).Curve;
+
+            return mepLine.IsPerpendicular(wallLine);
+        }
+
+        public static bool IsParallel(this MEPCurve curve, Wall wall) {
+            var mepLine = (Line) ((LocationCurve) curve.Location).Curve;
+            var wallLine = (Line) ((LocationCurve) wall.Location).Curve;
+
+            return mepLine.IsParallel(wallLine);
         }
 
         public static XYZ GetIntersectionWithFace(this MEPCurve curve, Face face) {
             var line = (Line) ((LocationCurve) curve.Location).Curve;
-            return line.GetIntersectionWithFace(face);
+            return line.GetIntersectionWithFaceFromEquation(face);
         }
 
         public static double GetDiameter(this MEPCurve curve) {

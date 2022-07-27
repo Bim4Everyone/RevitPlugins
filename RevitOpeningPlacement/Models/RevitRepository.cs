@@ -90,7 +90,7 @@ namespace RevitOpeningPlacement.Models {
                 if(!type.IsActive) {
                     type.Activate();
                 }
-                point = point - XYZ.BasisZ * level.Elevation;
+                point = point - XYZ.BasisZ * level.ProjectElevation;
                 return _document.Create.NewFamilyInstance(point, type, level, StructuralType.NonStructural);
             }
             return _document.Create.NewFamilyInstance(point, type, StructuralType.NonStructural);

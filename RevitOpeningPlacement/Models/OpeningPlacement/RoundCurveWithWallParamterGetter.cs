@@ -142,7 +142,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
                 foreach(var line in lines) {
                     XYZ point;
                     try {
-                        point = line.GetIntersectionWithFace(face);
+                        point = line.GetIntersectionWithFaceFromEquation(face);
                     } catch {
                         continue; //Возможно, если сформированная линия проходит вне границы существующей грани
                     }

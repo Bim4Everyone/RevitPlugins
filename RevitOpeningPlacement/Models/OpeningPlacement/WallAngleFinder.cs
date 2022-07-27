@@ -21,7 +21,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         public double GetAngle() {
             var orientation = _wall.Orientation;
             var angle = _transform.OfVector(orientation).AngleTo(XYZ.BasisY);
-            return (orientation.X < 0 && orientation.Y < 0) || (orientation.X < 0 && orientation.Y > 0) ? angle : -angle;
+            return (orientation.X <= 0 && orientation.Y <= 0) || (orientation.X <= 0 && orientation.Y >= 0) ? angle : -angle;
         }
     }
 }

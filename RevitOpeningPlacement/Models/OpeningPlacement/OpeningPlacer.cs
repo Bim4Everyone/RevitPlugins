@@ -8,6 +8,7 @@ using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models.Clashes;
 
+using RevitOpeningPlacement.Models.Exceptions;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement {
@@ -24,6 +25,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         public FamilySymbol Type { get; set; }
         public void Place() {
             var point = PointFinder.GetPoint();
+
             var level = _revitRepository.GetLevel(Clash.MainElement.Level);
             var opening = _revitRepository.CreateInstance(Type, point, level);
 
