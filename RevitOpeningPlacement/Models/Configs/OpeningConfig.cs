@@ -19,7 +19,7 @@ namespace RevitOpeningPlacement.Models.Configs {
         public override string ProjectConfigPath { get; set; }
         [JsonIgnore]
         public override IConfigSerializer Serializer { get; set; }
-        public MepCategoryCollection Categories { get; set; }
+        public MepCategoryCollection Categories { get; set; } = new MepCategoryCollection();
 
         public static OpeningConfig GetOpeningConfig() {
             return new ProjectConfigBuilder()
@@ -32,6 +32,9 @@ namespace RevitOpeningPlacement.Models.Configs {
     }
 
     internal class MepCategoryCollection : IEnumerable<MepCategory> {
+        public MepCategoryCollection() {
+            Categories = new List<MepCategory>();
+        }
         public MepCategoryCollection(IEnumerable<MepCategory> categories) {
             Categories = new List<MepCategory>(categories);
         }
@@ -45,11 +48,14 @@ namespace RevitOpeningPlacement.Models.Configs {
     internal class MepCategory {
         public string Name { get; set; }
         public string ImageSource { get; set; }
-        public SizeCollection MinSizes { get; set; }
-        public List<Offset> Offsets { get; set; }
+        public SizeCollection MinSizes { get; set; } = new SizeCollection();
+        public List<Offset> Offsets { get; set; } = new List<Offset>();
     }
 
     internal class SizeCollection : IEnumerable<Size> {
+        public SizeCollection() {
+            Sizes = new List<Size>();
+        }
         public SizeCollection(IEnumerable<Size> sizes) {
             Sizes = new List<Size>(sizes);
         }
