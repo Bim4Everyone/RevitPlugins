@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+
+using RevitOpeningPlacement.Models.OpeningPlacement;
 
 namespace RevitOpeningPlacement.Models.Extensions {
     internal static class MepCurveExtention {
@@ -29,11 +32,6 @@ namespace RevitOpeningPlacement.Models.Extensions {
             var wallLine = (Line) ((LocationCurve) wall.Location).Curve;
 
             return mepLine.IsParallel(wallLine);
-        }
-
-        public static XYZ GetIntersectionWithFace(this MEPCurve curve, Face face) {
-            var line = (Line) ((LocationCurve) curve.Location).Curve;
-            return line.GetIntersectionWithFaceFromEquation(face);
         }
 
         public static double GetDiameter(this MEPCurve curve) {

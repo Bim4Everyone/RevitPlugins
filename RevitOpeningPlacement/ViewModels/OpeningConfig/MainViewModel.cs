@@ -21,7 +21,6 @@ using RevitOpeningPlacement.ViewModels.Services;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
     internal class MainViewModel : BaseViewModel {
-        private readonly RevitRepository _revitRepository;
         private string _errorText;
         private string _messageText;
         private ObservableCollection<IMepCategoryViewModel> _mepCategories;

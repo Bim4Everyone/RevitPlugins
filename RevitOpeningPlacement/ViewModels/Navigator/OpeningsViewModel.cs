@@ -11,17 +11,13 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using RevitClashDetective.Models;
-
 namespace RevitOpeningPlacement.ViewModels.Navigator {
     internal class OpeningsViewModel : BaseViewModel {
         private readonly Models.RevitRepository _revitRepository;
-        private readonly RevitRepository _clashRevitRepository;
         private ObservableCollection<OpeningViewModel> _openings;
 
-        public OpeningsViewModel(Models.RevitRepository revitRepository, RevitRepository clashRevitRepository) {
+        public OpeningsViewModel(Models.RevitRepository revitRepository) {
             _revitRepository = revitRepository;
-            _clashRevitRepository = clashRevitRepository;
 
             InitializeOpenings();
 
@@ -40,7 +36,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
                 _revitRepository.GetOpenings()
                 .Select(item => new OpeningViewModel() {
                     Id = item.Id.IntegerValue,
-                    Level = _clashRevitRepository.GetLevel(item),
+                    Level = _revitRepository.GetLevel(item),
                     TypeName = item.Name,
                     FamilyName = _revitRepository.GetFamilyName(item)
                 }));
@@ -50,8 +46,8 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             var opening = p as OpeningViewModel;
             if(opening == null)
                 return;
-            var element = _clashRevitRepository.GetElement(new ElementId(opening.Id));
-            _clashRevitRepository.SelectAndShowElement(new[] { element.Id }, element.get_BoundingBox(null));
+            var element = _revitRepository.GetElement(new ElementId(opening.Id));
+            _revitRepository.SelectAndShowElement(element.Id, element.get_BoundingBox(null));
         }
     }
 }

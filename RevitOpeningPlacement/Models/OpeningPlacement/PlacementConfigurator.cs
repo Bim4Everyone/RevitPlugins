@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 using Autodesk.Revit.DB;
 
@@ -12,19 +14,19 @@ using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
 
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
+using RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement {
     internal class PlacementConfigurator {
         private readonly RevitRepository _revitRepository;
-        private readonly RevitClashDetective.Models.RevitRepository _clashRevitRepository;
         private readonly MepCategoryCollection _categories;
         private readonly List<DocInfo> _docInfos;
 
-        public PlacementConfigurator(RevitRepository revitRepository, RevitClashDetective.Models.RevitRepository clashRevitRepository, MepCategoryCollection categories) {
+        public PlacementConfigurator(RevitRepository revitRepository, MepCategoryCollection categories) {
             _revitRepository = revitRepository;
-            _clashRevitRepository = clashRevitRepository;
             _categories = categories;
-            _docInfos = _clashRevitRepository.GetDocInfos();
+            _docInfos = _revitRepository.GetDocInfos();
         }
 
         public IEnumerable<OpeningPlacer> GetPlacers() {
@@ -33,34 +35,23 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             var rectangleDuctFilter = GetRectangleDuctFilter();
             var trayFilter = GetTrayFilter();
 
-            var wallFilter = FiltersInitializer.GetWallFilter(_clashRevitRepository);
-            var floorFilter = FiltersInitializer.GetFloorFilter(_clashRevitRepository);
+            var wallFilter = FiltersInitializer.GetWallFilter(_revitRepository.GetClashRevitRepository());
+            var floorFilter = FiltersInitializer.GetFloorFilter(_revitRepository.GetClashRevitRepository());
 
-            return ClashInitializer.GetClashes(_clashRevitRepository, pipeFilter, wallFilter)
-                                    .Where(item =>ClashChecker.CheckPipeWallClash(item))
-                                    .Select(item => new OpeningPlacer(_revitRepository) {
-                                        Clash = item,
-                                        PointFinder = new HorizontalPointFinder((MEPCurve) item.MainElement.GetElement(),
-                                                                                (Wall) item.OtherElement.GetElement(),
-                                                                                GetTransform(item.OtherElement.GetElement())),
-                                        AngleFinder = new WallAngleFinder(item.OtherElement.GetElement() as Wall, GetTransform(item.OtherElement.GetElement())),
-                                        ParameterGetter = new RoundCurveWithWallParamterGetter((MEPCurve) item.MainElement.GetElement(),
-                                                                                               (Wall) item.OtherElement.GetElement(),
-                                                                                               GetTransform(item.OtherElement.GetElement())),
-                                        Type = _revitRepository.GetOpeningType(OpeningType.WallRound)
-                                    });
+            List<OpeningPlacer> placers = new List<OpeningPlacer>();
+
+            placers.AddRange(ClashInitializer.GetClashes(_revitRepository.GetClashRevitRepository(), pipeFilter, wallFilter)
+                                    .Where(item => ClashChecker.CheckWallClash(_docInfos, item))
+                                    .Select(item => RoundMepWallPlacerInitializer.GetPlacer(_revitRepository, _docInfos, item)));
+           
+            return placers;
             //TODO: добавить все случаи
-        }
-
-        private Transform GetTransform(Element element) {
-            return _docInfos.FirstOrDefault(item => item.Name.Equals(_clashRevitRepository.GetDocumentName(element.Document), StringComparison.CurrentCultureIgnoreCase))?.Transform
-                ?? Transform.Identity;
         }
 
         private Filter GetPipeFilter() {
             var minSizePipe = _categories[CategoryEnum.Pipe]?.MinSizes[Parameters.Diameter];
             if(minSizePipe != null) {
-                return FiltersInitializer.GetPipeFilter(_clashRevitRepository, minSizePipe.Value);
+                return FiltersInitializer.GetPipeFilter(_revitRepository.GetClashRevitRepository(), minSizePipe.Value);
             }
             return null;
         }
@@ -68,7 +59,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         private Filter GetRoundDuctFilter() {
             var minSizeRoundDuct = _categories[CategoryEnum.RoundDuct]?.MinSizes[Parameters.Diameter];
             if(minSizeRoundDuct != null) {
-                return FiltersInitializer.GetRoundDuctFilter(_clashRevitRepository, minSizeRoundDuct.Value);
+                return FiltersInitializer.GetRoundDuctFilter(_revitRepository.GetClashRevitRepository(), minSizeRoundDuct.Value);
             }
             return null;
         }
@@ -79,7 +70,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
                 var height = minSizesRectangleDuct[Parameters.Height];
                 var width = minSizesRectangleDuct[Parameters.Width];
                 if(height != null && width != null) {
-                    return FiltersInitializer.GetRectangleDuctFilter(_clashRevitRepository, height.Value, width.Value);
+                    return FiltersInitializer.GetRectangleDuctFilter(_revitRepository.GetClashRevitRepository(), height.Value, width.Value);
                 }
             }
             return null;
@@ -91,7 +82,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
                 var height = minSizesTray[Parameters.Height];
                 var width = minSizesTray[Parameters.Width];
                 if(height != null && width != null) {
-                    return FiltersInitializer.GetTrayFilter(_clashRevitRepository, height.Value, width.Value);
+                    return FiltersInitializer.GetTrayFilter(_revitRepository.GetClashRevitRepository(), height.Value, width.Value);
                 }
             }
             return null;

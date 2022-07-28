@@ -21,11 +21,10 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         public ClashModel Clash { get; set; }
         public IPointFinder PointFinder { get; set; }
         public IAngleFinder AngleFinder { get; set; }
-        public IParameterGetter ParameterGetter { get; set; }
+        public IParametersGetter ParameterGetter { get; set; }
         public FamilySymbol Type { get; set; }
         public void Place() {
             var point = PointFinder.GetPoint();
-
             var level = _revitRepository.GetLevel(Clash.MainElement.Level);
             var opening = _revitRepository.CreateInstance(Type, point, level);
 

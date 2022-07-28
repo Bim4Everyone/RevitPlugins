@@ -8,6 +8,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB.Structure;
 using System;
+using RevitClashDetective.Models;
 
 namespace RevitOpeningPlacement.Models {
     internal class RevitRepository {
@@ -16,6 +17,7 @@ namespace RevitOpeningPlacement.Models {
 
         private readonly Document _document;
         private readonly UIDocument _uiDocument;
+        private readonly RevitClashDetective.Models.RevitRepository _clashRevitRepository;
 
         public RevitRepository(Application application, Document document) {
 
@@ -24,6 +26,8 @@ namespace RevitOpeningPlacement.Models {
 
             _document = document;
             _uiDocument = new UIDocument(document);
+
+            _clashRevitRepository = new RevitClashDetective.Models.RevitRepository(_application, _document);
 
             UIApplication = _uiApplication;
         }
@@ -61,6 +65,9 @@ namespace RevitOpeningPlacement.Models {
 
         public static string OpeningDiameter => "ADSK_Размер_Диаметр";
         public static string OpeningThickness => "ADSK_Размер_Глубина";
+        public static string OpeningHeight => "ADSK_Размер_Высота";
+        public static string OpeningWidth => "ADSK_Размер_Ширина";
+
         public static List<BuiltInParameter> MepCurveDiameters => new List<BuiltInParameter>() {
             BuiltInParameter.RBS_PIPE_OUTER_DIAMETER,
             BuiltInParameter.RBS_CURVE_DIAMETER_PARAM
@@ -83,6 +90,22 @@ namespace RevitOpeningPlacement.Models {
                 .OfClass(typeof(Level))
                 .Cast<Level>()
                 .FirstOrDefault(item => item.Name.Equals(name, StringComparison.CurrentCulture));
+        }
+
+        public string GetLevel(Element element) {
+            return _clashRevitRepository.GetLevel(element);
+        }
+
+        public Element GetElement(ElementId id) {
+            return _document.GetElement(id);
+        }
+
+        public void SelectAndShowElement(ElementId elementId, BoundingBoxXYZ bb) {
+            _clashRevitRepository.SelectAndShowElement(new[] { elementId }, bb);
+        }
+
+        public string GetDocumentName(Document doc) {
+            return _clashRevitRepository.GetDocumentName(doc);
         }
 
         public FamilyInstance CreateInstance(FamilySymbol type, XYZ point, Level level) {
@@ -122,6 +145,14 @@ namespace RevitOpeningPlacement.Models {
                 return type?.FamilyName;
             }
             return null;
+        }
+
+        public List<DocInfo> GetDocInfos() {
+            return _clashRevitRepository.GetDocInfos();
+        }
+
+        public RevitClashDetective.Models.RevitRepository GetClashRevitRepository() {
+            return _clashRevitRepository;
         }
     }
 

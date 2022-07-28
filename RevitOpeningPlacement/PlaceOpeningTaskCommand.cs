@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -23,17 +25,15 @@ namespace RevitOpeningPlacement {
     [Transaction(TransactionMode.Manual)]
     public class PlaceOpeningTaskCommand : BasePluginCommand {
         public PlaceOpeningTaskCommand() {
-            PluginName = "Настройка ";
+            PluginName = "Расстановка заданий на отверстия";
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            RevitClashDetective.Models.RevitRepository clashRevitRepository
-                = new RevitClashDetective.Models.RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
 
             var openingConfig = OpeningConfig.GetOpeningConfig();
             if(openingConfig.Categories.Count > 0) {
-                var placementConfigurator = new PlacementConfigurator(revitRepository, clashRevitRepository, openingConfig.Categories);
+                var placementConfigurator = new PlacementConfigurator(revitRepository, openingConfig.Categories);
                 var placers = placementConfigurator.GetPlacers()
                                                    .ToList();
                 InitializeProgress(revitRepository, placers);

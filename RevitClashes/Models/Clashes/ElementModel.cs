@@ -33,11 +33,11 @@ namespace RevitClashDetective.Models.Clashes {
         public string DocumentName { get; set; }
 
 
-        public Element GetElement() {
-            var doc = _revitRepository.GetDocuments().FirstOrDefault(item => _revitRepository.GetDocumentName(item).Equals(DocumentName));
+        public Element GetElement(IEnumerable<DocInfo> docInfos) {
+            var doc = docInfos.FirstOrDefault(item => item.Name.Equals(DocumentName));
             var id = new ElementId(Id);
             if(doc != null && id.IsNotNull()) {
-                return doc.GetElement(id);
+                return doc.Doc.GetElement(id);
             }
             return null;
         }

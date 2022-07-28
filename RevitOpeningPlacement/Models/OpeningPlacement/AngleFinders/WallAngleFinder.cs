@@ -8,7 +8,7 @@ using Autodesk.Revit.DB;
 
 using RevitOpeningPlacement.Models.Interfaces;
 
-namespace RevitOpeningPlacement.Models.OpeningPlacement {
+namespace RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders {
     internal class WallAngleFinder : IAngleFinder {
         private readonly Wall _wall;
         private readonly Transform _transform;

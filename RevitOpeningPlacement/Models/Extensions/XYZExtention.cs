@@ -13,8 +13,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
         }
 
         public static bool IsPerpendicular(this XYZ vector1, XYZ vector2) {
-            return Math.Abs(vector1.AngleTo(vector2)) < 0.0001
-                || Math.Abs(vector1.AngleTo(vector2) - Math.PI) < 0.0001;
+            return Math.Abs(Math.Cos(vector1.AngleTo(vector2))) < 0.0001;
         }
     }
 }

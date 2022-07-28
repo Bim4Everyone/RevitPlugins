@@ -18,11 +18,9 @@ namespace RevitOpeningPlacement {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            RevitClashDetective.Models.RevitRepository clashRevitRepository
-                = new RevitClashDetective.Models.RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
 
-            var viewModel = new OpeningsViewModel(revitRepository, clashRevitRepository);
+            var viewModel = new OpeningsViewModel(revitRepository);
 
             var window = new NavigatorView() { Title = PluginName, DataContext = viewModel };
             var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
