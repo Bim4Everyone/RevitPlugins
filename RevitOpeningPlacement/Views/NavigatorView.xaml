@@ -19,12 +19,12 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <dxg:GridControl x:Name="_dg" ItemsSource="{Binding Openings}">
+        <dxg:GridControl x:Name="_dg" ItemsSource="{Binding OpeningsViewSource.View}">
             <dxg:GridControl.GroupSummary>
                 <dxg:GridSummaryItem SummaryType="Count" />
             </dxg:GridControl.GroupSummary>
             <mvvm:Interaction.Behaviors>
-                <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectCommand}" CommandParameter="{Binding ElementName=_dg, Path=SelectedItem}" />
+                <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectionChangedCommand}" />
             </mvvm:Interaction.Behaviors>
             <dxg:GridControl.View>
                 <dxg:TableView AutoWidth="True" AllowMergedGrouping="True" DataNavigatorButtons="Navigation" ShowDataNavigator="True"/>

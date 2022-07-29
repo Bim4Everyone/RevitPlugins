@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -22,6 +24,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             InitializeOpenings();
 
             SelectCommand = new RelayCommand(Select);
+            SelectionChangedCommand = new RelayCommand(SelectionChanged);
         }
 
         public ObservableCollection<OpeningViewModel> Openings {
@@ -29,7 +32,10 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             set => this.RaiseAndSetIfChanged(ref _openings, value);
         }
 
+        public CollectionViewSource OpeningsViewSource { get; set; }
+
         public ICommand SelectCommand { get; }
+        public ICommand SelectionChangedCommand { get; }
 
         private void InitializeOpenings() {
             Openings = new ObservableCollection<OpeningViewModel>(
@@ -40,6 +46,8 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
                     TypeName = item.Name,
                     FamilyName = _revitRepository.GetFamilyName(item)
                 }));
+
+            OpeningsViewSource = new CollectionViewSource() { Source = Openings };
         }
 
         private void Select(object p) {
@@ -48,6 +56,13 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
                 return;
             var element = _revitRepository.GetElement(new ElementId(opening.Id));
             _revitRepository.SelectAndShowElement(element.Id, element.get_BoundingBox(null));
+        }
+
+        private void SelectionChanged(object p) {
+            if(OpeningsViewSource.View.CurrentPosition > -1
+                && OpeningsViewSource.View.CurrentPosition < Openings.Count) {
+                Select(OpeningsViewSource.View.CurrentItem);
+            }
         }
     }
 }

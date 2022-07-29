@@ -11,6 +11,7 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.FilterModel;
 
 using RevitOpeningPlacement.Models.Configs;
@@ -22,6 +23,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         private readonly RevitRepository _revitRepository;
         private readonly MepCategoryCollection _categories;
         private readonly List<DocInfo> _docInfos;
+        private List<ClashModel> _unplacedClashes = new List<ClashModel>();
 
         public PlacementConfigurator(RevitRepository revitRepository, MepCategoryCollection categories) {
             _revitRepository = revitRepository;
@@ -40,14 +42,35 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
 
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
 
-            placers.AddRange(ClashInitializer.GetClashes(_revitRepository.GetClashRevitRepository(), pipeFilter, wallFilter)
-                                    .Where(item => ClashChecker.CheckWallClash(_docInfos, item))
-                                    .Select(item => RoundMepWallPlacerInitializer.GetPlacer(_revitRepository, _docInfos, item, _categories[CategoryEnum.Pipe])));
-            placers.AddRange(ClashInitializer.GetClashes(_revitRepository.GetClashRevitRepository(), roundDuctFilter, wallFilter)
-                                    .Where(item => ClashChecker.CheckWallClash(_docInfos, item))
-                                    .Select(item => RoundMepWallPlacerInitializer.GetPlacer(_revitRepository, _docInfos, item, _categories[CategoryEnum.RoundDuct])));
+
+
+            placers.AddRange(GetPipeWallPlacers(pipeFilter, wallFilter));
+
+            placers.AddRange(GetRoundDuctWallPlacers(roundDuctFilter, wallFilter));
             return placers;
             //TODO: добавить все случаи
+        }
+
+        public List<ClashModel> GetUnplacedClashes() {
+            return _unplacedClashes;
+        }
+
+        private IEnumerable<OpeningPlacer> GetRoundDuctWallPlacers(Filter roundDuctFilter, Filter wallFilter) {
+            var pipeWallClashes = ClashInitializer.GetClashes(_revitRepository.GetClashRevitRepository(), roundDuctFilter, wallFilter).ToList();
+
+            _unplacedClashes.AddRange(pipeWallClashes.Where(item => !ClashChecker.CheckWallClash(_docInfos, item)));
+
+            return pipeWallClashes.Where(item => ClashChecker.CheckWallClash(_docInfos, item))
+                                  .Select(item => RoundMepWallPlacerInitializer.GetPlacer(_revitRepository, _docInfos, item, _categories[CategoryEnum.RoundDuct]));
+        }
+
+        private IEnumerable<OpeningPlacer> GetPipeWallPlacers(Filter pipeFilter, Filter wallFilter) {
+            var pipeWallClashes = ClashInitializer.GetClashes(_revitRepository.GetClashRevitRepository(), pipeFilter, wallFilter).ToList();
+
+            _unplacedClashes.AddRange(pipeWallClashes.Where(item => !ClashChecker.CheckWallClash(_docInfos, item)));
+
+            return pipeWallClashes.Where(item => ClashChecker.CheckWallClash(_docInfos, item))
+                                  .Select(item => RoundMepWallPlacerInitializer.GetPlacer(_revitRepository, _docInfos, item, _categories[CategoryEnum.Pipe]));
         }
 
         private Filter GetPipeFilter() {

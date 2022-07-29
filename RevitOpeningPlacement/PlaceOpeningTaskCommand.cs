@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -14,11 +15,14 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 
+using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.FilterModel;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.OpeningPlacement;
+using RevitOpeningPlacement.ViewModels.ReportViewModel;
+using RevitOpeningPlacement.Views;
 
 namespace RevitOpeningPlacement {
 
@@ -37,6 +41,7 @@ namespace RevitOpeningPlacement {
                 var placers = placementConfigurator.GetPlacers()
                                                    .ToList();
                 InitializeProgress(revitRepository, placers);
+                InitializeReport(revitRepository, placementConfigurator.GetUnplacedClashes());
             }
         }
 
@@ -63,6 +68,17 @@ namespace RevitOpeningPlacement {
                 }
                 t.Commit();
             }
+        }
+
+        private void InitializeReport(RevitRepository revitRepository, IEnumerable<ClashModel> clashes) {
+            if(!clashes.Any()) {
+                return;
+            }
+            var viewModel = new ClashesViewModel(revitRepository, clashes);
+            var window = new ReportView() { DataContext = viewModel };
+            var helper = new WindowInteropHelper(window) { Owner = revitRepository.UIApplication.MainWindowHandle };
+
+            window.Show();
         }
     }
 }
