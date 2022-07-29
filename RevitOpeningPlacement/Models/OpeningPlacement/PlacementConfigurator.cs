@@ -42,10 +42,10 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
 
             placers.AddRange(ClashInitializer.GetClashes(_revitRepository.GetClashRevitRepository(), pipeFilter, wallFilter)
                                     .Where(item => ClashChecker.CheckWallClash(_docInfos, item))
-                                    .Select(item => RoundMepWallPlacerInitializer.GetPlacer(_revitRepository, _docInfos, item)));
+                                    .Select(item => RoundMepWallPlacerInitializer.GetPlacer(_revitRepository, _docInfos, item, _categories[CategoryEnum.Pipe])));
             placers.AddRange(ClashInitializer.GetClashes(_revitRepository.GetClashRevitRepository(), roundDuctFilter, wallFilter)
                                     .Where(item => ClashChecker.CheckWallClash(_docInfos, item))
-                                    .Select(item => RoundMepWallPlacerInitializer.GetPlacer(_revitRepository, _docInfos, item)));
+                                    .Select(item => RoundMepWallPlacerInitializer.GetPlacer(_revitRepository, _docInfos, item, _categories[CategoryEnum.RoundDuct])));
             return placers;
             //TODO: добавить все случаи
         }

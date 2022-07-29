@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models.Value;
 
+using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
