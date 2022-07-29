@@ -15,47 +15,47 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
     internal class ClashChecker {
         public bool Result { get; set; } = true;
 
-        public ClashChecker CheckMainElementIsMepCurve(IEnumerable<DocInfo> docInfos, ClashModel clashModel) {
+        public ClashChecker CheckMainElementIsMepCurve(RevitRepository revitRepository, ClashModel clashModel) {
             if(Result) {
-                Result = clashModel.MainElement.GetElement(docInfos) is MEPCurve;
+                Result = clashModel.MainElement.GetElement(revitRepository.DocInfos) is MEPCurve;
             }
             return this;
         }
 
-        public ClashChecker CheckOtherElementIsWall(IEnumerable<DocInfo> docInfos, ClashModel clashModel) {
+        public ClashChecker CheckOtherElementIsWall(RevitRepository revitRepository, ClashModel clashModel) {
             if(Result) {
-                Result = clashModel.OtherElement.GetElement(docInfos) is Wall;
+                Result = clashModel.OtherElement.GetElement(revitRepository.DocInfos) is Wall;
             }
             return this;
         }
 
-        public ClashChecker CheckMainElementIsNotVertical(IEnumerable<DocInfo> docInfos, ClashModel clashModel) {
+        public ClashChecker CheckMainElementIsNotVertical(RevitRepository revitRepository, ClashModel clashModel) {
             if(Result) {
-                Result = !((MEPCurve) clashModel.MainElement.GetElement(docInfos)).IsVertical();
+                Result = !((MEPCurve) clashModel.MainElement.GetElement(revitRepository.DocInfos)).IsVertical();
             }
             return this;
         }
 
-        public ClashChecker CheckElementsIsNotParallel(IEnumerable<DocInfo> docInfos, ClashModel clashModel) {
+        public ClashChecker CheckElementsIsNotParallel(RevitRepository revitRepository, ClashModel clashModel) {
             if(Result) {
-                Result = !((MEPCurve) clashModel.MainElement.GetElement(docInfos)).IsParallel((Wall) clashModel.OtherElement.GetElement(docInfos));
+                Result = !((MEPCurve) clashModel.MainElement.GetElement(revitRepository.DocInfos)).IsParallel((Wall) clashModel.OtherElement.GetElement(revitRepository.DocInfos));
             }
             return this;
         }
 
-        public ClashChecker CheckWallIsNotCurtain(IEnumerable<DocInfo> docInfos, ClashModel clashModel) {
+        public ClashChecker CheckWallIsNotCurtain(RevitRepository revitRepository, ClashModel clashModel) {
             if(Result) {
-                Result = ((Wall) clashModel.OtherElement.GetElement(docInfos)).WallType.Kind != WallKind.Curtain;
+                Result = ((Wall) clashModel.OtherElement.GetElement(revitRepository.DocInfos)).WallType.Kind != WallKind.Curtain;
             }
             return this;
         }
 
-        public static bool CheckWallClash(IEnumerable<DocInfo> docInfos, ClashModel clashModel) {
-            return new ClashChecker().CheckMainElementIsMepCurve(docInfos, clashModel)
-                                     .CheckOtherElementIsWall(docInfos, clashModel)
-                                     .CheckMainElementIsNotVertical(docInfos, clashModel)
-                                     .CheckElementsIsNotParallel(docInfos, clashModel)
-                                     .CheckWallIsNotCurtain(docInfos, clashModel)
+        public static bool CheckWallClash(RevitRepository revitRepository, ClashModel clashModel) {
+            return new ClashChecker().CheckMainElementIsMepCurve(revitRepository, clashModel)
+                                     .CheckOtherElementIsWall(revitRepository, clashModel)
+                                     .CheckMainElementIsNotVertical(revitRepository, clashModel)
+                                     .CheckElementsIsNotParallel(revitRepository, clashModel)
+                                     .CheckWallIsNotCurtain(revitRepository, clashModel)
                                      .Result;
         }
     }

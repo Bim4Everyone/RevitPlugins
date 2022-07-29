@@ -18,4 +18,20 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             yield return new ThicknessGetter(_clash).GetParamValue();
         }
     }
+
+    internal class PerpendicularRectangleCurveWallParamterGetter : IParametersGetter {
+        private readonly MepCurveWallClash _clash;
+        private readonly MepCategory _mepCategory;
+
+        public PerpendicularRectangleCurveWallParamterGetter(MepCurveWallClash clash, MepCategory mepCategory) {
+            _clash = clash;
+            _mepCategory = mepCategory;
+        }
+
+        public IEnumerable<ParameterValuePair> GetParamValues() {
+            yield return new HeightGetter(_clash, _mepCategory).GetParamValue();
+            yield return new WidthGetter(_clash, _mepCategory).GetParamValue();
+            yield return new ThicknessGetter(_clash).GetParamValue();
+        }
+    }
 }

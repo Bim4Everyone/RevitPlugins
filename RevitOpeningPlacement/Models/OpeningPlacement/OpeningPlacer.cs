@@ -23,6 +23,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         public IAngleFinder AngleFinder { get; set; }
         public IParametersGetter ParameterGetter { get; set; }
         public FamilySymbol Type { get; set; }
+
         public void Place() {
             var point = PointFinder.GetPoint();
             var level = _revitRepository.GetLevel(Clash.MainElement.Level);

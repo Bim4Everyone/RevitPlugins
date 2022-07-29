@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using RevitClashDetective.Models.Clashes;
+
 namespace RevitOpeningPlacement.Models.OpeningPlacement {
     internal class MepCurveWallClash {
-        public MepCurveWallClash(MEPCurve curve, Wall wall, Transform transform) {
-            Curve = curve;
-            Wall = wall;
-            WallTransform = transform;
+        public MepCurveWallClash(RevitRepository revitRepository, ClashModel clashModel) {
+            Curve = (MEPCurve) clashModel.MainElement.GetElement(revitRepository.DocInfos);
+            Wall = (Wall) clashModel.OtherElement.GetElement(revitRepository.DocInfos);
+            WallTransform = revitRepository.GetTransform(Wall);
         }
 
         public MEPCurve Curve { get; set; }

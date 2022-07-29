@@ -17,6 +17,7 @@ namespace RevitOpeningPlacement.Models {
 
         private readonly Document _document;
         private readonly UIDocument _uiDocument;
+
         private readonly RevitClashDetective.Models.RevitRepository _clashRevitRepository;
 
         public RevitRepository(Application application, Document document) {
@@ -30,9 +31,11 @@ namespace RevitOpeningPlacement.Models {
             _clashRevitRepository = new RevitClashDetective.Models.RevitRepository(_application, _document);
 
             UIApplication = _uiApplication;
+            DocInfos = GetDocInfos();
         }
 
         public UIApplication UIApplication { get; }
+        public List<DocInfo> DocInfos { get; }
 
         public static Dictionary<CategoryEnum, string> CategoryNames => new Dictionary<CategoryEnum, string> {
             {CategoryEnum.Pipe, "Трубы" },
@@ -71,6 +74,16 @@ namespace RevitOpeningPlacement.Models {
         public static List<BuiltInParameter> MepCurveDiameters => new List<BuiltInParameter>() {
             BuiltInParameter.RBS_PIPE_OUTER_DIAMETER,
             BuiltInParameter.RBS_CURVE_DIAMETER_PARAM
+        };
+
+        public static List<BuiltInParameter> MepCurveHeights => new List<BuiltInParameter>() {
+            BuiltInParameter.RBS_CURVE_HEIGHT_PARAM,
+            BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM
+        };
+
+        public static List<BuiltInParameter> MepCurveWidths => new List<BuiltInParameter>() {
+            BuiltInParameter.RBS_CURVE_WIDTH_PARAM,
+            BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM
         };
 
         public FamilySymbol GetOpeningType(OpeningType type) {
@@ -153,6 +166,11 @@ namespace RevitOpeningPlacement.Models {
 
         public RevitClashDetective.Models.RevitRepository GetClashRevitRepository() {
             return _clashRevitRepository;
+        }
+
+        public Transform GetTransform(Element element) {
+            return DocInfos.FirstOrDefault(item => item.Name.Equals(GetDocumentName(element.Document), StringComparison.CurrentCultureIgnoreCase))?.Transform
+                ?? Transform.Identity;
         }
     }
 

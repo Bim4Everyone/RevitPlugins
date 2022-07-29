@@ -11,23 +11,21 @@ using RevitClashDetective.Models.Clashes;
 
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Extensions;
+using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
     internal class RoundMepWallPlacerInitializer {
-        public static OpeningPlacer GetPlacer(RevitRepository revitRepository, IEnumerable<DocInfo> docInfos, ClashModel clashModel, MepCategory categoryOption) {
-            var mepCurve = (MEPCurve) clashModel.MainElement.GetElement(docInfos);
-            var wall = (Wall) clashModel.OtherElement.GetElement(docInfos);
-            var transform = GetTransform(revitRepository, docInfos, wall);
-            var clash = new MepCurveWallClash(mepCurve, wall, transform);
+        public static OpeningPlacer GetPlacer(RevitRepository revitRepository, ClashModel clashModel, MepCategory categoryOption) {
+            var clash = new MepCurveWallClash(revitRepository, clashModel);
 
             var placer = new OpeningPlacer(revitRepository) {
                 Clash = clashModel,
-                AngleFinder = new WallAngleFinder(wall, transform)
+                AngleFinder = new WallAngleFinder(clash.Wall, clash.WallTransform)
             };
-            if(mepCurve.IsPerpendicular(wall)) {
+            if(clash.Curve.IsPerpendicular(clash.Wall)) {
                 placer.PointFinder = new HorizontalPointFinder(clash);
                 placer.ParameterGetter = new PerpendicularRoundCurveWallParamterGetter(clash, categoryOption);
                 placer.Type = revitRepository.GetOpeningType(OpeningType.WallRound);
@@ -38,11 +36,6 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             };
 
             return placer;
-        }
-
-        private static Transform GetTransform(RevitRepository clashRevitRepository, IEnumerable<DocInfo> docInfos, Element element) {
-            return docInfos.FirstOrDefault(item => item.Name.Equals(clashRevitRepository.GetDocumentName(element.Document), StringComparison.CurrentCultureIgnoreCase))?.Transform
-                ?? Transform.Identity;
         }
     }
 }

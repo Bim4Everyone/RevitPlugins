@@ -7,10 +7,14 @@ using Autodesk.Revit.DB;
 
 namespace RevitOpeningPlacement.Models.Extensions {
     internal static class WallExtension {
+        public static Line GetLine(this Wall wall) {
+            return (Line) ((LocationCurve) wall.Location).Curve;
+        }
+
         public static Line GetСentralWallLine(this Wall wall) {
             var centralPoint = GetCentralPoint(wall);
 
-            var wallLine = (Line) ((LocationCurve) wall.Location).Curve;
+            var wallLine = wall.GetLine();
 
             var bottomCentralPoint = new XYZ(centralPoint.X, centralPoint.Y, wallLine.GetEndPoint(0).Z);
 

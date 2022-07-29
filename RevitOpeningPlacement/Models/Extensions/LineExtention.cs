@@ -21,6 +21,10 @@ namespace RevitOpeningPlacement.Models.Extensions {
             return mepLine.Direction.IsPerpendicular(wallLine.Direction);
         }
 
+        public static bool IsPerpendicular(this Line mepLine, XYZ direction) {
+            return mepLine.Direction.IsPerpendicular(direction);
+        }
+
         public static bool IsParallel(this Line mepLine, Line wallLine) {
             return mepLine.Direction.IsPapallel(wallLine.Direction);
         }
