@@ -17,15 +17,15 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             _mepCategory = mepCategory;
         }
 
-        public IEnumerable<ParameterValuePair> GetParamValues() {
-            //Получение ширины и высоты задания на отверстия с учетом наклона систем в горизонтальном и вертикальном направлении.
+        //Получение ширины и высоты задания на отверстия с учетом наклона систем в горизонтальном и вертикальном направлении.
 
-            //Размеры получаются следующим образом: осевую линию инженерной системы смещают на размер (например, радиус) (в положительную и отрицательную стороны)
-            //в плоскостях yOz (для получения высоты) и в xOy (для получения ширины).
-            //Далее для каждой плоскости находятся точки пересечения смещенных линий системы с гранями стены, затем из этих точек выбираются те,
-            //которые находятся на максимальном расстоянии друг от друга, далее по теореме Пифагора производится расчет размера.
-            yield return new InclinedWidthGetter(_clash, new DiameterGetter(_clash, _mepCategory)).GetParamValue();
-            yield return new InclinedHeightGetter(_clash, new DiameterGetter(_clash, _mepCategory)).GetParamValue();
+        //Размеры получаются следующим образом: осевую линию инженерной системы смещают на размер (например, радиус) (в положительную и отрицательную стороны)
+        //в плоскостях yOz (для получения высоты) и в xOy (для получения ширины).
+        //Далее для каждой плоскости находятся точки пересечения смещенных линий системы с гранями стены, затем из этих точек выбираются те,
+        //которые находятся на максимальном расстоянии друг от друга, далее по теореме Пифагора производится расчет размера.
+        public IEnumerable<ParameterValuePair> GetParamValues() {
+            yield return new InclinedSizeInitializer(_clash, _mepCategory).GetRoundMepHeightGetter().GetParamValue();
+            yield return new InclinedSizeInitializer(_clash, _mepCategory).GetRoundMepWidthGetter().GetParamValue();
             yield return new ThicknessGetter(_clash).GetParamValue();
         }
     }

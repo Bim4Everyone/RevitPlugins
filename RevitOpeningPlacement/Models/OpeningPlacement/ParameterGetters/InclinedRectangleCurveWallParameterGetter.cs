@@ -14,8 +14,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         }
 
         public IEnumerable<ParameterValuePair> GetParamValues() {
-            yield return new InclinedWidthGetter(_clash, new WidthGetter(_clash, _mepCategory)).GetParamValue();
-            yield return new InclinedHeightGetter(_clash, new HeightGetter(_clash, _mepCategory)).GetParamValue();
+            yield return new InclinedSizeInitializer(_clash, _mepCategory).GetRectangleMepHeightGetter().GetParamValue();
+            yield return new InclinedSizeInitializer(_clash, _mepCategory).GetRectangleMepWidthGetter().GetParamValue();
             yield return new ThicknessGetter(_clash).GetParamValue();
         }
     }

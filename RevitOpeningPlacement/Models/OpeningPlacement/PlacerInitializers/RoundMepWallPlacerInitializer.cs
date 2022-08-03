@@ -13,8 +13,10 @@ using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
+using RevitOpeningPlacement.Models.OpeningPlacement.DirGetters;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
+using RevitOpeningPlacement.Models.OpeningPlacement.Projectors;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
     internal class RoundMepWallPlacerInitializer {
@@ -30,7 +32,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
                 placer.ParameterGetter = new PerpendicularRoundCurveWallParamterGetter(clash, categoryOption);
                 placer.Type = revitRepository.GetOpeningType(OpeningType.WallRound);
             } else {
-                placer.PointFinder = new HorizontalPointFinder(clash, new InclinedHeightGetter(clash, new DiameterGetter(clash, categoryOption)));
+                placer.PointFinder = new HorizontalPointFinder(clash, new InclinedSizeInitializer(clash, categoryOption).GetRoundMepHeightGetter());
                 placer.ParameterGetter = new InclinedRoundCurveWallParameterGetter(clash, categoryOption);
                 placer.Type = revitRepository.GetOpeningType(OpeningType.WallRectangle);
             };
