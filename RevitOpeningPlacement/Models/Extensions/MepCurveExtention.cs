@@ -11,7 +11,12 @@ using RevitOpeningPlacement.Models.OpeningPlacement;
 namespace RevitOpeningPlacement.Models.Extensions {
     internal static class MepCurveExtention {
         public static Line GetLine(this MEPCurve curve) {
-            return (Line) ((LocationCurve) curve.Location).Curve;
+            var line = (Line) ((LocationCurve) curve.Location).Curve;
+            var elevations = curve.GetElevations().ToList();
+            var start = FixElevation(line.GetEndPoint(0), elevations);
+            var end = FixElevation(line.GetEndPoint(1), elevations);
+
+            return Line.CreateBound(start, end);
         }
 
         public static bool IsHorizontal(this MEPCurve curve) {
@@ -31,25 +36,62 @@ namespace RevitOpeningPlacement.Models.Extensions {
             return curve.GetLine().IsParallel(wall.GetLine());
         }
 
+        public static double GetTopElevation(this MEPCurve curve) {
+            return curve.GetBuiltInParam(RevitRepository.TopElevation);
+        }
+
+        public static double GetBottomElevation(this MEPCurve curve) {
+            return curve.GetBuiltInParam(RevitRepository.BottomElevation);
+        }
+
         public static double GetDiameter(this MEPCurve curve) {
-            return curve.GetBuiltInSize(RevitRepository.MepCurveDiameters);
+            return curve.GetBuiltInParam(RevitRepository.MepCurveDiameters);
         }
 
         public static double GetHeight(this MEPCurve curve) {
-            return curve.GetBuiltInSize(RevitRepository.MepCurveHeights);
+            return curve.GetBuiltInParam(RevitRepository.MepCurveHeights);
         }
 
         public static double GetWidth(this MEPCurve curve) {
-            return curve.GetBuiltInSize(RevitRepository.MepCurveWidths);
+            return curve.GetBuiltInParam(RevitRepository.MepCurveWidths);
         }
 
-        private static double GetBuiltInSize(this MEPCurve curve, IEnumerable<BuiltInParameter> parameters) {
+        public static Level GetLevel(this MEPCurve curve) {
+            var levelId = curve.GetParamValueOrDefault<ElementId>(BuiltInParameter.RBS_START_LEVEL_PARAM);
+            if(levelId.IsNull()) {
+                return null;
+            }
+            return (Level) curve.Document.GetElement(levelId);
+        }
+
+        private static double GetBuiltInParam(this MEPCurve curve, IEnumerable<BuiltInParameter> parameters) {
             foreach(var param in parameters) {
                 if(curve.IsExistsParam(param)) {
                     return curve.GetParamValueOrDefault<double>(param);
                 }
             }
             return 0;
+        }
+
+        private static double GetOffset(this MEPCurve curve) {
+
+            var bottomElevation = curve.GetBottomElevation();
+            var topElevation = curve.GetTopElevation();
+            var center = curve.GetParamValueOrDefault<double>(BuiltInParameter.RBS_OFFSET_PARAM);
+            return new[] { bottomElevation, topElevation }.Min(item => Math.Abs(item - center));
+        }
+
+        private static IEnumerable<double> GetElevations(this MEPCurve curve) {
+            var offset = curve.GetOffset();
+            double levelElevation = curve.GetLevel()?.ProjectElevation ?? 0;
+
+            yield return curve.GetTopElevation() - offset + levelElevation;
+            yield return curve.GetBottomElevation() + offset + levelElevation;
+        }
+
+        private static XYZ FixElevation(XYZ xyz, IEnumerable<double> elevations) {
+            var elevation = elevations.FirstOrDefault(item => Math.Abs(item - xyz.Z) == elevations.Min(e => Math.Abs(e - xyz.Z)));
+            return new XYZ(xyz.X, xyz.Y, elevation);
         }
     }
 }

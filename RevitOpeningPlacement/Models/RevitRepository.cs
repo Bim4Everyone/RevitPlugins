@@ -86,6 +86,18 @@ namespace RevitOpeningPlacement.Models {
             BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM
         };
 
+        public static List<BuiltInParameter> BottomElevation => new List<BuiltInParameter>() {
+            BuiltInParameter.RBS_CTC_BOTTOM_ELEVATION,
+            BuiltInParameter.RBS_DUCT_BOTTOM_ELEVATION,
+            BuiltInParameter.RBS_PIPE_BOTTOM_ELEVATION
+        };
+
+        public static List<BuiltInParameter> TopElevation => new List<BuiltInParameter>() {
+            BuiltInParameter.RBS_CTC_TOP_ELEVATION,
+            BuiltInParameter.RBS_DUCT_TOP_ELEVATION,
+            BuiltInParameter.RBS_PIPE_TOP_ELEVATION
+        };
+
         public FamilySymbol GetOpeningType(OpeningType type) {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)

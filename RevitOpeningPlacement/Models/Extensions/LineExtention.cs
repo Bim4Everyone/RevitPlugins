@@ -17,16 +17,20 @@ namespace RevitOpeningPlacement.Models.Extensions {
                 && Math.Abs(line.GetEndPoint(0).Y - line.GetEndPoint(1).Y) < 0.0001;
         }
 
-        public static bool IsPerpendicular(this Line mepLine, Line wallLine) {
-            return mepLine.Direction.IsPerpendicular(wallLine.Direction);
+        public static bool IsPerpendicular(this Line line, Line otherLine) {
+            return line.Direction.IsPerpendicular(otherLine.Direction);
         }
 
-        public static bool IsPerpendicular(this Line mepLine, XYZ direction) {
-            return mepLine.Direction.IsPerpendicular(direction);
+        public static bool IsPerpendicular(this Line line, XYZ otherLine) {
+            return line.Direction.IsPerpendicular(otherLine);
         }
 
-        public static bool IsParallel(this Line mepLine, Line wallLine) {
-            return mepLine.Direction.IsPapallel(wallLine.Direction);
+        public static bool IsParallel(this Line line, Line otherLine) {
+            return line.Direction.IsPapallel(otherLine.Direction);
+        }
+
+        public static Line GetTransformedLine(this Line line, Transform transform) {
+            return Line.CreateBound(transform.OfPoint(line.GetEndPoint(0)), transform.OfPoint(line.GetEndPoint(1)));
         }
 
         public static XYZ GetIntersectionWithFace(this Line line, Face face) {
@@ -39,7 +43,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
             var xy = GetHorizontalProjectionIntersection(mepLine, wallLine);
             double z;
 
-            //Подстановка получившихся значений в уравнение прямой в пространстве
+            //Подстановка получившихся значений в уравнение прямой в пространствеp
             if(Math.Abs(mepLine.Direction.X) > 0.0001) {
                 z = (xy.X - mepLine.GetEndPoint(0).X) / mepLine.Direction.X * mepLine.Direction.Z + mepLine.GetEndPoint(0).Z;
             } else {
@@ -95,6 +99,22 @@ namespace RevitOpeningPlacement.Models.Extensions {
                 z = p3 / p1 * (x - x0) + z0;
             }
             return new XYZ(x, y, z);
+        }
+
+        public static XYZ GetIntersectionWithFaceFromPlane(this Line line, Face face) {
+            var planarFace = (PlanarFace) face;
+            var plane = Plane.CreateByNormalAndOrigin(planarFace.FaceNormal, planarFace.Origin);
+
+            var point1 = plane.ProjectPoint(line.GetEndPoint(0));
+            var point2 = plane.ProjectPoint(line.GetEndPoint(1));
+            if(point1.DistanceTo(point2) < 0.00001) {
+                return point1;
+            }
+
+            var projectedLine = Line.CreateBound(point1, point2);
+
+            line.Intersect(projectedLine, out IntersectionResultArray result);
+            return result.get_Item(0).XYZPoint;
         }
     }
 }

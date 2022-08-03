@@ -15,5 +15,17 @@ namespace RevitOpeningPlacement.Models.Extensions {
         public static bool IsPerpendicular(this XYZ vector1, XYZ vector2) {
             return Math.Abs(Math.Cos(vector1.AngleTo(vector2))) < 0.0001;
         }
+
+        public static XYZ ProjectOnXoY(this XYZ xyz) {
+            return new XYZ(xyz.X, xyz.Y, 0);
+        }
+
+        public static XYZ ProjectOnXoZ(this XYZ xyz) {
+            return new XYZ(0, xyz.Y, xyz.Z);
+        }
+
+        public static XYZ ProjectOnYoZ(this XYZ xyz) {
+            return new XYZ(xyz.X, 0, xyz.Z);
+        }
     }
 }

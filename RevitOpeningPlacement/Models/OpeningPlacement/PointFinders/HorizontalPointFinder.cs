@@ -23,13 +23,13 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
         }
 
         public XYZ GetPoint() {
-            var mepLine = (Line) ((LocationCurve) _clash.Curve.Location).Curve;
+            var mepLine = _clash.Curve.GetLine();
             //удлинена осевая линия инженерной системы на 5 м в обе стороны
             var elongatedMepLine = Line.CreateBound(mepLine.GetEndPoint(0) - mepLine.Direction * 16.5,
                                       mepLine.GetEndPoint(1) + mepLine.Direction * 16.5);
 
             //получена линия, идущая вдоль стены и расположенная точно по центру (т.е. линия равноудалена от внутренней и наружной граней стены), и удлинена на 5 м в обе стороны
-            var wallLine = _clash.Wall.GetСentralWallLine();
+            var wallLine = _clash.Wall.GetСentralLine();
             var elongatedWallLine = Line.CreateBound(wallLine.GetEndPoint(0) - wallLine.Direction * 16.5,
                                      wallLine.GetEndPoint(1) + wallLine.Direction * 16.5);
 

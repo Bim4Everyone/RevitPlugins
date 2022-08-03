@@ -8,6 +8,8 @@ using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models.Clashes;
 
+using RevitOpeningPlacement.Models.Extensions;
+
 namespace RevitOpeningPlacement.Models.OpeningPlacement {
     internal class MepCurveWallClash {
         public MepCurveWallClash(RevitRepository revitRepository, ClashModel clashModel) {
@@ -23,7 +25,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         public Transform WallTransform { get; set; }
 
         public Line GetTransformedMepLine() {
-            var mepLine = (Line) ((LocationCurve) Curve.Location).Curve;
+            var mepLine = Curve.GetLine();
 
             //примерно на 5 м с обеих сторон удлинена осевая линия инженерной системы
             var elongatedMepLine = Line.CreateBound(mepLine.GetEndPoint(0) - mepLine.Direction * 16.5,
@@ -31,8 +33,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
 
             //трансформация осевой линии инженерной системы в систему координат файла со стеной
             var inversedTransform = WallTransform.Inverse.Multiply(Transform.Identity);
-            return Line.CreateBound(inversedTransform.OfPoint(elongatedMepLine.GetEndPoint(0)),
-                                                       inversedTransform.OfPoint(elongatedMepLine.GetEndPoint(1)));
+            return elongatedMepLine.GetTransformedLine(inversedTransform);
         }
     }
 }

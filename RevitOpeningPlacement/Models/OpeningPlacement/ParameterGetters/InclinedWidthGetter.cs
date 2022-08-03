@@ -7,6 +7,7 @@ using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Models.OpeningPlacement.Projectors;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
     internal class InclinedWidthGetter : IParameterGetter<DoubleParamValue> {
@@ -35,16 +36,19 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
 
             //алгоритм аналогичен тому, который описан в InclinedHeightGetter
             var angleToY = XYZ.BasisY.AngleOnPlaneTo(transformedMepLine.Direction, XYZ.BasisZ);
+            var projector = new XoYProjection();
 
             if(Math.Abs(Math.Cos(angleToY)) < 0.0001) {
-                return new MaxSizeGetter(_clash).GetSize(XYZ.BasisY, size);
+                return new MaxSizeGetter(_clash, projector).GetSize(XYZ.BasisY, size);
             } else if(Math.Abs(Math.Abs(Math.Cos(angleToY)) - 1) < 0.0001) {
-                return new MaxSizeGetter(_clash).GetSize(XYZ.BasisX, size);
+                return new MaxSizeGetter(_clash, projector).GetSize(XYZ.BasisX, size);
             } else {
-                var vectorY = (transformedMepLine.Direction.GetLength() / Math.Cos(angleToY)) * XYZ.BasisY;
-                var direction = (vectorY - transformedMepLine.Direction).Normalize();
+                var projectedDir = new XYZ(transformedMepLine.Direction.X, transformedMepLine.Direction.Y, 0);
 
-                return new MaxSizeGetter(_clash).GetSize(direction, size);
+                var vectorY = (projectedDir.GetLength() / Math.Cos(angleToY)) * XYZ.BasisY;
+                var direction = (vectorY - projectedDir).Normalize();
+
+                return new MaxSizeGetter(_clash, projector).GetSize(direction, size);
             }
         }
     }

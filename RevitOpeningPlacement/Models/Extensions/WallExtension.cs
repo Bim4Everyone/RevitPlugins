@@ -11,7 +11,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
             return (Line) ((LocationCurve) wall.Location).Curve;
         }
 
-        public static Line GetСentralWallLine(this Wall wall) {
+        public static Line GetСentralLine(this Wall wall) {
             var centralPoint = GetCentralPoint(wall);
 
             var wallLine = wall.GetLine();

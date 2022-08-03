@@ -7,6 +7,7 @@ using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Models.OpeningPlacement.Projectors;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
     internal class InclinedHeightGetter : IParameterGetter<DoubleParamValue> {
@@ -26,28 +27,21 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
                 TValue = new DoubleParamValue(height)
             };
         }
-
         private double GetHeight() {
-            var transformedMepLine = _clash.GetTransformedMepLine();
-
             //получение размера, на который будет смещена осевая линия инженерной системы
             var size = _sizeGetter.GetParamValue().TValue.TValue / 2;
 
-            //Получение угла между проекцией осевой линии инженерной системы на плоскость yOz и осью z
-            var angleToZ = XYZ.BasisZ.AngleOnPlaneTo(transformedMepLine.Direction, XYZ.BasisX);
-
-            if(Math.Abs(Math.Cos(angleToZ)) < 0.0001) {
-                //если угол равен 90 градусов, значит система расположена горизонтально и ее можно смещать строго вверх
-                return new MaxSizeGetter(_clash).GetSize(XYZ.BasisZ, size);
+            var transformedMepLine = _clash.GetTransformedMepLine();
+            var projection = new NormalWallPlaneProjection(_clash.Wall, _clash.WallTransform);
+            //Получение угла между проекцией осевой линии инженерной системы на плоскость перпендикулярную стене и осью z
+            var angle = projection.GetAngleOnPlaneToAxis(transformedMepLine.Direction);
+            if(Math.Abs(Math.Cos(angle)) < 0.0001) {
+                return new MaxSizeGetter(_clash, projection).GetSize(XYZ.BasisZ, size);
             } else {
-                //получение вектора, направленного вдоль оси Z, длина которого равной гипотенузе в прямоугольном треугольнике,
-                //катетами которого являются проекция осевой линии инженерной системы и направление для описанного выше смещения 
-                var vectorZ = (transformedMepLine.Direction.GetLength() / Math.Cos(angleToZ)) * XYZ.BasisZ;
-
-                //получение смещения путем векторного вычитания
-                var direction = (vectorZ - transformedMepLine.Direction).Normalize();
-
-                return new MaxSizeGetter(_clash).GetSize(direction, size);
+                var projectedDir = projection.ProjectVector(transformedMepLine.Direction);
+                var vector = (projectedDir.GetLength() / Math.Cos(angle)) * XYZ.BasisZ;
+                var dir = (vector - projectedDir).Normalize();
+                return new MaxSizeGetter(_clash, projection).GetSize(dir, size);
             }
         }
     }

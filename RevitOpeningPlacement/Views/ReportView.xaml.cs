@@ -21,7 +21,7 @@ namespace RevitOpeningPlacement.Views {
             InitializeComponent();
         }
         public override string PluginName => nameof(RevitOpeningPlacement);
-        public override string ProjectConfigName => nameof(MainWindow);
+        public override string ProjectConfigName => nameof(ReportView);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;
