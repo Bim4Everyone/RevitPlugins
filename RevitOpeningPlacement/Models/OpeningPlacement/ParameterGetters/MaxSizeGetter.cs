@@ -10,11 +10,11 @@ using RevitOpeningPlacement.Models.Interfaces;
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
     internal class MaxSizeGetter {
         private readonly MepCurveWallClash _clash;
-        private readonly IProjector _projector;
+        private readonly Plane _plane;
 
-        public MaxSizeGetter(MepCurveWallClash clash, IProjector projector) {
+        public MaxSizeGetter(MepCurveWallClash clash, Plane plane) {
             _clash = clash;
-            _projector = projector;
+            _plane = plane;
         }
 
         public double GetSize(IEnumerable<XYZ> directions, double distance) {
@@ -40,7 +40,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             var results = GetIntersectionPoints(lines, faces);
 
             //нахождение среди точек пересечений наиболее удаленных друг от друга и расчет расстояния между ними
-            var pointPairs = GetPoints(results.Select(item => _projector.ProjectPoint(item)).ToList());
+            var pointPairs = GetPoints(results.Select(item => _plane.ProjectPoint(item)).ToList());
             var maxDistance = pointPairs.Max(pp => pp.Point1.DistanceTo(pp.Point2));
 
             //нахождение размера по теореме Пифагора

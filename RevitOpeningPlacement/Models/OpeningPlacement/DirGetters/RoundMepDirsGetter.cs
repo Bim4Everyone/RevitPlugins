@@ -6,28 +6,29 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.DirGetters {
     internal class RoundMepDirsGetter : IDirectionsGetter {
         private readonly MepCurveWallClash _clash;
-        private readonly IProjector _projector;
+        private readonly Plane _plane;
 
-        public RoundMepDirsGetter(MepCurveWallClash clash, IProjector projector) {
+        public RoundMepDirsGetter(MepCurveWallClash clash, Plane projector) {
             _clash = clash;
-            _projector = projector;
+            _plane = projector;
         }
         public IEnumerable<XYZ> GetDirections() {
             var transformedMepLine = _clash.GetTransformedMepLine();
 
-            var angle = _projector.GetAngleOnPlaneToAxis(transformedMepLine.Direction);
+            var angle = _plane.GetAngleOnPlaneToYAxis(transformedMepLine.Direction);
             XYZ dir;
             if(Math.Abs(Math.Cos(angle)) < 0.0001) {
-                dir = _projector.GetPlaneY();
+                dir = _plane.YVec;
             } else {
-                var projectedDir = _projector.ProjectVector(transformedMepLine.Direction);
+                var projectedDir = _plane.ProjectVector(transformedMepLine.Direction);
 
-                var vector = (projectedDir.GetLength() / Math.Cos(angle)) * _projector.GetPlaneY();
+                var vector = (projectedDir.GetLength() / Math.Cos(angle)) * _plane.YVec;
                 dir = (vector - projectedDir).Normalize();
             }
 

@@ -22,6 +22,16 @@ namespace RevitOpeningPlacement.Models.Extensions {
                                     bottomCentralPoint - wallLine.Direction * wallLine.Length / 2);
         }
 
+        public static Plane GetVerticalNormalPlane(this Wall wall) {
+            var wallLine = wall.GetСentralLine();
+            return Plane.CreateByOriginAndBasis(wallLine.Origin, XYZ.BasisZ, wall.Orientation);
+        }
+
+        public static Plane GetHorizontalNormalPlane(this Wall wall) {
+            var wallLine = wall.GetСentralLine();
+            return Plane.CreateByOriginAndBasis(wallLine.Origin, wallLine.Direction, wall.Orientation);
+        }
+
         public static IEnumerable<Face> GetFaces(this Wall wall) {
             var interiorFace = HostObjectUtils.GetSideFaces(wall, ShellLayerType.Interior);
             var exteriorFace = HostObjectUtils.GetSideFaces(wall, ShellLayerType.Exterior);
@@ -33,6 +43,12 @@ namespace RevitOpeningPlacement.Models.Extensions {
         private static XYZ GetCentralPoint(Wall wall) {
             var bb = wall.get_BoundingBox(null);
             return bb.Min + (bb.Max - bb.Min) / 2;
+        }
+    }
+
+    internal static class TransformExtention {
+        public static Plane OfPlane(this Transform transform, Plane plane) {
+            return Plane.CreateByOriginAndBasis(transform.OfPoint(plane.Origin), transform.OfVector(plane.XVec), transform.OfVector(plane.YVec));
         }
     }
 }
