@@ -14,10 +14,11 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.DirGetters {
         private readonly MepCurveWallClash _clash;
         private readonly Plane _plane;
 
-        public RoundMepDirsGetter(MepCurveWallClash clash, Plane projector) {
+        public RoundMepDirsGetter(MepCurveWallClash clash, Plane plane) {
             _clash = clash;
-            _plane = projector;
+            _plane = plane;
         }
+
         public IEnumerable<XYZ> GetDirections() {
             var transformedMepLine = _clash.GetTransformedMepLine();
 

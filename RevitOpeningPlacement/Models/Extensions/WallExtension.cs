@@ -24,12 +24,12 @@ namespace RevitOpeningPlacement.Models.Extensions {
 
         public static Plane GetVerticalNormalPlane(this Wall wall) {
             var wallLine = wall.GetСentralLine();
-            return Plane.CreateByOriginAndBasis(wallLine.Origin, XYZ.BasisZ, wall.Orientation);
+            return Plane.CreateByOriginAndBasis(wallLine.Origin, wall.Orientation, XYZ.BasisZ);
         }
 
         public static Plane GetHorizontalNormalPlane(this Wall wall) {
             var wallLine = wall.GetСentralLine();
-            return Plane.CreateByOriginAndBasis(wallLine.Origin, wallLine.Direction, wall.Orientation);
+            return Plane.CreateByOriginAndBasis(wallLine.Origin, wall.Orientation, wallLine.Direction);
         }
 
         public static IEnumerable<Face> GetFaces(this Wall wall) {

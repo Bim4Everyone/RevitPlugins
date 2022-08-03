@@ -18,12 +18,13 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
                 Clash = clashModel,
                 AngleFinder = new WallAngleFinder(clash.Wall, clash.WallTransform),
                 Type = revitRepository.GetOpeningType(OpeningType.WallRectangle),
-                PointFinder = new HorizontalPointFinder(clash, new InclinedSizeInitializer(clash, categoryOption).GetRectangleMepHeightGetter())
             };
             if(clash.Curve.IsPerpendicular(clash.Wall)) {
                 placer.ParameterGetter = new PerpendicularRectangleCurveWallParamterGetter(clash, categoryOption);
+                placer.PointFinder = new HorizontalPointFinder(clash, new HeightGetter(clash, categoryOption));
             } else {
                 placer.ParameterGetter = new InclinedRectangleCurveWallParameterGetter(clash, categoryOption);
+                placer.PointFinder = new HorizontalPointFinder(clash, new InclinedSizeInitializer(clash, categoryOption).GetRectangleMepHeightGetter());
             };
 
             return placer;
