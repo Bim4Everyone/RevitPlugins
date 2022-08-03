@@ -8,6 +8,8 @@ using Autodesk.Revit.DB;
 
 namespace RevitOpeningPlacement.Models.Interfaces {
     internal interface IProjector {
+        XYZ GetPlaneX();
+        XYZ GetPlaneY();
         XYZ ProjectPoint(XYZ xyz);
         XYZ ProjectVector(XYZ xyz);
         double GetAngleOnPlaneToAxis(XYZ xyz);

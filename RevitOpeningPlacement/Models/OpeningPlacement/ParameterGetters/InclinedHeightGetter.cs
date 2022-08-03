@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.Projectors;
 
@@ -32,18 +33,21 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             var size = _sizeGetter.GetParamValue().TValue.TValue / 2;
 
             var transformedMepLine = _clash.GetTransformedMepLine();
-            var projection = new NormalWallPlaneProjector(_clash.Wall, _clash.WallTransform);
-            //Получение угла между проекцией осевой линии инженерной системы на плоскость перпендикулярную стене и осью z
-            var angle = projection.GetAngleOnPlaneToAxis(transformedMepLine.Direction);
-            if(Math.Abs(Math.Cos(angle)) < 0.0001) {
-                return new MaxSizeGetter(_clash, projection).GetSize(XYZ.BasisZ, size);
-            } else {
-                var projectedDir = projection.ProjectVector(transformedMepLine.Direction);
+            var wallLine = _clash.Wall.GetСentralLine()
+                                      .GetTransformedLine(_clash.WallTransform);
+            var projector = new PlaneProjector(wallLine.Origin, XYZ.BasisZ, _clash.WallTransform.OfVector(_clash.Wall.Orientation));
 
-                var vector = (projectedDir.GetLength() / Math.Cos(angle)) * XYZ.BasisZ;
+            //Получение угла между проекцией осевой линии инженерной системы на плоскость перпендикулярную стене и осью z
+            var angle = projector.GetAngleOnPlaneToAxis(transformedMepLine.Direction);
+            if(Math.Abs(Math.Cos(angle)) < 0.0001) {
+                return new MaxSizeGetter(_clash, projector).GetSize(projector.GetPlaneY(), size);
+            } else {
+                var projectedDir = projector.ProjectVector(transformedMepLine.Direction);
+
+                var vector = (projectedDir.GetLength() / Math.Cos(angle)) * projector.GetPlaneY();
                 var dir = (vector - projectedDir).Normalize();
 
-                return new MaxSizeGetter(_clash, projection).GetSize(dir, size);
+                return new MaxSizeGetter(_clash, projector).GetSize(dir, size);
             }
         }
     }

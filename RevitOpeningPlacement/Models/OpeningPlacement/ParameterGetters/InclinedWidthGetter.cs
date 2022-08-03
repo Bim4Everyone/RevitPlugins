@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.Projectors;
 
@@ -35,20 +36,21 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             var size = _sizeGetter.GetParamValue().TValue.TValue / 2;
 
             //алгоритм аналогичен тому, который описан в InclinedHeightGetter
-            var angleToY = XYZ.BasisY.AngleOnPlaneTo(transformedMepLine.Direction, XYZ.BasisZ);
-            var projector = new XoYProjector();
 
-            if(Math.Abs(Math.Cos(angleToY)) < 0.0001) {
-                return new MaxSizeGetter(_clash, projector).GetSize(XYZ.BasisY, size);
-            } else if(Math.Abs(Math.Abs(Math.Cos(angleToY)) - 1) < 0.0001) {
-                return new MaxSizeGetter(_clash, projector).GetSize(XYZ.BasisX, size);
+            var wallLine = _clash.Wall.GetСentralLine()
+                                      .GetTransformedLine(_clash.WallTransform);
+            var projector = new PlaneProjector(wallLine.Origin, wallLine.Direction, _clash.WallTransform.OfVector(_clash.Wall.Orientation));
+            var angle = projector.GetAngleOnPlaneToAxis(transformedMepLine.Direction);
+
+            if(Math.Abs(Math.Cos(angle)) < 0.0001) {
+                return new MaxSizeGetter(_clash, projector).GetSize(projector.GetPlaneY(), size);
             } else {
-                var projectedDir = new XYZ(transformedMepLine.Direction.X, transformedMepLine.Direction.Y, 0);
+                var projectedDir = projector.ProjectVector(transformedMepLine.Direction);
 
-                var vectorY = (projectedDir.GetLength() / Math.Cos(angleToY)) * XYZ.BasisY;
-                var direction = (vectorY - projectedDir).Normalize();
+                var vector = (projectedDir.GetLength() / Math.Cos(angle)) * projector.GetPlaneY();
+                var dir = (vector - projectedDir).Normalize();
 
-                return new MaxSizeGetter(_clash, projector).GetSize(direction, size);
+                return new MaxSizeGetter(_clash, projector).GetSize(dir, size);
             }
         }
     }
