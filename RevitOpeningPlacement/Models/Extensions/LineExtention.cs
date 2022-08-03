@@ -38,6 +38,10 @@ namespace RevitOpeningPlacement.Models.Extensions {
             return result.get_Item(0).XYZPoint;
         }
 
+        public static Line GetLineWithOffset(this Line line, XYZ dir, double distance) {
+            return Line.CreateBound(line.GetEndPoint(0) + distance * dir, line.GetEndPoint(1) + distance * dir);
+        }
+
         public static XYZ GetPointFromLineEquation(this Line mepLine, Line wallLine) {
             //Получение проекции точки вставки на плоскость xOy (то есть координаты x и y точки вставки)
             var xy = GetHorizontalProjectionIntersection(mepLine, wallLine);

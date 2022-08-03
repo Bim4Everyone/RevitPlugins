@@ -17,7 +17,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             _projector = projector;
         }
 
-        public double GetSize(XYZ direction, double distance) {
+        public double GetSize(IEnumerable<XYZ> directions, double distance) {
             var transformedMepLine = _clash.GetTransformedMepLine();
 
             //Наклоненный размер получают следующим образом: осевую линию инженерной системы смещают на заданное значение
@@ -25,19 +25,19 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             //(в положительную и отрицательную стороны) в заданном направлении
             //Далее находятся точки пересечения смещенных линий системы с гранями стены, затем из этих точек выбираются те,
             //которые находятся на максимальном расстоянии друг от друга, далее по теореме Пифагора производится расчет размера.
-            return GetSizeFromIntersection(transformedMepLine, direction, distance);
+            return GetSizeFromIntersection(transformedMepLine, directions, distance);
         }
 
-        private double GetSizeFromIntersection(Line mepCurve, XYZ direction, double distance) {
+        private double GetSizeFromIntersection(Line mepCurve, IEnumerable<XYZ> directions, double distance) {
             //получение наружной и внутренней граней
             var faces = _clash.Wall.GetFaces().ToList();
 
             //смещение осевой линии инженерной системы на заданное расстояние в заданном направлении
-            var mepCurvePlus = Line.CreateBound(mepCurve.GetEndPoint(0) + distance * direction, mepCurve.GetEndPoint(1) + distance * direction);
-            var mepCurveMinus = Line.CreateBound(mepCurve.GetEndPoint(0) - distance * direction, mepCurve.GetEndPoint(1) - distance * direction);
+            var lines = directions.Select(item => mepCurve.GetLineWithOffset(item, distance))
+                                  .ToList();
 
             //получение пересечений полученных линий и граней стены
-            var results = GetIntersectionPoints(new[] { mepCurveMinus, mepCurvePlus }, faces);
+            var results = GetIntersectionPoints(lines, faces);
 
             //нахождение среди точек пересечений наиболее удаленных друг от друга и расчет расстояния между ними
             var pointPairs = GetPoints(results.Select(item => _projector.ProjectPoint(item)).ToList());

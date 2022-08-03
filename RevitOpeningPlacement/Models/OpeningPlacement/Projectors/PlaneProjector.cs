@@ -11,6 +11,7 @@ using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.Projectors {
     internal class PlaneProjector : IProjector {
+
         private Plane _plane;
         public PlaneProjector(XYZ origin, XYZ axisX, XYZ axisY) {
             InitializePlane(origin, axisX, axisY);
