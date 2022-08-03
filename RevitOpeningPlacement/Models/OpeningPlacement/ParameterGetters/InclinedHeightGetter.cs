@@ -32,15 +32,17 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             var size = _sizeGetter.GetParamValue().TValue.TValue / 2;
 
             var transformedMepLine = _clash.GetTransformedMepLine();
-            var projection = new NormalWallPlaneProjection(_clash.Wall, _clash.WallTransform);
+            var projection = new NormalWallPlaneProjector(_clash.Wall, _clash.WallTransform);
             //Получение угла между проекцией осевой линии инженерной системы на плоскость перпендикулярную стене и осью z
             var angle = projection.GetAngleOnPlaneToAxis(transformedMepLine.Direction);
             if(Math.Abs(Math.Cos(angle)) < 0.0001) {
                 return new MaxSizeGetter(_clash, projection).GetSize(XYZ.BasisZ, size);
             } else {
                 var projectedDir = projection.ProjectVector(transformedMepLine.Direction);
+
                 var vector = (projectedDir.GetLength() / Math.Cos(angle)) * XYZ.BasisZ;
                 var dir = (vector - projectedDir).Normalize();
+
                 return new MaxSizeGetter(_clash, projection).GetSize(dir, size);
             }
         }

@@ -10,7 +10,7 @@ using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.Projectors {
-    internal class XoYProjection : IProjector {
+    internal class XoYProjector : IProjector {
         public double GetAngleOnPlaneToAxis(XYZ xyz) {
             return XYZ.BasisY.AngleOnPlaneTo(xyz, XYZ.BasisZ);
         }

@@ -5,11 +5,11 @@ using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.Projectors {
-    internal class NormalWallPlaneProjection : IProjector {
+    internal class NormalWallPlaneProjector : IProjector {
         private Plane _plane;
         private readonly Transform _transform;
 
-        public NormalWallPlaneProjection(Wall wall, Transform transform) {
+        public NormalWallPlaneProjector(Wall wall, Transform transform) {
             _transform = transform;
             InitializePlane(wall);
         }

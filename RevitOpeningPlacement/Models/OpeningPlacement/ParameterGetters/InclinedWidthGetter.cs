@@ -36,7 +36,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
 
             //алгоритм аналогичен тому, который описан в InclinedHeightGetter
             var angleToY = XYZ.BasisY.AngleOnPlaneTo(transformedMepLine.Direction, XYZ.BasisZ);
-            var projector = new XoYProjection();
+            var projector = new XoYProjector();
 
             if(Math.Abs(Math.Cos(angleToY)) < 0.0001) {
                 return new MaxSizeGetter(_clash, projector).GetSize(XYZ.BasisY, size);
