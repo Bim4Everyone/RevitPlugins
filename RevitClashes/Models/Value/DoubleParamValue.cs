@@ -9,13 +9,9 @@ using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.Value {
     internal class DoubleParamValue : ParamValue<double> {
-        public DoubleParamValue(double value, string stringValue) : base(value, stringValue) {
+        public DoubleParamValue(double value, string stringValue) : base(value, stringValue) { }
 
-        }
-
-        public DoubleParamValue(double value) : base(value) {
-
-        }
+        public DoubleParamValue(double value) : base(value) { }
 
         public override FilterRule GetFilterRule(IVisiter visiter, Document doc, RevitParam param) {
             var paramId = GetParamId(doc, param);
