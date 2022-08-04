@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -9,19 +13,19 @@ using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 
-namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
-    internal class DiagonalGetter : IParameterGetter<DoubleParamValue> {
+namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
+    internal class DiagonalValueGetter : IValueGetter<DoubleParamValue> {
         private readonly MepCurveWallClash _clash;
         private readonly Plane _plane;
         private readonly MepCategory _categoryOptions;
 
-        public DiagonalGetter(MepCurveWallClash clash, Plane plane, MepCategory categoryOptions) {
+        public DiagonalValueGetter(MepCurveWallClash clash, Plane plane, MepCategory categoryOptions) {
             _clash = clash;
             _plane = plane;
             _categoryOptions = categoryOptions;
         }
 
-        public ParameterValuePair<DoubleParamValue> GetParamValue() {
+        public DoubleParamValue GetValue() {
             var height = _clash.Curve.GetHeight();
             var width = _clash.Curve.GetWidth();
             var coordinateSystem = _clash.Curve.GetConnectorCoordinateSystem();
@@ -30,13 +34,12 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
 
             height += _categoryOptions.GetOffset(height);
             width += _categoryOptions.GetOffset(width);
-            var diagonals = new[] { _plane.ProjectVector(dirX * width + dirY * height).GetLength(), 
+
+            //получение длин проекций диагоналей коннектора инженерной системы на плоскость
+            var diagonals = new[] { _plane.ProjectVector(dirX * width + dirY * height).GetLength(),
                                     _plane.ProjectVector(dirX * width - dirY * height).GetLength() };
 
-            return new ParameterValuePair<DoubleParamValue>() {
-                ParamName = RevitRepository.OpeningDiameter,
-                TValue = new DoubleParamValue(diagonals.Max())
-            };
+            return new DoubleParamValue(diagonals.Max());
         }
     }
 }

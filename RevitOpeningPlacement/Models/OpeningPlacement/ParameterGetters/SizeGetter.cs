@@ -8,16 +8,16 @@ using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
-    internal class MaxSizeGetter {
+    internal class SizeGetter {
         private readonly MepCurveWallClash _clash;
         private readonly Plane _plane;
 
-        public MaxSizeGetter(MepCurveWallClash clash, Plane plane) {
+        public SizeGetter(MepCurveWallClash clash, Plane plane) {
             _clash = clash;
             _plane = plane;
         }
 
-        public double GetSize(IEnumerable<XYZ> directions, double distance) {
+        public double GetSizeFromProjection(IEnumerable<XYZ> directions, double distance) {
             var transformedMepLine = _clash.GetTransformedMepLine();
 
             //Наклоненный размер получают следующим образом: осевую линию инженерной системы смещают на заданное значение

@@ -12,25 +12,25 @@ using RevitOpeningPlacement.Models.Interfaces;
 namespace RevitOpeningPlacement.Models.OpeningPlacement.DirGetters {
     internal class RoundMepDirsGetter : IDirectionsGetter {
         private readonly MepCurveWallClash _clash;
-        private readonly Plane _plane;
 
-        public RoundMepDirsGetter(MepCurveWallClash clash, Plane plane) {
+        public RoundMepDirsGetter(MepCurveWallClash clash) {
             _clash = clash;
-            _plane = plane;
         }
 
-        public IEnumerable<XYZ> GetDirections() {
+        public IEnumerable<XYZ> GetDirectionsOnPlane(Plane plane) {
+            //получение осевой линии инженерной системы в координатах связанного файла со стенами
             var transformedMepLine = _clash.GetTransformedMepLine();
 
-            var angle = _plane.GetAngleOnPlaneToYAxis(transformedMepLine.Direction);
+            //получение угла между проекцией осевой линии на плоскость и осью Y на этой плоскости
+            var angle = plane.GetAngleOnPlaneToYAxis(transformedMepLine.Direction);
             XYZ dir;
-            if(Math.Abs(Math.Cos(angle)) < 0.0001) {
-                dir = _plane.YVec;
-            } else {
-                var projectedDir = _plane.ProjectVector(transformedMepLine.Direction);
 
-                var vector = (projectedDir.GetLength() / Math.Cos(angle)) * _plane.YVec;
-                dir = (vector - projectedDir).Normalize();
+            //нахождение перпендикулрного вектора осевой линии на плоскости
+            if(Math.Abs(Math.Cos(angle)) < 0.0001) {
+                //если угол равен 90 градусов, значит, что смещать осевую линию на плоскости нужно в направлении оси Y 
+                dir = plane.YVec;
+            } else {
+                dir = plane.ProjectVector(transformedMepLine.Direction).CrossProduct(plane.Normal).Normalize();
             }
 
             yield return dir;

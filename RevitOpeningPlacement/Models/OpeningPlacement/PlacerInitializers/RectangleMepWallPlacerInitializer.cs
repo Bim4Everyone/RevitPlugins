@@ -8,6 +8,7 @@ using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.DirGetters;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
+using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
     internal class RectangleMepWallPlacerInitializer {
@@ -21,7 +22,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             };
             if(clash.Curve.IsPerpendicular(clash.Wall)) {
                 placer.ParameterGetter = new PerpendicularRectangleCurveWallParamterGetter(clash, categoryOption);
-                placer.PointFinder = new HorizontalPointFinder(clash, new HeightGetter(clash, categoryOption));
+                placer.PointFinder = new HorizontalPointFinder(clash, new HeightValueGetter(clash, categoryOption));
             } else {
                 placer.ParameterGetter = new InclinedRectangleCurveWallParameterGetter(clash, categoryOption);
                 placer.PointFinder = new HorizontalPointFinder(clash, new InclinedSizeInitializer(clash, categoryOption).GetRectangleMepHeightGetter());

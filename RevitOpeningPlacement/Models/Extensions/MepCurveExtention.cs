@@ -36,6 +36,10 @@ namespace RevitOpeningPlacement.Models.Extensions {
             return curve.GetLine().IsParallel(wall.GetLine());
         }
 
+        public static bool RunAlongWall(this MEPCurve mepCurve, Wall wall) {
+            return mepCurve.GetLine().RunAlongWall(wall);
+        }
+
         public static double GetTopElevation(this MEPCurve curve) {
             return curve.GetBuiltInParam(RevitRepository.TopElevation);
         }

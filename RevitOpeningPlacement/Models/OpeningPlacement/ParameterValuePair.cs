@@ -7,11 +7,13 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
 
     internal abstract class ParameterValuePair {
         public string ParamName { get; set; }
-        public virtual ParamValue Value { get; }
+        public ParamValue Value { get; set; }
     }
 
     internal class ParameterValuePair<T> : ParameterValuePair where T : ParamValue {
-        public T TValue { get; set; }
-        public override ParamValue Value => TValue;
+        public new T Value {
+            get => (T) base.Value;
+            set => base.Value = value;
+        }
     }
 }

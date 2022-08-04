@@ -15,9 +15,9 @@ using RevitOpeningPlacement.Models.Interfaces;
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
     internal class HorizontalPointFinder : IPointFinder {
         private readonly MepCurveWallClash _clash;
-        private readonly IParameterGetter<DoubleParamValue> _sizeGetter;
+        private readonly IValueGetter<DoubleParamValue> _sizeGetter;
 
-        public HorizontalPointFinder(MepCurveWallClash clash, IParameterGetter<DoubleParamValue> sizeGetter = null) {
+        public HorizontalPointFinder(MepCurveWallClash clash, IValueGetter<DoubleParamValue> sizeGetter = null) {
             _clash = clash;
             _sizeGetter = sizeGetter;
         }
@@ -35,12 +35,16 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
 
             //трансформация линии стены в координаты основного файла
             var transformedWallLine = Line.CreateBound(_clash.WallTransform.OfPoint(elongatedWallLine.GetEndPoint(0)), _clash.WallTransform.OfPoint(elongatedWallLine.GetEndPoint(1)));
-
-            //получение точки вставки из уравнения линии 
-            if(_sizeGetter != null) {
-                return elongatedMepLine.GetPointFromLineEquation(transformedWallLine) - _clash.Wall.Orientation * _clash.Wall.Width / 2 - _sizeGetter.GetParamValue().TValue.TValue / 2 * XYZ.BasisZ;
+            try {
+                //получение точки вставки из уравнения линии 
+                if(_sizeGetter != null) {
+                    return elongatedMepLine.GetPointFromLineEquation(transformedWallLine) - _clash.Wall.Orientation * _clash.Wall.Width / 2 - _sizeGetter.GetValue().TValue / 2 * XYZ.BasisZ;
+                }
+                return elongatedMepLine.GetPointFromLineEquation(transformedWallLine) - _clash.Wall.Orientation * _clash.Wall.Width / 2;
+            } catch {
+                throw IntersectionNotFoundException.GetException(_clash.Curve, _clash.Wall);
             }
-            return elongatedMepLine.GetPointFromLineEquation(transformedWallLine) - _clash.Wall.Orientation * _clash.Wall.Width / 2;
+          
         }
     }
 }

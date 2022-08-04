@@ -38,7 +38,10 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
 
         public ClashChecker CheckElementsIsNotParallel(RevitRepository revitRepository, ClashModel clashModel) {
             if(Result) {
-                Result = !((MEPCurve) clashModel.MainElement.GetElement(revitRepository.DocInfos)).IsParallel((Wall) clashModel.OtherElement.GetElement(revitRepository.DocInfos));
+                var curve = (MEPCurve) clashModel.MainElement.GetElement(revitRepository.DocInfos);
+                var wall = (Wall) clashModel.OtherElement.GetElement(revitRepository.DocInfos);
+                Result = !curve.IsParallel(wall)
+                          && !curve.RunAlongWall(wall);
             }
             return this;
         }

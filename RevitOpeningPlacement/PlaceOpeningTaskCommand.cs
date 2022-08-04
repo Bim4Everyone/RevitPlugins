@@ -59,7 +59,7 @@ namespace RevitOpeningPlacement {
         }
 
         private void PlaceOpenings(IProgress<int> progress, CancellationToken ct, RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers) {
-            using(var t = revitRepository.GetTransaction("Расстановка заданий.")) {
+            using(var t = revitRepository.GetTransaction("Расстановка заданий")) {
                 int count = 0;
                 foreach(var p in placers) {
                     p.Place();

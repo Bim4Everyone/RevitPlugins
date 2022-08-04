@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
     internal class InclinedRoundCurveWallParameterGetter : IParametersGetter {
@@ -20,13 +21,13 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         //Получение ширины и высоты задания на отверстия с учетом наклона систем в горизонтальном и вертикальном направлении.
 
         //Размеры получаются следующим образом: осевую линию инженерной системы смещают на размер (например, радиус) (в положительную и отрицательную стороны)
-        //в плоскостях yOz (для получения высоты) и в xOy (для получения ширины).
+        //в плоскостях перпендикулярных стене (вертикальной и горизонтальной). Таким образом, инженерная система проецируется на задаынные плоскости.
         //Далее для каждой плоскости находятся точки пересечения смещенных линий системы с гранями стены, затем из этих точек выбираются те,
         //которые находятся на максимальном расстоянии друг от друга, далее по теореме Пифагора производится расчет размера.
         public IEnumerable<ParameterValuePair> GetParamValues() {
-            yield return new InclinedSizeInitializer(_clash, _mepCategory).GetRoundMepHeightGetter().GetParamValue();
-            yield return new InclinedSizeInitializer(_clash, _mepCategory).GetRoundMepWidthGetter().GetParamValue();
-            yield return new ThicknessGetter(_clash).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningHeight, new InclinedSizeInitializer(_clash, _mepCategory).GetRoundMepHeightGetter()).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningWidth, new InclinedSizeInitializer(_clash, _mepCategory).GetRoundMepWidthGetter()).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new ThicknessValueGetter(_clash)).GetParamValue();
         }
     }
 }

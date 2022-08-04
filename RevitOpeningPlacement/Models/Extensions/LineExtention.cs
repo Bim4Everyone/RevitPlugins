@@ -13,8 +13,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
         }
 
         public static bool IsVertical(this Line line) {
-            return Math.Abs(line.GetEndPoint(0).X - line.GetEndPoint(1).X) < 0.0001
-                && Math.Abs(line.GetEndPoint(0).Y - line.GetEndPoint(1).Y) < 0.0001;
+            return Math.Abs(Math.Abs(line.Direction.Z) - 1) < 0.0001;
         }
 
         public static bool IsPerpendicular(this Line line, Line otherLine) {
@@ -27,6 +26,12 @@ namespace RevitOpeningPlacement.Models.Extensions {
 
         public static bool IsParallel(this Line line, Line otherLine) {
             return line.Direction.IsPapallel(otherLine.Direction);
+        }
+
+        public static bool RunAlongWall(this Line line, Wall wall) {
+            var plane = wall.GetHorizontalNormalPlane();
+            var wallLine = wall.GetLine();
+            return plane.ProjectVector(line.Direction).IsPapallel(plane.ProjectVector(wallLine.Direction));
         }
 
         public static Line GetTransformedLine(this Line line, Transform transform) {

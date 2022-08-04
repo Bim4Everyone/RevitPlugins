@@ -12,25 +12,26 @@ using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 namespace RevitOpeningPlacement.Models.OpeningPlacement.DirGetters {
     internal class RectangleDirsGetter : IDirectionsGetter {
         private readonly MepCurveWallClash _clash;
-        private readonly Plane _plane;
 
-        public RectangleDirsGetter(MepCurveWallClash clash, Plane plane) {
+        public RectangleDirsGetter(MepCurveWallClash clash) {
             _clash = clash;
-            _plane = plane;
         }
 
-        public IEnumerable<XYZ> GetDirections() {
+        public IEnumerable<XYZ> GetDirectionsOnPlane(Plane plane) {
+            //получение векторов для смещения в плоскости коннектора инженерной системы
             var height = _clash.Curve.GetHeight();
             var width = _clash.Curve.GetWidth();
             var coordinateSystem = _clash.Curve.GetConnectorCoordinateSystem();
             var dirX = coordinateSystem.BasisX;
             var dirY = coordinateSystem.BasisY;
 
+            //умножение единичных векторов на длину
             var verticalDirs = new[] { dirY, -dirY }.Select(item => item * height);
             var horizontalDirs = new[] { dirX, -dirX }.Select(item => item * width);
 
+            // сложение векторов для получение направлений всех диагоналей и проекция полученных векторов на плоскость
             return verticalDirs.SelectMany(item => horizontalDirs.Select(hitem => _clash.WallTransform.OfVector(hitem + item)))
-                               .Select(item => _plane.ProjectVector(item).Normalize());
+                               .Select(item => plane.ProjectVector(item).Normalize());
         }
     }
 }

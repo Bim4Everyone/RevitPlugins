@@ -1,9 +1,14 @@
 ﻿
 using Autodesk.Revit.DB;
 
+using RevitClashDetective.Models.Value;
+
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.Exceptions;
 using RevitOpeningPlacement.Models.Extensions;
+using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.DirGetters;
+using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
     internal class InclinedSizeInitializer {
@@ -18,28 +23,32 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
            .GetTransformedLine(_clash.WallTransform);
         }
 
-        public InclinedSizeGetter GetRoundMepHeightGetter() {
-            var plane = _clash.WallTransform.OfPlane(_clash.Wall.GetVerticalNormalPlane());
-            var heightDirsGetter = new RoundMepDirsGetter(_clash, plane);
-            return new InclinedSizeGetter(_clash, new DiameterGetter(_clash, _mepCategory), plane, heightDirsGetter, RevitRepository.OpeningHeight);
+        public IValueGetter<DoubleParamValue> GetRoundMepHeightGetter() {
+            var plane = _clash.Wall.GetVerticalNormalPlane();
+
+            var heightDirsGetter = new RoundMepDirsGetter(_clash);
+            return new InclinedSizeValueGetter(_clash, new DiameterValueGetter(_clash, _mepCategory), plane, heightDirsGetter);
         }
 
-        public InclinedSizeGetter GetRoundMepWidthGetter() {
-            Plane plane = _clash.WallTransform.OfPlane(_clash.Wall.GetHorizontalNormalPlane());
-            var widthDirsGetters = new RoundMepDirsGetter(_clash, plane);
-            return new InclinedSizeGetter(_clash, new DiameterGetter(_clash, _mepCategory), plane, widthDirsGetters, RevitRepository.OpeningWidth);
+        public IValueGetter<DoubleParamValue> GetRoundMepWidthGetter() {
+            var plane = _clash.Wall.GetHorizontalNormalPlane();
+
+            var widthDirsGetters = new RoundMepDirsGetter(_clash);
+            return new InclinedSizeValueGetter(_clash, new DiameterValueGetter(_clash, _mepCategory), plane, widthDirsGetters);
         }
 
-        public InclinedSizeGetter GetRectangleMepHeightGetter() {
-            var plane = _clash.WallTransform.OfPlane(_clash.Wall.GetVerticalNormalPlane());
-            var heightDirsGetter = new RectangleDirsGetter(_clash, plane);
-            return new InclinedSizeGetter(_clash, new DiagonalGetter(_clash, plane, _mepCategory), plane, heightDirsGetter, RevitRepository.OpeningHeight);
+        public IValueGetter<DoubleParamValue> GetRectangleMepHeightGetter() {
+            var plane = _clash.Wall.GetVerticalNormalPlane();
+
+            var heightDirsGetter = new RectangleDirsGetter(_clash);
+            return new InclinedSizeValueGetter(_clash, new DiagonalValueGetter(_clash, plane, _mepCategory), plane, heightDirsGetter);
         }
 
-        public InclinedSizeGetter GetRectangleMepWidthGetter() {
-            var plane = _clash.WallTransform.OfPlane(_clash.Wall.GetHorizontalNormalPlane());
-            var widthDirsGetters = new RectangleDirsGetter(_clash, plane);
-            return new InclinedSizeGetter(_clash, new DiagonalGetter(_clash, plane, _mepCategory), plane, widthDirsGetters, RevitRepository.OpeningWidth);
+        public IValueGetter<DoubleParamValue> GetRectangleMepWidthGetter() {
+            var plane = _clash.Wall.GetHorizontalNormalPlane();
+
+            var widthDirsGetters = new RectangleDirsGetter(_clash);
+            return new InclinedSizeValueGetter(_clash, new DiagonalValueGetter(_clash, plane, _mepCategory), plane, widthDirsGetters);
         }
     }
 }

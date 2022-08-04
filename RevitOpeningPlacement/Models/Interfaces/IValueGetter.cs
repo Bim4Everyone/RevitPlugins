@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Autodesk.Revit.DB;
+using RevitClashDetective.Models.Value;
 
 namespace RevitOpeningPlacement.Models.Interfaces {
-    internal interface IDirectionsGetter {
-        IEnumerable<XYZ> GetDirectionsOnPlane(Plane plane);
+    internal interface IValueGetter<T> where T: ParamValue {
+        T GetValue();
     }
 }

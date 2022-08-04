@@ -2,6 +2,7 @@
 
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
     internal class InclinedRectangleCurveWallParameterGetter : IParametersGetter {
@@ -14,9 +15,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         }
 
         public IEnumerable<ParameterValuePair> GetParamValues() {
-            yield return new InclinedSizeInitializer(_clash, _mepCategory).GetRectangleMepHeightGetter().GetParamValue();
-            yield return new InclinedSizeInitializer(_clash, _mepCategory).GetRectangleMepWidthGetter().GetParamValue();
-            yield return new ThicknessGetter(_clash).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningHeight, new InclinedSizeInitializer(_clash, _mepCategory).GetRectangleMepHeightGetter()).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningWidth, new InclinedSizeInitializer(_clash, _mepCategory).GetRectangleMepWidthGetter()).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new ThicknessValueGetter(_clash)).GetParamValue();
         }
     }
 }
