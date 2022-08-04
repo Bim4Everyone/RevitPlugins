@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -45,6 +46,16 @@ namespace RevitLintelPlacement.Models {
         public LintelsConfig LintelsConfig { get; set; }
         public LintelsCommonConfig LintelsCommonConfig { get; set; }
         public Dictionary<string, RuleConfig> RuleConfigs { get; set; }
+
+        public static string ProfilePath {
+            get {
+                var path = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101\";
+                if(!Directory.Exists(path)) {
+                    path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dosymep");
+                }
+                return path;
+            }
+        }
 
         public string GetDocumentName() {
             var documentName = string.IsNullOrEmpty(_document.Title)
