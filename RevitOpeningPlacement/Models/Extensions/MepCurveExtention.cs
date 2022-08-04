@@ -56,6 +56,13 @@ namespace RevitOpeningPlacement.Models.Extensions {
             return curve.GetBuiltInParam(RevitRepository.MepCurveWidths);
         }
 
+        public static Transform GetConnectorCoordinateSystem(this MEPCurve curve) {
+            var connectorsEnumerator = curve.ConnectorManager.Connectors.GetEnumerator();
+            connectorsEnumerator.MoveNext();
+            var connector = connectorsEnumerator.Current as Connector;
+            return connector.CoordinateSystem;
+        }
+
         public static Level GetLevel(this MEPCurve curve) {
             var levelId = curve.GetParamValueOrDefault<ElementId>(BuiltInParameter.RBS_START_LEVEL_PARAM);
             if(levelId.IsNull()) {

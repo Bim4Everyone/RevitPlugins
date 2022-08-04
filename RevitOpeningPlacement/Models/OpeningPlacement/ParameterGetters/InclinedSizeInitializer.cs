@@ -32,14 +32,14 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
 
         public InclinedSizeGetter GetRectangleMepHeightGetter() {
             var plane = _clash.WallTransform.OfPlane(_clash.Wall.GetVerticalNormalPlane());
-            var heightDirsGetter = new RectangleDirsGetter(_clash, _mepCategory);
-            return new InclinedSizeGetter(_clash, new DiagonalGetter(_clash, _mepCategory), plane, heightDirsGetter, RevitRepository.OpeningHeight);
+            var heightDirsGetter = new RectangleDirsGetter(_clash, plane);
+            return new InclinedSizeGetter(_clash, new DiagonalGetter(_clash, plane, _mepCategory), plane, heightDirsGetter, RevitRepository.OpeningHeight);
         }
 
         public InclinedSizeGetter GetRectangleMepWidthGetter() {
             var plane = _clash.WallTransform.OfPlane(_clash.Wall.GetHorizontalNormalPlane());
-            var widthDirsGetters = new RectangleDirsGetter(_clash, _mepCategory);
-            return new InclinedSizeGetter(_clash, new DiagonalGetter(_clash, _mepCategory), plane, widthDirsGetters, RevitRepository.OpeningWidth);
+            var widthDirsGetters = new RectangleDirsGetter(_clash, plane);
+            return new InclinedSizeGetter(_clash, new DiagonalGetter(_clash, plane, _mepCategory), plane, widthDirsGetters, RevitRepository.OpeningWidth);
         }
     }
 }
