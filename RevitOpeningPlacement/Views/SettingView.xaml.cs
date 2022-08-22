@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using DevExpress.Xpf.Grid;
+
 namespace RevitOpeningPlacement.Views
 {
     /// <summary>
@@ -23,6 +25,10 @@ namespace RevitOpeningPlacement.Views
         public SettingView()
         {
             InitializeComponent();
+        }
+
+        private void TableView_CellValueChanging(object sender, CellValueChangedEventArgs e) {
+            (sender as TableView).PostEditor();
         }
     }
 }

@@ -78,6 +78,24 @@ namespace RevitLintelPlacement.Models {
         public string HolesFilter { get; set; }
         public string LintelFamily { get; set; }
 
+        public bool IsEmpty() {
+            return LintelThickness == null
+                || LintelWidth == null
+                || LintelRightOffset == null
+                || LintelLeftOffset == null
+                || LintelLeftCorner == null
+                || LintelRightCorner == null
+                || LintelFixation == null
+                || OpeningHeight == null
+                || OpeningWidth == null
+                || OpeningWidth == null
+                || OpeningFixation == null
+                || ReinforcedConcreteFilter == null
+                || HolesFilter == null
+                || LintelFamily == null;
+
+        }
+
         [JsonIgnore]
         public Dictionary<string, StorageType> ParamterType { get; set; } = new Dictionary<string, StorageType>() {
             {nameof(LintelThickness), StorageType.Double },
@@ -116,10 +134,10 @@ namespace RevitLintelPlacement.Models {
         }
 
         private static string GetLintelsCommonConfigPath() {
-            var projectConfigPath = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone";
+            var projectConfigPath = RevitRepository.ProfilePath;
             var pluginName = nameof(RevitLintelPlacement);
             var revitVersion = string.IsNullOrEmpty(ModuleEnvironment.RevitVersion) ? "2020" : ModuleEnvironment.RevitVersion;
-            return Path.Combine(projectConfigPath, revitVersion, "A101", pluginName);
+            return Path.Combine(projectConfigPath, revitVersion, pluginName);
         }
     }
 }

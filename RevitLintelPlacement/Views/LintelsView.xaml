@@ -71,6 +71,9 @@
             <dxg:GridControl.View>
                 <dxg:TableView x:Name="_gridView" AutoWidth="True" />
             </dxg:GridControl.View>
+            <dxg:GridControl.GroupSummary>
+                <dxg:GridSummaryItem SummaryType="Count" />
+            </dxg:GridControl.GroupSummary>
             <dxg:GridColumn Width="25" MaxWidth="25" MinWidth="25">
                 <dxg:GridColumn.CellTemplate>
                     <DataTemplate DataType="{x:Type vm:LintelInfoViewModel}">

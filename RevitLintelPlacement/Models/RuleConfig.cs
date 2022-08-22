@@ -33,9 +33,6 @@ namespace RevitLintelPlacement.Models {
         public static Dictionary<string, RuleConfig> GetRuleConfigs(string documentName) {
             var ruleDictionary = new Dictionary<string, RuleConfig>();
 
-            //var commonConfig = GeCommonConfig();
-            //ruleDictionary.Add(nameof(RuleConfig), commonConfig);
-
             var projectConfig = GetProjectConfig(documentName);
             ruleDictionary.Add(documentName, projectConfig);
 
@@ -135,10 +132,10 @@ namespace RevitLintelPlacement.Models {
         }
 
         private static string GetLintelsCommonConfigPath() {
-            var projectConfigPath = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone";
+            var projectConfigPath = RevitRepository.ProfilePath;
             var pluginName = nameof(RevitLintelPlacement);
             var revitVersion = string.IsNullOrEmpty(ModuleEnvironment.RevitVersion) ? "2020" : ModuleEnvironment.RevitVersion;
-            return Path.Combine(projectConfigPath, revitVersion, "A101", pluginName, "Rules");
+            return Path.Combine(projectConfigPath, revitVersion, pluginName, "Rules");
         }
 
         private static string GetLintelsUserConfigPath() {
@@ -189,5 +186,4 @@ namespace RevitLintelPlacement.Models {
         public double Offset{ get; set; }
         public LintelParameterType LintelParameterType { get; set; }
     }
-
 }

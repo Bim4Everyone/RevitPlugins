@@ -167,7 +167,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                 return false;
 
             if(Filters.Any(item => item.Set.IsEmpty())) {
-                ErrorText = $"Все поля в фильтре \"{Filters.FirstOrDefault(item => item.Set.IsEmpty())?.Name}\" критериях фильтрации должны быть заполнены.";
+                ErrorText = $"Все поля в поисковом наборе \"{Filters.FirstOrDefault(item => item.Set.IsEmpty())?.Name}\" должны быть заполнены.";
                 return false;
             }
 

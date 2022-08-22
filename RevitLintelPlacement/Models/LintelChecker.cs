@@ -208,7 +208,8 @@ namespace RevitLintelPlacement.Models {
 
         public IResultHandler Check(FamilyInstance lintel, FamilyInstance elementInWall) {
             var lintelLocationPoint = ((LocationPoint) lintel.Location).Point;
-            var elementInWallPoint = _revitRepository.GetLocationPoint(elementInWall);
+            double height = lintel.LevelId.IsNotNull() ? ((Level) _revitRepository.GetElementById(lintel.LevelId)).Elevation : 0;
+            var elementInWallPoint = _revitRepository.GetLocationPoint(elementInWall) + XYZ.BasisZ * height;
 
             if(lintelLocationPoint.DistanceTo(elementInWallPoint) < 0.0001)
                 return new EmptyResult { Code = ResultCode.Correct };

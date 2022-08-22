@@ -13,6 +13,7 @@ namespace RevitOpeningPlacement.ViewModels.Interfaces {
         string ImageSource { get; }
         ObservableCollection<ISizeViewModel> MinSizes { get; set; }
         ObservableCollection<IOffsetViewModel> Offsets { get; set; }
+        string GetErrorText();
         MepCategory GetMepCategory();
     }
 }

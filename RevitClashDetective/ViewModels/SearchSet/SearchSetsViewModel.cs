@@ -53,7 +53,11 @@ namespace RevitClashDetective.ViewModels.SearchSet {
         }
 
         private void Close(object p) {
-            _revitRepository.OpenFilterCreationWindow(Filter.Name);
+            Action action = () => {
+                var command = new CreateFiltersCommand();
+                command.ExecuteCommand(_revitRepository.UiApplication, Filter.Name);
+            };
+            _revitRepository.DoAction(action);
         }
     }
 }

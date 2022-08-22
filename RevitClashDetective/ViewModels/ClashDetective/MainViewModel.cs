@@ -173,7 +173,7 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
             }
             var emptyCheck = Checks.FirstOrDefault(item => !item.IsFilterSelected);
             if(emptyCheck != null) {
-                ErrorText = $"У проверки \"{emptyCheck.Name}\" необходимо выбрать хотя бы один фильтр.";
+                ErrorText = $"У проверки \"{emptyCheck.Name}\" необходимо выбрать хотя бы один поисковый набор.";
                 return false;
             }
 

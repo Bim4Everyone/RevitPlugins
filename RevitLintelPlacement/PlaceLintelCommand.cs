@@ -26,7 +26,9 @@ namespace RevitLintelPlacement {
         protected override void Execute(UIApplication uiApplication) {
             var lintelsConfig = LintelsConfig.GetLintelsConfig();
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document, lintelsConfig);
-
+            if(!HasConfig(revitRepository.LintelsCommonConfig)) {
+                return;
+            }
             var mainViewModel = new MainViewModel(revitRepository);
             var window = new MainWindow() { DataContext = mainViewModel };
             if(window.ShowDialog() == true) {
@@ -38,6 +40,14 @@ namespace RevitLintelPlacement {
                     .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
                     .ShowAsync();
             }
+        }
+
+        private bool HasConfig(LintelsCommonConfig lintelsConfig) {
+            if(lintelsConfig.IsEmpty()) {
+                TaskDialog.Show("BIM", "Необходимо заполнить настройки плагина");
+                return false;
+            }
+            return true;
         }
     }
 }

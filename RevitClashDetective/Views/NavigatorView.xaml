@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.Navigator"
+    xmlns:m="clr-namespace:RevitClashDetective.Models.Clashes"
     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
@@ -12,8 +13,6 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:converters="clr-namespace:dosymep.WPF.Converters"
-    xmlns:ui="clr-namespace:DevExpress.XtraScheduler.UI;assembly=DevExpress.XtraScheduler.v21.2"
-    
     mc:Ignorable="d"
     Title="Навигатор" Height="450" Width="800"
     d:DataContext="{d:DesignInstance vm:ClashesViewModel, IsDesignTimeCreatable=False}">
@@ -24,7 +23,6 @@
     </i:Interaction.Triggers>
     <base:ThemedPlatformWindow.Resources>
         <converters:IndexConverter x:Key="IndexConverter" />
-        <ui:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </base:ThemedPlatformWindow.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -64,11 +62,6 @@
             <mvvm:Interaction.Behaviors>
                 <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectionDataChangedCommand}" />
             </mvvm:Interaction.Behaviors>
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectionChanged">
-                    <i:InvokeCommandAction Command="{Binding SelectionDataChangedCommand}"></i:InvokeCommandAction>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
             <dxg:GridControl.View>
                 <dxg:TableView Name="_gridView" AutoWidth="True" DataNavigatorButtons="Navigation"
                                ShowDataNavigator="True">
@@ -84,8 +77,19 @@
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
-                <dxg:GridColumn Header="" Width="30" FieldName="IsSolved" />
-                <dxg:GridColumn ReadOnly="True" Header="Уровень 1" FieldName="FirstLevel" />
+                <dxg:GridColumn Header="Статус">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <dxe:ComboBoxEdit ApplyItemTemplateToSelectedItem="True"
+                                              IsTextEditable="False" 
+                                              EditMode="InplaceActive" 
+                                              EditValue="{Binding Row.ClashStatus}" 
+                                              ItemsSource="{dxe:EnumItemsSource EnumType={x:Type m:ClashStatus}}" />
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
+
+                <dxg:GridColumn ReadOnly="True" Header="Уровень 1" FieldName="FirstLevel"/>
                 <dxg:GridColumn ReadOnly="True" Header="Категория 1" FieldName="FirstCategory" />
                 <dxg:GridColumn ReadOnly="True" Header="Имя типа 1" FieldName="FirstName" />
                 <dxg:GridColumn ReadOnly="True" Header="Имя файла 1" FieldName="FirstDocumentName" />
