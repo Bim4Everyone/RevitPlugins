@@ -19,8 +19,8 @@ using RevitOpeningPlacement.Views;
 
 namespace RevitOpeningPlacement {
     [Transaction(TransactionMode.Manual)]
-    public class RevitOpeningPlacementCommand : BasePluginCommand {
-        public RevitOpeningPlacementCommand() {
+    public class SetOpeningTaskCommand : BasePluginCommand {
+        public SetOpeningTaskCommand() {
             PluginName = "Настройка заданий на отверстия";
         }
 

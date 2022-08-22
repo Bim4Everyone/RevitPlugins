@@ -151,6 +151,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interfaces", "Interfaces", 
 		RevitClashes\Models\Interfaces\IFilter.cs = RevitClashes\Models\Interfaces\IFilter.cs
 		RevitClashes\Models\Interfaces\IFilterableValueProvider.cs = RevitClashes\Models\Interfaces\IFilterableValueProvider.cs
 		RevitClashes\Models\Interfaces\IFilterGenerator.cs = RevitClashes\Models\Interfaces\IFilterGenerator.cs
+		RevitClashes\Models\Interfaces\INamedEntity.cs = RevitClashes\Models\Interfaces\INamedEntity.cs
 		RevitClashes\Models\Interfaces\IProvider.cs = RevitClashes\Models\Interfaces\IProvider.cs
 		RevitClashes\Models\Interfaces\IRevitLogicalFilterCreator.cs = RevitClashes\Models\Interfaces\IRevitLogicalFilterCreator.cs
 		RevitClashes\Models\Interfaces\IRevitRuleCreator.cs = RevitClashes\Models\Interfaces\IRevitRuleCreator.cs
@@ -188,6 +189,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Visiter", "Visiter", "{D966
 		RevitClashes\Models\Visiter\NotContainsVisister.cs = RevitClashes\Models\Visiter\NotContainsVisister.cs
 		RevitClashes\Models\Visiter\NotEndsWithVisister.cs = RevitClashes\Models\Visiter\NotEndsWithVisister.cs
 		RevitClashes\Models\Visiter\NotEqualsVisister.cs = RevitClashes\Models\Visiter\NotEqualsVisister.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Handlers", "Handlers", "{7D8627B7-D98F-4D86-A10F-7C9DA00EEA7B}"
+	ProjectSection(SolutionItems) = preProject
+		RevitClashes\Models\Handlers\RevitEventHandler.cs = RevitClashes\Models\Handlers\RevitEventHandler.cs
 	EndProjectSection
 EndProject
 Global
@@ -493,6 +499,7 @@ Global
 		{53A474C0-AD86-4DA3-B140-86344DF32811} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
 		{D9C7C058-C70E-4F81-9CAD-C7CF7D952CCF} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
 		{D9661EB6-ECF7-4E7F-B055-65A6313EDF8B} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
+		{7D8627B7-D98F-4D86-A10F-7C9DA00EEA7B} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2332A0ED-46BB-427C-AAD9-EFA10FA76316}

@@ -62,11 +62,6 @@
             <mvvm:Interaction.Behaviors>
                 <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectionDataChangedCommand}" />
             </mvvm:Interaction.Behaviors>
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectionChanged">
-                    <i:InvokeCommandAction Command="{Binding SelectionDataChangedCommand}"></i:InvokeCommandAction>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
             <dxg:GridControl.View>
                 <dxg:TableView Name="_gridView" AutoWidth="True" DataNavigatorButtons="Navigation"
                                ShowDataNavigator="True">

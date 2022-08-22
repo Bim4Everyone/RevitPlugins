@@ -1,0 +1,61 @@
+﻿<base:ThemedPlatformWindow xmlns:base="clr-namespace:dosymep.WPF.Views"
+                           x:Class="RevitOpeningPlacement.Views.NavigatorView"
+                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:local="clr-namespace:RevitOpeningPlacement.Views" 
+                           xmlns:vm="clr-namespace:RevitOpeningPlacement.ViewModels.Navigator" 
+                           xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
+                           xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+                           xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                           x:Name="_this"
+                           mc:Ignorable="d"
+                           Title="NavigatorView" Height="450" Width="800"
+                           d:DataContext="{d:DesignInstance {x:Type vm:OpeningsViewModel}, IsDesignTimeCreatable=False}">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <dxg:GridControl x:Name="_dg" ItemsSource="{Binding OpeningsViewSource.View}">
+            <dxg:GridControl.GroupSummary>
+                <dxg:GridSummaryItem SummaryType="Count" />
+            </dxg:GridControl.GroupSummary>
+            <mvvm:Interaction.Behaviors>
+                <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectionChangedCommand}" />
+            </mvvm:Interaction.Behaviors>
+            <dxg:GridControl.View>
+                <dxg:TableView AutoWidth="True" AllowMergedGrouping="True" DataNavigatorButtons="Navigation" ShowDataNavigator="True"/>
+            </dxg:GridControl.View>
+            <dxg:GridControl.Columns>
+                <dxg:GridColumn Width="60">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <dx:SimpleButton Content="Выбрать" 
+                                             Command="{Binding ElementName=_this, Path=DataContext.SelectCommand}" 
+                                             CommandParameter="{Binding Row}"/>
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
+                <dxg:GridColumn ReadOnly="True" Header="Id" FieldName="Id"/>
+                <dxg:GridColumn ReadOnly="True" Header="Уровень" FieldName="Level"/>
+                <dxg:GridColumn ReadOnly="True" Header="Имя семейства" FieldName="FamilyName"/>
+                <dxg:GridColumn ReadOnly="True" Header="Имя типа" FieldName="TypeName"/>
+            </dxg:GridControl.Columns>
+        </dxg:GridControl>
+
+        <StackPanel Grid.Row="1" Margin="0 10 0 0" Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
+                          Foreground="Orange" />
+            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding MessageText}"
+                          Foreground="Green" />
+            <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True"
+                             Click="ButtonOk_Click" Command="{Binding SaveConfigCommand}"/>
+            <dx:SimpleButton Content="Отмена" Height="25" Width="80"  IsCancel="true"
+                             Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</base:ThemedPlatformWindow>

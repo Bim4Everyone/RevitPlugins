@@ -8,7 +8,7 @@ using System.Windows;
 
 using Autodesk.Revit.UI;
 
-namespace RevitClashDetective.Handlers {
+namespace RevitClashDetective.Models.Handlers {
     internal class RevitEventHandler : IExternalEventHandler, INotifyCompletion {
         private readonly ExternalEvent _externalEvent;
         private Action _continuation;

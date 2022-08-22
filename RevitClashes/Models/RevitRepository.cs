@@ -17,7 +17,7 @@ using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
-using RevitClashDetective.Handlers;
+using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.FilterableValueProviders;
 
@@ -77,6 +77,8 @@ namespace RevitClashDetective.Models {
             BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM };
 
         public Document Doc => _document;
+
+        public UIApplication UiApplication => _uiApplication;
 
         public View3D GetClashView() {
             var view = new FilteredElementCollector(_document)
@@ -277,23 +279,11 @@ namespace RevitClashDetective.Models {
             _revitEventHandler.Raise();
         }
 
-        public void OpenFilterCreationWindow(string selectedFilter) {
-            _revitEventHandler.TransactAction = () => {
-                var command = new CreateFiltersCommand();
-                command.ExecuteCommand(_uiApplication, selectedFilter);
-            };
-
+        public void DoAction(Action action) {
+            _revitEventHandler.TransactAction = action;
             _revitEventHandler.Raise();
         }
 
-        public void OpenClashDetectorWindow() {
-            _revitEventHandler.TransactAction = () => {
-                var command = new DetectiveClashesCommand();
-                command.ExecuteCommand(_uiApplication);
-            };
-
-            _revitEventHandler.Raise();
-        }
 
         public Transform GetLinkedDocumentTransform(string documTitle) {
             if(documTitle.Equals(GetDocumentName(), StringComparison.CurrentCultureIgnoreCase))
@@ -301,6 +291,16 @@ namespace RevitClashDetective.Models {
             return GetRevitLinkInstances()
                 .FirstOrDefault(item => GetDocumentName(item.GetLinkDocument()).Equals(documTitle, StringComparison.CurrentCultureIgnoreCase))
                 ?.GetTotalTransform();
+        }
+        public string GetLevel(Element element) {
+            string level;
+            foreach(var paramName in BaseLevelParameters) {
+                level = element.IsExistsParam(paramName) ? element.GetParam(paramName).AsValueString() : null;
+                if(level != null) {
+                    return level;
+                }
+            }
+            return element.LevelId == null ? null : element.Document.GetElement(element.LevelId)?.Name;
         }
 
         private ParameterValueProvider GetParam(Document doc, Category category, ElementId elementId) {

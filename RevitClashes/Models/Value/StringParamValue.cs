@@ -11,6 +11,11 @@ namespace RevitClashDetective.Models.Value {
         public StringParamValue(string value, string stringValue) : base(value, stringValue) {
 
         }
+
+        public StringParamValue(string value) : base(value) {
+
+        }
+
         public override FilterRule GetFilterRule(IVisiter visiter, Document doc, RevitParam param) {
             var paramId = GetParamId(doc, param);
             if(!paramId.IsNotNull())
@@ -18,5 +23,10 @@ namespace RevitClashDetective.Models.Value {
             return visiter.Create(paramId, TValue);
         }
 
+        public override void SetParamValue(Element element, string paramName) {
+            if(element.IsExistsParam(paramName)) {
+                element.SetParamValue(paramName, TValue);
+            }
+        }
     }
 }

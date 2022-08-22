@@ -4,13 +4,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitOpeningPlacement.Views"
     xmlns:vms="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig" 
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
     xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
+    
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     x:Name="_this"
@@ -19,11 +19,39 @@
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <dxdo:DockLayoutManager Grid.Row="0">
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <dx:SimpleButton
+                Height="32"
+                Width="35"
+                Margin="0 0 10 0"
+                ToolTip="Загрузить проверки"
+                Command="{Binding LoadConfigCommand}"
+                Glyph="{dx:DXImage 'Office2013/Actions/Download_32x32.png'}" />
+
+            <dx:SimpleButton
+                Height="32"
+                Width="32"
+                Margin="0 0 10 0"
+                ToolTip="Cохранить"
+                Command="{Binding SaveConfigCommand}"
+                Glyph="{dx:DXImage 'DevAV/Actions/Save_32x32.png'}" />
+
+            <dx:SimpleButton
+                Height="32"
+                Width="32"
+                Margin="0 0 10 0"
+                ToolTip="Сохранить как"
+                Command="{Binding SaveAsConfigCommand}"
+                Glyph="{dx:DXImage 'DevAV/Actions/SaveAs_32x32.png'}" />
+
+        </StackPanel>
+
+        <dxdo:DockLayoutManager Grid.Row="1">
             <dxdo:LayoutGroup AllowSplitters="True">
                 <dxdo:LayoutControlItem ItemWidth="0.27*" Margin="-11 0">
                     <local:CategoryView x:Name="_categoryView" DataContext="{Binding ElementName=_this, Path=DataContext}"/>
@@ -34,10 +62,12 @@
             </dxdo:LayoutGroup>
         </dxdo:DockLayoutManager>
 
-        <StackPanel Grid.Row="1" Margin="0 10 0 0" Orientation="Horizontal"
+        <StackPanel Grid.Row="2" Margin="0 10 0 0" Orientation="Horizontal"
                     HorizontalAlignment="Right">
             <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
                           Foreground="Orange" />
+            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding MessageText}"
+                          Foreground="Green" />
             <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True"
                              Click="ButtonOk_Click" Command="{Binding SaveConfigCommand}"/>
             <dx:SimpleButton Content="Отмена" Height="25" Width="80"  IsCancel="true"

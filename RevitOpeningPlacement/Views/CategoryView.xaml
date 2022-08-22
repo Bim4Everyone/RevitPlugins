@@ -7,6 +7,7 @@
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:vm="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig"
              xmlns:category="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig.MepCategories"
+             
              mc:Ignorable="d" 
              Name="_this"
              d:DesignHeight="450" d:DesignWidth="800"

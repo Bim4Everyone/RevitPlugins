@@ -27,6 +27,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private string _message;
         private string _selectedFile;
+        private List<ClashViewModel> _allClashes;
         private List<ClashViewModel> _clashes;
         private CollectionViewSource _clashesViewSource;
         private bool _openFromClashDetector;
@@ -112,9 +113,11 @@ namespace RevitClashDetective.ViewModels.Navigator {
             var documentNames = _revitRepository.GetDocuments().Select(item => item.Title).ToList();
             if(SelectedFile != null) {
                 var config = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), SelectedFile);
-                Clashes = config.Clashes.Select(item => new ClashViewModel(_revitRepository, item))
-                    .Where(item => IsValid(documentNames, item))
-                    .ToList();
+                _allClashes = config.Clashes.Select(item => new ClashViewModel(_revitRepository, item))
+                                            .ToList();
+                   
+                Clashes = _allClashes.Where(item => IsValid(documentNames, item))
+                                     .ToList();
                 ClashesViewSource.Source = Clashes;
             }
         }
@@ -134,7 +137,14 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private void SaveConfig(object p) {
             var config = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), SelectedFile);
-            config.Clashes = Clashes.Select(item => item.GetClashModel()).ToList();
+
+            var notValidClashes = _allClashes.Except(Clashes)
+                                             .Select(item => item.GetClashModel());
+
+            config.Clashes = Clashes.Select(item => item.GetClashModel())
+                .Union(notValidClashes)
+                .ToList();
+
             config.SaveProjectConfig();
             Message = "Файл успешно сохранен";
             RefreshMessage();
@@ -156,7 +166,11 @@ namespace RevitClashDetective.ViewModels.Navigator {
         }
 
         private void OpenClashDetector(object p) {
-            _revitRepository.OpenClashDetectorWindow();
+            Action action = () => {
+                var command = new DetectiveClashesCommand();
+                command.ExecuteCommand(_revitRepository.UiApplication);
+            };
+            _revitRepository.DoAction(action);
         }
 
         private void InitializeTimer() {

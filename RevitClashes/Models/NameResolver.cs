@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.UI;
 
-using RevitClashDetective.ViewModels.Interfaces;
+using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models {
-    internal class NameResolver<T> where T: INamedViewModel {
+    internal class NameResolver<T> where T: INamedEntity {
         private IEnumerable<T> _oldCollection;
         private IEnumerable<T> _addedCollection;
         private List<T> _intersection;

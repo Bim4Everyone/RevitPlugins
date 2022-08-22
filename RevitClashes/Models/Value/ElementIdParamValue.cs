@@ -51,5 +51,11 @@ namespace RevitClashDetective.Models.Value {
             }
             return null;
         }
+
+        public override void SetParamValue(Element element, string paramName) {
+            if(element.IsExistsParam(paramName)) {
+                element.SetParamValue(paramName, TValue);
+            }
+        }
     }
 }

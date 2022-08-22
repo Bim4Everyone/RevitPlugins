@@ -5,5 +5,6 @@ namespace RevitOpeningPlacement.ViewModels.Interfaces {
         string Name { get; set; }
         double Value { get; set; }
         Size GetSize();
+        string GetErrorText();
     }
 }
