@@ -229,7 +229,7 @@ namespace RevitLintelPlacement.ViewModels.RuleViewModels {
             Rules.Remove((GroupedRuleViewModel) p);
         }
 
-        private bool CanSave(object p) => RuleConfigManager.CanSave;
+        private bool CanSave(object p) => RuleConfigManager.CanSave && string.IsNullOrEmpty(GetErrorText());
 
         private bool CanRemoveGroupedRule(object p) => p is GroupedRuleViewModel;
 

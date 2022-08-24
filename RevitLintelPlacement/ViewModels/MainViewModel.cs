@@ -167,6 +167,7 @@ namespace RevitLintelPlacement.ViewModels {
                 t.Commit();
             }
 
+            GroupedRules.SelectedRule.SaveCommand.Execute(null);
 
             if(ElementInfos.ElementInfos != null && ElementInfos.ElementInfos.Count > 0) {
                 ShowReport();
@@ -269,16 +270,15 @@ namespace RevitLintelPlacement.ViewModels {
 
         private bool CanPlace(object p) {
             var result = true;
-            //foreach(var groupedRule in GroupedRules.Rules) {
-            //    if(!groupedRule.UpdateErrorText()) {
-            //        result = false;
-            //    }
-            //}
-            //ErrorText = GroupedRules.GetErrorText();
-            //if(!string.IsNullOrEmpty(ErrorText)) {
-            //    result = false;
-            //}
-            //GroupedRules.CanSave = result;
+            foreach(var groupedRule in GroupedRules.SelectedRule.Rules) {
+                if(!groupedRule.UpdateErrorText()) {
+                    result = false;
+                }
+            }
+            ErrorText = GroupedRules.SelectedRule.GetErrorText();
+            if(!string.IsNullOrEmpty(ErrorText)) {
+                result = false;
+            }
             return result;
         }
     }
