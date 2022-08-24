@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -28,6 +29,8 @@ namespace RevitLintelPlacement.ViewModels.RuleViewModels {
         private readonly RuleConfig _ruleConfig;
         private readonly ElementInfosViewModel _elementInfos;
         private string _name;
+        private string _message;
+        private DispatcherTimer _timer;
         private RuleConfigManager _ruleConfigManager;
         private ObservableCollection<GroupedRuleViewModel> _rules;
 
@@ -37,6 +40,7 @@ namespace RevitLintelPlacement.ViewModels.RuleViewModels {
             _ruleConfig = ruleConfig;
 
             InitializeRules();
+            InitializeTimer();
 
             SaveCommand = new RelayCommand(Save, CanSave);
             SaveAsCommand = new RelayCommand(SaveAs, CanSave);
@@ -50,6 +54,11 @@ namespace RevitLintelPlacement.ViewModels.RuleViewModels {
         public string Name {
             get => _name;
             set => this.RaiseAndSetIfChanged(ref _name, value);
+        }
+
+        public string Message { 
+            get => _message; 
+            set => this.RaiseAndSetIfChanged(ref _message, value); 
         }
 
         public RuleConfig Config => GetUpdatedConfig();
@@ -120,8 +129,10 @@ namespace RevitLintelPlacement.ViewModels.RuleViewModels {
         }
 
         public RulesViewModel Copy(IEnumerable<RulesViewModel> rules) {
-            GetUpdatedConfig();
-            Save();
+            if(RuleConfigManager.CanSave) {
+                GetUpdatedConfig();
+                Save();
+            }
 
             var newConfig = RuleConfigManager.Copy(_ruleConfig, rules.Select(item => item.Config));
 
@@ -171,18 +182,34 @@ namespace RevitLintelPlacement.ViewModels.RuleViewModels {
             return _ruleConfig;
         }
 
+        private void InitializeTimer() {
+            _timer = new DispatcherTimer();
+            _timer.Interval = new TimeSpan(0, 0, 0, 3);
+            _timer.Tick += (s, a) => { Message = null; _timer.Stop(); };
+        }
+
+        private void RefreshMessage() {
+            _timer.Start();
+        }
+
         private void Save(object p) {
             if(IsLoaded) {
                 SaveWithQuestion();
                 return;
             }
             Save();
+
+            Message = "Файл успешно сохранен";
+            RefreshMessage();
         }
 
         private void SaveAs(object p) {
             GetUpdatedConfig();
             var saver = new ConfigSaverService();
             saver.Save(_ruleConfig);
+
+            Message = "Файл успешно сохранен";
+            RefreshMessage();
         }
 
         private void Rename(object p) {

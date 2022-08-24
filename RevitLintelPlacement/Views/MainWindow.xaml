@@ -61,7 +61,7 @@
         <local:GroupedRulesView Grid.Row="3" DataContext="{Binding GroupedRules.SelectedRule}" />
         <StackPanel Grid.Row="4" Margin="0 10 0 0" HorizontalAlignment="Right" Orientation="Horizontal" VerticalAlignment="Center">
             <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" VerticalAlignment="Center" Foreground="Green"
-                              EditValue="{Binding GroupedRules.Message}" Width="Auto"/>
+                              EditValue="{Binding GroupedRules.SelectedRule.Message}" Width="Auto"/>
 
             <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" VerticalAlignment="Center" Foreground="Orange"
                               TextWrapping="Wrap"
