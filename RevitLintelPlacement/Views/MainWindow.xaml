@@ -65,6 +65,7 @@
 
             <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" VerticalAlignment="Center" Foreground="Orange"
                               TextWrapping="Wrap"
+                              MaxHeight="20"
                               MaxWidth="{Binding RelativeSource={RelativeSource Mode=FindAncestor, 
                               AncestorType=Grid}, Path=ActualWidth, Converter={StaticResource WidthConverter}, ConverterParameter=115}"
                               EditValue="{Binding ErrorText}" Width="Auto"/>

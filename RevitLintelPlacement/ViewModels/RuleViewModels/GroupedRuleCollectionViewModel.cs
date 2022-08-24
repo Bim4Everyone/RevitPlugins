@@ -85,29 +85,41 @@ namespace RevitLintelPlacement.ViewModels {
 
         private void InitializeGroupRules() {
             var rules = new List<RulesViewModel>();
-            rules.AddRange(GetTemplateRules());
-            rules.AddRange(GetProjectRules());
+            var templateRules = GetTemplateRules();
+            if(templateRules != null) {
+                rules.Add(templateRules);
+            }
+            var projectRules = GetProjectRules();
+            if(projectRules != null) {
+                rules.Add(projectRules);
+            }
             rules.AddRange(GetLocalRules());
             Rules = new ObservableCollection<RulesViewModel>(rules);
         }
 
-        private IEnumerable<RulesViewModel> GetTemplateRules() {
+        private RulesViewModel GetTemplateRules() {
             var templatePath = _revitRepository.GetTemplatePath();
             if(File.Exists(templatePath)) {
                 var config = RuleConfig.GetRuleConfigs(templatePath);
-                yield return RulesViewModel.GetTemplateRules(_revitRepository, _elementInfos, config);
+                return RulesViewModel.GetTemplateRules(_revitRepository, _elementInfos, config);
             }
+            return null;
         }
 
-        private IEnumerable<RulesViewModel> GetProjectRules() {
+        private RulesViewModel GetProjectRules() {
             var projectPath = _revitRepository.GetProjectPath();
             if(File.Exists(projectPath)) {
                 var config = RuleConfig.GetRuleConfigs(projectPath);
-                yield return RulesViewModel.GetProjectRules(_revitRepository, _elementInfos, config);
+                return RulesViewModel.GetProjectRules(_revitRepository, _elementInfos, config);
             } else if(RevitRepository.HasEmptyProjectPath()) {
                 var config = RuleConfig.GetEmptyProjectConfig(projectPath);
-                yield return RulesViewModel.GetProjectRules(_revitRepository, _elementInfos, config);
+                var templateRules = GetTemplateRules();
+                if(templateRules != null) {
+                    config.RuleSettings = templateRules.Config.RuleSettings;
+                }
+                return RulesViewModel.GetProjectRules(_revitRepository, _elementInfos, config);
             }
+            return null;
         }
 
         private IEnumerable<RulesViewModel> GetLocalRules() {

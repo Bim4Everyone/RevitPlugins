@@ -167,7 +167,9 @@ namespace RevitLintelPlacement.ViewModels {
                 t.Commit();
             }
 
-            GroupedRules.SelectedRule.SaveCommand.Execute(null);
+            if(GroupedRules.SelectedRule.RuleConfigManager.CanSave) {
+                GroupedRules.SelectedRule.SaveCommand.Execute(null);
+            }
 
             if(ElementInfos.ElementInfos != null && ElementInfos.ElementInfos.Count > 0) {
                 ShowReport();

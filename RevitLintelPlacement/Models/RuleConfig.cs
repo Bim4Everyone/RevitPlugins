@@ -17,7 +17,6 @@ using RevitLintelPlacement.Models.Interfaces;
 
 namespace RevitLintelPlacement.Models {
     public class RuleConfig : ProjectConfig, INamedEntity {
-        [JsonIgnore]
         public string Name {
             get => !string.IsNullOrEmpty(ProjectConfigPath) ? Path.GetFileNameWithoutExtension(ProjectConfigPath) : null;
             set { }
