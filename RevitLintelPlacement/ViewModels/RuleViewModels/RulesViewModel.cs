@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -44,12 +45,14 @@ namespace RevitLintelPlacement.ViewModels.RuleViewModels {
             RemoveGroupedRuleCommand = new RelayCommand(RemoveGroupedRule, CanRemoveGroupedRule);
         }
 
-        public RuleConfig Config => GetUpdatedConfig();
+        public bool IsLoaded { get; set; }
 
         public string Name {
             get => _name;
             set => this.RaiseAndSetIfChanged(ref _name, value);
         }
+
+        public RuleConfig Config => GetUpdatedConfig();
 
         public RuleConfigManager RuleConfigManager {
             get => _ruleConfigManager;
@@ -85,6 +88,13 @@ namespace RevitLintelPlacement.ViewModels.RuleViewModels {
             };
         }
 
+        public static RulesViewModel GetLoadedRules(RevitRepository revitRepository, ElementInfosViewModel elementInfos, RuleConfig ruleConfig) {
+            return new RulesViewModel(revitRepository, elementInfos, ruleConfig) {
+                RuleConfigManager = RuleConfigManager.GetLocalConfigManager(),
+                IsLoaded = true
+            };
+        }
+
         public string GetErrorText() {
             for(int i = 0; i < Rules.Count - 1; i++) {
                 for(int j = i + 1; j < Rules.Count; j++) {
@@ -111,12 +121,12 @@ namespace RevitLintelPlacement.ViewModels.RuleViewModels {
 
         public RulesViewModel Copy(IEnumerable<RulesViewModel> rules) {
             GetUpdatedConfig();
-            Save(null);
+            Save();
 
             var newConfig = RuleConfigManager.Copy(_ruleConfig, rules.Select(item => item.Config));
 
             var copiedRule = GetLocalRules(_revitRepository, _elementInfos, newConfig);
-            copiedRule.Save(null);
+            copiedRule.Save();
             return copiedRule;
         }
 
@@ -132,21 +142,47 @@ namespace RevitLintelPlacement.ViewModels.RuleViewModels {
             }
         }
 
-        private void Save(object p) {
+        private void SaveWithQuestion() {
+            if(GetResult() == TaskDialogResult.CommandLink2) {
+                _ruleConfig.UpdateToLocalPath();
+                IsLoaded = false;
+            }
+
+            Save();
+        }
+
+        private void Save() {
             GetUpdatedConfig();
             RuleConfigManager.Save(_ruleConfig);
         }
 
-        private void SaveAs(object p) {
-            GetUpdatedConfig();
-            var saver = new ConfigSaverService();
-            saver.Save(_ruleConfig);
+        private TaskDialogResult GetResult() {
+            var dialog = new TaskDialog("BIM");
+            dialog.MainContent = $"Выберите вариант сохранения файла.";
+            dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Сохранить");
+            dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Сохранить локально");
+            dialog.CommonButtons = TaskDialogCommonButtons.Cancel;
+            return dialog.Show();
         }
 
         private RuleConfig GetUpdatedConfig() {
             _ruleConfig.ProjectConfigPath = Path.Combine(Path.GetDirectoryName(_ruleConfig.ProjectConfigPath), Name + ".json");
             _ruleConfig.RuleSettings = Rules.Select(item => item.GetGroupedRuleSetting()).ToList();
             return _ruleConfig;
+        }
+
+        private void Save(object p) {
+            if(IsLoaded) {
+                SaveWithQuestion();
+                return;
+            }
+            Save();
+        }
+
+        private void SaveAs(object p) {
+            GetUpdatedConfig();
+            var saver = new ConfigSaverService();
+            saver.Save(_ruleConfig);
         }
 
         private void Rename(object p) {

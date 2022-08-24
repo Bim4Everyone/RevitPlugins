@@ -140,8 +140,8 @@ namespace RevitLintelPlacement.ViewModels {
         private void Load(object p) {
             var loader = new ConfigLoaderService();
             var config = loader.Load<RuleConfig>();
-            config.ProjectConfigPath = Path.Combine(RevitRepository.LocalRulePath, config.Name + ".json");
-            var newRules = RulesViewModel.GetLocalRules(_revitRepository, _elementInfos, config);
+            //config.ProjectConfigPath = Path.Combine(RevitRepository.LocalRulePath, config.Name + ".json");
+            var newRules = RulesViewModel.GetLoadedRules(_revitRepository, _elementInfos, config);
             var nameResolver = new NameResolver<RulesViewModel>(Rules, new[] { newRules });
             Rules = new ObservableCollection<RulesViewModel>(nameResolver.GetCollection());
             SelectedRule = Rules.FirstOrDefault(item => item.Name.Equals(newRules.Name, StringComparison.CurrentCulture));

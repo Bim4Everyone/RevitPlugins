@@ -45,6 +45,10 @@ namespace RevitLintelPlacement.Models {
             var config = configLoader.Load<RuleConfig>(configPath);
             return config;
         }
+
+        public void UpdateToLocalPath() {
+            ProjectConfigPath = Path.Combine(RevitRepository.LocalRulePath, Name + ".json");
+        }
     }
 
     public class GroupedRuleSettings {
