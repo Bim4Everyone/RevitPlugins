@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 
@@ -14,72 +16,59 @@ using Autodesk.Revit.UI;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitClashDetective.Models;
+
 using RevitLintelPlacement.Models;
+using RevitLintelPlacement.Models.RuleConfigManagers;
+using RevitLintelPlacement.ViewModels.RuleViewModels;
+using RevitLintelPlacement.ViewModels.Services;
 using RevitLintelPlacement.Views;
 
 namespace RevitLintelPlacement.ViewModels {
     internal class GroupedRuleCollectionViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly ElementInfosViewModel _elementInfos;
-        private ObservableCollection<GroupedRuleViewModel> _groupedRules;
-        private ObservableCollection<string> _ruleNames;
-        private string _selectedName;
         private string _message;
-        private bool _canSave;
+        private ObservableCollection<RulesViewModel> _rules;
+        private RulesViewModel _selectedRule;
 
         public GroupedRuleCollectionViewModel() {
 
         }
 
         public GroupedRuleCollectionViewModel(RevitRepository revitRepository, ElementInfosViewModel elementInfos) {
-            this._revitRepository = revitRepository;
-            this._elementInfos = elementInfos;
-            InitializeRulePaths();
+            _revitRepository = revitRepository;
+            _elementInfos = elementInfos;
+
             InitializeGroupRules();
-            AddGroupedRuleCommand = new RelayCommand(AddGroupedRule, p => true);
-            RemoveGroupedRuleCommand = new RelayCommand(RemoveGroupedRule, p => true);
-            SaveCommand = new RelayCommand(Save, p => CanSave);
-            SaveAsCommand = new RelayCommand(SaveAs, p => CanSave);
-            LoadCommand = new RelayCommand(Load, p => true);
-            PathSelectionChangedCommand = new RelayCommand(SelectionChanged, p => true);
-            CreateNewRuleCommand = new RelayCommand(NewRule, p => true);
-            CanSave = true;
+
+            SelectedRule = Rules.FirstOrDefault(item => item.Name.Equals(_revitRepository.LintelsConfig.GetSettings(_revitRepository.GetDocumentName())?.SelectedPath,
+                                                                         StringComparison.CurrentCulture));
+            if(SelectedRule == null) {
+                SelectedRule = Rules.FirstOrDefault();
+            }
+            CopyCommand = new RelayCommand(Copy);
+            LoadCommand = new RelayCommand(Load);
+            CreateNewRuleCommand = new RelayCommand(CreateNewRule);
         }
 
-        public ICommand AddGroupedRuleCommand { get; set; }
-        public ICommand RemoveGroupedRuleCommand { get; set; }
-        public ICommand SaveCommand { get; set; }
-        public ICommand SaveAsCommand { get; set; }
+        public RulesViewModel SelectedRule {
+            get => _selectedRule;
+            set => this.RaiseAndSetIfChanged(ref _selectedRule, value);
+        }
+
+        public ICommand CopyCommand { get; }
         public ICommand LoadCommand { get; set; }
-        public ICommand PathSelectionChangedCommand { get; set; }
         public ICommand CreateNewRuleCommand { get; set; }
 
+        public ObservableCollection<RulesViewModel> Rules {
+            get => _rules;
+            set => this.RaiseAndSetIfChanged(ref _rules, value);
+        }
 
         public string Message {
             get => _message;
             set => this.RaiseAndSetIfChanged(ref _message, value);
-        }
-
-        public bool CanSave { 
-            get => _canSave; 
-            set => this.RaiseAndSetIfChanged(ref _canSave, value); 
-        }
-
-        public ObservableCollection<GroupedRuleViewModel> GroupedRules {
-            get => _groupedRules;
-            set => this.RaiseAndSetIfChanged(ref _groupedRules, value);
-        }
-
-        public ObservableCollection<string> RuleNames {
-            get => _ruleNames;
-            set => this.RaiseAndSetIfChanged(ref _ruleNames, value);
-        }
-
-        public string Name { get; set; }
-
-        public string SelectedName {
-            get => _selectedName;
-            set => this.RaiseAndSetIfChanged(ref _selectedName, value);
         }
 
         public ConcreteRuleViewModel GetRule(FamilyInstance familyInstance) {
@@ -87,226 +76,75 @@ namespace RevitLintelPlacement.ViewModels {
                 throw new ArgumentNullException(nameof(familyInstance));
             }
 
-            return GroupedRules.Select(groupedRule => groupedRule.GetRule(familyInstance))
-                .FirstOrDefault(rule => rule != null);
-        }
-
-        public void Save(object p) {
-            var config = GenerateConfig();
-            if(config != null) {
-                switch(config.RulesType) {
-                    case RulesType.Common: {
-                        config.Save(_revitRepository.GetDocumentName());
-                        ChangeMessage("Файл успешно сохранен");
-                        break;
-                    }
-                    case RulesType.Project: {
-                        config.Save(_revitRepository.GetDocumentName());
-                        ChangeMessage("Файл успешно сохранен");
-                        break;
-                    }
-                    case RulesType.User: {
-                        config.SaveAs(config.Name);
-                        ChangeMessage("Файл успешно сохранен");
-                        break;
-                    }
-                    case RulesType.New: {
-                        var result = AskAboutNewFile();
-                        if(result == TaskDialogResult.CommandLink1) {
-                            config.Save(_revitRepository.GetDocumentName());
-                            config.Name = _revitRepository.GetDocumentName();
-                            _revitRepository.RuleConfigs[_revitRepository.GetDocumentName()] = config;
-                            SelectedName = _revitRepository.GetDocumentName();
-                            _revitRepository.RuleConfigs.Remove(string.Empty);
-                            InitializeRulePaths();
-                            InitializeGroupRules();
-                        } else if(result == TaskDialogResult.CommandLink2) {
-                            SaveAsCommand.Execute(null);
-                            _revitRepository.RuleConfigs.Remove(string.Empty);
-                            InitializeRulePaths();
-                            InitializeGroupRules();
-                        }
-                        break;
-                    }
-                    default: {
-                        throw new ArgumentNullException(nameof(config.RulesType), $"Следуюший тип правила \"{config.RulesType}\" не найден");
-                    }
-                }
-            }
-        }
-
-        public void NewRule(object p) {
-            var config = RuleConfig.CreateNewConfig();
-            if(_revitRepository.RuleConfigs.ContainsKey(config.Name)) {
-                _revitRepository.RuleConfigs[config.Name] = config;
-            } else {
-                _revitRepository.RuleConfigs.Add(config.Name, config);
-            }
-            InitializeRulePaths();
-            SelectedName = config.Name;
-            InitializeGroupRules();
-        }
-
-        public TaskDialogResult AskAboutNewFile() {
-            TaskDialog saveDialog = new TaskDialog("BIM");
-            saveDialog.MainInstruction = "Как вы хотите сохранить новый файл с правилами?";
-
-            // Add commmandLink options to task dialog
-            saveDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1,
-                                      "Сохранить правила в качестве правил проекта.");
-            saveDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2,
-                                      "Сохранить правила локально.");
-            saveDialog.CommonButtons = TaskDialogCommonButtons.Close;
-            saveDialog.DefaultButton = TaskDialogResult.Close;
-            return saveDialog.Show();
-        }
-
-        public string GetErrorText() {
-            for(int i = 0; i < GroupedRules.Count - 1; i++) {
-                for(int j = i + 1; j < GroupedRules.Count; j++) {
-                    var commonWallTypes = GroupedRules[i].SelectedWallTypes
-                    .Intersect(GroupedRules[j].SelectedWallTypes)
-                    .ToList();
-                    if(commonWallTypes.Count > 0) {
-                        return $"У правил \"{GroupedRules[i].Name}\" и \"{GroupedRules[j].Name}\" " +
-                            $"выбраны следующие одинаковые типоразмеры стен: \"{string.Join(", ", commonWallTypes.Select(e => e.Name))}\"";
-                    }
-                }
-            }
-            return string.Empty;
-        }
-
-        private void SaveAs(object p) {
-            var vm = new SaveAsViewModel();
-            var saveAsWindow = new SaveAsWindow() { DataContext = vm };
-            saveAsWindow.ShowDialog();
-            if(vm.RulesFileName != null) {
-                var config = GenerateConfig();
-                if(config != null) {
-                    config.SaveAs(vm.RulesFileName);
-                    if(!_revitRepository.RuleConfigs.ContainsKey(config.Name)) {
-                        _revitRepository.RuleConfigs.Add(config.Name, config);
-                        RuleNames.Add(config.Name);
-                        SelectedName = config.Name;
-                        ChangeMessage("Файл успешно сохранен");
-                    }
-                }
-            }
-        }
-
-        private RuleConfig GenerateConfig() {
-            RuleConfig config;
-            if(!_revitRepository.RuleConfigs.ContainsKey(Name)) {
-                throw new ArgumentException(nameof(_revitRepository.RuleConfigs), $"Не загружены правила со следующим имененм\"{Name}\".");
-            }
-            config = _revitRepository.RuleConfigs[Name];
-            if(GroupedRules == null || GroupedRules.Count == 0) {
-                config.RuleSettings = new List<GroupedRuleSettings>();
-            } else {
-                var newRules = new List<GroupedRuleSettings>();
-                foreach(var rule in GroupedRules) {
-                    var newRule = rule.GetGroupedRuleSetting();
-                    var oldRule = config.RuleSettings.FirstOrDefault(r => r.Name != null && r.Name.Equals(rule.Name, StringComparison.CurrentCultureIgnoreCase));
-                    if(oldRule == null) {
-                        newRules.Add(newRule);
-                        continue;
-                    }
-                    var absentWalls = oldRule.WallTypes.WallTypes.Except(rule.WallTypes.WallTypes.Select(w => w.Name)).ToList();
-                    if(absentWalls.Count > 0) {
-                        newRule.WallTypes.WallTypes.AddRange(absentWalls);
-                    }
-                    newRules.Add(newRule);
-                }
-                config.RuleSettings = newRules;
-            }
-            return config;
-        }
-
-        private void Load(object p) {
-            using(OpenFileDialog openFileDialog = new OpenFileDialog()) {
-                openFileDialog.Filter = "Json files (*.json)|*.json";
-                openFileDialog.FilterIndex = 2;
-                openFileDialog.RestoreDirectory = true;
-
-                if(openFileDialog.ShowDialog() == DialogResult.OK) {
-                    var filePath = openFileDialog.FileName;
-                    RuleConfig config = RuleConfig.LoadConfigFromFile(filePath);
-                    if(_revitRepository.RuleConfigs.ContainsKey(config.Name)) {
-                        _revitRepository.RuleConfigs[config.Name] = config;
-                    } else {
-                        _revitRepository.RuleConfigs.Add(config.Name, config);
-                    }
-                    InitializeRulePaths();
-                    SelectedName = config.Name;
-                    InitializeGroupRules();
-                    Save(null);
-                }
-            }
-        }
-
-        private void AddGroupedRule(object p) {
-            GroupedRules.Add(new GroupedRuleViewModel(_revitRepository, _elementInfos));
+            return SelectedRule.GetRule(familyInstance);
         }
 
         private void InitializeGroupRules() {
-            if(SelectedName != null && _revitRepository.RuleConfigs.ContainsKey(SelectedName)) {
-                Name = _revitRepository.RuleConfigs[SelectedName].Name;
-                InitializeGroupRules(_revitRepository.RuleConfigs[SelectedName].RuleSettings);
-            } else {
-                SelectedName = _revitRepository.GetDocumentName();
-                if(!_revitRepository.RuleConfigs.ContainsKey(SelectedName)) {
-                    throw new ArgumentNullException(nameof(SelectedName), $"Не загружены правила для проекта.");
+            var rules = new List<RulesViewModel>();
+            rules.AddRange(GetTemplateRules());
+            rules.AddRange(GetProjectRules());
+            rules.AddRange(GetLocalRules());
+            Rules = new ObservableCollection<RulesViewModel>(rules);
+        }
+
+        private IEnumerable<RulesViewModel> GetTemplateRules() {
+            var templatePath = _revitRepository.GetTemplatePath();
+            if(File.Exists(templatePath)) {
+                var config = RuleConfig.GetRuleConfigs(templatePath);
+                yield return RulesViewModel.GetTemplateRules(_revitRepository, _elementInfos, config);
+            }
+        }
+
+        private IEnumerable<RulesViewModel> GetProjectRules() {
+            var projectPath = _revitRepository.GetProjectPath();
+            if(File.Exists(projectPath)) {
+                var config = RuleConfig.GetRuleConfigs(projectPath);
+                yield return RulesViewModel.GetProjectRules(_revitRepository, _elementInfos, config);
+            } else if(RevitRepository.HasEmptyProjectPath()) {
+                var config = RuleConfig.GetEmptyProjectConfig(projectPath);
+                yield return RulesViewModel.GetProjectRules(_revitRepository, _elementInfos, config);
+            }
+        }
+
+        private IEnumerable<RulesViewModel> GetLocalRules() {
+            var projectPath = RevitRepository.LocalRulePath;
+            if(projectPath != null && Directory.Exists(projectPath)) {
+                var configPaths = Directory.GetFiles(projectPath, "*.json");
+                foreach(var configPath in configPaths) {
+                    var config = RuleConfig.GetRuleConfigs(configPath);
+                    yield return RulesViewModel.GetLocalRules(_revitRepository, _elementInfos, config);
                 }
-                Name = _revitRepository.RuleConfigs[SelectedName].Name;
-                InitializeGroupRules(_revitRepository.RuleConfigs[SelectedName].RuleSettings);
             }
         }
 
-        private void InitializeGroupRules(IEnumerable<GroupedRuleSettings> rules) {
-            if(rules == null || rules.Count() == 0) {
-                GroupedRules = new ObservableCollection<GroupedRuleViewModel>();
-                GroupedRules.Add(new GroupedRuleViewModel(_revitRepository, _elementInfos));
-            } else {
-                GroupedRules = new ObservableCollection<GroupedRuleViewModel>(
-                rules.Select(r => new GroupedRuleViewModel(_revitRepository, _elementInfos, r))
-                );
+        private void Copy(object p) {
+            var newRule = SelectedRule.Copy(Rules);
+            Rules.Add(newRule);
+            Rules = new ObservableCollection<RulesViewModel>(Rules.OrderBy(item => item.Name));
+            SelectedRule = newRule;
+        }
+
+        private void CreateNewRule(object p) {
+            var newRulesName = new RulesNameViewModel(Rules.Select(item => item.Name));
+            var view = new RulesNameView() { DataContext = newRulesName, Owner = p as Window };
+            if(view.ShowDialog() == true) {
+                var newRulesConfig = RuleConfig.GetLocalRuleConfig(newRulesName.Name);
+                var newRules = RulesViewModel.GetLocalRules(_revitRepository, _elementInfos, newRulesConfig);
+                newRules.Name = newRulesName.Name;
+                Rules.Add(newRules);
+                Rules = new ObservableCollection<RulesViewModel>(Rules.OrderBy(item => item.Name));
+                SelectedRule = newRules;
             }
         }
 
-        private void RemoveGroupedRule(object p) {
-            if(p is GroupedRuleViewModel rule) {
-                GroupedRules.Remove(rule);
-            }
-        }
-
-        private void InitializeRulePaths() {
-            if(_revitRepository.RuleConfigs?.Keys == null && _revitRepository.RuleConfigs?.Keys.Count() == 0) {
-                throw new ArgumentException(nameof(_revitRepository.RuleConfigs), "Нет загруженных правил.");
-            }
-            RuleNames = new ObservableCollection<string>(_revitRepository.RuleConfigs.Keys);
-            var settings = _revitRepository.LintelsConfig.GetSettings(_revitRepository.GetDocumentName());
-            if(settings != null && !string.IsNullOrEmpty(settings.SelectedPath) && RuleNames.Contains(settings.SelectedPath)) {
-                SelectedName = settings.SelectedPath;
-            } else {
-                SelectedName = _revitRepository.GetDocumentName();
-            }
-        }
-
-        private void SelectionChanged(object p) {
-            var changedConfig = GenerateConfig();
-            if(changedConfig.Name != null && _revitRepository.RuleConfigs.ContainsKey(changedConfig.Name)) {
-                _revitRepository.RuleConfigs[changedConfig.Name] = changedConfig;
-            }
-            var config = _revitRepository.RuleConfigs[SelectedName];
-            InitializeGroupRules();
-        }
-
-        private async void ChangeMessage(string newMessage) {
-            Message = newMessage;
-            await Task.Run(() => {
-                Thread.Sleep(3000);
-            });
-            Message = string.Empty;
+        private void Load(object p) {
+            var loader = new ConfigLoaderService();
+            var config = loader.Load<RuleConfig>();
+            config.ProjectConfigPath = Path.Combine(RevitRepository.LocalRulePath, config.Name + ".json");
+            var newRules = RulesViewModel.GetLocalRules(_revitRepository, _elementInfos, config);
+            var nameResolver = new NameResolver<RulesViewModel>(Rules, new[] { newRules });
+            Rules = new ObservableCollection<RulesViewModel>(nameResolver.GetCollection());
+            SelectedRule = Rules.FirstOrDefault(item => item.Name.Equals(newRules.Name, StringComparison.CurrentCulture));
         }
     }
 }

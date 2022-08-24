@@ -37,7 +37,7 @@ namespace RevitLintelPlacement.Models {
         public override string ProjectName { get; set; }
         public SampleMode SelectedModeRules { get; set; }
         public SampleMode SelectedModeNavigator { get; set; }
-        public string SelectedPath { get; set; }
+        public string SelectedPath { get; set; } 
         public List<string> SelectedLinks { get; set; } = new List<string>();
     }
 

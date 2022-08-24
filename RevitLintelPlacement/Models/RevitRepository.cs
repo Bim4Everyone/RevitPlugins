@@ -11,6 +11,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 using RevitLintelPlacement.Handlers;
@@ -20,6 +21,7 @@ namespace RevitLintelPlacement.Models {
 
     internal class RevitRepository {
         private readonly string _view3DName = "3D_Перемычки";
+        private static readonly string _settingsPath = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101\";
 
         private readonly Application _application;
         private readonly UIApplication _uiApplication;
@@ -39,23 +41,36 @@ namespace RevitLintelPlacement.Models {
 
             LintelsConfig = lintelsConfig;
             LintelsCommonConfig = LintelsCommonConfig.GetLintelsCommonConfig(GetDocumentName());
-            RuleConfigs = RuleConfig.GetRuleConfigs(GetDocumentName());
+
             CreateView3DIfNotExisted();
         }
 
         public LintelsConfig LintelsConfig { get; set; }
         public LintelsCommonConfig LintelsCommonConfig { get; set; }
-        public Dictionary<string, RuleConfig> RuleConfigs { get; set; }
 
         public static string ProfilePath {
             get {
-                var path = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101\";
+                var path = _settingsPath;
                 if(!Directory.Exists(path)) {
                     path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dosymep");
                 }
                 return path;
             }
         }
+
+        public static string LocalRulePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                                                            "dosymep",
+                                                            ModuleEnvironment.RevitVersion,
+                                                            nameof(RevitLintelPlacement),
+                                                            "Rules");
+
+        public string GetTemplatePath() => Path.Combine(_settingsPath, ModuleEnvironment.RevitVersion, nameof(RevitLintelPlacement), "Rules", "АТР.json");
+
+
+        public string GetProjectPath() => Path.Combine(_settingsPath, ModuleEnvironment.RevitVersion, nameof(RevitLintelPlacement), "Rules", GetDocumentName() + ".json");
+
+
+        public static bool HasEmptyProjectPath() => Directory.Exists(_settingsPath);
 
         public string GetDocumentName() {
             var documentName = string.IsNullOrEmpty(_document.Title)
@@ -124,11 +139,11 @@ namespace RevitLintelPlacement.Models {
             XYZ center = GetLocationPoint(elementInWall);
             FamilyInstance lintel = null;
             if(elementInWall.LevelId != null && elementInWall.LevelId != ElementId.InvalidElementId) {
-                lintel = _document.Create.NewFamilyInstance(center, lintelType, (Level)_document.GetElement(elementInWall.LevelId), StructuralType.NonStructural);
+                lintel = _document.Create.NewFamilyInstance(center, lintelType, (Level) _document.GetElement(elementInWall.LevelId), StructuralType.NonStructural);
             } else {
                 lintel = _document.Create.NewFamilyInstance(center, lintelType, StructuralType.NonStructural);
             }
-             
+
 
             RotateLintel(lintel, elementInWall, center);
             return lintel;
@@ -244,7 +259,7 @@ namespace RevitLintelPlacement.Models {
         //проверка, есть ли сверху элемента стена, у которой тип железобетон (в таком случает перемычку ставить не надо)
         public bool CheckUp(View3D view3D, FamilyInstance elementInWall, IEnumerable<string> linkNames) {
             XYZ viewPoint = GetLocationPoint(elementInWall);
-            viewPoint = new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z+(((Level) _document.GetElement(elementInWall.LevelId))?.Elevation ?? 0));
+            viewPoint = new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z + (((Level) _document.GetElement(elementInWall.LevelId))?.Elevation ?? 0));
             ReferenceWithContext refWithContext =
                 GetNearestWallOrColumn(view3D, elementInWall, new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z - 0.32), new XYZ(0, 0, 1), false); //чтобы точка точно была под гранью стены
             if(refWithContext == null)

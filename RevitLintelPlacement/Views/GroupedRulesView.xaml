@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:converter="clr-namespace:RevitLintelPlacement.Converters"
-             xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels" 
+             xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels.RuleViewModels" 
+             xmlns:vm1="clr-namespace:RevitLintelPlacement.ViewModels" 
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
@@ -12,7 +13,7 @@
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="1100"
-             d:DataContext="{d:DesignInstance vm:GroupedRuleCollectionViewModel, IsDesignTimeCreatable=False}"
+             d:DataContext="{d:DesignInstance vm:RulesViewModel, IsDesignTimeCreatable=False}"
              Name="ucRules">
     <UserControl.Resources>
         <converter:WidthConverter x:Key="WidthConverter"/>
@@ -32,7 +33,7 @@
                 </Setter>
             </Style.Setters>
         </Style>
-        <DataTemplate DataType="{x:Type vm:GroupedRuleViewModel}">
+        <DataTemplate DataType="{x:Type vm1:GroupedRuleViewModel}">
             <DockPanel>
                 <Grid DockPanel.Dock="Left">
                     <Grid.ColumnDefinitions>
@@ -134,7 +135,7 @@
                                  Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}"/>
             </DockPanel>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:ConcreteRuleViewModel}">
+        <DataTemplate DataType="{x:Type vm1:ConcreteRuleViewModel}">
             <StackPanel Orientation="Horizontal">
                 <StackPanel Orientation="Horizontal" Margin="0 0 5 0">
                     <dxe:TextEdit Width="81" Margin="1,0" EditValue="{Binding OpeningWidthCondition.MinWidth, UpdateSourceTrigger=PropertyChanged}"></dxe:TextEdit>
@@ -190,7 +191,7 @@
                                  BorderBrush="Transparent"
                                  x:Name="lbGroupedRules"
                                  ItemContainerStyle="{StaticResource _lbStyle}"
-                                 ItemsSource="{Binding GroupedRules}"/>
+                                 ItemsSource="{Binding Rules}"/>
                 <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
                     <dx:SimpleButton Width="30"
                                      Height="30"

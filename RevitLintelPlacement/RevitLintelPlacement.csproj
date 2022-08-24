@@ -1,7 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\ProjectProps\Common.props"/>
-    
-    <PropertyGroup>
+    <Import Project="..\ProjectProps\Common.props" />
+
+	<ItemGroup>
+		<Compile Include="..\RevitClashes\Models\NameResolver.cs" Link="Models\NameResolver.cs" />
+		<Compile Include="..\RevitClashes\Models\Interfaces\INamedEntity.cs" Link="Models\Interfaces\INamedEntity.css" />
+	</ItemGroup>
+
+	<PropertyGroup>
         <UseWindowsForms>true</UseWindowsForms>
     </PropertyGroup>
 </Project>

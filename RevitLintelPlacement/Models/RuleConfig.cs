@@ -11,144 +11,40 @@ using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 
+using RevitClashDetective.Models.Interfaces;
+
+using RevitLintelPlacement.Models.Interfaces;
+
 namespace RevitLintelPlacement.Models {
-    public class RuleConfig {
+    public class RuleConfig : ProjectConfig, INamedEntity {
+        [JsonIgnore]
+        public string Name {
+            get => !string.IsNullOrEmpty(ProjectConfigPath) ? Path.GetFileNameWithoutExtension(ProjectConfigPath) : null;
+            set { }
+        }
+
+        public RuleConfig() {}
 
         public List<GroupedRuleSettings> RuleSettings { get; set; } = new List<GroupedRuleSettings>();
 
-        public RulesType RulesType { get; set; }
+        [JsonIgnore]
+        public override string ProjectConfigPath { get; set; }
+        [JsonIgnore]
+        public override IConfigSerializer Serializer { get; set; } = new ConfigSerializer();
 
-        public string Name { get; set; }
-
-        public static RuleConfig GetRuleConfig(string documentName) {
-            if(File.Exists(GetDocumentConfigPath(documentName))) {
-                return JsonConvert.DeserializeObject<RuleConfig>(File.ReadAllText(GetDocumentConfigPath(documentName)));
-            }
-            if(File.Exists(GetConfigPath())) {
-                return JsonConvert.DeserializeObject<RuleConfig>(File.ReadAllText(GetConfigPath()));
-            }
-            return new RuleConfig();
+        public static RuleConfig GetLocalRuleConfig(string name) {
+            return new RuleConfig() { ProjectConfigPath = Path.Combine(RevitRepository.LocalRulePath, name + ".json") };
         }
 
-        public static Dictionary<string, RuleConfig> GetRuleConfigs(string documentName) {
-            var ruleDictionary = new Dictionary<string, RuleConfig>();
-
-            var projectConfig = GetProjectConfig(documentName);
-            ruleDictionary.Add(documentName, projectConfig);
-
-            Directory.CreateDirectory(GetLintelsUserConfigPath());
-            var files = Directory.GetFiles(GetLintelsUserConfigPath(), "*.json");
-            if(files.Count() == 0)
-                return ruleDictionary;
-            foreach(var file in files) {
-                var userConfig = GetUserConfig(file);
-                if(!ruleDictionary.ContainsKey(userConfig.Name)) {
-                    ruleDictionary.Add(userConfig.Name, userConfig);
-                }
-            }
-            return ruleDictionary;
+        public static RuleConfig GetEmptyProjectConfig(string projectPath) {
+            return new RuleConfig() { ProjectConfigPath = projectPath };
         }
 
-        public void Save(string documentName) {
-            Directory.CreateDirectory(Path.GetDirectoryName(GetDocumentConfigPath(documentName)));
-            File.WriteAllText(GetDocumentConfigPath(documentName), JsonConvert.SerializeObject(this));
+        public static RuleConfig GetRuleConfigs(string configPath) {
+            var configLoader = new ConfigLoader();
+            var config = configLoader.Load<RuleConfig>(configPath);
+            return config;
         }
-
-        public void SaveAs(string name) {
-            Directory.CreateDirectory(GetLintelsUserConfigPath());
-            Name = name;
-            File.WriteAllText(Path.Combine(GetLintelsUserConfigPath(), Name + $"_{Environment.UserName}" + ".json"), JsonConvert.SerializeObject(this));
-        }
-
-        public static RuleConfig LoadConfigFromFile(string path) {
-            if(File.Exists(path)) {
-                try {
-                    var loadedConfig = JsonConvert.DeserializeObject<RuleConfig>(File.ReadAllText(path));
-                    if(loadedConfig != null) {
-                        loadedConfig.СonfigureConfig(Path.GetFileNameWithoutExtension(path), RulesType.User);
-                        return loadedConfig;
-                    }
-                } catch {}
-            }
-            var emptyConfig = new RuleConfig();
-            emptyConfig.СonfigureConfig(Path.GetFileNameWithoutExtension(path), RulesType.User);
-            return emptyConfig;
-        }
-
-        public static RuleConfig CreateNewConfig() {
-            var commonConfig = GeCommonConfig();
-            commonConfig.СonfigureConfig(string.Empty, RulesType.New);
-            return commonConfig;
-        }
-
-        private static RuleConfig GeCommonConfig() {
-            if(File.Exists(GetConfigPath())) {
-                var commonConfig = JsonConvert.DeserializeObject<RuleConfig>(File.ReadAllText(GetConfigPath()));
-                if(commonConfig != null) {
-                    commonConfig.СonfigureConfig(nameof(RuleConfig), RulesType.Common);
-                    return commonConfig;
-                }
-            }
-            var emptyCommonConfig = new RuleConfig();
-            emptyCommonConfig.СonfigureConfig(nameof(RuleConfig), RulesType.Common);
-            return emptyCommonConfig;
-        }
-
-        private static RuleConfig GetProjectConfig(string documentName) {
-            if(File.Exists(GetDocumentConfigPath(documentName))) {
-                var projectCpnfig = JsonConvert.DeserializeObject<RuleConfig>(File.ReadAllText(GetDocumentConfigPath(documentName)));
-                if(projectCpnfig != null) {
-                    projectCpnfig.СonfigureConfig(documentName, RulesType.Project);
-                    return projectCpnfig;
-                }
-            }
-            var emptyProjectConfig = new RuleConfig();
-            emptyProjectConfig.СonfigureConfig(documentName, RulesType.Project);
-            return emptyProjectConfig;
-        }
-
-        private static RuleConfig GetUserConfig(string file) {
-            var userConfig = JsonConvert.DeserializeObject<RuleConfig>(File.ReadAllText(file));
-            if(userConfig == null) {
-                userConfig = new RuleConfig();
-            }
-            userConfig.СonfigureConfig(userConfig.Name, RulesType.User);
-            return userConfig;
-        }
-
-        private void СonfigureConfig(string name, RulesType rulesType) {
-            if(name != null) { 
-                Name = name;
-            }
-            RulesType = rulesType;
-        }
-
-        private static string GetConfigPath() {
-            return Path.Combine(GetLintelsCommonConfigPath(), nameof(RuleConfig) + ".json");
-        }
-
-        private static string GetDocumentConfigPath(string documentName) {
-            return Path.Combine(GetLintelsCommonConfigPath(), documentName + ".json");
-        }
-
-        private static string GetLintelsCommonConfigPath() {
-            var projectConfigPath = RevitRepository.ProfilePath;
-            var pluginName = nameof(RevitLintelPlacement);
-            var revitVersion = string.IsNullOrEmpty(ModuleEnvironment.RevitVersion) ? "2020" : ModuleEnvironment.RevitVersion;
-            return Path.Combine(projectConfigPath, revitVersion, pluginName, "Rules");
-        }
-
-        private static string GetLintelsUserConfigPath() {
-            var revitVersion = string.IsNullOrEmpty(ModuleEnvironment.RevitVersion) ? "2020" : ModuleEnvironment.RevitVersion;
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dosymep", revitVersion, nameof(RevitLintelPlacement), "Rules");
-        }
-    }
-
-    public enum RulesType {
-        Common,
-        Project,
-        User,
-        New
     }
 
     public class GroupedRuleSettings {
@@ -183,7 +79,7 @@ namespace RevitLintelPlacement.Models {
 
     public class LintelParameterSetting {
         public bool IsCornerChecked { get; set; }
-        public double Offset{ get; set; }
+        public double Offset { get; set; }
         public LintelParameterType LintelParameterType { get; set; }
     }
 }

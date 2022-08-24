@@ -1,0 +1,40 @@
+﻿<base:ThemedPlatformWindow 
+        x:Class="RevitLintelPlacement.Views.RulesNameView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RevitLintelPlacement.Views"
+        xmlns:vm="clr-namespace:RevitLintelPlacement.ViewModels.RuleViewModels"
+        xmlns:base="clr-namespace:dosymep.WPF.Views" 
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+        
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance vm:RulesNameViewModel, IsDesignTimeCreatable=False}"
+        Title="Имя файла" Height="120" Width="520"
+        MinHeight="120" MinWidth="520">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0" LastChildFill="True">
+            <dxe:TextEdit DockPanel.Dock="Left" EditValue="Имя: " IsReadOnly="True" EditMode="InplaceActive"
+                          VerticalAlignment="Center" Margin="10 0 0 0" />
+            <dxe:TextEdit DockPanel.Dock="Right" Margin="10 0 0 0" HorizontalAlignment="Stretch"
+                          VerticalContentAlignment="Center"
+                          EditValue="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+        </DockPanel>
+
+        <StackPanel Grid.Row="1" Margin="0 10 0 0" Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
+                          Foreground="Orange" />
+            <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True"
+                             Command="{Binding Create}" Click="ButtonOk_Click" />
+            <dx:SimpleButton Content="Отмена" Height="25" Width="80" IsCancel="true"
+                             Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</base:ThemedPlatformWindow>

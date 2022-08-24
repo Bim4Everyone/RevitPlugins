@@ -119,7 +119,7 @@ namespace RevitLintelPlacement.ViewModels {
             }
             Lintels = new LintelCollectionViewModel(_revitRepository, ElementInfos);
 
-            var wallTypeNames = GroupedRules.GroupedRules.SelectMany(item => item.SelectedWallTypes.Select(w => w.Name)).ToList();
+            var wallTypeNames = GroupedRules.SelectedRule.Rules.SelectMany(item => item.SelectedWallTypes.Select(w => w.Name)).ToList();
 
             var elementInWalls = _revitRepository.GetAllElementsInWall(SelectedSampleMode, ElementInfos, wallTypeNames)
                 .ToList();
@@ -256,7 +256,7 @@ namespace RevitLintelPlacement.ViewModels {
             if(settings == null) {
                 settings = _revitRepository.LintelsConfig.AddSettings(_revitRepository.GetDocumentName());
             }
-            settings.SelectedPath = GroupedRules.SelectedName;
+            settings.SelectedPath = GroupedRules?.SelectedRule?.Name;
             settings.SelectedModeRules = SelectedSampleMode;
             if(SelectedLinks != null) {
                 settings.SelectedLinks = SelectedLinks.Select(l => l.Name).ToList();
@@ -269,16 +269,16 @@ namespace RevitLintelPlacement.ViewModels {
 
         private bool CanPlace(object p) {
             var result = true;
-            foreach(var groupedRule in GroupedRules.GroupedRules) {
-                if(!groupedRule.UpdateErrorText()) {
-                    result = false;
-                }
-            }
-            ErrorText = GroupedRules.GetErrorText();
-            if(!string.IsNullOrEmpty(ErrorText)) {
-                result = false;
-            }
-            GroupedRules.CanSave = result;
+            //foreach(var groupedRule in GroupedRules.Rules) {
+            //    if(!groupedRule.UpdateErrorText()) {
+            //        result = false;
+            //    }
+            //}
+            //ErrorText = GroupedRules.GetErrorText();
+            //if(!string.IsNullOrEmpty(ErrorText)) {
+            //    result = false;
+            //}
+            //GroupedRules.CanSave = result;
             return result;
         }
     }
