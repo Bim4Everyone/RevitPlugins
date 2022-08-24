@@ -13,6 +13,7 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -47,9 +48,11 @@ namespace RevitLintelPlacement.ViewModels {
             if(SelectedRule == null) {
                 SelectedRule = Rules.FirstOrDefault();
             }
+
             CopyCommand = new RelayCommand(Copy);
             LoadCommand = new RelayCommand(Load);
             CreateNewRuleCommand = new RelayCommand(CreateNewRule);
+            DeleteCommand = new RelayCommand(Delete, CanDelete);
         }
 
         public RulesViewModel SelectedRule {
@@ -60,6 +63,7 @@ namespace RevitLintelPlacement.ViewModels {
         public ICommand CopyCommand { get; }
         public ICommand LoadCommand { get; set; }
         public ICommand CreateNewRuleCommand { get; set; }
+        public ICommand DeleteCommand { get; set; }
 
         public ObservableCollection<RulesViewModel> Rules {
             get => _rules;
@@ -140,11 +144,21 @@ namespace RevitLintelPlacement.ViewModels {
         private void Load(object p) {
             var loader = new ConfigLoaderService();
             var config = loader.Load<RuleConfig>();
-            //config.ProjectConfigPath = Path.Combine(RevitRepository.LocalRulePath, config.Name + ".json");
             var newRules = RulesViewModel.GetLoadedRules(_revitRepository, _elementInfos, config);
             var nameResolver = new NameResolver<RulesViewModel>(Rules, new[] { newRules });
             Rules = new ObservableCollection<RulesViewModel>(nameResolver.GetCollection());
             SelectedRule = Rules.FirstOrDefault(item => item.Name.Equals(newRules.Name, StringComparison.CurrentCulture));
         }
+
+        private void Delete(object p) {
+            var mb = GetPlatformService<IMessageBoxService>();
+            if(mb.Show("Вы уверены, что хотите удалить файл?", "BIM", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Cancel) == MessageBoxResult.Yes) {
+                SelectedRule.RuleConfigManager.Delete(SelectedRule.Config);
+                Rules.Remove(SelectedRule);
+                SelectedRule = Rules.FirstOrDefault();
+            }
+        }
+
+        private bool CanDelete(object p) => SelectedRule.RuleConfigManager.CanDelete;
     }
 }

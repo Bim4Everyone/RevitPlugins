@@ -11,17 +11,18 @@ namespace RevitLintelPlacement.Models.RuleConfigManagers {
     internal class RuleConfigManager : IRuleConfigManager {
         public bool CanSave { get; set; }
         public bool CanRename { get; set; }
+        public bool CanDelete { get; set; }
 
         public static RuleConfigManager GetLocalConfigManager() {
-            return new RuleConfigManager() { CanRename = true, CanSave = true };
+            return new RuleConfigManager() { CanRename = true, CanSave = true, CanDelete = true };
         }
 
         public static RuleConfigManager GetProjectConfigManager() {
-            return new RuleConfigManager() { CanRename = false, CanSave = true };
+            return new RuleConfigManager() { CanRename = false, CanSave = true, CanDelete = false };
         }
 
         public static RuleConfigManager GetTemplateConfigManager() {
-            return new RuleConfigManager() { CanRename = false, CanSave = false };
+            return new RuleConfigManager() { CanRename = false, CanSave = false, CanDelete = false };
         }
 
         public RuleConfig Copy(RuleConfig config, IEnumerable<RuleConfig> configs) {
@@ -39,6 +40,12 @@ namespace RevitLintelPlacement.Models.RuleConfigManagers {
             var copyConfig = RuleConfig.GetRuleConfigs(config.ProjectConfigPath);
             copyConfig.ProjectConfigPath = Path.Combine(directory, name + ".json");
             return copyConfig;
+        }
+
+        public void Delete(RuleConfig config) {
+            if(File.Exists(config.ProjectConfigPath) && config.ProjectConfigPath.EndsWith(".json", StringComparison.CurrentCultureIgnoreCase)) {
+                File.Delete(config.ProjectConfigPath);
+            }
         }
 
         public RuleConfig Load(string path) {

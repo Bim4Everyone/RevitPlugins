@@ -31,7 +31,8 @@
             <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Сохранить как" Command="{Binding SelectedRule.SaveAsCommand}" Glyph="{dx:DXImage 'DevAV/Actions/SaveAs_16x16.png'}"/>
             <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Переименовать" Command="{Binding SelectedRule.RenameCommand}" Glyph="{dx:DXImage 'Office2013/Edit/Edit_16x16.png'}"
                              CommandParameter="{Binding Rules}"/>
-            <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Копировать" Command="{Binding CopyCommand}" Glyph="{dx:DXImage 'Office2013/Edit/Copy_16x16.png'}"/> 
+            <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Копировать" Command="{Binding CopyCommand}" Glyph="{dx:DXImage 'Office2013/Edit/Copy_16x16.png'}"/>
+            <dx:SimpleButton Width="28" Margin="5 0 0 0" ToolTip="Удалить" Command="{Binding DeleteCommand}" Glyph="{dx:DXImage 'Office2013/Reports/DeleteGroupHeader_16x16.png'}"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="0 10" Orientation="Vertical" HorizontalAlignment="Left">
             <dxe:ComboBoxEdit Width="300" Height="25" FontSize="14" IsTextEditable="False" ItemsSource="{Binding Rules}" DisplayMember="Name" SelectedItem="{Binding SelectedRule}"/>
