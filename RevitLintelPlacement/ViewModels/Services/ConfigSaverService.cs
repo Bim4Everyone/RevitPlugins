@@ -15,7 +15,7 @@ namespace RevitLintelPlacement.ViewModels.Services {
         public void Save(ProjectConfig config) {
             var saveWindow = GetPlatformService<ISaveFileDialogService>();
             saveWindow.AddExtension = true;
-            saveWindow.Filter = "ClashConfig |*.json";
+            saveWindow.Filter = "RuleConfig |*.json";
             saveWindow.FilterIndex = 1;
             if(!saveWindow.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "rules")) {
                 throw new OperationCanceledException();
