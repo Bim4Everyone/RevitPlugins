@@ -18,6 +18,7 @@ namespace RevitLintelPlacement.ViewModels {
     internal class GroupedRuleViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly ElementInfosViewModel _elementInfos;
+        private readonly GroupedRuleSettings _groupedRuleSettings;
         private string _name;
         private string _errorText;
         private string _filterText;
@@ -26,11 +27,12 @@ namespace RevitLintelPlacement.ViewModels {
         private ObservableCollection<ConcreteRuleViewModel> _groupedRules;
 
         public GroupedRuleViewModel(RevitRepository revitRepository, ElementInfosViewModel elementInfos, GroupedRuleSettings groupedRuleSettings = null) {
-            this._revitRepository = revitRepository;
-            this._elementInfos = elementInfos;
+            _revitRepository = revitRepository;
+            _elementInfos = elementInfos;
+            _groupedRuleSettings = groupedRuleSettings;
             AddRuleCommand = new RelayCommand(AddRule, p => true);
             RemoveRuleCommand = new RelayCommand(RemoveRule, p => true);
-            if(groupedRuleSettings == null || groupedRuleSettings.Rules.Count == 0) {
+            if(_groupedRuleSettings == null || _groupedRuleSettings.Rules.Count == 0) {
                 Rules = new ObservableCollection<ConcreteRuleViewModel>();
                 var rule = new ConcreteRuleViewModel(revitRepository, _elementInfos);
                 Rules.Add(rule);
@@ -38,12 +40,12 @@ namespace RevitLintelPlacement.ViewModels {
             } else {
                 InitializeWallTypes();
 
-                SelectedObjects = groupedRuleSettings.WallTypes.WallTypes
+                SelectedObjects = _groupedRuleSettings.WallTypes.WallTypes
                     .Select(item => (object) new WallTypeConditionViewModel() { Name = item })
                     .ToList();
-                Name = groupedRuleSettings.Name;
+                Name = _groupedRuleSettings.Name;
                 Rules = new ObservableCollection<ConcreteRuleViewModel>(
-                    groupedRuleSettings.Rules
+                    _groupedRuleSettings.Rules
                     .Select(r => new ConcreteRuleViewModel(_revitRepository, _elementInfos, r)));
             }
             WallTypesViewSource = new CollectionViewSource() { Source = WallTypes.WallTypes };
@@ -96,6 +98,7 @@ namespace RevitLintelPlacement.ViewModels {
                     ConditionType = ConditionType.WallTypes,
                     WallTypes = SelectedWallTypes
                     .Select(item => item.Name)
+                    .Union(GetOldNotShownWalls())
                     .ToList()
                     //WallTypes = WallTypes.WallTypes
                     //.Where(e => e.IsChecked)
@@ -172,6 +175,13 @@ namespace RevitLintelPlacement.ViewModels {
 
         private void FilterWalls(object p) {
             WallTypesViewSource.View.Refresh();
+        }
+
+        private IEnumerable<string> GetOldNotShownWalls() {
+            if(_groupedRuleSettings == null) {
+                return Enumerable.Empty<string>();
+            }
+            return _groupedRuleSettings.WallTypes.WallTypes.Except(WallTypes.WallTypes.Select(item => item.Name));
         }
     }
 }
