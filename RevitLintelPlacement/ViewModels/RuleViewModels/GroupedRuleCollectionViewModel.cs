@@ -171,6 +171,6 @@ namespace RevitLintelPlacement.ViewModels {
             }
         }
 
-        private bool CanDelete(object p) => SelectedRule.RuleConfigManager.CanDelete;
+        private bool CanDelete(object p) => SelectedRule!=null && SelectedRule.RuleConfigManager.CanDelete;
     }
 }

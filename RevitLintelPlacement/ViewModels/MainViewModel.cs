@@ -272,6 +272,9 @@ namespace RevitLintelPlacement.ViewModels {
 
         private bool CanPlace(object p) {
             var result = true;
+            if(GroupedRules.SelectedRule == null) {
+                return false;
+            }
             foreach(var groupedRule in GroupedRules.SelectedRule.Rules) {
                 if(!groupedRule.UpdateErrorText()) {
                     result = false;
