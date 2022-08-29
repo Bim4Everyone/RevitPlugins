@@ -91,6 +91,7 @@ namespace RevitClashDetective.Models {
                         .OfClass(typeof(ViewFamilyType))
                         .Cast<ViewFamilyType>()
                         .First(v => v.ViewFamily == ViewFamily.ThreeDimensional);
+                    type.DefaultTemplateId = ElementId.InvalidElementId;
                     view = View3D.CreateIsometric(_document, type.Id);
                     view.Name = _clashViewName + "_" + _application.Username;
                     var categories = new[] { new ElementId(BuiltInCategory.OST_Levels),

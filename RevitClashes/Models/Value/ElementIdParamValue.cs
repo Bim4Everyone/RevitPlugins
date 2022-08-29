@@ -12,6 +12,10 @@ using RevitClashDetective.Models.Visiter;
 namespace RevitClashDetective.Models.Value {
     internal class ElementIdParamValue : ParamValue<string> {
 
+        public ElementIdParamValue() : base() {
+
+        }
+
         public ElementIdParamValue(int[] categories, string value, string stringValue) : base(value, stringValue) {
             Categories = categories;
         }

@@ -8,6 +8,20 @@ using Autodesk.Revit.DB;
 
 namespace RevitClashDetective.Models.Extensions {
     internal static class ElementExtensions {
+        public static IEnumerable<Solid> GetSolids(this GeometryObject geometryObject) {
+            if(geometryObject is Solid solid) {
+                yield return solid;
+            } else if(geometryObject is GeometryInstance geometryInstance) {
+                foreach(var instance in geometryInstance.GetSolids()) {
+                    yield return instance;
+                }
+            }
+        }
+
+        public static IEnumerable<Solid> GetSolids(this GeometryInstance geometryInstance) {
+            return geometryInstance.GetInstanceGeometry().OfType<Solid>();
+        }
+
         public static Solid GetSolid(this Element element) {
             List<Solid> solids = new List<Solid>();
             var option = new Options() { ComputeReferences = true };

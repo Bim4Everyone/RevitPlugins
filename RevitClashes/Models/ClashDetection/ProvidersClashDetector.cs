@@ -78,7 +78,23 @@ namespace RevitClashDetective.Models.ClashDetection {
                                 .WherePasses(new BoundingBoxIntersectsFilter(solid.GetOutline()))
                                 .WherePasses(new ElementIntersectsSolidFilter(solid))
                                 .Where(item => item.Id != element.Id)
+                                //.Where(item => HasSolidsIntersection(item, solid))
                                 .Select(item => new ClashModel(_revitRepository, item, element));
+        }
+
+        private bool HasSolidsIntersection(Element element, Solid solid) {
+            foreach(var s in _firstProvider.GetSolids(element)) {
+                if(HasSolidIntersection(s, solid) || HasSolidIntersection(solid, s)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool HasSolidIntersection(Solid solid0, Solid solid1) {
+            var intersection = BooleanOperationsUtils.ExecuteBooleanOperation(solid0, solid1, BooleanOperationsType.Intersect);
+            return intersection.Volume > 0;
         }
 
         protected T GetPlatformService<T>() {

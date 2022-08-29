@@ -8,6 +8,10 @@ using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.Value {
     internal class StringParamValue : ParamValue<string> {
+        public StringParamValue() {
+
+        }
+
         public StringParamValue(string value, string stringValue) : base(value, stringValue) {
 
         }
