@@ -23,7 +23,7 @@ namespace RevitClashDetective.Models.ClashDetection {
         public Transform MainTransform { get; }
 
         public List<Element> GetElements() {
-            var categories = _filter.CategoryIds.Select(item => (BuiltInCategory)item).ToList();
+            var categories = _filter.CategoryIds.Select(item => (BuiltInCategory) item).ToList();
 
             var elements = new FilteredElementCollector(Doc)
                 .WherePasses(new ElementMulticategoryFilter(categories))
@@ -35,9 +35,10 @@ namespace RevitClashDetective.Models.ClashDetection {
         }
 
         public List<Solid> GetSolids(Element element) {
-            var options = new Options() { ComputeReferences = true };
+            var options = new Options() { ComputeReferences = true, IncludeNonVisibleObjects = false, DetailLevel = ViewDetailLevel.Fine};
             return element.get_Geometry(options)
                 .SelectMany(item => item.GetSolids())
+                .GetUnitedSolids()
                 .ToList();
         }
     }

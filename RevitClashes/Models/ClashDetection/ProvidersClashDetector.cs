@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitClashDetective.Models.Clashes;
@@ -44,7 +47,7 @@ namespace RevitClashDetective.Models.ClashDetection {
 
                 pb.Show();
 
-                return GetClashes(progress, ct);
+                return GetClashes(progress, ct).Distinct().ToList();
             }
         }
 
@@ -63,27 +66,49 @@ namespace RevitClashDetective.Models.ClashDetection {
                 ct.ThrowIfCancellationRequested();
 
                 var solids = _secondProvider.GetSolids(element)
-                    .Select(item => SolidUtils.CreateTransformed(item, resultTransform));
+                                            .ToArray();
 
-                foreach(var solid in solids) {
-                    clashes.AddRange(GetElementClashes(element, solid));
+                // Solid-ы необходимо проверять на замкнутость геометрии до трансформации, так как у трансформированного solid-а 
+                // появляютя грани и ребра
+                var closedSolids = solids.Where(item => !item.IsNotClosed())
+                                         .Select(item => SolidUtils.CreateTransformed(item, resultTransform));
+
+                var openSolids = solids.Where(item => item.IsNotClosed())
+                                       .Select(item => SolidUtils.CreateTransformed(item, resultTransform));
+
+                foreach(var solid in openSolids) {
+                    clashes.AddRange(GetElementClashesWithFilter(element, solid));
+                }
+
+                foreach(var solid in closedSolids) {
+                    clashes.AddRange(GetElementClashesWithIntersection(element, solid));
                 }
             }
 
             return clashes;
         }
 
-        private IEnumerable<ClashModel> GetElementClashes(Element element, Solid solid) {
+        private IEnumerable<ClashModel> GetElementClashesWithFilter(Element element, Solid solid) {
             return new FilteredElementCollector(_firstProvider.Doc, _ids)
                                 .WherePasses(new BoundingBoxIntersectsFilter(solid.GetOutline()))
                                 .WherePasses(new ElementIntersectsSolidFilter(solid))
                                 .Where(item => item.Id != element.Id)
-                                //.Where(item => HasSolidsIntersection(item, solid))
+                                .Select(item => new ClashModel(_revitRepository, item, element));
+        }
+
+        private IEnumerable<ClashModel> GetElementClashesWithIntersection(Element element, Solid solid) {
+            return new FilteredElementCollector(_firstProvider.Doc, _ids)
+                                .WherePasses(new BoundingBoxIntersectsFilter(solid.GetOutline()))
+                                .Where(item => item.Id != element.Id)
+                                .Where(item => HasSolidsIntersection(item, solid))
                                 .Select(item => new ClashModel(_revitRepository, item, element));
         }
 
         private bool HasSolidsIntersection(Element element, Solid solid) {
             foreach(var s in _firstProvider.GetSolids(element)) {
+                if(s.IsNotClosed()) {
+                    return new ElementIntersectsSolidFilter(solid).PassesFilter(element);
+                }
                 if(HasSolidIntersection(s, solid) || HasSolidIntersection(solid, s)) {
                     return true;
                 }
@@ -93,8 +118,12 @@ namespace RevitClashDetective.Models.ClashDetection {
         }
 
         private bool HasSolidIntersection(Solid solid0, Solid solid1) {
-            var intersection = BooleanOperationsUtils.ExecuteBooleanOperation(solid0, solid1, BooleanOperationsType.Intersect);
-            return intersection.Volume > 0;
+            try {
+                var intersection = BooleanOperationsUtils.ExecuteBooleanOperation(solid0, solid1, BooleanOperationsType.Intersect);
+                return intersection.Volume > 0;
+            } catch {
+                return false;
+            }
         }
 
         protected T GetPlatformService<T>() {
