@@ -68,20 +68,22 @@ namespace RevitClashDetective.Models.Clashes {
 
         public override int GetHashCode() {
             int hashCode = 2096115351;
-            hashCode = hashCode * -1521134295 + EqualityComparer<ElementModel>.Default.GetHashCode(MainElement);
-            hashCode = hashCode * -1521134295 + EqualityComparer<ElementModel>.Default.GetHashCode(OtherElement);
+            hashCode *= EqualityComparer<ElementModel>.Default.GetHashCode(MainElement);
+            hashCode *= EqualityComparer<ElementModel>.Default.GetHashCode(OtherElement);
             return hashCode;
         }
 
         public bool Equals(ClashModel other) {
             return other != null
-                && EqualityComparer<ElementModel>.Default.Equals(MainElement, other.MainElement)
-                && EqualityComparer<ElementModel>.Default.Equals(OtherElement, other.OtherElement);
+                && ((EqualityComparer<ElementModel>.Default.Equals(MainElement, other.MainElement)
+                && EqualityComparer<ElementModel>.Default.Equals(OtherElement, other.OtherElement))
+                || (EqualityComparer<ElementModel>.Default.Equals(MainElement, other.OtherElement)
+                && EqualityComparer<ElementModel>.Default.Equals(OtherElement, other.MainElement)));
         }
     }
 
     internal enum ClashStatus {
-        [Display(Name="Активно"), Image("pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_High.png")]
+        [Display(Name = "Активно"), Image("pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_High.png")]
         Active,
         [Display(Name = "Проанализировано"), Image("pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Low.png")]
         Analized,

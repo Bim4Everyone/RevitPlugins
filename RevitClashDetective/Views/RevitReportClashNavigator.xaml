@@ -1,56 +1,31 @@
-﻿<base:ThemedPlatformWindow
-    x:Class="RevitClashDetective.Views.NavigatorView"
+﻿<base:ThemedPlatformWindow  
+    x:Class="RevitClashDetective.Views.RevitReportClashNavigator"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.Navigator"
-    xmlns:m="clr-namespace:RevitClashDetective.Models.Clashes"
-    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:local="clr-namespace:RevitClashDetective.Views"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
     xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:converters="clr-namespace:dosymep.WPF.Converters"
     mc:Ignorable="d"
     Title="Навигатор" Height="450" Width="800"
-    d:DataContext="{d:DesignInstance vm:ClashesViewModel, IsDesignTimeCreatable=False}">
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Closing">
-            <i:InvokeCommandAction Command="{Binding OpenClashDetectorCommand}" />
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
-    <base:ThemedPlatformWindow.Resources>
-        <converters:IndexConverter x:Key="IndexConverter" />
-    </base:ThemedPlatformWindow.Resources>
+    d:DataContext="{d:DesignInstance vm:RevitReportClashesViewModel, IsDesignTimeCreatable=False}">
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <DockPanel LastChildFill="True">
-            <DockPanel.Style>
-                <Style TargetType="DockPanel">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding FileNames}" Value="{x:Null}">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </DockPanel.Style>
-            <dx:SimpleButton DockPanel.Dock="Left" ToolTip="Синхронизировать плагин с документом"
-                             Command="{Binding SelectionChangedCommand}"
-                             Glyph="{dx:DXImage 'Office2013/Actions/Refresh_32x32.png'}" />
-            <dxe:ComboBoxEdit IsTextEditable="False" ItemsSource="{Binding FileNames}"
-                              SelectedItem="{Binding SelectedFile}">
-                <mvvm:Interaction.Behaviors>
-                    <mvvm:EventToCommand EventName="EditValueChanged" Command="{Binding SelectionChangedCommand}" />
-                </mvvm:Interaction.Behaviors>
-            </dxe:ComboBoxEdit>
+        <DockPanel Grid.Row="0" LastChildFill="True">
+            <dx:SimpleButton DockPanel.Dock="Left" ToolTip="Загрузить отчет о пересечениях"
+                             Command="{Binding LoadReportCommand}"
+                             Glyph="{dx:DXImage 'Office2013/Actions/Download_32x32.png'}" />
+            <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding Name}"/>
         </DockPanel>
 
         <dxg:GridControl Name="_dg"
@@ -81,18 +56,7 @@
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
-                <dxg:GridColumn Header="Статус">
-                    <dxg:GridColumn.CellTemplate>
-                        <DataTemplate>
-                            <dxe:ComboBoxEdit ApplyItemTemplateToSelectedItem="True"
-                                              IsTextEditable="False" 
-                                              EditMode="InplaceActive" 
-                                              EditValue="{Binding Row.ClashStatus}" 
-                                              ItemsSource="{dxe:EnumItemsSource EnumType={x:Type m:ClashStatus}}" />
-                        </DataTemplate>
-                    </dxg:GridColumn.CellTemplate>
-                </dxg:GridColumn>
-
+               
                 <dxg:GridColumn ReadOnly="True" Header="Уровень 1" FieldName="FirstLevel"/>
                 <dxg:GridColumn ReadOnly="True" Header="Категория 1" FieldName="FirstCategory" />
                 <dxg:GridColumn ReadOnly="True" Header="Имя типа 1" FieldName="FirstName" />
@@ -106,10 +70,6 @@
 
         <StackPanel Grid.Row="2" Margin="0 10 0 0" Orientation="Horizontal"
                     HorizontalAlignment="Right">
-            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding Message}"
-                          Foreground="Green" />
-            <dx:SimpleButton Content="Сохранить" Height="25" Width="80" Margin="10 0" IsDefault="True"
-                             Command="{Binding SaveCommand}" />
             <dx:SimpleButton Content="Отмена" Height="25" Width="80" IsCancel="true"
                              Click="ButtonCancel_Click" />
         </StackPanel>

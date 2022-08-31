@@ -7,7 +7,7 @@ using RevitClashDetective.Models.FilterModel;
 
 namespace RevitClashDetective.Models {
     internal class ConfigLoader {
-        private IConfigSerializer _serializer = new RevitClashConfigSerializer();
+        private readonly IConfigSerializer _serializer = new RevitClashConfigSerializer();
         public T Load<T>(string configPath) where T : ProjectConfig, new() {
             if(string.IsNullOrEmpty(configPath)) {
                 throw new ArgumentException($"'{nameof(configPath)}' cannot be null or empty.", nameof(configPath));

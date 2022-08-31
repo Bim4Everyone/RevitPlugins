@@ -31,9 +31,9 @@ namespace RevitClashDetective.Models {
         private readonly Document _document;
         private readonly UIDocument _uiDocument;
         private readonly RevitEventHandler _revitEventHandler;
-        private List<string> _endings = new List<string> { "_отсоединено", "_detached" };
-        private string _clashViewName = "BIM_Проверка на коллизии";
-        private View3D _view;
+        private readonly List<string> _endings = new List<string> { "_отсоединено", "_detached" };
+        private readonly string _clashViewName = "BIM_Проверка на коллизии";
+        private readonly View3D _view;
 
         public RevitRepository(Application application, Document document) {
             _application = application;
@@ -127,12 +127,16 @@ namespace RevitClashDetective.Models {
 
         public string GetDocumentName(Document doc) {
             var title = doc.Title;
+            return GetDocumentName(title);
+        }
+
+        public string GetDocumentName(string fileName) {
             foreach(var ending in _endings) {
-                if(title.IndexOf(ending) > -1) {
-                    title = title.Substring(0, title.IndexOf(ending));
+                if(fileName.IndexOf(ending) > -1) {
+                    fileName = fileName.Substring(0, fileName.IndexOf(ending));
                 }
             }
-            return title;
+            return fileName;
         }
 
         public string GetObjectName() {
@@ -327,8 +331,8 @@ namespace RevitClashDetective.Models {
             if(bb == null)
                 return;
             using(Transaction t = _document.StartTransaction("Подрезка")) {
-                bb.Max = bb.Max + new XYZ(5, 5, 5);
-                bb.Min = bb.Min - new XYZ(5, 5, 5);
+                bb.Max += new XYZ(5, 5, 5);
+                bb.Min -= new XYZ(5, 5, 5);
                 _view.SetSectionBox(bb);
                 var uiView = _uiDocument.GetOpenUIViews().FirstOrDefault(item => item.ViewId == _view.Id);
                 if(uiView != null) {

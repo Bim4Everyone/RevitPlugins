@@ -159,6 +159,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interfaces", "Interfaces", 
 		RevitClashes\Models\Interfaces\IVisiter.cs = RevitClashes\Models\Interfaces\IVisiter.cs
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RevitClashReport", "RevitClashReport", "{C9F52F92-6BD2-4A45-8297-8775E5FE371A}"
+	ProjectSection(SolutionItems) = preProject
+		RevitClashes\Models\RevitClashReport\ReportLoader.cs = RevitClashes\Models\RevitClashReport\ReportLoader.cs
+	EndProjectSection
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{53A474C0-AD86-4DA3-B140-86344DF32811}"
 	ProjectSection(SolutionItems) = preProject
 		RevitClashes\Models\Utils\DoubleValueParser.cs = RevitClashes\Models\Utils\DoubleValueParser.cs
@@ -500,6 +505,7 @@ Global
 		{D9C7C058-C70E-4F81-9CAD-C7CF7D952CCF} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
 		{D9661EB6-ECF7-4E7F-B055-65A6313EDF8B} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
 		{7D8627B7-D98F-4D86-A10F-7C9DA00EEA7B} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
+		{C9F52F92-6BD2-4A45-8297-8775E5FE371A} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2332A0ED-46BB-427C-AAD9-EFA10FA76316}

@@ -20,18 +20,18 @@ using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.RevitClashReport;
 
 namespace RevitClashDetective.ViewModels.Navigator {
     internal class ClashesViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
 
+        private bool _openFromClashDetector;
         private string _message;
         private string _selectedFile;
+        private DispatcherTimer _timer;
         private List<ClashViewModel> _allClashes;
         private List<ClashViewModel> _clashes;
-        private CollectionViewSource _clashesViewSource;
-        private bool _openFromClashDetector;
-        private DispatcherTimer _timer;
 
         public ClashesViewModel(RevitRepository revitRepository, string selectedFile = null) {
             _revitRepository = revitRepository;
@@ -42,7 +42,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 InitializeFiles(selectedFile);
             }
 
-            ClashesViewSource = new CollectionViewSource();
             InitializeClashesFromFile();
             InitializeTimer();
 
@@ -50,14 +49,12 @@ namespace RevitClashDetective.ViewModels.Navigator {
             SelectClashCommand = new RelayCommand(SelectClash);
             SaveCommand = new RelayCommand(SaveConfig, CanSaveConfig);
 
-            SelectionDataChangedCommand = new RelayCommand(SelectionDataChanged);
             OpenClashDetectorCommand = new RelayCommand(OpenClashDetector, p => OpenFromClashDetector);
         }
-
-        public ICommand SelectClashCommand { get; }
+        
+        public ICommand SelectClashCommand { get;}
         public ICommand SaveCommand { get; }
         public ICommand SelectionChangedCommand { get; }
-        public ICommand SelectionDataChangedCommand { get; }
         public ICommand OpenClashDetectorCommand { get; }
 
         public string[] FileNames { get; set; }
@@ -77,11 +74,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
         public List<ClashViewModel> Clashes {
             get => _clashes;
             set => this.RaiseAndSetIfChanged(ref _clashes, value);
-        }
-
-        public CollectionViewSource ClashesViewSource {
-            get => _clashesViewSource;
-            set => this.RaiseAndSetIfChanged(ref _clashesViewSource, value);
         }
 
         public string Message {
@@ -118,7 +110,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
                    
                 Clashes = _allClashes.Where(item => IsValid(documentNames, item))
                                      .ToList();
-                ClashesViewSource.Source = Clashes;
             }
         }
 
@@ -128,8 +119,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
         }
 
         private void SelectClash(object p) {
-            var clash = p as ClashViewModel;
-            if(clash == null)
+            if(!(p is ClashViewModel clash))
                 return;
 
             _revitRepository.SelectAndShowElement(clash.GetElementIds(_revitRepository.Doc.Title), clash.GetBoundingBox());
@@ -158,24 +148,18 @@ namespace RevitClashDetective.ViewModels.Navigator {
             InitializeClashesFromFile();
         }
 
-        private void SelectionDataChanged(object p) {
-            if(ClashesViewSource.View.CurrentPosition > -1
-                && ClashesViewSource.View.CurrentPosition < Clashes.Count) {
-                SelectClash(ClashesViewSource.View.CurrentItem);
-            }
-        }
-
         private void OpenClashDetector(object p) {
-            Action action = () => {
+            void action() {
                 var command = new DetectiveClashesCommand();
                 command.ExecuteCommand(_revitRepository.UiApplication);
-            };
+            }
             _revitRepository.DoAction(action);
         }
 
         private void InitializeTimer() {
-            _timer = new DispatcherTimer();
-            _timer.Interval = new TimeSpan(0, 0, 0, 3);
+            _timer = new DispatcherTimer {
+                Interval = new TimeSpan(0, 0, 0, 3)
+            };
             _timer.Tick += (s, a) => { Message = null; _timer.Stop(); };
         }
 
