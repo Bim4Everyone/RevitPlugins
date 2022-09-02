@@ -11,29 +11,35 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 
 using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.RevitClashReport {
-    internal class ReportLoader {
+    internal class ReportLoader : IClashesLoader {
         private readonly RevitRepository _revitRepository;
 
-        public ReportLoader(RevitRepository revitRepository) {
+        public string FilePath { get; }
+
+        public ReportLoader(RevitRepository revitRepository, string path) {
             _revitRepository = revitRepository;
+            FilePath = path;
         }
 
-        public IEnumerable<ClashModel> GetClashes(string path) {
-            if(string.IsNullOrEmpty(path)) {
-                throw new ArgumentException($"'{nameof(path)}' cannot be null or empty.", nameof(path));
+        public IEnumerable<ClashModel> GetClashes() {
+            if(string.IsNullOrEmpty(FilePath)) {
+                throw new ArgumentException($"'{nameof(FilePath)}' cannot be null or empty.", nameof(FilePath));
             }
 
-            if(!File.Exists(path)) {
-                throw new ArgumentException($"Путь \"{path}\" недоступен.", nameof(path));
+            if(!File.Exists(FilePath)) {
+                throw new ArgumentException($"Путь \"{FilePath}\" недоступен.", nameof(FilePath));
             }
 
-            if(!IsCorrectFileName(path)) {
-                throw new ArgumentException($"Неверный файл отчета.", nameof(path));
+            if(!IsCorrectFileName(FilePath)) {
+                throw new ArgumentException($"Неверный файл отчета.", nameof(FilePath));
             }
 
-            return File.ReadAllLines(path).Skip(3)
+            _revitRepository.InitializeDocInfos();
+
+            return File.ReadAllLines(FilePath).Skip(3)
                                           .Select(item => Regex.Matches(item, @"<td>(?'value'.+?)</td>")
                                                                            .Cast<Match>()
                                                                            .Select(i => i.Groups["value"].Value.Split(':'))
@@ -46,6 +52,14 @@ namespace RevitClashDetective.Models.RevitClashReport {
                                           .Where(item => item.LeftElement != null && item.RightElement != null)
                                           .Select(item => new ClashModel(_revitRepository, item.LeftElement, item.RightElement))
                                           .ToArray();
+        }
+
+        public bool IsValid() {
+            return FilePath.EndsWith(".html")
+                   && File.ReadAllLines(FilePath).Skip(2)
+                                                .FirstOrDefault()
+                                                ?.Equals("<p><table border=on>  <tr>  <td></td>  <td ALIGN=\"center\">A</td>  " +
+                                                "<td ALIGN=\"center\">B</td>  </tr>", StringComparison.CurrentCultureIgnoreCase) != null;
         }
 
         private bool IsCorrectFileName(string path) {
@@ -63,7 +77,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
         }
 
         private Element GetElement(IEnumerable<string> elementString) {
-            return GetElement(GetId(elementString.LastOrDefault()), GetFile(elementString.FirstOrDefault().Trim()));
+            return _revitRepository.GetElement(GetFile(elementString.FirstOrDefault().Trim()), GetId(elementString.LastOrDefault()));
         }
 
         private int GetId(string idString) {
@@ -77,20 +91,6 @@ namespace RevitClashDetective.Models.RevitClashReport {
 
         private string GetFile(string fileString) {
             return fileString.EndsWith(".rvt", StringComparison.CurrentCultureIgnoreCase) ? fileString : null;
-        }
-
-        private Element GetElement(int id, string filename) {
-            var elementId = new ElementId(id);
-
-            if(filename == null && elementId.IsNotNull()) {
-                return _revitRepository.GetElement(elementId);
-            }
-
-            var doc = _revitRepository.GetRevitLinkInstances()
-                                      .FirstOrDefault(item => item.Name.StartsWith(filename, StringComparison.CurrentCultureIgnoreCase))
-                                      ?.GetLinkDocument();
-
-            return doc?.GetElement(elementId);
         }
     }
 }

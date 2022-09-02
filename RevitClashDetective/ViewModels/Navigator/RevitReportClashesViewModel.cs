@@ -54,9 +54,11 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private void InitializeClashes(string path) {
             Name = Path.GetFileNameWithoutExtension(path);
-            ReportLoader reportLoader = new ReportLoader(_revitRepository);
-            Clashes = new ObservableCollection<ClashViewModel>(reportLoader.GetClashes(path)
-                                    .Select(item => new ClashViewModel(_revitRepository, item)));
+            ReportLoader reportLoader = new ReportLoader(_revitRepository, path);
+            if(reportLoader.IsValid()) {
+                Clashes = new ObservableCollection<ClashViewModel>(reportLoader.GetClashes()
+                        .Select(item => new ClashViewModel(_revitRepository, item)));
+            }
         }
 
         private void SelectClash(object p) {

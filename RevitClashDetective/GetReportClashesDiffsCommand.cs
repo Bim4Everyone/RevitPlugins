@@ -25,7 +25,7 @@ namespace RevitClashDetective {
             var pluginClashes = ClashesConfig.GetClashesConfig(revitRepository.GetObjectName(), checkName).Clashes;
 
             var revitFilePath = @"";
-            var revitClashes = new ReportLoader(revitRepository).GetClashes(revitFilePath);
+            var revitClashes = new ReportLoader(revitRepository, revitFilePath).GetClashes();
 
             var mainViewModlel = new ClashReportDiffViewModel(revitRepository, revitClashes, pluginClashes);
            

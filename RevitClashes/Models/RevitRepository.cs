@@ -47,6 +47,8 @@ namespace RevitClashDetective.Models {
             _endings.Add("_" + _application.Username);
 
             _view = GetClashView();
+
+            InitializeDocInfos();
         }
 
         public static string ProfilePath {
@@ -80,6 +82,8 @@ namespace RevitClashDetective.Models {
         public Document Doc => _document;
 
         public UIApplication UiApplication => _uiApplication;
+
+        public List<DocInfo> DocInfos { get; set; }
 
         public View3D GetClashView() {
             var view = new FilteredElementCollector(_document)
@@ -133,7 +137,7 @@ namespace RevitClashDetective.Models {
 
         public string GetDocumentName(string fileName) {
             foreach(var ending in _endings) {
-                if(fileName.IndexOf(ending) > -1) {
+                if(Path.GetFileNameWithoutExtension(fileName).IndexOf(ending) > -1) {
                     fileName = fileName.Substring(0, fileName.IndexOf(ending));
                 }
             }
@@ -148,8 +152,13 @@ namespace RevitClashDetective.Models {
             return _document.GetElement(id);
         }
 
-        public Element GetElement(string documentName, int id) {
-            var doc = GetDocInfos().FirstOrDefault(item => item.Name.Equals(documentName, StringComparison.CurrentCultureIgnoreCase))?.Doc;
+        public Element GetElement(string fileName, int id) {
+            Document doc;
+            if(fileName == null) {
+                doc = _document;
+            } else {
+                doc = DocInfos.FirstOrDefault(item => item.Name.Equals(GetDocumentName(fileName), StringComparison.CurrentCultureIgnoreCase))?.Doc;
+            }
             var elementId = new ElementId(id);
             if(doc == null || elementId.IsNull()) {
                 return null;
@@ -217,15 +226,14 @@ namespace RevitClashDetective.Models {
             return false;
         }
 
-        public List<DocInfo> GetDocInfos() {
-            var linkedDocuments = new FilteredElementCollector(_document)
+        public void InitializeDocInfos() {
+            DocInfos = new FilteredElementCollector(_document)
                .OfClass(typeof(RevitLinkInstance))
                .Cast<RevitLinkInstance>()
                .Where(item => item.GetLinkDocument() != null)
                .Select(item => new DocInfo(GetDocumentName(item.GetLinkDocument()), item.GetLinkDocument(), item.GetTransform()))
                .ToList();
-            linkedDocuments.Add(new DocInfo(GetDocumentName(), _document, Transform.Identity));
-            return linkedDocuments;
+            DocInfos.Add(new DocInfo(GetDocumentName(), _document, Transform.Identity));
         }
 
         public bool IsValidElement(Document doc, ElementId elementId) {
