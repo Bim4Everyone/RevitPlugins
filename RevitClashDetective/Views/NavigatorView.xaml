@@ -13,6 +13,7 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:converters="clr-namespace:dosymep.WPF.Converters"
+    
     mc:Ignorable="d"
     Title="Навигатор" Height="450" Width="800"
     d:DataContext="{d:DesignInstance vm:ClashesViewModel, IsDesignTimeCreatable=False}">

@@ -20,8 +20,12 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private string _name;
         private ObservableCollection<ClashViewModel> _clashes;
 
-        public RevitReportClashesViewModel(RevitRepository revitRepository) {
+        public RevitReportClashesViewModel(RevitRepository revitRepository, string path = null) {
             _revitRepository = revitRepository;
+
+            if(!string.IsNullOrEmpty(path)) {
+                InitializeClashes(path);
+            }
 
             LoadReportCommand = new RelayCommand(LoadReport);
             SelectClashCommand = new RelayCommand(SelectClash, CanSelectClash);
@@ -29,13 +33,13 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         public ICommand LoadReportCommand { get; }
         public ICommand SelectClashCommand { get; }
-        public ObservableCollection<ClashViewModel> Clashes { 
-            get => _clashes; 
-            set => this.RaiseAndSetIfChanged(ref _clashes, value); 
+        public ObservableCollection<ClashViewModel> Clashes {
+            get => _clashes;
+            set => this.RaiseAndSetIfChanged(ref _clashes, value);
         }
-        public string Name { 
-            get => _name; 
-            set => this.RaiseAndSetIfChanged(ref _name, value); 
+        public string Name {
+            get => _name;
+            set => this.RaiseAndSetIfChanged(ref _name, value);
         }
 
         private void LoadReport(object p) {
@@ -45,15 +49,21 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 throw new OperationCanceledException();
             }
 
-            Name = Path.GetFileNameWithoutExtension(openWindow.File.FullName);
+            InitializeClashes(openWindow.File.FullName);
+        }
+
+        private void InitializeClashes(string path) {
+            Name = Path.GetFileNameWithoutExtension(path);
             ReportLoader reportLoader = new ReportLoader(_revitRepository);
-            Clashes = new ObservableCollection<ClashViewModel>(reportLoader.GetClashes(openWindow.File.FullName)
+            Clashes = new ObservableCollection<ClashViewModel>(reportLoader.GetClashes(path)
                                     .Select(item => new ClashViewModel(_revitRepository, item)));
         }
 
         private void SelectClash(object p) {
             var clash = (ClashViewModel) p;
-            _revitRepository.SelectAndShowElement(clash.GetElementIds(_revitRepository.Doc.Title), clash.GetBoundingBox());
+            var elements = new[] {_revitRepository.GetElement(clash.Clash.MainElement.DocumentName, clash.Clash.MainElement.Id),
+                                  _revitRepository.GetElement(clash.Clash.OtherElement.DocumentName, clash.Clash.OtherElement.Id)};
+            _revitRepository.SelectAndShowElement(elements.Where(item => item != null));
         }
 
         private bool CanSelectClash(object p) {

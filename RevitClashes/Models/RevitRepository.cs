@@ -22,6 +22,7 @@ using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.FilterableValueProviders;
 
 using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
+using RevitClashDetective.Models.Extensions;
 
 namespace RevitClashDetective.Models {
     internal class RevitRepository {
@@ -147,6 +148,16 @@ namespace RevitClashDetective.Models {
             return _document.GetElement(id);
         }
 
+        public Element GetElement(string documentName, int id) {
+            var doc = GetDocInfos().FirstOrDefault(item => item.Name.Equals(documentName, StringComparison.CurrentCultureIgnoreCase))?.Doc;
+            var elementId = new ElementId(id);
+            if(doc == null || elementId.IsNull()) {
+                return null;
+            }
+
+            return doc.GetElement(elementId);
+        }
+
         public Element GetElement(Document doc, ElementId id) {
             return doc.GetElement(id);
         }
@@ -265,14 +276,18 @@ namespace RevitClashDetective.Models {
                 .WherePasses(filter);
         }
 
-        public void SelectAndShowElement(IEnumerable<ElementId> ids, BoundingBoxXYZ bb) {
+        public void SelectAndShowElement(IEnumerable<Element> elements) {
             if(_document.ActiveView != _view) {
                 _uiDocument.ActiveView = _view;
             }
             _revitEventHandler.TransactAction = () => {
-                SetSectionBox(bb);
-                if(ids.Where(item => item != ElementId.InvalidElementId).Any()) {
-                    _uiDocument.Selection.SetElementIds(ids.Where(item => item != ElementId.InvalidElementId).ToArray());
+                var bb = GetCommonBoundingBox(elements);
+                if(bb != null) {
+                    SetSectionBox(bb);
+                }
+
+                if(elements.Where(item => item.IsFromDocument(_document)).Any()) {
+                    _uiDocument.Selection.SetElementIds(elements.Where(item => item.IsFromDocument(_document)).Select(item => item.Id).ToArray());
                 } else {
                     var border = _view.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_SectionBox)).FirstOrDefault();
                     if(border != null) {
@@ -283,6 +298,15 @@ namespace RevitClashDetective.Models {
 
             _revitEventHandler.Raise();
         }
+
+        private BoundingBoxXYZ GetCommonBoundingBox(IEnumerable<Element> elements) {
+            return elements.Select(item => new { Bb = item.get_BoundingBox(null), Transform = GetLinkedDocumentTransform(GetDocumentName(item.Document)) })
+                           .Where(item => item.Bb != null)
+                           .Select(item => item.Bb.GetTransformedBoundingBox(item.Transform))
+                           .GetCommonBoundingBox();
+        }
+
+
 
         public void DoAction(Action action) {
             _revitEventHandler.TransactAction = action;

@@ -46,13 +46,13 @@ namespace RevitClashDetective.ViewModels.Navigator {
             InitializeTimer();
 
             SelectionChangedCommand = new RelayCommand(SelectionChanged);
-            SelectClashCommand = new RelayCommand(SelectClash);
+            SelectClashCommand = new RelayCommand(SelectClash, CanSelectClash);
             SaveCommand = new RelayCommand(SaveConfig, CanSaveConfig);
 
             OpenClashDetectorCommand = new RelayCommand(OpenClashDetector, p => OpenFromClashDetector);
         }
-        
-        public ICommand SelectClashCommand { get;}
+
+        public ICommand SelectClashCommand { get; }
         public ICommand SaveCommand { get; }
         public ICommand SelectionChangedCommand { get; }
         public ICommand OpenClashDetectorCommand { get; }
@@ -107,7 +107,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 var config = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), SelectedFile);
                 _allClashes = config.Clashes.Select(item => new ClashViewModel(_revitRepository, item))
                                             .ToList();
-                   
+
                 Clashes = _allClashes.Where(item => IsValid(documentNames, item))
                                      .ToList();
             }
@@ -115,14 +115,22 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private bool IsValid(List<string> documentNames, ClashViewModel clash) {
             var clashDocuments = new[] { clash.FirstDocumentName, clash.SecondDocumentName };
-            return clashDocuments.All(item => documentNames.Any(d => d.Contains(item))) && clash.GetBoundingBox() != null;
+            var clashElements = new[] {_revitRepository.GetElement(clash.Clash.MainElement.DocumentName, clash.Clash.MainElement.Id),
+                                       _revitRepository.GetElement(clash.Clash.OtherElement.DocumentName, clash.Clash.OtherElement.Id)};
+
+            return clashDocuments.All(item => documentNames.Any(d => d.Contains(item))) && clashElements.Any(item => item != null);
         }
 
         private void SelectClash(object p) {
-            if(!(p is ClashViewModel clash))
-                return;
+            var clash = (ClashViewModel) p;
 
-            _revitRepository.SelectAndShowElement(clash.GetElementIds(_revitRepository.Doc.Title), clash.GetBoundingBox());
+            var elements = new[] {_revitRepository.GetElement(clash.Clash.MainElement.DocumentName, clash.Clash.MainElement.Id),
+                                  _revitRepository.GetElement(clash.Clash.OtherElement.DocumentName, clash.Clash.OtherElement.Id)};
+            _revitRepository.SelectAndShowElement(elements.Where(item => item != null));
+        }
+
+        private bool CanSelectClash(object p) {
+            return p != null && p is ClashViewModel;
         }
 
         private void SaveConfig(object p) {

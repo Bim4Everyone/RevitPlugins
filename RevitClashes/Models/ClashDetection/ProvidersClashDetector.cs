@@ -70,10 +70,10 @@ namespace RevitClashDetective.Models.ClashDetection {
 
                 // Solid-ы необходимо проверять на замкнутость геометрии до трансформации, так как у трансформированного solid-а 
                 // появляютя грани и ребра
-                var closedSolids = solids.Where(item => !item.IsNotClosed())
+                var closedSolids = solids.Where(item => item != null && !item.IsNotClosed())
                                          .Select(item => SolidUtils.CreateTransformed(item, resultTransform));
 
-                var openSolids = solids.Where(item => item.IsNotClosed())
+                var openSolids = solids.Where(item => item != null && item.IsNotClosed())
                                        .Select(item => SolidUtils.CreateTransformed(item, resultTransform));
 
                 foreach(var solid in openSolids) {
@@ -106,10 +106,10 @@ namespace RevitClashDetective.Models.ClashDetection {
 
         private bool HasSolidsIntersection(Element element, Solid solid) {
             foreach(var s in _firstProvider.GetSolids(element)) {
-                if(s.IsNotClosed()) {
+                if(s != null && s.IsNotClosed()) {
                     return new ElementIntersectsSolidFilter(solid).PassesFilter(element);
                 }
-                if(HasSolidIntersection(s, solid) || HasSolidIntersection(solid, s)) {
+                if(HasSolidIntersection(element, s, solid)) {
                     return true;
                 }
             }
@@ -117,12 +117,12 @@ namespace RevitClashDetective.Models.ClashDetection {
             return false;
         }
 
-        private bool HasSolidIntersection(Solid solid0, Solid solid1) {
+        private bool HasSolidIntersection(Element element, Solid solid0, Solid solid1) {
             try {
                 var intersection = BooleanOperationsUtils.ExecuteBooleanOperation(solid0, solid1, BooleanOperationsType.Intersect);
                 return intersection.Volume > 0;
             } catch {
-                return false;
+                return new ElementIntersectsSolidFilter(solid1).PassesFilter(element);
             }
         }
 

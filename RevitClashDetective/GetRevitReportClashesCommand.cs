@@ -1,10 +1,14 @@
 ﻿
+using System;
+using System.Linq;
+
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.Extensions;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
 
