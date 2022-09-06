@@ -26,7 +26,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         }
 
         private double GetSize() {
-            //получение размера, спроецированного на плоскость
+            //получение длины размера, спроецированного на плоскость
             var size = _sizeValueGetter.GetValue().TValue / 2;
             var directions = _directionsGetter.GetDirectionsOnPlane(_plane);
             return new SizeGetter(_clash, _plane).GetSizeFromProjection(directions, size);
