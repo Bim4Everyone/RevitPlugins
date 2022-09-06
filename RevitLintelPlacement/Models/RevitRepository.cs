@@ -296,8 +296,8 @@ namespace RevitLintelPlacement.Models {
             return DoesCornerNeeded(view3D, elementInWall, new XYZ(1, 0, 0), linkNames, elementInfos, out offset);
         }
 
-        private bool DoesCornerNeeded(View3D view3D, FamilyInstance elementInWall, XYZ direction, IEnumerable<string> linkNames, ElementInfosViewModel elementInfos, out double offset) {
-            offset = 0;
+        private bool DoesCornerNeeded(View3D view3D, FamilyInstance elementInWall, XYZ direction, IEnumerable<string> linkNames, ElementInfosViewModel elementInfos, out double realOffset) {
+            realOffset = 0;
             //получение предполагаемой точки вставки перемычки,
             //из которой проводится поиск жб-элементов
             XYZ viewPoint = GetLocationPoint(elementInWall);
@@ -325,23 +325,22 @@ namespace RevitLintelPlacement.Models {
                 return false;
             }
 
-            //если расстояне больше половины ширины проема + 100 мм - уголок не нужен
-            if(refWithContext.Proximity > ((double) elementWidth / 2 + 0.656)) {// 0.656 фута примерно = 200 мм
-                return false;
-            }
-
-            //получение смещения от края проема
-            offset = refWithContext.Proximity - (double) elementWidth / 2;
-
+#if REVIT_2020_OR_LESS
+            var offset = UnitUtils.ConvertToInternalUnits(200, DisplayUnitType.DUT_MILLIMETERS);
+#else
+            var offset = UnitUtils.ConvertToInternalUnits(200, UnitTypeId.Millimeters);
+#endif
             //получение ближайшего элемента и его проверка
             var wallOrColumn = _document.GetElement(refWithContext.GetReference().ElementId);
-            if(wallOrColumn is Wall wall)
-                return LintelsCommonConfig.ReinforcedConcreteFilter.Any(f => wall.Name.ToLower().Contains(f.ToLower()));
-            if(wallOrColumn.Category.Id == new ElementId(BuiltInCategory.OST_StructuralColumns) || wallOrColumn.Category.Id == new ElementId(BuiltInCategory.OST_StructuralFraming))
-                return true;
-            if(wallOrColumn is RevitLinkInstance linkedInstance) {
-                return linkNames.Any(l => l.Equals(linkedInstance.GetLinkDocument().Title, StringComparison.CurrentCultureIgnoreCase));
+
+            if((wallOrColumn is Wall wall && LintelsCommonConfig.ReinforcedConcreteFilter.Any(f => wall.Name.IndexOf(f, StringComparison.CurrentCultureIgnoreCase) > 0))
+            || (wallOrColumn.Category.Id == new ElementId(BuiltInCategory.OST_StructuralColumns) || wallOrColumn.Category.Id == new ElementId(BuiltInCategory.OST_StructuralFraming))
+            || (wallOrColumn is RevitLinkInstance linkedInstance && linkNames.Any(l => l.Equals(linkedInstance.GetLinkDocument().Title, StringComparison.CurrentCultureIgnoreCase)))){
+                //получение смещения от края проема
+                realOffset = refWithContext.Proximity - (double) elementWidth / 2;
+                return refWithContext.Proximity <= ((double) elementWidth / 2 + offset);
             }
+
             return false;
         }
 

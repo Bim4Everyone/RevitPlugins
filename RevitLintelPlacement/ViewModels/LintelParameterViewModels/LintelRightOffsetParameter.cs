@@ -25,17 +25,14 @@ namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels {
             get => _rightOffset;
             set => this.RaiseAndSetIfChanged(ref _rightOffset, value);
         }
+#if REVIT_2020_OR_LESS
+        public double RightOffsetInternal => UnitUtils.ConvertToInternalUnits(RightOffset, DisplayUnitType.DUT_MILLIMETERS);
+#else
+        public double RightOffsetInternal => UnitUtils.ConvertToInternalUnits(RightOffset, UnitTypeId.Millimeters);
+#endif
 
         public void SetTo(FamilyInstance lintel, FamilyInstance elementInWall) {
-#if D2020 || R2020
-            var value = UnitUtils.Convert(RightOffset, DisplayUnitType.DUT_MILLIMETERS, DisplayUnitType.DUT_DECIMAL_FEET);
-
-#elif D2021 || R2021
-            var value = UnitUtils.Convert(RightOffset, UnitTypeId.Millimeters, UnitTypeId.Feet);
-#else
-            var value = UnitUtils.Convert(RightOffset, UnitTypeId.Millimeters, UnitTypeId.Feet);
-#endif
-            lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightOffset, value);
+            lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightOffset, RightOffsetInternal);
         }
     }
 }
