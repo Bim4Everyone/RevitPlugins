@@ -39,12 +39,12 @@ namespace RevitLintelPlacement.ViewModels {
             LintelsViewSource = new CollectionViewSource { Source = LintelInfos };
             LintelsViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(LintelInfoViewModel.Level)));
             LintelsViewSource.Filter += ElementInWallKindFilter;
-            SelectAndShowElementCommand = new RelayCommand(async p => await SelectElement(p));
-            SelectNextCommand = new RelayCommand(async p => await SelectNext(p));
-            SelectPreviousCommand = new RelayCommand(async p => await SelectPrevious(p));
-            SelectionElementKindChangedCommand = new RelayCommand(SelectionElementKindChanged, p => true);
-            SampleModeChangedCommand = new RelayCommand(SampleModeChanged, p => true);
-            CloseCommand = new RelayCommand(Close, p => true);
+            SelectAndShowElementCommand = new RelayCommand(p => SelectElement(p));
+            SelectNextCommand = new RelayCommand(p => SelectNext(p));
+            SelectPreviousCommand = new RelayCommand(p => SelectPrevious(p));
+            SelectionElementKindChangedCommand = new RelayCommand(SelectionElementKindChanged);
+            SampleModeChangedCommand = new RelayCommand(SampleModeChanged);
+            CloseCommand = new RelayCommand(Close);
             CountLintelInView = LintelsViewSource.View.Cast<LintelInfoViewModel>().Count();
         }
 
@@ -87,7 +87,7 @@ namespace RevitLintelPlacement.ViewModels {
             }
         }
 
-        private async Task SelectElement(object p) {
+        private async void SelectElement(object p) {
             if(!(p is ElementId id) || p == null) {
                 return;
             }
@@ -98,26 +98,26 @@ namespace RevitLintelPlacement.ViewModels {
             await _revitRepository.SelectAndShowElement(id, _orientation);
         }
 
-        private async Task SelectNext(object p) {
+        private void SelectNext(object p) {
             LintelsViewSource.View.MoveCurrentToNext();
             if(LintelsViewSource.View.IsCurrentAfterLast) {
                 LintelsViewSource.View.MoveCurrentToPrevious();
             } else {
                 var lintelInfo = LintelsViewSource.View.CurrentItem;
                 if(lintelInfo is LintelInfoViewModel lintel) {
-                    await SelectElement(lintel.LintelId);
+                    SelectElement(lintel.LintelId);
                 }
             }
         }
 
-        private async Task SelectPrevious(object p) {
+        private void SelectPrevious(object p) {
             LintelsViewSource.View.MoveCurrentToPrevious();
             if(LintelsViewSource.View.IsCurrentBeforeFirst) {
                 LintelsViewSource.View.MoveCurrentToNext();
             } else {
                 var lintelInfo = LintelsViewSource.View.CurrentItem;
                 if(lintelInfo is LintelInfoViewModel lintel) {
-                    await SelectElement(lintel.LintelId);
+                    SelectElement(lintel.LintelId);
                 }
             }
         }

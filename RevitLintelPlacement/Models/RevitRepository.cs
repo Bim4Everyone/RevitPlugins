@@ -110,6 +110,7 @@ namespace RevitLintelPlacement.Models {
                 .OfClass(typeof(View3D))
                 .Cast<View3D>()
                 .FirstOrDefault(item => item.Name.Equals(_view3DName + "_" + _application.Username, StringComparison.CurrentCultureIgnoreCase));
+
             if(view == null) {
                 using(Transaction t = _document.StartTransaction("Создание 3D-вида")) {
                     var type = new FilteredElementCollector(_document)
@@ -131,11 +132,13 @@ namespace RevitLintelPlacement.Models {
                     }
 
                     var bimGroup = new FilteredElementCollector(_document)
-                        .OfClass(typeof(View3D))
-                        .Cast<View3D>()
-                        .Where(item => !item.IsTemplate)
+                        .OfClass(typeof(View))
+                        .Cast<View>()
+                        .Where(item => item.Category?.Id != new ElementId(BuiltInCategory.OST_Schedules)
+                                    && item.Category?.Id != new ElementId(BuiltInCategory.OST_Sheets))
                         .Select(item => item.GetParamValueOrDefault<string>(ProjectParamsConfig.Instance.ViewGroup))
-                        .FirstOrDefault(item => item != null && item.Contains("BIM"));
+                        .FirstOrDefault(item => !string.IsNullOrEmpty(item) && item.Contains("BIM"));
+
                     if(bimGroup != null) {
                         view.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, bimGroup);
                     }
@@ -374,7 +377,7 @@ namespace RevitLintelPlacement.Models {
 
             if((wallOrColumn is Wall wall && LintelsCommonConfig.ReinforcedConcreteFilter.Any(f => wall.Name.IndexOf(f, StringComparison.CurrentCultureIgnoreCase) > 0))
             || (wallOrColumn.Category.Id == new ElementId(BuiltInCategory.OST_StructuralColumns) || wallOrColumn.Category.Id == new ElementId(BuiltInCategory.OST_StructuralFraming))
-            || (wallOrColumn is RevitLinkInstance linkedInstance && linkNames.Any(l => l.Equals(linkedInstance.GetLinkDocument().Title, StringComparison.CurrentCultureIgnoreCase)))){
+            || (wallOrColumn is RevitLinkInstance linkedInstance && linkNames.Any(l => l.Equals(linkedInstance.GetLinkDocument().Title, StringComparison.CurrentCultureIgnoreCase)))) {
                 //получение смещения от края проема
                 realOffset = refWithContext.Proximity - (double) elementWidth / 2;
                 return refWithContext.Proximity <= ((double) elementWidth / 2 + offset);
@@ -402,14 +405,16 @@ namespace RevitLintelPlacement.Models {
         }
 
         public async Task SelectAndShowElement(ElementId id, ViewOrientation3D orientation) {
-            _revitEventHandler.TransactAction = () => {
-                _uiDocument.Selection.SetElementIds(new[] { id });
-                var commandId = RevitCommandId.LookupCommandId("ID_VIEW_APPLY_SELECTION_BOX");
-                if(!(commandId is null) && _uiDocument.Application.CanPostCommand(commandId)) {
-                    _uiApplication.PostCommand(commandId);
-                }
-            };
-            await _revitEventHandler.Raise();
+            for(int i=0; i < 2; i++) {
+                _revitEventHandler.TransactAction = () => {
+                    _uiDocument.Selection.SetElementIds(new[] { id });
+                    var commandId = RevitCommandId.LookupCommandId("ID_VIEW_APPLY_SELECTION_BOX");
+                    if(!(commandId is null) && _uiDocument.Application.CanPostCommand(commandId)) {
+                        _uiApplication.PostCommand(commandId);
+                    }
+                };
+                await _revitEventHandler.Raise();
+            }
         }
 
         public FamilyInstance GetDimensionFamilyInstance(FamilyInstance fi) {

@@ -25,8 +25,9 @@ namespace RevitLintelPlacement.Handlers {
         public void Execute(UIApplication app) {
             try {
                 this.TransactAction?.Invoke();
-            } catch(Exception ex) {
-                MessageBox.Show(ex.Message);
+            } finally {
+                IsCompleted = true;
+                _continuation?.Invoke();
             }
         }
 
