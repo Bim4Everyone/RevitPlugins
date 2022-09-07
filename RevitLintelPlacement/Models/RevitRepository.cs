@@ -12,6 +12,7 @@ using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
 
 using RevitLintelPlacement.Handlers;
@@ -42,7 +43,7 @@ namespace RevitLintelPlacement.Models {
             LintelsConfig = lintelsConfig;
             LintelsCommonConfig = LintelsCommonConfig.GetLintelsCommonConfig(GetDocumentName());
 
-            CreateView3DIfNotExisted();
+            GetView3D();
         }
 
         public LintelsConfig LintelsConfig { get; set; }
@@ -105,10 +106,44 @@ namespace RevitLintelPlacement.Models {
         }
 
         public View3D GetView3D() {
-            return new FilteredElementCollector(_document)
-              .OfClass(typeof(View3D))
-              .Cast<View3D>()
-              .First(v => !v.IsTemplate && v.Name == _view3DName);
+            var view = new FilteredElementCollector(_document)
+                .OfClass(typeof(View3D))
+                .Cast<View3D>()
+                .FirstOrDefault(item => item.Name.Equals(_view3DName + "_" + _application.Username, StringComparison.CurrentCultureIgnoreCase));
+            if(view == null) {
+                using(Transaction t = _document.StartTransaction("Создание 3D-вида")) {
+                    var type = new FilteredElementCollector(_document)
+                        .OfClass(typeof(ViewFamilyType))
+                        .Cast<ViewFamilyType>()
+                        .First(v => v.ViewFamily == ViewFamily.ThreeDimensional);
+                    type.DefaultTemplateId = ElementId.InvalidElementId;
+                    view = View3D.CreateIsometric(_document, type.Id);
+                    view.Name = _view3DName + "_" + _application.Username;
+                    var categories = new[] { new ElementId(BuiltInCategory.OST_Levels),
+                        new ElementId(BuiltInCategory.OST_WallRefPlanes),
+                        new ElementId(BuiltInCategory.OST_Grids),
+                        new ElementId(BuiltInCategory.OST_VolumeOfInterest) };
+
+                    foreach(var category in categories) {
+                        if(view.CanCategoryBeHidden(category)) {
+                            view.SetCategoryHidden(category, true);
+                        }
+                    }
+
+                    var bimGroup = new FilteredElementCollector(_document)
+                        .OfClass(typeof(View3D))
+                        .Cast<View3D>()
+                        .Where(item => !item.IsTemplate)
+                        .Select(item => item.GetParamValueOrDefault<string>(ProjectParamsConfig.Instance.ViewGroup))
+                        .FirstOrDefault(item => item != null && item.Contains("BIM"));
+                    if(bimGroup != null) {
+                        view.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, bimGroup);
+                    }
+
+                    t.Commit();
+                }
+            }
+            return view;
         }
 
         public IEnumerable<WallType> GetWallTypes() {
@@ -296,6 +331,10 @@ namespace RevitLintelPlacement.Models {
             return DoesCornerNeeded(view3D, elementInWall, new XYZ(1, 0, 0), linkNames, elementInfos, out offset);
         }
 
+        public void ActivateView() {
+            _uiDocument.ActiveView = GetView3D();
+        }
+
         private bool DoesCornerNeeded(View3D view3D, FamilyInstance elementInWall, XYZ direction, IEnumerable<string> linkNames, ElementInfosViewModel elementInfos, out double realOffset) {
             realOffset = 0;
             //получение предполагаемой точки вставки перемычки,
@@ -390,28 +429,6 @@ namespace RevitLintelPlacement.Models {
                 }
             }
             return null;
-        }
-
-        public void CreateView3DIfNotExisted() {
-            var view3D = new FilteredElementCollector(_document)
-              .OfClass(typeof(View3D))
-              .Cast<View3D>()
-              .FirstOrDefault(v => !v.IsTemplate && v.Name == _view3DName);
-            if(view3D != null) {
-                //_uiDocument.ActiveView = view3D;
-                return;
-            }
-            using(Transaction t = new Transaction(_document)) {
-                t.BIMStart("Создание 3D-вида");
-                var type = new FilteredElementCollector(_document)
-                    .OfClass(typeof(ViewFamilyType))
-                    .Cast<ViewFamilyType>()
-                    .First(v => v.ViewFamily == ViewFamily.ThreeDimensional);
-                view3D = View3D.CreateIsometric(_document, type.Id);
-                view3D.Name = _view3DName;
-                t.Commit();
-            }
-            _uiDocument.ActiveView = view3D;
         }
 
         public async Task MirrorLintel(FamilyInstance lintel, FamilyInstance elementInWall) {

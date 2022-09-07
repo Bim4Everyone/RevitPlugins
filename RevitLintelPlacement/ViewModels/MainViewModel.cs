@@ -105,6 +105,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         public void PlaceLintels(object p) {
+            
             ElementInfos.ElementInfos.Clear();
             if(!_revitRepository.CheckConfigParameters(ElementInfos)) {
                 ShowReport();
@@ -137,6 +138,7 @@ namespace RevitLintelPlacement.ViewModels {
                 }
                 t.Commit();
             }
+            _revitRepository.ActivateView();
             var links = SelectedLinks.Select(l => l.Name).ToList();
             LintelChecker lc = new LintelChecker(_revitRepository, GroupedRules, links, ElementInfos);
             using(Transaction t = _revitRepository.StartTransaction("Проверка расставленных перемычек")) {
