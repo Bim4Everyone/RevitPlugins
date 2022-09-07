@@ -143,7 +143,7 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
         }
 
         private void ShowClashes(object p) {
-            var view = new NavigatorView() { DataContext = new ClashesViewModel(_revitRepository, ReportName) { OpenFromClashDetector = true } };
+            var view = new NavigatorView() { DataContext = new ReportsViewModel(_revitRepository, ReportName) { OpenFromClashDetector = true } };
             view.Show();
         }
 

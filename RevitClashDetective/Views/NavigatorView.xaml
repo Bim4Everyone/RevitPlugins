@@ -16,7 +16,7 @@
     
     mc:Ignorable="d"
     Title="Навигатор" Height="450" Width="800"
-    d:DataContext="{d:DesignInstance vm:ClashesViewModel, IsDesignTimeCreatable=False}">
+    d:DataContext="{d:DesignInstance vm:ReportsViewModel, IsDesignTimeCreatable=False}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
             <i:InvokeCommandAction Command="{Binding OpenClashDetectorCommand}" />
@@ -34,35 +34,40 @@
         </Grid.RowDefinitions>
 
         <DockPanel LastChildFill="True">
-            <DockPanel.Style>
+            <!--<DockPanel.Style>
                 <Style TargetType="DockPanel">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding FileNames}" Value="{x:Null}">
+                        <DataTrigger Binding="{Binding Reports}" Value="{x:Null}">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
-            </DockPanel.Style>
-            <dx:SimpleButton DockPanel.Dock="Left" ToolTip="Синхронизировать плагин с документом"
+            </DockPanel.Style>-->
+            <!--<dx:SimpleButton DockPanel.Dock="Left" ToolTip="Синхронизировать плагин с документом"
                              Command="{Binding SelectionChangedCommand}"
-                             Glyph="{dx:DXImage 'Office2013/Actions/Refresh_32x32.png'}" />
-            <dxe:ComboBoxEdit IsTextEditable="False" ItemsSource="{Binding FileNames}"
-                              SelectedItem="{Binding SelectedFile}">
-                <mvvm:Interaction.Behaviors>
+                             Glyph="{dx:DXImage 'Office2013/Actions/Refresh_32x32.png'}" />-->
+            <dx:SimpleButton DockPanel.Dock="Left" ToolTip="Загрузить отчет"
+                             Command="{Binding LoadCommand}"
+                             Glyph="{dx:DXImage 'Office2013/Actions/Download_32x32.png'}" />
+            <dxe:ComboBoxEdit IsTextEditable="False" ItemsSource="{Binding Reports}"
+                              DisplayMember="Name"
+                              SelectedItem="{Binding SelectedReport}">
+                <!--<mvvm:Interaction.Behaviors>
                     <mvvm:EventToCommand EventName="EditValueChanged" Command="{Binding SelectionChangedCommand}" />
-                </mvvm:Interaction.Behaviors>
+                </mvvm:Interaction.Behaviors>-->
             </dxe:ComboBoxEdit>
         </DockPanel>
 
         <dxg:GridControl Name="_dg"
                          Grid.Row="1"
                          AllowCollectionView="False"
-                         ItemsSource="{Binding Clashes}">
+                         ItemsSource="{Binding SelectedReport.Clashes}">
             <dxg:GridControl.GroupSummary>
                 <dxg:GridSummaryItem SummaryType="Count" />
             </dxg:GridControl.GroupSummary>
             <mvvm:Interaction.Behaviors>
-                <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectClashCommand}" CommandParameter="{Binding ElementName=_dg, Path=CurrentItem}" />
+                <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectedReport.SelectClashCommand}" 
+                                     CommandParameter="{Binding ElementName=_dg, Path=CurrentItem}" />
             </mvvm:Interaction.Behaviors>
             <dxg:GridControl.View>
                 <dxg:TableView Name="_gridView" 
@@ -77,7 +82,7 @@
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
                             <dx:SimpleButton Content="Выбрать"
-                                             Command="{Binding ElementName=_dg, Path=DataContext.SelectClashCommand}"
+                                             Command="{Binding ElementName=_dg, Path=DataContext.SelectedReport.SelectClashCommand}"
                                              CommandParameter="{Binding Row}" />
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>

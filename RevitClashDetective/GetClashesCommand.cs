@@ -23,7 +23,7 @@ namespace RevitClashDetective {
 
         protected override void Execute(UIApplication uiApplication) {
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            var mainViewModlel = new ClashesViewModel(revitRepository);
+            var mainViewModlel = new ReportsViewModel(revitRepository);
             var window = new NavigatorView() { DataContext = mainViewModlel };
             window.Show();
         }
