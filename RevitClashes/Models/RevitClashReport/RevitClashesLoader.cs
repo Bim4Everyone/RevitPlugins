@@ -34,7 +34,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
             }
 
             if(!IsCorrectFileName(FilePath)) {
-                throw new ArgumentException($"Неверный файл отчета.", nameof(FilePath));
+                throw new ArgumentException($"Данный отчет о коллизиях создан в другом файле.");
             }
 
             _revitRepository.InitializeDocInfos();

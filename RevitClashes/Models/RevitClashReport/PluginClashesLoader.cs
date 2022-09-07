@@ -22,8 +22,13 @@ namespace RevitClashDetective.Models.RevitClashReport {
         public string FilePath { get; }
 
         public IEnumerable<ClashModel> GetClashes() {
-            var configLoader = new ConfigLoader();
-            return configLoader.Load<ClashesConfig>(FilePath).Clashes;
+            try {
+                var configLoader = new ConfigLoader();
+                return configLoader.Load<ClashesConfig>(FilePath).Clashes;
+            } catch(pyRevitLabs.Json.JsonSerializationException) {
+                throw new ArgumentException("Неверный файл конфигурации.");
+            }
+
         }
 
         public bool IsValid() {
