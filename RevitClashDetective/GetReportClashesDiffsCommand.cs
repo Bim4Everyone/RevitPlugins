@@ -21,11 +21,14 @@ namespace RevitClashDetective {
 
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
 
-            var checkName = @"";
-            var pluginClashes = ClashesConfig.GetClashesConfig(revitRepository.GetObjectName(), checkName).Clashes;
+            var pluginClashPath = @"";
+            var pluginClashes = ReportLoader.GetClashes(revitRepository, pluginClashPath);
 
             var revitFilePath = @"";
-            var revitClashes = new ReportLoader(revitRepository, revitFilePath).GetClashes();
+            var revitClashes = ReportLoader.GetClashes(revitRepository, revitFilePath);
+
+            var navisFilePath = @"";
+            var navisClashes = ReportLoader.GetClashes(revitRepository, navisFilePath);
 
             var mainViewModlel = new ClashReportDiffViewModel(revitRepository, revitClashes, pluginClashes);
            

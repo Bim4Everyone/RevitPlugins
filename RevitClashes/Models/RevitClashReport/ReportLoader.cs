@@ -14,83 +14,15 @@ using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.RevitClashReport {
-    internal class ReportLoader : IClashesLoader {
-        private readonly RevitRepository _revitRepository;
+    internal class ReportLoader {
+        public static IEnumerable<ClashModel> GetClashes(RevitRepository revitRepository, string path) {
+            var loaders = new List<IClashesLoader>() {
+                new RevitClashesLoader(revitRepository, path),
+                new PluginClashesLoader(path),
+                new NavisHtmlClashesLoader(revitRepository, path)
+            };
 
-        public string FilePath { get; }
-
-        public ReportLoader(RevitRepository revitRepository, string path) {
-            _revitRepository = revitRepository;
-            FilePath = path;
-        }
-
-        public IEnumerable<ClashModel> GetClashes() {
-            if(string.IsNullOrEmpty(FilePath)) {
-                throw new ArgumentException($"'{nameof(FilePath)}' cannot be null or empty.", nameof(FilePath));
-            }
-
-            if(!File.Exists(FilePath)) {
-                throw new ArgumentException($"Путь \"{FilePath}\" недоступен.", nameof(FilePath));
-            }
-
-            if(!IsCorrectFileName(FilePath)) {
-                throw new ArgumentException($"Неверный файл отчета.", nameof(FilePath));
-            }
-
-            _revitRepository.InitializeDocInfos();
-
-            return File.ReadAllLines(FilePath).Skip(3)
-                                          .Select(item => Regex.Matches(item, @"<td>(?'value'.+?)</td>")
-                                                                           .Cast<Match>()
-                                                                           .Select(i => i.Groups["value"].Value.Split(':'))
-                                                                           .Skip(1))
-                                          .Where(item => item.Any())
-                                          .Select(item => new {
-                                              LeftElement = GetElement(item.FirstOrDefault()),
-                                              RightElement = GetElement(item.LastOrDefault())
-                                          })
-                                          .Where(item => item.LeftElement != null && item.RightElement != null)
-                                          .Select(item => new ClashModel(_revitRepository, item.LeftElement, item.RightElement))
-                                          .ToArray();
-        }
-
-        public bool IsValid() {
-            return FilePath.EndsWith(".html")
-                   && File.ReadAllLines(FilePath).Skip(2)
-                                                .FirstOrDefault()
-                                                ?.Equals("<p><table border=on>  <tr>  <td></td>  <td ALIGN=\"center\">A</td>  " +
-                                                "<td ALIGN=\"center\">B</td>  </tr>", StringComparison.CurrentCultureIgnoreCase) != null;
-        }
-
-        private bool IsCorrectFileName(string path) {
-            var fileString = File.ReadAllLines(path).Skip(1).FirstOrDefault();
-            if(string.IsNullOrEmpty(fileString)) {
-                return false;
-            }
-            var match = Regex.Match(fileString, @"</b>(?'fileName'.+?)<br>");
-            if(!match.Success) {
-                return false;
-            }
-
-            var fileName = Path.GetFileNameWithoutExtension(match.Groups["fileName"].Value.Trim());
-            return _revitRepository.GetDocumentName().Equals(_revitRepository.GetDocumentName(fileName), StringComparison.CurrentCultureIgnoreCase);
-        }
-
-        private Element GetElement(IEnumerable<string> elementString) {
-            return _revitRepository.GetElement(GetFile(elementString.FirstOrDefault().Trim()), GetId(elementString.LastOrDefault()));
-        }
-
-        private int GetId(string idString) {
-            var match = Regex.Match(idString, @"(?'id'\d+)");
-            if(match.Success) {
-                return int.Parse(match.Groups["id"].Value);
-            }
-
-            return -1;
-        }
-
-        private string GetFile(string fileString) {
-            return fileString.EndsWith(".rvt", StringComparison.CurrentCultureIgnoreCase) ? fileString : null;
+            return loaders.FirstOrDefault(item => item.IsValid())?.GetClashes();
         }
     }
 }

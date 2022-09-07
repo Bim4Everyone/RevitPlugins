@@ -162,6 +162,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RevitClashReport", "RevitClashReport", "{C9F52F92-6BD2-4A45-8297-8775E5FE371A}"
 	ProjectSection(SolutionItems) = preProject
 		RevitClashes\Models\RevitClashReport\ReportLoader.cs = RevitClashes\Models\RevitClashReport\ReportLoader.cs
+		RevitClashes\Models\RevitClashReport\RevitClashesLoader.cs = RevitClashes\Models\RevitClashReport\RevitClashesLoader.cs
+		RevitClashes\Models\RevitClashReport\PluginClashesLoader.cs = RevitClashes\Models\RevitClashReport\PluginClashesLoader.cs
+		RevitClashes\Models\RevitClashReport\NavisHtmlClashesLoader.cs = RevitClashes\Models\RevitClashReport\NavisHtmlClashesLoader.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{53A474C0-AD86-4DA3-B140-86344DF32811}"
