@@ -38,7 +38,35 @@ namespace RevitClashDetective.Models.Extensions {
             };
         }
 
+        public static bool IntersectedWith(this BoundingBoxXYZ currentBb, BoundingBoxXYZ bb) {
+            return !((currentBb.Min.X > bb.Max.X && currentBb.Min.Y > bb.Max.Y) 
+                    || (currentBb.Min.Z > bb.Max.Z && currentBb.Min.X > bb.Max.X)
+                    || (currentBb.Min.Z > bb.Max.Z && currentBb.Min.Y > bb.Max.Y)
+                    || (currentBb.Max.X < bb.Min.X && currentBb.Max.Y < bb.Min.Y) 
+                    || (currentBb.Max.Z < bb.Min.Z && currentBb.Max.X < bb.Min.X)
+                    || (currentBb.Max.Z < bb.Min.Z && currentBb.Max.Y < bb.Min.Y));
+        }
+
+        public static bool IsIntersected(this IEnumerable<BoundingBoxXYZ> bbs) {
+            var boundings = bbs.ToArray();
+            var currentBb = boundings[0];
+            for(int i = 1; i < boundings.Length; i++) {
+                if(!currentBb.IntersectedWith(boundings[i])) {
+                    return false;
+                }
+                currentBb = currentBb.GetIntersection(boundings[i]);
+            }
+            return true;
+        }
+
         public static BoundingBoxXYZ GetCommonBoundingBox(this IEnumerable<BoundingBoxXYZ> bbs) {
+            if(bbs.IsIntersected()) {
+                return bbs.GetIntersectedBb();
+            }
+            return bbs.GetUnitedBb();
+        }
+
+        private static BoundingBoxXYZ GetIntersectedBb(this IEnumerable<BoundingBoxXYZ> bbs) {
             if(bbs.Any()) {
                 return new BoundingBoxXYZ() {
                     Min = new XYZ(bbs.Max(item => item.Min.X), bbs.Max(item => item.Min.Y), bbs.Max(item => item.Min.Z)),
@@ -47,5 +75,16 @@ namespace RevitClashDetective.Models.Extensions {
             }
             return null;
         }
+
+        private static BoundingBoxXYZ GetUnitedBb(this IEnumerable<BoundingBoxXYZ> bbs) {
+            if(bbs.Any()) {
+                return new BoundingBoxXYZ() {
+                    Min = new XYZ(bbs.Min(item => item.Min.X), bbs.Min(item => item.Min.Y), bbs.Min(item => item.Min.Z)),
+                    Max = new XYZ(bbs.Max(item => item.Max.X), bbs.Max(item => item.Max.Y), bbs.Max(item => item.Max.Z)),
+                };
+            }
+            return null;
+        }
+
     }
 }
