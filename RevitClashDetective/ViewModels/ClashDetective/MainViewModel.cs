@@ -141,7 +141,7 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
 
         private void SaveAsConfig(object p) {
             RenewConfig();
-            ConfigSaverService s = new ConfigSaverService();
+            ConfigSaverService s = new ConfigSaverService(_revitRepository);
             s.Save(_checksConfig);
             MessageText = "Файл проверок успешно сохранен";
             Wait(() => { MessageText = null; });
@@ -149,7 +149,7 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
         }
 
         private void LoadConfig(object p) {
-            var cl = new ConfigLoaderService();
+            var cl = new ConfigLoaderService(_revitRepository);
             var config = cl.Load<ChecksConfig>();
             cl.CheckConfig(config);
 

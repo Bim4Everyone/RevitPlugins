@@ -48,6 +48,8 @@ namespace RevitClashDetective.Models {
 
             _view = GetClashView();
 
+            CommonConfig = RevitClashDetectiveConfig.GetRevitClashDetectiveConfig();
+
             InitializeDocInfos();
         }
 
@@ -78,6 +80,8 @@ namespace RevitClashDetective.Models {
             BuiltInParameter.ROOF_BASE_LEVEL_PARAM,
             BuiltInParameter.ROOF_CONSTRAINT_LEVEL_PARAM,
             BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM };
+
+        public RevitClashDetectiveConfig CommonConfig { get; set; }
 
         public Document Doc => _document;
 
@@ -130,14 +134,23 @@ namespace RevitClashDetective.Models {
             return GetDocumentName(_document);
         }
 
+        public string GetFileDialogPath() {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            if(!string.IsNullOrEmpty(CommonConfig.LastRunPath) && Directory.Exists(CommonConfig.LastRunPath)) {
+                path = CommonConfig.LastRunPath;
+            }
+            return path;
+        }
+
         public string GetDocumentName(Document doc) {
             var title = doc.Title;
             return GetDocumentName(title);
         }
 
         public string GetDocumentName(string fileName) {
+            fileName = Path.GetFileNameWithoutExtension(fileName);
             foreach(var ending in _endings) {
-                if(Path.GetFileNameWithoutExtension(fileName).IndexOf(ending) > -1) {
+                if(fileName.IndexOf(ending) > -1) {
                     fileName = fileName.Substring(0, fileName.IndexOf(ending));
                 }
             }

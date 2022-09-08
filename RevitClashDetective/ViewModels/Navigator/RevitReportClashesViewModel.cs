@@ -45,11 +45,14 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private void LoadReport(object p) {
             var openWindow = GetPlatformService<IOpenFileDialogService>();
             openWindow.Filter = "ClashReport |*.html";
-            if(!openWindow.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop))) {
+
+            if(!openWindow.ShowDialog(_revitRepository.GetFileDialogPath())) {
                 throw new OperationCanceledException();
             }
 
             InitializeClashes(openWindow.File.FullName);
+            _revitRepository.CommonConfig.LastRunPath = openWindow.File.DirectoryName;
+            _revitRepository.CommonConfig.SaveProjectConfig();
         }
 
         private void InitializeClashes(string path) {

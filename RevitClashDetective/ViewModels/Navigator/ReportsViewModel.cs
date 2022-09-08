@@ -98,17 +98,20 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private void Load(object p) {
             var openWindow = GetPlatformService<IOpenFileDialogService>();
             openWindow.Filter = "AutodeskClashReport (*.html)|*.html|PluginClashReport (*.json)|*.json";
-            if(!openWindow.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop))) {
+
+            if(!openWindow.ShowDialog(_revitRepository.GetFileDialogPath())) {
                 throw new OperationCanceledException();
             }
 
             InitializeClashes(openWindow.File.FullName);
+            _revitRepository.CommonConfig.LastRunPath = openWindow.File.DirectoryName;
+            _revitRepository.CommonConfig.SaveProjectConfig();
         }
 
         private void InitializeClashes(string path) {
             var name = Path.GetFileNameWithoutExtension(path);
             var clashes = ReportLoader.GetClashes(_revitRepository, path)
-                                      .ToList();
+                                      ?.ToList();
             var report = new ReportViewModel(_revitRepository, name, clashes);
 
             Reports = new ObservableCollection<ReportViewModel>(new NameResolver<ReportViewModel>(Reports, new[] { report }).GetCollection());

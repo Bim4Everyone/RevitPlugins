@@ -37,8 +37,6 @@ namespace RevitClashDetective.Models.RevitClashReport {
                 throw new ArgumentException($"Данный отчет о коллизиях создан в другом файле.");
             }
 
-            _revitRepository.InitializeDocInfos();
-
             return File.ReadAllLines(FilePath).Skip(3)
                                           .Select(item => Regex.Matches(item, @"<td>(?'value'.+?)</td>")
                                                                            .Cast<Match>()

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
 
+using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -87,7 +88,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private void SaveAs(object p) {
             var config = GetUpdatedConfig();
-            var saver = new ConfigSaverService();
+            var saver = new ConfigSaverService(_revitRepository);
             saver.Save(config);
             Message = "Файл успешно сохранен";
             RefreshMessage();
@@ -96,11 +97,11 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private void InitializeClashesFromPluginFile() {
             if(Name != null) {
                 var config = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), Name);
-                InitializeClashes(config.Clashes);
+                InitializeClashes(config.Clashes.Select(item => item.SetRevitRepository(_revitRepository)));
             }
         }
 
-        private void InitializeClashes(ICollection<ClashModel> clashModels) {
+        private void InitializeClashes(IEnumerable<ClashModel> clashModels) {
             _allClashes = clashModels.Select(item => new ClashViewModel(_revitRepository, item))
                                      .ToList();
             var documentNames = _revitRepository.GetDocuments().Select(item => item.Title).ToList();
@@ -109,11 +110,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
         }
 
         private bool IsValid(List<string> documentNames, ClashViewModel clash) {
-            var clashDocuments = new[] { clash.FirstDocumentName, clash.SecondDocumentName };
-            var clashElements = new[] {_revitRepository.GetElement(clash.Clash.MainElement.DocumentName, clash.Clash.MainElement.Id),
-                                       _revitRepository.GetElement(clash.Clash.OtherElement.DocumentName, clash.Clash.OtherElement.Id)};
-
-            return clashDocuments.All(item => documentNames.Any(d => d.Contains(item))) && clashElements.Any(item => item != null);
+            return clash.Clash.IsValid(documentNames);
         }
 
         private void SelectClash(object p) {

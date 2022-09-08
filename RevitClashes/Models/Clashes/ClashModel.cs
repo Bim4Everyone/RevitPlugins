@@ -10,6 +10,8 @@ using Autodesk.Revit.DB;
 
 using DevExpress.Mvvm.DataAnnotations;
 
+using dosymep.Revit;
+
 using pyRevitLabs.Json;
 
 using RevitClashDetective.Models.Extensions;
@@ -31,8 +33,18 @@ namespace RevitClashDetective.Models.Clashes {
         public ElementModel OtherElement { get; set; }
 
 
-        public void SetRevitRepository(RevitRepository revitRepository) {
+        public ClashModel SetRevitRepository(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
+            return this;
+        }
+
+        public bool IsValid(ICollection<string> documentNames) {
+            var clashDocuments = new[] { MainElement.DocumentName, OtherElement.DocumentName };
+            var clashElements = new[] {_revitRepository.GetElement(MainElement.DocumentName, MainElement.Id),
+                                       _revitRepository.GetElement(OtherElement.DocumentName, OtherElement.Id)};
+
+            return clashDocuments.All(item => documentNames.Any(d => d.Contains(item))) && clashElements.Any(item => item != null)
+                   && clashElements.All(item => item.GetTypeId().IsNotNull());
         }
 
         public override bool Equals(object obj) {

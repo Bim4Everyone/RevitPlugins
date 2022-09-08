@@ -156,7 +156,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             filtersConfig.Filters = GetFilters().ToList();
             filtersConfig.RevitVersion = ModuleEnvironment.RevitVersion;
 
-            ConfigSaverService cs = new ConfigSaverService();
+            ConfigSaverService cs = new ConfigSaverService(_revitRepository);
             cs.Save(filtersConfig);
             MessageText = "Поисковые наборы успешно сохранены";
             RefreshMessage();
@@ -182,7 +182,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void Load(object p) {
-            var cl = new ConfigLoaderService();
+            var cl = new ConfigLoaderService(_revitRepository);
             var config = cl.Load<FiltersConfig>();
             cl.CheckConfig(config);
 
