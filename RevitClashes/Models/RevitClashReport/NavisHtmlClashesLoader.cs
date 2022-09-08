@@ -39,16 +39,19 @@ namespace RevitClashDetective.Models.RevitClashReport {
                 return null;
             }
 
-            return Regex.Matches(htmlText.Substring(index), @"<tr class=""contentRow"">(?'row'.+?)<\/tr>")
+            var rows = Regex.Matches(htmlText.Substring(index), @"<tr class=""contentRow"">(?'row'.+?)<\/tr>")
                             .Cast<Match>()
-                            .Select(GetCells)
-                            .Select(item => new {
+                            .Select(GetCells);
+            if(!IsCorrectFileName(rows.FirstOrDefault())) {
+                throw new ArgumentException($"Данный отчет о коллизиях создан в другом файле.");
+            }
+            return rows.Select(item => new {
                                 LeftElement = GetElement(item),
                                 RightElement = GetElement(item.Reverse())
                             })
-                            .Where(item => item.LeftElement != null && item.RightElement != null)
-                            .Select(item => new ClashModel(_revitRepository, item.LeftElement, item.RightElement))
-                            .ToArray();
+                        .Where(item => item.LeftElement != null && item.RightElement != null)
+                        .Select(item => new ClashModel(_revitRepository, item.LeftElement, item.RightElement))
+                        .ToArray();
         }
 
         private Element GetElement(IEnumerable<string> cells) {
@@ -83,6 +86,9 @@ namespace RevitClashDetective.Models.RevitClashReport {
 
         private string GetFileName(IEnumerable<string> cells) {
             var fileCell = cells.FirstOrDefault(item => _extensions.Any(e => item.IndexOf(e, StringComparison.CurrentCultureIgnoreCase) > 0));
+            if(fileCell == null) {
+                return null;
+            }
             var fileCellInfo = new {
                 Extension = _extensions.FirstOrDefault(e => fileCell.IndexOf(e, StringComparison.CurrentCultureIgnoreCase) > 0),
                 CellContent = fileCell
@@ -99,6 +105,16 @@ namespace RevitClashDetective.Models.RevitClashReport {
             return text.Contains("table.titleTable")
                 && text.Contains("table.testSummaryTable")
                 && text.Contains("table.mainTable");
+        }
+
+        private bool IsCorrectFileName(ICollection<string> cells) {
+             if(cells == null) {
+                return false;
+            }
+            return new[] { 
+                GetFileName(cells), 
+                GetFileName(cells.Reverse()) 
+            }.Any(item => _revitRepository.DocInfos.Any(d => d.Name.Equals(_revitRepository.GetDocumentName(item), StringComparison.CurrentCultureIgnoreCase)));
         }
     }
 }
