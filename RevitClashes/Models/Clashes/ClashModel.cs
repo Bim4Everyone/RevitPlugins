@@ -10,6 +10,8 @@ using Autodesk.Revit.DB;
 
 using DevExpress.Mvvm.DataAnnotations;
 
+using dosymep.Revit;
+
 using pyRevitLabs.Json;
 
 using RevitClashDetective.Models.Extensions;
@@ -30,36 +32,19 @@ namespace RevitClashDetective.Models.Clashes {
         public ElementModel MainElement { get; set; }
         public ElementModel OtherElement { get; set; }
 
-        public BoundingBoxXYZ GetClashBoundingBox() {
-            var docInfos = _revitRepository.GetDocInfos();
-            var mainDoc = docInfos.FirstOrDefault(item => item.Name.Equals(MainElement.DocumentName));
-            var otherDoc = docInfos.FirstOrDefault(item => item.Name.Equals(OtherElement.DocumentName));
 
-            BoundingBoxXYZ bb1 = null;
-            BoundingBoxXYZ bb2 = null;
-
-            if(mainDoc != null
-                && otherDoc != null
-                && _revitRepository.IsValidElement(mainDoc.Doc, new ElementId(MainElement.Id))
-                && _revitRepository.IsValidElement(otherDoc.Doc, new ElementId(OtherElement.Id))) {
-                bb1 = SolidUtils.CreateTransformed(mainDoc.Doc.GetElement(new ElementId(MainElement.Id)).GetSolid(), mainDoc.Transform).GetBoundingBox().GetTransformedBoundingBox();
-                bb2 = SolidUtils.CreateTransformed(otherDoc.Doc.GetElement(new ElementId(OtherElement.Id)).GetSolid(), otherDoc.Transform).GetBoundingBox().GetTransformedBoundingBox();
-                if(bb1 == null && bb2 == null) {
-                    return null;
-                }
-                if(bb1 == null) {
-                    return bb2;
-                }
-                if(bb2 == null) {
-                    return bb1;
-                }
-                return bb1.GetIntersection(bb2);
-            }
-            return null;
+        public ClashModel SetRevitRepository(RevitRepository revitRepository) {
+            _revitRepository = revitRepository;
+            return this;
         }
 
-        public void SetRevitRepository(RevitRepository revitRepository) {
-            _revitRepository = revitRepository;
+        public bool IsValid(ICollection<string> documentNames) {
+            var clashDocuments = new[] { MainElement.DocumentName, OtherElement.DocumentName };
+            var clashElements = new[] {_revitRepository.GetElement(MainElement.DocumentName, MainElement.Id),
+                                       _revitRepository.GetElement(OtherElement.DocumentName, OtherElement.Id)};
+
+            return clashDocuments.All(item => documentNames.Any(d => d.Contains(item))) && clashElements.Any(item => item != null)
+                   && clashElements.All(item => item.GetTypeId().IsNotNull());
         }
 
         public override bool Equals(object obj) {
@@ -68,20 +53,22 @@ namespace RevitClashDetective.Models.Clashes {
 
         public override int GetHashCode() {
             int hashCode = 2096115351;
-            hashCode = hashCode * -1521134295 + EqualityComparer<ElementModel>.Default.GetHashCode(MainElement);
-            hashCode = hashCode * -1521134295 + EqualityComparer<ElementModel>.Default.GetHashCode(OtherElement);
+            hashCode *= EqualityComparer<ElementModel>.Default.GetHashCode(MainElement);
+            hashCode *= EqualityComparer<ElementModel>.Default.GetHashCode(OtherElement);
             return hashCode;
         }
 
         public bool Equals(ClashModel other) {
             return other != null
-                && EqualityComparer<ElementModel>.Default.Equals(MainElement, other.MainElement)
-                && EqualityComparer<ElementModel>.Default.Equals(OtherElement, other.OtherElement);
+                && ((EqualityComparer<ElementModel>.Default.Equals(MainElement, other.MainElement)
+                && EqualityComparer<ElementModel>.Default.Equals(OtherElement, other.OtherElement))
+                || (EqualityComparer<ElementModel>.Default.Equals(MainElement, other.OtherElement)
+                && EqualityComparer<ElementModel>.Default.Equals(OtherElement, other.MainElement)));
         }
     }
 
     internal enum ClashStatus {
-        [Display(Name="Активно"), Image("pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_High.png")]
+        [Display(Name = "Активно"), Image("pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_High.png")]
         Active,
         [Display(Name = "Проанализировано"), Image("pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Low.png")]
         Analized,

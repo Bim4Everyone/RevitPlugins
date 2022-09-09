@@ -26,5 +26,9 @@ namespace RevitClashDetective.Models.Extensions {
             var max = new XYZ(points.Max(p => p.X), points.Max(p => p.Y), tMax.Z);
             return new Outline(min, max);
         }
+
+        public static bool IsNotClosed(this Solid solid) {
+            return solid.Faces.IsEmpty || solid.Edges.IsEmpty;
+        }
     }
 }

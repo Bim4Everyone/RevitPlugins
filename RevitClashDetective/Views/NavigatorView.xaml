@@ -13,9 +13,10 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:converters="clr-namespace:dosymep.WPF.Converters"
+    
     mc:Ignorable="d"
     Title="Навигатор" Height="450" Width="800"
-    d:DataContext="{d:DesignInstance vm:ClashesViewModel, IsDesignTimeCreatable=False}">
+    d:DataContext="{d:DesignInstance vm:ReportsViewModel, IsDesignTimeCreatable=False}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
             <i:InvokeCommandAction Command="{Binding OpenClashDetectorCommand}" />
@@ -25,6 +26,7 @@
         <converters:IndexConverter x:Key="IndexConverter" />
     </base:ThemedPlatformWindow.Resources>
     <Grid Margin="10">
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -33,50 +35,70 @@
         </Grid.RowDefinitions>
 
         <DockPanel LastChildFill="True">
-            <DockPanel.Style>
-                <Style TargetType="DockPanel">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding FileNames}" Value="{x:Null}">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </DockPanel.Style>
-            <dx:SimpleButton DockPanel.Dock="Left" ToolTip="Синхронизировать плагин с документом"
-                             Command="{Binding SelectionChangedCommand}"
-                             Glyph="{dx:DXImage 'Office2013/Actions/Refresh_32x32.png'}" />
-            <dxe:ComboBoxEdit IsTextEditable="False" ItemsSource="{Binding FileNames}"
-                              SelectedItem="{Binding SelectedFile}">
-                <mvvm:Interaction.Behaviors>
-                    <mvvm:EventToCommand EventName="EditValueChanged" Command="{Binding SelectionChangedCommand}" />
-                </mvvm:Interaction.Behaviors>
+
+            <dx:SimpleButton DockPanel.Dock="Left" 
+                             ToolTip="Загрузить"
+                             Command="{Binding LoadCommand}"
+                             Glyph="{dx:DXImage 'Office2013/Actions/Download_32x32.png'}" />
+            <dx:SimpleButton DockPanel.Dock="Left" 
+                             Margin="5 0 0 0"
+                             ToolTip="Сохранить"
+                             Command="{Binding SelectedReport.SaveCommand }"
+                             Glyph="{dx:DXImage 'DevAV/Actions/Save_32x32.png'}" />
+            <dx:SimpleButton DockPanel.Dock="Left"
+                             Margin="5 0 0 0"
+                             ToolTip="Сохранить как"
+                             Command="{Binding SelectedReport.SaveAsCommand}"
+                             Glyph="{dx:DXImage 'DevAV/Actions/SaveAs_32x32.png'}" />
+            <dx:SimpleButton DockPanel.Dock="Left"
+                             Margin="5 0 0 0"
+                             ToolTip="Удалить"
+                             Command="{Binding DeleteCommand}"
+                             Glyph="{dx:DXImage 'Office2013/Reports/DeleteGroupHeader_32x32.png'}" />
+            <dxe:ComboBoxEdit IsTextEditable="False" 
+                              Margin="5 0 0 0"
+                              ItemsSource="{Binding Reports}"
+                              DisplayMember="Name"
+                              SelectedItem="{Binding SelectedReport}">
             </dxe:ComboBoxEdit>
+            
         </DockPanel>
 
         <dxg:GridControl Name="_dg"
                          Grid.Row="1"
-                         ItemsSource="{Binding ClashesViewSource.View}">
+                         AllowCollectionView="False"
+                         ItemsSource="{Binding SelectedReport.Clashes}">
+            
             <dxg:GridControl.GroupSummary>
                 <dxg:GridSummaryItem SummaryType="Count" />
             </dxg:GridControl.GroupSummary>
+            
             <mvvm:Interaction.Behaviors>
-                <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectionDataChangedCommand}" />
+                <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectedReport.SelectClashCommand}" 
+                                     CommandParameter="{Binding ElementName=_dg, Path=CurrentItem}" />
             </mvvm:Interaction.Behaviors>
+            
             <dxg:GridControl.View>
-                <dxg:TableView Name="_gridView" AutoWidth="True" DataNavigatorButtons="Navigation"
+                <dxg:TableView Name="_gridView" 
+                               AutoWidth="True" 
+                               DataNavigatorButtons="Navigation"
+                               AllowMergedGrouping="True"
                                ShowDataNavigator="True">
                 </dxg:TableView>
             </dxg:GridControl.View>
+            
             <dxg:GridControl.Columns>
+                
                 <dxg:GridColumn ReadOnly="True" Width="70" Header="">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
                             <dx:SimpleButton Content="Выбрать"
-                                             Command="{Binding ElementName=_dg, Path=DataContext.SelectClashCommand}"
+                                             Command="{Binding ElementName=_dg, Path=DataContext.SelectedReport.SelectClashCommand}"
                                              CommandParameter="{Binding Row}" />
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
+                
                 <dxg:GridColumn Header="Статус">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
@@ -97,17 +119,24 @@
                 <dxg:GridColumn ReadOnly="True" Header="Категория 2" FieldName="SecondCategory" />
                 <dxg:GridColumn ReadOnly="True" Header="Имя типа 2" FieldName="SecondName" />
                 <dxg:GridColumn ReadOnly="True" Header="Имя файла 2" FieldName="SecondDocumentName" />
+                
             </dxg:GridControl.Columns>
         </dxg:GridControl>
 
         <StackPanel Grid.Row="2" Margin="0 10 0 0" Orientation="Horizontal"
                     HorizontalAlignment="Right">
-            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding Message}"
+            
+            <dxe:TextEdit Margin="10 0" 
+                          IsReadOnly="True" 
+                          EditMode="InplaceActive" 
+                          EditValue="{Binding SelectedReport.Message}"
                           Foreground="Green" />
-            <dx:SimpleButton Content="Сохранить" Height="25" Width="80" Margin="10 0" IsDefault="True"
-                             Command="{Binding SaveCommand}" />
-            <dx:SimpleButton Content="Отмена" Height="25" Width="80" IsCancel="true"
+            <dx:SimpleButton Content="Отмена" 
+                             Height="25" 
+                             Width="80" 
+                             IsCancel="true"
                              Click="ButtonCancel_Click" />
+            
         </StackPanel>
 
     </Grid>

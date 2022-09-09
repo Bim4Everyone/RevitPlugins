@@ -89,6 +89,10 @@ namespace RevitClashDetective.Models.Value {
     }
 
     internal abstract class ParamValue<T> : ParamValue, IComparable<ParamValue<T>> where T : IComparable {
+        public ParamValue() {
+
+        }
+
         public ParamValue(T value, string stringValue) {
             TValue = value;
             DisplayValue = stringValue ?? TValue?.ToString();

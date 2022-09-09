@@ -18,7 +18,7 @@ namespace RevitClashDetective.Models.Clashes {
             Id = element.Id.IntegerValue;
             Name = element.Name;
             DocumentName = _revitRepository.GetDocumentName(element.Document);
-            Category = element.Category.Name;
+            Category = element?.Category?.Name;
             Level = revitRepository.GetLevel(element);
         }
 

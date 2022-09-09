@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
+using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -11,20 +8,21 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.Extensions;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
 
 namespace RevitClashDetective {
     [Transaction(TransactionMode.Manual)]
-    public class GetClashesCommand : BasePluginCommand {
-        public GetClashesCommand() {
-            PluginName = "Поиск коллизий";
+    public class GetRevitReportClashesCommand : BasePluginCommand {
+        public GetRevitReportClashesCommand() {
+            PluginName = "Отчет Revit-а о пересечениях";
         }
 
         protected override void Execute(UIApplication uiApplication) {
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            var mainViewModlel = new ReportsViewModel(revitRepository);
-            var window = new NavigatorView() { DataContext = mainViewModlel };
+            var mainViewModlel = new RevitReportClashesViewModel(revitRepository);
+            var window = new RevitReportClashNavigator() { DataContext = mainViewModlel };
             window.Show();
         }
     }

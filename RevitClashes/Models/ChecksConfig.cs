@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 
@@ -41,5 +42,23 @@ namespace RevitClashDetective.Models {
     internal class SelectionConfig {
         public List<string> Filters { get; set; } = new List<string>();
         public List<string> Files { get; set; } = new List<string>();
+    }
+
+    internal class RevitClashDetectiveConfig : ProjectConfig {
+        [JsonIgnore]
+        public override string ProjectConfigPath { get; set; }
+        [JsonIgnore]
+        public override IConfigSerializer Serializer { get; set; }
+        public string LastRunPath { get; set; }
+
+        public static RevitClashDetectiveConfig GetRevitClashDetectiveConfig() {
+            return new dosymep.Bim4Everyone.ProjectConfigs.ProjectConfigBuilder()
+                .SetPluginName(nameof(RevitClashDetective))
+                .SetProjectConfigName(nameof(RevitClashDetectiveConfig))
+                .SetRevitVersion(ModuleEnvironment.RevitVersion)
+                .SetSerializer(new ConfigSerializer())
+                .Build<RevitClashDetectiveConfig>();
+
+        }
     }
 }

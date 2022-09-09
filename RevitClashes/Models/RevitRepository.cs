@@ -22,6 +22,7 @@ using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.FilterableValueProviders;
 
 using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
+using RevitClashDetective.Models.Extensions;
 
 namespace RevitClashDetective.Models {
     internal class RevitRepository {
@@ -31,9 +32,9 @@ namespace RevitClashDetective.Models {
         private readonly Document _document;
         private readonly UIDocument _uiDocument;
         private readonly RevitEventHandler _revitEventHandler;
-        private List<string> _endings = new List<string> { "_отсоединено", "_detached" };
-        private string _clashViewName = "BIM_Проверка на коллизии";
-        private View3D _view;
+        private readonly List<string> _endings = new List<string> { "_отсоединено", "_detached" };
+        private readonly string _clashViewName = "BIM_Проверка на коллизии";
+        private readonly View3D _view;
 
         public RevitRepository(Application application, Document document) {
             _application = application;
@@ -46,6 +47,10 @@ namespace RevitClashDetective.Models {
             _endings.Add("_" + _application.Username);
 
             _view = GetClashView();
+
+            CommonConfig = RevitClashDetectiveConfig.GetRevitClashDetectiveConfig();
+
+            InitializeDocInfos();
         }
 
         public static string ProfilePath {
@@ -76,9 +81,13 @@ namespace RevitClashDetective.Models {
             BuiltInParameter.ROOF_CONSTRAINT_LEVEL_PARAM,
             BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM };
 
+        public RevitClashDetectiveConfig CommonConfig { get; set; }
+
         public Document Doc => _document;
 
         public UIApplication UiApplication => _uiApplication;
+
+        public List<DocInfo> DocInfos { get; set; }
 
         public View3D GetClashView() {
             var view = new FilteredElementCollector(_document)
@@ -91,6 +100,7 @@ namespace RevitClashDetective.Models {
                         .OfClass(typeof(ViewFamilyType))
                         .Cast<ViewFamilyType>()
                         .First(v => v.ViewFamily == ViewFamily.ThreeDimensional);
+                    type.DefaultTemplateId = ElementId.InvalidElementId;
                     view = View3D.CreateIsometric(_document, type.Id);
                     view.Name = _clashViewName + "_" + _application.Username;
                     var categories = new[] { new ElementId(BuiltInCategory.OST_Levels),
@@ -124,14 +134,27 @@ namespace RevitClashDetective.Models {
             return GetDocumentName(_document);
         }
 
+        public string GetFileDialogPath() {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            if(!string.IsNullOrEmpty(CommonConfig.LastRunPath) && Directory.Exists(CommonConfig.LastRunPath)) {
+                path = CommonConfig.LastRunPath;
+            }
+            return path;
+        }
+
         public string GetDocumentName(Document doc) {
             var title = doc.Title;
+            return GetDocumentName(title);
+        }
+
+        public string GetDocumentName(string fileName) {
+            fileName = Path.GetFileNameWithoutExtension(fileName);
             foreach(var ending in _endings) {
-                if(title.IndexOf(ending) > -1) {
-                    title = title.Substring(0, title.IndexOf(ending));
+                if(fileName.IndexOf(ending) > -1) {
+                    fileName = fileName.Substring(0, fileName.IndexOf(ending));
                 }
             }
-            return title;
+            return fileName;
         }
 
         public string GetObjectName() {
@@ -140,6 +163,21 @@ namespace RevitClashDetective.Models {
 
         public Element GetElement(ElementId id) {
             return _document.GetElement(id);
+        }
+
+        public Element GetElement(string fileName, int id) {
+            Document doc;
+            if(fileName == null) {
+                doc = _document;
+            } else {
+                doc = DocInfos.FirstOrDefault(item => item.Name.Equals(GetDocumentName(fileName), StringComparison.CurrentCultureIgnoreCase))?.Doc;
+            }
+            var elementId = new ElementId(id);
+            if(doc == null || elementId.IsNull()) {
+                return null;
+            }
+
+            return doc.GetElement(elementId);
         }
 
         public Element GetElement(Document doc, ElementId id) {
@@ -201,15 +239,14 @@ namespace RevitClashDetective.Models {
             return false;
         }
 
-        public List<DocInfo> GetDocInfos() {
-            var linkedDocuments = new FilteredElementCollector(_document)
+        public void InitializeDocInfos() {
+            DocInfos = new FilteredElementCollector(_document)
                .OfClass(typeof(RevitLinkInstance))
                .Cast<RevitLinkInstance>()
                .Where(item => item.GetLinkDocument() != null)
                .Select(item => new DocInfo(GetDocumentName(item.GetLinkDocument()), item.GetLinkDocument(), item.GetTransform()))
                .ToList();
-            linkedDocuments.Add(new DocInfo(GetDocumentName(), _document, Transform.Identity));
-            return linkedDocuments;
+            DocInfos.Add(new DocInfo(GetDocumentName(), _document, Transform.Identity));
         }
 
         public bool IsValidElement(Document doc, ElementId elementId) {
@@ -260,14 +297,18 @@ namespace RevitClashDetective.Models {
                 .WherePasses(filter);
         }
 
-        public void SelectAndShowElement(IEnumerable<ElementId> ids, BoundingBoxXYZ bb) {
+        public void SelectAndShowElement(IEnumerable<Element> elements) {
             if(_document.ActiveView != _view) {
                 _uiDocument.ActiveView = _view;
             }
             _revitEventHandler.TransactAction = () => {
-                SetSectionBox(bb);
-                if(ids.Where(item => item != ElementId.InvalidElementId).Any()) {
-                    _uiDocument.Selection.SetElementIds(ids.Where(item => item != ElementId.InvalidElementId).ToArray());
+                var bb = GetCommonBoundingBox(elements);
+                if(bb != null) {
+                    SetSectionBox(bb);
+                }
+
+                if(elements.Where(item => item.IsFromDocument(_document)).Any()) {
+                    _uiDocument.Selection.SetElementIds(elements.Where(item => item.IsFromDocument(_document)).Select(item => item.Id).ToArray());
                 } else {
                     var border = _view.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_SectionBox)).FirstOrDefault();
                     if(border != null) {
@@ -278,6 +319,15 @@ namespace RevitClashDetective.Models {
 
             _revitEventHandler.Raise();
         }
+
+        private BoundingBoxXYZ GetCommonBoundingBox(IEnumerable<Element> elements) {
+            return elements.Select(item => new { Bb = item.get_BoundingBox(null), Transform = GetLinkedDocumentTransform(GetDocumentName(item.Document)) })
+                           .Where(item => item.Bb != null)
+                           .Select(item => item.Bb.GetTransformedBoundingBox(item.Transform))
+                           .GetCommonBoundingBox();
+        }
+
+
 
         public void DoAction(Action action) {
             _revitEventHandler.TransactAction = action;
@@ -326,8 +376,8 @@ namespace RevitClashDetective.Models {
             if(bb == null)
                 return;
             using(Transaction t = _document.StartTransaction("Подрезка")) {
-                bb.Max = bb.Max + new XYZ(5, 5, 5);
-                bb.Min = bb.Min - new XYZ(5, 5, 5);
+                bb.Max += new XYZ(5, 5, 5);
+                bb.Min -= new XYZ(5, 5, 5);
                 _view.SetSectionBox(bb);
                 var uiView = _uiDocument.GetOpenUIViews().FirstOrDefault(item => item.ViewId == _view.Id);
                 if(uiView != null) {

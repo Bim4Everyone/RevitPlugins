@@ -8,6 +8,32 @@ using Autodesk.Revit.DB;
 
 namespace RevitClashDetective.Models.Extensions {
     internal static class ElementExtensions {
+        public static bool IsFromDocument(this Element element, Document doc) {
+            return element.Document.Equals(doc);
+        }
+
+        public static List<Solid> GetSolids(this Element element) {
+            var options = new Options() { ComputeReferences = true, IncludeNonVisibleObjects = false, DetailLevel = ViewDetailLevel.Fine };
+            return element.get_Geometry(options)
+                .SelectMany(item => item.GetSolids())
+                .GetUnitedSolids()
+                .ToList();
+        }
+
+        public static IEnumerable<Solid> GetSolids(this GeometryObject geometryObject) {
+            if(geometryObject is Solid solid) {
+                yield return solid;
+            } else if(geometryObject is GeometryInstance geometryInstance) {
+                foreach(var instance in geometryInstance.GetSolids()) {
+                    yield return instance;
+                }
+            }
+        }
+
+        public static IEnumerable<Solid> GetSolids(this GeometryInstance geometryInstance) {
+            return geometryInstance.GetInstanceGeometry().SelectMany(item => item.GetSolids()).Where(item => item.Volume > 0);
+        }
+
         public static Solid GetSolid(this Element element) {
             List<Solid> solids = new List<Solid>();
             var option = new Options() { ComputeReferences = true };
@@ -27,27 +53,25 @@ namespace RevitClashDetective.Models.Extensions {
 
             return UniteSolids(solids);
         }
-        private static Solid UniteSolids(List<Solid> solids) {
 
-            if(solids.Count == 0) {
-                return null;
-            }
-            Solid union = solids[0];
-            solids.RemoveAt(0);
+        public static Solid UniteSolids(List<Solid> solids) {
+            return GetUnitedSolids(solids).OrderByDescending(s => s.Volume).FirstOrDefault();
+        }
 
-            List<Solid> unitedSolids = new List<Solid>();
-
-            foreach(var s in solids) {
+        public static IEnumerable<Solid> GetUnitedSolids(this IEnumerable<Solid> solids) {
+            Solid union = solids.FirstOrDefault();
+            var unions = new List<Solid>();
+            foreach(var s in solids.Skip(1)) {
                 try {
                     union = BooleanOperationsUtils.ExecuteBooleanOperation(union, s, BooleanOperationsType.Union);
                 } catch {
-                    unitedSolids.Add(union);
+                    unions.Add(union);
                     union = s;
                 }
             }
 
-            unitedSolids.Add(union);
-            return unitedSolids.FirstOrDefault(item => Math.Abs(item.Volume - unitedSolids.Max(s => s.Volume)) < 0.0001);
+            unions.Add(union);
+            return unions;
         }
     }
 }

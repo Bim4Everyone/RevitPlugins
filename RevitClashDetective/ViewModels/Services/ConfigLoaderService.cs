@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
@@ -9,12 +10,23 @@ using RevitClashDetective.Models.FilterModel;
 
 namespace RevitClashDetective.ViewModels.Services {
     internal class ConfigLoaderService {
+        private readonly RevitRepository _revitRepository;
+
+        public ConfigLoaderService(RevitRepository revitRepository) {
+            _revitRepository = revitRepository;
+        }
+
         public T Load<T>() where T : ProjectConfig, new() {
             var openWindow = GetPlatformService<IOpenFileDialogService>();
             openWindow.Filter = "ClashConfig |*.json";
-            if(!openWindow.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop))) {
+
+
+            if(!openWindow.ShowDialog(_revitRepository.GetFileDialogPath())) {
                 throw new OperationCanceledException();
             }
+
+            _revitRepository.CommonConfig.LastRunPath = openWindow.File.DirectoryName;
+            _revitRepository.CommonConfig.SaveProjectConfig();
 
             try {
                 var configLoader = new ConfigLoader();

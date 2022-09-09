@@ -102,8 +102,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
         }
 
         private void SelectElement(object p) {
-            var row = p as ExpandoObject;
-            if(row == null)
+            if(!(p is ExpandoObject row))
                 return;
             ((IDictionary<string, object>) row).TryGetValue("Id", out object resultId);
             ((IDictionary<string, object>) row).TryGetValue("File", out object resultFile);
@@ -112,9 +111,8 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             }
             if(resultId is int id) {
                 var element = GetElement(id, resultFile.ToString());
-                var bb = GetBoundingBox(element);
-                if(bb != null) {
-                    _revitRepository.SelectAndShowElement(GetElementId(element), bb);
+                if(element != null) {
+                    _revitRepository.SelectAndShowElement(new[] { element });
                 }
             }
         }
@@ -124,20 +122,6 @@ namespace RevitClashDetective.ViewModels.SearchSet {
                 .FirstOrDefault(item => _revitRepository.GetDocumentName(item).Equals(documentName, StringComparison.CurrentCultureIgnoreCase));
             if(doc != null && new ElementId(id).IsNotNull()) {
                 return doc.GetElement(new ElementId(id));
-            }
-            return null;
-        }
-
-        private IEnumerable<ElementId> GetElementId(Element element) {
-            if(_revitRepository.GetDocumentName(element.Document).Equals(_revitRepository.GetDocumentName(), StringComparison.CurrentCultureIgnoreCase)) {
-                yield return element.Id;
-            }
-        }
-
-        private BoundingBoxXYZ GetBoundingBox(Element element) {
-            var transform = _revitRepository.GetLinkedDocumentTransform(_revitRepository.GetDocumentName(element.Document));
-            if(transform != null) {
-                return SolidUtils.CreateTransformed(element.GetSolid(), transform).GetBoundingBox().GetTransformedBoundingBox();
             }
             return null;
         }

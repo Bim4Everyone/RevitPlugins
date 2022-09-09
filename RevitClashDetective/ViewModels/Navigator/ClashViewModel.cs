@@ -68,9 +68,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
             }
         }
 
-        public BoundingBoxXYZ GetBoundingBox() {
-            return Clash.GetClashBoundingBox();
-        }
 
         public ClashModel GetClashModel() {
             Clash.ClashStatus = ClashStatus;
