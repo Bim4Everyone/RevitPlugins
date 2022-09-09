@@ -53,8 +53,8 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         private void Select(object p) {
             if(!(p is OpeningViewModel opening))
                 return;
-            var element = _revitRepository.GetElement(new ElementId(opening.Id));
-            _revitRepository.SelectAndShowElement(element.Id, element.get_BoundingBox(null));
+            var elements = new[] { _revitRepository.GetElement(new ElementId(opening.Id)) };
+            _revitRepository.SelectAndShowElement(elements);
         }
 
         private void SelectionChanged(object p) {

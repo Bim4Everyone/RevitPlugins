@@ -42,7 +42,11 @@ namespace RevitOpeningPlacement.ViewModels.ReportViewModel {
 
         private void Select(object p) {
             var clash = (ClashViewModel) p;
-            _revitRepository.SelectAndShowElement(new ElementId(clash.Clash.MainElement.Id), clash.Clash.GetClashBoundingBox());
+            var elements = new[]{
+                _revitRepository.GetElement(clash.Clash.MainElement.DocumentName, clash.Clash.MainElement.Id),
+                _revitRepository.GetElement(clash.Clash.OtherElement.DocumentName, clash.Clash.OtherElement.Id)
+            };
+            _revitRepository.SelectAndShowElement(elements);
         }
 
         private bool CanSelect(object p) {

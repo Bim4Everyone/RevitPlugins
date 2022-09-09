@@ -125,8 +125,12 @@ namespace RevitOpeningPlacement.Models {
             return _document.GetElement(id);
         }
 
-        public void SelectAndShowElement(ElementId elementId, BoundingBoxXYZ bb) {
-            _clashRevitRepository.SelectAndShowElement(new[] { elementId }, bb);
+        public Element GetElement(string fileName, int id) {
+            return _clashRevitRepository.GetElement(fileName, id);
+        }
+
+        public void SelectAndShowElement(ICollection<Element> elements) {
+            _clashRevitRepository.SelectAndShowElement(elements);
         }
 
         public string GetDocumentName(Document doc) {
@@ -173,7 +177,7 @@ namespace RevitOpeningPlacement.Models {
         }
 
         public List<DocInfo> GetDocInfos() {
-            return _clashRevitRepository.GetDocInfos();
+            return _clashRevitRepository.DocInfos;
         }
 
         public RevitClashDetective.Models.RevitRepository GetClashRevitRepository() {
