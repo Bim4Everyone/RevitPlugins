@@ -63,6 +63,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectProps", "ProjectProp
 	ProjectSection(SolutionItems) = preProject
 		ProjectProps\Common.props = ProjectProps\Common.props
 		ProjectProps\RevitClashes.props = ProjectProps\RevitClashes.props
+		ProjectProps\DevExpress.props = ProjectProps\DevExpress.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitWindowGapPlacement", "RevitWindowGapPlacement\RevitWindowGapPlacement.csproj", "{997A6771-5EA7-4435-AC55-6578E052269C}"

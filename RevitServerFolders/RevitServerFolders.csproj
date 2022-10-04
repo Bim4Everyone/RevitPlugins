@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <Import Project="..\ProjectProps\Common.props"/>
+    <Import Project="..\ProjectProps\DevExpress.props"/>
     
     <ItemGroup>
         <Resource Include="Resources\folder.png" />
