@@ -1,23 +1,13 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31515.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitPlugins", "RevitPlugins\RevitPlugins.csproj", "{51D125DA-535F-49EF-BDF6-5AE94B39E9BB}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlatformSettings", "PlatformSettings\PlatformSettings.csproj", "{5C9650AE-A794-47C6-B5F7-92D099018302}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitBatchPrint", "RevitBatchPrint\RevitBatchPrint.csproj", "{C95B3383-B620-463C-9A33-7D290095B73A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitCopyStandarts", "RevitCopyStandarts\RevitCopyStandarts.csproj", "{42B67242-5EFD-4D2F-80E3-457B6647BF3B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitCopyViews", "RevitCopyViews\RevitCopyViews.csproj", "{9BCEA845-B482-46E8-B916-00F0B97F6BD6}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitCreateViewSheet", "RevitCreateViewSheet\RevitCreateViewSheet.csproj", "{41FFB315-803C-4CDD-B783-82FAD825465D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitSuperfilter", "RevitSuperfilter\RevitSuperfilter.csproj", "{AEF99352-8D07-4269-B9D9-AA369EDE4CBD}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitServerFolders", "RevitServerFolders\RevitServerFolders.csproj", "{9781A7B1-452D-489D-BD54-44E17FAF323B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectProps", "ProjectProps", "{036539D1-9384-4C6B-8A92-B9A50994DE8D}"
+	ProjectSection(SolutionItems) = preProject
+		ProjectProps\Common.props = ProjectProps\Common.props
+		ProjectProps\RevitClashes.props = ProjectProps\RevitClashes.props
+		ProjectProps\DevExpress.props = ProjectProps\DevExpress.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dosymep", "dosymep", "{064729BC-2CB6-4910-9C93-C687F7E2B1CD}"
 	ProjectSection(SolutionItems) = preProject
@@ -36,10 +26,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dosymep", "dosymep", "{0647
 		dosymep\ThemedPlatformWindow.cs = dosymep\ThemedPlatformWindow.cs
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitGenLookupTables", "RevitGenLookupTables\RevitGenLookupTables.csproj", "{65795232-ECD1-4811-A473-B718AE74E4E1}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitFamilyExplorer", "RevitFamilyExplorer\RevitFamilyExplorer.csproj", "{0D3A89D6-19AA-44BA-A854-D5C63542CC60}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0C7777D6-5306-4473-A046-497D2B54E4CA}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -48,29 +34,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		LICENSE.md = LICENSE.md
 		README.md = README.md
 	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitRooms", "RevitRooms\RevitRooms.csproj", "{5ED10BD4-7337-4DB1-8953-98489D09F507}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitLintelPlacement", "RevitLintelPlacement\RevitLintelPlacement.csproj", "{40E928EA-29EF-4831-BD9D-23B843BEF905}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitMarkPlacement", "RevitMarkPlacement\RevitMarkPlacement.csproj", "{8DF9A156-6ACD-4E5E-A2BA-0B748ABF225C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitSetLevelSection", "RevitSetLevelSection\RevitSetLevelSection.csproj", "{4ABC3706-AF4D-48E1-AA42-87D379B742E1}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitClashDetective", "RevitClashDetective\RevitClashDetective.csproj", "{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectProps", "ProjectProps", "{036539D1-9384-4C6B-8A92-B9A50994DE8D}"
-	ProjectSection(SolutionItems) = preProject
-		ProjectProps\Common.props = ProjectProps\Common.props
-		ProjectProps\RevitClashes.props = ProjectProps\RevitClashes.props
-		ProjectProps\DevExpress.props = ProjectProps\DevExpress.props
-	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitWindowGapPlacement", "RevitWindowGapPlacement\RevitWindowGapPlacement.csproj", "{997A6771-5EA7-4435-AC55-6578E052269C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitOpeningPlacement", "RevitOpeningPlacement\RevitOpeningPlacement.csproj", "{80EA241A-E858-41E8-B7DB-ABBD6199841D}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RevitClashes", "RevitClashes", "{D1D5F8CC-CC58-4C3B-AC68-F2451FA3BFC6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Models", "Models", "{968DE2B9-F390-4B99-A796-A797FBB7847A}"
 	ProjectSection(SolutionItems) = preProject
@@ -204,6 +167,42 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Handlers", "Handlers", "{7D
 	ProjectSection(SolutionItems) = preProject
 		RevitClashes\Models\Handlers\RevitEventHandler.cs = RevitClashes\Models\Handlers\RevitEventHandler.cs
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitGenLookupTables", "RevitGenLookupTables\RevitGenLookupTables.csproj", "{65795232-ECD1-4811-A473-B718AE74E4E1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitFamilyExplorer", "RevitFamilyExplorer\RevitFamilyExplorer.csproj", "{0D3A89D6-19AA-44BA-A854-D5C63542CC60}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitPlugins", "RevitPlugins\RevitPlugins.csproj", "{51D125DA-535F-49EF-BDF6-5AE94B39E9BB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlatformSettings", "PlatformSettings\PlatformSettings.csproj", "{5C9650AE-A794-47C6-B5F7-92D099018302}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitBatchPrint", "RevitBatchPrint\RevitBatchPrint.csproj", "{C95B3383-B620-463C-9A33-7D290095B73A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitCopyStandarts", "RevitCopyStandarts\RevitCopyStandarts.csproj", "{42B67242-5EFD-4D2F-80E3-457B6647BF3B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitCopyViews", "RevitCopyViews\RevitCopyViews.csproj", "{9BCEA845-B482-46E8-B916-00F0B97F6BD6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitCreateViewSheet", "RevitCreateViewSheet\RevitCreateViewSheet.csproj", "{41FFB315-803C-4CDD-B783-82FAD825465D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitSuperfilter", "RevitSuperfilter\RevitSuperfilter.csproj", "{AEF99352-8D07-4269-B9D9-AA369EDE4CBD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitServerFolders", "RevitServerFolders\RevitServerFolders.csproj", "{9781A7B1-452D-489D-BD54-44E17FAF323B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitRooms", "RevitRooms\RevitRooms.csproj", "{5ED10BD4-7337-4DB1-8953-98489D09F507}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitLintelPlacement", "RevitLintelPlacement\RevitLintelPlacement.csproj", "{40E928EA-29EF-4831-BD9D-23B843BEF905}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitMarkPlacement", "RevitMarkPlacement\RevitMarkPlacement.csproj", "{8DF9A156-6ACD-4E5E-A2BA-0B748ABF225C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitSetLevelSection", "RevitSetLevelSection\RevitSetLevelSection.csproj", "{4ABC3706-AF4D-48E1-AA42-87D379B742E1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitClashDetective", "RevitClashDetective\RevitClashDetective.csproj", "{B209CB3B-C4C1-4FB9-85CE-B0FA52DF6F80}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitWindowGapPlacement", "RevitWindowGapPlacement\RevitWindowGapPlacement.csproj", "{997A6771-5EA7-4435-AC55-6578E052269C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitOpeningPlacement", "RevitOpeningPlacement\RevitOpeningPlacement.csproj", "{80EA241A-E858-41E8-B7DB-ABBD6199841D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RevitClashes", "RevitClashes", "{D1D5F8CC-CC58-4C3B-AC68-F2451FA3BFC6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
