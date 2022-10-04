@@ -13,62 +13,62 @@
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ComboBox Grid.Row="0" Margin="10" 
-                  ItemsSource="{Binding RevitViewModels}" 
+        <ComboBox Grid.Row="0" Margin="10"
+                  ItemsSource="{Binding RevitViewModels}"
                   SelectedItem="{Binding RevitViewModel}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name}"/>
+                    <TextBlock Text="{Binding Name}" />
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
 
         <CheckBox Grid.Row="1" Margin="10" Content="Рассчитать площадь по пятну"
-                  IsChecked="{Binding RevitViewModel.IsSpotCalcArea}"/>
+                  IsChecked="{Binding RevitViewModel.IsSpotCalcArea}" />
 
         <CheckBox Grid.Row="2" Margin="10" Content="Рассчитать количество комнат"
-                  IsChecked="{Binding RevitViewModel.IsCountRooms}"/>
+                  IsChecked="{Binding RevitViewModel.IsCountRooms}" />
 
         <CheckBox x:Name="_checkArea" Grid.Row="3" Margin="10" Content="Проверить площадь помещений на изменения:"
-                  IsChecked="{Binding RevitViewModel.IsCheckRoomsChanges}"/>
+                  IsChecked="{Binding RevitViewModel.IsCheckRoomsChanges}" />
 
-        <StackPanel Grid.Row="4" Margin="0,5,10,0" Orientation="Horizontal" 
-                    Visibility="{Binding ElementName=_checkArea,Path=IsChecked, Converter={StaticResource BoolToVis}}" >
-            <TextBlock Margin="50,0,10,0" Text="Точность проверки"/>
-            <TextBox Width="50" Text="{Binding RevitViewModel.RoomAccuracy, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock Margin="10,0,0,0" Text="%"/>
+        <StackPanel Grid.Row="4" Margin="0,5,10,0" Orientation="Horizontal"
+                    Visibility="{Binding ElementName=_checkArea,Path=IsChecked, Converter={StaticResource BoolToVis}}">
+            <TextBlock Margin="50,0,10,0" Text="Точность проверки" />
+            <TextBox Width="50" Text="{Binding RevitViewModel.RoomAccuracy, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBlock Margin="10,0,0,0" Text="%" />
         </StackPanel>
 
         <DockPanel Grid.Row="5" Margin="10">
-            <TextBlock Text="Стадии:" Width="158"/>
+            <TextBlock Text="Стадии:" Width="158" />
             <ComboBox Margin="10,0,0,0"
                       ItemsSource="{Binding RevitViewModel.Phases}"
                       SelectedItem="{Binding RevitViewModel.Phase}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text="{Binding Name}" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
         </DockPanel>
 
         <DockPanel Grid.Row="6" Margin="10">
-            <TextBlock x:Name="_text" Text="Число знаков после запятой:"/>
+            <TextBlock x:Name="_text" Text="Число знаков после запятой:" />
             <ComboBox Margin="10,0,0,0"
                       ItemsSource="{Binding RevitViewModel.RoundAccuracyValues}"
-                    SelectedItem="{Binding RevitViewModel.RoundAccuracy}"/>
+                      SelectedItem="{Binding RevitViewModel.RoundAccuracy}" />
         </DockPanel>
 
         <ListView x:Name="_levels" Grid.Row="7" Margin="10" IsEnabled="{Binding RevitViewModel.IsAllowSelectLevels}"
@@ -81,35 +81,37 @@
                                 <CheckBox IsChecked="{Binding IsSelected}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Checked">
-                                            <i:InvokeCommandAction 
-                                                    Command="{Binding SelectElementsCommand}" 
-                                                    CommandParameter="{Binding SelectedItems, ElementName=_levels}"/>
+                                            <i:InvokeCommandAction
+                                                Command="{Binding SelectElementsCommand}"
+                                                CommandParameter="{Binding SelectedItems, ElementName=_levels}" />
                                         </i:EventTrigger>
                                         <i:EventTrigger EventName="Unchecked">
                                             <i:InvokeCommandAction
-                                                    Command="{Binding UnselectElementsCommand}"
-                                                    CommandParameter="{Binding SelectedItems, ElementName=_levels}"/>
+                                                Command="{Binding UnselectElementsCommand}"
+                                                CommandParameter="{Binding SelectedItems, ElementName=_levels}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </CheckBox>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Наименование" Width="250"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=Elevation}" Header="Уровень" Width="100"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Наименование" Width="250" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Elevation}" Header="Уровень" Width="100" />
                     <!--<GridViewColumn DisplayMemberBinding="{Binding Path=RoomsCount}" Header="Количество" Width="100"/>-->
                 </GridView>
             </ListView.View>
         </ListView>
 
         <CheckBox Grid.Row="8" Margin="10" Content="Не показывать предупреждения"
-                  IsChecked="{Binding RevitViewModel.NotShowWarnings}"/>
+                  IsChecked="{Binding RevitViewModel.NotShowWarnings}" />
 
         <StackPanel Grid.Row="9" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock Margin="10" Text="{Binding RevitViewModel.ErrorText}" Foreground="Orange" />
-            <Button Content="Рассчитать зоны" Height="25" Width="110" Margin="10" Click="ButtonOK_Click" Command="{Binding RevitViewModel.CalculateAreasCommand}"/>
-            <Button Content="Рассчитать помещения" Height="25" Width="150" Margin="10" IsDefault="True" Click="ButtonOK_Click" Command="{Binding RevitViewModel.CalculateCommand}"/>
-            <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
+            <Button Content="Рассчитать зоны" Height="25" Width="110" Margin="10" Click="ButtonOK_Click"
+                    Command="{Binding RevitViewModel.CalculateAreasCommand}" />
+            <Button Content="Рассчитать помещения" Height="25" Width="150" Margin="10" IsDefault="True"
+                    Click="ButtonOK_Click" Command="{Binding RevitViewModel.CalculateCommand}" />
+            <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
 </base:PlatformWindow>

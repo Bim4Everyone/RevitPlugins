@@ -9,14 +9,14 @@
     Title="Выбор" Height="450" Width="800" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <ListView x:Name="listbox" ItemsSource="{Binding NumberingOrders}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Наименование" Width="200"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Наименование" Width="200" />
                 </GridView>
             </ListView.View>
         </ListView>
@@ -24,8 +24,8 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
             <Button Content="Выбрать" Height="25" Width="70" Margin="10" IsDefault="True" Click="ButtonOK_Click"
-                    Command="{Binding SelectCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}"/>
-            <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
+                    Command="{Binding SelectCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}" />
+            <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
 </base:PlatformWindow>
