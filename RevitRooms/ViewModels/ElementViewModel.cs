@@ -34,7 +34,7 @@ namespace RevitRooms.ViewModels {
 
         public ElementId ElementId => Element.Id;
 
-        public string Name => Element.Name;
+        public virtual string Name => Element.Name;
         public virtual string PhaseName { get; }
         public virtual string LevelName { get; }
 

@@ -96,7 +96,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Наименование" Width="250" />
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=Elevation}" Header="Уровень" Width="100" />
+                    <!-- <GridViewColumn DisplayMemberBinding="{Binding Path=Elevation}" Header="Уровень" Width="100" /> -->
                     <!--<GridViewColumn DisplayMemberBinding="{Binding Path=RoomsCount}" Header="Количество" Width="100"/>-->
                 </GridView>
             </ListView.View>

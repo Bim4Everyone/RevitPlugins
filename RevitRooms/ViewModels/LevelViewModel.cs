@@ -15,9 +15,17 @@ using RevitRooms.Models;
 
 namespace RevitRooms.ViewModels {
     internal class LevelViewModel : ElementViewModel<Level> {
-        public LevelViewModel(Level level, RevitRepository revitRepository, IEnumerable<SpatialElement> spatialElements) : base(level, revitRepository) {
+        private readonly string _name;
+        public List<Level> Levels { get; }
+
+        public LevelViewModel(string name, List<Level> levels, RevitRepository revitRepository, IEnumerable<SpatialElement> spatialElements) 
+            : base(levels.FirstOrDefault(), revitRepository) {
+            _name = name;
+            Levels = levels;
             SpartialElements = new ObservableCollection<SpatialElementViewModel>(GetSpatialElements(revitRepository, spatialElements));
         }
+
+        public override string Name => _name;
 
 #if D2020 || R2020
         public string Elevation {
