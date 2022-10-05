@@ -82,14 +82,15 @@
                      Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
                      IsChecked="{Binding RoomsNums.IsNumRoomsGroup}" />
         <RadioButton Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums"
-                     Content="Сквозная нумерация помещений в пределах секции и этажа"
-                     Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
-                     IsChecked="{Binding RoomsNums.IsNumRoomsSectionLevels}" />
-        <RadioButton Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums"
                      Content="Сквозная нумерация помещений в пределах секции"
                      Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
                      IsChecked="{Binding RoomsNums.IsNumRoomsSection}" />
+        <RadioButton Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums"
+                     Content="Сквозная нумерация помещений в пределах секции и этажа"
+                     Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
+                     IsChecked="{Binding RoomsNums.IsNumRoomsSectionLevels}" />
 
+        
         <DockPanel Grid.Row="8" Grid.Column="0" Margin="10" LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Секции для нумерации" />
 
@@ -179,6 +180,7 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Наименование" Width="100" />
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=LevelNames}" Header="Уровень" Width="100" />
                     </GridView>
                 </ListView.View>
             </ListView>
