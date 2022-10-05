@@ -28,6 +28,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -81,11 +82,15 @@
                      Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
                      IsChecked="{Binding RoomsNums.IsNumRoomsGroup}" />
         <RadioButton Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums"
+                     Content="Сквозная нумерация помещений в пределах секции и этажа"
+                     Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
+                     IsChecked="{Binding RoomsNums.IsNumRoomsSectionLevels}" />
+        <RadioButton Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums"
                      Content="Сквозная нумерация помещений в пределах секции"
                      Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
                      IsChecked="{Binding RoomsNums.IsNumRoomsSection}" />
 
-        <DockPanel Grid.Row="7" Grid.Column="0" Margin="10" LastChildFill="True">
+        <DockPanel Grid.Row="8" Grid.Column="0" Margin="10" LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Секции для нумерации" />
 
             <ListView x:Name="_sections" ItemsSource="{Binding RoomsNums.Sections}">
@@ -117,7 +122,7 @@
             </ListView>
         </DockPanel>
 
-        <DockPanel Grid.Row="7" Grid.Column="1" Margin="10" LastChildFill="True">
+        <DockPanel Grid.Row="8" Grid.Column="1" Margin="10" LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Группы для нумерации" />
             <ListView x:Name="_groups" ItemsSource="{Binding RoomsNums.Groups}">
                 <ListView.View>
@@ -148,7 +153,7 @@
             </ListView>
         </DockPanel>
 
-        <DockPanel Grid.Row="7" Grid.Column="2" Margin="10" LastChildFill="True">
+        <DockPanel Grid.Row="8" Grid.Column="2" Margin="10" LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Уровни для нумерации" />
             <ListView x:Name="_levels" ItemsSource="{Binding RoomsNums.Levels}">
                 <ListView.View>
@@ -179,7 +184,7 @@
             </ListView>
         </DockPanel>
 
-        <DockPanel Grid.Row="7" Grid.Column="3" Margin="10" LastChildFill="True">
+        <DockPanel Grid.Row="8" Grid.Column="3" Margin="10" LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Приоритеты помещений" />
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
                 <Button Content="↑" Width="25" ToolTip="Вверх" Margin="5" Command="{Binding RoomsNums.UpOrderCommand}"
@@ -203,7 +208,7 @@
             </ListView>
         </DockPanel>
 
-        <StackPanel Grid.Row="8" Grid.ColumnSpan="4" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="9" Grid.ColumnSpan="4" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock Margin="10" Text="{Binding RoomsNums.ErrorText}" Foreground="Orange" />
             <Button Content="Запуск" Height="25" Width="70" Margin="10" IsDefault="True"
                     Command="{Binding RoomsNums.NumerateRoomsCommand}" />
