@@ -46,8 +46,8 @@
 
                 <dxdo:LayoutControlItem>
                     <dxg:GridControl
-                        ItemsSource="{Binding InfoElement.Elements}"
-                        MaxHeight="9000">
+                        MaxHeight="9000"
+                        ItemsSource="{Binding InfoElement.Elements}">
 
                         <dxg:GridControl.View>
                             <dxg:TableView
