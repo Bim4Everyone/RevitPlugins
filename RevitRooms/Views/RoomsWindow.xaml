@@ -109,12 +109,28 @@
                 <dxg:TableView
                     AutoWidth="True"
                     AllowGrouping="False"
-                    ShowGroupPanel="False" />
+                    ShowGroupPanel="False"
+                    EditorShowMode="MouseDown" />
             </dxg:GridControl.View>
 
             <dxg:GridColumn
-                FieldName="IsSelected" Header="#"
-                MinWidth="25" MaxWidth="25" Width="25" />
+                Header=""
+                ToolTip="Выделение"
+                FieldName="IsSelected"
+                Width="43" MaxWidth="43"
+                MinWidth="43" AllowResizing="False"
+                AllowColumnFiltering="False"
+                AllowSorting="False" 
+                ShowCheckBoxInHeader="True">
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate>
+                        <dxe:CheckEdit
+                            Name="PART_Editor"
+                            IsChecked="{Binding Row.IsSelected}" />
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+            </dxg:GridColumn>
+
             <dxg:GridColumn FieldName="Name" Header="Наименование" ReadOnly="True" />
             <dxg:GridColumn FieldName="LevelNames" Header="Уровень" ReadOnly="True" />
         </dxg:GridControl>
