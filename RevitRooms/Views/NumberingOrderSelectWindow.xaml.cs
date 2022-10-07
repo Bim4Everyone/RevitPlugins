@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -13,6 +14,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using DevExpress.Xpf.Core;
+
 using dosymep.WPF.Commands;
 using dosymep.WPF.Views;
 
@@ -22,7 +25,7 @@ namespace RevitRooms.Views {
     /// <summary>
     /// Interaction logic for NumberingOrderSelectWindow.xaml
     /// </summary>
-    public partial class NumberingOrderSelectWindow : PlatformWindow {
+    public partial class NumberingOrderSelectWindow {
         public NumberingOrderSelectWindow() {
             InitializeComponent();
         }
@@ -48,22 +51,15 @@ namespace RevitRooms.Views {
         }
 
         public ICommand SelectCommand { get; set; }
+        public IList SelectedNumberingOrders { get; set; }
         public ObservableCollection<NumberingOrderViewModel> NumberingOrders { get; set; }
-        public ObservableCollection<NumberingOrderViewModel> SelectedNumberingOrders { get; set; }
-
 
         private void Select(object parameter) {
-            SelectedNumberingOrders.Clear();
-            foreach(var selection in ((ObservableCollection<object>) parameter)
-                .Cast<NumberingOrderViewModel>()) {
-                SelectedNumberingOrders.Add(selection);
-            }
+
         }
 
         private bool CanSelect(object parameter) {
-            return parameter != null && ((ObservableCollection<object>) parameter)
-                .Cast<NumberingOrderViewModel>()
-                .Any();
+            return SelectedNumberingOrders.Count > 0;
         }
     }
 }

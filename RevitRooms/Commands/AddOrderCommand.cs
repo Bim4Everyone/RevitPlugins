@@ -22,14 +22,16 @@ namespace RevitRooms.Commands {
         public override void Execute(object parameter) {
             var window = new NumberingOrderSelectWindow() {
                 DataContext = new NumberingOrderSelectViewModel() {
-                    NumberingOrders = new ObservableCollection<NumberingOrderViewModel>(_numberingOrder.NumberingOrders.OrderBy(item => item.Name))
+                    NumberingOrders =
+                        new ObservableCollection<NumberingOrderViewModel>(
+                            _numberingOrder.NumberingOrders.OrderBy(item => item.Name))
                 }
             };
 
-            window.ShowDialog();
-
-            var selection = (window.DataContext as NumberingOrderSelectViewModel).SelectedNumberingOrders;
-            _numberingOrder.SelectNumberingOrder(selection);
+            if(window.ShowDialog() == true) {
+                var selection = (window.DataContext as NumberingOrderSelectViewModel).SelectedNumberingOrders;
+                _numberingOrder.SelectNumberingOrder(selection.OfType<NumberingOrderViewModel>());
+            }
         }
     }
 }
