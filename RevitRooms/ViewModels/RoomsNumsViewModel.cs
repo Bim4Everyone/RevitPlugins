@@ -110,7 +110,7 @@ namespace RevitRooms.ViewModels {
             get => _isNumRoomsSection;
             set => this.RaiseAndSetIfChanged(ref _isNumRoomsSection, value);
         }
-        
+
         public bool IsNumRoomsSectionLevels {
             get => _isNumRoomsSectionLevels;
             set => this.RaiseAndSetIfChanged(ref _isNumRoomsSectionLevels, value);
@@ -278,17 +278,22 @@ namespace RevitRooms.ViewModels {
                         transaction.Commit();
                     }
                 } else if(IsNumRoomsSectionLevels) {
-                    using(var transaction = _revitRepository.StartTransaction("Нумерация помещений по секции и этажу")) {
+                    using(var transaction =
+                          _revitRepository.StartTransaction("Нумерация помещений по секции и этажу")) {
                         orderedObjects = orderedObjects
                             .OrderBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
                             .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
                             .ThenBy(item => GetOrder(selectedOrder, item.Room))
                             .ThenBy(item => GetDistance(item.Element));
 
-                        int roomCount = startNumber;
-                        foreach(var room in orderedObjects) {
-                            room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER, Prefix + roomCount + Suffix);
-                            roomCount++;
+                        foreach(var section in orderedObjects.GroupBy(item => item.RoomSection.Id)) {
+                            foreach(var level in section.GroupBy(item =>  (_revitRepository.GetElement(item.LevelId) as Level)?.Name.Split('_').FirstOrDefault())) {
+                                int roomCount = startNumber;
+                                foreach(var room in level) {
+                                    room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER, Prefix + roomCount + Suffix);
+                                    roomCount++;
+                                }
+                            }
                         }
 
                         transaction.Commit();
@@ -405,7 +410,8 @@ namespace RevitRooms.ViewModels {
                 return false;
             }
 
-            if(IsNumRooms && IsNumRoomsGroup == false && IsNumRoomsSection == false && IsNumRoomsSectionLevels == false) {
+            if(IsNumRooms && IsNumRoomsGroup == false && IsNumRoomsSection == false &&
+               IsNumRoomsSectionLevels == false) {
                 ErrorText = "Выберите выберете режим работы нумерации помещений.";
                 return false;
             }
