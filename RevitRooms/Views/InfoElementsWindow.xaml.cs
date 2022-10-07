@@ -18,7 +18,7 @@ namespace RevitRooms.Views {
     /// <summary>
     /// Interaction logic for InfoElementsWindow.xaml
     /// </summary>
-    public partial class InfoElementsWindow : PlatformWindow {
+    public partial class InfoElementsWindow {
         public InfoElementsWindow() {
             InitializeComponent();
         }
