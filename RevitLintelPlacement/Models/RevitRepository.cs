@@ -49,6 +49,8 @@ namespace RevitLintelPlacement.Models {
         public LintelsConfig LintelsConfig { get; set; }
         public LintelsCommonConfig LintelsCommonConfig { get; set; }
 
+        public string View3DName => string.Concat(_view3DName, "_", _application.Username);
+
         public static string ProfilePath {
             get {
                 var path = _settingsPath;
@@ -119,7 +121,7 @@ namespace RevitLintelPlacement.Models {
                         .First(v => v.ViewFamily == ViewFamily.ThreeDimensional);
                     type.DefaultTemplateId = ElementId.InvalidElementId;
                     view = View3D.CreateIsometric(_document, type.Id);
-                    view.Name = _view3DName + "_" + _application.Username;
+                    view.Name = View3DName;
                     var categories = new[] { new ElementId(BuiltInCategory.OST_Levels),
                         new ElementId(BuiltInCategory.OST_WallRefPlanes),
                         new ElementId(BuiltInCategory.OST_Grids),
@@ -394,9 +396,9 @@ namespace RevitLintelPlacement.Models {
 
         public ViewOrientation3D GetOrientation3D() {
             var view3D = new FilteredElementCollector(_document)
-              .OfClass(typeof(View3D))
-              .Cast<View3D>()
-              .First(v => !v.IsTemplate && v.Name == _view3DName);
+                .OfClass(typeof(View3D))
+                .Cast<View3D>()
+                .First(v => !v.IsTemplate && v.Name == View3DName);
             return view3D.GetOrientation();
         }
 
