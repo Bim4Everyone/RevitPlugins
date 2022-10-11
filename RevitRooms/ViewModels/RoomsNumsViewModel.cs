@@ -21,6 +21,8 @@ using dosymep.Bim4Everyone.ProjectParams;
 
 using Autodesk.Revit.UI;
 
+using DevExpress.Mvvm.Native;
+
 namespace RevitRooms.ViewModels {
     internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
         public Guid _id;
@@ -283,15 +285,18 @@ namespace RevitRooms.ViewModels {
                         orderedObjects = orderedObjects
                             .OrderBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
                             .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
+                            .ThenBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
                             .ThenBy(item => GetOrder(selectedOrder, item.Room))
                             .ThenBy(item => GetDistance(item.Element));
 
                         foreach(var section in orderedObjects.GroupBy(item => item.RoomSection.Id)) {
                             foreach(var level in section.GroupBy(item =>  (_revitRepository.GetElement(item.LevelId) as Level)?.Name.Split('_').FirstOrDefault())) {
                                 int roomCount = startNumber;
-                                foreach(var room in level) {
-                                    room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER, Prefix + roomCount + Suffix);
-                                    roomCount++;
+                                foreach(var group in level.OrderBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer()).GroupBy(item => item.RoomGroup.Id)) {
+                                    foreach(var room in group) {
+                                        room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER, Prefix + roomCount + Suffix);
+                                        roomCount++;
+                                    }
                                 }
                             }
                         }
