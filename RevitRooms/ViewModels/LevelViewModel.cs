@@ -15,13 +15,29 @@ using RevitRooms.Models;
 
 namespace RevitRooms.ViewModels {
     internal class LevelViewModel : ElementViewModel<Level> {
-        public LevelViewModel(Level level, RevitRepository revitRepository, IEnumerable<SpatialElement> spatialElements) : base(level, revitRepository) {
-            SpartialElements = new ObservableCollection<SpatialElementViewModel>(GetSpatialElements(revitRepository, spatialElements));
+        private readonly string _name;
+        public List<Level> Levels { get; }
+
+        public LevelViewModel(string name, List<Level> levels, RevitRepository revitRepository,
+            IEnumerable<SpatialElement> spatialElements)
+            : base(levels.FirstOrDefault(), revitRepository) {
+            _name = name;
+            Levels = levels;
+            SpartialElements =
+                new ObservableCollection<SpatialElementViewModel>(GetSpatialElements(revitRepository, spatialElements));
         }
+
+        public override string Name => _name;
+
+        public string LevelNames => string.Join(Environment.NewLine,
+            Levels.OrderBy(item => item.Elevation).Select(item => item.Name).Distinct());
 
 #if D2020 || R2020
         public string Elevation {
-            get { return UnitUtils.ConvertFromInternalUnits(Element.Elevation, DisplayUnitType.DUT_METERS).ToString("0.000", CultureInfo.InvariantCulture); }
+            get {
+                return UnitUtils.ConvertFromInternalUnits(Element.Elevation, DisplayUnitType.DUT_METERS)
+                    .ToString("0.000", CultureInfo.InvariantCulture);
+            }
         }
 #elif D2021 || R2021 || D2022 || R2022
         public string Elevation {
@@ -51,15 +67,19 @@ namespace RevitRooms.ViewModels {
         }
 
         public IEnumerable<SpatialElementViewModel> GetRooms(PhaseViewModel phase) {
-            return SpartialElements.Where(item => item.Phase != null).Where(item => item.Phase == phase).Where(item => item.Element is Room);
+            return SpartialElements.Where(item => item.Phase != null).Where(item => item.Phase == phase)
+                .Where(item => item.Element is Room);
         }
 
         public IEnumerable<SpatialElementViewModel> GetRooms(IEnumerable<PhaseViewModel> phases) {
-            return SpartialElements.Where(item => item.Phase != null).Where(item => phases.Contains(item.Phase)).Where(item => item.Element is Room);
+            return SpartialElements.Where(item => item.Phase != null).Where(item => phases.Contains(item.Phase))
+                .Where(item => item.Element is Room);
         }
 
-        private static IEnumerable<SpatialElementViewModel> GetSpatialElements(RevitRepository revitRepository, IEnumerable<SpatialElement> spatialElements) {
-            return spatialElements.Select(item => new SpatialElementViewModel(item, revitRepository)).Where(item => item.IsPlaced);
+        private static IEnumerable<SpatialElementViewModel> GetSpatialElements(RevitRepository revitRepository,
+            IEnumerable<SpatialElement> spatialElements) {
+            return spatialElements.Select(item => new SpatialElementViewModel(item, revitRepository))
+                .Where(item => item.IsPlaced);
         }
     }
 }

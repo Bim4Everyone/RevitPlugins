@@ -18,7 +18,7 @@ namespace RevitRooms.Views {
     /// <summary>
     /// Interaction logic for RoomsNums.xaml
     /// </summary>
-    public partial class RoomsNumsWindows : PlatformWindow {
+    public partial class RoomsNumsWindows {
         public RoomsNumsWindows() {
             InitializeComponent();
         }

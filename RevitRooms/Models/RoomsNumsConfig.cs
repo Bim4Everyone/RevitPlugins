@@ -54,6 +54,8 @@ namespace RevitRooms.Models {
         public bool IsNumRooms { get; set; }
         public bool IsNumRoomsGroup { get; set; }
         public bool IsNumRoomsSection { get; set; }
+        
+        public bool IsNumRoomsSectionLevels { get; set; }
 
         public int PhaseElementId { get; set; }
 

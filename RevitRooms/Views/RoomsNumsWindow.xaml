@@ -1,4 +1,4 @@
-﻿<base:PlatformWindow
+﻿<base:ThemedPlatformWindow
     x:Class="RevitRooms.Views.RoomsNumsWindows"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,198 +6,289 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:vms="clr-namespace:RevitRooms.ViewModels"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+
     mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
     Title="Нумерация помещений с приоритетом" Height="650" Width="850"
-    x:Name="_this">
+    x:Name="_this"
+
+    d:DataContext="{d:DesignInstance vms:RoomNumsViewModel, IsDesignTimeCreatable=False}">
+
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        
+
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="10"
-                  ItemsSource="{Binding RoomsNumsViewModels}" 
-                  SelectedItem="{Binding RoomsNums}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}"/>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+        <dxe:ComboBoxEdit
+            Grid.Row="0" Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Margin="10"
+            IsTextEditable="False"
+            DisplayMember="Name"
+            ItemsSource="{Binding RoomsNumsViewModels}"
+            EditValue="{Binding RoomsNums}" />
 
-        <DockPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="10">
-            <TextBlock Margin="0,0,10,0" Text="Стадия:"/>
-            <ComboBox Grid.Row="1" 
-                  ItemsSource="{Binding RoomsNums.Phases}"
-                  SelectedItem="{Binding RoomsNums.Phase}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
+        <DockPanel
+            Grid.Row="1" Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Margin="10">
+            <TextBlock
+                Margin="0,0,10,0"
+                Text="Стадия:" />
+            <dxe:ComboBoxEdit
+                IsTextEditable="False"
+                DisplayMember="Name"
+                ItemsSource="{Binding RoomsNums.Phases}"
+                SelectedItem="{Binding RoomsNums.Phase}" />
         </DockPanel>
 
-        <DockPanel Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Margin="10">
-            <TextBlock Margin="0,0,10,0" Text="Префикс:"/>
-            <TextBox Text="{Binding RoomsNums.Prefix, UpdateSourceTrigger=PropertyChanged}"/>
+        <DockPanel
+            Grid.Row="0" Grid.Column="2"
+            Grid.ColumnSpan="2"
+            Margin="10">
+
+            <TextBlock
+                Margin="0,0,10,0"
+                Text="Префикс:" />
+
+            <dxe:TextEdit
+                EditValue="{Binding RoomsNums.Prefix, UpdateSourceTrigger=PropertyChanged}" />
         </DockPanel>
 
-        <DockPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Margin="10">
-            <TextBlock Margin="0,0,10,0"  Text="Суффикс:"/>
-            <TextBox Text="{Binding RoomsNums.Suffix, UpdateSourceTrigger=PropertyChanged}"/>
+        <DockPanel
+            Grid.Row="1" Grid.Column="2"
+            Grid.ColumnSpan="2"
+            Margin="10">
+
+            <TextBlock
+                Margin="0,0,10,0"
+                Text="Суффикс:" />
+
+            <dxe:TextEdit
+                EditValue="{Binding RoomsNums.Suffix, UpdateSourceTrigger=PropertyChanged}" />
         </DockPanel>
 
-        <DockPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="10">
-            <TextBlock Margin="0,0,10,0" Text="Начальный номер:"/>
-            <TextBox Text="{Binding RoomsNums.StartNumber, UpdateSourceTrigger=PropertyChanged}"/>
+        <DockPanel
+            Grid.Row="2" Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Margin="10">
+
+            <TextBlock
+                Margin="0,0,10,0"
+                Text="Начальный номер:" />
+
+            <dxe:TextEdit
+                EditValue="{Binding RoomsNums.StartNumber, UpdateSourceTrigger=PropertyChanged}" />
         </DockPanel>
 
-        <RadioButton Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" Margin="10" GroupName="nums" Content="Нумерация групп помещений (квартир, МОП)"
-                     IsChecked="{Binding RoomsNums.IsNumFlats}"/>
-        <RadioButton x:Name="_roomsNums" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Margin="10" GroupName="nums" Content="Нумерация помещений"
-                     IsChecked="{Binding RoomsNums.IsNumRooms}"/>
-        <RadioButton Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums" Content="Нумерация помещений в пределах каждой группы"
+        <RadioButton Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" Margin="10" GroupName="nums"
+                     Content="Нумерация групп помещений (квартир, МОП)"
+                     IsChecked="{Binding RoomsNums.IsNumFlats}" />
+        <RadioButton x:Name="_roomsNums" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Margin="10" GroupName="nums"
+                     Content="Нумерация помещений"
+                     IsChecked="{Binding RoomsNums.IsNumRooms}" />
+        <RadioButton Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums"
+                     Content="Нумерация помещений в пределах каждой группы"
                      Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
-                     IsChecked="{Binding RoomsNums.IsNumRoomsGroup}"/>
-        <RadioButton Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums" Content="Сквозная нумерация помещений в пределах секции"
+                     IsChecked="{Binding RoomsNums.IsNumRoomsGroup}" />
+        <RadioButton Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums"
+                     Content="Сквозная нумерация помещений в пределах секции"
                      Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
-                     IsChecked="{Binding RoomsNums.IsNumRoomsSection}"/>
+                     IsChecked="{Binding RoomsNums.IsNumRoomsSection}" />
+        <RadioButton Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums"
+                     Content="Сквозная нумерация помещений в пределах секции и этажа"
+                     Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
+                     IsChecked="{Binding RoomsNums.IsNumRoomsSectionLevels}" />
 
-        <DockPanel Grid.Row="7" Grid.Column="0" Margin="10" LastChildFill="True">
-            <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Секции для нумерации"/>
 
-            <ListView x:Name="_sections" ItemsSource="{Binding RoomsNums.Sections}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Width="35">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsSelected}">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="Checked">
-                                                <i:InvokeCommandAction 
-                                                    Command="{Binding SelectElementsCommand}" 
-                                                    CommandParameter="{Binding SelectedItems, ElementName=_sections}"/>
-                                            </i:EventTrigger>
-                                            <i:EventTrigger EventName="Unchecked">
-                                                <i:InvokeCommandAction
-                                                    Command="{Binding UnselectElementsCommand}"
-                                                    CommandParameter="{Binding SelectedItems, ElementName=_sections}"/>
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </CheckBox>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Наименование" Width="100"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+        <DockPanel Grid.Row="8" Grid.Column="0" Margin="10" LastChildFill="True">
+            <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Секции для нумерации" />
+
+            <dxg:GridControl
+                ItemsSource="{Binding RoomsNums.Sections}">
+
+                <dxg:GridControl.View>
+                    <dxg:TableView
+                        AutoWidth="True"
+                        AllowGrouping="False"
+                        ShowGroupPanel="False" />
+                </dxg:GridControl.View>
+
+                <dxg:GridColumn
+                    Header=""
+                    ToolTip="Выделение"
+                    FieldName="IsSelected"
+                    Width="43" MaxWidth="43"
+                    MinWidth="43" AllowResizing="False"
+                    AllowColumnFiltering="False"
+                    AllowSorting="False"
+                    ShowCheckBoxInHeader="True">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <dxe:CheckEdit
+                                Name="PART_Editor"
+                                IsChecked="{Binding Row.IsSelected}" />
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
+
+                <dxg:GridColumn ReadOnly="True" FieldName="Name" Header="Наименование" />
+            </dxg:GridControl>
         </DockPanel>
 
-        <DockPanel Grid.Row="7" Grid.Column="1" Margin="10" LastChildFill="True">
-            <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Группы для нумерации"/>
-            <ListView x:Name="_groups" ItemsSource="{Binding RoomsNums.Groups}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Width="35">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsSelected}">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="Checked">
-                                                <i:InvokeCommandAction 
-                                                    Command="{Binding SelectElementsCommand}" 
-                                                    CommandParameter="{Binding SelectedItems, ElementName=_groups}"/>
-                                            </i:EventTrigger>
-                                            <i:EventTrigger EventName="Unchecked">
-                                                <i:InvokeCommandAction
-                                                    Command="{Binding UnselectElementsCommand}"
-                                                    CommandParameter="{Binding SelectedItems, ElementName=_groups}"/>
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </CheckBox>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Наименование" Width="100"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+        <DockPanel Grid.Row="8" Grid.Column="1" Margin="10" LastChildFill="True">
+            <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Группы для нумерации" />
+            <dxg:GridControl
+                ItemsSource="{Binding RoomsNums.Groups}">
+
+                <dxg:GridControl.View>
+                    <dxg:TableView
+                        AutoWidth="True"
+                        AllowGrouping="False"
+                        ShowGroupPanel="False" />
+                </dxg:GridControl.View>
+
+                <dxg:GridColumn
+                    Header=""
+                    ToolTip="Выделение"
+                    FieldName="IsSelected"
+                    Width="43" MaxWidth="43"
+                    MinWidth="43" AllowResizing="False"
+                    AllowColumnFiltering="False"
+                    AllowSorting="False"
+                    ShowCheckBoxInHeader="True">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <dxe:CheckEdit
+                                Name="PART_Editor"
+                                IsChecked="{Binding Row.IsSelected}" />
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
+
+                <dxg:GridColumn ReadOnly="True" FieldName="Name" Header="Наименование" />
+            </dxg:GridControl>
         </DockPanel>
 
-        <DockPanel Grid.Row="7" Grid.Column="2" Margin="10" LastChildFill="True">
-            <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Уровни для нумерации"/>
-            <ListView x:Name="_levels" ItemsSource="{Binding RoomsNums.Levels}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Width="35">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsSelected}">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="Checked">
-                                                <i:InvokeCommandAction 
-                                                    Command="{Binding SelectElementsCommand}" 
-                                                    CommandParameter="{Binding SelectedItems, ElementName=_levels}"/>
-                                            </i:EventTrigger>
-                                            <i:EventTrigger EventName="Unchecked">
-                                                <i:InvokeCommandAction
-                                                    Command="{Binding UnselectElementsCommand}"
-                                                    CommandParameter="{Binding SelectedItems, ElementName=_levels}"/>
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </CheckBox>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Наименование" Width="100"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+        <DockPanel Grid.Row="8" Grid.Column="2" Margin="10" LastChildFill="True">
+            <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Уровни для нумерации" />
+
+            <dxg:GridControl
+                ItemsSource="{Binding RoomsNums.Levels}">
+
+                <dxg:GridControl.View>
+                    <dxg:TableView
+                        AutoWidth="True"
+                        AllowGrouping="False"
+                        ShowGroupPanel="False" />
+                </dxg:GridControl.View>
+
+                <dxg:GridColumn
+                    Header=""
+                    ToolTip="Выделение"
+                    FieldName="IsSelected"
+                    Width="43" MaxWidth="43"
+                    MinWidth="43" AllowResizing="False"
+                    AllowColumnFiltering="False"
+                    AllowSorting="False"
+                    ShowCheckBoxInHeader="True">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <dxe:CheckEdit
+                                Name="PART_Editor"
+                                IsChecked="{Binding Row.IsSelected}" />
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
+
+                <dxg:GridColumn ReadOnly="True" FieldName="Name" Header="Наименование" />
+                <dxg:GridColumn ReadOnly="True" FieldName="LevelNames" Header="Уровень" />
+            </dxg:GridControl>
         </DockPanel>
 
-        <DockPanel Grid.Row="7" Grid.Column="3" Margin="10" LastChildFill="True">
-            <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Приоритеты помещений"/>
+        <DockPanel Grid.Row="8" Grid.Column="3" Margin="10" LastChildFill="True">
+            <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Приоритеты помещений" />
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
-                <Button Content="↑" Width="25" ToolTip="Вверх" Margin="5" Command="{Binding RoomsNums.UpOrderCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}" />
-                <Button Content="↓" Width="25" ToolTip="Вниз" Margin="5" Command="{Binding RoomsNums.DownOrderCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}" />
-                <Button Content="+" Width="25" ToolTip="Добавить" Margin="5" Command="{Binding RoomsNums.AddOrderCommand}" />
-                <Button Content="-" Width="25" ToolTip="Удалить" Margin="5" Command="{Binding RoomsNums.RemoveOrderCommand}" CommandParameter="{Binding SelectedItems, ElementName=listbox}" />
-                <Button Content="*" Width="25" ToolTip="Сохранить" Margin="5" Command="{Binding RoomsNums.SaveOrderCommand}" />
+                <dx:SimpleButton
+                    ToolTip="Вверх"
+                    Width="25" Margin=" 5"
+                    Command="{Binding RoomsNums.UpOrderCommand}"
+                    CommandParameter="{Binding SelectedItems, ElementName=listbox}"
+                    GlyphHeight="16" Glyph="{dx:DXImage SvgImages/Arrows/MoveUp.svg}" />
+                <dx:SimpleButton
+                    ToolTip="Вниз"
+                    Width="25" Margin="5"
+                    Command="{Binding RoomsNums.DownOrderCommand}"
+                    CommandParameter="{Binding SelectedItems, ElementName=listbox}"
+                    GlyphHeight="16" Glyph="{dx:DXImage SvgImages/Arrows/MoveUp.svg}" />
+                <dx:SimpleButton
+                    ToolTip="Добавить"
+                    Width="25" Margin="5"
+                    Command="{Binding RoomsNums.AddOrderCommand}"
+                    GlyphHeight="16" Glyph="{dx:DXImage Office2013/Actions/Add_16x16.png}" />
+                <dx:SimpleButton
+                    ToolTip="Удалить"
+                    Width="25" Margin="5"
+                    Command="{Binding RoomsNums.RemoveOrderCommand}"
+                    CommandParameter="{Binding SelectedItems, ElementName=listbox}"
+                    GlyphHeight="16" Glyph="{dx:DXImage Office2013/Actions/Cancel_16x16.png}" />
+                <dx:SimpleButton
+                    ToolTip="Сохранить"
+                    Width="25" Margin="5"
+                    Command="{Binding RoomsNums.SaveOrderCommand}"
+                    GlyphHeight="16" Glyph="{dx:DXImage SvgImages/Save/Save.svg}" />
             </StackPanel>
-            <ListView x:Name="listbox" ItemsSource="{Binding RoomsNums.SelectedNumberingOrders}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Наименование" Width="100"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+
+            <dxg:GridControl
+                x:Name="listbox"
+                SelectionMode="Row"
+                ItemsSource="{Binding RoomsNums.SelectedNumberingOrders}">
+
+                <dxg:GridControl.View>
+                    <dxg:TableView
+                        AutoWidth="True"
+                        AllowEditing="False"
+                        AllowGrouping="False"
+                        ShowGroupPanel="False" />
+                </dxg:GridControl.View>
+
+                <dxg:GridColumn FieldName="Name" Header="Наименование" />
+            </dxg:GridControl>
         </DockPanel>
 
-        <StackPanel Grid.Row="8" Grid.ColumnSpan="4" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel
+            Grid.Row="9" Grid.Column="0"
+            Grid.ColumnSpan="4"
+            Orientation="Horizontal" HorizontalAlignment="Right">
+
             <TextBlock Margin="10" Text="{Binding RoomsNums.ErrorText}" Foreground="Orange" />
-            <Button Content="Запуск" Height="25" Width="70" Margin="10" IsDefault="True"
-                    Command="{Binding RoomsNums.NumerateRoomsCommand}"/>
-            <Button Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true" Click="ButtonCancel_Click"/>
+            <dx:SimpleButton Content="Запуск" Height="25" Width="70" Margin="10" IsDefault="True"
+                             Command="{Binding RoomsNums.NumerateRoomsCommand}" />
+            <dx:SimpleButton Content="Отмена" Height="25" Width="70" Margin="10" IsCancel="true"
+                             Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
-</base:PlatformWindow>
+</base:ThemedPlatformWindow>

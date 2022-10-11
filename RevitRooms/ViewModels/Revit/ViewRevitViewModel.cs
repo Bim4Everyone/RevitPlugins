@@ -25,8 +25,9 @@ namespace RevitRooms.ViewModels.Revit {
 
             return viewElements.Union(additionalElements)
                 .Where(item => item.Level != null)
-                .GroupBy(item => item.Level, new ElementComparer())
-                .Select(item => new LevelViewModel((Level) item.Key, _revitRepository, item));
+                .GroupBy(item => item.Level.Name.Split('_').FirstOrDefault())
+                .Select(item =>
+                    new LevelViewModel(item.Key, item.Select(room => room.Level).ToList(), _revitRepository, item));
         }
     }
 }
