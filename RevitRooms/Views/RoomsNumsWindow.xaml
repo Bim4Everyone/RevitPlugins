@@ -111,7 +111,7 @@
                      Content="Нумерация помещений"
                      IsChecked="{Binding RoomsNums.IsNumRooms}" />
         <RadioButton Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums"
-                     Content="Нумерация помещений в пределах каждой группы"
+                     Content="Нумерация помещений в пределах каждой секции, этажа и группы"
                      Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
                      IsChecked="{Binding RoomsNums.IsNumRoomsGroup}" />
         <RadioButton Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums"
@@ -243,7 +243,7 @@
                     Width="25" Margin="5"
                     Command="{Binding RoomsNums.DownOrderCommand}"
                     CommandParameter="{Binding SelectedItems, ElementName=listbox}"
-                    GlyphHeight="16" Glyph="{dx:DXImage SvgImages/Arrows/MoveUp.svg}" />
+                    GlyphHeight="16" Glyph="{dx:DXImage SvgImages/Arrows/MoveDown.svg}" />
                 <dx:SimpleButton
                     ToolTip="Добавить"
                     Width="25" Margin="5"
