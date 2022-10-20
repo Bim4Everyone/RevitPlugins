@@ -24,7 +24,6 @@ namespace RevitSetLevelSection.Models {
 
     public class SetLevelSectionSettings : ProjectSettings {
         public int LinkFileId { get; set; }
-        public bool FromRevitParam { get; set; }
         public override string ProjectName { get; set; }
 
         public List<ParamSettings> ParamSettings { get; set; } = new List<ParamSettings>();

@@ -103,24 +103,6 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <RadioButton
-            Grid.Column="1"
-            Grid.Row="0"
-            Grid.ColumnSpan="2"
-            Margin="10"
-            Content="Заполнить параметры по сведениям из проекта"
-            HorizontalAlignment="Left"
-            IsChecked="{Binding FromRevitParam}" />
-
-        <RadioButton
-            Grid.Column="1"
-            Grid.Row="1"
-            Grid.ColumnSpan="2"
-            Margin="10"
-            HorizontalAlignment="Left"
-            Content="Заполнить параметры по формообразующим"
-            IsChecked="{Binding FromRevitParam, Converter={StaticResource InverseBooleanConverter}}" />
-
         <TextBlock
             Grid.Column="0"
             Grid.Row="2"

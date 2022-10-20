@@ -74,13 +74,9 @@ namespace RevitSetLevelSection.ViewModels {
             }
         }
 
-        public override string GetErrorText(bool fromRevitParam) {
+        public override string GetErrorText() {
             if(!IsEnabled) {
                 return null;
-            }
-
-            if(fromRevitParam) {
-                return string.IsNullOrEmpty(ParamValue) ? "Заполните значение параметра документа." : null;
             }
 
             if(DesignOption == null) {
@@ -92,12 +88,8 @@ namespace RevitSetLevelSection.ViewModels {
                 : null;
         }
 
-        public override void UpdateElements(bool fromRevitParam) {
-            if(fromRevitParam) {
-                _revitRepository.UpdateElements(RevitParam, ParamValue);
-            } else {
-                _revitRepository.UpdateElements(RevitParam, DesignOption.Transform, DesignOption.GetMassObjects());
-            }
+        public override void UpdateElements() {
+            _revitRepository.UpdateElements(RevitParam, DesignOption.Transform, DesignOption.GetMassObjects());
         }
 
         private bool HasNotRussianLetters() {

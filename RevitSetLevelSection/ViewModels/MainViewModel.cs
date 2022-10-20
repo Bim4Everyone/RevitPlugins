@@ -44,11 +44,6 @@ namespace RevitSetLevelSection.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public bool FromRevitParam {
-            get => _fromRevitParam;
-            set => this.RaiseAndSetIfChanged(ref _fromRevitParam, value);
-        }
-
         public LinkTypeViewModel LinkType {
             get => _linkType;
             set => this.RaiseAndSetIfChanged(ref _linkType, value);
@@ -84,7 +79,7 @@ namespace RevitSetLevelSection.ViewModels {
                   _revitRepository.StartTransactionGroup("Установка уровня/секции")) {
                 
                 foreach(FillParamViewModel fillParamViewModel in FillParams.Where(item => item.IsEnabled)) {
-                    fillParamViewModel.UpdateElements(FromRevitParam);
+                    fillParamViewModel.UpdateElements();
                 }
 
                 transactionGroup.Assimilate();
@@ -92,7 +87,7 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         private bool CanUpdateElement(object param) {
-            if(!FromRevitParam && LinkType == null) {
+            if(LinkType == null) {
                 ErrorText = "Выберите связанный файл с формообразующими.";
                 return false;
             }
@@ -108,7 +103,7 @@ namespace RevitSetLevelSection.ViewModels {
             }
 
             string errorText = FillParams
-                .Select(item => item.GetErrorText(FromRevitParam))
+                .Select(item => item.GetErrorText())
                 .FirstOrDefault(item => !string.IsNullOrEmpty(item));
 
             if(!string.IsNullOrEmpty(errorText)) {
@@ -128,7 +123,6 @@ namespace RevitSetLevelSection.ViewModels {
                 return;
             }
 
-            FromRevitParam = settings.FromRevitParam;
             LinkType = LinkTypes
                            .FirstOrDefault(item => item.Id == settings.LinkFileId)
                        ?? LinkTypes.FirstOrDefault();
@@ -151,7 +145,6 @@ namespace RevitSetLevelSection.ViewModels {
             }
 
             settings.LinkFileId = LinkType.Id;
-            settings.FromRevitParam = FromRevitParam;
             settings.ParamSettings.Clear();
             foreach(FillParamViewModel fillParam in FillParams) {
                 ParamSettings paramSettings = fillParam.GetParamSettings();

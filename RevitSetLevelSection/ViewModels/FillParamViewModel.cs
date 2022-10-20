@@ -8,8 +8,8 @@ namespace RevitSetLevelSection.ViewModels {
         public abstract bool IsEnabled { get; set; }
         public abstract RevitParam RevitParam { get; set; }
 
-        public abstract string GetErrorText(bool fromRevitParam);
-        public abstract void UpdateElements(bool fromProjectParam);
+        public abstract string GetErrorText();
+        public abstract void UpdateElements();
 
         public abstract ParamSettings GetParamSettings();
         public abstract void SetParamSettings(ParamSettings paramSettings);

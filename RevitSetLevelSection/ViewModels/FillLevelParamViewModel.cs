@@ -32,11 +32,11 @@ namespace RevitSetLevelSection.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _isEnabled, value);
         }
 
-        public override string GetErrorText(bool fromRevitParam) {
+        public override string GetErrorText() {
             return null;
         }
 
-        public override void UpdateElements(bool fromProjectParam) {
+        public override void UpdateElements() {
             _revitRepository.SetLevelParam(RevitParam);
         }
 
