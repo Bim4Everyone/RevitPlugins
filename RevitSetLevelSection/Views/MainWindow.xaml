@@ -74,6 +74,7 @@
 
                     <dxe:ComboBoxEdit
                         DockPanel.Dock="Left"
+                        IsTextEditable="False"
                         IsEnabled="{Binding IsEnabled}"
                         SelectedItem="{Binding DesignOption}"
                         DisplayMember="Name"
@@ -94,6 +95,7 @@
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -122,8 +124,8 @@
         <TextBlock
             Grid.Column="0"
             Grid.Row="2"
-            Margin="20"
-            Text="Связанный файл" />
+            Margin="10"
+            Text="Координационный файл" />
 
         <DockPanel
             Grid.Column="1"
@@ -132,28 +134,49 @@
             Margin="10">
 
             <dx:SimpleButton
-                Margin="10"
                 Content="Загрузить"
                 DockPanel.Dock="Right"
                 Width="80"
+                Margin="10 0 0 0"
                 Command="{Binding LinkType.LoadLinkDocumentCommand}" />
 
             <dxe:ComboBoxEdit
-                Margin="10"
                 DisplayMember="Name"
+                IsTextEditable="False"
                 SelectedItem="{Binding LinkType}"
                 ItemsSource="{Binding LinkTypes}"
                 IsEnabled="{Binding FromRevitParam, Converter={StaticResource InverseBooleanConverter}}" />
         </DockPanel>
 
+        <TextBlock
+            Grid.Column="0"
+            Grid.Row="3"
+            Margin="10"
+            Text="Раздел" />
+
+        <DockPanel
+            Grid.Column="1"
+            Grid.Row="3"
+            Grid.ColumnSpan="2"
+            Margin="10">
+
+            <dxe:ComboBoxEdit
+                DisplayMember="Name"
+                IsTextEditable="False"
+                SelectedItem="{Binding BuildPart}"
+                ItemsSource="{Binding BuildParts}"
+                IsEnabled="{Binding FromRevitParam, Converter={StaticResource InverseBooleanConverter}}" />
+        </DockPanel>
+        
+        
         <ItemsControl
             Grid.Column="0"
             Grid.ColumnSpan="3"
-            Grid.Row="3"
+            Grid.Row="4"
             Margin="10"
             ItemsSource="{Binding FillParams}" />
 
-        <StackPanel Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="3" Orientation="Horizontal"
+        <StackPanel Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="3" Orientation="Horizontal"
                     HorizontalAlignment="Right">
             <TextBlock Margin="10" Foreground="Orange" VerticalAlignment="Center"
                        Text="{Binding ErrorText}" />
