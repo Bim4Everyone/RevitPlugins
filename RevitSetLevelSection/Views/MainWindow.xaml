@@ -15,15 +15,9 @@
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
-        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-
         <converters:BoolToVisibilityConverter
             x:Key="BoolToHiddenConverter"
             TrueValue="Visible" FalseValue="Hidden" />
-
-        <converters:BoolToVisibilityConverter
-            x:Key="InverseBoolToHiddenConverter"
-            TrueValue="Hidden" FalseValue="Visible" />
 
         <DataTemplate DataType="{x:Type vms:FillLevelParamViewModel}">
             <dxe:CheckEdit Margin="10" IsChecked="{Binding IsEnabled}">
@@ -54,15 +48,11 @@
                     Grid.Column="1"
                     Grid.Row="0"
                     IsEnabled="{Binding IsEnabled}"
-                    Text="{Binding ParamValue, UpdateSourceTrigger=PropertyChanged}"
-                    Visibility="{Binding DataContext.FromRevitParam,
-                                 Converter={StaticResource BoolToHiddenConverter}, ElementName=_this}" />
+                    Text="{Binding ParamValue, UpdateSourceTrigger=PropertyChanged}" />
 
                 <DockPanel
                     Grid.Column="1"
-                    LastChildFill="True"
-                    Visibility="{Binding DataContext.FromRevitParam,
-                                 Converter={StaticResource InverseBoolToHiddenConverter}, ElementName=_this}">
+                    LastChildFill="True">
 
                     <Image
                         DockPanel.Dock="Right"
@@ -126,8 +116,7 @@
                 DisplayMember="Name"
                 IsTextEditable="False"
                 SelectedItem="{Binding LinkType}"
-                ItemsSource="{Binding LinkTypes}"
-                IsEnabled="{Binding FromRevitParam, Converter={StaticResource InverseBooleanConverter}}" />
+                ItemsSource="{Binding LinkTypes}"/>
         </DockPanel>
 
         <TextBlock
@@ -146,8 +135,7 @@
                 DisplayMember="Name"
                 IsTextEditable="False"
                 SelectedItem="{Binding BuildPart}"
-                ItemsSource="{Binding BuildParts}"
-                IsEnabled="{Binding FromRevitParam, Converter={StaticResource InverseBooleanConverter}}" />
+                ItemsSource="{Binding BuildParts}"/>
         </DockPanel>
         
         
