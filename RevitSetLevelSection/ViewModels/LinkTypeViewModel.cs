@@ -8,6 +8,7 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -17,13 +18,22 @@ namespace RevitSetLevelSection.ViewModels {
     internal class LinkTypeViewModel : BaseViewModel {
         private readonly RevitLinkType _revitLinkType;
         private readonly RevitRepository _revitRepository;
-
+        private readonly LinkInstanceRepository _linkInstanceRepository;
+        
         private bool _isLoaded;
         private ObservableCollection<DesignOptionsViewModel> _designOptions;
 
         public LinkTypeViewModel(RevitLinkType revitLinkType, RevitRepository revitRepository) {
             _revitLinkType = revitLinkType;
             _revitRepository = revitRepository;
+            
+            RevitLinkInstance linkInstance = _revitRepository.GetLinkInstances()
+                .FirstOrDefault(item => item.GetTypeId() == _revitLinkType.Id);
+
+            if(linkInstance != null) {
+                _linkInstanceRepository =
+                    new LinkInstanceRepository(_revitRepository.Application, linkInstance);
+            }
 
             IsLoaded = _revitLinkType.GetLinkedFileStatus() == LinkedFileStatus.Loaded;
             LoadLinkDocumentCommand = new RelayCommand(LoadLinkDocument, CanLoadLinkDocument);
@@ -47,18 +57,20 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         private IEnumerable<DesignOptionsViewModel> GetDesignOptions() {
-            var linkInstance = _revitRepository.GetLinkInstances()
-                .FirstOrDefault(item => item.GetTypeId() == _revitLinkType.Id);
-
-            if(linkInstance == null) {
+            if(_linkInstanceRepository == null) {
                 return Enumerable.Empty<DesignOptionsViewModel>();
             }
 
-            var linkInstanceRepository =
-                new LinkInstanceRepository(_revitRepository.Application, linkInstance);
+            return _linkInstanceRepository.GetDesignOptions()
+                .Select(item => new DesignOptionsViewModel(item, _linkInstanceRepository));
+        }
+        
+        public RevitParam GetPartParam(string paramName) {
+            return _linkInstanceRepository.GetPartParam(paramName);
+        }
 
-            return linkInstanceRepository.GetDesignOptions()
-                .Select(item => new DesignOptionsViewModel(item, linkInstanceRepository));
+        public IEnumerable<RevitParam> GetPartParams(IEnumerable<string> paramNames) {
+            return _linkInstanceRepository.GetPartParams(paramNames);
         }
 
         private void LoadLinkDocument(object param) {

@@ -24,6 +24,7 @@ namespace RevitSetLevelSection.ViewModels {
         
         private RevitParam _revitParam;
         private string _errorText;
+        private string _partParamName;
 
         public FillMassParamViewModel(MainViewModel mainViewModel, RevitRepository revitRepository) {
             _mainViewModel = mainViewModel ?? throw new ArgumentNullException(nameof(mainViewModel));
@@ -33,6 +34,11 @@ namespace RevitSetLevelSection.ViewModels {
         public override RevitParam RevitParam {
             get => _revitParam;
             set => this.RaiseAndSetIfChanged(ref _revitParam, value);
+        }
+        
+        public string PartParamName {
+            get => _partParamName;
+            set => this.RaiseAndSetIfChanged(ref _partParamName, value);
         }
 
         public string Name => $"Обновить \"{RevitParam.Name}\"";
