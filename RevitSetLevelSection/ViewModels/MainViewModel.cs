@@ -20,7 +20,6 @@ namespace RevitSetLevelSection.ViewModels {
         private readonly RevitRepository _revitRepository;
 
         private string _errorText;
-        private bool _fromRevitParam;
         private LinkTypeViewModel _linkType;
 
         public MainViewModel(RevitRepository revitRepository) {

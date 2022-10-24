@@ -44,12 +44,6 @@
                     <TextBlock Text="{Binding Name}" />
                 </dxe:CheckEdit>
 
-                <dxe:TextEdit
-                    Grid.Column="1"
-                    Grid.Row="0"
-                    IsEnabled="{Binding IsEnabled}"
-                    Text="{Binding ParamValue, UpdateSourceTrigger=PropertyChanged}" />
-
                 <DockPanel
                     Grid.Column="1"
                     LastChildFill="True">

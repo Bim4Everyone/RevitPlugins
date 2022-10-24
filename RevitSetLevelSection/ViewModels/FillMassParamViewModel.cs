@@ -21,8 +21,7 @@ namespace RevitSetLevelSection.ViewModels {
 
         private bool _isEnabled;
         private DesignOptionsViewModel _designOption;
-
-        private string _paramValue;
+        
         private RevitParam _revitParam;
         private string _errorText;
 
@@ -33,18 +32,10 @@ namespace RevitSetLevelSection.ViewModels {
 
         public override RevitParam RevitParam {
             get => _revitParam;
-            set {
-                this.RaiseAndSetIfChanged(ref _revitParam, value);
-                ParamValue = (string) _revitRepository.ProjectInfo.GetParamValueOrDefault(RevitParam);
-            }
+            set => this.RaiseAndSetIfChanged(ref _revitParam, value);
         }
 
         public string Name => $"Обновить \"{RevitParam.Name}\"";
-
-        public string ParamValue {
-            get => _paramValue;
-            set => this.RaiseAndSetIfChanged(ref _paramValue, value);
-        }
 
         public override bool IsEnabled {
             get => _isEnabled;
