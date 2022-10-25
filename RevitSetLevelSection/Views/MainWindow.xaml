@@ -126,7 +126,6 @@
             Margin="10">
 
             <dxe:ComboBoxEdit
-                DisplayMember="Name"
                 IsTextEditable="False"
                 SelectedItem="{Binding BuildPart}"
                 ItemsSource="{Binding BuildParts}"/>

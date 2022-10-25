@@ -21,6 +21,7 @@ namespace RevitSetLevelSection.ViewModels {
 
         private string _errorText;
         private LinkTypeViewModel _linkType;
+        private string _buildPart;
 
         public MainViewModel(RevitRepository revitRepository) {
             if(revitRepository is null) {
@@ -28,11 +29,12 @@ namespace RevitSetLevelSection.ViewModels {
             }
 
             _revitRepository = revitRepository;
+            BuildParts = new ObservableCollection<string>();
             LinkTypes = new ObservableCollection<LinkTypeViewModel>(GetLinkTypes());
             FillParams = new ObservableCollection<FillParamViewModel>(GetFillParams());
 
             UpdateElementsCommand = new RelayCommand(UpdateElements, CanUpdateElement);
-            
+
             SetConfig();
         }
 
@@ -43,31 +45,48 @@ namespace RevitSetLevelSection.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public LinkTypeViewModel LinkType {
-            get => _linkType;
-            set => this.RaiseAndSetIfChanged(ref _linkType, value);
+        public string BuildPart {
+            get => _buildPart;
+            set => this.RaiseAndSetIfChanged(ref _buildPart, value);
         }
 
+        public LinkTypeViewModel LinkType {
+            get => _linkType;
+            set {
+                this.RaiseAndSetIfChanged(ref _linkType, value);
+
+                BuildPart = null;
+                BuildParts.Clear();
+                if(LinkType != null) {
+                    var partNames = LinkType.GetPartNames();
+                    foreach(string partName in partNames) {
+                        BuildParts.Add(partName);
+                    }
+
+                    BuildPart = BuildParts.FirstOrDefault();
+                }
+            }
+        }
+
+        public ObservableCollection<string> BuildParts { get; }
         public ObservableCollection<LinkTypeViewModel> LinkTypes { get; }
         public ObservableCollection<FillParamViewModel> FillParams { get; }
 
         private IEnumerable<FillParamViewModel> GetFillParams() {
-            yield return new FillLevelParamViewModel(_revitRepository) {
-                RevitParam = SharedParamsConfig.Instance.Level
-            };
-            
+            yield return new FillLevelParamViewModel(_revitRepository) {RevitParam = SharedParamsConfig.Instance.Level};
+
             yield return new FillMassParamViewModel(this, _revitRepository) {
-                PartParamName = "Блок СМР_",
+                PartParamName = LinkInstanceRepository.BuildingWorksBlockName,
                 RevitParam = SharedParamsConfig.Instance.BuildingWorksBlock
             };
-            
+
             yield return new FillMassParamViewModel(this, _revitRepository) {
-                PartParamName = "Секция СМР_",
+                PartParamName = LinkInstanceRepository.BuildingWorksSectionName,
                 RevitParam = SharedParamsConfig.Instance.BuildingWorksSection
             };
-            
+
             yield return new FillMassParamViewModel(this, _revitRepository) {
-                PartParamName = "Типизация СМР_",
+                PartParamName = LinkInstanceRepository.BuildingWorksTypingName,
                 RevitParam = SharedParamsConfig.Instance.BuildingWorksSection
             };
         }
@@ -80,10 +99,9 @@ namespace RevitSetLevelSection.ViewModels {
 
         private void UpdateElements(object param) {
             SaveConfig();
-         
-            using(var transactionGroup = 
+
+            using(var transactionGroup =
                   _revitRepository.StartTransactionGroup("Установка уровня/секции")) {
-                
                 foreach(FillParamViewModel fillParamViewModel in FillParams.Where(item => item.IsEnabled)) {
                     fillParamViewModel.UpdateElements();
                 }
@@ -156,7 +174,7 @@ namespace RevitSetLevelSection.ViewModels {
                 ParamSettings paramSettings = fillParam.GetParamSettings();
                 settings.ParamSettings.Add(paramSettings);
             }
-            
+
             config.SaveProjectConfig();
         }
     }

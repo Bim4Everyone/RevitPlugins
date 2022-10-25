@@ -26,16 +26,11 @@ namespace RevitSetLevelSection.ViewModels {
         public LinkTypeViewModel(RevitLinkType revitLinkType, RevitRepository revitRepository) {
             _revitLinkType = revitLinkType;
             _revitRepository = revitRepository;
-            
-            RevitLinkInstance linkInstance = _revitRepository.GetLinkInstances()
-                .FirstOrDefault(item => item.GetTypeId() == _revitLinkType.Id);
 
-            if(linkInstance != null) {
-                _linkInstanceRepository =
-                    new LinkInstanceRepository(_revitRepository.Application, linkInstance);
-            }
+            _linkInstanceRepository =
+                new LinkInstanceRepository(_revitRepository, _revitLinkType);
 
-            IsLoaded = _revitLinkType.GetLinkedFileStatus() == LinkedFileStatus.Loaded;
+            IsLoaded = _linkInstanceRepository.LinkIsLoaded();
             LoadLinkDocumentCommand = new RelayCommand(LoadLinkDocument, CanLoadLinkDocument);
             DesignOptions = IsLoaded
                 ? new ObservableCollection<DesignOptionsViewModel>(GetDesignOptions())
@@ -57,37 +52,21 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         private IEnumerable<DesignOptionsViewModel> GetDesignOptions() {
-            if(_linkInstanceRepository == null) {
+            if(!_linkInstanceRepository.LinkIsLoaded()) {
                 return Enumerable.Empty<DesignOptionsViewModel>();
             }
 
             return _linkInstanceRepository.GetDesignOptions()
                 .Select(item => new DesignOptionsViewModel(item, _linkInstanceRepository));
         }
-        
-        public RevitParam GetPartParam(string paramName) {
-            return _linkInstanceRepository.GetPartParam(paramName);
-        }
 
-        public IEnumerable<RevitParam> GetPartParams(IEnumerable<string> paramNames) {
-            return _linkInstanceRepository.GetPartParams(paramNames);
+        public IEnumerable<string> GetPartNames() {
+            return _linkInstanceRepository.GetPartNames().Distinct();
         }
 
         private void LoadLinkDocument(object param) {
-            if(_revitLinkType.GetLinkedFileStatus() == LinkedFileStatus.InClosedWorkset) {
-                Workset workset = _revitRepository.GetWorkset(_revitLinkType);
-                TaskDialog.Show("Предупреждение!", $"Откройте рабочий набор \"{workset.Name}\"." 
-                                         + Environment.NewLine
-                                         + "Загрузка связанного файла из закрытого рабочего набора не поддерживается!");
-                
-                return;
-            }
-            
-            var loadResult = _revitLinkType.Load();
-            IsLoaded = loadResult.LoadResult == LinkLoadResultType.LinkLoaded;
-            if(IsLoaded) {
-                DesignOptions = new ObservableCollection<DesignOptionsViewModel>(GetDesignOptions());
-            }
+            IsLoaded = _linkInstanceRepository.LoadLinkDocument();
+            DesignOptions = new ObservableCollection<DesignOptionsViewModel>(GetDesignOptions());
         }
 
         private bool CanLoadLinkDocument(object param) {
