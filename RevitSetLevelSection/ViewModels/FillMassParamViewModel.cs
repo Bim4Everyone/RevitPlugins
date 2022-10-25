@@ -86,7 +86,8 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         public override void UpdateElements() {
-            _revitRepository.UpdateElements(RevitParam, DesignOption.Transform, DesignOption.GetMassObjects());
+            string partParamName = PartParamName + _mainViewModel.BuildPart;
+            _revitRepository.UpdateElements(RevitParam, partParamName, DesignOption.Transform, DesignOption.GetMassObjects());
         }
 
         private bool HasNotRussianLetters() {

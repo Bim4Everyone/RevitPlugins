@@ -12,6 +12,7 @@ using Autodesk.Revit.UI;
 using DevExpress.Xpf.Core.FilteringUI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
 
 using RevitSetLevelSection.Models.LevelDefinitions;
@@ -168,7 +169,7 @@ namespace RevitSetLevelSection.Models {
             }
         }
 
-        public void UpdateElements(RevitParam revitParam, Transform transform,
+        public void UpdateElements(RevitParam revitParam, string partParamName, Transform transform,
             IEnumerable<FamilyInstance> massElements) {
             List<Element> elements = GetElements(revitParam);
             var cashedElements = elements.ToDictionary(item => item.Id);
@@ -185,7 +186,12 @@ namespace RevitSetLevelSection.Models {
                         if(IsIntersectCenterElement(transform, massObject, element)) {
 
                             try {
-                                element.SetParamValue(revitParam, massObject);
+                                if(massObject.IsExistsProjectParam(partParamName)) {
+                                    element.SetParamValue(revitParam, massObject.GetParamValue<string>(partParamName));
+                                } else {
+                                    element.SetParamValue(revitParam, massObject);                                    
+                                }
+
                             } catch(InvalidOperationException) {
                                 // решили что существует много вариантов,
                                 // когда параметр не может заполнится из-за настроек в ревите

@@ -87,7 +87,7 @@ namespace RevitSetLevelSection.ViewModels {
 
             yield return new FillMassParamViewModel(this, _revitRepository) {
                 PartParamName = LinkInstanceRepository.BuildingWorksTypingName,
-                RevitParam = SharedParamsConfig.Instance.BuildingWorksSection
+                RevitParam = SharedParamsConfig.Instance.BuildingWorksTyping
             };
         }
 
