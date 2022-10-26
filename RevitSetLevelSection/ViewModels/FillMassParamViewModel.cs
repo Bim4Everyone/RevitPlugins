@@ -87,7 +87,8 @@ namespace RevitSetLevelSection.ViewModels {
 
         public override void UpdateElements() {
             string partParamName = PartParamName + _mainViewModel.BuildPart;
-            _revitRepository.UpdateElements(RevitParam, partParamName, DesignOption.Transform, DesignOption.GetMassObjects());
+            var paramOption = new ParamOption() {SharedRevitParam = RevitParam, ProjectRevitParamName = partParamName};
+            _revitRepository.UpdateElements(paramOption, DesignOption.Transform, DesignOption.GetMassObjects());
         }
 
         private bool HasNotRussianLetters() {
@@ -95,8 +96,10 @@ namespace RevitSetLevelSection.ViewModels {
                 return false;
             }
 
+            string partParamName = PartParamName + _mainViewModel.BuildPart;
+            var paramOption = new ParamOption() {SharedRevitParam = RevitParam, ProjectRevitParamName = partParamName};
             return DesignOption.GetMassObjects()
-                .Any(item => HasNotRussianLetters((string) item.GetParamValueOrDefault(RevitParam)));
+                .Any(item => HasNotRussianLetters(item.GetParamValue<string>(paramOption)));
         }
 
         private bool HasNotRussianLetters(string text) {

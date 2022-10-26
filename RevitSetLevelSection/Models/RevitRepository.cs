@@ -169,13 +169,13 @@ namespace RevitSetLevelSection.Models {
             }
         }
 
-        public void UpdateElements(RevitParam revitParam, string partParamName, Transform transform,
+        public void UpdateElements(ParamOption paramOption, Transform transform,
             IEnumerable<FamilyInstance> massElements) {
-            List<Element> elements = GetElements(revitParam);
+            List<Element> elements = GetElements(paramOption.SharedRevitParam);
             var cashedElements = elements.ToDictionary(item => item.Id);
 
             using(Transaction transaction =
-                  _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
+                  _document.StartTransaction($"Установка уровня/секции \"{paramOption.SharedRevitParam.Name}\"")) {
                 
                 foreach(Element element in elements) {
                     if(!cashedElements.ContainsKey(element.Id)) {
@@ -186,12 +186,8 @@ namespace RevitSetLevelSection.Models {
                         if(IsIntersectCenterElement(transform, massObject, element)) {
 
                             try {
-                                if(massObject.IsExistsProjectParam(partParamName)) {
-                                    element.SetParamValue(revitParam, massObject.GetParamValue<string>(partParamName));
-                                } else {
-                                    element.SetParamValue(revitParam, massObject);                                    
-                                }
-
+                                string paramValue = massObject.GetParamValue<string>(paramOption);
+                                element.SetParamValue(paramOption.SharedRevitParam, paramValue);  
                             } catch(InvalidOperationException) {
                                 // решили что существует много вариантов,
                                 // когда параметр не может заполнится из-за настроек в ревите
@@ -205,7 +201,7 @@ namespace RevitSetLevelSection.Models {
                 }
 
                 foreach(Element element in cashedElements.Values) {
-                    element.RemoveParamValue(revitParam);
+                    element.RemoveParamValue(paramOption.SharedRevitParam);
                 }
 
                 transaction.Commit();
