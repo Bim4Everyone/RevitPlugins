@@ -22,6 +22,7 @@ namespace RevitSetLevelSection.ViewModels {
         
         private bool _isLoaded;
         private ObservableCollection<DesignOptionsViewModel> _designOptions;
+        private ObservableCollection<string> _buildParts;
 
         public LinkTypeViewModel(RevitLinkType revitLinkType, RevitRepository revitRepository) {
             _revitLinkType = revitLinkType;
@@ -31,6 +32,7 @@ namespace RevitSetLevelSection.ViewModels {
                 new LinkInstanceRepository(_revitRepository, _revitLinkType);
 
             IsLoaded = _linkInstanceRepository.LinkIsLoaded();
+            BuildParts = new ObservableCollection<string>(GetPartNames());
             LoadLinkDocumentCommand = new RelayCommand(LoadLinkDocument, CanLoadLinkDocument);
             DesignOptions = IsLoaded
                 ? new ObservableCollection<DesignOptionsViewModel>(GetDesignOptions())
@@ -44,6 +46,11 @@ namespace RevitSetLevelSection.ViewModels {
         public bool IsLoaded {
             get => _isLoaded;
             set => this.RaiseAndSetIfChanged(ref _isLoaded, value);
+        }
+        
+        public ObservableCollection<string> BuildParts {
+            get => _buildParts;
+            set => this.RaiseAndSetIfChanged(ref _buildParts, value);
         }
 
         public ObservableCollection<DesignOptionsViewModel> DesignOptions {
@@ -66,6 +73,7 @@ namespace RevitSetLevelSection.ViewModels {
 
         private void LoadLinkDocument(object param) {
             IsLoaded = _linkInstanceRepository.LoadLinkDocument();
+            BuildParts = new ObservableCollection<string>(GetPartNames());
             DesignOptions = new ObservableCollection<DesignOptionsViewModel>(GetDesignOptions());
         }
 

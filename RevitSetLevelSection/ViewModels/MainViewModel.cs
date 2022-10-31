@@ -29,7 +29,6 @@ namespace RevitSetLevelSection.ViewModels {
             }
 
             _revitRepository = revitRepository;
-            BuildParts = new ObservableCollection<string>();
             LinkTypes = new ObservableCollection<LinkTypeViewModel>(GetLinkTypes());
             FillParams = new ObservableCollection<FillParamViewModel>(GetFillParams());
 
@@ -52,23 +51,9 @@ namespace RevitSetLevelSection.ViewModels {
 
         public LinkTypeViewModel LinkType {
             get => _linkType;
-            set {
-                this.RaiseAndSetIfChanged(ref _linkType, value);
-
-                BuildPart = null;
-                BuildParts.Clear();
-                if(LinkType != null) {
-                    var partNames = LinkType.GetPartNames();
-                    foreach(string partName in partNames) {
-                        BuildParts.Add(partName);
-                    }
-
-                    BuildPart = BuildParts.FirstOrDefault();
-                }
-            }
+            set => this.RaiseAndSetIfChanged(ref _linkType, value);
         }
 
-        public ObservableCollection<string> BuildParts { get; }
         public ObservableCollection<LinkTypeViewModel> LinkTypes { get; }
         public ObservableCollection<FillParamViewModel> FillParams { get; }
 
@@ -152,9 +137,11 @@ namespace RevitSetLevelSection.ViewModels {
             LinkType = LinkTypes
                            .FirstOrDefault(item => item.Id == settings.LinkFileId)
                        ?? LinkTypes.FirstOrDefault();
-            
-            BuildPart = BuildParts.Contains(settings.BuildPart) ? settings.BuildPart : null;
-            
+
+            BuildPart = LinkType?.BuildParts.Contains(settings.BuildPart) == true
+                ? settings.BuildPart
+                : null;
+
             foreach(FillParamViewModel fillParam in FillParams) {
                 ParamSettings paramSettings = settings.ParamSettings
                     .FirstOrDefault(item => item.PropertyName.Equals(fillParam.RevitParam.Id));
