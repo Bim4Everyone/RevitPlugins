@@ -152,7 +152,9 @@ namespace RevitSetLevelSection.ViewModels {
             LinkType = LinkTypes
                            .FirstOrDefault(item => item.Id == settings.LinkFileId)
                        ?? LinkTypes.FirstOrDefault();
-
+            
+            BuildPart = BuildParts.Contains(settings.BuildPart) ? settings.BuildPart : null;
+            
             foreach(FillParamViewModel fillParam in FillParams) {
                 ParamSettings paramSettings = settings.ParamSettings
                     .FirstOrDefault(item => item.PropertyName.Equals(fillParam.RevitParam.Id));
@@ -170,6 +172,7 @@ namespace RevitSetLevelSection.ViewModels {
                 settings = config.AddSettings(_revitRepository.Document);
             }
 
+            settings.BuildPart = BuildPart;
             settings.LinkFileId = LinkType.Id;
             settings.ParamSettings.Clear();
             foreach(FillParamViewModel fillParam in FillParams) {
