@@ -210,6 +210,10 @@ namespace RevitSetLevelSection.Models {
 
                 foreach(Element element in cashedElements.Values) {
                     element.RemoveParamValue(paramOption.SharedRevitParam);
+                    if(!string.IsNullOrEmpty(paramOption.AdskParamName)
+                       && element.IsExistsSharedParam(paramOption.AdskParamName)) {
+                        element.RemoveSharedParamValue(paramOption.AdskParamName);
+                    }
                 }
 
                 transaction.Commit();
