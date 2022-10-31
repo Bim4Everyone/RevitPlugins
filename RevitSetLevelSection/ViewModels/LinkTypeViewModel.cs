@@ -21,8 +21,10 @@ namespace RevitSetLevelSection.ViewModels {
         private readonly LinkInstanceRepository _linkInstanceRepository;
         
         private bool _isLoaded;
-        private ObservableCollection<DesignOptionsViewModel> _designOptions;
+        private string _buildPart;
+        
         private ObservableCollection<string> _buildParts;
+        private ObservableCollection<DesignOptionsViewModel> _designOptions;
 
         public LinkTypeViewModel(RevitLinkType revitLinkType, RevitRepository revitRepository) {
             _revitLinkType = revitLinkType;
@@ -32,7 +34,10 @@ namespace RevitSetLevelSection.ViewModels {
                 new LinkInstanceRepository(_revitRepository, _revitLinkType);
 
             IsLoaded = _linkInstanceRepository.LinkIsLoaded();
+            
             BuildParts = new ObservableCollection<string>(GetPartNames());
+            BuildPart = BuildParts.FirstOrDefault();
+            
             LoadLinkDocumentCommand = new RelayCommand(LoadLinkDocument, CanLoadLinkDocument);
             DesignOptions = IsLoaded
                 ? new ObservableCollection<DesignOptionsViewModel>(GetDesignOptions())
@@ -46,6 +51,11 @@ namespace RevitSetLevelSection.ViewModels {
         public bool IsLoaded {
             get => _isLoaded;
             set => this.RaiseAndSetIfChanged(ref _isLoaded, value);
+        }
+        
+        public string BuildPart {
+            get => _buildPart;
+            set => this.RaiseAndSetIfChanged(ref _buildPart, value);
         }
         
         public ObservableCollection<string> BuildParts {
@@ -73,8 +83,10 @@ namespace RevitSetLevelSection.ViewModels {
 
         private void LoadLinkDocument(object param) {
             IsLoaded = _linkInstanceRepository.LoadLinkDocument();
-            BuildParts = new ObservableCollection<string>(GetPartNames());
             DesignOptions = new ObservableCollection<DesignOptionsViewModel>(GetDesignOptions());
+            
+            BuildParts = new ObservableCollection<string>(GetPartNames());
+            BuildPart = BuildParts.FirstOrDefault();
         }
 
         private bool CanLoadLinkDocument(object param) {

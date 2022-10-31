@@ -9,6 +9,8 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using DevExpress.Diagram.Core.Layout;
+
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -21,7 +23,6 @@ namespace RevitSetLevelSection.ViewModels {
 
         private string _errorText;
         private LinkTypeViewModel _linkType;
-        private string _buildPart;
 
         public MainViewModel(RevitRepository revitRepository) {
             if(revitRepository is null) {
@@ -42,11 +43,6 @@ namespace RevitSetLevelSection.ViewModels {
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
-        }
-
-        public string BuildPart {
-            get => _buildPart;
-            set => this.RaiseAndSetIfChanged(ref _buildPart, value);
         }
 
         public LinkTypeViewModel LinkType {
@@ -102,6 +98,12 @@ namespace RevitSetLevelSection.ViewModels {
                 ErrorText = "Выберите связанный файл с формообразующими.";
                 return false;
             }
+            
+            if(string.IsNullOrEmpty(LinkType.BuildPart)) {
+                ErrorText = "Выберите раздел.";
+                return false;
+            }
+
 
             if(LinkType != null && !LinkType.IsLoaded) {
                 ErrorText = "Загрузите выбранный связанный файл.";
@@ -138,9 +140,11 @@ namespace RevitSetLevelSection.ViewModels {
                            .FirstOrDefault(item => item.Id == settings.LinkFileId)
                        ?? LinkTypes.FirstOrDefault();
 
-            BuildPart = LinkType?.BuildParts.Contains(settings.BuildPart) == true
-                ? settings.BuildPart
-                : null;
+            if(LinkType != null) {
+                LinkType.BuildPart = LinkType?.BuildParts.Contains(settings.BuildPart) == true
+                    ? settings.BuildPart
+                    : null;
+            }
 
             foreach(FillParamViewModel fillParam in FillParams) {
                 ParamSettings paramSettings = settings.ParamSettings
@@ -159,7 +163,7 @@ namespace RevitSetLevelSection.ViewModels {
                 settings = config.AddSettings(_revitRepository.Document);
             }
 
-            settings.BuildPart = BuildPart;
+            settings.BuildPart = LinkType.BuildPart;
             settings.LinkFileId = LinkType.Id;
             settings.ParamSettings.Clear();
             foreach(FillParamViewModel fillParam in FillParams) {

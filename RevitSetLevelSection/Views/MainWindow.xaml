@@ -127,7 +127,7 @@
 
             <dxe:ComboBoxEdit
                 IsTextEditable="False"
-                SelectedItem="{Binding BuildPart}"
+                SelectedItem="{Binding LinkType.BuildPart}"
                 ItemsSource="{Binding LinkType.BuildParts}"/>
         </DockPanel>
         
