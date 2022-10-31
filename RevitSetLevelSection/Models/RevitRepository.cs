@@ -21,6 +21,9 @@ using InvalidOperationException = Autodesk.Revit.Exceptions.InvalidOperationExce
 
 namespace RevitSetLevelSection.Models {
     internal class RevitRepository {
+        public static readonly string AdskSectionNumberName = "ADSK_Номер секции";
+        public static readonly string AdskBuildingNumberName = "ADSK_Номер здания";
+        
         private readonly Application _application;
         private readonly UIApplication _uiApplication;
 
@@ -187,7 +190,12 @@ namespace RevitSetLevelSection.Models {
 
                             try {
                                 string paramValue = massObject.GetParamValue<string>(paramOption);
-                                element.SetParamValue(paramOption.SharedRevitParam, paramValue);  
+                                element.SetParamValue(paramOption.SharedRevitParam, paramValue);
+
+                                if(!string.IsNullOrEmpty(paramOption.AdskParamName)
+                                   && element.IsExistsSharedParam(paramOption.AdskParamName)) {
+                                    element.SetSharedParamValue(paramOption.AdskParamName, paramValue);
+                                }
                             } catch(InvalidOperationException) {
                                 // решили что существует много вариантов,
                                 // когда параметр не может заполнится из-за настроек в ревите

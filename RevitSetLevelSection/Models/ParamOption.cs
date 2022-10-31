@@ -5,6 +5,7 @@ using dosymep.Revit;
 
 namespace RevitSetLevelSection.Models {
     internal class ParamOption {
+        public string AdskParamName { get; set; }
         public string ProjectRevitParamName { get; set; }
         public RevitParam SharedRevitParam { get; set; }
     }
