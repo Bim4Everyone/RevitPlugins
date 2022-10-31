@@ -5,11 +5,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using DevExpress.Mvvm;
+
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitSetLevelSection.Models;
@@ -21,7 +25,7 @@ namespace RevitSetLevelSection.ViewModels {
 
         private bool _isEnabled;
         private DesignOptionsViewModel _designOption;
-        
+
         private RevitParam _revitParam;
         private string _errorText;
         private string _partParamName;
@@ -29,15 +33,19 @@ namespace RevitSetLevelSection.ViewModels {
         public FillMassParamViewModel(MainViewModel mainViewModel, RevitRepository revitRepository) {
             _mainViewModel = mainViewModel ?? throw new ArgumentNullException(nameof(mainViewModel));
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+
+            CheckRussianTextCommand = new RelayCommand(CheckRussianText);
         }
+        
+        public ICommand CheckRussianTextCommand { get; }
 
         public override RevitParam RevitParam {
             get => _revitParam;
             set => this.RaiseAndSetIfChanged(ref _revitParam, value);
         }
-        
+
         public string AdskParamName { get; set; }
-        
+
         public string PartParamName {
             get => _partParamName;
             set => this.RaiseAndSetIfChanged(ref _partParamName, value);
@@ -54,15 +62,7 @@ namespace RevitSetLevelSection.ViewModels {
 
         public DesignOptionsViewModel DesignOption {
             get => _designOption;
-            set {
-                this.RaiseAndSetIfChanged(ref _designOption, value);
-                if(HasNotRussianLetters()) {
-                    ErrorText =
-                        "В данном варианте содержится формообразующий элемент со значением параметра содержащий запрещенные символы.";
-                } else {
-                    ErrorText = null;
-                }
-            }
+            set => this.RaiseAndSetIfChanged(ref _designOption, value);
         }
 
         public string ErrorText {
@@ -89,7 +89,9 @@ namespace RevitSetLevelSection.ViewModels {
 
         public override void UpdateElements() {
             string partParamName = PartParamName + _mainViewModel.LinkType.BuildPart;
-            var paramOption = new ParamOption() {SharedRevitParam = RevitParam, ProjectRevitParamName = partParamName, AdskParamName = AdskParamName};
+            var paramOption = new ParamOption() {
+                SharedRevitParam = RevitParam, ProjectRevitParamName = partParamName, AdskParamName = AdskParamName
+            };
             _revitRepository.UpdateElements(paramOption, DesignOption.Transform, DesignOption.GetMassObjects());
         }
 
@@ -99,7 +101,9 @@ namespace RevitSetLevelSection.ViewModels {
             }
 
             string partParamName = PartParamName + _mainViewModel.LinkType.BuildPart;
-            var paramOption = new ParamOption() {SharedRevitParam = RevitParam, ProjectRevitParamName = partParamName, AdskParamName = AdskParamName};
+            var paramOption = new ParamOption() {
+                SharedRevitParam = RevitParam, ProjectRevitParamName = partParamName, AdskParamName = AdskParamName
+            };
             return DesignOption.GetMassObjects()
                 .Any(item => HasNotRussianLetters(item.GetParamValue<string>(paramOption)));
         }
@@ -109,7 +113,7 @@ namespace RevitSetLevelSection.ViewModels {
                 return false;
             }
 
-            return !Regex.IsMatch(text, @"^[А-Яа-я0-9,\s]+$");
+            return Regex.IsMatch(text, @"^[А-Яа-я0-9,\s]+$");
         }
 
         public override ParamSettings GetParamSettings() {
@@ -123,6 +127,12 @@ namespace RevitSetLevelSection.ViewModels {
             DesignOption = _mainViewModel.LinkType?.DesignOptions
                                .FirstOrDefault(item => item.Id == paramSettings.ElementId)
                            ?? _mainViewModel.LinkType?.DesignOptions.FirstOrDefault();
+        }
+
+        private void CheckRussianText(object args) {
+            ErrorText = HasNotRussianLetters()
+                ? "В данном варианте содержится формообразующий элемент со значением параметра содержащий запрещенные символы."
+                : null;
         }
     }
 }

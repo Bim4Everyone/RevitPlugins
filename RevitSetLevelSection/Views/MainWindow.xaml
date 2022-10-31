@@ -9,6 +9,7 @@
     xmlns:converters="clr-namespace:dosymep.WPF.Converters"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     mc:Ignorable="d"
     Title="Обновить уровень/секцию" Height="450" Width="800" WindowStartupLocation="CenterOwner"
     x:Name="_this"
@@ -60,9 +61,12 @@
                         DockPanel.Dock="Left"
                         IsTextEditable="False"
                         IsEnabled="{Binding IsEnabled}"
-                        SelectedItem="{Binding DesignOption}"
+                        EditValue="{Binding DesignOption, UpdateSourceTrigger=PropertyChanged}"
                         DisplayMember="Name"
                         ItemsSource="{Binding DataContext.LinkType.DesignOptions, ElementName=_this}">
+                        <dxmvvm:Interaction.Behaviors>
+                            <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding CheckRussianTextCommand}"/>
+                        </dxmvvm:Interaction.Behaviors>
                     </dxe:ComboBoxEdit>
                 </DockPanel>
 
@@ -127,8 +131,12 @@
 
             <dxe:ComboBoxEdit
                 IsTextEditable="False"
-                SelectedItem="{Binding LinkType.BuildPart}"
-                ItemsSource="{Binding LinkType.BuildParts}"/>
+                EditValue="{Binding LinkType.BuildPart, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding LinkType.BuildParts}">
+                <dxmvvm:Interaction.Behaviors>
+                    <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding CheckRussianTextCommand}"/>
+                </dxmvvm:Interaction.Behaviors>
+            </dxe:ComboBoxEdit>
         </DockPanel>
         
         

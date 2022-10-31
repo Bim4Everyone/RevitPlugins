@@ -34,11 +34,19 @@ namespace RevitSetLevelSection.ViewModels {
             FillParams = new ObservableCollection<FillParamViewModel>(GetFillParams());
 
             UpdateElementsCommand = new RelayCommand(UpdateElements, CanUpdateElement);
+            CheckRussianTextCommand = new RelayCommand(CheckRussianText);
 
             SetConfig();
         }
 
+        public ICommand CheckRussianTextCommand { get; }
         public ICommand UpdateElementsCommand { get; set; }
+
+        public void CheckRussianText(object args) {
+            foreach(FillMassParamViewModel fillMassParamViewModel in FillParams.OfType<FillMassParamViewModel>()) {
+                fillMassParamViewModel.CheckRussianTextCommand.Execute(null);
+            }
+        }
 
         public string ErrorText {
             get => _errorText;
