@@ -40,6 +40,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             var floorFilter = FiltersInitializer.GetFloorFilter(_revitRepository.GetClashRevitRepository());
 
             var wallClashChecker = ClashChecker.GetWallClashChecker(_revitRepository);
+            var floorClashChecker = ClashChecker.GetFloorClashChecker(_revitRepository);
 
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
             placers.AddRange(GetRoundMepWallPlacers(pipeFilter, wallFilter, wallClashChecker, _categories[CategoryEnum.Pipe]));

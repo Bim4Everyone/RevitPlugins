@@ -15,11 +15,11 @@ using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
     internal class DiagonalValueGetter : IValueGetter<DoubleParamValue> {
-        private readonly MepCurveWallClash _clash;
+        private readonly MepCurveClash<Wall> _clash;
         private readonly Plane _plane;
         private readonly MepCategory _categoryOptions;
 
-        public DiagonalValueGetter(MepCurveWallClash clash, Plane plane, MepCategory categoryOptions) {
+        public DiagonalValueGetter(MepCurveClash<Wall> clash, Plane plane, MepCategory categoryOptions) {
             _clash = clash;
             _plane = plane;
             _categoryOptions = categoryOptions;

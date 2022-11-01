@@ -10,10 +10,10 @@ using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
     internal class InclinedRoundCurveWallParameterGetter : IParametersGetter {
-        private readonly MepCurveWallClash _clash;
+        private readonly MepCurveClash<Wall> _clash;
         private readonly MepCategory _mepCategory;
 
-        public InclinedRoundCurveWallParameterGetter(MepCurveWallClash clash, MepCategory mepCategory) {
+        public InclinedRoundCurveWallParameterGetter(MepCurveClash<Wall> clash, MepCategory mepCategory) {
             _clash = clash;
             _mepCategory = mepCategory;
         }

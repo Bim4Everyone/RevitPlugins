@@ -1,4 +1,6 @@
 ﻿
+using Autodesk.Revit.DB;
+
 using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Configs;
@@ -7,10 +9,10 @@ using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
     internal class DiameterValueGetter : IValueGetter<DoubleParamValue> {
-        private readonly MepCurveWallClash _clash;
+        private readonly MepCurveClash<Wall> _clash;
         private readonly MepCategory _categoryOptions;
 
-        public DiameterValueGetter(MepCurveWallClash clash, MepCategory categoryOptions) {
+        public DiameterValueGetter(MepCurveClash<Wall> clash, MepCategory categoryOptions) {
             _clash = clash;
             _categoryOptions = categoryOptions;
         }

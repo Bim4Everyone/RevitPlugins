@@ -21,13 +21,13 @@ using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
     internal class RoundMepWallPlacerInitializer {
         public static OpeningPlacer GetPlacer(RevitRepository revitRepository, ClashModel clashModel, MepCategory categoryOption) {
-            var clash = new MepCurveWallClash(revitRepository, clashModel);
+            var clash = new MepCurveClash<Wall>(revitRepository, clashModel);
 
             var placer = new OpeningPlacer(revitRepository) {
                 Clash = clashModel,
-                AngleFinder = new WallAngleFinder(clash.Wall, clash.WallTransform)
+                AngleFinder = new WallAngleFinder(clash.Element, clash.ElementTransform)
             };
-            if(clash.Curve.IsPerpendicular(clash.Wall)) {
+            if(clash.Curve.IsPerpendicular(clash.Element)) {
                 placer.PointFinder = new HorizontalPointFinder(clash);
                 placer.ParameterGetter = new PerpendicularRoundCurveWallParamterGetter(clash, categoryOption);
                 placer.Type = revitRepository.GetOpeningType(OpeningType.WallRound);
@@ -38,6 +38,13 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             };
 
             return placer;
+        }
+    }
+
+    internal class RoundMepFloorPlacerInitializer {
+        public static OpeningPlacer GetPlacer(RevitRepository revitRepository, ClashModel clashModel, MepCategory categoryOption) {
+
+            return null;
         }
     }
 }

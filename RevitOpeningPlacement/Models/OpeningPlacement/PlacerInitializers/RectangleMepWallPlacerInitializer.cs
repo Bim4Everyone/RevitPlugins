@@ -13,14 +13,14 @@ using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
     internal class RectangleMepWallPlacerInitializer {
         public static OpeningPlacer GetPlacer(RevitRepository revitRepository, ClashModel clashModel, MepCategory categoryOption) {
-            var clash = new MepCurveWallClash(revitRepository, clashModel);
+            var clash = new MepCurveClash<Wall>(revitRepository, clashModel);
 
             var placer = new OpeningPlacer(revitRepository) {
                 Clash = clashModel,
-                AngleFinder = new WallAngleFinder(clash.Wall, clash.WallTransform),
+                AngleFinder = new WallAngleFinder(clash.Element, clash.ElementTransform),
                 Type = revitRepository.GetOpeningType(OpeningType.WallRectangle),
             };
-            if(clash.Curve.IsPerpendicular(clash.Wall)) {
+            if(clash.Curve.IsPerpendicular(clash.Element)) {
                 placer.ParameterGetter = new PerpendicularRectangleCurveWallParamterGetter(clash, categoryOption);
                 placer.PointFinder = new HorizontalPointFinder(clash, new HeightValueGetter(clash, categoryOption));
             } else {
