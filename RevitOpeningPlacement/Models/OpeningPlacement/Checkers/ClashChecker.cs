@@ -34,9 +34,16 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         public static IClashChecker GetWallClashChecker(RevitRepository revitRepository) {
             var mepCurveChecker = new MainElementIsMepCurveChecker(revitRepository, null);
             var wallChecker = new OtherElementIsWallChecker(revitRepository, mepCurveChecker);
-            var verticalityChecker = new MainElementIsNotVerticalChecker(revitRepository, wallChecker);
+            var verticalityChecker = new MepIsNotVerticalChecker(revitRepository, wallChecker);
             var parallelismChecker = new ElementsIsNotParallelChecker(revitRepository, verticalityChecker);
             return new WallIsNotCurtainChecker(revitRepository, parallelismChecker);
+        }
+
+        public static IClashChecker GetFloorClashChecker(RevitRepository revitRepository) {
+            var mepCurveChecker = new MainElementIsMepCurveChecker(revitRepository, null);
+            var floorChecker = new OtherElementIsFloorChecker(revitRepository, mepCurveChecker);
+            var horizontalityChecker = new MepIsNotHorizontalChecker(revitRepository, floorChecker);
+            return horizontalityChecker;
         }
     }
 
@@ -54,8 +61,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         }
     }
 
-    internal class MainElementIsNotVerticalChecker : ClashChecker {
-        public MainElementIsNotVerticalChecker(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
+    internal class MepIsNotVerticalChecker : ClashChecker {
+        public MepIsNotVerticalChecker(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
         public override bool CheckModel(ClashModel clashModel) {
             return !((MEPCurve) clashModel.MainElement.GetElement(_revitRepository.DocInfos)).IsVertical();
         }
@@ -74,6 +81,20 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         public WallIsNotCurtainChecker(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
         public override bool CheckModel(ClashModel clashModel) {
             return ((Wall) clashModel.OtherElement.GetElement(_revitRepository.DocInfos)).WallType.Kind != WallKind.Curtain;
+        }
+    }
+
+    internal class OtherElementIsFloorChecker : ClashChecker {
+        public OtherElementIsFloorChecker(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
+        public override bool CheckModel(ClashModel clashModel) {
+            return clashModel.OtherElement.GetElement(_revitRepository.DocInfos) is Floor;
+        }
+    }
+
+    internal class MepIsNotHorizontalChecker : ClashChecker {
+        public MepIsNotHorizontalChecker(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
+        public override bool CheckModel(ClashModel clashModel) {
+            return !((MEPCurve) clashModel.MainElement.GetElement(_revitRepository.DocInfos)).IsHorizontal();
         }
     }
 }
