@@ -1,5 +1,9 @@
-﻿namespace RevitOpeningPlacement.Models.Interfaces {
+﻿using Autodesk.Revit.DB;
+
+using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
+
+namespace RevitOpeningPlacement.Models.Interfaces {
     internal interface IAngleFinder {
-        double GetAngle();
+        Rotates GetAngle();
     }
 }

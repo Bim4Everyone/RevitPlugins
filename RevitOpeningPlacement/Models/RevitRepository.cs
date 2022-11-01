@@ -9,6 +9,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.DB.Structure;
 using System;
 using RevitClashDetective.Models;
+using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 
 namespace RevitOpeningPlacement.Models {
     internal class RevitRepository {
@@ -148,9 +149,11 @@ namespace RevitOpeningPlacement.Models {
             return _document.Create.NewFamilyInstance(point, type, StructuralType.NonStructural);
         }
 
-        public void RotateElement(Element element, XYZ point, double angle) {
+        public void RotateElement(Element element, XYZ point, Rotates angle) {
             if(point != null) {
-                ElementTransformUtils.RotateElement(_document, element.Id, Line.CreateBound(point, new XYZ(point.X, point.Y, point.Z + 1)), angle);
+                RotateElement(element, point, Line.CreateBound(point, new XYZ(point.X + 1, point.Y, point.Z)), angle.X);
+                RotateElement(element, point, Line.CreateBound(point, new XYZ(point.X, point.Y + 1, point.Z)), angle.Y);
+                RotateElement(element, point, Line.CreateBound(point, new XYZ(point.X, point.Y, point.Z + 1)), angle.Z);
             }
         }
 
@@ -187,6 +190,12 @@ namespace RevitOpeningPlacement.Models {
         public Transform GetTransform(Element element) {
             return DocInfos.FirstOrDefault(item => item.Name.Equals(GetDocumentName(element.Document), StringComparison.CurrentCultureIgnoreCase))?.Transform
                 ?? Transform.Identity;
+        }
+
+        private void RotateElement(Element element, XYZ point, Line axis, double angle) {
+            if(Math.Abs(angle) > 0.00001) {
+                ElementTransformUtils.RotateElement(_document, element.Id, axis, angle);
+            }
         }
     }
 

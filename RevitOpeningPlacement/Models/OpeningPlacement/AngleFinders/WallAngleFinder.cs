@@ -18,10 +18,10 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders {
             _transform = transform;
         }
 
-        public double GetAngle() {
+        public Rotates GetAngle() {
             var orientation = _wall.Orientation;
             var angle = _transform.OfVector(orientation).AngleTo(XYZ.BasisY);
-            return (orientation.X <= 0 && orientation.Y <= 0) || (orientation.X <= 0 && orientation.Y >= 0) ? angle : -angle;
+            return (orientation.X <= 0 && orientation.Y <= 0) || (orientation.X <= 0 && orientation.Y >= 0) ? new Rotates(0, 0, angle) : new Rotates(0, 0, -angle);
         }
     }
 }

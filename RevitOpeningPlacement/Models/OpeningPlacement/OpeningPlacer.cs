@@ -29,8 +29,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             var level = _revitRepository.GetLevel(Clash.MainElement.Level);
             var opening = _revitRepository.CreateInstance(Type, point, level);
 
-            var angle = AngleFinder.GetAngle();
-            _revitRepository.RotateElement(opening, point, angle);
+            var angles = AngleFinder.GetAngle();
+            _revitRepository.RotateElement(opening, point, angles);
 
             SetParamValues(opening);
         }
