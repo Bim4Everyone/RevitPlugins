@@ -13,11 +13,11 @@ using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
-    internal class HorizontalPointFinder : IPointFinder {
+    internal class WallPointFinder : IPointFinder {
         private readonly MepCurveClash<Wall> _clash;
         private readonly IValueGetter<DoubleParamValue> _sizeGetter;
 
-        public HorizontalPointFinder(MepCurveClash<Wall> clash, IValueGetter<DoubleParamValue> sizeGetter = null) {
+        public WallPointFinder(MepCurveClash<Wall> clash, IValueGetter<DoubleParamValue> sizeGetter = null) {
             _clash = clash;
             _sizeGetter = sizeGetter;
         }
@@ -44,7 +44,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
             } catch {
                 throw IntersectionNotFoundException.GetException(_clash.Curve, _clash.Element);
             }
-          
+
         }
     }
 }
