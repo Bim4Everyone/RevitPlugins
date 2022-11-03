@@ -114,6 +114,10 @@ namespace RevitOpeningPlacement.Models.Extensions {
             var planarFace = (PlanarFace) face;
             var plane = Plane.CreateByNormalAndOrigin(planarFace.FaceNormal, planarFace.Origin);
 
+            return line.GetIntersectionWithPlane(plane);
+        }
+
+        public static XYZ GetIntersectionWithPlane(this Line line, Plane plane) {
             var point1 = plane.ProjectPoint(line.GetEndPoint(0));
             var point2 = plane.ProjectPoint(line.GetEndPoint(1));
             if(point1.DistanceTo(point2) < 0.00001) {
