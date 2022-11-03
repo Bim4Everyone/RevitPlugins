@@ -27,14 +27,14 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             var plane = _clash.Element.GetVerticalNormalPlane();
 
             var heightDirsGetter = new RoundMepDirsGetter(_clash);
-            return new InclinedSizeValueGetter(_clash, new DiameterValueGetter(_clash, _mepCategory), plane, heightDirsGetter);
+            return new InclinedSizeValueGetter(_clash, new DiameterValueGetter(_clash.Curve, _mepCategory), plane, heightDirsGetter);
         }
 
         public IValueGetter<DoubleParamValue> GetRoundMepWidthGetter() {
             var plane = _clash.Element.GetHorizontalNormalPlane();
 
             var widthDirsGetters = new RoundMepDirsGetter(_clash);
-            return new InclinedSizeValueGetter(_clash, new DiameterValueGetter(_clash, _mepCategory), plane, widthDirsGetters);
+            return new InclinedSizeValueGetter(_clash, new DiameterValueGetter(_clash.Curve, _mepCategory), plane, widthDirsGetters);
         }
 
         public IValueGetter<DoubleParamValue> GetRectangleMepHeightGetter() {

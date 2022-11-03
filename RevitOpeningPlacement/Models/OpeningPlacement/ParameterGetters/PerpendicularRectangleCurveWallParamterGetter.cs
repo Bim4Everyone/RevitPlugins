@@ -19,7 +19,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         public IEnumerable<ParameterValuePair> GetParamValues() {
             yield return new DoubleParameterGetter(RevitRepository.OpeningHeight, new HeightValueGetter(_clash, _mepCategory)).GetParamValue();
             yield return new DoubleParameterGetter(RevitRepository.OpeningWidth, new WidthValueGetter(_clash, _mepCategory)).GetParamValue();
-            yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new ThicknessValueGetter(_clash)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new WallThicknessValueGetter(_clash)).GetParamValue();
         }
     }
 }

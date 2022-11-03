@@ -6,11 +6,10 @@ using RevitClashDetective.Models.Value;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
-    internal class ThicknessValueGetter : IValueGetter<DoubleParamValue> {
+    internal class WallThicknessValueGetter : IValueGetter<DoubleParamValue> {
         private readonly MepCurveClash<Wall> _clash;
 
-
-        public ThicknessValueGetter(MepCurveClash<Wall> clash) {
+        public WallThicknessValueGetter(MepCurveClash<Wall> clash) {
             _clash = clash;
         }
 
