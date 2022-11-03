@@ -42,8 +42,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         public static IClashChecker GetFloorClashChecker(RevitRepository revitRepository) {
             var mepCurveChecker = new MainElementIsMepCurveChecker(revitRepository, null);
             var floorChecker = new OtherElementIsFloorChecker(revitRepository, mepCurveChecker);
-            var horizontalityChecker = new MepIsNotHorizontalChecker(revitRepository, floorChecker);
-            return horizontalityChecker;
+           return new MepIsNotHorizontalChecker(revitRepository, floorChecker);
         }
     }
 
@@ -87,7 +86,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
     internal class OtherElementIsFloorChecker : ClashChecker {
         public OtherElementIsFloorChecker(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
         public override bool CheckModel(ClashModel clashModel) {
-            return clashModel.OtherElement.GetElement(_revitRepository.DocInfos) is Floor;
+            return clashModel.OtherElement.GetElement(_revitRepository.DocInfos) is CeilingAndFloor;
         }
     }
 
