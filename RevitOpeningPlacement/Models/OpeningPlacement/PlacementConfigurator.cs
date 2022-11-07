@@ -23,7 +23,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
     internal class PlacementConfigurator {
         private readonly RevitRepository _revitRepository;
         private readonly MepCategoryCollection _categories;
-        private List<ClashModel> _unplacedClashes = new List<ClashModel>();
+        private List<ClashModel> _unplacedClashes = new List<ClashModel>(); 
 
         public PlacementConfigurator(RevitRepository revitRepository, MepCategoryCollection categories) {
             _revitRepository = revitRepository;
