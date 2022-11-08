@@ -48,7 +48,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             placers.AddRange(GetRectangleMepWallPlacers(rectangleDuctFilter, wallFilter, wallClashChecker, _categories[CategoryEnum.RectangleDuct]));
             placers.AddRange(GetRectangleMepWallPlacers(trayFilter, wallFilter, wallClashChecker, _categories[CategoryEnum.CableTray]));
             placers.AddRange(GetRoundMepFloorPlacers(roundDuctFilter, floorFilter, floorClashChecker, _categories[CategoryEnum.RoundDuct]));
-            placers.AddRange(GetRectangleMepFloorPlacers(rectangleDuctFilter, floorFilter, floorClashChecker, _categories[CategoryEnum.RectangleDuct]));
+            placers.AddRange(GetRoundMepFloorPlacers(pipeFilter, floorFilter, floorClashChecker, _categories[CategoryEnum.Pipe]));
+            placers.AddRange(GetRectangleMepFloorPlacers(rectangleDuctFilter, floorFilter, floorClashChecker, _categories[CategoryEnum.RoundDuct]));
+            placers.AddRange(GetRectangleMepFloorPlacers(trayFilter, floorFilter, floorClashChecker, _categories[CategoryEnum.CableTray]));
             return placers;
         }
 

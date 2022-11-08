@@ -7,18 +7,17 @@ using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
-    internal class PerpendicularRectangleCurveWallParamterGetter : IParametersGetter {
+    internal class PerpendicularRoundCurveWallParamGetter : IParametersGetter {
         private readonly MepCurveClash<Wall> _clash;
         private readonly MepCategory _mepCategory;
 
-        public PerpendicularRectangleCurveWallParamterGetter(MepCurveClash<Wall> clash, MepCategory mepCategory) {
+        public PerpendicularRoundCurveWallParamGetter(MepCurveClash<Wall> clash, MepCategory mepCategory) {
             _clash = clash;
             _mepCategory = mepCategory;
         }
 
         public IEnumerable<ParameterValuePair> GetParamValues() {
-            yield return new DoubleParameterGetter(RevitRepository.OpeningHeight, new HeightValueGetter(_clash, _mepCategory)).GetParamValue();
-            yield return new DoubleParameterGetter(RevitRepository.OpeningWidth, new WidthValueGetter(_clash, _mepCategory)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningDiameter, new DiameterValueGetter(_clash.Curve, _mepCategory)).GetParamValue();
             yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new WallThicknessValueGetter(_clash)).GetParamValue();
         }
     }

@@ -9,16 +9,16 @@ using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
     internal class WidthValueGetter : IValueGetter<DoubleParamValue> {
-        private readonly MepCurveClash<Wall> _clash;
+        private readonly MEPCurve _curve;
         private readonly MepCategory _categoryOptions;
 
-        public WidthValueGetter(MepCurveClash<Wall> clash, MepCategory categoryOptions) {
-            _clash = clash;
+        public WidthValueGetter(MEPCurve curve, MepCategory categoryOptions) {
+            _curve = curve;
             _categoryOptions = categoryOptions;
         }
 
         public DoubleParamValue GetValue() {
-            var width = _clash.Curve.GetWidth();
+            var width = _curve.GetWidth();
             width += _categoryOptions.GetOffset(width);
 
             return new DoubleParamValue(width);

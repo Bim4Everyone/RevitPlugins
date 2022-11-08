@@ -14,13 +14,10 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
     internal class InclinedSizeInitializer {
         private readonly MepCurveClash<Wall> _clash;
         private readonly MepCategory _mepCategory;
-        private readonly Line _wallLine;
 
         public InclinedSizeInitializer(MepCurveClash<Wall> clash, MepCategory mepCategory) {
             _clash = clash;
             _mepCategory = mepCategory;
-            _wallLine = _clash.Element.GetСentralLine()
-           .GetTransformedLine(_clash.ElementTransform);
         }
 
         public IValueGetter<DoubleParamValue> GetRoundMepHeightGetter() {
