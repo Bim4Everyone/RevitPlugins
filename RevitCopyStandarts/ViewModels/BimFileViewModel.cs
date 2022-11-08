@@ -150,7 +150,8 @@ namespace RevitCopyStandarts.ViewModels {
             }
 
             IEnumerable<Element> elements = sourceDocument.ProjectInformation.ClientName
-                .Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries)
+                .Where(item => int.TryParse(item, out _))
                 .Select(item => GetElement(sourceDocument, item))
                 .Where(item => item != null);
 
