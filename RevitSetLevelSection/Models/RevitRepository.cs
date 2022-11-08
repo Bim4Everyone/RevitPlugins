@@ -13,6 +13,7 @@ using DevExpress.Xpf.Core.FilteringUI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
 using RevitSetLevelSection.Models.LevelDefinitions;
@@ -185,9 +186,13 @@ namespace RevitSetLevelSection.Models {
                         continue;
                     }
 
+                    bool? skip = element.GetParamValueOrDefault<bool?>(SharedParamsConfig.Instance.FixBuildingWorks);
+                    if(skip == true) {
+                        continue;
+                    }
+
                     foreach(FamilyInstance massObject in massElements) {
                         if(IsIntersectCenterElement(transform, massObject, element)) {
-
                             try {
                                 string paramValue = massObject.GetParamValue<string>(paramOption);
                                 element.SetParamValue(paramOption.SharedRevitParam, paramValue);

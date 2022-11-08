@@ -28,7 +28,8 @@ namespace RevitSetLevelSection {
                 SharedParamsConfig.Instance.Level,
                 SharedParamsConfig.Instance.BuildingWorksBlock,
                 SharedParamsConfig.Instance.BuildingWorksSection,
-                SharedParamsConfig.Instance.BuildingWorksTyping);
+                SharedParamsConfig.Instance.BuildingWorksTyping,
+                SharedParamsConfig.Instance.FixBuildingWorks);
 
             var repository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
             var viewModel = new MainViewModel(repository);
