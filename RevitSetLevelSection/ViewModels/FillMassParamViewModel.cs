@@ -47,6 +47,7 @@ namespace RevitSetLevelSection.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _revitParam, value);
         }
 
+        public bool IsRequired { get; set; }
         public string AdskParamName { get; set; }
 
         public string PartParamName {
@@ -90,9 +91,22 @@ namespace RevitSetLevelSection.ViewModels {
                 return "Выберите вариант с формообразующими.";
             }
 
-            return DesignOption.CountMassElements == 0
-                ? $"В выбранном варианте \"{DesignOption.Name}\" нет формообразующих."
-                : null;
+            if(DesignOption.CountMassElements == 0) {
+                return $"В выбранном варианте \"{DesignOption.Name}\" нет формообразующих.";
+            }
+
+            if(IsRequired) {
+                string partParamName = PartParamName + _mainViewModel.LinkType.BuildPart;
+                var paramOption = new ParamOption() {
+                    SharedRevitParam = RevitParam, ProjectRevitParamName = partParamName, AdskParamName = AdskParamName
+                };
+                return DesignOption.GetMassObjects()
+                    .Any(item => item.IsExistsParamValue(paramOption))
+                    ? null
+                    : $"У параметра \"{RevitParam.Name}\" есть не заполненные формообразующие.";
+            }
+
+            return null;
         }
 
         public override void UpdateElements() {

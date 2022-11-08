@@ -66,6 +66,7 @@ namespace RevitSetLevelSection.ViewModels {
             yield return new FillLevelParamViewModel(_revitRepository) {RevitParam = SharedParamsConfig.Instance.Level};
 
             yield return new FillMassParamViewModel(this, _revitRepository) {
+                IsRequired = true,
                 AdskParamName = RevitRepository.AdskBuildingNumberName,
                 PartParamName = LinkInstanceRepository.BuildingWorksBlockName,
                 RevitParam = SharedParamsConfig.Instance.BuildingWorksBlock
