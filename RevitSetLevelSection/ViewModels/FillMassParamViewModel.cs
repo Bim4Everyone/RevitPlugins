@@ -153,7 +153,7 @@ namespace RevitSetLevelSection.ViewModels {
 
         private void CheckRussianText(object args) {
             ErrorText = HasNotRussianLetters()
-                ? "В данном варианте содержится формообразующий элемент со значением параметра содержащий запрещенные символы."
+                ? "Найдены формообразующие содержащие запрещенные символы."
                 : null;
         }
 
