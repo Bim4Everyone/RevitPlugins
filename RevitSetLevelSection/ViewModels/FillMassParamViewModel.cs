@@ -29,15 +29,18 @@ namespace RevitSetLevelSection.ViewModels {
         private RevitParam _revitParam;
         private string _errorText;
         private string _partParamName;
+        private string _selectedParamName;
 
         public FillMassParamViewModel(MainViewModel mainViewModel, RevitRepository revitRepository) {
             _mainViewModel = mainViewModel ?? throw new ArgumentNullException(nameof(mainViewModel));
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
 
             CheckRussianTextCommand = new RelayCommand(CheckRussianText);
+            UpdatePartParamNameCommand = new RelayCommand(UpdatePartParamName);
         }
-        
+
         public ICommand CheckRussianTextCommand { get; }
+        public ICommand UpdatePartParamNameCommand { get; }
 
         public override RevitParam RevitParam {
             get => _revitParam;
@@ -49,6 +52,11 @@ namespace RevitSetLevelSection.ViewModels {
         public string PartParamName {
             get => _partParamName;
             set => this.RaiseAndSetIfChanged(ref _partParamName, value);
+        }
+
+        public string SelectedParamName {
+            get => _selectedParamName;
+            set => this.RaiseAndSetIfChanged(ref _selectedParamName, value);
         }
 
         public string Name => $"Обновить \"{RevitParam.Name}\"";
@@ -133,6 +141,12 @@ namespace RevitSetLevelSection.ViewModels {
             ErrorText = HasNotRussianLetters()
                 ? "В данном варианте содержится формообразующий элемент со значением параметра содержащий запрещенные символы."
                 : null;
+        }
+
+        private void UpdatePartParamName(object args) {
+            var partNames = _mainViewModel.LinkType.GetPartNames(new[] {PartParamName}).ToArray();
+            SelectedParamName = partNames.FirstOrDefault(item => item.Equals(_mainViewModel.LinkType.BuildPart)) ??
+                                partNames.FirstOrDefault();
         }
     }
 }

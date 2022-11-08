@@ -30,8 +30,10 @@
             <Grid Margin="10">
 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
@@ -45,30 +47,35 @@
                     <TextBlock Text="{Binding Name}" />
                 </dxe:CheckEdit>
 
-                <DockPanel
+                <dxe:ComboBoxEdit
                     Grid.Column="1"
-                    LastChildFill="True">
+                    MinWidth="250"
+                    IsTextEditable="False"
+                    IsEnabled="{Binding IsEnabled}"
+                    EditValue="{Binding DesignOption, UpdateSourceTrigger=PropertyChanged}"
+                    DisplayMember="Name"
+                    ItemsSource="{Binding DataContext.LinkType.DesignOptions, ElementName=_this}">
+                    <dxmvvm:Interaction.Behaviors>
+                        <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding CheckRussianTextCommand}" />
+                    </dxmvvm:Interaction.Behaviors>
 
-                    <Image
-                        DockPanel.Dock="Right"
-                        Height="20"
-                        Source="../Resources/icons8-error-96.png"
-                        ToolTip="{Binding ErrorText}"
-                        Visibility="{Binding HasError,
+                </dxe:ComboBoxEdit>
+
+                <dxe:ComboBoxEdit
+                    Grid.Column="2"
+                    Width="100"
+                    Margin="5 0 5 0"
+                    IsTextEditable="False"
+                    IsEnabled="False"
+                    EditValue="{Binding Path=SelectedParamName}" />
+
+                <Image
+                    Grid.Column="3"
+                    Height="20"
+                    Source="../Resources/icons8-error-96.png"
+                    ToolTip="{Binding ErrorText}"
+                    Visibility="{Binding HasError,
                                      Converter={StaticResource BoolToHiddenConverter}}" />
-
-                    <dxe:ComboBoxEdit
-                        DockPanel.Dock="Left"
-                        IsTextEditable="False"
-                        IsEnabled="{Binding IsEnabled}"
-                        EditValue="{Binding DesignOption, UpdateSourceTrigger=PropertyChanged}"
-                        DisplayMember="Name"
-                        ItemsSource="{Binding DataContext.LinkType.DesignOptions, ElementName=_this}">
-                        <dxmvvm:Interaction.Behaviors>
-                            <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding CheckRussianTextCommand}"/>
-                        </dxmvvm:Interaction.Behaviors>
-                    </dxe:ComboBoxEdit>
-                </DockPanel>
 
             </Grid>
         </DataTemplate>
@@ -114,7 +121,7 @@
                 DisplayMember="Name"
                 IsTextEditable="False"
                 SelectedItem="{Binding LinkType}"
-                ItemsSource="{Binding LinkTypes}"/>
+                ItemsSource="{Binding LinkTypes}" />
         </DockPanel>
 
         <TextBlock
@@ -134,12 +141,12 @@
                 EditValue="{Binding LinkType.BuildPart, UpdateSourceTrigger=PropertyChanged}"
                 ItemsSource="{Binding LinkType.BuildParts}">
                 <dxmvvm:Interaction.Behaviors>
-                    <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding CheckRussianTextCommand}"/>
+                    <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding CheckRussianTextCommand}" />
                 </dxmvvm:Interaction.Behaviors>
             </dxe:ComboBoxEdit>
         </DockPanel>
-        
-        
+
+
         <ItemsControl
             Grid.Column="0"
             Grid.ColumnSpan="3"
@@ -151,10 +158,10 @@
                     HorizontalAlignment="Right">
             <TextBlock Margin="10" Foreground="Orange" VerticalAlignment="Center"
                        Text="{Binding ErrorText}" />
-           
+
             <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10" IsDefault="True" Click="ButtonOK_Click"
                              Command="{Binding UpdateElementsCommand}" />
-            
+
             <dx:SimpleButton Content="Отмена" Height="25" Width="80" Margin="10" IsCancel="true"
                              Click="ButtonCancel_Click" />
         </StackPanel>

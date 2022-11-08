@@ -80,6 +80,10 @@ namespace RevitSetLevelSection.ViewModels {
         public IEnumerable<string> GetPartNames() {
             return _linkInstanceRepository.GetPartNames().Distinct();
         }
+        
+        public IEnumerable<string> GetPartNames(IEnumerable<string> paramNames) {
+            return _linkInstanceRepository.GetPartNames(paramNames).Distinct();
+        }
 
         private void LoadLinkDocument(object param) {
             IsLoaded = _linkInstanceRepository.LoadLinkDocument();

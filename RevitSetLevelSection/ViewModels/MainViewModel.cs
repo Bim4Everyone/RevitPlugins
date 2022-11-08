@@ -45,6 +45,7 @@ namespace RevitSetLevelSection.ViewModels {
         public void CheckRussianText(object args) {
             foreach(FillMassParamViewModel fillMassParamViewModel in FillParams.OfType<FillMassParamViewModel>()) {
                 fillMassParamViewModel.CheckRussianTextCommand.Execute(null);
+                fillMassParamViewModel.UpdatePartParamNameCommand.Execute(null);
             }
         }
 

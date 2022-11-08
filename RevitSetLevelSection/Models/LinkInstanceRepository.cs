@@ -18,7 +18,7 @@ namespace RevitSetLevelSection.Models {
 
         private readonly RevitLinkType _revitLinkType;
         private readonly RevitRepository _revitRepository;
-        
+
         private Document _document;
         private RevitLinkInstance _linkInstance;
 
@@ -55,13 +55,13 @@ namespace RevitSetLevelSection.Models {
         public bool LoadLinkDocument() {
             if(_revitLinkType.GetLinkedFileStatus() == LinkedFileStatus.InClosedWorkset) {
                 Workset workset = _revitRepository.GetWorkset(_revitLinkType);
-                TaskDialog.Show("Предупреждение!", $"Откройте рабочий набор \"{workset.Name}\"." 
+                TaskDialog.Show("Предупреждение!", $"Откройте рабочий набор \"{workset.Name}\"."
                                                    + Environment.NewLine
                                                    + "Загрузка связанного файла из закрытого рабочего набора не поддерживается!");
-                
+
                 return false;
             }
-            
+
             var loadResult = _revitLinkType.Load();
             if(loadResult.LoadResult == LinkLoadResultType.LinkLoaded) {
                 Update();
@@ -72,13 +72,18 @@ namespace RevitSetLevelSection.Models {
         }
 
         public IEnumerable<string> GetPartNames() {
+            return GetPartNames(GetParamNames());
+        }
+
+        public IEnumerable<string> GetPartNames(IEnumerable<string> paramNames) {
             if(_document == null) {
                 yield break;
             }
-            
+
             yield return "Без раздела";
-            foreach(ParameterElement paramElement in _document.GetProjectParams().OrderBy(item => item.Name)) {
-                foreach(string paramName in GetParamNames()) {
+
+            foreach(string paramName in paramNames) {
+                foreach(ParameterElement paramElement in _document.GetProjectParams().OrderBy(item => item.Name)) {
                     if(paramElement.Name.StartsWith(paramName, StringComparison.CurrentCultureIgnoreCase)) {
                         yield return paramElement.Name.Replace(paramName, string.Empty);
                     }
