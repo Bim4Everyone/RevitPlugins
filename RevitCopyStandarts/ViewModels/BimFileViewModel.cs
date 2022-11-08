@@ -74,7 +74,9 @@ namespace RevitCopyStandarts.ViewModels {
         private readonly Application _application;
         private readonly Document _targetDocument;
 
-        public BimFileViewModel(FileInfo fileInfo, Application application, Document targetDocument) {
+        public BimFileViewModel(string name, FileInfo fileInfo, Application application, Document targetDocument) {
+            Name = name;
+            
             _fileInfo = fileInfo;
             _application = application;
             _targetDocument = targetDocument;
@@ -82,9 +84,7 @@ namespace RevitCopyStandarts.ViewModels {
             CopyObjectsCommand = new RelayCommand(CopyObjectsAsync);
         }
 
-        public string Name {
-            get { return _fileInfo.Name; }
-        }
+        public string Name { get; }
 
         public DateTime CreationTime {
             get { return _fileInfo.CreationTime; }
