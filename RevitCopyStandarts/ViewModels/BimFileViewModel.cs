@@ -98,12 +98,15 @@ namespace RevitCopyStandarts.ViewModels {
         public INotificationService NotificationService
             => GetPlatformService<INotificationService>();
 
+
+        public IProgressDialogService ProgressDialogService
+            => GetPlatformService<IProgressDialogService>();
+
         private async void CopyObjectsAsync(object p) {
             Document sourceDocument = _application.OpenDocumentFile(_fileInfo.FullName);
             try {
                 var commands = new List<ICopyStandartsCommand>() {
                     new CopyViewTemplatesCommand(sourceDocument, _targetDocument),
-                    //new CopyFamiliesCommand(sourceDocument, _targetDocument),
                     new CopyViewSchedulesCommand(sourceDocument, _targetDocument),
                     new CopyMaterialsCommand(sourceDocument, _targetDocument),
                     new CopyViewLegendsCommand(sourceDocument, _targetDocument),
@@ -112,9 +115,20 @@ namespace RevitCopyStandarts.ViewModels {
 
                 commands.AddRange(GetOptionalStandarts(sourceDocument));
                 commands.AddRange(GetIdOptionalStandarts(sourceDocument));
-                commands.ForEach(command => command.Execute());
 
+                using(var window = ProgressDialogService) {
+                    window.MaxValue = commands.Count;
+                    window.DisplayTitleFormat = "Копирование стандартов [{0}\\{1}]...";
+                    window.Show();
 
+                    int counter = 1;
+                    var progress = window.CreateProgress();
+                    foreach(ICopyStandartsCommand command in commands) {
+                        progress.Report(counter++);
+                        command.Execute();
+                    }
+                }
+                
                 _ = await NotificationService.CreateNotification("Копирование стандартов", "Выполнение скрипта завершено успешно.").ShowAsync();
             } finally {
                 sourceDocument.Close(false);
