@@ -186,8 +186,9 @@ namespace RevitSetLevelSection.Models {
                         continue;
                     }
 
-                    bool? skip = element.GetParamValueOrDefault<bool?>(SharedParamsConfig.Instance.FixBuildingWorks);
-                    if(skip == true) {
+                    int? skip = element.GetParamValueOrDefault<int?>(SharedParamsConfig.Instance.FixBuildingWorks);
+                    if(skip == 1) {
+                        cashedElements.Remove(element.Id);
                         continue;
                     }
 
