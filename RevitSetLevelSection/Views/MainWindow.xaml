@@ -115,6 +115,7 @@
                 DockPanel.Dock="Right"
                 Width="80"
                 Margin="10 0 0 0"
+                ToolTip="Загрузить координационный файл"
                 Command="{Binding LinkType.LoadLinkDocumentCommand}" />
 
             <dxe:ComboBoxEdit

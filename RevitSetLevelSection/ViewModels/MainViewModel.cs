@@ -105,7 +105,7 @@ namespace RevitSetLevelSection.ViewModels {
 
         private bool CanUpdateElement(object param) {
             if(LinkType == null) {
-                ErrorText = "Выберите связанный файл с формообразующими.";
+                ErrorText = "Выберите координационный файл.";
                 return false;
             }
             
@@ -116,7 +116,7 @@ namespace RevitSetLevelSection.ViewModels {
 
 
             if(LinkType != null && !LinkType.IsLoaded) {
-                ErrorText = "Загрузите выбранный связанный файл.";
+                ErrorText = "Загрузите координационный файл.";
                 return false;
             }
 
