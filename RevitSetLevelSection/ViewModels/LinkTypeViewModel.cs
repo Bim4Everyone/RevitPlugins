@@ -70,11 +70,13 @@ namespace RevitSetLevelSection.ViewModels {
 
         private IEnumerable<DesignOptionsViewModel> GetDesignOptions() {
             if(!_linkInstanceRepository.LinkIsLoaded()) {
-                return Enumerable.Empty<DesignOptionsViewModel>();
+                yield break;
             }
 
-            return _linkInstanceRepository.GetDesignOptions()
-                .Select(item => new DesignOptionsViewModel(item, _linkInstanceRepository));
+            yield return new DesignOptionsViewModel(new DefaultDesignOption(), _linkInstanceRepository);
+            foreach(DesignOption designOption in _linkInstanceRepository.GetDesignOptions()) {
+                yield return new DesignOptionsViewModel(new DesignOptionAdapt(designOption), _linkInstanceRepository);
+            }
         }
 
         public IEnumerable<string> GetPartNames() {

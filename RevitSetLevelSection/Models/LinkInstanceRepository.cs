@@ -36,14 +36,25 @@ namespace RevitSetLevelSection.Models {
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(DesignOption))
                 .OfType<DesignOption>()
+                .Where(item=> !item.IsPrimary)
                 .ToList();
         }
 
-        public IEnumerable<FamilyInstance> GetMassElements(DesignOption designOption) {
-            return new FilteredElementCollector(_document)
+        public IEnumerable<FamilyInstance> GetMassElements(IDesignOption designOption) {
+            // Пропускаем все элементы, которые имеют DesignOptions.IsPrimary
+            // если в документе нет DesignOptions тогда элемент возвращает null
+            var elements = new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
                 .OfCategory(BuiltInCategory.OST_Mass)
-                .Where(item => item.DesignOption?.Id == designOption.Id)
+                .Where(item => item.DesignOption == null || item.DesignOption.IsPrimary == false);
+            
+            // Фиктивный DesignOption возвращает
+            // идентификатор ElementId.InvalidElementId
+            if(designOption.Id != ElementId.InvalidElementId) {
+                elements = elements.Where(item => GetDesignOptionId(item) == designOption.Id);
+            }
+
+            return elements
                 .OfType<FamilyInstance>()
                 .ToList();
         }
@@ -105,6 +116,10 @@ namespace RevitSetLevelSection.Models {
             yield return BuildingWorksTypingName;
             yield return BuildingWorksSectionName;
             yield return BuildingWorksBlockName;
+        }
+
+        private ElementId GetDesignOptionId(Element element) {
+            return element.DesignOption?.Id ?? ElementId.InvalidElementId;
         }
     }
 }

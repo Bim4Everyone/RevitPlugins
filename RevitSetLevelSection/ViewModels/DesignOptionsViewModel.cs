@@ -14,8 +14,7 @@ namespace RevitSetLevelSection.ViewModels {
     internal class DesignOptionsViewModel : BaseViewModel {
         private readonly List<FamilyInstance> _massElements;
 
-        public DesignOptionsViewModel(DesignOption designOption, LinkInstanceRepository linkInstanceRepository) {
-            
+        public DesignOptionsViewModel(IDesignOption designOption, LinkInstanceRepository linkInstanceRepository) {
             if(designOption is null) {
                 throw new ArgumentNullException(nameof(designOption));
             }
