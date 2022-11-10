@@ -8,6 +8,7 @@ using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
@@ -33,7 +34,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
 
         public static IClashChecker GetWallClashChecker(RevitRepository revitRepository) {
             var mepCurveChecker = new MainElementIsMepCurveChecker(revitRepository, null);
-            var wallChecker = new OtherElementIsWallChecker(revitRepository, mepCurveChecker);
+            var volumeChecker = new ClashVolumeChecker(revitRepository, mepCurveChecker);
+            var wallChecker = new OtherElementIsWallChecker(revitRepository, volumeChecker);
             var verticalityChecker = new MepIsNotVerticalChecker(revitRepository, wallChecker);
             var parallelismChecker = new ElementsIsNotParallelChecker(revitRepository, verticalityChecker);
             return new WallIsNotCurtainChecker(revitRepository, parallelismChecker);
@@ -41,8 +43,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
 
         public static IClashChecker GetFloorClashChecker(RevitRepository revitRepository) {
             var mepCurveChecker = new MainElementIsMepCurveChecker(revitRepository, null);
-            var floorChecker = new OtherElementIsFloorChecker(revitRepository, mepCurveChecker);
-           return new MepIsNotHorizontalChecker(revitRepository, floorChecker);
+            var volumeChecker = new ClashVolumeChecker(revitRepository, mepCurveChecker);
+            var floorChecker = new OtherElementIsFloorChecker(revitRepository, volumeChecker);
+            return new MepIsNotHorizontalChecker(revitRepository, floorChecker);
         }
     }
 
@@ -94,6 +97,24 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         public MepIsNotHorizontalChecker(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
         public override bool CheckModel(ClashModel clashModel) {
             return !((MEPCurve) clashModel.MainElement.GetElement(_revitRepository.DocInfos)).IsHorizontal();
+        }
+    }
+
+    internal class ClashVolumeChecker : ClashChecker {
+        public ClashVolumeChecker(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
+        public override bool CheckModel(ClashModel clashModel) {
+            var element1 = (MEPCurve) clashModel.MainElement.GetElement(_revitRepository.DocInfos);
+            var element2 = clashModel.OtherElement.GetElement(_revitRepository.DocInfos);
+            var transform = _revitRepository.GetTransform(element2);
+            try {
+                var solid = BooleanOperationsUtils.ExecuteBooleanOperation(element1.GetSolid(),
+                SolidUtils.CreateTransformed(element2.GetSolid(), transform),
+                BooleanOperationsType.Intersect);
+                return solid.Volume > element1.GetConnectorArea() * 0.05;
+            } catch {
+                return true;
+            }
+            
         }
     }
 }
