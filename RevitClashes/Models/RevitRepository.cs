@@ -223,7 +223,9 @@ namespace RevitClashDetective.Models {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(RevitLinkInstance))
                 .Cast<RevitLinkInstance>()
-                .Where(item => item.GetLinkDocument() != null && IsParentLink(item))
+                .Where(item => item.GetLinkDocument() != null)
+                .GroupBy(item => GetDocumentName(item.GetLinkDocument()))
+                .Select(item => item.First())
                 .ToList();
         }
 
@@ -240,10 +242,7 @@ namespace RevitClashDetective.Models {
         }
 
         public void InitializeDocInfos() {
-            DocInfos = new FilteredElementCollector(_document)
-               .OfClass(typeof(RevitLinkInstance))
-               .Cast<RevitLinkInstance>()
-               .Where(item => item.GetLinkDocument() != null)
+            DocInfos = GetRevitLinkInstances()
                .Select(item => new DocInfo(GetDocumentName(item.GetLinkDocument()), item.GetLinkDocument(), item.GetTransform()))
                .ToList();
             DocInfos.Add(new DocInfo(GetDocumentName(), _document, Transform.Identity));
@@ -280,11 +279,8 @@ namespace RevitClashDetective.Models {
         }
 
         public IEnumerable<Document> GetDocuments() {
-            var linkedDocuments = new FilteredElementCollector(_document)
-                .OfClass(typeof(RevitLinkInstance))
-                .Cast<RevitLinkInstance>()
+            var linkedDocuments = GetRevitLinkInstances()
                 .Select(item => item.GetLinkDocument())
-                .Where(item => item != null)
                 .ToList();
             linkedDocuments.Add(_document);
             return linkedDocuments;
