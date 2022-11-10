@@ -17,8 +17,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         }
 
         public IEnumerable<ParameterValuePair> GetParamValues() {
+            var sizeInit = new FloorOpeningSizeInitializer(new IntersectionGetter<CeilingAndFloor>(_clash).GetIntersection(), _mepCategory);
             yield return new DoubleParameterGetter(RevitRepository.OpeningDiameter, new DiameterValueGetter(_clash.Curve, _mepCategory)).GetParamValue();
-            yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new FloorThicknessValueGetter(_clash)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, sizeInit.GetThickness()).GetParamValue();
         }
     }
 }
