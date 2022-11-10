@@ -9,7 +9,7 @@ using dosymep.Revit;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 
 namespace RevitOpeningPlacement.Models.Extensions {
-    internal static class MepCurveExtention {
+    internal static class MepCurveExtension {
         public static Line GetLine(this MEPCurve curve) {
             var line = (Line) ((LocationCurve) curve.Location).Curve;
             var elevations = curve.GetElevations().ToList();
@@ -73,6 +73,11 @@ namespace RevitOpeningPlacement.Models.Extensions {
                 return null;
             }
             return (Level) curve.Document.GetElement(levelId);
+        }
+
+        public static double GetConnectorArea(this MEPCurve curve) {
+            var connector = curve.ConnectorManager.Connectors.OfType<Connector>().First();
+            return connector.GetArea();
         }
 
         private static double GetBuiltInParam(this MEPCurve curve, IEnumerable<BuiltInParameter> parameters) {

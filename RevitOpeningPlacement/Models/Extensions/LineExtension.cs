@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 namespace RevitOpeningPlacement.Models.Extensions {
-    internal static class LineExtention {
+    internal static class LineExtension {
         public static bool IsHorizontal(this Line line) {
             return Math.Abs(line.GetEndPoint(0).Z - line.GetEndPoint(1).Z) < 0.0001;
         }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 namespace RevitOpeningPlacement.Models.Extensions {
-    internal static class WallExtention {
+    internal static class WallExtension {
         public static Line GetLine(this Wall wall) {
             return (Line) ((LocationCurve) wall.Location).Curve;
         }
