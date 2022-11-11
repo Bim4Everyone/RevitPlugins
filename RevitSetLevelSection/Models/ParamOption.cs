@@ -12,8 +12,8 @@ namespace RevitSetLevelSection.Models {
 
     internal static class ElementExtensions {
         public static bool IsExistsParamValue(this Element element, ParamOption paramOption) {
-            if(element.IsExistsProjectParam(paramOption.ProjectRevitParamName)) {
-                return element.IsExistsProjectParamValue(paramOption.ProjectRevitParamName);
+            if(element.IsExistsProjectParamValue(paramOption.ProjectRevitParamName)) {
+                return true;
             } else {
                 return element.IsExistsParamValue(paramOption.SharedRevitParam);
             }
