@@ -8,12 +8,12 @@ using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
     internal class InclinedSizeValueGetter : IValueGetter<DoubleParamValue> {
-        private readonly MepCurveWallClash _clash;
+        private readonly MepCurveClash<Wall> _clash;
         private readonly Plane _plane;
         private readonly IValueGetter<DoubleParamValue> _sizeValueGetter;
         private readonly IDirectionsGetter _directionsGetter;
 
-        public InclinedSizeValueGetter(MepCurveWallClash clash, IValueGetter<DoubleParamValue> sizeValueGetter, Plane plane, IDirectionsGetter directionsGetter) {
+        public InclinedSizeValueGetter(MepCurveClash<Wall> clash, IValueGetter<DoubleParamValue> sizeValueGetter, Plane plane, IDirectionsGetter directionsGetter) {
             _clash = clash;
             _sizeValueGetter = sizeValueGetter;
             _plane = plane;

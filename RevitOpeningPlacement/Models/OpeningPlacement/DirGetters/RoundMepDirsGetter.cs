@@ -11,9 +11,9 @@ using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.DirGetters {
     internal class RoundMepDirsGetter : IDirectionsGetter {
-        private readonly MepCurveWallClash _clash;
+        private readonly MepCurveClash<Wall> _clash;
 
-        public RoundMepDirsGetter(MepCurveWallClash clash) {
+        public RoundMepDirsGetter(MepCurveClash<Wall> clash) {
             _clash = clash;
         }
 

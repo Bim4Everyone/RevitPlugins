@@ -15,6 +15,7 @@ using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.FilterModel;
 
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
 using RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers;
 
@@ -22,7 +23,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
     internal class PlacementConfigurator {
         private readonly RevitRepository _revitRepository;
         private readonly MepCategoryCollection _categories;
-        private List<ClashModel> _unplacedClashes = new List<ClashModel>();
+        private List<ClashModel> _unplacedClashes = new List<ClashModel>(); 
 
         public PlacementConfigurator(RevitRepository revitRepository, MepCategoryCollection categories) {
             _revitRepository = revitRepository;
@@ -38,11 +39,18 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             var wallFilter = FiltersInitializer.GetWallFilter(_revitRepository.GetClashRevitRepository());
             var floorFilter = FiltersInitializer.GetFloorFilter(_revitRepository.GetClashRevitRepository());
 
+            var wallClashChecker = ClashChecker.GetWallClashChecker(_revitRepository);
+            var floorClashChecker = ClashChecker.GetFloorClashChecker(_revitRepository);
+
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
-            placers.AddRange(GetRoundMepWallPlacers(pipeFilter, wallFilter, _categories[CategoryEnum.Pipe]));
-            placers.AddRange(GetRoundMepWallPlacers(roundDuctFilter, wallFilter, _categories[CategoryEnum.RoundDuct]));
-            placers.AddRange(GetRectangleMepWallPlacers(rectangleDuctFilter, wallFilter, _categories[CategoryEnum.RectangleDuct]));
-            placers.AddRange(GetRectangleMepWallPlacers(trayFilter, wallFilter, _categories[CategoryEnum.CableTray]));
+            placers.AddRange(GetRoundMepWallPlacers(pipeFilter, wallFilter, wallClashChecker, _categories[CategoryEnum.Pipe]));
+            placers.AddRange(GetRoundMepWallPlacers(roundDuctFilter, wallFilter, wallClashChecker, _categories[CategoryEnum.RoundDuct]));
+            placers.AddRange(GetRectangleMepWallPlacers(rectangleDuctFilter, wallFilter, wallClashChecker, _categories[CategoryEnum.RectangleDuct]));
+            placers.AddRange(GetRectangleMepWallPlacers(trayFilter, wallFilter, wallClashChecker, _categories[CategoryEnum.CableTray]));
+            placers.AddRange(GetRoundMepFloorPlacers(roundDuctFilter, floorFilter, floorClashChecker, _categories[CategoryEnum.RoundDuct]));
+            placers.AddRange(GetRoundMepFloorPlacers(pipeFilter, floorFilter, floorClashChecker, _categories[CategoryEnum.Pipe]));
+            placers.AddRange(GetRectangleMepFloorPlacers(rectangleDuctFilter, floorFilter, floorClashChecker, _categories[CategoryEnum.RoundDuct]));
+            placers.AddRange(GetRectangleMepFloorPlacers(trayFilter, floorFilter, floorClashChecker, _categories[CategoryEnum.CableTray]));
             return placers;
         }
 
@@ -50,21 +58,28 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             return _unplacedClashes;
         }
 
-        private IEnumerable<OpeningPlacer> GetRectangleMepWallPlacers(Filter rectangleDuctFilter, Filter wallFilter, MepCategory mepCategory) {
-            return GetWallClashes(rectangleDuctFilter, wallFilter).Where(item => ClashChecker.CheckWallClash(_revitRepository, item))
-                                  .Select(item => RectangleMepWallPlacerInitializer.GetPlacer(_revitRepository, item, mepCategory));
+        private IEnumerable<OpeningPlacer> GetRectangleMepWallPlacers(Filter rectangleMepFilter, Filter wallFilter, IClashChecker clashChecker, MepCategory mepCategory) {
+            return GetClashes(rectangleMepFilter, wallFilter, clashChecker).Select(item => RectangleMepWallPlacerInitializer.GetPlacer(_revitRepository, item, mepCategory));
         }
 
-        private IEnumerable<OpeningPlacer> GetRoundMepWallPlacers(Filter roundDuctFilter, Filter wallFilter, MepCategory mepCategory) {
-            return GetWallClashes(roundDuctFilter, wallFilter).Where(item => ClashChecker.CheckWallClash(_revitRepository, item))
-                                  .Select(item => RoundMepWallPlacerInitializer.GetPlacer(_revitRepository, item, mepCategory));
+        private IEnumerable<OpeningPlacer> GetRoundMepWallPlacers(Filter roundMepFilter, Filter wallFilter, IClashChecker clashChecker, MepCategory mepCategory) {
+            return GetClashes(roundMepFilter, wallFilter, clashChecker).Select(item => RoundMepWallPlacerInitializer.GetPlacer(_revitRepository, item, mepCategory));
         }
 
-        private IEnumerable<ClashModel> GetWallClashes(Filter mepFilter, Filter wallFilter) {
-            var wallClashes = ClashInitializer.GetClashes(_revitRepository.GetClashRevitRepository(), mepFilter, wallFilter).ToList();
+        private IEnumerable<OpeningPlacer> GetRoundMepFloorPlacers(Filter roundMepFilter, Filter floorFilter, IClashChecker clashChecker, MepCategory mepCategory) {
+            return GetClashes(roundMepFilter, floorFilter, clashChecker).Select(item => RoundMepFloorPlacerInitializer.GetPlacer(_revitRepository, item, mepCategory));
+        }
 
-            _unplacedClashes.AddRange(wallClashes.Where(item => !ClashChecker.CheckWallClash(_revitRepository, item)));
-            return wallClashes;
+        private IEnumerable<OpeningPlacer> GetRectangleMepFloorPlacers(Filter rectangleMepFilter, Filter floorFilter, IClashChecker clashChecker, MepCategory mepCategory) {
+            return GetClashes(rectangleMepFilter, floorFilter, clashChecker).Select(item => RectangleMepFloorPlacerInitializer.GetPlacer(_revitRepository, item, mepCategory));
+        }
+
+        private IEnumerable<ClashModel> GetClashes(Filter mepFilter, Filter constructionFilter, IClashChecker clashChecker) {
+            var wallClashes = ClashInitializer.GetClashes(_revitRepository.GetClashRevitRepository(), mepFilter, constructionFilter)
+                .ToList();
+
+            _unplacedClashes.AddRange(wallClashes.Where(item => !clashChecker.Check(item)));
+            return wallClashes.Where(item => clashChecker.Check(item));
         }
 
         private Filter GetPipeFilter() {
