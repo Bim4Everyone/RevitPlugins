@@ -20,7 +20,7 @@ namespace RevitSetLevelSection.Models {
         }
         
         public static T GetParamValue<T>(this Element element, ParamOption paramOption) {
-            if(element.IsExistsProjectParam(paramOption.ProjectRevitParamName)) {
+            if(element.IsExistsProjectParamValue(paramOption.ProjectRevitParamName)) {
                 return element.GetParamValue<T>(paramOption.ProjectRevitParamName);
             } else {
                 return element.GetParamValue<T>(paramOption.SharedRevitParam);
