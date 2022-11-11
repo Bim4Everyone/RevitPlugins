@@ -11,9 +11,9 @@ using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.DirGetters {
     internal class RectangleDirsGetter : IDirectionsGetter {
-        private readonly MepCurveWallClash _clash;
+        private readonly MepCurveClash<Wall> _clash;
 
-        public RectangleDirsGetter(MepCurveWallClash clash) {
+        public RectangleDirsGetter(MepCurveClash<Wall> clash) {
             _clash = clash;
         }
 
@@ -30,7 +30,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.DirGetters {
             var horizontalDirs = new[] { dirX, -dirX }.Select(item => item * width);
 
             // сложение векторов для получение направлений всех диагоналей и проекция полученных векторов на плоскость
-            return verticalDirs.SelectMany(item => horizontalDirs.Select(hitem => _clash.WallTransform.OfVector(hitem + item)))
+            return verticalDirs.SelectMany(item => horizontalDirs.Select(hitem => _clash.ElementTransform.OfVector(hitem + item)))
                                .Select(item => plane.ProjectVector(item).Normalize());
         }
     }

@@ -2,7 +2,7 @@
 using Autodesk.Revit.DB;
 
 namespace RevitOpeningPlacement.Models.Extensions {
-    internal static class PlaneExtention {
+    internal static class PlaneExtension {
         public static XYZ Evaluate(this Plane plane, UV uv) {
             return plane.Origin + uv.U * plane.XVec + uv.V * plane.YVec;
         }

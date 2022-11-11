@@ -9,11 +9,11 @@ using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
-    internal class InclinedRoundCurveWallParameterGetter : IParametersGetter {
-        private readonly MepCurveWallClash _clash;
+    internal class InclinedRoundCurveWallParamGetter : IParametersGetter {
+        private readonly MepCurveClash<Wall> _clash;
         private readonly MepCategory _mepCategory;
 
-        public InclinedRoundCurveWallParameterGetter(MepCurveWallClash clash, MepCategory mepCategory) {
+        public InclinedRoundCurveWallParamGetter(MepCurveClash<Wall> clash, MepCategory mepCategory) {
             _clash = clash;
             _mepCategory = mepCategory;
         }
@@ -27,7 +27,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         public IEnumerable<ParameterValuePair> GetParamValues() {
             yield return new DoubleParameterGetter(RevitRepository.OpeningHeight, new InclinedSizeInitializer(_clash, _mepCategory).GetRoundMepHeightGetter()).GetParamValue();
             yield return new DoubleParameterGetter(RevitRepository.OpeningWidth, new InclinedSizeInitializer(_clash, _mepCategory).GetRoundMepWidthGetter()).GetParamValue();
-            yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new ThicknessValueGetter(_clash)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new WallThicknessValueGetter(_clash)).GetParamValue();
         }
     }
 }

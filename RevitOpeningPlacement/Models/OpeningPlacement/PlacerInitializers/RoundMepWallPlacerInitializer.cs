@@ -21,19 +21,19 @@ using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
     internal class RoundMepWallPlacerInitializer {
         public static OpeningPlacer GetPlacer(RevitRepository revitRepository, ClashModel clashModel, MepCategory categoryOption) {
-            var clash = new MepCurveWallClash(revitRepository, clashModel);
+            var clash = new MepCurveClash<Wall>(revitRepository, clashModel);
 
             var placer = new OpeningPlacer(revitRepository) {
                 Clash = clashModel,
-                AngleFinder = new WallAngleFinder(clash.Wall, clash.WallTransform)
+                AngleFinder = new WallAngleFinder(clash.Element, clash.ElementTransform)
             };
-            if(clash.Curve.IsPerpendicular(clash.Wall)) {
-                placer.PointFinder = new HorizontalPointFinder(clash);
-                placer.ParameterGetter = new PerpendicularRoundCurveWallParamterGetter(clash, categoryOption);
+            if(clash.Curve.IsPerpendicular(clash.Element)) {
+                placer.PointFinder = new WallPointFinder(clash);
+                placer.ParameterGetter = new PerpendicularRoundCurveWallParamGetter(clash, categoryOption);
                 placer.Type = revitRepository.GetOpeningType(OpeningType.WallRound);
             } else {
-                placer.PointFinder = new HorizontalPointFinder(clash, new InclinedSizeInitializer(clash, categoryOption).GetRoundMepHeightGetter());
-                placer.ParameterGetter = new InclinedRoundCurveWallParameterGetter(clash, categoryOption);
+                placer.PointFinder = new WallPointFinder(clash, new InclinedSizeInitializer(clash, categoryOption).GetRoundMepHeightGetter());
+                placer.ParameterGetter = new InclinedRoundCurveWallParamGetter(clash, categoryOption);
                 placer.Type = revitRepository.GetOpeningType(OpeningType.WallRectangle);
             };
 

@@ -13,19 +13,19 @@ using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
     internal class RectangleMepWallPlacerInitializer {
         public static OpeningPlacer GetPlacer(RevitRepository revitRepository, ClashModel clashModel, MepCategory categoryOption) {
-            var clash = new MepCurveWallClash(revitRepository, clashModel);
+            var clash = new MepCurveClash<Wall>(revitRepository, clashModel);
 
             var placer = new OpeningPlacer(revitRepository) {
                 Clash = clashModel,
-                AngleFinder = new WallAngleFinder(clash.Wall, clash.WallTransform),
+                AngleFinder = new WallAngleFinder(clash.Element, clash.ElementTransform),
                 Type = revitRepository.GetOpeningType(OpeningType.WallRectangle),
             };
-            if(clash.Curve.IsPerpendicular(clash.Wall)) {
-                placer.ParameterGetter = new PerpendicularRectangleCurveWallParamterGetter(clash, categoryOption);
-                placer.PointFinder = new HorizontalPointFinder(clash, new HeightValueGetter(clash, categoryOption));
+            if(clash.Curve.IsPerpendicular(clash.Element)) {
+                placer.ParameterGetter = new PerpendicularRectangleCurveWallParamGetter(clash, categoryOption);
+                placer.PointFinder = new WallPointFinder(clash, new HeightValueGetter(clash.Curve, categoryOption));
             } else {
                 placer.ParameterGetter = new InclinedRectangleCurveWallParameterGetter(clash, categoryOption);
-                placer.PointFinder = new HorizontalPointFinder(clash, new InclinedSizeInitializer(clash, categoryOption).GetRectangleMepHeightGetter());
+                placer.PointFinder = new WallPointFinder(clash, new InclinedSizeInitializer(clash, categoryOption).GetRectangleMepHeightGetter());
             };
 
             return placer;

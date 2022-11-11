@@ -11,18 +11,18 @@ using RevitClashDetective.Models.Clashes;
 using RevitOpeningPlacement.Models.Extensions;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement {
-    internal class MepCurveWallClash {
-        public MepCurveWallClash(RevitRepository revitRepository, ClashModel clashModel) {
+    internal class MepCurveClash<T> where T : Element {
+        public MepCurveClash(RevitRepository revitRepository, ClashModel clashModel) {
             Curve = (MEPCurve) clashModel.MainElement.GetElement(revitRepository.DocInfos);
-            Wall = (Wall) clashModel.OtherElement.GetElement(revitRepository.DocInfos);
-            WallTransform = revitRepository.GetTransform(Wall);
+            Element = (T) clashModel.OtherElement.GetElement(revitRepository.DocInfos);
+            ElementTransform = revitRepository.GetTransform(Element);
         }
 
         public MEPCurve Curve { get; set; }
 
-        public Wall Wall { get; set; }
+        public T Element { get; set; }
 
-        public Transform WallTransform { get; set; }
+        public Transform ElementTransform { get; set; }
 
         public Line GetTransformedMepLine() {
             var mepLine = Curve.GetLine();
@@ -32,7 +32,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
                                                     mepLine.GetEndPoint(1) + mepLine.Direction * 16.5);
 
             //трансформация осевой линии инженерной системы в систему координат файла со стеной
-            var inversedTransform = WallTransform.Inverse.Multiply(Transform.Identity);
+            var inversedTransform = ElementTransform.Inverse.Multiply(Transform.Identity);
             return elongatedMepLine.GetTransformedLine(inversedTransform);
         }
     }
