@@ -38,13 +38,17 @@ namespace RevitOpeningPlacement.Models {
         public UIApplication UIApplication { get; }
         public List<DocInfo> DocInfos { get; }
 
-        public static Dictionary<CategoryEnum, string> CategoryNames => new Dictionary<CategoryEnum, string> {
-            {CategoryEnum.Pipe, "Трубы" },
-            {CategoryEnum.RectangleDuct, "Воздуховоды (прямоугольное сечение)" },
-            {CategoryEnum.RoundDuct, "Воздуховоды (круглое сечение)" },
-            {CategoryEnum.CableTray, "Лотки" },
-            {CategoryEnum.Wall, "Стены" },
-            {CategoryEnum.Floor, "Перекрытия" }
+        public static Dictionary<MepCategoryEnum, string> MepCategoryNames => new Dictionary<MepCategoryEnum, string> {
+            {MepCategoryEnum.Pipe, "Трубы" },
+            {MepCategoryEnum.RectangleDuct, "Воздуховоды (прямоугольное сечение)" },
+            {MepCategoryEnum.RoundDuct, "Воздуховоды (круглое сечение)" },
+            {MepCategoryEnum.CableTray, "Лотки" },
+            {MepCategoryEnum.Conduits, "Короба" }
+        };
+
+        public static Dictionary<StructureCategoryEnum, string> StructureCategoryNames => new Dictionary<StructureCategoryEnum, string> {
+            {StructureCategoryEnum.Wall, "Стены" },
+            {StructureCategoryEnum.Floor, "Перекрытия" },
         };
 
         public static Dictionary<Parameters, string> ParameterNames => new Dictionary<Parameters, string>() {
@@ -206,13 +210,17 @@ namespace RevitOpeningPlacement.Models {
         Diameter
     }
 
-    internal enum CategoryEnum {
+    internal enum MepCategoryEnum {
         Pipe,
         RectangleDuct,
         RoundDuct,
         CableTray,
+        Conduits
+    }
+
+    internal enum StructureCategoryEnum {
         Wall,
-        Floor
+        Floor,
     }
 
     internal enum OpeningType {

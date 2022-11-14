@@ -43,14 +43,14 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             var floorClashChecker = ClashChecker.GetFloorClashChecker(_revitRepository);
 
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
-            placers.AddRange(GetRoundMepWallPlacers(pipeFilter, wallFilter, wallClashChecker, _categories[CategoryEnum.Pipe]));
-            placers.AddRange(GetRoundMepWallPlacers(roundDuctFilter, wallFilter, wallClashChecker, _categories[CategoryEnum.RoundDuct]));
-            placers.AddRange(GetRectangleMepWallPlacers(rectangleDuctFilter, wallFilter, wallClashChecker, _categories[CategoryEnum.RectangleDuct]));
-            placers.AddRange(GetRectangleMepWallPlacers(trayFilter, wallFilter, wallClashChecker, _categories[CategoryEnum.CableTray]));
-            placers.AddRange(GetRoundMepFloorPlacers(roundDuctFilter, floorFilter, floorClashChecker, _categories[CategoryEnum.RoundDuct]));
-            placers.AddRange(GetRoundMepFloorPlacers(pipeFilter, floorFilter, floorClashChecker, _categories[CategoryEnum.Pipe]));
-            placers.AddRange(GetRectangleMepFloorPlacers(rectangleDuctFilter, floorFilter, floorClashChecker, _categories[CategoryEnum.RoundDuct]));
-            placers.AddRange(GetRectangleMepFloorPlacers(trayFilter, floorFilter, floorClashChecker, _categories[CategoryEnum.CableTray]));
+            placers.AddRange(GetRoundMepWallPlacers(pipeFilter, wallFilter, wallClashChecker, _categories[MepCategoryEnum.Pipe]));
+            placers.AddRange(GetRoundMepWallPlacers(roundDuctFilter, wallFilter, wallClashChecker, _categories[MepCategoryEnum.RoundDuct]));
+            placers.AddRange(GetRectangleMepWallPlacers(rectangleDuctFilter, wallFilter, wallClashChecker, _categories[MepCategoryEnum.RectangleDuct]));
+            placers.AddRange(GetRectangleMepWallPlacers(trayFilter, wallFilter, wallClashChecker, _categories[MepCategoryEnum.CableTray]));
+            placers.AddRange(GetRoundMepFloorPlacers(roundDuctFilter, floorFilter, floorClashChecker, _categories[MepCategoryEnum.RoundDuct]));
+            placers.AddRange(GetRoundMepFloorPlacers(pipeFilter, floorFilter, floorClashChecker, _categories[MepCategoryEnum.Pipe]));
+            placers.AddRange(GetRectangleMepFloorPlacers(rectangleDuctFilter, floorFilter, floorClashChecker, _categories[MepCategoryEnum.RoundDuct]));
+            placers.AddRange(GetRectangleMepFloorPlacers(trayFilter, floorFilter, floorClashChecker, _categories[MepCategoryEnum.CableTray]));
             return placers;
         }
 
@@ -83,7 +83,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         }
 
         private Filter GetPipeFilter() {
-            var minSizePipe = _categories[CategoryEnum.Pipe]?.MinSizes[Parameters.Diameter];
+            var minSizePipe = _categories[MepCategoryEnum.Pipe]?.MinSizes[Parameters.Diameter];
             if(minSizePipe != null) {
                 return FiltersInitializer.GetPipeFilter(_revitRepository.GetClashRevitRepository(), minSizePipe.Value);
             }
@@ -91,7 +91,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         }
 
         private Filter GetRoundDuctFilter() {
-            var minSizeRoundDuct = _categories[CategoryEnum.RoundDuct]?.MinSizes[Parameters.Diameter];
+            var minSizeRoundDuct = _categories[MepCategoryEnum.RoundDuct]?.MinSizes[Parameters.Diameter];
             if(minSizeRoundDuct != null) {
                 return FiltersInitializer.GetRoundDuctFilter(_revitRepository.GetClashRevitRepository(), minSizeRoundDuct.Value);
             }
@@ -99,7 +99,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         }
 
         private Filter GetRectangleDuctFilter() {
-            var minSizesRectangleDuct = _categories[CategoryEnum.RectangleDuct]?.MinSizes;
+            var minSizesRectangleDuct = _categories[MepCategoryEnum.RectangleDuct]?.MinSizes;
             if(minSizesRectangleDuct != null) {
                 var height = minSizesRectangleDuct[Parameters.Height];
                 var width = minSizesRectangleDuct[Parameters.Width];
@@ -111,7 +111,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         }
 
         private Filter GetTrayFilter() {
-            var minSizesTray = _categories[CategoryEnum.CableTray]?.MinSizes;
+            var minSizesTray = _categories[MepCategoryEnum.CableTray]?.MinSizes;
             if(minSizesTray != null) {
                 var height = minSizesTray[Parameters.Height];
                 var width = minSizesTray[Parameters.Width];
