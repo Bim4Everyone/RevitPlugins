@@ -43,7 +43,7 @@ namespace RevitOpeningPlacement.Models {
             {MepCategoryEnum.RectangleDuct, "Воздуховоды (прямоугольное сечение)" },
             {MepCategoryEnum.RoundDuct, "Воздуховоды (круглое сечение)" },
             {MepCategoryEnum.CableTray, "Лотки" },
-            {MepCategoryEnum.Conduits, "Короба" }
+            {MepCategoryEnum.Conduit, "Короба" }
         };
 
         public static Dictionary<StructureCategoryEnum, string> StructureCategoryNames => new Dictionary<StructureCategoryEnum, string> {
@@ -78,7 +78,8 @@ namespace RevitOpeningPlacement.Models {
 
         public static List<BuiltInParameter> MepCurveDiameters => new List<BuiltInParameter>() {
             BuiltInParameter.RBS_PIPE_OUTER_DIAMETER,
-            BuiltInParameter.RBS_CURVE_DIAMETER_PARAM
+            BuiltInParameter.RBS_CURVE_DIAMETER_PARAM,
+            BuiltInParameter.RBS_CONDUIT_OUTER_DIAM_PARAM
         };
 
         public static List<BuiltInParameter> MepCurveHeights => new List<BuiltInParameter>() {
@@ -215,7 +216,7 @@ namespace RevitOpeningPlacement.Models {
         RectangleDuct,
         RoundDuct,
         CableTray,
-        Conduits
+        Conduit
     }
 
     internal enum StructureCategoryEnum {

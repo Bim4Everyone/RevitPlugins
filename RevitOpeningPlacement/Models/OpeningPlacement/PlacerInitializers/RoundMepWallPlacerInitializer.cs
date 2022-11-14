@@ -19,8 +19,8 @@ using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
 
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
-    internal class RoundMepWallPlacerInitializer {
-        public static OpeningPlacer GetPlacer(RevitRepository revitRepository, ClashModel clashModel, MepCategory categoryOption) {
+    internal class RoundMepWallPlacerInitializer : IPlacerInitializer {
+        public OpeningPlacer GetPlacer(RevitRepository revitRepository, ClashModel clashModel, MepCategory categoryOption) {
             var clash = new MepCurveClash<Wall>(revitRepository, clashModel);
 
             var placer = new OpeningPlacer(revitRepository) {

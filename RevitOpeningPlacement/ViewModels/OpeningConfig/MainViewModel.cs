@@ -118,7 +118,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         };
 
         private MepCategoryViewModel GetConduit() => new MepCategoryViewModel {
-            Name = RevitRepository.MepCategoryNames[MepCategoryEnum.Conduits],
+            Name = RevitRepository.MepCategoryNames[MepCategoryEnum.Conduit],
             MinSizes = new ObservableCollection<ISizeViewModel>() {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
             },
@@ -149,7 +149,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 return GetRoundDuct();
                 case MepCategoryEnum.CableTray:
                 return GetCableTray();
-                case MepCategoryEnum.Conduits:
+                case MepCategoryEnum.Conduit:
                 return GetConduit();
                 default:
                 throw new ArgumentException($"Не найдена категория \"{missingCategory}\".", nameof(missingCategory));

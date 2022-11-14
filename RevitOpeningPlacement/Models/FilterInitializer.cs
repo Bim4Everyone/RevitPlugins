@@ -45,16 +45,17 @@ namespace RevitOpeningPlacement.Models {
                                  new[] { new ParamValuePair { RevitParam = revitParam, Value = minDiameter } });
         }
 
-        public static Filter GetRectangleDuctFilter(RevitClashDetective.Models.RevitRepository revitRepository, double minHeight, double minWidth) {
-            var heightParamValuePair = new ParamValuePair() {
-                RevitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM)),
-                Value = minHeight
-            };
+        public static Filter GetConduitFilter(RevitClashDetective.Models.RevitRepository revitRepository, double minDiameter) {
+            var revitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_CONDUIT_DIAMETER_PARAM));
+            return GetdMepFilter(RevitRepository.MepCategoryNames[MepCategoryEnum.Conduit],
+                                 revitRepository,
+                                 BuiltInCategory.OST_Conduit,
+                                 new[] { new ParamValuePair { RevitParam = revitParam, Value = minDiameter } });
+        }
 
-            var widthParamValuePair = new ParamValuePair() {
-                RevitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_CURVE_WIDTH_PARAM)),
-                Value = minWidth
-            };
+        public static Filter GetRectangleDuctFilter(RevitClashDetective.Models.RevitRepository revitRepository, double minHeight, double minWidth) {
+            var heightParamValuePair = ParamValuePair.GetBuiltInParamValuePair(revitRepository.Doc, BuiltInParameter.RBS_CURVE_HEIGHT_PARAM, minHeight); 
+            var widthParamValuePair = ParamValuePair.GetBuiltInParamValuePair(revitRepository.Doc, BuiltInParameter.RBS_CURVE_WIDTH_PARAM, minWidth);
 
             return GetdMepFilter(RevitRepository.MepCategoryNames[MepCategoryEnum.RectangleDuct],
                                  revitRepository,
@@ -63,15 +64,8 @@ namespace RevitOpeningPlacement.Models {
         }
 
         public static Filter GetTrayFilter(RevitClashDetective.Models.RevitRepository revitRepository, double minHeight, double minWidth) {
-            var heightParamValuePair = new ParamValuePair() {
-                RevitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM)),
-                Value = minHeight
-            };
-
-            var widthParamValuePair = new ParamValuePair() {
-                RevitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM)),
-                Value = minWidth
-            };
+            var heightParamValuePair = ParamValuePair.GetBuiltInParamValuePair(revitRepository.Doc, BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM, minHeight);
+            var widthParamValuePair = ParamValuePair.GetBuiltInParamValuePair(revitRepository.Doc, BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM, minWidth);
 
             return GetdMepFilter(RevitRepository.MepCategoryNames[MepCategoryEnum.CableTray],
                                  revitRepository,
@@ -121,5 +115,12 @@ namespace RevitOpeningPlacement.Models {
     internal class ParamValuePair {
         public RevitParam RevitParam { get; set; }
         public double Value { get; set; }
+
+        public static ParamValuePair GetBuiltInParamValuePair(Document doc, BuiltInParameter param, double value) {
+            return new ParamValuePair() {
+                RevitParam = ParameterInitializer.InitializeParameter(doc, new ElementId(param)),
+                Value = value
+            };
+        }
     }
 }

@@ -23,7 +23,20 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
     internal class PlacementConfigurator {
         private readonly RevitRepository _revitRepository;
         private readonly MepCategoryCollection _categories;
-        private List<ClashModel> _unplacedClashes = new List<ClashModel>(); 
+        private List<ClashModel> _unplacedClashes = new List<ClashModel>();
+
+        private Dictionary<MepCategoryEnum, Func<RevitClashDetective.Models.RevitRepository, double, double, Filter>> _rectangleMepFilterProviders =
+            new Dictionary<MepCategoryEnum, Func<RevitClashDetective.Models.RevitRepository, double, double, Filter>> {
+                { MepCategoryEnum.RectangleDuct, (revitRepository, height, width) => { return FiltersInitializer.GetRectangleDuctFilter(revitRepository, height, width); } },
+                { MepCategoryEnum.CableTray, (revitRepository, height, width) => { return FiltersInitializer.GetTrayFilter(revitRepository, height, width); } },
+            };
+
+        private Dictionary<MepCategoryEnum, Func<RevitClashDetective.Models.RevitRepository, double, Filter>> _roundMepFilterProviders =
+            new Dictionary<MepCategoryEnum, Func<RevitClashDetective.Models.RevitRepository, double, Filter>> {
+                { MepCategoryEnum.Pipe, (revitRepository, diameter) => { return FiltersInitializer.GetPipeFilter(revitRepository, diameter); } },
+                { MepCategoryEnum.RoundDuct, (revitRepository, diameter) => { return FiltersInitializer.GetRoundDuctFilter(revitRepository, diameter); } },
+                { MepCategoryEnum.Conduit, (revitRepository, diameter) => { return FiltersInitializer.GetConduitFilter(revitRepository, diameter); } },
+            };
 
         public PlacementConfigurator(RevitRepository revitRepository, MepCategoryCollection categories) {
             _revitRepository = revitRepository;
@@ -31,11 +44,6 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         }
 
         public IEnumerable<OpeningPlacer> GetPlacers() {
-            var pipeFilter = GetPipeFilter();
-            var roundDuctFilter = GetRoundDuctFilter();
-            var rectangleDuctFilter = GetRectangleDuctFilter();
-            var trayFilter = GetTrayFilter();
-
             var wallFilter = FiltersInitializer.GetWallFilter(_revitRepository.GetClashRevitRepository());
             var floorFilter = FiltersInitializer.GetFloorFilter(_revitRepository.GetClashRevitRepository());
 
@@ -43,14 +51,10 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             var floorClashChecker = ClashChecker.GetFloorClashChecker(_revitRepository);
 
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
-            placers.AddRange(GetRoundMepWallPlacers(pipeFilter, wallFilter, wallClashChecker, _categories[MepCategoryEnum.Pipe]));
-            placers.AddRange(GetRoundMepWallPlacers(roundDuctFilter, wallFilter, wallClashChecker, _categories[MepCategoryEnum.RoundDuct]));
-            placers.AddRange(GetRectangleMepWallPlacers(rectangleDuctFilter, wallFilter, wallClashChecker, _categories[MepCategoryEnum.RectangleDuct]));
-            placers.AddRange(GetRectangleMepWallPlacers(trayFilter, wallFilter, wallClashChecker, _categories[MepCategoryEnum.CableTray]));
-            placers.AddRange(GetRoundMepFloorPlacers(roundDuctFilter, floorFilter, floorClashChecker, _categories[MepCategoryEnum.RoundDuct]));
-            placers.AddRange(GetRoundMepFloorPlacers(pipeFilter, floorFilter, floorClashChecker, _categories[MepCategoryEnum.Pipe]));
-            placers.AddRange(GetRectangleMepFloorPlacers(rectangleDuctFilter, floorFilter, floorClashChecker, _categories[MepCategoryEnum.RoundDuct]));
-            placers.AddRange(GetRectangleMepFloorPlacers(trayFilter, floorFilter, floorClashChecker, _categories[MepCategoryEnum.CableTray]));
+            placers.AddRange(GetRoundMepPlacers(wallFilter, wallClashChecker, new RoundMepWallPlacerInitializer()));
+            placers.AddRange(GetRoundMepPlacers(floorFilter, floorClashChecker, new RoundMepFloorPlacerInitializer()));
+            placers.AddRange(GetRectangleMepPlacers(wallFilter, wallClashChecker, new RectangleMepWallPlacerInitializer()));
+            placers.AddRange(GetRectangleMepPlacers(floorFilter, floorClashChecker, new RectangleMepFloorPlacerInitializer()));
             return placers;
         }
 
@@ -58,20 +62,26 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             return _unplacedClashes;
         }
 
-        private IEnumerable<OpeningPlacer> GetRectangleMepWallPlacers(Filter rectangleMepFilter, Filter wallFilter, IClashChecker clashChecker, MepCategory mepCategory) {
-            return GetClashes(rectangleMepFilter, wallFilter, clashChecker).Select(item => RectangleMepWallPlacerInitializer.GetPlacer(_revitRepository, item, mepCategory));
+        private ICollection<OpeningPlacer> GetRoundMepPlacers(Filter structureFilter, IClashChecker structureChecker, IPlacerInitializer placerInitializer) {
+            List<OpeningPlacer> placers = new List<OpeningPlacer>();
+            foreach(var filterProvider in _roundMepFilterProviders) {
+                var mepFilter = GetRoundMepFilter(filterProvider.Key, filterProvider.Value);
+                placers.AddRange(GetMepPlacers(mepFilter, structureFilter, structureChecker, _categories[filterProvider.Key], placerInitializer));
+            };
+            return placers;
         }
 
-        private IEnumerable<OpeningPlacer> GetRoundMepWallPlacers(Filter roundMepFilter, Filter wallFilter, IClashChecker clashChecker, MepCategory mepCategory) {
-            return GetClashes(roundMepFilter, wallFilter, clashChecker).Select(item => RoundMepWallPlacerInitializer.GetPlacer(_revitRepository, item, mepCategory));
+        private ICollection<OpeningPlacer> GetRectangleMepPlacers(Filter structureFilter, IClashChecker structureChecker, IPlacerInitializer placerInitializer) {
+            List<OpeningPlacer> placers = new List<OpeningPlacer>();
+            foreach(var filterProvider in _rectangleMepFilterProviders) {
+                var mepFilter = GetRectangleMepFilter(filterProvider.Key, filterProvider.Value);
+                placers.AddRange(GetMepPlacers(mepFilter, structureFilter, structureChecker, _categories[filterProvider.Key], placerInitializer));
+            };
+            return placers;
         }
 
-        private IEnumerable<OpeningPlacer> GetRoundMepFloorPlacers(Filter roundMepFilter, Filter floorFilter, IClashChecker clashChecker, MepCategory mepCategory) {
-            return GetClashes(roundMepFilter, floorFilter, clashChecker).Select(item => RoundMepFloorPlacerInitializer.GetPlacer(_revitRepository, item, mepCategory));
-        }
-
-        private IEnumerable<OpeningPlacer> GetRectangleMepFloorPlacers(Filter rectangleMepFilter, Filter floorFilter, IClashChecker clashChecker, MepCategory mepCategory) {
-            return GetClashes(rectangleMepFilter, floorFilter, clashChecker).Select(item => RectangleMepFloorPlacerInitializer.GetPlacer(_revitRepository, item, mepCategory));
+        private IEnumerable<OpeningPlacer> GetMepPlacers(Filter mepFilter, Filter structureFilter, IClashChecker clashChecker, MepCategory mepCategory, IPlacerInitializer placerInitializer) {
+            return GetClashes(mepFilter, structureFilter, clashChecker).Select(item => placerInitializer.GetPlacer(_revitRepository, item, mepCategory));
         }
 
         private IEnumerable<ClashModel> GetClashes(Filter mepFilter, Filter constructionFilter, IClashChecker clashChecker) {
@@ -82,41 +92,21 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             return wallClashes.Where(item => clashChecker.Check(item));
         }
 
-        private Filter GetPipeFilter() {
-            var minSizePipe = _categories[MepCategoryEnum.Pipe]?.MinSizes[Parameters.Diameter];
-            if(minSizePipe != null) {
-                return FiltersInitializer.GetPipeFilter(_revitRepository.GetClashRevitRepository(), minSizePipe.Value);
+        private Filter GetRoundMepFilter(MepCategoryEnum category, Func<RevitClashDetective.Models.RevitRepository, double, Filter> filterProvider) {
+            var minSize = _categories[category]?.MinSizes[Parameters.Diameter];
+            if(minSize != null) {
+                return filterProvider.Invoke(_revitRepository.GetClashRevitRepository(), minSize.Value);
             }
             return null;
         }
 
-        private Filter GetRoundDuctFilter() {
-            var minSizeRoundDuct = _categories[MepCategoryEnum.RoundDuct]?.MinSizes[Parameters.Diameter];
-            if(minSizeRoundDuct != null) {
-                return FiltersInitializer.GetRoundDuctFilter(_revitRepository.GetClashRevitRepository(), minSizeRoundDuct.Value);
-            }
-            return null;
-        }
-
-        private Filter GetRectangleDuctFilter() {
-            var minSizesRectangleDuct = _categories[MepCategoryEnum.RectangleDuct]?.MinSizes;
-            if(minSizesRectangleDuct != null) {
-                var height = minSizesRectangleDuct[Parameters.Height];
-                var width = minSizesRectangleDuct[Parameters.Width];
+        private Filter GetRectangleMepFilter(MepCategoryEnum category, Func<RevitClashDetective.Models.RevitRepository, double, double, Filter> filterProvider) {
+            var minSizes = _categories[MepCategoryEnum.CableTray]?.MinSizes;
+            if(minSizes != null) {
+                var height = minSizes[Parameters.Height];
+                var width = minSizes[Parameters.Width];
                 if(height != null && width != null) {
-                    return FiltersInitializer.GetRectangleDuctFilter(_revitRepository.GetClashRevitRepository(), height.Value, width.Value);
-                }
-            }
-            return null;
-        }
-
-        private Filter GetTrayFilter() {
-            var minSizesTray = _categories[MepCategoryEnum.CableTray]?.MinSizes;
-            if(minSizesTray != null) {
-                var height = minSizesTray[Parameters.Height];
-                var width = minSizesTray[Parameters.Width];
-                if(height != null && width != null) {
-                    return FiltersInitializer.GetTrayFilter(_revitRepository.GetClashRevitRepository(), height.Value, width.Value);
+                    return filterProvider.Invoke(_revitRepository.GetClashRevitRepository(), height.Value, width.Value);
                 }
             }
             return null;
