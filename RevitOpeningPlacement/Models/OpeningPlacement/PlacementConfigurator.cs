@@ -23,7 +23,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
     internal class PlacementConfigurator {
         private readonly RevitRepository _revitRepository;
         private readonly MepCategoryCollection _categories;
-        private List<ClashModel> _unplacedClashes = new List<ClashModel>();
+        private List<UnplacedClashModel> _unplacedClashes = new List<UnplacedClashModel>();
 
         private Dictionary<MepCategoryEnum, Func<RevitClashDetective.Models.RevitRepository, double, double, Filter>> _rectangleMepFilterProviders =
             new Dictionary<MepCategoryEnum, Func<RevitClashDetective.Models.RevitRepository, double, double, Filter>> {
@@ -58,7 +58,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             return placers;
         }
 
-        public List<ClashModel> GetUnplacedClashes() {
+        public List<UnplacedClashModel> GetUnplacedClashes() {
             return _unplacedClashes;
         }
 
@@ -88,8 +88,13 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             var wallClashes = ClashInitializer.GetClashes(_revitRepository.GetClashRevitRepository(), mepFilter, constructionFilter)
                 .ToList();
 
-            _unplacedClashes.AddRange(wallClashes.Where(item => !clashChecker.Check(item)));
-            return wallClashes.Where(item => clashChecker.Check(item));
+            _unplacedClashes.AddRange(wallClashes
+                .Select(item => new UnplacedClashModel() {
+                    Message = clashChecker.Check(item),
+                    Clash = item
+                })
+                .Where(item => !string.IsNullOrEmpty(item.Message)));
+            return wallClashes.Where(item => string.IsNullOrEmpty(clashChecker.Check(item)));
         }
 
         private Filter GetRoundMepFilter(MepCategoryEnum category, Func<RevitClashDetective.Models.RevitRepository, double, Filter> filterProvider) {

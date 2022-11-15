@@ -23,14 +23,22 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
             _wrappee = clashChecker;
         }
 
-        public bool Check(ClashModel model) {
-            if(_wrappee?.Check(model) == false) {
-                return false;
+        public string Check(ClashModel model) {
+            if(_wrappee != null) {
+                var message = _wrappee.Check(model);
+                if(!string.IsNullOrEmpty(message)) {
+                    return message;
+                }
             }
-            return CheckModel(model);
+
+            if(!CheckModel(model)) {
+                return GetMessage();
+            }
+            return null;
         }
 
         public abstract bool CheckModel(ClashModel clashModel);
+        public abstract string GetMessage();
 
         public static IClashChecker GetWallClashChecker(RevitRepository revitRepository) {
             var mepCurveChecker = new MainElementIsMepCurveChecker(revitRepository, null);
@@ -54,6 +62,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         public override bool CheckModel(ClashModel clashModel) {
             return clashModel.MainElement.GetElement(_revitRepository.DocInfos) is MEPCurve;
         }
+
+        public override string GetMessage() => "Нет элемента инженерной системы.";
     }
 
     internal class OtherElementIsWallChecker : ClashChecker {
@@ -61,6 +71,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         public override bool CheckModel(ClashModel clashModel) {
             return clashModel.OtherElement.GetElement(_revitRepository.DocInfos) is Wall;
         }
+
+        public override string GetMessage() => "Задание на отверстие в стене: Нет элемента стены.";
     }
 
     internal class MepIsNotVerticalChecker : ClashChecker {
@@ -68,6 +80,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         public override bool CheckModel(ClashModel clashModel) {
             return !((MEPCurve) clashModel.MainElement.GetElement(_revitRepository.DocInfos)).IsVertical();
         }
+
+        public override string GetMessage() => "Задание на отверстие в стене: Инженерная система расположена вертикально.";
     }
 
     internal class ElementsIsNotParallelChecker : ClashChecker {
@@ -77,6 +91,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
             var wall = (Wall) clashModel.OtherElement.GetElement(_revitRepository.DocInfos);
             return !curve.IsParallel(wall) && !curve.RunAlongWall(wall);
         }
+        public override string GetMessage() => "Задание на отверстие в стене: Инженерная система расположена параллельно стене.";
     }
 
     internal class WallIsNotCurtainChecker : ClashChecker {
@@ -84,6 +99,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         public override bool CheckModel(ClashModel clashModel) {
             return ((Wall) clashModel.OtherElement.GetElement(_revitRepository.DocInfos)).WallType.Kind != WallKind.Curtain;
         }
+        public override string GetMessage() => "Задание на отверстие в стене: Стена относится к витражной системе.";
     }
 
     internal class OtherElementIsFloorChecker : ClashChecker {
@@ -91,6 +107,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         public override bool CheckModel(ClashModel clashModel) {
             return clashModel.OtherElement.GetElement(_revitRepository.DocInfos) is CeilingAndFloor;
         }
+        public override string GetMessage() => "Задание на отверстие в перекрытии: Нет элемента перекрытия.";
     }
 
     internal class MepIsNotHorizontalChecker : ClashChecker {
@@ -98,6 +115,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         public override bool CheckModel(ClashModel clashModel) {
             return !((MEPCurve) clashModel.MainElement.GetElement(_revitRepository.DocInfos)).IsHorizontal();
         }
+        public override string GetMessage() => "Задание на отверстие в перекрытии: Инженерная система расположена горизонтально.";
     }
 
     internal class ClashVolumeChecker : ClashChecker {
@@ -114,7 +132,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
             } catch {
                 return true;
             }
-            
         }
+        public override string GetMessage() => "Объем пересечения элементов меньше заданного.";
     }
 }

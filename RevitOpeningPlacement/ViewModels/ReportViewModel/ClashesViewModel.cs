@@ -14,12 +14,13 @@ using dosymep.WPF.ViewModels;
 using RevitClashDetective.Models.Clashes;
 
 using RevitOpeningPlacement.Models;
+using RevitOpeningPlacement.Models.OpeningPlacement;
 
 namespace RevitOpeningPlacement.ViewModels.ReportViewModel {
     internal class ClashesViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
 
-        public ClashesViewModel(RevitRepository revitRepository, IEnumerable<ClashModel> clashes) {
+        public ClashesViewModel(RevitRepository revitRepository, IEnumerable<UnplacedClashModel> clashes) {
             _revitRepository = revitRepository;
             Clashes = new List<ClashViewModel>(clashes.Select(item => new ClashViewModel(item)));
             ClashesViewSource = new CollectionViewSource() { Source = Clashes };

@@ -70,7 +70,7 @@ namespace RevitOpeningPlacement {
             }
         }
 
-        private void InitializeReport(RevitRepository revitRepository, IEnumerable<ClashModel> clashes) {
+        private void InitializeReport(RevitRepository revitRepository, IEnumerable<UnplacedClashModel> clashes) {
             if(!clashes.Any()) {
                 return;
             }

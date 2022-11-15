@@ -22,6 +22,7 @@
 
         <dxg:GridControl Name="_dg"
                          Grid.Row="0"
+                         AutoExpandAllGroups="False"
                          ItemsSource="{Binding ClashesViewSource.View}">
             <dxg:GridControl.GroupSummary>
                 <dxg:GridSummaryItem SummaryType="Count" />
@@ -45,10 +46,13 @@
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
 
+                <dxg:GridColumn ReadOnly="True" Header="Сообщение" FieldName="Message"/>
+                <dxg:GridColumn ReadOnly="True" Header="Id 1" FieldName="Clash.MainElement.Id"/>
                 <dxg:GridColumn ReadOnly="True" Header="Уровень 1" FieldName="Clash.MainElement.Level"/>
                 <dxg:GridColumn ReadOnly="True" Header="Категория 1" FieldName="Clash.MainElement.Category" />
                 <dxg:GridColumn ReadOnly="True" Header="Имя типа 1" FieldName="Clash.MainElement.Name" />
                 <dxg:GridColumn ReadOnly="True" Header="Имя файла 1" FieldName="Clash.MainElement.DocumentName" />
+                <dxg:GridColumn ReadOnly="True" Header="Id 2" FieldName="Clash.OtherElement.Id" />
                 <dxg:GridColumn ReadOnly="True" Header="Уровень 2" FieldName="Clash.OtherElement.Level" />
                 <dxg:GridColumn ReadOnly="True" Header="Категория 2" FieldName="Clash.OtherElement.Category" />
                 <dxg:GridColumn ReadOnly="True" Header="Имя типа 2" FieldName="Clash.OtherElement.Name" />
@@ -59,7 +63,7 @@
 
         <StackPanel Grid.Row="1" Margin="0 10 0 0" Orientation="Horizontal"
                     HorizontalAlignment="Right">
-            <dx:SimpleButton Content="Сохранить" Height="25" Width="80" Margin="10 0" IsDefault="True"
+            <dx:SimpleButton Content="Ok" Height="25" Width="80" Margin="10 0" IsDefault="True"
                              Click="ButtonOk_Click" />
             <dx:SimpleButton Content="Отмена" Height="25" Width="80" IsCancel="true"
                              Click="ButtonCancel_Click" />
