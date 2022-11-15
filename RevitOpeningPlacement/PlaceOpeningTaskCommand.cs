@@ -38,6 +38,7 @@ namespace RevitOpeningPlacement {
             if(!CheckModel(revitRepository)) {
                 return;
             }
+            revitRepository.DeleteAllOpenings();
             var openingConfig = OpeningConfig.GetOpeningConfig();
             if(openingConfig.Categories.Count > 0) {
                 var placementConfigurator = new PlacementConfigurator(revitRepository, openingConfig.Categories);

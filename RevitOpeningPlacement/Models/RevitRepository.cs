@@ -204,6 +204,15 @@ namespace RevitOpeningPlacement.Models {
                 ?? Transform.Identity;
         }
 
+        public void DeleteAllOpenings() {
+            var openings = GetOpenings();
+            using(Transaction t = _document.StartTransaction("Удаление старых заданий на отверстия")) {
+                _document.Delete(openings.Select(item => item.Id).ToArray());
+                t.Commit();
+            }
+            
+        }
+
         private void RotateElement(Element element, XYZ point, Line axis, double angle) {
             if(Math.Abs(angle) > 0.00001) {
                 ElementTransformUtils.RotateElement(_document, element.Id, axis, angle);
