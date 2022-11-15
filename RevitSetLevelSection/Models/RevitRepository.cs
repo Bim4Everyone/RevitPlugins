@@ -14,7 +14,9 @@ using DevExpress.Xpf.Core.FilteringUI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitSetLevelSection.Models.LevelDefinitions;
 
@@ -181,6 +183,9 @@ namespace RevitSetLevelSection.Models {
             using(Transaction transaction =
                   _document.StartTransaction($"Установка уровня/секции \"{paramOption.SharedRevitParam.Name}\"")) {
                 
+                var logger = ServicesProvider.GetPlatformService<ILoggerService>()
+                    .ForPluginContext("Установка уровня\\секции");
+                
                 foreach(Element element in elements) {
                     if(!cashedElements.ContainsKey(element.Id)) {
                         continue;
@@ -202,10 +207,14 @@ namespace RevitSetLevelSection.Models {
                                    && element.IsExistsSharedParam(paramOption.AdskParamName)) {
                                     element.SetSharedParamValue(paramOption.AdskParamName, paramValue);
                                 }
-                            } catch(InvalidOperationException) {
+                            } catch(InvalidOperationException ex) {
                                 // решили что существует много вариантов,
                                 // когда параметр не может заполнится из-за настроек в ревите
                                 // Например: базовая стена внутри составной
+
+                                logger.Warning(ex, 
+                                    "Не был обновлен элемент {@elementId} в документе {documentId}.",
+                                    element.Id.IntegerValue, Document.GetUniqId());
                             }
 
                             cashedElements.Remove(element.Id);

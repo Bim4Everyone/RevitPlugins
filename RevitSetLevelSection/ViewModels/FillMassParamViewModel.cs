@@ -92,7 +92,7 @@ namespace RevitSetLevelSection.ViewModels {
             }
 
             if(DesignOption.CountMassElements == 0) {
-                return $"В выбранном варианте \"{DesignOption.Name}\" нет формообразующих.";
+                return $"В варианте \"{DesignOption.Name}\" нет формообразующих.";
             }
 
             if(IsRequired) {
@@ -103,7 +103,7 @@ namespace RevitSetLevelSection.ViewModels {
                 return DesignOption.GetMassObjects()
                     .Any(item => item.IsExistsParamValue(paramOption))
                     ? null
-                    : $"У параметра \"{RevitParam.Name}\" есть не заполненные формообразующие.";
+                    : $"У формообразующих не заполнен параметр \"{RevitParam.Name}\".";
             }
 
             return null;
@@ -135,7 +135,7 @@ namespace RevitSetLevelSection.ViewModels {
                 return false;
             }
 
-            return Regex.IsMatch(text, @"^[А-Яа-я0-9,\s]+$");
+            return !Regex.IsMatch(text, @"^[А-Яа-я0-9,\s]+$");
         }
 
         public override ParamSettings GetParamSettings() {
