@@ -101,7 +101,7 @@ namespace RevitSetLevelSection.ViewModels {
                     SharedRevitParam = RevitParam, ProjectRevitParamName = partParamName, AdskParamName = AdskParamName
                 };
                 return DesignOption.GetMassObjects()
-                    .Any(item => item.IsExistsParamValue(paramOption))
+                    .All(item => item.IsExistsParamValue(paramOption))
                     ? null
                     : $"У формообразующих не заполнен параметр \"{RevitParam.Name}\".";
             }
