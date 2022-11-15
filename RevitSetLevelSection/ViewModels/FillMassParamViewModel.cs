@@ -135,7 +135,7 @@ namespace RevitSetLevelSection.ViewModels {
                 return false;
             }
 
-            return Regex.IsMatch(text, @"^[А-Яа-я0-9,\s]+$");
+            return !Regex.IsMatch(text, @"^[А-Яа-я0-9,\s]+$");
         }
 
         public override ParamSettings GetParamSettings() {
