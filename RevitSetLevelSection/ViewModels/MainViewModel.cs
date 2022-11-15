@@ -108,6 +108,11 @@ namespace RevitSetLevelSection.ViewModels {
                 ErrorText = "Выберите координационный файл.";
                 return false;
             }
+
+            if(!LinkType.IsLoaded) {
+                ErrorText = "Загрузите координационный файл.";
+                return false;
+            }
             
             if(string.IsNullOrEmpty(LinkType.BuildPart)) {
                 ErrorText = "Выберите раздел.";
