@@ -21,6 +21,7 @@ using RevitClashDetective.Models.FilterModel;
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.OpeningPlacement;
+using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
 using RevitOpeningPlacement.ViewModels.ReportViewModel;
 using RevitOpeningPlacement.Views;
 
@@ -34,7 +35,9 @@ namespace RevitOpeningPlacement {
 
         protected override void Execute(UIApplication uiApplication) {
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-
+            if(!CheckModel(revitRepository)) {
+                return;
+            }
             var openingConfig = OpeningConfig.GetOpeningConfig();
             if(openingConfig.Categories.Count > 0) {
                 var placementConfigurator = new PlacementConfigurator(revitRepository, openingConfig.Categories);
@@ -43,6 +46,17 @@ namespace RevitOpeningPlacement {
                 InitializeProgress(revitRepository, placers);
                 InitializeReport(revitRepository, placementConfigurator.GetUnplacedClashes());
             }
+        }
+
+        private bool CheckModel(RevitRepository revitRepository) {
+            var checker = new Checkers(revitRepository);
+            var errors = checker.GetErrorTexts();
+            if(errors == null || errors.Count == 0) {
+                return true;
+            }
+
+            TaskDialog.Show("BIM", $"{string.Join($"{Environment.NewLine}", errors)}");
+            return false;
         }
 
         private void InitializeProgress(RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers) {

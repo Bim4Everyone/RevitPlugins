@@ -112,6 +112,13 @@ namespace RevitOpeningPlacement.Models {
                 .FirstOrDefault(item => item.Name.Equals(TypeName[type]) && item.FamilyName.Equals(FamilyName[type]));
         }
 
+        public Family GetFamily(OpeningType openingType) {
+            return new FilteredElementCollector(_document)
+                .OfClass(typeof(Family))
+                .OfType<Family>()
+                .FirstOrDefault(item => item?.Name?.Equals(FamilyName[openingType], StringComparison.CurrentCulture) == true);
+        }
+
         public Transaction GetTransaction(string transactionName) {
             return _document.StartTransaction(transactionName);
         }
