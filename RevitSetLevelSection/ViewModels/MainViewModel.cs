@@ -109,19 +109,13 @@ namespace RevitSetLevelSection.ViewModels {
                 return false;
             }
 
-            if(!LinkType.IsLoaded) {
-                ErrorText = "Загрузите координационный файл.";
+            if(LinkType != null && !LinkType.IsLoaded) {
+                ErrorText = "Выбранная связь выгружена.";
                 return false;
             }
             
             if(string.IsNullOrEmpty(LinkType.BuildPart)) {
                 ErrorText = "Выберите раздел.";
-                return false;
-            }
-
-
-            if(LinkType != null && !LinkType.IsLoaded) {
-                ErrorText = "Загрузите координационный файл.";
                 return false;
             }
 
