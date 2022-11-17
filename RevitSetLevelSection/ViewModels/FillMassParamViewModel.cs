@@ -10,6 +10,7 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 
 using DevExpress.Mvvm;
+using DevExpress.Mvvm.POCO;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
@@ -93,6 +94,10 @@ namespace RevitSetLevelSection.ViewModels {
 
             if(DesignOption.CountMassElements == 0) {
                 return $"В варианте \"{DesignOption.Name}\" нет формообразующих.";
+            }
+
+            if(DesignOption.HasMassIntersect) {
+                return $"В варианте \"{DesignOption.Name}\" формообразующие имеют пересечения.";
             }
 
             if(IsRequired) {

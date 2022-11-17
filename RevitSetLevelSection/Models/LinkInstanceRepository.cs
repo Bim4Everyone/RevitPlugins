@@ -9,6 +9,7 @@ using Autodesk.Revit.UI;
 using dosymep.Revit;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Revit.Geometry;
 
 namespace RevitSetLevelSection.Models {
     internal class LinkInstanceRepository {
@@ -46,6 +47,13 @@ namespace RevitSetLevelSection.Models {
                 .Where(item => GetDesignOptionId(item) == designOption.Id)
                 .OfType<FamilyInstance>()
                 .ToList();
+        }
+
+        public bool HasIntersects(IEnumerable<FamilyInstance> massObjects) {
+            return massObjects
+                .SelectMany(item => item.GetSolids())
+                .Where(item => item.Volume > 0)
+                .HasIntersects();
         }
 
         public bool LinkIsLoaded() {
@@ -109,6 +117,39 @@ namespace RevitSetLevelSection.Models {
 
         private ElementId GetDesignOptionId(Element element) {
             return element.DesignOption?.Id ?? ElementId.InvalidElementId;
+        }
+    }
+
+    internal static class Extensions {
+        public static bool HasIntersects(this IEnumerable<Solid> args) {
+            List<Solid> solids = args.ToList();
+            if(solids.Count == 0) {
+                return false;
+            }
+            
+            Solid solid0 = solids[0];
+            for(int index = 1; index < solids.Count; index++) {
+                Solid solid1 = solids[index];
+                try {
+                    if(HasIntersection(solid0, solid1)) {
+                        return true;
+                    }
+                } catch {
+                    continue;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool HasIntersection(Solid solid0, Solid solid1) {
+            try {
+                var intersection =
+                    BooleanOperationsUtils.ExecuteBooleanOperation(solid0, solid1, BooleanOperationsType.Intersect);
+                return intersection.Volume > 0;
+            } catch {
+                return false;
+            }
         }
     }
 }
