@@ -17,7 +17,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         }
 
         public IEnumerable<ParameterValuePair> GetParamValues() {
-            yield return new DoubleParameterGetter(RevitRepository.OpeningDiameter, new DiameterValueGetter(_clash.Curve, _mepCategory)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningDiameter, new DiameterValueGetter(_clash.Element1, _mepCategory)).GetParamValue();
             yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new WallThicknessValueGetter(_clash)).GetParamValue();
         }
     }

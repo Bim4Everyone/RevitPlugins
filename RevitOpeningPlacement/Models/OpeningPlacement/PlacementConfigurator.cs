@@ -38,6 +38,14 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
                 { MepCategoryEnum.Conduit, (revitRepository, diameter) => { return FiltersInitializer.GetConduitFilter(revitRepository, diameter); } },
             };
 
+        private Dictionary<FittingCategoryEnum, Func<RevitClashDetective.Models.RevitRepository, Filter>> _fittingFilterProviders =
+            new Dictionary<FittingCategoryEnum, Func<RevitClashDetective.Models.RevitRepository, Filter>> {
+                { FittingCategoryEnum.PipeFitting, (revitRepository) => { return FiltersInitializer.GetPipeFittingFilter(revitRepository); } },
+                { FittingCategoryEnum.CableTrayFitting, (revitRepository) => { return FiltersInitializer.GetTrayFittingFilter(revitRepository); } },
+                { FittingCategoryEnum.ConduitFitting, (revitRepository) => { return FiltersInitializer.GetConduitFittingFilter(revitRepository); } },
+                { FittingCategoryEnum.DuctFitting, (revitRepository) => { return FiltersInitializer.GetDuctFittingFilter(revitRepository); } },
+            };
+
         public PlacementConfigurator(RevitRepository revitRepository, MepCategoryCollection categories) {
             _revitRepository = revitRepository;
             _categories = categories;
@@ -47,14 +55,16 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             var wallFilter = FiltersInitializer.GetWallFilter(_revitRepository.GetClashRevitRepository());
             var floorFilter = FiltersInitializer.GetFloorFilter(_revitRepository.GetClashRevitRepository());
 
-            var wallClashChecker = ClashChecker.GetWallClashChecker(_revitRepository);
-            var floorClashChecker = ClashChecker.GetFloorClashChecker(_revitRepository);
+            var mepCurveWallClashChecker = ClashChecker.GetMepCurveWallClashChecker(_revitRepository);
+            var mepCurveFloorClashChecker = ClashChecker.GetMepCurveFloorClashChecker(_revitRepository);
+            var fittingFloorClashChecker = ClashChecker.GetFittingFloorClashChecker(_revitRepository);
 
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
-            placers.AddRange(GetRoundMepPlacers(wallFilter, wallClashChecker, new RoundMepWallPlacerInitializer()));
-            placers.AddRange(GetRoundMepPlacers(floorFilter, floorClashChecker, new RoundMepFloorPlacerInitializer()));
-            placers.AddRange(GetRectangleMepPlacers(wallFilter, wallClashChecker, new RectangleMepWallPlacerInitializer()));
-            placers.AddRange(GetRectangleMepPlacers(floorFilter, floorClashChecker, new RectangleMepFloorPlacerInitializer()));
+            placers.AddRange(GetRoundMepPlacers(wallFilter, mepCurveWallClashChecker, new RoundMepWallPlacerInitializer()));
+            placers.AddRange(GetRoundMepPlacers(floorFilter, mepCurveFloorClashChecker, new RoundMepFloorPlacerInitializer()));
+            placers.AddRange(GetRectangleMepPlacers(wallFilter, mepCurveWallClashChecker, new RectangleMepWallPlacerInitializer()));
+            placers.AddRange(GetRectangleMepPlacers(floorFilter, mepCurveFloorClashChecker, new RectangleMepFloorPlacerInitializer()));
+            placers.AddRange(GetFittingPlacers(floorFilter, fittingFloorClashChecker, new FittingFloorPlacerInitializer()));
             return placers;
         }
 
@@ -62,7 +72,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             return _unplacedClashes;
         }
 
-        private ICollection<OpeningPlacer> GetRoundMepPlacers(Filter structureFilter, IClashChecker structureChecker, IPlacerInitializer placerInitializer) {
+        private List<OpeningPlacer> GetRoundMepPlacers(Filter structureFilter, IClashChecker structureChecker, IMepCurvePlacerInitializer placerInitializer) {
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
             foreach(var filterProvider in _roundMepFilterProviders) {
                 var mepFilter = GetRoundMepFilter(filterProvider.Key, filterProvider.Value);
@@ -71,7 +81,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             return placers;
         }
 
-        private ICollection<OpeningPlacer> GetRectangleMepPlacers(Filter structureFilter, IClashChecker structureChecker, IPlacerInitializer placerInitializer) {
+        private List<OpeningPlacer> GetRectangleMepPlacers(Filter structureFilter, IClashChecker structureChecker, IMepCurvePlacerInitializer placerInitializer) {
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
             foreach(var filterProvider in _rectangleMepFilterProviders) {
                 var mepFilter = GetRectangleMepFilter(filterProvider.Key, filterProvider.Value);
@@ -80,8 +90,26 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             return placers;
         }
 
-        private IEnumerable<OpeningPlacer> GetMepPlacers(Filter mepFilter, Filter structureFilter, IClashChecker clashChecker, MepCategory mepCategory, IPlacerInitializer placerInitializer) {
+        private List<OpeningPlacer> GetFittingPlacers(Filter structureFilter, IClashChecker structureChecker, IFittingPlacerInitializer placerInitializer) {
+            List<OpeningPlacer> placers = new List<OpeningPlacer>();
+            foreach(var filterProvider in _fittingFilterProviders) {
+                var mepFilter = GetFittingFilter(filterProvider.Key, filterProvider.Value);
+                var categoties = _categories.GetCategoties(filterProvider.Key).ToArray();
+                placers.AddRange(GetFittingPlacers(mepFilter,
+                    structureFilter,
+                    ClashChecker.GetFittingFloorClashChecker(_revitRepository, categoties),
+                    new FittingFloorPlacerInitializer(),
+                    categoties));
+            };
+            return placers;
+        }
+
+        private IEnumerable<OpeningPlacer> GetMepPlacers(Filter mepFilter, Filter structureFilter, IClashChecker clashChecker, MepCategory mepCategory, IMepCurvePlacerInitializer placerInitializer) {
             return GetClashes(mepFilter, structureFilter, clashChecker).Select(item => placerInitializer.GetPlacer(_revitRepository, item, mepCategory));
+        }
+
+        private IEnumerable<OpeningPlacer> GetFittingPlacers(Filter mepFilter, Filter structureFilter, IClashChecker clashChecker, IFittingPlacerInitializer placerInitializer, params MepCategory[] mepCategories) {
+            return GetClashes(mepFilter, structureFilter, clashChecker).Select(item => placerInitializer.GetPlacer(_revitRepository, item, mepCategories));
         }
 
         private IEnumerable<ClashModel> GetClashes(Filter mepFilter, Filter constructionFilter, IClashChecker clashChecker) {
@@ -93,7 +121,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
                     Message = clashChecker.Check(item),
                     Clash = item
                 })
-                .Where(item => !string.IsNullOrEmpty(item.Message)));
+                .Where(item => !string.IsNullOrEmpty(item.Message) && !item.Message.Equals(RevitRepository.SystemCheck, StringComparison.CurrentCulture)));
             return wallClashes.Where(item => string.IsNullOrEmpty(clashChecker.Check(item)));
         }
 
@@ -115,6 +143,10 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
                 }
             }
             return null;
+        }
+
+        private Filter GetFittingFilter(FittingCategoryEnum category, Func<RevitClashDetective.Models.RevitRepository, Filter> filterProvider) {
+            return filterProvider.Invoke(_revitRepository.GetClashRevitRepository());
         }
     }
 }

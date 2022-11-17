@@ -19,9 +19,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.DirGetters {
 
         public IEnumerable<XYZ> GetDirectionsOnPlane(Plane plane) {
             //получение векторов для смещения в плоскости коннектора инженерной системы
-            var height = _clash.Curve.GetHeight();
-            var width = _clash.Curve.GetWidth();
-            var coordinateSystem = _clash.Curve.GetConnectorCoordinateSystem();
+            var height = _clash.Element1.GetHeight();
+            var width = _clash.Element1.GetWidth();
+            var coordinateSystem = _clash.Element1.GetConnectorCoordinateSystem();
             var dirX = coordinateSystem.BasisX;
             var dirY = coordinateSystem.BasisY;
 
@@ -30,7 +30,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.DirGetters {
             var horizontalDirs = new[] { dirX, -dirX }.Select(item => item * width);
 
             // сложение векторов для получение направлений всех диагоналей и проекция полученных векторов на плоскость
-            return verticalDirs.SelectMany(item => horizontalDirs.Select(hitem => _clash.ElementTransform.OfVector(hitem + item)))
+            return verticalDirs.SelectMany(item => horizontalDirs.Select(hitem => _clash.Element2Transform.OfVector(hitem + item)))
                                .Select(item => plane.ProjectVector(item).Normalize());
         }
     }

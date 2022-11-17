@@ -12,22 +12,22 @@ using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
 
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
-    internal class RoundMepFloorPlacerInitializer : IPlacerInitializer {
+    internal class RoundMepFloorPlacerInitializer : IMepCurvePlacerInitializer {
         public OpeningPlacer GetPlacer(RevitRepository revitRepository, ClashModel clashModel, MepCategory categoryOption) {
             var clash = new MepCurveClash<CeilingAndFloor>(revitRepository, clashModel);
             var placer = new OpeningPlacer(revitRepository) {
                 Clash = clashModel,
-                PointFinder = new FloorPointFinder(clash),
+                PointFinder = new FloorPointFinder<MEPCurve>(clash),
             };
 
-            if(clash.Element.IsHorizontal() && clash.Curve.IsVertical()) {
-                placer.AngleFinder = new FloorAngleFinder(clash.Curve);
+            if(clash.Element2.IsHorizontal() && clash.Element1.IsVertical()) {
+                placer.AngleFinder = new FloorAngleFinder(clash.Element1);
                 placer.Type = revitRepository.GetOpeningType(OpeningType.FloorRound);
                 placer.ParameterGetter = new PerpendicularRoundCurveFloorParamterGetter(clash, categoryOption);
             } else {
                 placer.AngleFinder = new ZeroAngleFinder();
                 placer.Type = revitRepository.GetOpeningType(OpeningType.FloorRectangle);
-                placer.ParameterGetter = new InclinedCurveFloorParameterGetter(clash, categoryOption);
+                placer.ParameterGetter = new InclinedFloorParameterGetter<MEPCurve>(clash, categoryOption);
             }
 
             return placer;

@@ -19,15 +19,15 @@ using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
 
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
-    internal class RoundMepWallPlacerInitializer : IPlacerInitializer {
+    internal class RoundMepWallPlacerInitializer : IMepCurvePlacerInitializer {
         public OpeningPlacer GetPlacer(RevitRepository revitRepository, ClashModel clashModel, MepCategory categoryOption) {
             var clash = new MepCurveClash<Wall>(revitRepository, clashModel);
 
             var placer = new OpeningPlacer(revitRepository) {
                 Clash = clashModel,
-                AngleFinder = new WallAngleFinder(clash.Element, clash.ElementTransform)
+                AngleFinder = new WallAngleFinder(clash.Element2, clash.Element2Transform)
             };
-            if(clash.Curve.IsPerpendicular(clash.Element)) {
+            if(clash.Element1.IsPerpendicular(clash.Element2)) {
                 placer.PointFinder = new WallPointFinder(clash);
                 placer.ParameterGetter = new PerpendicularRoundCurveWallParamGetter(clash, categoryOption);
                 placer.Type = revitRepository.GetOpeningType(OpeningType.WallRound);

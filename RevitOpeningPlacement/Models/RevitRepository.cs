@@ -46,6 +46,13 @@ namespace RevitOpeningPlacement.Models {
             {MepCategoryEnum.Conduit, "Короба" }
         };
 
+        public static Dictionary<FittingCategoryEnum, string> FittingCategoryNames => new Dictionary<FittingCategoryEnum, string> {
+            {FittingCategoryEnum.CableTrayFitting, "Соединительные детали кабельных лотков" },
+            {FittingCategoryEnum.DuctFitting, "Соединительные детали воздуховодов" },
+            {FittingCategoryEnum.ConduitFitting, "Соединительные детали коробов" },
+            {FittingCategoryEnum.PipeFitting, "Соединительные детали трубопроводов" },
+        };
+
         public static Dictionary<StructureCategoryEnum, string> StructureCategoryNames => new Dictionary<StructureCategoryEnum, string> {
             {StructureCategoryEnum.Wall, "Стены" },
             {StructureCategoryEnum.Floor, "Перекрытия" },
@@ -103,6 +110,8 @@ namespace RevitOpeningPlacement.Models {
             BuiltInParameter.RBS_DUCT_TOP_ELEVATION,
             BuiltInParameter.RBS_PIPE_TOP_ELEVATION
         };
+
+        public static string SystemCheck => "Системная проверка";
 
         public FamilySymbol GetOpeningType(OpeningType type) {
             return new FilteredElementCollector(_document)
@@ -210,7 +219,7 @@ namespace RevitOpeningPlacement.Models {
                 _document.Delete(openings.Select(item => item.Id).ToArray());
                 t.Commit();
             }
-            
+
         }
 
         private void RotateElement(Element element, XYZ point, Line axis, double angle) {
@@ -233,6 +242,13 @@ namespace RevitOpeningPlacement.Models {
         RoundDuct,
         CableTray,
         Conduit
+    }
+
+    internal enum FittingCategoryEnum {
+        PipeFitting,
+        CableTrayFitting,
+        DuctFitting,
+        ConduitFitting
     }
 
     internal enum StructureCategoryEnum {

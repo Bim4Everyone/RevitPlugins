@@ -29,7 +29,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
 
         private double GetSizeFromIntersection(Line mepCurve, IEnumerable<XYZ> directions, double distance) {
             //получение наружной и внутренней граней
-            var faces = _clash.Element.GetFaces().ToList();
+            var faces = _clash.Element2.GetFaces().ToList();
 
             //смещение осевой линии инженерной системы на заданное расстояние в заданном направлении
             var lines = directions.Select(item => mepCurve.GetLineWithOffset(item, distance))
@@ -43,7 +43,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             var maxDistance = pointPairs.Max(pp => pp.Point1.DistanceTo(pp.Point2));
 
             //нахождение размера по теореме Пифагора
-            return Math.Sqrt(Math.Pow(maxDistance, 2) - Math.Pow(_clash.Element.Width, 2));
+            return Math.Sqrt(Math.Pow(maxDistance, 2) - Math.Pow(_clash.Element2.Width, 2));
         }
 
         private static IEnumerable<XYZ> GetIntersectionPoints(IEnumerable<Line> lines, IEnumerable<Face> faces) {

@@ -15,7 +15,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         }
 
         DoubleParamValue IValueGetter<DoubleParamValue>.GetValue() {
-            return new DoubleParamValue(_clash.Element.GetThickness());
+            return new DoubleParamValue(_clash.Element2.GetThickness());
         }
     }
 }

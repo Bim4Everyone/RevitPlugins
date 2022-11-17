@@ -10,19 +10,19 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
 
     internal class FloorOpeningSizeInitializer {
         private readonly BoundingBoxXYZ _bb;
-        private readonly MepCategory _mepCategory;
+        private readonly MepCategory[] _mepCategories;
 
-        public FloorOpeningSizeInitializer(Solid solid, MepCategory mepCategory) {
+        public FloorOpeningSizeInitializer(Solid solid, params MepCategory[] mepCategories) {
             _bb = solid.GetBoundingBox();
-            _mepCategory = mepCategory;
+            _mepCategories = mepCategories;
         }
 
         public IValueGetter<DoubleParamValue> GetWidth() {
-            return new OpeningInFloorSizeGetter(_bb.Max.X, _bb.Min.X, _mepCategory);
+            return new OpeningInFloorSizeGetter(_bb.Max.X, _bb.Min.X, _mepCategories);
         }
 
         public IValueGetter<DoubleParamValue> GetHeight() {
-            return new OpeningInFloorSizeGetter(_bb.Max.Y, _bb.Min.Y, _mepCategory);
+            return new OpeningInFloorSizeGetter(_bb.Max.Y, _bb.Min.Y, _mepCategories);
         }
 
         public IValueGetter<DoubleParamValue> GetThickness() {

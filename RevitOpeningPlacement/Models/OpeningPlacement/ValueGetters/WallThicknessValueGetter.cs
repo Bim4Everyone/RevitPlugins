@@ -14,7 +14,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         }
 
         public DoubleParamValue GetValue() {
-            return new DoubleParamValue(_clash.Element.Width);
+            return new DoubleParamValue(_clash.Element2.Width);
         }
     }
 }

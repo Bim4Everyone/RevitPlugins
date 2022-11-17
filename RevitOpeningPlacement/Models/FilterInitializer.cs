@@ -73,6 +73,22 @@ namespace RevitOpeningPlacement.Models {
                                  new[] { heightParamValuePair, widthParamValuePair });
         }
 
+        public static Filter GetTrayFittingFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
+            return GetFittingFilter(RevitRepository.FittingCategoryNames[FittingCategoryEnum.CableTrayFitting], revitRepository, BuiltInCategory.OST_CableTrayFitting);
+        }
+
+        public static Filter GetPipeFittingFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
+            return GetFittingFilter(RevitRepository.FittingCategoryNames[FittingCategoryEnum.PipeFitting], revitRepository, BuiltInCategory.OST_PipeFitting);
+        }
+
+        public static Filter GetDuctFittingFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
+            return GetFittingFilter(RevitRepository.FittingCategoryNames[FittingCategoryEnum.DuctFitting], revitRepository, BuiltInCategory.OST_DuctFitting);
+        }
+
+        public static Filter GetConduitFittingFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
+            return GetFittingFilter(RevitRepository.FittingCategoryNames[FittingCategoryEnum.ConduitFitting], revitRepository, BuiltInCategory.OST_ConduitFitting);
+        }
+
         private static Filter GetdMepFilter(string name, RevitClashDetective.Models.RevitRepository revitRepository, BuiltInCategory category, IEnumerable<ParamValuePair> paramValuePairs) {
             return new Filter(revitRepository) {
                 CategoryIds = new List<int> { (int) category },
@@ -83,6 +99,18 @@ namespace RevitOpeningPlacement.Models {
                     RevitRepository = revitRepository
                 },
                 RevitRepository = revitRepository
+            };
+        }
+
+        private static Filter GetFittingFilter(string name, RevitClashDetective.Models.RevitRepository revitRepository, BuiltInCategory category) {
+            return new Filter(revitRepository) {
+                CategoryIds = new List<int> { (int) category },
+                Name = name,
+                Set = new Set() {
+                    SetEvaluator = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And),
+                    Criteria = new List<Criterion>(),
+                    RevitRepository = revitRepository
+                },
             };
         }
 

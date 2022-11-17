@@ -1,4 +1,6 @@
 ﻿
+using System.Linq;
+
 using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Configs;
@@ -8,17 +10,17 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
     internal class OpeningInFloorSizeGetter : IValueGetter<DoubleParamValue> {
         private readonly double _max;
         private readonly double _min;
-        private readonly MepCategory _mepCategory;
+        private readonly MepCategory[] _mepCategories;
 
-        public OpeningInFloorSizeGetter(double max, double min, MepCategory mepCategory = null) {
+        public OpeningInFloorSizeGetter(double max, double min, params MepCategory[] mepCategories) {
             _max = max;
             _min = min;
-            _mepCategory = mepCategory;
+            _mepCategories = mepCategories;
         }
 
         DoubleParamValue IValueGetter<DoubleParamValue>.GetValue() {
-            if(_mepCategory != null) {
-                return new DoubleParamValue(_max - _min + _mepCategory.GetOffset(_max - _min));
+            if(_mepCategories != null && _mepCategories.Length > 0) {
+                return new DoubleParamValue(_max - _min + _mepCategories.Max(item => item.GetOffset(_max - _min)));
             }
             return new DoubleParamValue(_max - _min);
         }
