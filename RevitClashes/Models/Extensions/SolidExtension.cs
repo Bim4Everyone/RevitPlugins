@@ -30,5 +30,13 @@ namespace RevitClashDetective.Models.Extensions {
         public static bool IsNotClosed(this Solid solid) {
             return solid.Faces.IsEmpty || solid.Edges.IsEmpty;
         }
+
+        public static Solid GetIntersection(this Solid solid1, Solid solid2) {
+            return BooleanOperationsUtils.ExecuteBooleanOperation(solid1, solid2, BooleanOperationsType.Intersect);
+        }
+
+        public static Solid GetIntersection(this Solid solid1, Solid solid2, Transform solid2Transform) {
+            return solid1.GetIntersection(SolidUtils.CreateTransformed(solid2, solid2Transform));
+        }
     }
 }
