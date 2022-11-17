@@ -139,6 +139,31 @@
             <Private>False</Private>
         </Reference>
 
+        <Reference Include="dosymep.AutodeskApps">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.AutodeskApps.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.AutodeskApps.FileInfo">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.AutodeskApps.FileInfo.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.Revit.FileInfo">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.Revit.FileInfo.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.Revit.Journaling">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.Revit.Journaling.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.Revit.ServerClient">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.Revit.ServerClient.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
         <Reference Include="Ninject">
             <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\Ninject.dll</HintPath>
             <Private>False</Private>

@@ -10,15 +10,37 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
+
+using RevitPlugins.ViewModels;
+using RevitPlugins.Views;
+
 namespace RevitPlugins {
     [Transaction(TransactionMode.Manual)]
-    public class RevitPluginsCommand : IExternalCommand {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
-            Console.WriteLine($"RevitVersion_{commandData.Application.Application.VersionNumber}");
-            return Result.Succeeded;
+    public class RevitPluginsCommand : BasePluginCommand {
+        public RevitPluginsCommand() {
+            PluginName = "RevitPluginsCommand";
+        }
+
+        protected override void Execute(UIApplication uiApplication) {
+            var window = new MainWindow() {
+                Title = PluginName, 
+                DataContext = new MainViewModel(uiApplication)
+            };
+
+            if(window.ShowDialog() == true) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
+            }
         }
     }
-    
+
     [Transaction(TransactionMode.Manual)]
     public class RevitPluginsCommand1 : IExternalCommand {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
@@ -26,7 +48,7 @@ namespace RevitPlugins {
             return Result.Succeeded;
         }
     }
-    
+
     [Transaction(TransactionMode.Manual)]
     public class RevitPluginsCommand2 : IExternalCommand {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
@@ -34,7 +56,7 @@ namespace RevitPlugins {
             return Result.Succeeded;
         }
     }
-    
+
     [Transaction(TransactionMode.Manual)]
     public class RevitPluginsApplication : IExternalApplication {
         public Result OnStartup(UIControlledApplication application) {
@@ -47,7 +69,7 @@ namespace RevitPlugins {
             return Result.Succeeded;
         }
     }
-    
+
     [Transaction(TransactionMode.Manual)]
     public class RevitPluginsApplication1 : IExternalApplication {
         public Result OnStartup(UIControlledApplication application) {
@@ -60,7 +82,7 @@ namespace RevitPlugins {
             return Result.Succeeded;
         }
     }
-    
+
     [Transaction(TransactionMode.Manual)]
     public class RevitPluginsApplicationDB : IExternalDBApplication {
         public ExternalDBApplicationResult OnStartup(ControlledApplication application) {
@@ -73,7 +95,7 @@ namespace RevitPlugins {
             return ExternalDBApplicationResult.Succeeded;
         }
     }
-    
+
     [Transaction(TransactionMode.Manual)]
     public class RevitPluginsApplicationDB1 : IExternalDBApplication {
         public ExternalDBApplicationResult OnStartup(ControlledApplication application) {
