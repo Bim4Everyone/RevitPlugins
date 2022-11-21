@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -25,6 +26,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
                 return 0;
             }
         }
+
         public static double GetHeight(this Connector connector) {
             switch(connector.Shape) {
                 case ConnectorProfileType.Rectangular:
@@ -33,6 +35,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
                 return 0;
             }
         }
+
         public static double GetWidth(this Connector connector) {
             switch(connector.Shape) {
                 case ConnectorProfileType.Rectangular:

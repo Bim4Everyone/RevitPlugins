@@ -7,12 +7,12 @@ using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
-    internal class OpeningInFloorSizeGetter : IValueGetter<DoubleParamValue> {
+    internal class OpeningSizeGetter : IValueGetter<DoubleParamValue> {
         private readonly double _max;
         private readonly double _min;
         private readonly MepCategory[] _mepCategories;
 
-        public OpeningInFloorSizeGetter(double max, double min, params MepCategory[] mepCategories) {
+        public OpeningSizeGetter(double max, double min, params MepCategory[] mepCategories) {
             _max = max;
             _min = min;
             _mepCategories = mepCategories;

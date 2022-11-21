@@ -28,11 +28,11 @@ namespace RevitOpeningPlacement.Views {
         public override string ProjectConfigName => nameof(NavigatorView);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-            DialogResult = true;
+            Close();
         }
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-            DialogResult = false;
+            Close();
         }
     }
 }

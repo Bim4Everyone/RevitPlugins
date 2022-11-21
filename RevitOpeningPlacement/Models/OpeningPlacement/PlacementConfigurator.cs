@@ -57,14 +57,18 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
 
             var mepCurveWallClashChecker = ClashChecker.GetMepCurveWallClashChecker(_revitRepository);
             var mepCurveFloorClashChecker = ClashChecker.GetMepCurveFloorClashChecker(_revitRepository);
-            var fittingFloorClashChecker = ClashChecker.GetFittingFloorClashChecker(_revitRepository);
 
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
             placers.AddRange(GetRoundMepPlacers(wallFilter, mepCurveWallClashChecker, new RoundMepWallPlacerInitializer()));
             placers.AddRange(GetRoundMepPlacers(floorFilter, mepCurveFloorClashChecker, new RoundMepFloorPlacerInitializer()));
             placers.AddRange(GetRectangleMepPlacers(wallFilter, mepCurveWallClashChecker, new RectangleMepWallPlacerInitializer()));
             placers.AddRange(GetRectangleMepPlacers(floorFilter, mepCurveFloorClashChecker, new RectangleMepFloorPlacerInitializer()));
-            placers.AddRange(GetFittingPlacers(floorFilter, fittingFloorClashChecker, new FittingFloorPlacerInitializer()));
+            placers.AddRange(GetFittingPlacers(floorFilter,
+                (categoties) => ClashChecker.GetFittingFloorClashChecker(_revitRepository, categoties),
+                new FittingFloorPlacerInitializer()));
+            placers.AddRange(GetFittingPlacers(wallFilter,
+                (categoties) => ClashChecker.GetFittingWallClashChecker(_revitRepository, categoties),
+                new FittingWallPlacerInitializer()));
             return placers;
         }
 
@@ -90,15 +94,15 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             return placers;
         }
 
-        private List<OpeningPlacer> GetFittingPlacers(Filter structureFilter, IClashChecker structureChecker, IFittingPlacerInitializer placerInitializer) {
+        private List<OpeningPlacer> GetFittingPlacers(Filter structureFilter, Func<MepCategory[], IClashChecker> structureCheckerFunc, IFittingPlacerInitializer placerInitializer) {
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
             foreach(var filterProvider in _fittingFilterProviders) {
                 var mepFilter = GetFittingFilter(filterProvider.Key, filterProvider.Value);
                 var categoties = _categories.GetCategoties(filterProvider.Key).ToArray();
                 placers.AddRange(GetFittingPlacers(mepFilter,
                     structureFilter,
-                    ClashChecker.GetFittingFloorClashChecker(_revitRepository, categoties),
-                    new FittingFloorPlacerInitializer(),
+                    structureCheckerFunc.Invoke(categoties),
+                    placerInitializer,
                     categoties));
             };
             return placers;

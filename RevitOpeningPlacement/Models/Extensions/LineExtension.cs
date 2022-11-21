@@ -29,9 +29,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
         }
 
         public static bool RunAlongWall(this Line line, Wall wall) {
-            var plane = wall.GetHorizontalNormalPlane();
-            var wallLine = wall.GetLine();
-            return plane.ProjectVector(line.Direction).IsPapallel(plane.ProjectVector(wallLine.Direction));
+            return line.Direction.RunAlongWall(wall);
         }
 
         public static Line GetTransformedLine(this Line line, Transform transform) {

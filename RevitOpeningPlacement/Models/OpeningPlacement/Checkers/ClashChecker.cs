@@ -48,18 +48,30 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
 
         public static IClashChecker GetMepCurveFloorClashChecker(RevitRepository revitRepository) {
             var mepCurveChecker = new MainElementIsMepCurveChecker(revitRepository, null);
-            var volumeChecker = new ClashVolumeChecker<MEPCurve, CeilingAndFloor>(revitRepository, mepCurveChecker, new MepCurveClashProvider<CeilingAndFloor>());
+            var intersectionChecker = new GettingIntersectionChecker<MEPCurve, CeilingAndFloor>(revitRepository, mepCurveChecker, new MepCurveClashProvider<CeilingAndFloor>());
+            var volumeChecker = new ClashVolumeChecker<MEPCurve, CeilingAndFloor>(revitRepository, intersectionChecker, new MepCurveClashProvider<CeilingAndFloor>());
             var floorChecker = new OtherElementIsFloorChecker(revitRepository, volumeChecker);
             return new MepIsNotHorizontalChecker(revitRepository, floorChecker);
         }
 
         public static IClashChecker GetFittingFloorClashChecker(RevitRepository revitRepository, params MepCategory[] mepCategories) {
             var fittingChecker = new FittingHasNotSupercomponentChecker(revitRepository, null);
-            var volumeChecker = new ClashVolumeChecker<FamilyInstance, CeilingAndFloor>(revitRepository, fittingChecker, new FittingClashProvider<CeilingAndFloor>());
+            var intersectionChecker = new GettingIntersectionChecker<FamilyInstance, CeilingAndFloor>(revitRepository, fittingChecker, new FittingClashProvider<CeilingAndFloor>());
+            var volumeChecker = new ClashVolumeChecker<FamilyInstance, CeilingAndFloor>(revitRepository, intersectionChecker, new FittingClashProvider<CeilingAndFloor>());
             var floorChecker = new OtherElementIsFloorChecker(revitRepository, volumeChecker);
             var minSizeChecker = new FittingMinSizeChecker(revitRepository, floorChecker, mepCategories);
             var horizontalityChecker = new FittingIsNotHorizontalChecker(revitRepository, minSizeChecker);
             return horizontalityChecker;
+        }
+
+        public static IClashChecker GetFittingWallClashChecker(RevitRepository revitRepository, params MepCategory[] mepCategories) {
+            var fittingChecker = new FittingHasNotSupercomponentChecker(revitRepository, null);
+            var intersectionChecker = new GettingIntersectionChecker<FamilyInstance, Wall>(revitRepository, fittingChecker, new FittingClashProvider<Wall>());
+            var volumeChecker = new ClashVolumeChecker<FamilyInstance, Wall>(revitRepository, intersectionChecker, new FittingClashProvider<Wall>());
+            var wallChecker = new OtherElementIsWallChecker(revitRepository, volumeChecker);
+            var minSizeChecker = new FittingMinSizeChecker(revitRepository, wallChecker, mepCategories);
+            var parallelismChecker = new FittingAndWallAreNotParallelChecker(revitRepository, minSizeChecker);
+            return parallelismChecker;
         }
     }
 
@@ -167,6 +179,16 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         public override string GetMessage() => "Задание на отверстие в перекрытии: Соединительная арматура расположена горизонтально.";
     }
 
+    internal class FittingAndWallAreNotParallelChecker : ClashChecker {
+        public FittingAndWallAreNotParallelChecker(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
+
+        public override bool CheckModel(ClashModel clashModel) {
+            var clash = new FittingClash<Wall>(_revitRepository, clashModel);
+            return !clash.Element1.IsParallelToWall(clash.Element2);
+        }
+        public override string GetMessage() => "Задание на отверстие в стене: Соединительная арматура расположена параллельно стене.";
+    }
+
     internal class FittingHasNotSupercomponentChecker : ClashChecker {
         public FittingHasNotSupercomponentChecker(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
         public override bool CheckModel(ClashModel clashModel) {
@@ -174,6 +196,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
             return fitting.SuperComponent == null;
         }
         public override string GetMessage() => RevitRepository.SystemCheck;
+        //public override string GetMessage() => nameof(FittingHasNotSupercomponentChecker);
     }
 
     internal class FittingMinSizeChecker : ClashChecker {
@@ -201,9 +224,29 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         private Size GetSize(Parameters parameter) {
             return _mepCategories
                 .Select(item => item.MinSizes[parameter])
-                .First(item => item != null);
+                .FirstOrDefault(item => item != null);
         }
 
+        //public override string GetMessage() => nameof(FittingMinSizeChecker);
         public override string GetMessage() => RevitRepository.SystemCheck;
+    }
+
+    internal class GettingIntersectionChecker<T1, T2> : ClashChecker where T1 : Element where T2 : Element {
+        private readonly IClashProvider<T1, T2> _clashProvider;
+
+        public GettingIntersectionChecker(RevitRepository revitRepository, IClashChecker clashChecker, IClashProvider<T1, T2> clashProvider) : base(revitRepository, clashChecker) {
+            _clashProvider = clashProvider;
+        }
+
+        public override bool CheckModel(ClashModel clashModel) {
+            var clash = _clashProvider.GetClash(_revitRepository, clashModel);
+            try {
+                var solid = clash.GetIntersection();
+            } catch {
+                return false;
+            }
+            return true;
+        }
+        public override string GetMessage() => "Невозможно получить пересечение элементов.";
     }
 }

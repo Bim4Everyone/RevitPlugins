@@ -11,15 +11,16 @@ using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
 
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
-    internal class FittingFloorPlacerInitializer : IFittingPlacerInitializer {
+    internal class FittingWallPlacerInitializer : IFittingPlacerInitializer {
         public OpeningPlacer GetPlacer(RevitRepository revitRepository, ClashModel clashModel, params MepCategory[] categoryOptions) {
-            var clash = new FittingClash<CeilingAndFloor>(revitRepository, clashModel);
+            var clash = new FittingClash<Wall>(revitRepository, clashModel);
+            var angleFinder = new WallAngleFinder(clash.Element2, clash.Element2Transform);
             return new OpeningPlacer(revitRepository) {
-                Type = revitRepository.GetOpeningType(OpeningType.FloorRectangle),
-                PointFinder = new FloorPointFinder<FamilyInstance>(clash),
+                Type = revitRepository.GetOpeningType(OpeningType.WallRectangle),
                 Clash = clashModel,
-                AngleFinder = new ZeroAngleFinder(),
-                ParameterGetter = new InclinedFloorParameterGetter<FamilyInstance>(clash, categoryOptions)
+                AngleFinder = angleFinder,
+                ParameterGetter = new FittingWallParameterGetter(clash, angleFinder, categoryOptions),
+                PointFinder = new FittingWallPointFinder(clash, angleFinder)
             };
         }
     }

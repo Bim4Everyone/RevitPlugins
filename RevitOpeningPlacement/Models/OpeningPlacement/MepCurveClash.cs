@@ -38,6 +38,13 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         public override double GetConnectorArea() {
             return Element1.GetMaxConnectorArea();
         }
+
+        public Solid GetRotatedIntersection(IAngleFinder angleFinder) {
+            var solid = GetIntersection();
+            var zRotates = -angleFinder.GetAngle().Z;
+            var transform = Transform.Identity.GetRotationMatrixAroundZ(zRotates);
+            return SolidUtils.CreateTransformed(solid, transform);
+        }
     }
 
     internal abstract class Clash<T1, T2> where T1 : Element

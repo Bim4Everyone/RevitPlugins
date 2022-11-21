@@ -62,5 +62,22 @@ namespace RevitOpeningPlacement.Models.Extensions {
                 .OfType<Connector>()
                 .ToList();
         }
+
+
+        public static List<XYZ> GetConnectionLines(this FamilyInstance fitting) {
+            var connectors = fitting.GetConnectors();
+            if(connectors == null) {
+                return null;
+            }
+            return connectors.Select(item => item.CoordinateSystem.BasisZ).ToList();
+        }
+
+        public static bool IsParallelToWall(this FamilyInstance fitting, Wall wall) {
+            var connectorLines = fitting.GetConnectionLines();
+            if(connectorLines == null) {
+                return false;
+            }
+            return connectorLines.All(item => item.RunAlongWall(wall));
+        }
     }
 }
