@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -37,6 +38,12 @@ namespace RevitClashDetective.Models.Extensions {
 
         public static Solid GetIntersection(this Solid solid1, Solid solid2, Transform solid2Transform) {
             return solid1.GetIntersection(SolidUtils.CreateTransformed(solid2, solid2Transform));
+        }
+
+        public static void DrowSolid(this Solid solid, Document doc, string name) {
+            var ds = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_GenericModel));
+            ds.SetShape(new[] { solid });
+            ds.SetName(name);
         }
     }
 }
