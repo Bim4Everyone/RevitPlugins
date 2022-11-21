@@ -114,9 +114,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
     internal class ElementsIsNotParallelChecker : ClashChecker {
         public ElementsIsNotParallelChecker(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
         public override bool CheckModel(ClashModel clashModel) {
-            var curve = (MEPCurve) clashModel.MainElement.GetElement(_revitRepository.DocInfos);
-            var wall = (Wall) clashModel.OtherElement.GetElement(_revitRepository.DocInfos);
-            return !curve.IsParallel(wall) && !curve.RunAlongWall(wall);
+            var clash = new MepCurveClash<Wall>(_revitRepository, clashModel);
+            var curve = clash.GetTransformedMepLine();
+            return !curve.IsParallel(clash.Element2.GetLine()) && !curve.RunAlongWall(clash.Element2);
         }
         public override string GetMessage() => "Задание на отверстие в стене: Инженерная система расположена параллельно стене.";
     }
@@ -184,7 +184,12 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
 
         public override bool CheckModel(ClashModel clashModel) {
             var clash = new FittingClash<Wall>(_revitRepository, clashModel);
-            return !clash.Element1.IsParallelToWall(clash.Element2);
+            var connectorLines = clash.Element1.GetConnectionLines();
+            if(connectorLines == null) {
+                return true;
+            }
+            return connectorLines.Select(item => clash.Element2Transform.Inverse.Multiply(Transform.Identity).OfVector(item))
+                                 .Any(item => !item.RunAlongWall(clash.Element2));
         }
         public override string GetMessage() => "Задание на отверстие в стене: Соединительная арматура расположена параллельно стене.";
     }

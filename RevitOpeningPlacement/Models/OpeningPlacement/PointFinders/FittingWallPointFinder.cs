@@ -33,7 +33,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
             //проекция центра на грань стены
             var sizeInit = new WallOpeningSizeInitializer(transformedSolid);
             var thickness = sizeInit.GetThickness();
-            var point = center - _clash.Element2.Orientation * thickness.GetValue().TValue / 2;
+            var point = center - _clash.Element2Transform.OfVector(_clash.Element2.Orientation) * thickness.GetValue().TValue / 2;
 
             return new XYZ(point.X, point.Y, z);
         }
