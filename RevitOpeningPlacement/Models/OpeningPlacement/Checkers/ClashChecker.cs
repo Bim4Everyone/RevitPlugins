@@ -71,7 +71,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
             var wallChecker = new OtherElementIsWallChecker(revitRepository, volumeChecker);
             var minSizeChecker = new FittingMinSizeChecker(revitRepository, wallChecker, mepCategories);
             var parallelismChecker = new FittingAndWallAreNotParallelChecker(revitRepository, minSizeChecker);
-            return parallelismChecker;
+            return new WallIsNotCurtainChecker(revitRepository, parallelismChecker);
         }
     }
 
@@ -142,7 +142,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         public override bool CheckModel(ClashModel clashModel) {
             return !((MEPCurve) clashModel.MainElement.GetElement(_revitRepository.DocInfos)).IsHorizontal();
         }
-        public override string GetMessage() => "Задание на отверстие в перекрытии: Инженерная система расположена горизонтально.";
+        //public override string GetMessage() => "Задание на отверстие в перекрытии: Инженерная система расположена горизонтально.";
+        public override string GetMessage() => RevitRepository.SystemCheck;
     }
 
     internal class ClashVolumeChecker<T1, T2> : ClashChecker where T1 : Element where T2 : Element {
@@ -176,7 +177,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
             }
 
         }
-        public override string GetMessage() => "Задание на отверстие в перекрытии: Соединительная арматура расположена горизонтально.";
+        //public override string GetMessage() => "Задание на отверстие в перекрытии: Соединительная арматура расположена горизонтально.";
+        public override string GetMessage() => RevitRepository.SystemCheck;
     }
 
     internal class FittingAndWallAreNotParallelChecker : ClashChecker {
