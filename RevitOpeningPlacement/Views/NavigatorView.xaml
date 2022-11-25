@@ -27,7 +27,7 @@
                 <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectionChangedCommand}" />
             </mvvm:Interaction.Behaviors>
             <dxg:GridControl.View>
-                <dxg:TableView AutoWidth="True" AllowMergedGrouping="True" DataNavigatorButtons="Navigation" ShowDataNavigator="True"/>
+                <dxg:TableView AutoWidth="True" DataNavigatorButtons="Navigation" ShowDataNavigator="True"/>
             </dxg:GridControl.View>
             <dxg:GridControl.Columns>
                 <dxg:GridColumn Width="60">
