@@ -63,7 +63,9 @@ namespace RevitSetLevelSection.ViewModels {
         public ObservableCollection<FillParamViewModel> FillParams { get; }
 
         private IEnumerable<FillParamViewModel> GetFillParams() {
-            yield return new FillLevelParamViewModel(_revitRepository) {RevitParam = SharedParamsConfig.Instance.Level};
+            yield return new FillLevelParamViewModel(_revitRepository) {
+                RevitParam = SharedParamsConfig.Instance.BuildingWorksLevel
+            };
 
             yield return new FillMassParamViewModel(this, _revitRepository) {
                 IsRequired = true,

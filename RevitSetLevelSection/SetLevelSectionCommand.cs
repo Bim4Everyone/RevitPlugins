@@ -25,7 +25,7 @@ namespace RevitSetLevelSection {
         protected override void Execute(UIApplication uiApplication) {
             ProjectParameters projectParameters = ProjectParameters.Create(uiApplication.Application);
             projectParameters.SetupRevitParams(uiApplication.ActiveUIDocument.Document,
-                SharedParamsConfig.Instance.Level,
+                SharedParamsConfig.Instance.BuildingWorksLevel,
                 SharedParamsConfig.Instance.BuildingWorksBlock,
                 SharedParamsConfig.Instance.BuildingWorksSection,
                 SharedParamsConfig.Instance.BuildingWorksTyping,
