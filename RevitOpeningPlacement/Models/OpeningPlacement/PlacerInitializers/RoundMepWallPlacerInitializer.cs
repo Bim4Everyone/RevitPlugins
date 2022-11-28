@@ -14,6 +14,7 @@ using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.DirGetters;
+using RevitOpeningPlacement.Models.OpeningPlacement.LevelFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
 
@@ -24,7 +25,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             var clash = new MepCurveClash<Wall>(revitRepository, clashModel);
 
             var placer = new OpeningPlacer(revitRepository) {
-                Clash = clashModel,
+                LevelFinder = new ClashLevelFinder(revitRepository, clashModel),
                 AngleFinder = new WallAngleFinder(clash.Element2, clash.Element2Transform)
             };
             if(clash.Element1.IsPerpendicular(clash.Element2)) {

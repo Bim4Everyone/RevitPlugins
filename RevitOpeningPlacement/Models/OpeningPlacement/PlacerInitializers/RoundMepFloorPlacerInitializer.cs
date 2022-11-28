@@ -7,6 +7,7 @@ using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
+using RevitOpeningPlacement.Models.OpeningPlacement.LevelFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
 
@@ -16,7 +17,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
         public OpeningPlacer GetPlacer(RevitRepository revitRepository, ClashModel clashModel, MepCategory categoryOption) {
             var clash = new MepCurveClash<CeilingAndFloor>(revitRepository, clashModel);
             var placer = new OpeningPlacer(revitRepository) {
-                Clash = clashModel,
+                LevelFinder = new ClashLevelFinder(revitRepository, clashModel),
                 PointFinder = new FloorPointFinder<MEPCurve>(clash),
             };
 

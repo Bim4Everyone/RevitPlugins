@@ -6,6 +6,7 @@ using RevitClashDetective.Models.Clashes;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
+using RevitOpeningPlacement.Models.OpeningPlacement.LevelFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
 
@@ -17,7 +18,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             return new OpeningPlacer(revitRepository) {
                 Type = revitRepository.GetOpeningType(OpeningType.FloorRectangle),
                 PointFinder = new FloorPointFinder<FamilyInstance>(clash),
-                Clash = clashModel,
+                LevelFinder = new ClashLevelFinder(revitRepository, clashModel),
                 AngleFinder = new ZeroAngleFinder(),
                 ParameterGetter = new InclinedFloorParameterGetter<FamilyInstance>(clash, categoryOptions)
             };
