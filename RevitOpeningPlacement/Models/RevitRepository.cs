@@ -182,7 +182,7 @@ namespace RevitOpeningPlacement.Models {
             }
         }
 
-        public IEnumerable<FamilyInstance> GetOpenings() {
+        public List<FamilyInstance> GetOpenings() {
             return GetFamilyInstances()
                 .Where(item => TypeName.Any(n => n.Value.Equals(item.Name))
                             && FamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))

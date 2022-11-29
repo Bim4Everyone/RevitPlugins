@@ -346,9 +346,9 @@ namespace RevitClashDetective.Models {
         public Level GetLevel(Element element) {
             ElementId levelId;
             foreach(var paramName in BaseLevelParameters) {
-                levelId = element.IsExistsParam(paramName) ? element.GetParamValueOrDefault<ElementId>(paramName) : null;
+                levelId =  element.GetParamValueOrDefault<ElementId>(paramName);
                 if(levelId.IsNotNull()) {
-                    return element.Document.GetElement(element.LevelId) as Level;
+                    return element.Document.GetElement(levelId) as Level;
                 }
             }
             if(element.LevelId.IsNotNull()) {

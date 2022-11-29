@@ -17,9 +17,8 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
             _intersectionProvider = intersectionProvider;
         }
 
-        public List<OpeningsGroup> GetOpeningGroups(IList<FamilyInstance> elements, IProgress<int> progress, CancellationToken ct) {
+        public List<OpeningsGroup> GetOpeningGroups(IList<FamilyInstance> elements, IProgress<int> progress, CancellationToken ct, int count) {
             List<OpeningsGroup> groups = new List<OpeningsGroup>();
-            int count = 0;
             var elementsWrappers = elements.Select(item => new FamilyInstanceWrapper() { Element = item }).ToList();
             for(int i = 0; i < elementsWrappers.Count; i++) {
                 var group = new OpeningsGroup();

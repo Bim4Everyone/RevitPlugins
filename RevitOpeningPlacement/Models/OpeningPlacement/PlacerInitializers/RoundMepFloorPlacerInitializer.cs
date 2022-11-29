@@ -10,7 +10,7 @@ using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.LevelFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
-
+using RevitOpeningPlacement.Models.OpeningPlacement.SolidProviders;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
     internal class RoundMepFloorPlacerInitializer : IMepCurvePlacerInitializer {
@@ -28,7 +28,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             } else {
                 placer.AngleFinder = new ZeroAngleFinder();
                 placer.Type = revitRepository.GetOpeningType(OpeningType.FloorRectangle);
-                placer.ParameterGetter = new InclinedFloorParameterGetter<MEPCurve>(clash, categoryOption);
+                placer.ParameterGetter = new FloorSolidParameterGetter(new MepCurveClashSolidProvider<CeilingAndFloor>(clash), categoryOption);
             }
 
             return placer;
