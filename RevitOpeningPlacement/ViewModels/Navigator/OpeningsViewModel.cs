@@ -42,7 +42,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
                 _revitRepository.GetOpenings()
                 .Select(item => new OpeningViewModel() {
                     Id = item.Id.IntegerValue,
-                    Level = _revitRepository.GetLevel(item),
+                    Level = _revitRepository.GetLevelName(item),
                     TypeName = item.Name,
                     FamilyName = _revitRepository.GetFamilyName(item)
                 }));

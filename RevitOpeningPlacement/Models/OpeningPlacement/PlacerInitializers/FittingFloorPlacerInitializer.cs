@@ -10,7 +10,6 @@ using RevitOpeningPlacement.Models.OpeningPlacement.LevelFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
 
-
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
     internal class FittingFloorPlacerInitializer : IFittingPlacerInitializer {
         public OpeningPlacer GetPlacer(RevitRepository revitRepository, ClashModel clashModel, params MepCategory[] categoryOptions) {

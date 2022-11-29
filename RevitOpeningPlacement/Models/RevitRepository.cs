@@ -139,7 +139,11 @@ namespace RevitOpeningPlacement.Models {
                 .FirstOrDefault(item => item.Name.Equals(name, StringComparison.CurrentCulture));
         }
 
-        public string GetLevel(Element element) {
+        public string GetLevelName(Element element) {
+            return _clashRevitRepository.GetLevelName(element);
+        }
+
+        public Level GetLevel(Element element) {
             return _clashRevitRepository.GetLevel(element);
         }
 
@@ -179,13 +183,20 @@ namespace RevitOpeningPlacement.Models {
         }
 
         public IEnumerable<FamilyInstance> GetOpenings() {
-            return new FilteredElementCollector(_document)
-                .OfCategory(BuiltInCategory.OST_GenericModel)
-                .OfType<FamilyInstance>()
-                .OfType<FamilyInstance>()
+            return GetFamilyInstances()
                 .Where(item => TypeName.Any(n => n.Value.Equals(item.Name))
                             && FamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
                 .ToList();
+        }
+
+        public List<FamilyInstance> GetWallOpenings() {
+            var wallTypes = new[] { OpeningType.WallRectangle, OpeningType.WallRound };
+            return GetOpenings(wallTypes);
+        }
+
+        public List<FamilyInstance> GetFloorOpenings() {
+            var floorTypes = new[] { OpeningType.FloorRectangle, OpeningType.FloorRound };
+            return GetOpenings(floorTypes);
         }
 
         public string GetFamilyName(Element element) {
@@ -219,13 +230,32 @@ namespace RevitOpeningPlacement.Models {
                 _document.Delete(openings.Select(item => item.Id).ToArray());
                 t.Commit();
             }
+        }
 
+        public void DeleteElements(ICollection<Element> elements) {
+            using(Transaction t = _document.StartTransaction("Удаление объединенных заданий на отверстия")) {
+                _document.Delete(elements.Select(item => item.Id).ToArray());
+                t.Commit();
+            }
         }
 
         private void RotateElement(Element element, XYZ point, Line axis, double angle) {
             if(Math.Abs(angle) > 0.00001) {
                 ElementTransformUtils.RotateElement(_document, element.Id, axis, angle);
             }
+        }
+
+        private IEnumerable<FamilyInstance> GetFamilyInstances() {
+            return new FilteredElementCollector(_document)
+                .OfCategory(BuiltInCategory.OST_GenericModel)
+                .OfType<FamilyInstance>();
+        }
+
+        private List<FamilyInstance> GetOpenings(ICollection<OpeningType> types) {
+            return GetFamilyInstances()
+               .Where(item => types.Any(e => TypeName[e].Equals(item.Name))
+                           && types.Any(e => FamilyName[e].Equals(GetFamilyName(item))))
+               .ToList();
         }
     }
 

@@ -18,7 +18,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         public OpeningPlacer(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
         }
-        public ClashModel Clash { get; set; }
+        public ILevelFinder LevelFinder { get; set; }
         public IPointFinder PointFinder { get; set; }
         public IAngleFinder AngleFinder { get; set; }
         public IParametersGetter ParameterGetter { get; set; }
@@ -26,7 +26,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
 
         public void Place() {
             var point = PointFinder.GetPoint();
-            var level = _revitRepository.GetLevel(Clash.MainElement.Level);
+            var level = LevelFinder.GetLevel();
             var opening = _revitRepository.CreateInstance(Type, point, level);
 
             var angles = AngleFinder.GetAngle();

@@ -9,7 +9,7 @@ using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.LevelFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
-
+using RevitOpeningPlacement.Models.OpeningPlacement.SolidProviders;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
     internal class FittingWallPlacerInitializer : IFittingPlacerInitializer {
@@ -20,7 +20,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
                 Type = revitRepository.GetOpeningType(OpeningType.WallRectangle),
                 LevelFinder = new ClashLevelFinder(revitRepository, clashModel),
                 AngleFinder = angleFinder,
-                ParameterGetter = new FittingWallParameterGetter(clash, angleFinder, categoryOptions),
+                ParameterGetter = new WallSolidParameterGetter(new FittingClashSolidProvider<Wall>(clash, angleFinder), categoryOptions),
                 PointFinder = new FittingWallPointFinder(clash, angleFinder)
             };
         }
