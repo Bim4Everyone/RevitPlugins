@@ -114,7 +114,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
             return new[] { 
                 GetFileName(cells), 
                 GetFileName(cells.Reverse()) 
-            }.Any(item => _revitRepository.DocInfos.Any(d => d.Name.Equals(_revitRepository.GetDocumentName(item), StringComparison.CurrentCultureIgnoreCase)));
+            }.Any(item => _revitRepository.DocInfos.Any(d => d.Name.Equals(_revitRepository.GetDocumentName(Path.GetFileNameWithoutExtension(item)), StringComparison.CurrentCultureIgnoreCase)));
         }
     }
 }

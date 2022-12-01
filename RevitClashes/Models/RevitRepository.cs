@@ -148,7 +148,6 @@ namespace RevitClashDetective.Models {
         }
 
         public string GetDocumentName(string fileName) {
-            fileName = Path.GetFileNameWithoutExtension(fileName);
             foreach(var ending in _endings) {
                 if(fileName.IndexOf(ending) > -1) {
                     fileName = fileName.Substring(0, fileName.IndexOf(ending));

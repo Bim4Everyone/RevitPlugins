@@ -88,7 +88,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
         }
 
         private string GetFile(string fileString) {
-            return fileString.EndsWith(".rvt", StringComparison.CurrentCultureIgnoreCase) ? fileString : null;
+            return fileString.EndsWith(".rvt", StringComparison.CurrentCultureIgnoreCase) ? Path.GetFileNameWithoutExtension(fileString) : null;
         }
     }
 }
