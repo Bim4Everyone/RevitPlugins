@@ -46,9 +46,9 @@ namespace RevitClashDetective.Models.RevitClashReport {
                 throw new ArgumentException($"Данный отчет о коллизиях создан в другом файле.");
             }
             return rows.Select(item => new {
-                                LeftElement = GetElement(item),
-                                RightElement = GetElement(item.Reverse())
-                            })
+                LeftElement = GetElement(item),
+                RightElement = GetElement(item.Reverse())
+            })
                         .Where(item => item.LeftElement != null && item.RightElement != null)
                         .Select(item => new ClashModel(_revitRepository, item.LeftElement, item.RightElement))
                         .ToArray();
@@ -96,8 +96,8 @@ namespace RevitClashDetective.Models.RevitClashReport {
             if(fileCellInfo == null) {
                 return null;
             }
-            var match = Regex.Match(fileCellInfo.CellContent, $"(?'fileName'[^>\\s]+?){fileCellInfo.Extension}");
-            return match.Success ? match.Groups["fileName"].Value : null;
+            var match = Regex.Match(fileCellInfo.CellContent, $"(?'fileName'[^>&gt;]+?){fileCellInfo.Extension}");
+            return match.Success ? match.Groups["fileName"].Value.Trim() : null;
         }
 
         private bool TextContainsTables() {
@@ -108,12 +108,12 @@ namespace RevitClashDetective.Models.RevitClashReport {
         }
 
         private bool IsCorrectFileName(ICollection<string> cells) {
-             if(cells == null) {
+            if(cells == null) {
                 return false;
             }
-            return new[] { 
-                GetFileName(cells), 
-                GetFileName(cells.Reverse()) 
+            return new[] {
+                GetFileName(cells),
+                GetFileName(cells.Reverse())
             }.Any(item => _revitRepository.DocInfos.Any(d => d.Name.Equals(_revitRepository.GetDocumentName(Path.GetFileNameWithoutExtension(item)), StringComparison.CurrentCultureIgnoreCase)));
         }
     }
