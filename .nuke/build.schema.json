@@ -73,7 +73,8 @@
             "type": "string",
             "enum": [
               "Clean",
-              "Compile"
+              "Compile",
+              "CompileWithGitVersion"
             ]
           }
         },
@@ -84,7 +85,8 @@
             "type": "string",
             "enum": [
               "Clean",
-              "Compile"
+              "Compile",
+              "CompileWithGitVersion"
             ]
           }
         },

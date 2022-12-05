@@ -29,7 +29,7 @@ class Build : NukeBuild {
 
     [Parameter("PluginName")] readonly string PluginName;
 
-    // [GitVersion] readonly GitVersion GitVersion;
+    [GitVersion] readonly GitVersion GitVersion;
 
     readonly IEnumerable<RevitConfiguration> Configurations = IsLocalBuild
         ? RevitConfiguration.GetDebugConfiguration()
@@ -56,33 +56,25 @@ class Build : NukeBuild {
                 .CombineWith(Configurations, (settings, config) => settings
                     .SetConfiguration(config)));
         });
-    
-    // Target Compile => _ => _
-    //     .DependsOn(Restore)
-    //     .Requires(() => PluginName)
-    //     .Executes(() => {
-    //         if(string.IsNullOrEmpty(OutputPath)) {
-    //             throw new ArgumentNullException(nameof(OutputPath));
-    //         }
-    //
-    //         foreach(var configuration in Configurations) {
-    //             var assemblySemVer = UpdateMajorVersion(configuration, GitVersion.AssemblySemVer);
-    //             var assemblySemFileVer = UpdateMajorVersion(configuration, GitVersion.AssemblySemFileVer);
-    //             var informationalVersion = UpdateMajorVersion(configuration, GitVersion.InformationalVersion);
-    //         
-    //             DotNetBuild(s => s
-    //                 .SetProjectFile(PluginName)
-    //                 .SetAssemblyVersion(assemblySemVer)
-    //                 .SetFileVersion(assemblySemFileVer)
-    //                 .SetInformationalVersion(informationalVersion)
-    //                 .SetConfiguration(configuration)
-    //                 .DisableNoRestore()
-    //                 .SetOutputDirectory(OutputPath));
-    //         }
-    //     });
-    //
-    // string UpdateMajorVersion(RevitConfiguration configuration, string versionString) {
-    //     var index = versionString.IndexOf('.');
-    //     return configuration.Version + versionString.Substring(index);
-    // }
+
+    Target CompileVersion => _ => _
+        .DependsOn(Clean)
+        .Requires(() => Output)
+        .Requires(() => PluginName)
+        .Executes(() => {
+            DotNetBuild(s => s
+                .SetProjectFile(PluginName)
+                .DisableNoRestore()
+                .SetOutputDirectory(Output)
+                .CombineWith(Configurations, (settings, config) => settings
+                    .SetConfiguration(config)
+                    .SetAssemblyVersion(UpdateMajorVersion(config, GitVersion.AssemblySemVer))
+                    .SetFileVersion(UpdateMajorVersion(config, GitVersion.AssemblySemFileVer))
+                    .SetInformationalVersion(UpdateMajorVersion(config, GitVersion.InformationalVersion))));
+        });
+
+    string UpdateMajorVersion(RevitConfiguration configuration, string versionString) {
+        var index = versionString.IndexOf('.');
+        return configuration.Version + versionString.Substring(index);
+    }
 }
