@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 using Nuke.Common.Tooling;
@@ -27,14 +28,14 @@ class RevitConfiguration : Enumeration {
     }
 
     public static IEnumerable<RevitConfiguration> GetDebugConfiguration() {
-        return typeof(RevitConfiguration).GetFields()
+        return typeof(RevitConfiguration).GetFields(BindingFlags.Static | BindingFlags.NonPublic)
             .Where(item => item.Name.StartsWith("D"))
             .Select(item => item.GetValue(null))
             .OfType<RevitConfiguration>();
     }
 
     public static IEnumerable<RevitConfiguration> GetReleaseConfiguration() {
-        return typeof(RevitConfiguration).GetFields()
+        return typeof(RevitConfiguration).GetFields(BindingFlags.Static | BindingFlags.NonPublic)
             .Where(item => item.Name.StartsWith("R"))
             .Select(item => item.GetValue(null))
             .OfType<RevitConfiguration>();
