@@ -13,15 +13,16 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:converters="clr-namespace:dosymep.WPF.Converters"
-    
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+
     mc:Ignorable="d"
     Title="Навигатор" Height="450" Width="800"
     d:DataContext="{d:DesignInstance vm:ReportsViewModel, IsDesignTimeCreatable=False}">
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Closing">
-            <i:InvokeCommandAction Command="{Binding OpenClashDetectorCommand}" />
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Closing">
+            <b:InvokeCommandAction Command="{Binding OpenClashDetectorCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
     <base:ThemedPlatformWindow.Resources>
         <converters:IndexConverter x:Key="IndexConverter" />
     </base:ThemedPlatformWindow.Resources>

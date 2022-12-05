@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:dosymep.WPF.Views.Revit"
-             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -14,23 +14,23 @@
                     <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay}" />
                 </Style>
             </TreeView.ItemContainerStyle>
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectedItemChanged">
-                    <i:InvokeCommandAction
+            <b:Interaction.Triggers>
+                <b:EventTrigger EventName="SelectedItemChanged">
+                    <b:InvokeCommandAction
                                     Command="{Binding SetSelectedItemCommand}"
                                     CommandParameter="{Binding SelectedItem, ElementName=_tlRevitServer}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
+                </b:EventTrigger>
+            </b:Interaction.Triggers>
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type local:RevitServerInfo}" ItemsSource="{Binding Path=Children}">
                     <StackPanel Orientation="Horizontal">
                         <Image Height="16" Source="{Binding Path=ImageSource}"/>
                         <TextBlock Text="{Binding Path=Name}" ToolTip="{Binding Path=Path}" FontSize="15" />
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger SourceObject="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}}" EventName="Expanded">
-                                <i:InvokeCommandAction Command="{Binding Path=ExpandCommand}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
+                        <b:Interaction.Triggers>
+                            <b:EventTrigger SourceObject="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}}" EventName="Expanded">
+                                <b:InvokeCommandAction Command="{Binding Path=ExpandCommand}" />
+                            </b:EventTrigger>
+                        </b:Interaction.Triggers>
                     </StackPanel>
                 </HierarchicalDataTemplate>
                 <Style TargetType="TreeViewItem">

@@ -10,6 +10,7 @@
         xmlns:converters="clr-namespace:dosymep.WPF.Converters"
         xmlns:extention="clr-namespace:dosymep.WPF.Extentions"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="Отметки типовых этажей" Height="500" Width="400"
         d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
@@ -46,11 +47,11 @@
                     </Setter>
                 </Style>
             </ListBox.ItemContainerStyle>
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectionChanged">
-                    <i:InvokeCommandAction Command="{Binding SelectedMode.GetSpotDimentionTypesCommand}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
+            <b:Interaction.Triggers>
+                <b:EventTrigger EventName="SelectionChanged">
+                    <b:InvokeCommandAction Command="{Binding SelectedMode.GetSpotDimentionTypesCommand}"/>
+                </b:EventTrigger>
+            </b:Interaction.Triggers>
         </ListBox>
         <GroupBox Grid.Row="1" Margin="5 10" FontSize="14" Header="Типоразмеры высотных отметок">
             <ListBox Margin="5" Height="50" MaxHeight="100" BorderThickness="0" Focusable="False" ItemsSource="{Binding SelectedMode.SpotDimentionTypes}">

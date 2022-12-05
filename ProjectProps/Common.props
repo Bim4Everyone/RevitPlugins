@@ -6,6 +6,7 @@
         <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
         <UseWPF>true</UseWPF>
         <Platforms>x64</Platforms>
+        <NoWarn>1701;1702;MSB3246</NoWarn>
         <Configurations>D2020;D2021;D2022;D2023;R2020;R2021;R2022;R2023</Configurations>
     </PropertyGroup>
 
@@ -119,6 +120,11 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Autodesk.Revit.SDK" Version="$(RevitVersion).*">
+            <PrivateAssets>all</PrivateAssets>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+        
         <Reference Include="dosymep.Bim4Everyone">
             <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\$(RevitVersion)\dosymep.Bim4Everyone.dll</HintPath>
             <Private>False</Private>
@@ -173,16 +179,6 @@
             <HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.Json.dll</HintPath>
             <Private>False</Private>
         </Reference>
-
-        <Reference Include="RevitAPI">
-            <HintPath>$(ProgramW6432)\Autodesk\Revit $(RevitVersion)\RevitAPI.dll</HintPath>
-            <Private>False</Private>
-        </Reference>
-
-        <Reference Include="RevitAPIUI">
-            <HintPath>$(ProgramW6432)\Autodesk\Revit $(RevitVersion)\RevitAPIUI.dll</HintPath>
-            <Private>False</Private>
-        </Reference>
     </ItemGroup>
 
     <ItemGroup>
@@ -195,7 +191,7 @@
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0"/>
         <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0"/>
 
-        <PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525">
+        <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39">
             <PrivateAssets>all</PrivateAssets>
             <ExcludeAssets>runtime</ExcludeAssets>
         </PackageReference>
