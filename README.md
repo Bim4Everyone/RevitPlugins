@@ -23,3 +23,14 @@
 | 16. | Супер фильтр              | [RevitSuperfilter](RevitSuperfilter)               | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829991) | [BIM](https://github.com/dosymep/BIMExtensions)     | Выборка       |
 | 17. | Расстановщик проемов окон | [RevitWindowGapPlacement](RevitWindowGapPlacement) | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829981) | [BIM](https://github.com/dosymep/BIMExtensions)     | ###           |
 
+# Сборка проекта
+
+Установка nuke-build:
+```
+dotnet tool install Nuke.GlobalTool --global
+```
+
+Компиляция проекта:
+```
+nuke compile --plugin-name RevitPlugins
+```
