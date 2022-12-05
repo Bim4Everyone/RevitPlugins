@@ -19,13 +19,27 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         }
 
         public List<OpeningPlacer> GetPlacers(IProgress<int> progress, CancellationToken ct) {
-            var wallOpeningsGroup = new UnionGroupProvider(new WallIntersectionProvider()).GetOpeningGroups(_revitRepository.GetWallOpenings(), progress, ct, 0);
+            var wallOpeningsGroup = GetOpeningsGroupsInWall(progress, ct);
             _elementsToDelete.AddRange(wallOpeningsGroup.SelectMany(item => item.Elements));
-            var floorOpeningsGroup = new UnionGroupProvider(new FloorIntersectionProvider()).GetOpeningGroups(_revitRepository.GetFloorOpenings(), progress, ct, _revitRepository.GetWallOpenings().Count);
+            var floorOpeningsGroup = GetOpeningsGroupsInFloor(progress, ct);
             _elementsToDelete.AddRange(floorOpeningsGroup.SelectMany(item => item.Elements));
             return wallOpeningsGroup.Select(item => new WallOpeningGroupPlacerInitializer().GetPlacer(_revitRepository, item))
                 .Union(floorOpeningsGroup.Select(item => new FloorOpeningGroupPlacerInitializer().GetPlacer(_revitRepository, item)))
                 .ToList();
+        }
+
+        public List<OpeningsGroup> GetGroups(IProgress<int> progress, CancellationToken ct) {
+            return GetOpeningsGroupsInWall(progress, ct)
+                .Union(GetOpeningsGroupsInFloor(progress, ct))
+                .ToList();
+        }
+
+        private List<OpeningsGroup> GetOpeningsGroupsInWall(IProgress<int> progress, CancellationToken ct) {
+            return new UnionGroupProvider(new WallIntersectionProvider()).GetOpeningGroups(_revitRepository.GetWallOpenings(), progress, ct, 0);
+        }
+
+        private List<OpeningsGroup> GetOpeningsGroupsInFloor(IProgress<int> progress, CancellationToken ct) {
+            return new UnionGroupProvider(new FloorIntersectionProvider()).GetOpeningGroups(_revitRepository.GetFloorOpenings(), progress, ct, _revitRepository.GetWallOpenings().Count);
         }
 
         public List<Element> GetElementsToDelete() {

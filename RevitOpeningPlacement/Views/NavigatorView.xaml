@@ -19,7 +19,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <dxg:GridControl x:Name="_dg" ItemsSource="{Binding OpeningsViewSource.View}">
+        <dxg:GridControl x:Name="_dg" ItemsSource="{Binding OpeningsViewSource.View}" DefaultSorting="ParentId" CustomColumnSort="_dg_CustomColumnSort">
             <dxg:GridControl.GroupSummary>
                 <dxg:GridSummaryItem SummaryType="Count" />
             </dxg:GridControl.GroupSummary>
@@ -27,10 +27,23 @@
                 <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectionChangedCommand}" />
             </mvvm:Interaction.Behaviors>
             <dxg:GridControl.View>
-                <dxg:TableView AutoWidth="True" DataNavigatorButtons="Navigation" ShowDataNavigator="True"/>
+                <dxg:TreeListView x:Name="view"
+                                  KeyFieldName="Id"
+                                  ParentFieldName="ParentId"
+                                  AutoWidth="True"
+                                  TreeDerivationMode="Selfreference"
+                                  DataNavigatorButtons="Navigation"
+                                  ShowDataNavigator="True" AllowRecursiveNodeSummaryCalculation="False" ShowNodeFooters="False" ShowSearchPanelMode="Always">
+                    <!--<dxmvvm:Interaction.Triggers>
+                        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding Commands.ExpandAllNodes, ElementName=view}" />
+                    </dxmvvm:Interaction.Triggers>
+                    <dxg:TreeListView.NodeImageSelector>
+                        <local:EmployeeCategoryImageSelector />
+                    </dxg:TreeListView.NodeImageSelector>-->
+                </dxg:TreeListView>
             </dxg:GridControl.View>
             <dxg:GridControl.Columns>
-                <dxg:GridColumn Width="60">
+                <dxg:GridColumn Width="60" GroupIndex="0" SortMode="Custom">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
                             <dx:SimpleButton Content="Выбрать" 

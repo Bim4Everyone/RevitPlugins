@@ -14,6 +14,8 @@ using System.Windows.Shapes;
 
 using RevitClashDetective.Models;
 
+using RevitOpeningPlacement.ViewModels.Navigator;
+
 namespace RevitOpeningPlacement.Views {
     /// <summary>
     /// Interaction logic for NavigatorView.xaml
@@ -33,6 +35,11 @@ namespace RevitOpeningPlacement.Views {
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             Close();
+        }
+
+        private void _dg_CustomColumnSort(object sender, DevExpress.Xpf.Grid.CustomColumnSortEventArgs e) {
+            e.Result = ((OpeningViewModel) e.Row1).ParentId.CompareTo(((OpeningViewModel) e.Row2).ParentId);
+            e.Handled = true;
         }
     }
 }

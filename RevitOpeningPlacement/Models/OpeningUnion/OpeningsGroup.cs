@@ -27,7 +27,20 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
 
         public void AddElement(FamilyInstance element) {
             Elements.Add(element);
-            _solids.Add(element.GetSolid());
+            Solid unitedSolid = null;
+            foreach(var solid in _solids) {
+                try {
+                    unitedSolid = BooleanOperationsUtils.ExecuteBooleanOperation(solid, element.GetSolid(), BooleanOperationsType.Union);
+                    if(unitedSolid.Volume > 0) {
+                        break;
+                    }
+                } catch {
+                    continue;
+                }
+            }
+            if(unitedSolid == null || unitedSolid.Volume <= 0) {
+                _solids.Add(element.GetSolid());
+            }
         }
 
         public void AddRangeElements(ICollection<FamilyInstance> familyInstances) {

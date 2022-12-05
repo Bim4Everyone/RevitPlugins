@@ -13,11 +13,11 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
 
         public bool Equals(FamilyInstanceWrapper other) {
             return other != null &&
-                   EqualityComparer<ElementId>.Default.Equals(Element.Id, other.Element.Id);
+                   Element.Id.IntegerValue == other.Element.Id.IntegerValue;
         }
 
         public override int GetHashCode() {
-            return -703426257 + EqualityComparer<ElementId>.Default.GetHashCode(Element.Id);
+            return -703426257 + Element.Id.IntegerValue.GetHashCode();
         }
     }
 }

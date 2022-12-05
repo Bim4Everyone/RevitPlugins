@@ -28,12 +28,12 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
 
                 progress.Report(count++);
                 ct.ThrowIfCancellationRequested();
-                
+
                 GetIntersectedElements(elementsWrappers, group);
 
                 progress.Report(count += group.Elements.Count - 1);
 
-                if(group.Elements.Count > 1) {
+                if(group.Elements.Count > 0) {
                     groups.Add(group);
                 }
             }
@@ -43,7 +43,7 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         private void GetIntersectedElements(IList<FamilyInstanceWrapper> elements, OpeningsGroup group) {
             var intersections = _intersectionProvider.GetIntersectedElements(group, elements);
             if(intersections.Count > 0) {
-                group.AddRangeElements(intersections.Select(item=>item.Element).ToArray());
+                group.AddRangeElements(intersections.Select(item => item.Element).ToArray());
                 foreach(var intersection in intersections) {
                     elements.Remove(intersection);
                 }
