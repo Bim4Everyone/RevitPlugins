@@ -51,9 +51,9 @@ class Build : NukeBuild {
         .Executes(() => {
             DotNetBuild(s => s
                 .SetProjectFile(PluginName)
-                .EnableNoRestore()
+                .DisableNoRestore()
                 .SetOutputDirectory(Output)
-                .CombineWith(Configurations, (settings, config) => s
+                .CombineWith(Configurations, (settings, config) => settings
                     .SetConfiguration(config)));
         });
     
