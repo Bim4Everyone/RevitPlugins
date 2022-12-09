@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using DevExpress.Xpf.Grid;
+
 using RevitClashDetective.Models;
 
 using RevitOpeningPlacement.ViewModels.Navigator;
@@ -24,6 +26,11 @@ namespace RevitOpeningPlacement.Views {
 
         public NavigatorView() {
             InitializeComponent();
+            Loaded += NavigatorView_Loaded;
+        }
+
+        private void NavigatorView_Loaded(object sender, RoutedEventArgs e) {
+            _dg.GroupBy(_dg.Columns[1]);
         }
 
         public override string PluginName => nameof(RevitOpeningPlacement);
@@ -37,9 +44,10 @@ namespace RevitOpeningPlacement.Views {
             Close();
         }
 
-        private void _dg_CustomColumnSort(object sender, DevExpress.Xpf.Grid.CustomColumnSortEventArgs e) {
-            e.Result = ((OpeningViewModel) e.Row1).ParentId.CompareTo(((OpeningViewModel) e.Row2).ParentId);
-            e.Handled = true;
+        private void view_FocusedRowHandleChanged(object sender, FocusedRowHandleChangedEventArgs e) {
+            var handle = _dg.View.FocusedRowHandle;
+            _dg.UnselectAll();
+            _dg.SelectItem(handle);
         }
     }
 }

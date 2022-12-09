@@ -27,7 +27,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             }
 
             FamilyInstance firstOpening = group.Elements.Take(1).First();
-            yield return new OpeningViewModel() {
+            var firstOpeningViewModel = new OpeningViewModel() {
                 Id = firstOpening.Id.IntegerValue,
                 Level = revitRepository.GetLevelName(firstOpening),
                 TypeName = firstOpening.Name,
@@ -35,6 +35,11 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             };
 
             var otherOpenings = group.Elements.Skip(1);
+            if(otherOpenings.Any()) {
+                firstOpeningViewModel.ParentId = firstOpeningViewModel.Id;
+            }
+            yield return firstOpeningViewModel;
+
             foreach(var opening in otherOpenings) {
                 yield return new OpeningViewModel() {
                     Id = opening.Id.IntegerValue,

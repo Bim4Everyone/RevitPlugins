@@ -22,6 +22,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
     internal class OpeningsViewModel : BaseViewModel {
         private readonly Models.RevitRepository _revitRepository;
         private ObservableCollection<OpeningViewModel> _openings;
+        private ObservableCollection<OpeningViewModel> _selectedOpenings;
 
         public OpeningsViewModel(Models.RevitRepository revitRepository, ICollection<OpeningsGroup> openingsGroups) {
             _revitRepository = revitRepository;
@@ -29,8 +30,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             InitializeOpenings(openingsGroups);
 
             SelectCommand = new RelayCommand(Select);
-            SelectionChangedCommand = new RelayCommand(SelectionChanged);
-
+            SelectionChangedCommand = new RelayCommand(SelectionChanged, CanSelect);
         }
 
         public ObservableCollection<OpeningViewModel> Openings {
@@ -42,13 +42,12 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         public ICommand SelectCommand { get; }
         public ICommand SelectionChangedCommand { get; }
-        public ICommand<RowSortArgs> CustomColumnSortCommand { get; }
 
         private void InitializeOpenings(ICollection<OpeningsGroup> openingsGroups) {
             var openings = openingsGroups.SelectMany(item => OpeningViewModel.GetOpenings(_revitRepository, item)).ToList();
-            var parentsIds = openings.Select(item => item.ParentId).Distinct();
+            var parentsIds = openings.Select(item => item.ParentId).Distinct().ToArray();
 
-            Openings = new ObservableCollection<OpeningViewModel>(openings.OrderByDescending(item => parentsIds.FirstOrDefault(id => id == item.Id)));
+            Openings = new ObservableCollection<OpeningViewModel>(openings.OrderByDescending(item => parentsIds.FirstOrDefault(id => id == item.ParentId)));
 
             OpeningsViewSource = new CollectionViewSource() { Source = Openings };
         }
@@ -60,20 +59,22 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             _revitRepository.SelectAndShowElement(elements);
         }
 
+        private void SelectElements(ICollection<OpeningViewModel> openings) {
+            var elements = openings
+                .Select(item => _revitRepository.GetElement(new ElementId(item.Id)))
+                .ToArray();
+            _revitRepository.SelectAndShowElement(elements);
+        }
+
         private void SelectionChanged(object p) {
             if(OpeningsViewSource.View.CurrentPosition > -1
                 && OpeningsViewSource.View.CurrentPosition < Openings.Count) {
-                Select(OpeningsViewSource.View.CurrentItem);
+                SelectElements((ObservableCollection<OpeningViewModel>) p);
             }
         }
 
-        public void CustomSort(object p) {
-            var args = (RowSortArgs) p;
-            args.Result = ((OpeningViewModel) args.FirstItem).ParentId.CompareTo((OpeningViewModel) args.SecondItem);
-        }
-
-        public bool CanSort(object p) {
-            return p != null && p is RowSortArgs;
+        private bool CanSelect(object p) {
+            return p is ObservableCollection<OpeningViewModel>;
         }
     }
 }

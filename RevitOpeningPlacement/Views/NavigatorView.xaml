@@ -5,45 +5,107 @@
                            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                            xmlns:local="clr-namespace:RevitOpeningPlacement.Views" 
+                           xmlns:selectors="clr-namespace:RevitOpeningPlacement.Views.Selectors" 
+                           xmlns:controls="clr-namespace:RevitOpeningPlacement.Views.Controls" 
                            xmlns:vm="clr-namespace:RevitOpeningPlacement.ViewModels.Navigator" 
                            xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
                            xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
-                           xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                           xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                           xmlns:dxgt="http://schemas.devexpress.com/winfx/2008/xaml/grid/themekeys"
+                           xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                            x:Name="_this"
                            mc:Ignorable="d"
                            Title="NavigatorView" Height="450" Width="800"
                            d:DataContext="{d:DesignInstance {x:Type vm:OpeningsViewModel}, IsDesignTimeCreatable=False}">
+    <base:ThemedPlatformWindow.Resources>
+        <DataTemplate x:Key="SeveralParentIdTemplate" DataType="{x:Type dxg:GroupRowData}">
+            <Grid x:Name="_grid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" 
+                            Grid.Column="0">
+
+                    <dxg:GridGroupExpandButton x:Name="Toggle" VerticalAlignment="Center" HorizontalAlignment="Left" Command="{Binding View.Commands.ChangeGroupExpanded}" CommandParameter="{Binding RowHandle.Value}"
+                                               IsChecked="{Binding Path=IsRowExpanded}" />
+                    <Button Margin="14,0" Content="Объединить"/>
+                    <TextBlock Text="Пересекающиеся задания на отверстия" 
+                               VerticalAlignment="Center" 
+                               HorizontalAlignment="Left"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <TextBlock Margin="5,0" Text="{Binding GroupSummaryData[0].Text}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="OneParentIdTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <dxg:GridGroupExpandButton x:Name="Toggle" 
+                                               VerticalAlignment="Center" 
+                                               HorizontalAlignment="Left" 
+                                               Command="{Binding View.Commands.ChangeGroupExpanded}" 
+                                               CommandParameter="{Binding RowHandle.Value}"
+                                               IsChecked="{Binding Path=IsRowExpanded}" />
+                    <TextBlock Margin="2,0" 
+                               Text="Непересекающиеся задания на отверстия" 
+                               VerticalAlignment="Center" 
+                               HorizontalAlignment="Left"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <TextBlock Margin="5,0" Text="{Binding GroupSummaryData[0].Text}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <!--<Style TargetType="{x:Type dxg:RowControl}">
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="IsSelected" Value="True"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>-->
+        <selectors:GroupedRowTemplateSelector x:Key="GroupedRowTemplateSelector" 
+                                              StandardTemplate="{StaticResource {dxgt:GroupRowThemeKey ResourceKey=GroupRowTemplate}}"
+                                              SeveralParentIdTemplate="{StaticResource ResourceKey=SeveralParentIdTemplate}"
+                                              OneParentIdTemplate="{StaticResource ResourceKey=OneParentIdTemplate}"/>
+    </base:ThemedPlatformWindow.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <dxg:GridControl x:Name="_dg" ItemsSource="{Binding OpeningsViewSource.View}" DefaultSorting="ParentId" CustomColumnSort="_dg_CustomColumnSort">
+        <controls:CustomGrid x:Name="_dg" 
+                             ItemsSource="{Binding OpeningsViewSource.View}" 
+                             DefaultSorting="ParentId" BorderThickness="0" 
+                             SelectionMode="Row"
+                             CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningViewModel"
+                             CustomSelectedItems="{Binding SelectedOpenings, UpdateSourceTrigger=PropertyChanged}">
             <dxg:GridControl.GroupSummary>
                 <dxg:GridSummaryItem SummaryType="Count" />
             </dxg:GridControl.GroupSummary>
             <mvvm:Interaction.Behaviors>
-                <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectionChangedCommand}" />
+                <mvvm:EventToCommand EventName="SelectionChanged" Command="{Binding SelectionChangedCommand}" CommandParameter="{Binding ElementName=_dg, Path=CustomSelectedItems}"/>
             </mvvm:Interaction.Behaviors>
             <dxg:GridControl.View>
-                <dxg:TreeListView x:Name="view"
-                                  KeyFieldName="Id"
-                                  ParentFieldName="ParentId"
+                <dxg:TableView x:Name="view"
                                   AutoWidth="True"
-                                  TreeDerivationMode="Selfreference"
                                   DataNavigatorButtons="Navigation"
-                                  ShowDataNavigator="True" AllowRecursiveNodeSummaryCalculation="False" ShowNodeFooters="False" ShowSearchPanelMode="Always">
-                    <!--<dxmvvm:Interaction.Triggers>
-                        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding Commands.ExpandAllNodes, ElementName=view}" />
-                    </dxmvvm:Interaction.Triggers>
-                    <dxg:TreeListView.NodeImageSelector>
-                        <local:EmployeeCategoryImageSelector />
-                    </dxg:TreeListView.NodeImageSelector>-->
-                </dxg:TreeListView>
+                                  ShowDataNavigator="True" 
+                                  ShowSearchPanelMode="Always"
+                                  IndicatorWidth="0"
+                                  FocusedRowHandleChanged="view_FocusedRowHandleChanged"
+                                  GroupRowTemplateSelector="{StaticResource GroupedRowTemplateSelector}" NavigationStyle="Cell">
+                </dxg:TableView>
             </dxg:GridControl.View>
             <dxg:GridControl.Columns>
-                <dxg:GridColumn Width="60" GroupIndex="0" SortMode="Custom">
+                <dxg:GridColumn Width="60" GroupIndex="0" SortMode="Custom" AllowResizing="False">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
                             <dx:SimpleButton Content="Выбрать" 
@@ -52,12 +114,13 @@
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
+                <dxg:GridColumn ReadOnly="True" Header="ParentId" AllowResizing="False" Width="0" FieldName="ParentId"/>
                 <dxg:GridColumn ReadOnly="True" Header="Id" FieldName="Id"/>
                 <dxg:GridColumn ReadOnly="True" Header="Уровень" FieldName="Level"/>
                 <dxg:GridColumn ReadOnly="True" Header="Имя семейства" FieldName="FamilyName"/>
                 <dxg:GridColumn ReadOnly="True" Header="Имя типа" FieldName="TypeName"/>
             </dxg:GridControl.Columns>
-        </dxg:GridControl>
+        </controls:CustomGrid>
 
         <StackPanel Grid.Row="1" Margin="0 10 0 0" Orientation="Horizontal"
                     HorizontalAlignment="Right">
