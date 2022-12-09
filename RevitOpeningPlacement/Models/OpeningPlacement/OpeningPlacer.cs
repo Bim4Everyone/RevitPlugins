@@ -24,7 +24,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         public IParametersGetter ParameterGetter { get; set; }
         public FamilySymbol Type { get; set; }
 
-        public void Place() {
+        public FamilyInstance Place() {
             var point = PointFinder.GetPoint();
             var level = LevelFinder.GetLevel();
             var opening = _revitRepository.CreateInstance(Type, point, level);
@@ -33,6 +33,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             _revitRepository.RotateElement(opening, point, angles);
 
             SetParamValues(opening);
+
+            return opening;
         }
 
         private void SetParamValues(FamilyInstance opening) {

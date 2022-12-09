@@ -10,7 +10,11 @@ using RevitClashDetective.Models.Extensions;
 namespace RevitOpeningPlacement.Models.OpeningUnion {
     internal class OpeningsGroup {
         private List<Solid> _solids = new List<Solid>();
+        public OpeningsGroup() { }
 
+        public OpeningsGroup(ICollection<FamilyInstance> familyInstances) {
+            Elements.AddRange(familyInstances);
+        }
         public List<FamilyInstance> Elements { get; } = new List<FamilyInstance>();
 
         public List<FamilyInstance> Intersects(IList<FamilyInstance> elements) {

@@ -23,8 +23,10 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
             _elementsToDelete.AddRange(wallOpeningsGroup.SelectMany(item => item.Elements));
             var floorOpeningsGroup = GetOpeningsGroupsInFloor(progress, ct);
             _elementsToDelete.AddRange(floorOpeningsGroup.SelectMany(item => item.Elements));
-            return wallOpeningsGroup.Select(item => new WallOpeningGroupPlacerInitializer().GetPlacer(_revitRepository, item))
-                .Union(floorOpeningsGroup.Select(item => new FloorOpeningGroupPlacerInitializer().GetPlacer(_revitRepository, item)))
+            var wallOpeningGroupPlacerInitializer = new WallOpeningGroupPlacerInitializer();
+            var floorOpeningGroupPlacerInitializer = new FloorOpeningGroupPlacerInitializer();
+            return wallOpeningsGroup.Select(item => wallOpeningGroupPlacerInitializer.GetPlacer(_revitRepository, item))
+                .Union(floorOpeningsGroup.Select(item => floorOpeningGroupPlacerInitializer.GetPlacer(_revitRepository, item)))
                 .ToList();
         }
 

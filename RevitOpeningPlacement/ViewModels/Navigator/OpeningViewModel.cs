@@ -21,18 +21,21 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         public string TypeName { get; set; }
         public string FamilyName { get; set; }
 
+        public OpeningViewModel() { }
+        public OpeningViewModel(RevitRepository revitRepository, FamilyInstance opening) {
+            Id = opening.Id.IntegerValue;
+            Level = revitRepository.GetLevelName(opening);
+            TypeName = opening.Name;
+            FamilyName = revitRepository.GetFamilyName(opening);
+        }
+
         public static IEnumerable<OpeningViewModel> GetOpenings(RevitRepository revitRepository, OpeningsGroup group) {
             if(group.Elements.Count < 1) {
                 yield break;
             }
 
             FamilyInstance firstOpening = group.Elements.Take(1).First();
-            var firstOpeningViewModel = new OpeningViewModel() {
-                Id = firstOpening.Id.IntegerValue,
-                Level = revitRepository.GetLevelName(firstOpening),
-                TypeName = firstOpening.Name,
-                FamilyName = revitRepository.GetFamilyName(firstOpening)
-            };
+            var firstOpeningViewModel = new OpeningViewModel(revitRepository, firstOpening);
 
             var otherOpenings = group.Elements.Skip(1);
             if(otherOpenings.Any()) {
@@ -41,13 +44,9 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             yield return firstOpeningViewModel;
 
             foreach(var opening in otherOpenings) {
-                yield return new OpeningViewModel() {
-                    Id = opening.Id.IntegerValue,
-                    ParentId = firstOpening.Id.IntegerValue,
-                    Level = revitRepository.GetLevelName(opening),
-                    TypeName = opening.Name,
-                    FamilyName = revitRepository.GetFamilyName(opening)
-                };
+                var openingViewModel = new OpeningViewModel(revitRepository, opening);
+                openingViewModel.ParentId = firstOpening.Id.IntegerValue;
+                yield return openingViewModel;
             }
         }
 

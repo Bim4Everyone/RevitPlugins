@@ -16,13 +16,18 @@ using DevExpress.Mvvm.Xpf;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitOpeningPlacement.Models;
+using RevitOpeningPlacement.Models.OpeningPlacement;
+using RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers;
 using RevitOpeningPlacement.Models.OpeningUnion;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator {
     internal class OpeningsViewModel : BaseViewModel {
-        private readonly Models.RevitRepository _revitRepository;
+        private readonly RevitRepository _revitRepository;
         private ObservableCollection<OpeningViewModel> _openings;
-        private ObservableCollection<OpeningViewModel> _selectedOpenings;
+        private WallOpeningGroupPlacerInitializer _wallOpeningGroupPlacerInitializer = new WallOpeningGroupPlacerInitializer();
+        private FloorOpeningGroupPlacerInitializer _floorOpeningGroupPlacerInitializer = new FloorOpeningGroupPlacerInitializer();
+        private OpeningViewModel _selectedItem;
 
         public OpeningsViewModel(Models.RevitRepository revitRepository, ICollection<OpeningsGroup> openingsGroups) {
             _revitRepository = revitRepository;
@@ -31,6 +36,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
             SelectCommand = new RelayCommand(Select);
             SelectionChangedCommand = new RelayCommand(SelectionChanged, CanSelect);
+            UniteCommand = new RelayCommand(Unite, CanUnite);
         }
 
         public ObservableCollection<OpeningViewModel> Openings {
@@ -39,9 +45,14 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         }
 
         public CollectionViewSource OpeningsViewSource { get; set; }
+        public OpeningViewModel SelectedItem {
+            get => _selectedItem;
+            set => this.RaiseAndSetIfChanged(ref _selectedItem, value);
+        }
 
         public ICommand SelectCommand { get; }
         public ICommand SelectionChangedCommand { get; }
+        public ICommand UniteCommand { get; }
 
         private void InitializeOpenings(ICollection<OpeningsGroup> openingsGroups) {
             var openings = openingsGroups.SelectMany(item => OpeningViewModel.GetOpenings(_revitRepository, item)).ToList();
@@ -75,6 +86,47 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         private bool CanSelect(object p) {
             return p is ObservableCollection<OpeningViewModel>;
+        }
+
+        private async void Unite(object p) {
+            var elements = (ObservableCollection<OpeningViewModel>) p;
+            FamilyInstance createdOpening = await PlaceUnitedOpenings(elements);
+
+            RemoveOldOpenings(elements);
+
+            var opening = new OpeningViewModel(_revitRepository, createdOpening);
+            Openings.Add(opening);
+            SelectedItem = opening;
+        }
+
+        private void RemoveOldOpenings(ObservableCollection<OpeningViewModel> elements) {
+            var ids = elements.Select(item => item.Id).ToArray();
+            var openings = Openings.ToList();
+
+            var indexes = elements.Select(item => Openings.IndexOf(item)).OrderByDescending(item => item).ToArray();
+            foreach(var index in indexes) {
+                Openings.RemoveAt(index);
+            }
+        }
+
+        private async Task<FamilyInstance> PlaceUnitedOpenings(ObservableCollection<OpeningViewModel> elements) {
+            var familyName = elements.First().FamilyName;
+            OpeningPlacer placer = null;
+            var instances = elements
+                .Select(item => _revitRepository.GetElement(new ElementId(item.Id)))
+                .OfType<FamilyInstance>()
+                .ToArray();
+            if(RevitRepository.FloorFamilyNames.Any(item => item.Equals(familyName, StringComparison.CurrentCulture))) {
+                placer = _floorOpeningGroupPlacerInitializer.GetPlacer(_revitRepository, new OpeningsGroup(instances));
+            } else {
+                placer = _wallOpeningGroupPlacerInitializer.GetPlacer(_revitRepository, new OpeningsGroup(instances));
+            }
+
+            return await _revitRepository.UniteOpenings(placer, instances);
+        }
+
+        private bool CanUnite(object p) {
+            return p is ObservableCollection<OpeningViewModel> && ((ObservableCollection<OpeningViewModel>) p).Any();
         }
     }
 }

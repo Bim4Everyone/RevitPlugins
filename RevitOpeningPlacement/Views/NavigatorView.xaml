@@ -30,7 +30,11 @@
 
                     <dxg:GridGroupExpandButton x:Name="Toggle" VerticalAlignment="Center" HorizontalAlignment="Left" Command="{Binding View.Commands.ChangeGroupExpanded}" CommandParameter="{Binding RowHandle.Value}"
                                                IsChecked="{Binding Path=IsRowExpanded}" />
-                    <Button Margin="14,0" Content="Объединить"/>
+                    <Button Margin="14,0" 
+                            Content="Объединить" 
+                            Command="{Binding ElementName=_dg, Path=DataContext.UniteCommand}" 
+                            CommandParameter = "{Binding ElementName=_dg, Path=CustomSelectedItems}" 
+/>
                     <TextBlock Text="Пересекающиеся задания на отверстия" 
                                VerticalAlignment="Center" 
                                HorizontalAlignment="Left"/>
@@ -63,13 +67,6 @@
                 </StackPanel>
             </Grid>
         </DataTemplate>
-        <!--<Style TargetType="{x:Type dxg:RowControl}">
-            <Style.Triggers>
-                <Trigger Property="IsFocused" Value="True">
-                    <Setter Property="IsSelected" Value="True"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>-->
         <selectors:GroupedRowTemplateSelector x:Key="GroupedRowTemplateSelector" 
                                               StandardTemplate="{StaticResource {dxgt:GroupRowThemeKey ResourceKey=GroupRowTemplate}}"
                                               SeveralParentIdTemplate="{StaticResource ResourceKey=SeveralParentIdTemplate}"
@@ -86,7 +83,7 @@
                              DefaultSorting="ParentId" BorderThickness="0" 
                              SelectionMode="Row"
                              CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningViewModel"
-                             CustomSelectedItems="{Binding SelectedOpenings, UpdateSourceTrigger=PropertyChanged}">
+                             SelectedItem="{Binding SelectedItem}">
             <dxg:GridControl.GroupSummary>
                 <dxg:GridSummaryItem SummaryType="Count" />
             </dxg:GridControl.GroupSummary>
