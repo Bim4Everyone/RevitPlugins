@@ -49,5 +49,9 @@ namespace RevitOpeningPlacement.Views {
             _dg.UnselectAll();
             _dg.SelectItem(handle);
         }
+
+        private void SimpleButton_Click(object sender, RoutedEventArgs e) {
+            Close();
+        }
     }
 }

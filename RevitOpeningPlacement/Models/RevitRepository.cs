@@ -269,6 +269,10 @@ namespace RevitOpeningPlacement.Models {
             return createdOpening;
         }
 
+        public void DoAction(Action action) {
+            _clashRevitRepository.DoAction(action);
+        }
+
         private void RotateElement(Element element, XYZ point, Line axis, double angle) {
             if(Math.Abs(angle) > 0.00001) {
                 ElementTransformUtils.RotateElement(_document, element.Id, axis, angle);

@@ -37,6 +37,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             SelectCommand = new RelayCommand(Select);
             SelectionChangedCommand = new RelayCommand(SelectionChanged, CanSelect);
             UniteCommand = new RelayCommand(Unite, CanUnite);
+            RenewCommand = new RelayCommand(Renew);
         }
 
         public ObservableCollection<OpeningViewModel> Openings {
@@ -53,6 +54,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         public ICommand SelectCommand { get; }
         public ICommand SelectionChangedCommand { get; }
         public ICommand UniteCommand { get; }
+        public ICommand RenewCommand { get; }
 
         private void InitializeOpenings(ICollection<OpeningsGroup> openingsGroups) {
             var openings = openingsGroups.SelectMany(item => OpeningViewModel.GetOpenings(_revitRepository, item)).ToList();
@@ -127,6 +129,14 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         private bool CanUnite(object p) {
             return p is ObservableCollection<OpeningViewModel> && ((ObservableCollection<OpeningViewModel>) p).Any();
+        }
+
+        private void Renew(object p) {
+            Action action = () => {
+                var command = new GetOpeningTaskCommand();
+                command.ExecuteCommand(_revitRepository.UIApplication);
+            };
+            _revitRepository.DoAction(action);
         }
     }
 }

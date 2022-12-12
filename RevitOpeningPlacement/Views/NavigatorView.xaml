@@ -33,8 +33,7 @@
                     <Button Margin="14,0" 
                             Content="Объединить" 
                             Command="{Binding ElementName=_dg, Path=DataContext.UniteCommand}" 
-                            CommandParameter = "{Binding ElementName=_dg, Path=CustomSelectedItems}" 
-/>
+                            CommandParameter = "{Binding ElementName=_dg, Path=CustomSelectedItems}"/>
                     <TextBlock Text="Пересекающиеся задания на отверстия" 
                                VerticalAlignment="Center" 
                                HorizontalAlignment="Left"/>
@@ -71,6 +70,41 @@
                                               StandardTemplate="{StaticResource {dxgt:GroupRowThemeKey ResourceKey=GroupRowTemplate}}"
                                               SeveralParentIdTemplate="{StaticResource ResourceKey=SeveralParentIdTemplate}"
                                               OneParentIdTemplate="{StaticResource ResourceKey=OneParentIdTemplate}"/>
+
+        <ControlTemplate x:Key="{dxgt:TableViewThemeKey ResourceKey=GroupPanelContentTemplate, IsThemeIndependent = true}" TargetType="{x:Type dxg:GroupPanelControl}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <dx:SimpleButton Grid.Column="0"
+                                         VerticalAlignment="Center"
+                                         Margin="0 0 5 0"
+                                         ToolTip="Обновить задания на отверстия" 
+                                         Glyph="{dx:DXImage 'Office2013/Actions/Refresh_32x32.png'}"
+                                         Command="{Binding ElementName=_dg, Path=DataContext.RenewCommand}"
+                                         Click="SimpleButton_Click"/>
+
+                <dx:MeasurePixelSnapper Grid.Column="1">
+                    <Border x:Name="GroupPanelBorder" Background="Transparent" BorderBrush="Transparent" BorderThickness="0">
+                        <Grid Margin="{DynamicResource {dxgt:TableViewThemeKey ResourceKey=GroupPanelMargin}}">
+                            <TextBlock  x:Name="PART_GroupPanelDragText" Style="{DynamicResource {dxgt:TableViewThemeKey ResourceKey=GroupPanelDragTextStyle}}">
+                                <TextBlock.Text>
+                                    <Binding Path="View.LocalizationDescriptor" RelativeSource="{RelativeSource TemplatedParent}" ConverterParameter="GridGroupPanelText">
+                                        <Binding.Converter>
+                                            <dxg:DynamicLocalizationStringValueConvertor />
+                                        </Binding.Converter>
+                                    </Binding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <dxg:GroupPanelContainer  View="{Binding Path=View, RelativeSource={RelativeSource TemplatedParent}}" Margin="{DynamicResource {dxgt:TableViewThemeKey ResourceKey=GroupPanelSeparatorMargin}}" />
+                        </Grid>
+                    </Border>
+                </dx:MeasurePixelSnapper>
+            </Grid>
+        </ControlTemplate>
+
     </base:ThemedPlatformWindow.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -98,7 +132,7 @@
                                   ShowSearchPanelMode="Always"
                                   IndicatorWidth="0"
                                   FocusedRowHandleChanged="view_FocusedRowHandleChanged"
-                                  GroupRowTemplateSelector="{StaticResource GroupedRowTemplateSelector}" NavigationStyle="Cell">
+                                  GroupRowTemplateSelector="{StaticResource GroupedRowTemplateSelector}" NavigationStyle="Cell" >
                 </dxg:TableView>
             </dxg:GridControl.View>
             <dxg:GridControl.Columns>

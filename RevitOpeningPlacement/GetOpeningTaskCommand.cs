@@ -24,6 +24,10 @@ namespace RevitOpeningPlacement {
         }
 
         protected override void Execute(UIApplication uiApplication) {
+            ExecuteCommand(uiApplication);
+        }
+
+        public void ExecuteCommand(UIApplication uiApplication) {
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
             var configurator = new UnionGroupsConfigurator(revitRepository);
             var openingsGroups = GetOpeningsGroups(revitRepository, configurator);
