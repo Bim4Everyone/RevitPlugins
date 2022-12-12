@@ -92,8 +92,15 @@
                                              EditValue="{Binding SelectedObjects}"
                                              FilterCriteria="{Binding FilterCriteria, ElementName=searchControl}">
                                 <dxe:ListBoxEdit.StyleSettings>
-                                    <dxe:CheckedListBoxEditStyleSettings />
+                                    <dxe:ListBoxEditStyleSettings />
                                 </dxe:ListBoxEdit.StyleSettings>
+                                <dxe:ListBoxEdit.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type dxe:ListBoxEditItem}">
+                                        <dxe:CheckEdit Name="PART_Editor" HorizontalAlignment="Center" Margin="0 -3 0 -3"
+                                               EditValue="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}" Content="{Binding Name}">
+                                        </dxe:CheckEdit>
+                                    </DataTemplate>
+                                </dxe:ListBoxEdit.ItemTemplate>
                             </dxe:ListBoxEdit>
                             <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2">
                                 <Grid.RowDefinitions>

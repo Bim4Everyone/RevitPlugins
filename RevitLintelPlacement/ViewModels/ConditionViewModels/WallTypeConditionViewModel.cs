@@ -9,10 +9,16 @@ using RevitLintelPlacement.ViewModels.Interfaces;
 namespace RevitLintelPlacement.ViewModels {
     internal class WallTypeConditionViewModel : BaseViewModel, IEquatable<WallTypeConditionViewModel> {
         private string _name;
+        private bool _isChecked;
 
         public string Name {
             get => _name;
             set => this.RaiseAndSetIfChanged(ref _name, value);
+        }
+
+        public bool IsChecked {
+            get => _isChecked;
+            set => _isChecked = value;
         }
 
         public override bool Equals(object obj) {

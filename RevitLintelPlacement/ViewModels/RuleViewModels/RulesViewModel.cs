@@ -107,8 +107,8 @@ namespace RevitLintelPlacement.ViewModels.RuleViewModels {
         public string GetErrorText() {
             for(int i = 0; i < Rules.Count - 1; i++) {
                 for(int j = i + 1; j < Rules.Count; j++) {
-                    var commonWallTypes = Rules[i].SelectedWallTypes
-                    .Intersect(Rules[j].SelectedWallTypes)
+                    var commonWallTypes = Rules[i].WallTypes.WallTypes.Where(item=>item.IsChecked)
+                    .Intersect(Rules[j].WallTypes.WallTypes.Where(item => item.IsChecked))
                     .ToList();
                     if(commonWallTypes.Count > 0) {
                         return $"У правил \"{Rules[i].Name}\" и \"{Rules[j].Name}\" " +

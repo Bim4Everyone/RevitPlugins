@@ -105,7 +105,7 @@ namespace RevitLintelPlacement.ViewModels {
         }
 
         public void PlaceLintels(object p) {
-            
+
             ElementInfos.ElementInfos.Clear();
             if(!_revitRepository.CheckConfigParameters(ElementInfos)) {
                 ShowReport();
@@ -120,7 +120,7 @@ namespace RevitLintelPlacement.ViewModels {
             }
             Lintels = new LintelCollectionViewModel(_revitRepository, ElementInfos);
 
-            var wallTypeNames = GroupedRules.SelectedRule.Rules.SelectMany(item => item.SelectedWallTypes.Select(w => w.Name)).ToList();
+            var wallTypeNames = GroupedRules.SelectedRule.Rules.SelectMany(item => item.WallTypes.WallTypes.Where(w => w.IsChecked).Select(w => w.Name)).ToList();
 
             var elementInWalls = _revitRepository.GetAllElementsInWall(SelectedSampleMode, ElementInfos, wallTypeNames)
                 .ToList();

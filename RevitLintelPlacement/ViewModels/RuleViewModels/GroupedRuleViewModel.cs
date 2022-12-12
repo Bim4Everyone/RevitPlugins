@@ -38,11 +38,8 @@ namespace RevitLintelPlacement.ViewModels {
                 Rules.Add(rule);
                 InitializeWallTypes();
             } else {
-                InitializeWallTypes();
+                InitializeWallTypes(_groupedRuleSettings);
 
-                SelectedObjects = _groupedRuleSettings.WallTypes.WallTypes
-                    .Select(item => (object) new WallTypeConditionViewModel() { Name = item })
-                    .ToList();
                 Name = _groupedRuleSettings.Name;
                 Rules = new ObservableCollection<ConcreteRuleViewModel>(
                     _groupedRuleSettings.Rules
@@ -73,9 +70,6 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _wallTypes, value);
         }
 
-        public List<object> SelectedObjects { get; set; } = new List<object>();
-        public IEnumerable<WallTypeConditionViewModel> SelectedWallTypes => SelectedObjects?.OfType<WallTypeConditionViewModel>() ?? new List<WallTypeConditionViewModel>();
-
         public CollectionViewSource WallTypesViewSource {
             get => _wallTypesViewSource;
             set => this.RaiseAndSetIfChanged(ref _wallTypesViewSource, value);
@@ -96,14 +90,11 @@ namespace RevitLintelPlacement.ViewModels {
                 Name = Name,
                 WallTypes = new ConditionSetting() {
                     ConditionType = ConditionType.WallTypes,
-                    WallTypes = SelectedWallTypes
+                    WallTypes = WallTypes.WallTypes
+                    .Where(item => item.IsChecked)
                     .Select(item => item.Name)
                     .Union(GetOldNotShownWalls())
                     .ToList()
-                    //WallTypes = WallTypes.WallTypes
-                    //.Where(e => e.IsChecked)
-                    //.Select(e => e.Name)
-                    //.ToList()
                 },
                 Rules = Rules.Select(r => r.GetRuleSetting()).ToList()
             };
@@ -115,8 +106,8 @@ namespace RevitLintelPlacement.ViewModels {
             }
 
             if(familyInstance.Host is Wall wall &&
-                //WallTypes.WallTypes.Any(e => e.IsChecked && e.Name.Equals(wall.Name, StringComparison.CurrentCultureIgnoreCase))) {
-                SelectedWallTypes.Any(e => e.Name.Equals(wall.Name, StringComparison.CurrentCultureIgnoreCase))) {
+                WallTypes.WallTypes.Any(e => e.IsChecked && e.Name.Equals(wall.Name, StringComparison.CurrentCultureIgnoreCase))) {
+
                 foreach(var rule in Rules) {
                     if(rule.CheckConditions(familyInstance))
                         return rule;
@@ -163,13 +154,13 @@ namespace RevitLintelPlacement.ViewModels {
             }
         }
 
-        private void InitializeWallTypes() {
+        private void InitializeWallTypes(GroupedRuleSettings ruleSettings = null) {
             WallTypes = new WallTypesConditionViewModel();
             WallTypes.WallTypes = new ObservableCollection<WallTypeConditionViewModel>(
                 _revitRepository.GetWallTypes()
                 .Select(w => new WallTypeConditionViewModel() {
                     Name = w.Name,
-                    //IsChecked = false
+                    IsChecked = ruleSettings.WallTypes.WallTypes.Any(item => item.Equals(w.Name, StringComparison.CurrentCulture))
                 }).OrderBy(e => e.Name));
         }
 
