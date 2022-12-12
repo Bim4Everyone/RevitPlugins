@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -51,10 +52,16 @@ namespace RevitBatchPrint.Models {
             try {
                 _revitRepository.Document.Export(Folder, viewSheets.Select(item => item.Id).ToArray(), exportParams);
                 Process.Start(Path.Combine(Folder, exportParams.FileName + ".pdf"));
+            } catch(Win32Exception) {
+                Errors.Add("Произошла ошибка открытия pdf файла."
+                           + Environment.NewLine
+                           + "Файл сохранен по следующему пути:"
+                           + Environment.NewLine
+                           + Path.Combine(Folder, exportParams.FileName + ".pdf"));
             } catch(Exception ex) {
                 Errors.Add("Ошибка экспорта в pdf: " + ex.Message);
             }
-    }
+        }
 #endif
 
         private void AddErrorCropView(List<ViewSheet> viewSheets) {
