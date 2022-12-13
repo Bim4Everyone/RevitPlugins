@@ -148,7 +148,6 @@ namespace RevitClashDetective.Models {
         }
 
         public string GetDocumentName(string fileName) {
-            fileName = Path.GetFileNameWithoutExtension(fileName);
             foreach(var ending in _endings) {
                 if(fileName.IndexOf(ending) > -1) {
                     fileName = fileName.Substring(0, fileName.IndexOf(ending));
@@ -338,15 +337,23 @@ namespace RevitClashDetective.Models {
                 .FirstOrDefault(item => GetDocumentName(item.GetLinkDocument()).Equals(documTitle, StringComparison.CurrentCultureIgnoreCase))
                 ?.GetTotalTransform();
         }
-        public string GetLevel(Element element) {
-            string level;
+
+        public string GetLevelName(Element element) {
+            return GetLevel(element)?.Name;
+        }
+
+        public Level GetLevel(Element element) {
+            ElementId levelId;
             foreach(var paramName in BaseLevelParameters) {
-                level = element.IsExistsParam(paramName) ? element.GetParam(paramName).AsValueString() : null;
-                if(level != null) {
-                    return level;
+                levelId =  element.GetParamValueOrDefault<ElementId>(paramName);
+                if(levelId.IsNotNull()) {
+                    return element.Document.GetElement(levelId) as Level;
                 }
             }
-            return element.LevelId == null ? null : element.Document.GetElement(element.LevelId)?.Name;
+            if(element.LevelId.IsNotNull()) {
+                return element.Document.GetElement(element.LevelId) as Level;
+            }
+            return null;
         }
 
         private ParameterValueProvider GetParam(Document doc, Category category, ElementId elementId) {

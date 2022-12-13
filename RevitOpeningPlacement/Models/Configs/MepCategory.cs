@@ -10,7 +10,7 @@ namespace RevitOpeningPlacement.Models.Configs {
 
         public double GetOffset(double size) {
             return Offsets.Select(item => item.GetTransformedToInternalUnit())
-                .FirstOrDefault(item => item.From <= size && item.To >= size)?.OffsetValue ?? 0;
+                .FirstOrDefault(item => item.From <= size && item.To >= size)?.OffsetValue * 2 ?? 0;
         }
     }
 }

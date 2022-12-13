@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 using RevitClashDetective.Models.Clashes;
 
+using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
+
 namespace RevitOpeningPlacement.Models.Interfaces {
     internal interface IClashChecker {
-        bool Check(ClashModel clashModel);
+        string Check(ClashModel clashModel);
+        string GetMessage();
     }
 }

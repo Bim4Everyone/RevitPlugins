@@ -29,7 +29,7 @@
                         <dxg:TableView AutoWidth="True" AllowGrouping="False" ShowGroupPanel="False" ShowSearchPanelMode="Always" CellValueChanging="TableView_CellValueChanging"/>
                     </dxg:GridControl.View>
                     <dxg:GridControl.Columns>
-                        <dxg:GridColumn Header="Параметер" FieldName="Name" ReadOnly="True"/>
+                        <dxg:GridColumn Header="Параметр" FieldName="Name" ReadOnly="True"/>
                         <dxg:GridColumn Header="Значение" FieldName="Value"/>
                     </dxg:GridControl.Columns>
                 </dxg:GridControl>

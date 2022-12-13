@@ -29,9 +29,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
         }
 
         public static bool RunAlongWall(this Line line, Wall wall) {
-            var plane = wall.GetHorizontalNormalPlane();
-            var wallLine = wall.GetLine();
-            return plane.ProjectVector(line.Direction).IsPapallel(plane.ProjectVector(wallLine.Direction));
+            return line.Direction.RunAlongWall(wall);
         }
 
         public static Line GetTransformedLine(this Line line, Transform transform) {
@@ -52,7 +50,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
             var xy = GetHorizontalProjectionIntersection(mepLine, wallLine);
             double z;
 
-            //Подстановка получившихся значений в уравнение прямой в пространствеp
+            //Подстановка получившихся значений в уравнение прямой в пространстве
             if(Math.Abs(mepLine.Direction.X) > 0.0001) {
                 z = (xy.X - mepLine.GetEndPoint(0).X) / mepLine.Direction.X * mepLine.Direction.Z + mepLine.GetEndPoint(0).Z;
             } else {

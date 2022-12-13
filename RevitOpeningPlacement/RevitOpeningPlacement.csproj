@@ -4,6 +4,7 @@
 	<Import Project="..\ProjectProps\RevitClashes.props" />
 	
 	<ItemGroup>
+	  <None Remove="Resources\conduit.png" />
 	  <None Remove="Resources\pipe.png" />
 	  <None Remove="Resources\rectangleDuct.png" />
 	  <None Remove="Resources\roundDuct.png" />
@@ -11,6 +12,7 @@
 	</ItemGroup>
 	
 	<ItemGroup>
+	  <Resource Include="Resources\conduit.png" />
 	  <Resource Include="Resources\pipe.png" />
 	  <Resource Include="Resources\rectangleDuct.png" />
 	  <Resource Include="Resources\roundDuct.png" />

@@ -14,7 +14,7 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     x:Name="_this"
-    Height="450" Width="800"
+    Height="600" Width="1300"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid Margin="10">
@@ -29,7 +29,7 @@
                 Height="32"
                 Width="35"
                 Margin="0 0 10 0"
-                ToolTip="Загрузить проверки"
+                ToolTip="Загрузить настройки"
                 Command="{Binding LoadConfigCommand}"
                 Glyph="{dx:DXImage 'Office2013/Actions/Download_32x32.png'}" />
 

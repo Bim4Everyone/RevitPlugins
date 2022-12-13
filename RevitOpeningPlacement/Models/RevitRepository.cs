@@ -10,6 +10,9 @@ using Autodesk.Revit.DB.Structure;
 using System;
 using RevitClashDetective.Models;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
+using RevitClashDetective.Models.Handlers;
+using RevitOpeningPlacement.Models.OpeningPlacement;
+using System.Threading.Tasks;
 
 namespace RevitOpeningPlacement.Models {
     internal class RevitRepository {
@@ -20,6 +23,7 @@ namespace RevitOpeningPlacement.Models {
         private readonly UIDocument _uiDocument;
 
         private readonly RevitClashDetective.Models.RevitRepository _clashRevitRepository;
+        private readonly RevitEventHandler _revitEventHandler;
 
         public RevitRepository(Application application, Document document) {
 
@@ -30,6 +34,7 @@ namespace RevitOpeningPlacement.Models {
             _uiDocument = new UIDocument(document);
 
             _clashRevitRepository = new RevitClashDetective.Models.RevitRepository(_application, _document);
+            _revitEventHandler = new RevitEventHandler();
 
             UIApplication = _uiApplication;
             DocInfos = GetDocInfos();
@@ -38,26 +43,47 @@ namespace RevitOpeningPlacement.Models {
         public UIApplication UIApplication { get; }
         public List<DocInfo> DocInfos { get; }
 
-        public static Dictionary<CategoryEnum, string> CategoryNames => new Dictionary<CategoryEnum, string> {
-            {CategoryEnum.Pipe, "Трубы" },
-            {CategoryEnum.RectangleDuct, "Воздуховоды (прямоугольное сечение)" },
-            {CategoryEnum.RoundDuct, "Воздуховоды (круглое сечение)" },
-            {CategoryEnum.CableTray, "Лотки" },
-            {CategoryEnum.Wall, "Стены" },
-            {CategoryEnum.Floor, "Перекрытия" }
+        public static Dictionary<MepCategoryEnum, string> MepCategoryNames { get; } = new Dictionary<MepCategoryEnum, string> {
+            {MepCategoryEnum.Pipe, "Трубы" },
+            {MepCategoryEnum.RectangleDuct, "Воздуховоды (прямоугольное сечение)" },
+            {MepCategoryEnum.RoundDuct, "Воздуховоды (круглое сечение)" },
+            {MepCategoryEnum.CableTray, "Лотки" },
+            {MepCategoryEnum.Conduit, "Короба" }
         };
 
-        public static Dictionary<Parameters, string> ParameterNames => new Dictionary<Parameters, string>() {
+        public static Dictionary<FittingCategoryEnum, string> FittingCategoryNames { get; } = new Dictionary<FittingCategoryEnum, string> {
+            {FittingCategoryEnum.CableTrayFitting, "Соединительные детали кабельных лотков" },
+            {FittingCategoryEnum.DuctFitting, "Соединительные детали воздуховодов" },
+            {FittingCategoryEnum.ConduitFitting, "Соединительные детали коробов" },
+            {FittingCategoryEnum.PipeFitting, "Соединительные детали трубопроводов" },
+        };
+
+        public static Dictionary<StructureCategoryEnum, string> StructureCategoryNames { get; } = new Dictionary<StructureCategoryEnum, string> {
+            {StructureCategoryEnum.Wall, "Стены" },
+            {StructureCategoryEnum.Floor, "Перекрытия" },
+        };
+
+        public static Dictionary<Parameters, string> ParameterNames { get; } = new Dictionary<Parameters, string>() {
             {Parameters.Diameter, "Диаметр" },
             {Parameters.Height, "Высота" },
             {Parameters.Width, "Ширина" }
         };
 
-        public static Dictionary<OpeningType, string> FamilyName => new Dictionary<OpeningType, string>() {
+        public static Dictionary<OpeningType, string> FamilyName { get; } = new Dictionary<OpeningType, string>() {
             {OpeningType.FloorRectangle, "ОбщМд_Отв_Отверстие_Прямоугольное_В перекрытии" },
             {OpeningType.FloorRound, "ОбщМд_Отв_Отверстие_Круглое_В перекрытии" },
             {OpeningType.WallRectangle, "ОбщМд_Отв_Отверстие_Прямоугольное_В стене" },
             {OpeningType.WallRound, "ОбщМд_Отв_Отверстие_Круглое_В стене" },
+        };
+
+        public static List<string> WallFamilyNames { get; } = new List<string> {
+            FamilyName[OpeningType.WallRound],
+            FamilyName[OpeningType.WallRectangle]
+        };
+
+        public static List<string> FloorFamilyNames { get; } = new List<string> {
+            FamilyName[OpeningType.FloorRectangle],
+            FamilyName[OpeningType.FloorRound]
         };
 
         public static Dictionary<OpeningType, string> TypeName => new Dictionary<OpeningType, string>() {
@@ -74,7 +100,8 @@ namespace RevitOpeningPlacement.Models {
 
         public static List<BuiltInParameter> MepCurveDiameters => new List<BuiltInParameter>() {
             BuiltInParameter.RBS_PIPE_OUTER_DIAMETER,
-            BuiltInParameter.RBS_CURVE_DIAMETER_PARAM
+            BuiltInParameter.RBS_CURVE_DIAMETER_PARAM,
+            BuiltInParameter.RBS_CONDUIT_OUTER_DIAM_PARAM
         };
 
         public static List<BuiltInParameter> MepCurveHeights => new List<BuiltInParameter>() {
@@ -99,12 +126,21 @@ namespace RevitOpeningPlacement.Models {
             BuiltInParameter.RBS_PIPE_TOP_ELEVATION
         };
 
+        public static string SystemCheck => "Системная проверка";
+
         public FamilySymbol GetOpeningType(OpeningType type) {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .WhereElementIsElementType()
                 .OfType<FamilySymbol>()
                 .FirstOrDefault(item => item.Name.Equals(TypeName[type]) && item.FamilyName.Equals(FamilyName[type]));
+        }
+
+        public Family GetFamily(OpeningType openingType) {
+            return new FilteredElementCollector(_document)
+                .OfClass(typeof(Family))
+                .OfType<Family>()
+                .FirstOrDefault(item => item?.Name?.Equals(FamilyName[openingType], StringComparison.CurrentCulture) == true);
         }
 
         public Transaction GetTransaction(string transactionName) {
@@ -118,7 +154,11 @@ namespace RevitOpeningPlacement.Models {
                 .FirstOrDefault(item => item.Name.Equals(name, StringComparison.CurrentCulture));
         }
 
-        public string GetLevel(Element element) {
+        public string GetLevelName(Element element) {
+            return _clashRevitRepository.GetLevelName(element);
+        }
+
+        public Level GetLevel(Element element) {
             return _clashRevitRepository.GetLevel(element);
         }
 
@@ -157,14 +197,21 @@ namespace RevitOpeningPlacement.Models {
             }
         }
 
-        public IEnumerable<FamilyInstance> GetOpenings() {
-            return new FilteredElementCollector(_document)
-                .OfCategory(BuiltInCategory.OST_GenericModel)
-                .OfType<FamilyInstance>()
-                .OfType<FamilyInstance>()
+        public List<FamilyInstance> GetOpenings() {
+            return GetFamilyInstances()
                 .Where(item => TypeName.Any(n => n.Value.Equals(item.Name))
                             && FamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
                 .ToList();
+        }
+
+        public List<FamilyInstance> GetWallOpenings() {
+            var wallTypes = new[] { OpeningType.WallRectangle, OpeningType.WallRound };
+            return GetOpenings(wallTypes);
+        }
+
+        public List<FamilyInstance> GetFloorOpenings() {
+            var floorTypes = new[] { OpeningType.FloorRectangle, OpeningType.FloorRound };
+            return GetOpenings(floorTypes);
         }
 
         public string GetFamilyName(Element element) {
@@ -192,10 +239,57 @@ namespace RevitOpeningPlacement.Models {
                 ?? Transform.Identity;
         }
 
+        public void DeleteAllOpenings() {
+            var openings = GetOpenings();
+            using(Transaction t = _document.StartTransaction("Удаление старых заданий на отверстия")) {
+                _document.Delete(openings.Select(item => item.Id).ToArray());
+                t.Commit();
+            }
+        }
+
+        public void DeleteElements(ICollection<Element> elements) {
+            using(Transaction t = _document.StartTransaction("Удаление объединенных заданий на отверстия")) {
+                _document.Delete(elements.Select(item => item.Id).ToArray());
+                t.Commit();
+            }
+        }
+
+        public async Task<FamilyInstance> UniteOpenings(OpeningPlacer placer, ICollection<Element> elements) {
+            FamilyInstance createdOpening = null;
+            _revitEventHandler.TransactAction = () => {
+                using(var t = GetTransaction("Объединение отверстий")) {
+                    createdOpening = placer.Place();
+                    t.Commit();
+                }
+                DeleteElements(elements);
+            };
+
+            await _revitEventHandler.Raise();
+
+            return createdOpening;
+        }
+
+        public void DoAction(Action action) {
+            _clashRevitRepository.DoAction(action);
+        }
+
         private void RotateElement(Element element, XYZ point, Line axis, double angle) {
             if(Math.Abs(angle) > 0.00001) {
                 ElementTransformUtils.RotateElement(_document, element.Id, axis, angle);
             }
+        }
+
+        private IEnumerable<FamilyInstance> GetFamilyInstances() {
+            return new FilteredElementCollector(_document)
+                .OfCategory(BuiltInCategory.OST_GenericModel)
+                .OfType<FamilyInstance>();
+        }
+
+        private List<FamilyInstance> GetOpenings(ICollection<OpeningType> types) {
+            return GetFamilyInstances()
+               .Where(item => types.Any(e => TypeName[e].Equals(item.Name))
+                           && types.Any(e => FamilyName[e].Equals(GetFamilyName(item))))
+               .ToList();
         }
     }
 
@@ -206,13 +300,24 @@ namespace RevitOpeningPlacement.Models {
         Diameter
     }
 
-    internal enum CategoryEnum {
+    internal enum MepCategoryEnum {
         Pipe,
         RectangleDuct,
         RoundDuct,
         CableTray,
+        Conduit
+    }
+
+    internal enum FittingCategoryEnum {
+        PipeFitting,
+        CableTrayFitting,
+        DuctFitting,
+        ConduitFitting
+    }
+
+    internal enum StructureCategoryEnum {
         Wall,
-        Floor
+        Floor,
     }
 
     internal enum OpeningType {

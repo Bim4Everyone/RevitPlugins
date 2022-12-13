@@ -7,17 +7,17 @@ using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
-    internal class InclinedCurveFloorParameterGetter : IParametersGetter {
-        private readonly MepCurveClash<CeilingAndFloor> _clash;
-        private readonly MepCategory _mepCategory;
+    internal class FloorSolidParameterGetter : IParametersGetter {
+        private readonly ISolidProvider _solidProvider;
+        private readonly MepCategory[] _mepCategories;
 
-        public InclinedCurveFloorParameterGetter(MepCurveClash<CeilingAndFloor> clash, MepCategory mepCategory) {
-            _clash = clash;
-            _mepCategory = mepCategory;
+        public FloorSolidParameterGetter(ISolidProvider solidProvider, params MepCategory[] mepCategories) {
+            _solidProvider = solidProvider;
+            _mepCategories = mepCategories;
         }
 
         public IEnumerable<ParameterValuePair> GetParamValues() {
-            var sizeInit = new FloorOpeningSizeInitializer(new IntersectionGetter<CeilingAndFloor>(_clash).GetIntersection(), _mepCategory);
+            var sizeInit = new FloorOpeningSizeInitializer(_solidProvider.GetSolid(), _mepCategories);
             yield return new DoubleParameterGetter(RevitRepository.OpeningHeight, sizeInit.GetHeight()).GetParamValue();
             yield return new DoubleParameterGetter(RevitRepository.OpeningWidth, sizeInit.GetWidth()).GetParamValue();
             yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, sizeInit.GetThickness()).GetParamValue();

@@ -12,7 +12,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using DevExpress.Xpf.Grid;
+
 using RevitClashDetective.Models;
+
+using RevitOpeningPlacement.ViewModels.Navigator;
 
 namespace RevitOpeningPlacement.Views {
     /// <summary>
@@ -22,17 +26,32 @@ namespace RevitOpeningPlacement.Views {
 
         public NavigatorView() {
             InitializeComponent();
+            Loaded += NavigatorView_Loaded;
+        }
+
+        private void NavigatorView_Loaded(object sender, RoutedEventArgs e) {
+            _dg.GroupBy(_dg.Columns[1]);
         }
 
         public override string PluginName => nameof(RevitOpeningPlacement);
         public override string ProjectConfigName => nameof(NavigatorView);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-            DialogResult = true;
+            Close();
         }
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-            DialogResult = false;
+            Close();
+        }
+
+        private void view_FocusedRowHandleChanged(object sender, FocusedRowHandleChangedEventArgs e) {
+            var handle = _dg.View.FocusedRowHandle;
+            _dg.UnselectAll();
+            _dg.SelectItem(handle);
+        }
+
+        private void SimpleButton_Click(object sender, RoutedEventArgs e) {
+            Close();
         }
     }
 }

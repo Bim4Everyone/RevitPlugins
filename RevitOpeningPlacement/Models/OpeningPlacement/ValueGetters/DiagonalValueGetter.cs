@@ -26,9 +26,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         }
 
         public DoubleParamValue GetValue() {
-            var height = _clash.Curve.GetHeight();
-            var width = _clash.Curve.GetWidth();
-            var coordinateSystem = _clash.Curve.GetConnectorCoordinateSystem();
+            var height = _clash.Element1.GetHeight();
+            var width = _clash.Element1.GetWidth();
+            var coordinateSystem = _clash.Element1.GetConnectorCoordinateSystem();
             var dirX = coordinateSystem.BasisX;
             var dirY = coordinateSystem.BasisY;
 

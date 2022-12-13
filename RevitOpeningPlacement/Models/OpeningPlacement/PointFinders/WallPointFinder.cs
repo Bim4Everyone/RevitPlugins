@@ -23,26 +23,27 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
         }
 
         public XYZ GetPoint() {
-            var mepLine = _clash.Curve.GetLine();
+            var mepLine = _clash.Element1.GetLine();
             //удлинена осевая линия инженерной системы на 5 м в обе стороны
             var elongatedMepLine = Line.CreateBound(mepLine.GetEndPoint(0) - mepLine.Direction * 16.5,
                                       mepLine.GetEndPoint(1) + mepLine.Direction * 16.5);
 
             //получена линия, идущая вдоль стены и расположенная точно по центру (т.е. линия равноудалена от внутренней и наружной граней стены), и удлинена на 5 м в обе стороны
-            var wallLine = _clash.Element.GetСentralLine();
+            var wallLine = _clash.Element2.GetСentralLine();
             var elongatedWallLine = Line.CreateBound(wallLine.GetEndPoint(0) - wallLine.Direction * 16.5,
                                      wallLine.GetEndPoint(1) + wallLine.Direction * 16.5);
 
             //трансформация линии стены в координаты основного файла
-            var transformedWallLine = Line.CreateBound(_clash.ElementTransform.OfPoint(elongatedWallLine.GetEndPoint(0)), _clash.ElementTransform.OfPoint(elongatedWallLine.GetEndPoint(1)));
+            var transformedWallLine = Line.CreateBound(_clash.Element2Transform.OfPoint(elongatedWallLine.GetEndPoint(0)), _clash.Element2Transform.OfPoint(elongatedWallLine.GetEndPoint(1)));
             try {
+                var dir = _clash.Element2Transform.OfVector(_clash.Element2.Orientation);
                 //получение точки вставки из уравнения линии 
                 if(_sizeGetter != null) {
-                    return elongatedMepLine.GetPointFromLineEquation(transformedWallLine) - _clash.Element.Orientation * _clash.Element.Width / 2 - _sizeGetter.GetValue().TValue / 2 * XYZ.BasisZ;
+                    return elongatedMepLine.GetPointFromLineEquation(transformedWallLine) - dir * _clash.Element2.Width / 2 - _sizeGetter.GetValue().TValue / 2 * XYZ.BasisZ;
                 }
-                return elongatedMepLine.GetPointFromLineEquation(transformedWallLine) - _clash.Element.Orientation * _clash.Element.Width / 2;
+                return elongatedMepLine.GetPointFromLineEquation(transformedWallLine) - dir * _clash.Element2.Width / 2;
             } catch {
-                throw IntersectionNotFoundException.GetException(_clash.Curve, _clash.Element);
+                throw IntersectionNotFoundException.GetException(_clash.Element1, _clash.Element2);
             }
 
         }

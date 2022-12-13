@@ -19,7 +19,7 @@ namespace RevitClashDetective.Models.Clashes {
             Name = element.Name;
             DocumentName = _revitRepository.GetDocumentName(element.Document);
             Category = element?.Category?.Name;
-            Level = revitRepository.GetLevel(element);
+            Level = revitRepository.GetLevelName(element);
         }
 
         public ElementModel() {

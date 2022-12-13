@@ -21,28 +21,28 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         }
 
         public IValueGetter<DoubleParamValue> GetRoundMepHeightGetter() {
-            var plane = _clash.Element.GetVerticalNormalPlane();
+            var plane = _clash.Element2.GetVerticalNormalPlane();
 
             var heightDirsGetter = new RoundMepDirsGetter(_clash);
-            return new InclinedSizeValueGetter(_clash, new DiameterValueGetter(_clash.Curve, _mepCategory), plane, heightDirsGetter);
+            return new InclinedSizeValueGetter(_clash, new DiameterValueGetter(_clash.Element1, _mepCategory), plane, heightDirsGetter);
         }
 
         public IValueGetter<DoubleParamValue> GetRoundMepWidthGetter() {
-            var plane = _clash.Element.GetHorizontalNormalPlane();
+            var plane = _clash.Element2.GetHorizontalNormalPlane();
 
             var widthDirsGetters = new RoundMepDirsGetter(_clash);
-            return new InclinedSizeValueGetter(_clash, new DiameterValueGetter(_clash.Curve, _mepCategory), plane, widthDirsGetters);
+            return new InclinedSizeValueGetter(_clash, new DiameterValueGetter(_clash.Element1, _mepCategory), plane, widthDirsGetters);
         }
 
         public IValueGetter<DoubleParamValue> GetRectangleMepHeightGetter() {
-            var plane = _clash.Element.GetVerticalNormalPlane();
+            var plane = _clash.Element2.GetVerticalNormalPlane();
 
             var heightDirsGetter = new RectangleDirsGetter(_clash);
             return new InclinedSizeValueGetter(_clash, new DiagonalValueGetter(_clash, plane, _mepCategory), plane, heightDirsGetter);
         }
 
         public IValueGetter<DoubleParamValue> GetRectangleMepWidthGetter() {
-            var plane = _clash.Element.GetHorizontalNormalPlane();
+            var plane = _clash.Element2.GetHorizontalNormalPlane();
 
             var widthDirsGetters = new RectangleDirsGetter(_clash);
             return new InclinedSizeValueGetter(_clash, new DiagonalValueGetter(_clash, plane, _mepCategory), plane, widthDirsGetters);

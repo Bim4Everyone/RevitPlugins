@@ -27,5 +27,11 @@ namespace RevitOpeningPlacement.Models.Extensions {
         public static XYZ ProjectOnYoZ(this XYZ xyz) {
             return new XYZ(xyz.X, 0, xyz.Z);
         }
+
+        public static bool RunAlongWall(this XYZ direction, Wall wall) {
+            var plane = wall.GetHorizontalNormalPlane();
+            var wallLine = wall.GetLine();
+            return plane.ProjectVector(direction).IsPapallel(plane.ProjectVector(wallLine.Direction));
+        }
     }
 }
