@@ -170,7 +170,8 @@ namespace RevitLintelPlacement.Models {
         public IEnumerable<RevitLinkType> GetLinkTypes() {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(RevitLinkType))
-                .Cast<RevitLinkType>();
+                .Cast<RevitLinkType>()
+                .Where(item => item.GetLinkedFileStatus() == LinkedFileStatus.Loaded);
         }
 
         public FamilyInstance PlaceLintel(FamilySymbol lintelType, FamilyInstance elementInWall) {
@@ -221,12 +222,36 @@ namespace RevitLintelPlacement.Models {
                 throw new ArgumentException(nameof(sampleMode), $"Способ выборки \"{nameof(sampleMode)}\" не найден.");
             }
 
+            return GetLintels(collector);
+        }
+
+        public List<FamilyInstance> GetLintels(FilteredElementCollector collector) {
             return collector
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
                 .Where(e => LintelsCommonConfig.LintelFamily.Equals(e.Symbol?.Family?.Name, StringComparison.CurrentCultureIgnoreCase))
                 .ToList();
+        }
+
+        public FilteredElementCollector GetAllElementsCollector() {
+            return new FilteredElementCollector(_document);
+        }
+
+        public FilteredElementCollector GetViewElementCollector(View view) {
+            return new FilteredElementCollector(_document, view.Id);
+        }
+
+        public View GetCurrentView() {
+            return _document.ActiveView;
+        }
+
+        public FilteredElementCollector GetSelectedElementsCollector() {
+            var ids = _uiDocument.Selection.GetElementIds();
+            if(ids.Count == 0) {
+                throw new ArgumentException("Нет выбранных элементов");
+            }
+            return new FilteredElementCollector(_document, ids);
         }
 
         public IEnumerable<FamilyInstance> GetAllElementsInWall(SampleMode sampleMode, ElementInfosViewModel elementInfos, IEnumerable<string> wallTypes = null) {
@@ -280,6 +305,24 @@ namespace RevitLintelPlacement.Models {
             //    .Where(f => f?.Symbol != null && f.Symbol?.Family != null && f.Symbol.Family.Name != null &&
             //    f.Symbol.Family.Name.ToLower().Contains(LintelsCommonConfig.HolesFilter.ToLower())).ToList(), new FamilyInstanceComparer())
             //    .Where(e => CheckElementInWallParameter(e, elementInfos));
+        }
+
+        public List<FamilyInstance> GetElementsInWall(FilteredElementCollector collector1, FilteredElementCollector collector2, ElementInfosViewModel elementInfos) {
+            var categoryFilter = new ElementMulticategoryFilter(
+                new List<BuiltInCategory> { BuiltInCategory.OST_Doors, BuiltInCategory.OST_Windows });
+
+            var openings = collector1.OfClass(typeof(FamilyInstance))
+                .Cast<FamilyInstance>()
+                .Where(f => f?.Symbol != null && f.Symbol?.Family != null && f.Symbol.Family.Name != null &&
+                f.Symbol.Family.Name.ToLower().Contains(LintelsCommonConfig.HolesFilter.ToLower())).ToList();
+
+            var wallsAndDoors = collector2
+                .WherePasses(categoryFilter)
+                .OfClass(typeof(FamilyInstance))
+                .Cast<FamilyInstance>()
+                .Where(e => e.Host is Wall && e.Location != null).ToList();
+
+            return openings.Union(wallsAndDoors, new FamilyInstanceComparer()).Where(e => CheckElementInWallParameter(e, elementInfos)).ToList();
         }
 
         public View GetElevation() {
@@ -407,7 +450,7 @@ namespace RevitLintelPlacement.Models {
         }
 
         public async Task SelectAndShowElement(ElementId id, ViewOrientation3D orientation) {
-            for(int i=0; i < 2; i++) {
+            for(int i = 0; i < 2; i++) {
                 _revitEventHandler.TransactAction = () => {
                     _uiDocument.Selection.SetElementIds(new[] { id });
                     var commandId = RevitCommandId.LookupCommandId("ID_VIEW_APPLY_SELECTION_BOX");
@@ -420,22 +463,13 @@ namespace RevitLintelPlacement.Models {
         }
 
         public FamilyInstance GetDimensionFamilyInstance(FamilyInstance fi) {
-            var dimensionIds = fi.GetDependentElements(new ElementClassFilter(typeof(Dimension)));
-            if(!dimensionIds.Any()) {
-                return null;
-            }
-
-            foreach(var id in dimensionIds) {
-                var dimension = (Dimension) _document.GetElement(id);
-                var references = dimension.References;
-                foreach(Reference refer in references) {
-                    if(refer.ElementId == fi.Id)
-                        continue;
-                    if(_document.GetElement(refer.ElementId) is FamilyInstance allignFi)
-                        return allignFi;
-                }
-            }
-            return null;
+            return fi.GetDependentElements(new ElementClassFilter(typeof(Dimension)))
+                .Select(item => GetElementById(item))
+                .OfType<Dimension>()
+                .SelectMany(d => d.References.OfType<Reference>())
+                .Select(r => GetElementById(r.ElementId))
+                .OfType<FamilyInstance>()
+                .FirstOrDefault(i => i.Host != null);
         }
 
         public async Task MirrorLintel(FamilyInstance lintel, FamilyInstance elementInWall) {

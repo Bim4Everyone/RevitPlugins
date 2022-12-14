@@ -86,7 +86,6 @@
                                              MaxHeight="200" 
                                              Margin="0 5 0 0"
                                              ItemsSource="{Binding WallTypesViewSource.View}"
-                                             DisplayMember="Name"
                                              BorderThickness="0"
                                              BorderBrush="Transparent"
                                              EditValue="{Binding SelectedObjects}"
@@ -97,7 +96,8 @@
                                 <dxe:ListBoxEdit.ItemTemplate>
                                     <DataTemplate DataType="{x:Type dxe:ListBoxEditItem}">
                                         <dxe:CheckEdit Name="PART_Editor" HorizontalAlignment="Center" Margin="0 -3 0 -3"
-                                               EditValue="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}" Content="{Binding Name}">
+                                               EditValue="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}">
+                                            <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding Name}"/>
                                         </dxe:CheckEdit>
                                     </DataTemplate>
                                 </dxe:ListBoxEdit.ItemTemplate>

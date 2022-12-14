@@ -160,7 +160,7 @@ namespace RevitLintelPlacement.ViewModels {
                 _revitRepository.GetWallTypes()
                 .Select(w => new WallTypeConditionViewModel() {
                     Name = w.Name,
-                    IsChecked = ruleSettings.WallTypes.WallTypes.Any(item => item.Equals(w.Name, StringComparison.CurrentCulture))
+                    IsChecked = ruleSettings?.WallTypes?.WallTypes?.Any(item => item.Equals(w.Name, StringComparison.CurrentCulture)) == true
                 }).OrderBy(e => e.Name));
         }
 

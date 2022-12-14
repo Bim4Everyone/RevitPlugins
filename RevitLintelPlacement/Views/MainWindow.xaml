@@ -39,10 +39,9 @@
                               FontSize="14"
                               Height="25"
                               IsTextEditable="False"
+                              ItemsSource="{Binding SampleModes}"
+                              DisplayMember="Name"
                               EditValue="{Binding SelectedSampleMode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" >
-                <dxmvvm:Interaction.Behaviors>
-                    <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type vm:SampleMode}"/>
-                </dxmvvm:Interaction.Behaviors>
             </dxe:ComboBoxEdit>
         </StackPanel>
         <lc:GroupBox Grid.Row="2" Margin="0 5 0 10" HorizontalAlignment="Stretch" Header="Связанные файлы" FontSize="14">
@@ -75,7 +74,6 @@
                 Width="80"
                 Height="25"
                 Command="{Binding PlaceLintelCommand}"
-                CommandParameter="{Binding ElementName=MainView}"
                 Click="SimpleButtonOK_Click"/>
             <dx:SimpleButton
                 Content="Отмена"

@@ -35,6 +35,7 @@ namespace RevitLintelPlacement.Models {
 
     internal class LintelsSettings : ProjectSettings {
         public override string ProjectName { get; set; }
+        public string SelectedModeNameRules { get; set; }
         public SampleMode SelectedModeRules { get; set; }
         public SampleMode SelectedModeNavigator { get; set; }
         public string SelectedPath { get; set; } 

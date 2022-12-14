@@ -17,6 +17,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitLintelPlacement.Comparers;
 using RevitLintelPlacement.Models;
+using RevitLintelPlacement.Models.ElementInWallProviders;
 
 namespace RevitLintelPlacement.ViewModels {
     internal class LintelCollectionViewModel : BaseViewModel {
@@ -39,6 +40,7 @@ namespace RevitLintelPlacement.ViewModels {
             LintelsViewSource = new CollectionViewSource { Source = LintelInfos };
             LintelsViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(LintelInfoViewModel.Level)));
             LintelsViewSource.Filter += ElementInWallKindFilter;
+
             SelectAndShowElementCommand = new RelayCommand(p => SelectElement(p));
             SelectNextCommand = new RelayCommand(p => SelectNext(p));
             SelectPreviousCommand = new RelayCommand(p => SelectPrevious(p));
@@ -131,7 +133,7 @@ namespace RevitLintelPlacement.ViewModels {
         private void InitializeLintels(SampleMode sampleMode) {
             LintelInfos = new ObservableCollection<LintelInfoViewModel>();
             var lintels = _revitRepository.GetLintels(sampleMode);
-            var correlator = new LintelElementCorrelator(_revitRepository, _elementInfos);
+            var correlator = new LintelElementCorrelator(_revitRepository, new AllElementsInWallProvider(_revitRepository, _elementInfos));
             var lintelInfos = lintels
                 .Select(l => new LintelInfoViewModel(_revitRepository, l, correlator.Correlate(l)))
                 .OrderBy(l => l.Level, new AlphanumericComparer());

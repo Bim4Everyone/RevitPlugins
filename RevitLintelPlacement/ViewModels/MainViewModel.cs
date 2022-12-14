@@ -17,57 +17,38 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitLintelPlacement.Models;
+using RevitLintelPlacement.Models.ElementInWallProviders;
+using RevitLintelPlacement.Models.LintelsProviders;
+using RevitLintelPlacement.ViewModels.SampleModeViewModels;
 using RevitLintelPlacement.Views;
 
 namespace RevitLintelPlacement.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private SampleMode _selectedSampleMode;
 
-        private LintelCollectionViewModel _lintels;
         private GroupedRuleCollectionViewModel _groupedRules;
         private ObservableCollection<LinkViewModel> _links;
         private ElementInfosViewModel _elementInfosViewModel;
         private string _errorText;
         private List<LinkViewModel> _selectedLinks = new List<LinkViewModel>();
+        private List<SampleModeViewModel> _sampleModes;
+        private SampleModeViewModel _selectedSampleMode;
 
-        public MainViewModel() {
-
-        }
+        public MainViewModel() { }
 
         public MainViewModel(RevitRepository revitRepository) {
             this._revitRepository = revitRepository;
             ElementInfos = new ElementInfosViewModel(_revitRepository);
 
+            InitializeLinks();
+            InitializeSampleModes();
+            ApplySettings();
+
             GroupedRules = new GroupedRuleCollectionViewModel(_revitRepository, ElementInfos);
+
             PlaceLintelCommand = new RelayCommand(PlaceLintels, CanPlace);
             ShowReportCommand = new RelayCommand(ShowReport);
-
-            SelectedLinks = new List<LinkViewModel>();
-
-            var links = _revitRepository.GetLinkTypes().ToList();
-            if(links.Count > 0) {
-                Links = new ObservableCollection<LinkViewModel>(links.Select(l => new LinkViewModel() { Name = Path.GetFileNameWithoutExtension(l.Name) }));
-            } else {
-                Links = new ObservableCollection<LinkViewModel>();
-            }
             CloseCommand = new RelayCommand(Close);
-            var settings = _revitRepository.LintelsConfig.GetSettings(_revitRepository.GetDocumentName());
-            if(settings != null) {
-                SelectedSampleMode = settings.SelectedModeRules;
-                if(settings.SelectedLinks != null && settings.SelectedLinks.Count > 0) {
-                    foreach(var link in Links) {
-                        if(settings.SelectedLinks.Any(sl => sl.Equals(link.Name, StringComparison.CurrentCultureIgnoreCase))) {
-                            SelectedLinks.Add(link);
-                        }
-                    }
-                }
-            }
-        }
-
-        public SampleMode SelectedSampleMode {
-            get => _selectedSampleMode;
-            set => this.RaiseAndSetIfChanged(ref _selectedSampleMode, value);
         }
 
         public string ErrorText {
@@ -75,19 +56,10 @@ namespace RevitLintelPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public LintelCollectionViewModel Lintels {
-            get => _lintels;
-            set => this.RaiseAndSetIfChanged(ref _lintels, value);
-        }
-
         public GroupedRuleCollectionViewModel GroupedRules {
             get => _groupedRules;
             set => this.RaiseAndSetIfChanged(ref _groupedRules, value);
         }
-
-        public ICommand PlaceLintelCommand { get; set; }
-        public ICommand ShowReportCommand { get; set; }
-        public ICommand CloseCommand { get; set; }
 
         public ObservableCollection<LinkViewModel> Links {
             get => _links;
@@ -104,33 +76,158 @@ namespace RevitLintelPlacement.ViewModels {
             set => _selectedLinks = value;
         }
 
-        public void PlaceLintels(object p) {
+        public List<SampleModeViewModel> SampleModes {
+            get => _sampleModes;
+            set => _sampleModes = value;
+        }
 
-            ElementInfos.ElementInfos.Clear();
-            if(!_revitRepository.CheckConfigParameters(ElementInfos)) {
-                ShowReport();
+        public SampleModeViewModel SelectedSampleMode {
+            get => _selectedSampleMode;
+            set => this.RaiseAndSetIfChanged(ref _selectedSampleMode, value);
+        }
+
+        public ICommand PlaceLintelCommand { get; set; }
+        public ICommand ShowReportCommand { get; set; }
+        public ICommand CloseCommand { get; set; }
+
+        private void InitializeLinks() {
+            var links = _revitRepository.GetLinkTypes().ToList();
+            if(links.Count > 0) {
+                Links = new ObservableCollection<LinkViewModel>(links.Select(l => new LinkViewModel() { Name = Path.GetFileNameWithoutExtension(l.Name) }));
+            } else {
+                Links = new ObservableCollection<LinkViewModel>();
+            }
+        }
+
+        private void InitializeSampleModes() {
+            var view = _revitRepository.GetCurrentView();
+            SampleModes = new List<SampleModeViewModel>() {
+                new SampleModeViewModel("Выборка по всем элементам",
+                    new AllLintelsProvider(_revitRepository),
+                    new AllElementsInWallProvider(_revitRepository, ElementInfos)),
+                new SampleModeViewModel("Выборка по выделенным элементам",
+                    new SelectedLintelsProvider(_revitRepository, new SelectedElementsInWallProvider(_revitRepository, ElementInfos)),
+                    new SelectedElementsInWallProvider(_revitRepository, ElementInfos)),
+                new SampleModeViewModel("Выборка по текущему виду",
+                    new CurrentViewLintelsProvider(_revitRepository, view),
+                    new CurrentViewElementsInWallProvider(_revitRepository, ElementInfos, view)),
+            };
+        }
+
+        private void ApplySettings() {
+            SelectedLinks = new List<LinkViewModel>();
+
+            var settings = _revitRepository.LintelsConfig.GetSettings(_revitRepository.GetDocumentName());
+            if(settings != null) {
+                SelectedSampleMode = SampleModes.FirstOrDefault(item => item.Name.Equals(settings.SelectedModeNameRules, StringComparison.CurrentCulture))
+                    ?? SampleModes.FirstOrDefault();
+                if(settings.SelectedLinks != null && settings.SelectedLinks.Count > 0) {
+                    SelectedLinks = Links.Where(item => settings.SelectedLinks.Any(sl => sl.Equals(item.Name, StringComparison.CurrentCultureIgnoreCase))).ToList();
+                }
+            } else {
+                SelectedSampleMode = SampleModes.FirstOrDefault();
+            }
+        }
+
+        private void PlaceLintels(object p) {
+            if(!CheckConfig()) {
                 return;
             }
 
-            foreach(var type in _revitRepository.GetLintelTypes()) {
-                if(!_revitRepository.CheckLintelType(type, ElementInfos)) {
-                    ShowReport();
-                    return;
+            ICollection<LintelInfoViewModel> oldLintels = GetLintels();
+            ICollection<FamilyInstance> elementsInWalls = GetElementsInWalls(oldLintels);
+
+            //проверка старых перемычек
+            View3D view3D = GetView();
+            var links = SelectedLinks.Select(l => l.Name).ToList();
+            CheckOldLintels(links, oldLintels);
+
+            //расстановка перемычек
+            var lintels = GetPlacedLintels(elementsInWalls, view3D, links);
+
+            //фиксация перемычек
+            var elevation = _revitRepository.GetElevation();
+            if(!CheckView(elevation, "Фасад")) {
+                return;
+            }
+            var plan = _revitRepository.GetPlan();
+            if(!CheckView(elevation, "План")) {
+                return;
+            }
+            LockPlacedLintels(view3D, elevation, plan, lintels);
+
+            SaveRules();
+
+            //отчет об ошибках
+            if(ElementInfos.ElementInfos != null && ElementInfos.ElementInfos.Count > 0) {
+                ShowReport();
+            }
+        }
+
+        private bool CanPlace(object p) {
+            var result = true;
+            if(GroupedRules.SelectedRule == null) {
+                return false;
+            }
+            foreach(var groupedRule in GroupedRules.SelectedRule.Rules) {
+                if(!groupedRule.UpdateErrorText()) {
+                    result = false;
                 }
             }
-            Lintels = new LintelCollectionViewModel(_revitRepository, ElementInfos);
+            ErrorText = GroupedRules.SelectedRule.GetErrorText();
+            if(!string.IsNullOrEmpty(ErrorText)) {
+                result = false;
+            }
+            return result;
+        }
 
+        private bool CheckConfig() {
+            ElementInfos.ElementInfos.Clear();
+
+            if(!_revitRepository.CheckConfigParameters(ElementInfos)) {
+                ShowReport();
+                return false;
+            }
+
+            if(_revitRepository.GetLintelTypes().Any(item => !_revitRepository.CheckLintelType(item, ElementInfos))) {
+                ShowReport();
+                return false;
+            }
+
+            return true;
+        }
+
+        private void ShowReport() {
+            ElementInfos.UpdateCollection();
+            ElementInfos.UpdateGroupedMessage();
+            ElementInfos.ElementInfosViewSource?.View?.Refresh();
+            var view = new ReportView() { DataContext = ElementInfos };
+            view.Show();
+        }
+
+        private List<LintelInfoViewModel> GetLintels() {
+            var correlator = new LintelElementCorrelator(_revitRepository, SelectedSampleMode.ElementsInWallProvider);
+            return SelectedSampleMode.LintelsProvider.GetLintels()
+                .Select(item => new LintelInfoViewModel(_revitRepository, item, correlator.Correlate(item)))
+                .ToList();
+        }
+
+        private ICollection<FamilyInstance> GetElementsInWalls(ICollection<LintelInfoViewModel> oldLintels) {
             var wallTypeNames = GroupedRules.SelectedRule.Rules.SelectMany(item => item.WallTypes.WallTypes.Where(w => w.IsChecked).Select(w => w.Name)).ToList();
 
-            var elementInWalls = _revitRepository.GetAllElementsInWall(SelectedSampleMode, ElementInfos, wallTypeNames)
-                .ToList();
+            var elementsInWalls = SelectedSampleMode.ElementsInWallProvider.GetElementsInWall();
 
-            foreach(var lintel in Lintels.LintelInfos) {
-                var element = elementInWalls.FirstOrDefault(e => e.Id == lintel.ElementInWallId);
+            foreach(var lintel in oldLintels) {
+                var element = elementsInWalls.FirstOrDefault(e => e.Id == lintel.ElementInWallId);
                 if(element != null) {
-                    elementInWalls.Remove(element);
+                    elementsInWalls.Remove(element);
                 }
             }
+
+            return elementsInWalls;
+        }
+
+        private View3D GetView() {
             var view3D = _revitRepository.GetView3D();
             using(Transaction t = _revitRepository.StartTransaction("Подготовка к расстановке перемычек")) {
                 if(view3D.IsSectionBoxActive) {
@@ -139,45 +236,15 @@ namespace RevitLintelPlacement.ViewModels {
                 t.Commit();
             }
             _revitRepository.ActivateView();
-            var links = SelectedLinks.Select(l => l.Name).ToList();
+            return view3D;
+        }
+
+        private void CheckOldLintels(ICollection<string> links, ICollection<LintelInfoViewModel> oldLintels) {
             LintelChecker lc = new LintelChecker(_revitRepository, GroupedRules, links, ElementInfos);
+
             using(Transaction t = _revitRepository.StartTransaction("Проверка расставленных перемычек")) {
-                lc.Check(Lintels.LintelInfos);
+                lc.Check(oldLintels);
                 t.Commit();
-            }
-
-
-            var elevation = _revitRepository.GetElevation();
-            if(elevation == null) {
-                ElementInfos.ElementInfos.Add(new ElementInfoViewModel(ElementId.InvalidElementId, InfoElement.LackOfView.FormatMessage("Фасад")));
-                ShowReport();
-                return;
-            }
-            var plan = _revitRepository.GetPlan();
-            if(plan == null) {
-                ElementInfos.ElementInfos.Add(new ElementInfoViewModel(ElementId.InvalidElementId, InfoElement.LackOfView.FormatMessage("План")));
-                ShowReport();
-                return;
-            }
-
-            var lintels = GetPlacedLintels(elementInWalls, view3D, links);
-
-            using(Transaction t = _revitRepository.StartTransaction("Закрепление перемычек")) {
-                foreach(var lintel in lintels) {
-                    _revitRepository.LockLintel(view3D, elevation, plan, lintel.Lintel, lintel.ElementInWall);
-                }
-                t.Commit();
-            }
-
-            if(GroupedRules.SelectedRule.RuleConfigManager.CanSave) {
-                GroupedRules.SelectedRule.SaveCommand.Execute(null);
-            }
-
-            if(ElementInfos.ElementInfos != null && ElementInfos.ElementInfos.Count > 0) {
-                ShowReport();
-            }
-            if(p is MainWindow window) {
-                window.Close();
             }
         }
 
@@ -249,17 +316,32 @@ namespace RevitLintelPlacement.ViewModels {
             }
         }
 
+        private bool CheckView(View elevation, string viewName) {
+            if(elevation == null) {
+                ElementInfos.ElementInfos.Add(new ElementInfoViewModel(ElementId.InvalidElementId, InfoElement.LackOfView.FormatMessage(viewName)));
+                ShowReport();
+                return false;
+            }
+            return true;
+        }
+
+        private void LockPlacedLintels(View3D view3D, View elevation, View plan, IEnumerable<LintelInfoViewModel> lintels) {
+            using(Transaction t = _revitRepository.StartTransaction("Закрепление перемычек")) {
+                foreach(var lintel in lintels) {
+                    _revitRepository.LockLintel(view3D, elevation, plan, lintel.Lintel, lintel.ElementInWall);
+                }
+                t.Commit();
+            }
+        }
+
+        private void SaveRules() {
+            if(GroupedRules.SelectedRule.RuleConfigManager.CanSave) {
+                GroupedRules.SelectedRule.SaveCommand.Execute(null);
+            }
+        }
 
         private void ShowReport(object p) {
             ShowReport();
-        }
-
-        private void ShowReport() {
-            ElementInfos.UpdateCollection();
-            ElementInfos.UpdateGroupedMessage();
-            ElementInfos.ElementInfosViewSource?.View?.Refresh();
-            var view = new ReportView() { DataContext = ElementInfos };
-            view.Show();
         }
 
         private void Close(object p) {
@@ -268,7 +350,7 @@ namespace RevitLintelPlacement.ViewModels {
                 settings = _revitRepository.LintelsConfig.AddSettings(_revitRepository.GetDocumentName());
             }
             settings.SelectedPath = GroupedRules?.SelectedRule?.Name;
-            settings.SelectedModeRules = SelectedSampleMode;
+            settings.SelectedModeNameRules = SelectedSampleMode.Name;
             if(SelectedLinks != null) {
                 settings.SelectedLinks = SelectedLinks.Select(l => l.Name).ToList();
             } else {
@@ -276,23 +358,6 @@ namespace RevitLintelPlacement.ViewModels {
             }
 
             _revitRepository.LintelsConfig.SaveProjectConfig();
-        }
-
-        private bool CanPlace(object p) {
-            var result = true;
-            if(GroupedRules.SelectedRule == null) {
-                return false;
-            }
-            foreach(var groupedRule in GroupedRules.SelectedRule.Rules) {
-                if(!groupedRule.UpdateErrorText()) {
-                    result = false;
-                }
-            }
-            ErrorText = GroupedRules.SelectedRule.GetErrorText();
-            if(!string.IsNullOrEmpty(ErrorText)) {
-                result = false;
-            }
-            return result;
         }
     }
 }

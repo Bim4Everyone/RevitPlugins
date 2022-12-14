@@ -12,19 +12,22 @@ using RevitLintelPlacement.ViewModels;
 namespace RevitLintelPlacement.Models {
     internal class LintelElementCorrelator {
         public List<ICorrelator> Correlators { get; set; }
-        
-        public LintelElementCorrelator(RevitRepository revitRepository, ElementInfosViewModel elementInfos) {
 
+        public LintelElementCorrelator(RevitRepository revitRepository, IElementsInWallProvider elementsInWallProvider) {
             Correlators = new List<ICorrelator> {
-                new SuperComponentCorrelator(revitRepository),
                 new DimensionCorrelator(revitRepository),
-                new GeometricalCorrelator(revitRepository, elementInfos)
+                new SuperComponentCorrelator(revitRepository),
+                new GeometricalCorrelator(revitRepository, elementsInWallProvider)
             };
         }
 
         public FamilyInstance Correlate(FamilyInstance lintel) {
-            return Correlators.Select(correlator => correlator.Correlate(lintel))
-                .FirstOrDefault(element => element != null);
+            foreach(var correlator in Correlators) {
+                var element = correlator.Correlate(lintel);
+                if(element != null)
+                    return element;
+            }
+            return null;
         }
     }
 
@@ -67,9 +70,8 @@ namespace RevitLintelPlacement.Models {
     internal class GeometricalCorrelator : ICorrelator {
         private readonly Dictionary<XYZ, FamilyInstance> _elementLocationDict;
 
-        public GeometricalCorrelator(RevitRepository revitRepository, ElementInfosViewModel elementInfos) {
-            _elementLocationDict = revitRepository
-                  .GetAllElementsInWall(SampleMode.AllElements, elementInfos)
+        public GeometricalCorrelator(RevitRepository revitRepository, IElementsInWallProvider elementsInWallProvider) {
+            _elementLocationDict = elementsInWallProvider.GetElementsInWall()
                   .Where(e => e.Location != null)
                   .ToDictionary(revitRepository.GetLocationPoint);
         }

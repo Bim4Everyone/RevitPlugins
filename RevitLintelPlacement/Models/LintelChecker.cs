@@ -25,7 +25,7 @@ namespace RevitLintelPlacement.Models {
             };
         }
 
-        public void Check(IEnumerable<LintelInfoViewModel> lintels) {
+        public void Check(ICollection<LintelInfoViewModel> lintels) {
             foreach(var lintel in lintels) {
                 foreach(var checker in _checkers) {
                     var resultHandler = checker.Check(lintel.Lintel, lintel.ElementInWall);
