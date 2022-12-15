@@ -40,10 +40,11 @@
                 HorizontalAlignment="Stretch"
                 Background="Transparent"
                 IsTextEditable="False"
+                ItemsSource="{Binding SampleModes}"
+                DisplayMember="Name"
                 EditValue="{Binding SelectedSampleMode, UpdateSourceTrigger=PropertyChanged}" >
             <dxmvvm:Interaction.Behaviors>
                 <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding SampleModeChangedCommand}"/>
-                <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type vm:SampleMode}"/>
             </dxmvvm:Interaction.Behaviors>
         </dxe:ComboBoxEdit>
 

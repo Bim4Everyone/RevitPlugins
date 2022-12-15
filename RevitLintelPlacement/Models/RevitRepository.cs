@@ -199,32 +199,6 @@ namespace RevitLintelPlacement.Models {
                 yield return _document.GetElement(id);
         }
 
-        public IEnumerable<FamilyInstance> GetLintels(SampleMode sampleMode) {
-            FilteredElementCollector collector;
-            switch(sampleMode) {
-                case SampleMode.AllElements: {
-                    collector = new FilteredElementCollector(_document);
-                    break;
-                }
-                case SampleMode.CurrentView: {
-                    collector = new FilteredElementCollector(_document, _document.ActiveView.Id);
-                    break;
-                }
-                case SampleMode.SelectedElements: {
-                    var ids = _uiDocument.Selection.GetElementIds();
-                    if(ids.Count == 0) {
-                        return new List<FamilyInstance>();
-                    }
-                    collector = new FilteredElementCollector(_document, ids);
-                    break;
-                }
-                default:
-                throw new ArgumentException(nameof(sampleMode), $"Способ выборки \"{nameof(sampleMode)}\" не найден.");
-            }
-
-            return GetLintels(collector);
-        }
-
         public List<FamilyInstance> GetLintels(FilteredElementCollector collector) {
             return collector
                 .OfCategory(BuiltInCategory.OST_GenericModel)
@@ -252,59 +226,6 @@ namespace RevitLintelPlacement.Models {
                 throw new ArgumentException("Нет выбранных элементов");
             }
             return new FilteredElementCollector(_document, ids);
-        }
-
-        public IEnumerable<FamilyInstance> GetAllElementsInWall(SampleMode sampleMode, ElementInfosViewModel elementInfos, IEnumerable<string> wallTypes = null) {
-            var categoryFilter = new ElementMulticategoryFilter(
-                new List<BuiltInCategory> { BuiltInCategory.OST_Doors, BuiltInCategory.OST_Windows });
-
-            FilteredElementCollector collector;
-            switch(sampleMode) {
-                case SampleMode.AllElements: {
-                    collector = new FilteredElementCollector(_document);
-                    break;
-                }
-                case SampleMode.CurrentView: {
-                    collector = new FilteredElementCollector(_document, _document.ActiveView.Id);
-                    break;
-                }
-                case SampleMode.SelectedElements: {
-                    var ids = _uiDocument.Selection.GetElementIds();
-                    if(ids.Count == 0) {
-                        return new List<FamilyInstance>();
-                    }
-                    collector = new FilteredElementCollector(_document, ids);
-                    break;
-                }
-                default:
-                throw new ArgumentException(nameof(sampleMode), $"Способ выборки \"{nameof(sampleMode)}\" не найден.");
-            }
-
-            var smth = collector.OfClass(typeof(FamilyInstance))
-                .Cast<FamilyInstance>()
-                .Where(f => f?.Symbol != null && f.Symbol?.Family != null && f.Symbol.Family.Name != null &&
-                f.Symbol.Family.Name.ToLower().Contains(LintelsCommonConfig.HolesFilter.ToLower())).ToList();
-
-            var smth2 = collector
-                .WherePasses(categoryFilter)
-                .OfClass(typeof(FamilyInstance))
-                .Cast<FamilyInstance>()
-                .Where(e => e.Host is Wall && e.Location != null).ToList();
-
-            return smth2.Union(smth, new FamilyInstanceComparer()).Where(e => CheckElementInWallParameter(e, elementInfos)).ToList();
-
-            //return collector
-            //    .WherePasses(categoryFilter)
-            //    .OfClass(typeof(FamilyInstance))
-            //    .Cast<FamilyInstance>()
-            //    .Where(e => e.Host is Wall && e.Location != null)
-            //    .ToList()
-            //    .Union(
-            //     collector.OfClass(typeof(FamilyInstance))
-            //    .Cast<FamilyInstance>()
-            //    .Where(f => f?.Symbol != null && f.Symbol?.Family != null && f.Symbol.Family.Name != null &&
-            //    f.Symbol.Family.Name.ToLower().Contains(LintelsCommonConfig.HolesFilter.ToLower())).ToList(), new FamilyInstanceComparer())
-            //    .Where(e => CheckElementInWallParameter(e, elementInfos));
         }
 
         public List<FamilyInstance> GetElementsInWall(FilteredElementCollector collector1, FilteredElementCollector collector2, ElementInfosViewModel elementInfos) {

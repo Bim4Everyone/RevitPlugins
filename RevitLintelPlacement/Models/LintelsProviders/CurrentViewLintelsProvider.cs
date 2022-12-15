@@ -1,23 +1,19 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 using Autodesk.Revit.DB;
 
 using RevitLintelPlacement.Models.Interfaces;
-using RevitLintelPlacement.ViewModels;
 
 namespace RevitLintelPlacement.Models.LintelsProviders {
     internal class CurrentViewLintelsProvider : ILintelsProvider {
         private readonly RevitRepository _revitRepository;
-        private readonly View _currentView;
 
-        public CurrentViewLintelsProvider(RevitRepository revitRepository, View currentView) {
+        public CurrentViewLintelsProvider(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
-            _currentView = currentView;
         }
 
         public ICollection<FamilyInstance> GetLintels() {
-            return _revitRepository.GetLintels(_revitRepository.GetViewElementCollector(_currentView));
+            return _revitRepository.GetLintels(_revitRepository.GetViewElementCollector(_revitRepository.GetCurrentView()));
         }
     }
 }

@@ -106,10 +106,10 @@ namespace RevitLintelPlacement.ViewModels {
                     new AllLintelsProvider(_revitRepository),
                     new AllElementsInWallProvider(_revitRepository, ElementInfos)),
                 new SampleModeViewModel("Выборка по выделенным элементам",
-                    new SelectedLintelsProvider(_revitRepository, new SelectedElementsInWallProvider(_revitRepository, ElementInfos)),
+                    new SelectedElementsInWallWithLintelsProvider(_revitRepository, new SelectedElementsInWallProvider(_revitRepository, ElementInfos)),
                     new SelectedElementsInWallProvider(_revitRepository, ElementInfos)),
                 new SampleModeViewModel("Выборка по текущему виду",
-                    new CurrentViewLintelsProvider(_revitRepository, view),
+                    new ViewLintelsProvider(_revitRepository, view),
                     new CurrentViewElementsInWallProvider(_revitRepository, ElementInfos, view)),
             };
         }
