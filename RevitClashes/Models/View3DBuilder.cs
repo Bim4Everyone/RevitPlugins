@@ -8,9 +8,9 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-using RevitOpeningPlacement.Models.Interfaces;
+using RevitClashDetective.Models.Interfaces;
 
-namespace RevitOpeningPlacement.Models.RevitViews {
+namespace RevitClashDetective.Models.RevitViews {
     internal class View3DBuilder : IView3DBuilder {
         private string _name;
         private View3D _template;

@@ -9,6 +9,8 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
 
+using RevitClashDetective.Models.Interfaces;
+using RevitClashDetective.Models.RevitViewSettings;
 using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Interfaces;

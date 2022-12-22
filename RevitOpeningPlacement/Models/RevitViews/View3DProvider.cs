@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
-using RevitOpeningPlacement.Models.Interfaces;
+using RevitClashDetective.Models.Interfaces;
+using RevitClashDetective.Models.RevitViews;
 
 namespace RevitOpeningPlacement.Models.RevitViews {
     internal class View3DProvider : IView3DProvider {

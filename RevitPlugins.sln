@@ -45,6 +45,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Models", "Models", "{968DE2
 		RevitClashes\Models\NameResolver.cs = RevitClashes\Models\NameResolver.cs
 		RevitClashes\Models\ProjectConfigBuilder.cs = RevitClashes\Models\ProjectConfigBuilder.cs
 		RevitClashes\Models\RevitRepository.cs = RevitClashes\Models\RevitRepository.cs
+		RevitClashes\Models\View3DBuilder.cs = RevitClashes\Models\View3DBuilder.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ClashDetection", "ClashDetection", "{435BD787-178B-4358-82CA-FC242DDD4371}"
@@ -121,6 +122,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interfaces", "Interfaces", 
 		RevitClashes\Models\Interfaces\IRevitRuleCreator.cs = RevitClashes\Models\Interfaces\IRevitRuleCreator.cs
 		RevitClashes\Models\Interfaces\IRule.cs = RevitClashes\Models\Interfaces\IRule.cs
 		RevitClashes\Models\Interfaces\IVisiter.cs = RevitClashes\Models\Interfaces\IVisiter.cs
+		RevitClashes\Models\Interfaces\IView3DBuilder.cs = RevitClashes\Models\Interfaces\IView3DBuilder.cs
+		RevitClashes\Models\Interfaces\IView3DProvider.cs = RevitClashes\Models\Interfaces\IView3DProvider.cs
+		RevitClashes\Models\Interfaces\IView3DSetting.cs = RevitClashes\Models\Interfaces\IView3DSetting.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RevitClashReport", "RevitClashReport", "{C9F52F92-6BD2-4A45-8297-8775E5FE371A}"
@@ -161,6 +165,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Visiter", "Visiter", "{D966
 		RevitClashes\Models\Visiter\NotContainsVisister.cs = RevitClashes\Models\Visiter\NotContainsVisister.cs
 		RevitClashes\Models\Visiter\NotEndsWithVisister.cs = RevitClashes\Models\Visiter\NotEndsWithVisister.cs
 		RevitClashes\Models\Visiter\NotEqualsVisister.cs = RevitClashes\Models\Visiter\NotEqualsVisister.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RevitViewSettings", "RevitViewSettings", "{74DD9D4A-AEAD-4C5E-ACBD-B5447AA791DA}"
+	ProjectSection(SolutionItems) = preProject
+		RevitClashes\Models\RevitViewSettings\DetailLevelSetting.cs = RevitClashes\Models\RevitViewSettings\DetailLevelSetting.cs
+		RevitClashes\Models\RevitViewSettings\DisplayStyleSetting.cs = RevitClashes\Models\RevitViewSettings\DisplayStyleSetting.cs
+		RevitClashes\Models\RevitViewSettings\FilterSetting.cs = RevitClashes\Models\RevitViewSettings\FilterSetting.cs
+		RevitClashes\Models\RevitViewSettings\HiddenCategoriesSetting.cs = RevitClashes\Models\RevitViewSettings\HiddenCategoriesSetting.cs
+		RevitClashes\Models\RevitViewSettings\ParamSetting.cs = RevitClashes\Models\RevitViewSettings\ParamSetting.cs
+		RevitClashes\Models\RevitViewSettings\TransparencySetting.cs = RevitClashes\Models\RevitViewSettings\TransparencySetting.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Handlers", "Handlers", "{7D8627B7-D98F-4D86-A10F-7C9DA00EEA7B}"
@@ -519,6 +533,7 @@ Global
 		{D9661EB6-ECF7-4E7F-B055-65A6313EDF8B} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
 		{7D8627B7-D98F-4D86-A10F-7C9DA00EEA7B} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
 		{C9F52F92-6BD2-4A45-8297-8775E5FE371A} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
+		{74DD9D4A-AEAD-4C5E-ACBD-B5447AA791DA} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2332A0ED-46BB-427C-AAD9-EFA10FA76316}

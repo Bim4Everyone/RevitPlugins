@@ -1,9 +1,9 @@
 ﻿
 using Autodesk.Revit.DB;
 
-using RevitOpeningPlacement.Models.Interfaces;
+using RevitClashDetective.Models.Interfaces;
 
-namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
+namespace RevitClashDetective.Models.RevitViewSettings {
     internal class DetailLevelSetting : IView3DSetting {
         private readonly ViewDetailLevel _detailLevel;
 
