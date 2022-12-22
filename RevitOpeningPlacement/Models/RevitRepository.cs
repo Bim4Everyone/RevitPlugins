@@ -13,6 +13,7 @@ using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitClashDetective.Models.Handlers;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using System.Threading.Tasks;
+using RevitOpeningPlacement.Models.RevitViews;
 
 namespace RevitOpeningPlacement.Models {
     internal class RevitRepository {
@@ -25,6 +26,9 @@ namespace RevitOpeningPlacement.Models {
         private readonly RevitClashDetective.Models.RevitRepository _clashRevitRepository;
         private readonly RevitEventHandler _revitEventHandler;
 
+        private View3DProvider _view3DProvider;
+        private View3D _view;
+
         public RevitRepository(Application application, Document document) {
 
             _application = application;
@@ -35,6 +39,9 @@ namespace RevitOpeningPlacement.Models {
 
             _clashRevitRepository = new RevitClashDetective.Models.RevitRepository(_application, _document);
             _revitEventHandler = new RevitEventHandler();
+
+            _view3DProvider = new View3DProvider();
+            _view = _view3DProvider.GetView(_document, $"BIM_Задания на отверстия_{_application.Username}");
 
             UIApplication = _uiApplication;
             DocInfos = GetDocInfos();
@@ -171,7 +178,7 @@ namespace RevitOpeningPlacement.Models {
         }
 
         public void SelectAndShowElement(ICollection<Element> elements) {
-            _clashRevitRepository.SelectAndShowElement(elements);
+            _clashRevitRepository.SelectAndShowElement(elements, _view);
         }
 
         public string GetDocumentName(Document doc) {

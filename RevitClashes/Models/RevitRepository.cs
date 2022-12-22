@@ -292,14 +292,16 @@ namespace RevitClashDetective.Models {
                 .WherePasses(filter);
         }
 
-        public void SelectAndShowElement(IEnumerable<Element> elements) {
-            if(_document.ActiveView != _view) {
-                _uiDocument.ActiveView = _view;
+        public void SelectAndShowElement(IEnumerable<Element> elements, View3D view = null) {
+            if(view == null) {
+                view = _view;
             }
+            _uiDocument.ActiveView = view;
+
             _revitEventHandler.TransactAction = () => {
                 var bb = GetCommonBoundingBox(elements);
                 if(bb != null) {
-                    SetSectionBox(bb);
+                    SetSectionBox(bb, view);
                 }
 
                 if(elements.Where(item => item.IsFromDocument(_document)).Any()) {
@@ -345,7 +347,7 @@ namespace RevitClashDetective.Models {
         public Level GetLevel(Element element) {
             ElementId levelId;
             foreach(var paramName in BaseLevelParameters) {
-                levelId =  element.GetParamValueOrDefault<ElementId>(paramName);
+                levelId = element.GetParamValueOrDefault<ElementId>(paramName);
                 if(levelId.IsNotNull()) {
                     return element.Document.GetElement(levelId) as Level;
                 }
@@ -375,14 +377,14 @@ namespace RevitClashDetective.Models {
             return new[] { providers.First() };
         }
 
-        private void SetSectionBox(BoundingBoxXYZ bb) {
+        private void SetSectionBox(BoundingBoxXYZ bb, View3D view) {
             if(bb == null)
                 return;
             using(Transaction t = _document.StartTransaction("Подрезка")) {
                 bb.Max += new XYZ(5, 5, 5);
                 bb.Min -= new XYZ(5, 5, 5);
-                _view.SetSectionBox(bb);
-                var uiView = _uiDocument.GetOpenUIViews().FirstOrDefault(item => item.ViewId == _view.Id);
+                view.SetSectionBox(bb);
+                var uiView = _uiDocument.GetOpenUIViews().FirstOrDefault(item => item.ViewId == view.Id);
                 if(uiView != null) {
                     uiView.ZoomAndCenterRectangle(bb.Min, bb.Max);
                 }
