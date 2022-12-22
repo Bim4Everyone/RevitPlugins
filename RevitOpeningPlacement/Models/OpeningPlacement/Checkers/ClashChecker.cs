@@ -41,25 +41,26 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
             var mepCurveChecker = new MainElementIsMepCurveChecker(revitRepository, null);
             var volumeChecker = new ClashVolumeChecker<MEPCurve, Wall>(revitRepository, mepCurveChecker, new MepCurveClashProvider<Wall>());
             var wallChecker = new OtherElementIsWallChecker(revitRepository, volumeChecker);
-            var verticalityChecker = new MepIsNotVerticalChecker(revitRepository, wallChecker);
+            var wallIsStraight = new WallIsStraight(revitRepository, wallChecker);
+            var verticalityChecker = new MepIsNotVerticalChecker(revitRepository, wallIsStraight);
             var parallelismChecker = new ElementsIsNotParallelChecker(revitRepository, verticalityChecker);
             return new WallIsNotCurtainChecker(revitRepository, parallelismChecker);
         }
 
         public static IClashChecker GetMepCurveFloorClashChecker(RevitRepository revitRepository) {
             var mepCurveChecker = new MainElementIsMepCurveChecker(revitRepository, null);
-            var intersectionChecker = new GettingIntersectionChecker<MEPCurve, CeilingAndFloor>(revitRepository, mepCurveChecker, new MepCurveClashProvider<CeilingAndFloor>());
+            var floorChecker = new OtherElementIsFloorChecker(revitRepository, mepCurveChecker);
+            var intersectionChecker = new GettingIntersectionChecker<MEPCurve, CeilingAndFloor>(revitRepository, floorChecker, new MepCurveClashProvider<CeilingAndFloor>());
             var volumeChecker = new ClashVolumeChecker<MEPCurve, CeilingAndFloor>(revitRepository, intersectionChecker, new MepCurveClashProvider<CeilingAndFloor>());
-            var floorChecker = new OtherElementIsFloorChecker(revitRepository, volumeChecker);
-            return new MepIsNotHorizontalChecker(revitRepository, floorChecker);
+            return new MepIsNotHorizontalChecker(revitRepository, volumeChecker);
         }
 
         public static IClashChecker GetFittingFloorClashChecker(RevitRepository revitRepository, params MepCategory[] mepCategories) {
             var fittingChecker = new FittingHasNotSupercomponentChecker(revitRepository, null);
-            var intersectionChecker = new GettingIntersectionChecker<FamilyInstance, CeilingAndFloor>(revitRepository, fittingChecker, new FittingClashProvider<CeilingAndFloor>());
+            var floorChecker = new OtherElementIsFloorChecker(revitRepository, fittingChecker);
+            var intersectionChecker = new GettingIntersectionChecker<FamilyInstance, CeilingAndFloor>(revitRepository, floorChecker, new FittingClashProvider<CeilingAndFloor>());
             var volumeChecker = new ClashVolumeChecker<FamilyInstance, CeilingAndFloor>(revitRepository, intersectionChecker, new FittingClashProvider<CeilingAndFloor>());
-            var floorChecker = new OtherElementIsFloorChecker(revitRepository, volumeChecker);
-            var minSizeChecker = new FittingMinSizeChecker(revitRepository, floorChecker, mepCategories);
+            var minSizeChecker = new FittingMinSizeChecker(revitRepository, volumeChecker, mepCategories);
             var horizontalityChecker = new FittingIsNotHorizontalChecker(revitRepository, minSizeChecker);
             return horizontalityChecker;
         }
@@ -69,7 +70,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
             var intersectionChecker = new GettingIntersectionChecker<FamilyInstance, Wall>(revitRepository, fittingChecker, new FittingClashProvider<Wall>());
             var volumeChecker = new ClashVolumeChecker<FamilyInstance, Wall>(revitRepository, intersectionChecker, new FittingClashProvider<Wall>());
             var wallChecker = new OtherElementIsWallChecker(revitRepository, volumeChecker);
-            var minSizeChecker = new FittingMinSizeChecker(revitRepository, wallChecker, mepCategories);
+            var wallIsStraight = new WallIsStraight(revitRepository, wallChecker);
+            var minSizeChecker = new FittingMinSizeChecker(revitRepository, wallIsStraight, mepCategories);
             var parallelismChecker = new FittingAndWallAreNotParallelChecker(revitRepository, minSizeChecker);
             return new WallIsNotCurtainChecker(revitRepository, parallelismChecker);
         }
@@ -102,6 +104,14 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         public override string GetMessage() => "Задание на отверстие в стене: Нет элемента стены.";
     }
 
+    internal class OtherElementIsFloorChecker : ClashChecker {
+        public OtherElementIsFloorChecker(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
+        public override bool CheckModel(ClashModel clashModel) {
+            return clashModel.OtherElement.GetElement(_revitRepository.DocInfos) is CeilingAndFloor;
+        }
+        public override string GetMessage() => "Задание на отверстие в перекрытии: Нет элемента перекрытия.";
+    }
+
     internal class MepIsNotVerticalChecker : ClashChecker {
         public MepIsNotVerticalChecker(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
         public override bool CheckModel(ClashModel clashModel) {
@@ -127,14 +137,6 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
             return ((Wall) clashModel.OtherElement.GetElement(_revitRepository.DocInfos)).WallType.Kind != WallKind.Curtain;
         }
         public override string GetMessage() => "Задание на отверстие в стене: Стена относится к витражной системе.";
-    }
-
-    internal class OtherElementIsFloorChecker : ClashChecker {
-        public OtherElementIsFloorChecker(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
-        public override bool CheckModel(ClashModel clashModel) {
-            return clashModel.OtherElement.GetElement(_revitRepository.DocInfos) is CeilingAndFloor;
-        }
-        public override string GetMessage() => "Задание на отверстие в перекрытии: Нет элемента перекрытия.";
     }
 
     internal class MepIsNotHorizontalChecker : ClashChecker {
@@ -204,6 +206,19 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         }
         public override string GetMessage() => RevitRepository.SystemCheck;
         //public override string GetMessage() => nameof(FittingHasNotSupercomponentChecker);
+    }
+
+    internal class WallIsStraight : ClashChecker {
+        public WallIsStraight(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
+        public override bool CheckModel(ClashModel clashModel) {
+            var wall = (Wall) clashModel.OtherElement.GetElement(_revitRepository.DocInfos);
+            try {
+                return wall.GetLine() is Line;
+            } catch {
+                return false;
+            }
+        }
+        public override string GetMessage() => "Стена не является прямой";
     }
 
     internal class FittingMinSizeChecker : ClashChecker {
