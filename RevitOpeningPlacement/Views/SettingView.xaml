@@ -80,6 +80,12 @@
                     </lc:GroupBox>
                 </dxdo:LayoutControlItem>
 
+                <dxdo:LayoutControlItem>
+                    <lc:GroupBox Header="Округление размеров отверстия">
+                        <dxe:ComboBoxEdit ItemsSource="{Binding Roundings}" SelectedItem="{Binding SelectedRounding}" IsTextEditable="False"/>
+                    </lc:GroupBox>
+                </dxdo:LayoutControlItem>
+                
                 <dxdo:LayoutControlItem ItemHeight="*">
                     <lc:GroupBox Header="Пересечение">
                         <dxe:ListBoxEdit ItemsSource="{Binding StructureCategories}">
@@ -91,6 +97,8 @@
                         </dxe:ListBoxEdit>
                     </lc:GroupBox>
                 </dxdo:LayoutControlItem>
+
+                
 
             </dxdo:LayoutGroup>
         </dxdo:DockLayoutManager>

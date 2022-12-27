@@ -32,6 +32,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 IsSelected = mepCategory.IsSelected;
                 Offsets = new ObservableCollection<OffsetViewModel>(mepCategory.Offsets.Select(item => new OffsetViewModel(item, new TypeNamesProvider(mepCategory.IsRound))));
                 SetSelectedCategories(mepCategory);
+                SelectedRounding = mepCategory.Rounding;
             }
 
             AddOffsetCommand = new RelayCommand(AddOffset);
@@ -44,6 +45,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             get => _isSelected;
             set => this.RaiseAndSetIfChanged(ref _isSelected, value);
         }
+
+        public int SelectedRounding { get; set; }
 
         public string Name {
             get => _name;
@@ -66,6 +69,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             get => _structureCategories;
             set => this.RaiseAndSetIfChanged(ref _structureCategories, value);
         }
+
+        public List<int> Roundings { get; set; } = new List<int> { 0, 10, 50 };
 
         public ICommand AddOffsetCommand { get; }
         public ICommand RemoveOffsetCommand { get; }
@@ -97,7 +102,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 MinSizes = new SizeCollection(MinSizes.Select(item => item.GetSize())),
                 IsRound = IsRound,
                 IsSelected = IsSelected,
-                Intersections = StructureCategories.Select(item => new StructureCategory() { Name = item.Name, IsSelected = item.IsSelected }).ToList()
+                Intersections = StructureCategories.Select(item => new StructureCategory() { Name = item.Name, IsSelected = item.IsSelected }).ToList(),
+                Rounding = SelectedRounding
             };
         }
 
