@@ -52,7 +52,7 @@
         </StackPanel>
 
         <dxdo:DockLayoutManager Grid.Row="1">
-            <dxdo:LayoutGroup AllowSplitters="True">
+            <dxdo:LayoutGroup AllowSplitters="True" LastChildFill="True">
                 <dxdo:LayoutControlItem ItemWidth="0.27*" Margin="-11 0">
                     <local:CategoryView x:Name="_categoryView" DataContext="{Binding ElementName=_this, Path=DataContext}"/>
                 </dxdo:LayoutControlItem>

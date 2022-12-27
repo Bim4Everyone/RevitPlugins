@@ -14,22 +14,18 @@ using dosymep.WPF.ViewModels;
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.TypeNamesProviders;
-using RevitOpeningPlacement.ViewModels.Interfaces;
-using RevitOpeningPlacement.ViewModels.OpeningConfig.MepCategories;
-using RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels;
-using RevitOpeningPlacement.ViewModels.OpeningConfig.SizeViewModels;
 using RevitOpeningPlacement.ViewModels.Services;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
     internal class MainViewModel : BaseViewModel {
         private string _errorText;
         private string _messageText;
-        private ObservableCollection<IMepCategoryViewModel> _mepCategories;
+        private ObservableCollection<MepCategoryViewModel> _mepCategories;
         private DispatcherTimer _timer;
 
         public MainViewModel(UIApplication uiApplication, Models.Configs.OpeningConfig openingConfig) {
             if(openingConfig.Categories.Any()) {
-                MepCategories = new ObservableCollection<IMepCategoryViewModel>(openingConfig.Categories.Select(item => new MepCategoryViewModel(item)));
+                MepCategories = new ObservableCollection<MepCategoryViewModel>(openingConfig.Categories.Select(item => new MepCategoryViewModel(item)));
                 if(MepCategories.All(item => !item.IsRound)) {
                     SetShape();
                 }
@@ -45,7 +41,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             LoadConfigCommand = new RelayCommand(LoadConfig);
         }
 
-        public ObservableCollection<IMepCategoryViewModel> MepCategories {
+        public ObservableCollection<MepCategoryViewModel> MepCategories {
             get => _mepCategories;
             set => this.RaiseAndSetIfChanged(ref _mepCategories, value);
         }
@@ -66,7 +62,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
 
         private void InitializeCategories() {
-            MepCategories = new ObservableCollection<IMepCategoryViewModel>() {
+            MepCategories = new ObservableCollection<MepCategoryViewModel>() {
                 GetPipe(),
                 GetRectangleDuct(),
                 GetRoundDuct(),
@@ -77,10 +73,10 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
         private MepCategoryViewModel GetPipe() => new MepCategoryViewModel {
             Name = RevitRepository.MepCategoryNames[MepCategoryEnum.Pipe],
-            MinSizes = new ObservableCollection<ISizeViewModel>() {
+            MinSizes = new ObservableCollection<SizeViewModel>() {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
             },
-            Offsets = new ObservableCollection<IOffsetViewModel>() {
+            Offsets = new ObservableCollection<OffsetViewModel>() {
                 new OffsetViewModel(new TypeNamesProvider(true))
             },
             ImageSource = "../Resources/pipe.png"
@@ -88,11 +84,11 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
         private MepCategoryViewModel GetRectangleDuct() => new MepCategoryViewModel {
             Name = RevitRepository.MepCategoryNames[MepCategoryEnum.RectangleDuct],
-            MinSizes = new ObservableCollection<ISizeViewModel>() {
+            MinSizes = new ObservableCollection<SizeViewModel>() {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Width]},
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Height]}
             },
-            Offsets = new ObservableCollection<IOffsetViewModel>() {
+            Offsets = new ObservableCollection<OffsetViewModel>() {
                 new OffsetViewModel(new TypeNamesProvider(false))
             },
             ImageSource = "../Resources/rectangleDuct.png"
@@ -100,10 +96,10 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
         private MepCategoryViewModel GetRoundDuct() => new MepCategoryViewModel {
             Name = RevitRepository.MepCategoryNames[MepCategoryEnum.RoundDuct],
-            MinSizes = new ObservableCollection<ISizeViewModel>() {
+            MinSizes = new ObservableCollection<SizeViewModel>() {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
             },
-            Offsets = new ObservableCollection<IOffsetViewModel>() {
+            Offsets = new ObservableCollection<OffsetViewModel>() {
                 new OffsetViewModel(new TypeNamesProvider(true))
             },
             ImageSource = "../Resources/roundDuct.png"
@@ -111,11 +107,11 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
         private MepCategoryViewModel GetCableTray() => new MepCategoryViewModel {
             Name = RevitRepository.MepCategoryNames[MepCategoryEnum.CableTray],
-            MinSizes = new ObservableCollection<ISizeViewModel>() {
+            MinSizes = new ObservableCollection<SizeViewModel>() {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Width]},
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Height]}
             },
-            Offsets = new ObservableCollection<IOffsetViewModel>() {
+            Offsets = new ObservableCollection<OffsetViewModel>() {
                 new OffsetViewModel(new TypeNamesProvider(false))
             },
             ImageSource = "../Resources/tray.png"
@@ -123,10 +119,10 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
         private MepCategoryViewModel GetConduit() => new MepCategoryViewModel {
             Name = RevitRepository.MepCategoryNames[MepCategoryEnum.Conduit],
-            MinSizes = new ObservableCollection<ISizeViewModel>() {
+            MinSizes = new ObservableCollection<SizeViewModel>() {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
             },
-            Offsets = new ObservableCollection<IOffsetViewModel>() {
+            Offsets = new ObservableCollection<OffsetViewModel>() {
                 new OffsetViewModel(new TypeNamesProvider(false))
             },
             ImageSource = "../Resources/conduit.png"
@@ -159,7 +155,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             }
         }
 
-        private IMepCategoryViewModel GetMissingCategory(MepCategoryEnum missingCategory) {
+        private MepCategoryViewModel GetMissingCategory(MepCategoryEnum missingCategory) {
             switch(missingCategory) {
                 case MepCategoryEnum.Pipe:
                 return GetPipe();
@@ -207,7 +203,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             var cls = new ConfigLoaderService();
             var config = cls.Load<Models.Configs.OpeningConfig>();
             if(config != null) {
-                MepCategories = new ObservableCollection<IMepCategoryViewModel>(config.Categories.Select(item => new MepCategoryViewModel(item)));
+                MepCategories = new ObservableCollection<MepCategoryViewModel>(config.Categories.Select(item => new MepCategoryViewModel(item)));
             }
             MessageText = "Файл настроек успешно загружен.";
             _timer.Start();

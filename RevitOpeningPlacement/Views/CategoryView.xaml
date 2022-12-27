@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:RevitOpeningPlacement.Views" 
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:vm="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig"
-             xmlns:category="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig.MepCategories"
              
              mc:Ignorable="d" 
              Name="_this"
@@ -15,7 +14,7 @@
     <Grid>
         <dxe:ListBoxEdit ItemsSource="{Binding MepCategories}" SelectedItem="{Binding ElementName=_this, Path=SelectedItem}">
             <dxe:ListBoxEdit.ItemTemplate>
-                <DataTemplate DataType="{x:Type category:MepCategoryViewModel}">
+                <DataTemplate DataType="{x:Type vm:MepCategoryViewModel}">
                     <DockPanel Margin="0 3 0 0" LastChildFill="True">
                         <CheckBox Margin="5 0 10 0" VerticalAlignment="Center" IsChecked="{Binding IsSelected}"/>
                         <Image DockPanel.Dock="Left" Width="38" Height="38" VerticalAlignment="Center" Source="{Binding ImageSource}"/>

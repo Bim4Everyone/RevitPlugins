@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-using RevitOpeningPlacement.ViewModels.OpeningConfig.MepCategories;
+using RevitOpeningPlacement.ViewModels.OpeningConfig;
 
 namespace RevitOpeningPlacement.Views {
     /// <summary>

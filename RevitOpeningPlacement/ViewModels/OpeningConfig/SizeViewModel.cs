@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models.Configs;
-using RevitOpeningPlacement.ViewModels.Interfaces;
 
-namespace RevitOpeningPlacement.ViewModels.OpeningConfig.SizeViewModels {
-    internal class SizeViewModel : BaseViewModel, ISizeViewModel {
+namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
+    internal class SizeViewModel : BaseViewModel {
         private double _value;
         private string _name;
 

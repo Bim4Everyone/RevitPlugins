@@ -10,10 +10,9 @@ using dosymep.WPF.ViewModels;
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
-using RevitOpeningPlacement.ViewModels.Interfaces;
 
-namespace RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels {
-    internal class OffsetViewModel : BaseViewModel, IOffsetViewModel {
+namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
+    internal class OffsetViewModel : BaseViewModel {
         private double _from;
         private double _to;
         private double _offset;
@@ -82,7 +81,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels {
             return new Offset() { From = From, To = To, OffsetValue = Offset, OpeningTypeName = SelectedOpeningType };
         }
 
-        public string GetIntersectText(IOffsetViewModel offset) {
+        public string GetIntersectText(OffsetViewModel offset) {
             if((offset.From >= From || offset.To >= From) && (offset.To <= To || offset.From <= To)) {
                 return $"пересекаются диапазоны значений параметров \"{From}\" - \"{To}\" с \"{offset.From}\" - \"{offset.To}\".";
             }

@@ -362,7 +362,7 @@ namespace RevitLintelPlacement.Models {
             var view3D = new FilteredElementCollector(_document)
                 .OfClass(typeof(View3D))
                 .Cast<View3D>()
-                .First(v => !v.IsTemplate && v.Name == View3DName);
+                .First(v => !v.IsTemplate && v.Name.Equals(View3DName, StringComparison.CurrentCultureIgnoreCase));
             return view3D.GetOrientation();
         }
 
