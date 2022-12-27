@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 using dosymep.WPF.ViewModels;
 
+using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.ViewModels.Interfaces;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels {
@@ -14,15 +17,26 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels {
         private double _from;
         private double _to;
         private double _offset;
+        private ObservableCollection<string> _typeNames;
+        private string _selectedOpeningType;
+        private ITypeNamesProvider _typeNamesProvider;
 
-        public OffsetViewModel(Offset offset) {
+        public OffsetViewModel(Offset offset, ITypeNamesProvider typeNamesProvider) {
             To = offset.To;
             From = offset.From;
             Offset = offset.OffsetValue;
+            _typeNamesProvider = typeNamesProvider;
+
+            InitializeOpeningTypeNames();
+            SelectedOpeningType = OpeningTypeNames.FirstOrDefault(item => item.Equals(offset.OpeningTypeName, StringComparison.CurrentCulture))
+                ?? OpeningTypeNames.FirstOrDefault();
         }
 
-        public OffsetViewModel() {
+        public OffsetViewModel(ITypeNamesProvider typeNamesProvider) {
+            _typeNamesProvider = typeNamesProvider;
 
+            InitializeOpeningTypeNames();
+            SelectedOpeningType = OpeningTypeNames.FirstOrDefault();
         }
 
         public double From {
@@ -36,6 +50,16 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels {
         public double Offset {
             get => _offset;
             set => this.RaiseAndSetIfChanged(ref _offset, value);
+        }
+
+        public ObservableCollection<string> OpeningTypeNames {
+            get => _typeNames;
+            set => this.RaiseAndSetIfChanged(ref _typeNames, value);
+        }
+
+        public string SelectedOpeningType {
+            get => _selectedOpeningType;
+            set => this.RaiseAndSetIfChanged(ref _selectedOpeningType, value);
         }
 
         public string GetErrorText() {
@@ -55,7 +79,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels {
         }
 
         public Offset GetOffset() {
-            return new Offset() { From = From, To = To, OffsetValue = Offset };
+            return new Offset() { From = From, To = To, OffsetValue = Offset, OpeningTypeName = SelectedOpeningType };
         }
 
         public string GetIntersectText(IOffsetViewModel offset) {
@@ -63,6 +87,15 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels {
                 return $"пересекаются диапазоны значений параметров \"{From}\" - \"{To}\" с \"{offset.From}\" - \"{offset.To}\".";
             }
             return null;
+        }
+
+        public void Update(ITypeNamesProvider typeNamesProvider) {
+            _typeNamesProvider = typeNamesProvider;
+            InitializeOpeningTypeNames();
+        }
+
+        private void InitializeOpeningTypeNames() {
+            OpeningTypeNames = new ObservableCollection<string>(_typeNamesProvider.GetTypeNames());
         }
     }
 }

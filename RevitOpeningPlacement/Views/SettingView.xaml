@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RevitOpeningPlacement.Views" 
              xmlns:vm="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig.MepCategories" 
+             xmlns:offset="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels" 
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
              xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol" 
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
@@ -34,10 +35,10 @@
                     </dxg:GridControl.Columns>
                 </dxg:GridControl>
             </lc:GroupBox>
-            
+
             <lc:GroupBox Margin="0 5 0 0" Grid.Row="2" Header="Зазоры">
                 <DockPanel LastChildFill="True">
-                    
+
                     <StackPanel Margin="0 0 0 5" DockPanel.Dock="Top" Orientation="Horizontal">
                         <dx:SimpleButton 
                         Height="32" 
@@ -52,7 +53,7 @@
                         Command="{Binding RemoveOffsetCommand}" CommandParameter="{Binding ElementName=_offsetgrid, Path=SelectedItem}"
                         Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}"/>
                     </StackPanel>
-                    
+
                     <dxg:GridControl SelectionMode="Row" DockPanel.Dock="Bottom" x:Name="_offsetgrid" MinHeight="110" MaxHeight="2000" ItemsSource="{Binding Offsets}">
                         <dxg:GridControl.View>
                             <dxg:TableView AutoWidth="True" AllowGrouping="False" ShowGroupPanel="False" ShowSearchPanelMode="Always" CellValueChanging="TableView_CellValueChanging"/>
@@ -61,12 +62,19 @@
                             <dxg:GridColumn Header="От" FieldName="From"/>
                             <dxg:GridColumn Header="До" FieldName="To"/>
                             <dxg:GridColumn Header="Зазор" FieldName="Offset"/>
+                            <dxg:GridColumn Header="Имя типа">
+                                <dxg:GridColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox
+                                            ItemsSource="{Binding RowData.Row.OpeningTypeNames}" 
+                                            SelectedItem="{Binding RowData.Row.SelectedOpeningType}"/>
+                                    </DataTemplate>
+                                </dxg:GridColumn.CellTemplate>
+                            </dxg:GridColumn>
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
-                    
                 </DockPanel>
             </lc:GroupBox>
-            
         </Grid>
     </Grid>
 </UserControl>

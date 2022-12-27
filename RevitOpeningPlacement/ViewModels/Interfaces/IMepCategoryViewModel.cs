@@ -9,6 +9,8 @@ using RevitOpeningPlacement.Models.Configs;
 
 namespace RevitOpeningPlacement.ViewModels.Interfaces {
     internal interface IMepCategoryViewModel {
+        bool IsRound { get; set; }
+        bool IsSelected { get; set; }
         string Name { get; set; }
         string ImageSource { get; }
         ObservableCollection<ISizeViewModel> MinSizes { get; set; }

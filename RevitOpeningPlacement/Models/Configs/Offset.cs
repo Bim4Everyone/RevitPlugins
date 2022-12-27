@@ -6,7 +6,7 @@ namespace RevitOpeningPlacement.Models.Configs {
         public double From { get; set; }
         public double To { get; set; }
         public double OffsetValue { get; set; }
-
+        public string OpeningTypeName { get; set; }
         public Offset GetTransformedToInternalUnit() {
             return new Offset() {
                 From = TransformToInternalUnits(From),

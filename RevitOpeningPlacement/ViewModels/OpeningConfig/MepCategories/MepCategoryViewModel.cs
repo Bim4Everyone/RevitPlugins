@@ -11,6 +11,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.TypeNamesProviders;
 using RevitOpeningPlacement.ViewModels.Interfaces;
 using RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels;
 using RevitOpeningPlacement.ViewModels.OpeningConfig.SizeViewModels;
@@ -20,17 +21,27 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig.MepCategories {
         private string _name;
         private ObservableCollection<ISizeViewModel> _minSizes;
         private ObservableCollection<IOffsetViewModel> _offsets;
+        private bool _isSelected;
 
         public MepCategoryViewModel(MepCategory mepCategory = null) {
             if(mepCategory != null) {
                 Name = mepCategory.Name;
                 ImageSource = mepCategory.ImageSource;
                 MinSizes = new ObservableCollection<ISizeViewModel>(mepCategory.MinSizes.Select(item => new SizeViewModel(item)));
-                Offsets = new ObservableCollection<IOffsetViewModel>(mepCategory.Offsets.Select(item => new OffsetViewModel(item)));
+                IsRound = mepCategory.IsRound;
+                IsSelected = mepCategory.IsSelected;
+                Offsets = new ObservableCollection<IOffsetViewModel>(mepCategory.Offsets.Select(item => new OffsetViewModel(item, new TypeNamesProvider(mepCategory.IsRound))));
             }
 
             AddOffsetCommand = new RelayCommand(AddOffset);
             RemoveOffsetCommand = new RelayCommand(RemoveOffset, CanRemoveOffset);
+        }
+
+        public bool IsRound { get; set; }
+
+        public bool IsSelected {
+            get => _isSelected;
+            set => this.RaiseAndSetIfChanged(ref _isSelected, value);
         }
 
         public string Name {
@@ -74,12 +85,14 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig.MepCategories {
                 Name = Name,
                 ImageSource = ImageSource,
                 Offsets = Offsets.Select(item => item.GetOffset()).ToList(),
-                MinSizes = new SizeCollection(MinSizes.Select(item => item.GetSize()))
+                MinSizes = new SizeCollection(MinSizes.Select(item => item.GetSize())),
+                IsRound = IsRound,
+                IsSelected = IsSelected
             };
         }
 
         private void AddOffset(object p) {
-            Offsets.Add(new OffsetViewModel());
+            Offsets.Add(new OffsetViewModel(new TypeNamesProvider(IsRound)));
         }
 
         private void RemoveOffset(object p) {

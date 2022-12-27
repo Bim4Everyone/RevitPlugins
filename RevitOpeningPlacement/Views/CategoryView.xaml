@@ -17,6 +17,7 @@
             <dxe:ListBoxEdit.ItemTemplate>
                 <DataTemplate DataType="{x:Type category:MepCategoryViewModel}">
                     <DockPanel Margin="0 3 0 0" LastChildFill="True">
+                        <CheckBox Margin="5 0 10 0" VerticalAlignment="Center" IsChecked="{Binding IsSelected}"/>
                         <Image DockPanel.Dock="Left" Width="38" Height="38" VerticalAlignment="Center" Source="{Binding ImageSource}"/>
                         <TextBlock DockPanel.Dock="Right" TextWrapping="Wrap" VerticalAlignment="Center" Margin="5 0 0 0" Text="{Binding Name}" />
                     </DockPanel>

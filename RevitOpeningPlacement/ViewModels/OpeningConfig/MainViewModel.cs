@@ -13,6 +13,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.TypeNamesProviders;
 using RevitOpeningPlacement.ViewModels.Interfaces;
 using RevitOpeningPlacement.ViewModels.OpeningConfig.MepCategories;
 using RevitOpeningPlacement.ViewModels.OpeningConfig.OffsetViewModels;
@@ -29,6 +30,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         public MainViewModel(UIApplication uiApplication, Models.Configs.OpeningConfig openingConfig) {
             if(openingConfig.Categories.Any()) {
                 MepCategories = new ObservableCollection<IMepCategoryViewModel>(openingConfig.Categories.Select(item => new MepCategoryViewModel(item)));
+                if(MepCategories.All(item => !item.IsRound)) {
+                    SetShape();
+                }
             } else {
                 InitializeCategories();
             }
@@ -77,7 +81,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
             },
             Offsets = new ObservableCollection<IOffsetViewModel>() {
-                new OffsetViewModel()
+                new OffsetViewModel(new TypeNamesProvider(true))
             },
             ImageSource = "../Resources/pipe.png"
         };
@@ -89,7 +93,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Height]}
             },
             Offsets = new ObservableCollection<IOffsetViewModel>() {
-                new OffsetViewModel()
+                new OffsetViewModel(new TypeNamesProvider(false))
             },
             ImageSource = "../Resources/rectangleDuct.png"
         };
@@ -100,7 +104,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
             },
             Offsets = new ObservableCollection<IOffsetViewModel>() {
-                new OffsetViewModel()
+                new OffsetViewModel(new TypeNamesProvider(true))
             },
             ImageSource = "../Resources/roundDuct.png"
         };
@@ -112,7 +116,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Height]}
             },
             Offsets = new ObservableCollection<IOffsetViewModel>() {
-                new OffsetViewModel()
+                new OffsetViewModel(new TypeNamesProvider(false))
             },
             ImageSource = "../Resources/tray.png"
         };
@@ -123,7 +127,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
             },
             Offsets = new ObservableCollection<IOffsetViewModel>() {
-                new OffsetViewModel()
+                new OffsetViewModel(new TypeNamesProvider(false))
             },
             ImageSource = "../Resources/conduit.png"
         };
@@ -135,6 +139,22 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             foreach(var mepCategoryName in RevitRepository.MepCategoryNames) {
                 if(!MepCategories.Any(item => item.Name.Equals(mepCategoryName.Value, StringComparison.CurrentCulture))) {
                     MepCategories.Add(GetMissingCategory(mepCategoryName.Key));
+                }
+            }
+        }
+
+        private void SetShape() {
+            SetRoundShape(MepCategoryEnum.Pipe);
+            SetRoundShape(MepCategoryEnum.RoundDuct);
+            SetRoundShape(MepCategoryEnum.Conduit);
+        }
+
+        private void SetRoundShape(MepCategoryEnum category) {
+            var mep = MepCategories.FirstOrDefault(item => item.Name.Equals(RevitRepository.MepCategoryNames[category]));
+            if(mep != null) {
+                mep.IsRound = true;
+                foreach(var offset in mep.Offsets) {
+                    offset.Update(new TypeNamesProvider(mep.IsRound));
                 }
             }
         }

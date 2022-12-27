@@ -3,6 +3,8 @@ using System.Linq;
 
 namespace RevitOpeningPlacement.Models.Configs {
     internal class MepCategory {
+        public bool IsRound { get; set; }
+        public bool IsSelected { get; set; }
         public string Name { get; set; }
         public string ImageSource { get; set; }
         public SizeCollection MinSizes { get; set; } = new SizeCollection();
