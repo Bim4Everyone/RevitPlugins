@@ -4,6 +4,7 @@
         <TargetFramework>net48</TargetFramework>
         <OutputType>Library</OutputType>
         <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+        <IncludePackageReferencesDuringMarkupCompilation>false</IncludePackageReferencesDuringMarkupCompilation>
         <UseWPF>true</UseWPF>
         <Platforms>x64</Platforms>
         <NoWarn>1701;1702;MSB3246</NoWarn>
