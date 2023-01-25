@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RevitCheckingLevels.Models.Level {
+namespace RevitCheckingLevels.Models.LevelParser {
     /// <summary>
     /// Информация об уровне.
     /// </summary>

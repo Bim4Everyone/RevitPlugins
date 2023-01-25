@@ -1,4 +1,4 @@
-﻿namespace RevitCheckingLevels.Models.Level {
+﻿namespace RevitCheckingLevels.Models.LevelParser {
     /// <summary>
     /// Префиксы типа уровня.
     /// </summary>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace RevitCheckingLevels.Models.Level {
+namespace RevitCheckingLevels.Models.LevelParser {
     /// <summary>
     /// Класс содержащий имя префикса.
     /// </summary>

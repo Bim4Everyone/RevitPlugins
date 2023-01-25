@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace RevitCheckingLevels.Models.Level {
+namespace RevitCheckingLevels.Models.LevelParser {
     internal class LevelParserImpl {
         public static readonly CultureInfo CultureInfo = GetCultureInfo();
 
