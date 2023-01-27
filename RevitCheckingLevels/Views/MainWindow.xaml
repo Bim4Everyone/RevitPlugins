@@ -8,6 +8,9 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitCheckingLevels.Views"
     xmlns:vms="clr-namespace:RevitCheckingLevels.ViewModels"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -17,16 +20,37 @@
     
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Views/ChangingModeView.xaml" />
+                <ResourceDictionary Source="../Views/CheckingLevelsView.xaml" />
+                <ResourceDictionary Source="../Views/CheckingLinkLevelsView.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+        <ContentControl
+            Grid.Row="0" 
+            Content="{Binding Navigation.CurrentView}" />
+
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Height="45">
             <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
-            <Button Content="ОК" Margin="10" Click="ButtonOk_Click" Width="80" />
-            <Button Content="Отмена" Margin="10" Click="ButtonCancel_Click" Width="80" />
+
+            <dx:SimpleButton 
+                Content="ОК" Margin="10" Width="80"
+                Command="{Binding Navigation.CurrentView.ViewCommand}" />
+
+            <dx:SimpleButton 
+                Content="Отмена" Margin="10" Width="80" 
+                Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
 </base:ThemedPlatformWindow>

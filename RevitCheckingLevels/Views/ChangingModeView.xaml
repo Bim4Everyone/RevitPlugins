@@ -1,0 +1,22 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModels="clr-namespace:RevitCheckingLevels.ViewModels"
+                    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm">
+
+    <dxmvvm:BooleanNegationConverter x:Key="BooleanNegationConverter"/>
+
+    <DataTemplate DataType="{x:Type viewModels:ChangingModeViewModel}">
+        <StackPanel>
+            <RadioButton
+                Content="Проверить уровни"
+                IsChecked="{Binding IsSelectCheckingLevel}"/>
+            <RadioButton
+                x:Name="_linkLevel"
+                Content="Проверить соответствие уровней в координационном файле"
+                IsChecked="{Binding IsSelectCheckingLevel, Converter={StaticResource BooleanNegationConverter}}"/>
+
+            <dxe:ComboBoxEdit IsEnabled="{Binding ElementName=_linkLevel, Path=IsChecked}"/>
+        </StackPanel>
+    </DataTemplate>
+</ResourceDictionary>

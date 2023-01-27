@@ -1,17 +1,23 @@
-﻿using Autodesk.Revit.UI;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
+
+using Autodesk.Revit.UI;
 
 using dosymep.WPF.ViewModels;
 
 using RevitCheckingLevels.Models;
+using RevitCheckingLevels.Services;
 
 namespace RevitCheckingLevels.ViewModels {
     internal class MainViewModel : BaseViewModel {
-        private readonly RevitRepository _revitRepository;
         private string _errorText;
 
-        public MainViewModel(UIApplication uiApplication) {
-            _revitRepository = new RevitRepository(uiApplication);
+        public MainViewModel(INavigationService navigationService) {
+            Navigation = navigationService;
+            Navigation.NavigateTo<ChangingModeViewModel>();
         }
+
+        public INavigationService Navigation { get; }
 
         public string ErrorText {
             get => _errorText;
