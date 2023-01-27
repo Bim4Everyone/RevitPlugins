@@ -2,12 +2,19 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:RevitCheckingLevels.ViewModels"
                     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-                    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm">
+                    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core">
 
     <dxmvvm:BooleanNegationConverter x:Key="BooleanNegationConverter"/>
 
     <DataTemplate DataType="{x:Type viewModels:ChangingModeViewModel}">
         <StackPanel>
+            <dxmvvm:Interaction.Behaviors>
+                <dxmvvm:EventToCommand
+                    EventName="Initialized" 
+                    Command="{Binding ViewLoadCommand}"/>
+            </dxmvvm:Interaction.Behaviors>
+
             <RadioButton
                 Content="Проверить уровни"
                 IsChecked="{Binding IsSelectCheckingLevel}"/>
@@ -16,7 +23,22 @@
                 Content="Проверить соответствие уровней в координационном файле"
                 IsChecked="{Binding IsSelectCheckingLevel, Converter={StaticResource BooleanNegationConverter}}"/>
 
-            <dxe:ComboBoxEdit IsEnabled="{Binding ElementName=_linkLevel, Path=IsChecked}"/>
+            <StackPanel Orientation="Horizontal">
+                <dxe:ComboBoxEdit 
+                    DisplayMember="Name"
+                    ItemsSource="{Binding Path=LinkTypes}"
+                    SelectedItem="{Binding Path=LinkType}"
+                    IsEnabled="{Binding ElementName=_linkLevel, Path=IsChecked}"/>
+
+                <dx:SimpleButton
+                    Content="Загрузить"
+                    DockPanel.Dock="Right"
+                    Width="80"
+                    Margin="10 0 0 0"
+                    ToolTipService.ShowOnDisabled="True"
+                    ToolTip="{Binding LinkType.LinkLoadToolTip}"
+                    Command="{Binding LinkType.LinkLoadCommand}" />
+            </StackPanel>
         </StackPanel>
     </DataTemplate>
 </ResourceDictionary>
