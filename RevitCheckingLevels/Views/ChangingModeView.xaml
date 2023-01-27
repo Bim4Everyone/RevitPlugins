@@ -16,19 +16,18 @@
             </dxmvvm:Interaction.Behaviors>
 
             <RadioButton
+                Margin="10"
                 Content="Проверить уровни"
                 IsChecked="{Binding IsSelectCheckingLevel}"/>
             <RadioButton
+                Margin="10 0 10 10"
                 x:Name="_linkLevel"
                 Content="Проверить соответствие уровней в координационном файле"
                 IsChecked="{Binding IsSelectCheckingLevel, Converter={StaticResource BooleanNegationConverter}}"/>
 
-            <StackPanel Orientation="Horizontal">
-                <dxe:ComboBoxEdit 
-                    DisplayMember="Name"
-                    ItemsSource="{Binding Path=LinkTypes}"
-                    SelectedItem="{Binding Path=LinkType}"
-                    IsEnabled="{Binding ElementName=_linkLevel, Path=IsChecked}"/>
+            <DockPanel 
+                Margin="10"
+                IsEnabled="{Binding ElementName=_linkLevel, Path=IsChecked}">
 
                 <dx:SimpleButton
                     Content="Загрузить"
@@ -38,7 +37,13 @@
                     ToolTipService.ShowOnDisabled="True"
                     ToolTip="{Binding LinkType.LinkLoadToolTip}"
                     Command="{Binding LinkType.LinkLoadCommand}" />
-            </StackPanel>
+
+                <dxe:ComboBoxEdit 
+                    DisplayMember="Name"
+                    IsTextEditable="False"
+                    ItemsSource="{Binding Path=LinkTypes}"
+                    SelectedItem="{Binding Path=LinkType}" />
+            </DockPanel>
         </StackPanel>
     </DataTemplate>
 </ResourceDictionary>
