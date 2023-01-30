@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+
+using Autodesk.Revit.DB;
 
 namespace RevitCheckingLevels.Models.LevelParser {
     /// <summary>
@@ -6,9 +9,14 @@ namespace RevitCheckingLevels.Models.LevelParser {
     /// </summary>
     internal class LevelInfo {
         /// <summary>
+        /// Разобранный уровень.
+        /// </summary>
+        public Level Level { get; set; }
+
+        /// <summary>
         /// Номер этажа.
         /// </summary>
-        public int Level { get; set; }
+        public int LevelNum { get; set; }
 
         /// <summary>
         /// Номер уровня.
@@ -45,8 +53,13 @@ namespace RevitCheckingLevels.Models.LevelParser {
         /// </summary>
         public double Elevation { get; set; }
 
+        /// <summary>
+        /// Список ошибок при разборе имени.
+        /// </summary>
+        public IReadOnlyCollection<string> Errors { get; set; }
+
         public string GetLevelName() {
-            return $"{LevelType?.Name}{Level:D2} этаж";
+            return $"{LevelType?.Name}{LevelNum:D2} этаж";
         }
 
         public string GetBlockName() {

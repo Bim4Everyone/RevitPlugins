@@ -3,27 +3,31 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
+using Autodesk.Revit.DB;
+
 namespace RevitCheckingLevels.Models.LevelParser {
     internal class LevelParserImpl {
+        private readonly Level _level;
         public static readonly CultureInfo CultureInfo = GetCultureInfo();
 
         private readonly List<string> _errors = new List<string>();
 
-        public LevelParserImpl(string levelName) {
-            LevelName = levelName;
+        public LevelParserImpl(Level level) {
+            _level = level;
         }
 
-        public string LevelName { get; }
-        public IReadOnlyCollection<string> Errors => _errors;
+        public Level Level => _level;
+        public string LevelName => _level.Name;
 
         public LevelInfo ReadLevelInfo() {
-            string[] splittedName = LevelName.Split(new[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] splittedName = LevelName.Split(
+                new[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
 
-            var levelInfo = new LevelInfo();
+            var levelInfo = new LevelInfo { Errors = _errors };
             ReadLevelName(levelInfo, splittedName[0]);
             ReadBlockName(levelInfo, splittedName[1]);
             ReadElevation(levelInfo, splittedName[2]);
-
+            
             return levelInfo;
         }
 
@@ -37,7 +41,7 @@ namespace RevitCheckingLevels.Models.LevelParser {
                     _errors.Add("После уровня должна идти надпись \"этаж\".");
                 }
 
-                levelInfo.Level = ReadInt32(levelNum, "Не удалось прочитать номер этажа.");
+                levelInfo.LevelNum = ReadInt32(levelNum, "Не удалось прочитать номер этажа.");
                 levelInfo.LevelType = ReadPrefix<LevelType>(levelType, "Не удалось прочитать тип уровня.");
             } else {
                 _errors.Add("Не удалось прочитать уровень.");

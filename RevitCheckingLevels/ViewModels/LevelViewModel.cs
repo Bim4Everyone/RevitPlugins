@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
@@ -10,31 +9,54 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.ViewModels;
 
 using RevitCheckingLevels.Models;
+using RevitCheckingLevels.Models.LevelParser;
 
 namespace RevitCheckingLevels.ViewModels {
     internal class LevelViewModel : BaseViewModel {
-        private readonly Level _level;
-        private readonly RevitRepository _revitRepository;
+        private readonly LevelInfo _levelInfo;
+        private ErrorType _errorType;
 
-        public LevelViewModel(Level level, RevitRepository revitRepository) {
-            _level = level;
-            _revitRepository = revitRepository;
+        public LevelViewModel(LevelInfo levelInfoInfo) {
+            _levelInfo = levelInfoInfo;
+
+            ErrorType = GetErrorType();
+            Errors = new ObservableCollection<string>(_levelInfo.Errors);
         }
 
-        public string Name => _level.Name;
+        public string Name => _levelInfo.Level.Name;
 
 #if REVIT_2020_OR_LESS
-        
-        public double Elevation =>
-            UnitUtils.ConvertFromInternalUnits(_level.Elevation, DisplayUnitType.DUT_MILLIMETERS);
+
+        public double Elevation => LevelExtensions.GetMeterElevation(_levelInfo.Level);
 
 #else
-    
-        public double Elevation =>
-            UnitUtils.ConvertFromInternalUnits(_level.Elevation, UnitTypeId.Millimeters);
+
+        public double Elevation => LevelExtensions.GetMeterElevation(_levelInfo.Level);
 
 #endif
 
-        public ObservableCollection<string> LevelErrors { get; }
+        public ErrorType ErrorType {
+            get => _errorType;
+            set => this.RaiseAndSetIfChanged(ref _errorType, value);
+        }
+
+        public ObservableCollection<string> Errors { get; }
+
+        private ErrorType GetErrorType() {
+            if(_levelInfo.Errors.Count > 0) {
+                return ErrorType.NotStandard;
+            }
+
+            double elevation = LevelExtensions.GetMeterElevation(_levelInfo.Level);
+            if(!LevelExtensions.IsAlmostEqual(_levelInfo.Elevation, elevation, 0.001)) {
+                return ErrorType.NotElevation;
+            }
+
+            if(!LevelExtensions.IsAlmostEqual(elevation % 1, 0.0000001, 0.0000001)) {
+                return ErrorType.NotMillimeterElevation;
+            }
+
+            return null;
+        }
     }
 }
