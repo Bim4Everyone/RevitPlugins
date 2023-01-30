@@ -45,10 +45,6 @@ namespace RevitCheckingLevels {
                     .ToSelf()
                     .InSingletonScope();
 
-                kernel.Bind<ChangingModeViewModel>()
-                    .ToSelf()
-                    .InSingletonScope();
-
                 kernel.Bind<MainViewModel>().ToSelf();
                 kernel.Bind<CheckingLevelsViewModel>().ToSelf();
                 kernel.Bind<CheckingLinkLevelsViewModel>().ToSelf();
@@ -57,15 +53,6 @@ namespace RevitCheckingLevels {
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext),
                         c => c.Kernel.Get<MainViewModel>());
-
-                kernel.Bind<INavigationService>()
-                    .To<NavigationService>()
-                    .InSingletonScope();
-
-                BaseViewModel Factory(Type t) => (BaseViewModel) kernel.Get(t);
-                kernel.Bind<Func<Type, BaseViewModel>>()
-                    .ToConstant((Func<Type, BaseViewModel>) Factory)
-                    .InSingletonScope();
 
                 MainWindow window = kernel.Get<MainWindow>();
                 if(window.ShowDialog() == true) {

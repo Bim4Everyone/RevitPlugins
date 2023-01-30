@@ -19,25 +19,19 @@ using RevitCheckingLevels.Views;
 
 namespace RevitCheckingLevels.ViewModels {
     internal class CheckingLevelsViewModel : BaseViewModel {
-        private readonly MainWindow _mainWindow;
         private readonly RevitRepository _revitRepository;
-        private readonly INavigationService _navigationService;
+
         private LevelViewModel _level;
 
-        public CheckingLevelsViewModel(MainWindow mainWindow, RevitRepository revitRepository,
-            INavigationService navigationService) {
-            _mainWindow = mainWindow;
+        public CheckingLevelsViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
-            _navigationService = navigationService;
 
             ViewCommand = new RelayCommand(Execute);
             ViewLoadCommand = new RelayCommand(Load);
-            ViewHomeCommand = new RelayCommand(ToHome);
         }
 
         public ICommand ViewCommand { get; }
         public ICommand ViewLoadCommand { get; }
-        public ICommand ViewHomeCommand { get; }
 
         public ObservableCollection<LevelViewModel> Levels { get; }
             = new ObservableCollection<LevelViewModel>();
@@ -48,7 +42,7 @@ namespace RevitCheckingLevels.ViewModels {
         }
 
         private void Execute(object p) {
-            _mainWindow.DialogResult = true;
+
         }
 
         private void Load(object p) {
@@ -59,10 +53,6 @@ namespace RevitCheckingLevels.ViewModels {
             }
 
             Level = Levels.FirstOrDefault();
-        }
-
-        private void ToHome(object p) {
-            _navigationService.NavigateTo<ChangingModeViewModel>();
         }
     }
 }

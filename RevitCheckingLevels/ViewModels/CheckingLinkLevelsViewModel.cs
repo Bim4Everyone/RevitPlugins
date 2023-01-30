@@ -9,37 +9,30 @@ using System.Windows.Input;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitCheckingLevels.Models;
 using RevitCheckingLevels.Services;
 using RevitCheckingLevels.Views;
 
 namespace RevitCheckingLevels.ViewModels {
     internal class CheckingLinkLevelsViewModel : BaseViewModel {
-        private readonly MainWindow _mainWindow;
-        private readonly INavigationService _navigationService;
+        private readonly RevitRepository _revitRepository;
 
-        public CheckingLinkLevelsViewModel(MainWindow mainWindow, INavigationService navigationService) {
-            _mainWindow = mainWindow;
-            _navigationService = navigationService;
+        public CheckingLinkLevelsViewModel(RevitRepository revitRepository) {
+            _revitRepository = revitRepository;
 
             ViewCommand = new RelayCommand(Execute);
             ViewLoadCommand = new RelayCommand(Load);
-            ViewHomeCommand = new RelayCommand(ToHome);
         }
 
         public ICommand ViewCommand { get; }
         public ICommand ViewLoadCommand { get; }
-        public ICommand ViewHomeCommand { get; }
 
         private void Execute(object p) {
-            _mainWindow.DialogResult = true;
+
         }
 
         private void Load(object p) {
             MessageBox.Show("aaaa");
-        }
-
-        private void ToHome(object p) {
-            _navigationService.NavigateTo<ChangingModeViewModel>();
         }
     }
 }
