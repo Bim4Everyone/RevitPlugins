@@ -42,7 +42,10 @@
             Content="{Binding Navigation.CurrentView}" />
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Height="45">
-            <TextBlock Margin="10" Text="{Binding ErrorText}" Foreground="Orange" />
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                Text="{Binding Navigation.CurrentView.ErrorText}" />
 
             <dx:SimpleButton 
                 Content="ОК" Margin="10" Width="80"

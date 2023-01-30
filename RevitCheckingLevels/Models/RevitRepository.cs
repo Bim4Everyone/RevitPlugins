@@ -29,7 +29,8 @@ namespace RevitCheckingLevels.Models {
             return new FilteredElementCollector(Document)
                 .WhereElementIsElementType()
                 .OfClass(typeof(RevitLinkType))
-                .OfType<RevitLinkType>();
+                .OfType<RevitLinkType>()
+                .OrderBy(item => item.Name);
         }
     }
 }
