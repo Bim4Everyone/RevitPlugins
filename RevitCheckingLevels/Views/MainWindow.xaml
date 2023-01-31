@@ -17,7 +17,6 @@
     
     Title="MainWindow"
     Height="450" Width="800"
-    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 

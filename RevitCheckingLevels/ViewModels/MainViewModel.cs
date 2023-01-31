@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -10,17 +12,21 @@ using dosymep.WPF.ViewModels;
 
 using RevitCheckingLevels.Models;
 using RevitCheckingLevels.Services;
+using RevitCheckingLevels.Views;
 
 namespace RevitCheckingLevels.ViewModels {
     internal class MainViewModel : BaseViewModel {
+        private readonly Func<Type, Window> _modeFactory;
         private readonly RevitRepository _revitRepository;
 
         private string _errorText;
         private bool _isSelectCheckingLevel;
         private LinkTypeViewModel _linkType;
 
-        public MainViewModel(RevitRepository revitRepository) {
+        public MainViewModel(RevitRepository revitRepository, Func<Type, Window> modeFactory) {
+            _modeFactory = modeFactory;
             _revitRepository = revitRepository;
+
             IsSelectCheckingLevel = true;
 
             ViewCommand = new RelayCommand(ChangeMode, CanChangeMode);
@@ -59,9 +65,9 @@ namespace RevitCheckingLevels.ViewModels {
 
         private void ChangeMode(object p) {
             if(IsSelectCheckingLevel) {
-
+                _modeFactory(typeof(CheckingLevelsWindow)).ShowDialog();
             } else {
-
+                // _modeFactory(typeof(CheckingLinkLevelsWindow)).ShowDialog();
             }
         }
 

@@ -21,6 +21,7 @@ namespace RevitCheckingLevels.ViewModels {
     internal class CheckingLevelsViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
 
+        private string _errorText;
         private LevelViewModel _level;
 
         public CheckingLevelsViewModel(RevitRepository revitRepository) {
@@ -32,6 +33,11 @@ namespace RevitCheckingLevels.ViewModels {
 
         public ICommand ViewCommand { get; }
         public ICommand ViewLoadCommand { get; }
+
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
 
         public ObservableCollection<LevelViewModel> Levels { get; }
             = new ObservableCollection<LevelViewModel>();
