@@ -17,6 +17,9 @@ namespace RevitCheckingLevels.ViewModels {
     internal class CheckingLinkLevelsViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
 
+        private string _errorText;
+        private LinkTypeViewModel _linkTypeViewModel;
+
         public CheckingLinkLevelsViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
 
@@ -27,12 +30,17 @@ namespace RevitCheckingLevels.ViewModels {
         public ICommand ViewCommand { get; }
         public ICommand ViewLoadCommand { get; }
 
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
         private void Execute(object p) {
 
         }
 
         private void Load(object p) {
-            MessageBox.Show("aaaa");
+
         }
     }
 }

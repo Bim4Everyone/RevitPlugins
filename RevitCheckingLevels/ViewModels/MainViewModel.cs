@@ -67,7 +67,7 @@ namespace RevitCheckingLevels.ViewModels {
             if(IsSelectCheckingLevel) {
                 _modeFactory(typeof(CheckingLevelsWindow)).ShowDialog();
             } else {
-                // _modeFactory(typeof(CheckingLinkLevelsWindow)).ShowDialog();
+                _modeFactory(typeof(CheckingLinkLevelsWindow)).ShowDialog();
             }
         }
 

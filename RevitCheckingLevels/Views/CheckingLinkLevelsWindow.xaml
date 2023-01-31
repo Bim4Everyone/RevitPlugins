@@ -1,0 +1,54 @@
+﻿<base:ThemedPlatformWindow
+    x:Class="RevitCheckingLevels.Views.CheckingLinkLevelsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitCheckingLevels.Views"
+    xmlns:vms="clr-namespace:RevitCheckingLevels.ViewModels"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+    
+    Title="MainWindow"
+    Height="450" Width="800"
+    
+    d:DataContext="{d:DesignInstance vms:CheckingLinkLevelsViewModel, IsDesignTimeCreatable=False}">
+    
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand
+            EventName="Loaded" 
+            Command="{Binding ViewLoadCommand}"/>
+    </dxmvvm:Interaction.Behaviors>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <dx:SimpleButton Grid.Row="0" Content="Назад" />
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Height="45">
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                Text="{Binding ErrorText}" />
+
+            <dx:SimpleButton 
+                Content="ОК" Margin="10" Width="80"
+                Command="{Binding ViewCommand}"
+                Click="ButtonOk_Click"/>
+
+            <dx:SimpleButton 
+                Content="Отмена" Margin="10" Width="80" 
+                Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</base:ThemedPlatformWindow>
