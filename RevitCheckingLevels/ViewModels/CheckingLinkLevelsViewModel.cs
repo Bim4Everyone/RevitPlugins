@@ -18,7 +18,7 @@ namespace RevitCheckingLevels.ViewModels {
         private readonly RevitRepository _revitRepository;
 
         private string _errorText;
-        private LinkTypeViewModel _linkTypeViewModel;
+        private LinkTypeViewModel _linkType;
 
         public CheckingLinkLevelsViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
@@ -33,6 +33,11 @@ namespace RevitCheckingLevels.ViewModels {
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        public LinkTypeViewModel LinkType {
+            get => _linkType;
+            set => this.RaiseAndSetIfChanged(ref _linkType, value);
         }
 
         private void Execute(object p) {

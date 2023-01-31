@@ -20,20 +20,20 @@
     Height="450" Width="800"
     
     d:DataContext="{d:DesignInstance vms:CheckingLinkLevelsViewModel, IsDesignTimeCreatable=False}">
-    
+
     <dxmvvm:Interaction.Behaviors>
         <dxmvvm:EventToCommand
             EventName="Loaded" 
             Command="{Binding ViewLoadCommand}"/>
     </dxmvvm:Interaction.Behaviors>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <dx:SimpleButton Grid.Row="0" Content="Назад" />
+        <dx:SimpleButton Grid.Row="0" Content="{Binding LinkType.Name}" />
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Height="45">
             <TextBlock
