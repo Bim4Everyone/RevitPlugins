@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -24,14 +25,19 @@ namespace RevitCheckingLevels.Models.LevelParser {
                 new[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
 
             var levelInfo = new LevelInfo { Errors = _errors };
-            ReadLevelName(levelInfo, splittedName[0]);
-            ReadBlockName(levelInfo, splittedName[1]);
-            ReadElevation(levelInfo, splittedName[2]);
+            ReadLevelName(levelInfo, splittedName.ElementAtOrDefault(0));
+            ReadBlockName(levelInfo, splittedName.ElementAtOrDefault(1));
+            ReadElevation(levelInfo, splittedName.ElementAtOrDefault(1));
             
             return levelInfo;
         }
 
         private void ReadLevelName(LevelInfo levelInfo, string levelName) {
+            if(levelName == null) {
+                _errors.Add("Не удалось прочитать уровень.");
+                return;
+            }
+
             var splittedLevelName = levelName.Split(new[] { ' ' },
                 StringSplitOptions.RemoveEmptyEntries);
 
@@ -49,6 +55,11 @@ namespace RevitCheckingLevels.Models.LevelParser {
         }
 
         private void ReadBlockName(LevelInfo levelInfo, string blockName) {
+            if(blockName == null) {
+                _errors.Add("Не удалось прочитать тип блока.");
+                return;
+            }
+
             string[] splittedBlockName = blockName.Split(new[] { '.' },
                 StringSplitOptions.RemoveEmptyEntries);
 
@@ -68,13 +79,17 @@ namespace RevitCheckingLevels.Models.LevelParser {
                 ReadBlock(levelInfo, splittedBlockName[0]);
                 levelInfo.SubLevel = ReadInt32(splittedBlockName[1], "Не удалось прочитать значение номера уровня.");
             } else {
-
                 _errors.Add("Не удалось прочитать тип блока.");
             }
 
         }
 
         private void ReadElevation(LevelInfo levelInfo, string elevation) {
+            if(elevation == null) {
+                _errors.Add("Не удалось прочитать отметку уровня.");
+                return;
+            }
+
             if(double.TryParse(elevation, NumberStyles.AllowDecimalPoint, CultureInfo, out double result)) {
                 levelInfo.Elevation = result;
                 return;
