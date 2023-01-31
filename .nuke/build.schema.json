@@ -74,7 +74,7 @@
             "enum": [
               "Clean",
               "Compile",
-              "CompileWithGitVersion"
+              "CompileVersion"
             ]
           }
         },
@@ -86,7 +86,7 @@
             "enum": [
               "Clean",
               "Compile",
-              "CompileWithGitVersion"
+              "CompileVersion"
             ]
           }
         },
