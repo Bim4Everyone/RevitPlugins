@@ -24,7 +24,7 @@ namespace RevitCheckingLevels.Models.LevelParser {
             string[] splittedName = LevelName.Split(
                 new[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
 
-            var levelInfo = new LevelInfo { Errors = _errors };
+            var levelInfo = new LevelInfo { Level = _level, Errors = _errors };
             ReadLevelName(levelInfo, splittedName.ElementAtOrDefault(0));
             ReadBlockName(levelInfo, splittedName.ElementAtOrDefault(1));
             ReadElevation(levelInfo, splittedName.ElementAtOrDefault(1));

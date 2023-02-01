@@ -12,7 +12,8 @@
 
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-    
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
@@ -33,7 +34,20 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <dx:SimpleButton Grid.Row="0" Content="Назад" />
+        <dxg:GridControl 
+            Grid.Row="0"
+            ItemsSource="{Binding Levels}"
+            SelectedItem="{Binding Level}">
+           
+            <dxg:GridControl.View>
+                <dxg:TableView ShowTotalSummary="True" AllowEditing="False"/>
+            </dxg:GridControl.View>
+          
+            <dxg:GridColumn FieldName="Name" Header="Имя"/>
+            <dxg:GridColumn FieldName="Elevation" Header="Отметка" />
+
+        </dxg:GridControl>
+
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Height="45">
             <TextBlock

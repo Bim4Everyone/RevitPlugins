@@ -24,16 +24,7 @@ namespace RevitCheckingLevels.ViewModels {
         }
 
         public string Name => _levelInfo.Level.Name;
-
-#if REVIT_2020_OR_LESS
-
-        public double Elevation => LevelExtensions.GetMeterElevation(_levelInfo.Level);
-
-#else
-
-        public double Elevation => LevelExtensions.GetMeterElevation(_levelInfo.Level);
-
-#endif
+        public string Elevation => LevelExtensions.GetFormattedMeterElevation(_levelInfo.Level);
 
         public ErrorType ErrorType {
             get => _errorType;
