@@ -3,9 +3,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitCheckingLevels.Models;
@@ -24,7 +27,9 @@ namespace RevitCheckingLevels.ViewModels {
         }
 
         public string Name => _levelInfo.Level.Name;
-        public string Elevation => LevelExtensions.GetFormattedMeterElevation(_levelInfo.Level);
+        public string Elevation => _levelInfo.Level.GetFormattedMeterElevation();
+
+        public LevelInfo LevelInfo => _levelInfo;
 
         public ErrorType ErrorType {
             get => _errorType;
@@ -38,12 +43,13 @@ namespace RevitCheckingLevels.ViewModels {
                 return ErrorType.NotStandard;
             }
 
-            double elevation = LevelExtensions.GetMeterElevation(_levelInfo.Level);
-            if(!LevelExtensions.IsAlmostEqual(_levelInfo.Elevation, elevation, 0.001)) {
+            double meterElevation = _levelInfo.Level.GetMeterElevation();
+            if(!LevelExtensions.IsAlmostEqual(_levelInfo.Elevation, meterElevation, 0.001)) {
                 return ErrorType.NotElevation;
             }
 
-            if(!LevelExtensions.IsAlmostEqual(elevation % 1, 0.0000001, 0.0000001)) {
+            double millimeterElevation = _levelInfo.Level.GetMillimeterElevation();
+            if(!LevelExtensions.IsAlmostEqual(millimeterElevation % 1, 0.0000001, 0.0000001)) {
                 return ErrorType.NotMillimeterElevation;
             }
 

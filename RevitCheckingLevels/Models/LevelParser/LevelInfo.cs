@@ -56,7 +56,13 @@ namespace RevitCheckingLevels.Models.LevelParser {
         /// <summary>
         /// Список ошибок при разборе имени.
         /// </summary>
-        public IReadOnlyCollection<string> Errors { get; set; }
+        public IReadOnlyCollection<string> Errors { get; set; } = new List<string>();
+
+        public string FormatLevelName() {
+            return Errors.Count > 0
+                ? Level.Name
+                : $"{GetLevelName()}_{GetBlockName()}_{GetElevation()}";
+        }
 
         public string GetLevelName() {
             return $"{LevelType?.Name}{LevelNum:D2} этаж";

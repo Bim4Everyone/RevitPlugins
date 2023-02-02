@@ -5,6 +5,8 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Revit;
+
 using RevitCheckingLevels.Models.LevelParser;
 
 namespace RevitCheckingLevels.Models {
@@ -31,6 +33,17 @@ namespace RevitCheckingLevels.Models {
                 .OfClass(typeof(RevitLinkType))
                 .OfType<RevitLinkType>()
                 .OrderBy(item => item.Name);
+        }
+
+        public void UpdateElevations(IEnumerable<LevelInfo> levels) {
+            using(Transaction transaction = Document.StartTransaction("Обновление отметок уровня")) {
+                foreach(LevelInfo levelInfo in levels) {
+                    levelInfo.Elevation = levelInfo.Level.GetMeterElevation();
+                    levelInfo.Level.Name = levelInfo.FormatLevelName();
+                }
+
+                transaction.Commit();
+            }
         }
     }
 }

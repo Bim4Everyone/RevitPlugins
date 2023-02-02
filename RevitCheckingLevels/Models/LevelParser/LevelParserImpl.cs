@@ -27,7 +27,7 @@ namespace RevitCheckingLevels.Models.LevelParser {
             var levelInfo = new LevelInfo { Level = _level, Errors = _errors };
             ReadLevelName(levelInfo, splittedName.ElementAtOrDefault(0));
             ReadBlockName(levelInfo, splittedName.ElementAtOrDefault(1));
-            ReadElevation(levelInfo, splittedName.ElementAtOrDefault(1));
+            ReadElevation(levelInfo, splittedName.ElementAtOrDefault(2));
             
             return levelInfo;
         }
@@ -124,7 +124,7 @@ namespace RevitCheckingLevels.Models.LevelParser {
         }
 
         private (string prefixName, string prefixNum) ReadPrefix(string prefixName) {
-            var match = Regex.Match(prefixName, "^(?'type'[A-Za-zА-Яа-я]+)?(?'num'\\d{2})$");
+            var match = Regex.Match(prefixName, "^(?'type'[A-Za-zА-Яа-я]+)?(?'num'\\d{1,2})");
             return (match.Groups["type"].Value, match.Groups["num"].Value);
         }
 

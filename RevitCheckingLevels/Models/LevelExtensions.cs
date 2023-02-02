@@ -21,7 +21,7 @@ namespace RevitCheckingLevels.Models {
         public static readonly FormatOptions FormatOptions 
             = new FormatOptions(DisplayUnitType.DUT_METERS) { Accuracy = 0.001 };
 
-        public static string GetFormattedMeterElevation(Level level) {
+        public static string GetFormattedMeterElevation(this Level level) {
             var formatValueOptions = new FormatValueOptions();
             formatValueOptions.SetFormatOptions(FormatOptions);
             formatValueOptions.AppendUnitSymbol = true;
@@ -29,17 +29,17 @@ namespace RevitCheckingLevels.Models {
                 level.Elevation, false, false, formatValueOptions);
         }
 
-        public static double GetMeterElevation(Level level) =>
+        public static double GetMeterElevation(this Level level) =>
             UnitUtils.ConvertFromInternalUnits(level.Elevation, DisplayUnitType.DUT_METERS);
 
-        public static double GetMillimeterElevation(Level level) =>
+        public static double GetMillimeterElevation(this Level level) =>
             UnitUtils.ConvertFromInternalUnits(level.Elevation, DisplayUnitType.DUT_MILLIMETERS);
 
 #else
         public static readonly FormatOptions FormatOptions 
             = new FormatOptions(UnitTypeId.Meters) { Accuracy = 0.001 };
 
-        public static string GetFormattedMeterElevation(Level level) {
+        public static string GetFormattedMeterElevation(this Level level) {
             var formatValueOptions = new FormatValueOptions();
             formatValueOptions.SetFormatOptions(FormatOptions);
             formatValueOptions.AppendUnitSymbol = true;
@@ -47,10 +47,10 @@ namespace RevitCheckingLevels.Models {
                 level.Elevation, false, formatValueOptions);
         }
 
-        public static double GetMeterElevation(Level level) =>
+        public static double GetMeterElevation(this Level level) =>
             UnitUtils.ConvertFromInternalUnits(level.Elevation, UnitTypeId.Meters);
 
-        public static double GetMillimeterElevation(Level level) =>
+        public static double GetMillimeterElevation(this Level level) =>
             UnitUtils.ConvertFromInternalUnits(level.Elevation, UnitTypeId.Millimeters);
 
 #endif

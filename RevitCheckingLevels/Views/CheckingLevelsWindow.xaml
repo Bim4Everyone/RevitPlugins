@@ -13,21 +13,35 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:converters="clr-namespace:RevitCheckingLevels.Converters"
+    xmlns:commands="clr-namespace:RevitCheckingLevels.Commands"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
     Height="450" Width="800"
-    
+
+    x:Name="_this"
     d:DataContext="{d:DesignInstance vms:CheckingLevelsViewModel, IsDesignTimeCreatable=False}">
-    
+
+    <Window.Resources>
+        <converters:GroupRowConverter x:Key="RowConverter" />
+    </Window.Resources>
+
     <dxmvvm:Interaction.Behaviors>
         <dxmvvm:EventToCommand
             EventName="Loaded" 
             Command="{Binding ViewLoadCommand}"/>
+
+        <dxmvvm:EventToCommand
+            SourceName="_gridControl"
+            PassEventArgsToCommand="True"
+            EventName="GroupRowCollapsing"
+            Command="{Binding  ElementName=_this, 
+                Path=DisableCollapseGroupRowCommand}"/>
     </dxmvvm:Interaction.Behaviors>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -36,16 +50,49 @@
 
         <dxg:GridControl 
             Grid.Row="0"
+            x:Name="_gridControl"
+            AutoExpandAllGroups="True"
             ItemsSource="{Binding Levels}"
             SelectedItem="{Binding Level}">
-           
+
             <dxg:GridControl.View>
-                <dxg:TableView ShowTotalSummary="True" AllowEditing="False"/>
+                <dxg:TableView 
+                    ShowGroupPanel="False"
+                    ShowTotalSummary="False"
+                    AllowEditing="False"
+                    AllowGrouping="False">
+                    <dxg:TableView.GroupRowTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock 
+                                    Grid.Column="0"
+                                    Margin="2,0"
+                                    VerticalAlignment="Center" HorizontalAlignment="Left"
+                                    Text="{Binding GroupValue.DisplayText}" />
+                                <Button 
+                                    Grid.Column="1"
+                                    Margin="2,0"
+                                    Content="Обновить отметки"
+                                    VerticalAlignment="Center" HorizontalAlignment="Right"
+                                    Command="{Binding ElementName=_this,
+                                        Path=DataContext.UpdateElevationCommand}" 
+                                    CommandParameter="{Binding 
+                                        Converter={StaticResource RowConverter}}" />
+                            </Grid>
+                        </DataTemplate>
+                    </dxg:TableView.GroupRowTemplate>
+                </dxg:TableView>
             </dxg:GridControl.View>
-          
+
             <dxg:GridColumn FieldName="Name" Header="Имя"/>
             <dxg:GridColumn FieldName="Elevation" Header="Отметка" />
 
+
+            <dxg:GridColumn FieldName="ErrorType" Header="Тип ошибки" GroupIndex="0" />
         </dxg:GridControl>
 
 

@@ -14,6 +14,8 @@ using System.Windows.Shapes;
 
 using DevExpress.Utils.CommonDialogs.Internal;
 
+using RevitCheckingLevels.Commands;
+
 namespace RevitCheckingLevels.Views {
     /// <summary>
     /// Interaction logic for CheckingLevelsWindow.xaml
@@ -25,6 +27,8 @@ namespace RevitCheckingLevels.Views {
 
         public override string PluginName => nameof(RevitCheckingLevels);
         public override string ProjectConfigName => nameof(CheckingLevelsWindow);
+
+        public ICommand DisableCollapseGroupRowCommand { get; } = new DisableCollapseGroupRowCommand();
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;

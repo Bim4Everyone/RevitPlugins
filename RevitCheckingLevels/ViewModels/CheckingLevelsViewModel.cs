@@ -9,6 +9,8 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using DevExpress.Xpf.Grid;
+
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -29,10 +31,13 @@ namespace RevitCheckingLevels.ViewModels {
 
             ViewCommand = new RelayCommand(Execute);
             ViewLoadCommand = new RelayCommand(Load);
+
+            UpdateElevationCommand = new RelayCommand(UpdateElevation, CanUpdateElevation);
         }
 
         public ICommand ViewCommand { get; }
         public ICommand ViewLoadCommand { get; }
+        public ICommand UpdateElevationCommand { get; }
 
         public string ErrorText {
             get => _errorText;
@@ -54,11 +59,35 @@ namespace RevitCheckingLevels.ViewModels {
         private void Load(object p) {
             Levels.Clear();
             foreach(Level level in _revitRepository.GetLevels()) {
-                Levels.Add(new LevelViewModel(
-                    new LevelParserImpl(level).ReadLevelInfo()));
+                var levelViewModel = new LevelViewModel(
+                    new LevelParserImpl(level).ReadLevelInfo());
+                if(levelViewModel.ErrorType != null) {
+                    Levels.Add(levelViewModel);
+                }
             }
 
             Level = Levels.FirstOrDefault();
+        }
+
+        private void UpdateElevation(object p) {
+            if(p is object[] list) {
+                _revitRepository.UpdateElevations(list
+                    .OfType<LevelViewModel>()
+                    .Select(item => item.LevelInfo));
+
+                foreach(LevelViewModel levelViewModel in list.OfType<LevelViewModel>()) {
+                    Levels.Remove(levelViewModel);
+                }
+            }
+        }
+
+        private bool CanUpdateElevation(object p) {
+            if(p is object[] list) {
+                return list.OfType<LevelViewModel>()
+                    .All(item => item.ErrorType == ErrorType.NotElevation);
+            }
+
+            return false;
         }
     }
 }
