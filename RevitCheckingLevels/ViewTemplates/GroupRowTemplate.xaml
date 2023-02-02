@@ -1,0 +1,29 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:RevitCheckingLevels.Converters"
+                    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid">
+    
+    <converters:GroupRowConverter x:Key="RowConverter" />
+    <DataTemplate x:Key="GroupRowTemplate" DataType="{x:Type dxg:GroupRowData}">
+        <Grid ToolTip="{Binding Row.ErrorType.Description}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock 
+                Grid.Column="0"
+                Margin="2,0"
+                VerticalAlignment="Center" HorizontalAlignment="Left"
+                Text="{Binding GroupValue.DisplayText}" />
+            <Button 
+                Grid.Column="1"
+                Margin="2,0"
+                Content="Обновить отметки"
+                VerticalAlignment="Center" HorizontalAlignment="Right"
+                Command="{Binding ElementName=_this,
+                                        Path=DataContext.UpdateElevationCommand}" 
+                CommandParameter="{Binding 
+                                        Converter={StaticResource RowConverter}}" />
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>
