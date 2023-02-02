@@ -29,13 +29,10 @@ namespace RevitCheckingLevels.ViewModels {
         public CheckingLevelsViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
 
-            ViewCommand = new RelayCommand(Execute);
             ViewLoadCommand = new RelayCommand(Load);
-
             UpdateElevationCommand = new RelayCommand(UpdateElevation, CanUpdateElevation);
         }
 
-        public ICommand ViewCommand { get; }
         public ICommand ViewLoadCommand { get; }
         public ICommand UpdateElevationCommand { get; }
 
@@ -50,10 +47,6 @@ namespace RevitCheckingLevels.ViewModels {
         public LevelViewModel Level {
             get => _level;
             set => this.RaiseAndSetIfChanged(ref _level, value);
-        }
-
-        private void Execute(object p) {
-
         }
 
         private void Load(object p) {
