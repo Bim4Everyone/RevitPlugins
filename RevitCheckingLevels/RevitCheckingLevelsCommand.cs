@@ -37,9 +37,11 @@ namespace RevitCheckingLevels {
         protected override void Execute(UIApplication uiApplication) {
             using(IKernel kernel = new StandardKernel()) {
                 kernel.Bind<UIApplication>()
-                    .ToConstant(uiApplication);
+                    .ToConstant(uiApplication)
+                    .InTransientScope();
                 kernel.Bind<Application>()
-                    .ToConstant(uiApplication.Application);
+                    .ToConstant(uiApplication.Application)
+                    .InTransientScope();
 
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
