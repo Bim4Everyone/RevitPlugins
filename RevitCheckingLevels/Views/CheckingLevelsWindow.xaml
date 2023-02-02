@@ -27,6 +27,7 @@
 
     <Window.Resources>
         <converters:GroupRowConverter x:Key="RowConverter" />
+        <commands:DisableCollapseGroupRowCommand x:Key="DisableCollapseGroupRowCommand" />
     </Window.Resources>
 
     <dxmvvm:Interaction.Behaviors>
@@ -38,8 +39,8 @@
             SourceName="_gridControl"
             PassEventArgsToCommand="True"
             EventName="GroupRowCollapsing"
-            Command="{Binding  ElementName=_this, 
-                Path=DisableCollapseGroupRowCommand}"/>
+            Command="{Binding  
+                Source={StaticResource DisableCollapseGroupRowCommand}}"/>
     </dxmvvm:Interaction.Behaviors>
 
     <Grid>

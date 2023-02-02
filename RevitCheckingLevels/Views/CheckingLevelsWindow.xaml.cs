@@ -28,8 +28,6 @@ namespace RevitCheckingLevels.Views {
         public override string PluginName => nameof(RevitCheckingLevels);
         public override string ProjectConfigName => nameof(CheckingLevelsWindow);
 
-        public ICommand DisableCollapseGroupRowCommand { get; } = new DisableCollapseGroupRowCommand();
-
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;
         }
