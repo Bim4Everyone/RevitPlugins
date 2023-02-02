@@ -4,7 +4,7 @@
                     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
                     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core">
     
-    <converters:GroupRowConverter x:Key="RowConverter" />
+    <converters:GroupRowConverter x:Key="GroupRowConverter" />
     <DataTemplate x:Key="GroupRowTemplate" DataType="{x:Type dxg:GroupRowData}">
         <Grid ToolTip="{Binding Row.ErrorType.Description}">
             <Grid.ColumnDefinitions>
@@ -31,9 +31,16 @@
                 Content="Обновить отметки"
                 VerticalAlignment="Center" HorizontalAlignment="Right"
                 Command="{Binding ElementName=_this,
-                                        Path=DataContext.UpdateElevationCommand}" 
-                CommandParameter="{Binding 
-                                        Converter={StaticResource RowConverter}}" />
+                                        Path=DataContext.UpdateElevationCommand}" >
+
+                <!--HACK: DevExpress не обновляет GroupRowData после обновления GridControl -->
+                <dx:SimpleButton.CommandParameter>
+                    <MultiBinding Converter="{StaticResource GroupRowConverter}">
+                        <Binding Path=""/>
+                        <Binding Path="GroupValue.Text" />
+                    </MultiBinding>
+                </dx:SimpleButton.CommandParameter>
+            </dx:SimpleButton>
         </Grid>
     </DataTemplate>
 </ResourceDictionary>

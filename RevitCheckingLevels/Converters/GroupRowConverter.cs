@@ -9,7 +9,7 @@ using System.Windows.Data;
 using DevExpress.Xpf.Grid;
 
 namespace RevitCheckingLevels.Converters {
-    internal class GroupRowConverter : IValueConverter {
+    internal class GroupRowConverter : IValueConverter, IMultiValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             GroupRowData rowData = (GroupRowData) value;
             GridControl gridControl = (GridControl) rowData.View.DataControl;
@@ -21,6 +21,14 @@ namespace RevitCheckingLevels.Converters {
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+            throw new NotImplementedException();
+        }
+
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
+            return Convert(values[0], targetType, parameter, culture);
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) {
             throw new NotImplementedException();
         }
     }

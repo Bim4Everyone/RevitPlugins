@@ -41,8 +41,7 @@ namespace RevitCheckingLevels.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public ObservableCollection<LevelViewModel> Levels { get; }
-            = new ObservableCollection<LevelViewModel>();
+        public ObservableCollection<LevelViewModel> Levels { get; } = new ObservableCollection<LevelViewModel>();
 
         public LevelViewModel Level {
             get => _level;
@@ -68,9 +67,7 @@ namespace RevitCheckingLevels.ViewModels {
                     .OfType<LevelViewModel>()
                     .Select(item => item.LevelInfo));
 
-                foreach(LevelViewModel levelViewModel in list.OfType<LevelViewModel>()) {
-                    Levels.Remove(levelViewModel);
-                }
+                Load(null);
             }
         }
 
