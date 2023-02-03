@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -32,6 +34,18 @@ namespace RevitCheckingLevels.Models {
                 Name = "Уровни замоделированы не по стандарту",
                 Description =
                     $"Значение параметра \"{LabelUtils.GetLabelFor(BuiltInParameter.LEVEL_ELEV)}\" должно отступать на 1500мм от предыдущего."
+            };
+
+        public static readonly ErrorType NotFoundLevels =
+            new ErrorType(4) {
+                Name = "Не были найдены уровни в открытом проекте",
+                Description = "Все уровни должны быть скопированы с координационного файла."
+            };
+
+        public static readonly ErrorType NotFoundLinkLevels =
+            new ErrorType(5) {
+                Name = "Не были найдены уровни в координационном файле",
+                Description = "Все уровни должны быть скопированы с координационного файла."
             };
 
         public ErrorType(int id) {
@@ -128,6 +142,51 @@ namespace RevitCheckingLevels.Models {
         public static bool IsNotMillimeterElevation(this LevelInfo levelInfo) {
             double millimeterElevation = levelInfo.Level.GetMillimeterElevation();
             return !LevelExtensions.IsAlmostEqual(millimeterElevation % 1, 0.0000001, 0.0000001);
+        }
+
+        public static bool IsNotRangeElevation(this LevelInfo levelInfo, IEnumerable<LevelInfo> levelInfos) {
+            if(levelInfo.Errors.Count > 0) {
+                return false;
+            }
+
+            if(levelInfo.SubLevel.HasValue) {
+                return levelInfos
+                    .Where(item => item.Errors.Count == 0)
+                    .Where(item => item.SubLevel.HasValue)
+                    .Where(item=> item.BlockType == levelInfo.BlockType)
+                    .Where(item=> item.StartBlock == levelInfo.StartBlock)
+                    .Any(item => Math.Abs(levelInfo.Level.GetMillimeterElevation() - item.Level.GetMillimeterElevation()) < 1500);
+            }
+
+            if(levelInfo.SubLevel == null) {
+                bool first = levelInfos
+                    .Where(item => item.Errors.Count == 0)
+                    .Where(item=> item.SubLevel == null)
+                    .Where(item=> item.LevelNum == levelInfo.LevelNum)
+                    .Where(item=> item.BlockType == levelInfo.BlockType)
+                    .Any(item => item.StartBlock == levelInfo.StartBlock);
+
+                bool second = levelInfos
+                    .Where(item => item.Errors.Count == 0)
+                    .Where(item=> item.SubLevel == null)
+                    .Where(item=> item.Elevation.HasValue)
+                    .Where(item=> item.LevelNum == levelInfo.LevelNum)
+                    .Where(item=> item.BlockType == levelInfo.BlockType)
+                    .Where(item => item.StartBlock == levelInfo.StartBlock)
+                    .Any(item => Math.Abs(item.Elevation ?? 0 - levelInfo.Elevation ?? 0) < double.Epsilon);
+
+                return first || second;
+            }
+
+            return false;
+        }
+
+        public static bool IsNotFoundLevels(this LevelInfo levelInfo, IEnumerable<LevelInfo> linkLevelInfos) {
+            return linkLevelInfos.Any(item=> item.Level.Name.Equals(levelInfo.Level.Name));
+        }
+
+        public static bool IsNotFoundLinkLevels(this LevelInfo linkLevelInfo, IEnumerable<LevelInfo> levelInfos) {
+            return levelInfos.Any(item=> item.Level.Name.Equals(linkLevelInfo.Level.Name));
         }
     }
 }

@@ -52,6 +52,7 @@ namespace RevitCheckingLevels.ViewModels {
             Levels.Clear();
             var levelInfos = _revitRepository.GetLevels()
                 .Select(item => new LevelParserImpl(item).ReadLevelInfo())
+                .OrderBy(item => item.Level.Elevation)
                 .ToArray();
 
             foreach(LevelInfo levelInfo in levelInfos) {
@@ -65,6 +66,10 @@ namespace RevitCheckingLevels.ViewModels {
                 
                 if(levelInfo.IsNotMillimeterElevation()) {
                     Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotMillimeterElevation });
+                }
+
+                if(levelInfo.IsNotRangeElevation(levelInfos)) {
+                    Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotRangeElevation });
                 }
             }
 
