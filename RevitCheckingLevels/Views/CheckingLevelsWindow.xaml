@@ -70,8 +70,8 @@
             </dxg:GridControl.View>
 
             <dxg:GridColumn FieldName="Name" Header="Имя"/>
-            <dxg:GridColumn FieldName="MeterElevation" Header="Отметка м" />
-            <dxg:GridColumn FieldName="MillimeterElevation" Header="Отметка мм" />
+            <dxg:GridColumn FieldName="MeterElevation" Header="Отметка (м)" />
+            <dxg:GridColumn FieldName="MillimeterElevation" Header="Отметка (мм)" />
 
 
             <dxg:GridColumn FieldName="ErrorType" Header="Тип ошибки" GroupIndex="0" />

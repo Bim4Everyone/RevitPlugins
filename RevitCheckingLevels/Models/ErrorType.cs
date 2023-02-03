@@ -182,11 +182,11 @@ namespace RevitCheckingLevels.Models {
         }
 
         public static bool IsNotFoundLevels(this LevelInfo levelInfo, IEnumerable<LevelInfo> linkLevelInfos) {
-            return linkLevelInfos.Any(item=> item.Level.Name.Equals(levelInfo.Level.Name));
+            return !linkLevelInfos.Any(item=> item.Level.Name.Equals(levelInfo.Level.Name));
         }
 
         public static bool IsNotFoundLinkLevels(this LevelInfo linkLevelInfo, IEnumerable<LevelInfo> levelInfos) {
-            return levelInfos.Any(item=> item.Level.Name.Equals(linkLevelInfo.Level.Name));
+             return !levelInfos.Any(item=> item.Level.Name.Equals(linkLevelInfo.Level.Name));
         }
     }
 }

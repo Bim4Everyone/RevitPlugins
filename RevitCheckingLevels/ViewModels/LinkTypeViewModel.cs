@@ -24,6 +24,8 @@ namespace RevitCheckingLevels.ViewModels {
             LinkLoadCommand = new RelayCommand(LinkLoad, CanLinkLoad);
         }
 
+        public RevitLinkType Element => _linkType;
+
         public ElementId Id => _linkType.Id;
         public string Name => _linkType.Name;
         public bool IsLinkLoaded => _linkType.GetLinkedFileStatus() == LinkedFileStatus.Loaded;

@@ -22,9 +22,17 @@ namespace RevitCheckingLevels.Models {
         public Document Document => ActiveUIDocument.Document;
 
         public IEnumerable<Level> GetLevels() {
-            return new FilteredElementCollector(Document)
-                .OfCategory(BuiltInCategory.OST_Levels)
-                .OfType<Level>();
+            return GetLevels(Document);
+        }
+
+        public IEnumerable<Level> GetLevels(RevitLinkType linkType) {
+            var linkInstance = new FilteredElementCollector(Document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(RevitLinkInstance))
+                .OfType<RevitLinkInstance>()
+                .FirstOrDefault(item => item.GetTypeId() == linkType.Id);
+
+            return GetLevels(linkInstance?.GetLinkDocument());
         }
 
         public IEnumerable<RevitLinkType> GetRevitLinkTypes() {
@@ -44,6 +52,12 @@ namespace RevitCheckingLevels.Models {
 
                 transaction.Commit();
             }
+        }
+
+        private IEnumerable<Level> GetLevels(Document document) {
+            return new FilteredElementCollector(document)
+                .OfCategory(BuiltInCategory.OST_Levels)
+                .OfType<Level>();
         }
     }
 }
