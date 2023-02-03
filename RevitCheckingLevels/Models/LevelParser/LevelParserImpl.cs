@@ -90,6 +90,11 @@ namespace RevitCheckingLevels.Models.LevelParser {
                 return;
             }
 
+            if(!Regex.IsMatch(elevation, @"-?\d+\.\d+")) {
+                _errors.Add("Отметка уровня не верного формата.");
+                return;
+            }
+
             if(double.TryParse(elevation, NumberStyles.AllowDecimalPoint, CultureInfo, out double result)) {
                 levelInfo.Elevation = result;
                 return;

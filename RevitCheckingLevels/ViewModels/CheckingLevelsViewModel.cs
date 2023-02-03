@@ -50,11 +50,21 @@ namespace RevitCheckingLevels.ViewModels {
 
         private void Load(object p) {
             Levels.Clear();
-            foreach(Level level in _revitRepository.GetLevels()) {
-                var levelViewModel = new LevelViewModel(
-                    new LevelParserImpl(level).ReadLevelInfo());
-                if(levelViewModel.ErrorType != null) {
-                    Levels.Add(levelViewModel);
+            var levelInfos = _revitRepository.GetLevels()
+                .Select(item => new LevelParserImpl(item).ReadLevelInfo())
+                .ToArray();
+
+            foreach(LevelInfo levelInfo in levelInfos) {
+                if(levelInfo.IsNotStandard()) {
+                    Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotStandard });
+                } 
+                
+                if(levelInfo.IsNotElevation()) {
+                    Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotElevation });
+                } 
+                
+                if(levelInfo.IsNotMillimeterElevation()) {
+                    Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotMillimeterElevation });
                 }
             }
 

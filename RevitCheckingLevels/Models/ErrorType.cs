@@ -2,6 +2,8 @@
 
 using Autodesk.Revit.DB;
 
+using RevitCheckingLevels.Models.LevelParser;
+
 namespace RevitCheckingLevels.Models {
     internal class ErrorType : IEquatable<ErrorType>, IComparable<ErrorType>, IComparable {
         public static readonly ErrorType NotStandard =
@@ -106,6 +108,26 @@ namespace RevitCheckingLevels.Models {
 
         public override string ToString() {
             return Name;
+        }
+    }
+
+    internal static class LevelInfoExtensions {
+        public static bool IsNotStandard(this LevelInfo levelInfo) {
+            return levelInfo.Errors.Count > 0;
+        }
+
+        public static bool IsNotElevation(this LevelInfo levelInfo) {
+            if(levelInfo.Elevation == null) {
+                return false;
+            }
+
+            double meterElevation = levelInfo.Level.GetMeterElevation();
+            return !LevelExtensions.IsAlmostEqual(levelInfo.Elevation.Value, meterElevation, 0.001);
+        }
+
+        public static bool IsNotMillimeterElevation(this LevelInfo levelInfo) {
+            double millimeterElevation = levelInfo.Level.GetMillimeterElevation();
+            return !LevelExtensions.IsAlmostEqual(millimeterElevation % 1, 0.0000001, 0.0000001);
         }
     }
 }

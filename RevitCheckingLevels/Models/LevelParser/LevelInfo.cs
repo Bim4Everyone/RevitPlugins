@@ -16,7 +16,7 @@ namespace RevitCheckingLevels.Models.LevelParser {
         /// <summary>
         /// Номер этажа.
         /// </summary>
-        public int LevelNum { get; set; }
+        public int? LevelNum { get; set; }
 
         /// <summary>
         /// Номер уровня.
@@ -36,12 +36,12 @@ namespace RevitCheckingLevels.Models.LevelParser {
         /// <summary>
         /// Начальный номер блока.
         /// </summary>
-        public int StartBlock { get; set; }
+        public int? StartBlock { get; set; }
 
         /// <summary>
         /// Последний номер блока.
         /// </summary>
-        public int FinishBlock { get; set; }
+        public int? FinishBlock { get; set; }
 
         /// <summary>
         /// Признак равенства начального и последнего номера блока.
@@ -51,7 +51,7 @@ namespace RevitCheckingLevels.Models.LevelParser {
         /// <summary>
         /// Отметка уровня.
         /// </summary>
-        public double Elevation { get; set; }
+        public double? Elevation { get; set; }
 
         /// <summary>
         /// Список ошибок при разборе имени.
@@ -75,7 +75,7 @@ namespace RevitCheckingLevels.Models.LevelParser {
         }
 
         public string GetElevation() {
-            return Elevation.ToString("F3", LevelParserImpl.CultureInfo);
+            return Elevation?.ToString("F3", LevelParserImpl.CultureInfo);
         }
 
         private string GetBlockNum() {
@@ -85,7 +85,11 @@ namespace RevitCheckingLevels.Models.LevelParser {
         }
 
         private string GetDelimiter() {
-            return Math.Abs(FinishBlock - StartBlock) > 1
+            if(FinishBlock == null || StartBlock == null) {
+                return null;
+            }
+
+            return Math.Abs(FinishBlock.Value - StartBlock.Value) > 1
                 ? "-"
                 : ", ";
         }

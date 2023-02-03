@@ -13,17 +13,28 @@ namespace RevitCheckingLevels.Models {
 
         public static bool IsAlmostEqual(double left, double right,
             double eps = double.Epsilon) {
-            return Math.Abs(left - right) < eps;
+            return Math.Abs(left - right) <= eps;
         }
 
 #if REVIT_2020_OR_LESS
 
-        public static readonly FormatOptions FormatOptions 
+        public static readonly FormatOptions MeterFormatOptions 
             = new FormatOptions(DisplayUnitType.DUT_METERS) { Accuracy = 0.001 };
+
+        public static readonly FormatOptions MillimeterFormatOptions 
+            = new FormatOptions(DisplayUnitType.DUT_MILLIMETERS) { Accuracy = 0.00000001 };
 
         public static string GetFormattedMeterElevation(this Level level) {
             var formatValueOptions = new FormatValueOptions();
-            formatValueOptions.SetFormatOptions(FormatOptions);
+            formatValueOptions.SetFormatOptions(MeterFormatOptions);
+            formatValueOptions.AppendUnitSymbol = true;
+            return UnitFormatUtils.Format(MetricUnits, UnitType.UT_Length,
+                level.Elevation, false, false, formatValueOptions);
+        }
+
+        public static string GetFormattedMillimeterElevation(this Level level) {
+            var formatValueOptions = new FormatValueOptions();
+            formatValueOptions.SetFormatOptions(MillimeterFormatOptions);
             formatValueOptions.AppendUnitSymbol = true;
             return UnitFormatUtils.Format(MetricUnits, UnitType.UT_Length,
                 level.Elevation, false, false, formatValueOptions);
@@ -36,12 +47,23 @@ namespace RevitCheckingLevels.Models {
             UnitUtils.ConvertFromInternalUnits(level.Elevation, DisplayUnitType.DUT_MILLIMETERS);
 
 #else
-        public static readonly FormatOptions FormatOptions 
+        public static readonly FormatOptions MeterFormatOptions 
             = new FormatOptions(UnitTypeId.Meters) { Accuracy = 0.001 };
+
+        public static readonly FormatOptions MillimeterFormatOptions 
+            = new FormatOptions(UnitTypeId.Millimeters) { Accuracy = 0.00000001 };
 
         public static string GetFormattedMeterElevation(this Level level) {
             var formatValueOptions = new FormatValueOptions();
-            formatValueOptions.SetFormatOptions(FormatOptions);
+            formatValueOptions.SetFormatOptions(MeterFormatOptions);
+            formatValueOptions.AppendUnitSymbol = true;
+            return UnitFormatUtils.Format(MetricUnits, SpecTypeId.Length,
+                level.Elevation, false, formatValueOptions);
+        }
+
+        public static string GetFormattedMillimeterElevation(this Level level) {
+            var formatValueOptions = new FormatValueOptions();
+            formatValueOptions.SetFormatOptions(MillimeterFormatOptions);
             formatValueOptions.AppendUnitSymbol = true;
             return UnitFormatUtils.Format(MetricUnits, SpecTypeId.Length,
                 level.Elevation, false, formatValueOptions);
