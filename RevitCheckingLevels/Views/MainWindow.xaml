@@ -40,11 +40,21 @@
             Command="{Binding ViewLoadCommand}"/>
 
         <dxmvvm:EventToCommand
+            SourceName="_linkTypes"
+            EventName="SelectedIndexChanged"
+            Command="{Binding LoadLevelErrorsCommand}"/>
+
+        <dxmvvm:EventToCommand
             SourceName="_gridControl"
             PassEventArgsToCommand="True"
             EventName="GroupRowCollapsing"
             Command="{Binding  
                 Source={StaticResource DisableCollapseGroupRowCommand}}"/>
+
+        <dxmvvm:CompositeCommandBehavior x:Name="MultiCommand">
+            <dxmvvm:CommandItem Command="{Binding LinkType.LinkLoadCommand}"/>
+            <dxmvvm:CommandItem Command="{Binding ViewLoadCommand}"/>
+        </dxmvvm:CompositeCommandBehavior>
     </dxmvvm:Interaction.Behaviors>
 
     <Grid>
@@ -71,9 +81,10 @@
                 Margin="10 0 0 0"
                 ToolTipService.ShowOnDisabled="True"
                 ToolTip="{Binding LinkType.LinkLoadToolTip}"
-                Command="{Binding LinkType.LinkLoadCommand}" />
+                Command="{Binding CompositeCommand, ElementName=MultiCommand}"/>
 
-            <dxe:ComboBoxEdit 
+            <dxe:ComboBoxEdit
+                x:Name="_linkTypes"
                 DisplayMember="Name"
                 IsTextEditable="False"
                 ItemsSource="{Binding Path=LinkTypes}"

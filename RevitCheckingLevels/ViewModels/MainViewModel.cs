@@ -28,10 +28,12 @@ namespace RevitCheckingLevels.ViewModels {
             _revitRepository = revitRepository;
 
             ViewLoadCommand = new RelayCommand(LoadView);
+            LoadLevelErrorsCommand = new RelayCommand(LoadLevelErrors);
             UpdateElevationCommand = new RelayCommand(UpdateElevation, CanUpdateElevation);
         }
 
         public ICommand ViewLoadCommand { get; }
+        public ICommand LoadLevelErrorsCommand { get; }
         public ICommand UpdateElevationCommand { get; }
 
         public string ErrorText {
@@ -54,11 +56,11 @@ namespace RevitCheckingLevels.ViewModels {
         }
 
         private void LoadView(object p) {
-            LoadLinkFiles();
-            LoadLevelErrors();
+            LoadLinkFiles(null);
+            LoadLevelErrors(null);
         }
 
-        private void LoadLinkFiles() {
+        private void LoadLinkFiles(object parameter) {
             LinkTypes.Clear();
             foreach(RevitLinkType linkType in _revitRepository.GetRevitLinkTypes()) {
                 LinkTypes.Add(new LinkTypeViewModel(linkType));
@@ -67,7 +69,7 @@ namespace RevitCheckingLevels.ViewModels {
             LinkType = LinkTypes.FirstOrDefault();
         }
 
-        private void LoadLevelErrors() {
+        private void LoadLevelErrors(object parameter) {
             Levels.Clear();
             var levelInfos = _revitRepository.GetLevels()
                 .Select(item => new LevelParserImpl(item).ReadLevelInfo())
