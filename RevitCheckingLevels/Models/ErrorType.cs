@@ -149,9 +149,12 @@ namespace RevitCheckingLevels.Models {
                 return false;
             }
 
+            var filtered = levelInfos
+                .Where(item => item.Errors.Count == 0)
+                .ToArray();
+
             if(levelInfo.SubLevel.HasValue) {
-                return levelInfos
-                    .Where(item => item.Errors.Count == 0)
+                return filtered
                     .Where(item => item.SubLevel.HasValue)
                     .Where(item=> item.BlockType == levelInfo.BlockType)
                     .Where(item=> item.StartBlock == levelInfo.StartBlock)
@@ -159,20 +162,17 @@ namespace RevitCheckingLevels.Models {
             }
 
             if(levelInfo.SubLevel == null) {
-                bool first = levelInfos
-                    .Where(item => item.Errors.Count == 0)
-                    .Where(item=> item.SubLevel == null)
-                    .Where(item=> item.LevelNum == levelInfo.LevelNum)
-                    .Where(item=> item.BlockType == levelInfo.BlockType)
-                    .Any(item => item.StartBlock == levelInfo.StartBlock);
-
-                bool second = levelInfos
-                    .Where(item => item.Errors.Count == 0)
-                    .Where(item=> item.SubLevel == null)
-                    .Where(item=> item.Elevation.HasValue)
-                    .Where(item=> item.LevelNum == levelInfo.LevelNum)
-                    .Where(item=> item.BlockType == levelInfo.BlockType)
+                filtered = filtered
+                    .Where(item => item.SubLevel == null)
+                    .Where(item => item.BlockType == levelInfo.BlockType)
                     .Where(item => item.StartBlock == levelInfo.StartBlock)
+                    .ToArray();
+
+                bool first = filtered
+                    .Any(item => item.LevelNum == levelInfo.LevelNum);
+
+                bool second = filtered
+                    .Where(item => item.Elevation.HasValue)
                     .Any(item => Math.Abs(item.Elevation ?? 0 - levelInfo.Elevation ?? 0) < double.Epsilon);
 
                 return first || second;
