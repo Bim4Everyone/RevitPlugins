@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using RevitCheckingLevels.Models.LevelParser;
+
 namespace RevitCheckingLevels.Models {
     internal static class LevelExtensions {
         public static readonly Units MetricUnits 
@@ -30,6 +32,14 @@ namespace RevitCheckingLevels.Models {
             formatValueOptions.AppendUnitSymbol = true;
             return UnitFormatUtils.Format(MetricUnits, UnitType.UT_Length,
                 level.Elevation, false, false, formatValueOptions);
+        }
+
+        public static string GetFormattedMeterElevation(this LevelInfo level) {
+            var formatValueOptions = new FormatValueOptions();
+            formatValueOptions.SetFormatOptions(MeterFormatOptions);
+            formatValueOptions.AppendUnitSymbol = true;
+            return UnitFormatUtils.Format(MetricUnits, UnitType.UT_Length,
+                level.Elevation ?? 0, false, false, formatValueOptions);
         }
 
         public static string GetFormattedMillimeterElevation(this Level level) {
@@ -59,6 +69,14 @@ namespace RevitCheckingLevels.Models {
             formatValueOptions.AppendUnitSymbol = true;
             return UnitFormatUtils.Format(MetricUnits, SpecTypeId.Length,
                 level.Elevation, false, formatValueOptions);
+        }
+
+        public static string GetFormattedMeterElevation(this LevelInfo level) {
+            var formatValueOptions = new FormatValueOptions();
+            formatValueOptions.SetFormatOptions(MeterFormatOptions);
+            formatValueOptions.AppendUnitSymbol = true;
+            return UnitFormatUtils.Format(MetricUnits, SpecTypeId.Length,
+                level.Elevation ?? 0, false, formatValueOptions);
         }
 
         public static string GetFormattedMillimeterElevation(this Level level) {

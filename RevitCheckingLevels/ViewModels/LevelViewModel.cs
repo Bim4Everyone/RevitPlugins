@@ -41,8 +41,10 @@ namespace RevitCheckingLevels.ViewModels {
             if(ErrorType.NotStandard == ErrorType) {
                 return string.Join(Environment.NewLine, LevelInfo.Errors);
             } else if(ErrorType.NotElevation == ErrorType) {
-
-            }
+                return $"Значение отметки: фактическое \"{_levelInfo.Level.GetFormattedMeterElevation()}\", в имени уровня \"{_levelInfo.GetFormattedMeterElevation()}\".";
+            } else if(ErrorType.NotMillimeterElevation == ErrorType) {
+                return $"Значение отметки: фактическое \"{_levelInfo.Level.GetFormattedMillimeterElevation()}\".";
+            } 
 
             return null;
         }
