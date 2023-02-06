@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
@@ -32,6 +33,18 @@ namespace RevitCheckingLevels.ViewModels {
         public ErrorType ErrorType {
             get => _errorType;
             set => this.RaiseAndSetIfChanged(ref _errorType, value);
+        }
+
+        public string ToolTipInfo => GetTooltip();
+
+        private string GetTooltip() {
+            if(ErrorType.NotStandard == ErrorType) {
+                return string.Join(Environment.NewLine, LevelInfo.Errors);
+            } else if(ErrorType.NotElevation == ErrorType) {
+
+            }
+
+            return null;
         }
     }
 }

@@ -66,7 +66,13 @@
                     ShowTotalSummary="False"
                     AllowEditing="False"
                     AllowGrouping="False"
-                    GroupRowTemplate="{StaticResource GroupRowTemplate}" />
+                    GroupRowTemplate="{StaticResource GroupRowTemplate}">
+                    <dxg:TableView.RowStyle>  
+                        <Style TargetType="dxg:RowControl">  
+                            <Setter Property="ToolTip" Value="{Binding Row.ToolTipInfo}" />  
+                        </Style>  
+                    </dxg:TableView.RowStyle>  
+                </dxg:TableView>
             </dxg:GridControl.View>
 
             <dxg:GridColumn FieldName="Name" Header="Имя"/>
