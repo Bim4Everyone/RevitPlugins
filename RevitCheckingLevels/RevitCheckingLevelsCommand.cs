@@ -47,26 +47,6 @@ namespace RevitCheckingLevels {
                     .ToSelf()
                     .InSingletonScope();
 
-                Window Factory(Type t) => (Window) kernel.Get(t);
-                kernel.Bind<Func<Type, Window>>()
-                    .ToConstant((Func<Type, Window>) Factory);
-
-                kernel.Bind<CheckingLevelsViewModel>().ToSelf();
-                kernel.Bind<CheckingLevelsWindow>().ToSelf()
-                    .WithPropertyValue(nameof(Window.Title), PluginName)
-                    .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<CheckingLevelsViewModel>());
-
-
-                kernel.Bind<CheckingLinkLevelsViewModel>().ToSelf()
-                    .WithPropertyValue(nameof(CheckingLinkLevelsViewModel.LinkType),
-                    c => c.Kernel.Get<MainViewModel>().LinkType);
-                kernel.Bind<CheckingLinkLevelsWindow>().ToSelf()
-                    .WithPropertyValue(nameof(Window.Title), PluginName)
-                    .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<CheckingLinkLevelsViewModel>());
-
-
                 kernel.Bind<MainViewModel>().ToSelf()
                     .InSingletonScope();
                 kernel.Bind<MainWindow>().ToSelf()

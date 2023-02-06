@@ -11,50 +11,54 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitCheckingLevels.Models;
+using RevitCheckingLevels.Models.LevelParser;
 using RevitCheckingLevels.Services;
 using RevitCheckingLevels.Views;
 
 namespace RevitCheckingLevels.ViewModels {
     internal class MainViewModel : BaseViewModel {
-        private readonly Func<Type, Window> _modeFactory;
         private readonly RevitRepository _revitRepository;
 
         private string _errorText;
-        private bool _isSelectCheckingLevel;
-        private LinkTypeViewModel _linkType;
+        private LevelViewModel _level;
+        private LinkTypeViewModel _linkType
+            ;
 
-        public MainViewModel(RevitRepository revitRepository, Func<Type, Window> modeFactory) {
-            _modeFactory = modeFactory;
+        public MainViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
 
-            IsSelectCheckingLevel = true;
-
-            ViewCommand = new RelayCommand(ChangeMode, CanChangeMode);
-            ViewLoadCommand = new RelayCommand(ViewLoad);
+            ViewLoadCommand = new RelayCommand(LoadView);
+            UpdateElevationCommand = new RelayCommand(UpdateElevation, CanUpdateElevation);
         }
 
-        public ICommand ViewCommand { get; }
         public ICommand ViewLoadCommand { get; }
-
-        public ObservableCollection<LinkTypeViewModel> LinkTypes { get; }
-            = new ObservableCollection<LinkTypeViewModel>();
-
-        public LinkTypeViewModel LinkType {
-            get => _linkType;
-            set => this.RaiseAndSetIfChanged(ref _linkType, value);
-        }
+        public ICommand UpdateElevationCommand { get; }
 
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public bool IsSelectCheckingLevel {
-            get => _isSelectCheckingLevel;
-            set => this.RaiseAndSetIfChanged(ref _isSelectCheckingLevel, value);
+        public ObservableCollection<LevelViewModel> Levels { get; } = new ObservableCollection<LevelViewModel>();
+
+        public LevelViewModel Level {
+            get => _level;
+            set => this.RaiseAndSetIfChanged(ref _level, value);
         }
 
-        private void ViewLoad(object p) {
+        public ObservableCollection<LinkTypeViewModel> LinkTypes { get; } = new ObservableCollection<LinkTypeViewModel>();
+
+        public LinkTypeViewModel LinkType {
+            get => _linkType;
+            set => this.RaiseAndSetIfChanged(ref _linkType, value);
+        }
+
+        private void LoadView(object p) {
+            LoadLinkFiles();
+            LoadLevelErrors();
+        }
+
+        private void LoadLinkFiles() {
             LinkTypes.Clear();
             foreach(RevitLinkType linkType in _revitRepository.GetRevitLinkTypes()) {
                 LinkTypes.Add(new LinkTypeViewModel(linkType));
@@ -63,29 +67,73 @@ namespace RevitCheckingLevels.ViewModels {
             LinkType = LinkTypes.FirstOrDefault();
         }
 
-        private void ChangeMode(object p) {
-            if(IsSelectCheckingLevel) {
-                _modeFactory(typeof(CheckingLevelsWindow)).ShowDialog();
-            } else {
-                _modeFactory(typeof(CheckingLinkLevelsWindow)).ShowDialog();
+        private void LoadLevelErrors() {
+            Levels.Clear();
+            var levelInfos = _revitRepository.GetLevels()
+                .Select(item => new LevelParserImpl(item).ReadLevelInfo())
+                .OrderBy(item => item.Level.Elevation)
+                .ToArray();
+
+            foreach(LevelInfo levelInfo in levelInfos) {
+                if(levelInfo.IsNotStandard()) {
+                    Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotStandard });
+                }
+
+                if(levelInfo.IsNotElevation()) {
+                    Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotElevation });
+                }
+
+                if(levelInfo.IsNotMillimeterElevation()) {
+                    Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotMillimeterElevation });
+                }
+
+                if(levelInfo.IsNotRangeElevation(levelInfos)) {
+                    Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotRangeElevation });
+                }
+            }
+
+            LoadLinkLevels(levelInfos);
+            Level = Levels.FirstOrDefault();
+        }
+
+        private void LoadLinkLevels(LevelInfo[] levelInfos) {
+            if(LinkType?.IsLinkLoaded == true) {
+                var linkLevelInfos = _revitRepository.GetLevels(LinkType.Element)
+                    .Select(item => new LevelParserImpl(item).ReadLevelInfo())
+                    .OrderBy(item => item.Level.Elevation)
+                    .ToArray();
+
+                foreach(LevelInfo levelInfo in levelInfos) {
+                    if(levelInfo.IsNotFoundLevels(linkLevelInfos)) {
+                        Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotFoundLevels });
+                    }
+                }
+
+                foreach(LevelInfo linkLevelInfo in linkLevelInfos) {
+                    if(linkLevelInfo.IsNotFoundLinkLevels(levelInfos)) {
+                        Levels.Add(new LevelViewModel(linkLevelInfo) { ErrorType = ErrorType.NotFoundLinkLevels });
+                    }
+                }
             }
         }
 
-        private bool CanChangeMode(object p) {
-            if(!IsSelectCheckingLevel) {
-                if(LinkType == null) {
-                    ErrorText = "Выберите координационный файл.";
-                    return false;
-                }
+        private void UpdateElevation(object p) {
+            if(p is object[] list) {
+                _revitRepository.UpdateElevations(list
+                    .OfType<LevelViewModel>()
+                    .Select(item => item.LevelInfo));
 
-                if(!LinkType.IsLinkLoaded) {
-                    ErrorText = "Загрузите координационный файл.";
-                    return false;
-                }
+                LoadView(null);
+            }
+        }
+
+        private bool CanUpdateElevation(object p) {
+            if(p is object[] list) {
+                return list.OfType<LevelViewModel>()
+                    .All(item => item.ErrorType == ErrorType.NotElevation);
             }
 
-            ErrorText = null;
-            return true;
+            return false;
         }
     }
 }
