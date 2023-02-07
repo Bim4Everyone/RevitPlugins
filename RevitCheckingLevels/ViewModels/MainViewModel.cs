@@ -60,7 +60,7 @@ namespace RevitCheckingLevels.ViewModels {
 
         private void LoadView(object p) {
             LoadLinkFiles(null);
-            LoadLevelErrors(null);
+            LoadLevelErrors((object) null);
         }
 
         private void LoadLinkFiles(object parameter) {
