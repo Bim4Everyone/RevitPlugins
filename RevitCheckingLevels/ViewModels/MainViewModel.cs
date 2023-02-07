@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -6,6 +7,8 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+
+using DevExpress.Data.Native;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -76,22 +79,8 @@ namespace RevitCheckingLevels.ViewModels {
                 .OrderBy(item => item.Level.Elevation)
                 .ToArray();
 
-            foreach(LevelInfo levelInfo in levelInfos) {
-                if(levelInfo.IsNotStandard()) {
-                    Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotStandard });
-                }
-
-                if(levelInfo.IsNotElevation()) {
-                    Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotElevation });
-                }
-
-                if(levelInfo.IsNotMillimeterElevation()) {
-                    Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotMillimeterElevation });
-                }
-
-                if(levelInfo.IsNotRangeElevation(levelInfos)) {
-                    Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotRangeElevation });
-                }
+            foreach(LevelViewModel item in LoadLevelErrors(levelInfos)) {
+                Levels.Add(item);
             }
 
             LoadLinkLevels(levelInfos);
@@ -105,6 +94,11 @@ namespace RevitCheckingLevels.ViewModels {
                     .OrderBy(item => item.Level.Elevation)
                     .ToArray();
 
+                if(LoadLevelErrors(levelInfos).Any()) {
+                    ErrorText = $"В координационном файле \"{LinkType.Name}\" найдены ошибки в уровнях.";
+                    return;
+                }
+
                 foreach(LevelInfo levelInfo in levelInfos) {
                     if(levelInfo.IsNotFoundLevels(linkLevelInfos)) {
                         Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotFoundLevels });
@@ -115,6 +109,26 @@ namespace RevitCheckingLevels.ViewModels {
                     if(linkLevelInfo.IsNotFoundLinkLevels(levelInfos)) {
                         Levels.Add(new LevelViewModel(linkLevelInfo) { ErrorType = ErrorType.NotFoundLinkLevels });
                     }
+                }
+            }
+        }
+
+        private static IEnumerable<LevelViewModel> LoadLevelErrors(LevelInfo[] levelInfos) {
+            foreach(LevelInfo levelInfo in levelInfos) {
+                if(levelInfo.IsNotStandard()) {
+                    yield return new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotStandard };
+                }
+
+                if(levelInfo.IsNotElevation()) {
+                    yield return new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotElevation };
+                }
+
+                if(levelInfo.IsNotMillimeterElevation()) {
+                    yield return new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotMillimeterElevation };
+                }
+
+                if(levelInfo.IsNotRangeElevation(levelInfos)) {
+                    yield return new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotRangeElevation };
                 }
             }
         }
