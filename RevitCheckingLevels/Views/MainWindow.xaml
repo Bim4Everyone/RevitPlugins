@@ -127,6 +127,7 @@
             <TextBlock
                 Margin="10"
                 Foreground="Orange"
+                VerticalAlignment="Center"
                 Text="{Binding ErrorText}" />
 
             <dx:SimpleButton 

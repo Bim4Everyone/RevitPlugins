@@ -25,6 +25,14 @@ namespace RevitCheckingLevels.Models {
             return GetLevels(Document);
         }
 
+        public bool HasLinkInstance(RevitLinkType linkType) {
+            return new FilteredElementCollector(Document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(RevitLinkInstance))
+                .OfType<RevitLinkInstance>()
+                .Any(item => item.GetTypeId() == linkType.Id);
+        }
+
         public IEnumerable<Level> GetLevels(RevitLinkType linkType) {
             var linkInstance = new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
@@ -32,7 +40,9 @@ namespace RevitCheckingLevels.Models {
                 .OfType<RevitLinkInstance>()
                 .FirstOrDefault(item => item.GetTypeId() == linkType.Id);
 
-            return GetLevels(linkInstance?.GetLinkDocument());
+            return linkInstance == null
+                ? Enumerable.Empty<Level>()
+                : GetLevels(linkInstance.GetLinkDocument());
         }
 
         public IEnumerable<RevitLinkType> GetRevitLinkTypes() {

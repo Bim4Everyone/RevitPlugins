@@ -154,12 +154,18 @@ namespace RevitCheckingLevels.Models {
                 .Where(item => item.Errors.Count == 0)
                 .ToArray();
 
+            if(filtered.Length <= 1) {
+                return false;
+            }
+
             if(levelInfo.SubLevel.HasValue) {
-                return filtered
+                return !filtered
                     .Where(item => item.SubLevel.HasValue)
                     .Where(item => item.BlockType == levelInfo.BlockType)
                     .Where(item => item.StartBlock == levelInfo.StartBlock)
-                    .Any(item => Math.Abs(levelInfo.Level.GetMillimeterElevation() - item.Level.GetMillimeterElevation()) < 1500);
+                    .Any(item =>
+                        Math.Abs(levelInfo.Level.GetMillimeterElevation()
+                                 - item.Level.GetMillimeterElevation()) >= 1500);
             }
 
             if(levelInfo.SubLevel == null) {
@@ -174,7 +180,7 @@ namespace RevitCheckingLevels.Models {
 
                 bool second = filtered
                     .Where(item => item.Elevation.HasValue)
-                    .Any(item => Math.Abs(item.Elevation ?? 0 - levelInfo.Elevation ?? 0) < double.Epsilon);
+                    .Any(item => Math.Abs(item.Elevation - levelInfo.Elevation ?? 0) < double.Epsilon);
 
                 return first || second;
             }

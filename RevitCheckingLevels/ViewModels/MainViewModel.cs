@@ -88,11 +88,27 @@ namespace RevitCheckingLevels.ViewModels {
         }
 
         private void LoadLinkLevels(LevelInfo[] levelInfos) {
+            ErrorText = null;
+            if(LinkType?.IsLinkLoaded == false) {
+                ErrorText = $"Загрузите координационный файл \"{LinkType.Name}\".";
+                return;
+            }
+
             if(LinkType?.IsLinkLoaded == true) {
+                if(!_revitRepository.HasLinkInstance(LinkType.Element)) {
+                    ErrorText = $"Не были созданы экземпляры связанного файла \"{LinkType.Name}\".";
+                    return;
+                }
+
                 var linkLevelInfos = _revitRepository.GetLevels(LinkType.Element)
                     .Select(item => new LevelParserImpl(item).ReadLevelInfo())
                     .OrderBy(item => item.Level.Elevation)
                     .ToArray();
+
+                if(linkLevelInfos.Length == 0) {
+                    ErrorText = $"В координационном файле \"{LinkType.Name}\" не были найдены уровни.";
+                    return;
+                }
 
                 if(LoadLevelErrors(levelInfos).Any()) {
                     ErrorText = $"В координационном файле \"{LinkType.Name}\" найдены ошибки в уровнях.";
