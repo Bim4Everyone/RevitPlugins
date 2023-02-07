@@ -95,7 +95,7 @@ namespace RevitCheckingLevels.Models.LevelParser {
                 return;
             }
 
-            if(double.TryParse(elevation, NumberStyles.AllowDecimalPoint, CultureInfo, out double result)) {
+            if(double.TryParse(elevation, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo, out double result)) {
                 levelInfo.Elevation = result;
                 return;
             }
