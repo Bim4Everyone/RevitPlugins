@@ -141,6 +141,7 @@ namespace RevitCheckingLevels.Models {
 
         public static bool IsNotMillimeterElevation(this LevelInfo levelInfo) {
             double millimeterElevation = levelInfo.Level.GetMillimeterElevation();
+            millimeterElevation = Math.Round(millimeterElevation, 8, MidpointRounding.AwayFromZero);
             return !LevelExtensions.IsAlmostEqual(millimeterElevation % 1, 0.0000001, 0.0000001);
         }
 
@@ -156,8 +157,8 @@ namespace RevitCheckingLevels.Models {
             if(levelInfo.SubLevel.HasValue) {
                 return filtered
                     .Where(item => item.SubLevel.HasValue)
-                    .Where(item=> item.BlockType == levelInfo.BlockType)
-                    .Where(item=> item.StartBlock == levelInfo.StartBlock)
+                    .Where(item => item.BlockType == levelInfo.BlockType)
+                    .Where(item => item.StartBlock == levelInfo.StartBlock)
                     .Any(item => Math.Abs(levelInfo.Level.GetMillimeterElevation() - item.Level.GetMillimeterElevation()) < 1500);
             }
 
@@ -182,11 +183,11 @@ namespace RevitCheckingLevels.Models {
         }
 
         public static bool IsNotFoundLevels(this LevelInfo levelInfo, IEnumerable<LevelInfo> linkLevelInfos) {
-            return !linkLevelInfos.Any(item=> item.Level.Name.Equals(levelInfo.Level.Name));
+            return !linkLevelInfos.Any(item => item.Level.Name.Equals(levelInfo.Level.Name));
         }
 
         public static bool IsNotFoundLinkLevels(this LevelInfo linkLevelInfo, IEnumerable<LevelInfo> levelInfos) {
-             return !levelInfos.Any(item=> item.Level.Name.Equals(linkLevelInfo.Level.Name));
+            return !levelInfos.Any(item => item.Level.Name.Equals(linkLevelInfo.Level.Name));
         }
     }
 }
