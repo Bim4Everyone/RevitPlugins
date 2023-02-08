@@ -131,6 +131,10 @@ namespace RevitCheckingLevels.Models {
         }
 
         public static bool IsNotElevation(this LevelInfo levelInfo) {
+            if(levelInfo.IsNotStandard()) {
+                return false;
+            }
+
             if(levelInfo.Elevation == null) {
                 return false;
             }
@@ -194,6 +198,19 @@ namespace RevitCheckingLevels.Models {
 
         public static bool IsNotFoundLinkLevels(this LevelInfo linkLevelInfo, IEnumerable<LevelInfo> levelInfos) {
             return !levelInfos.Any(item => item.Level.Name.Equals(linkLevelInfo.Level.Name));
+        }
+
+        public static string GetNotStandardTooltip(this LevelInfo levelInfo) {
+            return string.Join(Environment.NewLine, levelInfo.Errors);
+        }
+
+        public static string GetNotElevationTooltip(this LevelInfo levelInfo) {
+            return $"Значение отметки: фактическое \"{levelInfo.Level.GetFormattedMeterElevation()}\", " +
+                   $"в имени уровня \"{levelInfo.GetFormattedMeterElevation()}\".";
+        }
+
+        public static string GetNotMillimeterElevationTooltip(this LevelInfo levelInfo) {
+            return $"Значение отметки: фактическое \"{levelInfo.Level.GetFormattedMillimeterElevation()}\".";
         }
     }
 }

@@ -19,6 +19,7 @@ namespace RevitCheckingLevels.ViewModels {
     internal class LevelViewModel : BaseViewModel {
         private readonly LevelInfo _levelInfo;
         private ErrorType _errorType;
+        private string _toolTipInfo;
 
         public LevelViewModel(LevelInfo levelInfoInfo) {
             _levelInfo = levelInfoInfo;
@@ -35,18 +36,9 @@ namespace RevitCheckingLevels.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorType, value);
         }
 
-        public string ToolTipInfo => GetTooltip();
-
-        private string GetTooltip() {
-            if(ErrorType.NotStandard == ErrorType) {
-                return string.Join(Environment.NewLine, LevelInfo.Errors);
-            } else if(ErrorType.NotElevation == ErrorType) {
-                return $"Значение отметки: фактическое \"{_levelInfo.Level.GetFormattedMeterElevation()}\", в имени уровня \"{_levelInfo.GetFormattedMeterElevation()}\".";
-            } else if(ErrorType.NotMillimeterElevation == ErrorType) {
-                return $"Значение отметки: фактическое \"{_levelInfo.Level.GetFormattedMillimeterElevation()}\".";
-            } 
-
-            return null;
+        public string ToolTipInfo {
+            get => _toolTipInfo;
+            set => this.RaiseAndSetIfChanged(ref _toolTipInfo, value);
         }
     }
 }

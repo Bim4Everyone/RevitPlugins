@@ -146,15 +146,21 @@ namespace RevitCheckingLevels.ViewModels {
         private static IEnumerable<LevelViewModel> LoadLevelErrors(LevelInfo[] levelInfos) {
             foreach(LevelInfo levelInfo in levelInfos) {
                 if(levelInfo.IsNotStandard()) {
-                    yield return new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotStandard };
+                    yield return new LevelViewModel(levelInfo) {
+                        ErrorType = ErrorType.NotStandard, ToolTipInfo = levelInfo.GetNotStandardTooltip()
+                    };
                 }
 
                 if(levelInfo.IsNotElevation()) {
-                    yield return new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotElevation };
+                    yield return new LevelViewModel(levelInfo) {
+                        ErrorType = ErrorType.NotElevation, ToolTipInfo = levelInfo.GetNotElevationTooltip()
+                    };
                 }
 
                 if(levelInfo.IsNotMillimeterElevation()) {
-                    yield return new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotMillimeterElevation };
+                    yield return new LevelViewModel(levelInfo) {
+                        ErrorType = ErrorType.NotMillimeterElevation, ToolTipInfo = levelInfo.GetNotElevationTooltip()
+                    };
                 }
 
                 if(levelInfo.IsNotRangeElevation(levelInfos)) {
