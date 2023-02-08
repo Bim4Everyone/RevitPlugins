@@ -9,6 +9,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using DevExpress.Data.Native;
+using DevExpress.Mvvm.Native;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -21,20 +22,24 @@ using RevitCheckingLevels.Views;
 namespace RevitCheckingLevels.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly CheckingLevelConfig _checkingLevelConfig;
 
         private string _errorText;
         private LevelViewModel _level;
         private LinkTypeViewModel _linkType
             ;
 
-        public MainViewModel(RevitRepository revitRepository) {
+        public MainViewModel(RevitRepository revitRepository, CheckingLevelConfig checkingLevelConfig) {
             _revitRepository = revitRepository;
+            _checkingLevelConfig = checkingLevelConfig;
 
+            ViewCommand = new RelayCommand(SaveSettings);
             ViewLoadCommand = new RelayCommand(LoadView);
             LoadLevelErrorsCommand = new RelayCommand(LoadLevelErrors);
             UpdateElevationCommand = new RelayCommand(UpdateElevation, CanUpdateElevation);
         }
 
+        public ICommand ViewCommand { get; }
         public ICommand ViewLoadCommand { get; }
         public ICommand LoadLevelErrorsCommand { get; }
         public ICommand UpdateElevationCommand { get; }
@@ -58,6 +63,14 @@ namespace RevitCheckingLevels.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _linkType, value);
         }
 
+        private void SaveSettings(object obj) {
+            var settings = _checkingLevelConfig.GetSettings(_revitRepository.Document)
+                           ?? _checkingLevelConfig.AddSettings(_revitRepository.Document);
+
+            settings.LinkTypeId = LinkType?.Id.IntegerValue ?? 0;
+            _checkingLevelConfig.SaveProjectConfig();
+        }
+
         private void LoadView(object p) {
             LoadLinkFiles(null);
             LoadLevelErrors((object) null);
@@ -69,7 +82,8 @@ namespace RevitCheckingLevels.ViewModels {
                 LinkTypes.Add(new LinkTypeViewModel(linkType));
             }
 
-            LinkType = LinkTypes.FirstOrDefault();
+            var settings = _checkingLevelConfig.GetSettings(_revitRepository.Document);
+            LinkType = LinkTypes.FirstOrDefault(item => item.Id.IntegerValue == settings?.LinkTypeId);
         }
 
         private void LoadLevelErrors(object parameter) {

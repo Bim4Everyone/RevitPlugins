@@ -47,8 +47,10 @@ namespace RevitCheckingLevels {
                     .ToSelf()
                     .InSingletonScope();
 
-                kernel.Bind<MainViewModel>().ToSelf()
-                    .InSingletonScope();
+                kernel.Bind<MainViewModel>().ToSelf();
+                kernel.Bind<CheckingLevelConfig>()
+                    .ToMethod(c => CheckingLevelConfig.GetCheckingLevelConfig());
+
                 kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext),
