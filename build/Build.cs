@@ -73,6 +73,25 @@ class Build : NukeBuild {
                     .SetInformationalVersion(UpdateMajorVersion(config, GitVersion.InformationalVersion))));
         });
 
+    Target FullClean => _ => _
+        .Executes(() => {
+            SourceDirectory.GlobDirectories("**/bin", "**/obj")
+                .Where(item => item != (SourceDirectory / "build" / "bin"))
+                .ForEach(DeleteDirectory);
+            EnsureCleanDirectory(Output);
+        });
+    
+    Target FullCompile => _ => _
+        .DependsOn(FullClean)
+        .Requires(() => Output)
+        .Executes(() => {
+            DotNetBuild(s => s
+                .DisableNoRestore()
+                .SetOutputDirectory(Output)
+                .CombineWith(Configurations, (settings, config) => settings
+                    .SetConfiguration(config)));
+        });
+
     string UpdateMajorVersion(RevitConfiguration configuration, string versionString) {
         var index = versionString.IndexOf('.');
         return configuration.Version + versionString.Substring(index);
