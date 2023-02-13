@@ -134,12 +134,6 @@ namespace RevitCheckingLevels.ViewModels {
                         Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotFoundLevels });
                     }
                 }
-
-                foreach(LevelInfo linkLevelInfo in linkLevelInfos) {
-                    if(linkLevelInfo.IsNotFoundLinkLevels(levelInfos)) {
-                        Levels.Add(new LevelViewModel(linkLevelInfo) { ErrorType = ErrorType.NotFoundLinkLevels });
-                    }
-                }
             }
         }
 

@@ -162,29 +162,23 @@ namespace RevitCheckingLevels.Models {
                 return false;
             }
 
-            if(levelInfo.SubLevel.HasValue) {
-                return !filtered
-                    .Where(item => item.SubLevel.HasValue)
-                    .Where(item => item.BlockType == levelInfo.BlockType)
-                    .Where(item => item.StartBlock == levelInfo.StartBlock)
+            if(levelInfo.HasSubLevel()) {
+                return filtered
+                    .Where(item => item.HasSubLevel())
+                    .Where(item => item.IsEqualBlockName(levelInfo))
                     .Any(item =>
                         Math.Abs(levelInfo.Level.GetMillimeterElevation()
-                                 - item.Level.GetMillimeterElevation()) >= 1500);
+                                 - item.Level.GetMillimeterElevation()) < 1500);
             }
 
-            if(levelInfo.SubLevel == null) {
-                filtered = filtered
-                    .Where(item => item.SubLevel == null)
-                    .Where(item => item.BlockType == levelInfo.BlockType)
-                    .Where(item => item.StartBlock == levelInfo.StartBlock)
-                    .ToArray();
-
-                bool first = filtered
-                    .Any(item => item.LevelNum == levelInfo.LevelNum);
-
-                bool second = filtered
-                    .Where(item => item.Elevation.HasValue)
-                    .Any(item => Math.Abs(item.Elevation - levelInfo.Elevation ?? 0) < double.Epsilon);
+            if(!levelInfo.HasSubLevel()) {
+                bool first =  filtered
+                    .Where(item => !item.HasSubLevel())
+                    .Any(item => item.IsEqualLevelName(levelInfo) && item.IsEqualBlockName(levelInfo));
+                
+                bool second =  filtered
+                    .Where(item => !item.HasSubLevel())
+                    .Any(item => item.IsEqualBlockName(levelInfo) && item.IsEqualElevation(levelInfo));
 
                 return first || second;
             }

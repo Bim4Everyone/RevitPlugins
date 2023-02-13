@@ -12,6 +12,7 @@ namespace RevitCheckingLevels.Models.LevelParser {
         public static readonly CultureInfo CultureInfo = GetCultureInfo();
 
         private readonly List<string> _errors = new List<string>();
+        private readonly List<ILevelBlock> _levelBlocks = new List<ILevelBlock>();
 
         public LevelParserImpl(Level level) {
             _level = level;
@@ -24,7 +25,7 @@ namespace RevitCheckingLevels.Models.LevelParser {
             string[] splittedName = LevelName.Split(
                 new[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
 
-            var levelInfo = new LevelInfo { Level = _level, Errors = _errors };
+            var levelInfo = new LevelInfo { Level = _level, Errors = _errors, LevelBlocks = _levelBlocks};
             ReadLevelName(levelInfo, splittedName.ElementAtOrDefault(0));
             ReadBlockName(levelInfo, splittedName.ElementAtOrDefault(1));
             ReadElevation(levelInfo, splittedName.ElementAtOrDefault(2));
@@ -33,6 +34,7 @@ namespace RevitCheckingLevels.Models.LevelParser {
         }
 
         private void ReadLevelName(LevelInfo levelInfo, string levelName) {
+            levelInfo.LevelName = levelName;
             if(levelName == null) {
                 _errors.Add("Не удалось прочитать уровень.");
                 return;
@@ -55,36 +57,42 @@ namespace RevitCheckingLevels.Models.LevelParser {
         }
 
         private void ReadBlockName(LevelInfo levelInfo, string blockName) {
+            levelInfo.BlockName = blockName;
             if(blockName == null) {
                 _errors.Add("Не удалось прочитать тип блока.");
                 return;
             }
 
-            string[] splittedBlockName = blockName.Split(new[] { '.' },
-                StringSplitOptions.RemoveEmptyEntries);
-
-            if(splittedBlockName.Length == 1) {
-                var blockRange = splittedBlockName[0].Split(new[] { ',', '-' },
+            if(blockName.Contains('.')) {
+                _levelBlocks.Add(ReadBlock(blockName));
+            } else {
+                var blockRange = blockName.Split(new[] {','},
                     StringSplitOptions.RemoveEmptyEntries);
 
-                if(blockRange.Length == 1) {
-                    ReadBlock(levelInfo, splittedBlockName[0]);
-                } else if(blockRange.Length == 2) {
-                    ReadBlockRange(levelInfo, blockRange);
-                } else {
-                    _errors.Add("Не удалось прочитать диапазон типа блока.");
+                foreach(string block in blockRange) {
+                    if(block.Contains('-')) {
+                        var levelBlockRange = ReadBlockRange(blockName);
+                        if(!levelBlockRange.StartBlock.BlockType
+                               .Equals(levelBlockRange.FinishBlock.BlockType)) {
+                            _errors.Add("Наименование типов блоков не совпадают.");
+                        }
+
+                        if(levelBlockRange.StartBlock.BlockNum > levelBlockRange.FinishBlock.BlockNum) {
+                            _errors.Add("Значение начального номера блока больше значения конечного блока.");
+                        }
+                        
+                        if(levelBlockRange.StartBlock.BlockNum == levelBlockRange.FinishBlock.BlockNum) {
+                            _errors.Add("Значение начального номера блока и значения конечного блока равны.");
+                        }
+                    } else {
+                        _levelBlocks.Add(ReadBlock(blockName));
+                    }
                 }
-
-            } else if(splittedBlockName.Length == 2) {
-                ReadBlock(levelInfo, splittedBlockName[0]);
-                levelInfo.SubLevel = ReadInt32(splittedBlockName[1], "Не удалось прочитать значение номера уровня.");
-            } else {
-                _errors.Add("Не удалось прочитать тип блока.");
             }
-
         }
 
         private void ReadElevation(LevelInfo levelInfo, string elevation) {
+            levelInfo.ElevationName = elevation;
             if(elevation == null) {
                 _errors.Add("Не удалось прочитать отметку уровня.");
                 return;
@@ -103,33 +111,30 @@ namespace RevitCheckingLevels.Models.LevelParser {
             _errors.Add("Не удалось прочитать отметку уровня.");
         }
 
-        private void ReadBlock(LevelInfo levelInfo, string blockName) {
+        private LevelBlock ReadBlock(string blockName) {
             (string blockType, string blockNum) = ReadPrefix(blockName);
 
-            levelInfo.StartBlock = ReadInt32(blockNum, "Не удалось прочитать номер блока.");
-            levelInfo.FinishBlock = levelInfo.StartBlock;
-            levelInfo.BlockType = ReadPrefix<BlockType>(blockType, "Не удалось прочитать тип блока.");
+            int? subLevel = blockName.Contains('.')
+                ? ReadInt32(blockName.Split('.').LastOrDefault(), "Не удалось прочитать значение номера уровня.")
+                : (int?) null;
+
+            return new LevelBlock() {
+                SubLevel = subLevel,
+                BlockNum = ReadInt32(blockNum, null),
+                BlockType = ReadPrefix<BlockType>(blockType, "Не удалось прочитать тип блока.")
+            };
         }
 
-        private void ReadBlockRange(LevelInfo levelInfo, string[] blockRange) {
-            (string startBlockType, string startBlockNum) = ReadPrefix(blockRange[0]);
-            (string finishBlockType, string finishBlockNum) = ReadPrefix(blockRange[1]);
-
-            if(!startBlockType.Equals(finishBlockType)) {
-                _errors.Add("Наименование типов блоков не совпадают.");
-            }
-
-            levelInfo.BlockType = ReadPrefix<BlockType>(startBlockType, "Не удалось прочитать тип блока.");
-            levelInfo.StartBlock = ReadInt32(startBlockNum, "Не удалось прочитать начальный номер блока.");
-            levelInfo.FinishBlock = ReadInt32(finishBlockNum, "Не удалось прочитать конечный номер блока.");
-
-            if(levelInfo.StartBlock > levelInfo.FinishBlock) {
-                _errors.Add("Значение начального номера блока больше значения конечного блока.");
-            }
+        private LevelBlockRange ReadBlockRange(string blockName) {
+            string[] blockRange = blockName.Split('-');
+            return new LevelBlockRange() {
+                StartBlock = ReadBlock(blockRange[0]),
+                FinishBlock = ReadBlock(blockRange[1])
+            };
         }
 
         private (string prefixName, string prefixNum) ReadPrefix(string prefixName) {
-            var match = Regex.Match(prefixName, "^(?'type'[A-Za-zА-Яа-я]+)?(?'num'\\d{1,2})");
+            var match = Regex.Match(prefixName, "^(?'type'[A-Za-zА-Яа-я]+)?(?'num'\\d{1,2})?");
             return (match.Groups["type"].Value, match.Groups["num"].Value);
         }
 
@@ -145,6 +150,9 @@ namespace RevitCheckingLevels.Models.LevelParser {
 
         private int ReadInt32(string value, string errorText) {
             if(!int.TryParse(value, out int result)) {
+                if(errorText == null) {
+                    return 1;
+                }
                 _errors.Add(errorText);
             }
 

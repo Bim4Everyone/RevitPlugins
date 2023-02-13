@@ -12,6 +12,26 @@ namespace RevitCheckingLevels.Models.LevelParser {
         /// Разобранный уровень.
         /// </summary>
         public Level Level { get; set; }
+        
+        public string LevelName { get; set; }
+        public string BlockName { get; set; }
+        public string ElevationName { get; set; }
+
+        public bool HasSubLevel() {
+            return BlockName.Contains(".");
+        }
+
+        public bool IsEqualBlockName(LevelInfo levelInfo) {
+            return levelInfo.BlockName.Equals(BlockName);
+        }
+        
+        public bool IsEqualLevelName(LevelInfo levelInfo) {
+            return levelInfo.LevelName.Equals(LevelName);
+        }
+        
+        public bool IsEqualElevation(LevelInfo levelInfo) {
+            return levelInfo.ElevationName.Equals(ElevationName);
+        }
 
         /// <summary>
         /// Номер этажа.
@@ -19,34 +39,14 @@ namespace RevitCheckingLevels.Models.LevelParser {
         public int? LevelNum { get; set; }
 
         /// <summary>
-        /// Номер уровня.
-        /// </summary>
-        public int? SubLevel { get; set; }
-
-        /// <summary>
         /// Тип этажа.
         /// </summary>
         public LevelType LevelType { get; set; }
 
         /// <summary>
-        /// Блок уровня.
+        /// Блоки уровня.
         /// </summary>
-        public BlockType BlockType { get; set; }
-
-        /// <summary>
-        /// Начальный номер блока.
-        /// </summary>
-        public int? StartBlock { get; set; }
-
-        /// <summary>
-        /// Последний номер блока.
-        /// </summary>
-        public int? FinishBlock { get; set; }
-
-        /// <summary>
-        /// Признак равенства начального и последнего номера блока.
-        /// </summary>
-        public bool IsSameBlockNum => StartBlock == FinishBlock;
+        public IReadOnlyCollection<ILevelBlock> LevelBlocks { get; set; } = new List<ILevelBlock>();
 
         /// <summary>
         /// Отметка уровня.
@@ -69,29 +69,11 @@ namespace RevitCheckingLevels.Models.LevelParser {
         }
 
         public string GetBlockName() {
-            return SubLevel == null
-                ? GetBlockNum()
-                : GetBlockNum() + "." + SubLevel;
+            return string.Join(", ", LevelBlocks);
         }
 
         public string GetElevation() {
             return Elevation?.ToString("F3", LevelParserImpl.CultureInfo);
-        }
-
-        private string GetBlockNum() {
-            return IsSameBlockNum
-                ? BlockType?.Name + StartBlock
-                : BlockType?.Name + StartBlock + GetDelimiter() + BlockType?.Name + FinishBlock;
-        }
-
-        private string GetDelimiter() {
-            if(FinishBlock == null || StartBlock == null) {
-                return null;
-            }
-
-            return Math.Abs(FinishBlock.Value - StartBlock.Value) > 1
-                ? "-"
-                : ", ";
         }
 
         public override string ToString() {
