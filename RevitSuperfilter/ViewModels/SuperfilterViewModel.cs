@@ -17,14 +17,16 @@ namespace RevitSuperfilter.ViewModels {
         private RevitViewModel _revitViewModel;
 
         public SuperfilterViewModel() { }
-        public SuperfilterViewModel(Application application, Document document) {
+        public SuperfilterViewModel(Application application, Document document, bool hasSelectedElement) {
             RevitViewModels = new ObservableCollection<RevitViewModel> {
                 new ViewRevitViewModel(application, document) { DisplayData = "Выборка по текущему виду" },
                 new ElementsRevitViewModel(application, document) { DisplayData = "Выборка по всем элементам" },
                 new SelectedRevitViewModel(application, document) { DisplayData = "Выборка по выделенным элементам" }
             };
 
-            RevitViewModel = RevitViewModels[0];
+            RevitViewModel = hasSelectedElement
+                ? RevitViewModels[2]
+                : RevitViewModels[0];
         }
 
         public RevitViewModel RevitViewModel {

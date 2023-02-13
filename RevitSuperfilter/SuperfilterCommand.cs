@@ -11,6 +11,7 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 using dosymep.Bim4Everyone;
+using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitSuperfilter.ViewModels;
@@ -24,7 +25,9 @@ namespace RevitSuperfilter {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            var viewModel = new SuperfilterViewModel(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
+            var hasSelectedElements = uiApplication.ActiveUIDocument.GetSelectedElements().Any();
+            var viewModel = new SuperfilterViewModel(uiApplication.Application, 
+                uiApplication.ActiveUIDocument.Document, hasSelectedElements);
 
             var window = new MainWindow() { DataContext = viewModel };
             if(window.ShowDialog() == true) {
