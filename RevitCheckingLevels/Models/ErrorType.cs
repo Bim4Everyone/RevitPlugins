@@ -155,12 +155,9 @@ namespace RevitCheckingLevels.Models {
             }
 
             var filtered = levelInfos
+                .Where(item => item.Level.Id != levelInfo.Level.Id)
                 .Where(item => item.Errors.Count == 0)
                 .ToArray();
-
-            if(filtered.Length <= 1) {
-                return false;
-            }
 
             if(levelInfo.HasSubLevel()) {
                 return filtered
