@@ -23,6 +23,7 @@
 | 16. | Супер фильтр              | [RevitSuperfilter](RevitSuperfilter)               | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829991)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Выборка       |
 | 17. | Расстановщик проемов окон | [RevitWindowGapPlacement](RevitWindowGapPlacement) | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829981)  | [BIM](https://github.com/dosymep/BIMExtensions)     | ###           |
 | 18. | Проверка уровней          | [RevitCheckingLevels](RevitCheckingLevels)         | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67844245)  | [BIM](https://github.com/dosymep/BIMExtensions)     | СМР           |
+| 18. | Копирование зон СМР       | [RevitCopingZones](RevitCopingZones)               | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67844245)  | [BIM](https://github.com/dosymep/BIMExtensions)     | СМР           |
 
 # Сборка проекта
 
