@@ -53,11 +53,21 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <dx:SimpleButton
+        <DockPanel
             Grid.Row="0"
-            Content="Выбрать зоны"
-            Glyph="{dx:DXImage 'Office2013/Actions/SelectAll_32x32.png'}"
-            Command="{Binding CompositeCommand, ElementName=MultiCommand}" />
+            Margin="0 10">
+            <dx:SimpleButton
+                Margin="5 0"
+                DockPanel.Dock="Right"
+                Content="Выбрать зоны"
+                Glyph="{dx:DXImage 'Office2013/Actions/SelectAll_32x32.png'}"
+                Command="{Binding CompositeCommand, ElementName=MultiCommand}" />
+
+            <dxe:TextEdit
+                IsReadOnly="True"
+                NullText="Выберите зоны"
+                Text="{Binding CountOfAreas}"/>
+        </DockPanel>
 
         <dxg:GridControl
             Grid.Row="1">

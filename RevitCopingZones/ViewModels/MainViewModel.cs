@@ -19,6 +19,7 @@ namespace RevitCopingZones.ViewModels {
         private Area[] _selectedAreas;
         private FloorPlanViewModel _floorPlan;
         private ObservableCollection<FloorPlanViewModel> _floorPlans;
+        private string _countOfAreas;
 
         public MainViewModel(RevitRepository revitRepository, CopingZonesConfig copingZonesConfig) {
             _revitRepository = revitRepository;
@@ -36,6 +37,11 @@ namespace RevitCopingZones.ViewModels {
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        public string CountOfAreas {
+            get => _countOfAreas;
+            set => this.RaiseAndSetIfChanged(ref _countOfAreas, value);
         }
 
         public FloorPlanViewModel FloorPlan {
@@ -56,6 +62,9 @@ namespace RevitCopingZones.ViewModels {
 
         private void SelectAreas(object p) {
             _selectedAreas = _revitRepository.GetSelectedAreas().ToArray();
+            CountOfAreas = _selectedAreas.Length == 0
+                ? null
+                : $"Выбрано зон: \"{_selectedAreas.Length}\"";
         }
 
         private void ExecuteView(object p) {
