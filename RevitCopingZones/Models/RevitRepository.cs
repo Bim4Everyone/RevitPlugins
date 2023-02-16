@@ -39,6 +39,7 @@ namespace RevitCopingZones.Models {
             foreach(ViewPlan areaPlan in areaPlanes) {
                 if(floorPlans.TryGetValue(areaPlan.Name, out FloorPlan floorPlan)) {
                     floorPlan.AreaPlan = areaPlan;
+                    floorPlan.CanCopyAreas = HasAreas(areaPlan);
                 }
             }
 
@@ -53,6 +54,17 @@ namespace RevitCopingZones.Models {
                 .OfType<ViewPlan>()
                 .Where(item => item.AreaScheme != null)
                 .Where(item => item.AreaScheme.Id == areaScheme?.Id);
+        }
+
+        public bool HasAreas(ViewPlan areaPlan) {
+            return GetAreas(areaPlan).Any();
+        }
+        
+        public IEnumerable<Area> GetAreas(ViewPlan areaPlan) {
+            return new FilteredElementCollector(Document, areaPlan.Id)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(Area))
+                .OfType<Area>();
         }
 
         public IEnumerable<Area> GetSelectedAreas() {
