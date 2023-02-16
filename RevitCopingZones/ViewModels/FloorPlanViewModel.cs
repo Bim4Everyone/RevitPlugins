@@ -14,5 +14,6 @@ namespace RevitCopingZones.ViewModels {
 
         public string FloorName => _floorPlan.Name;
         public string AreaPlanName => _floorPlan.AreaPlan?.Name;
+        public bool CanCopyAreas => _floorPlan.CanCopyAreas;
     }
 }

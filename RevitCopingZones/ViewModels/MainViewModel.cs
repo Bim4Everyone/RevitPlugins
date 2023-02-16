@@ -26,10 +26,12 @@ namespace RevitCopingZones.ViewModels {
 
             LoadViewCommand = new RelayCommand(LoadView);
             SelectAreasCommand = new RelayCommand(SelectAreas);
+            ExecuteViewCommand = new RelayCommand(ExecuteView, CanExecuteView);
         }
-        
+
         public ICommand LoadViewCommand { get; }
         public ICommand SelectAreasCommand { get; }
+        public ICommand ExecuteViewCommand { get; }
 
         public string ErrorText {
             get => _errorText;
@@ -53,7 +55,27 @@ namespace RevitCopingZones.ViewModels {
         }
 
         private void SelectAreas(object p) {
-            _selectedAreas=_revitRepository.GetSelectedAreas().ToArray();
+            _selectedAreas = _revitRepository.GetSelectedAreas().ToArray();
+        }
+
+        private void ExecuteView(object p) {
+            
+        }
+
+        private bool CanExecuteView(object p) {
+            if(_selectedAreas == null 
+               || _selectedAreas.Length == 0) {
+                ErrorText = "Выберите зоны.";
+                return false;
+            }
+
+            if(!FloorPlans.Any(item => item.CanCopyAreas)) {
+                ErrorText = "Выберите этажи.";
+                return false;
+            }
+            
+            ErrorText = null;
+            return true;
         }
     }
 }

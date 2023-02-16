@@ -104,7 +104,8 @@
                 Margin="10"
                 Width="80"
                 Content="ОК"
-                Click="ButtonOk_Click" />
+                Click="ButtonOk_Click"
+                Command="{Binding ExecuteViewCommand}" />
 
             <dx:SimpleButton
                 Margin="10"
