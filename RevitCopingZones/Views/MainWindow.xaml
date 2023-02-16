@@ -9,22 +9,88 @@
     xmlns:local="clr-namespace:RevitCopingZones.Views"
     xmlns:vms="clr-namespace:RevitCopingZones.ViewModels"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:commands="clr-namespace:RevitCopingZones.Commands"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    
-    Title="MainWindow"
-    Height="450" Width="800"    
 
+    Title="MainWindow"
+    Height="450" Width="800"
+
+    x:Name="_this"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <Window.Resources>
+        <commands:HideUnHideWindowCommand x:Key="_hideUnHideCommand" />
+    </Window.Resources>
+
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand
+            EventName="Loaded"
+            Command="{Binding LoadViewCommand}" />
+
+        <dxmvvm:CompositeCommandBehavior x:Name="MultiCommand">
+            <dxmvvm:CommandItem
+                Command="{StaticResource _hideUnHideCommand}"
+                CommandParameter="{Binding ElementName=_this}" />
+
+            <dxmvvm:CommandItem
+                Command="{Binding SelectAreasCommand}" />
+
+            <dxmvvm:CommandItem
+                Command="{StaticResource _hideUnHideCommand}"
+                CommandParameter="{Binding ElementName=_this}" />
+        </dxmvvm:CompositeCommandBehavior>
+    </dxmvvm:Interaction.Behaviors>
+
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+        <dx:SimpleButton
+            Grid.Row="0"
+            Content="Выбрать зоны"
+            Glyph="{dx:DXImage 'Office2013/Actions/SelectAll_32x32.png'}"
+            Command="{Binding CompositeCommand, ElementName=MultiCommand}" />
+
+        <dxg:GridControl
+            Grid.Row="1">
+            <dxg:GridControl.View>
+                <dxg:TableView
+                    ShowGroupPanel="False"
+                    ShowTotalSummary="False"
+                    AllowEditing="False"
+                    AllowGrouping="False" />
+            </dxg:GridControl.View>
+
+            <dxg:GridColumn
+                FieldName="IsSelected"
+                Header=""
+                AllowEditing="True"
+                AllowMoving="False"
+                AllowResizing="False"
+                AllowSorting="False"
+                AllowGrouping="False"
+                Width="25"
+                MinWidth="25"
+                MaxWidth="25" />
+            <dxg:GridColumn FieldName="FloorName" Header="Этаж" />
+            <dxg:GridColumn FieldName="AreaPlanName" Header="План зонирования">
+                <dxg:GridColumn.EditSettings>
+                    <dxe:TextEditSettings
+                        NullText="Отсутствует план зонирования" />
+                </dxg:GridColumn.EditSettings>
+            </dxg:GridColumn>
+        </dxg:GridControl>
+
         <StackPanel
-            Grid.Row="1"
+            Grid.Row="2"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">

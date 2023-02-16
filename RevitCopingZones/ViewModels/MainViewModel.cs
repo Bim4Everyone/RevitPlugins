@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.WPF.Commands;
@@ -15,6 +16,7 @@ namespace RevitCopingZones.ViewModels {
         private readonly CopingZonesConfig _copingZonesConfig;
 
         private string _errorText;
+        private Area[] _selectedAreas;
         private FloorPlanViewModel _floorPlan;
         private ObservableCollection<FloorPlanViewModel> _floorPlans;
 
@@ -23,9 +25,11 @@ namespace RevitCopingZones.ViewModels {
             _copingZonesConfig = copingZonesConfig;
 
             LoadViewCommand = new RelayCommand(LoadView);
+            SelectAreasCommand = new RelayCommand(SelectAreas);
         }
         
         public ICommand LoadViewCommand { get; }
+        public ICommand SelectAreasCommand { get; }
 
         public string ErrorText {
             get => _errorText;
@@ -46,6 +50,10 @@ namespace RevitCopingZones.ViewModels {
             var floorPlans = _revitRepository.GetFloorPlans()
                 .Select(item => new FloorPlanViewModel(item));
             FloorPlans = new ObservableCollection<FloorPlanViewModel>(floorPlans);
+        }
+
+        private void SelectAreas(object p) {
+            _selectedAreas=_revitRepository.GetSelectedAreas().ToArray();
         }
     }
 }

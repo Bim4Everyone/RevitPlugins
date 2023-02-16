@@ -69,7 +69,8 @@ namespace RevitCopingZones.Models {
 
         public IEnumerable<Area> GetSelectedAreas() {
             return new UIDocument(Document).Selection
-                .PickElementsByRectangle(new AreaFilter(), "Выберите зоны на текущем виде")
+                .PickElementsByRectangle(new AreaFilter(GetAreaScheme()),
+                    "Выберите зоны на текущем виде")
                 .OfType<Area>();
         }
 
@@ -87,10 +88,15 @@ namespace RevitCopingZones.Models {
     }
 
     internal class AreaFilter : ISelectionFilter {
-        private readonly ElementId _areaCatId = new ElementId(BuiltInParameter.ROOM_AREA);
+        private readonly AreaScheme _areaScheme;
+
+        public AreaFilter(AreaScheme areaScheme) {
+            _areaScheme = areaScheme;
+        }
 
         public bool AllowElement(Element elem) {
-            return elem.Category.Id == _areaCatId;
+            var area = elem as Area;
+            return area != null && _areaScheme?.Id == area.AreaScheme.Id;
         }
 
         public bool AllowReference(Reference reference, XYZ position) {
