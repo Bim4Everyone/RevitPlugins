@@ -6,6 +6,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
+using dosymep.Revit;
+
 namespace RevitCopingZones.Models {
     internal class RevitRepository {
         public RevitRepository(UIApplication uiApplication) {
@@ -17,6 +19,10 @@ namespace RevitCopingZones.Models {
 
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
+        
+        public Transaction StartTransaction(string transactionName) {
+            return Document.StartTransaction(transactionName);
+        }
 
         public AreaScheme GetAreaScheme() {
             return new FilteredElementCollector(Document)

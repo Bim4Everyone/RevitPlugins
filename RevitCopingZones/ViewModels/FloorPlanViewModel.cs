@@ -18,6 +18,8 @@ namespace RevitCopingZones.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _isSelected, value);
         }
 
+        public FloorPlan FloorPlan => _floorPlan;
+        
         public string FloorName => _floorPlan.Name;
         public string AreaPlanName => _floorPlan.AreaPlan?.Name;
         public bool CanCopyAreas => _floorPlan.CanCopyAreas;

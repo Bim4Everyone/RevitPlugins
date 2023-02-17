@@ -68,21 +68,32 @@ namespace RevitCopingZones.ViewModels {
         }
 
         private void ExecuteView(object p) {
-            
+            var floorPlans = FloorPlans
+                .Where(item => item.IsSelected)
+                .Where(item => item.CanCopyAreas)
+                .Select(item => item.FloorPlan);
+
+            using(Transaction transaction = _revitRepository.StartTransaction("Копирование зон")) {
+                foreach (FloorPlan floorPlan in floorPlans) {
+                    _revitRepository.CopyAreaToView(floorPlan.AreaPlan, _selectedAreas);
+                }
+
+                transaction.Commit();
+            }
         }
 
         private bool CanExecuteView(object p) {
-            if(_selectedAreas == null 
+            if(_selectedAreas == null
                || _selectedAreas.Length == 0) {
                 ErrorText = "Выберите зоны.";
                 return false;
             }
 
-            if(!FloorPlans.Any(item => item.CanCopyAreas)) {
-                ErrorText = "Выберите этажи.";
+            if(!FloorPlans.Any(item => item.IsSelected && item.CanCopyAreas)) {
+                ErrorText = "Выберите этажи на которых нет зон.";
                 return false;
             }
-            
+
             ErrorText = null;
             return true;
         }
