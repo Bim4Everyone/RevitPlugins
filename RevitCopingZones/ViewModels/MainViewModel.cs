@@ -74,8 +74,11 @@ namespace RevitCopingZones.ViewModels {
                 .Select(item => item.FloorPlan);
 
             using(Transaction transaction = _revitRepository.StartTransaction("Копирование зон")) {
-                foreach (FloorPlan floorPlan in floorPlans) {
-                    _revitRepository.CopyAreaToView(floorPlan.AreaPlan, _selectedAreas);
+                foreach(FloorPlan floorPlan in floorPlans) {
+                    var copiedAreas = _revitRepository.CopyAreaToView(floorPlan, _selectedAreas);
+                    foreach(Area copiedArea in copiedAreas) {
+                        _revitRepository.UpdateAreaName(copiedArea, floorPlan);
+                    }
                 }
 
                 transaction.Commit();

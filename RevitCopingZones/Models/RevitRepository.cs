@@ -19,7 +19,7 @@ namespace RevitCopingZones.Models {
 
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
-        
+
         public Transaction StartTransaction(string transactionName) {
             return Document.StartTransaction(transactionName);
         }
@@ -80,16 +80,34 @@ namespace RevitCopingZones.Models {
                 .OfType<Area>();
         }
 
-        public IEnumerable<Area> CopyAreaToView(View targetView, IEnumerable<Area> copingAreas) {
-            return CopyAreaToView(Document.ActiveView, targetView, copingAreas);
+        public IEnumerable<Area> CopyAreaToView(FloorPlan floorPlan, IEnumerable<Area> copingAreas) {
+            return CopyAreaToView(Document.ActiveView, floorPlan.AreaPlan, copingAreas);
         }
 
-        public IEnumerable<Area> CopyAreaToView(View sourceView, View targetView, IEnumerable<Area> copingAreas) {
+        public string UpdateAreaName(Area area, FloorPlan floorPlan) {
+            var roomName = area.GetParamValue<string>(BuiltInParameter.ROOM_NAME);
+            var areaFloorData = new FloorData(roomName);
+            var levelFloorData = GetLevelFloorData(floorPlan, areaFloorData);
+            area.SetParamValue(BuiltInParameter.ROOM_NAME,
+                $"{floorPlan.AreaPlan.Name}_{areaFloorData.BlockTypeName}_{levelFloorData.Elevation}");
+
+            return area.GetParamValue<string>(BuiltInParameter.ROOM_NAME);
+        }
+
+        private IEnumerable<Area> CopyAreaToView(View sourceView, View targetView, IEnumerable<Area> copingAreas) {
             ElementId[] copyAreaIds = copingAreas.Select(item => item.Id).ToArray();
             return ElementTransformUtils.CopyElements(sourceView, copyAreaIds,
                     targetView, Transform.Identity, new CopyPasteOptions())
                 .Select(item => Document.GetElement(item))
                 .OfType<Area>();
+        }
+
+        private FloorData GetLevelFloorData(FloorPlan floorPlan, FloorData areaFloorData) {
+            var level = floorPlan.Levels
+                .FirstOrDefault(item =>
+                    item.Name.StartsWith($"{floorPlan.AreaPlan.Name}_{areaFloorData.BlockTypeName}"));
+
+            return level == null ? null : new FloorData(level?.Name);
         }
     }
 
@@ -108,5 +126,18 @@ namespace RevitCopingZones.Models {
         public bool AllowReference(Reference reference, XYZ position) {
             return false;
         }
+    }
+
+    internal class FloorData {
+        public FloorData(string floorName) {
+            string[] split = floorName.Split('_');
+            FloorName = split.ElementAtOrDefault(0);
+            BlockTypeName = split.ElementAtOrDefault(1);
+            Elevation = split.ElementAtOrDefault(2);
+        }
+
+        public string FloorName { get; }
+        public string BlockTypeName { get; }
+        public string Elevation { get; }
     }
 }
