@@ -66,17 +66,20 @@
             <dxe:TextEdit
                 IsReadOnly="True"
                 NullText="Выберите зоны"
-                Text="{Binding CountOfAreas}"/>
+                Text="{Binding CountOfAreas}" />
         </DockPanel>
 
         <dxg:GridControl
-            Grid.Row="1">
+            Grid.Row="1"
+            ItemsSource="{Binding FloorPlans}"
+            SelectedItem="{Binding FloorPlan}">
             <dxg:GridControl.View>
                 <dxg:TableView
                     ShowGroupPanel="False"
                     ShowTotalSummary="False"
                     AllowEditing="False"
-                    AllowGrouping="False" />
+                    AllowGrouping="False"
+                    EnableImmediatePosting="True" />
             </dxg:GridControl.View>
 
             <dxg:GridColumn
@@ -87,10 +90,27 @@
                 AllowResizing="False"
                 AllowSorting="False"
                 AllowGrouping="False"
-                Width="25"
-                MinWidth="25"
-                MaxWidth="25" />
+                AllowAutoFilter="False"
+                AllowColumnFiltering="False"
+                Width="43"
+                MinWidth="43"
+                MaxWidth="43"
+                ShowCheckBoxInHeader="True">
+
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate DataType="{x:Type dxg:RowData}">
+                        <dxe:CheckEdit
+                            Name="PART_Editor"
+                            IsReadOnly="True"
+                            IsChecked="{Binding Row.IsSelected, 
+                                UpdateSourceTrigger=PropertyChanged}"
+                            IsEnabled="{Binding Row.CanCopyAreas}" />
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+            </dxg:GridColumn>
+
             <dxg:GridColumn FieldName="FloorName" Header="Этаж" />
+
             <dxg:GridColumn FieldName="AreaPlanName" Header="План зонирования">
                 <dxg:GridColumn.EditSettings>
                     <dxe:TextEditSettings
@@ -121,6 +141,7 @@
                 Margin="10"
                 Width="80"
                 Content="Отмена"
+                IsCancel="True"
                 Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
