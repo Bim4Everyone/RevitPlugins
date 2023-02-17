@@ -21,7 +21,7 @@ namespace RevitCopingZones.Models {
         public AreaScheme GetAreaScheme() {
             return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
-                .OfClass(typeof(AreaScheme))
+                .OfCategory(BuiltInCategory.OST_AreaSchemes)
                 .OfType<AreaScheme>()
                 .FirstOrDefault(item => item.Name.Equals("Назначение этажа СМР"));
         }
@@ -59,11 +59,11 @@ namespace RevitCopingZones.Models {
         public bool HasAreas(ViewPlan areaPlan) {
             return GetAreas(areaPlan).Any();
         }
-        
+
         public IEnumerable<Area> GetAreas(ViewPlan areaPlan) {
             return new FilteredElementCollector(Document, areaPlan.Id)
                 .WhereElementIsNotElementType()
-                .OfClass(typeof(Area))
+                .OfCategory(BuiltInCategory.OST_Areas)
                 .OfType<Area>();
         }
 
