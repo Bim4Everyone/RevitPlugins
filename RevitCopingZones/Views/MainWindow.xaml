@@ -13,6 +13,7 @@
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:commands="clr-namespace:RevitCopingZones.Commands"
+    xmlns:system="clr-namespace:System;assembly=mscorlib"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -25,6 +26,24 @@
 
     <Window.Resources>
         <commands:HideUnHideWindowCommand x:Key="_hideUnHideCommand" />
+        
+        <dxmvvm:BooleanToObjectConverter x:Key="HasNotConverter">
+            <dxmvvm:BooleanToObjectConverter.TrueValue>
+                <system:String>Есть</system:String>
+            </dxmvvm:BooleanToObjectConverter.TrueValue>
+            <dxmvvm:BooleanToObjectConverter.FalseValue>
+                <system:String>Нет</system:String>
+            </dxmvvm:BooleanToObjectConverter.FalseValue>
+        </dxmvvm:BooleanToObjectConverter>
+        
+        <dxmvvm:BooleanToObjectConverter x:Key="PermitConverter">
+            <dxmvvm:BooleanToObjectConverter.TrueValue>
+                <system:String>Разрешено</system:String>
+            </dxmvvm:BooleanToObjectConverter.TrueValue>
+            <dxmvvm:BooleanToObjectConverter.FalseValue>
+                <system:String>Запрещено</system:String>
+            </dxmvvm:BooleanToObjectConverter.FalseValue>
+        </dxmvvm:BooleanToObjectConverter>
     </Window.Resources>
 
     <dxmvvm:Interaction.Behaviors>
@@ -110,13 +129,21 @@
             </dxg:GridColumn>
 
             <dxg:GridColumn FieldName="FloorName" Header="Этаж" />
+            
+            <dxg:GridColumn
+                Header="План зонирования"
+                Binding="{Binding HasViewPlan, 
+                    Converter={StaticResource HasNotConverter}}"/>
+            
+            <dxg:GridColumn
+                Header="Зоны на плане зонирования"
+                Binding="{Binding HasAreasInPlan, 
+                    Converter={StaticResource HasNotConverter}}" />
 
-            <dxg:GridColumn FieldName="AreaPlanName" Header="План зонирования">
-                <dxg:GridColumn.EditSettings>
-                    <dxe:TextEditSettings
-                        NullText="Отсутствует план зонирования" />
-                </dxg:GridColumn.EditSettings>
-            </dxg:GridColumn>
+            <dxg:GridColumn
+                Header="Разрешение копирования"
+                Binding="{Binding CanCopyAreas, 
+                    Converter={StaticResource PermitConverter}}"/>
         </dxg:GridControl>
 
         <StackPanel

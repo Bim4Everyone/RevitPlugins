@@ -45,7 +45,7 @@ namespace RevitCopingZones.Models {
             foreach(ViewPlan areaPlan in areaPlanes) {
                 if(floorPlans.TryGetValue(areaPlan.Name, out FloorPlan floorPlan)) {
                     floorPlan.AreaPlan = areaPlan;
-                    floorPlan.CanCopyAreas = !HasAreas(areaPlan);
+                    floorPlan.HasAreasInPlan = HasAreas(areaPlan);
                 }
             }
 

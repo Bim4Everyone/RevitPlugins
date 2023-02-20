@@ -13,6 +13,8 @@ namespace RevitCopingZones.Models {
         public List<Level> Levels { get; }
         
         public ViewPlan AreaPlan { get; set; }
-        public bool CanCopyAreas { get; set; }
+        public bool HasAreasInPlan { get; set; }
+        public bool HasViewPlan => AreaPlan != null;
+        public bool CanCopyAreas => HasViewPlan && !HasAreasInPlan;
     }
 }
