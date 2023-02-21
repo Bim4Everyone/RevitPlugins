@@ -56,7 +56,8 @@ namespace RevitCopingZones.ViewModels {
 
         private void LoadView(object p) {
             var floorPlans = _revitRepository.GetFloorPlans()
-                .Select(item => new FloorPlanViewModel(item));
+                .Select(item => new FloorPlanViewModel(item))
+                .OrderBy(item=> item.FloorPlan.Elevation);
             FloorPlans = new ObservableCollection<FloorPlanViewModel>(floorPlans);
         }
 

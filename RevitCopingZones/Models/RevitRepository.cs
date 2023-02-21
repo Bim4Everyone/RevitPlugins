@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
@@ -111,10 +112,8 @@ namespace RevitCopingZones.Models {
         }
 
         private FloorData GetLevelFloorData(FloorPlan floorPlan, FloorData areaFloorData) {
-            var level = floorPlan.Levels
-                .FirstOrDefault(item =>
-                    item.Name.StartsWith($"{floorPlan.AreaPlan.Name}_{areaFloorData.BlockTypeName}"));
-
+            string levelName = $"{floorPlan.AreaPlan.Name}_{areaFloorData.BlockTypeName}";
+            var level = floorPlan.Levels.FirstOrDefault(item => item.Name.StartsWith(levelName));
             return level == null ? null : new FloorData(level?.Name);
         }
     }
