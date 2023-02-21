@@ -84,7 +84,7 @@
 
             <dxe:TextEdit
                 IsReadOnly="True"
-                NullText="Выберите зоны"
+                NullText="Выберите зоны на плане"
                 Text="{Binding CountOfAreas}" />
         </DockPanel>
 

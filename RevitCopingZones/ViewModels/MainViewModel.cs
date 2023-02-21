@@ -65,7 +65,7 @@ namespace RevitCopingZones.ViewModels {
             _selectedAreas = _revitRepository.GetSelectedAreas().ToArray();
             CountOfAreas = _selectedAreas.Length == 0
                 ? null
-                : $"Выбрано зон: \"{_selectedAreas.Length}\"";
+                : $"Выбрано зон: \"{_selectedAreas.Length} шт.\"";
         }
 
         private void ExecuteView(object p) {
@@ -89,12 +89,12 @@ namespace RevitCopingZones.ViewModels {
         private bool CanExecuteView(object p) {
             if(_selectedAreas == null
                || _selectedAreas.Length == 0) {
-                ErrorText = "Выберите зоны.";
+                ErrorText = "Выберите зоны на плане.";
                 return false;
             }
 
             if(!FloorPlans.Any(item => item.IsSelected && item.CanCopyAreas)) {
-                ErrorText = "Выберите этажи на которых нет зон.";
+                ErrorText = "Выберите этажи на которые разрешено копирование.";
                 return false;
             }
 
