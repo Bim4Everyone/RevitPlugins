@@ -85,6 +85,14 @@ namespace RevitCopingZones.Models {
         }
 
         public IEnumerable<Area> GetSelectedAreas() {
+            var areaFilter = new AreaFilter(GetAreaScheme());
+            return new UIDocument(Document).GetSelectedElements()
+                .OfType<Area>()
+                .Where(item => areaFilter.AllowElement(item))
+                .Where(item => item.Level?.Id == Document.ActiveView?.GenLevel?.Id);
+        }
+
+        public IEnumerable<Area> SelectedAreas() {
             return new UIDocument(Document).Selection
                 .PickElementsByRectangle(new AreaFilter(GetAreaScheme()),
                     "Выберите зоны на текущем виде")

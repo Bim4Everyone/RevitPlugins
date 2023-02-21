@@ -59,13 +59,14 @@ namespace RevitCopingZones.ViewModels {
                 .Select(item => new FloorPlanViewModel(item))
                 .OrderBy(item=> item.FloorPlan.Elevation);
             FloorPlans = new ObservableCollection<FloorPlanViewModel>(floorPlans);
+            
+            _selectedAreas = _revitRepository.GetSelectedAreas().ToArray();
+            UpdateCountOfAreas();
         }
 
         private void SelectAreas(object p) {
-            _selectedAreas = _revitRepository.GetSelectedAreas().ToArray();
-            CountOfAreas = _selectedAreas.Length == 0
-                ? null
-                : $"Выбрано зон: \"{_selectedAreas.Length} шт.\"";
+            _selectedAreas = _revitRepository.SelectedAreas().ToArray();
+            UpdateCountOfAreas();
         }
 
         private void ExecuteView(object p) {
@@ -100,6 +101,12 @@ namespace RevitCopingZones.ViewModels {
 
             ErrorText = null;
             return true;
+        }
+        
+        private void UpdateCountOfAreas() {
+            CountOfAreas = _selectedAreas.Length == 0
+                ? null
+                : $"Выбрано зон: \"{_selectedAreas.Length} шт.\"";
         }
     }
 }
