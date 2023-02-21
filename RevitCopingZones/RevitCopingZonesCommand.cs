@@ -40,7 +40,7 @@ namespace RevitCopingZones {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
-                
+
                 kernel.Bind<CopingZonesConfig>()
                     .ToMethod(c => CopingZonesConfig.GetCheckingLevelConfig());
 
@@ -50,23 +50,47 @@ namespace RevitCopingZones {
                     .WithPropertyValue(nameof(Window.DataContext),
                         c => c.Kernel.Get<MainViewModel>());
 
-                bool hasCorruptedAreas = kernel.Get<RevitRepository>().GetCorruptedAreas().Any();
-                if(hasCorruptedAreas) {
-                    TaskDialog.Show(PluginName,
-                        "Были обнаружены избыточные и не окруженные зоны, выполнение скрипта было отменено.");
-                    return;
-                }
 
-                MainWindow window = kernel.Get<MainWindow>();
-                if(window.ShowDialog() == true) {
-                    GetPlatformService<INotificationService>()
-                        .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                        .ShowAsync();
-                } else {
-                    GetPlatformService<INotificationService>()
-                        .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                        .ShowAsync();
-                }
+                Check(kernel);
+                ShowDialog(kernel);
+            }
+        }
+
+        private void Check(IKernel kernel) {
+            var revitRepository = kernel.Get<RevitRepository>();
+            if(!revitRepository.HasAreaScheme()) {
+                TaskDialog.Show(PluginName,
+                    $"В документе отсутствует схема зонирования с именем \"{RevitRepository.AreaSchemeName}\".");
+                throw new OperationCanceledException();
+            }
+
+            if(!revitRepository.IsAreaPlan()) {
+                TaskDialog.Show(PluginName, $"Текущий вид не является планом зонирования.");
+                throw new OperationCanceledException();
+            }
+
+            if(!revitRepository.HasAreas()) {
+                TaskDialog.Show(PluginName, "На активном виде нет зон.");
+                throw new OperationCanceledException();
+            }
+
+            if(revitRepository.HasCorruptedAreas()) {
+                TaskDialog.Show(PluginName,
+                    "Были обнаружены избыточные и не окруженные зоны, выполнение скрипта было отменено.");
+                throw new OperationCanceledException();
+            }
+        }
+
+        private void ShowDialog(IKernel kernel) {
+            MainWindow window = kernel.Get<MainWindow>();
+            if(window.ShowDialog() == true) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
             }
         }
     }

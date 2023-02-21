@@ -13,8 +13,11 @@ using dosymep.Revit;
 
 namespace RevitCopingZones.Models {
     internal class RevitRepository {
+        public static readonly string AreaSchemeName = "Назначение этажа СМР";
+
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
+            AreaScheme = GetAreaScheme();
         }
 
         public UIApplication UIApplication { get; }
@@ -22,6 +25,8 @@ namespace RevitCopingZones.Models {
 
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
+
+        public AreaScheme AreaScheme { get; }
 
         public Transaction StartTransaction(string transactionName) {
             return Document.StartTransaction(transactionName);
@@ -32,7 +37,7 @@ namespace RevitCopingZones.Models {
                 .WhereElementIsNotElementType()
                 .OfCategory(BuiltInCategory.OST_AreaSchemes)
                 .OfType<AreaScheme>()
-                .FirstOrDefault(item => item.Name.Equals("Назначение этажа СМР"));
+                .FirstOrDefault(item => item.Name.Equals(AreaSchemeName));
         }
 
         public IEnumerable<FloorPlan> GetFloorPlans() {
@@ -56,25 +61,44 @@ namespace RevitCopingZones.Models {
         }
 
         public IEnumerable<ViewPlan> GetAreaPlanes() {
-            var areaScheme = GetAreaScheme();
             return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(ViewPlan))
                 .OfType<ViewPlan>()
-                .Where(item => item.AreaScheme != null)
-                .Where(item => item.AreaScheme.Id == areaScheme?.Id);
+                .Where(item => IsAreaPlan(item));
+        }
+
+        public bool IsAreaPlan() {
+            return IsAreaPlan(Document.ActiveView);
+        }
+
+        public bool IsAreaPlan(View view) {
+            if(view is ViewPlan viewPlan) {
+                return viewPlan.AreaScheme != null
+                       && viewPlan.AreaScheme.Id == AreaScheme.Id;
+            }
+
+            return false;
         }
 
         public bool HasAreas(ViewPlan areaPlan) {
             return GetAreas(areaPlan).Any();
         }
 
-        public IEnumerable<Area> GetCorruptedAreas() {
+        public bool HasAreas() {
+            return HasAreas(Document.ActiveView as ViewPlan);
+        }
+
+        public bool HasCorruptedAreas() {
             return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
                 .OfCategory(BuiltInCategory.OST_Areas)
                 .OfType<Area>()
-                .Where(item => item.IsNotEnclosed() || item.IsRedundant());
+                .Any(item => item.IsNotEnclosed() || item.IsRedundant());
+        }
+
+        public bool HasAreaScheme() {
+            return GetAreaScheme() != null;
         }
 
         public IEnumerable<Area> GetAreas(ViewPlan areaPlan) {
