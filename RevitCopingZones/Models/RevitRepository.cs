@@ -7,6 +7,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
 namespace RevitCopingZones.Models {
@@ -96,12 +98,13 @@ namespace RevitCopingZones.Models {
         public string UpdateAreaName(Area area, FloorPlan floorPlan) {
             var roomName = area.GetParamValue<string>(BuiltInParameter.ROOM_NAME);
             var areaFloorData = new FloorData(roomName);
-            var levelFloorData = GetLevelFloorData(floorPlan, areaFloorData);
+            var levelFloorData = GetLevelFloorData(floorPlan, areaFloorData, out Level level);
 
             var newAreaName = $"{floorPlan.AreaPlan.Name}" +
                               $"_{areaFloorData.BlockTypeName}" +
                               $"_{levelFloorData?.Elevation ?? "нет уровня"}";
             area.SetParamValue(BuiltInParameter.ROOM_NAME, newAreaName);
+            area.SetParamValue(SharedParamsConfig.Instance.FixComment, level?.Id.ToString());
 
             return newAreaName;
         }
@@ -114,9 +117,9 @@ namespace RevitCopingZones.Models {
                 .OfType<Area>();
         }
 
-        private FloorData GetLevelFloorData(FloorPlan floorPlan, FloorData areaFloorData) {
+        private FloorData GetLevelFloorData(FloorPlan floorPlan, FloorData areaFloorData, out Level level) {
             string levelName = $"{floorPlan.AreaPlan.Name}_{areaFloorData.BlockTypeName}";
-            var level = floorPlan.Levels.FirstOrDefault(item => item.Name.StartsWith(levelName));
+            level = floorPlan.Levels.FirstOrDefault(item => item.Name.StartsWith(levelName));
             return level == null ? null : new FloorData(level.Name);
         }
     }
