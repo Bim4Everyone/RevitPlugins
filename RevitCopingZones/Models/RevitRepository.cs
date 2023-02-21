@@ -66,6 +66,14 @@ namespace RevitCopingZones.Models {
             return GetAreas(areaPlan).Any();
         }
 
+        public IEnumerable<Area> GetCorruptedAreas() {
+            return new FilteredElementCollector(Document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_Areas)
+                .OfType<Area>()
+                .Where(item => item.IsNotEnclosed() || item.IsRedundant());
+        }
+
         public IEnumerable<Area> GetAreas(ViewPlan areaPlan) {
             return new FilteredElementCollector(Document, areaPlan.Id)
                 .WhereElementIsNotElementType()
