@@ -52,10 +52,8 @@ namespace RevitCopingZones {
 
                 bool hasCorruptedAreas = kernel.Get<RevitRepository>().GetCorruptedAreas().Any();
                 if(hasCorruptedAreas) {
-                    GetPlatformService<INotificationService>()
-                        .CreateFatalNotification(PluginName, "Были обнаружены избыточные и не окруженные зоны, выполнение скрипта отменено.")
-                        .ShowAsync();
-                    
+                    TaskDialog.Show(PluginName,
+                        "Были обнаружены избыточные и не окруженные зоны, выполнение скрипта было отменено.");
                     return;
                 }
 
