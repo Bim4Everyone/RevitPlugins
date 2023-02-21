@@ -97,10 +97,13 @@ namespace RevitCopingZones.Models {
             var roomName = area.GetParamValue<string>(BuiltInParameter.ROOM_NAME);
             var areaFloorData = new FloorData(roomName);
             var levelFloorData = GetLevelFloorData(floorPlan, areaFloorData);
-            area.SetParamValue(BuiltInParameter.ROOM_NAME,
-                $"{floorPlan.AreaPlan.Name}_{areaFloorData.BlockTypeName}_{levelFloorData.Elevation}");
 
-            return area.GetParamValue<string>(BuiltInParameter.ROOM_NAME);
+            var newAreaName = $"{floorPlan.AreaPlan.Name}" +
+                              $"_{areaFloorData.BlockTypeName}" +
+                              $"_{levelFloorData?.Elevation ?? "нет уровня"}";
+            area.SetParamValue(BuiltInParameter.ROOM_NAME, newAreaName);
+
+            return newAreaName;
         }
 
         private IEnumerable<Area> CopyAreaToView(View sourceView, View targetView, IEnumerable<Area> copingAreas) {
@@ -114,7 +117,7 @@ namespace RevitCopingZones.Models {
         private FloorData GetLevelFloorData(FloorPlan floorPlan, FloorData areaFloorData) {
             string levelName = $"{floorPlan.AreaPlan.Name}_{areaFloorData.BlockTypeName}";
             var level = floorPlan.Levels.FirstOrDefault(item => item.Name.StartsWith(levelName));
-            return level == null ? null : new FloorData(level?.Name);
+            return level == null ? null : new FloorData(level.Name);
         }
     }
 
