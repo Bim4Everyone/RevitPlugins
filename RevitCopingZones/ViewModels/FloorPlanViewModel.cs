@@ -15,7 +15,11 @@ namespace RevitCopingZones.ViewModels {
 
         public bool IsSelected {
             get => _isSelected;
-            set => this.RaiseAndSetIfChanged(ref _isSelected, value);
+            set {
+                if(CanCopyAreas) {
+                    this.RaiseAndSetIfChanged(ref _isSelected, value);
+                }
+            }
         }
 
         public FloorPlan FloorPlan => _floorPlan;
