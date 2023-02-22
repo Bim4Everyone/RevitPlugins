@@ -102,14 +102,16 @@ namespace RevitCopingZones.Models {
         }
 
         public IEnumerable<Area> GetAreas(ViewPlan areaPlan) {
+            var areaFilter = new AreaFilter(AreaScheme);
             return new FilteredElementCollector(Document, areaPlan.Id)
                 .WhereElementIsNotElementType()
                 .OfCategory(BuiltInCategory.OST_Areas)
-                .OfType<Area>();
+                .OfType<Area>()
+                .Where(item => areaFilter.AllowElement(item));
         }
 
         public IEnumerable<Area> GetSelectedAreas() {
-            var areaFilter = new AreaFilter(GetAreaScheme());
+            var areaFilter = new AreaFilter(AreaScheme);
             return new UIDocument(Document).GetSelectedElements()
                 .OfType<Area>()
                 .Where(item => areaFilter.AllowElement(item))
