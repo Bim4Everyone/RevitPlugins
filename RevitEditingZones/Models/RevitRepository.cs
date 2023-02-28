@@ -6,6 +6,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
 namespace RevitEditingZones.Models {
@@ -80,6 +82,20 @@ namespace RevitEditingZones.Models {
                 .OfCategory(BuiltInCategory.OST_Areas)
                 .OfType<Area>()
                 .Where(item => areaFilter.AllowElement(item));
+        }
+
+        public Level GetLevel(Area area) {
+            var fixCommentParam = SharedParamsConfig.Instance.FixComment;
+            if(area.IsExistsParamValue(fixCommentParam)) {
+                var paramValue = area.GetParamValue<string>(fixCommentParam);
+                var levelId = int.TryParse(paramValue, out int elementId)
+                    ? new ElementId(elementId)
+                    : ElementId.InvalidElementId;
+
+                return Document.GetElement(levelId) as Level;
+            }
+
+            return null;
         }
     }
 

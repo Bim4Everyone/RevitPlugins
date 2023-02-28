@@ -8,20 +8,62 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitEditingZones.Views"
     xmlns:vms="clr-namespace:RevitEditingZones.ViewModels"
-	xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    
-    Title="MainWindow"
-    Height="450" Width="800"    
 
+    Title="MainWindow"
+    Height="450" Width="800"
+
+    x:Name="_this"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand
+            EventName="Loaded"
+            Command="{Binding LoadViewCommand}" />
+    </dxmvvm:Interaction.Behaviors>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+
+        <dxg:GridControl
+            Grid.Row="0"
+            ItemsSource="{Binding ZonePlans}"
+            SelectedItem="{Binding ZonePlan}">
+            <dxg:GridControl.View>
+                <dxg:TableView
+                    ShowGroupPanel="False"
+                    ShowTotalSummary="False"
+                    AllowEditing="False"
+                    AllowGrouping="False"
+                    EnableImmediatePosting="True"
+                    EditorShowMode="MouseUp"/>
+            </dxg:GridControl.View>
+
+            <dxg:GridColumn FieldName="AreaName" Header="Зона" />
+            <dxg:GridColumn FieldName="AreaPlanName" Header="План" />
+
+            <dxg:GridColumn FieldName="Level" AllowEditing="True" Header="Уровень">
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate>
+                        <dxe:ComboBoxEdit
+                            Name="PART_Editor"
+                            IsTextEditable="False"
+                            NullText="Выберите уровень"
+                            NullValueButtonPlacement="EditBox"
+                            ItemsSource="{Binding RowData.Row.Levels}" />
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+            </dxg:GridColumn>
+        </dxg:GridControl>
 
         <StackPanel
             Grid.Row="1"
