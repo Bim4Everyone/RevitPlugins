@@ -13,7 +13,6 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-    xmlns:converters="clr-namespace:RevitCheckingLevels.Converters"
     xmlns:commands="clr-namespace:RevitCheckingLevels.Commands"
 
     mc:Ignorable="d"
