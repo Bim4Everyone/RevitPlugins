@@ -40,7 +40,7 @@ class Build : NukeBuild {
     Target Clean => _ => _
         .Requires(() => PluginName)
         .Executes(() => {
-            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
+            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory); 
             EnsureCleanDirectory(Output);
         });
 

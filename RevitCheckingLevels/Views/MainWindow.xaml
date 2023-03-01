@@ -42,7 +42,6 @@
         </ResourceDictionary>
     </Window.Resources>
 
-
     <dxmvvm:Interaction.Behaviors>
         <dxmvvm:EventToCommand
             EventName="Loaded"
@@ -124,7 +123,6 @@
 
             <dxg:GridColumn FieldName="ErrorType" Header="Тип ошибки" GroupIndex="0" />
         </dxg:GridControl>
-
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Height="45">
             <TextBlock
