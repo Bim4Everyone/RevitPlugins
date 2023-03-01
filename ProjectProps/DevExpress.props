@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <ItemGroup>
-        <Compile Include="..\dosymep\ThemedPlatformWindow.cs" Link="dosymep\ThemedPlatformWindow.cs"/>
-        <Compile Include="..\dosymep\GroupRowChildrenValuesConverter.cs" Link="dosymep\GroupRowChildrenValuesConverter.cs"/>
+        <Compile Include="..\dosymep\ThemedPlatformWindow.cs" Link="dosymep\DevExpress\ThemedPlatformWindow.cs"/>
+        <Compile Include="..\dosymep\GroupRowChildrenValuesConverter.cs" Link="dosymep\DevExpress\GroupRowChildrenValuesConverter.cs"/>
+        <Compile Include="..\dosymep\GroupRowValueConverter.cs" Link="dosymep\DevExpress\GroupRowValueConverter.cs"/>
+        <Compile Include="..\dosymep\DisableCollapseGroupRowCommand.cs" Link="dosymep\DevExpress\DisableCollapseGroupRowCommand.cs"/>
 
         <PackageReference Include="DevExpress.Wpf" Version="21.2.3">
             <PrivateAssets>all</PrivateAssets>

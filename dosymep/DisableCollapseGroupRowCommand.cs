@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 using DevExpress.Xpf.Grid;
 
-namespace RevitCheckingLevels.Commands {
+namespace dosymep.WPF.Commands {
     internal class DisableCollapseGroupRowCommand : ICommand {
 #pragma warning disable CS0067
         public event EventHandler CanExecuteChanged;
