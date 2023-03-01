@@ -21,9 +21,10 @@ namespace dosymep.WPF.Converters {
         }
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
-            var array= values
+            var array = values
                 .OfType<GroupRowData>()
                 .Select(item => Convert(item, targetType, parameter, culture))
+                .Where(item => item != default)
                 .ToArray();
 
             return array.CreateTypedArray(targetType);
