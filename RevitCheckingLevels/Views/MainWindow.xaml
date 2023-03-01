@@ -37,7 +37,8 @@
 
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../ViewTemplates/GridRowStyle.xaml" />
-                <ResourceDictionary Source="../ViewTemplates/GroupRowTemplate.xaml" />
+                <ResourceDictionary Source="../ViewTemplates/DefaultGroupRowTemplate.xaml" />
+                <ResourceDictionary Source="../ViewTemplates/UpdateElevationGroupRowTemplate.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>

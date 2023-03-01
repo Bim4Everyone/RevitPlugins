@@ -5,27 +5,7 @@
                     xmlns:converters="clr-namespace:dosymep.WPF.Converters">
 
     <converters:GroupRowChildrenValuesConverter x:Key="GroupRowChildrenValuesConverter" />
-    <DataTemplate x:Key="DefaultGroupRowTemplate" DataType="{x:Type dxg:GroupRowData}">
-        <Grid ToolTip="{Binding Row.ErrorType.Description}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <dx:DXImage
-                Grid.Column="0"
-                Margin="5,0"
-                VerticalAlignment="Center" HorizontalAlignment="Left"
-                Source="{dx:DXImage 'Office2013/Support/Info_16x16.png'}" />
-
-            <TextBlock
-                Grid.Column="1"
-                Margin="5,0"
-                VerticalAlignment="Center" HorizontalAlignment="Left"
-                Text="{Binding GroupValue.Text}" />
-        </Grid>
-    </DataTemplate>
+    
     <DataTemplate x:Key="UpdateElevationGroupRowTemplate" DataType="{x:Type dxg:GroupRowData}">
         <Grid ToolTip="{Binding Row.ErrorType.Description}">
             <Grid.ColumnDefinitions>
