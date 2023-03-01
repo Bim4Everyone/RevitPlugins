@@ -6,12 +6,13 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 
     xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:local="clr-namespace:RevitEditingZones.Views"
     xmlns:vms="clr-namespace:RevitEditingZones.ViewModels"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:commands="clr-namespace:dosymep.WPF.Commands"
+    xmlns:viewTemplateSelectors="clr-namespace:RevitEditingZones.ViewTemplateSelectors"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -22,10 +23,37 @@
     x:Name="_this"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
+    <Window.Resources>
+        <ResourceDictionary>
+            <viewTemplateSelectors:ErrorTypeGroupRowTemplateSelector
+                x:Key="ErrorTypeGroupRowTemplateSelector"
+                DefaultTemplate="{StaticResource DefaultTemplate}"
+                NotMatchNamesTemplate="{StaticResource NotMatchNamesTemplate}"
+                NotLinkedZonesTemplate="{StaticResource NotLinkedZonesTemplate}" />
+
+            <commands:DisableCollapseGroupRowCommand x:Key="DisableCollapseGroupRowCommand" />
+
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../ViewTemplates/GridRowStyle.xaml" />
+                <ResourceDictionary Source="../ViewTemplates/GridCellTemplate.xaml" />
+                <ResourceDictionary Source="../ViewTemplates/DefaultTemplate.xaml" />
+                <ResourceDictionary Source="../ViewTemplates/NotMatchNamesTemplate.xaml" />
+                <ResourceDictionary Source="../ViewTemplates/NotLinkedZonesTemplate.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <dxmvvm:Interaction.Behaviors>
         <dxmvvm:EventToCommand
             EventName="Loaded"
             Command="{Binding LoadViewCommand}" />
+
+        <dxmvvm:EventToCommand
+            SourceName="_gridControl"
+            PassEventArgsToCommand="True"
+            EventName="GroupRowCollapsing"
+            Command="{Binding  
+                Source={StaticResource DisableCollapseGroupRowCommand}}" />
     </dxmvvm:Interaction.Behaviors>
 
     <Grid>
@@ -45,24 +73,16 @@
                     AllowEditing="False"
                     AllowGrouping="False"
                     EnableImmediatePosting="True"
-                    EditorShowMode="MouseUp"/>
+                    EditorShowMode="MouseUp"
+                    RowStyle="{StaticResource GridRowStyle}"
+                    GroupRowTemplateSelector="{StaticResource ErrorTypeGroupRowTemplateSelector}" />
             </dxg:GridControl.View>
 
+            <dxg:GridColumn GroupIndex="0" FieldName="ErrorType" Header="Тип ошибки" />
             <dxg:GridColumn FieldName="AreaName" Header="Зона" />
             <dxg:GridColumn FieldName="AreaPlanName" Header="План" />
-
-            <dxg:GridColumn FieldName="Level" AllowEditing="True" Header="Уровень">
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate>
-                        <dxe:ComboBoxEdit
-                            Name="PART_Editor"
-                            IsTextEditable="False"
-                            NullText="Выберите уровень"
-                            NullValueButtonPlacement="EditBox"
-                            ItemsSource="{Binding RowData.Row.Levels}" />
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
+            <dxg:GridColumn AllowEditing="True" FieldName="Level" Header="Уровень"
+                            CellTemplate="{StaticResource GridCellTemplate}" />
         </dxg:GridControl>
 
         <StackPanel

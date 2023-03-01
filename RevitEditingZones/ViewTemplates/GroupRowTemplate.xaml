@@ -5,42 +5,4 @@
                     xmlns:converters="clr-namespace:dosymep.WPF.Converters">
     
     <converters:GroupRowChildrenValuesConverter x:Key="GroupRowConverter" />
-    <DataTemplate x:Key="GroupRowTemplate" DataType="{x:Type dxg:GroupRowData}">
-        <Grid ToolTip="{Binding Row.ErrorType.Description}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <dx:DXImage 
-                Grid.Column="0"
-                Margin="5,0"
-                VerticalAlignment="Center" HorizontalAlignment="Left"
-                Source="{dx:DXImage 'Office2013/Support/Info_16x16.png'}" />
-
-            <TextBlock 
-                Grid.Column="1"
-                Margin="5,0"
-                VerticalAlignment="Center" HorizontalAlignment="Left"
-                Text="{Binding GroupValue.Text}" />
-            
-            <dx:SimpleButton 
-                Grid.Column="2"
-                Margin="5,0"
-                Content="Обновить отметки"
-                VerticalAlignment="Center" HorizontalAlignment="Right"
-                Command="{Binding ElementName=_this,
-                                        Path=DataContext.UpdateElevationCommand}" >
-
-                <!--HACK: DevExpress не обновляет GroupRowData после обновления GridControl -->
-                <dx:SimpleButton.CommandParameter>
-                    <MultiBinding Converter="{StaticResource GroupRowConverter}">
-                        <Binding Path=""/>
-                        <Binding Path="GroupValue.Text" />
-                    </MultiBinding>
-                </dx:SimpleButton.CommandParameter>
-            </dx:SimpleButton>
-        </Grid>
-    </DataTemplate>
 </ResourceDictionary>

@@ -1,0 +1,13 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid">
+    <DataTemplate x:Key="GridCellTemplate" DataType="{x:Type dxg:EditGridCellData}">
+        <dxe:ComboBoxEdit
+            Name="PART_Editor"
+            IsTextEditable="False"
+            NullText="Выберите уровень"
+            NullValueButtonPlacement="EditBox"
+            ItemsSource="{Binding RowData.Row.Levels}" />
+    </DataTemplate>
+</ResourceDictionary>
