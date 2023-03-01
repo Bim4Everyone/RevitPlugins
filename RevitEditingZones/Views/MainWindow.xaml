@@ -64,6 +64,8 @@
 
         <dxg:GridControl
             Grid.Row="0"
+            x:Name="_gridControl"
+            AutoExpandAllGroups="True"
             ItemsSource="{Binding ZonePlans}"
             SelectedItem="{Binding ZonePlan}">
             <dxg:GridControl.View>

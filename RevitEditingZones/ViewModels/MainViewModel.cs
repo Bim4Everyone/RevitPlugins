@@ -17,7 +17,7 @@ namespace RevitEditingZones.ViewModels {
 
         private string _errorText;
         private ObservableCollection<LevelViewModel> _levels;
-        
+
         private ZonePlanViewModel _zonePlan;
         private ObservableCollection<ZonePlanViewModel> _zonePlans;
 
@@ -39,7 +39,7 @@ namespace RevitEditingZones.ViewModels {
             get => _levels;
             set => this.RaiseAndSetIfChanged(ref _levels, value);
         }
-        
+
         public ZonePlanViewModel ZonePlan {
             get => _zonePlan;
             set => this.RaiseAndSetIfChanged(ref _zonePlan, value);
@@ -59,7 +59,9 @@ namespace RevitEditingZones.ViewModels {
             foreach(ViewPlan areaPlane in _revitRepository.GetAreaPlanes()) {
                 foreach(Area area in _revitRepository.GetAreas(areaPlane)) {
                     var level = RemoveLevel(_revitRepository.GetLevel(area));
-                    ZonePlans.Add(new ZonePlanViewModel(area, areaPlane) {Level = level, Levels = Levels});
+                    var zonePlan = new ZonePlanViewModel(area, areaPlane) {Level = level, Levels = Levels};
+                    zonePlan.ErrorType = GetErrorType(zonePlan);
+                    ZonePlans.Add(zonePlan);
                 }
             }
         }
@@ -68,10 +70,30 @@ namespace RevitEditingZones.ViewModels {
             if(level == null) {
                 return null;
             }
-            
+
             var foundLevel = Levels.FirstOrDefault(item => item.Level.Id == level.Id);
             Levels.Remove(foundLevel);
             return foundLevel;
+        }
+
+        private ErrorType GetErrorType(ZonePlanViewModel zonePlan) {
+            if(zonePlan.IsNotLinkedZones()) {
+                return ErrorType.NotLinkedZones;
+            }
+
+            if(zonePlan.IsZoneNotMatchViewPlan()) {
+                return ErrorType.ZoneNotMatchViewPlan;
+            }
+
+            if(zonePlan.IsZoneMatchWithSameLevels(ZonePlans)) {
+                return ErrorType.ZoneMatchWithSameLevels;
+            }
+
+            if(zonePlan.IsZoneNotMatchNames()) {
+                return ErrorType.ZoneNotMatchNames;
+            }
+
+            return ErrorType.Default;
         }
     }
 }

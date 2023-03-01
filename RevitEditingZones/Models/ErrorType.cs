@@ -4,8 +4,32 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitEditingZones.ViewModels;
+
 namespace RevitEditingZones.Models {
     internal class ErrorType : IEquatable<ErrorType>, IComparable<ErrorType>, IComparable {
+        public static readonly ErrorType NotLinkedZones = new ErrorType(0) {
+            Name = "Зоны не связаны с уровнем", Description = "Зоны не связаны с уровнем"
+        };
+
+        public static readonly ErrorType ZoneNotMatchViewPlan = new ErrorType(1) {
+            Name = "Этаж зоны не соответствует этажу уровня", Description = "Этаж зоны не соответствует этажу уровня"
+        };
+
+        public static readonly ErrorType ZoneMatchWithSameLevels = new ErrorType(2) {
+            Name = "К нескольким зонам привязан один уровень", Description = "К нескольким зонам привязан один уровень"
+        };
+
+        public static readonly ErrorType ZoneNotMatchNames = new ErrorType(3) {
+            Name = "Имена зон не соответствуют именам уровней",
+            Description = "Имена зон не соответствуют именам уровней"
+        };
+        
+        public static readonly ErrorType Default = new ErrorType(int.MaxValue) {
+            Name = "Ошибки отсутствуют",
+            Description = "Ошибки отсутствуют"
+        };
+
         public ErrorType(int id) {
             Id = id;
         }
@@ -80,6 +104,25 @@ namespace RevitEditingZones.Models {
 
         public override string ToString() {
             return Name;
+        }
+    }
+
+    internal static class ZonePlanExtensions {
+        public static bool IsNotLinkedZones(this ZonePlanViewModel zonePlan) {
+            return zonePlan.Level == null;
+        }
+
+        public static bool IsZoneNotMatchViewPlan(this ZonePlanViewModel zonePlan) {
+            return !zonePlan.Level.LevelName.StartsWith(zonePlan.AreaPlanName + "_");
+        }
+
+        public static bool IsZoneMatchWithSameLevels(this ZonePlanViewModel zonePlan,
+            IEnumerable<ZonePlanViewModel> zonePlans) {
+            return zonePlans.Any(item => item.Level?.Level.Id == zonePlan.Level?.Level.Id);
+        }
+
+        public static bool IsZoneNotMatchNames(this ZonePlanViewModel zonePlan) {
+            return !zonePlan.AreaName.Equals(zonePlan.Level?.LevelName);
         }
     }
 }
