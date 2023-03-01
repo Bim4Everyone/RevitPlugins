@@ -36,6 +36,7 @@
             <commands:DisableCollapseGroupRowCommand x:Key="DisableCollapseGroupRowCommand" />
 
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../ViewTemplates/GridRowStyle.xaml" />
                 <ResourceDictionary Source="../ViewTemplates/GroupRowTemplate.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -113,19 +114,13 @@
                     ShowTotalSummary="False"
                     AllowEditing="False"
                     AllowGrouping="False"
-                    GroupRowTemplateSelector="{StaticResource ErrorTypeGroupRowTemplateSelector}">
-                    <dxg:TableView.RowStyle>
-                        <Style TargetType="dxg:RowControl">
-                            <Setter Property="ToolTip" Value="{Binding Row.ToolTipInfo}" />
-                        </Style>
-                    </dxg:TableView.RowStyle>
-                </dxg:TableView>
+                    RowStyle="{StaticResource GridRowStyle}"
+                    GroupRowTemplateSelector="{StaticResource ErrorTypeGroupRowTemplateSelector}" />
             </dxg:GridControl.View>
 
             <dxg:GridColumn FieldName="Name" Header="Имя" />
             <dxg:GridColumn FieldName="MeterElevation" Header="Отметка (м)" />
             <dxg:GridColumn FieldName="MillimeterElevation" Header="Отметка (мм)" />
-
 
             <dxg:GridColumn FieldName="ErrorType" Header="Тип ошибки" GroupIndex="0" />
         </dxg:GridControl>
