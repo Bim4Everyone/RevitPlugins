@@ -28,6 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dosymep", "dosymep", "{0647
 		dosymep\GroupRowChildrenValuesConverter.cs = dosymep\GroupRowChildrenValuesConverter.cs
 		dosymep\GroupRowValueConverter.cs = dosymep\GroupRowValueConverter.cs
 		dosymep\DisableCollapseGroupRowCommand.cs = dosymep\DisableCollapseGroupRowCommand.cs
+		dosymep\GroupRowExtensions.cs = dosymep\GroupRowExtensions.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0C7777D6-5306-4473-A046-497D2B54E4CA}"

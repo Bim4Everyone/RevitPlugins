@@ -3,6 +3,7 @@ using System.Windows.Controls;
 
 using DevExpress.Xpf.Grid;
 
+using dosymep.WPF;
 using dosymep.WPF.Converters;
 
 using RevitCheckingLevels.Models;

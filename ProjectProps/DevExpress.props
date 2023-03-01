@@ -5,6 +5,7 @@
         <Compile Include="..\dosymep\GroupRowChildrenValuesConverter.cs" Link="dosymep\DevExpress\GroupRowChildrenValuesConverter.cs"/>
         <Compile Include="..\dosymep\GroupRowValueConverter.cs" Link="dosymep\DevExpress\GroupRowValueConverter.cs"/>
         <Compile Include="..\dosymep\DisableCollapseGroupRowCommand.cs" Link="dosymep\DevExpress\DisableCollapseGroupRowCommand.cs"/>
+        <Compile Include="..\dosymep\GroupRowExtensions.cs" Link="dosymep\DevExpress\GroupRowExtensions.cs"/>
 
         <PackageReference Include="DevExpress.Wpf" Version="21.2.3">
             <PrivateAssets>all</PrivateAssets>
