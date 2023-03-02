@@ -78,8 +78,7 @@
 
             <dx:SimpleButton
                 Margin="10"
-                Width="80"
-                Content="ОК"
+                Content="Обновить привязки"
                 Click="ButtonOk_Click" />
 
             <dx:SimpleButton
