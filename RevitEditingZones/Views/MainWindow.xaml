@@ -32,6 +32,11 @@
         <dxmvvm:EventToCommand
             EventName="Loaded"
             Command="{Binding LoadViewCommand}" />
+
+        <dxmvvm:CompositeCommandBehavior x:Name="MultiCommand">
+            <dxmvvm:CommandItem Command="{Binding ViewCommand}" />
+            <dxmvvm:CommandItem Command="{Binding LoadViewCommand}" />
+        </dxmvvm:CompositeCommandBehavior>
     </dxmvvm:Interaction.Behaviors>
 
     <Grid>
@@ -64,7 +69,7 @@
                     ContentTemplate="{StaticResource ZonePlansTemplate}" />
             </dxdo:LayoutGroup>
         </dxdo:DockLayoutManager>
-        
+
         <StackPanel
             Grid.Row="2"
             Height="45"
@@ -79,7 +84,7 @@
             <dx:SimpleButton
                 Margin="10"
                 Content="Обновить привязки"
-                Click="ButtonOk_Click" />
+                Command="{Binding CompositeCommand, ElementName=MultiCommand}" />
 
             <dx:SimpleButton
                 Margin="10"

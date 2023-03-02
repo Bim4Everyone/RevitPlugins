@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -25,9 +26,11 @@ namespace RevitEditingZones.ViewModels {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
+            ViewCommand = new RelayCommand(UpdateLinks);
             LoadViewCommand = new RelayCommand(LoadView);
         }
 
+        public ICommand ViewCommand { get; }
         public ICommand LoadViewCommand { get; }
 
         public string ErrorText {
@@ -50,6 +53,8 @@ namespace RevitEditingZones.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _rightZonePlans, value);
         }
 
+        public IEnumerable<ZonePlanViewModel> ZonePlans => LeftZonePlans.ZonePlans.Union(RightZonePlans.ZonePlans);
+
         private void LoadView(object p) {
             var levels = _revitRepository.GetLevels()
                 .Select(item => new LevelViewModel(item));
@@ -71,6 +76,17 @@ namespace RevitEditingZones.ViewModels {
                         LeftZonePlans.ZonePlans.Add(zonePlan);
                     }
                 }
+            }
+        }
+
+        private void UpdateLinks(object obj) {
+            using(Transaction transaction = _revitRepository.StartTransaction("Обновление привязок")) {
+                foreach(ZonePlanViewModel zonePlan in ZonePlans) {
+                    _revitRepository.UpdateAreaName(zonePlan.Area, zonePlan.AreaName);
+                    _revitRepository.UpdateAreaLevel(zonePlan.Area, zonePlan.Level.Level);
+                }
+
+                transaction.Commit();
             }
         }
 

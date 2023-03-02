@@ -27,6 +27,10 @@ namespace RevitEditingZones.Models {
 
         public AreaScheme AreaScheme { get; }
 
+        public Transaction StartTransaction(string transactionName) {
+            return Document.StartTransaction(transactionName);
+        }
+
         public AreaScheme GetAreaScheme() {
             return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
@@ -96,6 +100,14 @@ namespace RevitEditingZones.Models {
             }
 
             return null;
+        }
+
+        public void UpdateAreaName(Area area, string areaName) {
+            area.SetParamValue(BuiltInParameter.ROOM_NAME, areaName);
+        }
+        
+        public void UpdateAreaLevel(Area area, Level level) {
+            area.SetParamValue(SharedParamsConfig.Instance.FixComment, level.Id.ToString());
         }
     }
 
