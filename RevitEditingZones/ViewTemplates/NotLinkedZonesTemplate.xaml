@@ -31,7 +31,7 @@
             <dx:SimpleButton
                 Grid.Column="2"
                 Margin="5,0"
-                Content="Автоподбор уровней"
+                Content="Автоподбор"
                 VerticalAlignment="Center" HorizontalAlignment="Right"
                 Command="{Binding ElementName=_this,
                                         Path=DataContext.AutoLinkZonesCommand}">

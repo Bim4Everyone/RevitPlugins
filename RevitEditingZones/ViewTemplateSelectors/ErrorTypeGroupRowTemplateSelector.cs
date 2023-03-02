@@ -15,6 +15,14 @@ namespace RevitEditingZones.ViewTemplateSelectors {
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container) {
             var errorType = (item as GroupRowData).GetGroupRowValue<ErrorType>();
+            if(errorType == ErrorType.NotLinkedZones) {
+                return NotLinkedZonesTemplate;
+            }
+
+            if(errorType == ErrorType.ZoneNotMatchNames) {
+                return NotMatchNamesTemplate;
+            }
+            
             return DefaultTemplate;
         }
     }
