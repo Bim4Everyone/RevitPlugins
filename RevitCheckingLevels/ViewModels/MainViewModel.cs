@@ -26,8 +26,7 @@ namespace RevitCheckingLevels.ViewModels {
 
         private string _errorText;
         private LevelViewModel _level;
-        private LinkTypeViewModel _linkType
-            ;
+        private LinkTypeViewModel _linkType;
 
         public MainViewModel(RevitRepository revitRepository, CheckingLevelConfig checkingLevelConfig) {
             _revitRepository = revitRepository;
@@ -56,7 +55,8 @@ namespace RevitCheckingLevels.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _level, value);
         }
 
-        public ObservableCollection<LinkTypeViewModel> LinkTypes { get; } = new ObservableCollection<LinkTypeViewModel>();
+        public ObservableCollection<LinkTypeViewModel> LinkTypes { get; } =
+            new ObservableCollection<LinkTypeViewModel>();
 
         public LinkTypeViewModel LinkType {
             get => _linkType;
@@ -131,7 +131,7 @@ namespace RevitCheckingLevels.ViewModels {
 
                 foreach(LevelInfo levelInfo in levelInfos) {
                     if(levelInfo.IsNotFoundLevels(linkLevelInfos)) {
-                        Levels.Add(new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotFoundLevels });
+                        Levels.Add(new LevelViewModel(levelInfo) {ErrorType = ErrorType.NotFoundLevels});
                     }
                 }
             }
@@ -141,39 +141,35 @@ namespace RevitCheckingLevels.ViewModels {
             foreach(LevelInfo levelInfo in levelInfos) {
                 if(levelInfo.IsNotStandard()) {
                     yield return new LevelViewModel(levelInfo) {
-                        ErrorType = ErrorType.NotStandard, 
-                        ToolTipInfo = levelInfo.GetNotStandardTooltip()
+                        ErrorType = ErrorType.NotStandard, ToolTipInfo = levelInfo.GetNotStandardTooltip()
                     };
                 }
 
                 if(levelInfo.IsNotElevation()) {
                     yield return new LevelViewModel(levelInfo) {
-                        ErrorType = ErrorType.NotElevation, 
-                        ToolTipInfo = levelInfo.GetNotElevationTooltip()
+                        ErrorType = ErrorType.NotElevation, ToolTipInfo = levelInfo.GetNotElevationTooltip()
                     };
                 }
 
                 if(levelInfo.IsNotMillimeterElevation()) {
                     yield return new LevelViewModel(levelInfo) {
-                        ErrorType = ErrorType.NotMillimeterElevation, 
+                        ErrorType = ErrorType.NotMillimeterElevation,
                         ToolTipInfo = levelInfo.GetNotMillimeterElevationTooltip()
                     };
                 }
 
                 if(levelInfo.IsNotRangeElevation(levelInfos)) {
-                    yield return new LevelViewModel(levelInfo) { ErrorType = ErrorType.NotRangeElevation };
+                    yield return new LevelViewModel(levelInfo) {ErrorType = ErrorType.NotRangeElevation};
                 }
             }
         }
 
         private void UpdateElevation(object p) {
-            if(p is object[] list) {
-                _revitRepository.UpdateElevations(list
-                    .OfType<LevelViewModel>()
-                    .Select(item => item.LevelInfo));
+            _revitRepository.UpdateElevations(Levels
+                .Where(item => item.ErrorType == ErrorType.NotElevation)
+                .Select(item => item.LevelInfo));
 
-                LoadView(null);
-            }
+            LoadView(null);
         }
 
         private bool CanUpdateElevation(object p) {

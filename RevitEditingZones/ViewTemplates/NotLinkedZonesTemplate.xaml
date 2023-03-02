@@ -4,10 +4,6 @@
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core">
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="GroupRowTemplate.xaml" />
-    </ResourceDictionary.MergedDictionaries>
-
     <DataTemplate x:Key="NotLinkedZonesTemplate" DataType="{x:Type dxg:GroupRowData}">
         <Grid ToolTip="{Binding Row.ErrorType.Description}">
             <Grid.ColumnDefinitions>
@@ -33,16 +29,7 @@
                 Margin="5,0"
                 Content="Автоподбор"
                 VerticalAlignment="Center" HorizontalAlignment="Right"
-                Command="{Binding View.DataContext.AutoLinkZonesCommand}">
-
-                <!--HACK: DevExpress не обновляет GroupRowData после обновления GridControl -->
-                <dx:SimpleButton.CommandParameter>
-                    <MultiBinding Converter="{StaticResource GroupRowConverter}">
-                        <Binding Path="" />
-                        <Binding Path="GroupValue.Text" />
-                    </MultiBinding>
-                </dx:SimpleButton.CommandParameter>
-            </dx:SimpleButton>
+                Command="{Binding View.DataContext.AutoLinkZonesCommand}" />
         </Grid>
     </DataTemplate>
 </ResourceDictionary>
