@@ -33,8 +33,7 @@
                 Margin="5,0"
                 Content="Автоподбор"
                 VerticalAlignment="Center" HorizontalAlignment="Right"
-                Command="{Binding ElementName=_this,
-                                        Path=DataContext.AutoLinkZonesCommand}">
+                Command="{Binding View.DataContext.AutoLinkZonesCommand}">
 
                 <!--HACK: DevExpress не обновляет GroupRowData после обновления GridControl -->
                 <dx:SimpleButton.CommandParameter>
