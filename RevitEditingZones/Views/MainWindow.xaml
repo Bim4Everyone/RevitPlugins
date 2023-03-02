@@ -8,11 +8,8 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:vms="clr-namespace:RevitEditingZones.ViewModels"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-    xmlns:commands="clr-namespace:dosymep.WPF.Commands"
-    xmlns:viewTemplateSelectors="clr-namespace:RevitEditingZones.ViewTemplateSelectors"
+    xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -25,20 +22,8 @@
 
     <Window.Resources>
         <ResourceDictionary>
-            <viewTemplateSelectors:ErrorTypeGroupRowTemplateSelector
-                x:Key="ErrorTypeGroupRowTemplateSelector"
-                DefaultTemplate="{StaticResource DefaultTemplate}"
-                NotMatchNamesTemplate="{StaticResource NotMatchNamesTemplate}"
-                NotLinkedZonesTemplate="{StaticResource NotLinkedZonesTemplate}" />
-
-            <commands:DisableCollapseGroupRowCommand x:Key="DisableCollapseGroupRowCommand" />
-
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../ViewTemplates/GridRowStyle.xaml" />
-                <ResourceDictionary Source="../ViewTemplates/GridCellTemplate.xaml" />
-                <ResourceDictionary Source="../ViewTemplates/DefaultTemplate.xaml" />
-                <ResourceDictionary Source="../ViewTemplates/NotMatchNamesTemplate.xaml" />
-                <ResourceDictionary Source="../ViewTemplates/NotLinkedZonesTemplate.xaml" />
+                <ResourceDictionary Source="../ViewTemplates/ZonePlansTemplate.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -47,48 +32,41 @@
         <dxmvvm:EventToCommand
             EventName="Loaded"
             Command="{Binding LoadViewCommand}" />
-
-        <dxmvvm:EventToCommand
-            SourceName="_gridControl"
-            PassEventArgsToCommand="True"
-            EventName="GroupRowCollapsing"
-            Command="{Binding  
-                Source={StaticResource DisableCollapseGroupRowCommand}}" />
     </dxmvvm:Interaction.Behaviors>
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <dxg:GridControl
-            Grid.Row="0"
-            x:Name="_gridControl"
-            AutoExpandAllGroups="True"
-            ItemsSource="{Binding ZonePlans}"
-            SelectedItem="{Binding ZonePlan}">
-            <dxg:GridControl.View>
-                <dxg:TableView
-                    ShowGroupPanel="False"
-                    ShowTotalSummary="False"
-                    AllowEditing="False"
-                    AllowGrouping="False"
-                    EnableImmediatePosting="True"
-                    EditorShowMode="MouseUp"
-                    RowStyle="{StaticResource GridRowStyle}"
-                    GroupRowTemplateSelector="{StaticResource ErrorTypeGroupRowTemplateSelector}" />
-            </dxg:GridControl.View>
+        <DockPanel Grid.Row="0">
+            <dx:SimpleButton
+                DockPanel.Dock="Right"
+                Content="Показать" />
+            <TextBlock DockPanel.Dock="Left"
+                       FontSize="16"
+                       Foreground="Orange"
+                       Text="{Binding Levels.Count, 
+                                    StringFormat={}В проекте {0} уровней без привязки к зонам!}" />
+        </DockPanel>
 
-            <dxg:GridColumn GroupIndex="0" FieldName="ErrorType" Header="Тип ошибки" />
-            <dxg:GridColumn FieldName="AreaName" Header="Зона" />
-            <dxg:GridColumn FieldName="AreaPlanName" Header="План" />
-            <dxg:GridColumn AllowEditing="True" FieldName="Level" Header="Уровень"
-                            CellTemplate="{StaticResource GridCellTemplate}" />
-        </dxg:GridControl>
-
-        <StackPanel
+        <dxdo:DockLayoutManager
             Grid.Row="1"
+            Padding="0">
+            <dxdo:LayoutGroup AllowSplitters="True" Margin="0">
+                <dxdo:LayoutControlItem
+                    Content="{Binding LeftZonePlans}"
+                    ContentTemplate="{StaticResource ZonePlansTemplate}" />
+                <dxdo:LayoutControlItem
+                    Content="{Binding RightZonePlans}"
+                    ContentTemplate="{StaticResource ZonePlansTemplate}" />
+            </dxdo:LayoutGroup>
+        </dxdo:DockLayoutManager>
+        
+        <StackPanel
+            Grid.Row="2"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">

@@ -17,9 +17,9 @@ namespace RevitEditingZones.ViewModels {
 
         private string _errorText;
         private ObservableCollection<LevelViewModel> _levels;
-
-        private ZonePlanViewModel _zonePlan;
-        private ObservableCollection<ZonePlanViewModel> _zonePlans;
+        
+        private ZonePlansViewModel _leftZonePlans;
+        private ZonePlansViewModel _rightZonePlans;
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
@@ -40,14 +40,14 @@ namespace RevitEditingZones.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _levels, value);
         }
 
-        public ZonePlanViewModel ZonePlan {
-            get => _zonePlan;
-            set => this.RaiseAndSetIfChanged(ref _zonePlan, value);
+        public ZonePlansViewModel LeftZonePlans {
+            get => _leftZonePlans;
+            set => this.RaiseAndSetIfChanged(ref _leftZonePlans, value);
         }
-
-        public ObservableCollection<ZonePlanViewModel> ZonePlans {
-            get => _zonePlans;
-            set => this.RaiseAndSetIfChanged(ref _zonePlans, value);
+        
+        public ZonePlansViewModel RightZonePlans {
+            get => _rightZonePlans;
+            set => this.RaiseAndSetIfChanged(ref _rightZonePlans, value);
         }
 
         private void LoadView(object p) {
@@ -55,13 +55,21 @@ namespace RevitEditingZones.ViewModels {
                 .Select(item => new LevelViewModel(item));
             Levels = new ObservableCollection<LevelViewModel>(levels);
 
-            ZonePlans = new ObservableCollection<ZonePlanViewModel>();
+            LeftZonePlans = new ZonePlansViewModel();
+            RightZonePlans = new ZonePlansViewModel();
+            
+            LeftZonePlans.ZonePlans = new ObservableCollection<ZonePlanViewModel>();
+            RightZonePlans.ZonePlans = new ObservableCollection<ZonePlanViewModel>();
             foreach(ViewPlan areaPlane in _revitRepository.GetAreaPlanes()) {
                 foreach(Area area in _revitRepository.GetAreas(areaPlane)) {
                     var level = RemoveLevel(_revitRepository.GetLevel(area));
                     var zonePlan = new ZonePlanViewModel(area, areaPlane) {Level = level, Levels = Levels};
                     zonePlan.ErrorType = GetErrorType(zonePlan);
-                    ZonePlans.Add(zonePlan);
+                    if(zonePlan.ErrorType == ErrorType.Default) {
+                        RightZonePlans.ZonePlans.Add(zonePlan);
+                    } else {
+                        LeftZonePlans.ZonePlans.Add(zonePlan);
+                    }
                 }
             }
         }
@@ -85,7 +93,7 @@ namespace RevitEditingZones.ViewModels {
                 return ErrorType.ZoneNotMatchViewPlan;
             }
 
-            if(zonePlan.IsZoneMatchWithSameLevels(ZonePlans)) {
+            if(zonePlan.IsZoneMatchWithSameLevels(LeftZonePlans.ZonePlans)) {
                 return ErrorType.ZoneMatchWithSameLevels;
             }
 
