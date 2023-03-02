@@ -35,7 +35,7 @@ namespace RevitCheckingLevels.ViewModels {
             ViewCommand = new RelayCommand(SaveSettings);
             ViewLoadCommand = new RelayCommand(LoadView);
             LoadLevelErrorsCommand = new RelayCommand(LoadLevelErrors);
-            UpdateElevationCommand = new RelayCommand(UpdateElevation, CanUpdateElevation);
+            UpdateElevationCommand = new RelayCommand(UpdateElevation);
         }
 
         public ICommand ViewCommand { get; }
@@ -170,15 +170,6 @@ namespace RevitCheckingLevels.ViewModels {
                 .Select(item => item.LevelInfo));
 
             LoadView(null);
-        }
-
-        private bool CanUpdateElevation(object p) {
-            if(p is object[] list) {
-                return list.OfType<LevelViewModel>()
-                    .All(item => item.ErrorType == ErrorType.NotElevation);
-            }
-
-            return false;
         }
     }
 }

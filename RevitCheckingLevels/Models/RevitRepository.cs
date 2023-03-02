@@ -56,8 +56,10 @@ namespace RevitCheckingLevels.Models {
         public void UpdateElevations(IEnumerable<LevelInfo> levels) {
             using(Transaction transaction = Document.StartTransaction("Обновление отметок уровня")) {
                 foreach(LevelInfo levelInfo in levels) {
-                    levelInfo.Elevation = levelInfo.Level.GetMeterElevation();
-                    levelInfo.Level.Name = levelInfo.FormatLevelName();
+                    double elevation = levelInfo.Level.GetMeterElevation();
+                    var elements = levelInfo.Level.Name.Split('_');
+                    elements[2] = elevation.ToString(LevelParserImpl.CultureInfo);
+                    levelInfo.Level.Name = string.Join("_", elements);
                 }
 
                 transaction.Commit();
