@@ -46,16 +46,22 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <DockPanel Grid.Row="0">
+        <StackPanel
+            Grid.Row="0"
+            Margin="0 10"
+            Orientation="Horizontal">
+
+            <TextBlock
+                Margin="5 0"
+                FontSize="16"
+                Foreground="Orange"
+                Text="{Binding Levels.Count, 
+                                    StringFormat={}Уровней без привязки {0} шт.}" />
+            
             <dx:SimpleButton
-                DockPanel.Dock="Right"
-                Content="Показать" />
-            <TextBlock DockPanel.Dock="Left"
-                       FontSize="16"
-                       Foreground="Orange"
-                       Text="{Binding Levels.Count, 
-                                    StringFormat={}В проекте {0} уровней без привязки к зонам!}" />
-        </DockPanel>
+                Content="Показать"
+                Command="{Binding ShowLevelsCommand}" />
+        </StackPanel>
 
         <dxdo:DockLayoutManager
             Grid.Row="1"

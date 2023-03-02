@@ -6,15 +6,18 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitEditingZones.Models;
+using RevitEditingZones.Services;
 
 namespace RevitEditingZones.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
+        private readonly ILevelsWindowService _levelWindowService;
 
         private string _errorText;
         private ObservableCollection<LevelViewModel> _levels;
@@ -22,17 +25,20 @@ namespace RevitEditingZones.ViewModels {
         private ZonePlansViewModel _leftZonePlans;
         private ZonePlansViewModel _rightZonePlans;
 
-        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
+        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository, ILevelsWindowService levelWindowService) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
+            _levelWindowService = levelWindowService;
 
             ViewCommand = new RelayCommand(UpdateLinks);
             LoadViewCommand = new RelayCommand(LoadView);
+            ShowLevelsCommand = new RelayCommand(ShowLevels);
         }
 
         public ICommand ViewCommand { get; }
         public ICommand LoadViewCommand { get; }
-
+        public ICommand ShowLevelsCommand { get; }
+        
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
@@ -88,6 +94,14 @@ namespace RevitEditingZones.ViewModels {
 
                 transaction.Commit();
             }
+            
+            GetPlatformService<INotificationService>()
+                .CreateNotification("Редактор зон СМР ", "Обновление привязок завершено.", "C#")
+                .ShowAsync();
+        }
+        
+        private void ShowLevels(object obj) {
+            _levelWindowService.ShowLevels(Levels);
         }
 
         private LevelViewModel RemoveLevel(Level level) {

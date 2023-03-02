@@ -16,6 +16,7 @@ using dosymep.SimpleServices;
 using Ninject;
 
 using RevitEditingZones.Models;
+using RevitEditingZones.Services;
 using RevitEditingZones.ViewModels;
 using RevitEditingZones.Views;
 
@@ -25,7 +26,7 @@ namespace RevitEditingZones {
     [Transaction(TransactionMode.Manual)]
     public class RevitEditingZonesCommand : BasePluginCommand {
         public RevitEditingZonesCommand() {
-            PluginName = "Настройка зон СМР";
+            PluginName = "Редактор зон СМР";
         }
 
         protected override void Execute(UIApplication uiApplication) {
@@ -44,8 +45,19 @@ namespace RevitEditingZones {
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
+                Func<LevelsWindow> levelsWindowFactory = () => kernel.Get<LevelsWindow>();
+                kernel.Bind<Func<LevelsWindow>>()
+                    .ToConstant(levelsWindowFactory);
+
+                kernel.Bind<ILevelsWindowService>()
+                    .To<LevelsWindowService>();
+                kernel.Bind<LevelsWindow>().ToSelf()
+                    .WithPropertyValue(nameof(Window.Owner), 
+                        c => c.Kernel.Get<MainWindow>());
+
                 kernel.Bind<MainViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()
+                    .InSingletonScope()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext),
                         c => c.Kernel.Get<MainViewModel>());
