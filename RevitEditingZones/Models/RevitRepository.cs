@@ -107,7 +107,7 @@ namespace RevitEditingZones.Models {
         }
         
         public void UpdateAreaLevel(Area area, Level level) {
-            area.SetParamValue(SharedParamsConfig.Instance.FixComment, level.Id.ToString());
+            area.SetParamValue(SharedParamsConfig.Instance.FixComment, level?.Id.ToString());
         }
     }
 

@@ -89,7 +89,7 @@ namespace RevitEditingZones.ViewModels {
             using(Transaction transaction = _revitRepository.StartTransaction("Обновление привязок")) {
                 foreach(ZonePlanViewModel zonePlan in ZonePlans) {
                     _revitRepository.UpdateAreaName(zonePlan.Area, zonePlan.AreaName);
-                    _revitRepository.UpdateAreaLevel(zonePlan.Area, zonePlan.Level.Level);
+                    _revitRepository.UpdateAreaLevel(zonePlan.Area, zonePlan.Level?.Level);
                 }
 
                 transaction.Commit();
