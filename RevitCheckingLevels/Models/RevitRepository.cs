@@ -20,6 +20,14 @@ namespace RevitCheckingLevels.Models {
 
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
+        
+        public bool IsKoordFile() {
+            return Document.Title.Contains("_KOORD");
+        }
+
+        public bool IsKoordFile(RevitLinkType revitLinkType) {
+            return revitLinkType.Name.Contains("_KOORD");
+        }
 
         public IEnumerable<Level> GetLevels() {
             return GetLevels(Document);

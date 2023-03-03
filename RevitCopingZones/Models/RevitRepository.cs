@@ -31,6 +31,14 @@ namespace RevitCopingZones.Models {
         public Transaction StartTransaction(string transactionName) {
             return Document.StartTransaction(transactionName);
         }
+        
+        public bool IsKoordFile() {
+            return Document.Title.Contains("_KOORD");
+        }
+        
+        public bool IsKoordFile(RevitLinkType revitLinkType) {
+            return revitLinkType.Name.Contains("_KOORD");
+        }
 
         public AreaScheme GetAreaScheme() {
             return new FilteredElementCollector(Document)

@@ -58,6 +58,12 @@ namespace RevitCopingZones {
 
         private void Check(IKernel kernel) {
             var revitRepository = kernel.Get<RevitRepository>();
+            if(!revitRepository.IsKoordFile()) {
+                TaskDialog.Show(PluginName,
+                    $"Данный скрипт работает только в координационном файле.");
+                throw new OperationCanceledException();
+            }
+            
             if(!revitRepository.HasAreaScheme()) {
                 TaskDialog.Show(PluginName,
                     $"В документе отсутствует схема зонирования с именем \"{RevitRepository.AreaSchemeName}\".");

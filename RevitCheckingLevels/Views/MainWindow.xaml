@@ -34,7 +34,8 @@
                 UpdateElevationTemplate="{StaticResource UpdateElevationGroupRowTemplate}" />
 
             <commands:DisableCollapseGroupRowCommand x:Key="DisableCollapseGroupRowCommand" />
-
+            <dxmvvm:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" Inverse="True"/>
+            
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../ViewTemplates/GridRowStyle.xaml" />
                 <ResourceDictionary Source="../ViewTemplates/DefaultGroupRowTemplate.xaml" />
@@ -75,7 +76,9 @@
 
         <DockPanel
             Grid.Row="0"
-            Margin="10">
+            Margin="10"
+            Visibility="{Binding IsKoordFile, 
+                Converter={StaticResource BooleanToVisibilityConverter}}">
 
             <TextBlock
                 Margin="0 5"
@@ -94,8 +97,11 @@
 
             <dxe:ComboBoxEdit
                 x:Name="_linkTypes"
-                DisplayMember="Name"
+                IsReadOnly="True"
                 IsTextEditable="False"
+                ShowPopupIfReadOnly="False"
+                
+                DisplayMember="Name"
                 ItemsSource="{Binding Path=LinkTypes}"
                 SelectedItem="{Binding Path=LinkType}" />
         </DockPanel>
@@ -134,7 +140,6 @@
 
             <dx:SimpleButton
                 Content="ОК" Margin="10" Width="80"
-                Command="{Binding ViewCommand}"
                 Click="ButtonOk_Click" />
 
             <dx:SimpleButton

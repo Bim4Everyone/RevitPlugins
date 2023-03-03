@@ -26,6 +26,14 @@ namespace RevitEditingZones.Models {
         public Document Document => ActiveUIDocument.Document;
 
         public AreaScheme AreaScheme { get; }
+        
+        public bool IsKoordFile() {
+            return Document.Title.Contains("_KOORD");
+        }
+        
+        public bool IsKoordFile(RevitLinkType revitLinkType) {
+            return revitLinkType.Name.Contains("_KOORD");
+        }
 
         public Transaction StartTransaction(string transactionName) {
             return Document.StartTransaction(transactionName);

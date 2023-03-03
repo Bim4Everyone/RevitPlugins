@@ -43,6 +43,8 @@ namespace RevitCheckingLevels.ViewModels {
         public ICommand LoadLevelErrorsCommand { get; }
         public ICommand UpdateElevationCommand { get; }
 
+        public bool IsKoordFile => _revitRepository.IsKoordFile();
+
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
@@ -78,12 +80,15 @@ namespace RevitCheckingLevels.ViewModels {
 
         private void LoadLinkFiles(object parameter) {
             LinkTypes.Clear();
-            foreach(RevitLinkType linkType in _revitRepository.GetRevitLinkTypes()) {
-                LinkTypes.Add(new LinkTypeViewModel(linkType));
-            }
 
-            var settings = _checkingLevelConfig.GetSettings(_revitRepository.Document);
-            LinkType = LinkTypes.FirstOrDefault(item => item.Id.IntegerValue == settings?.LinkTypeId);
+            if(!IsKoordFile) {
+                foreach(RevitLinkType linkType in _revitRepository.GetRevitLinkTypes()) {
+                    LinkTypes.Add(new LinkTypeViewModel(linkType));
+                }
+
+                // var settings = _checkingLevelConfig.GetSettings(_revitRepository.Document);
+                LinkType = LinkTypes.FirstOrDefault(item => _revitRepository.IsKoordFile(item.Element));
+            }
         }
 
         private void LoadLevelErrors(object parameter) {
