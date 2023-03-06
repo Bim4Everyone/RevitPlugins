@@ -8,16 +8,11 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using DevExpress.Data.Native;
-using DevExpress.Mvvm.Native;
-
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitCheckingLevels.Models;
 using RevitCheckingLevels.Models.LevelParser;
-using RevitCheckingLevels.Services;
-using RevitCheckingLevels.Views;
 
 namespace RevitCheckingLevels.ViewModels {
     internal class MainViewModel : BaseViewModel {
@@ -108,14 +103,23 @@ namespace RevitCheckingLevels.ViewModels {
 
         private void LoadLinkLevels(LevelInfo[] levelInfos) {
             ErrorText = null;
+            if(IsKoordFile) {
+                return;
+            }
+
+            if(LinkType == null) {
+                ErrorText = $"Проверки на соответствие координационному файлу не выполнены (файл не выбран).";
+                return;
+            }
+            
             if(LinkType?.IsLinkLoaded == false) {
-                ErrorText = $"Загрузите координационный файл \"{LinkType.Name}\".";
+                ErrorText = $"Проверки на соответствие координационному файлу не выполнены (файл не загружен).";
                 return;
             }
 
             if(LinkType?.IsLinkLoaded == true) {
                 if(!_revitRepository.HasLinkInstance(LinkType.Element)) {
-                    ErrorText = $"Не были созданы экземпляры связанного файла \"{LinkType.Name}\".";
+                    ErrorText = $"Проверки на соответствие координационному файлу не выполнены (экземпляры не созданы).";
                     return;
                 }
 
@@ -125,12 +129,12 @@ namespace RevitCheckingLevels.ViewModels {
                     .ToArray();
 
                 if(linkLevelInfos.Length == 0) {
-                    ErrorText = $"В координационном файле \"{LinkType.Name}\" не были найдены уровни.";
+                    ErrorText = $"Проверки на соответствие координационному файлу не выполнены (нет уровней).";
                     return;
                 }
 
-                if(LoadLevelErrors(levelInfos).Any()) {
-                    ErrorText = $"В координационном файле \"{LinkType.Name}\" найдены ошибки в уровнях.";
+                if(LoadLevelErrors(linkLevelInfos).Any()) {
+                    ErrorText = $"Проверки на соответствие координационному файлу не выполнены (ошибки в коорд. файле).";
                     return;
                 }
 
