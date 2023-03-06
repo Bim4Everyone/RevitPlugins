@@ -15,46 +15,60 @@
         <ResourceDictionary Source="../ViewTemplates/NotMatchNamesTemplate.xaml" />
         <ResourceDictionary Source="../ViewTemplates/NotLinkedZonesTemplate.xaml" />
     </ResourceDictionary.MergedDictionaries>
-    
+
+    <dxmvvm:NumericToVisibilityConverter x:Key="GridVisible" />
+    <dxmvvm:NumericToVisibilityConverter x:Key="HintVisible" Inverse="True" />
+
     <selectors:ErrorTypeGroupRowTemplateSelector
         x:Key="ErrorTypeGroupRowTemplateSelector"
         DefaultTemplate="{StaticResource DefaultTemplate}"
         NotMatchNamesTemplate="{StaticResource NotMatchNamesTemplate}"
         NotLinkedZonesTemplate="{StaticResource NotLinkedZonesTemplate}" />
-    
-    <commands:DisableCollapseGroupRowCommand x:Key="DisableCollapseGroupRowCommand"/>
+
+    <commands:DisableCollapseGroupRowCommand x:Key="DisableCollapseGroupRowCommand" />
 
     <DataTemplate x:Key="ZonePlansTemplate" DataType="{x:Type vms:ZonePlansViewModel}">
-        <dxg:GridControl
-            MaxHeight="9000"
-            AutoExpandAllGroups="True"
-            ItemsSource="{Binding ZonePlans}"
-            SelectedItem="{Binding ZonePlan}">
-            <dxg:GridControl.View>
-                <dxg:TableView
-                    ShowGroupPanel="False"
-                    ShowTotalSummary="False"
-                    AllowEditing="False"
-                    AllowGrouping="False"
-                    EnableImmediatePosting="True"
-                    EditorShowMode="MouseUp"
-                    RowStyle="{StaticResource GridRowStyle}"
-                    GroupRowTemplateSelector="{StaticResource ErrorTypeGroupRowTemplateSelector}" />
-            </dxg:GridControl.View>
+        <Grid>
+            <TextBlock
+                Text="Ошибки не найдены"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Visibility="{Binding ZonePlans.Count, 
+                Converter={StaticResource HintVisible}}" />
 
-            <dxg:GridColumn GroupIndex="0" FieldName="ErrorType" Header="Тип ошибки" />
-            <dxg:GridColumn FieldName="AreaName" Header="Зона" />
-            <dxg:GridColumn FieldName="AreaPlanName" Header="План" />
-            <dxg:GridColumn AllowEditing="True" FieldName="Level" Header="Уровень"
-                            CellTemplate="{StaticResource GridCellTemplate}" />
-            
-            <dxmvvm:Interaction.Behaviors>
-                <dxmvvm:EventToCommand
-                    PassEventArgsToCommand="True"
-                    EventName="GroupRowCollapsing"
-                    Command="{Binding  
+            <dxg:GridControl
+                MaxHeight="9000"
+                AutoExpandAllGroups="True"
+                ItemsSource="{Binding ZonePlans}"
+                SelectedItem="{Binding ZonePlan}"
+                Visibility="{Binding ZonePlans.Count, 
+                Converter={StaticResource GridVisible}}">
+                <dxg:GridControl.View>
+                    <dxg:TableView
+                        ShowGroupPanel="False"
+                        ShowTotalSummary="False"
+                        AllowEditing="False"
+                        AllowGrouping="False"
+                        EnableImmediatePosting="True"
+                        EditorShowMode="MouseUp"
+                        RowStyle="{StaticResource GridRowStyle}"
+                        GroupRowTemplateSelector="{StaticResource ErrorTypeGroupRowTemplateSelector}" />
+                </dxg:GridControl.View>
+
+                <dxg:GridColumn GroupIndex="0" FieldName="ErrorType" Header="Тип ошибки" />
+                <dxg:GridColumn FieldName="AreaName" Header="Зона" />
+                <dxg:GridColumn FieldName="AreaPlanName" Header="План" />
+                <dxg:GridColumn AllowEditing="True" FieldName="Level" Header="Уровень"
+                                CellTemplate="{StaticResource GridCellTemplate}" />
+
+                <dxmvvm:Interaction.Behaviors>
+                    <dxmvvm:EventToCommand
+                        PassEventArgsToCommand="True"
+                        EventName="GroupRowCollapsing"
+                        Command="{Binding  
                 Source={StaticResource DisableCollapseGroupRowCommand}}" />
-            </dxmvvm:Interaction.Behaviors>
-        </dxg:GridControl>
+                </dxmvvm:Interaction.Behaviors>
+            </dxg:GridControl>
+        </Grid>
     </DataTemplate>
 </ResourceDictionary>

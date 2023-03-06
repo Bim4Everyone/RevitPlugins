@@ -34,8 +34,11 @@
                 UpdateElevationTemplate="{StaticResource UpdateElevationGroupRowTemplate}" />
 
             <commands:DisableCollapseGroupRowCommand x:Key="DisableCollapseGroupRowCommand" />
-            <dxmvvm:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" Inverse="True"/>
-            
+            <dxmvvm:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" Inverse="True" />
+
+            <dxmvvm:NumericToVisibilityConverter x:Key="GridVisible" />
+            <dxmvvm:NumericToVisibilityConverter x:Key="HintVisible" Inverse="True" />
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../ViewTemplates/GridRowStyle.xaml" />
                 <ResourceDictionary Source="../ViewTemplates/DefaultGroupRowTemplate.xaml" />
@@ -100,11 +103,19 @@
                 IsReadOnly="True"
                 IsTextEditable="False"
                 ShowPopupIfReadOnly="False"
-                
+
                 DisplayMember="Name"
                 ItemsSource="{Binding Path=LinkTypes}"
                 SelectedItem="{Binding Path=LinkType}" />
         </DockPanel>
+
+        <TextBlock
+            Grid.Row="1"
+            Text="Ошибки не найдены"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            Visibility="{Binding Levels.Count, 
+                Converter={StaticResource HintVisible}}" />
 
         <dxg:GridControl
             Grid.Row="1"
@@ -112,7 +123,9 @@
             x:Name="_gridControl"
             AutoExpandAllGroups="True"
             ItemsSource="{Binding Levels}"
-            SelectedItem="{Binding Level}">
+            SelectedItem="{Binding Level}"
+            Visibility="{Binding Levels.Count, 
+                Converter={StaticResource GridVisible}}">
 
             <dxg:GridControl.View>
                 <dxg:TableView
