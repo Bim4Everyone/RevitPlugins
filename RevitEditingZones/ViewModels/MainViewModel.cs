@@ -66,8 +66,8 @@ namespace RevitEditingZones.ViewModels {
                 .Select(item => new LevelViewModel(item));
             Levels = new ObservableCollection<LevelViewModel>(levels);
 
-            LeftZonePlans = new ZonePlansViewModel();
-            RightZonePlans = new ZonePlansViewModel();
+            LeftZonePlans = new ZonePlansViewModel() {HintText = "Ошибки не найдены"};
+            RightZonePlans = new ZonePlansViewModel(){HintText = "Уровни без ошибок не найдены"};
             
             LeftZonePlans.ZonePlans = new ObservableCollection<ZonePlanViewModel>();
             RightZonePlans.ZonePlans = new ObservableCollection<ZonePlanViewModel>();

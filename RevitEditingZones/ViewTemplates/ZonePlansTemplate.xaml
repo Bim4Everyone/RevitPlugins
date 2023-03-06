@@ -30,7 +30,7 @@
     <DataTemplate x:Key="ZonePlansTemplate" DataType="{x:Type vms:ZonePlansViewModel}">
         <Grid>
             <TextBlock
-                Text="Ошибки не найдены"
+                Text="{Binding HintText}"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 Visibility="{Binding ZonePlans.Count, 

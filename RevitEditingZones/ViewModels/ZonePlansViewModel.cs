@@ -12,6 +12,7 @@ namespace RevitEditingZones.ViewModels {
     internal class ZonePlansViewModel : BaseViewModel {
         private ZonePlanViewModel _zonePlan;
         private ObservableCollection<ZonePlanViewModel> _zonePlans;
+        private string _hintText;
 
         public ZonePlansViewModel() {
             AutoLinkZonesCommand = new RelayCommand(AutoLinkZones);
@@ -20,6 +21,11 @@ namespace RevitEditingZones.ViewModels {
 
         public ICommand AutoLinkZonesCommand { get; }
         public ICommand UpdateZoneNamesCommand { get; }
+
+        public string HintText {
+            get => _hintText;
+            set => this.RaiseAndSetIfChanged(ref _hintText, value);
+        }
 
         public ZonePlanViewModel ZonePlan {
             get => _zonePlan;
