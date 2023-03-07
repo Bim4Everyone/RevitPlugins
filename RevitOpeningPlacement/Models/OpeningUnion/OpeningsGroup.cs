@@ -8,7 +8,13 @@ using dosymep.Revit;
 using RevitClashDetective.Models.Extensions;
 
 namespace RevitOpeningPlacement.Models.OpeningUnion {
+    /// <summary>
+    /// Класс для обертки списка экземпляров семейств заданий на отверстия
+    /// </summary>
     internal class OpeningsGroup {
+        /// <summary>
+        /// Список объединенных солидов экземпляров семейств отверстий
+        /// </summary>
         private List<Solid> _solids = new List<Solid>();
         public OpeningsGroup() { }
 
@@ -17,6 +23,11 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         }
         public List<FamilyInstance> Elements { get; } = new List<FamilyInstance>();
 
+        /// <summary>
+        /// Возвращает список экземпляров семейств отверстий из поданного списка, которые пересекаются с <see cref="_solids">солидами</see> группы отверстий
+        /// </summary>
+        /// <param name="elements">Список экземпляров семейств, которые будут фильтроваться по пересечению</param>
+        /// <returns>Экземпляры семейств из поданного списка, пересекающиеся с <see cref="_solids">солидами</see> группы отверстий</returns>
         public List<FamilyInstance> Intersects(IList<FamilyInstance> elements) {
             List<FamilyInstance> intersections = new List<FamilyInstance>();
             var doc = elements.FirstOrDefault()?.Document;
@@ -31,6 +42,11 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
             return intersections;
         }
 
+        /// <summary>
+        /// Добавляет поданный экземпляр семейства в <see cref="Elements">список элементов</see>, 
+        /// а также объединяет Solid поданного элемента с Solid из списка уже добавленнымх <see cref="_solids">солидов элементов</see>, если они пересекаются.
+        /// </summary>
+        /// <param name="element">Экземпляр семейства отверстия для добавления</param>
         public void AddElement(FamilyInstance element) {
             Elements.Add(element);
             Solid unitedSolid = null;
