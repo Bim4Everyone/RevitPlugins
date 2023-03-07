@@ -14,6 +14,7 @@ using RevitClashDetective.Models.Handlers;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using System.Threading.Tasks;
 using RevitOpeningPlacement.Models.RevitViews;
+using System.Text.RegularExpressions;
 
 namespace RevitOpeningPlacement.Models {
     internal class RevitRepository {
@@ -135,6 +136,21 @@ namespace RevitOpeningPlacement.Models {
 
         public static string SystemCheck => "Системная проверка";
 
+        /// <summary>
+        /// Шаблон названий АР файлов в соответствии с BIM стандартом: \\uprav-stroy.loc\corparate\Департаменты\Проектный институт\Типовые ТЗ\BIM-стандарт A101
+        /// </summary>
+        private static Regex _RegexAR => new Regex(@"^.+_AR.*$");
+
+        /// <summary>
+        /// Шаблон названий КР файлов в соответствии с BIM стандартом: \\uprav-stroy.loc\corparate\Департаменты\Проектный институт\Типовые ТЗ\BIM-стандарт A101
+        /// </summary>
+        private static Regex _RegexKR => new Regex(@"^.+_(KR|KM).*$");
+
+        /// <summary>
+        /// Шаблон названий файлов инженерных систем в соответствии с BIM стандартом: \\uprav-stroy.loc\corparate\Департаменты\Проектный институт\Типовые ТЗ\BIM-стандарт A101
+        /// </summary>
+        private static Regex _RegexMEP => new Regex(@"^.+_(OV|ITP|HC|VK|EOM|EG|SS).*$");
+
         public FamilySymbol GetOpeningType(OpeningType type) {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
@@ -185,6 +201,32 @@ namespace RevitOpeningPlacement.Models {
             return _clashRevitRepository.GetDocumentName(doc);
         }
 
+        /// <summary>
+        /// Возвращает название файла репозитория без суффикса пользователя и суффикса "отсоединено"
+        /// </summary>
+        /// <returns></returns>
+        public string GetDocumentName() {
+            return _clashRevitRepository.GetDocumentName();
+        }
+
+        /// <summary>
+        /// Возвращает раздел проектирования <see cref="_document">файла репозитория</see>
+        /// </summary>
+        /// <returns></returns>
+        public DocTypeEnum GetDocumentType() {
+            string docName = GetDocumentName();
+            if(_RegexAR.IsMatch(docName)) {
+                return DocTypeEnum.AR;
+            }
+            if(_RegexKR.IsMatch(docName)) {
+                return DocTypeEnum.KR;
+            }
+            if(_RegexMEP.IsMatch(docName)) {
+                return DocTypeEnum.MEP;
+            }
+            return DocTypeEnum.NotDefined;
+        }
+
         public FamilyInstance CreateInstance(FamilySymbol type, XYZ point, Level level) {
             if(level != null) {
                 if(!type.IsActive) {
@@ -204,7 +246,13 @@ namespace RevitOpeningPlacement.Models {
             }
         }
 
-        public List<FamilyInstance> GetOpenings() {
+        /// <summary>
+        /// Возвращает список экземпляров семейств-заданий на отверстия из текущего файла ревит ("исходящие" задания).
+        /// </summary>
+        /// <returns>Список экземпляров семейств, названия семейств и типов которых заданы в соответствующих словарях
+        /// <see cref="TypeName">названий типов</see> и
+        /// <see cref="FamilyName">названий семейств</see></returns>
+        public List<FamilyInstance> GetOpeningsTaskFromCurrentDoc() {
             return GetFamilyInstances()
                 .Where(item => TypeName.Any(n => n.Value.Equals(item.Name))
                             && FamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
@@ -247,7 +295,7 @@ namespace RevitOpeningPlacement.Models {
         }
 
         public void DeleteAllOpenings() {
-            var openings = GetOpenings();
+            var openings = GetOpeningsTaskFromCurrentDoc();
             using(Transaction t = _document.StartTransaction("Удаление старых заданий на отверстия")) {
                 _document.Delete(openings.Select(item => item.Id).ToArray());
                 t.Commit();
@@ -332,5 +380,27 @@ namespace RevitOpeningPlacement.Models {
         WallRectangle,
         FloorRound,
         FloorRectangle
+    }
+
+    /// <summary>
+    /// Типы файов ревита в соответствии с шифрами разделов проектирования
+    /// </summary>
+    internal enum DocTypeEnum {
+        /// <summary>
+        /// Архитектурный раздел
+        /// </summary>
+        AR,
+        /// <summary>
+        /// Конструкторский раздел
+        /// </summary>
+        KR,
+        /// <summary>
+        /// Раздел инженерных систем
+        /// </summary>
+        MEP,
+        /// <summary>
+        /// Раздел не определен
+        /// </summary>
+        NotDefined
     }
 }

@@ -43,7 +43,7 @@ namespace RevitOpeningPlacement {
             using(var pb = GetPlatformService<IProgressDialogService>()) {
                 IProgress<int> progress;
                 CancellationToken ct;
-                var maxValue = revitRepository.GetOpenings().Count;
+                var maxValue = revitRepository.GetOpeningsTaskFromCurrentDoc().Count;
                 InitializeProgress(maxValue, pb, out progress, out ct);
 
                 placers.AddRange(configurator.GetPlacers(progress, ct));
