@@ -6,80 +6,26 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vms="clr-namespace:RevitSetLevelSection.ViewModels"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:converters="clr-namespace:dosymep.WPF.Converters"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+
     mc:Ignorable="d"
-    Title="Обновить уровень/секцию" Height="450" Width="800" WindowStartupLocation="CenterOwner"
+    WindowStartupLocation="CenterOwner"
+
+    Title="MainWindow"
+    Height="450" Width="800"
+
     x:Name="_this"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
-        <converters:BoolToVisibilityConverter
-            x:Key="BoolToHiddenConverter"
-            TrueValue="Visible" FalseValue="Hidden" />
-
-        <DataTemplate DataType="{x:Type vms:FillLevelParamViewModel}">
-            <dxe:CheckEdit Margin="10" IsChecked="{Binding IsEnabled}">
-                <TextBlock Text="{Binding Name}" />
-            </dxe:CheckEdit>
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type vms:FillMassParamViewModel}">
-            <Grid Margin="10">
-
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <dxe:CheckEdit
-                    Grid.Column="0"
-                    Grid.Row="0"
-                    IsChecked="{Binding IsEnabled}">
-                    <TextBlock Text="{Binding Name}" />
-                </dxe:CheckEdit>
-
-                <dxe:ComboBoxEdit
-                    Grid.Column="1"
-                    MinWidth="250"
-                    IsTextEditable="False"
-                    IsEnabled="{Binding IsEnabled}"
-                    EditValue="{Binding DesignOption, UpdateSourceTrigger=PropertyChanged}"
-                    DisplayMember="Name"
-                    ItemsSource="{Binding DataContext.LinkType.DesignOptions, ElementName=_this}">
-                    <dxmvvm:Interaction.Behaviors>
-                        <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding CheckRussianTextCommand}" />
-                    </dxmvvm:Interaction.Behaviors>
-
-                </dxe:ComboBoxEdit>
-
-                <dxe:ComboBoxEdit
-                    Grid.Column="2"
-                    Width="100"
-                    Margin="5 0 5 0"
-                    IsTextEditable="False"
-                    IsEnabled="False"
-                    EditValue="{Binding Path=SelectedParamName}" />
-
-                <Image
-                    Grid.Column="3"
-                    Height="20"
-                    Source="../Resources/icons8-error-96.png"
-                    ToolTip="{Binding ErrorText}"
-                    Visibility="{Binding HasError,
-                                     Converter={StaticResource BoolToHiddenConverter}}" />
-
-            </Grid>
-        </DataTemplate>
-
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../ViewTemplates/LevelParamTemplate.xaml" />
+                <ResourceDictionary Source="../ViewTemplates/FillMassParamTemplate.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
@@ -99,22 +45,22 @@
         </Grid.RowDefinitions>
 
         <TextBlock
-            Grid.Column="0"
             Grid.Row="2"
+            Grid.Column="0"
             Margin="10"
             Text="Координационный файл" />
 
         <DockPanel
-            Grid.Column="1"
             Grid.Row="2"
+            Grid.Column="1"
             Grid.ColumnSpan="2"
             Margin="10">
 
             <dx:SimpleButton
-                Content="Загрузить"
                 DockPanel.Dock="Right"
                 Width="80"
                 Margin="10 0 0 0"
+                Content="Загрузить"
                 ToolTip="Загрузить координационный файл"
                 Command="{Binding LinkType.LoadLinkDocumentCommand}" />
 
@@ -126,20 +72,21 @@
         </DockPanel>
 
         <TextBlock
-            Grid.Column="0"
             Grid.Row="3"
+            Grid.Column="0"
             Margin="10"
             Text="Раздел" />
 
         <DockPanel
-            Grid.Column="1"
             Grid.Row="3"
+            Grid.Column="1"
             Grid.ColumnSpan="2"
             Margin="10">
 
             <dxe:ComboBoxEdit
                 IsTextEditable="False"
-                EditValue="{Binding LinkType.BuildPart, UpdateSourceTrigger=PropertyChanged}"
+                EditValue="{Binding LinkType.BuildPart,
+                    UpdateSourceTrigger=PropertyChanged}"
                 ItemsSource="{Binding LinkType.BuildParts}">
                 <dxmvvm:Interaction.Behaviors>
                     <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding CheckRussianTextCommand}" />
@@ -147,24 +94,32 @@
             </dxe:ComboBoxEdit>
         </DockPanel>
 
-
         <ItemsControl
+            Grid.Row="4"
             Grid.Column="0"
             Grid.ColumnSpan="3"
-            Grid.Row="4"
             Margin="10"
             ItemsSource="{Binding FillParams}" />
 
-        <StackPanel Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="3" Orientation="Horizontal"
-                    HorizontalAlignment="Right">
-            <TextBlock Margin="10" Foreground="Orange" VerticalAlignment="Center"
-                       Text="{Binding ErrorText}" />
+        <StackPanel
+            Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"
+            Orientation="Horizontal" HorizontalAlignment="Right" Height="45">
 
-            <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10" IsDefault="True" Click="ButtonOK_Click"
-                             Command="{Binding UpdateElementsCommand}" />
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
 
-            <dx:SimpleButton Content="Отмена" Height="25" Width="80" Margin="10" IsCancel="true"
-                             Click="ButtonCancel_Click" />
+            <dx:SimpleButton
+                Content="ОК" Margin="10" Width="80"
+                Command="{Binding UpdateElementsCommand}"
+                Click="ButtonOK_Click" />
+
+            <dx:SimpleButton
+                Content="Отмена" Margin="10" Width="80"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
 </base:ThemedPlatformWindow>

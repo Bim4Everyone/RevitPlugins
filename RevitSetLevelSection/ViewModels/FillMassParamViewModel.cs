@@ -68,8 +68,6 @@ namespace RevitSetLevelSection.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _isEnabled, value);
         }
 
-        public bool HasError => !string.IsNullOrEmpty(ErrorText);
-
         public DesignOptionsViewModel DesignOption {
             get => _designOption;
             set => this.RaiseAndSetIfChanged(ref _designOption, value);
@@ -77,10 +75,7 @@ namespace RevitSetLevelSection.ViewModels {
 
         public string ErrorText {
             get => _errorText;
-            set {
-                this.RaiseAndSetIfChanged(ref _errorText, value);
-                this.RaisePropertyChanged(nameof(HasError));
-            }
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
         public override string GetErrorText() {

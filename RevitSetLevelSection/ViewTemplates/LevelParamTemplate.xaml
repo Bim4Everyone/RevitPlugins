@@ -1,0 +1,14 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vms="clr-namespace:RevitSetLevelSection.ViewModels"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors">
+
+    <DataTemplate DataType="{x:Type vms:FillLevelParamViewModel}">
+        <dxe:CheckEdit
+            Margin="10"
+            EditValue="{Binding IsEnabled}">
+            <TextBlock Text="{Binding Name}" />
+        </dxe:CheckEdit>
+    </DataTemplate>
+</ResourceDictionary>
