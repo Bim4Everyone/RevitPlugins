@@ -26,12 +26,6 @@ namespace RevitSetLevelSection.Models {
     internal class RevitRepository {
         public static readonly string AdskSectionNumberName = "ADSK_Номер секции";
         public static readonly string AdskBuildingNumberName = "ADSK_Номер здания";
-        
-        private readonly Application _application;
-        private readonly UIApplication _uiApplication;
-
-        private readonly Document _document;
-        private readonly UIDocument _uiDocument;
 
         private Dictionary<ElementId, LevelDefinition> _algorithms
             = new Dictionary<ElementId, LevelDefinition>() {
@@ -91,29 +85,28 @@ namespace RevitSetLevelSection.Models {
                 },
             };
 
-        public RevitRepository(Application application, Document document) {
-            _application = application;
-            _uiApplication = new UIApplication(application);
-
-            _document = document;
-            _uiDocument = new UIDocument(document);
+        public RevitRepository(UIApplication uiApplication) {
+            UIApplication = uiApplication;
         }
 
-        public Document Document => _document;
-        public Application Application => _application;
+        public UIApplication UIApplication { get; }
+        public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
 
-        public ProjectInfo ProjectInfo => _document.ProjectInformation;
+        public Application Application => UIApplication.Application;
+        public Document Document => ActiveUIDocument.Document;
+        
+        public ProjectInfo ProjectInfo => Document.ProjectInformation;
 
         public Element GetElements(ElementId elementId) {
-            return _document.GetElement(elementId);
+            return Document.GetElement(elementId);
         }
 
         public TransactionGroup StartTransactionGroup(string transactionGroupName) {
-            return _document.StartTransactionGroup(transactionGroupName);
+            return Document.StartTransactionGroup(transactionGroupName);
         }
 
         public IEnumerable<RevitLinkType> GetRevitLinkTypes() {
-            return new FilteredElementCollector(_document)
+            return new FilteredElementCollector(Document)
                 .WhereElementIsElementType()
                 .OfClass(typeof(RevitLinkType))
                 .OfType<RevitLinkType>()
@@ -121,7 +114,7 @@ namespace RevitSetLevelSection.Models {
         }
         
         public IEnumerable<RevitLinkInstance> GetLinkInstances() {
-            return new FilteredElementCollector(_document)
+            return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(RevitLinkInstance))
                 .OfType<RevitLinkInstance>()
@@ -130,7 +123,7 @@ namespace RevitSetLevelSection.Models {
 
         public void SetLevelParam(RevitParam revitParam) {
             using(Transaction transaction =
-                  _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
+                  Document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
 
                 List<Level> levels = GetLevels();
                 IEnumerable<Element> elements = GetElements(revitParam);
@@ -146,7 +139,7 @@ namespace RevitSetLevelSection.Models {
         }
 
         private List<Level> GetLevels() {
-            return new FilteredElementCollector(_document)
+            return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
                 .OfCategory(BuiltInCategory.OST_Levels)
                 .OfType<Level>()
@@ -163,7 +156,7 @@ namespace RevitSetLevelSection.Models {
         }
 
         public void UpdateElements(RevitParam revitParam, string paramValue) {
-            using(Transaction transaction = _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
+            using(Transaction transaction = Document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
                 ProjectInfo.SetParamValue(revitParam, paramValue);
                 IEnumerable<Element> elements = GetElements(revitParam);
 
@@ -181,7 +174,7 @@ namespace RevitSetLevelSection.Models {
             var cashedElements = elements.ToDictionary(item => item.Id);
 
             using(Transaction transaction =
-                  _document.StartTransaction($"Установка уровня/секции \"{paramOption.SharedRevitParam.Name}\"")) {
+                  Document.StartTransaction($"Установка уровня/секции \"{paramOption.SharedRevitParam.Name}\"")) {
                 
                 var logger = ServicesProvider.GetPlatformService<ILoggerService>()
                     .ForPluginContext("Установка уровня\\секции");
@@ -237,7 +230,7 @@ namespace RevitSetLevelSection.Models {
 
         private List<Element> GetElements(RevitParam revitParam) {
             var catFilter = new ElementMulticategoryFilter(GetCategories(revitParam));
-            return new FilteredElementCollector(_document)
+            return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
                 .WherePasses(catFilter)
                 .ToList();
@@ -325,23 +318,23 @@ namespace RevitSetLevelSection.Models {
         }
 
         private Line GetLine(XYZ point) {
-            XYZ start = point.Subtract(new XYZ(_application.ShortCurveTolerance, 0, 0));
-            XYZ finish = point.Add(new XYZ(_application.ShortCurveTolerance, 0, 0));
+            XYZ start = point.Subtract(new XYZ(Application.ShortCurveTolerance, 0, 0));
+            XYZ finish = point.Add(new XYZ(Application.ShortCurveTolerance, 0, 0));
 
             return Line.CreateBound(start, finish);
         }
 
         private ElementId[] GetCategories(RevitParam revitParam) {
-            return _document.GetParameterBindings()
+            return Document.GetParameterBindings()
                 .Where(item => item.Binding.IsInstanceBinding())
-                .Where(item => revitParam.IsRevitParam(_document, item.Definition))
+                .Where(item => revitParam.IsRevitParam(Document, item.Definition))
                 .SelectMany(item => item.Binding.GetCategories())
                 .Select(item => item.Id)
                 .ToArray();
         }
 
         public Workset GetWorkset(RevitLinkType revitLinkType) {
-            return _document.GetWorksetTable().GetWorkset(revitLinkType.WorksetId);
+            return Document.GetWorksetTable().GetWorkset(revitLinkType.WorksetId);
         }
     }
 }
