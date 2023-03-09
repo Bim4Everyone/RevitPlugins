@@ -24,5 +24,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.SolidProviders {
                .CreateUnitedBoundingBox()
                .CreateSolid();
         }
+
+        public BoundingBoxXYZ GetTransformedBBoxXYZ() {
+            throw new System.NotImplementedException();
+        }
     }
 }

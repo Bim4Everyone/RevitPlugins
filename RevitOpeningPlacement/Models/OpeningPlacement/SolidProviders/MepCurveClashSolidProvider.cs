@@ -14,5 +14,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.SolidProviders {
         public Solid GetSolid() {
             return _clash.GetIntersection();
         }
+
+        public BoundingBoxXYZ GetTransformedBBoxXYZ() {
+            throw new System.NotImplementedException();
+        }
     }
 }
