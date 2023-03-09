@@ -140,8 +140,8 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         private void SetConfig() {
-            SetLevelSectionSettings settings =
-                SetLevelSectionConfig.GetPrintConfig()
+            RevitSettings settings =
+                PluginConfig.GetPluginConfig()
                     .GetSettings(_revitRepository.Document);
             if(settings == null) {
                 return;
@@ -159,7 +159,7 @@ namespace RevitSetLevelSection.ViewModels {
 
             foreach(FillParamViewModel fillParam in FillParams) {
                 ParamSettings paramSettings = settings.ParamSettings
-                    .FirstOrDefault(item => item.PropertyName.Equals(fillParam.RevitParam.Id));
+                    .FirstOrDefault(item => item.ParamId.Equals(fillParam.RevitParam.Id));
 
                 if(paramSettings != null) {
                     fillParam.SetParamSettings(paramSettings);
@@ -168,8 +168,8 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         private void SaveConfig() {
-            SetLevelSectionConfig config = SetLevelSectionConfig.GetPrintConfig();
-            SetLevelSectionSettings settings = config.GetSettings(_revitRepository.Document);
+            PluginConfig config = PluginConfig.GetPluginConfig();
+            RevitSettings settings = config.GetSettings(_revitRepository.Document);
             if(settings == null) {
                 settings = config.AddSettings(_revitRepository.Document);
             }
