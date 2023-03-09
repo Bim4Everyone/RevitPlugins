@@ -94,6 +94,7 @@
             SelectedItem="{Binding FloorPlan}">
             <dxg:GridControl.View>
                 <dxg:TableView
+                    AutoWidth="True"
                     ShowGroupPanel="False"
                     ShowTotalSummary="False"
                     AllowEditing="False"
