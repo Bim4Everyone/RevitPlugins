@@ -11,6 +11,7 @@ using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 
 using RevitOpeningPlacement.Models;
+using RevitOpeningPlacement.Models.OpeningIntersection;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningUnion;
 using RevitOpeningPlacement.ViewModels.Navigator;
@@ -126,9 +127,11 @@ namespace RevitOpeningPlacement {
         /// </summary>
         /// <param name="revitRepository"></param>
         private void GetOpeningsTaskInDocumentNotDefined(RevitRepository revitRepository) {
-            TaskDialog.Show("BIM", $"Название файла: \"{revitRepository.GetDocumentName()}\" не удовлетворяет BIM стандарту А101. " +
-                $"Скорректируйте название и запустите команду снова.");
-            throw new OperationCanceledException();
+            TaskDialog.Show("Предупреждение", "Команда для отладки");
+            Test.TestMethod(revitRepository);
+            //TaskDialog.Show("BIM", $"Название файла: \"{revitRepository.GetDocumentName()}\" не удовлетворяет BIM стандарту А101. " +
+            //    $"Скорректируйте название и запустите команду снова.");
+            //throw new OperationCanceledException();
         }
 
         /// <summary>
