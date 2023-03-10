@@ -14,6 +14,7 @@ using dosymep.SimpleServices;
 
 using Ninject;
 
+using RevitSetLevelSection.Factories;
 using RevitSetLevelSection.Models;
 using RevitSetLevelSection.ViewModels;
 using RevitSetLevelSection.Views;
@@ -38,6 +39,17 @@ namespace RevitSetLevelSection {
 
                 kernel.Bind<RevitRepository>().ToSelf()
                     .InSingletonScope();
+
+                kernel.Bind<DesignOptionAdapt>().ToSelf();
+                kernel.Bind<DefaultDesignOption>().ToSelf();
+
+                kernel.Bind<LinkTypeViewModel>().ToSelf();
+                kernel.Bind<DesignOptionsViewModel>().ToSelf();
+
+                kernel.Bind<IViewModelFactory>()
+                    .To<ViewModelFactory>().InSingletonScope();
+                kernel.Bind<IDesignOptionFactory>()
+                    .To<DesignOptionFactory>().InSingletonScope();
 
                 kernel.Bind<MainViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()

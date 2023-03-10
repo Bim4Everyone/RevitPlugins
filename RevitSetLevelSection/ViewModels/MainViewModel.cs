@@ -15,21 +15,25 @@ using dosymep.Bim4Everyone.SharedParams;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitSetLevelSection.Factories;
 using RevitSetLevelSection.Models;
 
 namespace RevitSetLevelSection.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly IViewModelFactory _viewModelFactory;
 
         private string _errorText;
         private LinkTypeViewModel _linkType;
 
-        public MainViewModel(RevitRepository revitRepository) {
+        public MainViewModel(RevitRepository revitRepository, IViewModelFactory viewModelFactory) {
             if(revitRepository is null) {
                 throw new ArgumentNullException(nameof(revitRepository));
             }
 
             _revitRepository = revitRepository;
+            _viewModelFactory = viewModelFactory;
+            
             LinkTypes = new ObservableCollection<LinkTypeViewModel>(GetLinkTypes());
             FillParams = new ObservableCollection<FillParamViewModel>(GetFillParams());
 
@@ -88,8 +92,7 @@ namespace RevitSetLevelSection.ViewModels {
 
         private IEnumerable<LinkTypeViewModel> GetLinkTypes() {
             return _revitRepository.GetRevitLinkTypes()
-                .Select(item =>
-                    new LinkTypeViewModel(item, _revitRepository));
+                .Select(item => _viewModelFactory.Create(item));
         }
 
         private void UpdateElements(object param) {

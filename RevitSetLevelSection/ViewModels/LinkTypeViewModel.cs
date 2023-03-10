@@ -12,12 +12,15 @@ using dosymep.Bim4Everyone;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitSetLevelSection.Factories;
 using RevitSetLevelSection.Models;
 
 namespace RevitSetLevelSection.ViewModels {
     internal class LinkTypeViewModel : BaseViewModel {
         private readonly RevitLinkType _revitLinkType;
         private readonly RevitRepository _revitRepository;
+        private readonly IViewModelFactory _viewModelFactory;
+        private readonly IDesignOptionFactory _designOptionFactory;
         private readonly LinkInstanceRepository _linkInstanceRepository;
         
         private bool _isLoaded;
@@ -26,9 +29,14 @@ namespace RevitSetLevelSection.ViewModels {
         private ObservableCollection<string> _buildParts;
         private ObservableCollection<DesignOptionsViewModel> _designOptions;
 
-        public LinkTypeViewModel(RevitLinkType revitLinkType, RevitRepository revitRepository) {
+        public LinkTypeViewModel(RevitLinkType revitLinkType, 
+            RevitRepository revitRepository, 
+            IViewModelFactory viewModelFactory, 
+            IDesignOptionFactory designOptionFactory) {
             _revitLinkType = revitLinkType;
             _revitRepository = revitRepository;
+            _viewModelFactory = viewModelFactory;
+            _designOptionFactory = designOptionFactory;
 
             _linkInstanceRepository =
                 new LinkInstanceRepository(_revitRepository, _revitLinkType);
@@ -73,9 +81,9 @@ namespace RevitSetLevelSection.ViewModels {
                 yield break;
             }
 
-            yield return new DesignOptionsViewModel(new DefaultDesignOption(), _linkInstanceRepository);
+            yield return _viewModelFactory.Create(_designOptionFactory.Create(), _linkInstanceRepository);
             foreach(DesignOption designOption in _linkInstanceRepository.GetDesignOptions()) {
-                yield return new DesignOptionsViewModel(new DesignOptionAdapt(designOption), _linkInstanceRepository);
+                yield return _viewModelFactory.Create(_designOptionFactory.Create(designOption), _linkInstanceRepository);
             }
         }
 
