@@ -176,11 +176,6 @@
             <Private>False</Private>
         </Reference>
 
-        <Reference Include="Ninject.Extensions.Factory">
-            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\Ninject.Extensions.Factory.dll</HintPath>
-            <Private>False</Private>
-        </Reference>
-
         <Reference Include="pyRevitLabs.Json">
             <HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.Json.dll</HintPath>
             <Private>False</Private>
