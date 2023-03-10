@@ -15,12 +15,15 @@ using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningIntersection {
     /// <summary>
-    /// Класс отверстия - обертка экземпляров семейств заданий на отверстия и "чистовых" отверстий
+    /// Базовый класс отверстия - обертка экземпляров семейств заданий на отверстия и "чистовых" отверстий
     /// </summary>
-    internal class Opening : ISolidProvider {
-        private readonly FamilyInstance _element;
+    internal class OpeningBase : ISolidProvider {
+        /// <summary>
+        /// Экземпляр семейства задания на отверстие или "чистового" семейства, показываемого на чертежах
+        /// </summary>
+        private protected readonly FamilyInstance _element;
 
-        public Opening(FamilyInstance familyInstance) {
+        public OpeningBase(FamilyInstance familyInstance) {
             _element = familyInstance;
         }
 
@@ -28,10 +31,14 @@ namespace RevitOpeningPlacement.Models.OpeningIntersection {
         /// Возвращает Solid отверстия с трансформированными координатами
         /// </summary>
         /// <returns></returns>
-        public Solid GetSolid() {
+        public virtual Solid GetSolid() {
             return _element.GetSolid();
         }
 
+        /// <summary>
+        /// Возвращает BoundingBoxXYZ с учетом расположения <see cref="_element">элемента</see> в файле Revit
+        /// </summary>
+        /// <returns></returns>
         public BoundingBoxXYZ GetTransformedBBoxXYZ() {
             return GetSolid().GetBoundingBox().TransformBoundingBox(_element.GetTotalTransform().Inverse);
         }
