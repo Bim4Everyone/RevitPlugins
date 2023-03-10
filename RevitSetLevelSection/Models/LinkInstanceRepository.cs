@@ -5,6 +5,7 @@ using System.Linq;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
 using dosymep.Bim4Everyone;
@@ -13,6 +14,8 @@ using dosymep.Revit.Geometry;
 
 namespace RevitSetLevelSection.Models {
     internal class LinkInstanceRepository {
+        public static readonly string AreaSchemeName = "Назначение этажа СМР";
+        
         public static readonly string BuildingWorksBlockName = "Блок СМР_";
         public static readonly string BuildingWorksSectionName = "Секция СМР_";
         public static readonly string BuildingWorksTypingName = "Типизация СМР_";
@@ -98,6 +101,23 @@ namespace RevitSetLevelSection.Models {
                 }
             }
         }
+        
+        public AreaScheme GetAreaScheme() {
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_AreaSchemes)
+                .OfType<AreaScheme>()
+                .FirstOrDefault(item => item.Name.Equals(AreaSchemeName));
+        }
+        
+        public IEnumerable<Area> GetAreas() {
+            var areaFilter = new AreaFilter(GetAreaScheme());
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_Areas)
+                .OfType<Area>()
+                .Where(item => areaFilter.AllowElement(item));
+        }
 
         private void Update() {
             _linkInstance = _revitRepository.GetLinkInstances()
@@ -150,6 +170,23 @@ namespace RevitSetLevelSection.Models {
             } catch {
                 return false;
             }
+        }
+    }
+    
+    internal class AreaFilter : ISelectionFilter {
+        private readonly AreaScheme _areaScheme;
+
+        public AreaFilter(AreaScheme areaScheme) {
+            _areaScheme = areaScheme;
+        }
+
+        public bool AllowElement(Element elem) {
+            var area = elem as Area;
+            return area != null && _areaScheme?.Id == area.AreaScheme.Id;
+        }
+
+        public bool AllowReference(Reference reference, XYZ position) {
+            return false;
         }
     }
 }
