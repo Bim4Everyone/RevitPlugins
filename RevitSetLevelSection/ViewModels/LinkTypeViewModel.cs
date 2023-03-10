@@ -66,6 +66,9 @@ namespace RevitSetLevelSection.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _buildPart, value);
         }
         
+        public bool HasAreas => _linkInstanceRepository.GetAreas().Any();
+        public bool HasAreaScheme => _linkInstanceRepository.GetAreaScheme() != null;
+
         public ObservableCollection<string> BuildParts {
             get => _buildParts;
             set => this.RaiseAndSetIfChanged(ref _buildParts, value);

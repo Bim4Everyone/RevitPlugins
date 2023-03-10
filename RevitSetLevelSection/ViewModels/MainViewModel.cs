@@ -118,6 +118,16 @@ namespace RevitSetLevelSection.ViewModels {
                 ErrorText = "Выбранная связь выгружена.";
                 return false;
             }
+
+            if(!LinkType.HasAreaScheme) {
+                ErrorText = "Выбранная связь не содержит схему зонирования.";
+                return false;
+            }
+            
+            if(!LinkType.HasAreas) {
+                ErrorText = "Выбранная связь не содержит зоны.";
+                return false;
+            }
             
             if(string.IsNullOrEmpty(LinkType.BuildPart)) {
                 ErrorText = "Выберите раздел.";
