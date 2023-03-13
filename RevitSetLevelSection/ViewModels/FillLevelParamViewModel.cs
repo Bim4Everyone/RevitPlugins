@@ -12,21 +12,23 @@ using RevitSetLevelSection.Models;
 
 namespace RevitSetLevelSection.ViewModels {
     internal class FillLevelParamViewModel : FillParamViewModel {
+        private readonly RevitParam _revitParam;
         private readonly MainViewModel _mainViewModel;
         private readonly RevitRepository _revitRepository;
 
         private bool _isEnabled;
 
-        public FillLevelParamViewModel(MainViewModel mainViewModel, RevitRepository revitRepository) {
+        public FillLevelParamViewModel(RevitParam revitParam, MainViewModel mainViewModel, RevitRepository revitRepository) {
             if(revitRepository is null) {
                 throw new ArgumentNullException(nameof(revitRepository));
             }
 
+            _revitParam = revitParam;
             _mainViewModel = mainViewModel;
             _revitRepository = revitRepository;
         }
 
-        public override RevitParam RevitParam { get; set; }
+        public override RevitParam RevitParam => _revitParam;
         public string Name => $"Обновить \"{RevitParam.Name}\"";
 
         public override bool IsEnabled {

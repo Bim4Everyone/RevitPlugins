@@ -170,11 +170,11 @@ namespace RevitSetLevelSection.Models {
 
         public void UpdateElements(ParamOption paramOption, Transform transform,
             IEnumerable<FamilyInstance> massElements) {
-            List<Element> elements = GetElements(paramOption.SharedRevitParam);
+            List<Element> elements = GetElements(paramOption.RevitParam);
             var cashedElements = elements.ToDictionary(item => item.Id);
 
             using(Transaction transaction =
-                  Document.StartTransaction($"Установка уровня/секции \"{paramOption.SharedRevitParam.Name}\"")) {
+                  Document.StartTransaction($"Установка уровня/секции \"{paramOption.RevitParam.Name}\"")) {
                 
                 var logger = ServicesProvider.GetPlatformService<ILoggerService>()
                     .ForPluginContext("Установка уровня\\секции");
@@ -194,7 +194,7 @@ namespace RevitSetLevelSection.Models {
                         if(IsIntersectCenterElement(transform, massObject, element)) {
                             try {
                                 string paramValue = massObject.GetParamValue<string>(paramOption);
-                                element.SetParamValue(paramOption.SharedRevitParam, paramValue);
+                                element.SetParamValue(paramOption.RevitParam, paramValue);
 
                                 if(!string.IsNullOrEmpty(paramOption.AdskParamName)
                                    && element.IsExistsSharedParam(paramOption.AdskParamName)) {
@@ -217,7 +217,7 @@ namespace RevitSetLevelSection.Models {
                 }
 
                 foreach(Element element in cashedElements.Values) {
-                    element.RemoveParamValue(paramOption.SharedRevitParam);
+                    element.RemoveParamValue(paramOption.RevitParam);
                     if(!string.IsNullOrEmpty(paramOption.AdskParamName)
                        && element.IsExistsSharedParam(paramOption.AdskParamName)) {
                         element.RemoveSharedParamValue(paramOption.AdskParamName);

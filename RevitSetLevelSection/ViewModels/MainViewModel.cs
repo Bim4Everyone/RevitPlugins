@@ -25,6 +25,8 @@ namespace RevitSetLevelSection.ViewModels {
 
         private string _errorText;
         private LinkTypeViewModel _linkType;
+        private ObservableCollection<LinkTypeViewModel> _linkTypes;
+        private ObservableCollection<FillParamViewModel> _fillParams;
 
         public MainViewModel(RevitRepository revitRepository, IViewModelFactory viewModelFactory) {
             if(revitRepository is null) {
@@ -33,18 +35,22 @@ namespace RevitSetLevelSection.ViewModels {
 
             _revitRepository = revitRepository;
             _viewModelFactory = viewModelFactory;
-            
-            LinkTypes = new ObservableCollection<LinkTypeViewModel>(GetLinkTypes());
-            FillParams = new ObservableCollection<FillParamViewModel>(GetFillParams());
 
+            LoadViewCommand = new RelayCommand(LoadView);
             UpdateElementsCommand = new RelayCommand(UpdateElements, CanUpdateElement);
             CheckRussianTextCommand = new RelayCommand(CheckRussianText);
 
             SetConfig();
         }
 
+        private void LoadView(object obj) {
+            LinkTypes = new ObservableCollection<LinkTypeViewModel>(GetLinkTypes());
+            FillParams = new ObservableCollection<FillParamViewModel>(GetFillParams());
+        }
+
+        public ICommand LoadViewCommand { get; }
         public ICommand CheckRussianTextCommand { get; }
-        public ICommand UpdateElementsCommand { get; set; }
+        public ICommand UpdateElementsCommand { get; }
 
         public void CheckRussianText(object args) {
             foreach(FillMassParamViewModel fillMassParamViewModel in FillParams.OfType<FillMassParamViewModel>()) {
@@ -63,31 +69,21 @@ namespace RevitSetLevelSection.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _linkType, value);
         }
 
-        public ObservableCollection<LinkTypeViewModel> LinkTypes { get; }
-        public ObservableCollection<FillParamViewModel> FillParams { get; }
+        public ObservableCollection<LinkTypeViewModel> LinkTypes {
+            get => _linkTypes;
+            set => this.RaiseAndSetIfChanged(ref _linkTypes, value);
+        }
+
+        public ObservableCollection<FillParamViewModel> FillParams {
+            get => _fillParams;
+            set => this.RaiseAndSetIfChanged(ref _fillParams, value);
+        }
 
         private IEnumerable<FillParamViewModel> GetFillParams() {
-            yield return new FillLevelParamViewModel(this, _revitRepository) {
-                RevitParam = SharedParamsConfig.Instance.BuildingWorksLevel
-            };
-
-            yield return new FillMassParamViewModel(this, _revitRepository) {
-                IsRequired = true,
-                AdskParamName = RevitRepository.AdskBuildingNumberName,
-                PartParamName = LinkInstanceRepository.BuildingWorksBlockName,
-                RevitParam = SharedParamsConfig.Instance.BuildingWorksBlock
-            };
-
-            yield return new FillMassParamViewModel(this, _revitRepository) {
-                AdskParamName = RevitRepository.AdskSectionNumberName,
-                PartParamName = LinkInstanceRepository.BuildingWorksSectionName,
-                RevitParam = SharedParamsConfig.Instance.BuildingWorksSection
-            };
-
-            yield return new FillMassParamViewModel(this, _revitRepository) {
-                PartParamName = LinkInstanceRepository.BuildingWorksTypingName,
-                RevitParam = SharedParamsConfig.Instance.BuildingWorksTyping
-            };
+            yield return _viewModelFactory.Create(SharedParamsConfig.Instance.BuildingWorksLevel);
+            yield return _viewModelFactory.Create(ParamOption.BuildingWorksBlock);
+            yield return _viewModelFactory.Create(ParamOption.BuildingWorksSection);
+            yield return _viewModelFactory.Create(ParamOption.BuildingWorksTyping);
         }
 
         private IEnumerable<LinkTypeViewModel> GetLinkTypes() {

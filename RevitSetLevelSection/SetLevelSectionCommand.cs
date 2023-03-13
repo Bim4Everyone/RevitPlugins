@@ -51,7 +51,8 @@ namespace RevitSetLevelSection {
                 kernel.Bind<IDesignOptionFactory>()
                     .To<DesignOptionFactory>().InSingletonScope();
 
-                kernel.Bind<MainViewModel>().ToSelf();
+                kernel.Bind<MainViewModel>().ToSelf()
+                    .InSingletonScope();
                 kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext),

@@ -28,6 +28,12 @@
         </ResourceDictionary>
     </Window.Resources>
 
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand
+            EventName="Loaded"
+            Command="{Binding LoadViewCommand}" />
+    </dxmvvm:Interaction.Behaviors>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.33*" />

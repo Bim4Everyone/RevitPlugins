@@ -21,18 +21,18 @@ using RevitSetLevelSection.Models;
 
 namespace RevitSetLevelSection.ViewModels {
     internal class FillMassParamViewModel : FillParamViewModel {
+        private readonly ParamOption _paramOption;
         private readonly MainViewModel _mainViewModel;
         private readonly RevitRepository _revitRepository;
 
         private bool _isEnabled;
         private DesignOptionsViewModel _designOption;
-
-        private RevitParam _revitParam;
+        
         private string _errorText;
-        private string _partParamName;
         private string _selectedParamName;
 
-        public FillMassParamViewModel(MainViewModel mainViewModel, RevitRepository revitRepository) {
+        public FillMassParamViewModel(ParamOption paramOption, MainViewModel mainViewModel, RevitRepository revitRepository) {
+            _paramOption = paramOption;
             _mainViewModel = mainViewModel ?? throw new ArgumentNullException(nameof(mainViewModel));
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
 
@@ -43,18 +43,7 @@ namespace RevitSetLevelSection.ViewModels {
         public ICommand CheckRussianTextCommand { get; }
         public ICommand UpdatePartParamNameCommand { get; }
 
-        public override RevitParam RevitParam {
-            get => _revitParam;
-            set => this.RaiseAndSetIfChanged(ref _revitParam, value);
-        }
-
-        public bool IsRequired { get; set; }
-        public string AdskParamName { get; set; }
-
-        public string PartParamName {
-            get => _partParamName;
-            set => this.RaiseAndSetIfChanged(ref _partParamName, value);
-        }
+        public override RevitParam RevitParam => _paramOption.RevitParam;
 
         public string SelectedParamName {
             get => _selectedParamName;
@@ -99,10 +88,10 @@ namespace RevitSetLevelSection.ViewModels {
                 return "Выберите раздел.";
             }
 
-            if(IsRequired) {
-                string partParamName = PartParamName + _mainViewModel.LinkType.BuildPart;
+            if(_paramOption.IsRequired) {
+                string partParamName = _paramOption.RevitParamName + _mainViewModel.LinkType.BuildPart;
                 var paramOption = new ParamOption() {
-                    SharedRevitParam = RevitParam, ProjectRevitParamName = partParamName, AdskParamName = AdskParamName
+                    RevitParam = RevitParam, RevitParamName = partParamName, AdskParamName = _paramOption.AdskParamName
                 };
                 return DesignOption.GetMassObjects()
                     .All(item => item.IsExistsParamValue(paramOption))
@@ -114,9 +103,9 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         public override void UpdateElements() {
-            string partParamName = PartParamName + _mainViewModel.LinkType.BuildPart;
+            string partParamName = _paramOption.RevitParamName + _mainViewModel.LinkType.BuildPart;
             var paramOption = new ParamOption() {
-                SharedRevitParam = RevitParam, ProjectRevitParamName = partParamName, AdskParamName = AdskParamName
+                RevitParam = RevitParam, RevitParamName = partParamName, AdskParamName = _paramOption.AdskParamName
             };
             _revitRepository.UpdateElements(paramOption, DesignOption.Transform, DesignOption.GetMassObjects());
         }
@@ -126,9 +115,9 @@ namespace RevitSetLevelSection.ViewModels {
                 return false;
             }
 
-            string partParamName = PartParamName + _mainViewModel.LinkType.BuildPart;
+            string partParamName = _paramOption.RevitParamName + _mainViewModel.LinkType.BuildPart;
             var paramOption = new ParamOption() {
-                SharedRevitParam = RevitParam, ProjectRevitParamName = partParamName, AdskParamName = AdskParamName
+                RevitParam = RevitParam, RevitParamName = partParamName, AdskParamName = _paramOption.AdskParamName
             };
             return DesignOption.GetMassObjects()
                 .Any(item => HasNotRussianLetters(item.GetParamValue<string>(paramOption)));
@@ -162,7 +151,7 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         private void UpdatePartParamName(object args) {
-            var partNames = _mainViewModel.LinkType.GetPartNames(new[] {PartParamName}).ToArray();
+            var partNames = _mainViewModel.LinkType.GetPartNames(new[] {_paramOption.RevitParamName}).ToArray();
             SelectedParamName = partNames.FirstOrDefault(item => item.Equals(_mainViewModel.LinkType.BuildPart)) ??
                                 partNames.FirstOrDefault();
         }

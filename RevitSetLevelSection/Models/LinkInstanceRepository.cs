@@ -15,10 +15,6 @@ using dosymep.Revit.Geometry;
 namespace RevitSetLevelSection.Models {
     internal class LinkInstanceRepository {
         public static readonly string AreaSchemeName = "Назначение этажа СМР";
-        
-        public static readonly string BuildingWorksBlockName = "Блок СМР_";
-        public static readonly string BuildingWorksSectionName = "Секция СМР_";
-        public static readonly string BuildingWorksTypingName = "Типизация СМР_";
 
         private readonly RevitLinkType _revitLinkType;
         private readonly RevitRepository _revitRepository;
@@ -130,9 +126,9 @@ namespace RevitSetLevelSection.Models {
         }
 
         private IEnumerable<string> GetParamNames() {
-            yield return BuildingWorksTypingName;
-            yield return BuildingWorksSectionName;
-            yield return BuildingWorksBlockName;
+            yield return ParamOption.BuildingWorksTypingName;
+            yield return ParamOption.BuildingWorksSectionName;
+            yield return ParamOption.BuildingWorksBlockName;
         }
 
         private ElementId GetDesignOptionId(Element element) {
