@@ -95,7 +95,7 @@
                     UpdateSourceTrigger=PropertyChanged}"
                 ItemsSource="{Binding LinkType.BuildParts}">
                 <dxmvvm:Interaction.Behaviors>
-                    <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding CheckRussianTextCommand}" />
+                    <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding UpdateBuildPartCommand}" />
                 </dxmvvm:Interaction.Behaviors>
             </dxe:ComboBoxEdit>
         </DockPanel>

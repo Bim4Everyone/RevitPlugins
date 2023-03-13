@@ -37,27 +37,15 @@ namespace RevitSetLevelSection.ViewModels {
             _viewModelFactory = viewModelFactory;
 
             LoadViewCommand = new RelayCommand(LoadView);
+            UpdateBuildPartCommand = new RelayCommand(UpdateBuildPart);
             UpdateElementsCommand = new RelayCommand(UpdateElements, CanUpdateElement);
-            CheckRussianTextCommand = new RelayCommand(CheckRussianText);
 
             SetConfig();
         }
 
-        private void LoadView(object obj) {
-            LinkTypes = new ObservableCollection<LinkTypeViewModel>(GetLinkTypes());
-            FillParams = new ObservableCollection<FillParamViewModel>(GetFillParams());
-        }
-
         public ICommand LoadViewCommand { get; }
-        public ICommand CheckRussianTextCommand { get; }
+        public ICommand UpdateBuildPartCommand { get; }
         public ICommand UpdateElementsCommand { get; }
-
-        public void CheckRussianText(object args) {
-            foreach(FillMassParamViewModel fillMassParamViewModel in FillParams.OfType<FillMassParamViewModel>()) {
-                fillMassParamViewModel.CheckRussianTextCommand.Execute(null);
-                fillMassParamViewModel.UpdatePartParamNameCommand.Execute(null);
-            }
-        }
 
         public string ErrorText {
             get => _errorText;
@@ -78,6 +66,11 @@ namespace RevitSetLevelSection.ViewModels {
             get => _fillParams;
             set => this.RaiseAndSetIfChanged(ref _fillParams, value);
         }
+        
+        private IEnumerable<LinkTypeViewModel> GetLinkTypes() {
+            return _revitRepository.GetRevitLinkTypes()
+                .Select(item => _viewModelFactory.Create(item));
+        }
 
         private IEnumerable<FillParamViewModel> GetFillParams() {
             yield return _viewModelFactory.Create(SharedParamsConfig.Instance.BuildingWorksLevel);
@@ -86,9 +79,16 @@ namespace RevitSetLevelSection.ViewModels {
             yield return _viewModelFactory.Create(ParamOption.BuildingWorksTyping);
         }
 
-        private IEnumerable<LinkTypeViewModel> GetLinkTypes() {
-            return _revitRepository.GetRevitLinkTypes()
-                .Select(item => _viewModelFactory.Create(item));
+        private void LoadView(object obj) {
+            LinkTypes = new ObservableCollection<LinkTypeViewModel>(GetLinkTypes());
+            FillParams = new ObservableCollection<FillParamViewModel>(GetFillParams());
+        }
+        
+        public void UpdateBuildPart(object args) {
+            foreach(FillMassParamViewModel fillParam in FillParams.OfType<FillMassParamViewModel>()) {
+                fillParam.CheckRussianTextCommand.Execute(null);
+                fillParam.UpdatePartParamNameCommand.Execute(null);
+            }
         }
 
         private void UpdateElements(object param) {
