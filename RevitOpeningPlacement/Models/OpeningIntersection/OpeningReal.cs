@@ -8,6 +8,7 @@ using Autodesk.Revit.DB;
 
 using DevExpress.DirectX.Common.Direct2D;
 
+using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
 using RevitClashDetective.Models.Extensions;
@@ -54,7 +55,7 @@ namespace RevitOpeningPlacement.Models.OpeningIntersection {
         /// </summary>
         /// <returns></returns>
         public BoundingBoxXYZ GetTransformedBBoxXYZ() {
-            return GetSolid().GetBoundingBox().TransformBoundingBox(_element.GetTotalTransform().Inverse);
+            return _element.GetBoundingBox().TransformBoundingBox(_element.GetTotalTransform().Inverse);
         }
 
         /// <summary>

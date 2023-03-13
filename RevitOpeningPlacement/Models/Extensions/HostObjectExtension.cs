@@ -25,10 +25,10 @@ namespace RevitOpeningPlacement.Models.Extensions {
             if(loops.Count != 2) {
                 throw new ArgumentException($"{nameof(loops)} содержит {loops.Count} петли, ожидалось 2.");
             }
-            return GeometryCreationUtilities.CreateBlendGeometry(
-                loops[0],
-                loops[1],
-                null);
+            SolidOptions opts = new SolidOptions(ElementId.InvalidElementId, ElementId.InvalidElementId);
+            return GeometryCreationUtilities.CreateLoftGeometry(
+                loops,
+                opts);
         }
 
         /// <summary>
