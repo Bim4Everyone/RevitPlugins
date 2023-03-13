@@ -6,25 +6,35 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using DevExpress.DirectX.Common.Direct2D;
+
 using dosymep.Revit.Geometry;
 
 using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models.Extensions;
+using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningIntersection {
     /// <summary>
-    /// Класс - обертка "чистовых" экземпляров семейств, которые проектировщик размещает в местах расположений экземпляров семейств заданий на отверстия
+    /// Класс - обертка "чистовых" экземпляров семейств, обычно полых, 
+    /// которые проектировщик размещает в местах расположения экземпляров семейств <seealso cref="OpeningTask">заданий на отверстия</seealso>
     /// </summary>
-    internal class OpeningReal : OpeningBase {
-        public OpeningReal(FamilyInstance familyInstance) : base(familyInstance) {
+    internal class OpeningReal : ISolidProvider {
+        /// <summary>
+        /// Экземпляр семейства отверстия, которое идет в чертежи
+        /// </summary>
+        private readonly FamilyInstance _element;
+
+        public OpeningReal(FamilyInstance familyInstance) {
+            _element = familyInstance;
         }
 
         /// <summary>
         /// Получение Solid "чистового" отверстия с полой геометрией
         /// </summary>
         /// <returns></returns>
-        public override Solid GetSolid() {
+        public Solid GetSolid() {
             XYZ openingLocation = (_element.Location as LocationPoint).Point;
             var hostElement = GetHost();
             Solid hostSolidCut = hostElement.GetSolid();
@@ -38,15 +48,24 @@ namespace RevitOpeningPlacement.Models.OpeningIntersection {
             }
         }
 
+
         /// <summary>
-        /// Возвращает хост экземпляра семейства <see cref="OpeningBase._element">отверстия</see>
+        /// Возвращает BoundingBoxXYZ с учетом расположения <see cref="_element">элемента</see> в файле Revit
+        /// </summary>
+        /// <returns></returns>
+        public BoundingBoxXYZ GetTransformedBBoxXYZ() {
+            return GetSolid().GetBoundingBox().TransformBoundingBox(_element.GetTotalTransform().Inverse);
+        }
+
+        /// <summary>
+        /// Возвращает хост экземпляра семейства <see cref="OpeningTask._element">отверстия</see>
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NullReferenceException"></exception>
-        private Element GetHost() {
+        public Element GetHost() {
             var host = _element.Host;
             if(host is null) {
-                throw new NullReferenceException($"Host of element with id: {_element.Id} returned null");
+                throw new NullReferenceException($"Хост элемента с Id: {_element.Id} - null");
             }
             return host;
         }
