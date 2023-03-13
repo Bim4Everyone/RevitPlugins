@@ -12,15 +12,17 @@ using RevitSetLevelSection.Models;
 
 namespace RevitSetLevelSection.ViewModels {
     internal class FillLevelParamViewModel : FillParamViewModel {
+        private readonly MainViewModel _mainViewModel;
         private readonly RevitRepository _revitRepository;
 
         private bool _isEnabled;
 
-        public FillLevelParamViewModel(RevitRepository revitRepository) {
+        public FillLevelParamViewModel(MainViewModel mainViewModel, RevitRepository revitRepository) {
             if(revitRepository is null) {
                 throw new ArgumentNullException(nameof(revitRepository));
             }
 
+            _mainViewModel = mainViewModel;
             _revitRepository = revitRepository;
         }
 
@@ -33,6 +35,18 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         public override string GetErrorText() {
+            if(!IsEnabled) {
+                return null;
+            }
+            
+            if(_mainViewModel.LinkType?.HasAreaScheme == false) {
+                return "Выбранная связь не содержит схему зонирования.";
+            }
+            
+            if(_mainViewModel.LinkType?.HasAreas == false) {
+                return "Выбранная связь не содержит зоны.";
+            }
+
             return null;
         }
 

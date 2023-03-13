@@ -67,7 +67,7 @@ namespace RevitSetLevelSection.ViewModels {
         public ObservableCollection<FillParamViewModel> FillParams { get; }
 
         private IEnumerable<FillParamViewModel> GetFillParams() {
-            yield return new FillLevelParamViewModel(_revitRepository) {
+            yield return new FillLevelParamViewModel(this, _revitRepository) {
                 RevitParam = SharedParamsConfig.Instance.BuildingWorksLevel
             };
 
@@ -116,21 +116,6 @@ namespace RevitSetLevelSection.ViewModels {
 
             if(LinkType != null && !LinkType.IsLoaded) {
                 ErrorText = "Выбранная связь выгружена.";
-                return false;
-            }
-
-            if(!LinkType.HasAreaScheme) {
-                ErrorText = "Выбранная связь не содержит схему зонирования.";
-                return false;
-            }
-            
-            if(!LinkType.HasAreas) {
-                ErrorText = "Выбранная связь не содержит зоны.";
-                return false;
-            }
-            
-            if(string.IsNullOrEmpty(LinkType.BuildPart)) {
-                ErrorText = "Выберите раздел.";
                 return false;
             }
 

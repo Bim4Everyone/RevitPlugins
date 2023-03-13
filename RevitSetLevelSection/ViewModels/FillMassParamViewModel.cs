@@ -94,6 +94,10 @@ namespace RevitSetLevelSection.ViewModels {
             if(DesignOption.HasMassIntersect) {
                 return $"В варианте \"{DesignOption.Name}\" формообразующие имеют пересечения.";
             }
+            
+            if(string.IsNullOrEmpty(_mainViewModel.LinkType.BuildPart)) {
+                return "Выберите раздел.";
+            }
 
             if(IsRequired) {
                 string partParamName = PartParamName + _mainViewModel.LinkType.BuildPart;
