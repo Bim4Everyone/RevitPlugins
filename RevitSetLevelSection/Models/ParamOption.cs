@@ -6,19 +6,22 @@ using dosymep.Revit;
 
 namespace RevitSetLevelSection.Models {
     internal class ParamOption {
+        public static readonly string AdskSectionNumberName = "ADSK_Номер секции";
+        public static readonly string AdskBuildingNumberName = "ADSK_Номер здания";
+        
         public static readonly string BuildingWorksBlockName = "Блок СМР_";
         public static readonly string BuildingWorksSectionName = "Секция СМР_";
         public static readonly string BuildingWorksTypingName = "Типизация СМР_";
 
         public static readonly ParamOption BuildingWorksBlock = new ParamOption() {
             IsRequired = true,
-            AdskParamName = RevitRepository.AdskBuildingNumberName,
+            AdskParamName = AdskBuildingNumberName,
             RevitParamName = BuildingWorksBlockName,
             RevitParam = SharedParamsConfig.Instance.BuildingWorksBlock
         };
 
         public static readonly ParamOption BuildingWorksSection = new ParamOption() {
-            AdskParamName = RevitRepository.AdskSectionNumberName,
+            AdskParamName = AdskSectionNumberName,
             RevitParamName = BuildingWorksSectionName,
             RevitParam = SharedParamsConfig.Instance.BuildingWorksSection
         };

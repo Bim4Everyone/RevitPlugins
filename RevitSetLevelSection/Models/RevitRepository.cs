@@ -24,9 +24,6 @@ using InvalidOperationException = Autodesk.Revit.Exceptions.InvalidOperationExce
 
 namespace RevitSetLevelSection.Models {
     internal class RevitRepository {
-        public static readonly string AdskSectionNumberName = "ADSK_Номер секции";
-        public static readonly string AdskBuildingNumberName = "ADSK_Номер здания";
-
         private Dictionary<ElementId, LevelDefinition> _algorithms
             = new Dictionary<ElementId, LevelDefinition>() {
                 {
