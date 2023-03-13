@@ -8,6 +8,8 @@ using Autodesk.Revit.DB;
 
 using DevExpress.CodeParser;
 
+using dosymep.Revit;
+
 namespace RevitOpeningPlacement.Models.Extensions {
     /// <summary>
     /// Методы расширения для классов - наследников <see cref="Autodesk.Revit.DB.HostObject"/>
@@ -68,8 +70,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
         /// <param name="hostObject"></param>
         /// <returns>True, если <paramref name="hostObject"/> - стена, иначе False (перекрытия, крыши, потолки)</returns>
         public static bool IsVerticallyCompound(this HostObject hostObject) {
-            Document doc = hostObject.Document;
-            return (doc.GetElement(hostObject.GetTypeId()) as HostObjAttributes).GetCompoundStructure().IsVerticallyCompound;
+            return hostObject.GetElementType<HostObjAttributes>().GetCompoundStructure().IsVerticallyCompound;
         }
 
         /// <summary>
@@ -83,7 +84,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
                 var faceRefs = HostObjectUtils.GetTopFaces(hostObject);
                 return (Face) hostObject.GetGeometryObjectFromReference(faceRefs[0]);
             } else {
-                throw new ArgumentException($"{nameof(hostObject)} - не Перекрытие | Потолок | Крыша.");
+                throw new ArgumentException($"Слои структуры элемента с Id {hostObject.Id} расположены вертикально. Нельзя определить верхнюю поверхность.");
             }
         }
 
@@ -98,7 +99,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
                 var faceRefs = HostObjectUtils.GetBottomFaces(hostObject);
                 return (Face) hostObject.GetGeometryObjectFromReference(faceRefs[0]);
             } else {
-                throw new ArgumentException($"{nameof(hostObject)} - не Перекрытие | Потолок | Крыша.");
+                throw new ArgumentException($"Слои структуры элемента с Id {hostObject.Id} расположены вертикально. Нельзя определить нижнюю поверхность.");
             }
         }
 
@@ -116,7 +117,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
                 yield return (Face) hostObject.GetGeometryObjectFromReference(interiorFace[0]);
                 yield return (Face) hostObject.GetGeometryObjectFromReference(exteriorFace[0]);
             } else {
-                throw new ArgumentException($"{nameof(hostObject)} - не Стена");
+                throw new ArgumentException($"Слои структуры элемента с Id {hostObject.Id} расположены не вертикально. Нельзя определить боковые поверхности.");
             }
         }
     }
