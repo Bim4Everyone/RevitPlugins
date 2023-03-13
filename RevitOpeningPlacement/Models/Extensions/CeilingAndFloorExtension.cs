@@ -31,15 +31,5 @@ namespace RevitOpeningPlacement.Models.Extensions {
             var normal = floor.GetTopFace().ComputeNormal(new UV(0, 0));
             return normal.IsPapallel(new XYZ(0, 0, 1));
         }
-
-        public static Face GetTopFace(this CeilingAndFloor ceilingAndFloor) {
-            var faceRefs = HostObjectUtils.GetTopFaces(ceilingAndFloor);
-            return (Face) ceilingAndFloor.GetGeometryObjectFromReference(faceRefs[0]);
-        }
-
-        public static Face GetBottomFace(this CeilingAndFloor ceilingAndFloor) {
-            var faceRefs = HostObjectUtils.GetBottomFaces(ceilingAndFloor);
-            return (Face) ceilingAndFloor.GetGeometryObjectFromReference(faceRefs[0]);
-        }
     }
 }

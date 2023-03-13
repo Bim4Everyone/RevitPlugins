@@ -29,7 +29,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
 
         private double GetSizeFromIntersection(Line mepCurve, IEnumerable<XYZ> directions, double distance) {
             //получение наружной и внутренней граней
-            var faces = _clash.Element2.GetFaces().ToList();
+            var faces = _clash.Element2.GetSideFaces().ToList();
 
             //смещение осевой линии инженерной системы на заданное расстояние в заданном направлении
             var lines = directions.Select(item => mepCurve.GetLineWithOffset(item, distance))

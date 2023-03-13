@@ -32,14 +32,6 @@ namespace RevitOpeningPlacement.Models.Extensions {
             return Plane.CreateByOriginAndBasis(wallLine.Origin, wall.Orientation, wallLine.Direction);
         }
 
-        public static IEnumerable<Face> GetFaces(this Wall wall) {
-            var interiorFace = HostObjectUtils.GetSideFaces(wall, ShellLayerType.Interior);
-            var exteriorFace = HostObjectUtils.GetSideFaces(wall, ShellLayerType.Exterior);
-
-            yield return (Face) wall.GetGeometryObjectFromReference(interiorFace[0]);
-            yield return (Face) wall.GetGeometryObjectFromReference(exteriorFace[0]);
-        }
-
         private static XYZ GetCentralPoint(Wall wall) {
             var bb = wall.get_BoundingBox(null);
             return bb.Min + (bb.Max - bb.Min) / 2;

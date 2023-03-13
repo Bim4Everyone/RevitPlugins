@@ -23,7 +23,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
         public static Solid GetHostElementOriginalSolid(this HostObject hostObject) {
             IList<CurveLoop> loops = GetHostBoundCurveLoops(hostObject);
             if(loops.Count != 2) {
-                throw new ArgumentException($"{nameof(loops)} contains {loops.Count} loops, expected 2.");
+                throw new ArgumentException($"{nameof(loops)} содержит {loops.Count} петли, ожидалось 2.");
             }
             return GeometryCreationUtilities.CreateBlendGeometry(
                 loops[0],
@@ -46,32 +46,78 @@ namespace RevitOpeningPlacement.Models.Extensions {
 
         /// <summary>
         /// Возвращает список, содержащий нижнюю и верхнюю поверхности <see cref="Autodesk.Revit.DB.HostObject">хоста</see>, 
-        /// если хост - "плитный" элемент, или содержащий переднюю и заднюю поверхности, если хост - стена.
+        /// если хост - "плитный" элемент, или содержащий внутреннюю и внешнюю поверхности, если хост - стена.
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="ArgumentException">Исключение, если хост элемента не Стена | Потолок | Перекрытие | Крыша</exception>
-        private static IList<Face> GetHostBoundFaces(this HostObject hostObject) {
-            if(hostObject is Wall hostWall) {
-                return hostWall.GetFaces().ToArray();
-            } else if(hostObject is Floor hostFloor) {
-                return new List<Face> {
-                    hostFloor.GetBottomFace(),
-                    hostFloor.GetTopFace()
-                };
-            } else if(hostObject is Ceiling hostCeiling) {
-                return new List<Face> {
-                    hostCeiling.GetBottomFace(),
-                    hostCeiling.GetTopFace()
-                };
-            } else if(hostObject is RoofBase hostRoofBase) {
-                return new List<Face> {
-                    hostRoofBase.GetBottomFace(),
-                    hostRoofBase.GetTopFace()
-                };
+        /// <exception cref="ArgumentException">Исключение, если <paramref name="hostObject"/> не Стена | Потолок | Перекрытие | Крыша</exception>
+        public static IEnumerable<Face> GetHostBoundFaces(this HostObject hostObject) {
+            if(IsVerticallyCompound(hostObject)) {
+                return hostObject.GetSideFaces().ToArray();
             } else {
-                throw new ArgumentException($"{nameof(hostObject)} is {hostObject.GetType().Name}, expected: Wall | Floor | Ceiling | RoofBase ");
+                return new List<Face> {
+                    hostObject.GetBottomFace(),
+                    hostObject.GetTopFace()
+                };
             }
         }
         #endregion
+
+        /// <summary>
+        /// Определяет, является ли <paramref name="hostObject"/> стеной.
+        /// </summary>
+        /// <param name="hostObject"></param>
+        /// <returns>True, если <paramref name="hostObject"/> - стена, иначе False (перекрытия, крыши, потолки)</returns>
+        public static bool IsVerticallyCompound(this HostObject hostObject) {
+            Document doc = hostObject.Document;
+            return (doc.GetElement(hostObject.GetTypeId()) as HostObjAttributes).GetCompoundStructure().IsVerticallyCompound;
+        }
+
+        /// <summary>
+        /// Возвращает верхнюю поверхность <paramref name="hostObject"/>, если он является "плитным" элементом: Перекрытие | Потолок | Крыша
+        /// </summary>
+        /// <param name="hostObject">Плитный элемент: Перекрытие | Потолок | Крыша</param>
+        /// <returns>Верхнюю поверхность Перекрытия | Потолка | Крыши</returns>
+        /// <exception cref="ArgumentException">Исключение, если <paramref name="hostObject"/> не является Перекрытием | Потолком | Крышей</exception>
+        public static Face GetTopFace(this HostObject hostObject) {
+            if(!IsVerticallyCompound(hostObject)) {
+                var faceRefs = HostObjectUtils.GetTopFaces(hostObject);
+                return (Face) hostObject.GetGeometryObjectFromReference(faceRefs[0]);
+            } else {
+                throw new ArgumentException($"{nameof(hostObject)} - не Перекрытие | Потолок | Крыша.");
+            }
+        }
+
+        /// <summary>
+        /// Возвращает нижнюю поверхность <paramref name="hostObject"/>, если он является "плитным" элементом: Перекрытие | Потолок | Крыша
+        /// </summary>
+        /// <param name="hostObject">Плитный элемент: Перекрытие | Потолок | Крыша</param>
+        /// <returns>Нижнюю поверхность Перекрытия | Потолка | Крыши</returns>
+        /// <exception cref="ArgumentException">Исключение, если <paramref name="hostObject"/> не является Перекрытием | Потолком | Крышей</exception>
+        public static Face GetBottomFace(this HostObject hostObject) {
+            if(!IsVerticallyCompound(hostObject)) {
+                var faceRefs = HostObjectUtils.GetBottomFaces(hostObject);
+                return (Face) hostObject.GetGeometryObjectFromReference(faceRefs[0]);
+            } else {
+                throw new ArgumentException($"{nameof(hostObject)} - не Перекрытие | Потолок | Крыша.");
+            }
+        }
+
+        /// <summary>
+        /// Возвращает перечисление, состоящее из внутренней и внешней поверхности <paramref name="hostObject"/>, если он является Стеной
+        /// </summary>
+        /// <param name="hostObject">Стена</param>
+        /// <returns>перечисление, состоящее из внутренней и внешней поверхности Стены></returns>
+        /// <exception cref="ArgumentException">Исключение, если <paramref name="hostObject"/> не является Стеной</exception>
+        public static IEnumerable<Face> GetSideFaces(this HostObject hostObject) {
+            if(IsVerticallyCompound(hostObject)) {
+                var interiorFace = HostObjectUtils.GetSideFaces(hostObject, ShellLayerType.Interior);
+                var exteriorFace = HostObjectUtils.GetSideFaces(hostObject, ShellLayerType.Exterior);
+
+                yield return (Face) hostObject.GetGeometryObjectFromReference(interiorFace[0]);
+                yield return (Face) hostObject.GetGeometryObjectFromReference(exteriorFace[0]);
+            } else {
+                throw new ArgumentException($"{nameof(hostObject)} - не Стена");
+            }
+        }
     }
 }
