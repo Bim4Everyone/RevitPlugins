@@ -375,10 +375,25 @@ namespace RevitOpeningPlacement.Models {
         Floor,
     }
 
+    /// <summary>
+    /// Типы проемов - заданий на отверстия
+    /// </summary>
     internal enum OpeningType {
+        /// <summary>
+        /// Круглый проем в стене
+        /// </summary>
         WallRound,
+        /// <summary>
+        /// Прямоугольный проем в стене
+        /// </summary>
         WallRectangle,
+        /// <summary>
+        /// Круглый проем в перекрытии
+        /// </summary>
         FloorRound,
+        /// <summary>
+        /// Прямоугольный проем в перекрытии
+        /// </summary>
         FloorRectangle
     }
 
