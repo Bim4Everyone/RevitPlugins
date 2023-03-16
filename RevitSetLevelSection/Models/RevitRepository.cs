@@ -20,6 +20,8 @@ using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
 
 using RevitSetLevelSection.Models.LevelDefinitions;
+using RevitSetLevelSection.Models.LevelDefinitions.BBPositions;
+using RevitSetLevelSection.Models.LevelDefinitions.LevelProviders;
 
 using InvalidOperationException = Autodesk.Revit.Exceptions.InvalidOperationException;
 
