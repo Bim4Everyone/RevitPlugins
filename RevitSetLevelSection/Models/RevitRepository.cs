@@ -16,6 +16,7 @@ using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
 
 using RevitSetLevelSection.Models.LevelDefinitions;
@@ -144,10 +145,10 @@ namespace RevitSetLevelSection.Models {
         }
 
         private string GetLevelName(Element element, List<Level> levels) {
-            var outline = GetOutline(element, Transform.Identity);
-            if(_algorithms.TryGetValue(element.Category.Id, out var levelDefinition)) {
-                return levelDefinition.GetLevelName(outline, levels);
-            }
+            // var outline = GetOutline(element, Transform.Identity);
+            // if(_algorithms.TryGetValue(element.Category.Id, out var levelDefinition)) {
+            //     return levelDefinition.GetLevelName(outline, levels);
+            // }
 
             return null;
         }
@@ -175,7 +176,8 @@ namespace RevitSetLevelSection.Models {
                 
                 var logger = ServicesProvider.GetPlatformService<ILoggerService>()
                     .ForPluginContext("Установка уровня\\секции");
-                
+
+                var intersectImpl = new IntersectImpl() {LinkedTransform = transform, Application = Application};
                 foreach(Element element in elements) {
                     if(!cashedElements.ContainsKey(element.Id)) {
                         continue;
@@ -188,7 +190,7 @@ namespace RevitSetLevelSection.Models {
                     }
 
                     foreach(FamilyInstance massObject in massElements) {
-                        if(IsIntersectCenterElement(transform, massObject, element)) {
+                        if(intersectImpl.IsIntersect(massObject, element)) {
                             try {
                                 string paramValue = massObject.GetParamValue<string>(paramOption);
                                 element.SetParamValue(paramOption.RevitParam, paramValue);
@@ -232,95 +234,7 @@ namespace RevitSetLevelSection.Models {
                 .WherePasses(catFilter)
                 .ToList();
         }
-
-        private bool IsIntersectCenterElement(Transform transform, FamilyInstance massElement, Element element) {
-            Solid solid = GetSolid(massElement, transform);
-            if(solid == null) {
-                return false;
-            }
-
-            XYZ elementCenterPoint = GetCenterPoint(element);
-            var line = GetLine(elementCenterPoint);
-
-            var result = solid.IntersectWithCurve(line,
-                new SolidCurveIntersectionOptions() {ResultType = SolidCurveIntersectionMode.CurveSegmentsInside});
-
-            if(result.ResultType == SolidCurveIntersectionMode.CurveSegmentsInside) {
-                return result.Any(item => item.Length > 0);
-            }
-
-            return false;
-        }
-
-        private XYZ GetCenterPoint(Element element) {
-            try {
-                Solid solid = GetSolid(element, Transform.Identity);
-                if(solid != null) {
-                    return solid.ComputeCentroid();
-                }
-            } catch {
-                
-            }
-
-            var elementOutline = GetOutline(element, Transform.Identity);
-            return (elementOutline.MaximumPoint - elementOutline.MinimumPoint) / 2
-                   + elementOutline.MinimumPoint;
-        }
-
-        private Outline GetOutline(Element element, Transform transform) {
-            var boundingBox = element.get_BoundingBox(null);
-            if(boundingBox == null) {
-                return new Outline(XYZ.Zero, XYZ.Zero);
-            }
-
-            return new Outline(transform.OfPoint(boundingBox.Min), transform.OfPoint(boundingBox.Max));
-        }
-
-        private Solid GetSolid(Element element, Transform transform) {
-            var geometryElement = element.get_Geometry(new Options() {ComputeReferences = true});
-            if(geometryElement == null) {
-                return null;
-            }
-
-            List<Solid> solids = new List<Solid>();
-            foreach(GeometryObject geometryObject in geometryElement.OfType<GeometryObject>()) {
-                if(geometryObject is Solid solid) {
-                    solids.Add(solid);
-                } else if(geometryObject is GeometryInstance instance) {
-                    solids.AddRange(instance.GetInstanceGeometry().OfType<Solid>());
-                }
-            }
-
-            solids = solids
-                    .Where(item => item.Volume > 0)
-                    .ToList();
-
-            if(solids.Count == 0) {
-                return null;
-            }
-
-            Solid resultSolid = solids.First();
-            solids.Remove(resultSolid);
-
-            try {
-                foreach(Solid solid in solids) {
-                    resultSolid =
-                        BooleanOperationsUtils.ExecuteBooleanOperation(resultSolid, solid, BooleanOperationsType.Union);
-                }
-            } catch(InvalidOperationException) {
-                return null;
-            }
-
-            return SolidUtils.CreateTransformed(resultSolid, transform);
-        }
-
-        private Line GetLine(XYZ point) {
-            XYZ start = point.Subtract(new XYZ(Application.ShortCurveTolerance, 0, 0));
-            XYZ finish = point.Add(new XYZ(Application.ShortCurveTolerance, 0, 0));
-
-            return Line.CreateBound(start, finish);
-        }
-
+        
         private ElementId[] GetCategories(RevitParam revitParam) {
             return Document.GetParameterBindings()
                 .Where(item => item.Binding.IsInstanceBinding())

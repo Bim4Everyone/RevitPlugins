@@ -10,6 +10,7 @@ using Autodesk.Revit.UI.Selection;
 using dosymep.Revit;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit.Geometry;
 
 namespace RevitSetLevelSection.Models {
@@ -105,14 +106,28 @@ namespace RevitSetLevelSection.Models {
                 .OfType<AreaScheme>()
                 .FirstOrDefault(item => item.Name.Equals(AreaSchemeName));
         }
-        
+
         public IEnumerable<Area> GetAreas() {
             var areaFilter = new AreaFilter(GetAreaScheme());
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
                 .OfCategory(BuiltInCategory.OST_Areas)
                 .OfType<Area>()
-                .Where(item => areaFilter.AllowElement(item));
+                .Where(item => areaFilter.AllowElement(item))
+                .Where(item => HasAreaLevel(item));
+        }
+
+        public bool HasAreaLevel(Area area) {
+            return GetLevel(area) != null;
+        }
+
+        public Level GetLevel(Area area) {
+            var paramValue = area.GetParamValue<string>(SharedParamsConfig.Instance.FixComment);
+            if(int.TryParse(paramValue, out int elementId)) {
+                return _document.GetElement(new ElementId(elementId)) as Level;
+            }
+
+            return null;
         }
 
         private void Update() {
