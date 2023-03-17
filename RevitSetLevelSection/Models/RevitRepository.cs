@@ -19,72 +19,13 @@ using dosymep.Revit;
 using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
 
-using RevitSetLevelSection.Models.LevelDefinitions;
-using RevitSetLevelSection.Models.LevelDefinitions.BBPositions;
-using RevitSetLevelSection.Models.LevelDefinitions.LevelProviders;
+using RevitSetLevelSection.Models.ElementPositions;
+using RevitSetLevelSection.Models.LevelProviders;
 
 using InvalidOperationException = Autodesk.Revit.Exceptions.InvalidOperationException;
 
 namespace RevitSetLevelSection.Models {
     internal class RevitRepository {
-        private Dictionary<ElementId, LevelDefinition> _algorithms
-            = new Dictionary<ElementId, LevelDefinition>() {
-                {
-                    new ElementId(BuiltInCategory.OST_Walls),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_Floors),
-                    new LevelDefinition() {BBPosition = new BBPositionTop(), LevelProvider = new LevelNearestProvider()}
-                }, {
-                    new ElementId(BuiltInCategory.OST_Doors),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_Windows),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionMiddle(), LevelProvider = new LevelBottomProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_GenericModel),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_Roofs),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_Ceilings),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_Columns),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_Parts),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_Gutter),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_StairsRailing),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                },
-            };
-
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
         }
