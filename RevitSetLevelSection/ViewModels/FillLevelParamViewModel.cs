@@ -17,6 +17,7 @@ namespace RevitSetLevelSection.ViewModels {
         private readonly RevitRepository _revitRepository;
 
         private bool _isEnabled;
+        private string _buildPart;
 
         public FillLevelParamViewModel(RevitParam revitParam, MainViewModel mainViewModel, RevitRepository revitRepository) {
             if(revitRepository is null) {
@@ -34,6 +35,11 @@ namespace RevitSetLevelSection.ViewModels {
         public override bool IsEnabled {
             get => _isEnabled;
             set => this.RaiseAndSetIfChanged(ref _isEnabled, value);
+        }
+
+        public string BuildPart {
+            get => _buildPart;
+            set => this.RaiseAndSetIfChanged(ref _buildPart, value);
         }
 
         public override string GetErrorText() {

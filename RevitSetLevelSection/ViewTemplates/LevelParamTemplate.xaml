@@ -5,10 +5,29 @@
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors">
 
     <DataTemplate DataType="{x:Type vms:FillLevelParamViewModel}">
-        <dxe:CheckEdit
-            Margin="10"
-            EditValue="{Binding IsEnabled}">
-            <TextBlock Text="{Binding Name}" />
-        </dxe:CheckEdit>
+        <DockPanel>
+            <dxe:CheckEdit
+                Margin="10"
+                EditValue="{Binding IsEnabled}">
+                <TextBlock Text="{Binding Name}" />
+            </dxe:CheckEdit>
+            
+            <dxe:ListBoxEdit 
+                Margin="10"
+                StyleSettings="{dxe:RadioListBoxEditStyleSettings}"
+                SelectedItem="{Binding BuildPart}">
+                
+                <dxe:ListBoxEdit.ItemsPanel>  
+                    <ItemsPanelTemplate>  
+                        <StackPanel Orientation="Horizontal"/>  
+                    </ItemsPanelTemplate>  
+                </dxe:ListBoxEdit.ItemsPanel>  
+                
+                <dxe:ListBoxEditItem Content="АР"/>
+                <dxe:ListBoxEditItem Content="КР"/>
+                <dxe:ListBoxEditItem Content="ВИС"/>
+            </dxe:ListBoxEdit>
+        </DockPanel>
+
     </DataTemplate>
 </ResourceDictionary>
