@@ -98,6 +98,10 @@ namespace RevitSetLevelSection.ViewModels {
             return _linkInstanceRepository.GetPartNames(paramNames).Distinct();
         }
 
+        public IAreaRepository GetAreaRepository() {
+            return _linkInstanceRepository;
+        }
+
         private void LoadLinkDocument(object param) {
             IsLoaded = _linkInstanceRepository.LoadLinkDocument();
             DesignOptions = new ObservableCollection<DesignOptionsViewModel>(GetDesignOptions());

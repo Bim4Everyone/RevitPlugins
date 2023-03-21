@@ -19,6 +19,7 @@ using dosymep.Revit;
 using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
 
+using RevitSetLevelSection.Factories;
 using RevitSetLevelSection.Models.ElementPositions;
 using RevitSetLevelSection.Models.LevelProviders;
 
@@ -65,38 +66,30 @@ namespace RevitSetLevelSection.Models {
                 .ToList();
         }
 
-        public void SetLevelParam(RevitParam revitParam) {
+        public void SetLevelParam(RevitParam revitParam, IAreaRepository areaRepository,
+            ILevelProviderFactory providerFactory) {
             using(Transaction transaction =
                   Document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
 
-                List<Level> levels = GetLevels();
+                var intersectImpl =
+                    new IntersectImpl() {LinkedTransform = areaRepository.Transform, Application = Application};
+
+                Area[] areas = areaRepository.GetAreas().ToArray();
                 IEnumerable<Element> elements = GetElements(revitParam);
                 foreach(Element element in elements) {
                     try {
-                        string paramValue = GetLevelName(element, levels);
-                        element.SetParamValue(revitParam, paramValue);
+                        List<Level> levels = areas
+                            .Where(item => intersectImpl.IsIntersect(item, element))
+                            .Select(item => areaRepository.GetLevel(item))
+                            .ToList();
+
+                        var level = providerFactory.Create(element).GetLevel(element, levels);
+                        element.SetParamValue(revitParam, level.Name);
                     } catch { }
                 }
 
                 transaction.Commit();
             }
-        }
-
-        private List<Level> GetLevels() {
-            return new FilteredElementCollector(Document)
-                .WhereElementIsNotElementType()
-                .OfCategory(BuiltInCategory.OST_Levels)
-                .OfType<Level>()
-                .ToList();
-        }
-
-        private string GetLevelName(Element element, List<Level> levels) {
-            // var outline = GetOutline(element, Transform.Identity);
-            // if(_algorithms.TryGetValue(element.Category.Id, out var levelDefinition)) {
-            //     return levelDefinition.GetLevelName(outline, levels);
-            // }
-
-            return null;
         }
 
         public void UpdateElements(RevitParam revitParam, string paramValue) {

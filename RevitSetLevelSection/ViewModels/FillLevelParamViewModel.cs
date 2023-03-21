@@ -9,6 +9,8 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.WPF.ViewModels;
 
+using RevitSetLevelSection.Factories;
+using RevitSetLevelSection.Factories.LevelProviders;
 using RevitSetLevelSection.Models;
 
 namespace RevitSetLevelSection.ViewModels {
@@ -16,12 +18,13 @@ namespace RevitSetLevelSection.ViewModels {
         private readonly RevitParam _revitParam;
         private readonly MainViewModel _mainViewModel;
         private readonly RevitRepository _revitRepository;
+        private readonly ILevelProviderFactoryFactory _levelProviderFactoryFactory;
 
         private bool _isEnabled;
         private MainBimBuildPart _buildPart;
 
         public FillLevelParamViewModel(RevitParam revitParam, MainViewModel mainViewModel,
-            RevitRepository revitRepository) {
+            RevitRepository revitRepository, ILevelProviderFactoryFactory levelProviderFactoryFactory) {
             if(revitRepository is null) {
                 throw new ArgumentNullException(nameof(revitRepository));
             }
@@ -29,6 +32,7 @@ namespace RevitSetLevelSection.ViewModels {
             _revitParam = revitParam;
             _mainViewModel = mainViewModel;
             _revitRepository = revitRepository;
+            _levelProviderFactoryFactory = levelProviderFactoryFactory;
 
             BuildParts = new ObservableCollection<MainBimBuildPart>(_revitRepository.GetBuildParts());
 
@@ -68,7 +72,8 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         public override void UpdateElements() {
-            _revitRepository.SetLevelParam(RevitParam);
+            ILevelProviderFactory levelProviderFactory = _levelProviderFactoryFactory.Create(BuildPart);
+            _revitRepository.SetLevelParam(RevitParam, _mainViewModel.LinkType.GetAreaRepository(), levelProviderFactory);
         }
 
         public override ParamSettings GetParamSettings() {

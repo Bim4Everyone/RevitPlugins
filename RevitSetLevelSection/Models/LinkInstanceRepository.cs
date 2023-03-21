@@ -14,7 +14,7 @@ using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit.Geometry;
 
 namespace RevitSetLevelSection.Models {
-    internal class LinkInstanceRepository {
+    internal class LinkInstanceRepository : IAreaRepository {
         public static readonly string AreaSchemeName = "Назначение этажа СМР";
 
         private readonly RevitLinkType _revitLinkType;
@@ -149,6 +149,13 @@ namespace RevitSetLevelSection.Models {
         private ElementId GetDesignOptionId(Element element) {
             return element.DesignOption?.Id ?? ElementId.InvalidElementId;
         }
+    }
+
+    internal interface IAreaRepository {
+        Transform Transform { get; }
+        
+        Level GetLevel(Area area);
+        IEnumerable<Area> GetAreas();
     }
 
     internal static class Extensions {
