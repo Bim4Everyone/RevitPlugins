@@ -39,8 +39,6 @@ namespace RevitSetLevelSection.ViewModels {
             LoadViewCommand = new RelayCommand(LoadView);
             UpdateBuildPartCommand = new RelayCommand(UpdateBuildPart);
             UpdateElementsCommand = new RelayCommand(UpdateElements, CanUpdateElement);
-
-            SetConfig();
         }
 
         public ICommand LoadViewCommand { get; }
@@ -82,6 +80,8 @@ namespace RevitSetLevelSection.ViewModels {
         private void LoadView(object obj) {
             LinkTypes = new ObservableCollection<LinkTypeViewModel>(GetLinkTypes());
             FillParams = new ObservableCollection<FillParamViewModel>(GetFillParams());
+            
+            SetConfig();
         }
         
         public void UpdateBuildPart(object args) {

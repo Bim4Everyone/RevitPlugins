@@ -1,6 +1,8 @@
 ﻿using Ninject;
+using Ninject.Parameters;
 using Ninject.Syntax;
 
+using RevitSetLevelSection.Factories.ElementPositions;
 using RevitSetLevelSection.Factories.LevelProviders;
 using RevitSetLevelSection.Models;
 
@@ -18,11 +20,17 @@ namespace RevitSetLevelSection.Factories {
 
         public ILevelProviderFactory Create(MainBimBuildPart mainBimBuildPart) {
             if(mainBimBuildPart == MainBimBuildPart.ARPart) {
-                return _resolutionRoot.Get<ARLevelProviderFactory>();
+                var positionFactory = _resolutionRoot.Get<ARElementPositionFactory>();
+                var constructorArgument = new ConstructorArgument("positionFactory", positionFactory);
+                return _resolutionRoot.Get<ARLevelProviderFactory>(constructorArgument);
             } else if(mainBimBuildPart == MainBimBuildPart.KRPart) {
-                return _resolutionRoot.Get<KRLevelProviderFactory>();
+                var positionFactory = _resolutionRoot.Get<KRElementPositionFactory>();
+                var constructorArgument = new ConstructorArgument("positionFactory", positionFactory);
+                return _resolutionRoot.Get<KRLevelProviderFactory>(constructorArgument);
             } else if(mainBimBuildPart == MainBimBuildPart.VisPart) {
-                return _resolutionRoot.Get<VISLevelProviderFactory>();
+                var positionFactory = _resolutionRoot.Get<VISElementPositionFactory>();
+                var constructorArgument = new ConstructorArgument("positionFactory", positionFactory);
+                return _resolutionRoot.Get<VISLevelProviderFactory>(constructorArgument);
             }
 
             return null;
