@@ -11,21 +11,20 @@
                 EditValue="{Binding IsEnabled}">
                 <TextBlock Text="{Binding Name}" />
             </dxe:CheckEdit>
-            
-            <dxe:ListBoxEdit 
+
+            <dxe:ListBoxEdit
                 Margin="10"
                 StyleSettings="{dxe:RadioListBoxEditStyleSettings}"
-                SelectedItem="{Binding BuildPart}">
-                
-                <dxe:ListBoxEdit.ItemsPanel>  
-                    <ItemsPanelTemplate>  
-                        <StackPanel Orientation="Horizontal"/>  
-                    </ItemsPanelTemplate>  
-                </dxe:ListBoxEdit.ItemsPanel>  
-                
-                <dxe:ListBoxEditItem Content="АР"/>
-                <dxe:ListBoxEditItem Content="КР"/>
-                <dxe:ListBoxEditItem Content="ВИС"/>
+                DisplayMember="Name"
+                IsEnabled="{Binding IsEnabled}"
+                ItemsSource="{Binding BuildParts}"
+                EditValue="{Binding BuildPart}">
+
+                <dxe:ListBoxEdit.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </dxe:ListBoxEdit.ItemsPanel>
             </dxe:ListBoxEdit>
         </DockPanel>
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,9 +18,10 @@ namespace RevitSetLevelSection.ViewModels {
         private readonly RevitRepository _revitRepository;
 
         private bool _isEnabled;
-        private string _buildPart;
+        private MainBimBuildPart _buildPart;
 
-        public FillLevelParamViewModel(RevitParam revitParam, MainViewModel mainViewModel, RevitRepository revitRepository) {
+        public FillLevelParamViewModel(RevitParam revitParam, MainViewModel mainViewModel,
+            RevitRepository revitRepository) {
             if(revitRepository is null) {
                 throw new ArgumentNullException(nameof(revitRepository));
             }
@@ -27,6 +29,11 @@ namespace RevitSetLevelSection.ViewModels {
             _revitParam = revitParam;
             _mainViewModel = mainViewModel;
             _revitRepository = revitRepository;
+
+            BuildParts = new ObservableCollection<MainBimBuildPart>(_revitRepository.GetBuildParts());
+
+            var documentPart = _revitRepository.GetBuildPart();
+            BuildPart = BuildParts.FirstOrDefault(item => item == documentPart);
         }
 
         public override RevitParam RevitParam => _revitParam;
@@ -37,10 +44,12 @@ namespace RevitSetLevelSection.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _isEnabled, value);
         }
 
-        public string BuildPart {
+        public MainBimBuildPart BuildPart {
             get => _buildPart;
             set => this.RaiseAndSetIfChanged(ref _buildPart, value);
         }
+        
+        public ObservableCollection<MainBimBuildPart> BuildParts { get; }
 
         public override string GetErrorText() {
             if(!IsEnabled) {

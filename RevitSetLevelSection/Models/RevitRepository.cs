@@ -26,8 +26,11 @@ using InvalidOperationException = Autodesk.Revit.Exceptions.InvalidOperationExce
 
 namespace RevitSetLevelSection.Models {
     internal class RevitRepository {
-        public RevitRepository(UIApplication uiApplication) {
+        private readonly IBimModelPartsService _bimModelPartsService;
+
+        public RevitRepository(UIApplication uiApplication, IBimModelPartsService bimModelPartsService) {
             UIApplication = uiApplication;
+            _bimModelPartsService = bimModelPartsService;
         }
 
         public UIApplication UIApplication { get; }
@@ -35,7 +38,7 @@ namespace RevitSetLevelSection.Models {
 
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
-        
+
         public ProjectInfo ProjectInfo => Document.ProjectInformation;
 
         public Element GetElements(ElementId elementId) {
@@ -53,7 +56,7 @@ namespace RevitSetLevelSection.Models {
                 .OfType<RevitLinkType>()
                 .ToList();
         }
-        
+
         public IEnumerable<RevitLinkInstance> GetLinkInstances() {
             return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
@@ -97,7 +100,8 @@ namespace RevitSetLevelSection.Models {
         }
 
         public void UpdateElements(RevitParam revitParam, string paramValue) {
-            using(Transaction transaction = Document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
+            using(Transaction transaction =
+                  Document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
                 ProjectInfo.SetParamValue(revitParam, paramValue);
                 IEnumerable<Element> elements = GetElements(revitParam);
 
@@ -116,7 +120,7 @@ namespace RevitSetLevelSection.Models {
 
             using(Transaction transaction =
                   Document.StartTransaction($"Установка уровня/секции \"{paramOption.RevitParam.Name}\"")) {
-                
+
                 var logger = ServicesProvider.GetPlatformService<ILoggerService>()
                     .ForPluginContext("Установка уровня\\секции");
 
@@ -147,7 +151,7 @@ namespace RevitSetLevelSection.Models {
                                 // когда параметр не может заполнится из-за настроек в ревите
                                 // Например: базовая стена внутри составной
 
-                                logger.Warning(ex, 
+                                logger.Warning(ex,
                                     "Не был обновлен элемент {@elementId} в документе {documentId}.",
                                     element.Id.IntegerValue, Document.GetUniqId());
                             }
@@ -177,7 +181,7 @@ namespace RevitSetLevelSection.Models {
                 .WherePasses(catFilter)
                 .ToList();
         }
-        
+
         private ElementId[] GetCategories(RevitParam revitParam) {
             return Document.GetParameterBindings()
                 .Where(item => item.Binding.IsInstanceBinding())
@@ -190,5 +194,84 @@ namespace RevitSetLevelSection.Models {
         public Workset GetWorkset(RevitLinkType revitLinkType) {
             return Document.GetWorksetTable().GetWorkset(revitLinkType.WorksetId);
         }
+
+        public IEnumerable<MainBimBuildPart> GetBuildParts() {
+            yield return MainBimBuildPart.ARPart;
+            yield return MainBimBuildPart.KRPart;
+            yield return MainBimBuildPart.VisPart;
+        }
+        
+        public MainBimBuildPart GetBuildPart() {
+            if(_bimModelPartsService.InAnyBimModelParts(Document, BimModelPart.ARPart, BimModelPart.GPPart)) {
+                return MainBimBuildPart.ARPart;
+            }
+
+            if(_bimModelPartsService.InAnyBimModelParts(Document, BimModelPart.KRPart, BimModelPart.KMPart)) {
+                return MainBimBuildPart.KRPart;
+            }
+            
+            if(_bimModelPartsService.InAnyBimModelParts(Document, BimModelPart.KOORDPart)) {
+                return MainBimBuildPart.KOORDPart;
+            }
+
+            // Будем считать что все остальные это ВИС
+            // ошибки будущего - ошибки будущего :D
+            return MainBimBuildPart.VisPart;
+        }
+    }
+
+    internal class MainBimBuildPart : IEquatable<MainBimBuildPart> {
+        public static readonly MainBimBuildPart ARPart = new MainBimBuildPart() {Id = 0, Name = "АР"};
+        public static readonly MainBimBuildPart KRPart = new MainBimBuildPart() {Id = 1, Name = "КР"};
+        public static readonly MainBimBuildPart VisPart = new MainBimBuildPart() {Id = 2, Name = "ВИС"};
+        public static readonly MainBimBuildPart KOORDPart = new MainBimBuildPart() {Id = 3, Name = "КООРД"};
+
+        public int Id { get; private set; }
+        public string Name { get; private set; }
+        public string Description { get; private set; }
+
+        #region IEquatable<MainBimBuildPart>
+
+        public bool Equals(MainBimBuildPart other) {
+            if(ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if(ReferenceEquals(this, other)) {
+                return true;
+            }
+
+            return Id == other.Id;
+        }
+
+        public override bool Equals(object obj) {
+            if(ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if(ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            if(obj.GetType() != this.GetType()) {
+                return false;
+            }
+
+            return Equals((MainBimBuildPart) obj);
+        }
+
+        public override int GetHashCode() {
+            return Id;
+        }
+
+        public static bool operator ==(MainBimBuildPart left, MainBimBuildPart right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(MainBimBuildPart left, MainBimBuildPart right) {
+            return !Equals(left, right);
+        }
+
+        #endregion
     }
 }

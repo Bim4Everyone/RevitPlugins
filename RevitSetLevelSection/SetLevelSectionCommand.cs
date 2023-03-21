@@ -9,6 +9,7 @@ using Autodesk.Revit.UI;
 using dosymep;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Bim4Everyone.Templates;
 using dosymep.SimpleServices;
 
@@ -39,6 +40,9 @@ namespace RevitSetLevelSection {
 
                 kernel.Bind<RevitRepository>().ToSelf()
                     .InSingletonScope();
+
+                kernel.Bind<IBimModelPartsService>()
+                    .ToMethod(c => GetPlatformService<IBimModelPartsService>());
 
                 kernel.Bind<DesignOptionAdapt>().ToSelf();
                 kernel.Bind<DefaultDesignOption>().ToSelf();
