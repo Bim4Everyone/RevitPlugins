@@ -6,10 +6,10 @@ using Autodesk.Revit.DB;
 using RevitSetLevelSection.Models.ElementPositions;
 
 namespace RevitSetLevelSection.Models.LevelProviders {
-    internal class TopLevelProvider : ILevelProvider {
+    internal class LevelTopProvider : ILevelProvider {
         private readonly IElementPosition _elementPosition;
 
-        public TopLevelProvider(IElementPosition elementPosition) {
+        public LevelTopProvider(IElementPosition elementPosition) {
             _elementPosition = elementPosition;
         }
         

@@ -16,7 +16,11 @@ using dosymep.SimpleServices;
 using Ninject;
 
 using RevitSetLevelSection.Factories;
+using RevitSetLevelSection.Factories.ElementPositions;
+using RevitSetLevelSection.Factories.LevelProviders;
 using RevitSetLevelSection.Models;
+using RevitSetLevelSection.Models.ElementPositions;
+using RevitSetLevelSection.Models.LevelProviders;
 using RevitSetLevelSection.ViewModels;
 using RevitSetLevelSection.Views;
 
@@ -43,6 +47,28 @@ namespace RevitSetLevelSection {
 
                 kernel.Bind<IBimModelPartsService>()
                     .ToMethod(c => GetPlatformService<IBimModelPartsService>());
+                
+                kernel.Bind<ARElementPositionFactory>().ToSelf().InSingletonScope();
+                kernel.Bind<KRElementPositionFactory>().ToSelf().InSingletonScope();
+                kernel.Bind<VISElementPositionFactory>().ToSelf().InSingletonScope();
+                
+                kernel.Bind<ARLevelProviderFactory>().ToSelf().InSingletonScope();
+                kernel.Bind<KRLevelProviderFactory>().ToSelf().InSingletonScope();
+                kernel.Bind<VISLevelProviderFactory>().ToSelf().InSingletonScope();
+                
+                kernel.Bind<ElementBottomPosition>().ToSelf().InSingletonScope();
+                kernel.Bind<ElementMiddlePosition>().ToSelf().InSingletonScope();
+                kernel.Bind<ElementTopPosition>().ToSelf().InSingletonScope();
+                
+                kernel.Bind<LevelBottomProvider>().ToSelf();
+                kernel.Bind<LevelByIdProvider>().ToSelf();
+                kernel.Bind<LevelMagicBottomProvider>().ToSelf();
+                kernel.Bind<LevelNearestProvider>().ToSelf();
+                kernel.Bind<LevelStairsProvider>().ToSelf();
+                kernel.Bind<LevelTopProvider>().ToSelf();
+
+                kernel.Bind<ILevelProviderFactoryFactory>()
+                    .To<LevelProviderFactoryFactory>().InSingletonScope();
 
                 kernel.Bind<DesignOptionAdapt>().ToSelf();
                 kernel.Bind<DefaultDesignOption>().ToSelf();
