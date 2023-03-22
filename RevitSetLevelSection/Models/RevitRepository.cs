@@ -40,8 +40,6 @@ namespace RevitSetLevelSection.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        public ProjectInfo ProjectInfo => Document.ProjectInformation;
-
         public Element GetElements(ElementId elementId) {
             return Document.GetElement(elementId);
         }
@@ -88,20 +86,6 @@ namespace RevitSetLevelSection.Models {
 
                     var level = providerFactory.Create(element).GetLevel(element, levels);
                     element.SetParamValue(revitParam, level?.Name.Split('_').FirstOrDefault());
-                }
-
-                transaction.Commit();
-            }
-        }
-
-        public void UpdateElements(RevitParam revitParam, string paramValue) {
-            using(Transaction transaction =
-                  Document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
-                ProjectInfo.SetParamValue(revitParam, paramValue);
-                IEnumerable<Element> elements = GetElements(revitParam);
-
-                foreach(Element element in elements) {
-                    element.SetParamValue(revitParam, paramValue);
                 }
 
                 transaction.Commit();
