@@ -77,15 +77,13 @@ namespace RevitSetLevelSection.Models {
                 Area[] areas = areaRepository.GetAreas().ToArray();
                 IEnumerable<Element> elements = GetElements(revitParam);
                 foreach(Element element in elements) {
-                    try {
-                        List<Level> levels = areas
-                            .Where(item => intersectImpl.IsIntersect(item, element))
-                            .Select(item => areaRepository.GetLevel(item))
-                            .ToList();
+                    List<Level> levels = areas
+                        .Where(item => intersectImpl.IsIntersect(item, element))
+                        .Select(item => areaRepository.GetLevel(item))
+                        .ToList();
 
-                        var level = providerFactory.Create(element).GetLevel(element, levels);
-                        element.SetParamValue(revitParam, level.Name);
-                    } catch { }
+                    var level = providerFactory.Create(element).GetLevel(element, levels);
+                    element.SetParamValue(revitParam, level?.Name);
                 }
 
                 transaction.Commit();

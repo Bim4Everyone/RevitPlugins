@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -8,20 +9,13 @@ using dosymep.Revit.Geometry;
 
 namespace RevitSetLevelSection.Models {
     internal class IntersectImpl {
-        /// <summary>
-        /// Нужен для проецирования <see cref="Curve"/> на ось Z.
-        /// </summary>
-        private readonly Transform _transform = Transform.Identity;
-
-        public IntersectImpl() {
-            _transform.BasisZ = XYZ.Zero;
-        }
+        public static readonly double DefaultHeight = 10;
         
         public Application Application { get; set; }
         public Transform LinkedTransform { get; set; }
 
         public bool IsIntersect(Area area, Element element) {
-            var line = GetShortLine(element).CreateTransformed(_transform);
+            var line = GetShortLineInZ(element);
             var result = CreateSolid(area)?.IntersectWithCurve(line,
                 new SolidCurveIntersectionOptions() {ResultType = SolidCurveIntersectionMode.CurveSegmentsInside});
 
@@ -45,29 +39,28 @@ namespace RevitSetLevelSection.Models {
         }
 
         /// <summary>
-        /// Возвращает транспонированный <see cref="Solid"/> по границам зоны расположенный на Z=0.
+        /// Возвращает трансформированный <see cref="Solid"/> по границам зоны расположенный на Z=0.
         /// </summary>
         /// <param name="area">Зона.</param>
-        /// <returns>Возвращает транспонированный <see cref="Solid"/> по границам зоны расположенный на Z=0.</returns>
+        /// <returns>Возвращает трансформированный <see cref="Solid"/> по границам зоны расположенный на Z=0.</returns>
         private Solid CreateSolid(Area area) {
             // Зоны являются замкнутыми и с простым одним контуром
             var boundarySegments = area.GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions)
                 .First();
 
+            Transform transform = CreateAreaTransform(area);
             var curves = boundarySegments
                 .Select(item => item.GetCurve())
-                .Select(item => item.CreateTransformed(_transform))
                 .Select(item => item.CreateTransformed(LinkedTransform))
+                .Select(item => item.CreateTransformed(transform))
                 .ToList();
 
             var curveLoops = new[] {CurveLoop.Create(curves)};
-            return GeometryCreationUtilities.CreateExtrusionGeometry(curveLoops,
-                XYZ.BasisZ,
-                2 * Application.ShortCurveTolerance);
+            return GeometryCreationUtilities.CreateExtrusionGeometry(curveLoops, XYZ.BasisZ, DefaultHeight);
         }
 
         /// <summary>
-        /// Создает транспонированный общий <see cref="Solid"/> элемента.
+        /// Создает трансформированный общий <see cref="Solid"/> элемента.
         /// </summary>
         /// <param name="element"></param>
         /// <returns>Возвращает самый большой <see cref="Solid"/> элемента после объединения.</returns>
@@ -79,9 +72,19 @@ namespace RevitSetLevelSection.Models {
 
             return solid == null ? null : SolidUtils.CreateTransformed(solid, LinkedTransform);
         }
+        
+        private Transform CreateAreaTransform(Area area) {
+            XYZ areaPoint = ((LocationPoint) area.Location).Point;
+            areaPoint = LinkedTransform.OfPoint(areaPoint);
+            return Transform.CreateTranslation(new XYZ(0, 0, -areaPoint.Z));
+        }
 
         private Line GetShortLine(Element element) {
             return GetShortLine(GetMidPoint(element));
+        }
+        
+        private Line GetShortLineInZ(Element element) {
+            return GetShortLineInZ(GetMidPoint(element));
         }
 
         /// <summary>
@@ -104,6 +107,17 @@ namespace RevitSetLevelSection.Models {
                 Application.ShortCurveTolerance, 
                 Application.ShortCurveTolerance);
             return Line.CreateBound(point - minPoint, point + minPoint);
+        }
+        
+        /// <summary>
+        /// Создает минимальной длины линию относительно точки .
+        /// </summary>
+        /// <param name="point">Точка вокруг которой создается линия.</param>
+        /// <returns>Возвращает новую линию вокруг точки.</returns>
+        private Line GetShortLineInZ(XYZ point) {
+            var minPoint = new XYZ(0, 0, DefaultHeight);
+            var newPoint = new XYZ(point.X, point.Y, 0);
+            return Line.CreateBound(newPoint - minPoint, newPoint + minPoint);
         }
     }
 }
