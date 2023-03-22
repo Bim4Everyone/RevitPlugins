@@ -1,4 +1,6 @@
-﻿using Ninject;
+﻿using System;
+
+using Ninject;
 using Ninject.Parameters;
 using Ninject.Syntax;
 
@@ -33,7 +35,7 @@ namespace RevitSetLevelSection.Factories {
                 return _resolutionRoot.Get<VISLevelProviderFactory>(constructorArgument);
             }
 
-            return null;
+            throw new ArgumentException($"Переданный раздел \"{mainBimBuildPart.Name}\" не поддерживается.");
         }
     }
 }
