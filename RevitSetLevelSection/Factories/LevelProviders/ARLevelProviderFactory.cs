@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -20,6 +22,11 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
             _resolutionRoot = resolutionRoot;
             _positionFactory = positionFactory;
         }
+        
+        public bool CanCreate(Element element) {
+            return _positionFactory.CanCreate(element)
+                   && element.InAnyCategory(GetAllCategories());
+        }
 
         public ILevelProvider Create(Element element) {
             var elementPosition = _positionFactory.Create(element);
@@ -27,16 +34,30 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
             
             if(element.InAnyCategory(GetLevelNearestProviderCategories())) {
                 return _resolutionRoot.Get<LevelNearestProvider>(constructorArgument);
-            } else if(element.InAnyCategory(BuiltInCategory.OST_Windows,
-                          BuiltInCategory.OST_Ceilings,
-                          BuiltInCategory.OST_RoofSoffit)) {
+            } else if(element.InAnyCategory(GetLevelBottomProviderCategories())) {
                 return _resolutionRoot.Get<LevelBottomProvider>(constructorArgument);
-            } else if(element.InAnyCategory(BuiltInCategory.OST_Rooms, 
-                          BuiltInCategory.OST_Areas)) {
+            } else if(element.InAnyCategory(GetLevelByIdProviderCategories())) {
                 return _resolutionRoot.Get<LevelByIdProvider>(constructorArgument);
             }
 
-            return null;
+            throw new ArgumentException($"Переданный элемент \"{element.Id}\" с категорией \"{element.Category.Name}\" не поддерживается.");
+        }
+        
+        private IEnumerable<BuiltInCategory> GetAllCategories() {
+            return GetLevelNearestProviderCategories()
+                .Union(GetLevelBottomProviderCategories())
+                .Union(GetLevelByIdProviderCategories());
+        }
+
+        private IEnumerable<BuiltInCategory> GetLevelBottomProviderCategories() {
+            yield return BuiltInCategory.OST_Windows;
+            yield return BuiltInCategory.OST_Ceilings;
+            yield return BuiltInCategory.OST_RoofSoffit;
+        }
+        
+        private IEnumerable<BuiltInCategory> GetLevelByIdProviderCategories() {
+            yield return BuiltInCategory.OST_Rooms;
+            yield return BuiltInCategory.OST_Areas;
         }
 
         private IEnumerable<BuiltInCategory> GetLevelNearestProviderCategories() {

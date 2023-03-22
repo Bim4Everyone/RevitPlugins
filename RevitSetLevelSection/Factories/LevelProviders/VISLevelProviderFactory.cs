@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -20,22 +22,36 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
             _resolutionRoot = resolutionRoot;
             _positionFactory = positionFactory;
         }
+        
+        public bool CanCreate(Element element) {
+            return _positionFactory.CanCreate(element)
+                   && element.InAnyCategory(GetAllCategories());
+        }
 
         public ILevelProvider Create(Element element) {
             var elementPosition = _positionFactory.Create(element);
             var constructorArgument = new ConstructorArgument("elementPosition", elementPosition);
 
-            if(element.InAnyCategory(BuiltInCategory.OST_PlumbingFixtures,
-                   BuiltInCategory.OST_MechanicalEquipment)) {
+            if(element.InAnyCategory(GetLevelNearestProviderCategories())) {
                 return _resolutionRoot.Get<LevelNearestProvider>(constructorArgument);
-            } else if(element.InAnyCategory(GetLevelBottomCategories())) {
+            } else if(element.InAnyCategory(GetLevelBottomProviderCategories())) {
                 return _resolutionRoot.Get<LevelBottomProvider>(constructorArgument);
             }
 
-            return null;
+            throw new ArgumentException($"Переданный элемент \"{element.Id}\" с категорией \"{element.Category.Name}\" не поддерживается.");
+        }
+        
+        private IEnumerable<BuiltInCategory> GetAllCategories() {
+            return GetLevelBottomProviderCategories()
+                .Union(GetLevelNearestProviderCategories());
         }
 
-        private IEnumerable<BuiltInCategory> GetLevelBottomCategories() {
+        private IEnumerable<BuiltInCategory> GetLevelNearestProviderCategories() {
+            yield return BuiltInCategory.OST_PlumbingFixtures;
+            yield return BuiltInCategory.OST_MechanicalEquipment;
+        }
+
+        private IEnumerable<BuiltInCategory> GetLevelBottomProviderCategories() {
             yield return BuiltInCategory.OST_DuctCurves;
             yield return BuiltInCategory.OST_FlexDuctCurves;
             yield return BuiltInCategory.OST_PipeCurves;

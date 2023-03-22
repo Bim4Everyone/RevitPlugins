@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -21,22 +23,41 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
             _positionFactory = positionFactory;
         }
 
+        public bool CanCreate(Element element) {
+            return _positionFactory.CanCreate(element)
+                   && element.InAnyCategory(GetAllCategories());
+        }
+
         public ILevelProvider Create(Element element) {
             var elementPosition = _positionFactory.Create(element);
             var constructorArgument = new ConstructorArgument("elementPosition", elementPosition);
 
             if(element.InAnyCategory(GetLevelNearestProviderCategories())) {
                 return _resolutionRoot.Get<LevelNearestProvider>(constructorArgument);
-            } else if(element.InAnyCategory(BuiltInCategory.OST_StructuralFraming,
-                          BuiltInCategory.OST_Floors,
-                          BuiltInCategory.OST_StructuralTruss)) {
+            } else if(element.InAnyCategory(GetLevelMagicBottomProviderCategories())) {
                 return _resolutionRoot.Get<LevelMagicBottomProvider>(constructorArgument);
-            } else if(element.InAnyCategory(BuiltInCategory.OST_StairsRuns,
-                          BuiltInCategory.OST_StairsLandings)) {
+            } else if(element.InAnyCategory(GetLevelStairsProviderCategories())) {
                 return _resolutionRoot.Get<LevelStairsProvider>(new ConstructorArgument("factory", this));
             }
 
-            return null;
+            throw new ArgumentException($"Переданный элемент \"{element.Id}\" с категорией \"{element.Category.Name}\" не поддерживается.");
+        }
+        
+        private IEnumerable<BuiltInCategory> GetAllCategories() {
+            return GetLevelNearestProviderCategories()
+                .Union(GetLevelMagicBottomProviderCategories())
+                .Union(GetLevelStairsProviderCategories());
+        }
+
+        private IEnumerable<BuiltInCategory> GetLevelMagicBottomProviderCategories() {
+            yield return BuiltInCategory.OST_StructuralFraming;
+            yield return BuiltInCategory.OST_Floors;
+            yield return BuiltInCategory.OST_StructuralTruss;
+        }
+
+        private IEnumerable<BuiltInCategory> GetLevelStairsProviderCategories() {
+            yield return BuiltInCategory.OST_StairsRuns;
+            yield return BuiltInCategory.OST_StairsLandings;
         }
 
         private IEnumerable<BuiltInCategory> GetLevelNearestProviderCategories() {
