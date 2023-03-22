@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -19,14 +20,22 @@ namespace RevitSetLevelSection.Factories.ElementPositions
             _resolutionRoot = resolutionRoot;
         }
         
+        public bool CanCreate(Element element) {
+            return element.InAnyCategory(GetAllCategories());
+        }
+        
         public IElementPosition Create(Element element) {
             if(element.InAnyCategory(GetElementBottomPositionCategories())) {
                 return _resolutionRoot.Get<ElementBottomPosition>();
             } 
             
-            return null;
+            throw new ArgumentException($"Переданный элемент \"{element.Id}\" с категорией \"{element.Category.Name}\" не поддерживается.");
         }
-        
+
+        private IEnumerable<BuiltInCategory> GetAllCategories() {
+            return GetElementBottomPositionCategories();
+        }
+
         private IEnumerable<BuiltInCategory> GetElementBottomPositionCategories() {
             yield return BuiltInCategory.OST_DuctCurves;
             yield return BuiltInCategory.OST_FlexDuctCurves;

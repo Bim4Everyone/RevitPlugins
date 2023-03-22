@@ -1,4 +1,8 @@
-﻿using Autodesk.Revit.DB;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
@@ -15,21 +19,38 @@ namespace RevitSetLevelSection.Factories.ElementPositions {
         public KRElementPositionFactory(IResolutionRoot resolutionRoot) {
             _resolutionRoot = resolutionRoot;
         }
+        
+        public bool CanCreate(Element element) {
+            return element.InAnyCategory(GetAllCategories());
+        }
 
         public IElementPosition Create(Element element) {
-            if(element.InAnyCategory(BuiltInCategory.OST_StructuralFoundation,
-                   BuiltInCategory.OST_EdgeSlab,
-                   BuiltInCategory.OST_StructuralFraming,
-                   BuiltInCategory.OST_Floors,
-                   BuiltInCategory.OST_StructuralTruss)) {
+            if(element.InAnyCategory(GetElementTopPositionCategories())) {
                 return _resolutionRoot.Get<ElementTopPosition>();
-            } else if(element.InAnyCategory(BuiltInCategory.OST_Walls,
-                          BuiltInCategory.OST_StructuralColumns,
-                          BuiltInCategory.OST_Stairs)) {
+            } else if(element.InAnyCategory(GetElementBottomPositionCategories())) {
                 return _resolutionRoot.Get<ElementBottomPosition>();
             }
             
-            return null;
+            throw new ArgumentException($"Переданный элемент \"{element.Id}\" с категорией \"{element.Category.Name}\" не поддерживается.");
+        }
+
+        private IEnumerable<BuiltInCategory> GetAllCategories() {
+            return GetElementTopPositionCategories()
+                .Union(GetElementBottomPositionCategories());
+        }
+
+        private IEnumerable<BuiltInCategory> GetElementTopPositionCategories() {
+            yield return BuiltInCategory.OST_StructuralFoundation;
+            yield return BuiltInCategory.OST_EdgeSlab;
+            yield return BuiltInCategory.OST_StructuralFraming;
+            yield return BuiltInCategory.OST_Floors;
+            yield return BuiltInCategory.OST_StructuralTruss;
+        }
+        
+        private IEnumerable<BuiltInCategory> GetElementBottomPositionCategories() {
+            yield return BuiltInCategory.OST_Walls;
+            yield return BuiltInCategory.OST_StructuralColumns;
+            yield return BuiltInCategory.OST_Stairs;
         }
     }
 }
