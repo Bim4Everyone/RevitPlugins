@@ -9,8 +9,6 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using DevExpress.Xpf.Core.FilteringUI;
-
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SharedParams;
@@ -22,8 +20,6 @@ using dosymep.SimpleServices;
 using RevitSetLevelSection.Factories;
 using RevitSetLevelSection.Models.ElementPositions;
 using RevitSetLevelSection.Models.LevelProviders;
-
-using InvalidOperationException = Autodesk.Revit.Exceptions.InvalidOperationException;
 
 namespace RevitSetLevelSection.Models {
     internal class RevitRepository {
@@ -95,8 +91,7 @@ namespace RevitSetLevelSection.Models {
         public void UpdateElements(ParamOption paramOption, Transform transform,
             IEnumerable<FamilyInstance> massElements) {
             List<Element> elements = GetElements(paramOption.RevitParam);
-            var cashedElements = elements.ToDictionary(item => item.Id);
-
+            
             using(Transaction transaction =
                   Document.StartTransaction($"Установка уровня/секции \"{paramOption.RevitParam.Name}\"")) {
 
@@ -104,48 +99,33 @@ namespace RevitSetLevelSection.Models {
                     .ForPluginContext("Установка уровня\\секции");
 
                 var intersectImpl = new IntersectImpl() {LinkedTransform = transform, Application = Application};
-                foreach(Element element in elements) {
-                    if(!cashedElements.ContainsKey(element.Id)) {
-                        continue;
-                    }
 
-                    int? skip = element.GetParamValueOrDefault<int?>(SharedParamsConfig.Instance.FixBuildingWorks);
-                    if(skip == 1) {
-                        cashedElements.Remove(element.Id);
-                        continue;
-                    }
+                var skipParam = SharedParamsConfig.Instance.FixBuildingWorks;
+                var objects = elements
+                    .Where(item => item.GetParamValueOrDefault<int?>(skipParam) != 1)
+                    .Select(item => new {
+                        Element = item,
+                        MassObject = massElements.FirstOrDefault(mass => intersectImpl.IsIntersect(mass, item))
+                    })
+                    .ToList();
 
-                    foreach(FamilyInstance massObject in massElements) {
-                        if(intersectImpl.IsIntersect(massObject, element)) {
-                            try {
-                                string paramValue = massObject.GetParamValue<string>(paramOption);
-                                element.SetParamValue(paramOption.RevitParam, paramValue);
+                foreach(var element in objects) {
+                    try {
+                        string paramValue = element.MassObject?.GetParamValue<string>(paramOption);
+                        element.Element.SetParamValue(paramOption.RevitParam, paramValue);
 
-                                if(!string.IsNullOrEmpty(paramOption.AdskParamName)
-                                   && element.IsExistsSharedParam(paramOption.AdskParamName)) {
-                                    element.SetSharedParamValue(paramOption.AdskParamName, paramValue);
-                                }
-                            } catch(InvalidOperationException ex) {
-                                // решили что существует много вариантов,
-                                // когда параметр не может заполнится из-за настроек в ревите
-                                // Например: базовая стена внутри составной
-
-                                logger.Warning(ex,
-                                    "Не был обновлен элемент {@elementId} в документе {documentId}.",
-                                    element.Id.IntegerValue, Document.GetUniqId());
-                            }
-
-                            cashedElements.Remove(element.Id);
-                            break;
+                        if(!string.IsNullOrEmpty(paramOption.AdskParamName)
+                           && element.Element.IsExistsSharedParam(paramOption.AdskParamName)) {
+                            element.Element.SetSharedParamValue(paramOption.AdskParamName, paramValue);
                         }
-                    }
-                }
+                    } catch(InvalidOperationException ex) {
+                        // решили что существует много вариантов,
+                        // когда параметр не может заполнится из-за настроек в ревите
+                        // Например: базовая стена внутри составной
 
-                foreach(Element element in cashedElements.Values) {
-                    element.RemoveParamValue(paramOption.RevitParam);
-                    if(!string.IsNullOrEmpty(paramOption.AdskParamName)
-                       && element.IsExistsSharedParam(paramOption.AdskParamName)) {
-                        element.RemoveSharedParamValue(paramOption.AdskParamName);
+                        logger.Warning(ex,
+                            "Не был обновлен элемент {@elementId} в документе {documentId}.",
+                            element.Element.Id.IntegerValue, Document.GetUniqId());
                     }
                 }
 
