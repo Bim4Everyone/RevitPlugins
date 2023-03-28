@@ -24,11 +24,9 @@ namespace RevitRooms.ViewModels {
                 Phase = new PhaseViewModel(phase, revitRepository);
             }
 
-            var segments = Element.GetBoundarySegments(new SpatialElementBoundaryOptions());
-            var segment = segments.FirstOrDefault();
-            IsCountourIntersect = GetCountourIntersect(segment);
-
+            IsCountourIntersect = element.IsSelfCrossBoundaries();
             if(RoomArea == null || RoomArea == 0) {
+                var segments = Element.GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions);
                 IsRedundant = segments.Count > 0;
                 NotEnclosed = segments.Count == 0;
             }
@@ -135,37 +133,6 @@ namespace RevitRooms.ViewModels {
         private Element GetParamElement(RevitParam revitParam) {
             ElementId elementId = (ElementId) Element.GetParamValueOrDefault(revitParam);
             return elementId == null ? null : Element.Document.GetElement(elementId);
-        }
-
-        private bool? GetCountourIntersect(IList<BoundarySegment> boundarySegment) {
-            if(boundarySegment == null) {
-                return null;
-            }
-
-            var curves = boundarySegment
-                .Select(item => item.GetCurve())
-                .ToArray();
-
-            var array = new IntersectionResultArray();
-
-            // идет проверка через один элемент
-            // потому что соседние элементы пересекаются между собой
-            for(int i = 0; i < curves.Length - 2; i++) {
-                var firstCurve = curves[i];
-                for(int j = i + 2; j < curves.Length; j++) {
-                    if(i == 0 && j == (curves.Length - 1)) {
-                        continue;
-                    }
-
-                    var secondCurve = curves[j];
-                    var intersect = firstCurve.Intersect(secondCurve, out array);
-                    if(intersect == SetComparisonResult.Overlap) {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
         }
     }
 }
