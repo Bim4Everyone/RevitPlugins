@@ -2,31 +2,34 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vms="clr-namespace:RevitSetLevelSection.ViewModels"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors">
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:views="clr-namespace:RevitSetLevelSection.Views">
 
     <DataTemplate DataType="{x:Type vms:FillLevelParamViewModel}">
-        <DockPanel>
-            <dxe:CheckEdit
-                Margin="10"
-                EditValue="{Binding IsEnabled}">
-                <TextBlock Text="{Binding Name}" />
-            </dxe:CheckEdit>
+        <views:SimpleItemView>
+            <views:SimpleItemView.Title>
+                <dxe:CheckEdit
+                    EditValue="{Binding IsEnabled}">
+                    <TextBlock Text="{Binding Name}" />
+                </dxe:CheckEdit>
+            </views:SimpleItemView.Title>
 
-            <dxe:ListBoxEdit
-                Margin="10"
-                StyleSettings="{dxe:RadioListBoxEditStyleSettings}"
-                DisplayMember="Name"
-                IsEnabled="{Binding IsEnabled}"
-                ItemsSource="{Binding BuildParts}"
-                EditValue="{Binding BuildPart}">
+            <views:SimpleItemView.Right>
+                <dxe:ListBoxEdit
+                    DisplayMember="Name"
+                    ShowBorder="False"
+                    StyleSettings="{dxe:RadioListBoxEditStyleSettings}"
+                    IsEnabled="{Binding IsEnabled}"
+                    ItemsSource="{Binding BuildParts}"
+                    EditValue="{Binding BuildPart}">
 
-                <dxe:ListBoxEdit.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </dxe:ListBoxEdit.ItemsPanel>
-            </dxe:ListBoxEdit>
-        </DockPanel>
-
+                    <dxe:ListBoxEdit.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </dxe:ListBoxEdit.ItemsPanel>
+                </dxe:ListBoxEdit>
+            </views:SimpleItemView.Right>
+        </views:SimpleItemView>
     </DataTemplate>
 </ResourceDictionary>
