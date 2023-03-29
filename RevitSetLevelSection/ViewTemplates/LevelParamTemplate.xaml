@@ -6,7 +6,10 @@
     xmlns:views="clr-namespace:RevitSetLevelSection.Views">
 
     <DataTemplate DataType="{x:Type vms:FillLevelParamViewModel}">
-        <views:SimpleItemView>
+        <views:SimpleItemView
+            Padding="0 5"
+            BorderBrush="Gray"
+            BorderThickness="0 1 0 0">
             <views:SimpleItemView.Title>
                 <dxe:CheckEdit
                     EditValue="{Binding IsEnabled}">

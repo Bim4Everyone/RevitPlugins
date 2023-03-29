@@ -69,7 +69,10 @@
         
         <views:SimpleItemView
             Grid.Row="1"
-            Title="Раздел">
+            Title="Раздел (секций и типизации)"
+            Padding="0 5"
+            BorderBrush="Gray"
+            BorderThickness="0 1 0 0">
             <views:SimpleItemView.Right>
                 <DockPanel>
 

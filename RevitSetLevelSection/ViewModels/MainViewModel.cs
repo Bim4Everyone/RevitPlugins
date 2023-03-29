@@ -71,10 +71,10 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         private IEnumerable<FillParamViewModel> GetFillParams() {
-            yield return _viewModelFactory.Create(SharedParamsConfig.Instance.BuildingWorksLevel);
             yield return _viewModelFactory.Create(ParamOption.BuildingWorksBlock);
             yield return _viewModelFactory.Create(ParamOption.BuildingWorksSection);
             yield return _viewModelFactory.Create(ParamOption.BuildingWorksTyping);
+            yield return _viewModelFactory.Create(SharedParamsConfig.Instance.BuildingWorksLevel);
         }
 
         private void LoadView(object obj) {
