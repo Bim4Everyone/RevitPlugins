@@ -34,7 +34,7 @@
             EventName="Loaded"
             Command="{Binding LoadViewCommand}" />
     </dxmvvm:Interaction.Behaviors>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -48,47 +48,42 @@
         <views:SimpleItemView
             Grid.Row="0"
             Title="Координационный файл">
-            <views:SimpleItemView.Right>
-                <DockPanel>
-                    <dx:SimpleButton
-                        DockPanel.Dock="Right"
-                        Width="80"
-                        Margin="10 0 0 0"
-                        Content="Загрузить"
-                        ToolTip="Загрузить координационный файл"
-                        Command="{Binding LinkType.LoadLinkDocumentCommand}" />
+            <DockPanel>
+                <dx:SimpleButton
+                    DockPanel.Dock="Right"
+                    Width="80"
+                    Margin="10 0 0 0"
+                    Content="Загрузить"
+                    ToolTip="Загрузить координационный файл"
+                    Command="{Binding LinkType.LoadLinkDocumentCommand}" />
 
-                    <dxe:ComboBoxEdit
-                        DisplayMember="Name"
-                        IsTextEditable="False"
-                        SelectedItem="{Binding LinkType}"
-                        ItemsSource="{Binding LinkTypes}" />
-                </DockPanel>
-            </views:SimpleItemView.Right>
+                <dxe:ComboBoxEdit
+                    DisplayMember="Name"
+                    IsTextEditable="False"
+                    SelectedItem="{Binding LinkType}"
+                    ItemsSource="{Binding LinkTypes}" />
+            </DockPanel>
         </views:SimpleItemView>
-        
+
         <views:SimpleItemView
             Grid.Row="1"
             Title="Раздел (секций и типизации)"
             Padding="0 5"
             BorderBrush="Gray"
             BorderThickness="0 1 0 0">
-            <views:SimpleItemView.Right>
-                <DockPanel>
-
-                    <dxe:ComboBoxEdit
-                        IsTextEditable="False"
-                        EditValue="{Binding LinkType.BuildPart,
+            <DockPanel>
+                <dxe:ComboBoxEdit
+                    IsTextEditable="False"
+                    EditValue="{Binding LinkType.BuildPart,
                     UpdateSourceTrigger=PropertyChanged}"
-                        ItemsSource="{Binding LinkType.BuildParts}">
-                        <dxmvvm:Interaction.Behaviors>
-                            <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding UpdateBuildPartCommand}" />
-                        </dxmvvm:Interaction.Behaviors>
-                    </dxe:ComboBoxEdit>
-                </DockPanel>
-            </views:SimpleItemView.Right>
+                    ItemsSource="{Binding LinkType.BuildParts}">
+                    <dxmvvm:Interaction.Behaviors>
+                        <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding UpdateBuildPartCommand}" />
+                    </dxmvvm:Interaction.Behaviors>
+                </dxe:ComboBoxEdit>
+            </DockPanel>
         </views:SimpleItemView>
-        
+
         <ItemsControl
             Grid.Row="4"
             ItemsSource="{Binding FillParams}" />

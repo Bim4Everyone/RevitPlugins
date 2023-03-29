@@ -17,46 +17,44 @@
                 </dxe:CheckEdit>
             </views:SimpleItemView.Title>
 
-            <views:SimpleItemView.Right>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="0.3*" />
-                        <ColumnDefinition Width="20" />
-                    </Grid.ColumnDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="0.3*" />
+                    <ColumnDefinition Width="20" />
+                </Grid.ColumnDefinitions>
 
-                    <dxe:ComboBoxEdit
-                        Grid.Column="0"
-                        IsTextEditable="False"
-                        DisplayMember="Name"
-                        IsEnabled="{Binding IsEnabled}"
-                        EditValue="{Binding DesignOption, UpdateSourceTrigger=PropertyChanged}"
-                        ItemsSource="{Binding DataContext.LinkType.DesignOptions, ElementName=_this}">
+                <dxe:ComboBoxEdit
+                    Grid.Column="0"
+                    IsTextEditable="False"
+                    DisplayMember="Name"
+                    IsEnabled="{Binding IsEnabled}"
+                    EditValue="{Binding DesignOption, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding DataContext.LinkType.DesignOptions, ElementName=_this}">
 
-                        <dxmvvm:Interaction.Behaviors>
-                            <dxmvvm:EventToCommand EventName="EditValueChanged"
-                                                   Command="{Binding CheckRussianTextCommand}" />
-                        </dxmvvm:Interaction.Behaviors>
+                    <dxmvvm:Interaction.Behaviors>
+                        <dxmvvm:EventToCommand EventName="EditValueChanged"
+                                               Command="{Binding CheckRussianTextCommand}" />
+                    </dxmvvm:Interaction.Behaviors>
 
-                    </dxe:ComboBoxEdit>
+                </dxe:ComboBoxEdit>
 
-                    <dxe:ComboBoxEdit
-                        Grid.Column="1"
-                        Margin="5 0"
-                        IsEnabled="False"
-                        IsTextEditable="False"
-                        EditValue="{Binding Path=SelectedParamName}" />
+                <dxe:ComboBoxEdit
+                    Grid.Column="1"
+                    Margin="5 0"
+                    IsEnabled="False"
+                    IsTextEditable="False"
+                    EditValue="{Binding Path=SelectedParamName}" />
 
-                    <Image
-                        Grid.Column="2"
-                        Height="20"
-                        Source="../Resources/icons8-error-96.png"
-                        ToolTip="{Binding ErrorText}"
-                        Visibility="{Binding ErrorText,
+                <Image
+                    Grid.Column="2"
+                    Height="20"
+                    Source="../Resources/icons8-error-96.png"
+                    ToolTip="{Binding ErrorText}"
+                    Visibility="{Binding ErrorText,
                                      Converter={StaticResource StringToVisibilityConverter}}" />
 
-                </Grid>
-            </views:SimpleItemView.Right>
+            </Grid>
         </views:SimpleItemView>
     </DataTemplate>
 </ResourceDictionary>

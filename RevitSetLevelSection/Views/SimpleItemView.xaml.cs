@@ -1,7 +1,10 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace RevitSetLevelSection.Views {
+    [DefaultProperty(nameof(Right))]
+    [System.Windows.Markup.ContentProperty(nameof(Right))]
     public partial class SimpleItemView {
         public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(
             nameof(Title), typeof(object), 

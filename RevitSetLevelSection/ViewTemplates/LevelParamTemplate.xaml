@@ -10,6 +10,7 @@
             Padding="0 5"
             BorderBrush="Gray"
             BorderThickness="0 1 0 0">
+
             <views:SimpleItemView.Title>
                 <dxe:CheckEdit
                     EditValue="{Binding IsEnabled}">
@@ -17,22 +18,20 @@
                 </dxe:CheckEdit>
             </views:SimpleItemView.Title>
 
-            <views:SimpleItemView.Right>
-                <dxe:ListBoxEdit
-                    DisplayMember="Name"
-                    ShowBorder="False"
-                    StyleSettings="{dxe:RadioListBoxEditStyleSettings}"
-                    IsEnabled="{Binding IsEnabled}"
-                    ItemsSource="{Binding BuildParts}"
-                    EditValue="{Binding BuildPart}">
+            <dxe:ListBoxEdit
+                DisplayMember="Name"
+                ShowBorder="False"
+                StyleSettings="{dxe:RadioListBoxEditStyleSettings}"
+                IsEnabled="{Binding IsEnabled}"
+                ItemsSource="{Binding BuildParts}"
+                EditValue="{Binding BuildPart}">
 
-                    <dxe:ListBoxEdit.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </dxe:ListBoxEdit.ItemsPanel>
-                </dxe:ListBoxEdit>
-            </views:SimpleItemView.Right>
+                <dxe:ListBoxEdit.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </dxe:ListBoxEdit.ItemsPanel>
+            </dxe:ListBoxEdit>
         </views:SimpleItemView>
     </DataTemplate>
 </ResourceDictionary>
