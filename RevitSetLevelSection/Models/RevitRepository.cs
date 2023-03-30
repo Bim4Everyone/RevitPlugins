@@ -43,12 +43,17 @@ namespace RevitSetLevelSection.Models {
         public TransactionGroup StartTransactionGroup(string transactionGroupName) {
             return Document.StartTransactionGroup(transactionGroupName);
         }
+        
+        public bool IsKoordFile() {
+            return _bimModelPartsService.InAnyBimModelParts(Document, BimModelPart.KOORDPart);
+        }
 
-        public IEnumerable<RevitLinkType> GetRevitLinkTypes() {
+        public IEnumerable<RevitLinkType> GetKoordLinkTypes() {
             return new FilteredElementCollector(Document)
                 .WhereElementIsElementType()
                 .OfClass(typeof(RevitLinkType))
                 .OfType<RevitLinkType>()
+                .Where(item => _bimModelPartsService.InAnyBimModelParts(item, BimModelPart.KOORDPart))
                 .ToList();
         }
 

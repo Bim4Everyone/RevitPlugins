@@ -23,7 +23,6 @@ namespace RevitSetLevelSection.Models {
     }
 
     public class RevitSettings : ProjectSettings {
-        public int LinkFileId { get; set; }
         public string BuildPart { get; set; }
         public override string ProjectName { get; set; }
 

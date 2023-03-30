@@ -66,7 +66,7 @@ namespace RevitSetLevelSection.ViewModels {
         }
         
         private IEnumerable<LinkTypeViewModel> GetLinkTypes() {
-            return _revitRepository.GetRevitLinkTypes()
+            return _revitRepository.GetKoordLinkTypes()
                 .Select(item => _viewModelFactory.Create(item));
         }
 
@@ -80,6 +80,11 @@ namespace RevitSetLevelSection.ViewModels {
         private void LoadView(object obj) {
             LinkTypes = new ObservableCollection<LinkTypeViewModel>(GetLinkTypes());
             FillParams = new ObservableCollection<FillParamViewModel>(GetFillParams());
+            
+            // После присвоения выполняется
+            // команда обновления раздела,
+            // которой требуются заполненные параметры
+            LinkType = LinkTypes.FirstOrDefault();
             
             SetConfig();
         }
@@ -141,14 +146,8 @@ namespace RevitSetLevelSection.ViewModels {
                 return;
             }
 
-            LinkType = LinkTypes
-                           .FirstOrDefault(item => item.Id == settings.LinkFileId)
-                       ?? LinkTypes.FirstOrDefault();
-
             if(LinkType != null) {
-                LinkType.BuildPart = LinkType?.BuildParts.Contains(settings.BuildPart) == true
-                    ? settings.BuildPart
-                    : null;
+                LinkType.BuildPart = LinkType.BuildParts.FirstOrDefault(item => item.Equals(settings.BuildPart));
             }
 
             foreach(FillParamViewModel fillParam in FillParams) {
@@ -169,7 +168,6 @@ namespace RevitSetLevelSection.ViewModels {
             }
 
             settings.BuildPart = LinkType.BuildPart;
-            settings.LinkFileId = LinkType.Id;
             settings.ParamSettings.Clear();
             foreach(FillParamViewModel fillParam in FillParams) {
                 ParamSettings paramSettings = fillParam.GetParamSettings();

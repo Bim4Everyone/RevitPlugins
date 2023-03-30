@@ -58,6 +58,7 @@
                     Command="{Binding LinkType.LoadLinkDocumentCommand}" />
 
                 <dxe:ComboBoxEdit
+                    IsEnabled="False"
                     DisplayMember="Name"
                     IsTextEditable="False"
                     SelectedItem="{Binding LinkType}"
