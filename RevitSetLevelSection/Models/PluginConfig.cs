@@ -30,8 +30,8 @@ namespace RevitSetLevelSection.Models {
     }
 
     public class ParamSettings {
+        public int? BuildPartId { get; set; }
         public int? DesignOptionId { get; set; }
-        
         public string ParamId { get; set; }
         public bool IsEnabled { get; set; }
     }

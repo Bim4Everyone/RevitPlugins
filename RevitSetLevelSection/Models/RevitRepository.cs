@@ -166,6 +166,10 @@ namespace RevitSetLevelSection.Models {
         }
         
         public MainBimBuildPart GetBuildPart() {
+            if(_bimModelPartsService.GetBimModelPart(Document) == null) {
+                return null;
+            }
+            
             if(_bimModelPartsService.InAnyBimModelParts(Document, BimModelPart.ARPart, BimModelPart.GPPart)) {
                 return MainBimBuildPart.ARPart;
             }

@@ -59,13 +59,17 @@ namespace RevitSetLevelSection.ViewModels {
             if(!IsEnabled) {
                 return null;
             }
-            
+
             if(_mainViewModel.LinkType?.HasAreaScheme == false) {
                 return "Выбранная связь не содержит схему зонирования.";
             }
             
             if(_mainViewModel.LinkType?.HasAreas == false) {
                 return "Выбранная связь не содержит зоны.";
+            }
+            
+            if(BuildPart == null) {
+                return "Выберите раздел для параметра.";
             }
 
             return null;
@@ -79,12 +83,14 @@ namespace RevitSetLevelSection.ViewModels {
         public override ParamSettings GetParamSettings() {
             return new ParamSettings() {
                 IsEnabled = IsEnabled, 
-                ParamId = RevitParam.Id
+                ParamId = RevitParam.Id,
+                BuildPartId = BuildPart?.Id
             };
         }
 
         public override void SetParamSettings(ParamSettings paramSettings) {
             IsEnabled = paramSettings.IsEnabled;
+            BuildPart = BuildParts.FirstOrDefault(item => item.Id == paramSettings.BuildPartId) ?? BuildPart;
         }
     }
 }
