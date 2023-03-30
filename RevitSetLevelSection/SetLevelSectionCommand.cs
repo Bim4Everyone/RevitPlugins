@@ -47,19 +47,19 @@ namespace RevitSetLevelSection {
 
                 kernel.Bind<IBimModelPartsService>()
                     .ToMethod(c => GetPlatformService<IBimModelPartsService>());
-                
+
                 kernel.Bind<ARElementPositionFactory>().ToSelf().InSingletonScope();
                 kernel.Bind<KRElementPositionFactory>().ToSelf().InSingletonScope();
                 kernel.Bind<VISElementPositionFactory>().ToSelf().InSingletonScope();
-                
+
                 kernel.Bind<ARLevelProviderFactory>().ToSelf().InSingletonScope();
                 kernel.Bind<KRLevelProviderFactory>().ToSelf().InSingletonScope();
                 kernel.Bind<VISLevelProviderFactory>().ToSelf().InSingletonScope();
-                
+
                 kernel.Bind<ElementBottomPosition>().ToSelf().InSingletonScope();
                 kernel.Bind<ElementMiddlePosition>().ToSelf().InSingletonScope();
                 kernel.Bind<ElementTopPosition>().ToSelf().InSingletonScope();
-                
+
                 kernel.Bind<LevelBottomProvider>().ToSelf();
                 kernel.Bind<LevelByIdProvider>().ToSelf();
                 kernel.Bind<LevelMagicBottomProvider>().ToSelf();
@@ -89,16 +89,9 @@ namespace RevitSetLevelSection {
                         c => c.Kernel.Get<MainViewModel>());
 
                 UpdateParams(uiApplication);
-                MainWindow window = kernel.Get<MainWindow>();
-                if(window.ShowDialog() == true) {
-                    GetPlatformService<INotificationService>()
-                        .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                        .ShowAsync();
-                } else {
-                    GetPlatformService<INotificationService>()
-                        .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                        .ShowAsync();
-                }
+
+                Check(kernel);
+                ShowDialog(kernel);
             }
         }
 
@@ -110,6 +103,28 @@ namespace RevitSetLevelSection {
                 SharedParamsConfig.Instance.BuildingWorksSection,
                 SharedParamsConfig.Instance.BuildingWorksTyping,
                 SharedParamsConfig.Instance.FixBuildingWorks);
+        }
+
+        private void Check(IKernel kernel) {
+            var revitRepository = kernel.Get<RevitRepository>();
+            if(revitRepository.IsKoordFile()) {
+                TaskDialog.Show(PluginName,
+                    $"Данный скрипт не работает в координационном файле.");
+                throw new OperationCanceledException();
+            }
+        }
+
+        private void ShowDialog(IKernel kernel) {
+            MainWindow window = kernel.Get<MainWindow>();
+            if(window.ShowDialog() == true) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
+            }
         }
     }
 }
