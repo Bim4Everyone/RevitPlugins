@@ -54,7 +54,8 @@
                     Width="80"
                     Margin="10 0 0 0"
                     Content="Загрузить"
-                    ToolTip="Загрузить координационный файл"
+                    ToolTipService.ShowOnDisabled="True"
+                    ToolTip="{Binding LinkType.LinkLoadToolTip}"
                     Command="{Binding LinkType.LoadLinkDocumentCommand}" />
 
                 <dxe:ComboBoxEdit

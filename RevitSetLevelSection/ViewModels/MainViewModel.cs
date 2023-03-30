@@ -115,7 +115,7 @@ namespace RevitSetLevelSection.ViewModels {
                 return false;
             }
 
-            if(LinkType != null && !LinkType.IsLoaded) {
+            if(LinkType != null && !LinkType.IsLinkLoaded) {
                 ErrorText = "Выбранная связь выгружена.";
                 return false;
             }

@@ -32,6 +32,10 @@ namespace RevitSetLevelSection.Models {
 
         public Transform Transform { get; private set; }
 
+        public Workset GetWorkset() {
+            return _revitRepository.Document.GetWorksetTable().GetWorkset(_revitLinkType.WorksetId);
+        }
+
         public IEnumerable<DesignOption> GetDesignOptions() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
@@ -61,15 +65,6 @@ namespace RevitSetLevelSection.Models {
         }
 
         public bool LoadLinkDocument() {
-            if(_revitLinkType.GetLinkedFileStatus() == LinkedFileStatus.InClosedWorkset) {
-                Workset workset = _revitRepository.GetWorkset(_revitLinkType);
-                TaskDialog.Show("Предупреждение!", $"Откройте рабочий набор \"{workset.Name}\"."
-                                                   + Environment.NewLine
-                                                   + "Загрузка связанного файла из закрытого рабочего набора не поддерживается!");
-
-                return false;
-            }
-
             var loadResult = _revitLinkType.Load();
             if(loadResult.LoadResult == LinkLoadResultType.LinkLoaded) {
                 Update();
