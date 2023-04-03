@@ -31,12 +31,18 @@ namespace RevitLintelPlacement.Models {
         private readonly UIDocument _uiDocument;
         private readonly RevitEventHandler _revitEventHandler;
 
+        private readonly double _baseHeight;
+
         public RevitRepository(Application application, Document document, LintelsConfig lintelsConfig) {
             _application = application;
             _uiApplication = new UIApplication(application);
 
             _document = document;
             _uiDocument = new UIDocument(document);
+            
+            // Получаем высоту базовой точки, 
+            // так как она влияет на вставку элементов (перемычки)
+            _baseHeight = BasePoint.GetProjectBasePoint(_document).Position.Z;
 
             _revitEventHandler = new RevitEventHandler();
 
@@ -527,7 +533,9 @@ namespace RevitLintelPlacement.Models {
                 var topBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
                 z = topBarHeight /*+ (level?.Elevation ?? 0)*/;
             }
-            return new XYZ(location.X, location.Y, z);
+
+            // Компенсируем высоту базовой точки
+            return new XYZ(location.X, location.Y, z - _baseHeight);
         }
 
         public bool CheckLintelType(FamilySymbol lintelType, ElementInfosViewModel elementInfos) {
