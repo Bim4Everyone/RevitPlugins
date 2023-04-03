@@ -513,25 +513,28 @@ namespace RevitLintelPlacement.Models {
             if(elementInWall is null) {
                 throw new ArgumentNullException(nameof(elementInWall));
             }
-            var location = ((LocationPoint) elementInWall.Location).Point;
-            //var level = _document.GetElement(elementInWall.LevelId) as Level;
-            var height = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningHeight)
-               ?? elementInWall.Symbol.GetParamValueOrDefault(LintelsCommonConfig.OpeningHeight);
 
-            var bottomBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
+            var location = ((LocationPoint) elementInWall.Location).Point;
+            var height = elementInWall.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningHeight)
+                         ?? elementInWall.Symbol.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningHeight);
+
+            var bottomBarHeight =
+                elementInWall.GetParamValueOrDefault<double>(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
             if(bottomBarHeight == 0) {
-                bottomBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_ELEVATION_PARAM);
+                bottomBarHeight =
+                    elementInWall.GetParamValueOrDefault<double>(BuiltInParameter.INSTANCE_ELEVATION_PARAM);
             }
+
             if(bottomBarHeight == 0) {
-                bottomBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_FREE_HOST_OFFSET_PARAM);
+                bottomBarHeight =
+                    elementInWall.GetParamValueOrDefault<double>(BuiltInParameter.INSTANCE_FREE_HOST_OFFSET_PARAM);
             }
 
             double z;
-            if(height != null) {
-                z = (double) height + (double) bottomBarHeight /*+ (level?.Elevation ?? 0)*/;
+            if(height.HasValue) {
+                z = height.Value + bottomBarHeight;
             } else {
-                var topBarHeight = (double) elementInWall.GetParamValueOrDefault(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
-                z = topBarHeight /*+ (level?.Elevation ?? 0)*/;
+                z = elementInWall.GetParamValueOrDefault<double>(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
             }
 
             // Компенсируем высоту базовой точки
