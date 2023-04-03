@@ -269,7 +269,7 @@ namespace RevitLintelPlacement.Models {
         //проверка, есть ли сверху элемента стена, у которой тип железобетон (в таком случает перемычку ставить не надо)
         public bool CheckUp(View3D view3D, FamilyInstance elementInWall, IEnumerable<string> linkNames) {
             XYZ viewPoint = GetLocationPoint(elementInWall);
-            viewPoint = new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z + (((Level) _document.GetElement(elementInWall.LevelId))?.Elevation ?? 0));
+            viewPoint = new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z + GetElevation(elementInWall));
             ReferenceWithContext refWithContext =
                 GetNearestWallOrColumn(view3D, elementInWall, new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z - 0.32), new XYZ(0, 0, 1), false); //чтобы точка точно была под гранью стены
             if(refWithContext == null)
@@ -315,7 +315,7 @@ namespace RevitLintelPlacement.Models {
             //получение предполагаемой точки вставки перемычки,
             //из которой проводится поиск жб-элементов
             XYZ viewPoint = GetLocationPoint(elementInWall);
-            viewPoint = new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z + (((Level) _document.GetElement(elementInWall.LevelId))?.Elevation ?? 0));
+            viewPoint = new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z + GetElevation(elementInWall));
 
             //направление, в котором будет проводиться поиск
             direction = elementInWall.GetTransform().OfVector(direction);
@@ -509,6 +509,15 @@ namespace RevitLintelPlacement.Models {
             return true;
         }
 
+        /// <summary>
+        /// Возвращает высоту уровня с учетом базовой точки.
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns>Возвращает высоту уровня с учетом базовой точки.</returns>
+        private double GetElevation(FamilyInstance element) {
+            return ((Level) _document.GetElement(element.LevelId)).Elevation + _baseHeight;
+        }
+
         public XYZ GetLocationPoint(FamilyInstance elementInWall) {
             if(elementInWall is null) {
                 throw new ArgumentNullException(nameof(elementInWall));
@@ -536,9 +545,8 @@ namespace RevitLintelPlacement.Models {
             } else {
                 z = elementInWall.GetParamValueOrDefault<double>(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
             }
-
-            // Компенсируем высоту базовой точки
-            return new XYZ(location.X, location.Y, z - _baseHeight);
+            
+            return new XYZ(location.X, location.Y, z);
         }
 
         public bool CheckLintelType(FamilySymbol lintelType, ElementInfosViewModel elementInfos) {
