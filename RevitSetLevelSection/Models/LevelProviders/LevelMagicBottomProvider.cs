@@ -20,7 +20,7 @@ namespace RevitSetLevelSection.Models.LevelProviders {
             double position = _elementPosition.GetPosition(element);
             return levels.OrderBy(item => item.Elevation)
                 .Where(item => _levelElevationService.GetElevation(item) < position)
-                .FirstOrDefault(item=> Math.Abs(item.Elevation - position) > 4.92125984251969);
+                .FirstOrDefault(item=> Math.Abs(item.Elevation - position) > 4.92125984251969); // больше 1500мм
         }
     }
 }
