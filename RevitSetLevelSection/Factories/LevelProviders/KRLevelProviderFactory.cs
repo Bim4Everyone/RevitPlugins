@@ -14,7 +14,7 @@ using RevitSetLevelSection.Models;
 using RevitSetLevelSection.Models.LevelProviders;
 
 namespace RevitSetLevelSection.Factories.LevelProviders {
-    internal class KRLevelProviderFactory : ILevelProviderFactory {
+    internal class KRLevelProviderFactory : LevelProviderFactory {
         private readonly IResolutionRoot _resolutionRoot;
         private readonly IElementPositionFactory _positionFactory;
 
@@ -23,12 +23,12 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
             _positionFactory = positionFactory;
         }
 
-        public bool CanCreate(Element element) {
+        protected override bool CanCreateImpl(Element element) {
             return _positionFactory.CanCreate(element)
                    && element.InAnyCategory(GetAllCategories());
         }
 
-        public ILevelProvider Create(Element element) {
+        protected override ILevelProvider CreateImpl(Element element) {
             var elementPosition = _positionFactory.Create(element);
             var constructorArgument = new ConstructorArgument("elementPosition", elementPosition);
 
