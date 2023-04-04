@@ -9,6 +9,8 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using DevExpress.Utils.Extensions;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SharedParams;
@@ -38,6 +40,10 @@ namespace RevitSetLevelSection.Models {
 
         public Element GetElements(ElementId elementId) {
             return Document.GetElement(elementId);
+        }
+
+        public BasePoint GetBasePoint() {
+            return BasePoint.GetProjectBasePoint(Document);
         }
 
         public TransactionGroup StartTransactionGroup(string transactionGroupName) {
@@ -73,10 +79,10 @@ namespace RevitSetLevelSection.Models {
                 var intersectImpl =
                     new IntersectImpl() {Application = Application};
 
-                List<ZoneInfo> zoneInfos = areaRepository.GetAreas();
                 List<Element> elements = GetElements(revitParam);
-
-
+                List<ZoneInfo> zoneInfos = areaRepository.GetAreas();
+                Dictionary<string, Level> levels = GetLevels().ToDictionary(item => item.Name);
+                
                 using(var window = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
                     window.DisplayTitleFormat = "Обработка [{0}\\{1}]";
                     window.MaxValue = elements.Count;
@@ -96,18 +102,27 @@ namespace RevitSetLevelSection.Models {
                             continue;
                         }
 
-                        List<Level> levels = zoneInfos
+                        List<Level> zoneLevels = zoneInfos
                             .Where(item => intersectImpl.IsIntersect(item, element))
-                            .Select(item => item.Level)
+                            .Select(item => levels.GetValueOrDefault(item.Level.Name, null))
+                            .Where(item => item != null)
                             .ToList();
 
-                        var level = providerFactory.Create(element).GetLevel(element, levels);
+                        var level = providerFactory.Create(element).GetLevel(element, zoneLevels);
                         element.SetParamValue(revitParam, level?.Name.Split('_').FirstOrDefault());
                     }
                 }
 
                 transaction.Commit();
             }
+        }
+
+        private List<Level> GetLevels() {
+            return new FilteredElementCollector(Document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(Level))
+                .OfType<Level>()
+                .ToList();
         }
 
         public void UpdateElements(ParamOption paramOption, Transform transform,

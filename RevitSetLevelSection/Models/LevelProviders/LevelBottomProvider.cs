@@ -8,15 +8,17 @@ using RevitSetLevelSection.Models.ElementPositions;
 namespace RevitSetLevelSection.Models.LevelProviders {
     internal class LevelBottomProvider : ILevelProvider {
         private readonly IElementPosition _elementPosition;
+        private readonly ILevelElevationService _levelElevationService;
 
-        public LevelBottomProvider(IElementPosition elementPosition) {
+        public LevelBottomProvider(IElementPosition elementPosition, ILevelElevationService levelElevationService) {
             _elementPosition = elementPosition;
+            _levelElevationService = levelElevationService;
         }
         
         public Level GetLevel(Element element, List<Level> levels) {
             double position = _elementPosition.GetPosition(element);
             return levels.OrderBy(item => item.Elevation)
-                .Where(item => item.Elevation < position)
+                .Where(item => _levelElevationService.GetElevation(item) < position)
                 .FirstOrDefault();
         }
     }

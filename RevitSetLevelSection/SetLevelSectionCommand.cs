@@ -48,6 +48,12 @@ namespace RevitSetLevelSection {
                 kernel.Bind<IBimModelPartsService>()
                     .ToMethod(c => GetPlatformService<IBimModelPartsService>());
 
+                kernel.Bind<ILevelElevationService>()
+                    .To<LevelElevationService>().InSingletonScope();
+
+                kernel.Bind<BasePoint>()
+                    .ToMethod(c => c.Kernel.Get<RevitRepository>().GetBasePoint());
+
                 kernel.Bind<ARElementPositionFactory>().ToSelf().InSingletonScope();
                 kernel.Bind<KRElementPositionFactory>().ToSelf().InSingletonScope();
                 kernel.Bind<VISElementPositionFactory>().ToSelf().InSingletonScope();
