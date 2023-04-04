@@ -102,14 +102,43 @@ namespace RevitSetLevelSection.Models {
                 .FirstOrDefault(item => item.Name.Equals(AreaSchemeName));
         }
 
-        public IEnumerable<Area> GetAreas() {
+        public List<ZoneInfo> GetAreas() {
             var areaFilter = new AreaFilter(GetAreaScheme());
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
                 .OfCategory(BuiltInCategory.OST_Areas)
                 .OfType<Area>()
                 .Where(item => areaFilter.AllowElement(item))
-                .Where(item => HasAreaLevel(item));
+                .Where(item => HasAreaLevel(item))
+                .Select(item => new ZoneInfo() {Area = item, Level = GetLevel(item), Solid = CreateSolid(item)})
+                .ToList();
+        }
+        
+        /// <summary>
+        /// Возвращает трансформированный <see cref="Solid"/> по границам зоны расположенный на Z=0.
+        /// </summary>
+        /// <param name="area">Зона.</param>
+        /// <returns>Возвращает трансформированный <see cref="Solid"/> по границам зоны расположенный на Z=0.</returns>
+        private Solid CreateSolid(Area area) {
+            // Зоны являются замкнутыми и с простым одним контуром
+            var boundarySegments = area.GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions)
+                .First();
+
+            Transform transform = CreateAreaTransform(area);
+            var curves = boundarySegments
+                .Select(item => item.GetCurve())
+                .Select(item => item.CreateTransformed(Transform))
+                .Select(item => item.CreateTransformed(transform))
+                .ToList();
+
+            var curveLoops = new[] {CurveLoop.Create(curves)};
+            return GeometryCreationUtilities.CreateExtrusionGeometry(curveLoops, XYZ.BasisZ, 10);
+        }
+        
+        private Transform CreateAreaTransform(Area area) {
+            XYZ areaPoint = ((LocationPoint) area.Location).Point;
+            areaPoint = Transform.OfPoint(areaPoint);
+            return Transform.CreateTranslation(new XYZ(0, 0, -areaPoint.Z));
         }
 
         public bool HasAreaLevel(Area area) {
@@ -147,10 +176,7 @@ namespace RevitSetLevelSection.Models {
     }
 
     internal interface IAreaRepository {
-        Transform Transform { get; }
-        
-        Level GetLevel(Area area);
-        IEnumerable<Area> GetAreas();
+        List<ZoneInfo> GetAreas();
     }
 
     internal static class Extensions {

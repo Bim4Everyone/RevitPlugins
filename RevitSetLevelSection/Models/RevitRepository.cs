@@ -71,22 +71,39 @@ namespace RevitSetLevelSection.Models {
                   Document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
 
                 var intersectImpl =
-                    new IntersectImpl() {LinkedTransform = areaRepository.Transform, Application = Application};
+                    new IntersectImpl() {Application = Application};
 
-                Area[] areas = areaRepository.GetAreas().ToArray();
-                IEnumerable<Element> elements = GetElements(revitParam);
-                foreach(Element element in elements) {
-                    if(!providerFactory.CanCreate(element)) {
-                        continue;
+                List<ZoneInfo> zoneInfos = areaRepository.GetAreas();
+                List<Element> elements = GetElements(revitParam);
+
+
+                using(var window = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
+                    window.DisplayTitleFormat = "Обработка [{0}\\{1}]";
+                    window.MaxValue = elements.Count;
+                    window.StepValue = 10;
+
+                    var progress = window.CreateProgress();
+                    var cancellationToken = window.CreateCancellationToken();
+
+                    window.Show();
+
+                    int count = 1;
+                    foreach(Element element in elements) {
+                        progress.Report(count++);
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        if(!providerFactory.CanCreate(element)) {
+                            continue;
+                        }
+
+                        List<Level> levels = zoneInfos
+                            .Where(item => intersectImpl.IsIntersect(item, element))
+                            .Select(item => item.Level)
+                            .ToList();
+
+                        var level = providerFactory.Create(element).GetLevel(element, levels);
+                        element.SetParamValue(revitParam, level?.Name.Split('_').FirstOrDefault());
                     }
-                    
-                    List<Level> levels = areas
-                        .Where(item => intersectImpl.IsIntersect(item, element))
-                        .Select(item => areaRepository.GetLevel(item))
-                        .ToList();
-
-                    var level = providerFactory.Create(element).GetLevel(element, levels);
-                    element.SetParamValue(revitParam, level?.Name.Split('_').FirstOrDefault());
                 }
 
                 transaction.Commit();

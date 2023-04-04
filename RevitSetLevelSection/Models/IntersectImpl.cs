@@ -14,9 +14,9 @@ namespace RevitSetLevelSection.Models {
         public Application Application { get; set; }
         public Transform LinkedTransform { get; set; }
 
-        public bool IsIntersect(Area area, Element element) {
+        public bool IsIntersect(ZoneInfo zoneInfo, Element element) {
             var line = GetShortLineInZ(element);
-            var result = CreateSolid(area)?.IntersectWithCurve(line,
+            var result = zoneInfo.Solid?.IntersectWithCurve(line,
                 new SolidCurveIntersectionOptions() {ResultType = SolidCurveIntersectionMode.CurveSegmentsInside});
 
             if(result?.ResultType == SolidCurveIntersectionMode.CurveSegmentsInside) {
@@ -39,27 +39,6 @@ namespace RevitSetLevelSection.Models {
         }
 
         /// <summary>
-        /// Возвращает трансформированный <see cref="Solid"/> по границам зоны расположенный на Z=0.
-        /// </summary>
-        /// <param name="area">Зона.</param>
-        /// <returns>Возвращает трансформированный <see cref="Solid"/> по границам зоны расположенный на Z=0.</returns>
-        private Solid CreateSolid(Area area) {
-            // Зоны являются замкнутыми и с простым одним контуром
-            var boundarySegments = area.GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions)
-                .First();
-
-            Transform transform = CreateAreaTransform(area);
-            var curves = boundarySegments
-                .Select(item => item.GetCurve())
-                .Select(item => item.CreateTransformed(LinkedTransform))
-                .Select(item => item.CreateTransformed(transform))
-                .ToList();
-
-            var curveLoops = new[] {CurveLoop.Create(curves)};
-            return GeometryCreationUtilities.CreateExtrusionGeometry(curveLoops, XYZ.BasisZ, DefaultHeight);
-        }
-
-        /// <summary>
         /// Создает трансформированный общий <see cref="Solid"/> элемента.
         /// </summary>
         /// <param name="element"></param>
@@ -71,12 +50,6 @@ namespace RevitSetLevelSection.Models {
                 .LastOrDefault();
 
             return solid == null ? null : SolidUtils.CreateTransformed(solid, LinkedTransform);
-        }
-        
-        private Transform CreateAreaTransform(Area area) {
-            XYZ areaPoint = ((LocationPoint) area.Location).Point;
-            areaPoint = LinkedTransform.OfPoint(areaPoint);
-            return Transform.CreateTranslation(new XYZ(0, 0, -areaPoint.Z));
         }
 
         private Line GetShortLine(Element element) {
