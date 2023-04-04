@@ -24,17 +24,21 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
         }
 
         protected override bool CanCreateImpl(Element element) {
-            return _positionFactory.CanCreate(element)
-                   && element.InAnyCategory(GetAllCategories());
+            return element.InAnyCategory(GetLevelStairsProviderCategories())
+                   || (_positionFactory.CanCreate(element)
+                       && element.InAnyCategory(GetAllCategories()));
         }
 
         protected override ILevelProvider CreateImpl(Element element) {
-            var elementPosition = _positionFactory.Create(element);
-            var constructorArgument = new ConstructorArgument("elementPosition", elementPosition);
-
             if(element.InAnyCategory(GetLevelNearestProviderCategories())) {
+                var elementPosition = _positionFactory.Create(element);
+                var constructorArgument = new ConstructorArgument("elementPosition", elementPosition);
+
                 return _resolutionRoot.Get<LevelNearestProvider>(constructorArgument);
             } else if(element.InAnyCategory(GetLevelMagicBottomProviderCategories())) {
+                var elementPosition = _positionFactory.Create(element);
+                var constructorArgument = new ConstructorArgument("elementPosition", elementPosition);
+
                 return _resolutionRoot.Get<LevelMagicBottomProvider>(constructorArgument);
             } else if(element.InAnyCategory(GetLevelStairsProviderCategories())) {
                 return _resolutionRoot.Get<LevelStairsProvider>(new ConstructorArgument("factory", this));
@@ -42,7 +46,7 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
 
             throw new ArgumentException($"Переданный элемент \"{element.Id}\" с категорией \"{element.Category.Name}\" не поддерживается.");
         }
-        
+
         private IEnumerable<BuiltInCategory> GetAllCategories() {
             return GetLevelNearestProviderCategories()
                 .Union(GetLevelMagicBottomProviderCategories())
