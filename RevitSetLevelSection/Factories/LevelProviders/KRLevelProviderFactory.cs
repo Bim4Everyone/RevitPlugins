@@ -15,61 +15,21 @@ using RevitSetLevelSection.Models.LevelProviders;
 
 namespace RevitSetLevelSection.Factories.LevelProviders {
     internal class KRLevelProviderFactory : LevelProviderFactory {
-        private readonly IResolutionRoot _resolutionRoot;
-        private readonly IElementPositionFactory _positionFactory;
-
-        public KRLevelProviderFactory(IResolutionRoot resolutionRoot, IElementPositionFactory positionFactory) {
-            _resolutionRoot = resolutionRoot;
-            _positionFactory = positionFactory;
+        public KRLevelProviderFactory(IResolutionRoot resolutionRoot, IElementPositionFactory positionFactory)
+            : base(resolutionRoot, positionFactory) {
         }
 
         protected override bool CanCreateImpl(Element element) {
-            return element.InAnyCategory(GetLevelStairsProviderCategories())
-                   || (_positionFactory.CanCreate(element)
-                       && element.InAnyCategory(GetAllCategories()));
+            return base.CanCreateImpl(element)
+                   || element.InAnyCategory(BuiltInCategory.OST_Floors);
         }
 
         protected override ILevelProvider CreateImpl(Element element) {
-            if(element.InAnyCategory(GetLevelNearestProviderCategories())) {
-                var elementPosition = _positionFactory.Create(element);
-                var constructorArgument = new ConstructorArgument("elementPosition", elementPosition);
-
-                return _resolutionRoot.Get<LevelNearestProvider>(constructorArgument);
-            } else if(element.InAnyCategory(GetLevelMagicBottomProviderCategories())) {
-                var elementPosition = _positionFactory.Create(element);
-                var constructorArgument = new ConstructorArgument("elementPosition", elementPosition);
-
-                return _resolutionRoot.Get<LevelMagicBottomProvider>(constructorArgument);
-            } else if(element.InAnyCategory(GetLevelStairsProviderCategories())) {
-                return _resolutionRoot.Get<LevelStairsProvider>(new ConstructorArgument("factory", this));
+            if(element.InAnyCategory(BuiltInCategory.OST_Floors)) {
+                return _resolutionRoot.Get<LevelMagicBottomProvider>(GetConstructorArgument(element));
             }
 
-            throw new ArgumentException($"Переданный элемент \"{element.Id}\" с категорией \"{element.Category.Name}\" не поддерживается.");
-        }
-
-        private IEnumerable<BuiltInCategory> GetAllCategories() {
-            return GetLevelNearestProviderCategories()
-                .Union(GetLevelMagicBottomProviderCategories())
-                .Union(GetLevelStairsProviderCategories());
-        }
-
-        private IEnumerable<BuiltInCategory> GetLevelMagicBottomProviderCategories() {
-            yield return BuiltInCategory.OST_StructuralFraming;
-            yield return BuiltInCategory.OST_Floors;
-            yield return BuiltInCategory.OST_StructuralTruss;
-        }
-
-        private IEnumerable<BuiltInCategory> GetLevelStairsProviderCategories() {
-            yield return BuiltInCategory.OST_StairsRuns;
-            yield return BuiltInCategory.OST_StairsLandings;
-        }
-
-        private IEnumerable<BuiltInCategory> GetLevelNearestProviderCategories() {
-            yield return BuiltInCategory.OST_Walls;
-            yield return BuiltInCategory.OST_StructuralColumns;
-            yield return BuiltInCategory.OST_Stairs;
-            yield return BuiltInCategory.OST_StructuralFoundation;
-            yield return BuiltInCategory.OST_EdgeSlab;
+            return base.CreateImpl(element);
         }
     }
 }
