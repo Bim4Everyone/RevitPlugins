@@ -54,10 +54,8 @@ namespace RevitSetLevelSection {
                 kernel.Bind<BasePoint>()
                     .ToMethod(c => c.Kernel.Get<RevitRepository>().GetBasePoint());
 
-                kernel.Bind<ARElementPositionFactory>().ToSelf().InSingletonScope();
-                kernel.Bind<KRElementPositionFactory>().ToSelf().InSingletonScope();
-                kernel.Bind<VISElementPositionFactory>().ToSelf().InSingletonScope();
-
+                kernel.Bind<ElementPositionFactory>().ToSelf().InSingletonScope();
+                
                 kernel.Bind<ARLevelProviderFactory>().ToSelf().InSingletonScope();
                 kernel.Bind<KRLevelProviderFactory>().ToSelf().InSingletonScope();
                 kernel.Bind<VISLevelProviderFactory>().ToSelf().InSingletonScope();

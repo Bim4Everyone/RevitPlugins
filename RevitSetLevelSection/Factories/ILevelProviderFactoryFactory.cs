@@ -21,17 +21,14 @@ namespace RevitSetLevelSection.Factories {
         }
 
         public ILevelProviderFactory Create(MainBimBuildPart mainBimBuildPart) {
+            var positionFactory = _resolutionRoot.Get<ElementPositionFactory>();
+            var constructorArgument = new ConstructorArgument("positionFactory", positionFactory);
+            
             if(mainBimBuildPart == MainBimBuildPart.ARPart) {
-                var positionFactory = _resolutionRoot.Get<ARElementPositionFactory>();
-                var constructorArgument = new ConstructorArgument("positionFactory", positionFactory);
                 return _resolutionRoot.Get<ARLevelProviderFactory>(constructorArgument);
             } else if(mainBimBuildPart == MainBimBuildPart.KRPart) {
-                var positionFactory = _resolutionRoot.Get<KRElementPositionFactory>();
-                var constructorArgument = new ConstructorArgument("positionFactory", positionFactory);
                 return _resolutionRoot.Get<KRLevelProviderFactory>(constructorArgument);
             } else if(mainBimBuildPart == MainBimBuildPart.VisPart) {
-                var positionFactory = _resolutionRoot.Get<VISElementPositionFactory>();
-                var constructorArgument = new ConstructorArgument("positionFactory", positionFactory);
                 return _resolutionRoot.Get<VISLevelProviderFactory>(constructorArgument);
             }
 
