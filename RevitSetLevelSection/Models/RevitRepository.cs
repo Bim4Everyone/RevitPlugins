@@ -99,6 +99,7 @@ namespace RevitSetLevelSection.Models {
                         cancellationToken.ThrowIfCancellationRequested();
 
                         if(!providerFactory.CanCreate(element)) {
+                            element.RemoveParamValue(revitParam);
                             continue;
                         }
 
