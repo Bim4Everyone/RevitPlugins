@@ -86,6 +86,7 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
         
         private IEnumerable<BuiltInCategory> GetLevelNearestProviderCategories() {
             yield return BuiltInCategory.OST_Walls;
+            yield return BuiltInCategory.OST_Floors;
             yield return BuiltInCategory.OST_Doors;
             yield return BuiltInCategory.OST_GenericModel;
             yield return BuiltInCategory.OST_Roofs;
