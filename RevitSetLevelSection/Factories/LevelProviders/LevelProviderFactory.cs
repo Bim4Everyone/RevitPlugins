@@ -51,6 +51,7 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
 
         protected virtual bool CanCreateImpl(Element element) {
             return element.InAnyCategory(GetLevelStairsProviderCategories())
+                   || element.InAnyCategory(GetLevelByIdProviderCategories())
                    || (_positionFactory.CanCreate(element)
                        && element.InAnyCategory(GetAllCategories()));
         }
@@ -63,7 +64,7 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
             } else if(element.InAnyCategory(GetLevelMagicBottomProviderCategories())) {
                 return _resolutionRoot.Get<LevelMagicBottomProvider>(GetConstructorArgument(element));
             } else if(element.InAnyCategory(GetLevelByIdProviderCategories())) {
-                return _resolutionRoot.Get<LevelByIdProvider>(GetConstructorArgument(element));
+                return _resolutionRoot.Get<LevelByIdProvider>();
             } else if(element.InAnyCategory(GetLevelStairsProviderCategories())) {
                 return _resolutionRoot.Get<LevelStairsProvider>(new ConstructorArgument("factory", this));
             }
