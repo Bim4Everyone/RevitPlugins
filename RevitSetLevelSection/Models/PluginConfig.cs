@@ -7,23 +7,22 @@ using dosymep.Serializers;
 using pyRevitLabs.Json;
 
 namespace RevitSetLevelSection.Models {
-    public class SetLevelSectionConfig : ProjectConfig<SetLevelSectionSettings> {
+    public class PluginConfig : ProjectConfig<RevitSettings> {
         [JsonIgnore] public override string ProjectConfigPath { get; set; }
 
         [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
 
-        public static SetLevelSectionConfig GetPrintConfig() {
+        public static PluginConfig GetPluginConfig() {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())
                 .SetPluginName(nameof(RevitSetLevelSection))
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
-                .SetProjectConfigName(nameof(SetLevelSectionConfig) + ".json")
-                .Build<SetLevelSectionConfig>();
+                .SetProjectConfigName(nameof(PluginConfig) + ".json")
+                .Build<PluginConfig>();
         }
     }
 
-    public class SetLevelSectionSettings : ProjectSettings {
-        public int LinkFileId { get; set; }
+    public class RevitSettings : ProjectSettings {
         public string BuildPart { get; set; }
         public override string ProjectName { get; set; }
 
@@ -31,8 +30,9 @@ namespace RevitSetLevelSection.Models {
     }
 
     public class ParamSettings {
-        public int? ElementId { get; set; }
+        public int? BuildPartId { get; set; }
+        public int? DesignOptionId { get; set; }
+        public string ParamId { get; set; }
         public bool IsEnabled { get; set; }
-        public string PropertyName { get; set; }
     }
 }

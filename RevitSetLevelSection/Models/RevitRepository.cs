@@ -9,136 +9,109 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using DevExpress.Xpf.Core.FilteringUI;
+using DevExpress.Utils.Extensions;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
 
-using RevitSetLevelSection.Models.LevelDefinitions;
-
-using InvalidOperationException = Autodesk.Revit.Exceptions.InvalidOperationException;
+using RevitSetLevelSection.Factories;
+using RevitSetLevelSection.Models.ElementPositions;
+using RevitSetLevelSection.Models.LevelProviders;
 
 namespace RevitSetLevelSection.Models {
     internal class RevitRepository {
-        public static readonly string AdskSectionNumberName = "ADSK_Номер секции";
-        public static readonly string AdskBuildingNumberName = "ADSK_Номер здания";
-        
-        private readonly Application _application;
-        private readonly UIApplication _uiApplication;
+        private readonly IBimModelPartsService _bimModelPartsService;
 
-        private readonly Document _document;
-        private readonly UIDocument _uiDocument;
-
-        private Dictionary<ElementId, LevelDefinition> _algorithms
-            = new Dictionary<ElementId, LevelDefinition>() {
-                {
-                    new ElementId(BuiltInCategory.OST_Walls),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_Floors),
-                    new LevelDefinition() {BBPosition = new BBPositionTop(), LevelProvider = new LevelNearestProvider()}
-                }, {
-                    new ElementId(BuiltInCategory.OST_Doors),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_Windows),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionMiddle(), LevelProvider = new LevelBottomProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_GenericModel),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_Roofs),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_Ceilings),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_Columns),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_Parts),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_Gutter),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                }, {
-                    new ElementId(BuiltInCategory.OST_StairsRailing),
-                    new LevelDefinition() {
-                        BBPosition = new BBPositionBottom(), LevelProvider = new LevelNearestProvider()
-                    }
-                },
-            };
-
-        public RevitRepository(Application application, Document document) {
-            _application = application;
-            _uiApplication = new UIApplication(application);
-
-            _document = document;
-            _uiDocument = new UIDocument(document);
+        public RevitRepository(UIApplication uiApplication, IBimModelPartsService bimModelPartsService) {
+            UIApplication = uiApplication;
+            _bimModelPartsService = bimModelPartsService;
         }
 
-        public Document Document => _document;
-        public Application Application => _application;
+        public UIApplication UIApplication { get; }
+        public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
 
-        public ProjectInfo ProjectInfo => _document.ProjectInformation;
+        public Application Application => UIApplication.Application;
+        public Document Document => ActiveUIDocument.Document;
 
         public Element GetElements(ElementId elementId) {
-            return _document.GetElement(elementId);
+            return Document.GetElement(elementId);
+        }
+
+        public BasePoint GetBasePoint() {
+            return BasePoint.GetProjectBasePoint(Document);
         }
 
         public TransactionGroup StartTransactionGroup(string transactionGroupName) {
-            return _document.StartTransactionGroup(transactionGroupName);
+            return Document.StartTransactionGroup(transactionGroupName);
+        }
+        
+        public bool IsKoordFile() {
+            return _bimModelPartsService.InAnyBimModelParts(Document, BimModelPart.KOORDPart);
         }
 
-        public IEnumerable<RevitLinkType> GetRevitLinkTypes() {
-            return new FilteredElementCollector(_document)
+        public IEnumerable<RevitLinkType> GetKoordLinkTypes() {
+            return new FilteredElementCollector(Document)
                 .WhereElementIsElementType()
                 .OfClass(typeof(RevitLinkType))
                 .OfType<RevitLinkType>()
+                .Where(item => _bimModelPartsService.InAnyBimModelParts(item, BimModelPart.KOORDPart))
                 .ToList();
         }
-        
+
         public IEnumerable<RevitLinkInstance> GetLinkInstances() {
-            return new FilteredElementCollector(_document)
+            return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(RevitLinkInstance))
                 .OfType<RevitLinkInstance>()
                 .ToList();
         }
 
-        public void SetLevelParam(RevitParam revitParam) {
+        public void SetLevelParam(RevitParam revitParam, IAreaRepository areaRepository,
+            ILevelProviderFactory providerFactory) {
             using(Transaction transaction =
-                  _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
+                  Document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
 
-                List<Level> levels = GetLevels();
-                IEnumerable<Element> elements = GetElements(revitParam);
-                foreach(Element element in elements) {
-                    try {
-                        string paramValue = GetLevelName(element, levels);
-                        element.SetParamValue(revitParam, paramValue);
-                    } catch { }
+                var intersectImpl =
+                    new IntersectImpl() {Application = Application};
+
+                List<Element> elements = GetElements(revitParam);
+                List<ZoneInfo> zoneInfos = areaRepository.GetAreas();
+                Dictionary<string, Level> levels = GetLevels().ToDictionary(item => item.Name);
+                
+                using(var window = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
+                    window.DisplayTitleFormat = "Обработка [{0}\\{1}]";
+                    window.MaxValue = elements.Count;
+                    window.StepValue = 10;
+
+                    var progress = window.CreateProgress();
+                    var cancellationToken = window.CreateCancellationToken();
+
+                    window.Show();
+
+                    int count = 1;
+                    foreach(Element element in elements) {
+                        progress.Report(count++);
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        if(!providerFactory.CanCreate(element)) {
+                            element.RemoveParamValue(revitParam);
+                            continue;
+                        }
+
+                        List<Level> zoneLevels = zoneInfos
+                            .Where(item => intersectImpl.IsIntersect(item, element))
+                            .Select(item => levels.GetValueOrDefault(item.Level.Name, null))
+                            .Where(item => item != null)
+                            .ToList();
+
+                        var level = providerFactory.Create(element).GetLevel(element, zoneLevels);
+                        element.SetParamValue(revitParam, level?.Name.Split('_').FirstOrDefault());
+                    }
                 }
 
                 transaction.Commit();
@@ -146,88 +119,65 @@ namespace RevitSetLevelSection.Models {
         }
 
         private List<Level> GetLevels() {
-            return new FilteredElementCollector(_document)
+            return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
-                .OfCategory(BuiltInCategory.OST_Levels)
+                .OfClass(typeof(Level))
                 .OfType<Level>()
                 .ToList();
         }
 
-        private string GetLevelName(Element element, List<Level> levels) {
-            var outline = GetOutline(element, Transform.Identity);
-            if(_algorithms.TryGetValue(element.Category.Id, out var levelDefinition)) {
-                return levelDefinition.GetLevelName(outline, levels);
-            }
-
-            return null;
-        }
-
-        public void UpdateElements(RevitParam revitParam, string paramValue) {
-            using(Transaction transaction = _document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
-                ProjectInfo.SetParamValue(revitParam, paramValue);
-                IEnumerable<Element> elements = GetElements(revitParam);
-
-                foreach(Element element in elements) {
-                    element.SetParamValue(revitParam, paramValue);
-                }
-
-                transaction.Commit();
-            }
-        }
-
         public void UpdateElements(ParamOption paramOption, Transform transform,
             IEnumerable<FamilyInstance> massElements) {
-            List<Element> elements = GetElements(paramOption.SharedRevitParam);
-            var cashedElements = elements.ToDictionary(item => item.Id);
-
+            List<Element> elements = GetElements(paramOption.RevitParam);
+            
             using(Transaction transaction =
-                  _document.StartTransaction($"Установка уровня/секции \"{paramOption.SharedRevitParam.Name}\"")) {
-                
+                  Document.StartTransaction($"Установка уровня/секции \"{paramOption.RevitParam.Name}\"")) {
+
                 var logger = ServicesProvider.GetPlatformService<ILoggerService>()
                     .ForPluginContext("Установка уровня\\секции");
-                
-                foreach(Element element in elements) {
-                    if(!cashedElements.ContainsKey(element.Id)) {
-                        continue;
-                    }
 
-                    int? skip = element.GetParamValueOrDefault<int?>(SharedParamsConfig.Instance.FixBuildingWorks);
-                    if(skip == 1) {
-                        cashedElements.Remove(element.Id);
-                        continue;
-                    }
+                var intersectImpl = new IntersectImpl() {LinkedTransform = transform, Application = Application};
 
-                    foreach(FamilyInstance massObject in massElements) {
-                        if(IsIntersectCenterElement(transform, massObject, element)) {
-                            try {
-                                string paramValue = massObject.GetParamValue<string>(paramOption);
-                                element.SetParamValue(paramOption.SharedRevitParam, paramValue);
+                var skipParam = SharedParamsConfig.Instance.FixBuildingWorks;
+                var objects = elements
+                    .Where(item => item.GetParamValueOrDefault<int?>(skipParam) != 1)
+                    .Select(item => new {
+                        Element = item,
+                        MassObject = massElements.FirstOrDefault(mass => intersectImpl.IsIntersect(mass, item))
+                    })
+                    .ToList();
 
-                                if(!string.IsNullOrEmpty(paramOption.AdskParamName)
-                                   && element.IsExistsSharedParam(paramOption.AdskParamName)) {
-                                    element.SetSharedParamValue(paramOption.AdskParamName, paramValue);
-                                }
-                            } catch(InvalidOperationException ex) {
-                                // решили что существует много вариантов,
-                                // когда параметр не может заполнится из-за настроек в ревите
-                                // Например: базовая стена внутри составной
+                using(var window = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
+                    window.DisplayTitleFormat = "Обработка [{0}\\{1}]";
+                    window.MaxValue = elements.Count;
+                    window.StepValue = 10;
 
-                                logger.Warning(ex, 
-                                    "Не был обновлен элемент {@elementId} в документе {documentId}.",
-                                    element.Id.IntegerValue, Document.GetUniqId());
+                    var progress = window.CreateProgress();
+                    var cancellationToken = window.CreateCancellationToken();
+
+                    window.Show();
+
+                    int count = 1;
+                    foreach(var element in objects) {
+                        progress.Report(count++);
+                        cancellationToken.ThrowIfCancellationRequested();
+                        try {
+                            string paramValue = element.MassObject?.GetParamValue<string>(paramOption);
+                            element.Element.SetParamValue(paramOption.RevitParam, paramValue);
+
+                            if(!string.IsNullOrEmpty(paramOption.AdskParamName)
+                               && element.Element.IsExistsSharedParam(paramOption.AdskParamName)) {
+                                element.Element.SetSharedParamValue(paramOption.AdskParamName, paramValue);
                             }
+                        } catch(InvalidOperationException ex) {
+                            // решили что существует много вариантов,
+                            // когда параметр не может заполнится из-за настроек в ревите
+                            // Например: базовая стена внутри составной
 
-                            cashedElements.Remove(element.Id);
-                            break;
+                            logger.Warning(ex,
+                                "Не был обновлен элемент {@elementId} в документе {documentId}.",
+                                element.Element.Id.IntegerValue, Document.GetUniqId());
                         }
-                    }
-                }
-
-                foreach(Element element in cashedElements.Values) {
-                    element.RemoveParamValue(paramOption.SharedRevitParam);
-                    if(!string.IsNullOrEmpty(paramOption.AdskParamName)
-                       && element.IsExistsSharedParam(paramOption.AdskParamName)) {
-                        element.RemoveSharedParamValue(paramOption.AdskParamName);
                     }
                 }
 
@@ -237,111 +187,106 @@ namespace RevitSetLevelSection.Models {
 
         private List<Element> GetElements(RevitParam revitParam) {
             var catFilter = new ElementMulticategoryFilter(GetCategories(revitParam));
-            return new FilteredElementCollector(_document)
+            return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
                 .WherePasses(catFilter)
                 .ToList();
         }
 
-        private bool IsIntersectCenterElement(Transform transform, FamilyInstance massElement, Element element) {
-            Solid solid = GetSolid(massElement, transform);
-            if(solid == null) {
-                return false;
-            }
-
-            XYZ elementCenterPoint = GetCenterPoint(element);
-            var line = GetLine(elementCenterPoint);
-
-            var result = solid.IntersectWithCurve(line,
-                new SolidCurveIntersectionOptions() {ResultType = SolidCurveIntersectionMode.CurveSegmentsInside});
-
-            if(result.ResultType == SolidCurveIntersectionMode.CurveSegmentsInside) {
-                return result.Any(item => item.Length > 0);
-            }
-
-            return false;
-        }
-
-        private XYZ GetCenterPoint(Element element) {
-            try {
-                Solid solid = GetSolid(element, Transform.Identity);
-                if(solid != null) {
-                    return solid.ComputeCentroid();
-                }
-            } catch {
-                
-            }
-
-            var elementOutline = GetOutline(element, Transform.Identity);
-            return (elementOutline.MaximumPoint - elementOutline.MinimumPoint) / 2
-                   + elementOutline.MinimumPoint;
-        }
-
-        private Outline GetOutline(Element element, Transform transform) {
-            var boundingBox = element.get_BoundingBox(null);
-            if(boundingBox == null) {
-                return new Outline(XYZ.Zero, XYZ.Zero);
-            }
-
-            return new Outline(transform.OfPoint(boundingBox.Min), transform.OfPoint(boundingBox.Max));
-        }
-
-        private Solid GetSolid(Element element, Transform transform) {
-            var geometryElement = element.get_Geometry(new Options() {ComputeReferences = true});
-            if(geometryElement == null) {
-                return null;
-            }
-
-            List<Solid> solids = new List<Solid>();
-            foreach(GeometryObject geometryObject in geometryElement.OfType<GeometryObject>()) {
-                if(geometryObject is Solid solid) {
-                    solids.Add(solid);
-                } else if(geometryObject is GeometryInstance instance) {
-                    solids.AddRange(instance.GetInstanceGeometry().OfType<Solid>());
-                }
-            }
-
-            solids = solids
-                    .Where(item => item.Volume > 0)
-                    .ToList();
-
-            if(solids.Count == 0) {
-                return null;
-            }
-
-            Solid resultSolid = solids.First();
-            solids.Remove(resultSolid);
-
-            try {
-                foreach(Solid solid in solids) {
-                    resultSolid =
-                        BooleanOperationsUtils.ExecuteBooleanOperation(resultSolid, solid, BooleanOperationsType.Union);
-                }
-            } catch(InvalidOperationException) {
-                return null;
-            }
-
-            return SolidUtils.CreateTransformed(resultSolid, transform);
-        }
-
-        private Line GetLine(XYZ point) {
-            XYZ start = point.Subtract(new XYZ(_application.ShortCurveTolerance, 0, 0));
-            XYZ finish = point.Add(new XYZ(_application.ShortCurveTolerance, 0, 0));
-
-            return Line.CreateBound(start, finish);
-        }
-
         private ElementId[] GetCategories(RevitParam revitParam) {
-            return _document.GetParameterBindings()
+            return Document.GetParameterBindings()
                 .Where(item => item.Binding.IsInstanceBinding())
-                .Where(item => revitParam.IsRevitParam(_document, item.Definition))
+                .Where(item => revitParam.IsRevitParam(Document, item.Definition))
                 .SelectMany(item => item.Binding.GetCategories())
                 .Select(item => item.Id)
                 .ToArray();
         }
 
         public Workset GetWorkset(RevitLinkType revitLinkType) {
-            return _document.GetWorksetTable().GetWorkset(revitLinkType.WorksetId);
+            return Document.GetWorksetTable().GetWorkset(revitLinkType.WorksetId);
         }
+
+        public IEnumerable<MainBimBuildPart> GetBuildParts() {
+            yield return MainBimBuildPart.ARPart;
+            yield return MainBimBuildPart.KRPart;
+            yield return MainBimBuildPart.VisPart;
+        }
+        
+        public MainBimBuildPart GetBuildPart() {
+            if(_bimModelPartsService.GetBimModelPart(Document) == null) {
+                return null;
+            }
+            
+            if(_bimModelPartsService.InAnyBimModelParts(Document, BimModelPart.ARPart, BimModelPart.GPPart)) {
+                return MainBimBuildPart.ARPart;
+            }
+
+            if(_bimModelPartsService.InAnyBimModelParts(Document, BimModelPart.KRPart, BimModelPart.KMPart)) {
+                return MainBimBuildPart.KRPart;
+            }
+            
+            if(_bimModelPartsService.InAnyBimModelParts(Document, BimModelPart.KOORDPart)) {
+                return MainBimBuildPart.KOORDPart;
+            }
+
+            // Будем считать что все остальные это ВИС
+            // ошибки будущего - ошибки будущего :D
+            return MainBimBuildPart.VisPart;
+        }
+    }
+
+    internal class MainBimBuildPart : IEquatable<MainBimBuildPart> {
+        public static readonly MainBimBuildPart ARPart = new MainBimBuildPart() {Id = 0, Name = "АР"};
+        public static readonly MainBimBuildPart KRPart = new MainBimBuildPart() {Id = 1, Name = "КР"};
+        public static readonly MainBimBuildPart VisPart = new MainBimBuildPart() {Id = 2, Name = "ВИС"};
+        public static readonly MainBimBuildPart KOORDPart = new MainBimBuildPart() {Id = 3, Name = "КООРД"};
+
+        public int Id { get; private set; }
+        public string Name { get; private set; }
+        public string Description { get; private set; }
+
+        #region IEquatable<MainBimBuildPart>
+
+        public bool Equals(MainBimBuildPart other) {
+            if(ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if(ReferenceEquals(this, other)) {
+                return true;
+            }
+
+            return Id == other.Id;
+        }
+
+        public override bool Equals(object obj) {
+            if(ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if(ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            if(obj.GetType() != this.GetType()) {
+                return false;
+            }
+
+            return Equals((MainBimBuildPart) obj);
+        }
+
+        public override int GetHashCode() {
+            return Id;
+        }
+
+        public static bool operator ==(MainBimBuildPart left, MainBimBuildPart right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(MainBimBuildPart left, MainBimBuildPart right) {
+            return !Equals(left, right);
+        }
+
+        #endregion
     }
 }

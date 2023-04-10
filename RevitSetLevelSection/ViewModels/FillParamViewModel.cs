@@ -6,7 +6,7 @@ using RevitSetLevelSection.Models;
 namespace RevitSetLevelSection.ViewModels {
     internal abstract class FillParamViewModel : BaseViewModel {
         public abstract bool IsEnabled { get; set; }
-        public abstract RevitParam RevitParam { get; set; }
+        public abstract RevitParam RevitParam { get; }
 
         public abstract string GetErrorText();
         public abstract void UpdateElements();
