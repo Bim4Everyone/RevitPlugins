@@ -9,32 +9,37 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.ViewModels;
 
 using RevitSetLevelSection.Models;
+using RevitSetLevelSection.Models.Repositories;
 
 namespace RevitSetLevelSection.ViewModels {
     internal class DesignOptionsViewModel : BaseViewModel {
+        private readonly IDesignOption _designOption;
         private readonly List<FamilyInstance> _massElements;
 
-        public DesignOptionsViewModel(IDesignOption designOption, LinkInstanceRepository linkInstanceRepository) {
+        public DesignOptionsViewModel(IDesignOption designOption, IMassRepository massRepository) {
             if(designOption is null) {
                 throw new ArgumentNullException(nameof(designOption));
             }
 
-            if(linkInstanceRepository is null) {
-                throw new ArgumentNullException(nameof(linkInstanceRepository));
+            if(massRepository is null) {
+                throw new ArgumentNullException(nameof(massRepository));
             }
 
-            _massElements = linkInstanceRepository.GetMassElements(designOption).ToList();
+            _designOption = designOption;
+            _massElements = massRepository.GetElements(designOption).ToList();
 
             Id = designOption.Id.IntegerValue;
             Name = designOption.Name;
-            Transform = linkInstanceRepository.Transform;
-            HasMassIntersect = linkInstanceRepository.HasIntersects(_massElements);
+            Transform = massRepository.Transform;
+            HasMassIntersect = massRepository.HasIntersects(designOption);
         }
 
         public int Id { get; }
         public string Name { get; }
         public Transform Transform { get; }
         public bool HasMassIntersect { get; }
+
+        public IDesignOption DesignOption => _designOption;
 
         public int CountMassElements => _massElements.Count;
 

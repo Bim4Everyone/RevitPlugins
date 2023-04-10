@@ -13,8 +13,10 @@ using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit.Geometry;
 
+using RevitSetLevelSection.Models.Repositories;
+
 namespace RevitSetLevelSection.Models {
-    internal class LinkInstanceRepository : IAreaRepository {
+    internal class LinkInstanceRepository : IZoneRepository, IMassRepository {
         public static readonly string AreaSchemeName = "Назначение этажа СМР";
 
         private readonly RevitLinkType _revitLinkType;
@@ -43,18 +45,23 @@ namespace RevitSetLevelSection.Models {
                 .OfType<DesignOption>()
                 .ToList();
         }
-
-        public IEnumerable<FamilyInstance> GetMassElements(IDesignOption designOption) {
+        
+        public List<FamilyInstance> GetElements() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
                 .OfCategory(BuiltInCategory.OST_Mass)
-                .Where(item => GetDesignOptionId(item) == designOption.Id)
                 .OfType<FamilyInstance>()
                 .ToList();
         }
 
-        public bool HasIntersects(IEnumerable<FamilyInstance> massObjects) {
-            return massObjects
+        public List<FamilyInstance> GetElements(IDesignOption designOption) {
+            return GetElements()
+                .Where(item => GetDesignOptionId(item) == designOption.Id)
+                .ToList();
+        }
+
+        public bool HasIntersects(IDesignOption designOption) {
+            return GetElements(designOption)
                 .SelectMany(item => item.GetSolids())
                 .Where(item => item.Volume > 0)
                 .HasIntersects();
@@ -102,7 +109,7 @@ namespace RevitSetLevelSection.Models {
                 .FirstOrDefault(item => item.Name.Equals(AreaSchemeName));
         }
 
-        public List<ZoneInfo> GetAreas() {
+        public List<ZoneInfo> GetZones() {
             var areaFilter = new AreaFilter(GetAreaScheme());
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
@@ -173,10 +180,6 @@ namespace RevitSetLevelSection.Models {
         private ElementId GetDesignOptionId(Element element) {
             return element.DesignOption?.Id ?? ElementId.InvalidElementId;
         }
-    }
-
-    internal interface IAreaRepository {
-        List<ZoneInfo> GetAreas();
     }
 
     internal static class Extensions {

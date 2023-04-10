@@ -12,6 +12,7 @@ using Autodesk.Revit.DB;
 using DevExpress.Diagram.Core.Layout;
 
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -99,14 +100,40 @@ namespace RevitSetLevelSection.ViewModels {
         private void UpdateElements(object param) {
             SaveConfig();
 
-            using(var transactionGroup =
-                  _revitRepository.StartTransactionGroup("Установка уровня/секции")) {
-                foreach(FillParamViewModel fillParamViewModel in FillParams.Where(item => item.IsEnabled)) {
-                    fillParamViewModel.UpdateElements();
+            using(Transaction transaction = _revitRepository.StartTransaction("Заполнение параметров СМР")) {
+                var fillParams = FillParams
+                    .Where(item => item.IsEnabled)
+                    .Select(item => item.CreateFillParam())
+                    .ToArray();
+
+                var elements = _revitRepository.GetElementInstances();
+                using(var window = CreateProgressDialog(elements)) {
+                    var progress = window.CreateProgress();
+                    var cancellationToken = window.CreateCancellationToken();
+
+                    int count = 1;
+                    foreach(var element in elements) {
+                        progress.Report(count++);
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        foreach(IFillParam fillParam in fillParams) {
+                            fillParam.UpdateValue(element);
+                        }
+                    }
                 }
 
-                transactionGroup.Assimilate();
+                transaction.Commit();
             }
+        }
+
+        private IProgressDialogService CreateProgressDialog(IList<Element> elements) {
+            var window = GetPlatformService<IProgressDialogService>();
+            window.DisplayTitleFormat = $"Заполнение [{{0}}\\{{1}}]";
+            window.MaxValue = elements.Count;
+            window.StepValue = 10;
+
+            window.Show();
+            return window;
         }
 
         private bool CanUpdateElement(object param) {

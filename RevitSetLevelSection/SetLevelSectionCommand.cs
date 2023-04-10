@@ -21,6 +21,7 @@ using RevitSetLevelSection.Factories.LevelProviders;
 using RevitSetLevelSection.Models;
 using RevitSetLevelSection.Models.ElementPositions;
 using RevitSetLevelSection.Models.LevelProviders;
+using RevitSetLevelSection.Models.Repositories;
 using RevitSetLevelSection.ViewModels;
 using RevitSetLevelSection.Views;
 
@@ -44,6 +45,15 @@ namespace RevitSetLevelSection {
 
                 kernel.Bind<RevitRepository>().ToSelf()
                     .InSingletonScope();
+
+                kernel.Bind<ILevelRepository>()
+                    .ToMethod(c => c.Kernel.Get<RevitRepository>()).InSingletonScope();
+
+                kernel.Bind<FillMassParam>().ToSelf();
+                kernel.Bind<FillLevelParam>().ToSelf();
+
+                kernel.Bind<IFillParamFactory>()
+                    .To<FillParamFactory>().InSingletonScope();
 
                 kernel.Bind<IBimModelPartsService>()
                     .ToMethod(c => GetPlatformService<IBimModelPartsService>());
