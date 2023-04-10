@@ -94,7 +94,7 @@ namespace RevitSetLevelSection.ViewModels {
             if(_paramOption.IsRequired) {
                 string partParamName = _paramOption.RevitParamName + _mainViewModel.LinkType.BuildPart;
                 var paramOption = new ParamOption() {
-                    RevitParam = RevitParam, RevitParamName = partParamName, AdskParamName = _paramOption.AdskParamName
+                    RevitParam = RevitParam, RevitParamName = partParamName
                 };
                 return DesignOption.GetMassObjects()
                     .All(item => item.IsExistsParamValue(paramOption))
@@ -108,7 +108,7 @@ namespace RevitSetLevelSection.ViewModels {
         public override IFillParam CreateFillParam() {
             string partParamName = _paramOption.RevitParamName + _mainViewModel.LinkType.BuildPart;
             var paramOption = new ParamOption() {
-                RevitParam = RevitParam, RevitParamName = partParamName, AdskParamName = _paramOption.AdskParamName
+                RevitParam = RevitParam, RevitParamName = partParamName
             };
             return _fillParamFactory.Create(paramOption, 
                 DesignOption.DesignOption,
@@ -122,7 +122,7 @@ namespace RevitSetLevelSection.ViewModels {
 
             string partParamName = _paramOption.RevitParamName + _mainViewModel.LinkType.BuildPart;
             var paramOption = new ParamOption() {
-                RevitParam = RevitParam, RevitParamName = partParamName, AdskParamName = _paramOption.AdskParamName
+                RevitParam = RevitParam, RevitParamName = partParamName
             };
             return DesignOption.GetMassObjects()
                 .Any(item => HasNotRussianLetters(item.GetParamValue<string>(paramOption)));

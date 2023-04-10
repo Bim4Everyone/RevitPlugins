@@ -7,10 +7,10 @@ using dosymep.Bim4Everyone.SharedParams;
 
 namespace RevitSetLevelSection.Models {
     internal class FillAdskParam : IFillParam {
-        private readonly SharedParam _adskParam;
-        private readonly SharedParam[] _copyFromParam;
+        private readonly RevitParam _adskParam;
+        private readonly RevitParam[] _copyFromParam;
 
-        public FillAdskParam(SharedParam adskParam, SharedParam[] copyFromParam) {
+        public FillAdskParam(RevitParam adskParam, params RevitParam[] copyFromParam) {
             _adskParam = adskParam;
             _copyFromParam = copyFromParam;
         }

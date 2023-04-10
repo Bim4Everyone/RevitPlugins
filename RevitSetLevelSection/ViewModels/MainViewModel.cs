@@ -11,7 +11,10 @@ using Autodesk.Revit.DB;
 
 using DevExpress.Diagram.Core.Layout;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.CustomParams;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -23,19 +26,21 @@ namespace RevitSetLevelSection.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly IViewModelFactory _viewModelFactory;
+        private readonly IFillAdskParamFactory _fillAdskParamFactory;
 
         private string _errorText;
         private LinkTypeViewModel _linkType;
         private ObservableCollection<LinkTypeViewModel> _linkTypes;
         private ObservableCollection<FillParamViewModel> _fillParams;
 
-        public MainViewModel(RevitRepository revitRepository, IViewModelFactory viewModelFactory) {
+        public MainViewModel(RevitRepository revitRepository, IViewModelFactory viewModelFactory, IFillAdskParamFactory fillAdskParamFactory) {
             if(revitRepository is null) {
                 throw new ArgumentNullException(nameof(revitRepository));
             }
 
             _revitRepository = revitRepository;
             _viewModelFactory = viewModelFactory;
+            _fillAdskParamFactory = fillAdskParamFactory;
 
             LoadViewCommand = new RelayCommand(LoadView);
             UpdateBuildPartCommand = new RelayCommand(UpdateBuildPart);
@@ -101,11 +106,7 @@ namespace RevitSetLevelSection.ViewModels {
             SaveConfig();
 
             using(Transaction transaction = _revitRepository.StartTransaction("Заполнение параметров СМР")) {
-                var fillParams = FillParams
-                    .Where(item => item.IsEnabled)
-                    .Select(item => item.CreateFillParam())
-                    .ToArray();
-
+                var fillParams = GetEnabledFillParams().ToArray();
                 var elements = _revitRepository.GetElementInstances(fillParams.Select(item=>item.RevitParam));
                 using(var window = CreateProgressDialog(elements)) {
                     var progress = window.CreateProgress();
@@ -123,6 +124,33 @@ namespace RevitSetLevelSection.ViewModels {
                 }
 
                 transaction.Commit();
+            }
+        }
+
+        private IEnumerable<IFillParam> GetEnabledFillParams() {
+            foreach(IFillParam fillParam in FillParams
+                        .Where(item => item.IsEnabled)
+                        .Select(item => item.CreateFillParam())) {
+                yield return fillParam;
+            }
+
+            if(_revitRepository.IsExistsParam(ParamOption.AdskSectionNumberName)) {
+                var revitParam = _revitRepository.CreateRevitParam(ParamOption.AdskSectionNumberName);
+                yield return _fillAdskParamFactory.Create(revitParam,
+                    SharedParamsConfig.Instance.BuildingWorksSection,
+                    SharedParamsConfig.Instance.BuildingWorksBlock);
+            }
+
+            if(_revitRepository.IsExistsParam(ParamOption.AdskBuildingNumberName)) {
+                var revitParam = _revitRepository.CreateRevitParam(ParamOption.AdskBuildingNumberName);
+                yield return _fillAdskParamFactory.Create(revitParam,
+                    SharedParamsConfig.Instance.BuildingWorksBlock);
+            }
+
+            if(_revitRepository.IsExistsParam(ParamOption.AdskLevelName)) {
+                var revitParam = _revitRepository.CreateRevitParam(ParamOption.AdskLevelName);
+                yield return _fillAdskParamFactory.Create(revitParam,
+                    SharedParamsConfig.Instance.BuildingWorksLevel);
             }
         }
 

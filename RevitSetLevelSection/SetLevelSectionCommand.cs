@@ -55,6 +55,9 @@ namespace RevitSetLevelSection {
                 kernel.Bind<IFillParamFactory>()
                     .To<FillParamFactory>().InSingletonScope();
 
+                kernel.Bind<IFillAdskParamFactory>()
+                    .To<FillAdskParamFactory>().InSingletonScope();
+                
                 kernel.Bind<IBimModelPartsService>()
                     .ToMethod(c => GetPlatformService<IBimModelPartsService>());
 

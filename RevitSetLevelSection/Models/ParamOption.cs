@@ -6,6 +6,7 @@ using dosymep.Revit;
 
 namespace RevitSetLevelSection.Models {
     internal class ParamOption {
+        public static readonly string AdskLevelName = "ADSK_Этаж";
         public static readonly string AdskSectionNumberName = "ADSK_Номер секции";
         public static readonly string AdskBuildingNumberName = "ADSK_Номер здания";
         
@@ -15,13 +16,11 @@ namespace RevitSetLevelSection.Models {
 
         public static readonly ParamOption BuildingWorksBlock = new ParamOption() {
             IsRequired = true,
-            AdskParamName = AdskBuildingNumberName,
             RevitParamName = BuildingWorksBlockName,
             RevitParam = SharedParamsConfig.Instance.BuildingWorksBlock
         };
 
         public static readonly ParamOption BuildingWorksSection = new ParamOption() {
-            AdskParamName = AdskSectionNumberName,
             RevitParamName = BuildingWorksSectionName,
             RevitParam = SharedParamsConfig.Instance.BuildingWorksSection
         };
@@ -32,7 +31,6 @@ namespace RevitSetLevelSection.Models {
         };
 
         public bool IsRequired { get; set; }
-        public string AdskParamName { get; set; }
         public string RevitParamName { get; set; }
         public RevitParam RevitParam { get; set; }
     }

@@ -122,5 +122,13 @@ namespace RevitSetLevelSection.Models {
             // ошибки будущего - ошибки будущего :D
             return MainBimBuildPart.VisPart;
         }
+
+        public bool IsExistsParam(string paramName) {
+            return Document.IsExistsParam(paramName);
+        }
+        
+        public RevitParam CreateRevitParam(string paramName) {
+            return SharedParamsConfig.Instance.CreateRevitParam(Document, paramName);
+        }
     }
 }
