@@ -147,23 +147,37 @@ namespace RevitSetLevelSection.Models {
                     })
                     .ToList();
 
-                foreach(var element in objects) {
-                    try {
-                        string paramValue = element.MassObject?.GetParamValue<string>(paramOption);
-                        element.Element.SetParamValue(paramOption.RevitParam, paramValue);
+                using(var window = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
+                    window.DisplayTitleFormat = "Обработка [{0}\\{1}]";
+                    window.MaxValue = elements.Count;
+                    window.StepValue = 10;
 
-                        if(!string.IsNullOrEmpty(paramOption.AdskParamName)
-                           && element.Element.IsExistsSharedParam(paramOption.AdskParamName)) {
-                            element.Element.SetSharedParamValue(paramOption.AdskParamName, paramValue);
+                    var progress = window.CreateProgress();
+                    var cancellationToken = window.CreateCancellationToken();
+
+                    window.Show();
+
+                    int count = 1;
+                    foreach(var element in objects) {
+                        progress.Report(count++);
+                        cancellationToken.ThrowIfCancellationRequested();
+                        try {
+                            string paramValue = element.MassObject?.GetParamValue<string>(paramOption);
+                            element.Element.SetParamValue(paramOption.RevitParam, paramValue);
+
+                            if(!string.IsNullOrEmpty(paramOption.AdskParamName)
+                               && element.Element.IsExistsSharedParam(paramOption.AdskParamName)) {
+                                element.Element.SetSharedParamValue(paramOption.AdskParamName, paramValue);
+                            }
+                        } catch(InvalidOperationException ex) {
+                            // решили что существует много вариантов,
+                            // когда параметр не может заполнится из-за настроек в ревите
+                            // Например: базовая стена внутри составной
+
+                            logger.Warning(ex,
+                                "Не был обновлен элемент {@elementId} в документе {documentId}.",
+                                element.Element.Id.IntegerValue, Document.GetUniqId());
                         }
-                    } catch(InvalidOperationException ex) {
-                        // решили что существует много вариантов,
-                        // когда параметр не может заполнится из-за настроек в ревите
-                        // Например: базовая стена внутри составной
-
-                        logger.Warning(ex,
-                            "Не был обновлен элемент {@elementId} в документе {documentId}.",
-                            element.Element.Id.IntegerValue, Document.GetUniqId());
                     }
                 }
 
