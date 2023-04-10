@@ -106,7 +106,7 @@ namespace RevitSetLevelSection.ViewModels {
                     .Select(item => item.CreateFillParam())
                     .ToArray();
 
-                var elements = _revitRepository.GetElementInstances();
+                var elements = _revitRepository.GetElementInstances(fillParams.Select(item=>item.RevitParam));
                 using(var window = CreateProgressDialog(elements)) {
                     var progress = window.CreateProgress();
                     var cancellationToken = window.CreateCancellationToken();

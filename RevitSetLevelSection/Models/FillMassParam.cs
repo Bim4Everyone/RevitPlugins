@@ -33,6 +33,8 @@ namespace RevitSetLevelSection.Models {
             // Кешируем нужные объекты
             _massElements = massRepository.GetElements(_designOption);
         }
+        
+        public RevitParam RevitParam => _paramOption.RevitParam;
 
         public void UpdateValue(Element element) {
             if(!element.IsExistsParam(_paramOption.RevitParam)) {

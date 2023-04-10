@@ -39,6 +39,8 @@ namespace RevitSetLevelSection.Models {
             _zoneInfos = zoneRepository.GetZones();
             _sourceLevels = levelRepository.GetElements().ToDictionary(item => item.Name);
         }
+
+        public RevitParam RevitParam => _revitParam;
         
         public void UpdateValue(Element element) {
             if(!element.IsExistsParam(_revitParam)) {

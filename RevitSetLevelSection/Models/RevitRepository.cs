@@ -46,9 +46,17 @@ namespace RevitSetLevelSection.Models {
                 .ToList();
         }
 
-        public IList<Element> GetElementInstances() {
+        public IList<Element> GetElementInstances(IEnumerable<RevitParam> revitParams) {
+            List<ElementId> categories = revitParams
+                .SelectMany(item => item.GetParamBinding(Document).Binding.GetCategories())
+                .Select(item => item.Id)
+                .Distinct()
+                .ToList();
+
+            var filter = new ElementMulticategoryFilter(categories);
             return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
+                .WherePasses(filter)
                 .Where(item => item.Category != null)
                 .OrderBy(item => item.Category.Name)
                 .ToList();
