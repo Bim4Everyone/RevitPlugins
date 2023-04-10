@@ -27,6 +27,11 @@ namespace RevitSetLevelSection.Models {
                 .Select(item => element.GetParam(item))
                 .FirstOrDefault();
 
+            if(copyFromParam == null) {
+                element.RemoveParamValue(_adskParam);
+                return;
+            }
+
             element.SetParamValue(_adskParam, copyFromParam);
         }
     }
