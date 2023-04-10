@@ -14,6 +14,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitSetLevelSection.Factories;
 using RevitSetLevelSection.Models;
+using RevitSetLevelSection.Models.Repositories;
 
 namespace RevitSetLevelSection.ViewModels {
     internal class LinkTypeViewModel : BaseViewModel {
@@ -70,7 +71,7 @@ namespace RevitSetLevelSection.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _buildPart, value);
         }
 
-        public bool HasAreas => _linkInstanceRepository.GetAreas().Any();
+        public bool HasAreas => _linkInstanceRepository.GetZones().Any();
         public bool HasAreaScheme => _linkInstanceRepository.GetAreaScheme() != null;
 
         public ObservableCollection<string> BuildParts {
@@ -108,7 +109,11 @@ namespace RevitSetLevelSection.ViewModels {
             return _linkInstanceRepository.GetPartNames(paramNames).Distinct();
         }
 
-        public IAreaRepository GetAreaRepository() {
+        public IZoneRepository GetZonesRepository() {
+            return _linkInstanceRepository;
+        }
+        
+        public IMassRepository GetMassRepository() {
             return _linkInstanceRepository;
         }
 

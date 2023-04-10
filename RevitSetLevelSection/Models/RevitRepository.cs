@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,9 +21,10 @@ using dosymep.SimpleServices;
 using RevitSetLevelSection.Factories;
 using RevitSetLevelSection.Models.ElementPositions;
 using RevitSetLevelSection.Models.LevelProviders;
+using RevitSetLevelSection.Models.Repositories;
 
 namespace RevitSetLevelSection.Models {
-    internal class RevitRepository {
+    internal class RevitRepository : ILevelRepository {
         private readonly IBimModelPartsService _bimModelPartsService;
 
         public RevitRepository(UIApplication uiApplication, IBimModelPartsService bimModelPartsService) {
@@ -37,19 +37,39 @@ namespace RevitSetLevelSection.Models {
 
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
+        
+        public List<Level> GetElements() {
+            return new FilteredElementCollector(Document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(Level))
+                .OfType<Level>()
+                .ToList();
+        }
 
-        public Element GetElements(ElementId elementId) {
-            return Document.GetElement(elementId);
+        public IList<Element> GetElementInstances(IEnumerable<RevitParam> revitParams) {
+            List<ElementId> categories = revitParams
+                .SelectMany(item => item.GetParamBinding(Document).Binding.GetCategories())
+                .Select(item => item.Id)
+                .Distinct()
+                .ToList();
+
+            var filter = new ElementMulticategoryFilter(categories);
+            return new FilteredElementCollector(Document)
+                .WhereElementIsNotElementType()
+                .WherePasses(filter)
+                .Where(item => item.Category != null)
+                .OrderBy(item => item.Category.Name)
+                .ToList();
         }
 
         public BasePoint GetBasePoint() {
             return BasePoint.GetProjectBasePoint(Document);
         }
 
-        public TransactionGroup StartTransactionGroup(string transactionGroupName) {
-            return Document.StartTransactionGroup(transactionGroupName);
+        public Transaction StartTransaction(string transactionName) {
+            return Document.StartTransaction(transactionName);
         }
-        
+
         public bool IsKoordFile() {
             return _bimModelPartsService.InAnyBimModelParts(Document, BimModelPart.KOORDPart);
         }
@@ -71,137 +91,6 @@ namespace RevitSetLevelSection.Models {
                 .ToList();
         }
 
-        public void SetLevelParam(RevitParam revitParam, IAreaRepository areaRepository,
-            ILevelProviderFactory providerFactory) {
-            using(Transaction transaction =
-                  Document.StartTransaction($"Установка уровня/секции \"{revitParam.Name}\"")) {
-
-                var intersectImpl =
-                    new IntersectImpl() {Application = Application};
-
-                List<Element> elements = GetElements(revitParam);
-                List<ZoneInfo> zoneInfos = areaRepository.GetAreas();
-                Dictionary<string, Level> levels = GetLevels().ToDictionary(item => item.Name);
-                
-                using(var window = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
-                    window.DisplayTitleFormat = "Обработка [{0}\\{1}]";
-                    window.MaxValue = elements.Count;
-                    window.StepValue = 10;
-
-                    var progress = window.CreateProgress();
-                    var cancellationToken = window.CreateCancellationToken();
-
-                    window.Show();
-
-                    int count = 1;
-                    foreach(Element element in elements) {
-                        progress.Report(count++);
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        if(!providerFactory.CanCreate(element)) {
-                            element.RemoveParamValue(revitParam);
-                            continue;
-                        }
-
-                        List<Level> zoneLevels = zoneInfos
-                            .Where(item => intersectImpl.IsIntersect(item, element))
-                            .Select(item => levels.GetValueOrDefault(item.Level.Name, null))
-                            .Where(item => item != null)
-                            .ToList();
-
-                        var level = providerFactory.Create(element).GetLevel(element, zoneLevels);
-                        element.SetParamValue(revitParam, level?.Name.Split('_').FirstOrDefault());
-                    }
-                }
-
-                transaction.Commit();
-            }
-        }
-
-        private List<Level> GetLevels() {
-            return new FilteredElementCollector(Document)
-                .WhereElementIsNotElementType()
-                .OfClass(typeof(Level))
-                .OfType<Level>()
-                .ToList();
-        }
-
-        public void UpdateElements(ParamOption paramOption, Transform transform,
-            IEnumerable<FamilyInstance> massElements) {
-            List<Element> elements = GetElements(paramOption.RevitParam);
-            
-            using(Transaction transaction =
-                  Document.StartTransaction($"Установка уровня/секции \"{paramOption.RevitParam.Name}\"")) {
-
-                var logger = ServicesProvider.GetPlatformService<ILoggerService>()
-                    .ForPluginContext("Установка уровня\\секции");
-
-                var intersectImpl = new IntersectImpl() {LinkedTransform = transform, Application = Application};
-
-                var skipParam = SharedParamsConfig.Instance.FixBuildingWorks;
-                var objects = elements
-                    .Where(item => item.GetParamValueOrDefault<int?>(skipParam) != 1)
-                    .Select(item => new {
-                        Element = item,
-                        MassObject = massElements.FirstOrDefault(mass => intersectImpl.IsIntersect(mass, item))
-                    })
-                    .ToList();
-
-                using(var window = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
-                    window.DisplayTitleFormat = "Обработка [{0}\\{1}]";
-                    window.MaxValue = elements.Count;
-                    window.StepValue = 10;
-
-                    var progress = window.CreateProgress();
-                    var cancellationToken = window.CreateCancellationToken();
-
-                    window.Show();
-
-                    int count = 1;
-                    foreach(var element in objects) {
-                        progress.Report(count++);
-                        cancellationToken.ThrowIfCancellationRequested();
-                        try {
-                            string paramValue = element.MassObject?.GetParamValue<string>(paramOption);
-                            element.Element.SetParamValue(paramOption.RevitParam, paramValue);
-
-                            if(!string.IsNullOrEmpty(paramOption.AdskParamName)
-                               && element.Element.IsExistsSharedParam(paramOption.AdskParamName)) {
-                                element.Element.SetSharedParamValue(paramOption.AdskParamName, paramValue);
-                            }
-                        } catch(InvalidOperationException ex) {
-                            // решили что существует много вариантов,
-                            // когда параметр не может заполнится из-за настроек в ревите
-                            // Например: базовая стена внутри составной
-
-                            logger.Warning(ex,
-                                "Не был обновлен элемент {@elementId} в документе {documentId}.",
-                                element.Element.Id.IntegerValue, Document.GetUniqId());
-                        }
-                    }
-                }
-
-                transaction.Commit();
-            }
-        }
-
-        private List<Element> GetElements(RevitParam revitParam) {
-            var catFilter = new ElementMulticategoryFilter(GetCategories(revitParam));
-            return new FilteredElementCollector(Document)
-                .WhereElementIsNotElementType()
-                .WherePasses(catFilter)
-                .ToList();
-        }
-
-        private ElementId[] GetCategories(RevitParam revitParam) {
-            return Document.GetParameterBindings()
-                .Where(item => item.Binding.IsInstanceBinding())
-                .Where(item => revitParam.IsRevitParam(Document, item.Definition))
-                .SelectMany(item => item.Binding.GetCategories())
-                .Select(item => item.Id)
-                .ToArray();
-        }
-
         public Workset GetWorkset(RevitLinkType revitLinkType) {
             return Document.GetWorksetTable().GetWorkset(revitLinkType.WorksetId);
         }
@@ -211,12 +100,12 @@ namespace RevitSetLevelSection.Models {
             yield return MainBimBuildPart.KRPart;
             yield return MainBimBuildPart.VisPart;
         }
-        
+
         public MainBimBuildPart GetBuildPart() {
             if(_bimModelPartsService.GetBimModelPart(Document) == null) {
                 return null;
             }
-            
+
             if(_bimModelPartsService.InAnyBimModelParts(Document, BimModelPart.ARPart, BimModelPart.GPPart)) {
                 return MainBimBuildPart.ARPart;
             }
@@ -224,7 +113,7 @@ namespace RevitSetLevelSection.Models {
             if(_bimModelPartsService.InAnyBimModelParts(Document, BimModelPart.KRPart, BimModelPart.KMPart)) {
                 return MainBimBuildPart.KRPart;
             }
-            
+
             if(_bimModelPartsService.InAnyBimModelParts(Document, BimModelPart.KOORDPart)) {
                 return MainBimBuildPart.KOORDPart;
             }
@@ -233,60 +122,13 @@ namespace RevitSetLevelSection.Models {
             // ошибки будущего - ошибки будущего :D
             return MainBimBuildPart.VisPart;
         }
-    }
 
-    internal class MainBimBuildPart : IEquatable<MainBimBuildPart> {
-        public static readonly MainBimBuildPart ARPart = new MainBimBuildPart() {Id = 0, Name = "АР"};
-        public static readonly MainBimBuildPart KRPart = new MainBimBuildPart() {Id = 1, Name = "КР"};
-        public static readonly MainBimBuildPart VisPart = new MainBimBuildPart() {Id = 2, Name = "ВИС"};
-        public static readonly MainBimBuildPart KOORDPart = new MainBimBuildPart() {Id = 3, Name = "КООРД"};
-
-        public int Id { get; private set; }
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-
-        #region IEquatable<MainBimBuildPart>
-
-        public bool Equals(MainBimBuildPart other) {
-            if(ReferenceEquals(null, other)) {
-                return false;
-            }
-
-            if(ReferenceEquals(this, other)) {
-                return true;
-            }
-
-            return Id == other.Id;
+        public bool IsExistsParam(string paramName) {
+            return Document.IsExistsParam(paramName);
         }
-
-        public override bool Equals(object obj) {
-            if(ReferenceEquals(null, obj)) {
-                return false;
-            }
-
-            if(ReferenceEquals(this, obj)) {
-                return true;
-            }
-
-            if(obj.GetType() != this.GetType()) {
-                return false;
-            }
-
-            return Equals((MainBimBuildPart) obj);
+        
+        public RevitParam CreateRevitParam(string paramName) {
+            return SharedParamsConfig.Instance.CreateRevitParam(Document, paramName);
         }
-
-        public override int GetHashCode() {
-            return Id;
-        }
-
-        public static bool operator ==(MainBimBuildPart left, MainBimBuildPart right) {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(MainBimBuildPart left, MainBimBuildPart right) {
-            return !Equals(left, right);
-        }
-
-        #endregion
     }
 }

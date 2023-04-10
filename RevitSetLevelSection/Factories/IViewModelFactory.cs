@@ -7,12 +7,13 @@ using Ninject.Parameters;
 using Ninject.Syntax;
 
 using RevitSetLevelSection.Models;
+using RevitSetLevelSection.Models.Repositories;
 using RevitSetLevelSection.ViewModels;
 
 namespace RevitSetLevelSection.Factories {
     internal interface IViewModelFactory {
         LinkTypeViewModel Create(RevitLinkType revitLinkType);
-        DesignOptionsViewModel Create(IDesignOption designOption, LinkInstanceRepository linkInstanceRepository);
+        DesignOptionsViewModel Create(IDesignOption designOption, IMassRepository massRepository);
 
         FillParamViewModel Create(RevitParam revitParam);
         FillParamViewModel Create(ParamOption paramOption);
@@ -30,11 +31,10 @@ namespace RevitSetLevelSection.Factories {
                 new ConstructorArgument(nameof(revitLinkType), revitLinkType));
         }
 
-        public DesignOptionsViewModel Create(IDesignOption designOption,
-            LinkInstanceRepository linkInstanceRepository) {
+        public DesignOptionsViewModel Create(IDesignOption designOption, IMassRepository massRepository) {
             return _resolutionRoot.Get<DesignOptionsViewModel>(
                 new ConstructorArgument(nameof(designOption), designOption),
-                new ConstructorArgument(nameof(linkInstanceRepository), linkInstanceRepository));
+                new ConstructorArgument(nameof(massRepository), massRepository));
         }
 
         public FillParamViewModel Create(ParamOption paramOption) {

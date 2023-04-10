@@ -9,7 +9,7 @@ namespace RevitSetLevelSection.ViewModels {
         public abstract RevitParam RevitParam { get; }
 
         public abstract string GetErrorText();
-        public abstract void UpdateElements();
+        public abstract IFillParam CreateFillParam();
 
         public abstract ParamSettings GetParamSettings();
         public abstract void SetParamSettings(ParamSettings paramSettings);
