@@ -63,7 +63,9 @@ namespace RevitSetLevelSection.Models {
         }
 
         public BasePoint GetBasePoint() {
-            return BasePoint.GetProjectBasePoint(Document);
+            return (BasePoint) new FilteredElementCollector(Document)
+                .OfClass(typeof(BasePoint))
+                .FirstElement();
         }
 
         public Transaction StartTransaction(string transactionName) {

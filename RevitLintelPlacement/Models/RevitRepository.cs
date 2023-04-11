@@ -42,7 +42,7 @@ namespace RevitLintelPlacement.Models {
             
             // Получаем высоту базовой точки, 
             // так как она влияет на вставку элементов (перемычки)
-            _baseHeight = BasePoint.GetProjectBasePoint(_document).Position.Z;
+            _baseHeight = GetBasePoint().Position.Z;
 
             _revitEventHandler = new RevitEventHandler();
 
@@ -87,6 +87,12 @@ namespace RevitLintelPlacement.Models {
                 : _document.Title.Split('_').FirstOrDefault();
 
             return documentName;
+        }
+        
+        public BasePoint GetBasePoint() {
+            return (BasePoint) new FilteredElementCollector(_document)
+                .OfClass(typeof(BasePoint))
+                .FirstElement();
         }
 
         public FamilySymbol GetLintelType(string lintelTypeName) {
