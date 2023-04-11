@@ -135,7 +135,6 @@ namespace RevitGenLookupTables.ViewModels {
                     SelectedFamilyParams.Add(selectedParam);
                     FamilyParams.Remove(selectedParam);
                 }
-
             }
         }
 
