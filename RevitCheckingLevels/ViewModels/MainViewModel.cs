@@ -111,37 +111,36 @@ namespace RevitCheckingLevels.ViewModels {
                 ErrorText = $"Проверки на соответствие координационному файлу не выполнены (файл не выбран).";
                 return;
             }
-            
-            if(LinkType?.IsLinkLoaded == false) {
+
+            if(!LinkType.IsLinkLoaded) {
                 ErrorText = $"Проверки на соответствие координационному файлу не выполнены (файл не загружен).";
                 return;
             }
 
-            if(LinkType?.IsLinkLoaded == true) {
-                if(!_revitRepository.HasLinkInstance(LinkType.Element)) {
-                    ErrorText = $"Проверки на соответствие координационному файлу не выполнены (экземпляры не созданы).";
-                    return;
-                }
 
-                var linkLevelInfos = _revitRepository.GetLevels(LinkType.Element)
-                    .Select(item => new LevelParserImpl(item).ReadLevelInfo())
-                    .OrderBy(item => item.Level.Elevation)
-                    .ToArray();
+            if(!_revitRepository.HasLinkInstance(LinkType.Element)) {
+                ErrorText = $"Проверки на соответствие координационному файлу не выполнены (экземпляры не созданы).";
+                return;
+            }
 
-                if(linkLevelInfos.Length == 0) {
-                    ErrorText = $"Проверки на соответствие координационному файлу не выполнены (нет уровней).";
-                    return;
-                }
+            var linkLevelInfos = _revitRepository.GetLevels(LinkType.Element)
+                .Select(item => new LevelParserImpl(item).ReadLevelInfo())
+                .OrderBy(item => item.Level.Elevation)
+                .ToArray();
 
-                if(LoadLevelErrors(linkLevelInfos).Any()) {
-                    ErrorText = $"Проверки на соответствие координационному файлу не выполнены (ошибки в коорд. файле).";
-                    return;
-                }
+            if(linkLevelInfos.Length == 0) {
+                ErrorText = $"Проверки на соответствие координационному файлу не выполнены (нет уровней).";
+                return;
+            }
 
-                foreach(LevelInfo levelInfo in levelInfos) {
-                    if(levelInfo.IsNotFoundLevels(linkLevelInfos)) {
-                        Levels.Add(new LevelViewModel(levelInfo) {ErrorType = ErrorType.NotFoundLevels});
-                    }
+            if(LoadLevelErrors(linkLevelInfos).Any()) {
+                ErrorText = $"Проверки на соответствие координационному файлу не выполнены (ошибки в коорд. файле).";
+                return;
+            }
+
+            foreach(LevelInfo levelInfo in levelInfos) {
+                if(levelInfo.IsNotFoundLevels(linkLevelInfos)) {
+                    Levels.Add(new LevelViewModel(levelInfo) {ErrorType = ErrorType.NotFoundLevels});
                 }
             }
         }

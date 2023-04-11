@@ -30,7 +30,6 @@ namespace RevitLintelPlacement.ViewModels {
 
         public ElementInfoViewModel(ElementId elementId, InfoElement infoElement, params string[] args) {
             ElementId = elementId;
-            infoElement.FormatMessage(args);
             Message = infoElement.Message;
             ElementType = infoElement.ElementType;
             TypeInfo = infoElement.TypeInfo;

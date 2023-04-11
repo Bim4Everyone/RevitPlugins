@@ -30,7 +30,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
             }
 
             if(!File.Exists(FilePath)) {
-                throw new ArgumentException($"Путь \"{FilePath}\" недоступен.", nameof(FilePath));
+                throw new ArgumentException($"пїЅпїЅпїЅпїЅ \"{FilePath}\" пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.", nameof(FilePath));
             }
 
             var htmlText = string.Join("", File.ReadAllLines(FilePath));
@@ -43,7 +43,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
                             .Cast<Match>()
                             .Select(GetCells);
             if(!IsCorrectFileName(rows.FirstOrDefault())) {
-                throw new ArgumentException($"Данный отчет о коллизиях создан в другом файле.");
+                throw new ArgumentException($"пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.");
             }
             return rows.Select(item => new {
                 LeftElement = GetElement(item),
@@ -93,9 +93,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
                 Extension = _extensions.FirstOrDefault(e => fileCell.IndexOf(e, StringComparison.CurrentCultureIgnoreCase) > 0),
                 CellContent = fileCell
             };
-            if(fileCellInfo == null) {
-                return null;
-            }
+            
             var match = Regex.Match(fileCellInfo.CellContent, $"(?'fileName'[^>&gt;]+?){fileCellInfo.Extension}");
             return match.Success ? match.Groups["fileName"].Value.Trim() : null;
         }

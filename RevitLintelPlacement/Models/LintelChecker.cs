@@ -29,7 +29,7 @@ namespace RevitLintelPlacement.Models {
             foreach(var lintel in lintels) {
                 foreach(var checker in _checkers) {
                     var resultHandler = checker.Check(lintel.Lintel, lintel.ElementInWall);
-                    resultHandler?.Handle();
+                    resultHandler.Handle();
                     if(resultHandler.Code != ResultCode.Correct)
                         break;
                 }
@@ -62,7 +62,7 @@ namespace RevitLintelPlacement.Models {
             if((int) lintel.GetParamValue(_revitRepository.LintelsCommonConfig.LintelFixation) == 1) {
                 _elementInfos.ElementInfos.Add(new ElementInfoViewModel(lintel.Id, InfoElement.LintelIsFixedWithoutElement) {
                     Name = lintel.Name,
-                    LevelName = lintel?.LevelId != null ? _revitRepository.GetElementById(lintel?.LevelId).Name : null
+                    LevelName = lintel.LevelId != null ? _revitRepository.GetElementById(lintel.LevelId).Name : null
                 });
                 return new ReportResult(lintel.Id) { Code = ResultCode.LintelIsFixedWithoutElement };
             }
