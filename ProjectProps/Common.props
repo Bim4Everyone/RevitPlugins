@@ -137,7 +137,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Autodesk.Revit.SDK" Version="$(RevitVersion).*">
+        <PackageReference Include="ModPlus.Revit.API.$(RevitVersion)" Version="*">
             <PrivateAssets>all</PrivateAssets>
             <ExcludeAssets>runtime</ExcludeAssets>
         </PackageReference>
