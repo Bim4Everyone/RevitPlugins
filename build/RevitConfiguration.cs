@@ -12,14 +12,14 @@ class RevitConfiguration : Enumeration {
     static RevitConfiguration D2020 = new RevitConfiguration {Value = nameof(D2020), Version = 2020};
     static RevitConfiguration D2021 = new RevitConfiguration {Value = nameof(D2021), Version = 2021};
     static RevitConfiguration D2022 = new RevitConfiguration {Value = nameof(D2022), Version = 2022};
-    static RevitConfiguration D2023 = new RevitConfiguration {Value = nameof(D2023), Version = 2023};
-    static RevitConfiguration D2024 = new RevitConfiguration {Value = nameof(D2024), Version = 2024};
+    // static RevitConfiguration D2023 = new RevitConfiguration {Value = nameof(D2023), Version = 2023};
+    // static RevitConfiguration D2024 = new RevitConfiguration {Value = nameof(D2024), Version = 2024};
 
     static RevitConfiguration R2020 = new RevitConfiguration {Value = nameof(R2020), Version = 2020};
     static RevitConfiguration R2021 = new RevitConfiguration {Value = nameof(R2021), Version = 2021};
     static RevitConfiguration R2022 = new RevitConfiguration {Value = nameof(R2022), Version = 2022};
-    static RevitConfiguration R2023 = new RevitConfiguration {Value = nameof(R2023), Version = 2023};
-    static RevitConfiguration R2024 = new RevitConfiguration {Value = nameof(R2024), Version = 2024};
+    // static RevitConfiguration R2023 = new RevitConfiguration {Value = nameof(R2023), Version = 2023};
+    // static RevitConfiguration R2024 = new RevitConfiguration {Value = nameof(R2024), Version = 2024};
 
     public int Version { get; protected set; }
 
