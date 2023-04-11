@@ -71,13 +71,13 @@ namespace RevitRooms.ViewModels {
         public bool? IsRoomBalcony {
             get { return Convert.ToInt32(Element.GetParamValueOrDefault(ProjectParamsConfig.Instance.IsRoomBalcony)) == 1; }
         }
-#if D2020 || R2020 || D2021 || R2021
+#if REVIT_2021_OR_LESS
 
         public double? RoomAreaRatio {
             get { return (double?) Element.GetParamValueOrDefault(ProjectParamsConfig.Instance.RoomAreaRatio); }
         }
 
-#elif D2021 || R2021 || D2022 || R2022
+#else
 
         public double? RoomAreaRatio {
             get { return (double?) Element.GetParamValueOrDefault(SharedParamsConfig.Instance.RoomAreaRatio); }
@@ -112,7 +112,7 @@ namespace RevitRooms.ViewModels {
         public PhaseViewModel Phase { get; }
 
         public void UpdateSharedParams() {
-#if D2020 || R2020 || D2021 || R2021
+#if REVIT_2021_OR_LESS
             Element.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaSpec, ProjectParamsConfig.Instance.ApartmentAreaSpec);
             Element.SetParamValue(SharedParamsConfig.Instance.ApartmentGroupName, ProjectParamsConfig.Instance.ApartmentGroupName);
             Element.SetParamValue(SharedParamsConfig.Instance.ApartmentAreaMinSpec, ProjectParamsConfig.Instance.ApartmentAreaMinSpec);

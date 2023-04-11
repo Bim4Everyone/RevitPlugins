@@ -24,7 +24,7 @@ namespace RevitMarkPlacement.Models {
              || spot.Name.EndsWith(RevitRepository.FilterSpotName, StringComparison.CurrentCultureIgnoreCase));
         }
 
-#if D2020 || R2020
+#if REVIT_2021_OR_LESS
         private static bool GetHasLeader(SpotDimension spot) {
             return true;
         }

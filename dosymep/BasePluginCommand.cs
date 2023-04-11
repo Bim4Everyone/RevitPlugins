@@ -44,7 +44,7 @@ namespace dosymep.Bim4Everyone {
                     .ShowAsync();
             } catch(Exception ex) {
                 PluginLoggerService.Warning(ex, "Ошибка в команде расширения.");
-#if D2020 || D2021 || D2022
+#if DEBUG
                 TaskDialog.Show(PluginName, ex.ToString());
 #else
                 TaskDialog.Show(PluginName, ex.Message);

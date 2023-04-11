@@ -29,7 +29,7 @@ namespace RevitRooms.Models {
         }
 
         public CheckProjectParams CopyProjectParams() {
-#if D2020 || R2020 || D2021 || R2021
+#if REVIT_2021_OR_LESS
             _projectParameters.SetupRevitParams(_uiApplication.ActiveUIDocument.Document,
                 ProjectParamsConfig.Instance.IsRoomNumberFix,
                 ProjectParamsConfig.Instance.NumberingOrder,

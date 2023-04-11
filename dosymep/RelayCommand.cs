@@ -48,7 +48,7 @@ namespace dosymep.WPF.Commands {
                 GetPlatformService<ILoggerService>()
                     .Warning(ex, "Ошибка выполнения команды.");
 
-#if D2020 || D2021 || D2022
+#if DEBUG
                 TaskDialog.Show("Ошибка!", ex.ToString());
 #else
                 TaskDialog.Show("Ошибка!", ex.Message);

@@ -51,7 +51,7 @@ namespace RevitBatchPrint.ViewModels {
                 ? System.Windows.Visibility.Collapsed
                 : System.Windows.Visibility.Visible;
 
-#if D2022 || R2022
+#if REVIT_2022_OR_GREATER
             VisibilitySelectFile = System.Windows.Visibility.Visible;
 #endif
         }

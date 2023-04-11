@@ -57,7 +57,7 @@ namespace RevitMarkPlacement.ViewModels {
         }
 
         private double GetValue(GlobalParameter parameter) {
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
             return UnitUtils.ConvertFromInternalUnits((parameter.GetValue() as DoubleParameterValue).Value, DisplayUnitType.DUT_MILLIMETERS);
 #else
             return UnitUtils.ConvertFromInternalUnits((parameter.GetValue() as DoubleParameterValue).Value, UnitTypeId.Millimeters);

@@ -55,9 +55,9 @@ namespace RevitLintelPlacement.ViewModels {
             }
 
             double openingWidth;
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
             openingWidth = UnitUtils.ConvertFromInternalUnits((double) elementWidth, DisplayUnitType.DUT_MILLIMETERS);
-#elif D2021 || R2021
+#elif REVIT_2021
             openingWidth = UnitUtils.ConvertFromInternalUnits((double) elementWidth, UnitTypeId.Millimeters);
 
 #else

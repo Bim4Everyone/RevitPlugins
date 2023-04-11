@@ -30,7 +30,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
 
         [JsonIgnore]
         public RevitRepository RevitRepository { get; set; }
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
         [JsonIgnore]
         public UnitType UnitType => UnitType.UT_Number;
 #else
