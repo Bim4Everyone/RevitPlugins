@@ -1,63 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Input;
-
-using Autodesk.Revit.UI;
-
-using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.SimpleServices;
 
 namespace dosymep.WPF.Commands {
-    internal class RelayCommand : ICommand {
-        private Action<object> execute;
-        private Func<object, bool> canExecute;
-
-        public event EventHandler CanExecuteChanged {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
+    internal class RelayCommand : RelayCommand<object> {
+        public RelayCommand Create(Action execute, Func<bool> canExecute = null) {
+            return new RelayCommand(p => execute(), canExecute == null ? (Func<object, bool>) null : p => canExecute());
         }
 
-        public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null) {
-            this.execute = execute;
-            this.canExecute = canExecute;
+        public RelayCommand<T> Create<T>(Action<T> execute, Func<T, bool> canExecute = null) {
+            return new RelayCommand<T>(execute, canExecute);
         }
 
-        public bool CanExecute(object parameter) {
-            return this.canExecute == null || this.canExecute(parameter);
-        }
-
-        public void Execute(object parameter) {
-            try {
-                this.execute(parameter);
-            } catch(OperationCanceledException) {
-                GetPlatformService<INotificationService>()
-                    .CreateWarningNotification("C#", "Отмена выполнения команды.")
-                    .ShowAsync();
-            } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
-                GetPlatformService<INotificationService>()
-                    .CreateWarningNotification("C#", "Отмена выполнения команды.")
-                    .ShowAsync();
-            } catch(Exception ex) {
-                GetPlatformService<INotificationService>()
-                    .CreateFatalNotification("C#", "Ошибка выполнения команды.")
-                    .ShowAsync();
-
-                GetPlatformService<ILoggerService>()
-                    .Warning(ex, "Ошибка выполнения команды.");
-
-#if DEBUG
-                TaskDialog.Show("Ошибка!", ex.ToString());
-#else
-                TaskDialog.Show("Ошибка!", ex.Message);
-#endif
-            }
-        }
-
-        protected T GetPlatformService<T>() {
-            return ServicesProvider.GetPlatformService<T>();
+        public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
+            : base(execute, canExecute) {
         }
     }
 }

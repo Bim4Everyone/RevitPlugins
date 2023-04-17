@@ -134,7 +134,9 @@
         <Compile Include="..\dosymep\IndexConverter.cs" Link="dosymep\IndexConverter.cs"/>
         <Compile Include="..\dosymep\InverseBooleanConverter.cs" Link="dosymep\InverseBooleanConverter.cs"/>
         <Compile Include="..\dosymep\PlatformWindow.cs" Link="dosymep\PlatformWindow.cs"/>
-        <Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\RelayCommand.cs"/>
+        <Compile Include="..\dosymep\ICommand.cs" Link="dosymep\Commands\ICommand.cs"/>
+        <Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\Commands\RelayCommand.cs"/>
+        <Compile Include="..\dosymep\RelayCommand.T.cs" Link="dosymep\Commands\RelayCommand.T.cs"/>
     </ItemGroup>
 
     <ItemGroup>
