@@ -24,7 +24,7 @@ namespace dosymep.Serializers {
         }
     }
 
-    public class ElementIdConverter : JsonConverter<ElementId> {
+    internal class ElementIdConverter : JsonConverter<ElementId> {
         public override void WriteJson(JsonWriter writer, ElementId value, JsonSerializer serializer) {
 #if REVIT_2023_OR_LESS
             writer.WriteValue(value.IntegerValue.ToString());
