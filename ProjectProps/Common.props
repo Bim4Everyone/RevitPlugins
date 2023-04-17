@@ -135,8 +135,12 @@
         <Compile Include="..\dosymep\InverseBooleanConverter.cs" Link="dosymep\InverseBooleanConverter.cs"/>
         <Compile Include="..\dosymep\PlatformWindow.cs" Link="dosymep\PlatformWindow.cs"/>
         <Compile Include="..\dosymep\ICommand.cs" Link="dosymep\Commands\ICommand.cs"/>
+        <Compile Include="..\dosymep\IAsyncCommand.cs" Link="dosymep\Commands\IAsyncCommand.cs"/>
+        <Compile Include="..\dosymep\IAsyncCommand.T.cs" Link="dosymep\Commands\IAsyncCommand.T.cs"/>
         <Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\Commands\RelayCommand.cs"/>
         <Compile Include="..\dosymep\RelayCommand.T.cs" Link="dosymep\Commands\RelayCommand.T.cs"/>
+        <Compile Include="..\dosymep\AsyncRelayCommand.cs" Link="dosymep\Commands\AsyncRelayCommand.cs"/>
+        <Compile Include="..\dosymep\AsyncRelayCommand.T.cs" Link="dosymep\Commands\AsyncRelayCommand.T.cs"/>
     </ItemGroup>
 
     <ItemGroup>
