@@ -69,7 +69,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
         }
 
         public FilterRule GetRule(Document doc, IVisiter visiter, ParamValue paramValue) {
-            var revitParam = SystemParamsConfig.Instance.CreateRevitParam(BuiltInParameter.ELEM_PARTITION_PARAM);
+            var revitParam = SystemParamsConfig.Instance.CreateRevitParam(doc, BuiltInParameter.ELEM_PARTITION_PARAM);
             return paramValue.GetFilterRule(visiter, doc, revitParam);
         }
 
