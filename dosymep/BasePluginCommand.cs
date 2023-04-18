@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -98,6 +99,24 @@ namespace dosymep.Bim4Everyone {
         /// </summary>
         /// <param name="uiApplication">Приложение Revit.</param>
         protected abstract void Execute(UIApplication uiApplication);
+
+        protected void Notification(Window window) {
+            Notification(window.ShowDialog());
+        }
+        
+        protected void Notification(bool? dialogResult) {
+            if(dialogResult == null) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выход из скрипта.", "C#")
+                    .ShowAsync();
+            } else if(dialogResult == true) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else if(dialogResult == false) {
+                throw new OperationCanceledException();
+            }
+        }
 
         protected T GetPlatformService<T>() {
             return ServicesProvider.GetPlatformService<T>();
