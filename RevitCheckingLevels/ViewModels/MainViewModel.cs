@@ -39,7 +39,7 @@ namespace RevitCheckingLevels.ViewModels {
         public ICommand UpdateElevationCommand { get; }
 
         public bool IsKoordFile => _revitRepository.IsKoordFile();
-        public bool HasErrors => LinkType == null || !LinkType.IsLinkLoaded || Levels.Count > 0;
+        public bool HasErrors => !IsKoordFile && (LinkType == null || !LinkType.IsLinkLoaded) || Levels.Count > 0;
 
         public string ErrorText {
             get => _errorText;
