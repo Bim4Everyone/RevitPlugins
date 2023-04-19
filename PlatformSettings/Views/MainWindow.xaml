@@ -46,7 +46,7 @@
 
                         <dxg:TreeViewControl
                             x:Name="_settings"
-                            RootValue="-1"
+                            RootValue="0"
                             AutoExpandAllNodes="True"
                             
                             KeyFieldName="Id"
