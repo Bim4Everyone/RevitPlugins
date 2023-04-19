@@ -1,9 +1,8 @@
 ﻿#region Namespaces
-using PlatformSettings.TabExtensions;
 
 #endregion
 
-namespace PlatformSettings.TabExtensions {
+namespace PlatformSettings.Legacy.TabExtensions {
     /// <summary>
     /// Включает и выключает расширение.
     /// </summary>

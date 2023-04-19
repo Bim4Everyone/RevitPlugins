@@ -1,16 +1,16 @@
 ﻿<views:PlatformWindow
-    x:Class="PlatformSettings.SettingsWindow"
+    x:Class="PlatformSettings.Legacy.SettingsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:PlatformSettings"
-    xmlns:tabextensions="clr-namespace:PlatformSettings.TabExtensions"
     xmlns:views="clr-namespace:dosymep.WPF.Views"
+    xmlns:legacy="clr-namespace:PlatformSettings.Legacy"
     mc:Ignorable="d" 
     Height="450" Width="800" WindowStartupLocation="CenterScreen" Title="Настройки">
     <Window.DataContext>
-        <local:PlatformSettingsViewModel/>
+        <legacy:PlatformSettingsViewModel/>
     </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>

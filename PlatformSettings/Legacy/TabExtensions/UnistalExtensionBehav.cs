@@ -1,11 +1,10 @@
 ﻿#region Namespaces
-using PlatformSettings.TabExtensions;
 
 using pyRevitLabs.PyRevit;
 
 #endregion
 
-namespace PlatformSettings {
+namespace PlatformSettings.Legacy.TabExtensions {
     /// <summary>
     /// Устанавливает и удаляет расширение.
     /// </summary>

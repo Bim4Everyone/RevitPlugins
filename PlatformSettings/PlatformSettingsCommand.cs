@@ -11,7 +11,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 
-using PlatformSettings.TabExtensions;
+using PlatformSettings.Legacy;
 
 using pyRevitLabs.NLog;
 using pyRevitLabs.PyRevit;

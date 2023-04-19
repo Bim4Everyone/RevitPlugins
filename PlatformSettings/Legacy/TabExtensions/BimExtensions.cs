@@ -1,14 +1,11 @@
 ﻿#region Namespaces
+
 using System;
 using System.Collections.Generic;
 
-using PlatformSettings.TabExtensions;
-
-using pyRevitLabs.PyRevit;
-
 #endregion
 
-namespace PlatformSettings.TabExtensions {
+namespace PlatformSettings.Legacy.TabExtensions {
     /// <summary>
     /// Класс для получения расширений платформы.
     /// </summary>

@@ -2,7 +2,7 @@
 
 #endregion
 
-namespace PlatformSettings.TabExtensions {
+namespace PlatformSettings.Legacy.TabExtensions {
     /// <summary>
     /// Интерфейс переключателя расширения (включение/отключение)
     /// </summary>

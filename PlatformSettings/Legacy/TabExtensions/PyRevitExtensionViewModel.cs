@@ -2,7 +2,7 @@
 
 using pyRevitLabs.PyRevit;
 
-namespace PlatformSettings.TabExtensions {
+namespace PlatformSettings.Legacy.TabExtensions {
     public class PyRevitExtensionViewModel : INotifyPropertyChanged {
         private readonly PyRevitExtensionDefinitionEx _pyRevitExtension;
 

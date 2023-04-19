@@ -11,7 +11,7 @@ using dosymep.WPF.Commands;
 
 using pyRevitLabs.NLog;
 
-namespace PlatformSettings.SharedParams {
+namespace PlatformSettings.Legacy.SharedParams {
     /// <summary>
     /// Interaction logic for SharedParamsSettingsView.xaml
     /// </summary>

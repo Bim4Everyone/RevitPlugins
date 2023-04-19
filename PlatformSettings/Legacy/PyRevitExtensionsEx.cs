@@ -8,7 +8,7 @@ using pyRevitLabs.Json.Linq;
 using pyRevitLabs.NLog;
 using pyRevitLabs.PyRevit;
 
-namespace PlatformSettings {
+namespace PlatformSettings.Legacy {
     /// <summary>
     /// https://github.com/eirannejad/pyRevit/blob/7eb0a4e1f6d2509735b2da80168b1c8b0e5b2f20/dev/pyRevitLabs/pyRevitLabs.PyRevit/PyRevitExtension.cs#L35
     /// Пришлось создать дубликат класса, чтобы нормально происходила десериализация.
