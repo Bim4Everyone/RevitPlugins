@@ -9,6 +9,8 @@
     xmlns:vms="clr-namespace:PlatformSettings.ViewModels"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -17,20 +19,58 @@
     Height="450" Width="800"
 
     x:Name="_this"
-    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
-    
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=True}">
+
     <dxmvvm:Interaction.Behaviors>
         <dxmvvm:EventToCommand
             EventName="Loaded"
             Command="{Binding LoadViewCommand}" />
     </dxmvvm:Interaction.Behaviors>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
+
+        <dxlc:LayoutControl
+            Grid.Row="0"
+            AllowItemSizing="True">
+            <dxlc:LayoutGroup View="Group">
+                <dxlc:LayoutGroup>
+                    <dxlc:LayoutGroup
+                        Width="300"
+                        MinWidth="200"
+                        View="Group"
+                        Header="Settings">
+
+                        <dxg:TreeViewControl
+                            x:Name="_settings"
+                            RootValue="-1"
+                            AutoExpandAllNodes="True"
+                            
+                            KeyFieldName="Id"
+                            ParentFieldName="ParentId"
+                            TreeViewFieldName="SettingsName"
+                            TreeDerivationMode="Selfreference"
+                            ItemsSource="{Binding Settings}">
+                            
+                            
+                        </dxg:TreeViewControl>
+
+                    </dxlc:LayoutGroup>
+                    <dxlc:LayoutGroup
+                        View="Group"
+                        dxlc:LayoutControl.AllowHorizontalSizing="True">
+
+                        <ContentControl
+                            Content="{Binding SelectedItem, ElementName=_settings}" />
+
+                    </dxlc:LayoutGroup>
+                </dxlc:LayoutGroup>
+            </dxlc:LayoutGroup>
+        </dxlc:LayoutControl>
+
         <StackPanel
             Grid.Row="1"
             Height="45"
