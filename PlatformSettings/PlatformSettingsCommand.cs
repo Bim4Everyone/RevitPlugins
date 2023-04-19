@@ -64,6 +64,9 @@ namespace PlatformSettings {
                 kernel.Bind<IExtensionsService<ThirdPartyExtension>>()
                     .To<ThirdPartyExtensionsService>();
                 
+                kernel.Bind<IExtensionViewModelFactory>()
+                    .To<ExtensionViewModelFactory>();
+                
                 kernel.Bind<ISettingsViewModelFactory>()
                     .To<SettingsViewModelFactory>();
                 

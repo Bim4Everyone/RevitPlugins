@@ -17,16 +17,11 @@ namespace PlatformSettings.ViewModels {
             _settingsViewModelFactory = settingsViewModelFactory;
 
             LoadViewCommand = RelayCommand.Create(LoadView);
+            ApplyViewCommand = RelayCommand.Create(ApplyView);
         }
-
-        private void LoadView() {
-            Settings = new ObservableCollection<SettingsViewModel>() {
-                _settingsViewModelFactory.Create<SettingsViewModel>(0, 0, "Общие"),
-                _settingsViewModelFactory.Create<ExtensionsSettingsViewModel>(1, 0, "Расширения"),
-            };
-        }
-
+        
         public ICommand LoadViewCommand { get; }
+        public ICommand ApplyViewCommand { get; }
 
         public string ErrorText {
             get => _errorText;
@@ -36,6 +31,17 @@ namespace PlatformSettings.ViewModels {
         public ObservableCollection<SettingsViewModel> Settings {
             get => _settings;
             set => this.RaiseAndSetIfChanged(ref _settings, value);
+        }
+
+        private void LoadView() {
+            Settings = new ObservableCollection<SettingsViewModel>() {
+                _settingsViewModelFactory.Create<SettingsViewModel>(0, 0, "Общие"),
+                _settingsViewModelFactory.Create<ExtensionsSettingsViewModel>(1, 0, "Расширения"),
+            };
+        }
+        
+        private void ApplyView() {
+            throw new System.NotImplementedException();
         }
     }
 }

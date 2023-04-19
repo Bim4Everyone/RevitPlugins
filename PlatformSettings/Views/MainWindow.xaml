@@ -19,7 +19,27 @@
     Height="450" Width="800"
 
     x:Name="_this"
-    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=True}">
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vms:SettingsViewModel}">
+
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vms:ExtensionsSettingsViewModel}">
+            <dxg:GridControl
+                SelectionMode="Row"
+                ItemsSource="{Binding Extensions}">
+                <dxg:GridControl.View>
+                    <dxg:TableView AutoWidth="True" />
+                </dxg:GridControl.View>
+                
+                <dxg:GridColumn Header=" " Width="250" FieldName="IsSelected" />
+                <dxg:GridColumn Header="Имя" Width="250" FieldName="Name" />
+                <dxg:GridColumn Header="Описание" Width="250" FieldName="Description" />
+            </dxg:GridControl>
+        </DataTemplate>
+    </Window.Resources>
 
     <dxmvvm:Interaction.Behaviors>
         <dxmvvm:EventToCommand
@@ -48,14 +68,13 @@
                             x:Name="_settings"
                             RootValue="0"
                             AutoExpandAllNodes="True"
-                            
+
                             KeyFieldName="Id"
                             ParentFieldName="ParentId"
                             TreeViewFieldName="SettingsName"
                             TreeDerivationMode="Selfreference"
                             ItemsSource="{Binding Settings}">
-                            
-                            
+
                         </dxg:TreeViewControl>
 
                     </dxlc:LayoutGroup>
@@ -85,7 +104,8 @@
             <dx:SimpleButton
                 Margin="10"
                 Width="80"
-                Content="ОК" />
+                Content="ОК"
+                Command="{Binding ApplyViewCommand}" />
 
             <dx:SimpleButton
                 Margin="10"
