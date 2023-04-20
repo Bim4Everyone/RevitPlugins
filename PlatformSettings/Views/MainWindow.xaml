@@ -12,6 +12,8 @@
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:sharedParams="clr-namespace:dosymep.Bim4Everyone.SharedParams;assembly=dosymep.Bim4Everyone"
+    xmlns:projectParams="clr-namespace:dosymep.Bim4Everyone.ProjectParams;assembly=dosymep.Bim4Everyone"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -67,6 +69,25 @@
 
                 <dxg:GridColumn Header="Имя" Width="250" FieldName="Name" />
                 <dxg:GridColumn Header="Описание" Width="250" FieldName="Description" />
+            </dxg:GridControl>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vms:RevitParamsSettingsViewModel}">
+            <dxg:GridControl
+                ItemsSource="{Binding RevitParams}">
+                
+                <dxg:GridControl.View>
+                    <dxg:TableView
+                        AutoWidth="True"
+                        AllowEditing="False"
+                        AllowGrouping="False"
+                        ShowGroupPanel="False"
+                        EnableImmediatePosting="True" />
+                </dxg:GridControl.View>
+
+                <dxg:GridColumn Header="Id" FieldName="Id" />
+                <dxg:GridColumn Header="Имя" FieldName="Name" />
+                <dxg:GridColumn Header="StorageType" FieldName="StorageType" />
             </dxg:GridControl>
         </DataTemplate>
     </Window.Resources>

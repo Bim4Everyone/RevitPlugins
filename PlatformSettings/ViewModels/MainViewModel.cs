@@ -43,6 +43,7 @@ namespace PlatformSettings.ViewModels {
             Settings = new ObservableCollection<SettingsViewModel>() {
                 _settingsViewModelFactory.Create<SettingsViewModel>(0, 0, "Общие"),
                 _settingsViewModelFactory.Create<ExtensionsSettingsViewModel>(1, 0, "Расширения"),
+                _settingsViewModelFactory.Create<RevitParamsSettingsViewModel>(2, 0, "Параметры платформы"),
             };
 
             Setting = Settings[1];
