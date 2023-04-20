@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Security.Policy;
@@ -18,7 +19,7 @@ namespace PlatformSettings.Model {
 
         public bool Builtin => GetValue<bool>();
         public bool DefaultEnabled => GetValue<bool>();
-        
+
         public string Type => GetValue<string>();
         public string Name => GetValue<string>();
         public string Description => GetValue<string>();
@@ -28,9 +29,6 @@ namespace PlatformSettings.Model {
 
         public Url Url => new Url(GetValue<string>());
         public Url Website => new Url(GetValue<string>());
-
-        public abstract void EnableExtension();
-        public abstract void DisableExtension();
 
         protected T GetValue<T>([CallerMemberName] string propertyName = null) {
             return _token.Value<T>(ToSnakeCase(propertyName));
@@ -58,11 +56,6 @@ namespace PlatformSettings.Model {
             }
 
             return sb.ToString();
-        }
-
-        protected string GetApplicationPath() {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "pyRevit-Master", "bin");
         }
     }
 }

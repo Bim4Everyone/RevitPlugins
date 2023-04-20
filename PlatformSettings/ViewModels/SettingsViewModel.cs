@@ -13,5 +13,7 @@ namespace PlatformSettings.ViewModels {
         public int Id { get; }
         public int ParentId { get; }
         public string SettingsName { get; }
+
+        public virtual void SaveSettings() { }
     }
 }

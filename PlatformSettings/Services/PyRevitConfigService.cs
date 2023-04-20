@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -22,6 +23,52 @@ namespace PlatformSettings.Services {
         public bool IsEnabledExtension(Extension extension) {
             string disabled = _iniFile.Read($"{extension.Name}.{extension.Type}", "disabled");
             return string.IsNullOrEmpty(disabled) ? false : !bool.Parse(disabled);
+        }
+
+        public void ToggleExtension(Extension extension) {
+            if(IsEnabledExtension(extension)) {
+                DisableExtension(extension);
+            } else {
+                EnableExtension(extension);
+            }
+        }
+
+        public void EnableExtension(Extension extension) {
+            _iniFile.Write($"{extension.Name}.{extension.Type}", "disabled", "false");
+        }
+
+        public void DisableExtension(Extension extension) {
+            _iniFile.Write($"{extension.Name}.{extension.Type}", "disabled", "true");
+        }
+
+        public bool IsInstalledExtension(Extension extension) {
+            throw new NotSupportedException();
+        }
+
+        public void InstallExtension(Extension extension) {
+            EnableExtension(extension);
+            var type = extension.Type == "extension" ? "ui" : "lib";
+            PyRevitCliStart($"extend {type} {extension.Name} {extension.Url.Value}");
+        }
+
+        public void RemoveExtension(Extension extension) {
+            PyRevitCliStart($"extensions delete {extension.Name}");
+            _iniFile.RemoveSection($"{extension.Name}.{extension.Type}");
+        }
+
+        private void PyRevitCliStart(string args) {
+            Process.Start(new ProcessStartInfo() {
+                CreateNoWindow = true,
+                UseShellExecute = true,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                FileName = GetPyRevitCliPath(),
+                Arguments = args
+            })?.WaitForExit();
+        }
+
+        private string GetPyRevitCliPath() {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "pyRevit-Master", "bin", "pyrevit.exe");
         }
 
         private class IniFile {
@@ -57,7 +104,7 @@ namespace PlatformSettings.Services {
                 Write(section, key, null);
             }
 
-            public void DeleteSection(string section) {
+            public void RemoveSection(string section) {
                 Write(section, null, null);
             }
         }

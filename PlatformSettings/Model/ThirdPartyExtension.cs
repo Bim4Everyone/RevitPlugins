@@ -9,13 +9,5 @@ namespace PlatformSettings.Model {
         }
 
         public override bool AllowChangeEnabled => !DefaultEnabled;
-
-        public override void EnableExtension() {
-            Process.Start(GetApplicationPath(), $"extend ui {Name} {Url}")?.WaitForExit();
-        }
-
-        public override void DisableExtension() {
-            Process.Start(GetApplicationPath(), $"delete {Name}")?.WaitForExit();
-        }
     }
 }

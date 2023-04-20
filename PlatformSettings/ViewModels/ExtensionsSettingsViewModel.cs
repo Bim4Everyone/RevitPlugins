@@ -26,9 +26,14 @@ namespace PlatformSettings.ViewModels {
                 new ObservableCollection<ExtensionViewModel>(GetExtensions()
                     .Select(item => _extensionFactory.Create(item)));
         }
-
-
+        
         public ObservableCollection<ExtensionViewModel> Extensions { get; }
+
+        public override void SaveSettings() {
+            foreach(ExtensionViewModel extensionViewModel in Extensions) {
+                extensionViewModel.SaveExtensionState();
+            }
+        }
 
         private IEnumerable<Extension> GetExtensions() {
             return _thirdPartyService.GetExtensions()

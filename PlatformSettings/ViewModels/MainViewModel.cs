@@ -49,7 +49,9 @@ namespace PlatformSettings.ViewModels {
         }
 
         private void ApplyView() {
-            throw new System.NotImplementedException();
+            foreach(SettingsViewModel settingsViewModel in Settings) {
+                settingsViewModel.SaveSettings();
+            }
         }
     }
 }
