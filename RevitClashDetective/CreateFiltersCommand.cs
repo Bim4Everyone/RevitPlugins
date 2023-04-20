@@ -38,7 +38,6 @@ namespace RevitClashDetective {
             if(selectedFilter != null) {
                 viewModlel.SelectedFilter = viewModlel.Filters.FirstOrDefault(item => item.Name.Equals(selectedFilter, StringComparison.CurrentCultureIgnoreCase));
             }
-            GetPlatformService<IRootWindowService>().RootWindow = window;
             if(window.ShowDialog() == true) {
                 GetPlatformService<INotificationService>()
                     .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
