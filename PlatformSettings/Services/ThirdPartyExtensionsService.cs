@@ -28,7 +28,9 @@ namespace PlatformSettings.Services {
         }
 
         public IEnumerable<ThirdPartyExtension> GetExtensions() {
-            return JArray.Parse(File.ReadAllText(ExtensionsDefinitionPath))
+            return JObject.Parse(File.ReadAllText(ExtensionsDefinitionPath))
+                .GetValue("extensions")
+                .ToObject<JToken[]>()
                 .Select(item => _thirdPartyFactory.Create(item));
         }
     }
