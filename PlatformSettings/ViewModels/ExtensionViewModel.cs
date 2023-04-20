@@ -7,17 +7,18 @@ using PlatformSettings.Model;
 namespace PlatformSettings.ViewModels {
     internal class ExtensionViewModel : BaseViewModel {
         private readonly Extension _extension;
-        private bool _isSelected;
+        private bool _isEnabled;
 
-        public ExtensionViewModel(Extension extension) {
+        public ExtensionViewModel(Extension extension, bool isEnabled) {
             _extension = extension;
+            _isEnabled = isEnabled;
         }
 
-        public bool IsSelected {
-            get => _isSelected;
+        public bool IsEnabled {
+            get => _isEnabled;
             set {
                 if(AllowChangeEnabled) {
-                    this.RaiseAndSetIfChanged(ref _isSelected, value);
+                    this.RaiseAndSetIfChanged(ref _isEnabled, value);
                 }
             }
         }

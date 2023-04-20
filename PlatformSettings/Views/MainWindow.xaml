@@ -29,18 +29,18 @@
 
         <DataTemplate DataType="{x:Type vms:ExtensionsSettingsViewModel}">
             <dxg:GridControl
-                SelectionMode="Row"
                 ItemsSource="{Binding Extensions}">
                 <dxg:GridControl.View>
                     <dxg:TableView
                         AutoWidth="True"
                         AllowEditing="False"
                         AllowGrouping="False"
-                        ShowGroupPanel="False" />
+                        ShowGroupPanel="False"
+                        EnableImmediatePosting="True" />
                 </dxg:GridControl.View>
 
                 <dxg:GridColumn
-                    FieldName="IsSelected"
+                    FieldName="IsEnabled"
                     Header=""
                     AllowEditing="True"
                     AllowMoving="False"
@@ -58,10 +58,8 @@
                         <DataTemplate DataType="{x:Type dxg:RowData}">
                             <dxe:CheckEdit
                                 Name="PART_Editor"
-                                IsReadOnly="True"
-                                IsChecked="{Binding Row.IsSelected, 
-                                UpdateSourceTrigger=PropertyChanged}"
-                                IsEnabled="{Binding Row.AllowChangeEnabled}" />
+                                IsEnabled="{Binding Row.AllowChangeEnabled}"
+                                EditValue="{Binding Row.IsEnabled, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
 

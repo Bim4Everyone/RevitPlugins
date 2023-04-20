@@ -1,4 +1,5 @@
 #region Namespaces
+
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -47,29 +48,32 @@ namespace PlatformSettings {
                 kernel.Bind<Application>()
                     .ToConstant(uiApplication.Application)
                     .InTransientScope();
-                
-                
+
+
                 kernel.Bind<BuiltinExtension>().ToSelf();
                 kernel.Bind<ThirdPartyExtension>().ToSelf();
 
                 kernel.Bind<IExtensionFactory<BuiltinExtension>>()
                     .To<ExtensionFactory<BuiltinExtension>>();
-                
+
                 kernel.Bind<IExtensionFactory<ThirdPartyExtension>>()
                     .To<ExtensionFactory<ThirdPartyExtension>>();
-                
+
                 kernel.Bind<IExtensionsService<BuiltinExtension>>()
                     .To<BuiltinExtensionsService>();
-                
+
                 kernel.Bind<IExtensionsService<ThirdPartyExtension>>()
                     .To<ThirdPartyExtensionsService>();
-                
+
+                kernel.Bind<IPyRevitConfigService>()
+                    .To<PyRevitConfigService>();
+
                 kernel.Bind<IExtensionViewModelFactory>()
                     .To<ExtensionViewModelFactory>();
-                
+
                 kernel.Bind<ISettingsViewModelFactory>()
                     .To<SettingsViewModelFactory>();
-                
+
                 kernel.Bind<SettingsViewModel>().ToSelf();
                 kernel.Bind<ExtensionsSettingsViewModel>().ToSelf();
 
