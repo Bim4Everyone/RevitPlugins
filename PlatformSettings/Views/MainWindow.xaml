@@ -11,6 +11,7 @@
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -31,10 +32,41 @@
                 SelectionMode="Row"
                 ItemsSource="{Binding Extensions}">
                 <dxg:GridControl.View>
-                    <dxg:TableView AutoWidth="True" />
+                    <dxg:TableView
+                        AutoWidth="True"
+                        AllowEditing="False"
+                        AllowGrouping="False"
+                        ShowGroupPanel="False" />
                 </dxg:GridControl.View>
-                
-                <dxg:GridColumn Header=" " Width="250" FieldName="IsSelected" />
+
+                <dxg:GridColumn
+                    FieldName="IsSelected"
+                    Header=""
+                    AllowEditing="True"
+                    AllowMoving="False"
+                    AllowResizing="False"
+                    AllowSorting="False"
+                    AllowGrouping="False"
+                    AllowAutoFilter="False"
+                    AllowColumnFiltering="False"
+                    Width="43"
+                    MinWidth="43"
+                    MaxWidth="43"
+                    ShowCheckBoxInHeader="True">
+
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type dxg:RowData}">
+                            <dxe:CheckEdit
+                                Name="PART_Editor"
+                                IsReadOnly="True"
+                                IsChecked="{Binding Row.IsSelected, 
+                                UpdateSourceTrigger=PropertyChanged}"
+                                IsEnabled="{Binding Row.AllowChangeEnabled}" />
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+
+                </dxg:GridColumn>
+
                 <dxg:GridColumn Header="Имя" Width="250" FieldName="Name" />
                 <dxg:GridColumn Header="Описание" Width="250" FieldName="Description" />
             </dxg:GridControl>
@@ -59,10 +91,11 @@
             <dxlc:LayoutGroup View="Group">
                 <dxlc:LayoutGroup>
                     <dxlc:LayoutGroup
-                        Width="300"
+                        Width="200"
                         MinWidth="200"
                         View="Group"
-                        Header="Settings">
+                        Header="Settings"
+                        dxlc:LayoutControl.AllowHorizontalSizing="True">
 
                         <dxg:TreeViewControl
                             x:Name="_settings"
@@ -73,13 +106,15 @@
                             ParentFieldName="ParentId"
                             TreeViewFieldName="SettingsName"
                             TreeDerivationMode="Selfreference"
-                            ItemsSource="{Binding Settings}">
+                            ItemsSource="{Binding Settings}"
+                            SelectedItem="{Binding Setting}">
 
                         </dxg:TreeViewControl>
 
                     </dxlc:LayoutGroup>
                     <dxlc:LayoutGroup
                         View="Group"
+                        Header="Settings"
                         dxlc:LayoutControl.AllowHorizontalSizing="True">
 
                         <ContentControl

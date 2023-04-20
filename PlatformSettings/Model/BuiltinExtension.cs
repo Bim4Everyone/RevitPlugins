@@ -4,8 +4,8 @@ using pyRevitLabs.Json.Linq;
 
 namespace PlatformSettings.Model {
     internal class BuiltinExtension : Extension {
-        public BuiltinExtension(JObject jObject)
-            : base(jObject) {
+        public BuiltinExtension(JToken token)
+            : base(token) {
         }
 
         public override void EnableExtension() {

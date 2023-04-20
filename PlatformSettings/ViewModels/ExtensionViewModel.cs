@@ -15,9 +15,16 @@ namespace PlatformSettings.ViewModels {
 
         public bool IsSelected {
             get => _isSelected;
-            set => this.RaiseAndSetIfChanged(ref _isSelected, value);
+            set {
+                if(AllowChangeEnabled) {
+                    this.RaiseAndSetIfChanged(ref _isSelected, value);
+                }
+            }
         }
 
+        public bool AllowChangeEnabled => _extension.AllowChangeEnabled;
+
+        public string Type => _extension.Type;
         public string Name => _extension.Name;
         public string Description => _extension.Description;
 

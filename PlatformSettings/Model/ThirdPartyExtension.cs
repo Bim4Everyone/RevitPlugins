@@ -8,7 +8,7 @@ namespace PlatformSettings.Model {
             : base(token) {
         }
 
-        public bool AllowChangeEnabled => !Builtin;
+        public override bool AllowChangeEnabled => !DefaultEnabled;
 
         public override void EnableExtension() {
             Process.Start(GetApplicationPath(), $"extend ui {Name} {Url}")?.WaitForExit();

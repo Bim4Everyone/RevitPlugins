@@ -14,7 +14,12 @@ namespace PlatformSettings.Model {
             _token = token;
         }
 
+        public virtual bool AllowChangeEnabled { get; set; } = true;
+
         public bool Builtin => GetValue<bool>();
+        public bool DefaultEnabled => GetValue<bool>();
+        
+        public string Type => GetValue<string>();
         public string Name => GetValue<string>();
         public string Description => GetValue<string>();
 

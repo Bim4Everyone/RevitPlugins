@@ -11,6 +11,7 @@ namespace PlatformSettings.ViewModels {
         private readonly ISettingsViewModelFactory _settingsViewModelFactory;
 
         private string _errorText;
+        private SettingsViewModel _setting;
         private ObservableCollection<SettingsViewModel> _settings;
 
         public MainViewModel(ISettingsViewModelFactory settingsViewModelFactory) {
@@ -19,13 +20,18 @@ namespace PlatformSettings.ViewModels {
             LoadViewCommand = RelayCommand.Create(LoadView);
             ApplyViewCommand = RelayCommand.Create(ApplyView);
         }
-        
+
         public ICommand LoadViewCommand { get; }
         public ICommand ApplyViewCommand { get; }
 
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        public SettingsViewModel Setting {
+            get => _setting;
+            set => this.RaiseAndSetIfChanged(ref _setting, value);
         }
 
         public ObservableCollection<SettingsViewModel> Settings {
@@ -38,8 +44,10 @@ namespace PlatformSettings.ViewModels {
                 _settingsViewModelFactory.Create<SettingsViewModel>(0, 0, "Общие"),
                 _settingsViewModelFactory.Create<ExtensionsSettingsViewModel>(1, 0, "Расширения"),
             };
+
+            Setting = Settings[1];
         }
-        
+
         private void ApplyView() {
             throw new System.NotImplementedException();
         }
