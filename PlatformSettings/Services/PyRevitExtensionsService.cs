@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
 using PlatformSettings.Model;
 
 namespace PlatformSettings.Services {
-    internal class PyRevitConfigService : IPyRevitConfigService {
+    internal class PyRevitExtensionsService : IPyRevitExtensionsService {
         public static readonly string PyRevitConfigPath =
             Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -15,14 +17,27 @@ namespace PlatformSettings.Services {
 
 
         private IniFile _iniFile;
+        private readonly string[] _extensionsPaths;
 
-        public PyRevitConfigService() {
+        public PyRevitExtensionsService() {
             _iniFile = new IniFile(PyRevitConfigPath);
+            _extensionsPaths = GetExtensionsPath()
+                .Distinct()
+                .Where(item => Directory.Exists(item))
+                .SelectMany(item => Directory.GetDirectories(item))
+                .Select(item => Path.GetFileName(item))
+                .ToArray();
         }
 
         public bool IsEnabledExtension(Extension extension) {
-            string disabled = _iniFile.Read($"{extension.Name}.{extension.Type}", "disabled");
-            return string.IsNullOrEmpty(disabled) ? false : !bool.Parse(disabled);
+            if(extension is BuiltinExtension) {
+                string disabled = _iniFile.Read($"{extension.Name}.{extension.Type}", "disabled");
+                return string.IsNullOrEmpty(disabled) ? false : !bool.Parse(disabled);
+            } else if(extension is ThirdPartyExtension) {
+                return IsInstalledExtension(extension);
+            } else {
+                throw new NotSupportedException();
+            }
         }
 
         public void ToggleExtension(Extension extension) {
@@ -34,26 +49,51 @@ namespace PlatformSettings.Services {
         }
 
         public void EnableExtension(Extension extension) {
-            _iniFile.Write($"{extension.Name}.{extension.Type}", "disabled", "false");
+            if(extension is BuiltinExtension) {
+                _iniFile.Write($"{extension.Name}.{extension.Type}", "disabled", "false");
+            } else if(extension is ThirdPartyExtension) {
+                InstallExtension(extension);
+                _iniFile.Write($"{extension.Name}.{extension.Type}", "disabled", "false");
+            } else {
+                throw new NotSupportedException();
+            }
         }
 
         public void DisableExtension(Extension extension) {
-            _iniFile.Write($"{extension.Name}.{extension.Type}", "disabled", "true");
+            if(extension is BuiltinExtension) {
+                _iniFile.Write($"{extension.Name}.{extension.Type}", "disabled", "true");
+            } else if(extension is ThirdPartyExtension) {
+                RemoveExtension(extension);
+                _iniFile.RemoveSection($"{extension.Name}.{extension.Type}");
+            } else {
+                throw new NotSupportedException();
+            }
         }
 
         public bool IsInstalledExtension(Extension extension) {
-            throw new NotSupportedException();
+            return _extensionsPaths.Contains($"{extension.Name}.{extension.Type}", StringComparer.OrdinalIgnoreCase);
         }
 
-        public void InstallExtension(Extension extension) {
-            EnableExtension(extension);
+        private void InstallExtension(Extension extension) {
             var type = extension.Type == "extension" ? "ui" : "lib";
             PyRevitCliStart($"extend {type} {extension.Name} {extension.Url.Value}");
         }
 
-        public void RemoveExtension(Extension extension) {
+        private void RemoveExtension(Extension extension) {
             PyRevitCliStart($"extensions delete {extension.Name}");
-            _iniFile.RemoveSection($"{extension.Name}.{extension.Type}");
+        }
+
+        private IEnumerable<string> GetExtensionsPath() {
+            yield return BuiltinExtensionsService.ExtensionsPath;
+            yield return ThirdPartyExtensionsService.ExtensionsPath;
+
+            var extensionsPaths = _iniFile.Read("core", "userextensions")
+                .Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+                .Select(item => item.Trim(']').Trim('[').Trim('"').Trim());
+
+            foreach(string extensionsPath in extensionsPaths) {
+                yield return extensionsPath;
+            }
         }
 
         private void PyRevitCliStart(string args) {

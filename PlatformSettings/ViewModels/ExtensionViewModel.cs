@@ -9,14 +9,14 @@ using PlatformSettings.Services;
 namespace PlatformSettings.ViewModels {
     internal class ExtensionViewModel : BaseViewModel {
         private readonly Extension _extension;
-        private readonly IPyRevitConfigService _pyRevitConfigService;
+        private readonly IPyRevitExtensionsService _pyRevitExtensionsService;
 
         private bool _isEnabled;
 
-        public ExtensionViewModel(Extension extension, IPyRevitConfigService pyRevitConfigService) {
+        public ExtensionViewModel(Extension extension, IPyRevitExtensionsService pyRevitExtensionsService) {
             _extension = extension;
-            _pyRevitConfigService = pyRevitConfigService;
-            _isEnabled = _pyRevitConfigService.IsEnabledExtension(_extension);
+            _pyRevitExtensionsService = pyRevitExtensionsService;
+            _isEnabled = _pyRevitExtensionsService.IsEnabledExtension(_extension);
         }
 
         public bool IsEnabled {
@@ -41,24 +41,14 @@ namespace PlatformSettings.ViewModels {
         public Url Website => _extension.Website;
 
         public void SaveExtensionState() {
-            if(IsEnabled == _pyRevitConfigService.IsEnabledExtension(_extension)) {
+            if(IsEnabled == _pyRevitExtensionsService.IsEnabledExtension(_extension)) {
                 return;
             }
 
-            if(_extension is BuiltinExtension builtinExtension) {
-                if(IsEnabled) {
-                    _pyRevitConfigService.EnableExtension(builtinExtension);
-                } else {
-                    _pyRevitConfigService.DisableExtension(builtinExtension);
-                }
-            } else if(_extension is ThirdPartyExtension thirdPartyExtension) {
-                if(IsEnabled) {
-                    _pyRevitConfigService.InstallExtension(thirdPartyExtension);
-                } else {
-                    _pyRevitConfigService.RemoveExtension(thirdPartyExtension);
-                }
+            if(IsEnabled) {
+                _pyRevitExtensionsService.EnableExtension(_extension);
             } else {
-                throw new NotSupportedException($"Расширение не поддерживается \"{_extension.Name}\".");
+                _pyRevitExtensionsService.DisableExtension(_extension);
             }
         }
     }

@@ -65,8 +65,8 @@ namespace PlatformSettings {
                 kernel.Bind<IExtensionsService<ThirdPartyExtension>>()
                     .To<ThirdPartyExtensionsService>();
 
-                kernel.Bind<IPyRevitConfigService>()
-                    .To<PyRevitConfigService>();
+                kernel.Bind<IPyRevitExtensionsService>()
+                    .To<PyRevitExtensionsService>();
 
                 kernel.Bind<IExtensionViewModelFactory>()
                     .To<ExtensionViewModelFactory>();
