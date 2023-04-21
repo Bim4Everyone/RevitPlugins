@@ -193,7 +193,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitFamilyExplorer", "Revi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitPlugins", "RevitPlugins\RevitPlugins.csproj", "{51D125DA-535F-49EF-BDF6-5AE94B39E9BB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlatformSettings", "PlatformSettings\PlatformSettings.csproj", "{5C9650AE-A794-47C6-B5F7-92D099018302}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitPlatformSettings", "RevitPlatformSettings\RevitPlatformSettings.csproj", "{5C9650AE-A794-47C6-B5F7-92D099018302}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitBatchPrint", "RevitBatchPrint\RevitBatchPrint.csproj", "{C95B3383-B620-463C-9A33-7D290095B73A}"
 EndProject
