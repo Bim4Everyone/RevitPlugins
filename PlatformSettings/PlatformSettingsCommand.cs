@@ -1,33 +1,19 @@
-#region Namespaces
-
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
 using System.Windows;
-using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
-using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
-using dosymep.SimpleServices;
 
 using Ninject;
 
 using PlatformSettings.Factories;
-using PlatformSettings.Legacy;
 using PlatformSettings.Model;
 using PlatformSettings.Services;
 using PlatformSettings.ViewModels;
 using PlatformSettings.Views;
 
-using pyRevitLabs.NLog;
-using pyRevitLabs.PyRevit;
-
 using Application = Autodesk.Revit.ApplicationServices.Application;
-
-#endregion
 
 namespace PlatformSettings {
     [Transaction(TransactionMode.Manual)]
