@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\ProjectProps\Common.props"/>
+    <Import Project="..\ProjectProps\Common.props" />
+    <Import Project="..\ProjectProps\DevExpress.props" />
 
     <PropertyGroup>
         <UseWindowsForms>true</UseWindowsForms>
@@ -20,5 +21,22 @@
             <HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.PyRevit.dll</HintPath>
             <Private>False</Private>
         </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Page Update="Legasy\SettingsWindow.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+      <Page Update="Legasy\TabExtensions\TabExtensionsSettingsView.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Legasy\SharedParams\SharedParamsSettingsView.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="Legasy\SharedParams\SharedParamView.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
     </ItemGroup>
 </Project>
