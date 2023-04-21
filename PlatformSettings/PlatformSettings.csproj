@@ -1,42 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\ProjectProps\Common.props" />
-    <Import Project="..\ProjectProps\DevExpress.props" />
-
-    <PropertyGroup>
-        <UseWindowsForms>true</UseWindowsForms>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <Reference Include="pyRevitLabs.NLog">
-            <HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.NLog.dll</HintPath>
-            <Private>False</Private>
-        </Reference>
-
-        <Reference Include="pyRevitLabs.Common">
-            <HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.Common.dll</HintPath>
-            <Private>False</Private>
-        </Reference>
-
-        <Reference Include="pyRevitLabs.PyRevit">
-            <HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.PyRevit.dll</HintPath>
-            <Private>False</Private>
-        </Reference>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Page Update="Legasy\SettingsWindow.xaml">
-        <Generator>MSBuild:Compile</Generator>
-        <XamlRuntime>Wpf</XamlRuntime>
-        <SubType>Designer</SubType>
-      </Page>
-      <Page Update="Legasy\TabExtensions\TabExtensionsSettingsView.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </Page>
-      <Page Update="Legasy\SharedParams\SharedParamsSettingsView.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </Page>
-      <Page Update="Legasy\SharedParams\SharedParamView.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </Page>
-    </ItemGroup>
+    <Import Project="..\ProjectProps\Common.props"/>
+    <Import Project="..\ProjectProps\DevExpress.props"/>
 </Project>
