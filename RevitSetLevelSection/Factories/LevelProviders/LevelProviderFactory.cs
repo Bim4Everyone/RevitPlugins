@@ -48,6 +48,14 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
 
             return levelProvider;
         }
+        
+        public ILevelProvider CreateDefault(Element element) {
+            if(element == null) {
+                throw new ArgumentNullException(nameof(element));
+            }
+            
+            return _resolutionRoot.Get<LevelNearestProvider>(GetConstructorArgument(element));
+        }
 
         protected virtual bool CanCreateImpl(Element element) {
             return element.InAnyCategory(GetLevelStairsProviderCategories())

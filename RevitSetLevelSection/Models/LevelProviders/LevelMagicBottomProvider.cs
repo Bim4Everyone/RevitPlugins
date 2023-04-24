@@ -9,18 +9,16 @@ using RevitSetLevelSection.Models.ElementPositions;
 namespace RevitSetLevelSection.Models.LevelProviders {
     internal class LevelMagicBottomProvider : ILevelProvider {
         private readonly IElementPosition _elementPosition;
-        private readonly ILevelElevationService _levelElevationService;
 
-        public LevelMagicBottomProvider(IElementPosition elementPosition, ILevelElevationService levelElevationService) {
+        public LevelMagicBottomProvider(IElementPosition elementPosition) {
             _elementPosition = elementPosition;
-            _levelElevationService = levelElevationService;
         }
-        
+
         public Level GetLevel(Element element, List<Level> levels) {
             double position = _elementPosition.GetPosition(element);
-            return levels.OrderByDescending(item => item.Elevation)
-                .Where(item => _levelElevationService.GetElevation(item) < position)
-                .FirstOrDefault(item=> Math.Abs(item.Elevation - position) > 4.92125984251969); // больше 1500мм
+            return levels.OrderByDescending(item => item.ProjectElevation)
+                .Where(item => item.ProjectElevation < position)
+                .FirstOrDefault(item => Math.Abs(item.ProjectElevation - position) > 4.92125984251969); // больше 1500мм
         }
     }
 }
