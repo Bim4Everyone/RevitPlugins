@@ -18,7 +18,7 @@ namespace RevitSetLevelSection.Models.LevelProviders {
             double position = _elementPosition.GetPosition(element);
             return levels.OrderByDescending(item => item.ProjectElevation)
                 .Where(item => item.ProjectElevation < position)
-                .FirstOrDefault(item => Math.Abs(item.ProjectElevation - position) > 4.92125984251969); // больше 1500мм
+                .FirstOrDefault(item => Math.Abs(item.ProjectElevation - position) >= 4.92125984251969); // больше 1500мм
         }
     }
 }
