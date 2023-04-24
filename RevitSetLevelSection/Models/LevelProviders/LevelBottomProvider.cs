@@ -13,7 +13,7 @@ namespace RevitSetLevelSection.Models.LevelProviders {
             _elementPosition = elementPosition;
         }
 
-        public Level GetLevel(Element element, List<Level> levels) {
+        public Level GetLevel(Element element, ICollection<Level> levels) {
             double position = _elementPosition.GetPosition(element);
             return levels.OrderByDescending(item => item.ProjectElevation)
                 .Where(item => item.ProjectElevation < position)

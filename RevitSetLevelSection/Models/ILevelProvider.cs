@@ -4,6 +4,6 @@ using Autodesk.Revit.DB;
 
 namespace RevitSetLevelSection.Models {
     internal interface ILevelProvider {
-        Level GetLevel(Element element, List<Level> levels);
+        Level GetLevel(Element element, ICollection<Level> levels);
     }
 }
