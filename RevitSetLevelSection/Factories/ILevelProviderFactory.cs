@@ -7,5 +7,6 @@ namespace RevitSetLevelSection.Factories {
     internal interface ILevelProviderFactory {
         bool CanCreate(Element element);
         ILevelProvider Create(Element element);
+        ILevelProvider CreateDefault(Element element);
     }
 }

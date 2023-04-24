@@ -31,22 +31,22 @@ namespace RevitSetLevelSection.Models {
             _zoneRepository = zoneRepository;
             _levelRepository = levelRepository;
             _levelProviderFactory = levelProviderFactory;
-            
+
             _intersectImpl =
                 new IntersectImpl() {Application = application};
-            
+
             // Кешируем нужные объекты
             _zoneInfos = zoneRepository.GetZones();
             _sourceLevels = levelRepository.GetElements().ToDictionary(item => item.Name);
         }
 
         public RevitParam RevitParam => _revitParam;
-        
+
         public void UpdateValue(Element element) {
             if(!element.IsExistsParam(_revitParam)) {
                 return;
             }
-            
+
             if(!_levelProviderFactory.CanCreate(element)) {
                 element.RemoveParamValue(_revitParam);
                 return;
@@ -58,7 +58,8 @@ namespace RevitSetLevelSection.Models {
                 .Where(item => item != null)
                 .ToList();
 
-            var level = _levelProviderFactory.Create(element).GetLevel(element, zoneLevels);
+            var level = _levelProviderFactory.Create(element).GetLevel(element, zoneLevels)
+                        ?? _levelProviderFactory.CreateDefault(element).GetLevel(element, zoneLevels);
             element.SetParamValue(_revitParam, level?.Name.Split('_').FirstOrDefault());
         }
     }
