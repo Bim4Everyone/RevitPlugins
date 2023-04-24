@@ -145,7 +145,7 @@ namespace RevitCheckingLevels.Models {
 
         public static bool IsNotMillimeterElevation(this LevelInfo levelInfo) {
             double millimeterElevation = levelInfo.Level.GetMillimeterElevation();
-            millimeterElevation = Math.Round(millimeterElevation, 8, MidpointRounding.AwayFromZero);
+            millimeterElevation = Math.Round(millimeterElevation, 7, MidpointRounding.AwayFromZero);
             return !LevelExtensions.IsAlmostEqual(millimeterElevation % 1, 0.0000001, 0.0000001);
         }
 
