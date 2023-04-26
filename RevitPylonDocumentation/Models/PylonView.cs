@@ -93,14 +93,12 @@ namespace RevitPylonDocumentation.Models {
             double viewportHalfHeight = viewportOutline.MaximumPoint.Y;
 
             // Задание правильного положения метки видового экрана
-#if D2020 || D2021 || R2020 || R2021
+#if REVIT_2021_OR_LESS 
             report += "Вы работаете в Revit 2020 или 2021, поэтому имя вида необходимо будет спозиционировать на листе самостоятельно.";
             report += string.Format("Вы работаете в Revit 2020 или 2021, поэтому метку имени вида \"{0}\" необходимо будет спозиционировать на листе самостоятельно" 
             + Environment.NewLine, ViewElement.Name);
-#elif D2022 || R2022
-            viewPort.LabelOffset = new XYZ(viewportHalfWidth, 2 * viewportHalfHeight - 0.022, 0);
 #else
-                TaskDialog.Show("Ошибка!", ex.Message);
+            viewPort.LabelOffset = new XYZ(viewportHalfWidth, 2 * viewportHalfHeight - 0.022, 0);
 #endif
 
             ViewportHalfWidth = viewportHalfWidth;
