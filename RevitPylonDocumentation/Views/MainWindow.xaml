@@ -46,7 +46,6 @@
 
 
 
-
         <Label Grid.Row="2" Content="Выберите марки пилонов для обработки:"/>
 
         <StackPanel Grid.Row="3" HorizontalAlignment="Right" Orientation="Horizontal">
