@@ -30,11 +30,11 @@ namespace RevitClashDetective.Models.RevitClashReport {
             }
 
             if(!File.Exists(FilePath)) {
-                throw new ArgumentException($"Путь \"{FilePath}\" недоступен.", nameof(FilePath));
+                throw new ArgumentException($"пїЅпїЅпїЅпїЅ \"{FilePath}\" пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.", nameof(FilePath));
             }
 
             if(!IsCorrectFileName(FilePath)) {
-                throw new ArgumentException($"Данный отчет о коллизиях создан в другом файле.");
+                throw new ArgumentException($"пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.");
             }
 
             return File.ReadAllLines(FilePath).Skip(3)
@@ -75,7 +75,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
         }
 
         private Element GetElement(IEnumerable<string> elementString) {
-            return _revitRepository.GetElement(GetFile(elementString.FirstOrDefault().Trim()), GetId(elementString.LastOrDefault()));
+            return _revitRepository.GetElement(GetFile(elementString.FirstOrDefault()?.Trim()), GetId(elementString.LastOrDefault()));
         }
 
         private int GetId(string idString) {

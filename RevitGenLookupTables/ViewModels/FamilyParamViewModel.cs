@@ -33,11 +33,11 @@ namespace RevitGenLookupTables.ViewModels {
         public string ColumnMetaData {
             get {
                 string unitType = "OTHER";
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
                 if(_familyParameter.Definition.UnitType != UnitType.UT_Undefined) {
                     unitType = UnitUtils.GetTypeCatalogString(_familyParameter.Definition.UnitType);
                 }
-#elif D2021 || R2021
+#elif REVIT_2021
                 if(UnitUtils.IsSpec(_familyParameter.Definition.GetSpecTypeId())) {
                     unitType = UnitUtils.GetTypeCatalogStringForSpec(_familyParameter.Definition.GetSpecTypeId());
                 }
@@ -48,7 +48,7 @@ namespace RevitGenLookupTables.ViewModels {
 #endif
 
                 string displayUnitType = string.Empty;
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
                 try {
                     if(_familyParameter.DisplayUnitType != DisplayUnitType.DUT_UNDEFINED) {
                         displayUnitType = UnitUtils.GetTypeCatalogString(_familyParameter.DisplayUnitType);

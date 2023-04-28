@@ -29,7 +29,7 @@ namespace RevitMarkPlacement.Models {
                 foreach(var mark in TemplateLevelMarks) {
                     if(mark.Annotation == null) {
                         mark.CreateAnnotation(floorCount, floorHeight);
-                    } else if(mark.Annotation != null) {
+                    } else {
                         mark.OverwriteAnnotation(floorCount, floorHeight);
                     }
                 }

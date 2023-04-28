@@ -40,7 +40,7 @@ namespace RevitMarkPlacement.Models {
         }
 
         private XYZ GetPlacePoint(SpotDimension spot) {
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
             var elevSymbolId = (ElementId) spot.SpotDimensionType.GetParamValueOrDefault(BuiltInParameter.SPOT_ELEV_SYMBOL);
             var elevSymbol = _revitRepository.GetElement(elevSymbolId) as FamilySymbol;
             var width = (double) elevSymbol.GetParamValueOrDefault(RevitRepository.ElevSymbolWidth);
@@ -75,7 +75,7 @@ namespace RevitMarkPlacement.Models {
             annotation.SetParamValue(RevitRepository.FirstLevelOnParam, 0);
             annotation.SetParamValue(RevitRepository.SpotDimensionIdParam, spot.Id.IntegerValue);
 
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
             annotation.SetParamValue(RevitRepository.FirstLevelParam, UnitUtils.ConvertFromInternalUnits(level, DisplayUnitType.DUT_METERS));
 #else
             annotation.SetParamValue(RevitRepository.FirstLevelParam, UnitUtils.ConvertFromInternalUnits(level, UnitTypeId.Meters));

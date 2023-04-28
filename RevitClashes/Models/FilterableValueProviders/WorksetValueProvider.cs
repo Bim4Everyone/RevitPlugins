@@ -30,7 +30,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
 
         [JsonIgnore]
         public RevitRepository RevitRepository { get; set; }
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
         [JsonIgnore]
         public UnitType UnitType => UnitType.UT_Number;
 #else
@@ -69,7 +69,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
         }
 
         public FilterRule GetRule(Document doc, IVisiter visiter, ParamValue paramValue) {
-            var revitParam = SystemParamsConfig.Instance.CreateRevitParam(BuiltInParameter.ELEM_PARTITION_PARAM);
+            var revitParam = SystemParamsConfig.Instance.CreateRevitParam(doc, BuiltInParameter.ELEM_PARTITION_PARAM);
             return paramValue.GetFilterRule(visiter, doc, revitParam);
         }
 

@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
+using dosymep.Bim4Everyone;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -102,18 +103,14 @@ namespace RevitFamilyExplorer.ViewModels {
         #endregion
 
         private void RefreshImageSource(bool isInsertedFamilyFile) {
-#if D2020 || R2020
+#if REVIT_2020
             ImageSource = isInsertedFamilyFile
                 ? @"pack://application:,,,/RevitFamilyExplorer;component/Resources/insert.png"
                 : @"pack://application:,,,/RevitFamilyExplorer;component/Resources/not-insert.png";
-#elif D2021 || R2021
+#else
             ImageSource = isInsertedFamilyFile 
-                ? @"pack://application:,,,/RevitFamilyExplorer_2021;component/Resources/insert.png" 
-                : @"pack://application:,,,/RevitFamilyExplorer_2021;component/Resources/not-insert.png";
-#elif D2022 || R2022
-            ImageSource = isInsertedFamilyFile 
-                ? @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/insert.png" 
-                : @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/not-insert.png";
+                ? $@"pack://application:,,,/RevitFamilyExplorer_{ModuleEnvironment.RevitVersion};component/Resources/insert.png" 
+                : $@"pack://application:,,,/RevitFamilyExplorer_{ModuleEnvironment.RevitVersion};component/Resources/not-insert.png";
 #endif
         }
 

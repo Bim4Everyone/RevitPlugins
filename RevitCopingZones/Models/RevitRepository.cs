@@ -31,6 +31,14 @@ namespace RevitCopingZones.Models {
         public Transaction StartTransaction(string transactionName) {
             return Document.StartTransaction(transactionName);
         }
+        
+        public bool IsKoordFile() {
+            return Document.Title.Contains("_KOORD");
+        }
+        
+        public bool IsKoordFile(RevitLinkType revitLinkType) {
+            return revitLinkType.Name.Contains("_KOORD");
+        }
 
         public AreaScheme GetAreaScheme() {
             return new FilteredElementCollector(Document)
@@ -102,14 +110,16 @@ namespace RevitCopingZones.Models {
         }
 
         public IEnumerable<Area> GetAreas(ViewPlan areaPlan) {
+            var areaFilter = new AreaFilter(AreaScheme);
             return new FilteredElementCollector(Document, areaPlan.Id)
                 .WhereElementIsNotElementType()
                 .OfCategory(BuiltInCategory.OST_Areas)
-                .OfType<Area>();
+                .OfType<Area>()
+                .Where(item => areaFilter.AllowElement(item));
         }
 
         public IEnumerable<Area> GetSelectedAreas() {
-            var areaFilter = new AreaFilter(GetAreaScheme());
+            var areaFilter = new AreaFilter(AreaScheme);
             return new UIDocument(Document).GetSelectedElements()
                 .OfType<Area>()
                 .Where(item => areaFilter.AllowElement(item))

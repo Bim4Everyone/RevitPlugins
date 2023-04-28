@@ -1,0 +1,56 @@
+﻿<base:ThemedPlatformWindow
+    x:Class="RevitEditingZones.Views.LevelsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitEditingZones.Views"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+
+    Title="Уровни без привязки"
+    Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <dxg:GridControl
+            Grid.Row="0"
+            ItemsSource="{Binding }">
+            <dxg:GridControl.View>
+                <dxg:TableView
+                    AutoWidth="True"
+                    ShowGroupPanel="False"
+                    ShowTotalSummary="False"
+                    AllowEditing="False"
+                    AllowGrouping="False"
+                    BestFitModeOnSourceChange="AllRows" />
+            </dxg:GridControl.View>
+
+            <dxg:GridColumn IsSmart="True" FieldName="LevelName" Header="Наименование" />
+        </dxg:GridControl>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Height="45">
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+
+            <dx:SimpleButton
+                Content="ОК" Margin="10" Width="80"
+                Click="ButtonOk_Click" />
+
+            <dx:SimpleButton
+                Content="Отмена" Margin="10" Width="80"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</base:ThemedPlatformWindow>

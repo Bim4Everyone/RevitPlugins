@@ -32,6 +32,10 @@ namespace RevitRooms.ViewModels {
 
         public ElementId LevelId => Element.LevelId;
         public override string LevelName => RevitRepository.GetElement(Element.LevelId)?.Name;
+        
+        public override string PhaseName {
+            get { return Phase.Name; }
+        }
 
         public bool IsSectionNameEqual {
             get {

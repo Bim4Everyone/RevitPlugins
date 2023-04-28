@@ -12,7 +12,7 @@ namespace RevitCheckingLevels.Models {
             new ErrorType(0) {
                 Name = "Имена уровней не соответствуют стандарту",
                 Description =
-                    "Имена уровней должны соответствовать данному формату: \"[Префикс][Номер этажа] [пробел] [«этаж»][\"_\"][Название блока][\".\"][Номер уровня][\"_\"][Отметка уровня]\"."
+                    "Имена уровней должны соответствовать данному формату: \"[Название этажа][\'_\'][Название блока][\'.\'][Номер уровня][\'_\'][Отметка уровня]\"."
             };
 
         public static readonly ErrorType NotElevation =
@@ -145,7 +145,7 @@ namespace RevitCheckingLevels.Models {
 
         public static bool IsNotMillimeterElevation(this LevelInfo levelInfo) {
             double millimeterElevation = levelInfo.Level.GetMillimeterElevation();
-            millimeterElevation = Math.Round(millimeterElevation, 8, MidpointRounding.AwayFromZero);
+            millimeterElevation = Math.Round(millimeterElevation, 7, MidpointRounding.AwayFromZero);
             return !LevelExtensions.IsAlmostEqual(millimeterElevation % 1, 0.0000001, 0.0000001);
         }
 

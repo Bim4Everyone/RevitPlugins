@@ -93,7 +93,7 @@ namespace RevitBatchPrint.Models {
                 .Where(item =>
                     ((InstanceBinding) item.Binding).Categories.OfType<Category>()
                     .Any(category => category.Id == categoryId))
-#if D2020 || R2020 || D2021 || R2021
+#if REVIT_2021_OR_LESS
                 .Where(item => item.Definition.ParameterType == ParameterType.Text)
 #else
                 .Where(item => item.Definition.GetDataType() == SpecTypeId.String.Text)
@@ -187,7 +187,7 @@ namespace RevitBatchPrint.Models {
             double sheetWidth = (double) familyInstance.GetParamValueOrDefault(BuiltInParameter.SHEET_WIDTH);
             double sheetHeight = (double) familyInstance.GetParamValueOrDefault(BuiltInParameter.SHEET_HEIGHT);
 
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
             sheetWidth = UnitUtils.ConvertFromInternalUnits(sheetWidth, DisplayUnitType.DUT_MILLIMETERS);
             sheetHeight = UnitUtils.ConvertFromInternalUnits(sheetHeight, DisplayUnitType.DUT_MILLIMETERS);
 #else

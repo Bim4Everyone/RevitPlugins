@@ -8,6 +8,7 @@ using System.Windows.Media.Imaging;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -61,18 +62,14 @@ namespace RevitFamilyExplorer.ViewModels {
         #endregion
 
         private void RefreshImageSource() {
-#if D2020 || R2020
+#if REVIT_2020
             ImageSource = _revitRepository.IsInsertedFamilySymbol(_parentFamily.FileInfo, Name)
                 ? @"pack://application:,,,/RevitFamilyExplorer;component/Resources/insert.png"
                 : @"pack://application:,,,/RevitFamilyExplorer;component/Resources/not-insert.png";
-#elif D2021 || R2021
-                        ImageSource = CanPlaceFamilySymbol(null) 
-                ? @"pack://application:,,,/RevitFamilyExplorer_2021;component/Resources/insert.png"
-                : @"pack://application:,,,/RevitFamilyExplorer_2021;component/Resources/not-insert.png";
-#elif D2022 || R2022
-                        ImageSource = CanPlaceFamilySymbol(null) 
-                ? @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/insert.png"
-                : @"pack://application:,,,/RevitFamilyExplorer_2022;component/Resources/not-insert.png";
+#else
+            ImageSource = _revitRepository.IsInsertedFamilySymbol(_parentFamily.FileInfo, Name)
+                ? $@"pack://application:,,,/RevitFamilyExplorer_{ModuleEnvironment.RevitVersion};component/Resources/insert.png" 
+                : $@"pack://application:,,,/RevitFamilyExplorer_{ModuleEnvironment.RevitVersion};component/Resources/not-insert.png";
 #endif
         }
     }

@@ -21,7 +21,7 @@ namespace RevitRooms.Models {
         public Phase Phase { get; set; }
         public RevitParam RevitParam { get; set; }
 
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
 
         protected static double ConvertValueToSquareMeters(double? value, int accuracy) {
             return value.HasValue ? Math.Round(UnitUtils.ConvertFromInternalUnits(value.Value, DisplayUnitType.DUT_SQUARE_METERS), accuracy, MidpointRounding.AwayFromZero) : 0;
@@ -31,7 +31,7 @@ namespace RevitRooms.Models {
             return UnitUtils.ConvertToInternalUnits(value, DisplayUnitType.DUT_SQUARE_METERS);
         }
 
-#elif D2021 || R2021 || D2022 || R2022
+#else
         
         protected double ConvertValueToSquareMeters(double? value, int accuracy) {
             return value.HasValue ? Math.Round(UnitUtils.ConvertFromInternalUnits(value.Value, UnitTypeId.SquareMeters), accuracy, MidpointRounding.AwayFromZero) : 0;

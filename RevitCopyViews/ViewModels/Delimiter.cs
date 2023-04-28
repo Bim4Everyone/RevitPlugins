@@ -105,7 +105,7 @@ namespace RevitCopyViews.ViewModels {
                 || view.ViewType == ViewType.AreaPlan
                 || view.ViewType == ViewType.EngineeringPlan) {
 
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
                 double elevation = UnitUtils.ConvertFromInternalUnits(view.GenLevel.Elevation, DisplayUnitType.DUT_METERS);
 #else
                 double elevation = UnitUtils.ConvertFromInternalUnits(view.GenLevel.Elevation, UnitTypeId.Meters);

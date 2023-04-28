@@ -5,17 +5,19 @@ using System.Linq;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit.Geometry;
 
+using RevitSetLevelSection.Models.Repositories;
+
 namespace RevitSetLevelSection.Models {
-    internal class LinkInstanceRepository {
-        public static readonly string BuildingWorksBlockName = "Блок СМР_";
-        public static readonly string BuildingWorksSectionName = "Секция СМР_";
-        public static readonly string BuildingWorksTypingName = "Типизация СМР_";
+    internal class LinkInstanceRepository : IZoneRepository, IMassRepository {
+        public static readonly string AreaSchemeName = "Назначение этажа СМР";
 
         private readonly RevitLinkType _revitLinkType;
         private readonly RevitRepository _revitRepository;
@@ -32,6 +34,10 @@ namespace RevitSetLevelSection.Models {
 
         public Transform Transform { get; private set; }
 
+        public Workset GetWorkset() {
+            return _revitRepository.Document.GetWorksetTable().GetWorkset(_revitLinkType.WorksetId);
+        }
+
         public IEnumerable<DesignOption> GetDesignOptions() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
@@ -39,18 +45,23 @@ namespace RevitSetLevelSection.Models {
                 .OfType<DesignOption>()
                 .ToList();
         }
-
-        public IEnumerable<FamilyInstance> GetMassElements(IDesignOption designOption) {
+        
+        public List<FamilyInstance> GetElements() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
                 .OfCategory(BuiltInCategory.OST_Mass)
-                .Where(item => GetDesignOptionId(item) == designOption.Id)
                 .OfType<FamilyInstance>()
                 .ToList();
         }
 
-        public bool HasIntersects(IEnumerable<FamilyInstance> massObjects) {
-            return massObjects
+        public List<FamilyInstance> GetElements(IDesignOption designOption) {
+            return GetElements()
+                .Where(item => GetDesignOptionId(item) == designOption.Id)
+                .ToList();
+        }
+
+        public bool HasIntersects(IDesignOption designOption) {
+            return GetElements(designOption)
                 .SelectMany(item => item.GetSolids())
                 .Where(item => item.Volume > 0)
                 .HasIntersects();
@@ -61,15 +72,6 @@ namespace RevitSetLevelSection.Models {
         }
 
         public bool LoadLinkDocument() {
-            if(_revitLinkType.GetLinkedFileStatus() == LinkedFileStatus.InClosedWorkset) {
-                Workset workset = _revitRepository.GetWorkset(_revitLinkType);
-                TaskDialog.Show("Предупреждение!", $"Откройте рабочий набор \"{workset.Name}\"."
-                                                   + Environment.NewLine
-                                                   + "Загрузка связанного файла из закрытого рабочего набора не поддерживается!");
-
-                return false;
-            }
-
             var loadResult = _revitLinkType.Load();
             if(loadResult.LoadResult == LinkLoadResultType.LinkLoaded) {
                 Update();
@@ -98,6 +100,66 @@ namespace RevitSetLevelSection.Models {
                 }
             }
         }
+        
+        public AreaScheme GetAreaScheme() {
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_AreaSchemes)
+                .OfType<AreaScheme>()
+                .FirstOrDefault(item => item.Name.Equals(AreaSchemeName));
+        }
+
+        public List<ZoneInfo> GetZones() {
+            var areaFilter = new AreaFilter(GetAreaScheme());
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_Areas)
+                .OfType<Area>()
+                .Where(item => areaFilter.AllowElement(item))
+                .Where(item => HasAreaLevel(item))
+                .Select(item => new ZoneInfo() {Area = item, Level = GetLevel(item), Solid = CreateSolid(item)})
+                .ToList();
+        }
+        
+        /// <summary>
+        /// Возвращает трансформированный <see cref="Solid"/> по границам зоны расположенный на Z=0.
+        /// </summary>
+        /// <param name="area">Зона.</param>
+        /// <returns>Возвращает трансформированный <see cref="Solid"/> по границам зоны расположенный на Z=0.</returns>
+        private Solid CreateSolid(Area area) {
+            // Зоны являются замкнутыми и с простым одним контуром
+            var boundarySegments = area.GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions)
+                .First();
+
+            Transform transform = CreateAreaTransform(area);
+            var curves = boundarySegments
+                .Select(item => item.GetCurve())
+                .Select(item => item.CreateTransformed(Transform))
+                .Select(item => item.CreateTransformed(transform))
+                .ToList();
+
+            var curveLoops = new[] {CurveLoop.Create(curves)};
+            return GeometryCreationUtilities.CreateExtrusionGeometry(curveLoops, XYZ.BasisZ, 10);
+        }
+        
+        private Transform CreateAreaTransform(Area area) {
+            XYZ areaPoint = ((LocationPoint) area.Location).Point;
+            areaPoint = Transform.OfPoint(areaPoint);
+            return Transform.CreateTranslation(new XYZ(0, 0, -areaPoint.Z));
+        }
+
+        public bool HasAreaLevel(Area area) {
+            return GetLevel(area) != null;
+        }
+
+        public Level GetLevel(Area area) {
+            var paramValue = area.GetParamValue<string>(SharedParamsConfig.Instance.FixComment);
+            if(int.TryParse(paramValue, out int elementId)) {
+                return _document.GetElement(new ElementId(elementId)) as Level;
+            }
+
+            return null;
+        }
 
         private void Update() {
             _linkInstance = _revitRepository.GetLinkInstances()
@@ -110,9 +172,9 @@ namespace RevitSetLevelSection.Models {
         }
 
         private IEnumerable<string> GetParamNames() {
-            yield return BuildingWorksTypingName;
-            yield return BuildingWorksSectionName;
-            yield return BuildingWorksBlockName;
+            yield return ParamOption.BuildingWorksTypingName;
+            yield return ParamOption.BuildingWorksSectionName;
+            yield return ParamOption.BuildingWorksBlockName;
         }
 
         private ElementId GetDesignOptionId(Element element) {
@@ -150,6 +212,23 @@ namespace RevitSetLevelSection.Models {
             } catch {
                 return false;
             }
+        }
+    }
+    
+    internal class AreaFilter : ISelectionFilter {
+        private readonly AreaScheme _areaScheme;
+
+        public AreaFilter(AreaScheme areaScheme) {
+            _areaScheme = areaScheme;
+        }
+
+        public bool AllowElement(Element elem) {
+            var area = elem as Area;
+            return area != null && _areaScheme?.Id == area.AreaScheme.Id;
+        }
+
+        public bool AllowReference(Reference reference, XYZ position) {
+            return false;
         }
     }
 }

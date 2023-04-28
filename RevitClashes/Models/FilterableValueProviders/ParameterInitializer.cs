@@ -16,7 +16,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
     internal class ParameterInitializer {
         public static RevitParam InitializeParameter(Document doc, ElementId id) {
             if(id.IsSystemId()) {
-                return SystemParamsConfig.Instance.CreateRevitParam((BuiltInParameter) id.IntegerValue);
+                return SystemParamsConfig.Instance.CreateRevitParam(doc, (BuiltInParameter) id.IntegerValue);
             } else {
                 var element = doc.GetElement(id);
                 if (element is SharedParameterElement sharedParameterElement) {

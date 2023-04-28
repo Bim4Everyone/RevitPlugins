@@ -20,6 +20,14 @@ namespace RevitCheckingLevels.Models {
 
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
+        
+        public bool IsKoordFile() {
+            return Document.Title.Contains("_KOORD");
+        }
+
+        public bool IsKoordFile(RevitLinkType revitLinkType) {
+            return revitLinkType.Name.Contains("_KOORD");
+        }
 
         public IEnumerable<Level> GetLevels() {
             return GetLevels(Document);
@@ -56,8 +64,10 @@ namespace RevitCheckingLevels.Models {
         public void UpdateElevations(IEnumerable<LevelInfo> levels) {
             using(Transaction transaction = Document.StartTransaction("Обновление отметок уровня")) {
                 foreach(LevelInfo levelInfo in levels) {
-                    levelInfo.Elevation = levelInfo.Level.GetMeterElevation();
-                    levelInfo.Level.Name = levelInfo.FormatLevelName();
+                    double elevation = levelInfo.Level.GetMeterElevation();
+                    var elements = levelInfo.Level.Name.Split('_');
+                    elements[2] = elevation.ToString(LevelParserImpl.CultureInfo);
+                    levelInfo.Level.Name = string.Join("_", elements);
                 }
 
                 transaction.Commit();

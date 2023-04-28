@@ -12,7 +12,7 @@ using dosymep.Bim4Everyone.SystemParams;
 namespace RevitClashDetective.Models.Utils {
     internal class DoubleValueParser {
 
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
         public static bool TryParse(string value, UnitType unitType, out double result) {
 
             if(unitType == UnitType.UT_Undefined) {

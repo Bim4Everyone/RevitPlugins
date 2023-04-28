@@ -32,14 +32,14 @@ namespace RevitRooms.ViewModels {
         public string LevelNames => string.Join(Environment.NewLine,
             Levels.OrderBy(item => item.Elevation).Select(item => item.Name).Distinct());
 
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
         public string Elevation {
             get {
                 return UnitUtils.ConvertFromInternalUnits(Element.Elevation, DisplayUnitType.DUT_METERS)
                     .ToString("0.000", CultureInfo.InvariantCulture);
             }
         }
-#elif D2021 || R2021 || D2022 || R2022
+#else
         public string Elevation {
             get { return UnitUtils.ConvertFromInternalUnits(Element.Elevation, UnitTypeId.Meters).ToString("0.000", CultureInfo.InvariantCulture); }
         }

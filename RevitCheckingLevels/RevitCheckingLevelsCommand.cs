@@ -47,7 +47,10 @@ namespace RevitCheckingLevels {
                     .ToSelf()
                     .InSingletonScope();
 
-                kernel.Bind<MainViewModel>().ToSelf();
+                kernel.Bind<MainViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+                
                 kernel.Bind<CheckingLevelConfig>()
                     .ToMethod(c => CheckingLevelConfig.GetCheckingLevelConfig());
 
@@ -56,15 +59,26 @@ namespace RevitCheckingLevels {
                     .WithPropertyValue(nameof(Window.DataContext),
                         c => c.Kernel.Get<MainViewModel>());
 
-                MainWindow window = kernel.Get<MainWindow>();
-                if(window.ShowDialog() == true) {
+                Window mainWindow = kernel.Get<MainWindow>();
+                bool? dialogResult = mainWindow.ShowDialog();
+
+                if(!FromGui) {
+                    var mainViewModel = kernel.Get<MainViewModel>();
+                    if(mainViewModel.HasErrors) {
+                        throw new InvalidOperationException("Были обнаружены ошибки в уровнях.");
+                    }
+                }
+
+                if(dialogResult == null) {
+                    GetPlatformService<INotificationService>()
+                        .CreateNotification(PluginName, "Выход из скрипта.", "C#")
+                        .ShowAsync();
+                } else if(dialogResult == true) {
                     GetPlatformService<INotificationService>()
                         .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
                         .ShowAsync();
-                } else {
-                    GetPlatformService<INotificationService>()
-                        .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                        .ShowAsync();
+                } else if(dialogResult == false) {
+                    throw new OperationCanceledException();
                 }
             }
         }

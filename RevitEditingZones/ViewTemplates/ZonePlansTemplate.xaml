@@ -1,0 +1,75 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:vms="clr-namespace:RevitEditingZones.ViewModels"
+    xmlns:selectors="clr-namespace:RevitEditingZones.ViewTemplateSelectors"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:commands="clr-namespace:dosymep.WPF.Commands">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="../ViewTemplates/GridRowStyle.xaml" />
+        <ResourceDictionary Source="../ViewTemplates/GridCellTemplate.xaml" />
+
+        <ResourceDictionary Source="../ViewTemplates/DefaultTemplate.xaml" />
+        <ResourceDictionary Source="../ViewTemplates/NotMatchNamesTemplate.xaml" />
+        <ResourceDictionary Source="../ViewTemplates/NotLinkedZonesTemplate.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <dxmvvm:NumericToVisibilityConverter x:Key="GridVisible" />
+    <dxmvvm:NumericToVisibilityConverter x:Key="HintVisible" Inverse="True" />
+
+    <selectors:ErrorTypeGroupRowTemplateSelector
+        x:Key="ErrorTypeGroupRowTemplateSelector"
+        DefaultTemplate="{StaticResource DefaultTemplate}"
+        NotMatchNamesTemplate="{StaticResource NotMatchNamesTemplate}"
+        NotLinkedZonesTemplate="{StaticResource NotLinkedZonesTemplate}" />
+
+    <commands:DisableCollapseGroupRowCommand x:Key="DisableCollapseGroupRowCommand" />
+
+    <DataTemplate x:Key="ZonePlansTemplate" DataType="{x:Type vms:ZonePlansViewModel}">
+        <Grid>
+            <TextBlock
+                Text="{Binding HintText}"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Visibility="{Binding ZonePlans.Count, 
+                Converter={StaticResource HintVisible}}" />
+
+            <dxg:GridControl
+                MaxHeight="9000"
+                AutoExpandAllGroups="True"
+                ItemsSource="{Binding ZonePlans}"
+                SelectedItem="{Binding ZonePlan}"
+                Visibility="{Binding ZonePlans.Count, 
+                Converter={StaticResource GridVisible}}">
+                <dxg:GridControl.View>
+                    <dxg:TableView
+                        AutoWidth="True"
+                        ShowGroupPanel="False"
+                        ShowTotalSummary="False"
+                        AllowEditing="False"
+                        AllowGrouping="False"
+                        EnableImmediatePosting="True"
+                        EditorShowMode="MouseUp"
+                        RowStyle="{StaticResource GridRowStyle}"
+                        GroupRowTemplateSelector="{StaticResource ErrorTypeGroupRowTemplateSelector}" />
+                </dxg:GridControl.View>
+
+                <dxg:GridColumn GroupIndex="0" FieldName="ErrorType" Header="Тип ошибки" />
+                <dxg:GridColumn FieldName="AreaName" Header="Зона" />
+                <dxg:GridColumn FieldName="AreaPlanName" Header="План" />
+                <dxg:GridColumn AllowEditing="True" FieldName="Level" Header="Уровень"
+                                CellTemplate="{StaticResource GridCellTemplate}" />
+
+                <dxmvvm:Interaction.Behaviors>
+                    <dxmvvm:EventToCommand
+                        PassEventArgsToCommand="True"
+                        EventName="GroupRowCollapsing"
+                        Command="{Binding  
+                Source={StaticResource DisableCollapseGroupRowCommand}}" />
+                </dxmvvm:Interaction.Behaviors>
+            </dxg:GridControl>
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>

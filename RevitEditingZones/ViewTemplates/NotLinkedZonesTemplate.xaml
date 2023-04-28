@@ -1,0 +1,35 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core">
+
+    <DataTemplate x:Key="NotLinkedZonesTemplate" DataType="{x:Type dxg:GroupRowData}">
+        <Grid ToolTip="{Binding Row.ErrorType.Description}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <dx:DXImage
+                Grid.Column="0"
+                Margin="5,0"
+                VerticalAlignment="Center" HorizontalAlignment="Left"
+                Source="{dx:DXImage 'Office2013/Support/Info_16x16.png'}" />
+
+            <TextBlock
+                Grid.Column="1"
+                Margin="5,0"
+                VerticalAlignment="Center" HorizontalAlignment="Left"
+                Text="{Binding GroupValue.Text}" />
+
+            <dx:SimpleButton
+                Grid.Column="2"
+                Margin="5,0"
+                Content="Автоподбор"
+                VerticalAlignment="Center" HorizontalAlignment="Right"
+                Command="{Binding View.DataContext.AutoLinkZonesCommand}" />
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>
