@@ -5,6 +5,7 @@ using System.Linq;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 
+using DevExpress.Utils.Extensions;
 
 using dosymep.Bim4Everyone;
 
@@ -54,9 +55,10 @@ namespace RevitSetLevelSection.Models {
             ICollection<Level> zoneLevels = _zoneInfos
                 .Where(item => _intersectImpl.IsIntersect(item, element))
                 .Select(item => item.Level)
+                // .Select(item => _sourceLevels.GetValueOrDefault(item.Level.Name, null))
                 .Where(item => item != null)
                 .ToList();
-            
+
             try {
                 var level = GetLevel(element, zoneLevels);
                 element.SetParamValue(_revitParam, level?.Name.Split('_').FirstOrDefault());
