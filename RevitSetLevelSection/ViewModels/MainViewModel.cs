@@ -134,20 +134,20 @@ namespace RevitSetLevelSection.ViewModels {
                 yield return fillParam;
             }
 
-            if(_revitRepository.IsExistsParam(ParamOption.AdskSectionNumberName)) {
+            if(_revitRepository.IsEomFile() && _revitRepository.IsExistsParam(ParamOption.AdskSectionNumberName)) {
                 var revitParam = _revitRepository.CreateRevitParam(ParamOption.AdskSectionNumberName);
                 yield return _fillAdskParamFactory.Create(revitParam,
                     SharedParamsConfig.Instance.BuildingWorksSection,
                     SharedParamsConfig.Instance.BuildingWorksBlock);
             }
 
-            if(_revitRepository.IsExistsParam(ParamOption.AdskBuildingNumberName)) {
+            if(_revitRepository.IsEomFile() && _revitRepository.IsExistsParam(ParamOption.AdskBuildingNumberName)) {
                 var revitParam = _revitRepository.CreateRevitParam(ParamOption.AdskBuildingNumberName);
                 yield return _fillAdskParamFactory.Create(revitParam,
                     SharedParamsConfig.Instance.BuildingWorksBlock);
             }
 
-            if(_revitRepository.IsExistsParam(ParamOption.AdskLevelName)) {
+            if(_revitRepository.IsEomFile() && _revitRepository.IsExistsParam(ParamOption.AdskLevelName)) {
                 var revitParam = _revitRepository.CreateRevitParam(ParamOption.AdskLevelName);
                 yield return _fillAdskParamFactory.Create(revitParam,
                     SharedParamsConfig.Instance.BuildingWorksLevel);

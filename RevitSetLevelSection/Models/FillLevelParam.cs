@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
@@ -7,7 +8,6 @@ using Autodesk.Revit.DB;
 using DevExpress.Utils.Extensions;
 
 using dosymep.Bim4Everyone;
-using dosymep.Revit;
 
 using RevitSetLevelSection.Factories;
 using RevitSetLevelSection.Models.Repositories;
@@ -31,35 +31,51 @@ namespace RevitSetLevelSection.Models {
             _zoneRepository = zoneRepository;
             _levelRepository = levelRepository;
             _levelProviderFactory = levelProviderFactory;
-            
+
             _intersectImpl =
                 new IntersectImpl() {Application = application};
-            
+
             // Кешируем нужные объекты
             _zoneInfos = zoneRepository.GetZones();
             _sourceLevels = levelRepository.GetElements().ToDictionary(item => item.Name);
         }
 
         public RevitParam RevitParam => _revitParam;
-        
+
         public void UpdateValue(Element element) {
             if(!element.IsExistsParam(_revitParam)) {
                 return;
             }
-            
+
             if(!_levelProviderFactory.CanCreate(element)) {
                 element.RemoveParamValue(_revitParam);
                 return;
             }
 
-            List<Level> zoneLevels = _zoneInfos
+            ICollection<Level> zoneLevels = _zoneInfos
                 .Where(item => _intersectImpl.IsIntersect(item, element))
-                .Select(item => _sourceLevels.GetValueOrDefault(item.Level.Name, null))
+                .Select(item => item.Level)
+                // .Select(item => _sourceLevels.GetValueOrDefault(item.Level.Name, null))
                 .Where(item => item != null)
                 .ToList();
 
-            var level = _levelProviderFactory.Create(element).GetLevel(element, zoneLevels);
-            element.SetParamValue(_revitParam, level?.Name.Split('_').FirstOrDefault());
+            try {
+                var level = GetLevel(element, zoneLevels);
+                element.SetParamValue(_revitParam, level?.Name.Split('_').FirstOrDefault());
+            } catch(InvalidOperationException) {
+                // решили что существует много вариантов,
+                // когда параметр не может заполнится из-за настроек в ревите
+                // Например: элемент находится в более поздней стадии
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                // решили что существует много вариантов,
+                // когда параметр не может заполнится из-за настроек в ревите
+                // Например: элемент находится в более поздней стадии
+            }
+        }
+
+        private Level GetLevel(Element element, ICollection<Level> levels) {
+            return _levelProviderFactory.Create(element).GetLevel(element, levels)
+                   ?? _levelProviderFactory.CreateDefault(element).GetLevel(element, levels);
         }
     }
 }

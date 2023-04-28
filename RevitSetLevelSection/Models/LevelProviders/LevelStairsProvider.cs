@@ -13,7 +13,7 @@ namespace RevitSetLevelSection.Models.LevelProviders {
             _factory = factory;
         }
 
-        public Level GetLevel(Element element, List<Level> levels) {
+        public Level GetLevel(Element element, ICollection<Level> levels) {
             Element hostObject = GetHostObject(element);
             return hostObject == null
                 ? null

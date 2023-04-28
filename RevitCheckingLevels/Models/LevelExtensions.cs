@@ -24,7 +24,7 @@ namespace RevitCheckingLevels.Models {
             = new FormatOptions(DisplayUnitType.DUT_METERS) { Accuracy = 0.001 };
 
         public static readonly FormatOptions MillimeterFormatOptions 
-            = new FormatOptions(DisplayUnitType.DUT_MILLIMETERS) { Accuracy = 0.00000001 };
+            = new FormatOptions(DisplayUnitType.DUT_MILLIMETERS) { Accuracy = 0.0000001 };
 
         public static string GetFormattedMeterElevation(this Level level) {
             var formatValueOptions = new FormatValueOptions();
@@ -61,7 +61,7 @@ namespace RevitCheckingLevels.Models {
             = new FormatOptions(UnitTypeId.Meters) { Accuracy = 0.001 };
 
         public static readonly FormatOptions MillimeterFormatOptions 
-            = new FormatOptions(UnitTypeId.Millimeters) { Accuracy = 0.00000001 };
+            = new FormatOptions(UnitTypeId.Millimeters) { Accuracy = 0.0000001 };
 
         public static string GetFormattedMeterElevation(this Level level) {
             var formatValueOptions = new FormatValueOptions();

@@ -72,6 +72,13 @@ namespace RevitSetLevelSection.Models {
             return Document.StartTransaction(transactionName);
         }
 
+        public bool IsEomFile() {
+            return _bimModelPartsService.InAnyBimModelParts(Document,
+                BimModelPart.EOMPart,
+                BimModelPart.EOPart,
+                BimModelPart.EMPart);
+        }
+
         public bool IsKoordFile() {
             return _bimModelPartsService.InAnyBimModelParts(Document, BimModelPart.KOORDPart);
         }
