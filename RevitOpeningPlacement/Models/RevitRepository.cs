@@ -1,20 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-
-using dosymep.Revit;
+using System.Threading.Tasks;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using Autodesk.Revit.DB.Structure;
-using System;
+using Autodesk.Revit.UI;
+
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Revit;
+
 using RevitClashDetective.Models;
-using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitClashDetective.Models.Handlers;
+
 using RevitOpeningPlacement.Models.OpeningPlacement;
-using System.Threading.Tasks;
+using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.RevitViews;
-using System.Text.RegularExpressions;
 
 namespace RevitOpeningPlacement.Models {
     internal class RevitRepository {
@@ -136,21 +139,6 @@ namespace RevitOpeningPlacement.Models {
 
         public static string SystemCheck => "Системная проверка";
 
-        /// <summary>
-        /// Шаблон названий АР файлов в соответствии с BIM стандартом: \\uprav-stroy.loc\corparate\Департаменты\Проектный институт\Типовые ТЗ\BIM-стандарт A101
-        /// </summary>
-        private static Regex _RegexAR => new Regex(@"^.+_AR.*$");
-
-        /// <summary>
-        /// Шаблон названий КР файлов в соответствии с BIM стандартом: \\uprav-stroy.loc\corparate\Департаменты\Проектный институт\Типовые ТЗ\BIM-стандарт A101
-        /// </summary>
-        private static Regex _RegexKR => new Regex(@"^.+_(KR|KM).*$");
-
-        /// <summary>
-        /// Шаблон названий файлов инженерных систем в соответствии с BIM стандартом: \\uprav-stroy.loc\corparate\Департаменты\Проектный институт\Типовые ТЗ\BIM-стандарт A101
-        /// </summary>
-        private static Regex _RegexMEP => new Regex(@"^.+_(OV|ITP|HC|VK|EOM|EG|SS).*$");
-
         public FamilySymbol GetOpeningType(OpeningType type) {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
@@ -214,18 +202,27 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <returns></returns>
         public DocTypeEnum GetDocumentType() {
-            string docName = GetDocumentName();
-            if(_RegexAR.IsMatch(docName)) {
+            var bimModelPartsService = GetPlatformService<IBimModelPartsService>();
+
+            if(bimModelPartsService.GetBimModelPart(_document) == null) {
+                return DocTypeEnum.NotDefined;
+            }
+
+            if(bimModelPartsService.InAnyBimModelParts(_document, BimModelPart.ARPart)) {
                 return DocTypeEnum.AR;
             }
-            if(_RegexKR.IsMatch(docName)) {
+
+            if(bimModelPartsService.InAnyBimModelParts(_document, BimModelPart.KRPart, BimModelPart.KMPart)) {
                 return DocTypeEnum.KR;
             }
-            if(_RegexMEP.IsMatch(docName)) {
-                return DocTypeEnum.MEP;
+
+            if(bimModelPartsService.InAnyBimModelParts(_document, BimModelPart.KOORDPart)) {
+                return DocTypeEnum.KOORD;
             }
-            return DocTypeEnum.NotDefined;
+
+            return DocTypeEnum.MEP;
         }
+
 
         public FamilyInstance CreateInstance(FamilySymbol type, XYZ point, Level level) {
             if(level != null) {
@@ -346,6 +343,10 @@ namespace RevitOpeningPlacement.Models {
                            && types.Any(e => FamilyName[e].Equals(GetFamilyName(item))))
                .ToList();
         }
+
+        protected T GetPlatformService<T>() {
+            return ServicesProvider.GetPlatformService<T>();
+        }
     }
 
 
@@ -398,7 +399,7 @@ namespace RevitOpeningPlacement.Models {
     }
 
     /// <summary>
-    /// Типы файов ревита в соответствии с шифрами разделов проектирования
+    /// Типы файлов Revit в соответствии с шифрами разделов проектирования
     /// </summary>
     internal enum DocTypeEnum {
         /// <summary>
@@ -413,6 +414,10 @@ namespace RevitOpeningPlacement.Models {
         /// Раздел инженерных систем
         /// </summary>
         MEP,
+        /// <summary>
+        /// Координационный файл
+        /// </summary>
+        KOORD,
         /// <summary>
         /// Раздел не определен
         /// </summary>
