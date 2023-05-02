@@ -11,8 +11,6 @@ using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 
 using RevitOpeningPlacement.Models;
-using RevitOpeningPlacement.Models.OpeningIntersection;
-using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningUnion;
 using RevitOpeningPlacement.ViewModels.Navigator;
 using RevitOpeningPlacement.Views;
@@ -49,6 +47,9 @@ namespace RevitOpeningPlacement {
                 break;
                 case DocTypeEnum.MEP:
                 GetOpeningsTaskInDocumentMEP(uiApplication, revitRepository);
+                break;
+                case DocTypeEnum.KOORD:
+                GetOpeningsTaskInDocumentKoord(revitRepository);
                 break;
                 case DocTypeEnum.NotDefined:
                 GetOpeningsTaskInDocumentNotDefined(revitRepository);
@@ -129,6 +130,15 @@ namespace RevitOpeningPlacement {
         private void GetOpeningsTaskInDocumentNotDefined(RevitRepository revitRepository) {
             TaskDialog.Show("BIM", $"Название файла: \"{revitRepository.GetDocumentName()}\" не удовлетворяет BIM стандарту А101. " +
                 $"Скорректируйте название и запустите команду снова.");
+            throw new OperationCanceledException();
+        }
+
+        /// <summary>
+        /// Логика вывода окна навигатора по заданиям на отверстия в координационном файле
+        /// </summary>
+        /// <param name="revitRepository"></param>
+        private void GetOpeningsTaskInDocumentKoord(RevitRepository revitRepository) {
+            TaskDialog.Show("BIM", $"Команда не может быть запущена в координационном файле \"{revitRepository.GetDocumentName()}\"");
             throw new OperationCanceledException();
         }
 
