@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
@@ -14,9 +10,6 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
-
-using RevitClashDetective.Models.Clashes;
-using RevitClashDetective.Models.FilterModel;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
@@ -44,7 +37,7 @@ namespace RevitOpeningPlacement {
                 var placementConfigurator = new PlacementConfigurator(revitRepository, openingConfig.Categories);
                 var placers = placementConfigurator.GetPlacers()
                                                    .ToList();
-                InitializeProgress(revitRepository, placers);
+                InitializePlacing(revitRepository, placers);
                 InitializeReport(revitRepository, placementConfigurator.GetUnplacedClashes());
             }
         }
@@ -60,7 +53,7 @@ namespace RevitOpeningPlacement {
             return false;
         }
 
-        private void InitializeProgress(RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers) {
+        private void InitializePlacing(RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers) {
             using(var pb = GetPlatformService<IProgressDialogService>()) {
                 pb.StepValue = 10;
                 pb.DisplayTitleFormat = "Идёт расчёт... [{0}\\{1}]";
