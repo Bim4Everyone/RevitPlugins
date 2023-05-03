@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -99,19 +96,68 @@ namespace RevitOpeningPlacement.Models.Extensions {
             var thisSolid = solidProvider.GetSolid();
             var otherSolid = otherSolidProvider.GetSolid();
 
-            if(Math.Abs(thisSolid.Volume - otherSolid.Volume) > _toleranceVolume) {
+            if(!SolidsVolumesEqual(thisSolid, otherSolid)) {
                 return false;
             }
 
             var thisSolidBBox = solidProvider.GetTransformedBBoxXYZ();
             var otherSolidBBox = otherSolidProvider.GetTransformedBBoxXYZ();
 
-            var minDistance = (thisSolidBBox.Min - otherSolidBBox.Min).GetLength();
-            if(minDistance > _toleranceDistance) {
+            return BBoxesEqual(thisSolidBBox, otherSolidBBox);
+        }
+
+        /// <summary>
+        /// Проверяет на равенство текущего <see cref="ISolidProvider">ISolidProvider</see> и поданного <see cref="Solid"/>
+        /// Под равенством понимается равенство объемов с точностью до 1 см3 и равенство координат ограничивающих <see cref="BoundingBoxXYZ"/> с точностью до 1 мм.
+        /// </summary>
+        /// <param name="solidProvider">Текущий <see cref="ISolidProvider">ISolidProvider</see></param>
+        /// <param name="otherSolid">Поданный <see cref="Solid"/></param>
+        /// <returns>True, если разница объемов текущего и поданного <see cref="ISolidProvider">ISolidProvider</see> меньше, либо равна 1 см3, 
+        /// и если разница координат ограничивающих их <see cref="BoundingBoxXYZ"/> меньше, либо равна 1 мм;
+        /// Иначе False</returns>
+        internal static bool EqualsSolid(this ISolidProvider solidProvider, Solid otherSolid) {
+            return EqualsSolid(solidProvider, otherSolid, _toleranceDistance);
+        }
+
+        /// <summary>
+        /// Проверяет на равенство текущего <see cref="ISolidProvider">ISolidProvider</see> и поданного <see cref="Solid"/>
+        /// Под равенством понимается равенство объемов с точностью до 1 см3 и равенство координат ограничивающих <see cref="BoundingBoxXYZ"/> 
+        /// с точностью до <paramref name="tolerance"/> в единицах длины Revit (футах)
+        /// </summary>
+        /// <param name="solidProvider">Текущий <see cref="ISolidProvider">ISolidProvider</see></param>
+        /// <param name="otherSolid">Поданный <see cref="Solid"/></param>
+        /// <param name="tolerance">Допустимое расстояние в единицах длины Revit (футах) между текущим <see cref="ISolidProvider"/> и поданным <see cref="Solid"/></param>
+        /// <returns>True, если разница объемов текущего и поданного <see cref="ISolidProvider">ISolidProvider</see> меньше, либо равна 1 см3, 
+        /// и если разница координат ограничивающих их <see cref="BoundingBoxXYZ"/> меньше, либо равна <paramref name="tolerance"/>;
+        /// Иначе False</returns>
+        internal static bool EqualsSolid(this ISolidProvider solidProvider, Solid otherSolid, double tolerance) {
+            var thisSolid = solidProvider.GetSolid();
+
+            if(!SolidsVolumesEqual(thisSolid, otherSolid)) {
                 return false;
             }
-            var maxDistance = (thisSolidBBox.Max - otherSolidBBox.Max).GetLength();
-            if(maxDistance > _toleranceDistance) {
+
+            var thisSolidBBox = thisSolid.GetTransformedBoundingBox();
+            var otherSolidBBox = otherSolid.GetTransformedBoundingBox();
+
+            return BBoxesEqual(thisSolidBBox, otherSolidBBox, tolerance);
+        }
+
+        private static bool SolidsVolumesEqual(Solid solid1, Solid solid2) {
+            return Math.Abs(solid1.Volume - solid2.Volume) <= _toleranceVolume;
+        }
+
+        private static bool BBoxesEqual(BoundingBoxXYZ bbox1, BoundingBoxXYZ bbox2) {
+            return BBoxesEqual(bbox1, bbox2, _toleranceDistance);
+        }
+
+        private static bool BBoxesEqual(BoundingBoxXYZ bbox1, BoundingBoxXYZ bbox2, double tolerance) {
+            var minDistance = (bbox1.Min - bbox2.Min).GetLength();
+            if(minDistance > tolerance) {
+                return false;
+            }
+            var maxDistance = (bbox1.Max - bbox2.Max).GetLength();
+            if(maxDistance > tolerance) {
                 return false;
             }
             return true;
