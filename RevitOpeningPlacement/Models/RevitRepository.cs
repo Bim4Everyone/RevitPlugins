@@ -18,6 +18,7 @@ using RevitClashDetective.Models.Handlers;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.RevitViews;
+using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models {
     internal class RevitRepository {
@@ -243,19 +244,6 @@ namespace RevitOpeningPlacement.Models {
             }
         }
 
-        /// <summary>
-        /// Возвращает список экземпляров семейств-заданий на отверстия из текущего файла ревит ("исходящие" задания).
-        /// </summary>
-        /// <returns>Список экземпляров семейств, названия семейств и типов которых заданы в соответствующих словарях
-        /// <see cref="TypeName">названий типов</see> и
-        /// <see cref="FamilyName">названий семейств</see></returns>
-        public List<FamilyInstance> GetOpeningsTaskFromCurrentDoc() {
-            return GetFamilyInstances()
-                .Where(item => TypeName.Any(n => n.Value.Equals(item.Name))
-                            && FamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
-                .ToList();
-        }
-
         public List<FamilyInstance> GetWallOpenings() {
             var wallTypes = new[] { OpeningType.WallRectangle, OpeningType.WallRound };
             return GetOpenings(wallTypes);
@@ -299,6 +287,14 @@ namespace RevitOpeningPlacement.Models {
             }
         }
 
+        /// <summary>
+        /// Возвращает коллекцию исходящих заданий на отверстия, размещенных в текущем файле Revit
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<OpeningTaskOutcoming> GetPlacedOutcomingTasks() {
+            return GetOpeningsTaskFromCurrentDoc().Select(f => new OpeningTaskOutcoming(f)).ToList();
+        }
+
         public void DeleteElements(ICollection<Element> elements) {
             using(Transaction t = _document.StartTransaction("Удаление объединенных заданий на отверстия")) {
                 _document.Delete(elements.Select(item => item.Id).ToArray());
@@ -323,6 +319,19 @@ namespace RevitOpeningPlacement.Models {
 
         public void DoAction(Action action) {
             _clashRevitRepository.DoAction(action);
+        }
+
+        /// <summary>
+        /// Возвращает список экземпляров семейств-заданий на отверстия из текущего файла ревит ("исходящие" задания).
+        /// </summary>
+        /// <returns>Список экземпляров семейств, названия семейств и типов которых заданы в соответствующих словарях
+        /// <see cref="TypeName">названий типов</see> и
+        /// <see cref="FamilyName">названий семейств</see></returns>
+        private List<FamilyInstance> GetOpeningsTaskFromCurrentDoc() {
+            return GetFamilyInstances()
+                .Where(item => TypeName.Any(n => n.Value.Equals(item.Name))
+                            && FamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
+                .ToList();
         }
 
         private void RotateElement(Element element, XYZ point, Line axis, double angle) {

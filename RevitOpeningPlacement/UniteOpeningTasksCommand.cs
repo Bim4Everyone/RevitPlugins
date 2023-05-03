@@ -1,7 +1,6 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 using Autodesk.Revit.Attributes;
@@ -13,9 +12,7 @@ using dosymep.SimpleServices;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.OpeningPlacement;
-using RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers;
 using RevitOpeningPlacement.Models.OpeningUnion;
-using RevitOpeningPlacement.Models.OpeningUnion.IntersectionProviders;
 
 namespace RevitOpeningPlacement {
     [Transaction(TransactionMode.Manual)]
@@ -43,7 +40,7 @@ namespace RevitOpeningPlacement {
             using(var pb = GetPlatformService<IProgressDialogService>()) {
                 IProgress<int> progress;
                 CancellationToken ct;
-                var maxValue = revitRepository.GetOpeningsTaskFromCurrentDoc().Count;
+                var maxValue = revitRepository.GetPlacedOutcomingTasks().Count;
                 InitializeProgress(maxValue, pb, out progress, out ct);
 
                 placers.AddRange(configurator.GetPlacers(progress, ct));
