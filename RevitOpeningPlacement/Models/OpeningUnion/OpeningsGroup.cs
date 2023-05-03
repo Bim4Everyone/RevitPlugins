@@ -3,8 +3,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
-
 using RevitClashDetective.Models.Extensions;
 
 namespace RevitOpeningPlacement.Models.OpeningUnion {
@@ -62,7 +60,10 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
                 }
             }
             if(unitedSolid == null || unitedSolid.Volume <= 0) {
-                _solids.Add(element.GetSolid());
+                var solid = element.GetSolid();
+                if((solid != null) && (solid.Volume > 0)) {
+                    _solids.Add(solid);
+                }
             }
         }
 
