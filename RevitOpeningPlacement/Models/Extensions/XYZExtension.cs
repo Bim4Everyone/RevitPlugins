@@ -5,9 +5,21 @@ using Autodesk.Revit.DB;
 namespace RevitOpeningPlacement.Models.Extensions {
     internal static class XYZExtension {
         /// <summary>
-        /// Значение округления координат в мм
+        /// Значение округления координат в мм = 5 мм
         /// </summary>
-        private static readonly int _mmRound = 5;
+        private static int MmRound => 5;
+
+#if REVIT_2020_OR_LESS
+        /// <summary>
+        /// Значение округления координат в футах (единицах длины в Revit), равное конвертированному <see cref="MmRound"/>
+        /// </summary>
+        public static double FeetRound => UnitUtils.ConvertToInternalUnits(MmRound, DisplayUnitType.DUT_MILLIMETERS);
+#else
+        /// <summary>
+        /// Значение округления координат в футах (единицах длины в Revit), равное конвертированному <see cref="MmRound"/>
+        /// </summary>
+        public static double FeetRound => UnitUtils.ConvertToInternalUnits(MmRound, UnitTypeId.Millimeters);
+#endif
 
 
         internal static bool IsPapallel(this XYZ vector1, XYZ vector2) {
@@ -49,17 +61,13 @@ namespace RevitOpeningPlacement.Models.Extensions {
         }
 
         /// <summary>
-        /// Округляет значение координаты точки на прямой до <see cref="_mmRound">заданного количества мм</see>
+        /// Округляет значение координаты точки на прямой до <see cref="MmRound">заданного количества мм</see>
         /// </summary>
         /// <param name="coordinate"></param>
         /// <returns></returns>
         private static double RoundCoordinate(double coordinate) {
-#if REVIT_2020_OR_LESS
-            double roundFeet = UnitUtils.ConvertToInternalUnits(_mmRound, DisplayUnitType.DUT_MILLIMETERS);
-#else
-            double roundFeet = UnitUtils.ConvertToInternalUnits(_mmRound, UnitTypeId.Millimeters);
-#endif
-            return Math.Round(coordinate / roundFeet) * roundFeet;
+
+            return Math.Round(coordinate / FeetRound) * FeetRound;
         }
     }
 }
