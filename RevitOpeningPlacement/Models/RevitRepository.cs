@@ -302,6 +302,14 @@ namespace RevitOpeningPlacement.Models {
             }
         }
 
+        /// <summary>
+        /// Удаляет элемент из документа Revit без запуска транзакции
+        /// </summary>
+        /// <param name="elementId">Id элемента, который нужно удалить</param>
+        public void DeleteElement(int elementId) {
+            _document.Delete(new ElementId(elementId));
+        }
+
         public async Task<FamilyInstance> UniteOpenings(OpeningPlacer placer, ICollection<Element> elements) {
             FamilyInstance createdOpening = null;
             _revitEventHandler.TransactAction = () => {
