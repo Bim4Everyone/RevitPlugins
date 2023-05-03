@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Autodesk.Revit.DB;
 
-using Autodesk.Revit.DB;
-
-using RevitClashDetective.Models.Clashes;
-
-using RevitOpeningPlacement.Models.Exceptions;
+using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement {
@@ -25,7 +17,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         public FamilySymbol Type { get; set; }
 
         public FamilyInstance Place() {
-            var point = PointFinder.GetPoint();
+            var point = PointFinder.GetPoint().Round();
             var level = LevelFinder.GetLevel();
             var opening = _revitRepository.CreateInstance(Type, point, level);
 
