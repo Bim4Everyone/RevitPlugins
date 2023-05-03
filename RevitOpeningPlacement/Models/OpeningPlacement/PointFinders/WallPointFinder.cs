@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models.Value;
 
@@ -37,11 +31,13 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
             var transformedWallLine = Line.CreateBound(_clash.Element2Transform.OfPoint(elongatedWallLine.GetEndPoint(0)), _clash.Element2Transform.OfPoint(elongatedWallLine.GetEndPoint(1)));
             try {
                 var dir = _clash.Element2Transform.OfVector(_clash.Element2.Orientation);
+
+                var point = elongatedMepLine.GetPointFromLineEquation(transformedWallLine) - dir * _clash.Element2.Width / 2;
                 //получение точки вставки из уравнения линии 
                 if(_sizeGetter != null) {
-                    return elongatedMepLine.GetPointFromLineEquation(transformedWallLine) - dir * _clash.Element2.Width / 2 - _sizeGetter.GetValue().TValue / 2 * XYZ.BasisZ;
+                    point -= _sizeGetter.GetValue().TValue / 2 * XYZ.BasisZ;
                 }
-                return elongatedMepLine.GetPointFromLineEquation(transformedWallLine) - dir * _clash.Element2.Width / 2;
+                return point;
             } catch {
                 throw IntersectionNotFoundException.GetException(_clash.Element1, _clash.Element2);
             }
