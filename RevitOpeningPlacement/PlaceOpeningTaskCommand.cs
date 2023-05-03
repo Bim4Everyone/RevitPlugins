@@ -13,8 +13,10 @@ using dosymep.SimpleServices;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
+using RevitOpeningPlacement.OpeningModels;
 using RevitOpeningPlacement.ViewModels.ReportViewModel;
 using RevitOpeningPlacement.Views;
 
@@ -31,7 +33,6 @@ namespace RevitOpeningPlacement {
             if(!CheckModel(revitRepository)) {
                 return;
             }
-            revitRepository.DeleteAllOpenings();
             var openingConfig = OpeningConfig.GetOpeningConfig();
             if(openingConfig.Categories.Count > 0) {
                 var placementConfigurator = new PlacementConfigurator(revitRepository, openingConfig.Categories);
@@ -67,12 +68,37 @@ namespace RevitOpeningPlacement {
         }
 
         private void PlaceOpenings(IProgress<int> progress, CancellationToken ct, RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers) {
+            var placedOpeningTasks = revitRepository.GetPlacedOutcomingTasks();
+            var newOpenings = new List<FamilyInstance>();
+
             using(var t = revitRepository.GetTransaction("Расстановка заданий")) {
                 int count = 0;
                 foreach(var p in placers) {
-                    p.Place();
+                    var newOpening = p.Place();
+                    newOpenings.Add(newOpening);
+
                     progress.Report(count++);
                     ct.ThrowIfCancellationRequested();
+                }
+                //Отсрочить показ предупреждений до завершения следующей транзакции - удаления дублирующих отверстий в RemoveAlreadyPlacedOpenings
+                FailureHandlingOptions options = t.GetFailureHandlingOptions();
+                options = options.SetForcedModalHandling(false);
+                options = options.SetDelayedMiniWarnings(true);
+                t.Commit(options);
+            }
+
+            //Удаление дублирующих заданий на отверстия нужно начинать в отдельной транзакции после завершения транзакции создания заданий на отверстия,
+            //т.к. свойство Location у элемента FamilyInstance, созданного внутри транзакции, может быть не актуально (установлено в (0,0,0) несмотря на реальное расположение),
+            //а после завершения транзакции актуализируется
+            RemoveAlreadyPlacedOpenings(revitRepository, newOpenings.Select(o => new OpeningTaskOutcoming(o)).ToList(), placedOpeningTasks);
+        }
+
+        private void RemoveAlreadyPlacedOpenings(RevitRepository revitRepository, ICollection<OpeningTaskOutcoming> newOpenings, ICollection<OpeningTaskOutcoming> alreadyPlacedOpenings) {
+            using(var t = revitRepository.GetTransaction("Удаление дублирующих заданий")) {
+                foreach(var newOpening in newOpenings) {
+                    if(IsAlreadyPlaced(newOpening, alreadyPlacedOpenings)) {
+                        revitRepository.DeleteElement(newOpening.Id);
+                    }
                 }
                 t.Commit();
             }
@@ -87,6 +113,31 @@ namespace RevitOpeningPlacement {
             var helper = new WindowInteropHelper(window) { Owner = revitRepository.UIApplication.MainWindowHandle };
 
             window.Show();
+        }
+
+        /// <summary>
+        /// Проверяет, размещено ли уже такое же задание на отверстие в проекте. Под "таким" же понимается семейство задания на отверстие с координатами
+        /// </summary>
+        /// <param name="newOpening">Новое задание на отверстие</param>
+        /// <param name="placedOpenings">Существующие задания на отверстия в проекте</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        private bool IsAlreadyPlaced(OpeningTaskOutcoming newOpening, ICollection<OpeningTaskOutcoming> placedOpenings) {
+            if(newOpening == null) {
+                throw new ArgumentNullException(nameof(newOpening));
+            }
+            var toleranceCubeDiagonal = Math.Sqrt(XYZExtension.FeetRound * XYZExtension.FeetRound * XYZExtension.FeetRound);
+
+            var closestPlacedOpenings = placedOpenings.Where(placedOpening =>
+                placedOpening.Location
+                .DistanceTo(placedOpening.Location) <= toleranceCubeDiagonal);
+
+            foreach(OpeningTaskOutcoming placedOpening in closestPlacedOpenings) {
+                if(placedOpening.EqualsSolid(newOpening.GetSolid(), XYZExtension.FeetRound)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
