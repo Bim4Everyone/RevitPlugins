@@ -1,7 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 
 using dosymep.Revit;
-using dosymep.Revit.Geometry;
 
 using RevitClashDetective.Models.Extensions;
 
@@ -67,7 +66,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <returns></returns>
         public BoundingBoxXYZ GetTransformedBBoxXYZ() {
-            return _familyInstance.GetBoundingBox().TransformBoundingBox(_familyInstance.GetTotalTransform().Inverse);
+            return _familyInstance.GetBoundingBox();
         }
     }
 }
