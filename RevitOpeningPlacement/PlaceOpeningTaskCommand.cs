@@ -81,9 +81,9 @@ namespace RevitOpeningPlacement {
                     ct.ThrowIfCancellationRequested();
                 }
                 //Отсрочить показ предупреждений до завершения следующей транзакции - удаления дублирующих отверстий в RemoveAlreadyPlacedOpenings
-                FailureHandlingOptions options = t.GetFailureHandlingOptions();
-                options = options.SetForcedModalHandling(false);
-                options = options.SetDelayedMiniWarnings(true);
+                FailureHandlingOptions options = t.GetFailureHandlingOptions()
+                    .SetForcedModalHandling(false)
+                    .SetDelayedMiniWarnings(true);
                 t.Commit(options);
             }
 
