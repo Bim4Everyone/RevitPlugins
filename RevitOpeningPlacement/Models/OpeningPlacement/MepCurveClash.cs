@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -50,9 +46,13 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
     internal abstract class Clash<T1, T2> where T1 : Element
                                  where T2 : Element {
         public Clash(RevitRepository revitRepository, ClashModel clashModel) {
-            Element1 = (T1) clashModel.MainElement.GetElement(revitRepository.DocInfos);
-            Element2 = (T2) clashModel.OtherElement.GetElement(revitRepository.DocInfos);
-            Element2Transform = revitRepository.GetTransform(Element2);
+            try {
+                Element1 = (T1) clashModel.MainElement.GetElement(revitRepository.DocInfos);
+                Element2 = (T2) clashModel.OtherElement.GetElement(revitRepository.DocInfos);
+                Element2Transform = revitRepository.GetTransform(Element2);
+            } catch(InvalidCastException) {
+                // Дальше этот Clash попадет в Unplaced
+            }
         }
 
         public T1 Element1 { get; set; }
