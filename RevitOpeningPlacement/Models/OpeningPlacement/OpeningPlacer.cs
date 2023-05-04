@@ -55,6 +55,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             } catch(System.NullReferenceException) {
                 _revitRepository.DeleteElement(opening.Id.IntegerValue);
                 throw new OpeningNotPlacedException("Не удалось назначить параметры созданного отверстия, вследствие чего оно было удалено");
+            } catch(SizeTooSmallException e) {
+                _revitRepository.DeleteElement(opening.Id.IntegerValue);
+                throw new OpeningNotPlacedException($"{e.Message}, отверстие было удалено");
             }
             return opening;
         }
