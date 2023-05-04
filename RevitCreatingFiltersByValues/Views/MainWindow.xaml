@@ -14,17 +14,36 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    Height="450" Width="800"    
+    Height="450" Width="500"    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+
+        <Label Grid.Row="0" Content="Выберите категории:"/>
+
+        <!--<StackPanel Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button Content="Выбрать все" Margin="5 0 5 5" Padding="5 0" 
+                    Click="SelectAllHostMarks"/>
+            <Button Content="Отменить выбор" Margin="5 0 5 5" Padding="5 0" 
+                    Click="UnselectAllHostMarks"/>
+        </StackPanel>-->
+
+        <ListBox Grid.Row="2" Grid.Column="0" Margin="5 5 5 0" Name="categories"
+                 ItemsSource="{Binding CategoriesInView}"
+                 SelectionMode="Multiple">
+        </ListBox>
+
+        
+        
         <StackPanel
-            Grid.Row="1"
+            Grid.Row="3"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
@@ -38,6 +57,8 @@
                 Margin="10"
                 Width="80"
                 Content="ОК"
+                Command="{Binding CreateCommand}"
+                CommandParameter="{Binding SelectedItems, ElementName=categories}"
                 Click="ButtonOk_Click" />
 
             <Button
