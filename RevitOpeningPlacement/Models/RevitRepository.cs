@@ -279,14 +279,6 @@ namespace RevitOpeningPlacement.Models {
                 ?? Transform.Identity;
         }
 
-        public void DeleteAllOpenings() {
-            var openings = GetOpeningsTaskFromCurrentDoc();
-            using(Transaction t = _document.StartTransaction("Удаление старых заданий на отверстия")) {
-                _document.Delete(openings.Select(item => item.Id).ToArray());
-                t.Commit();
-            }
-        }
-
         /// <summary>
         /// Возвращает коллекцию исходящих заданий на отверстия, размещенных в текущем файле Revit
         /// </summary>
