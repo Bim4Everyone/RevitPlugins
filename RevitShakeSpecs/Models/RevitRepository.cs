@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.ApplicationServices;
+﻿using System.Collections.Generic;
+
+using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
@@ -13,5 +15,10 @@ namespace RevitShakeSpecs.Models {
 
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
+
+        public IList<Element> AllExistingSheets => new FilteredElementCollector(Document)
+        .OfClass(typeof(ViewSheet))
+        .WhereElementIsNotElementType()
+        .ToElements();
     }
 }

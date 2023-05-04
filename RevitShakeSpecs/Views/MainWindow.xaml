@@ -13,18 +13,37 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
-    Title="MainWindow"
-    Height="450" Width="800"    
+    Title="Встряхнуть спецификации"
+    Height="200" Width="650"  
+    MinHeight="200" MinWidth="650"    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+        <Label Grid.Row="0" Content="Параметр для группировки листов:"/>
+        <TextBox Grid.Row="1" HorizontalAlignment="Left" 
+                 Margin="5 0"
+                 Width="625"
+                 VerticalContentAlignment="Center"
+                 Text="{Binding PROJECT_SECTION, UpdateSourceTrigger=PropertyChanged}"/>
+
+
+        <Label Grid.Row="2" Content="Выберите нужный комплект документации:"/>
+        <ComboBox Grid.Row="3" Grid.Column="0"  Margin="5 0 5 5"
+                  ItemsSource="{Binding ProjectSections}" 
+                  SelectedItem="{Binding SelectedProjectSection}">
+        </ComboBox>
+        
+        
         <StackPanel
-            Grid.Row="1"
+            Grid.Row="4"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
@@ -36,8 +55,16 @@
 
             <Button
                 Margin="10"
-                Width="80"
-                Content="ОК"
+                Width="110"
+                Content="Вариант 1"
+                Command="{Binding RegenerateCommand}"
+                Click="ButtonOk_Click" />
+            
+            <Button
+                Margin="10"
+                Width="110"
+                Content="Вариант 2"
+                Command="{Binding ShakeCommand}"
                 Click="ButtonOk_Click" />
 
             <Button
