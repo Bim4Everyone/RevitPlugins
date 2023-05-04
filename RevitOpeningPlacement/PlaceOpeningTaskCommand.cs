@@ -13,6 +13,7 @@ using dosymep.SimpleServices;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.Exceptions;
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
@@ -38,8 +39,9 @@ namespace RevitOpeningPlacement {
                 var placementConfigurator = new PlacementConfigurator(revitRepository, openingConfig.Categories);
                 var placers = placementConfigurator.GetPlacers()
                                                    .ToList();
-                InitializePlacing(revitRepository, placers);
-                InitializeReport(revitRepository, placementConfigurator.GetUnplacedClashes());
+                var unplacedClashes = InitializePlacing(revitRepository, placers)
+                    .Concat(placementConfigurator.GetUnplacedClashes());
+                InitializeReport(revitRepository, unplacedClashes);
             }
         }
 
@@ -54,7 +56,7 @@ namespace RevitOpeningPlacement {
             return false;
         }
 
-        private void InitializePlacing(RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers) {
+        private IList<UnplacedClashModel> InitializePlacing(RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers) {
             using(var pb = GetPlatformService<IProgressDialogService>()) {
                 pb.StepValue = 10;
                 pb.DisplayTitleFormat = "Идёт расчёт... [{0}\\{1}]";
@@ -63,19 +65,28 @@ namespace RevitOpeningPlacement {
                 var ct = pb.CreateCancellationToken();
                 pb.Show();
 
-                PlaceOpenings(progress, ct, revitRepository, placers);
+                return PlaceOpenings(progress, ct, revitRepository, placers);
             }
         }
 
-        private void PlaceOpenings(IProgress<int> progress, CancellationToken ct, RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers) {
+        private IList<UnplacedClashModel> PlaceOpenings(IProgress<int> progress, CancellationToken ct, RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers) {
             var placedOpeningTasks = revitRepository.GetPlacedOutcomingTasks();
             var newOpenings = new List<FamilyInstance>();
+            List<UnplacedClashModel> unplacedClashes = new List<UnplacedClashModel>();
 
             using(var t = revitRepository.GetTransaction("Расстановка заданий")) {
                 int count = 0;
                 foreach(var p in placers) {
-                    var newOpening = p.Place();
-                    newOpenings.Add(newOpening);
+                    try {
+                        var newOpening = p.Place();
+
+                        newOpenings.Add(newOpening);
+                    } catch(OpeningNotPlacedException e) {
+                        var clashModel = p.ClashModel;
+                        if(!(clashModel is null)) {
+                            unplacedClashes.Add(new UnplacedClashModel() { Message = e.Message, Clash = clashModel });
+                        }
+                    }
 
                     progress.Report(count++);
                     ct.ThrowIfCancellationRequested();
@@ -91,6 +102,8 @@ namespace RevitOpeningPlacement {
             //т.к. свойство Location у элемента FamilyInstance, созданного внутри транзакции, может быть не актуально (установлено в (0,0,0) несмотря на реальное расположение),
             //а после завершения транзакции актуализируется
             RemoveAlreadyPlacedOpenings(revitRepository, newOpenings.Select(o => new OpeningTaskOutcoming(o)).ToList(), placedOpeningTasks);
+
+            return unplacedClashes;
         }
 
         private void RemoveAlreadyPlacedOpenings(RevitRepository revitRepository, ICollection<OpeningTaskOutcoming> newOpenings, ICollection<OpeningTaskOutcoming> alreadyPlacedOpenings) {
