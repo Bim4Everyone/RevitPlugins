@@ -1,7 +1,4 @@
-﻿
-using System.Linq;
-
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models.Clashes;
 
@@ -18,7 +15,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
     internal class RectangleMepFloorPlacerInitializer : IMepCurvePlacerInitializer {
         public OpeningPlacer GetPlacer(RevitRepository revitRepository, ClashModel clashModel, MepCategory categoryOption) {
             var clash = new MepCurveClash<CeilingAndFloor>(revitRepository, clashModel);
-            var placer = new OpeningPlacer(revitRepository) {
+            var placer = new OpeningPlacer(revitRepository, clashModel) {
                 LevelFinder = new ClashLevelFinder(revitRepository, clashModel),
                 PointFinder = new FloorPointFinder<MEPCurve>(clash),
                 Type = revitRepository.GetOpeningType(OpeningType.FloorRectangle),

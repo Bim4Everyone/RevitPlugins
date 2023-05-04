@@ -20,7 +20,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             var solidProvider = new FittingClashSolidProvider<Wall>(clash, angleFinder);
             var heightGetter = new WallOpeningSizeInitializer(solidProvider.GetSolid(), categoryOptions).GetHeight();
 
-            return new OpeningPlacer(revitRepository) {
+            return new OpeningPlacer(revitRepository, clashModel) {
                 Type = revitRepository.GetOpeningType(OpeningType.WallRectangle),
                 LevelFinder = new ClashLevelFinder(revitRepository, clashModel),
                 AngleFinder = angleFinder,
