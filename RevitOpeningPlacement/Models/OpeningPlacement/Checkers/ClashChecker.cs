@@ -134,7 +134,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
     internal class WallIsNotCurtainChecker : ClashChecker {
         public WallIsNotCurtainChecker(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
         public override bool CheckModel(ClashModel clashModel) {
-            return ((Wall) clashModel.OtherElement.GetElement(_revitRepository.DocInfos)).WallType.Kind != WallKind.Curtain;
+            // Если стена - FaceWall, будет System.InvalidCastException
+            return (clashModel.OtherElement.GetElement(_revitRepository.DocInfos) is Wall wall) && (wall.WallType.Kind != WallKind.Curtain);
         }
         public override string GetMessage() => "Задание на отверстие в стене: Стена относится к витражной системе.";
     }
@@ -211,8 +212,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
     internal class WallIsStraight : ClashChecker {
         public WallIsStraight(RevitRepository revitRepository, IClashChecker clashChecker) : base(revitRepository, clashChecker) { }
         public override bool CheckModel(ClashModel clashModel) {
-            var wall = (Wall) clashModel.OtherElement.GetElement(_revitRepository.DocInfos);
             try {
+                // Если стена - FaceWall, будет System.InvalidCastException
+                var wall = (Wall) clashModel.OtherElement.GetElement(_revitRepository.DocInfos);
                 return wall.GetLine() is Line;
             } catch {
                 return false;
