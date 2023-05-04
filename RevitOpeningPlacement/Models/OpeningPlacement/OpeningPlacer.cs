@@ -30,16 +30,32 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         /// </summary>
         public ClashModel ClashModel { get; }
 
+
+        /// <summary>
+        /// Размещает семейство по заданным настройкам
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="OpeningNotPlacedException">Исключение, если не удалось разместить семейство с заданными настройками</exception>
         public FamilyInstance Place() {
-            var point = PointFinder.GetPoint().Round();
+            XYZ point;
+            try {
+                point = PointFinder.GetPoint().Round();
+            } catch(IntersectionNotFoundException) {
+                throw new OpeningNotPlacedException("Не удалось найти точку вставки");
+            }
+
             var level = LevelFinder.GetLevel();
             var opening = _revitRepository.CreateInstance(Type, point, level);
 
             var angles = AngleFinder.GetAngle();
             _revitRepository.RotateElement(opening, point, angles);
 
-            SetParamValues(opening);
-
+            try {
+                SetParamValues(opening);
+            } catch(System.NullReferenceException) {
+                _revitRepository.DeleteElement(opening.Id.IntegerValue);
+                throw new OpeningNotPlacedException("Не удалось назначить параметры созданного отверстия, вследствие чего оно было удалено");
+            }
             return opening;
         }
 
