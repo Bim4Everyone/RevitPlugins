@@ -46,17 +46,22 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
     internal abstract class Clash<T1, T2> where T1 : Element
                                  where T2 : Element {
         public Clash(RevitRepository revitRepository, ClashModel clashModel) {
+            bool exceptionWasThrown = false;
             try {
                 Element1 = (T1) clashModel.MainElement.GetElement(revitRepository.DocInfos);
             } catch(InvalidCastException) {
                 // Дальше этот Clash попадет в Unplaced
+                exceptionWasThrown = true;
             }
             try {
                 Element2 = (T2) clashModel.OtherElement.GetElement(revitRepository.DocInfos);
             } catch(InvalidCastException) {
                 // Дальше этот Clash попадет в Unplaced
+                exceptionWasThrown = true;
             }
-            Element2Transform = revitRepository.GetTransform(Element2);
+            if(!exceptionWasThrown) {
+                Element2Transform = revitRepository.GetTransform(Element2);
+            }
         }
 
         public T1 Element1 { get; set; }
