@@ -48,11 +48,15 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         public Clash(RevitRepository revitRepository, ClashModel clashModel) {
             try {
                 Element1 = (T1) clashModel.MainElement.GetElement(revitRepository.DocInfos);
-                Element2 = (T2) clashModel.OtherElement.GetElement(revitRepository.DocInfos);
-                Element2Transform = revitRepository.GetTransform(Element2);
             } catch(InvalidCastException) {
                 // Дальше этот Clash попадет в Unplaced
             }
+            try {
+                Element2 = (T2) clashModel.OtherElement.GetElement(revitRepository.DocInfos);
+            } catch(InvalidCastException) {
+                // Дальше этот Clash попадет в Unplaced
+            }
+            Element2Transform = revitRepository.GetTransform(Element2);
         }
 
         public T1 Element1 { get; set; }
