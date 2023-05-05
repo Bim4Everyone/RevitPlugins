@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitClashDetective.Models.Clashes;
@@ -38,6 +33,9 @@ namespace RevitClashDetective.Models.ClashDetection {
         }
 
         public List<ClashModel> GetClashes() {
+            if(_mainElements.Count == 0) {
+                return new List<ClashModel>();
+            }
             using(var pb = GetPlatformService<IProgressDialogService>()) {
                 pb.StepValue = 100;
                 pb.DisplayTitleFormat = "Идёт расчёт... [{0}\\{1}]";
@@ -51,7 +49,7 @@ namespace RevitClashDetective.Models.ClashDetection {
             }
         }
 
-        public List<ClashModel> GetClashes(IProgress<int> progress, CancellationToken ct) {
+        private List<ClashModel> GetClashes(IProgress<int> progress, CancellationToken ct) {
             List<ClashModel> clashes = new List<ClashModel>();
 
             if(_mainElements.Count == 0) {
