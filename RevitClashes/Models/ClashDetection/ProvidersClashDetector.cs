@@ -69,7 +69,7 @@ namespace RevitClashDetective.Models.ClashDetection {
                                             .ToArray();
 
                 // Solid-ы необходимо проверять на замкнутость геометрии до трансформации, так как у трансформированного solid-а 
-                // появляютя грани и ребра
+                // появляются грани и ребра
                 var closedSolids = solids.Where(item => item != null && !item.IsNotClosed())
                                          .Select(item => SolidUtils.CreateTransformed(item, resultTransform));
 
