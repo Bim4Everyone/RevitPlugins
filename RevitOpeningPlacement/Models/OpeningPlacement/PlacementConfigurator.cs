@@ -1,16 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
-using Autodesk.Revit.DB;
-
-using dosymep.Revit;
-
-using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.FilterModel;
 
@@ -117,16 +108,16 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         }
 
         private IEnumerable<ClashModel> GetClashes(Filter mepFilter, Filter constructionFilter, IClashChecker clashChecker) {
-            var wallClashes = ClashInitializer.GetClashes(_revitRepository.GetClashRevitRepository(), mepFilter, constructionFilter)
+            var clashes = ClashInitializer.GetClashes(_revitRepository.GetClashRevitRepository(), mepFilter, constructionFilter)
                 .ToList();
 
-            _unplacedClashes.AddRange(wallClashes
+            _unplacedClashes.AddRange(clashes
                 .Select(item => new UnplacedClashModel() {
                     Message = clashChecker.Check(item),
                     Clash = item
                 })
                 .Where(item => !string.IsNullOrEmpty(item.Message) && !item.Message.Equals(RevitRepository.SystemCheck, StringComparison.CurrentCulture)));
-            return wallClashes.Where(item => string.IsNullOrEmpty(clashChecker.Check(item)));
+            return clashes.Where(item => string.IsNullOrEmpty(clashChecker.Check(item)));
         }
 
         private Filter GetRoundMepFilter(MepCategoryEnum category, Func<RevitClashDetective.Models.RevitRepository, double, Filter> filterProvider) {
