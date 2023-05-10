@@ -6,6 +6,7 @@ using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -14,7 +15,6 @@ using dosymep.SimpleServices;
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Exceptions;
-using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
 using RevitOpeningPlacement.OpeningModels;
@@ -25,11 +25,20 @@ namespace RevitOpeningPlacement {
 
     [Transaction(TransactionMode.Manual)]
     public class PlaceOpeningTaskCommand : BasePluginCommand {
+        private readonly int _progressBarStepValue = 10;
+
+        /// <summary>
+        /// Список Id элементов которые выдают предупреждение дублирования в Revit
+        /// </summary>
+        private readonly List<int> _duplicatedInstancesIds = new List<int>();
+
+
         public PlaceOpeningTaskCommand() {
             PluginName = "Расстановка заданий на отверстия";
         }
 
         protected override void Execute(UIApplication uiApplication) {
+            _duplicatedInstancesIds.Clear();
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
             if(!CheckModel(revitRepository)) {
                 return;
@@ -39,10 +48,13 @@ namespace RevitOpeningPlacement {
                 var placementConfigurator = new PlacementConfigurator(revitRepository, openingConfig.Categories);
                 var placers = placementConfigurator.GetPlacers()
                                                    .ToList();
+                uiApplication.Application.FailuresProcessing += FailureProcessor;
                 var unplacedClashes = InitializePlacing(revitRepository, placers)
                     .Concat(placementConfigurator.GetUnplacedClashes());
+                uiApplication.Application.FailuresProcessing -= FailureProcessor;
                 InitializeReport(revitRepository, unplacedClashes);
             }
+            _duplicatedInstancesIds.Clear();
         }
 
         private bool CheckModel(RevitRepository revitRepository) {
@@ -57,9 +69,12 @@ namespace RevitOpeningPlacement {
         }
 
         private IList<UnplacedClashModel> InitializePlacing(RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers) {
+            if(placers.Count() == 0) {
+                return new List<UnplacedClashModel>();
+            }
             using(var pb = GetPlatformService<IProgressDialogService>()) {
-                pb.StepValue = 10;
-                pb.DisplayTitleFormat = "Идёт расчёт... [{0}\\{1}]";
+                pb.StepValue = _progressBarStepValue;
+                pb.DisplayTitleFormat = "Расстановка отверстий... [{0}\\{1}]";
                 var progress = pb.CreateProgress();
                 pb.MaxValue = placers.Count();
                 var ct = pb.CreateCancellationToken();
@@ -71,51 +86,113 @@ namespace RevitOpeningPlacement {
 
         private IList<UnplacedClashModel> PlaceOpenings(IProgress<int> progress, CancellationToken ct, RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers) {
             var placedOpeningTasks = revitRepository.GetPlacedOutcomingTasks();
-            var newOpenings = new List<FamilyInstance>();
+            var newOpenings = new List<OpeningTaskOutcoming>();
             List<UnplacedClashModel> unplacedClashes = new List<UnplacedClashModel>();
 
             using(var t = revitRepository.GetTransaction("Расстановка заданий")) {
                 int count = 0;
+                int lastCount = 0;
                 foreach(var p in placers) {
+                    count++;
                     try {
                         var newOpening = p.Place();
-
-                        newOpenings.Add(newOpening);
+                        newOpenings.Add(new OpeningTaskOutcoming(newOpening));
                     } catch(OpeningNotPlacedException e) {
                         var clashModel = p.ClashModel;
                         if(!(clashModel is null)) {
                             unplacedClashes.Add(new UnplacedClashModel() { Message = e.Message, Clash = clashModel });
                         }
                     }
-
-                    progress.Report(count++);
+                    if((count == 0) || ((count - lastCount) >= _progressBarStepValue)) {
+                        progress.Report(count);
+                        lastCount = count;
+                    }
                     ct.ThrowIfCancellationRequested();
                 }
-                //Отсрочить показ предупреждений до завершения следующей транзакции - удаления дублирующих отверстий в RemoveAlreadyPlacedOpenings
-                FailureHandlingOptions options = t.GetFailureHandlingOptions()
-                    .SetForcedModalHandling(false)
-                    .SetDelayedMiniWarnings(true);
-                t.Commit(options);
+                t.Commit();
             }
 
             //Удаление дублирующих заданий на отверстия нужно начинать в отдельной транзакции после завершения транзакции создания заданий на отверстия,
             //т.к. свойство Location у элемента FamilyInstance, созданного внутри транзакции, может быть не актуально (установлено в (0,0,0) несмотря на реальное расположение),
             //а после завершения транзакции актуализируется
-            RemoveAlreadyPlacedOpenings(revitRepository, newOpenings.Select(o => new OpeningTaskOutcoming(o)).ToList(), placedOpeningTasks);
-
+            if(placedOpeningTasks.Count > 0) {
+                InitializeRemoving(revitRepository, newOpenings, placedOpeningTasks);
+            }
             return unplacedClashes;
         }
 
-        private void RemoveAlreadyPlacedOpenings(RevitRepository revitRepository, ICollection<OpeningTaskOutcoming> newOpenings, ICollection<OpeningTaskOutcoming> alreadyPlacedOpenings) {
-            using(var t = revitRepository.GetTransaction("Удаление дублирующих заданий")) {
-                foreach(var newOpening in newOpenings) {
-                    if(IsAlreadyPlaced(newOpening, alreadyPlacedOpenings)) {
-                        revitRepository.DeleteElement(newOpening.Id);
-                    }
-                }
-                t.Commit();
+        private void InitializeRemoving(
+            RevitRepository revitRepository,
+            ICollection<OpeningTaskOutcoming> newOpenings,
+            ICollection<OpeningTaskOutcoming> alreadyPlacedOpenings) {
+            using(var pb = GetPlatformService<IProgressDialogService>()) {
+                pb.StepValue = _progressBarStepValue;
+                pb.DisplayTitleFormat = "Проверка дублей... [{0}\\{1}]";
+                var progressRemove = pb.CreateProgress();
+                pb.MaxValue = newOpenings.Count;
+                var ctRemove = pb.CreateCancellationToken();
+                pb.Show();
+
+                RemoveAlreadyPlacedOpenings(
+                    revitRepository,
+                    newOpenings,
+                    alreadyPlacedOpenings,
+                    progressRemove,
+                    ctRemove);
             }
         }
+
+        private void RemoveAlreadyPlacedOpenings(
+            RevitRepository revitRepository,
+            ICollection<OpeningTaskOutcoming> newOpenings,
+            ICollection<OpeningTaskOutcoming> alreadyPlacedOpenings,
+            IProgress<int> progress,
+            CancellationToken ct) {
+            if(alreadyPlacedOpenings.Count > 0) {
+                using(var t = revitRepository.GetTransaction("Удаление дублирующих заданий")) {
+                    int count = 0;
+                    int lastCount = 0;
+                    foreach(var newOpening in newOpenings) {
+                        bool deleteNewOpening = _duplicatedInstancesIds.Contains(newOpening.Id) || newOpening.IsAlreadyPlaced(alreadyPlacedOpenings);
+                        if(deleteNewOpening) {
+                            revitRepository.DeleteElement(newOpening.Id);
+                        }
+                        count++;
+                        if((count == 0) || ((count - lastCount) >= _progressBarStepValue)) {
+                            progress.Report(count);
+                            lastCount = count;
+                        }
+                        ct.ThrowIfCancellationRequested();
+                    }
+                    t.Commit();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Метод для подписки на событие <see cref="UIApplication.Application.FailuresProcessing"/>
+        /// Используется для запоминания расставленных экземпляров семейств заданий на отверстия, которые дают дублирование с уже размещенными
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FailureProcessor(object sender, FailuresProcessingEventArgs e) {
+            FailuresAccessor fas = e.GetFailuresAccessor();
+
+            List<FailureMessageAccessor> fma = fas.GetFailureMessages().ToList();
+
+            foreach(FailureMessageAccessor fa in fma) {
+                var definition = fa.GetFailureDefinitionId();
+                if(definition == BuiltInFailures.OverlapFailures.DuplicateInstances) {
+                    var ids = fa.GetFailingElementIds().Select(id => id.IntegerValue);
+                    foreach(var id in ids) {
+                        if(!_duplicatedInstancesIds.Contains(id)) {
+                            _duplicatedInstancesIds.Add(id);
+                        }
+                    }
+                };
+            }
+        }
+
 
         private void InitializeReport(RevitRepository revitRepository, IEnumerable<UnplacedClashModel> clashes) {
             if(!clashes.Any()) {
@@ -126,31 +203,6 @@ namespace RevitOpeningPlacement {
             var helper = new WindowInteropHelper(window) { Owner = revitRepository.UIApplication.MainWindowHandle };
 
             window.Show();
-        }
-
-        /// <summary>
-        /// Проверяет, размещено ли уже такое же задание на отверстие в проекте. Под "таким" же понимается семейство задания на отверстие с координатами
-        /// </summary>
-        /// <param name="newOpening">Новое задание на отверстие</param>
-        /// <param name="placedOpenings">Существующие задания на отверстия в проекте</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        private bool IsAlreadyPlaced(OpeningTaskOutcoming newOpening, ICollection<OpeningTaskOutcoming> placedOpenings) {
-            if(newOpening == null) {
-                throw new ArgumentNullException(nameof(newOpening));
-            }
-            var toleranceCubeDiagonal = Math.Sqrt(XYZExtension.FeetRound * XYZExtension.FeetRound * XYZExtension.FeetRound);
-
-            var closestPlacedOpenings = placedOpenings.Where(placedOpening =>
-                placedOpening.Location
-                .DistanceTo(placedOpening.Location) <= toleranceCubeDiagonal);
-
-            foreach(OpeningTaskOutcoming placedOpening in closestPlacedOpenings) {
-                if(placedOpening.EqualsSolid(newOpening.GetSolid(), XYZExtension.FeetRound)) {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }
