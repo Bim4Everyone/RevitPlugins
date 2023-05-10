@@ -20,6 +20,8 @@ namespace RevitClashDetective.Models.ClashDetection {
         private readonly List<ElementId> _ids;
         private readonly List<Element> _mainElements;
         private readonly List<Element> _secondElements;
+        private readonly int _progressBarStep = 100;
+
 
         public ProvidersClashDetector(RevitRepository revitRepository, IProvider firstProvider, IProvider secondProvider) {
             _revitRepository = revitRepository;
@@ -37,7 +39,7 @@ namespace RevitClashDetective.Models.ClashDetection {
                 return new List<ClashModel>();
             }
             using(var pb = GetPlatformService<IProgressDialogService>()) {
-                pb.StepValue = 100;
+                pb.StepValue = _progressBarStep;
                 pb.DisplayTitleFormat = "Идёт расчёт... [{0}\\{1}]";
                 var progress = pb.CreateProgress();
                 pb.MaxValue = _secondElements.Count;
@@ -59,19 +61,25 @@ namespace RevitClashDetective.Models.ClashDetection {
             var resultTransform = _firstProvider.MainTransform.GetTransitionMatrix(_secondProvider.MainTransform);
 
             var count = 0;
+            var lastCount = 0;
             foreach(var element in _secondElements) {
-                progress.Report(count++);
+                count++;
+                if((count == 0) || ((count - lastCount) >= _progressBarStep)) {
+                    progress.Report(count);
+                    lastCount = count;
+                }
                 ct.ThrowIfCancellationRequested();
 
                 var solids = _secondProvider.GetSolids(element)
                                             .ToArray();
 
+                var notNullSolids = solids.Where(s => s != null);
                 // Solid-ы необходимо проверять на замкнутость геометрии до трансформации, так как у трансформированного solid-а 
                 // появляются грани и ребра
-                var closedSolids = solids.Where(item => item != null && !item.IsNotClosed())
+                var closedSolids = notNullSolids.Where(item => !item.IsNotClosed())
                                          .Select(item => SolidUtils.CreateTransformed(item, resultTransform));
 
-                var openSolids = solids.Where(item => item != null && item.IsNotClosed())
+                var openSolids = notNullSolids.Where(item => item.IsNotClosed())
                                        .Select(item => SolidUtils.CreateTransformed(item, resultTransform));
 
                 foreach(var solid in openSolids) {
@@ -88,18 +96,18 @@ namespace RevitClashDetective.Models.ClashDetection {
 
         private IEnumerable<ClashModel> GetElementClashesWithFilter(Element element, Solid solid) {
             return new FilteredElementCollector(_firstProvider.Doc, _ids)
-                                .WherePasses(new BoundingBoxIntersectsFilter(solid.GetOutline()))
-                                .WherePasses(new ElementIntersectsSolidFilter(solid))
-                                .Where(item => item.Id != element.Id)
-                                .Select(item => new ClashModel(_revitRepository, item, element));
+                .Excluding(new ElementId[] { element.Id })
+                .WherePasses(new BoundingBoxIntersectsFilter(solid.GetOutline()))
+                .WherePasses(new ElementIntersectsSolidFilter(solid))
+                .Select(item => new ClashModel(_revitRepository, item, element));
         }
 
         private IEnumerable<ClashModel> GetElementClashesWithIntersection(Element element, Solid solid) {
             return new FilteredElementCollector(_firstProvider.Doc, _ids)
-                                .WherePasses(new BoundingBoxIntersectsFilter(solid.GetOutline()))
-                                .Where(item => item.Id != element.Id)
-                                .Where(item => HasSolidsIntersection(item, solid))
-                                .Select(item => new ClashModel(_revitRepository, item, element));
+                    .Excluding(new ElementId[] { element.Id })
+                    .WherePasses(new BoundingBoxIntersectsFilter(solid.GetOutline()))
+                    .Where(item => HasSolidsIntersection(item, solid))
+                    .Select(item => new ClashModel(_revitRepository, item, element));
         }
 
         private bool HasSolidsIntersection(Element element, Solid solid) {
