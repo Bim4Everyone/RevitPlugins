@@ -17,7 +17,11 @@ namespace RevitOpeningPlacement.Models {
             }
             var otherProviders = revitRepository.DocInfos
                                                 .Select(item => new FilterProvider(item.Doc, architectureFilter, item.Transform))
+                                                .Where(item => item.GetElements().Count > 0)
                                                 .ToList();
+            if(otherProviders.Count == 0) {
+                return Enumerable.Empty<ClashModel>();
+            }
             var clashDetector = new ClashDetector(revitRepository, new[] { mainProvider }, otherProviders);
             return clashDetector.FindClashes();
         }
