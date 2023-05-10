@@ -144,6 +144,9 @@ namespace RevitOpeningPlacement.Models.Extensions {
         }
 
         private static bool SolidsVolumesEqual(Solid solid1, Solid solid2) {
+            if((solid1 is null) || (solid2 is null)) {
+                return false;
+            }
             return Math.Abs(solid1.Volume - solid2.Volume) <= _toleranceVolume;
         }
 
