@@ -16,5 +16,12 @@ namespace RevitCreatingFiltersByValues.Views {
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;
         }
+
+        private void SelectAllCategories(object sender, RoutedEventArgs e) {
+            categories.SelectAll();
+        }
+        private void UnselectAllCategories(object sender, RoutedEventArgs e) {
+            categories.UnselectAll();
+        }
     }
 }

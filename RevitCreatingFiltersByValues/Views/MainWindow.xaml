@@ -8,13 +8,13 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitCreatingFiltersByValues.Views"
     xmlns:vms="clr-namespace:RevitCreatingFiltersByValues.ViewModels"
-	  xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-
+	  xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    Height="450" Width="500"    
+    Height="800" Width="500"    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid>
@@ -22,28 +22,43 @@
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
 
         <Label Grid.Row="0" Content="Выберите категории:"/>
 
-        <!--<StackPanel Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal">
+        <StackPanel Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal">
             <Button Content="Выбрать все" Margin="5 0 5 5" Padding="5 0" 
-                    Click="SelectAllHostMarks"/>
+                    Click="SelectAllCategories"/>
             <Button Content="Отменить выбор" Margin="5 0 5 5" Padding="5 0" 
-                    Click="UnselectAllHostMarks"/>
-        </StackPanel>-->
+                    Click="UnselectAllCategories"/>
+        </StackPanel>
 
         <ListBox Grid.Row="2" Grid.Column="0" Margin="5 5 5 0" Name="categories"
-                 ItemsSource="{Binding CategoriesInView}"
+                 ItemsSource="{Binding DictCategoryElements.Keys}"
                  SelectionMode="Multiple">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction 
+                        Command="{Binding GetFilterableParametersCommand}"
+                        CommandParameter="{Binding SelectedItems, ElementName=categories}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
         </ListBox>
+        
 
+        <ListBox Grid.Row="3" Grid.Column="0" Margin="5 5 5 0"
+                 ItemsSource="{Binding FilterableParameters}"
+                 SelectionMode="Single">
+        </ListBox>
         
         
+        
+
         <StackPanel
-            Grid.Row="3"
+            Grid.Row="4"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">

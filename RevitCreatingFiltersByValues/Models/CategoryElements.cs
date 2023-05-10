@@ -8,11 +8,14 @@ using Autodesk.Revit.DB;
 
 namespace RevitCreatingFiltersByValues.Models {
     internal class CategoryElements {
-        public CategoryElements(Category cat) {
+        public CategoryElements(Category cat, ElementId id) {
             CategoryInView = cat;
+            CategoryIdInView = id;
         }
 
         public Category CategoryInView { get; set; }
+        public ElementId CategoryIdInView { get; set; }
+
 
         public List<Element> ElementsInView { get; set; } = new List<Element>();
 

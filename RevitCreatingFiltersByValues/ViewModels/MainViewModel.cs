@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Controls;
@@ -24,9 +25,14 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         }
 
 
+
+        public ObservableCollection<string> FilterableParameters { get; set; } = new ObservableCollection<string>();
+
         public ObservableCollection<string> CategoriesInView { get; set; } = new ObservableCollection<string>();
+
         public Dictionary<string, CategoryElements> DictCategoryElements { get; set; } = new Dictionary<string, CategoryElements>();
-        public System.Collections.IList SelectedCategories { get; set; }             // Список меток основ, которые выбрал пользователь
+        public System.Collections.IList SelectedCategoriesTemp { get; set; }             // Список категорий, которые выбрал пользователь
+        public List<Category> SelectedCategories { get; set; }             // Список категорий, которые выбрал пользователь
 
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
@@ -36,7 +42,13 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             GetCategoriesInView();
 
             CreateCommand = new RelayCommand(Create, CanCreate);
+            GetFilterableParametersCommand = new RelayCommand(GetFilterableParameters);
         }
+
+
+
+
+
 
 
 
@@ -44,11 +56,12 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         public ICommand CreateCommand { get; }
         private void Create(object p) {
             // Забираем список выбранных элементов через CommandParameter
-            SelectedCategories = p as System.Collections.IList;
+            SelectedCategoriesTemp = p as System.Collections.IList;
 
             // Перевод списка выбранных марок пилонов в формат листа строк
             List<ElementId> selectedElements = new List<ElementId>();
-            foreach(var item in SelectedCategories) {
+            List<ElementId> selectedCatsId = new List<ElementId>();
+            foreach(var item in SelectedCategoriesTemp) {
                 string categoryName = item as string;
                 if(categoryName == null) { continue;}
 
@@ -56,14 +69,32 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 foreach(Element elem in DictCategoryElements[categoryName].ElementsInView) {
                     selectedElements.Add(elem.Id);
                 }
-            }
 
+
+
+                selectedCatsId.Add(DictCategoryElements[categoryName].CategoryIdInView);
+            }
 
 
 
             _revitRepository.ActiveUIDocument.Selection.SetElementIds(selectedElements);
 
+
+            // Закинуть списки в свойтсва проекат, дописать логику по выведению пользователю возможных значений выбранного параметра
+
         }
+        private bool CanCreate(object p) {
+            return true;
+        }
+
+
+
+
+
+
+
+
+
 
         public void GetCategoriesInView() {
             IList<Element> collector = new FilteredElementCollector(_revitRepository.Document, _revitRepository.Document.ActiveView.Id)
@@ -74,14 +105,21 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 Element elem = item as Element;
                 if(elem is null || elem.Category is null) { continue; }
 
-                string elemCategoryName = elem.Category.Name;
+                Category catOfElem = elem.Category;
+                string elemCategoryName = catOfElem.Name;
+                ElementId elemCategoryId = catOfElem.Id;
+
+
+                // Отсеиваем категории, которые не имеют параметров фильтрации
+                if(!_revitRepository.FilterableCategories.Contains(elemCategoryId)) { continue; }
+
 
 
                 if(DictCategoryElements.ContainsKey(elemCategoryName)) {
                     DictCategoryElements[elemCategoryName].ElementsInView.Add(elem);
 
                 } else {
-                    DictCategoryElements.Add(elemCategoryName, new CategoryElements(elem.Category));
+                    DictCategoryElements.Add(elemCategoryName, new CategoryElements(catOfElem, elemCategoryId));
                     CategoriesInView.Add(elemCategoryName);
                 }
             }
@@ -89,8 +127,51 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
 
 
-        private bool CanCreate(object p) {
-            return true;
+        // Получение списка возможных параметров фильтрации
+        public ICommand GetFilterableParametersCommand { get; }
+        private void GetFilterableParameters(object p) {
+            FilterableParameters.Clear();
+
+            // Забираем список выбранных элементов через CommandParameter
+            SelectedCategoriesTemp = p as System.Collections.IList;
+
+            // Получаем ID категорий для последующего получения параметров фильтрации
+            List<ElementId> selectedCatsId = new List<ElementId>();
+            foreach(var item in SelectedCategoriesTemp) {
+                string categoryName = item as string;
+                if(categoryName == null) { continue; }
+
+
+                selectedCatsId.Add(DictCategoryElements[categoryName].CategoryIdInView);
+            }
+
+
+            // Получаем параметры для фильтров на основе ID категорий
+            List<ElementId> elementIds = ParameterFilterUtilities.GetFilterableParametersInCommon(_revitRepository.Document, selectedCatsId).ToList();
+
+            foreach(ElementId id in elementIds) {
+
+                ParameterElement paramAsParameterElement = _revitRepository.Document.GetElement(id) as ParameterElement;
+                string paramName = string.Empty;
+                // Значит он встроенный
+                if(paramAsParameterElement is null) {
+                    BuiltInParameter parameterAsBuiltIn = (BuiltInParameter) Enum.ToObject(typeof(BuiltInParameter), id.IntegerValue);
+                    paramName = LabelUtils.GetLabelFor(parameterAsBuiltIn);
+                } else {
+                    paramName = paramAsParameterElement.Name;
+                }
+
+                FilterableParameters.Add(paramName);
+            }
+        }
+
+
+
+
+
+
+        public void GetPossibleValues() {
+            
         }
     }
 }

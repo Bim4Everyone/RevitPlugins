@@ -1,4 +1,7 @@
-﻿using Autodesk.Revit.ApplicationServices;
+﻿using System.Collections.Generic;
+using System.Linq;
+
+using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
@@ -13,5 +16,8 @@ namespace RevitCreatingFiltersByValues.Models {
 
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
+
+        public List<ElementId> FilterableCategories => ParameterFilterUtilities.GetAllFilterableCategories().ToList();
+
     }
 }
