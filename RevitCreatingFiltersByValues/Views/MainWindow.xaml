@@ -23,6 +23,7 @@
             <RowDefinition Height="30" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
@@ -36,7 +37,8 @@
                     Click="UnselectAllCategories"/>
         </StackPanel>
 
-        <ListBox Grid.Row="2" Grid.Column="0" Margin="5 5 5 0" Name="categories"
+
+        <ListBox Grid.Row="2" Margin="5 5 5 0" Name="categories"
                  ItemsSource="{Binding DictCategoryElements.Keys}"
                  SelectionMode="Multiple">
             <i:Interaction.Triggers>
@@ -47,18 +49,25 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </ListBox>
-        
 
-        <ListBox Grid.Row="3" Grid.Column="0" Margin="5 5 5 0"
+
+        <ListBox Grid.Row="3" Margin="5 5 5 0"
                  ItemsSource="{Binding FilterableParameters}"
+                 SelectedItem="{Binding SelectedFilterableParameter}"
                  SelectionMode="Single">
         </ListBox>
+
         
         
         
+        <ListBox Grid.Row="4" Margin="5 5 5 0"
+                 ItemsSource="{Binding PossibleValues}"
+                 SelectionMode="Multiple">
+        </ListBox>
+
 
         <StackPanel
-            Grid.Row="4"
+            Grid.Row="5"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">

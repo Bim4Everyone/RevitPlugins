@@ -26,13 +26,30 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
 
 
-        public ObservableCollection<string> FilterableParameters { get; set; } = new ObservableCollection<string>();
 
         public ObservableCollection<string> CategoriesInView { get; set; } = new ObservableCollection<string>();
 
         public Dictionary<string, CategoryElements> DictCategoryElements { get; set; } = new Dictionary<string, CategoryElements>();
         public System.Collections.IList SelectedCategoriesTemp { get; set; }             // Список категорий, которые выбрал пользователь
-        public List<Category> SelectedCategories { get; set; }             // Список категорий, которые выбрал пользователь
+        //public List<Category> SelectedCategories { get; set; }             // Список категорий, которые выбрал пользователь
+
+
+
+        public ObservableCollection<string> FilterableParameters { get; set; } = new ObservableCollection<string>();
+
+        private string _selectedFilterableParameter;
+        public string SelectedFilterableParameter {
+            get => _selectedFilterableParameter;
+            set {
+                this.RaiseAndSetIfChanged(ref _selectedFilterableParameter, value);
+                GetPossibleValues();
+            }
+        }
+
+
+        public ObservableCollection<string> PossibleValues { get; set; } = new ObservableCollection<string>();
+
+
 
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
@@ -171,7 +188,29 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
 
         public void GetPossibleValues() {
-            
+            if(SelectedFilterableParameter is null) { return; }
+            PossibleValues.Clear();
+
+            List<Element> elementsForWork = new List<Element>();
+
+
+            // Получаем элементы, которые выбрал пользователь через категории
+            foreach(var item in SelectedCategoriesTemp) {
+                string categoryName = item as string;
+                if(categoryName == null) { continue; }
+
+                elementsForWork.AddRange(DictCategoryElements[categoryName].ElementsInView);
+            }
+
+            foreach(Element elem in elementsForWork) {
+                var param = elem.LookupParameter(SelectedFilterableParameter);
+                if(param is null) { continue; }
+
+                string val = param.AsValueString();
+                if(!PossibleValues.Contains(val)) {
+                    PossibleValues.Add(val);
+                }
+            }
         }
     }
 }
