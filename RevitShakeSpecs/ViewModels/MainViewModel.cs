@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO.Ports;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -7,6 +9,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Visual;
 using Autodesk.Revit.UI;
 
+using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -24,18 +27,29 @@ namespace RevitShakeSpecs.ViewModels {
         }
 
 
-        private string _projectSection = "обр_ФОП_Раздел проекта";
-        public string PROJECT_SECTION {
-            get => _projectSection;
+
+
+
+
+        public List<string> ProjectSectionParamNames { get; set; } = new List<string>();
+
+        private string _selectedProjectSectionParamName;
+        public string SelectedProjectSectionParamName {
+            get => _selectedProjectSectionParamName;
             set {
-                _projectSection = value;
-                GetProjectSections();
+                this.RaiseAndSetIfChanged(ref _selectedProjectSectionParamName, value);
             }
         }
 
 
 
-        
+
+
+
+
+
+
+
         public ObservableCollection<string> ProjectSections { get; set; } = new ObservableCollection<string>();     // Список всех комплектов док-ции (обр_ФОП_Раздел проекта)
         private string _selectedProjectSection { get; set; }                                                        // Выбранный пользователем комплект док-ции
         public string SelectedProjectSection {
@@ -53,12 +67,19 @@ namespace RevitShakeSpecs.ViewModels {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
-            GetProjectSections();
-            
+
+            LoadConfig();
+            GetFilterableParams();
+            GetProjectSections(null);
+
+            GetProjectSectionsCommand = new RelayCommand(GetProjectSections);
             RegenerateCommand = new RelayCommand(Regenerate, CanShake);
             ShakeCommand = new RelayCommand(Shake, CanShake);
-
         }
+
+
+
+
 
 
 
@@ -69,13 +90,8 @@ namespace RevitShakeSpecs.ViewModels {
 
         public ICommand RegenerateCommand { get; }
         private void Regenerate(object p) {
-            Transaction transaction = new Transaction(_revitRepository.Document, "Встряска спецификаций");
-            transaction.Start();
-            _revitRepository.Document.Regenerate();
-            transaction.Commit();
+            SaveConfig();
         }
-
-
 
 
 
@@ -86,16 +102,19 @@ namespace RevitShakeSpecs.ViewModels {
             transaction.Start();
             foreach(var item in _revitRepository.AllExistingSheets) {
                 ViewSheet viewSheet = item as ViewSheet;
-                Parameter param = viewSheet.LookupParameter(PROJECT_SECTION);
-                
-                if(viewSheet is null || param is null) { continue; }
+                Parameter param = viewSheet.LookupParameter(SelectedProjectSectionParamName);
 
-                if(param.AsString() != SelectedProjectSection) {
-                    continue;
-                }
+                //var paramValue = viewSheet.GetParamValueOrDefault(SelectedProjectSectionParamName);
 
-                SheetUtils sheetUtils = new SheetUtils(this, viewSheet);
-                sheetUtils.FindAndShakeSpecsOnSheet();
+
+                //if(viewSheet is null || param is null) { continue; }
+
+                //if(param.AsString() != SelectedProjectSection) {
+                //    continue;
+                //}
+
+                //SheetUtils sheetUtils = new SheetUtils(this, viewSheet);
+                //sheetUtils.FindAndShakeSpecsOnSheet();
 
             }
 
@@ -113,15 +132,47 @@ namespace RevitShakeSpecs.ViewModels {
 
 
 
-        private void GetProjectSections() {
+
+
+
+
+
+
+
+
+
+
+
+        // Заполнение списка параметров, где может быть прописан раздел проекта
+        private void GetFilterableParams() {
+            Category category = _revitRepository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sheets);
+
+            var filterableParametersIds = ParameterFilterUtilities.GetFilterableParametersInCommon(_revitRepository.Document, new List<ElementId> { category.Id });
+
+            foreach(var id in filterableParametersIds) {
+                ParameterElement param = _revitRepository.Document.GetElement(id) as ParameterElement;
+                if(param is null) { continue; }
+
+                ProjectSectionParamNames.Add(param.Name);
+            }
+
+            ProjectSectionParamNames.Sort();
+        }
+
+
+
+        // Получение возможных вариантов заполнения параметра раздела проекта
+        public ICommand GetProjectSectionsCommand { get; }
+
+        private void GetProjectSections(object p) {
             ProjectSections.Clear();
             ErrorText = string.Empty;
             string projectSection;
             foreach(var item in _revitRepository.AllExistingSheets) {
                 ViewSheet viewSheet = item as ViewSheet;
-                if (viewSheet is null) { continue; }
+                if(viewSheet is null) { continue; }
 
-                Parameter param = viewSheet.LookupParameter(PROJECT_SECTION);
+                Parameter param = viewSheet.LookupParameter(SelectedProjectSectionParamName);
 
                 if(param is null) {
                     ErrorText = "Данный параметр не найден у листов";
@@ -135,6 +186,37 @@ namespace RevitShakeSpecs.ViewModels {
                     ProjectSections.Add(projectSection);
                 }
             }
+            // Сортировка
+            ProjectSections = new ObservableCollection<string>(ProjectSections.OrderBy(i => i));
+        }
+
+
+
+
+
+
+
+
+
+        private void SaveConfig() {
+            var setting = _pluginConfig.GetSettings(_revitRepository.Document);
+
+            if(setting is null) {
+                setting = _pluginConfig.AddSettings(_revitRepository.Document);
+            }
+
+            setting.ProjectSectionParamName = SelectedProjectSectionParamName;
+            setting.SelectedProjectSection = SelectedProjectSection;
+
+            _pluginConfig.SaveProjectConfig();
+        }
+
+        private void LoadConfig() {
+            var setting = _pluginConfig.GetSettings(_revitRepository.Document);
+
+            SelectedProjectSectionParamName = setting?.ProjectSectionParamName;
+            SelectedProjectSection = setting?.SelectedProjectSection;
         }
     }
+
 }

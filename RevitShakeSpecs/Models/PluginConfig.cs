@@ -22,5 +22,8 @@ namespace RevitShakeSpecs.Models {
 
     internal class PluginSettings : ProjectSettings {
         public override string ProjectName { get; set; }
+
+        public string ProjectSectionParamName { get; set; }
+        public string SelectedProjectSection { get; set; }
     }
 }
