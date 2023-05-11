@@ -18,17 +18,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dosymep", "dosymep", "{0647
 		dosymep\BoolToVisibilityConverter.cs = dosymep\BoolToVisibilityConverter.cs
 		dosymep\ConfigSerializer.cs = dosymep\ConfigSerializer.cs
 		dosymep\ConvertibleExtention.cs = dosymep\ConvertibleExtention.cs
+		dosymep\DisableCollapseGroupRowCommand.cs = dosymep\DisableCollapseGroupRowCommand.cs
 		dosymep\EnumConverter.cs = dosymep\EnumConverter.cs
 		dosymep\EnumToItemsSource.cs = dosymep\EnumToItemsSource.cs
+		dosymep\GroupRowChildrenValuesConverter.cs = dosymep\GroupRowChildrenValuesConverter.cs
+		dosymep\GroupRowExtensions.cs = dosymep\GroupRowExtensions.cs
+		dosymep\GroupRowValueConverter.cs = dosymep\GroupRowValueConverter.cs
 		dosymep\IndexConverter.cs = dosymep\IndexConverter.cs
 		dosymep\InverseBooleanConverter.cs = dosymep\InverseBooleanConverter.cs
 		dosymep\PlatformWindow.cs = dosymep\PlatformWindow.cs
 		dosymep\RelayCommand.cs = dosymep\RelayCommand.cs
 		dosymep\ThemedPlatformWindow.cs = dosymep\ThemedPlatformWindow.cs
-		dosymep\GroupRowChildrenValuesConverter.cs = dosymep\GroupRowChildrenValuesConverter.cs
-		dosymep\GroupRowValueConverter.cs = dosymep\GroupRowValueConverter.cs
-		dosymep\DisableCollapseGroupRowCommand.cs = dosymep\DisableCollapseGroupRowCommand.cs
-		dosymep\GroupRowExtensions.cs = dosymep\GroupRowExtensions.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0C7777D6-5306-4473-A046-497D2B54E4CA}"
@@ -225,11 +225,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RevitClashes", "RevitClashe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{09BF8F15-C3C3-4631-A773-A4434F8E083B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitCheckingLevels", "RevitCheckingLevels\RevitCheckingLevels.csproj", "{4BAEB10E-CEB9-4EA7-B1CB-38125A453CB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitCheckingLevels", "RevitCheckingLevels\RevitCheckingLevels.csproj", "{4BAEB10E-CEB9-4EA7-B1CB-38125A453CB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitCopingZones", "RevitCopingZones\RevitCopingZones.csproj", "{799E0D79-162C-4903-8A01-8A9977A8C144}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitCopingZones", "RevitCopingZones\RevitCopingZones.csproj", "{799E0D79-162C-4903-8A01-8A9977A8C144}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitEditingZones", "RevitEditingZones\RevitEditingZones.csproj", "{09A8D037-DD95-4B6D-97AD-6250EE49509E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitEditingZones", "RevitEditingZones\RevitEditingZones.csproj", "{09A8D037-DD95-4B6D-97AD-6250EE49509E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitDeleteUnused", "RevitDeleteUnused\RevitDeleteUnused.csproj", "{0EC70618-8306-4F61-B6D0-33C9EC69A760}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -571,6 +573,22 @@ Global
 		{09A8D037-DD95-4B6D-97AD-6250EE49509E}.R2022|x64.Build.0 = R2022|x64
 		{09A8D037-DD95-4B6D-97AD-6250EE49509E}.R2023|x64.ActiveCfg = R2023|x64
 		{09A8D037-DD95-4B6D-97AD-6250EE49509E}.R2023|x64.Build.0 = R2023|x64
+		{0EC70618-8306-4F61-B6D0-33C9EC69A760}.D2020|x64.ActiveCfg = D2020|x64
+		{0EC70618-8306-4F61-B6D0-33C9EC69A760}.D2020|x64.Build.0 = D2020|x64
+		{0EC70618-8306-4F61-B6D0-33C9EC69A760}.D2021|x64.ActiveCfg = D2021|x64
+		{0EC70618-8306-4F61-B6D0-33C9EC69A760}.D2021|x64.Build.0 = D2021|x64
+		{0EC70618-8306-4F61-B6D0-33C9EC69A760}.D2022|x64.ActiveCfg = D2022|x64
+		{0EC70618-8306-4F61-B6D0-33C9EC69A760}.D2022|x64.Build.0 = D2022|x64
+		{0EC70618-8306-4F61-B6D0-33C9EC69A760}.D2023|x64.ActiveCfg = D2023|x64
+		{0EC70618-8306-4F61-B6D0-33C9EC69A760}.D2023|x64.Build.0 = D2023|x64
+		{0EC70618-8306-4F61-B6D0-33C9EC69A760}.R2020|x64.ActiveCfg = R2020|x64
+		{0EC70618-8306-4F61-B6D0-33C9EC69A760}.R2020|x64.Build.0 = R2020|x64
+		{0EC70618-8306-4F61-B6D0-33C9EC69A760}.R2021|x64.ActiveCfg = R2021|x64
+		{0EC70618-8306-4F61-B6D0-33C9EC69A760}.R2021|x64.Build.0 = R2021|x64
+		{0EC70618-8306-4F61-B6D0-33C9EC69A760}.R2022|x64.ActiveCfg = R2022|x64
+		{0EC70618-8306-4F61-B6D0-33C9EC69A760}.R2022|x64.Build.0 = R2022|x64
+		{0EC70618-8306-4F61-B6D0-33C9EC69A760}.R2023|x64.ActiveCfg = R2023|x64
+		{0EC70618-8306-4F61-B6D0-33C9EC69A760}.R2023|x64.Build.0 = R2023|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
