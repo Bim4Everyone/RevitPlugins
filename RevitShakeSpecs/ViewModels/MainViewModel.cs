@@ -28,10 +28,7 @@ namespace RevitShakeSpecs.ViewModels {
 
 
 
-
-
-
-        public List<string> ProjectSectionParamNames { get; set; } = new List<string>();
+        public List<string> ProjectSectionParamNames { get; set; } = new List<string>();                            // Параметры листов
 
         private string _selectedProjectSectionParamName;
         public string SelectedProjectSectionParamName {
@@ -44,20 +41,17 @@ namespace RevitShakeSpecs.ViewModels {
 
 
 
-
-
-
-
-
-
-        public ObservableCollection<string> ProjectSections { get; set; } = new ObservableCollection<string>();     // Список всех комплектов док-ции (обр_ФОП_Раздел проекта)
-        private string _selectedProjectSection { get; set; }                                                        // Выбранный пользователем комплект док-ции
+        public ObservableCollection<string> ProjectSections { get; set; } = new ObservableCollection<string>();     // Разделы проекта
+        private string _selectedProjectSection { get; set; }                                                        
         public string SelectedProjectSection {
             get => _selectedProjectSection;
             set {
                 _selectedProjectSection = value;
             }
         }
+
+
+
 
 
 
@@ -85,11 +79,14 @@ namespace RevitShakeSpecs.ViewModels {
 
 
 
-
-
-
         public ICommand RegenerateCommand { get; }
         private void Regenerate(object p) {
+            using(Transaction transaction = new Transaction(_revitRepository.Document)) {
+                transaction.Start("Регенирация документа");
+                _revitRepository.Document.Regenerate();
+                transaction.Commit();
+            }
+
             SaveConfig();
         }
 
@@ -98,27 +95,29 @@ namespace RevitShakeSpecs.ViewModels {
 
         public ICommand ShakeCommand { get; }
         private void Shake(object p) {
-            Transaction transaction = new Transaction(_revitRepository.Document, "Встряска спецификаций");
-            transaction.Start();
-            foreach(var item in _revitRepository.AllExistingSheets) {
-                ViewSheet viewSheet = item as ViewSheet;
-                Parameter param = viewSheet.LookupParameter(SelectedProjectSectionParamName);
 
-                //var paramValue = viewSheet.GetParamValueOrDefault(SelectedProjectSectionParamName);
+            using(Transaction transaction = new Transaction(_revitRepository.Document)) {
+                transaction.Start("Встряска спецификаций");
 
+                foreach(var item in _revitRepository.AllExistingSheets) {
+                    ViewSheet viewSheet = item as ViewSheet;
 
-                //if(viewSheet is null || param is null) { continue; }
+                    var paramValueTemp = viewSheet.GetParamValueOrDefault(SelectedProjectSectionParamName);
+                    if(paramValueTemp is null) { continue; }
+                    string paramValue = paramValueTemp.ToString();
 
-                //if(param.AsString() != SelectedProjectSection) {
-                //    continue;
-                //}
+                    if(paramValue != SelectedProjectSection) {
+                        continue;
+                    }
 
-                //SheetUtils sheetUtils = new SheetUtils(this, viewSheet);
-                //sheetUtils.FindAndShakeSpecsOnSheet();
+                    SheetUtils sheetUtils = new SheetUtils(this, viewSheet);
+                    sheetUtils.FindAndShakeSpecsOnSheet();
+                }
 
+                transaction.Commit();
             }
 
-            transaction.Commit();
+            SaveConfig();
         }
         private bool CanShake(object p) {
             if(ErrorText.Length > 0) {
@@ -172,14 +171,9 @@ namespace RevitShakeSpecs.ViewModels {
                 ViewSheet viewSheet = item as ViewSheet;
                 if(viewSheet is null) { continue; }
 
-                Parameter param = viewSheet.LookupParameter(SelectedProjectSectionParamName);
-
-                if(param is null) {
-                    ErrorText = "Данный параметр не найден у листов";
-                    return;
-                }
-
-                projectSection = param.AsString();
+                var projectSectionTemp = viewSheet.GetParamValueOrDefault(SelectedProjectSectionParamName);
+                if(projectSectionTemp is null) { continue; }
+                projectSection = projectSectionTemp.ToString();
 
                 // Заполнение списка разделов проекта
                 if(!ProjectSections.Contains(projectSection)) {
@@ -189,9 +183,6 @@ namespace RevitShakeSpecs.ViewModels {
             // Сортировка
             ProjectSections = new ObservableCollection<string>(ProjectSections.OrderBy(i => i));
         }
-
-
-
 
 
 

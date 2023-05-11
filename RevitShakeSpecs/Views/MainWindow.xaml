@@ -32,6 +32,7 @@
 
         <Label Grid.Row="0" Content="Параметр для группировки листов:"/>
         <ComboBox Grid.Row="1" Margin="5 0"
+                  VerticalContentAlignment="Center"
                   ItemsSource="{Binding ProjectSectionParamNames}" 
                   SelectedItem="{Binding SelectedProjectSectionParamName}">
 
@@ -46,6 +47,7 @@
 
         <Label Grid.Row="2" Content="Выберите нужный комплект документации:"/>
         <ComboBox Grid.Row="3" Grid.Column="0"  Margin="5 0"
+                  VerticalContentAlignment="Center"
                   ItemsSource="{Binding ProjectSections}" 
                   SelectedItem="{Binding SelectedProjectSection}">
         </ComboBox>
