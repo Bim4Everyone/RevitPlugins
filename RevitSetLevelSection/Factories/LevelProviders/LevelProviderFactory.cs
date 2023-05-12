@@ -18,7 +18,7 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
     internal abstract class LevelProviderFactory : ILevelProviderFactory {
         private readonly Dictionary<ElementId, ILevelProvider> _providersCache =
             new Dictionary<ElementId, ILevelProvider>();
-        
+
         protected readonly IResolutionRoot _resolutionRoot;
         protected readonly IElementPositionFactory _positionFactory;
 
@@ -40,6 +40,10 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
                 throw new ArgumentNullException(nameof(element));
             }
 
+            if(element.InAnyCategory(BuiltInCategory.OST_Walls, BuiltInCategory.OST_StructuralFraming)) {
+                return CreateImpl(element);
+            }
+
             if(_providersCache.TryGetValue(element.Category.Id, out ILevelProvider levelProvider)) {
                 return levelProvider;
             }
@@ -49,12 +53,12 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
 
             return levelProvider;
         }
-        
+
         public ILevelProvider CreateDefault(Element element) {
             if(element == null) {
                 throw new ArgumentNullException(nameof(element));
             }
-            
+
             return _resolutionRoot.Get<LevelNearestProvider>(GetConstructorArgument(element));
         }
 
@@ -93,12 +97,13 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
         }
 
         private bool IsStairs(Element element) {
-            return element.GetElementType()
+            var elementType = element.GetElementType();
+            return elementType
                        ?.GetParamValue<string>(BuiltInParameter.UNIFORMAT_CODE)
                        ?.StartsWith("ОС.КЭ.3.5") == true
-                   || element.Name.IndexOf("лестн", StringComparison.CurrentCultureIgnoreCase) >= 0
-                   || element.Name.IndexOf("марш", StringComparison.CurrentCultureIgnoreCase) >= 0
-                   || element.Name.IndexOf("площад", StringComparison.CurrentCultureIgnoreCase) >= 0;
+                   || elementType?.FamilyName.IndexOf("лестн", StringComparison.CurrentCultureIgnoreCase) >= 0
+                   || elementType?.FamilyName.IndexOf("марш", StringComparison.CurrentCultureIgnoreCase) >= 0
+                   || elementType?.FamilyName.IndexOf("площад", StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
 
         private IEnumerable<BuiltInCategory> GetAllCategories() {
@@ -108,7 +113,7 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
                 .Union(GetLevelByIdProviderCategories())
                 .Union(GetLevelStairsProviderCategories());
         }
-        
+
         private IEnumerable<BuiltInCategory> GetLevelNearestProviderCategories() {
             yield return BuiltInCategory.OST_Walls;
             yield return BuiltInCategory.OST_Floors;
@@ -170,17 +175,17 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
             yield return BuiltInCategory.OST_ElectricalEquipment;
             yield return BuiltInCategory.OST_ElectricalFixtures;
         }
-        
+
         private IEnumerable<BuiltInCategory> GetLevelMagicBottomProviderCategories() {
             yield return BuiltInCategory.OST_StructuralFraming;
             yield return BuiltInCategory.OST_StructuralTruss;
         }
-        
+
         private IEnumerable<BuiltInCategory> GetLevelByIdProviderCategories() {
             yield return BuiltInCategory.OST_Rooms;
             yield return BuiltInCategory.OST_Areas;
         }
-        
+
         private IEnumerable<BuiltInCategory> GetLevelStairsProviderCategories() {
             yield return BuiltInCategory.OST_StairsRuns;
             yield return BuiltInCategory.OST_StairsLandings;

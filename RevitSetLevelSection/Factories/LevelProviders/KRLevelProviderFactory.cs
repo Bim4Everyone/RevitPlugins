@@ -81,7 +81,7 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
             var result = intersector.FindNearest(point, XYZ.BasisZ);
 
             // 140 mm
-            return result.Proximity >= 0.459317585301837;
+            return result?.Proximity >= 0.459317585301837;
         }
 
         private View3D GetView3D(Element element) {
