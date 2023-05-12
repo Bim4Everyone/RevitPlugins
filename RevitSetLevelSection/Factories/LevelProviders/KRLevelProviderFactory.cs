@@ -52,8 +52,8 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
         /// <returns>Возвращает true - если она является балкой, иначе false.</returns>
         private bool IsStructFarmCode(Wall wall) {
             return wall.GetElementType()
-                .GetParamValue<string>(BuiltInParameter.UNIFORMAT_CODE)
-                .StartsWith("ОС.КЭ.3.2");
+                ?.GetParamValue<string>(BuiltInParameter.UNIFORMAT_CODE)
+                ?.StartsWith("ОС.КЭ.3.2") == true;
         }
 
         /// <summary>

@@ -94,8 +94,8 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
 
         private bool IsStairs(Element element) {
             return element.GetElementType()
-                       .GetParamValue<string>(BuiltInParameter.UNIFORMAT_CODE)
-                       .StartsWith("ОС.КЭ.3.5")
+                       ?.GetParamValue<string>(BuiltInParameter.UNIFORMAT_CODE)
+                       ?.StartsWith("ОС.КЭ.3.5") == true
                    || element.Name.IndexOf("лестн", StringComparison.CurrentCultureIgnoreCase) >= 0
                    || element.Name.IndexOf("марш", StringComparison.CurrentCultureIgnoreCase) >= 0
                    || element.Name.IndexOf("площад", StringComparison.CurrentCultureIgnoreCase) >= 0;
