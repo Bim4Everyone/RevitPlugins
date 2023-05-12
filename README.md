@@ -5,7 +5,7 @@
 
 | #   | Плагин                    | Проект                                             | Справка                                                                 | Вкладка                                             | Панель        |
 |-----|---------------------------|----------------------------------------------------|-------------------------------------------------------------------------|-----------------------------------------------------|---------------|
-| 1.  | Настройки                 | [PlatformSettings](PlatformSettings)               | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829987)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Установки     |
+| 1.  | Настройки                 | [RevitPlatformSettings](RevitPlatformSettings)     | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829987)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Установки     |
 | 2.  | Печать                    | [RevitBatchPrint](RevitBatchPrint)                 | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829996)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Листы         |
 | 3.  | Поиск коллизий            | [RevitClashDetective](RevitClashDetective)         | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67830002)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Проверки      |
 | 4.  | Копирование стандартов    | [RevitCopyStandarts](RevitCopyStandarts)           | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67846251)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Прочее        |
