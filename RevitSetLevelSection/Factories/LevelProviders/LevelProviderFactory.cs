@@ -11,6 +11,7 @@ using Ninject.Parameters;
 using Ninject.Syntax;
 
 using RevitSetLevelSection.Models;
+using RevitSetLevelSection.Models.ElementPositions;
 using RevitSetLevelSection.Models.LevelProviders;
 
 namespace RevitSetLevelSection.Factories.LevelProviders {
@@ -65,6 +66,12 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
         }
 
         protected virtual ILevelProvider CreateImpl(Element element) {
+            if(element.InAnyCategory(BuiltInCategory.OST_StructuralFraming) && IsStairs(element)) {
+                var constructorArgument =
+                    new ConstructorArgument("elementPosition", _resolutionRoot.Get<ElementBottomPosition>());
+                return _resolutionRoot.Get<LevelBottomProvider>(constructorArgument);
+            }
+
             if(element.InAnyCategory(GetLevelNearestProviderCategories())) {
                 return _resolutionRoot.Get<LevelNearestProvider>(GetConstructorArgument(element));
             } else if(element.InAnyCategory(GetLevelBottomProviderCategories())) {
@@ -83,6 +90,15 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
         protected ConstructorArgument GetConstructorArgument(Element element) {
             var elementPosition = _positionFactory.Create(element);
             return new ConstructorArgument("elementPosition", elementPosition);
+        }
+
+        private bool IsStairs(Element element) {
+            return element.GetElementType()
+                       .GetParamValue<string>(BuiltInParameter.UNIFORMAT_CODE)
+                       .StartsWith("ОС.КЭ.3.2")
+                   || element.Name.IndexOf("лестн", StringComparison.CurrentCultureIgnoreCase) >= 0
+                   || element.Name.IndexOf("марш", StringComparison.CurrentCultureIgnoreCase) >= 0
+                   || element.Name.IndexOf("площад", StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
 
         private IEnumerable<BuiltInCategory> GetAllCategories() {
