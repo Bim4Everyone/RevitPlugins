@@ -13,6 +13,7 @@ using Ninject.Parameters;
 using Ninject.Syntax;
 
 using RevitSetLevelSection.Models;
+using RevitSetLevelSection.Models.ElementPositions;
 using RevitSetLevelSection.Models.LevelProviders;
 
 namespace RevitSetLevelSection.Factories.LevelProviders {
@@ -35,7 +36,9 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
 
             if(element is Wall wall) {
                 if(IsStructFarmCode(wall) || IsStructFarm(wall)) {
-                    return _resolutionRoot.Get<LevelMagicBottomProvider>(GetConstructorArgument(element));
+                    var constructorArgument =
+                        new ConstructorArgument("elementPosition", _resolutionRoot.Get<ElementTopPosition>());
+                    return _resolutionRoot.Get<LevelMagicBottomProvider>(constructorArgument);
                 }
             }
 
@@ -69,10 +72,10 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
             };
 
             var filter = new ElementMulticategoryFilter(categories);
-            
+
             // Надеюсь что нужный вид существует
             var intersector = new ReferenceIntersector(filter, FindReferenceTarget.Element, GetView3D(wall));
-            
+
             // пока считаю что начальной точки достаточно
             var point = ((LocationCurve) wall.Location).Curve.GetEndPoint(0);
             var result = intersector.FindNearest(point, XYZ.BasisZ);
