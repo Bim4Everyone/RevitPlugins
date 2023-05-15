@@ -63,7 +63,7 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
         /// <returns>Возвращает true - если она является балкой, иначе false.</returns>
         private bool IsStructFarm(Wall wall) {
             // 1300 mm
-            if(wall.GetParamValue<double>(BuiltInParameter.WALL_USER_HEIGHT_PARAM) >= 4.26509186351706) {
+            if(wall.GetParamValue<double>(BuiltInParameter.WALL_USER_HEIGHT_PARAM) > 4.26509186351706) {
                 return false;
             }
 
@@ -74,14 +74,19 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
             var filter = new ElementMulticategoryFilter(categories);
 
             // Надеюсь что нужный вид существует
-            var intersector = new ReferenceIntersector(filter, FindReferenceTarget.Element, GetView3D(wall));
+            var intersector = new ReferenceIntersector(filter, FindReferenceTarget.Face, GetView3D(wall));
 
             // пока считаю что начальной точки достаточно
             var point = ((LocationCurve) wall.Location).Curve.GetEndPoint(0);
+            point = new XYZ(point.X, point.Y,
+                point.Z
+                + 0.459317585301837 // 140 mm
+                + wall.GetParamValue<double>(BuiltInParameter.WALL_USER_HEIGHT_PARAM)); 
+            
             var result = intersector.FindNearest(point, XYZ.BasisZ);
-
+            
             // 140 mm
-            return result?.Proximity >= 0.459317585301837;
+            return result?.Proximity >= 0.0;
         }
 
         private View3D GetView3D(Element element) {
