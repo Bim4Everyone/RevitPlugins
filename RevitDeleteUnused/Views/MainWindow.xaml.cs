@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 
+using RevitDeleteUnused.ViewModels;
+
 namespace RevitDeleteUnused.Views {
     public partial class MainWindow {
         public MainWindow() {
