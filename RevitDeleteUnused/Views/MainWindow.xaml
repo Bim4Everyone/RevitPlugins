@@ -19,11 +19,11 @@
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="35"/>
             <RowDefinition Height="35"/>
             <RowDefinition/>
-            <RowDefinition Height="40" />
-            <RowDefinition Height="40" />
+            <RowDefinition Height="35" />
+            <RowDefinition Height="35" />
         </Grid.RowDefinitions>
         
         <TextBlock 
@@ -34,7 +34,8 @@
 
         <ComboBox
             Grid.Row="1"
-            Margin="10,5"            
+            Margin="10, 5"            
+            VerticalContentAlignment="Center"
             ItemsSource="{Binding RevitViewModels}"
             DisplayMemberPath = "Name"
             SelectedItem="{Binding SelectedElementType}">
@@ -43,12 +44,15 @@
         <ListView 
             Grid.Row="2"
             Margin="10,5"
+            SelectionMode="Extended"
             DataContext="{Binding SelectedElementType}"
             ItemsSource="{Binding ElementsToDelete}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <CheckBox Content="{Binding Name}"
-                              IsChecked="{Binding IsChecked}"/>
+                    <CheckBox
+                        IsChecked="{Binding IsChecked}">
+                        <TextBlock Text="{Binding Name}"/>
+                    </CheckBox>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListView>
@@ -73,17 +77,17 @@
 
         <StackPanel
             Grid.Row="4"
-            Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <TextBlock
-                Margin="10"
+                Margin="10, 5"
                 Foreground="Orange"
                 VerticalAlignment="Center"
+                DataContext="{Binding SelectedElementType}"
                 Text="{Binding ErrorText}" />
 
             <Button
-                Margin="10"
+                Margin="10, 5"
                 Width="80"
                 Content="ОК"
                 Click="ButtonOk_Click" 
@@ -91,7 +95,7 @@
                 Command="{Binding DeleteSelected}"/>
 
             <Button
-                Margin="10"
+                Margin="10, 5"
                 Width="80"
                 Content="Отмена"
                 Click="ButtonCancel_Click" />

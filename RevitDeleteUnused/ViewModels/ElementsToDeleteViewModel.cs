@@ -16,15 +16,32 @@ using RevitDeleteUnused.Commands;
 
 namespace RevitDeleteUnused.ViewModels {
     internal class ElementsToDeleteViewModel : BaseViewModel {
-        ObservableCollection<ElementToDelete> _elementsToDelete;
+        private ObservableCollection<ElementToDelete> _elementsToDelete;
+
+        private string _errorText;
 
         public ElementsToDeleteViewModel(Document document, ObservableCollection<ElementToDelete> elementsToDelete, string name) {
             _elementsToDelete = elementsToDelete;
-            DeleteSelected = new RelayCommand(obj => { DeleteCommand.DeleteSelectedCommand(document, ElementsToDelete); });
+            DeleteSelected = new RelayCommand(obj => { DeleteCommand.DeleteSelectedCommand(document, ElementsToDelete); }, CanDelete);
             Name = name;
         }
         public string Name { get; }
         public ObservableCollection<ElementToDelete> ElementsToDelete => _elementsToDelete;
         public ICommand DeleteSelected { get; }
+
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        private bool CanDelete(object p) {
+            int checkedElements = ElementsToDelete.Where(x => x.IsChecked).Count();
+            if(checkedElements == 0) {
+                ErrorText = "Не выбраны элементы.";
+                return false;
+            }
+            ErrorText = "";
+            return true;
+        }
     }
 }
