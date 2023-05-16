@@ -16,6 +16,8 @@ using Ninject.Infrastructure.Language;
 using static Autodesk.AdvanceSteel.Modelling.Beam;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Text;
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 
 namespace RevitFamilyParameterAdder.ViewModels {
     internal class MainViewModel : BaseViewModel {
@@ -28,6 +30,8 @@ namespace RevitFamilyParameterAdder.ViewModels {
         private string _selectedParamGroupName;
         private bool _isParamsForKR;
         private List<string> _paramGroupNames = new List<string>();
+        private List<string> _paramsInFM = new List<string>();
+        public StringBuilder _report = new StringBuilder();
         private List<SharedParam> _selectedParams = new List<SharedParam>();
         private List<ParameterGroupHelper> _bINParameterGroups = new List<ParameterGroupHelper>();
         private List<string> _defaultParamsKR = new List<string>() {
@@ -69,8 +73,11 @@ namespace RevitFamilyParameterAdder.ViewModels {
 
 
 
+
+
+
+
         public ObservableCollection<SharedParam> Params { get; set; } = new ObservableCollection<SharedParam>();
-        //public System.Collections.IList SelectedParams { get; set; }             // Список меток основ, которые выбрал пользователь
         public List<SharedParam> SelectedParams {
             get => _selectedParams;
             set => this.RaiseAndSetIfChanged(ref _selectedParams, value);
@@ -133,6 +140,8 @@ namespace RevitFamilyParameterAdder.ViewModels {
             GetParamsNSetParamFilter();
             // Получаем группы параметров, доступные пользователю
             GetBuiltInParameterGroups();
+            // Получаем параметры, которые уже есть в семействе
+            GetFamilyParams();
         }
         private void AcceptView() {
 
@@ -156,56 +165,37 @@ namespace RevitFamilyParameterAdder.ViewModels {
         }
 
 
+        private void GetFamilyParams() {
+            foreach(FamilyParameter familyParameter in FamilyManagerFm.Parameters) {
+                _paramsInFM.Add(familyParameter.Definition.Name);
+            }
+        }
+
+
 
         private void Add() {
 
-            string temp = string.Empty;
-            foreach(SharedParam item in SelectedParams) {
-                temp += item.ParamName + item.SelectedParamGroupInFM.GroupName + Environment.NewLine;
+            using(Transaction t = new Transaction(_revitRepository.Document)) {
+                t.Start("Добавление параметров");
+                // Перебираем параметры в группе
+                foreach(SharedParam param in SelectedParams) {
+                    //Если семейство уже имеет параметр,пропускаем, идем дальше
+                    if(_paramsInFM.Contains(param.ParamName)) {
+                        _report.AppendLine(string.Format("Параметр {0} уже имеется в семействе", param.ParamName));
+                        continue; 
+                    }
+
+                    try {
+                        FamilyParameter familyParam = FamilyManagerFm.AddParameter(param.ParamInShPF, param.SelectedParamGroupInFM.BuiltInParamGroup, true);
+                        _report.AppendLine(string.Format("Добавлен параметр {0} в группу {1} на уровень экземпляра", param.ParamName, param.SelectedParamGroupInFM.GroupName));
+
+                    } catch(Exception) {
+                        _report.AppendLine(string.Format("При добавлении параметра {0} произошла ошибка", param.ParamName));
+                    }
+                }
+                t.Commit();
             }
-            TaskDialog.Show("f", temp);
-            
-            //Transaction transaction = new Transaction(_revitRepository.Document, "Добавление параметров");
-            //transaction.Start();
-
-
-
-            //transaction.Commit();
-
-
-
-
-
-
-
-
-
-            //DefinitionFile sharedParametersFile = _revitRepository.Application.OpenSharedParameterFile();
-
-
-            //FamilyManager familyManager = _revitRepository.Document.FamilyManager;
-            //IList<FamilyParameter> existfamilyPar = familyManager.GetParameters();
-
-
-            //// Проходимся по каждой группе ФОП
-            //foreach(DefinitionGroup sharedGroup in sharedParametersFile.Groups) {
-
-            //    var paramsInGroup = (from ExternalDefinition def in sharedGroup.Definitions select def);
-
-
-            //    using(Transaction t = new Transaction(_revitRepository.Document)) {
-            //        t.Start("Add Shared Parameters");
-            //        // Перебираем параметры в группе
-            //        //foreach(ExternalDefinition paramInShPF in paramsInGroup) {
-
-            //        //    if(defaultParamsKR.Contains(paramInShPF.Name)) {
-            //        //        //FamilyParameter fp = familyManager.AddParameter(paramInShPF, BuiltInParameterGroup.PG_ELECTRICAL_LIGHTING, false);
-            //        //        Params.Add(paramInShPF.Name);
-            //        //    }
-            //        //}
-            //        t.Commit();
-            //    }
-            //}
+            TaskDialog.Show("Отчет", _report.ToString());
         }
 
 
