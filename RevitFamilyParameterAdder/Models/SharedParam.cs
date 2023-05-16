@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using dosymep.WPF;
 using Autodesk.Revit.DB;
+using RevitFamilyParameterAdder.ViewModels;
 
 namespace RevitFamilyParameterAdder.Models
 {
@@ -35,10 +36,11 @@ namespace RevitFamilyParameterAdder.Models
         /// </summary>
         public List<ParameterGroupHelper> ParamGroupsInFM { get; set; }
 
+
         /// <summary>
         /// Выбранная группа для группировки параметра в семействе
         /// </summary>
-        public ParameterGroupHelper SelectedParamGroupInFM { get; set; }
+        public ParameterGroupHelper SelectedParamGroupInFM { get; set; } 
 
         /// <summary>
         /// Уровень размещения параметра - экземпляр/тип

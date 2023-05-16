@@ -34,22 +34,22 @@ namespace RevitFamilyParameterAdder.ViewModels {
         public StringBuilder _report = new StringBuilder();
         private List<SharedParam> _selectedParams = new List<SharedParam>();
         private List<ParameterGroupHelper> _bINParameterGroups = new List<ParameterGroupHelper>();
-        private List<string> _defaultParamsKR = new List<string>() {
-            "обр_ФОП_Форма_префикс",
-            "обр_ФОП_Форма_номер",
-            "обр_ФОП_Количество типовых этажей",
-            "обр_ФОП_Количество типовых на этаже",
-            "обр_ФОП_Длина",
-            "мод_ФОП_Габарит А",
-            "мод_ФОП_Габарит Б",
-            "мод_ФОП_Габарит В",
-            "обр_ФОП_Изделие_Обозначение",
-            "обр_ФОП_Изделие_Наименование",
-            "обр_ФОП_Изделие_Марка",
-            "обр_ФОП_Изделие_Главная деталь",
-            "обр_ФОП_Габарит А_ВД",
-            "обр_ФОП_Габарит Б_ВД",
-            "обр_ФОП_Габарит В_ВД"
+        private Dictionary<string, BuiltInParameterGroup> _defaultParamsKR = new Dictionary<string, BuiltInParameterGroup>() {
+            { "обр_ФОП_Форма_префикс", BuiltInParameterGroup.PG_CONSTRUCTION},
+            { "обр_ФОП_Форма_номер", BuiltInParameterGroup.PG_CONSTRUCTION},
+            { "обр_ФОП_Количество типовых этажей", BuiltInParameterGroup.PG_REBAR_ARRAY},
+            { "обр_ФОП_Количество типовых на этаже", BuiltInParameterGroup.PG_REBAR_ARRAY},
+            { "обр_ФОП_Длина", BuiltInParameterGroup.PG_GEOMETRY},
+            { "мод_ФОП_Габарит А", BuiltInParameterGroup.PG_GEOMETRY},
+            { "мод_ФОП_Габарит Б", BuiltInParameterGroup.PG_GEOMETRY},
+            { "мод_ФОП_Габарит В", BuiltInParameterGroup.PG_GEOMETRY},
+            { "обр_ФОП_Изделие_Обозначение", BuiltInParameterGroup.PG_GENERAL},
+            { "обр_ФОП_Изделие_Наименование", BuiltInParameterGroup.PG_GENERAL},
+            { "обр_ФОП_Изделие_Марка", BuiltInParameterGroup.PG_GENERAL},
+            { "обр_ФОП_Изделие_Главная деталь", BuiltInParameterGroup.PG_GENERAL},
+            { "обр_ФОП_Габарит А_ВД", BuiltInParameterGroup.INVALID},
+            { "обр_ФОП_Габарит Б_ВД", BuiltInParameterGroup.INVALID},
+            { "обр_ФОП_Габарит В_ВД", BuiltInParameterGroup.INVALID}
         };
 
    
@@ -226,8 +226,13 @@ namespace RevitFamilyParameterAdder.ViewModels {
             if(IsParamsForKR) {
                 Params = new ObservableCollection<SharedParam>(
                         Params
-                        .Where(item => _defaultParamsKR.Contains(item.ParamName))
+                        .Where(item => _defaultParamsKR.ContainsKey(item.ParamName))
                         .ToList());
+
+                foreach(SharedParam item in Params) {
+                    BuiltInParameterGroup groupForParam = _defaultParamsKR[item.ParamName];
+                    item.SelectedParamGroupInFM = new ParameterGroupHelper(groupForParam);
+                }
             }
             OnPropertyChanged(nameof(Params));
         }

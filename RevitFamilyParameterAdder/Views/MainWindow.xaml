@@ -64,8 +64,8 @@
                       Margin="5 3"
                       Width="200"
                       VerticalContentAlignment="Center"
-                      ItemsSource="{Binding ParamGroupNames}" 
-                      SelectedItem="{Binding SelectedParamGroupName}">
+                      ItemsSource="{Binding Path=ParamGroupNames}"
+                      SelectedItem="{Binding Path=SelectedParamGroupName}">
 
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
@@ -112,9 +112,11 @@
                             <DataTemplate>
                                 <ComboBox Name="parameters_ParamGroup"
                                           Width="200"
-                                          ItemsSource="{Binding ParamGroupsInFM}"
+                                          ItemsSource="{Binding Path=ParamGroupsInFM}"
                                           DisplayMemberPath="GroupName"
-                                          SelectedItem="{Binding SelectedParamGroupInFM}">
+                                          SelectedItem="{Binding SelectedParamGroupInFM}"
+                                          SelectedValuePath="GroupName"
+                                          SelectedValue="{Binding SelectedParamGroupInFM.GroupName}">
                                 </ComboBox>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
