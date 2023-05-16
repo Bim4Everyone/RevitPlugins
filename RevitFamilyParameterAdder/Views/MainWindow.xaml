@@ -93,34 +93,41 @@
         </StackPanel>
 
 
-        <!--<ListBox Grid.Row="3" Grid.Column="0" Margin="5 5 5 0" Name="parameters"
-                 ItemsSource="{Binding Params}"
-                 DisplayMemberPath="Name"
-                 SelectionMode="Multiple">
+
+        <ListView Grid.Row="3" 
+                  ItemsSource="{Binding Params}" 
+                  Name="parameters"
+                  SelectionMode="Multiple">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Имя параметра"
+                                    Width="300"
+                                    DisplayMemberBinding="{Binding Path=ParamName}"/>
+                    <GridViewColumn Header="Группа параметров в ФОП"
+                                    Width="200"
+                                    DisplayMemberBinding="{Binding Path=ParamGroupInShPF}"/>
+                    <GridViewColumn Header="Группа параметров в семействе">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox Name="parameters_ParamGroup"
+                                          Width="200"
+                                          ItemsSource="{Binding ParamGroupsInFM}"
+                                          DisplayMemberPath="GroupName"
+                                          SelectedItem="{Binding SelectedParamGroupInFM}">
+                                </ComboBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction 
-                        Command="{Binding SetSelectedParams}"/>
+                        Command="{Binding SelectionParamsCommand}"
+                        CommandParameter="{Binding SelectedItems, ElementName=parameters}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-        </ListBox>-->
-
-
-        <!--<ListView Grid.Row="3" ItemsSource="{Binding MyProperty}">
-            
-        </ListView>-->
-
-
-        <ListView Grid.Row="3" ItemsSource="{Binding Params, UpdateSourceTrigger=PropertyChanged}" 
-                  Name="phonesList">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=ParamName}"
-                                    Width="300" >Имя параметра</GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=ParamGroupInShPF}" 
-                                    Width="200">Группа параметров в ФОП</GridViewColumn>
-                </GridView>
-            </ListView.View>
         </ListView>
         
         

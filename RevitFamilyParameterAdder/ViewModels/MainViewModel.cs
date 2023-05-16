@@ -15,6 +15,7 @@ using System.Windows.Controls;
 using Ninject.Infrastructure.Language;
 using static Autodesk.AdvanceSteel.Modelling.Beam;
 using System.Collections.Specialized;
+using System.Diagnostics;
 
 namespace RevitFamilyParameterAdder.ViewModels {
     internal class MainViewModel : BaseViewModel {
@@ -27,6 +28,8 @@ namespace RevitFamilyParameterAdder.ViewModels {
         private string _selectedParamGroupName;
         private bool _isParamsForKR;
         private List<string> _paramGroupNames = new List<string>();
+        private List<SharedParam> _selectedParams = new List<SharedParam>();
+        private List<ParameterGroupHelper> _bINParameterGroups = new List<ParameterGroupHelper>();
         private List<string> _defaultParamsKR = new List<string>() {
             "обр_ФОП_Форма_префикс",
             "обр_ФОП_Форма_номер",
@@ -50,22 +53,31 @@ namespace RevitFamilyParameterAdder.ViewModels {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
+            FamilyManagerFm = _revitRepository.Document.FamilyManager;
+
             LoadViewCommand = RelayCommand.Create(LoadView);
-            AcceptViewCommand = RelayCommand.Create(AcceptView);
+            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             GetParamsNSetParamFilterCommand = RelayCommand.Create(GetParamsNSetParamFilter);
+            SelectionParamsCommand = new RelayCommand(SelectionParams);
         }
+
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
         public ICommand GetParamsNSetParamFilterCommand { get; }
+        public ICommand SelectionParamsCommand { get; }
 
 
 
         public ObservableCollection<SharedParam> Params { get; set; } = new ObservableCollection<SharedParam>();
-        public System.Collections.IList SelectedParams { get; set; }             // Список меток основ, которые выбрал пользователь
+        //public System.Collections.IList SelectedParams { get; set; }             // Список меток основ, которые выбрал пользователь
+        public List<SharedParam> SelectedParams {
+            get => _selectedParams;
+            set => this.RaiseAndSetIfChanged(ref _selectedParams, value);
+        }
 
 
-
+        public FamilyManager FamilyManagerFm { get; set; }
 
         public List<string> ParamGroupNames {
             get => _paramGroupNames;
@@ -77,31 +89,16 @@ namespace RevitFamilyParameterAdder.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedParamGroupName, value);
         }
 
+        public List<ParameterGroupHelper> BINParameterGroups {
+            get => _bINParameterGroups;
+            set => this.RaiseAndSetIfChanged(ref _bINParameterGroups, value);
+        }
+
 
         public bool IsParamsForKR {
             get => _isParamsForKR;
             set => this.RaiseAndSetIfChanged(ref _isParamsForKR, value);
         }
-
-
-
-
-
-
-
-        //private string _hostMarkForSearch = string.Empty;
-        //public string HostMarkForSearch {
-        //    get => _hostMarkForSearch;
-        //    set {
-        //        //this.RaiseAndSetIfChanged(ref _hostMarkForSearch, value);
-        //        _hostMarkForSearch = value;
-        //    }
-        //}
-
-
-
-
-
 
 
         public string SaveProperty {
@@ -134,15 +131,40 @@ namespace RevitFamilyParameterAdder.ViewModels {
             GetParamGroupNames();
             // Получаем параметры из ФОП и применяем установленные фильтры
             GetParamsNSetParamFilter();
+            // Получаем группы параметров, доступные пользователю
+            GetBuiltInParameterGroups();
         }
         private void AcceptView() {
 
-            //Add();
+            Add();
             SaveConfig();
+        }
+        private bool CanAcceptView() {
+            if(SelectedParams.Count > 0) {
+                foreach(SharedParam item in SelectedParams) {
+                    if(item.SelectedParamGroupInFM is null) {
+                        ErrorText = "Назначьте группу всем выбранным параметрам";
+                        return false;
+                    }
+                }
+                ErrorText = string.Empty;
+                return true;
+            } else {
+                ErrorText = "Выберите параметры для добавления";
+                return false;
+            }
         }
 
 
+
         private void Add() {
+
+            string temp = string.Empty;
+            foreach(SharedParam item in SelectedParams) {
+                temp += item.ParamName + item.SelectedParamGroupInFM.GroupName + Environment.NewLine;
+            }
+            TaskDialog.Show("f", temp);
+            
             //Transaction transaction = new Transaction(_revitRepository.Document, "Добавление параметров");
             //transaction.Start();
 
@@ -155,32 +177,35 @@ namespace RevitFamilyParameterAdder.ViewModels {
 
 
 
-            DefinitionFile sharedParametersFile = _revitRepository.Application.OpenSharedParameterFile();
 
 
-            FamilyManager familyManager = _revitRepository.Document.FamilyManager;
-            IList<FamilyParameter> existfamilyPar = familyManager.GetParameters();
+
+            //DefinitionFile sharedParametersFile = _revitRepository.Application.OpenSharedParameterFile();
 
 
-            // Проходимся по каждой группе ФОП
-            foreach(DefinitionGroup sharedGroup in sharedParametersFile.Groups) {
-
-                var paramsInGroup = (from ExternalDefinition def in sharedGroup.Definitions select def);
+            //FamilyManager familyManager = _revitRepository.Document.FamilyManager;
+            //IList<FamilyParameter> existfamilyPar = familyManager.GetParameters();
 
 
-                using(Transaction t = new Transaction(_revitRepository.Document)) {
-                    t.Start("Add Shared Parameters");
-                    // Перебираем параметры в группе
-                    //foreach(ExternalDefinition paramInShPF in paramsInGroup) {
+            //// Проходимся по каждой группе ФОП
+            //foreach(DefinitionGroup sharedGroup in sharedParametersFile.Groups) {
 
-                    //    if(defaultParamsKR.Contains(paramInShPF.Name)) {
-                    //        //FamilyParameter fp = familyManager.AddParameter(paramInShPF, BuiltInParameterGroup.PG_ELECTRICAL_LIGHTING, false);
-                    //        Params.Add(paramInShPF.Name);
-                    //    }
-                    //}
-                    t.Commit();
-                }
-            }
+            //    var paramsInGroup = (from ExternalDefinition def in sharedGroup.Definitions select def);
+
+
+            //    using(Transaction t = new Transaction(_revitRepository.Document)) {
+            //        t.Start("Add Shared Parameters");
+            //        // Перебираем параметры в группе
+            //        //foreach(ExternalDefinition paramInShPF in paramsInGroup) {
+
+            //        //    if(defaultParamsKR.Contains(paramInShPF.Name)) {
+            //        //        //FamilyParameter fp = familyManager.AddParameter(paramInShPF, BuiltInParameterGroup.PG_ELECTRICAL_LIGHTING, false);
+            //        //        Params.Add(paramInShPF.Name);
+            //        //    }
+            //        //}
+            //        t.Commit();
+            //    }
+            //}
         }
 
 
@@ -195,7 +220,7 @@ namespace RevitFamilyParameterAdder.ViewModels {
             Params.Clear();
             List<ExternalDefinition> paramsInShPF = _revitRepository.GetParamsInShPF();
             foreach(ExternalDefinition item in paramsInShPF) {
-                Params.Add(new SharedParam(item));
+                Params.Add(new SharedParam(item, BINParameterGroups));
             }
         }
 
@@ -206,7 +231,6 @@ namespace RevitFamilyParameterAdder.ViewModels {
                         Params
                         .Where(item => item.ParamGroupInShPF.Equals(SelectedParamGroupName))
                         .ToList());
-                OnPropertyChanged(nameof(Params));
             }
 
             if(IsParamsForKR) {
@@ -214,9 +238,37 @@ namespace RevitFamilyParameterAdder.ViewModels {
                         Params
                         .Where(item => _defaultParamsKR.Contains(item.ParamName))
                         .ToList());
-                OnPropertyChanged(nameof(Params));
+            }
+            OnPropertyChanged(nameof(Params));
+        }
+
+
+        private void SelectionParams(object p) {
+            // Забираем список выбранных элементов через CommandParameter
+            SelectedParams.Clear();
+            foreach(var item in p as System.Collections.IList) {
+                SharedParam sharedParam = item as SharedParam;
+                if(sharedParam == null) {
+                    continue;
+                }
+                SelectedParams.Add(sharedParam);
             }
         }
+
+
+        private void GetBuiltInParameterGroups() {
+            // Забираем все встроенные группы параметров
+            Array array = Enum.GetValues(typeof(BuiltInParameterGroup));
+            
+            // Отбираем только те, что отображаются у пользователя
+            foreach(BuiltInParameterGroup group in array) {
+                if(FamilyManagerFm.IsUserAssignableParameterGroup(group)) {
+                    BINParameterGroups.Add(new ParameterGroupHelper(group));
+                }
+            }
+            BINParameterGroups.OrderBy(i => i.GroupName);
+        }
+
 
 
         private void LoadConfig() {
