@@ -67,8 +67,8 @@ namespace RevitEditingZones.ViewModels {
             Levels = new ObservableCollection<LevelViewModel>(levels);
 
             LeftZonePlans = new ZonePlansViewModel() {HintText = "Ошибки не найдены"};
-            RightZonePlans = new ZonePlansViewModel(){HintText = "Настроенные зоны не найдены"};
-            
+            RightZonePlans = new ZonePlansViewModel() {HintText = "Настроенные зоны не найдены"};
+
             LeftZonePlans.ZonePlans = new ObservableCollection<ZonePlanViewModel>();
             RightZonePlans.ZonePlans = new ObservableCollection<ZonePlanViewModel>();
             foreach(ViewPlan areaPlane in _revitRepository.GetAreaPlanes()) {
@@ -83,6 +83,10 @@ namespace RevitEditingZones.ViewModels {
                     }
                 }
             }
+
+            LeftZonePlans.HintText = Levels.Count == 0
+                ? "Ошибки не найдены"
+                : "Ошибки в зонах не найдены. Имеются уровни без зон!";
         }
 
         private void UpdateLinks(object obj) {
