@@ -12,6 +12,9 @@ using System.Windows.Input;
 using System;
 using System.Linq;
 using System.Windows.Controls;
+using Ninject.Infrastructure.Language;
+using static Autodesk.AdvanceSteel.Modelling.Beam;
+using System.Collections.Specialized;
 
 namespace RevitFamilyParameterAdder.ViewModels {
     internal class MainViewModel : BaseViewModel {
@@ -41,34 +44,26 @@ namespace RevitFamilyParameterAdder.ViewModels {
             "обр_ФОП_Габарит Б_ВД",
             "обр_ФОП_Габарит В_ВД"
         };
-        private List<ExternalDefinition> _params;
-        
 
-
-
-
+   
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView);
-            SetParamFilterCommand = RelayCommand.Create(SetParamFilter);
+            GetParamsNSetParamFilterCommand = RelayCommand.Create(GetParamsNSetParamFilter);
         }
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
-        public ICommand SetParamFilterCommand { get; }
+        public ICommand GetParamsNSetParamFilterCommand { get; }
 
 
 
-
-
-        public List<ExternalDefinition> Params {
-            get => _params;
-            set => this.RaiseAndSetIfChanged(ref _params, value);
-        }
+        public ObservableCollection<SharedParam> Params { get; set; } = new ObservableCollection<SharedParam>();
         public System.Collections.IList SelectedParams { get; set; }             // Список меток основ, которые выбрал пользователь
+
 
 
 
@@ -132,14 +127,13 @@ namespace RevitFamilyParameterAdder.ViewModels {
         private void LoadView() {
             IsParamsForKR = true;
             SelectedParamGroupName = _allGroup;
+
             // Подгружаем сохраненные данные прошлого запуска
             LoadConfig();
             // Получаем имена групп параметров из ФОП
             GetParamGroupNames();
-            // Получаем параметры из ФОП
-            GetParams();
-            // Применем установленные фильтры
-            SetParamFilter();
+            // Получаем параметры из ФОП и применяем установленные фильтры
+            GetParamsNSetParamFilter();
         }
         private void AcceptView() {
 
@@ -191,31 +185,38 @@ namespace RevitFamilyParameterAdder.ViewModels {
 
 
 
-        private void GetParams() {
-            Params = _revitRepository.GetParamsInShPF();
-        }
         private void GetParamGroupNames() {
             ParamGroupNames = _revitRepository.GetParamGroupNames();
             ParamGroupNames.Sort();
             ParamGroupNames.Insert(0, _allGroup);
         }
 
-
-        private void SetParamFilter() {
-            GetParams();
-            if(!SelectedParamGroupName.Equals(_allGroup)) {
-                Params = new List<ExternalDefinition>(Params)
-                    .Where(item => item.OwnerGroup.Name.Equals(SelectedParamGroupName))
-                    .ToList();
-            }
-
-            if(IsParamsForKR) {
-                Params = new List<ExternalDefinition>(Params)
-                    .Where(item => _defaultParamsKR.Contains(item.Name))
-                    .ToList();
+        private void GetParams() {
+            Params.Clear();
+            List<ExternalDefinition> paramsInShPF = _revitRepository.GetParamsInShPF();
+            foreach(ExternalDefinition item in paramsInShPF) {
+                Params.Add(new SharedParam(item));
             }
         }
 
+        private void GetParamsNSetParamFilter() {
+            GetParams();
+            if(!SelectedParamGroupName.Equals(_allGroup)) {
+                Params = new ObservableCollection<SharedParam>(
+                        Params
+                        .Where(item => item.ParamGroupInShPF.Equals(SelectedParamGroupName))
+                        .ToList());
+                OnPropertyChanged(nameof(Params));
+            }
+
+            if(IsParamsForKR) {
+                Params = new ObservableCollection<SharedParam>(
+                        Params
+                        .Where(item => _defaultParamsKR.Contains(item.ParamName))
+                        .ToList());
+                OnPropertyChanged(nameof(Params));
+            }
+        }
 
 
         private void LoadConfig() {

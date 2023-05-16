@@ -19,10 +19,10 @@ namespace RevitFamilyParameterAdder.Views {
 
 
         private void SelectAllParams(object sender, RoutedEventArgs e) {
-            parameters.SelectAll();
+            //parameters.SelectAll();
         }
         private void UnselectAllParams(object sender, RoutedEventArgs e) {
-            parameters.UnselectAll();
+            //parameters.UnselectAll();
         }
     }
 }

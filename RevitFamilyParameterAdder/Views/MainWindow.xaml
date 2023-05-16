@@ -48,11 +48,11 @@
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="Checked">
                         <i:InvokeCommandAction 
-                            Command="{Binding SetParamFilterCommand}"/>
+                            Command="{Binding GetParamsNSetParamFilterCommand}"/>
                     </i:EventTrigger>
                     <i:EventTrigger EventName="Unchecked">
                         <i:InvokeCommandAction 
-                            Command="{Binding SetParamFilterCommand}"/>
+                            Command="{Binding GetParamsNSetParamFilterCommand}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </CheckBox>
@@ -70,7 +70,7 @@
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
                         <i:InvokeCommandAction 
-                            Command="{Binding SetParamFilterCommand}"/>
+                            Command="{Binding GetParamsNSetParamFilterCommand}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </ComboBox>
@@ -93,7 +93,7 @@
         </StackPanel>
 
 
-        <ListBox Grid.Row="3" Grid.Column="0" Margin="5 5 5 0" Name="parameters"
+        <!--<ListBox Grid.Row="3" Grid.Column="0" Margin="5 5 5 0" Name="parameters"
                  ItemsSource="{Binding Params}"
                  DisplayMemberPath="Name"
                  SelectionMode="Multiple">
@@ -103,10 +103,28 @@
                         Command="{Binding SetSelectedParams}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-        </ListBox>
+        </ListBox>-->
+
+
+        <!--<ListView Grid.Row="3" ItemsSource="{Binding MyProperty}">
+            
+        </ListView>-->
+
+
+        <ListView Grid.Row="3" ItemsSource="{Binding Params, UpdateSourceTrigger=PropertyChanged}" 
+                  Name="phonesList">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=ParamName}"
+                                    Width="300" >Имя параметра</GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=ParamGroupInShPF}" 
+                                    Width="200">Группа параметров в ФОП</GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
         
         
-        
+
         <StackPanel
             Grid.Row="4"
             Height="45"
