@@ -69,17 +69,7 @@ namespace RevitCheckingLevels {
                     }
                 }
 
-                if(dialogResult == null) {
-                    GetPlatformService<INotificationService>()
-                        .CreateNotification(PluginName, "Выход из скрипта.", "C#")
-                        .ShowAsync();
-                } else if(dialogResult == true) {
-                    GetPlatformService<INotificationService>()
-                        .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                        .ShowAsync();
-                } else if(dialogResult == false) {
-                    throw new OperationCanceledException();
-                }
+                Notification(dialogResult);
             }
         }
     }
