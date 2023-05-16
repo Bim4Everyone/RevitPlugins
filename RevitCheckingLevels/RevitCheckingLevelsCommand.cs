@@ -59,6 +59,14 @@ namespace RevitCheckingLevels {
                     .WithPropertyValue(nameof(Window.DataContext),
                         c => c.Kernel.Get<MainViewModel>());
 
+                if(!FromGui) {
+                    var mainViewModel = kernel.Get<MainViewModel>();
+                    mainViewModel.ViewLoadCommand.Execute(null);
+                    if(!mainViewModel.HasErrors) {
+                        return;
+                    }
+                }
+
                 Window mainWindow = kernel.Get<MainWindow>();
                 bool? dialogResult = mainWindow.ShowDialog();
 
