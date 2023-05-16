@@ -101,11 +101,12 @@
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Имя параметра"
-                                    Width="300"
+                                    Width="250"
                                     DisplayMemberBinding="{Binding Path=ParamName}"/>
                     <GridViewColumn Header="Группа параметров в ФОП"
                                     Width="200"
                                     DisplayMemberBinding="{Binding Path=ParamGroupInShPF}"/>
+                    
                     <GridViewColumn Header="Группа параметров в семействе">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -115,6 +116,17 @@
                                           DisplayMemberPath="GroupName"
                                           SelectedItem="{Binding SelectedParamGroupInFM}">
                                 </ComboBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Экземпляр/Типоразмер">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox Width="150" 
+                                          HorizontalAlignment="Center"
+                                          HorizontalContentAlignment="Center"
+                                          IsChecked="{Binding IsInstanceParam}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

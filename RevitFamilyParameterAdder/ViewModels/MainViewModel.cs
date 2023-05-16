@@ -73,9 +73,7 @@ namespace RevitFamilyParameterAdder.ViewModels {
 
 
 
-
-
-
+        public FamilyManager FamilyManagerFm { get; set; }
 
         public ObservableCollection<SharedParam> Params { get; set; } = new ObservableCollection<SharedParam>();
         public List<SharedParam> SelectedParams {
@@ -83,8 +81,6 @@ namespace RevitFamilyParameterAdder.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedParams, value);
         }
 
-
-        public FamilyManager FamilyManagerFm { get; set; }
 
         public List<string> ParamGroupNames {
             get => _paramGroupNames;
@@ -143,8 +139,12 @@ namespace RevitFamilyParameterAdder.ViewModels {
             // Получаем параметры, которые уже есть в семействе
             GetFamilyParams();
         }
-        private void AcceptView() {
 
+        /// <summary>
+        /// Метод для команды, отрабатываеющий при нажатии "Ок"
+        /// </summary>
+        private void AcceptView() {
+            // Метод по добавлению параметров
             Add();
             SaveConfig();
         }
@@ -165,16 +165,9 @@ namespace RevitFamilyParameterAdder.ViewModels {
         }
 
 
-        private void GetFamilyParams() {
-            foreach(FamilyParameter familyParameter in FamilyManagerFm.Parameters) {
-                _paramsInFM.Add(familyParameter.Definition.Name);
-            }
-        }
-
 
 
         private void Add() {
-
             using(Transaction t = new Transaction(_revitRepository.Document)) {
                 t.Start("Добавление параметров");
                 // Перебираем параметры в группе
@@ -186,8 +179,13 @@ namespace RevitFamilyParameterAdder.ViewModels {
                     }
 
                     try {
-                        FamilyParameter familyParam = FamilyManagerFm.AddParameter(param.ParamInShPF, param.SelectedParamGroupInFM.BuiltInParamGroup, true);
-                        _report.AppendLine(string.Format("Добавлен параметр {0} в группу {1} на уровень экземпляра", param.ParamName, param.SelectedParamGroupInFM.GroupName));
+                        FamilyParameter familyParam = FamilyManagerFm.AddParameter(param.ParamInShPF, param.SelectedParamGroupInFM.BuiltInParamGroup, param.IsInstanceParam);
+
+                        if(param.IsInstanceParam) {
+                            _report.AppendLine(string.Format("Добавлен параметр {0} в группу {1} на уровень экземпляра", param.ParamName, param.SelectedParamGroupInFM.GroupName));
+                        } else {
+                            _report.AppendLine(string.Format("Добавлен параметр {0} в группу {1} на уровень типоразмера", param.ParamName, param.SelectedParamGroupInFM.GroupName));
+                        }
 
                     } catch(Exception) {
                         _report.AppendLine(string.Format("При добавлении параметра {0} произошла ошибка", param.ParamName));
@@ -195,17 +193,16 @@ namespace RevitFamilyParameterAdder.ViewModels {
                 }
                 t.Commit();
             }
+
             TaskDialog.Show("Отчет", _report.ToString());
         }
 
 
 
-        private void GetParamGroupNames() {
-            ParamGroupNames = _revitRepository.GetParamGroupNames();
-            ParamGroupNames.Sort();
-            ParamGroupNames.Insert(0, _allGroup);
-        }
 
+        /// <summary>
+        /// Получение параметров из ФОП с переводом в оболочку SharedParam
+        /// </summary>
         private void GetParams() {
             Params.Clear();
             List<ExternalDefinition> paramsInShPF = _revitRepository.GetParamsInShPF();
@@ -214,6 +211,9 @@ namespace RevitFamilyParameterAdder.ViewModels {
             }
         }
 
+        /// <summary>
+        /// Получение параметров из ФОП и применение фильтров по группе параметров ФОП и галочке "для КР"
+        /// </summary>
         private void GetParamsNSetParamFilter() {
             GetParams();
             if(!SelectedParamGroupName.Equals(_allGroup)) {
@@ -232,7 +232,10 @@ namespace RevitFamilyParameterAdder.ViewModels {
             OnPropertyChanged(nameof(Params));
         }
 
-
+        /// <summary>
+        /// Заполняем список выбранных параметров для добавления. Работает по событию выбора в ListView
+        /// </summary>
+        /// <param name="p"></param>
         private void SelectionParams(object p) {
             // Забираем список выбранных элементов через CommandParameter
             SelectedParams.Clear();
@@ -246,6 +249,19 @@ namespace RevitFamilyParameterAdder.ViewModels {
         }
 
 
+        /// <summary>
+        /// Получение имен групп параметров в ФОП
+        /// </summary>
+        private void GetParamGroupNames() {
+            ParamGroupNames = _revitRepository.GetParamGroupNames();
+            ParamGroupNames.Sort();
+            ParamGroupNames.Insert(0, _allGroup);
+        }
+
+
+        /// <summary>
+        /// Получение групп параметров семейства (для группировки параметров в списке параметров семейства)
+        /// </summary>
         private void GetBuiltInParameterGroups() {
             // Забираем все встроенные группы параметров
             Array array = Enum.GetValues(typeof(BuiltInParameterGroup));
@@ -256,7 +272,21 @@ namespace RevitFamilyParameterAdder.ViewModels {
                     BINParameterGroups.Add(new ParameterGroupHelper(group));
                 }
             }
-            BINParameterGroups.OrderBy(i => i.GroupName);
+
+            BINParameterGroups.Sort((x, y) => x.GroupName.CompareTo(y.GroupName));
+        }
+
+
+        /// <summary>
+        /// Получение параметров, которые уже имеются в семействе
+        /// </summary>
+        private void GetFamilyParams() {
+            foreach(FamilyParameter familyParameter in FamilyManagerFm.Parameters) {
+                // Отбираем имена общих параметров, которые уже есть в семействе
+                if(familyParameter.IsShared == true) {
+                    _paramsInFM.Add(familyParameter.Definition.Name);
+                }
+            }
         }
 
 

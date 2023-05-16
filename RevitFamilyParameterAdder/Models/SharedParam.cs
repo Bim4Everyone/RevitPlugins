@@ -10,9 +10,6 @@ namespace RevitFamilyParameterAdder.Models
 {
     internal class SharedParam
     {
-        //public SharedParam() {
-
-        //}
         public SharedParam(ExternalDefinition externalDefinition, List<ParameterGroupHelper> bINParameterGroups) {
             ParamName = externalDefinition.Name;
             ParamInShPF = externalDefinition;
@@ -21,11 +18,31 @@ namespace RevitFamilyParameterAdder.Models
         }
 
         public string ParamName { get; set; }
+
+        /// <summary>
+        /// Объект параметра в ФОП
+        /// </summary>
         public ExternalDefinition ParamInShPF { get; set; }
+
+        /// <summary>
+        /// Группа параметров в ФОП
+        /// </summary>
         public string ParamGroupInShPF { get; set; }
 
 
+        /// <summary>
+        /// Список групп параметров в семействе
+        /// </summary>
         public List<ParameterGroupHelper> ParamGroupsInFM { get; set; }
+
+        /// <summary>
+        /// Выбранная группа для группировки параметра в семействе
+        /// </summary>
         public ParameterGroupHelper SelectedParamGroupInFM { get; set; }
+
+        /// <summary>
+        /// Уровень размещения параметра - экземпляр/тип
+        /// </summary>
+        public bool IsInstanceParam { get; set; } = true;
     }
 }
