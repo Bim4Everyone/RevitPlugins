@@ -68,12 +68,12 @@ namespace RevitCopingZones {
             
             if(!revitRepository.HasAreaScheme()) {
                 TaskDialog.Show(PluginName,
-                    $"В документе отсутствует схема зонирования с именем \"{RevitRepository.AreaSchemeName}\".");
+                    $"В открытом документе отсутствует схема зонирования с именем \"{RevitRepository.AreaSchemeName}\".");
                 throw new OperationCanceledException();
             }
 
             if(!revitRepository.IsAreaPlan()) {
-                TaskDialog.Show(PluginName, $"Текущий вид не является планом зонирования.");
+                TaskDialog.Show(PluginName, $"Активный вид не является планом зонирования.");
                 throw new OperationCanceledException();
             }
 
@@ -84,7 +84,7 @@ namespace RevitCopingZones {
 
             if(revitRepository.HasCorruptedAreas()) {
                 TaskDialog.Show(PluginName,
-                    "Были обнаружены избыточные и не окруженные зоны, выполнение скрипта было отменено.");
+                    "В открытом проекте были обнаружены избыточные и не окруженные зоны, выполнение. Их следует удалить.");
                 throw new OperationCanceledException();
             }
         }
