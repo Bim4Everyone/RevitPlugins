@@ -30,26 +30,28 @@ namespace RevitFamilyParameterAdder.ViewModels {
         private string _selectedParamGroupName;
         private bool _isParamsForKR;
         private List<string> _paramGroupNames = new List<string>();
-        private List<string> _paramsInFM = new List<string>();
-        public StringBuilder _report = new StringBuilder();
+        private List<Guid> _paramGUIDsInFM = new List<Guid>();
+        public StringBuilder _reportAdded = new StringBuilder();
+        public StringBuilder _reportError = new StringBuilder();
+        public StringBuilder _reportAlreadyBeen = new StringBuilder();
         private List<SharedParam> _selectedParams = new List<SharedParam>();
         private List<ParameterGroupHelper> _bINParameterGroups = new List<ParameterGroupHelper>();
-        private Dictionary<string, BuiltInParameterGroup> _defaultParamsKR = new Dictionary<string, BuiltInParameterGroup>() {
-            { "обр_ФОП_Форма_префикс", BuiltInParameterGroup.PG_CONSTRUCTION},
-            { "обр_ФОП_Форма_номер", BuiltInParameterGroup.PG_CONSTRUCTION},
-            { "обр_ФОП_Количество типовых этажей", BuiltInParameterGroup.PG_REBAR_ARRAY},
-            { "обр_ФОП_Количество типовых на этаже", BuiltInParameterGroup.PG_REBAR_ARRAY},
-            { "обр_ФОП_Длина", BuiltInParameterGroup.PG_GEOMETRY},
-            { "мод_ФОП_Габарит А", BuiltInParameterGroup.PG_GEOMETRY},
-            { "мод_ФОП_Габарит Б", BuiltInParameterGroup.PG_GEOMETRY},
-            { "мод_ФОП_Габарит В", BuiltInParameterGroup.PG_GEOMETRY},
-            { "обр_ФОП_Изделие_Обозначение", BuiltInParameterGroup.PG_GENERAL},
-            { "обр_ФОП_Изделие_Наименование", BuiltInParameterGroup.PG_GENERAL},
-            { "обр_ФОП_Изделие_Марка", BuiltInParameterGroup.PG_GENERAL},
-            { "обр_ФОП_Изделие_Главная деталь", BuiltInParameterGroup.PG_GENERAL},
-            { "обр_ФОП_Габарит А_ВД", BuiltInParameterGroup.INVALID},
-            { "обр_ФОП_Габарит Б_ВД", BuiltInParameterGroup.INVALID},
-            { "обр_ФОП_Габарит В_ВД", BuiltInParameterGroup.INVALID}
+        private List<DefaultParam> _defaultParamsKR = new List<DefaultParam>() {
+            new DefaultParam("обр_ФОП_Форма_префикс", BuiltInParameterGroup.PG_CONSTRUCTION, "П"),
+            new DefaultParam("обр_ФОП_Форма_номер", BuiltInParameterGroup.PG_CONSTRUCTION),
+            new DefaultParam("обр_ФОП_Количество типовых этажей", BuiltInParameterGroup.PG_REBAR_ARRAY),
+            new DefaultParam("обр_ФОП_Количество типовых на этаже", BuiltInParameterGroup.PG_REBAR_ARRAY),
+            new DefaultParam("обр_ФОП_Длина", BuiltInParameterGroup.PG_GEOMETRY),
+            new DefaultParam("мод_ФОП_Габарит А", BuiltInParameterGroup.PG_GEOMETRY),
+            new DefaultParam("мод_ФОП_Габарит Б", BuiltInParameterGroup.PG_GEOMETRY),
+            new DefaultParam("мод_ФОП_Габарит В", BuiltInParameterGroup.PG_GEOMETRY),
+            new DefaultParam("обр_ФОП_Изделие_Обозначение", BuiltInParameterGroup.PG_GENERAL),
+            new DefaultParam("обр_ФОП_Изделие_Наименование", BuiltInParameterGroup.PG_GENERAL),
+            new DefaultParam("обр_ФОП_Изделие_Марка", BuiltInParameterGroup.PG_GENERAL),
+            new DefaultParam("обр_ФОП_Изделие_Главная деталь", BuiltInParameterGroup.PG_GENERAL),
+            new DefaultParam("обр_ФОП_Габарит А_ВД", BuiltInParameterGroup.INVALID),
+            new DefaultParam("обр_ФОП_Габарит Б_ВД", BuiltInParameterGroup.INVALID),
+            new DefaultParam("обр_ФОП_Габарит В_ВД", BuiltInParameterGroup.INVALID)
         };
 
    
@@ -62,7 +64,7 @@ namespace RevitFamilyParameterAdder.ViewModels {
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             GetParamsNSetParamFilterCommand = RelayCommand.Create(GetParamsNSetParamFilter);
-            SelectionParamsCommand = new RelayCommand(SelectionParams);
+            SelectionParamsCommand = RelayCommand.Create<object>(SelectionParams);
         }
 
 
@@ -126,12 +128,12 @@ namespace RevitFamilyParameterAdder.ViewModels {
         /// </summary>
         private void LoadView() {
             IsParamsForKR = true;
-            SelectedParamGroupName = _allGroup;
 
             // Подгружаем сохраненные данные прошлого запуска
             LoadConfig();
             // Получаем имена групп параметров из ФОП
             GetParamGroupNames();
+            SelectedParamGroupName = _allGroup;
             // Получаем параметры из ФОП и применяем установленные фильтры
             GetParamsNSetParamFilter();
             // Получаем группы параметров, доступные пользователю
@@ -173,28 +175,35 @@ namespace RevitFamilyParameterAdder.ViewModels {
                 // Перебираем параметры в группе
                 foreach(SharedParam param in SelectedParams) {
                     //Если семейство уже имеет параметр,пропускаем, идем дальше
-                    if(_paramsInFM.Contains(param.ParamName)) {
-                        _report.AppendLine(string.Format("Параметр {0} уже имеется в семействе", param.ParamName));
+                    if(_paramGUIDsInFM.Contains(param.ParamInShPF.GUID)) {
+                        _reportAlreadyBeen.AppendLine(param.ParamName);
                         continue; 
                     }
 
                     try {
                         FamilyParameter familyParam = FamilyManagerFm.AddParameter(param.ParamInShPF, param.SelectedParamGroupInFM.BuiltInParamGroup, param.IsInstanceParam);
 
-                        if(param.IsInstanceParam) {
-                            _report.AppendLine(string.Format("Добавлен параметр {0} в группу {1} на уровень экземпляра", param.ParamName, param.SelectedParamGroupInFM.GroupName));
-                        } else {
-                            _report.AppendLine(string.Format("Добавлен параметр {0} в группу {1} на уровень типоразмера", param.ParamName, param.SelectedParamGroupInFM.GroupName));
-                        }
+                        _reportAdded.AppendLine(param.ParamName);
 
                     } catch(Exception) {
-                        _report.AppendLine(string.Format("При добавлении параметра {0} произошла ошибка", param.ParamName));
+                        _reportError.AppendLine(param.ParamName);
                     }
                 }
                 t.Commit();
             }
 
-            TaskDialog.Show("Отчет", _report.ToString());
+            if(_reportAdded.Length > 0) {
+                _reportAdded.Insert(0, "Добавлены параметры:" + Environment.NewLine);
+                TaskDialog.Show("Отчет", _reportAdded.ToString());
+            }
+            if(_reportAlreadyBeen.Length > 0) {
+                _reportAlreadyBeen.Insert(0, "Параметры уже были:" + Environment.NewLine);
+                TaskDialog.Show("Отчет", _reportAlreadyBeen.ToString());
+            }
+            if(_reportError.Length > 0) {
+                _reportError.Insert(0, "Произошла ошибка при добавлении параметров:" + Environment.NewLine);
+                TaskDialog.Show("Отчет", _reportError.ToString());
+            }
         }
 
 
@@ -207,9 +216,12 @@ namespace RevitFamilyParameterAdder.ViewModels {
             Params.Clear();
             List<ExternalDefinition> paramsInShPF = _revitRepository.GetParamsInShPF();
             foreach(ExternalDefinition item in paramsInShPF) {
-                Params.Add(new SharedParam(item, BINParameterGroups));
+                SharedParam sharedParam = new SharedParam(item, BINParameterGroups, _defaultParamsKR);
+                Params.Add(sharedParam);
             }
         }
+
+
 
         /// <summary>
         /// Получение параметров из ФОП и применение фильтров по группе параметров ФОП и галочке "для КР"
@@ -226,13 +238,12 @@ namespace RevitFamilyParameterAdder.ViewModels {
             if(IsParamsForKR) {
                 Params = new ObservableCollection<SharedParam>(
                         Params
-                        .Where(item => _defaultParamsKR.ContainsKey(item.ParamName))
-                        .ToList());
+                        .Where(item => item.IsDefaultParam));
 
-                foreach(SharedParam item in Params) {
-                    BuiltInParameterGroup groupForParam = _defaultParamsKR[item.ParamName];
-                    item.SelectedParamGroupInFM = new ParameterGroupHelper(groupForParam);
-                }
+                //foreach(SharedParam item in Params) {
+                //    BuiltInParameterGroup groupForParam = _defaultParamsKR[item.ParamName].BINParameterGroup;
+                //    item.SelectedParamGroupInFM = new ParameterGroupHelper(groupForParam);
+                //}
             }
             OnPropertyChanged(nameof(Params));
         }
@@ -259,7 +270,6 @@ namespace RevitFamilyParameterAdder.ViewModels {
         /// </summary>
         private void GetParamGroupNames() {
             ParamGroupNames = _revitRepository.GetParamGroupNames();
-            ParamGroupNames.Sort();
             ParamGroupNames.Insert(0, _allGroup);
         }
 
@@ -289,7 +299,7 @@ namespace RevitFamilyParameterAdder.ViewModels {
             foreach(FamilyParameter familyParameter in FamilyManagerFm.Parameters) {
                 // Отбираем имена общих параметров, которые уже есть в семействе
                 if(familyParameter.IsShared == true) {
-                    _paramsInFM.Add(familyParameter.Definition.Name);
+                    _paramGUIDsInFM.Add(familyParameter.GUID);
                 }
             }
         }

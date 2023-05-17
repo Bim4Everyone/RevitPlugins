@@ -79,7 +79,7 @@
         <StackPanel Grid.Row="2" HorizontalAlignment="Right" Orientation="Horizontal">
             <Button Content="Выбрать все" Margin="5 0 5 5" Padding="5 0" 
                     Click="SelectAllParams"/>
-            <Button Content="Отменить выбор" Margin="5 0 5 5" Padding="5 0" 
+            <Button Content="Отменить выбор" Margin="10 0 5 5" Padding="5 0" 
                     Click="UnselectAllParams"/>
             <!--<TextBox Width="150" Margin="5 0 5 5"
                      Text="{Binding ParamNameForSearch, UpdateSourceTrigger=PropertyChanged}">
@@ -93,11 +93,11 @@
         </StackPanel>
 
 
-
+        
         <ListView Grid.Row="3" 
                   ItemsSource="{Binding Params}" 
                   Name="parameters"
-                  SelectionMode="Multiple">
+                  SelectionMode="Extended">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Имя параметра"
@@ -106,7 +106,7 @@
                     <GridViewColumn Header="Группа параметров в ФОП"
                                     Width="200"
                                     DisplayMemberBinding="{Binding Path=ParamGroupInShPF}"/>
-                    
+
                     <GridViewColumn Header="Группа параметров в семействе">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -122,13 +122,16 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Экземпляр/Типоразмер">
+                    <GridViewColumn Header="Уровень параметра">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <CheckBox Width="150" 
-                                          HorizontalAlignment="Center"
-                                          HorizontalContentAlignment="Center"
-                                          IsChecked="{Binding IsInstanceParam}"/>
+                                <ComboBox Width="200"
+                                          ItemsSource="{Binding Path=LevelOfParam}"
+                                          DisplayMemberPath="Key"
+                                          
+                                          SelectedValuePath="Value"
+                                          SelectedValue="{Binding IsInstanceParam}">
+                                </ComboBox>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

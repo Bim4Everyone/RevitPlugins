@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace RevitFamilyParameterAdder.Models {
 
         public List<string> GetParamGroupNames() => Application.OpenSharedParameterFile().Groups
             .Select(item => item.Name)
+            .OrderBy(item => item)
             .ToList();
 
 
@@ -39,6 +41,14 @@ namespace RevitFamilyParameterAdder.Models {
 
             paramsInGroup.Sort((x, y) => string.Compare(x.Name, y.Name));
             return paramsInGroup;
+        }
+
+        internal bool IsFamilyFile() {
+            if(Document.IsFamilyDocument) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 }

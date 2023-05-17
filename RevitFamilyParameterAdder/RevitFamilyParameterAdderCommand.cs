@@ -50,6 +50,8 @@ namespace RevitFamilyParameterAdder {
                     .WithPropertyValue(nameof(Window.DataContext),
                         c => c.Kernel.Get<MainViewModel>());
 
+                Check(kernel);
+
                 MainWindow window = kernel.Get<MainWindow>();
                 if(window.ShowDialog() == true) {
                     GetPlatformService<INotificationService>()
@@ -60,6 +62,15 @@ namespace RevitFamilyParameterAdder {
                         .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
                         .ShowAsync();
                 }
+            }
+        }
+
+        private void Check(IKernel kernel) {
+            var revitRepositiry = kernel.Get<RevitRepository>();
+            if(!revitRepositiry.IsFamilyFile()) {
+                TaskDialog.Show(PluginName,
+                    $"Данный скрипт работает только в файле семейства.");
+                throw new OperationCanceledException();
             }
         }
     }

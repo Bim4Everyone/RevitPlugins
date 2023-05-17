@@ -9,13 +9,17 @@ using RevitFamilyParameterAdder.ViewModels;
 
 namespace RevitFamilyParameterAdder.Models
 {
-    internal class SharedParam
-    {
-        public SharedParam(ExternalDefinition externalDefinition, List<ParameterGroupHelper> bINParameterGroups) {
+    internal class SharedParam {
+        private List<DefaultParam> _defaultParams;
+        
+        
+        public SharedParam(ExternalDefinition externalDefinition, List<ParameterGroupHelper> bINParameterGroups, List<DefaultParam> defList) {
             ParamName = externalDefinition.Name;
             ParamInShPF = externalDefinition;
             ParamGroupInShPF = externalDefinition.OwnerGroup.Name;
+
             ParamGroupsInFM = bINParameterGroups;
+            DefaultParams = defList;
         }
 
         public string ParamName { get; set; }
@@ -32,6 +36,22 @@ namespace RevitFamilyParameterAdder.Models
 
 
         /// <summary>
+        /// Уровень размещения параметра - экземпляр/тип
+        /// </summary>
+        public bool IsInstanceParam { get; set; } = true;
+        public Dictionary<string, bool> LevelOfParam { get; set; } = new Dictionary<string, bool>() {
+            { "Экземпляр", true},
+            { "Типоразмер", false}
+        };
+
+
+
+
+
+
+
+
+        /// <summary>
         /// Список групп параметров в семействе
         /// </summary>
         public List<ParameterGroupHelper> ParamGroupsInFM { get; set; }
@@ -40,11 +60,50 @@ namespace RevitFamilyParameterAdder.Models
         /// <summary>
         /// Выбранная группа для группировки параметра в семействе
         /// </summary>
-        public ParameterGroupHelper SelectedParamGroupInFM { get; set; } 
+        public ParameterGroupHelper SelectedParamGroupInFM { get; set; }
+
+
+
+
+
+
+
 
         /// <summary>
-        /// Уровень размещения параметра - экземпляр/тип
+        /// Указывает является ли текущий параметр дефолтным
         /// </summary>
-        public bool IsInstanceParam { get; set; } = true;
+        public bool IsDefaultParam { get; set; } = false;
+
+        /// <summary>
+        /// Строка формулы, которую нужно попытаться вставить при добавлении параметра в семейство
+        /// </summary>
+        public string Formula { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Список дефолтных параметров, указанных во ViewModel
+        /// </summary>
+        public List<DefaultParam> DefaultParams {
+            get => _defaultParams;
+            set {
+                _defaultParams = value;
+                CheckDefaultParams();
+            }
+        }
+
+
+
+        /// <summary>
+        /// Проверяет является ли текущий параметр дефолтным
+        /// </summary>
+        private void CheckDefaultParams() {
+            foreach(DefaultParam defParam in DefaultParams) {
+                if(defParam.ParamName == ParamName) {
+                    IsDefaultParam = true;
+                    Formula = defParam.Formula;
+                    SelectedParamGroupInFM = new ParameterGroupHelper(defParam.BINParameterGroup);
+                    return;
+                }
+            }
+        }
     }
 }
