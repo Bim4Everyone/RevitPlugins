@@ -122,7 +122,7 @@ namespace RevitEditingZones.ViewModels {
 
         private LevelViewModel GetLevel(Area area) {
             var level = _revitRepository.GetLevel(area);
-            return AllLevels.FirstOrDefault(item => item.Level.Id == level.Id);
+            return AllLevels.FirstOrDefault(item => item.Level.Id == level?.Id);
         }
 
         private ErrorType GetErrorType(ZonePlanViewModel zonePlan) {
