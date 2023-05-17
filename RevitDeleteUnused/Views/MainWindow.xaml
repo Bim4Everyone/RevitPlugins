@@ -14,7 +14,8 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    Height="450" Width="400"    
+    Height="500" Width="400"
+    MinHeight="400" MinWidth="350"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid>
@@ -23,7 +24,7 @@
             <RowDefinition Height="35"/>
             <RowDefinition/>
             <RowDefinition Height="35" />
-            <RowDefinition Height="35" />
+            <RowDefinition Height="40" />
         </Grid.RowDefinitions>
         
         <TextBlock 
@@ -80,14 +81,14 @@
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <TextBlock
-                Margin="10, 5"
+                Margin="5,5,5,10"
                 Foreground="Orange"
                 VerticalAlignment="Center"
                 DataContext="{Binding SelectedElementType}"
                 Text="{Binding ErrorText}" />
 
             <Button
-                Margin="10, 5"
+                Margin="5,5,5,10"
                 Width="80"
                 Content="ОК"
                 Click="ButtonOk_Click" 
@@ -95,10 +96,10 @@
                 Command="{Binding DeleteSelected}"/>
 
             <Button
-                Margin="10, 5"
+                Margin="5,5,10,10"
                 Width="80"
                 Content="Отмена"
-                Click="ButtonCancel_Click" />
+                Click="ButtonCancel_Click"/>
         </StackPanel>
     </Grid>
 </base:PlatformWindow>

@@ -18,10 +18,10 @@ namespace RevitDeleteUnused.Commands {
             using(Transaction t = new Transaction(document)) {
                 t.Start("BIM: Удалить неиспользуемые");
 
-                foreach(ElementToDelete e in list) {
-                    if(e.IsChecked) {
-                        document.Delete(e.Element.Id);
-                        elements.Remove(e);
+                foreach(ElementToDelete elementToDelete in list) {
+                    if(elementToDelete.IsChecked) {
+                        document.Delete(elementToDelete.Element.Id);
+                        elements.Remove(elementToDelete);
                     }
                 }
                 t.Commit();

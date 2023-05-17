@@ -25,7 +25,6 @@ namespace RevitDeleteUnused.ViewModels {
                 new ElementsToDeleteViewModel(_document, ElementsCollector.GetFilters(_document), "Фильтры"),
                 new ElementsToDeleteViewModel(_document, ElementsCollector.GetViewTemplates(_document),  "Шаблоны видов")
             };
-
             SelectedElementType = RevitViewModels[0];
         }
 
@@ -34,7 +33,7 @@ namespace RevitDeleteUnused.ViewModels {
             set => RaiseAndSetIfChanged(ref _selectedElementType, value);
         }
 
-        public ObservableCollection<ElementsToDeleteViewModel> RevitViewModels { get; set; }
+        public ObservableCollection<ElementsToDeleteViewModel> RevitViewModels { get; }
 
         private RelayCommand checkAll;
         public RelayCommand CheckAllCommand {
