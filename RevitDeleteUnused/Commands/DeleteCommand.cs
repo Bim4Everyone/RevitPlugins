@@ -12,18 +12,11 @@ using RevitDeleteUnused.Models;
 namespace RevitDeleteUnused.Commands {
     internal class DeleteCommand 
     {
-        public static void DeleteSelectedCommand(Document document, ObservableCollection<ElementToDelete> elements) 
+        public static void DeleteSelectedCommand(Document document, List<ElementToDelete> elements) 
         {
-            var list = elements.ToList();
             using(Transaction t = new Transaction(document)) {
                 t.Start("BIM: Удалить неиспользуемые");
-
-                foreach(ElementToDelete elementToDelete in list) {
-                    if(elementToDelete.IsChecked) {
-                        document.Delete(elementToDelete.Element.Id);
-                        elements.Remove(elementToDelete);
-                    }
-                }
+                elements.Where(e => e.IsChecked).ToList().ForEach(e => { document.Delete(e.Element.Id); } );
                 t.Commit();
             }
         }

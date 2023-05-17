@@ -19,11 +19,12 @@ namespace RevitDeleteUnused.ViewModels {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
             _document = _revitRepository.Document;
+            ElementsCollector elemCollector = new ElementsCollector(_document);
 
             RevitViewModels = new ObservableCollection<ElementsToDeleteViewModel>
             {
-                new ElementsToDeleteViewModel(_document, ElementsCollector.GetFilters(_document), "Фильтры"),
-                new ElementsToDeleteViewModel(_document, ElementsCollector.GetViewTemplates(_document),  "Шаблоны видов")
+                new ElementsToDeleteViewModel(_document, elemCollector.GetFilters(), "Фильтры"),
+                new ElementsToDeleteViewModel(_document, elemCollector.GetViewTemplates(),  "Шаблоны видов")
             };
             SelectedElementType = RevitViewModels[0];
         }
