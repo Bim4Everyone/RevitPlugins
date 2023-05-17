@@ -187,7 +187,7 @@ namespace RevitCheckingLevels.Models {
 
         public static string GetNotElevationTooltip(this LevelInfo levelInfo) {
             return $"Значение отметки: фактическое \"{levelInfo.Level.GetFormattedMeterElevation()}\", " +
-                   $"в имени уровня \"{levelInfo.GetFormattedMeterElevation()}\".";
+                   $"в имени уровня \"{levelInfo.ElevationName}\".";
         }
 
         public static string GetNotMillimeterElevationTooltip(this LevelInfo levelInfo) {
