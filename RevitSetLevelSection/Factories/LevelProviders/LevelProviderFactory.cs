@@ -72,7 +72,7 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
         protected virtual ILevelProvider CreateImpl(Element element) {
             if(element.InAnyCategory(BuiltInCategory.OST_StructuralFraming) && IsStairs(element)) {
                 var constructorArgument =
-                    new ConstructorArgument("elementPosition", _resolutionRoot.Get<ElementBottomPosition>());
+                    new ConstructorArgument("elementPosition", _resolutionRoot.Get<ElementMiddlePosition>());
                 return _resolutionRoot.Get<LevelBottomProvider>(constructorArgument);
             }
 
