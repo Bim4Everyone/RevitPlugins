@@ -11,17 +11,17 @@ namespace RevitFamilyParameterAdder.Models {
     internal class DefaultParam {
         public DefaultParam(string name, BuiltInParameterGroup builtInParameterGroup) {
             ParamName = name;
-            BINParameterGroup = builtInParameterGroup;
+            BINParameterGroup = new ParameterGroupHelper(builtInParameterGroup);
         }
 
         public DefaultParam(string name, BuiltInParameterGroup builtInParameterGroup, string formula) {
             ParamName = name;
-            BINParameterGroup = builtInParameterGroup;
+            BINParameterGroup = new ParameterGroupHelper(builtInParameterGroup);
             Formula = formula;
         }
 
         public string ParamName { get; set; }
-        public BuiltInParameterGroup BINParameterGroup { get; set; }
+        public ParameterGroupHelper BINParameterGroup { get; set; }
         public string Formula { get; set; } = string.Empty;
     }
 }

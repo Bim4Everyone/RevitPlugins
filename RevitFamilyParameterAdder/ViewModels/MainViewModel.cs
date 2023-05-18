@@ -29,6 +29,7 @@ namespace RevitFamilyParameterAdder.ViewModels {
         private string _allGroup = "<Выбрать все>";
         private string _selectedParamGroupName;
         private bool _isParamsForKR;
+        private bool _writeFormulasInParamsForKR;
         private List<string> _paramGroupNames = new List<string>();
         private List<Guid> _paramGUIDsInFM = new List<Guid>();
         public StringBuilder _reportAdded = new StringBuilder();
@@ -37,11 +38,14 @@ namespace RevitFamilyParameterAdder.ViewModels {
         private List<SharedParam> _selectedParams = new List<SharedParam>();
         private List<ParameterGroupHelper> _bINParameterGroups = new List<ParameterGroupHelper>();
         private List<DefaultParam> _defaultParamsKR = new List<DefaultParam>() {
-            new DefaultParam("обр_ФОП_Форма_префикс", BuiltInParameterGroup.PG_CONSTRUCTION, "П"),
-            new DefaultParam("обр_ФОП_Форма_номер", BuiltInParameterGroup.PG_CONSTRUCTION),
+            new DefaultParam("обр_ФОП_Форма_префикс", BuiltInParameterGroup.PG_CONSTRUCTION, 
+                "\"П\""),
+            new DefaultParam("обр_ФОП_Форма_номер", BuiltInParameterGroup.PG_CONSTRUCTION, 
+                "201"),
             new DefaultParam("обр_ФОП_Количество типовых этажей", BuiltInParameterGroup.PG_REBAR_ARRAY),
             new DefaultParam("обр_ФОП_Количество типовых на этаже", BuiltInParameterGroup.PG_REBAR_ARRAY),
-            new DefaultParam("обр_ФОП_Длина", BuiltInParameterGroup.PG_GEOMETRY),
+            new DefaultParam("обр_ФОП_Длина", BuiltInParameterGroup.PG_GEOMETRY, 
+                "roundup(мод_ФОП_Габарит А / 5 мм) * 5 мм + roundup(мод_ФОП_Габарит Б / 5 мм) * 5 мм + roundup(мод_ФОП_Габарит В / 5 мм) * 5 мм"),
             new DefaultParam("мод_ФОП_Габарит А", BuiltInParameterGroup.PG_GEOMETRY),
             new DefaultParam("мод_ФОП_Габарит Б", BuiltInParameterGroup.PG_GEOMETRY),
             new DefaultParam("мод_ФОП_Габарит В", BuiltInParameterGroup.PG_GEOMETRY),
@@ -49,9 +53,12 @@ namespace RevitFamilyParameterAdder.ViewModels {
             new DefaultParam("обр_ФОП_Изделие_Наименование", BuiltInParameterGroup.PG_GENERAL),
             new DefaultParam("обр_ФОП_Изделие_Марка", BuiltInParameterGroup.PG_GENERAL),
             new DefaultParam("обр_ФОП_Изделие_Главная деталь", BuiltInParameterGroup.PG_GENERAL),
-            new DefaultParam("обр_ФОП_Габарит А_ВД", BuiltInParameterGroup.INVALID),
-            new DefaultParam("обр_ФОП_Габарит Б_ВД", BuiltInParameterGroup.INVALID),
-            new DefaultParam("обр_ФОП_Габарит В_ВД", BuiltInParameterGroup.INVALID)
+            new DefaultParam("обр_ФОП_Габарит А_ВД", BuiltInParameterGroup.INVALID,
+                "roundup((мод_ФОП_Габарит А) / 5 мм) * 5 мм"),
+            new DefaultParam("обр_ФОП_Габарит Б_ВД", BuiltInParameterGroup.INVALID,
+                "roundup((мод_ФОП_Габарит Б) / 5 мм) * 5 мм"),
+            new DefaultParam("обр_ФОП_Габарит В_ВД", BuiltInParameterGroup.INVALID,
+                "roundup((мод_ФОП_Габарит В) / 5 мм) * 5 мм")
         };
 
    
@@ -102,7 +109,15 @@ namespace RevitFamilyParameterAdder.ViewModels {
 
         public bool IsParamsForKR {
             get => _isParamsForKR;
-            set => this.RaiseAndSetIfChanged(ref _isParamsForKR, value);
+            set {
+                this.RaiseAndSetIfChanged(ref _isParamsForKR, value);
+                WriteFormulasInParamsForKR = false;
+            }
+        }
+
+        public bool WriteFormulasInParamsForKR {
+            get => _writeFormulasInParamsForKR;
+            set => this.RaiseAndSetIfChanged(ref _writeFormulasInParamsForKR, value);
         }
 
 
@@ -128,6 +143,7 @@ namespace RevitFamilyParameterAdder.ViewModels {
         /// </summary>
         private void LoadView() {
             IsParamsForKR = true;
+            WriteFormulasInParamsForKR = true;
 
             // Подгружаем сохраненные данные прошлого запуска
             LoadConfig();
@@ -172,12 +188,13 @@ namespace RevitFamilyParameterAdder.ViewModels {
         private void Add() {
             using(Transaction t = new Transaction(_revitRepository.Document)) {
                 t.Start("Добавление параметров");
+
                 // Перебираем параметры в группе
                 foreach(SharedParam param in SelectedParams) {
-                    //Если семейство уже имеет параметр,пропускаем, идем дальше
+                    //Если семейство уже имеет параметр, пропускаем, идем дальше
                     if(_paramGUIDsInFM.Contains(param.ParamInShPF.GUID)) {
                         _reportAlreadyBeen.AppendLine(param.ParamName);
-                        continue; 
+                        continue;
                     }
 
                     try {
@@ -189,8 +206,43 @@ namespace RevitFamilyParameterAdder.ViewModels {
                         _reportError.AppendLine(param.ParamName);
                     }
                 }
+
+
+
+                // Сначала проверяем, есть ли типоразмеры в семействе, если нет явно создаем дефолтный с именем семейства
+                // Без этого формулы не добавить
+                FamilyTypeSet familyTypeSet = FamilyManagerFm.Types;
+
+                if(WriteFormulasInParamsForKR == true && familyTypeSet.Size == 0) {
+                    FamilyType newFamilyType = FamilyManagerFm.NewType(_revitRepository.Document.Title);
+                }
+
+
+
+                // Назначаем добавленным параметрам формулы,если стоит соответствующая галка и есть формула
+                foreach(SharedParam param in SelectedParams) {
+                    if(WriteFormulasInParamsForKR == false || param.Formula == string.Empty) {
+                        continue;
+                    }
+
+                    FamilyParameter familyParam = FamilyManagerFm.get_Parameter(param.ParamName);
+                    // Если параметр найден в семействе и у него пустой блок заполнения формул и он общий и в него можно добавить формулу, добавляем
+                    if(familyParam == null || familyParam.IsShared == false || familyParam.CanAssignFormula == false) {
+                        continue;
+                    }
+
+
+                    try {
+                        FamilyManagerFm.SetFormula(familyParam, param.Formula);
+
+                    } catch(Exception) {
+                        _reportError.AppendLine(param.ParamName);
+                    }
+                }
                 t.Commit();
+
             }
+
 
             if(_reportAdded.Length > 0) {
                 _reportAdded.Insert(0, "Добавлены параметры:" + Environment.NewLine);
@@ -216,7 +268,7 @@ namespace RevitFamilyParameterAdder.ViewModels {
             Params.Clear();
             List<ExternalDefinition> paramsInShPF = _revitRepository.GetParamsInShPF();
             foreach(ExternalDefinition item in paramsInShPF) {
-                SharedParam sharedParam = new SharedParam(item, BINParameterGroups, _defaultParamsKR);
+                SharedParam sharedParam = new SharedParam(item, BINParameterGroups);
                 Params.Add(sharedParam);
             }
         }
@@ -236,14 +288,20 @@ namespace RevitFamilyParameterAdder.ViewModels {
             }
 
             if(IsParamsForKR) {
+                foreach(SharedParam item in Params) {
+                    foreach(DefaultParam defParam in _defaultParamsKR) {
+                        if(defParam.ParamName == item.ParamName) {
+                            item.IsDefaultParam = true;
+                            item.Formula = defParam.Formula;
+                            item.SelectedParamGroupInFM = defParam.BINParameterGroup;
+                        }
+                    }
+                }
+
                 Params = new ObservableCollection<SharedParam>(
                         Params
                         .Where(item => item.IsDefaultParam));
 
-                //foreach(SharedParam item in Params) {
-                //    BuiltInParameterGroup groupForParam = _defaultParamsKR[item.ParamName].BINParameterGroup;
-                //    item.SelectedParamGroupInFM = new ParameterGroupHelper(groupForParam);
-                //}
             }
             OnPropertyChanged(nameof(Params));
         }

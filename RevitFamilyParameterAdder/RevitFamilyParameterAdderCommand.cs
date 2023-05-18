@@ -25,7 +25,7 @@ namespace RevitFamilyParameterAdder {
     [Transaction(TransactionMode.Manual)]
     public class RevitFamilyParameterAdderCommand : BasePluginCommand {
         public RevitFamilyParameterAdderCommand() {
-            PluginName = "RevitFamilyParameterAdder";
+            PluginName = "Добавление параметров в семейство";
         }
 
         protected override void Execute(UIApplication uiApplication) {

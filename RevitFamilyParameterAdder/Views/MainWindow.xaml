@@ -16,7 +16,7 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    Height="450" Width="800"    
+    Height="550" Width="930"    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -32,7 +32,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="35"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
@@ -40,7 +40,7 @@
 
         <Label Grid.Row="0" Content="Выберите параметры:"/>
 
-        <StackPanel Grid.Row="1" HorizontalAlignment="Left" Orientation="Horizontal"
+        <StackPanel Grid.Row="1" HorizontalAlignment="Left" Orientation="Vertical"
                     Margin="10 0"
                     VerticalAlignment="Center">
             <CheckBox Content="Загрузка параметров для семейств КР"
@@ -56,12 +56,16 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </CheckBox>
+
+            <CheckBox Content="Загрузка формул для параметров для семейств КР"
+                      IsChecked="{Binding WriteFormulasInParamsForKR}"
+                      IsEnabled="{Binding IsParamsForKR}"/>
         </StackPanel>
         
         <StackPanel Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal">
-            <Label Content="Фильтр по группе в ФОП:"/>
+            <Label Margin="5" Content="Фильтр по группе в ФОП:"/>
             <ComboBox Grid.Row="1" 
-                      Margin="5 3"
+                      Margin="5 5"
                       Width="200"
                       VerticalContentAlignment="Center"
                       ItemsSource="{Binding Path=ParamGroupNames}"
@@ -111,7 +115,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <ComboBox Name="parameters_ParamGroup"
-                                          Width="200"
+                                          Width="250"
                                           ItemsSource="{Binding Path=ParamGroupsInFM}"
                                           DisplayMemberPath="GroupName"
                                           SelectedItem="{Binding SelectedParamGroupInFM}"
@@ -125,7 +129,7 @@
                     <GridViewColumn Header="Уровень параметра">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <ComboBox Width="200"
+                                <ComboBox Width="150"
                                           ItemsSource="{Binding Path=LevelOfParam}"
                                           DisplayMemberPath="Key"
                                           
