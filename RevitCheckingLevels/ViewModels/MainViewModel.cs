@@ -181,7 +181,7 @@ namespace RevitCheckingLevels.ViewModels {
 
             var duplicateNames = levelCreationNames
                 .Where(item => item.DuplicateName)
-                .Select(item => item.LevelName)
+                .Select(item => $"{item.LevelInfo.Level.Name} -> {item.LevelName}")
                 .OrderBy(item => item)
                 .ToArray();
 
@@ -203,17 +203,18 @@ namespace RevitCheckingLevels.ViewModels {
             var taskDialog = new TaskDialog("Обновление отметки");
             taskDialog.TitleAutoPrefix = false;
             taskDialog.AllowCancellation = true;
-            taskDialog.MainContent = "Обновление отметки невозможно:";
-            taskDialog.MainInstruction = "Найдены уровни с похожими именами.";
+            taskDialog.MainIcon = TaskDialogIcon.TaskDialogIconWarning;
+            taskDialog.MainContent = "Имена уровней должны быть уникальными";
+            taskDialog.MainInstruction = "Обновление отметки в имени невозможно.";
             taskDialog.ExpandedContent = Environment.NewLine + " - "
                                                + string.Join(Environment.NewLine + " - ", duplicateNames);
 
             taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1,
                 "Игнорировать ошибки",
-                "Игнорирует найденные ошибки в именах уровней.");
+                "Пропускает уровни с дублирующимися именами.");
             taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2,
                 "Отменить",
-                "Отменяет команду обновления отметок уровня.");
+                "Отменяет переименование всех уровней.");
             return taskDialog;
         }
     }
