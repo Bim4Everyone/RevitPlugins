@@ -7,32 +7,42 @@ using dosymep.WPF.Commands;
 using Autodesk.Revit.DB;
 
 using RevitDeleteUnused.Models;
-using RevitDeleteUnused.Commands;
 
 
 namespace RevitDeleteUnused.ViewModels {
     internal class ElementsToDeleteViewModel : BaseViewModel {
-        private List<ElementToDelete> _elementsToDelete;
+        private List<ElementToDeleteViewModel> _elementsToDelete;
 
         private string _errorText;
+        private RevitRepository _revitRepository;
 
-        public ElementsToDeleteViewModel(Document document, List<ElementToDelete> elementsToDelete, string name) {
+        public ElementsToDeleteViewModel(RevitRepository revitRepository, List<ElementToDeleteViewModel> elementsToDelete, string name) {
             _elementsToDelete = elementsToDelete;
-            DeleteSelected = new RelayCommand(obj => { DeleteCommand.DeleteSelectedCommand(document, ElementsToDelete); }, CanDelete);
+            _revitRepository = revitRepository;
+
+            DeleteSelected = new RelayCommand(Delete, CanDelete);
             Name = name;
         }
-        public string Name { get; }
-        public List<ElementToDelete> ElementsToDelete => _elementsToDelete;
+
         public ICommand DeleteSelected { get; }
+
+        public string Name { get; }
+        public List<ElementToDeleteViewModel> ElementsToDelete => _elementsToDelete;
 
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
+        private void Delete(object p) {
+            _revitRepository.DeleteSelectedCommand(ElementsToDelete
+                                                    .Where(e => e.IsChecked)
+                                                    .Select(e => e.Element)
+                                                    .ToList());
+        }
+
         private bool CanDelete(object p) {
-            int checkedElements = ElementsToDelete.Where(x => x.IsChecked).Count();
-            if(checkedElements == 0) {
+            if(!ElementsToDelete.Any(x => x.IsChecked)) {
                 ErrorText = "Не выбраны элементы.";
                 return false;
             }

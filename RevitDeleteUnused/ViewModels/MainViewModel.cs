@@ -4,30 +4,35 @@ using dosymep.WPF.ViewModels;
 using dosymep.WPF.Commands;
 
 using RevitDeleteUnused.Models;
-using RevitDeleteUnused.Commands;
 using Autodesk.Revit.DB;
+using System.Windows.Input;
 
 namespace RevitDeleteUnused.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
-        private readonly Document _document;
 
         private ElementsToDeleteViewModel _selectedElementType;
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
-            _document = _revitRepository.Document;
-            ElementsCollector elemCollector = new ElementsCollector(_document);
 
             RevitViewModels = new ObservableCollection<ElementsToDeleteViewModel>
             {
-                new ElementsToDeleteViewModel(_document, elemCollector.GetFilters(), "Фильтры"),
-                new ElementsToDeleteViewModel(_document, elemCollector.GetViewTemplates(),  "Шаблоны видов")
+                new ElementsToDeleteViewModel(_revitRepository, _revitRepository.GetFilters(), "Фильтры"),
+                new ElementsToDeleteViewModel(_revitRepository, _revitRepository.GetViewTemplates(),  "Шаблоны видов")
             };
             SelectedElementType = RevitViewModels[0];
+
+            CheckAllCommand = new RelayCommand(CheckAll);
+            UnCheckAllCommand = new RelayCommand(UnCheckAll);
+            InvertAllCommand = new RelayCommand(InvertAll);
         }
+
+        public ICommand CheckAllCommand { get; }
+        public ICommand UnCheckAllCommand { get; }
+        public ICommand InvertAllCommand { get; }
 
         public ElementsToDeleteViewModel SelectedElementType {
             get => _selectedElementType;
@@ -36,25 +41,16 @@ namespace RevitDeleteUnused.ViewModels {
 
         public ObservableCollection<ElementsToDeleteViewModel> RevitViewModels { get; }
 
-        private RelayCommand checkAll;
-        public RelayCommand CheckAllCommand {
-            get {
-                return checkAll ?? new RelayCommand(obj => { CheckBoxCommands.SetAll(_selectedElementType.ElementsToDelete, true); });
-            }
+        private void CheckAll(object p) {
+            _revitRepository.SetAll(_selectedElementType.ElementsToDelete, true);
         }
 
-        private RelayCommand unCheckAll;
-        public RelayCommand UnCheckAllCommand {
-            get {
-                return unCheckAll ?? new RelayCommand(obj => { CheckBoxCommands.SetAll(_selectedElementType.ElementsToDelete, false); });
-            }
+        private void UnCheckAll(object p) {
+            _revitRepository.SetAll(_selectedElementType.ElementsToDelete, false);
         }
 
-        private RelayCommand invertAll;
-        public RelayCommand InvertAllCommand {
-            get {
-                return invertAll ?? new RelayCommand(obj => { CheckBoxCommands.InvertAll(_selectedElementType.ElementsToDelete); });
-            }
+        private void InvertAll(object p) {
+            _revitRepository.InvertAll(_selectedElementType.ElementsToDelete);
         }
     }
 }
