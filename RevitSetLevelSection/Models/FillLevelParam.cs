@@ -54,8 +54,7 @@ namespace RevitSetLevelSection.Models {
 
             ICollection<Level> zoneLevels = _zoneInfos
                 .Where(item => _intersectImpl.IsIntersect(item, element))
-                .Select(item => item.Level)
-                // .Select(item => _sourceLevels.GetValueOrDefault(item.Level.Name, null))
+                .Select(item => _sourceLevels.GetValueOrDefault(item.Level.Name, null))
                 .Where(item => item != null)
                 .ToList();
 
