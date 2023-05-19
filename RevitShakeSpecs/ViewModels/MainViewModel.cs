@@ -18,42 +18,11 @@ using RevitShakeSpecs.Models;
 namespace RevitShakeSpecs.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
-        public readonly RevitRepository _revitRepository;
+        private readonly RevitRepository _revitRepository;
 
-        private string _errorText;
-        public string ErrorText {
-            get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
-        }
-
-
-
-        public List<string> ProjectSectionParamNames { get; set; } = new List<string>();                            // Параметры листов
-
-        private string _selectedProjectSectionParamName;
-        public string SelectedProjectSectionParamName {
-            get => _selectedProjectSectionParamName;
-            set {
-                this.RaiseAndSetIfChanged(ref _selectedProjectSectionParamName, value);
-            }
-        }
-
-
-
-
-        public ObservableCollection<string> ProjectSections { get; set; } = new ObservableCollection<string>();     // Разделы проекта
-        private string _selectedProjectSection { get; set; }                                                        
-        public string SelectedProjectSection {
-            get => _selectedProjectSection;
-            set {
-                _selectedProjectSection = value;
-            }
-        }
-
-
-
-
-
+        private string _errorText = string.Empty;
+        private string _selectedProjectSectionParamName = string.Empty;
+        private string _selectedProjectSection = string.Empty;
 
 
 
@@ -61,9 +30,11 @@ namespace RevitShakeSpecs.ViewModels {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
-
+            // Подгружаем выбранное при прошлом сеансе
             LoadConfig();
+            // Заполняем параметры (в один из них пользователь писал название комплекта)
             GetFilterableParams();
+            // Заполняем варианты комплектов, в соответствии с выбранным параметров
             GetProjectSections(null);
 
             GetProjectSectionsCommand = new RelayCommand(GetProjectSections);
@@ -73,16 +44,51 @@ namespace RevitShakeSpecs.ViewModels {
 
 
 
-
-
-
-
-
-
         public ICommand RegenerateCommand { get; }
+        public ICommand ShakeCommand { get; }
+        public ICommand GetProjectSectionsCommand { get; }
+
+
+
+        /// <summary>
+        /// Параметры листов, по которым может идти фильтрация
+        /// </summary>
+        public List<string> ProjectSectionParamNames { get; set; } = new List<string>();
+
+        /// <summary>
+        /// Разделы проекта (доступные варианты заполнения выбранного параметра из ProjectSectionParamNames)
+        /// </summary>
+        public ObservableCollection<string> ProjectSections { get; set; } = new ObservableCollection<string>();
+        
+        /// <summary>
+        /// Выбранное пользователем имя параметра, по которому производится фильтрация (раздел проекта)
+        /// </summary>
+        public string SelectedProjectSectionParamName {
+            get => _selectedProjectSectionParamName;
+            set => this.RaiseAndSetIfChanged(ref _selectedProjectSectionParamName, value);
+        }
+
+        /// <summary>
+        /// Выбранныое пользоватлем значение раздела проекта
+        /// </summary>
+        public string SelectedProjectSection {
+            get => _selectedProjectSection;
+            set => this.RaiseAndSetIfChanged(ref _selectedProjectSection, value);
+        }
+
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+
+
+        /// <summary>
+        /// (Вариант 1) Метод команды простой регенерации проекта
+        /// </summary>
+        /// <param name="p"></param>
         private void Regenerate(object p) {
-            using(Transaction transaction = new Transaction(_revitRepository.Document)) {
-                transaction.Start("Регенирация документа");
+            using(Transaction transaction = _revitRepository.Document.StartTransaction("Регенирация документа")) {
                 _revitRepository.Document.Regenerate();
                 transaction.Commit();
             }
@@ -91,16 +97,14 @@ namespace RevitShakeSpecs.ViewModels {
         }
 
 
-
-
-        public ICommand ShakeCommand { get; }
+        /// <summary>
+        /// (Вариант 2) Метод команды перемещающий спецификации на листах выбранного комплекта чертежей (раздела проекта)
+        /// </summary>
+        /// <param name="p"></param>
         private void Shake(object p) {
 
-            using(Transaction transaction = new Transaction(_revitRepository.Document)) {
-                transaction.Start("Встряска спецификаций");
-
-                foreach(var item in _revitRepository.AllExistingSheets) {
-                    ViewSheet viewSheet = item as ViewSheet;
+            using(Transaction transaction = _revitRepository.Document.StartTransaction("Встряска спецификаций")) {
+                foreach(ViewSheet viewSheet in _revitRepository.GetAllExistingSheets) {
 
                     var paramValueTemp = viewSheet.GetParamValueOrDefault(SelectedProjectSectionParamName);
                     if(paramValueTemp is null) { continue; }
@@ -110,7 +114,7 @@ namespace RevitShakeSpecs.ViewModels {
                         continue;
                     }
 
-                    SheetUtils sheetUtils = new SheetUtils(this, viewSheet);
+                    SheetUtils sheetUtils = new SheetUtils(_revitRepository.Document, viewSheet);
                     sheetUtils.FindAndShakeSpecsOnSheet();
                 }
 
@@ -131,18 +135,9 @@ namespace RevitShakeSpecs.ViewModels {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-        // Заполнение списка параметров, где может быть прописан раздел проекта
+        /// <summary>
+        /// Заполнение списка параметров, где может быть прописан раздел проекта
+        /// </summary>
         private void GetFilterableParams() {
             Category category = _revitRepository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sheets);
 
@@ -159,17 +154,19 @@ namespace RevitShakeSpecs.ViewModels {
         }
 
 
-
-        // Получение возможных вариантов заполнения параметра раздела проекта
-        public ICommand GetProjectSectionsCommand { get; }
-
+        /// <summary>
+        /// Получение возможных вариантов заполнения параметра раздела проекта
+        /// </summary>
+        /// <param name="p"></param>
         private void GetProjectSections(object p) {
+            if(SelectedProjectSectionParamName is null) {
+                return;
+            }
+
             ProjectSections.Clear();
             ErrorText = string.Empty;
             string projectSection;
-            foreach(var item in _revitRepository.AllExistingSheets) {
-                ViewSheet viewSheet = item as ViewSheet;
-                if(viewSheet is null) { continue; }
+            foreach(ViewSheet viewSheet in _revitRepository.GetAllExistingSheets) {
 
                 var projectSectionTemp = viewSheet.GetParamValueOrDefault(SelectedProjectSectionParamName);
                 if(projectSectionTemp is null) { continue; }
@@ -183,9 +180,6 @@ namespace RevitShakeSpecs.ViewModels {
             // Сортировка
             ProjectSections = new ObservableCollection<string>(ProjectSections.OrderBy(i => i));
         }
-
-
-
 
 
 

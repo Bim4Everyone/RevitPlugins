@@ -11,17 +11,17 @@ using RevitShakeSpecs.ViewModels;
 
 namespace RevitShakeSpecs.Models {
     internal class SheetUtils {
-        public SheetUtils(MainViewModel mainViewModel, ViewSheet viewSheet) {
+        public SheetUtils(Document document, ViewSheet viewSheet) {
             ViewSheet = viewSheet;
-            MainViewModel = mainViewModel;
+            Doc = document;
         }
 
         public ViewSheet ViewSheet { get; set; }
-        internal MainViewModel MainViewModel { get; set; }
+        internal Document Doc { get; set; }
 
 
         public void FindAndShakeSpecsOnSheet() {
-            var allSpecsViews = new FilteredElementCollector(MainViewModel._revitRepository.Document, ViewSheet.Id)
+            var allSpecsViews = new FilteredElementCollector(Doc, ViewSheet.Id)
                 .OfClass(typeof(ScheduleSheetInstance))
                 .WhereElementIsNotElementType()
                 .ToElements();
@@ -36,10 +36,10 @@ namespace RevitShakeSpecs.Models {
 
                 XYZ point_1 = spec.Point;
                 spec.Point = new XYZ(0, 0, 0);
-                MainViewModel._revitRepository.Document.Regenerate();
+                Doc.Regenerate();
 
                 spec.Point = point_1;
-                MainViewModel._revitRepository.Document.Regenerate();
+                Doc.Regenerate();
             }
         }
 

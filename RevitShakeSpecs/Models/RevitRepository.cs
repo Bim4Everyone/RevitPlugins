@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -16,9 +17,10 @@ namespace RevitShakeSpecs.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        public IList<Element> AllExistingSheets => new FilteredElementCollector(Document)
-        .OfClass(typeof(ViewSheet))
-        .WhereElementIsNotElementType()
-        .ToElements();
+        public IList<ViewSheet> GetAllExistingSheets => new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewSheet))
+            .WhereElementIsNotElementType()
+            .OfType<ViewSheet>()
+            .ToList();
     }
 }
