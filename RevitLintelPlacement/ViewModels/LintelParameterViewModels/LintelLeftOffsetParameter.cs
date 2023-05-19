@@ -27,9 +27,9 @@ namespace RevitLintelPlacement.ViewModels.LintelParameterViewModels {
         }
 
         public void SetTo(FamilyInstance lintel, FamilyInstance elementInWall) {
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
             var value = UnitUtils.Convert(LeftOffset, DisplayUnitType.DUT_MILLIMETERS, DisplayUnitType.DUT_DECIMAL_FEET);
-#elif D2021 || R2021
+#elif REVIT_2021
             var value = UnitUtils.Convert(LeftOffset, UnitTypeId.Millimeters, UnitTypeId.Feet);
 #else
             var value = UnitUtils.Convert(LeftOffset, UnitTypeId.Millimeters, UnitTypeId.Feet);

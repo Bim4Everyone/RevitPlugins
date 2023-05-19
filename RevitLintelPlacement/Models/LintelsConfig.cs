@@ -90,12 +90,10 @@ namespace RevitLintelPlacement.Models {
                 || LintelFixation == null
                 || OpeningHeight == null
                 || OpeningWidth == null
-                || OpeningWidth == null
                 || OpeningFixation == null
                 || ReinforcedConcreteFilter == null
                 || HolesFilter == null
                 || LintelFamily == null;
-
         }
 
         [JsonIgnore]

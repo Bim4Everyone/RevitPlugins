@@ -144,7 +144,7 @@ namespace RevitCopyViews.ViewModels {
 
 
             var logicalFilter = new LogicalAndFilter(new[] {
-#if D2020 || R2020 || D2021 || R2021
+#if REVIT_2021_OR_LESS
             new ElementParameterFilter(new FilterInverseRule(new FilterStringRule(new ParameterValueProvider(parameterElement.Id), new FilterStringEquals(), filterName, true)))
 #else
             new ElementParameterFilter(new FilterInverseRule(new FilterStringRule(new ParameterValueProvider(parameterElement.Id), new FilterStringEquals(), filterName)))

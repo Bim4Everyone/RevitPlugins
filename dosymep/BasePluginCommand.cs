@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Windows;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -13,6 +15,8 @@ namespace dosymep.Bim4Everyone {
             PluginName = GetType().Name;
         }
 
+        public bool FromGui { get; set; } = true;
+
         /// <summary>
         /// Предоставляет доступ к логгеру расширения.
         /// </summary>
@@ -25,6 +29,8 @@ namespace dosymep.Bim4Everyone {
 
         /// <inheritdoc />
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
+            FromGui = GetFromGui(commandData.JournalData);
+            
             PluginLoggerService = LoggerService.ForPluginContext(PluginName);
             PluginLoggerService.Information("Запуск команды расширения.");
 
@@ -34,17 +40,33 @@ namespace dosymep.Bim4Everyone {
                 PluginLoggerService.Information("Выход из команды расширения.");
             } catch(OperationCanceledException) {
                 PluginLoggerService.Warning("Отмена выполнения команды расширения.");
+
+                if(!FromGui) {
+                    return Result.Cancelled;
+                }
+                
                 GetPlatformService<INotificationService>()
                     .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
                     .ShowAsync();
             } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
                 PluginLoggerService.Warning("Отмена выполнения команды расширения.");
+                
+                if(!FromGui) {
+                    return Result.Cancelled;
+                }
+                
                 GetPlatformService<INotificationService>()
                     .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
                     .ShowAsync();
             } catch(Exception ex) {
                 PluginLoggerService.Warning(ex, "Ошибка в команде расширения.");
-#if D2020 || D2021 || D2022
+                
+                if(!FromGui) {
+                    message = ex.Message;
+                    return Result.Failed;
+                }
+                
+#if DEBUG
                 TaskDialog.Show(PluginName, ex.ToString());
 #else
                 TaskDialog.Show(PluginName, ex.Message);
@@ -59,6 +81,14 @@ namespace dosymep.Bim4Everyone {
             return Result.Succeeded;
         }
 
+        private bool GetFromGui(IDictionary<string, string> journalData) {
+            if(journalData.TryGetValue(PlatformCommandIds.ExecutedFromUI, out string fromGui)) {
+                return bool.Parse(fromGui);
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Наименование расширения для логгера
         /// </summary>
@@ -69,6 +99,24 @@ namespace dosymep.Bim4Everyone {
         /// </summary>
         /// <param name="uiApplication">Приложение Revit.</param>
         protected abstract void Execute(UIApplication uiApplication);
+
+        protected void Notification(Window window) {
+            Notification(window.ShowDialog());
+        }
+        
+        protected void Notification(bool? dialogResult) {
+            if(dialogResult == null) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выход из скрипта.", "C#")
+                    .ShowAsync();
+            } else if(dialogResult == true) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else if(dialogResult == false) {
+                throw new OperationCanceledException();
+            }
+        }
 
         protected T GetPlatformService<T>() {
             return ServicesProvider.GetPlatformService<T>();

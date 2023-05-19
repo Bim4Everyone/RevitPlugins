@@ -32,7 +32,7 @@ namespace RevitSuperfilter.Models {
             }
 
             try {
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
                 if(x.DisplayUnitType != y.DisplayUnitType) {
                     return false;
                 }

@@ -16,7 +16,7 @@ namespace RevitClashDetective.Models.Interfaces {
         string Name { get; }
         string DisplayValue { get; }
         RevitRepository RevitRepository { get; set; }
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
         UnitType UnitType { get; }
 #else
         ForgeTypeId UnitType { get; }

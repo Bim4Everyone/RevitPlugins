@@ -99,7 +99,14 @@ namespace RevitGenLookupTables.ViewModels {
         }
 
         private void Generate(object param) {
-            ParamValues = string.Join(Environment.NewLine, RangedEnumeration(MinValue.Value, MaxValue.Value, StepValue.Value).Select(item => ConvertValue(item)));
+            if(MinValue == null
+               || MaxValue == null
+               || StepValue == null) {
+                return;
+            }
+
+            ParamValues = string.Join(Environment.NewLine, RangedEnumeration(MinValue.Value, MaxValue.Value, StepValue.Value)
+                .Select(item => ConvertValue(item)));
         }
 
         private bool CanGenerate(object param) {
@@ -138,17 +145,17 @@ namespace RevitGenLookupTables.ViewModels {
             }
 
             if(_storageType == StorageType.Integer) {
-                if(!IsWholeNumber(MinValue.Value)) {
+                if(!IsWholeNumber(MinValue)) {
                     ErrorText = "Минимальное значение должно быть целым.";
                     return false;
                 }
 
-                if(!IsWholeNumber(MaxValue.Value)) {
+                if(!IsWholeNumber(MaxValue)) {
                     ErrorText = "Максимальное значение должно быть целым.";
                     return false;
                 }
 
-                if(!IsWholeNumber(StepValue.Value)) {
+                if(!IsWholeNumber(StepValue)) {
                     ErrorText = "Значение шага должно быть целым.";
                     return false;
                 }
@@ -172,13 +179,17 @@ namespace RevitGenLookupTables.ViewModels {
                 yield return i;
             }
 
-            if(i != max || i == max) {
+            if(i <= max) {
                 yield return max;
             }
         }
 
-        private static bool IsWholeNumber(double x) {
-            return Math.Abs(x % 1) <= (double.Epsilon * 100);
+        private static bool IsWholeNumber(double? x) {
+            if(x == null) {
+                return false;
+            }
+            
+            return Math.Abs(x.Value % 1) <= (double.Epsilon * 100);
         }
 
         private double? GetDouble(string value) {

@@ -11,6 +11,7 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 
 using Ninject;
@@ -62,6 +63,7 @@ namespace RevitEditingZones {
                     .WithPropertyValue(nameof(Window.DataContext),
                         c => c.Kernel.Get<MainViewModel>());
                 
+                CheckLevels();
                 Check(kernel);
                 ShowDialog(kernel);
             }
@@ -76,13 +78,24 @@ namespace RevitEditingZones {
             
             if(!revitRepository.HasAreaScheme()) {
                 TaskDialog.Show(PluginName,
-                    $"В документе отсутствует схема зонирования с именем \"{RevitRepository.AreaSchemeName}\".");
+                    $"В открытом проекте отсутствует схема зонирования с именем \"{RevitRepository.AreaSchemeName}\".");
                 throw new OperationCanceledException();
             }
 
             if(revitRepository.HasCorruptedAreas()) {
                 TaskDialog.Show(PluginName,
-                    "Были обнаружены избыточные и не окруженные зоны, выполнение скрипта было отменено.");
+                    "В открытом проекте были обнаружены избыточные и не окруженные зоны, выполнение. Их следует удалить.");
+                throw new OperationCanceledException();
+            }
+        }
+        
+        private void CheckLevels() {
+            var service = GetPlatformService<IPlatformCommandsService>();
+            string message = null;
+            Guid commandId = PlatformCommandIds.CheckLevelsCommandId;
+            Result commandResult = service.InvokeCommand(commandId, ref message, new ElementSet());
+            if(commandResult == Result.Failed) {
+                TaskDialog.Show(PluginName, message);
                 throw new OperationCanceledException();
             }
         }

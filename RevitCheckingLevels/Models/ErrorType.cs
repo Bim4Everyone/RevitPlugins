@@ -38,14 +38,8 @@ namespace RevitCheckingLevels.Models {
 
         public static readonly ErrorType NotFoundLevels =
             new ErrorType(4) {
-                Name = "Не были найдены уровни в открытом проекте",
-                Description = "Все уровни должны быть скопированы с координационного файла."
-            };
-
-        public static readonly ErrorType NotFoundLinkLevels =
-            new ErrorType(5) {
-                Name = "Не были найдены уровни в координационном файле",
-                Description = "Все уровни должны быть скопированы с координационного файла."
+                Name = "Уровни не найдены в координационном файле",
+                Description = "Все уровни проекта должны присутствовать в координационном файле."
             };
 
         public ErrorType(int id) {
@@ -145,7 +139,7 @@ namespace RevitCheckingLevels.Models {
 
         public static bool IsNotMillimeterElevation(this LevelInfo levelInfo) {
             double millimeterElevation = levelInfo.Level.GetMillimeterElevation();
-            millimeterElevation = Math.Round(millimeterElevation, 8, MidpointRounding.AwayFromZero);
+            millimeterElevation = Math.Round(millimeterElevation, 7, MidpointRounding.AwayFromZero);
             return !LevelExtensions.IsAlmostEqual(millimeterElevation % 1, 0.0000001, 0.0000001);
         }
 
@@ -187,17 +181,13 @@ namespace RevitCheckingLevels.Models {
             return !linkLevelInfos.Any(item => item.Level.Name.Equals(levelInfo.Level.Name));
         }
 
-        public static bool IsNotFoundLinkLevels(this LevelInfo linkLevelInfo, IEnumerable<LevelInfo> levelInfos) {
-            return !levelInfos.Any(item => item.Level.Name.Equals(linkLevelInfo.Level.Name));
-        }
-
         public static string GetNotStandardTooltip(this LevelInfo levelInfo) {
             return string.Join(Environment.NewLine, levelInfo.Errors);
         }
 
         public static string GetNotElevationTooltip(this LevelInfo levelInfo) {
             return $"Значение отметки: фактическое \"{levelInfo.Level.GetFormattedMeterElevation()}\", " +
-                   $"в имени уровня \"{levelInfo.GetFormattedMeterElevation()}\".";
+                   $"в имени уровня \"{levelInfo.ElevationName}\".";
         }
 
         public static string GetNotMillimeterElevationTooltip(this LevelInfo levelInfo) {

@@ -45,7 +45,7 @@ namespace RevitBatchPrint.ViewModels {
             RevitSaveCommand = new RelayCommand(RevitSave, CanRevitSave);
             RevitPrintCommand = new RelayCommand(RevitPrint, CanRevitPrint);
 
-#if D2022 || R2022
+#if REVIT_2022_OR_LESS
             VisibilitySaveFile = System.Windows.Visibility.Visible;
 #else
             VisibilitySaveFile = System.Windows.Visibility.Collapsed;
@@ -164,7 +164,7 @@ namespace RevitBatchPrint.ViewModels {
         public void RevitSave(object p) {
             SavePrintConfig();
 
-#if D2022 || R2022
+#if REVIT_2022_OR_GREATER
             var revitPrintErrors = new List<string>();
 
             var revitPrint = new RevitPrint2022(_repository);
@@ -206,7 +206,7 @@ namespace RevitBatchPrint.ViewModels {
         }
 
         public bool CanRevitSave(object p) {
-#if D2022 || R2022
+#if REVIT_2022_OR_GREATER
             if(string.IsNullOrEmpty(PrintParamName)) {
                 return false;
             }
@@ -318,7 +318,7 @@ namespace RevitBatchPrint.ViewModels {
             if(PrintSettings.PaperPlacement == PaperPlacementType.Margins) {
                 printParameters.MarginType = PrintSettings.MarginType;
                 if(PrintSettings.MarginType == MarginType.UserDefined) {
-#if D2020 || R2020 || D2021 || R2021
+#if REVIT_2021_OR_LESS
                     printParameters.UserDefinedMarginX = PrintSettings.UserDefinedMarginX;
                     printParameters.UserDefinedMarginY = PrintSettings.UserDefinedMarginY;
 #else

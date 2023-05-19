@@ -98,7 +98,7 @@ namespace RevitCheckingLevels.Models.LevelParser {
                 return;
             }
 
-            if(!Regex.IsMatch(elevation, @"-?\d+\.\d+")) {
+            if(!Regex.IsMatch(elevation, @"-?\d+\.\d\d\d")) {
                 _errors.Add("Отметка уровня не верного формата.");
                 return;
             }

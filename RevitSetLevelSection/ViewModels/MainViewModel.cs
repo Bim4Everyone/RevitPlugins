@@ -11,43 +11,45 @@ using Autodesk.Revit.DB;
 
 using DevExpress.Diagram.Core.Layout;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.CustomParams;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitSetLevelSection.Factories;
 using RevitSetLevelSection.Models;
 
 namespace RevitSetLevelSection.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly IViewModelFactory _viewModelFactory;
+        private readonly IFillAdskParamFactory _fillAdskParamFactory;
 
         private string _errorText;
         private LinkTypeViewModel _linkType;
+        private ObservableCollection<LinkTypeViewModel> _linkTypes;
+        private ObservableCollection<FillParamViewModel> _fillParams;
 
-        public MainViewModel(RevitRepository revitRepository) {
+        public MainViewModel(RevitRepository revitRepository, IViewModelFactory viewModelFactory, IFillAdskParamFactory fillAdskParamFactory) {
             if(revitRepository is null) {
                 throw new ArgumentNullException(nameof(revitRepository));
             }
 
             _revitRepository = revitRepository;
-            LinkTypes = new ObservableCollection<LinkTypeViewModel>(GetLinkTypes());
-            FillParams = new ObservableCollection<FillParamViewModel>(GetFillParams());
+            _viewModelFactory = viewModelFactory;
+            _fillAdskParamFactory = fillAdskParamFactory;
 
+            LoadViewCommand = new RelayCommand(LoadView);
+            UpdateBuildPartCommand = new RelayCommand(UpdateBuildPart);
             UpdateElementsCommand = new RelayCommand(UpdateElements, CanUpdateElement);
-            CheckRussianTextCommand = new RelayCommand(CheckRussianText);
-
-            SetConfig();
         }
 
-        public ICommand CheckRussianTextCommand { get; }
-        public ICommand UpdateElementsCommand { get; set; }
-
-        public void CheckRussianText(object args) {
-            foreach(FillMassParamViewModel fillMassParamViewModel in FillParams.OfType<FillMassParamViewModel>()) {
-                fillMassParamViewModel.CheckRussianTextCommand.Execute(null);
-                fillMassParamViewModel.UpdatePartParamNameCommand.Execute(null);
-            }
-        }
+        public ICommand LoadViewCommand { get; }
+        public ICommand UpdateBuildPartCommand { get; }
+        public ICommand UpdateElementsCommand { get; }
 
         public string ErrorText {
             get => _errorText;
@@ -59,50 +61,107 @@ namespace RevitSetLevelSection.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _linkType, value);
         }
 
-        public ObservableCollection<LinkTypeViewModel> LinkTypes { get; }
-        public ObservableCollection<FillParamViewModel> FillParams { get; }
-
-        private IEnumerable<FillParamViewModel> GetFillParams() {
-            yield return new FillLevelParamViewModel(_revitRepository) {
-                RevitParam = SharedParamsConfig.Instance.BuildingWorksLevel
-            };
-
-            yield return new FillMassParamViewModel(this, _revitRepository) {
-                IsRequired = true,
-                AdskParamName = RevitRepository.AdskBuildingNumberName,
-                PartParamName = LinkInstanceRepository.BuildingWorksBlockName,
-                RevitParam = SharedParamsConfig.Instance.BuildingWorksBlock
-            };
-
-            yield return new FillMassParamViewModel(this, _revitRepository) {
-                AdskParamName = RevitRepository.AdskSectionNumberName,
-                PartParamName = LinkInstanceRepository.BuildingWorksSectionName,
-                RevitParam = SharedParamsConfig.Instance.BuildingWorksSection
-            };
-
-            yield return new FillMassParamViewModel(this, _revitRepository) {
-                PartParamName = LinkInstanceRepository.BuildingWorksTypingName,
-                RevitParam = SharedParamsConfig.Instance.BuildingWorksTyping
-            };
+        public ObservableCollection<LinkTypeViewModel> LinkTypes {
+            get => _linkTypes;
+            set => this.RaiseAndSetIfChanged(ref _linkTypes, value);
         }
 
+        public ObservableCollection<FillParamViewModel> FillParams {
+            get => _fillParams;
+            set => this.RaiseAndSetIfChanged(ref _fillParams, value);
+        }
+        
         private IEnumerable<LinkTypeViewModel> GetLinkTypes() {
-            return _revitRepository.GetRevitLinkTypes()
-                .Select(item =>
-                    new LinkTypeViewModel(item, _revitRepository));
+            return _revitRepository.GetKoordLinkTypes()
+                .Select(item => _viewModelFactory.Create(item));
+        }
+
+        private IEnumerable<FillParamViewModel> GetFillParams() {
+            yield return _viewModelFactory.Create(ParamOption.BuildingWorksBlock);
+            yield return _viewModelFactory.Create(ParamOption.BuildingWorksSection);
+            yield return _viewModelFactory.Create(ParamOption.BuildingWorksTyping);
+            yield return _viewModelFactory.Create(SharedParamsConfig.Instance.BuildingWorksLevel);
+        }
+
+        private void LoadView(object obj) {
+            LinkTypes = new ObservableCollection<LinkTypeViewModel>(GetLinkTypes());
+            FillParams = new ObservableCollection<FillParamViewModel>(GetFillParams());
+            
+            // После присвоения выполняется
+            // команда обновления раздела,
+            // которой требуются заполненные параметры
+            LinkType = LinkTypes.FirstOrDefault();
+            
+            SetConfig();
+        }
+        
+        public void UpdateBuildPart(object args) {
+            foreach(FillMassParamViewModel fillParam in FillParams.OfType<FillMassParamViewModel>()) {
+                fillParam.CheckRussianTextCommand.Execute(null);
+                fillParam.UpdatePartParamNameCommand.Execute(null);
+            }
         }
 
         private void UpdateElements(object param) {
             SaveConfig();
 
-            using(var transactionGroup =
-                  _revitRepository.StartTransactionGroup("Установка уровня/секции")) {
-                foreach(FillParamViewModel fillParamViewModel in FillParams.Where(item => item.IsEnabled)) {
-                    fillParamViewModel.UpdateElements();
+            using(Transaction transaction = _revitRepository.StartTransaction("Заполнение параметров СМР")) {
+                var fillParams = GetEnabledFillParams().ToArray();
+                var elements = _revitRepository.GetElementInstances(fillParams.Select(item=>item.RevitParam));
+                using(var window = CreateProgressDialog(elements)) {
+                    var progress = window.CreateProgress();
+                    var cancellationToken = window.CreateCancellationToken();
+
+                    int count = 1;
+                    foreach(var element in elements) {
+                        progress.Report(count++);
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        foreach(IFillParam fillParam in fillParams) {
+                            fillParam.UpdateValue(element);
+                        }
+                    }
                 }
 
-                transactionGroup.Assimilate();
+                transaction.Commit();
             }
+        }
+
+        private IEnumerable<IFillParam> GetEnabledFillParams() {
+            foreach(IFillParam fillParam in FillParams
+                        .Where(item => item.IsEnabled)
+                        .Select(item => item.CreateFillParam())) {
+                yield return fillParam;
+            }
+
+            if(_revitRepository.IsEomFile() && _revitRepository.IsExistsParam(ParamOption.AdskSectionNumberName)) {
+                var revitParam = _revitRepository.CreateRevitParam(ParamOption.AdskSectionNumberName);
+                yield return _fillAdskParamFactory.Create(revitParam,
+                    SharedParamsConfig.Instance.BuildingWorksSection,
+                    SharedParamsConfig.Instance.BuildingWorksBlock);
+            }
+
+            if(_revitRepository.IsEomFile() && _revitRepository.IsExistsParam(ParamOption.AdskBuildingNumberName)) {
+                var revitParam = _revitRepository.CreateRevitParam(ParamOption.AdskBuildingNumberName);
+                yield return _fillAdskParamFactory.Create(revitParam,
+                    SharedParamsConfig.Instance.BuildingWorksBlock);
+            }
+
+            if(_revitRepository.IsEomFile() && _revitRepository.IsExistsParam(ParamOption.AdskLevelName)) {
+                var revitParam = _revitRepository.CreateRevitParam(ParamOption.AdskLevelName);
+                yield return _fillAdskParamFactory.Create(revitParam,
+                    SharedParamsConfig.Instance.BuildingWorksLevel);
+            }
+        }
+
+        private IProgressDialogService CreateProgressDialog(IList<Element> elements) {
+            var window = GetPlatformService<IProgressDialogService>();
+            window.DisplayTitleFormat = $"Заполнение [{{0}}\\{{1}}]";
+            window.MaxValue = elements.Count;
+            window.StepValue = 10;
+
+            window.Show();
+            return window;
         }
 
         private bool CanUpdateElement(object param) {
@@ -111,13 +170,8 @@ namespace RevitSetLevelSection.ViewModels {
                 return false;
             }
 
-            if(LinkType != null && !LinkType.IsLoaded) {
+            if(LinkType != null && !LinkType.IsLinkLoaded) {
                 ErrorText = "Выбранная связь выгружена.";
-                return false;
-            }
-            
-            if(string.IsNullOrEmpty(LinkType.BuildPart)) {
-                ErrorText = "Выберите раздел.";
                 return false;
             }
 
@@ -140,26 +194,20 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         private void SetConfig() {
-            SetLevelSectionSettings settings =
-                SetLevelSectionConfig.GetPrintConfig()
+            RevitSettings settings =
+                PluginConfig.GetPluginConfig()
                     .GetSettings(_revitRepository.Document);
             if(settings == null) {
                 return;
             }
 
-            LinkType = LinkTypes
-                           .FirstOrDefault(item => item.Id == settings.LinkFileId)
-                       ?? LinkTypes.FirstOrDefault();
-
             if(LinkType != null) {
-                LinkType.BuildPart = LinkType?.BuildParts.Contains(settings.BuildPart) == true
-                    ? settings.BuildPart
-                    : null;
+                LinkType.BuildPart = LinkType.BuildParts.FirstOrDefault(item => item.Equals(settings.BuildPart));
             }
 
             foreach(FillParamViewModel fillParam in FillParams) {
                 ParamSettings paramSettings = settings.ParamSettings
-                    .FirstOrDefault(item => item.PropertyName.Equals(fillParam.RevitParam.Id));
+                    .FirstOrDefault(item => item.ParamId.Equals(fillParam.RevitParam.Id));
 
                 if(paramSettings != null) {
                     fillParam.SetParamSettings(paramSettings);
@@ -168,14 +216,13 @@ namespace RevitSetLevelSection.ViewModels {
         }
 
         private void SaveConfig() {
-            SetLevelSectionConfig config = SetLevelSectionConfig.GetPrintConfig();
-            SetLevelSectionSettings settings = config.GetSettings(_revitRepository.Document);
+            PluginConfig config = PluginConfig.GetPluginConfig();
+            RevitSettings settings = config.GetSettings(_revitRepository.Document);
             if(settings == null) {
                 settings = config.AddSettings(_revitRepository.Document);
             }
 
             settings.BuildPart = LinkType.BuildPart;
-            settings.LinkFileId = LinkType.Id;
             settings.ParamSettings.Clear();
             foreach(FillParamViewModel fillParam in FillParams) {
                 ParamSettings paramSettings = fillParam.GetParamSettings();

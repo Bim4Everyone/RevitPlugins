@@ -171,11 +171,9 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                 return false;
             }
 
-            if(SelectedFilter != null) {
-                ErrorText = Filters.FirstOrDefault(item => item.Set.GetErrorText() != null)?.Set?.GetErrorText();
-                if(!string.IsNullOrEmpty(ErrorText)) {
-                    return false;
-                }
+            ErrorText = Filters.FirstOrDefault(item => item.Set.GetErrorText() != null)?.Set?.GetErrorText();
+            if(!string.IsNullOrEmpty(ErrorText)) {
+                return false;
             }
 
             return true;

@@ -464,7 +464,7 @@ namespace RevitRooms.ViewModels {
                 .Where(item => additionalPhases.Contains(_revitRepository.GetPhaseId(item)));
         }
 
-#if D2020 || R2020
+#if REVIT_2020_OR_LESS
         private string GetSquareMetersText() {
             return LabelUtils.GetLabelFor(DisplayUnitType.DUT_SQUARE_METERS);
         }

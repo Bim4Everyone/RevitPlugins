@@ -10,42 +10,79 @@
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:vms="clr-namespace:RevitGenLookupTables.ViewModels"
+
     mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+
     Title="Параметры семейства"
     Height="450" Width="800"
-    WindowStartupLocation="CenterOwner">
-    <base:ThemedPlatformWindow.Resources>
+
+    x:Name="_this"
+    d:DataContext="{d:DesignInstance vms:SelectFamilyParamsViewModel, IsDesignTimeCreatable=False}">
+
+    <Window.Resources>
         <converter:StorageTypeConverter x:Key="StorageTypeConverter" />
-    </base:ThemedPlatformWindow.Resources>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <dxg:GridControl Grid.Row="0" Margin="10" ItemsSource="{Binding FamilyParams}" SelectionMode="Row"
-                         SelectedItems="{Binding SelectedFamilyParams, UpdateSourceTrigger=PropertyChanged}"
-                         SelectedItem="{Binding SelectedFamilyParam, UpdateSourceTrigger=PropertyChanged}">
+        <dxg:GridControl
+            Grid.Row="0"
+            Margin="10"
+            ItemsSource="{Binding FamilyParams}" SelectionMode="Row"
+            SelectedItems="{Binding SelectedFamilyParams, UpdateSourceTrigger=PropertyChanged}"
+            SelectedItem="{Binding SelectedFamilyParam, UpdateSourceTrigger=PropertyChanged}">
+
             <dxg:GridControl.View>
-                <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always" ShowGroupPanel="False"/>
+                <dxg:TableView x:Name="_gridView" AutoWidth="True" ShowSearchPanelMode="Always" ShowGroupPanel="False" />
             </dxg:GridControl.View>
 
-            <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False"
-                            Header="Наименование" FieldName="Name" />
-            <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False"
-                            Header="Метаданные колонки" FieldName="ColumnMetaData" />
-            <dxg:GridColumn AllowSorting="False" AllowEditing="False" AllowColumnFiltering="False"
-                            Header="Тип данных параметра"
-                            Binding="{Binding StorageType, Converter={StaticResource StorageTypeConverter}}" />
+            <dxg:GridColumn
+                AllowSorting="False"
+                AllowEditing="False"
+                AllowColumnFiltering="False"
+                Header="Наименование" FieldName="Name" />
+            
+            <dxg:GridColumn
+                AllowSorting="False"
+                AllowEditing="False"
+                AllowColumnFiltering="False"
+                Header="Метаданные колонки" FieldName="ColumnMetaData" />
+            
+            <dxg:GridColumn
+                AllowSorting="False"
+                AllowEditing="False"
+                AllowColumnFiltering="False"
+                Header="Тип данных параметра"
+                Binding="{Binding StorageType, Converter={StaticResource StorageTypeConverter}}" />
 
         </dxg:GridControl>
-        <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Margin="0 0 0 5" Orientation="Horizontal" HorizontalAlignment="Right">
-            <dxe:TextEdit Margin="10 0" EditMode="InplaceActive" IsReadOnly="True" EditValue="{Binding ErrorText}"
-                          Foreground="Orange" />
-            <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True" Click="ButtonOK_Click"
-                             Command="{Binding SaveTableCommand}" />
-            <dx:SimpleButton Content="Отмена" Height="25" Width="80" Margin="0 0 10 0" IsCancel="true"
-                             Click="ButtonCancel_Click" />
+        
+        <StackPanel
+            Grid.Row="1" 
+            Grid.ColumnSpan="3" 
+            Orientation="Horizontal" HorizontalAlignment="Right" Height="45">
+
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+
+            <dx:SimpleButton
+                Content="ОК" Margin="10" Width="80"
+                Command="{Binding SaveTableCommand}"
+                Click="ButtonOK_Click" />
+
+            <dx:SimpleButton
+                Content="Отмена" Margin="10" Width="80"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
 </base:ThemedPlatformWindow>

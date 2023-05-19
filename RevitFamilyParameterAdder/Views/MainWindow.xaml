@@ -1,0 +1,181 @@
+﻿<base:PlatformWindow
+    x:Class="RevitFamilyParameterAdder.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitFamilyParameterAdder.Views"
+    xmlns:vms="clr-namespace:RevitFamilyParameterAdder.ViewModels"
+	  xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+
+
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+    
+    Title="MainWindow"
+    Height="550" Width="930"    
+
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Content="Выберите параметры:"/>
+
+        <StackPanel Grid.Row="1" HorizontalAlignment="Left" Orientation="Vertical"
+                    Margin="10 0"
+                    VerticalAlignment="Center">
+            <CheckBox Content="Загрузка параметров для семейств КР"
+                IsChecked="{Binding IsParamsForKR}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Checked">
+                        <i:InvokeCommandAction 
+                            Command="{Binding GetParamsNSetParamFilterCommand}"/>
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="Unchecked">
+                        <i:InvokeCommandAction 
+                            Command="{Binding GetParamsNSetParamFilterCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </CheckBox>
+
+            <CheckBox Content="Загрузка формул для параметров для семейств КР"
+                      IsChecked="{Binding WriteFormulasInParamsForKR}"
+                      IsEnabled="{Binding IsParamsForKR}"/>
+        </StackPanel>
+        
+        <StackPanel Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal">
+            <Label Margin="5" Content="Фильтр по группе в ФОП:"/>
+            <ComboBox Grid.Row="1" 
+                      Margin="5 5"
+                      Width="200"
+                      VerticalContentAlignment="Center"
+                      ItemsSource="{Binding Path=ParamGroupNames}"
+                      SelectedItem="{Binding Path=SelectedParamGroupName}">
+
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction 
+                            Command="{Binding GetParamsNSetParamFilterCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ComboBox>
+        </StackPanel>
+        
+        <StackPanel Grid.Row="2" HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button Content="Выбрать все" Margin="5 0 5 5" Padding="5 0" 
+                    Click="SelectAllParams"/>
+            <Button Content="Отменить выбор" Margin="10 0 5 5" Padding="5 0" 
+                    Click="UnselectAllParams"/>
+            <!--<TextBox Width="150" Margin="5 0 5 5"
+                     Text="{Binding ParamNameForSearch, UpdateSourceTrigger=PropertyChanged}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="TextChanged">
+                        <i:InvokeCommandAction 
+                        Command="{Binding SearchParamName}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </TextBox>-->
+        </StackPanel>
+
+
+        
+        <ListView Grid.Row="3" 
+                  ItemsSource="{Binding Params}" 
+                  Name="parameters"
+                  SelectionMode="Extended">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Имя параметра"
+                                    Width="250"
+                                    DisplayMemberBinding="{Binding Path=ParamName}"/>
+                    <GridViewColumn Header="Группа параметров в ФОП"
+                                    Width="200"
+                                    DisplayMemberBinding="{Binding Path=ParamGroupInShPF}"/>
+
+                    <GridViewColumn Header="Группа параметров в семействе">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox Name="parameters_ParamGroup"
+                                          Width="250"
+                                          ItemsSource="{Binding Path=ParamGroupsInFM}"
+                                          DisplayMemberPath="GroupName"
+                                          SelectedItem="{Binding SelectedParamGroupInFM}"
+                                          SelectedValuePath="GroupName"
+                                          SelectedValue="{Binding SelectedParamGroupInFM.GroupName}">
+                                </ComboBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Уровень параметра">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox Width="150"
+                                          ItemsSource="{Binding Path=LevelOfParam}"
+                                          DisplayMemberPath="Key"
+                                          
+                                          SelectedValuePath="Value"
+                                          SelectedValue="{Binding IsInstanceParam}">
+                                </ComboBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction 
+                        Command="{Binding SelectionParamsCommand}"
+                        CommandParameter="{Binding SelectedItems, ElementName=parameters}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ListView>
+        
+        
+
+        <StackPanel
+            Grid.Row="4"
+            Height="45"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+
+            <Button
+                Margin="10"
+                Width="80"
+                Content="ОК"
+                Click="ButtonOk_Click"
+                Command="{Binding AcceptViewCommand}"/>
+
+            <Button
+                Margin="10"
+                Width="80"
+                Content="Отмена"
+                Click="ButtonCancel_Click"/>
+        </StackPanel>
+    </Grid>
+</base:PlatformWindow>

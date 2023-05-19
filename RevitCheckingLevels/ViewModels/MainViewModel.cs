@@ -39,6 +39,7 @@ namespace RevitCheckingLevels.ViewModels {
         public ICommand UpdateElevationCommand { get; }
 
         public bool IsKoordFile => _revitRepository.IsKoordFile();
+        public bool HasErrors => !IsKoordFile && (LinkType == null || !LinkType.IsLinkLoaded) || Levels.Count > 0;
 
         public string ErrorText {
             get => _errorText;
@@ -111,37 +112,36 @@ namespace RevitCheckingLevels.ViewModels {
                 ErrorText = $"Проверки на соответствие координационному файлу не выполнены (файл не выбран).";
                 return;
             }
-            
-            if(LinkType?.IsLinkLoaded == false) {
+
+            if(!LinkType.IsLinkLoaded) {
                 ErrorText = $"Проверки на соответствие координационному файлу не выполнены (файл не загружен).";
                 return;
             }
 
-            if(LinkType?.IsLinkLoaded == true) {
-                if(!_revitRepository.HasLinkInstance(LinkType.Element)) {
-                    ErrorText = $"Проверки на соответствие координационному файлу не выполнены (экземпляры не созданы).";
-                    return;
-                }
 
-                var linkLevelInfos = _revitRepository.GetLevels(LinkType.Element)
-                    .Select(item => new LevelParserImpl(item).ReadLevelInfo())
-                    .OrderBy(item => item.Level.Elevation)
-                    .ToArray();
+            if(!_revitRepository.HasLinkInstance(LinkType.Element)) {
+                ErrorText = $"Проверки на соответствие координационному файлу не выполнены (экземпляры не созданы).";
+                return;
+            }
 
-                if(linkLevelInfos.Length == 0) {
-                    ErrorText = $"Проверки на соответствие координационному файлу не выполнены (нет уровней).";
-                    return;
-                }
+            var linkLevelInfos = _revitRepository.GetLevels(LinkType.Element)
+                .Select(item => new LevelParserImpl(item).ReadLevelInfo())
+                .OrderBy(item => item.Level.Elevation)
+                .ToArray();
 
-                if(LoadLevelErrors(linkLevelInfos).Any()) {
-                    ErrorText = $"Проверки на соответствие координационному файлу не выполнены (ошибки в коорд. файле).";
-                    return;
-                }
+            if(linkLevelInfos.Length == 0) {
+                ErrorText = $"Проверки на соответствие координационному файлу не выполнены (нет уровней).";
+                return;
+            }
 
-                foreach(LevelInfo levelInfo in levelInfos) {
-                    if(levelInfo.IsNotFoundLevels(linkLevelInfos)) {
-                        Levels.Add(new LevelViewModel(levelInfo) {ErrorType = ErrorType.NotFoundLevels});
-                    }
+            if(LoadLevelErrors(linkLevelInfos).Any()) {
+                ErrorText = $"Проверки на соответствие координационному файлу не выполнены (ошибки в коорд. файле).";
+                return;
+            }
+
+            foreach(LevelInfo levelInfo in levelInfos) {
+                if(levelInfo.IsNotFoundLevels(linkLevelInfos)) {
+                    Levels.Add(new LevelViewModel(levelInfo) {ErrorType = ErrorType.NotFoundLevels});
                 }
             }
         }
@@ -174,11 +174,48 @@ namespace RevitCheckingLevels.ViewModels {
         }
 
         private void UpdateElevation(object p) {
-            _revitRepository.UpdateElevations(Levels
-                .Where(item => item.ErrorType == ErrorType.NotElevation)
-                .Select(item => item.LevelInfo));
+            var levelCreationNames = _revitRepository.GetLevelCreationNames(Levels
+                    .Where(item => item.ErrorType == ErrorType.NotElevation)
+                    .Select(item => item.LevelInfo))
+                .ToArray();
+
+            var duplicateNames = levelCreationNames
+                .Where(item => item.DuplicateName)
+                .Select(item => $"{item.LevelInfo.Level.Name} -> {item.LevelName}")
+                .OrderBy(item => item)
+                .ToArray();
+
+            if(duplicateNames.Length > 0) {
+                TaskDialog taskDialog = CreateTaskDialog(duplicateNames);
+                if(taskDialog.Show() == TaskDialogResult.CommandLink1) {
+                    _revitRepository.UpdateElevations(levelCreationNames);
+                } else {
+                    throw new OperationCanceledException();
+                }
+            } else {
+                _revitRepository.UpdateElevations(levelCreationNames);
+            }
 
             LoadView(null);
+        }
+
+        private static TaskDialog CreateTaskDialog(string[] duplicateNames) {
+            var taskDialog = new TaskDialog("Обновление отметки");
+            taskDialog.TitleAutoPrefix = false;
+            taskDialog.AllowCancellation = true;
+            taskDialog.MainIcon = TaskDialogIcon.TaskDialogIconWarning;
+            taskDialog.MainContent = "Имена уровней должны быть уникальными";
+            taskDialog.MainInstruction = "Обновление отметки в имени невозможно.";
+            taskDialog.ExpandedContent = Environment.NewLine + " - "
+                                               + string.Join(Environment.NewLine + " - ", duplicateNames);
+
+            taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1,
+                "Игнорировать ошибки",
+                "Пропускает уровни с дублирующимися именами.");
+            taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2,
+                "Отменить",
+                "Отменяет переименование всех уровней.");
+            return taskDialog;
         }
     }
 }

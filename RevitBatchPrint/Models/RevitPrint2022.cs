@@ -39,7 +39,7 @@ namespace RevitBatchPrint.Models {
         /// </summary>
         public List<string> Errors { get; set; } = new List<string>();
 
-#if D2022 || R2022
+#if REVIT_2022_OR_GREATER
         public void Execute(PDFExportOptions exportParams) {
             List<ViewSheet> viewSheets = _revitRepository.GetViewSheets(FilterParamName, FilterParamValue)
                 .OrderBy(item => item, new ViewSheetComparer())
