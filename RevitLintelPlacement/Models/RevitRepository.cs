@@ -23,6 +23,12 @@ namespace RevitLintelPlacement.Models {
     internal class RevitRepository {
         private readonly string _view3DName = "3D_Перемычки";
         private static readonly string _settingsPath = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101\";
+        
+        private readonly BuiltInParameter[] _bottomBarHeightsParams = new[] {
+            BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM,
+            BuiltInParameter.INSTANCE_ELEVATION_PARAM,
+            BuiltInParameter.INSTANCE_FREE_HOST_OFFSET_PARAM
+        };
 
         private readonly Application _application;
         private readonly UIApplication _uiApplication;
@@ -527,20 +533,12 @@ namespace RevitLintelPlacement.Models {
             var height = elementInWall.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningHeight)
                          ?? elementInWall.Symbol.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningHeight);
 
-            var bottomBarHeight =
-                elementInWall.GetParamValueOrDefault<double>(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
-            if(bottomBarHeight == 0) {
-                bottomBarHeight =
-                    elementInWall.GetParamValueOrDefault<double>(BuiltInParameter.INSTANCE_ELEVATION_PARAM);
-            }
-
-            if(bottomBarHeight == 0) {
-                bottomBarHeight =
-                    elementInWall.GetParamValueOrDefault<double>(BuiltInParameter.INSTANCE_FREE_HOST_OFFSET_PARAM);
-            }
-
             double z;
             if(height.HasValue) {
+                var bottomBarHeight = _bottomBarHeightsParams
+                    .Select(item => elementInWall.GetParamValueOrDefault<double>(item))
+                    .FirstOrDefault(item => item > 0);
+                
                 z = height.Value + bottomBarHeight;
             } else {
                 z = elementInWall.GetParamValueOrDefault<double>(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
