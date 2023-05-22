@@ -13,8 +13,8 @@
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
-    mc:Ignorable="d" Height="550" Width="900"
-    MinHeight="550" MinWidth="350"
+    mc:Ignorable="d" Height="580" Width="900"
+    MinHeight="580" MinWidth="350"
     Title="Настройки"
     d:DataContext="{d:DesignInstance vm:ConfigViewModel}"
     x:Name="Config">
@@ -138,6 +138,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -156,9 +157,15 @@
                               EditValue="{Binding OpeningWidth, UpdateSourceTrigger=PropertyChanged}">
                 </dxe:TextEdit>
                 <dxe:TextEdit Grid.Row="2" Grid.Column="0" Margin="5" IsReadOnly="True" EditMode="InplaceActive"
-                              Text="Фиксация перемычки">
+                              Text="Вырезание стены ниже двери">
                 </dxe:TextEdit>
                 <dxe:TextEdit Grid.Row="2" Grid.Column="1" Margin="5"
+                              EditValue="{Binding OpeningDown, UpdateSourceTrigger=PropertyChanged}">
+                </dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="3" Grid.Column="0" Margin="5" IsReadOnly="True" EditMode="InplaceActive"
+                              Text="Фиксация перемычки">
+                </dxe:TextEdit>
+                <dxe:TextEdit Grid.Row="3" Grid.Column="1" Margin="5"
                               EditValue="{Binding OpeningFixation, UpdateSourceTrigger=PropertyChanged}">
                 </dxe:TextEdit>
             </Grid>
