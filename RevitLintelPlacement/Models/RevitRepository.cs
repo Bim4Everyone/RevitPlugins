@@ -546,7 +546,7 @@ namespace RevitLintelPlacement.Models {
                     .Select(item => elementInWall.GetParamValueOrDefault<double>(item))
                     .FirstOrDefault(item => item > 0);
 
-                z = height.Value + bottomBarHeight + down ?? 0;
+                z = height.Value + bottomBarHeight - down ?? 0;
             } else {
                 z = elementInWall.GetParamValueOrDefault<double>(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
             }
