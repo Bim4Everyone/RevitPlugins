@@ -534,7 +534,7 @@ namespace RevitLintelPlacement.Models {
                          ?? elementInWall.Symbol.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningHeight);
 
             double? down = null;
-            if(string.IsNullOrEmpty(LintelsCommonConfig.OpeningDown)) {
+            if(!string.IsNullOrEmpty(LintelsCommonConfig.OpeningDown)) {
                 down = elementInWall.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningDown)
                        ?? elementInWall.Symbol.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningDown);
 
