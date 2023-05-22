@@ -31,18 +31,12 @@ namespace RevitLintelPlacement.Models {
         private readonly UIDocument _uiDocument;
         private readonly RevitEventHandler _revitEventHandler;
 
-        private readonly double _baseHeight;
-
         public RevitRepository(Application application, Document document, LintelsConfig lintelsConfig) {
             _application = application;
             _uiApplication = new UIApplication(application);
 
             _document = document;
             _uiDocument = new UIDocument(document);
-            
-            // Получаем высоту базовой точки, 
-            // так как она влияет на вставку элементов (перемычки)
-            _baseHeight = GetBasePoint().Position.Z;
 
             _revitEventHandler = new RevitEventHandler();
 
@@ -521,7 +515,7 @@ namespace RevitLintelPlacement.Models {
         /// <param name="element"></param>
         /// <returns>Возвращает высоту уровня с учетом базовой точки.</returns>
         private double GetElevation(FamilyInstance element) {
-            return ((Level) _document.GetElement(element.LevelId)).Elevation + _baseHeight;
+            return ((Level) _document.GetElement(element.LevelId)).ProjectElevation;
         }
 
         public XYZ GetLocationPoint(FamilyInstance elementInWall) {
