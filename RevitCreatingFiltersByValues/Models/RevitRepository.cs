@@ -18,6 +18,9 @@ namespace RevitCreatingFiltersByValues.Models {
         public Document Document => ActiveUIDocument.Document;
 
         public List<ElementId> FilterableCategories => ParameterFilterUtilities.GetAllFilterableCategories().ToList();
-
+        public List<Element> ElementsInView => new FilteredElementCollector(Document, Document.ActiveView.Id)
+                .WhereElementIsNotElementType()
+                .ToElements()
+                .ToList();
     }
 }

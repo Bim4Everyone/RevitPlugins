@@ -38,7 +38,9 @@
         </StackPanel>
 
 
-        <ListBox Grid.Row="2" Margin="5 5 5 0" Name="categories"
+        <ListBox Grid.Row="2" 
+                 Margin="5 5 5 0" 
+                 Name="categories"
                  ItemsSource="{Binding DictCategoryElements.Keys}"
                  SelectionMode="Multiple">
             <i:Interaction.Triggers>
@@ -51,18 +53,35 @@
         </ListBox>
 
 
-        <ListBox Grid.Row="3" Margin="5 5 5 0"
+        <ListBox Grid.Row="3" 
+                 Margin="5 5 5 0"
                  ItemsSource="{Binding FilterableParameters}"
+                 DisplayMemberPath="ParamName"
                  SelectedItem="{Binding SelectedFilterableParameter}"
                  SelectionMode="Single">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction 
+                        Command="{Binding GetPossibleValuesCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
         </ListBox>
 
         
         
         
-        <ListBox Grid.Row="4" Margin="5 5 5 0"
+        <ListBox Grid.Row="4" 
+                 Margin="5 5 5 0"
+                 Name="values"
                  ItemsSource="{Binding PossibleValues}"
                  SelectionMode="Multiple">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction 
+                        Command="{Binding SetPossibleValuesCommand}"
+                        CommandParameter="{Binding SelectedItems, ElementName=values}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
         </ListBox>
 
 
