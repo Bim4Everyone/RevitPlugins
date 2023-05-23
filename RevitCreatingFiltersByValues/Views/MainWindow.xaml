@@ -23,6 +23,7 @@
             <RowDefinition Height="30" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="30" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -42,7 +43,8 @@
                  Margin="5 5 5 0" 
                  Name="categories"
                  ItemsSource="{Binding DictCategoryElements.Keys}"
-                 SelectionMode="Multiple">
+                 SelectionMode="Multiple"
+                 SelectionChanged="Parameters_SelectionChanged">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction 
@@ -55,10 +57,12 @@
 
         <ListBox Grid.Row="3" 
                  Margin="5 5 5 0"
+                 Name="parameters"
                  ItemsSource="{Binding FilterableParameters}"
                  DisplayMemberPath="ParamName"
                  SelectedItem="{Binding SelectedFilterableParameter}"
-                 SelectionMode="Single">
+                 SelectionMode="Single"
+                 SelectionChanged="Values_SelectionChanged">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction 
@@ -67,10 +71,15 @@
             </i:Interaction.Triggers>
         </ListBox>
 
-        
-        
-        
-        <ListBox Grid.Row="4" 
+        <StackPanel Grid.Row="4" HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button Content="Выбрать все" Margin="5 5 5 0" Padding="5 0" 
+                    Click="SelectAllValues"/>
+            <Button Content="Отменить выбор" Margin="5 5 5 0" Padding="5 0" 
+                    Click="UnselectAllValues"/>
+        </StackPanel>
+
+
+        <ListBox Grid.Row="5" 
                  Margin="5 5 5 0"
                  Name="values"
                  ItemsSource="{Binding PossibleValues}"
@@ -86,7 +95,7 @@
 
 
         <StackPanel
-            Grid.Row="5"
+            Grid.Row="6"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
@@ -101,14 +110,13 @@
                 Width="80"
                 Content="ОК"
                 Command="{Binding CreateCommand}"
-                CommandParameter="{Binding SelectedItems, ElementName=categories}"
                 Click="ButtonOk_Click" />
 
             <Button
                 Margin="10"
                 Width="80"
                 Content="Отмена"
-                Click="ButtonCancel_Click" />
+                Click="ButtonCancel_Click"/>
         </StackPanel>
     </Grid>
 </base:PlatformWindow>

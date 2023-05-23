@@ -23,5 +23,23 @@ namespace RevitCreatingFiltersByValues.Views {
         private void UnselectAllCategories(object sender, RoutedEventArgs e) {
             categories.UnselectAll();
         }
+
+
+        private void SelectAllValues(object sender, RoutedEventArgs e) {
+            values.SelectAll();
+        }
+        private void UnselectAllValues(object sender, RoutedEventArgs e) {
+            values.UnselectAll();
+        }
+
+        private void Values_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
+            values.Items.SortDescriptions.Clear();
+            values.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", System.ComponentModel.ListSortDirection.Ascending));
+        }
+
+        private void Parameters_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
+            parameters.Items.SortDescriptions.Clear();
+            parameters.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("ParamName", System.ComponentModel.ListSortDirection.Ascending));
+        }
     }
 }

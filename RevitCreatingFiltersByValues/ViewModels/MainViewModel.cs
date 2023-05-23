@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Web.UI.WebControls;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -18,15 +19,15 @@ using Ninject.Activation;
 
 using RevitCreatingFiltersByValues.Models;
 
+using Parameter = Autodesk.Revit.DB.Parameter;
+
 namespace RevitCreatingFiltersByValues.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
         private string _errorText;
-        private ParametersHelper _selectedFilterableParameter;
         private List<ElementId> _filterableCategories;
-
 
 
 
@@ -55,13 +56,12 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         private List<Element> elementsInView= new List<Element>();
         public ObservableCollection<ParametersHelper> FilterableParameters { get; set; } = new ObservableCollection<ParametersHelper>();
         public ObservableCollection<string> PossibleValues { get; set; } = new ObservableCollection<string>();
-
+        public List<string> SelectedCategories { get; set; } = new List<string>();
+        public List<ElementId> SelectedCatIds { get; set; } = new List<ElementId>();
+        public List<string> SelectedPossibleValues { get; set; } = new List<string>();
+        public ParametersHelper SelectedFilterableParameter { get; set; }
 
         public Dictionary<string, CategoryElements> DictCategoryElements { get; set; } = new Dictionary<string, CategoryElements>();
-        public System.Collections.IList SelectedCategories { get; set; }             // Список категорий, которые выбрал пользователь
-        public System.Collections.IList SelectedPossibleValues { get; set; }             // Список категорий, которые выбрал пользователь
-        //public List<Category> SelectedCategories { get; set; }             // Список категорий, которые выбрал пользователь
-
 
 
 
@@ -69,15 +69,13 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
-        public ParametersHelper SelectedFilterableParameter {
-            get => _selectedFilterableParameter;
-            set => this.RaiseAndSetIfChanged(ref _selectedFilterableParameter, value);
-        }
 
 
 
 
-
+        /// <summary>
+        /// Получает категории, представленные на виде + элементы в словаре по ним
+        /// </summary>
         public void GetCategoriesInView() {
             elementsInView = _revitRepository.ElementsInView;
             _filterableCategories = _revitRepository.FilterableCategories;
@@ -106,32 +104,36 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
 
 
-        // Получение списка возможных параметров фильтрации
+        /// <summary>
+        /// Получает параметры по которым доступна фильтрация из выбранных категорий
+        /// </summary>
+        /// <param name="p"></param>
         private void GetFilterableParameters(object p) {
             FilterableParameters.Clear();
             PossibleValues.Clear();
 
             // Забираем список выбранных элементов через CommandParameter
-            SelectedCategories = p as System.Collections.IList;
+            System.Collections.IList selectedCategories = p as System.Collections.IList;
 
             // Получаем ID категорий для последующего получения параметров фильтрации
-            List<ElementId> selectedCatsId = new List<ElementId>();
-            foreach(var item in SelectedCategories) {
+            foreach(var item in selectedCategories) {
                 string categoryName = item as string;
                 if(categoryName == null) { continue; }
 
-                selectedCatsId.Add(DictCategoryElements[categoryName].CategoryIdInView);
+                SelectedCategories.Add(categoryName);
+                SelectedCatIds.Add(DictCategoryElements[categoryName].CategoryIdInView);
             }
 
 
             // Получаем параметры для фильтров на основе ID категорий
-            List<ElementId> elementIds = ParameterFilterUtilities.GetFilterableParametersInCommon(_revitRepository.Document, selectedCatsId).ToList();
+            List<ElementId> elementIds = ParameterFilterUtilities.GetFilterableParametersInCommon(_revitRepository.Document, SelectedCatIds).ToList();
 
             foreach(ElementId id in elementIds) {
-
+                // Переводим сначала в ParameterElement, если null, значит это BuiltInParameter
                 ParameterElement paramAsParameterElement = _revitRepository.Document.GetElement(id) as ParameterElement;
-
+                
                 ParametersHelper parametersHelper = new ParametersHelper();
+
                 // Если он null, значит это встроенный параметр
                 if(paramAsParameterElement is null) {
                     BuiltInParameter parameterAsBuiltIn = (BuiltInParameter) Enum.ToObject(typeof(BuiltInParameter), id.IntegerValue);
@@ -151,6 +153,10 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
 
 
+        /// <summary>
+        /// Получает варианты заполнения выбранного параметра у элементов выбранных категорий
+        /// </summary>
+        /// <param name="p"></param>
         public void GetPossibleValues(object p) {
 
             if(SelectedFilterableParameter is null) { return; }
@@ -206,11 +212,9 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                             }
                         }
                     }
-                    
                 } catch(Exception) {
                     continue;
                 }
-
 
                 if(!PossibleValues.Contains(paramValue)) {
                     PossibleValues.Add(paramValue);
@@ -220,49 +224,86 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
 
 
-        // Получение списка возможных параметров фильтрации
+        /// <summary>
+        /// Переводит выбранные значений для фильтрации в нормальный формат
+        /// </summary>
+        /// <param name="p"></param>
         private void SetPossibleValues(object p) {
             // Забираем список выбранных значений через CommandParameter
-            SelectedPossibleValues = p as System.Collections.IList;
+            System.Collections.IList selectedPossibleValues = p as System.Collections.IList;
 
-            TaskDialog.Show("ss", SelectedPossibleValues.Count.ToString());
+            // Получаем элементы, которые выбрал пользователь
+            foreach(var item in selectedPossibleValues) {
+                string possibleValue = item as string;
+                if(possibleValue == null) { continue; }
+
+                SelectedPossibleValues.Add(possibleValue);
+            }
         }
-
-
 
 
 
         private void Create(object p) {
-            // Забираем список выбранных элементов через CommandParameter
-            SelectedCategories = p as System.Collections.IList;
+            //List<ElementId> categoryIds = new List<ElementId>();
+            //categories.Add(new ElementId(BuiltInCategory.OST_Walls));
+            List<FilterRule> filterRules = new List<FilterRule>();
 
-            // Перевод списка выбранных марок пилонов в формат листа строк
-            List<ElementId> selectedElements = new List<ElementId>();
-            List<ElementId> selectedCatsId = new List<ElementId>();
-            foreach(var item in SelectedCategories) {
-                string categoryName = item as string;
-                if(categoryName == null) { continue; }
+            using(Transaction transaction = _revitRepository.StartTransaction("Добавление фильтров")) {
 
+                // Create filter element assocated to the input categories
+                ParameterFilterElement parameterFilterElement = ParameterFilterElement.Create(_revitRepository.Document, "Example view filter", SelectedCatIds);
 
-                foreach(Element elem in DictCategoryElements[categoryName].ElementsInView) {
-                    selectedElements.Add(elem.Id);
-                }
+                // Criterion 1 - wall type Function is "Exterior"
+                ElementId exteriorParamId = new ElementId(BuiltInParameter.FUNCTION_PARAM);
+                filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(exteriorParamId, (int) WallFunction.Exterior));
 
+                // Criterion 2 - wall height > some number
+                ElementId lengthId = new ElementId(BuiltInParameter.CURVE_ELEM_LENGTH);
+                filterRules.Add(ParameterFilterRuleFactory.CreateGreaterOrEqualRule(lengthId, 28.0, 0.0001));
 
+            //    // Criterion 3 - custom shared parameter value matches string pattern
+            //    // Get the id for the shared parameter - the ElementId is not hardcoded, so we need to get an instance of this type to find it
+            //    Guid spGuid = new Guid("96b00b61-7f5a-4f36-a828-5cd07890a02a");
+            //    FilteredElementCollector collector = new FilteredElementCollector(doc);
+            //    collector.OfClass(typeof(Wall));
+            //    Wall wall = collector.FirstElement() as Wall;
 
-                selectedCatsId.Add(DictCategoryElements[categoryName].CategoryIdInView);
+            //    if(wall != null) {
+            //        Parameter sharedParam = wall.get_Parameter(spGuid);
+            //        ElementId sharedParamId = sharedParam.Id;
+
+            //        filterRules.Add(ParameterFilterRuleFactory.CreateBeginsWithRule(sharedParamId, "15."));
+            //    }
+
+                ElementFilter elemFilter = CreateElementFilterFromFilterRules(filterRules);
+                parameterFilterElement.SetElementFilter(elemFilter);
+
+                // Apply filter to view
+                View view = _revitRepository.Document.ActiveView;
+                view.AddFilter(parameterFilterElement.Id);
+                view.SetFilterVisibility(parameterFilterElement.Id, false);
+
+                transaction.Commit();
             }
-
-
-
-            _revitRepository.ActiveUIDocument.Selection.SetElementIds(selectedElements);
-
-
-            // Закинуть списки в свойтсва проекат, дописать логику по выведению пользователю возможных значений выбранного параметра
-
         }
         private bool CanCreate(object p) {
             return true;
+        }
+
+
+
+        private static ElementFilter CreateElementFilterFromFilterRules(IList<FilterRule> filterRules) {
+            // We use a LogicalAndFilter containing one ElementParameterFilter
+            // for each FilterRule. We could alternatively create a single
+            // ElementParameterFilter containing the entire list of FilterRules.
+            IList<ElementFilter> elemFilters = new List<ElementFilter>();
+            foreach(FilterRule filterRule in filterRules) {
+                ElementParameterFilter elemParamFilter = new ElementParameterFilter(filterRule);
+                elemFilters.Add(elemParamFilter);
+            }
+            LogicalAndFilter elemFilter = new LogicalAndFilter(elemFilters);
+
+            return elemFilter;
         }
     }
 }
