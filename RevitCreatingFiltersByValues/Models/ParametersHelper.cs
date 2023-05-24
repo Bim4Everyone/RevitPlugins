@@ -18,6 +18,6 @@ namespace RevitCreatingFiltersByValues.Models {
         public bool IsBInParam { get; set; } = false;
 
 
-        //public ElementId Id { get; set; }
+        public ElementId Id { get; set; }
     }
 }

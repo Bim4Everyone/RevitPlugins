@@ -25,6 +25,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="30" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="30" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
@@ -83,7 +84,7 @@
                  Margin="5 5 5 0"
                  Name="values"
                  ItemsSource="{Binding PossibleValues}"
-                 SelectionMode="Multiple">
+                 SelectionMode="Extended">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction 
@@ -93,9 +94,24 @@
             </i:Interaction.Triggers>
         </ListBox>
 
-
         <StackPanel
             Grid.Row="6"
+            Height="45"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <CheckBox 
+                Margin="10"
+                Content="Фильтры по заливке"
+                IsChecked="{Binding OverrideByColor}"/>
+            
+            <CheckBox 
+                Margin="10"
+                Content="Фильтры по штриховкам"
+                IsChecked="{Binding OverrideByPattern}"/>
+        </StackPanel>
+
+        <StackPanel
+            Grid.Row="7"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">

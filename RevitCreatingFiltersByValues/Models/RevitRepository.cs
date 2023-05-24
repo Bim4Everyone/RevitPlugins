@@ -22,5 +22,12 @@ namespace RevitCreatingFiltersByValues.Models {
                 .WhereElementIsNotElementType()
                 .ToElements()
                 .ToList();
+
+        public List<FillPatternElement> AllPatterns => new FilteredElementCollector(Document)
+                .OfClass(typeof(FillPatternElement))
+                .OfType<FillPatternElement>()
+                .ToList();
+        
+
     }
 }
