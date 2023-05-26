@@ -15,13 +15,13 @@ using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using Ninject.Activation;
-
 using RevitCreatingFiltersByValues.Models;
 
 using Parameter = Autodesk.Revit.DB.Parameter;
 using View = Autodesk.Revit.DB.View;
 using Color = Autodesk.Revit.DB.Color;
+using System.Xml.Linq;
+using System.Windows.Media;
 
 namespace RevitCreatingFiltersByValues.ViewModels {
     internal class MainViewModel : BaseViewModel {
@@ -29,35 +29,14 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         private readonly RevitRepository _revitRepository;
 
         private string _errorText;
-        private bool _overrideByColor;
+        private bool _overrideByColor = true;
         private bool _overrideByPattern;
         private List<ElementId> _filterableCategories;
         private List<string> _selectedCategories = new List<string>();
         private ParametersHelper _selectedFilterableParameter;
         private List<string> _selectedPossibleValues = new List<string>();
 
-        private List<Color> colors = new List<Color>() {
-            new Color(255, 0, 0),
-            new Color(0, 255, 0),
-            new Color(0, 0, 255),
-            new Color(255, 255, 0),
-            new Color(0, 255, 255),
-            new Color(255, 0, 255),
-            new Color(255, 0, 128),
-            new Color(128, 0, 255),
-            new Color(255, 128, 0),
-            new Color(64, 128, 128),
-            new Color(192, 192, 192),
-            new Color(250, 180, 135),
-            new Color(250, 180, 135),
-            new Color(240, 100, 10),
-            new Color(240, 230, 115),
-            new Color(0, 128, 0),
-            new Color(255, 128, 255),
-            new Color(128, 128, 128),
-            new Color(255, 120, 150),
-            new Color(110, 255, 180),
-        };
+        private ColorHelper _selectedColor;
         private List<string> patternNames = new List<string>() {
             "Алюминий",
             "Вертикальный",
@@ -72,28 +51,21 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
-            SolidFillPattern = FillPatternElement.GetFillPatternElementByName(_revitRepository.Document, FillPatternTarget.Drafting, "<Сплошная заливка>");
 
-            foreach(FillPatternElement pattern in _revitRepository.AllPatterns) {
-                if(patternNames.Contains(pattern.Name) && pattern.GetFillPattern().Target == FillPatternTarget.Drafting) {
-                    Patterns.Add(pattern);
-                }
-            }
-
-            TaskDialog.Show("Паттерном найдено", Patterns.Count.ToString());
-
+            GetUserPatterns();
             GetCategoriesInView();
-
-
 
 
             CreateCommand = new RelayCommand(Create, CanCreate);
             GetFilterableParametersCommand = new RelayCommand(GetFilterableParameters);
             GetPossibleValuesCommand = new RelayCommand(GetPossibleValues);
             SetPossibleValuesCommand = new RelayCommand(SetPossibleValues);
+            ChangeColorCommand = new RelayCommand(ChangeColor, CanChangeColor);
+            AddColorCommand = new RelayCommand(AddColor);
+            DeleteColorCommand = new RelayCommand(DeleteColor, CanChangeColor);
+            MoveColorUpCommand = new RelayCommand(MoveColorUp, CanChangeColor);
+            MoveColorDownCommand = new RelayCommand(MoveColorDown, CanChangeColor);
         }
-
-
 
 
 
@@ -101,13 +73,22 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         public ICommand GetFilterableParametersCommand { get; }
         public ICommand GetPossibleValuesCommand { get; }
         public ICommand SetPossibleValuesCommand { get; }
+        public ICommand ChangeColorCommand { get; }
+        public ICommand AddColorCommand { get; }
+        public ICommand DeleteColorCommand { get; }
+        public ICommand MoveColorUpCommand { get; }
+        public ICommand MoveColorDownCommand { get; }
 
 
 
 
+        private List<Element> elementsInView { get; set; } = new List<Element>();
         public FillPatternElement SolidFillPattern { get; set; }
         public List<FillPatternElement> Patterns { get; set; } = new List<FillPatternElement>();
-        private List<Element> elementsInView { get; set; } = new List<Element>();
+        public List<ParameterFilterElement> AllFiltersInPj { get; set; } = new List<ParameterFilterElement>();
+        public List<ParameterFilterElement> AllFiltersInView { get; set; } = new List<ParameterFilterElement>();
+        public List<string> AllFilterNamesInPj { get; set; } = new List<string>();
+        public List<string> AllFilterNamesInView { get; set; } = new List<string>();
         public Dictionary<string, CategoryElements> DictCategoryElements { get; set; } = new Dictionary<string, CategoryElements>();
         public ObservableCollection<ParametersHelper> FilterableParameters { get; set; } = new ObservableCollection<ParametersHelper>();
         public ObservableCollection<string> PossibleValues { get; set; } = new ObservableCollection<string>();
@@ -136,12 +117,52 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             get => _overrideByPattern;
             set => this.RaiseAndSetIfChanged(ref _overrideByPattern, value);
         }
+
+        public ObservableCollection<ColorHelper> Colors { get; set; } = new ObservableCollection<ColorHelper>() {
+            new ColorHelper(255, 0, 0),
+            new ColorHelper(0, 255, 0),
+            new ColorHelper(0, 0, 255),
+            new ColorHelper(255, 255, 0),
+            new ColorHelper(0, 255, 255),
+            new ColorHelper(255, 0, 255),
+            new ColorHelper(255, 0, 128),
+            new ColorHelper(128, 0, 255),
+            new ColorHelper(255, 128, 0),
+            new ColorHelper(64, 128, 128),
+            new ColorHelper(192, 192, 192),
+            new ColorHelper(250, 180, 135),
+            new ColorHelper(250, 180, 135),
+            new ColorHelper(240, 100, 10),
+            new ColorHelper(240, 230, 115),
+            new ColorHelper(0, 128, 0),
+            new ColorHelper(255, 128, 255),
+            new ColorHelper(128, 128, 128),
+            new ColorHelper(255, 120, 150),
+            new ColorHelper(110, 255, 180)
+        };
+        public ColorHelper SelectedColor {
+            get => _selectedColor;
+            set => this.RaiseAndSetIfChanged(ref _selectedColor, value);
+        }
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
 
+
+        /// <summary>
+        /// Находим штриховки по именам, указаным польователем
+        /// </summary>
+        public void GetUserPatterns() {
+            SolidFillPattern = FillPatternElement.GetFillPatternElementByName(_revitRepository.Document, FillPatternTarget.Drafting, "<Сплошная заливка>");
+
+            foreach(FillPatternElement pattern in _revitRepository.AllPatterns) {
+                if(patternNames.Contains(pattern.Name) && pattern.GetFillPattern().Target == FillPatternTarget.Drafting) {
+                    Patterns.Add(pattern);
+                }
+            }
+        }
 
 
         /// <summary>
@@ -331,6 +352,10 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         }
 
 
+        /// <summary>
+        /// Создает фильтры на виде. Старые временные фильтры удаляет с вида. У существующих в проекте меняет категории
+        /// </summary>
+        /// <param name="p"></param>
         private void Create(object p) {
 
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Добавление фильтров")) {
@@ -338,44 +363,58 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 int i = 0;
                 int j = 0;
 
-                TaskDialog.Show("Цвета", colors.Count.ToString());
-                TaskDialog.Show("Паттерны", Patterns.Count.ToString());
+                AllFiltersInPj = _revitRepository.AllFilterElements;
+                AllFilterNamesInPj = _revitRepository.AllFilterElementNames;
+                string userName = _revitRepository.UserName;
+
+
+                // Удаляем временные фильтры пользователя на виде
+                _revitRepository.DeleteTempFiltersInView();
 
                 foreach(string possibleValue in SelectedPossibleValues) {
-                    
-                    
-                    
-                    
-                    
-                    
-                    // Создаем объект фильтра, связанный с определенными категориями
-                    ParameterFilterElement parameterFilterElement = ParameterFilterElement
-                        .Create(_revitRepository.Document, "$_" + SelectedFilterableParameter.ParamName + "_" + possibleValue, SelectedCatIds);
 
-                    // Создаем правила фильтрации
-                    FilterRule filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, possibleValue, true);
+                    string newFilterName = string.Format("${0}_{1}_{2}", userName, SelectedFilterableParameter.ParamName, possibleValue);
 
-                    ElementParameterFilter elemParamFilter = new ElementParameterFilter(filterRule);
+                    ParameterFilterElement parameterFilterElement = null;
 
-                    LogicalAndFilter elemFilter = new LogicalAndFilter(new List<ElementFilter>() { elemParamFilter });
+                    if(AllFilterNamesInPj.Contains(newFilterName)) {
 
-                    // Задаем правила фильтрации объекту фильтра
-                    parameterFilterElement.SetElementFilter(elemFilter);
+                        // Если создаваемый фильтр уже есть в проекте, то находим его
+                        parameterFilterElement =  (from filter in AllFiltersInPj where filter.Name.Equals(newFilterName) select filter).FirstOrDefault();
+
+                        // Назначаем выбранные категории
+                        parameterFilterElement.SetCategories(SelectedCatIds);
+                    } else {
+                        // Если его нет в проекте, то создаем
+                        parameterFilterElement = ParameterFilterElement
+                            .Create(_revitRepository.Document, newFilterName, SelectedCatIds);
+
+                        // Создаем правила фильтрации
+                        FilterRule filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, possibleValue, true);
+
+                        ElementParameterFilter elemParamFilter = new ElementParameterFilter(filterRule);
+
+                        LogicalAndFilter elemFilter = new LogicalAndFilter(new List<ElementFilter>() { elemParamFilter });
+
+                        // Задаем правила фильтрации объекту фильтра
+                        parameterFilterElement.SetElementFilter(elemFilter);
+                    }
 
                     // Применяем фильтр на вид
                     View view = _revitRepository.Document.ActiveView;
                     view.AddFilter(parameterFilterElement.Id);
 
-
                     OverrideGraphicSettings settings = new OverrideGraphicSettings();
+                    // Если пользователь поставил галку перекрашивания
                     if(OverrideByColor) {
                         settings.SetSurfaceForegroundPatternId(SolidFillPattern.Id);
-                        settings.SetSurfaceForegroundPatternColor(colors[i]);
+                        settings.SetSurfaceForegroundPatternColor(Colors[i].UserColor);
 
                         settings.SetCutForegroundPatternId(SolidFillPattern.Id);
-                        settings.SetCutForegroundPatternColor(colors[i]);
+                        settings.SetCutForegroundPatternColor(Colors[i].UserColor);
                     }
-
+                    
+                    // Если пользователь поставил галку смены штриховки
                     if(OverrideByPattern) {
                         settings.SetSurfaceForegroundPatternId(Patterns[j].Id);
 
@@ -386,10 +425,10 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
                     i++;
                     j++;
-                    if(i > colors.Count) {
+                    if(i > Colors.Count - 1) {
                         i = 0;
                     }
-                    if(j > Patterns.Count) {
+                    if(j > Patterns.Count - 1) {
                         j = 0;
                     }
                 }
@@ -401,5 +440,55 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             return true;
         }
 
+
+        private void ChangeColor(object p) {
+                       
+            ColorSelectionDialog colorSelectionDialog = new ColorSelectionDialog();
+
+            if(colorSelectionDialog.Show() == ItemSelectionDialogResult.Confirmed) {
+
+                ColorHelper newColor = new ColorHelper(
+                    colorSelectionDialog.SelectedColor.Red,
+                    colorSelectionDialog.SelectedColor.Green,
+                    colorSelectionDialog.SelectedColor.Blue);
+
+                int index = Colors.IndexOf(SelectedColor);
+                Colors[index] = newColor;
+            }
+        }
+        private void AddColor(object p) {
+            ColorSelectionDialog colorSelectionDialog = new ColorSelectionDialog();
+
+            if(colorSelectionDialog.Show() == ItemSelectionDialogResult.Confirmed) {
+                Colors.Add(new ColorHelper(colorSelectionDialog.SelectedColor.Red, colorSelectionDialog.SelectedColor.Green, colorSelectionDialog.SelectedColor.Blue));
+            }
+        }
+        private void DeleteColor(object p) {
+
+            Colors.Remove(SelectedColor);
+        }
+
+        private void MoveColorUp(object p) {
+
+            int index = Colors.IndexOf(SelectedColor);
+            if(index != 0) {
+                Colors.Move(index, index - 1);
+            }
+        }
+
+        private void MoveColorDown(object p) {
+
+            int index = Colors.IndexOf(SelectedColor);
+            if(Colors.Count - 1 != index) {
+                Colors.Move(index, index + 1);
+            }
+        }
+
+        private bool CanChangeColor(object p) {
+            if(SelectedColor is null) {
+                return false;
+            }
+            return true;
+        }
     }
 }

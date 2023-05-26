@@ -14,7 +14,7 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    Height="800" Width="500"    
+    Height="800" Width="600"    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid>
@@ -28,7 +28,10 @@
             <RowDefinition Height="30" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
 
         <Label Grid.Row="0" Content="Выберите категории:"/>
 
@@ -84,7 +87,7 @@
                  Margin="5 5 5 0"
                  Name="values"
                  ItemsSource="{Binding PossibleValues}"
-                 SelectionMode="Extended">
+                 SelectionMode="Multiple">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction 
@@ -101,15 +104,27 @@
             HorizontalAlignment="Right">
             <CheckBox 
                 Margin="10"
-                Content="Фильтры по заливке"
+                Content="Переопределять цвет"
                 IsChecked="{Binding OverrideByColor}"/>
             
             <CheckBox 
                 Margin="10"
-                Content="Фильтры по штриховкам"
+                Content="Переопределять штриховку"
                 IsChecked="{Binding OverrideByPattern}"/>
+            
+            <Button
+                Margin="10"
+                Width="80"
+                Content="ColorSelectionDialog"
+                Command="{Binding GetColorSelectionDialogCommand}"/>
         </StackPanel>
 
+        
+        
+        
+        
+        
+        
         <StackPanel
             Grid.Row="7"
             Height="45"
@@ -134,5 +149,135 @@
                 Content="Отмена"
                 Click="ButtonCancel_Click"/>
         </StackPanel>
+
+
+        
+        
+        
+
+        <Expander Grid.Row="0" Grid.RowSpan="6" Grid.Column="1"
+                  ExpandDirection="Left" 
+                  HorizontalAlignment="Left">
+            <Expander.Header>
+                <TextBlock Text="Настройки">
+                    <TextBlock.LayoutTransform>
+                        <TransformGroup>
+                            <RotateTransform Angle="-90"/>
+                        </TransformGroup>
+                    </TextBlock.LayoutTransform>
+                </TextBlock>
+            </Expander.Header>
+
+
+
+            <Grid Width="340">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="25"/>
+                </Grid.RowDefinitions>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <GroupBox Grid.Row="0" Header="Цвета" Margin="5">
+                            <StackPanel>
+                                <Label Content="Цвета для переопределения графики"/>
+                                <ListView 
+                                    Name="colors" 
+                                    ItemsSource="{Binding Colors, UpdateSourceTrigger=PropertyChanged}"
+                                    SelectedItem="{Binding SelectedColor}">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="Цвет">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <Viewbox Margin="0,0,0,0">
+                                                            <Rectangle  
+                                                                Width="100"
+                                                                Height="30"
+                                                                Fill="{Binding UserBrush}" 
+                                                                Visibility="Visible"/>
+                                                        </Viewbox>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn 
+                                                DisplayMemberBinding="{Binding Path=UserColor.Red}"
+                                                Header="Красный"
+                                                Width="60"/>
+                                            <GridViewColumn 
+                                                DisplayMemberBinding="{Binding Path=UserColor.Green}"
+                                                Header="Зеленый"
+                                                Width="60"/>
+                                            <GridViewColumn 
+                                                DisplayMemberBinding="{Binding Path=UserColor.Blue}"
+                                                Header="Синий"
+                                                Width="60"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="0.3*"/>
+                                        <ColumnDefinition Width="0.3*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button
+                                        Grid.Column="0"
+                                        Margin="5 3"
+                                        Content="Изменить"
+                                        Command="{Binding ChangeColorCommand}"/>
+                                    <Button
+                                        Grid.Column="1"
+                                        Margin="5 3"
+                                        Content="Добавить"
+                                        Command="{Binding AddColorCommand}"/>
+                                    <Button
+                                        Grid.Column="2"
+                                        Margin="5 3"
+                                        Content="Удалить"
+                                        Command="{Binding DeleteColorCommand}"/>
+                                    <Button
+                                        Grid.Column="3"
+                                        Margin="3 5 2 5"
+                                        Content="↑"
+                                        Command="{Binding MoveColorUpCommand}"/>
+                                    <Button
+                                        Grid.Column="4"
+                                        Margin="2 5 3 5"
+                                        Content="↓"
+                                        Command="{Binding MoveColorDownCommand}"/>
+                                </Grid>
+
+
+                            </StackPanel>
+                        </GroupBox>
+
+
+                        <GroupBox Grid.Row="1" Header="Правила поиска видов" Margin="5">
+                            <StackPanel>
+
+                            </StackPanel>
+                        </GroupBox>
+
+
+                    </Grid>
+
+                </ScrollViewer>
+
+
+                <Button Grid.Row="4" Margin="5 5 0 0"
+                        Content="Применить" Command="{Binding ApplySettingsCommands}"/>
+            </Grid>
+        </Expander>
     </Grid>
 </base:PlatformWindow>
