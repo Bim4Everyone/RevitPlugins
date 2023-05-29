@@ -30,9 +30,10 @@ namespace RevitCreatingFiltersByValues.Models {
                 .ToElements()
                 .ToList();
 
-        public List<FillPatternElement> AllPatterns => new FilteredElementCollector(Document)
+        public List<FillPatternElement> AllDraftingPatterns => new FilteredElementCollector(Document)
                 .OfClass(typeof(FillPatternElement))
                 .OfType<FillPatternElement>()
+                .Where(item => item.GetFillPattern().Target == FillPatternTarget.Drafting)
                 .ToList();
         
         public List<ParameterFilterElement> AllFilterElements => new FilteredElementCollector(Document)

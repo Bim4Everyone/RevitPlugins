@@ -37,6 +37,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         private List<string> _selectedPossibleValues = new List<string>();
 
         private ColorHelper _selectedColor;
+        private PatternsHelper _selectedPattern;
         private List<string> patternNames = new List<string>() {
             "Алюминий",
             "Вертикальный",
@@ -60,11 +61,17 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             GetFilterableParametersCommand = new RelayCommand(GetFilterableParameters);
             GetPossibleValuesCommand = new RelayCommand(GetPossibleValues);
             SetPossibleValuesCommand = new RelayCommand(SetPossibleValues);
+
             ChangeColorCommand = new RelayCommand(ChangeColor, CanChangeColor);
             AddColorCommand = new RelayCommand(AddColor);
             DeleteColorCommand = new RelayCommand(DeleteColor, CanChangeColor);
             MoveColorUpCommand = new RelayCommand(MoveColorUp, CanChangeColor);
             MoveColorDownCommand = new RelayCommand(MoveColorDown, CanChangeColor);
+
+            AddPatternCommand = new RelayCommand(AddPattern);
+            DeletePatternCommand = new RelayCommand(DeletePattern, CanChangePattern);
+            MovePatternUpCommand = new RelayCommand(MovePatternUp, CanChangePattern);
+            MovePatternDownCommand = new RelayCommand(MovePatternDown, CanChangePattern);
         }
 
 
@@ -73,18 +80,22 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         public ICommand GetFilterableParametersCommand { get; }
         public ICommand GetPossibleValuesCommand { get; }
         public ICommand SetPossibleValuesCommand { get; }
+
         public ICommand ChangeColorCommand { get; }
         public ICommand AddColorCommand { get; }
         public ICommand DeleteColorCommand { get; }
         public ICommand MoveColorUpCommand { get; }
         public ICommand MoveColorDownCommand { get; }
 
-
+        public ICommand AddPatternCommand { get; }
+        public ICommand DeletePatternCommand { get; }
+        public ICommand MovePatternUpCommand { get; }
+        public ICommand MovePatternDownCommand { get; }
 
 
         private List<Element> elementsInView { get; set; } = new List<Element>();
         public FillPatternElement SolidFillPattern { get; set; }
-        public List<FillPatternElement> Patterns { get; set; } = new List<FillPatternElement>();
+        public ObservableCollection<PatternsHelper> PatternsInPj { get; set; } = new ObservableCollection<PatternsHelper>();
         public List<ParameterFilterElement> AllFiltersInPj { get; set; } = new List<ParameterFilterElement>();
         public List<ParameterFilterElement> AllFiltersInView { get; set; } = new List<ParameterFilterElement>();
         public List<string> AllFilterNamesInPj { get; set; } = new List<string>();
@@ -144,6 +155,11 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             get => _selectedColor;
             set => this.RaiseAndSetIfChanged(ref _selectedColor, value);
         }
+        public PatternsHelper SelectedPattern {
+            get => _selectedPattern;
+            set => this.RaiseAndSetIfChanged(ref _selectedPattern, value);
+        }
+
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
@@ -156,10 +172,11 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         /// </summary>
         public void GetUserPatterns() {
             SolidFillPattern = FillPatternElement.GetFillPatternElementByName(_revitRepository.Document, FillPatternTarget.Drafting, "<Сплошная заливка>");
+            List<FillPatternElement> allDraftingPatterns = _revitRepository.AllDraftingPatterns;
 
-            foreach(FillPatternElement pattern in _revitRepository.AllPatterns) {
-                if(patternNames.Contains(pattern.Name) && pattern.GetFillPattern().Target == FillPatternTarget.Drafting) {
-                    Patterns.Add(pattern);
+            foreach(FillPatternElement pattern in allDraftingPatterns) {
+                if(patternNames.Contains(pattern.Name)) {
+                    PatternsInPj.Add(new PatternsHelper(pattern, allDraftingPatterns));
                 }
             }
         }
@@ -269,7 +286,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             }
 
 
-            // Получаем возможные значения через выбранный параметр и элементы
+            // Получаем возможные значения через выбранные параметр и элементы
             foreach(Element elem in elementsForWork) {
 
                 string paramValue = string.Empty;
@@ -283,7 +300,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                         paramValue = type.FamilyName;
                     } else {
                         // Теперь получаем значения через параметры (сначала пробуем на экземпляре, потом на типе)
-                        paramValue = GetParamValueFromPramsHelper(elem, SelectedFilterableParameter);
+                        paramValue = GetParamValueFromParamsHelper(elem, SelectedFilterableParameter);
                     }
                 } catch(Exception) {
                     continue;
@@ -296,7 +313,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         }
 
 
-        public string GetParamValueFromPramsHelper(Element elem, ParametersHelper parametersHelper) {
+        public string GetParamValueFromParamsHelper(Element elem, ParametersHelper parametersHelper) {
 
             string paramValue = string.Empty;
 
@@ -416,9 +433,9 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                     
                     // Если пользователь поставил галку смены штриховки
                     if(OverrideByPattern) {
-                        settings.SetSurfaceForegroundPatternId(Patterns[j].Id);
+                        settings.SetSurfaceForegroundPatternId(PatternsInPj[j].Pattern.Id);
 
-                        settings.SetCutForegroundPatternId(Patterns[j].Id);
+                        settings.SetCutForegroundPatternId(PatternsInPj[j].Pattern.Id);
                     }
 
                     view.SetFilterOverrides(parameterFilterElement.Id, settings);
@@ -428,7 +445,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                     if(i > Colors.Count - 1) {
                         i = 0;
                     }
-                    if(j > Patterns.Count - 1) {
+                    if(j > PatternsInPj.Count - 1) {
                         j = 0;
                     }
                 }
@@ -486,6 +503,41 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
         private bool CanChangeColor(object p) {
             if(SelectedColor is null) {
+                return false;
+            }
+            return true;
+        }
+
+        private void AddPattern(object p) {
+
+            List<FillPatternElement> allDraftingPatterns = _revitRepository.AllDraftingPatterns;
+
+            if(allDraftingPatterns.Count > 0) {
+                PatternsInPj.Add(new PatternsHelper(allDraftingPatterns[0], allDraftingPatterns));
+            }
+        }
+
+        private void DeletePattern(object p) {
+
+            PatternsInPj.Remove(SelectedPattern);
+        }
+        private void MovePatternUp(object p) {
+
+            int index = PatternsInPj.IndexOf(SelectedPattern);
+            if(index != 0) {
+                PatternsInPj.Move(index, index - 1);
+            }
+        }
+
+        private void MovePatternDown(object p) {
+
+            int index = PatternsInPj.IndexOf(SelectedPattern);
+            if(PatternsInPj.Count - 1 != index) {
+                PatternsInPj.Move(index, index + 1);
+            }
+        }
+        private bool CanChangePattern(object p) {
+            if(SelectedPattern is null) {
                 return false;
             }
             return true;

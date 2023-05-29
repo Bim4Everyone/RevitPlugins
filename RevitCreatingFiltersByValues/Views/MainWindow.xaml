@@ -122,9 +122,6 @@
         
         
         
-        
-        
-        
         <StackPanel
             Grid.Row="7"
             Height="45"
@@ -150,12 +147,9 @@
                 Click="ButtonCancel_Click"/>
         </StackPanel>
 
-
-        
-        
         
 
-        <Expander Grid.Row="0" Grid.RowSpan="6" Grid.Column="1"
+        <Expander Grid.Row="0" Grid.RowSpan="8" Grid.Column="1"
                   ExpandDirection="Left" 
                   HorizontalAlignment="Left">
             <Expander.Header>
@@ -170,113 +164,172 @@
 
 
 
-            <Grid Width="340">
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <GroupBox Grid.Row="0" Header="Цвета" Margin="5">
                     <Grid>
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
                             <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="30"/>
                         </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                        <GroupBox Grid.Row="0" Header="Цвета" Margin="5">
-                            <StackPanel>
-                                <Label Content="Цвета для переопределения графики"/>
-                                <ListView 
-                                    Name="colors" 
+
+                        <Label
+                                Grid.Row="0" 
+                                Grid.ColumnSpan="5" 
+                                Content="Цвета для переопределения графики"/>
+                        <ListView
+                                Grid.Row="1" 
+                                Grid.ColumnSpan="5" 
+                                Name="colors"
+                                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                    ScrollViewer.CanContentScroll="False"
                                     ItemsSource="{Binding Colors, UpdateSourceTrigger=PropertyChanged}"
                                     SelectedItem="{Binding SelectedColor}">
-                                    <ListView.View>
-                                        <GridView>
-                                            <GridViewColumn Header="Цвет">
-                                                <GridViewColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <Viewbox Margin="0,0,0,0">
-                                                            <Rectangle  
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="Цвет">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Viewbox Margin="0,0,0,0">
+                                                    <Rectangle  
                                                                 Width="100"
                                                                 Height="30"
                                                                 Fill="{Binding UserBrush}" 
                                                                 Visibility="Visible"/>
-                                                        </Viewbox>
-                                                    </DataTemplate>
-                                                </GridViewColumn.CellTemplate>
-                                            </GridViewColumn>
-                                            <GridViewColumn 
+                                                </Viewbox>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn 
                                                 DisplayMemberBinding="{Binding Path=UserColor.Red}"
                                                 Header="Красный"
                                                 Width="60"/>
-                                            <GridViewColumn 
+                                    <GridViewColumn 
                                                 DisplayMemberBinding="{Binding Path=UserColor.Green}"
                                                 Header="Зеленый"
                                                 Width="60"/>
-                                            <GridViewColumn 
+                                    <GridViewColumn 
                                                 DisplayMemberBinding="{Binding Path=UserColor.Blue}"
                                                 Header="Синий"
                                                 Width="60"/>
-                                        </GridView>
-                                    </ListView.View>
-                                </ListView>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
 
 
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="0.3*"/>
-                                        <ColumnDefinition Width="0.3*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <Button
-                                        Grid.Column="0"
-                                        Margin="5 3"
-                                        Content="Изменить"
-                                        Command="{Binding ChangeColorCommand}"/>
-                                    <Button
-                                        Grid.Column="1"
-                                        Margin="5 3"
-                                        Content="Добавить"
-                                        Command="{Binding AddColorCommand}"/>
-                                    <Button
-                                        Grid.Column="2"
-                                        Margin="5 3"
-                                        Content="Удалить"
-                                        Command="{Binding DeleteColorCommand}"/>
-                                    <Button
-                                        Grid.Column="3"
-                                        Margin="3 5 2 5"
-                                        Content="↑"
-                                        Command="{Binding MoveColorUpCommand}"/>
-                                    <Button
-                                        Grid.Column="4"
-                                        Margin="2 5 3 5"
-                                        Content="↓"
-                                        Command="{Binding MoveColorDownCommand}"/>
-                                </Grid>
-
-
-                            </StackPanel>
-                        </GroupBox>
-
-
-                        <GroupBox Grid.Row="1" Header="Правила поиска видов" Margin="5">
-                            <StackPanel>
-
-                            </StackPanel>
-                        </GroupBox>
-
-
+                        <Button
+                                Grid.Row="3"
+                                Grid.Column="0"
+                                Margin="0 5 3 0"
+                                Content="Изменить"
+                                Command="{Binding ChangeColorCommand}"/>
+                        <Button 
+                                Grid.Row="3"
+                                Grid.Column="1"
+                                Margin="3 5 3 0"
+                                Content="Добавить"
+                                Command="{Binding AddColorCommand}"/>
+                        <Button
+                                Grid.Row="3"
+                                Grid.Column="2"
+                                Margin="3 5 3 0"
+                                Content="Удалить"
+                                Command="{Binding DeleteColorCommand}"/>
+                        <Button
+                                Grid.Row="3"
+                                Grid.Column="3"
+                                Margin="3 5 2 0"
+                                Content=" ↑ "
+                                Command="{Binding MoveColorUpCommand}"/>
+                        <Button
+                                Grid.Row="3"
+                                Grid.Column="4"
+                                Margin="2 5 0 0"
+                                Content=" ↓ "
+                                Command="{Binding MoveColorDownCommand}"/>
                     </Grid>
+                </GroupBox>
 
-                </ScrollViewer>
+
+                <GroupBox Grid.Row="1" Header="Штриховки" Margin="5">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="30"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        
+                        <Label 
+                            Grid.Row="0"
+                            Grid.ColumnSpan="5"
+                            Content="Штриховки для переопределения графики"/>
+                        
+                        <ListView 
+                            Grid.Row="1"
+                            Grid.ColumnSpan="5"
+                            Name="patterns"
+                            ItemsSource="{Binding PatternsInPj, UpdateSourceTrigger=PropertyChanged}"
+                            SelectedItem="{Binding SelectedPattern}">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="Имя">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ComboBox
+                                                    Width="250"
+                                                    ItemsSource="{Binding Path=Patterns}"
+                                                    DisplayMemberPath="Name"
+                                                    SelectedItem="{Binding Pattern, Mode=TwoWay}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
 
 
-                <Button Grid.Row="4" Margin="5 5 0 0"
-                        Content="Применить" Command="{Binding ApplySettingsCommands}"/>
+                        <Button
+                                Grid.Row="2" Grid.Column="0"
+                                Margin="0 5 3 0"
+                                Content="Добавить"
+                                Command="{Binding AddPatternCommand}"/>
+                        <Button
+                                Grid.Row="2" Grid.Column="1"
+                                Margin="3 5 3 0"
+                                Content="Удалить"
+                                Command="{Binding DeletePatternCommand}"/>
+                        <Button
+                                Grid.Row="2" Grid.Column="2"
+                                Margin="3 5 2 0"
+                                Content=" ↑ "
+                                Command="{Binding MovePatternUpCommand}"/>
+                        <Button
+                                Grid.Row="2" Grid.Column="3"
+                                Margin="2 5 0 0"
+                                Content=" ↓ "
+                                Command="{Binding MovePatternDownCommand}"/>
+                    </Grid>
+                </GroupBox>
             </Grid>
         </Expander>
     </Grid>
