@@ -31,6 +31,14 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
             if(element == null) {
                 throw new ArgumentNullException(nameof(element));
             }
+            
+            if(LevelByIdProvider.IsValidElement(element)) {
+                return true;
+            }
+            
+            if(LevelStairsProvider.IsValidElement(element)) {
+                return true;
+            }
 
             return _providersCache.ContainsKey(element.Category.Id) || CanCreateImpl(element);
         }
@@ -38,6 +46,14 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
         public ILevelProvider Create(Element element) {
             if(element == null) {
                 throw new ArgumentNullException(nameof(element));
+            }
+            
+            if(LevelByIdProvider.IsValidElement(element)) {
+                return CreateImpl(element);
+            }
+            
+            if(LevelStairsProvider.IsValidElement(element)) {
+                return CreateImpl(element);
             }
 
             if(element.InAnyCategory(BuiltInCategory.OST_Walls, BuiltInCategory.OST_StructuralFraming)) {
@@ -63,10 +79,8 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
         }
 
         protected virtual bool CanCreateImpl(Element element) {
-            return element.InAnyCategory(GetLevelStairsProviderCategories())
-                   || element.InAnyCategory(GetLevelByIdProviderCategories())
-                   || (_positionFactory.CanCreate(element)
-                       && element.InAnyCategory(GetAllCategories()));
+            return _positionFactory.CanCreate(element)
+                   && element.InAnyCategory(GetAllCategories());
         }
 
         protected virtual ILevelProvider CreateImpl(Element element) {
@@ -82,9 +96,9 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
                 return _resolutionRoot.Get<LevelBottomProvider>(GetConstructorArgument(element));
             } else if(element.InAnyCategory(GetLevelMagicBottomProviderCategories())) {
                 return _resolutionRoot.Get<LevelMagicBottomProvider>(GetConstructorArgument(element));
-            } else if(element.InAnyCategory(GetLevelByIdProviderCategories())) {
+            } else if(LevelByIdProvider.IsValidElement(element)) {
                 return _resolutionRoot.Get<LevelByIdProvider>();
-            } else if(element.InAnyCategory(GetLevelStairsProviderCategories())) {
+            } else if(LevelStairsProvider.IsValidElement(element)) {
                 return _resolutionRoot.Get<LevelStairsProvider>(new ConstructorArgument("factory", this));
             }
 
@@ -109,9 +123,7 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
         private IEnumerable<BuiltInCategory> GetAllCategories() {
             return GetLevelNearestProviderCategories()
                 .Union(GetLevelBottomProviderCategories())
-                .Union(GetLevelMagicBottomProviderCategories())
-                .Union(GetLevelByIdProviderCategories())
-                .Union(GetLevelStairsProviderCategories());
+                .Union(GetLevelMagicBottomProviderCategories());
         }
 
         private IEnumerable<BuiltInCategory> GetLevelNearestProviderCategories() {
@@ -179,16 +191,6 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
         private IEnumerable<BuiltInCategory> GetLevelMagicBottomProviderCategories() {
             yield return BuiltInCategory.OST_StructuralFraming;
             yield return BuiltInCategory.OST_StructuralTruss;
-        }
-
-        private IEnumerable<BuiltInCategory> GetLevelByIdProviderCategories() {
-            yield return BuiltInCategory.OST_Rooms;
-            yield return BuiltInCategory.OST_Areas;
-        }
-
-        private IEnumerable<BuiltInCategory> GetLevelStairsProviderCategories() {
-            yield return BuiltInCategory.OST_StairsRuns;
-            yield return BuiltInCategory.OST_StairsLandings;
         }
     }
 }

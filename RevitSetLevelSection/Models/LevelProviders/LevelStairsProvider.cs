@@ -20,7 +20,7 @@ namespace RevitSetLevelSection.Models.LevelProviders {
                 : _factory.Create(hostObject).GetLevel(hostObject, levels);
         }
 
-        private Element GetHostObject(Element element) {
+        private static Element GetHostObject(Element element) {
             if(element is StairsRun stairsRun) {
                 return stairsRun.GetStairs();
             } else if(element is StairsLanding stairsLanding) {
@@ -28,6 +28,10 @@ namespace RevitSetLevelSection.Models.LevelProviders {
             }
 
             return null;
+        }
+
+        public static bool IsValidElement(Element element) {
+            return GetHostObject(element) != null;
         }
     }
 }
