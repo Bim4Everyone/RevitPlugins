@@ -31,10 +31,9 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         private string _errorText;
         private bool _overrideByColor = true;
         private bool _overrideByPattern;
-        private List<ElementId> _filterableCategories;
         private List<string> _selectedCategories = new List<string>();
         private ParametersHelper _selectedFilterableParameter;
-        private List<string> _selectedPossibleValues = new List<string>();
+        private List<PossibleValue> _selectedPossibleValues = new List<PossibleValue>();
 
         private ColorHelper _selectedColor;
         private PatternsHelper _selectedPattern;
@@ -53,8 +52,10 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
-            GetUserPatterns();
-            GetCategoriesInView();
+            DictCategoryElements = _revitRepository.GetDictCategoriesInView();
+            SolidFillPattern = _revitRepository.SolidFillPattern;
+            PatternsInPj = _revitRepository.GetPatternsByNames(patternNames);
+
 
 
             CreateCommand = new RelayCommand(Create, CanCreate);
@@ -102,7 +103,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         public List<string> AllFilterNamesInView { get; set; } = new List<string>();
         public Dictionary<string, CategoryElements> DictCategoryElements { get; set; } = new Dictionary<string, CategoryElements>();
         public ObservableCollection<ParametersHelper> FilterableParameters { get; set; } = new ObservableCollection<ParametersHelper>();
-        public ObservableCollection<string> PossibleValues { get; set; } = new ObservableCollection<string>();
+        public ObservableCollection<PossibleValue> PossibleValues { get; set; } = new ObservableCollection<PossibleValue>();
         public List<ElementId> SelectedCatIds { get; set; } = new List<ElementId>();
 
 
@@ -116,7 +117,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedFilterableParameter, value);
         }
 
-        public List<string> SelectedPossibleValues {
+        public List<PossibleValue> SelectedPossibleValues {
             get => _selectedPossibleValues;
             set => this.RaiseAndSetIfChanged(ref _selectedPossibleValues, value);
         }
@@ -168,53 +169,8 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
 
         /// <summary>
-        /// Находим штриховки по именам, указаным польователем
-        /// </summary>
-        public void GetUserPatterns() {
-            SolidFillPattern = FillPatternElement.GetFillPatternElementByName(_revitRepository.Document, FillPatternTarget.Drafting, "<Сплошная заливка>");
-            List<FillPatternElement> allDraftingPatterns = _revitRepository.AllDraftingPatterns;
-
-            foreach(FillPatternElement pattern in allDraftingPatterns) {
-                if(patternNames.Contains(pattern.Name)) {
-                    PatternsInPj.Add(new PatternsHelper(pattern, allDraftingPatterns));
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// Получает категории, представленные на виде + элементы в словаре по ним
-        /// </summary>
-        public void GetCategoriesInView() {
-            elementsInView = _revitRepository.ElementsInView;
-            _filterableCategories = _revitRepository.FilterableCategories;
-
-
-            foreach(Element item in elementsInView) {
-                if(item.Category is null) { continue; }
-
-                Category catOfElem = item.Category;
-                string elemCategoryName = catOfElem.Name;
-                ElementId elemCategoryId = catOfElem.Id;
-
-
-                // Отсеиваем категории, которые не имеют параметров фильтрации
-                if(!_filterableCategories.Contains(elemCategoryId)) { continue; }
-
-
-                if(DictCategoryElements.ContainsKey(elemCategoryName)) {
-                    DictCategoryElements[elemCategoryName].ElementsInView.Add(item);
-
-                } else {
-                    DictCategoryElements.Add(elemCategoryName, new CategoryElements(catOfElem, elemCategoryId, new List<Element>() { item }));
-                }
-            }
-        }
-
-
-
-        /// <summary>
-        /// Получает параметры по которым доступна фильтрация из выбранных категорий
+        /// Получает параметры по которым доступна фильтрация из выбранных категорий.
+        /// Отрабатывает при выборе категорий в списке категорий GUI
         /// </summary>
         /// <param name="p"></param>
         private void GetFilterableParameters(object p) {
@@ -268,6 +224,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
         /// <summary>
         /// Получает варианты заполнения выбранного параметра у элементов выбранных категорий
+        /// Отрабатывает при выборе параметра фильтрации в списке параметров GUI
         /// </summary>
         /// <param name="p"></param>
         public void GetPossibleValues(object p) {
@@ -285,72 +242,27 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 elementsForWork.AddRange(DictCategoryElements[categoryName].ElementsInView);
             }
 
-
-            // Получаем возможные значения через выбранные параметр и элементы
+            // Перебираем выбранные через категории элементы и получаем их значения по выбранному параметру
             foreach(Element elem in elementsForWork) {
 
-                string paramValue = string.Empty;
+                PossibleValue possibleValue = new PossibleValue(elem, SelectedFilterableParameter);
 
-                try {
-                    // Сначала работаем по исключениям - атрибутам, которые нельзя запросить через параметры
-                    if(SelectedFilterableParameter.BInParameter == BuiltInParameter.ALL_MODEL_TYPE_NAME) {
-                        paramValue = elem.Name;
-                    } else if(SelectedFilterableParameter.BInParameter == BuiltInParameter.SYMBOL_FAMILY_NAME_PARAM) {
-                        ElementType type = _revitRepository.Document.GetElement(elem.GetTypeId()) as ElementType;
-                        paramValue = type.FamilyName;
-                    } else {
-                        // Теперь получаем значения через параметры (сначала пробуем на экземпляре, потом на типе)
-                        paramValue = GetParamValueFromParamsHelper(elem, SelectedFilterableParameter);
-                    }
-                } catch(Exception) {
-                    continue;
-                }
+                possibleValue.GetValue();
 
-                if(!PossibleValues.Contains(paramValue)) {
-                    PossibleValues.Add(paramValue);
+                int test = PossibleValues
+                    .Where(str => str.ValueAsString.Equals(possibleValue.ValueAsString))
+                    .ToList().Count;
+                if(test == 0 && possibleValue.ValueAsString != null) {
+                    PossibleValues.Add(possibleValue);
                 }
             }
-        }
-
-
-        public string GetParamValueFromParamsHelper(Element elem, ParametersHelper parametersHelper) {
-
-            string paramValue = string.Empty;
-
-            if(SelectedFilterableParameter.IsBInParam) {
-                Parameter param = elem.get_Parameter(SelectedFilterableParameter.BInParameter);
-                if(param != null) {
-                    // Значит параметр на экземпляре
-                    paramValue = param.AsValueString();
-                } else {
-                    // Значит на типе
-                    ElementType elementType = _revitRepository.Document.GetElement(elem.GetTypeId()) as ElementType;
-                    if(elementType is null) { return string.Empty; }
-
-                    paramValue = elementType.get_Parameter(SelectedFilterableParameter.BInParameter).AsValueString();
-                }
-
-            } else {
-                Parameter param = elem.LookupParameter(SelectedFilterableParameter.ParamName);
-                if(param != null) {
-                    // Значит параметр на экземпляре
-                    paramValue = param.AsValueString();
-                } else {
-                    // Значит на типе
-                    ElementType elementType = _revitRepository.Document.GetElement(elem.GetTypeId()) as ElementType;
-                    if(elementType is null) { return string.Empty; }
-
-                    paramValue = elementType.LookupParameter(SelectedFilterableParameter.ParamName).AsValueString();
-                }
-            }
-
-            return paramValue;
         }
 
 
 
         /// <summary>
         /// Переводит выбранные значений для фильтрации в нормальный формат
+        /// Отрабатывает при выборе возможных значений выбранного параметра фильтрации в списке значений GUI
         /// </summary>
         /// <param name="p"></param>
         private void SetPossibleValues(object p) {
@@ -361,7 +273,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
             // Получаем элементы, которые выбрал пользователь
             foreach(var item in selectedPossibleValues) {
-                string possibleValue = item as string;
+                PossibleValue possibleValue = item as PossibleValue;
                 if(possibleValue == null) { continue; }
 
                 SelectedPossibleValues.Add(possibleValue);
@@ -371,6 +283,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
         /// <summary>
         /// Создает фильтры на виде. Старые временные фильтры удаляет с вида. У существующих в проекте меняет категории
+        /// Отрабатывает при нажатии кнопки "Ок" в GUI
         /// </summary>
         /// <param name="p"></param>
         private void Create(object p) {
@@ -388,7 +301,10 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 // Удаляем временные фильтры пользователя на виде
                 _revitRepository.DeleteTempFiltersInView();
 
-                foreach(string possibleValue in SelectedPossibleValues) {
+                foreach(PossibleValue pos in SelectedPossibleValues) {
+
+                    string possibleValue = pos.ValueAsString;
+
 
                     string newFilterName = string.Format("${0}_{1}_{2}", userName, SelectedFilterableParameter.ParamName, possibleValue);
 
@@ -458,6 +374,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         }
 
 
+
         private void ChangeColor(object p) {
                        
             ColorSelectionDialog colorSelectionDialog = new ColorSelectionDialog();
@@ -484,7 +401,6 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
             Colors.Remove(SelectedColor);
         }
-
         private void MoveColorUp(object p) {
 
             int index = Colors.IndexOf(SelectedColor);
@@ -492,7 +408,6 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 Colors.Move(index, index - 1);
             }
         }
-
         private void MoveColorDown(object p) {
 
             int index = Colors.IndexOf(SelectedColor);
@@ -508,6 +423,8 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             return true;
         }
 
+
+
         private void AddPattern(object p) {
 
             List<FillPatternElement> allDraftingPatterns = _revitRepository.AllDraftingPatterns;
@@ -516,7 +433,6 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 PatternsInPj.Add(new PatternsHelper(allDraftingPatterns[0], allDraftingPatterns));
             }
         }
-
         private void DeletePattern(object p) {
 
             PatternsInPj.Remove(SelectedPattern);
@@ -528,7 +444,6 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 PatternsInPj.Move(index, index - 1);
             }
         }
-
         private void MovePatternDown(object p) {
 
             int index = PatternsInPj.IndexOf(SelectedPattern);

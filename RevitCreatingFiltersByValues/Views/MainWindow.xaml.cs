@@ -34,7 +34,7 @@ namespace RevitCreatingFiltersByValues.Views {
 
         private void Values_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
             values.Items.SortDescriptions.Clear();
-            values.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", System.ComponentModel.ListSortDirection.Ascending));
+            values.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("ValueAsString", System.ComponentModel.ListSortDirection.Ascending));
         }
 
         private void Parameters_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {

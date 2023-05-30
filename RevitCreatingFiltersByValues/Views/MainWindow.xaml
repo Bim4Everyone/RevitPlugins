@@ -87,6 +87,8 @@
                  Margin="5 5 5 0"
                  Name="values"
                  ItemsSource="{Binding PossibleValues}"
+                 DisplayMemberPath="ValueAsString"
+
                  SelectionMode="Multiple">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
@@ -106,17 +108,11 @@
                 Margin="10"
                 Content="Переопределять цвет"
                 IsChecked="{Binding OverrideByColor}"/>
-            
+
             <CheckBox 
                 Margin="10"
                 Content="Переопределять штриховку"
                 IsChecked="{Binding OverrideByPattern}"/>
-            
-            <Button
-                Margin="10"
-                Width="80"
-                Content="ColorSelectionDialog"
-                Command="{Binding GetColorSelectionDialogCommand}"/>
         </StackPanel>
 
         

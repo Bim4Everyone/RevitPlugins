@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,23 +25,36 @@ namespace RevitCreatingFiltersByValues.Models {
 
         public string UserName => Application.Username;
 
+
+        /// <summary>
+        /// Возвращает перечень ElementId категорий, которые имеют параметры для фильтрации
+        /// </summary>
         public List<ElementId> FilterableCategories => ParameterFilterUtilities.GetAllFilterableCategories().ToList();
         public List<Element> ElementsInView => new FilteredElementCollector(Document, Document.ActiveView.Id)
                 .WhereElementIsNotElementType()
                 .ToElements()
                 .ToList();
 
+        /// <summary>
+        /// Получает все чертежные штриховки, имеющиеся в проекте
+        /// </summary>
         public List<FillPatternElement> AllDraftingPatterns => new FilteredElementCollector(Document)
                 .OfClass(typeof(FillPatternElement))
                 .OfType<FillPatternElement>()
                 .Where(item => item.GetFillPattern().Target == FillPatternTarget.Drafting)
                 .ToList();
         
+        /// <summary>
+        /// Получает все фильтры, имеющиеся в проекте
+        /// </summary>
         public List<ParameterFilterElement> AllFilterElements => new FilteredElementCollector(Document)
                 .OfClass(typeof(ParameterFilterElement))
                 .OfType<ParameterFilterElement>()
                 .ToList();
 
+        /// <summary>
+        /// Получает все фильтры, имеющиеся на виде
+        /// </summary>
         public List<ParameterFilterElement> AllFilterElementsInView => Document.ActiveView.GetFilters()
             .Select(id => Document.GetElement(id) as ParameterFilterElement)
             .ToList();
@@ -50,10 +64,30 @@ namespace RevitCreatingFiltersByValues.Models {
                 .Select(p => p.Name)
                 .ToList();
 
-        //public List<string> AllFilterElementNamesInView => Document.ActiveView.GetFilters()
-        //    .Select(id => Document.GetElement(id) as ParameterFilterElement)
-        //    .Select(p => p.Name)
-        //    .ToList();
+        /// <summary>
+        /// Получает штриховку в виде сплошной заливки
+        /// </summary>
+        public FillPatternElement SolidFillPattern => FillPatternElement.GetFillPatternElementByName(Document, FillPatternTarget.Drafting, "<Сплошная заливка>");
+
+
+
+        /// <summary>
+        /// Находит объекты штриховок по именам, указаным пользователем
+        /// </summary>
+        public ObservableCollection<PatternsHelper> GetPatternsByNames(List<string> patternNames) {
+
+            ObservableCollection<PatternsHelper> patterns= new ObservableCollection<PatternsHelper>();
+            List<FillPatternElement> allDraftingPatterns = AllDraftingPatterns;
+
+            foreach(FillPatternElement pattern in allDraftingPatterns) {
+                if(patternNames.Contains(pattern.Name)) {
+                    patterns.Add(new PatternsHelper(pattern, allDraftingPatterns));
+                }
+            }
+
+            return patterns;
+        }
+
 
 
         /// <summary>
@@ -71,5 +105,37 @@ namespace RevitCreatingFiltersByValues.Models {
                 }
             }
         }
+
+
+
+        /// <summary>
+        /// Получает категории, представленные на виде + элементы в словаре по ним
+        /// </summary>
+        public Dictionary<string, CategoryElements> GetDictCategoriesInView() {
+
+            Dictionary<string, CategoryElements> dictCategoryElements = new Dictionary<string, CategoryElements>();
+
+            foreach(Element item in ElementsInView) {
+                if(item.Category is null) { continue; }
+
+                Category catOfElem = item.Category;
+                string elemCategoryName = catOfElem.Name;
+                ElementId elemCategoryId = catOfElem.Id;
+
+                // Отсеиваем категории, которые не имеют параметров фильтрации
+                if(!FilterableCategories.Contains(elemCategoryId)) { continue; }
+
+                // Добавляем в словарь элементы, разбивая по группам по ключу
+                if(dictCategoryElements.ContainsKey(elemCategoryName)) {
+                    dictCategoryElements[elemCategoryName].ElementsInView.Add(item);
+
+                } else {
+                    dictCategoryElements.Add(elemCategoryName, new CategoryElements(catOfElem, elemCategoryId, new List<Element>() { item }));
+                }
+            }
+
+            return dictCategoryElements;
+        }
+
     }
 }
