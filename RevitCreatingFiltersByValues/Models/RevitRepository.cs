@@ -30,10 +30,7 @@ namespace RevitCreatingFiltersByValues.Models {
         /// Возвращает перечень ElementId категорий, которые имеют параметры для фильтрации
         /// </summary>
         public List<ElementId> FilterableCategories => ParameterFilterUtilities.GetAllFilterableCategories().ToList();
-        public List<Element> ElementsInView => new FilteredElementCollector(Document, Document.ActiveView.Id)
-                .WhereElementIsNotElementType()
-                .ToElements()
-                .ToList();
+
 
         /// <summary>
         /// Получает все чертежные штриховки, имеющиеся в проекте
@@ -68,6 +65,33 @@ namespace RevitCreatingFiltersByValues.Models {
         /// Получает штриховку в виде сплошной заливки
         /// </summary>
         public FillPatternElement SolidFillPattern => FillPatternElement.GetFillPatternElementByName(Document, FillPatternTarget.Drafting, "<Сплошная заливка>");
+
+
+        public List<Element> GetElementsInView() {
+            
+            // Сначала получаем элементы на виде из текущего проекта
+            List<Element> elementsInView = new FilteredElementCollector(Document, Document.ActiveView.Id)
+                .WhereElementIsNotElementType()
+                .ToElements()
+                .ToList();
+
+            // Получаем экземпляры связей, видимые на виде
+            List<RevitLinkInstance> links = new FilteredElementCollector(Document, Document.ActiveView.Id)
+                .OfClass(typeof(RevitLinkInstance))
+                .OfType<RevitLinkInstance>()
+                .ToList();
+
+            // Получаем и добавляем элементы из связей, видимые на виде
+            foreach(RevitLinkInstance link in links) {
+                elementsInView.AddRange(new FilteredElementCollector(link.GetLinkDocument(), Document.ActiveView.Id)
+                    .WhereElementIsNotElementType()
+                    .ToElements()
+                    .ToList());
+            }
+
+            return elementsInView;
+        }
+
 
 
 
@@ -115,7 +139,7 @@ namespace RevitCreatingFiltersByValues.Models {
 
             Dictionary<string, CategoryElements> dictCategoryElements = new Dictionary<string, CategoryElements>();
 
-            foreach(Element item in ElementsInView) {
+            foreach(Element item in GetElementsInView()) {
                 if(item.Category is null) { continue; }
 
                 Category catOfElem = item.Category;

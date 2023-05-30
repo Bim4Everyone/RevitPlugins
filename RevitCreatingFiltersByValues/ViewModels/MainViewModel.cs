@@ -51,11 +51,11 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
-
+            
             DictCategoryElements = _revitRepository.GetDictCategoriesInView();
+            CategoriesInPj = DictCategoryElements.Keys.OrderBy(s => s).ToList();
             SolidFillPattern = _revitRepository.SolidFillPattern;
             PatternsInPj = _revitRepository.GetPatternsByNames(patternNames);
-
 
 
             CreateCommand = new RelayCommand(Create, CanCreate);
@@ -102,6 +102,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         public List<string> AllFilterNamesInPj { get; set; } = new List<string>();
         public List<string> AllFilterNamesInView { get; set; } = new List<string>();
         public Dictionary<string, CategoryElements> DictCategoryElements { get; set; } = new Dictionary<string, CategoryElements>();
+        public List<string> CategoriesInPj { get; set; } = new List<string>();
         public ObservableCollection<ParametersHelper> FilterableParameters { get; set; } = new ObservableCollection<ParametersHelper>();
         public ObservableCollection<PossibleValue> PossibleValues { get; set; } = new ObservableCollection<PossibleValue>();
         public List<ElementId> SelectedCatIds { get; set; } = new List<ElementId>();
@@ -218,6 +219,9 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
                 FilterableParameters.Add(parametersHelper);
             }
+
+            FilterableParameters = new ObservableCollection<ParametersHelper>(FilterableParameters.OrderBy(i => i.ParamName));
+            OnPropertyChanged(nameof(FilterableParameters));
         }
 
 
@@ -246,9 +250,9 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             foreach(Element elem in elementsForWork) {
 
                 PossibleValue possibleValue = new PossibleValue(elem, SelectedFilterableParameter);
-
                 possibleValue.GetValue();
 
+                // Записываем только уникальные
                 int test = PossibleValues
                     .Where(str => str.ValueAsString.Equals(possibleValue.ValueAsString))
                     .ToList().Count;
@@ -256,6 +260,9 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                     PossibleValues.Add(possibleValue);
                 }
             }
+
+            PossibleValues = new ObservableCollection<PossibleValue>(PossibleValues.OrderBy(i => i.ValueAsString));
+            OnPropertyChanged(nameof(PossibleValues));
         }
 
 
@@ -322,8 +329,19 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                         parameterFilterElement = ParameterFilterElement
                             .Create(_revitRepository.Document, newFilterName, SelectedCatIds);
 
-                        // Создаем правила фильтрации
-                        FilterRule filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, possibleValue, true);
+                        // Создаем правила фильтрации в зависимости от типа данных параметра
+                        FilterRule filterRule = null;
+                        if(pos.StorageParamType == StorageType.String) {
+                            filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, pos.ValueAsString, true);
+                        } else if(pos.StorageParamType == StorageType.Double) {
+                            filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, pos.ValueAsDouble, 0.0000001);
+                        } else if(pos.StorageParamType == StorageType.ElementId) {
+                            filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, pos.ValueAsElementId);
+                        } else if(pos.StorageParamType == StorageType.Integer) {
+                            filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, pos.ValueAsInteger);
+                        }
+
+                        if(filterRule is null) { continue; }
 
                         ElementParameterFilter elemParamFilter = new ElementParameterFilter(filterRule);
 
@@ -337,31 +355,30 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                     View view = _revitRepository.Document.ActiveView;
                     view.AddFilter(parameterFilterElement.Id);
 
-                    OverrideGraphicSettings settings = new OverrideGraphicSettings();
-                    // Если пользователь поставил галку перекрашивания
-                    if(OverrideByColor) {
-                        settings.SetSurfaceForegroundPatternId(SolidFillPattern.Id);
-                        settings.SetSurfaceForegroundPatternColor(Colors[i].UserColor);
+                    OverrideGraphicSettings settings = GetOverrideGraphicSettings(i, j);
+                    //// Если пользователь поставил галку перекрашивания
+                    //if(OverrideByColor) {
+                    //    settings.SetSurfaceForegroundPatternId(SolidFillPattern.Id);
+                    //    settings.SetSurfaceForegroundPatternColor(Colors[i].UserColor);
 
-                        settings.SetCutForegroundPatternId(SolidFillPattern.Id);
-                        settings.SetCutForegroundPatternColor(Colors[i].UserColor);
-                    }
+                    //    settings.SetCutForegroundPatternId(SolidFillPattern.Id);
+                    //    settings.SetCutForegroundPatternColor(Colors[i].UserColor);
+                    //}
                     
-                    // Если пользователь поставил галку смены штриховки
-                    if(OverrideByPattern) {
-                        settings.SetSurfaceForegroundPatternId(PatternsInPj[j].Pattern.Id);
+                    //// Если пользователь поставил галку смены штриховки
+                    //if(OverrideByPattern) {
+                    //    settings.SetSurfaceForegroundPatternId(PatternsInPj[j].Pattern.Id);
 
-                        settings.SetCutForegroundPatternId(PatternsInPj[j].Pattern.Id);
-                    }
+                    //    settings.SetCutForegroundPatternId(PatternsInPj[j].Pattern.Id);
+                    //}
+
 
                     view.SetFilterOverrides(parameterFilterElement.Id, settings);
 
-                    i++;
-                    j++;
-                    if(i > Colors.Count - 1) {
+                    if(++i > Colors.Count - 1) {
                         i = 0;
                     }
-                    if(j > PatternsInPj.Count - 1) {
+                    if(++j > PatternsInPj.Count - 1) {
                         j = 0;
                     }
                 }
@@ -369,6 +386,28 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 transaction.Commit();
             }
         }
+
+        private OverrideGraphicSettings GetOverrideGraphicSettings(int c, int p) {
+            OverrideGraphicSettings settings = new OverrideGraphicSettings();
+            // Если пользователь поставил галку перекрашивания
+            if(OverrideByColor) {
+                settings.SetSurfaceForegroundPatternId(SolidFillPattern.Id);
+                settings.SetSurfaceForegroundPatternColor(Colors[c].UserColor);
+
+                settings.SetCutForegroundPatternId(SolidFillPattern.Id);
+                settings.SetCutForegroundPatternColor(Colors[c].UserColor);
+            }
+
+            // Если пользователь поставил галку смены штриховки
+            if(OverrideByPattern) {
+                settings.SetSurfaceForegroundPatternId(PatternsInPj[p].Pattern.Id);
+
+                settings.SetCutForegroundPatternId(PatternsInPj[p].Pattern.Id);
+            }
+            return settings;
+        }
+
+
         private bool CanCreate(object p) {
             return true;
         }

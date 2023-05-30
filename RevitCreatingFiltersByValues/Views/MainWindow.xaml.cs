@@ -31,15 +31,5 @@ namespace RevitCreatingFiltersByValues.Views {
         private void UnselectAllValues(object sender, RoutedEventArgs e) {
             values.UnselectAll();
         }
-
-        private void Values_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
-            values.Items.SortDescriptions.Clear();
-            values.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("ValueAsString", System.ComponentModel.ListSortDirection.Ascending));
-        }
-
-        private void Parameters_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
-            parameters.Items.SortDescriptions.Clear();
-            parameters.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("ParamName", System.ComponentModel.ListSortDirection.Ascending));
-        }
     }
 }
