@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace RevitCreatingFiltersByValues.Views {
     public partial class MainWindow {
@@ -30,6 +32,10 @@ namespace RevitCreatingFiltersByValues.Views {
         }
         private void UnselectAllValues(object sender, RoutedEventArgs e) {
             values.UnselectAll();
+        }
+
+        private void window_Loaded(object sender, RoutedEventArgs e) {
+            expander.MaxHeight = window.ActualHeight * 0.88;
         }
     }
 }

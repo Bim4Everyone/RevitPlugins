@@ -25,7 +25,7 @@ namespace RevitCreatingFiltersByValues {
     [Transaction(TransactionMode.Manual)]
     public class RevitCreatingFiltersByValuesCommand : BasePluginCommand {
         public RevitCreatingFiltersByValuesCommand() {
-            PluginName = "RevitCreatingFiltersByValues";
+            PluginName = "Создание временных фильтров";
         }
 
         protected override void Execute(UIApplication uiApplication) {
