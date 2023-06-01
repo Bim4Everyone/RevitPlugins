@@ -31,6 +31,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         private string _errorText;
         private bool _overrideByColor = true;
         private bool _overrideByPattern;
+        private bool _overridingWithFilters = true;
         private List<string> _selectedCategories = new List<string>();
         private ParametersHelper _selectedFilterableParameter;
         private List<PossibleValue> _selectedPossibleValues = new List<PossibleValue>();
@@ -106,6 +107,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         public ObservableCollection<ParametersHelper> FilterableParameters { get; set; } = new ObservableCollection<ParametersHelper>();
         public ObservableCollection<PossibleValue> PossibleValues { get; set; } = new ObservableCollection<PossibleValue>();
         public List<ElementId> SelectedCatIds { get; set; } = new List<ElementId>();
+        public List<Element> SelectedElements { get; set; } = new List<Element>();
 
 
         public List<string> SelectedCategories {
@@ -129,6 +131,11 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         public bool OverrideByPattern {
             get => _overrideByPattern;
             set => this.RaiseAndSetIfChanged(ref _overrideByPattern, value);
+        }
+
+        public bool OverridingWithFilters {
+            get => _overridingWithFilters;
+            set => this.RaiseAndSetIfChanged(ref _overridingWithFilters, value);
         }
 
         public ObservableCollection<ColorHelper> Colors { get; set; } = new ObservableCollection<ColorHelper>() {
@@ -235,30 +242,46 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
             if(SelectedFilterableParameter is null) { return; }
             PossibleValues.Clear();
-
-            List<Element> elementsForWork = new List<Element>();
+            SelectedElements.Clear();
 
             // Получаем элементы, которые выбрал пользователь через категории
             foreach(var item in SelectedCategories) {
                 string categoryName = item as string;
                 if(categoryName == null) { continue; }
 
-                elementsForWork.AddRange(DictCategoryElements[categoryName].ElementsInView);
+                SelectedElements.AddRange(DictCategoryElements[categoryName].ElementsInView);
             }
 
             // Перебираем выбранные через категории элементы и получаем их значения по выбранному параметру
-            foreach(Element elem in elementsForWork) {
+            foreach(Element elem in SelectedElements) {
 
                 PossibleValue possibleValue = new PossibleValue(elem, SelectedFilterableParameter);
                 possibleValue.GetValue();
 
                 // Записываем только уникальные
-                int test = PossibleValues
-                    .Where(str => str.ValueAsString.Equals(possibleValue.ValueAsString))
-                    .ToList().Count;
-                if(test == 0 && possibleValue.ValueAsString != null) {
+                //int test = PossibleValues
+                //    .Where(str => str.ValueAsString.Equals(possibleValue.ValueAsString))
+                //    .ToList().Count;
+
+                if(possibleValue.ValueAsString is null) {
+                    continue;
+                }
+
+                bool flag = false;
+                foreach(PossibleValue pos in PossibleValues) {
+                    if(pos.ValueAsString.Equals(possibleValue.ValueAsString)) {
+                        pos.ElementsInPj.Add(elem);
+                        flag = true;
+                        break;
+                    }
+                }
+                if(flag is false) {
                     PossibleValues.Add(possibleValue);
                 }
+
+                //if(test == 0 && possibleValue.ValueAsString != null) {
+                //    PossibleValues.Add(possibleValue);
+                //}
             }
 
             PossibleValues = new ObservableCollection<PossibleValue>(PossibleValues.OrderBy(i => i.ValueAsString));
@@ -310,70 +333,63 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
                 foreach(PossibleValue pos in SelectedPossibleValues) {
 
-                    string possibleValue = pos.ValueAsString;
+                    // Либо создаем фильтры и переопределяем видимость через них
+                    if(OverridingWithFilters) {
+                        string newFilterName = string.Format("${0}_{1}_{2}", userName, SelectedFilterableParameter.ParamName, pos.ValueAsString);
 
+                        ParameterFilterElement parameterFilterElement = null;
 
-                    string newFilterName = string.Format("${0}_{1}_{2}", userName, SelectedFilterableParameter.ParamName, possibleValue);
+                        if(AllFilterNamesInPj.Contains(newFilterName)) {
 
-                    ParameterFilterElement parameterFilterElement = null;
+                            // Если создаваемый фильтр уже есть в проекте, то находим его
+                            parameterFilterElement = (from filter in AllFiltersInPj where filter.Name.Equals(newFilterName) select filter).FirstOrDefault();
 
-                    if(AllFilterNamesInPj.Contains(newFilterName)) {
+                            // Назначаем выбранные категории
+                            parameterFilterElement.SetCategories(SelectedCatIds);
+                        } else {
+                            // Если его нет в проекте, то создаем
+                            parameterFilterElement = ParameterFilterElement
+                                .Create(_revitRepository.Document, newFilterName, SelectedCatIds);
 
-                        // Если создаваемый фильтр уже есть в проекте, то находим его
-                        parameterFilterElement =  (from filter in AllFiltersInPj where filter.Name.Equals(newFilterName) select filter).FirstOrDefault();
+                            // Создаем правила фильтрации в зависимости от типа данных параметра
+                            FilterRule filterRule = null;
+                            if(pos.StorageParamType == StorageType.String) {
+                                filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, pos.ValueAsString, true);
+                            } else if(pos.StorageParamType == StorageType.Double) {
+                                filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, pos.ValueAsDouble, 0.0000001);
+                            } else if(pos.StorageParamType == StorageType.ElementId) {
+                                filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, pos.ValueAsElementId);
+                            } else if(pos.StorageParamType == StorageType.Integer) {
+                                filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, pos.ValueAsInteger);
+                            }
 
-                        // Назначаем выбранные категории
-                        parameterFilterElement.SetCategories(SelectedCatIds);
-                    } else {
-                        // Если его нет в проекте, то создаем
-                        parameterFilterElement = ParameterFilterElement
-                            .Create(_revitRepository.Document, newFilterName, SelectedCatIds);
+                            if(filterRule is null) { continue; }
 
-                        // Создаем правила фильтрации в зависимости от типа данных параметра
-                        FilterRule filterRule = null;
-                        if(pos.StorageParamType == StorageType.String) {
-                            filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, pos.ValueAsString, true);
-                        } else if(pos.StorageParamType == StorageType.Double) {
-                            filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, pos.ValueAsDouble, 0.0000001);
-                        } else if(pos.StorageParamType == StorageType.ElementId) {
-                            filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, pos.ValueAsElementId);
-                        } else if(pos.StorageParamType == StorageType.Integer) {
-                            filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, pos.ValueAsInteger);
+                            ElementParameterFilter elemParamFilter = new ElementParameterFilter(filterRule);
+
+                            LogicalAndFilter elemFilter = new LogicalAndFilter(new List<ElementFilter>() { elemParamFilter });
+
+                            // Задаем правила фильтрации объекту фильтра
+                            parameterFilterElement.SetElementFilter(elemFilter);
                         }
 
-                        if(filterRule is null) { continue; }
+                        // Применяем фильтр на вид
+                        View view = _revitRepository.Document.ActiveView;
+                        view.AddFilter(parameterFilterElement.Id);
 
-                        ElementParameterFilter elemParamFilter = new ElementParameterFilter(filterRule);
+                        OverrideGraphicSettings settings = GetOverrideGraphicSettings(i, j);
 
-                        LogicalAndFilter elemFilter = new LogicalAndFilter(new List<ElementFilter>() { elemParamFilter });
+                        view.SetFilterOverrides(parameterFilterElement.Id, settings);
+                    } else {
+                        // Либо выполняем прямое переопределение графики элементов на виде
+                        OverrideGraphicSettings settings = GetOverrideGraphicSettings(i, j);
 
-                        // Задаем правила фильтрации объекту фильтра
-                        parameterFilterElement.SetElementFilter(elemFilter);
+                        foreach(Element elem in pos.ElementsInPj) {
+
+                            _revitRepository.Document.ActiveView.SetElementOverrides(elem.Id, settings);
+                        }
                     }
 
-                    // Применяем фильтр на вид
-                    View view = _revitRepository.Document.ActiveView;
-                    view.AddFilter(parameterFilterElement.Id);
-
-                    OverrideGraphicSettings settings = GetOverrideGraphicSettings(i, j);
-                    //// Если пользователь поставил галку перекрашивания
-                    //if(OverrideByColor) {
-                    //    settings.SetSurfaceForegroundPatternId(SolidFillPattern.Id);
-                    //    settings.SetSurfaceForegroundPatternColor(Colors[i].UserColor);
-
-                    //    settings.SetCutForegroundPatternId(SolidFillPattern.Id);
-                    //    settings.SetCutForegroundPatternColor(Colors[i].UserColor);
-                    //}
-                    
-                    //// Если пользователь поставил галку смены штриховки
-                    //if(OverrideByPattern) {
-                    //    settings.SetSurfaceForegroundPatternId(PatternsInPj[j].Pattern.Id);
-
-                    //    settings.SetCutForegroundPatternId(PatternsInPj[j].Pattern.Id);
-                    //}
-
-
-                    view.SetFilterOverrides(parameterFilterElement.Id, settings);
 
                     if(++i > Colors.Count - 1) {
                         i = 0;

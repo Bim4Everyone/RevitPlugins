@@ -12,7 +12,7 @@ using dosymep.Revit;
 namespace RevitCreatingFiltersByValues.Models {
     internal class PossibleValue {
         public PossibleValue(Element elem, ParametersHelper parameter) {
-            ElementInPj = elem;
+            ElementsInPj.Add(elem);
             SelectedFilterableParameter = parameter;
 
             if(SelectedFilterableParameter.IsBInParam) {
@@ -23,7 +23,7 @@ namespace RevitCreatingFiltersByValues.Models {
         }
 
 
-        public Element ElementInPj { get; set; }
+        public List<Element> ElementsInPj { get; set; } = new List<Element>();
         public ParametersHelper SelectedFilterableParameter { get; set; }
 
 
@@ -40,79 +40,59 @@ namespace RevitCreatingFiltersByValues.Models {
         /// </summary>
         public void GetValue() {
 
-
-            //TaskDialog.Show("f", "На начало метода получения, имя параметра - " + SelectedFilterableParameter.ParamName);
-
+            Element elem = ElementsInPj.FirstOrDefault();
 
             // Сначала работаем по исключениям - атрибутам, которые нельзя запросить через параметры
             if(SelectedFilterableParameter.BInParameter == BuiltInParameter.ALL_MODEL_TYPE_NAME) {
-                ValueAsString = ElementInPj.Name;
-
-                //TaskDialog.Show("f", "Это параметр имени типа, значение - " + ValueAsString);
-
+                ValueAsString = elem.Name;
 
             } else if(SelectedFilterableParameter.BInParameter == BuiltInParameter.SYMBOL_FAMILY_NAME_PARAM) {
-                ElementType type = ElementInPj.Document.GetElement(ElementInPj.GetTypeId()) as ElementType;
+                ElementType type = elem.Document.GetElement(elem.GetTypeId()) as ElementType;
                 ValueAsString = type.FamilyName;
 
-
-                //TaskDialog.Show("f", "Это параметр имени семейства, значение - " + ValueAsString);
-
             } else {
-                //TaskDialog.Show("f", "Это не параметр исключение");
-
 
                 // Теперь получаем значения через параметры (сначала пробуем на экземпляре, потом на типе)
                 if(SelectedFilterableParameter.IsBInParam) {
-                    //TaskDialog.Show("f", "Это встроенный параметр");
-
-                    GetValueFromBInParam();
+                    GetValueFromBInParam(elem);
 
                 } else {
-                    //TaskDialog.Show("f", "Это не встроенный параметр");
-
-                    GetValueFromParamElemet();
+                    GetValueFromParamElemet(elem);
                 }
             }
         }
 
 
 
-        private void GetValueFromBInParam() {
-            
+        private void GetValueFromBInParam(Element elem) {
+
             // Пытаемся получить параметр на экземпляре
-            Parameter param = ElementInPj.get_Parameter(SelectedFilterableParameter.BInParameter);
+            Parameter param = elem.get_Parameter(SelectedFilterableParameter.BInParameter);
             if(param is null) {
                 //TaskDialog.Show("f", "Не нашли параметр на экземпляре");
 
 
                 // Значит мы не нашли параметр на экземпляре и ищем параметр на типе
-                ElementType elementType = ElementInPj.Document.GetElement(ElementInPj.GetTypeId()) as ElementType;
+                ElementType elementType = elem.Document.GetElement(elem.GetTypeId()) as ElementType;
                 if(elementType is null) { return; }
 
                 param = elementType.get_Parameter(SelectedFilterableParameter.BInParameter);
-                if(param is null) {
-                    //TaskDialog.Show("f", "Не ашли на типе, но ValueAsString=" + ValueAsString);
-
-                    return; }
-                //TaskDialog.Show("f", "Нашли на типе");
+                if(param is null) { return;}
             }
-
-            //TaskDialog.Show("f", "Приступаем к получению значений");
 
             // Если дошли до сюда, то параметр нашли
             WriteValues(param);
         }
 
 
-        private void GetValueFromParamElemet() {
+        private void GetValueFromParamElemet(Element elem) {
 
             // Пытаемся получить параметр на экземпляре
-            Parameter param = ElementInPj.LookupParameter(SelectedFilterableParameter.ParamName);
+            Parameter param = elem.LookupParameter(SelectedFilterableParameter.ParamName);
             if(param is null) {
 
                 // Значит мы не нашли параметр на экземпляре и ищем параметр на типе
-                ElementType elementType = ElementInPj.Document.GetElement(ElementInPj.GetTypeId()) as ElementType;
+                ElementType elementType = elem.Document.GetElement(elem.GetTypeId()) as ElementType;
                 if(elementType is null) { return; }
 
                 param = elementType.LookupParameter(SelectedFilterableParameter.ParamName);
@@ -128,20 +108,15 @@ namespace RevitCreatingFiltersByValues.Models {
             // В любом случае заполняем string значение для отображения в GUI
             ValueAsString = param.AsValueString();
 
-            //TaskDialog.Show("f", "ValueAsString = " + ValueAsString);
-
 
             if(StorageParamType.Equals(StorageType.Double)) {
                 ValueAsDouble = param.AsDouble();
-                //TaskDialog.Show("f", "ValueAsDouble = " + ValueAsDouble.ToString());
 
             } else if(StorageParamType.Equals(StorageType.ElementId)) {
                 ValueAsElementId = param.AsElementId();
-                //TaskDialog.Show("f", "ValueAsElementId = " + ValueAsElementId.ToString());
 
             } else if(StorageParamType.Equals(StorageType.Integer)) {
                 ValueAsInteger = param.AsInteger();
-                //TaskDialog.Show("f", "ValueAsInteger = " + ValueAsInteger.ToString());
 
             }
         }

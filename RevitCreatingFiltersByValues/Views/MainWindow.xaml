@@ -14,7 +14,7 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    Height="800" Width="600"    
+    Height="800" MinWidth="550"    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
     x:Name="window"
@@ -30,7 +30,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="30" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="30" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -243,11 +243,12 @@
 
         <TextBlock 
             Grid.Column="0"
+            Grid.ColumnSpan="2"
+            
             Margin="5"
             Text="Плагин создает пакет фильтров или перекрашивает элементы"
             TextWrapping="Wrap"
             VerticalAlignment="Center"/>
-
 
         <Label Grid.Row="1" Grid.ColumnSpan="2" Content="Выберите категории элементов на виде:"
                VerticalAlignment="Center"/>
@@ -386,15 +387,16 @@
             </i:Interaction.Triggers>
         </ListBox>
 
-        <Label 
-            Grid.Row="7" 
-            Grid.ColumnSpan="2" 
-            Content="Выберите способ перекраса:"
-            VerticalAlignment="Center"
+
+        <GroupBox 
+            Grid.Row="7"
+            Grid.ColumnSpan="2"
+            Header="Выберите способ перекраса:" 
+            Margin="5"
             ToolTipService.InitialShowDelay="1000"
             ToolTipService.ShowDuration="20000"
             ToolTipService.BetweenShowDelay="1">
-            <Label.ToolTip>
+            <GroupBox.ToolTip>
                 <ToolTip>
                     <TextBlock 
                         Text="Доступны несколько способов перекраса:&#10;- &quot;Переопределять цвет&quot; - плагин выполнит переопределение графики элементов на текущем виде путем задания цвета штриховке. При этом будет установлена штриховка &quot;&lt;Сплошная заливка&quot;&gt;, а перечень и последовательность цветов будет взята из Настроек плагина (см. выше);&#10;- &quot;Переопределять штриховку&quot; - плагин выполнит переопределение графики элементов на текущем виде путем задания штриховок. При этом цвет задаваться не будет, а перечень и последовательность штриховок будет взята из Настроек плагина (см. выше).&#10;Если поставить галку и в &quot;Переопределять цвет&quot; и в &quot;Переопределять штриховку&quot;, то будет выполнено переопределение путем задания штриховок и назначения цвета одновременно." 
@@ -403,37 +405,77 @@
                         TextAlignment="Justify"
                         FlowDirection="LeftToRight"/>
                 </ToolTip>
-            </Label.ToolTip>
-        </Label>
-
-        <StackPanel
-            Grid.Row="7"
-            Grid.ColumnSpan="2"
-            Height="45"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
-
-            <CheckBox 
-                Margin="10"
-                Content="Переопределять цвет"
-                IsChecked="{Binding OverrideByColor}"
-                ToolTip="Будет выполнено переопределение графики путем задания цвета"
-                ToolTipService.InitialShowDelay="1000"
-                ToolTipService.ShowDuration="20000"
-                ToolTipService.BetweenShowDelay="1"/>
-
-            <CheckBox 
-                Margin="10"
-                Content="Переопределять штриховку"
-                IsChecked="{Binding OverrideByPattern}"
-                ToolTip="Будет выполнено переопределение графики путем задания штриховки"
-                ToolTipService.InitialShowDelay="1000"
-                ToolTipService.ShowDuration="20000"
-                ToolTipService.BetweenShowDelay="1"/>
-        </StackPanel>
+            </GroupBox.ToolTip>
 
 
+            <StackPanel>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <CheckBox 
+                        Grid.Column="0"
+                        Margin="10 5"
+                        FlowDirection="RightToLeft"
+                        Content="Переопределять цвет"
+                        IsChecked="{Binding OverrideByColor}"
+                        ToolTip="Будет выполнено переопределение графики путем задания цвета"
+                        ToolTipService.InitialShowDelay="1000"
+                        ToolTipService.ShowDuration="20000"
+                        ToolTipService.BetweenShowDelay="1">
+                        <CheckBox.Resources>
+                            <Style TargetType="{x:Type Path}">
+                                <Setter Property="FlowDirection" Value="LeftToRight"/>
+                            </Style>
+                        </CheckBox.Resources>
+                    </CheckBox>
 
+                    <CheckBox 
+                        Grid.Column="1"
+                        Margin="10 5"
+                        Content="Переопределять штриховку"
+                        IsChecked="{Binding OverrideByPattern}"
+                        ToolTip="Будет выполнено переопределение графики путем задания штриховки"
+                        ToolTipService.InitialShowDelay="1000"
+                        ToolTipService.ShowDuration="20000"
+                        ToolTipService.BetweenShowDelay="1"/>
+
+                    
+                    <RadioButton 
+                        Grid.Row="1"
+                        Margin="10 5"
+                        FlowDirection="RightToLeft"
+                        GroupName="ways" 
+                        Content="Создание фильтров на виде" 
+                        IsChecked="{Binding OverridingWithFilters}"/>
+                    <RadioButton 
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Margin="10 5"
+                        GroupName="ways" 
+                        Content="Переопределение графики элементов" />
+                </Grid>
+                
+
+
+                <StackPanel
+                    Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center">
+                    
+                </StackPanel>
+            </StackPanel>
+
+        </GroupBox>
+        
+        
 
         <StackPanel
             Grid.Row="8"
