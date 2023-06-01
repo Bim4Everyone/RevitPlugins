@@ -14,7 +14,7 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    Height="800" MinWidth="550"    
+    MinHeight="700" MinWidth="550"    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
     x:Name="window"
@@ -27,7 +27,7 @@
             <RowDefinition Height="30" />
             <RowDefinition Height="*" />
             <RowDefinition Height="30" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="30" />
             <RowDefinition Height="30" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -306,7 +306,36 @@
         <Label Grid.Row="3" Grid.ColumnSpan="2" Content="Выберите параметр для фильтрации:"
                VerticalAlignment="Center"/>
 
-        <ListBox Grid.Row="4" Grid.ColumnSpan="2"
+        <ComboBox 
+            Grid.Row="4" Grid.ColumnSpan="2"
+            Name="parameters"
+            Margin="5"
+            ItemsSource="{Binding Path=FilterableParameters}"
+            DisplayMemberPath="ParamName"
+            SelectedItem="{Binding SelectedFilterableParameter, Mode=TwoWay}"
+            ToolTipService.InitialShowDelay="1000"
+            ToolTipService.ShowDuration="20000"
+            ToolTipService.BetweenShowDelay="1">
+            <ComboBox.ToolTip>
+                <ToolTip>
+                    <TextBlock 
+                        Text="Перечень параметров, по которым возможна фильтрация среди выбранных категорий. Выберите параметр для фильтрации, и тогда плагин произведет отбор значений по этому параметру среди элементов выбранных категорий. По выбранному здесь параметру будут работать созданные плагином фильтры в случае, если стоит галка &quot;Переопределять цвет&quot;. Если этот список пуст, значит не выбрана ни одна категория (см. выше)." 
+                        TextWrapping="Wrap"
+                        Width="300"
+                        TextAlignment="Justify"
+                        FlowDirection="LeftToRight"/>
+                </ToolTip>
+            </ComboBox.ToolTip>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction 
+                        Command="{Binding GetPossibleValuesCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ComboBox>
+
+
+        <!--<ListBox Grid.Row="4" Grid.ColumnSpan="2"
                  Margin="5 5 5 0"
                  Name="parameters"
                  ItemsSource="{Binding FilterableParameters}"
@@ -332,7 +361,7 @@
                         Command="{Binding GetPossibleValuesCommand}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-        </ListBox>
+        </ListBox>-->
 
         <Label Grid.Row="5" Grid.ColumnSpan="2" Content="Выберите значения для перекраса:"
                VerticalAlignment="Center"/>
