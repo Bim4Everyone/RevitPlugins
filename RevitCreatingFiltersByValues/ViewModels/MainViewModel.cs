@@ -22,6 +22,10 @@ using View = Autodesk.Revit.DB.View;
 using Color = Autodesk.Revit.DB.Color;
 using System.Xml.Linq;
 using System.Windows.Media;
+using System.Windows.Documents;
+using System.Security.Cryptography;
+using System.Windows.Data;
+using System.ComponentModel;
 
 namespace RevitCreatingFiltersByValues.ViewModels {
     internal class MainViewModel : BaseViewModel {
@@ -32,9 +36,11 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         private bool _overrideByColor = true;
         private bool _overrideByPattern;
         private bool _overridingWithFilters = true;
-        private List<string> _selectedCategories = new List<string>();
+        private ICollectionView _categoriesView;
+        private string _categoriesFilter;
         private ParametersHelper _selectedFilterableParameter;
         private List<PossibleValue> _selectedPossibleValues = new List<PossibleValue>();
+        //private List<CategoryElements> _categoryElements = new List<CategoryElements>();
 
         private ColorHelper _selectedColor;
         private PatternsHelper _selectedPattern;
@@ -49,20 +55,24 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         };
 
 
+
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
-            
-            DictCategoryElements = _revitRepository.GetDictCategoriesInView();
-            CategoriesInPj = DictCategoryElements.Keys.OrderBy(s => s).ToList();
+
+            CategoryElements = _revitRepository.GetCategoriesInView(false);
             SolidFillPattern = _revitRepository.SolidFillPattern;
             PatternsInPj = _revitRepository.GetPatternsByNames(patternNames);
+            SetFilters();
 
+            ClearCategoriesFilterInGUICommand = new RelayCommand(ClearCategoriesFilterInGUI);
+            SelectAllCategoriesInGUICommand = new RelayCommand(SelectAllCategoriesInGUI);
+            UnselectAllCategoriesInGUICommand = new RelayCommand(UnselectAllCategoriesInGUI);
 
-            CreateCommand = new RelayCommand(Create, CanCreate);
             GetFilterableParametersCommand = new RelayCommand(GetFilterableParameters);
             GetPossibleValuesCommand = new RelayCommand(GetPossibleValues);
             SetPossibleValuesCommand = new RelayCommand(SetPossibleValues);
+            CreateCommand = new RelayCommand(Create, CanCreate);
 
             ChangeColorCommand = new RelayCommand(ChangeColor, CanChangeColor);
             AddColorCommand = new RelayCommand(AddColor);
@@ -78,10 +88,16 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
 
 
-        public ICommand CreateCommand { get; }
         public ICommand GetFilterableParametersCommand { get; }
         public ICommand GetPossibleValuesCommand { get; }
         public ICommand SetPossibleValuesCommand { get; }
+        public ICommand CreateCommand { get; }
+
+
+        public ICommand ClearCategoriesFilterInGUICommand { get; }
+        public ICommand SelectAllCategoriesInGUICommand { get; }
+        public ICommand UnselectAllCategoriesInGUICommand { get; }
+
 
         public ICommand ChangeColorCommand { get; }
         public ICommand AddColorCommand { get; }
@@ -95,25 +111,18 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         public ICommand MovePatternDownCommand { get; }
 
 
-        private List<Element> elementsInView { get; set; } = new List<Element>();
+
         public FillPatternElement SolidFillPattern { get; set; }
         public ObservableCollection<PatternsHelper> PatternsInPj { get; set; } = new ObservableCollection<PatternsHelper>();
         public List<ParameterFilterElement> AllFiltersInPj { get; set; } = new List<ParameterFilterElement>();
-        public List<ParameterFilterElement> AllFiltersInView { get; set; } = new List<ParameterFilterElement>();
         public List<string> AllFilterNamesInPj { get; set; } = new List<string>();
-        public List<string> AllFilterNamesInView { get; set; } = new List<string>();
-        public Dictionary<string, CategoryElements> DictCategoryElements { get; set; } = new Dictionary<string, CategoryElements>();
-        public List<string> CategoriesInPj { get; set; } = new List<string>();
+        public ObservableCollection<CategoryElements> CategoryElements { get; set; } = new ObservableCollection<CategoryElements>();
         public ObservableCollection<ParametersHelper> FilterableParameters { get; set; } = new ObservableCollection<ParametersHelper>();
         public ObservableCollection<PossibleValue> PossibleValues { get; set; } = new ObservableCollection<PossibleValue>();
         public List<ElementId> SelectedCatIds { get; set; } = new List<ElementId>();
         public List<Element> SelectedElements { get; set; } = new List<Element>();
 
 
-        public List<string> SelectedCategories {
-            get => _selectedCategories;
-            set => this.RaiseAndSetIfChanged(ref _selectedCategories, value);
-        }
 
         public ParametersHelper SelectedFilterableParameter {
             get => _selectedFilterableParameter;
@@ -168,12 +177,26 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             get => _selectedPattern;
             set => this.RaiseAndSetIfChanged(ref _selectedPattern, value);
         }
+        /// <summary>
+        /// Текстовое поле для привязки к TextBlock GUI фильтра списка категорий
+        /// </summary>
+        public string CategoriesFilter {
+            get => _categoriesFilter;
+            set {
+                if(value != _categoriesFilter) {
+                    _categoriesFilter = value;
+                    _categoriesView.Refresh();
+                    OnPropertyChanged(nameof(CategoriesFilter));
+                }
+            }
+        }
 
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
+       
 
 
         /// <summary>
@@ -184,19 +207,21 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         private void GetFilterableParameters(object p) {
             FilterableParameters.Clear();
             PossibleValues.Clear();
-            SelectedCategories.Clear();
             SelectedCatIds.Clear();
 
-            // Забираем список выбранных элементов через CommandParameter
-            System.Collections.IList selectedCategories = p as System.Collections.IList;
+            List<CategoryElements> selectedCategories = new List<CategoryElements>();
+
+            foreach(CategoryElements cat in CategoryElements) {
+                if(cat.IsCheck) {
+                    selectedCategories.Add(cat);
+                }
+            }
+
 
             // Получаем ID категорий для последующего получения параметров фильтрации
-            foreach(var item in selectedCategories) {
-                string categoryName = item as string;
-                if(categoryName == null) { continue; }
+            foreach(CategoryElements cat in selectedCategories) {
 
-                SelectedCategories.Add(categoryName);
-                SelectedCatIds.Add(DictCategoryElements[categoryName].CategoryIdInView);
+                SelectedCatIds.Add(cat.CategoryIdInView);
             }
 
 
@@ -206,7 +231,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             foreach(ElementId id in elementIds) {
                 // Переводим сначала в ParameterElement, если null, значит это BuiltInParameter
                 ParameterElement paramAsParameterElement = _revitRepository.Document.GetElement(id) as ParameterElement;
-                
+
                 ParametersHelper parametersHelper = new ParametersHelper();
 
                 // Если он null, значит это встроенный параметр
@@ -245,23 +270,20 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             SelectedElements.Clear();
 
             // Получаем элементы, которые выбрал пользователь через категории
-            foreach(var item in SelectedCategories) {
-                string categoryName = item as string;
-                if(categoryName == null) { continue; }
+            List<CategoryElements> selectedCategories = new List<CategoryElements>();
 
-                SelectedElements.AddRange(DictCategoryElements[categoryName].ElementsInView);
+            foreach(CategoryElements cat in CategoryElements) {
+                if(cat.IsCheck) {
+                    SelectedElements.AddRange(cat.ElementsInView);
+                }
             }
+
 
             // Перебираем выбранные через категории элементы и получаем их значения по выбранному параметру
             foreach(Element elem in SelectedElements) {
 
                 PossibleValue possibleValue = new PossibleValue(elem, SelectedFilterableParameter);
                 possibleValue.GetValue();
-
-                // Записываем только уникальные
-                //int test = PossibleValues
-                //    .Where(str => str.ValueAsString.Equals(possibleValue.ValueAsString))
-                //    .ToList().Count;
 
                 if(possibleValue.ValueAsString is null) {
                     continue;
@@ -278,10 +300,6 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 if(flag is false) {
                     PossibleValues.Add(possibleValue);
                 }
-
-                //if(test == 0 && possibleValue.ValueAsString != null) {
-                //    PossibleValues.Add(possibleValue);
-                //}
             }
 
             PossibleValues = new ObservableCollection<PossibleValue>(PossibleValues.OrderBy(i => i.ValueAsString));
@@ -335,7 +353,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
                     // Либо создаем фильтры и переопределяем видимость через них
                     if(OverridingWithFilters) {
-                        string newFilterName = string.Format("${0}_{1}_{2}", userName, SelectedFilterableParameter.ParamName, pos.ValueAsString);
+                        string newFilterName = CorrectName(string.Format("${0}/{1}/{2}", userName, SelectedFilterableParameter.ParamName, pos.ValueAsString));
 
                         ParameterFilterElement parameterFilterElement = null;
 
@@ -403,6 +421,26 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             }
         }
 
+        private string CorrectName(string name) {
+            
+            if(name.Contains('\\')) { name = name.Replace('\\', '-'); }
+            if(name.Contains(':')) { name = name.Replace(':', '-'); }
+            if(name.Contains('{')) { name = name.Replace('{', '-'); }
+            if(name.Contains('}')) { name = name.Replace('}', '-'); }
+            if(name.Contains('[')) { name = name.Replace('[', '-'); }
+            if(name.Contains(']')) { name = name.Replace(']', '-'); }
+            if(name.Contains('|')) { name = name.Replace('|', '-'); }
+            if(name.Contains(';')) { name = name.Replace(';', '-'); }
+            if(name.Contains('<')) { name = name.Replace('<', '-'); }
+            if(name.Contains('>')) { name = name.Replace('>', '-'); }
+            if(name.Contains('?')) { name = name.Replace('?', '-'); }
+            if(name.Contains('`')) { name = name.Replace('`', '-'); }
+            if(name.Contains('~')) { name = name.Replace('~', '-'); }
+
+            return name;
+        }
+
+
         private OverrideGraphicSettings GetOverrideGraphicSettings(int c, int p) {
             OverrideGraphicSettings settings = new OverrideGraphicSettings();
             // Если пользователь поставил галку перекрашивания
@@ -423,13 +461,76 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             return settings;
         }
 
-
         private bool CanCreate(object p) {
             return true;
         }
 
 
 
+        /// <summary>
+        /// Назначает фильтр привязанный к тексту, через который фильтруется список категорий в GUI
+        /// </summary>
+        /// <param name="p"></param>
+        private void SetFilters() {
+            // Организуем фильтрацию списка категорий
+            _categoriesView = CollectionViewSource.GetDefaultView(CategoryElements);
+            _categoriesView.Filter = item => String.IsNullOrEmpty(CategoriesFilter) ? true :
+                ((CategoryElements) item).CategoryName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+
+        /// <summary>
+        /// Обнуление строки фильтра привязанного к тексту, через который фильтруется список категорий в GUI
+        /// Работает при нажатии "x" в правой части области поиска
+        /// </summary>
+        /// <param name="p"></param>
+        private void ClearCategoriesFilterInGUI(object p) {
+            CategoriesFilter = null;
+        }
+
+        /// <summary>
+        /// Ставит галку выбора всем категориям элементов, видимых на виде.
+        /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка категорий в GUI
+        /// </summary>
+        /// <param name="p"></param>
+        private void SelectAllCategoriesInGUI(object p) {
+            foreach(CategoryElements cat in CategoryElements) {
+                if(String.IsNullOrEmpty(CategoriesFilter) ? true :
+                (cat.CategoryName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0)) {
+                    cat.IsCheck = true;
+                }
+            }
+            // Иначе не работало:
+            _categoriesView.Refresh();
+
+            GetFilterableParameters(null);
+        }
+
+
+        /// <summary>
+        /// Снимает галку выбора у всех категорий элементов, видимых на виде.
+        /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка категорий в GUI
+        /// </summary>
+        /// <param name="p"></param>
+        private void UnselectAllCategoriesInGUI(object p) {
+            foreach(CategoryElements cat in CategoryElements) {
+                if(String.IsNullOrEmpty(CategoriesFilter) ? true :
+                (cat.CategoryName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0)) {
+                    cat.IsCheck = false;
+                }
+            }
+            // Иначе не работало:
+            _categoriesView.Refresh();
+
+            GetFilterableParameters(null);
+        }
+
+
+
+        /// <summary>
+        /// Отработка изменений выбранного цвет в настройках плагина
+        /// </summary>
+        /// <param name="p"></param>
         private void ChangeColor(object p) {
                        
             ColorSelectionDialog colorSelectionDialog = new ColorSelectionDialog();
@@ -445,6 +546,10 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 Colors[index] = newColor;
             }
         }
+        /// <summary>
+        /// Добавляет новый цвет в настройках плагина
+        /// </summary>
+        /// <param name="p"></param>
         private void AddColor(object p) {
             ColorSelectionDialog colorSelectionDialog = new ColorSelectionDialog();
 
@@ -452,10 +557,18 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 Colors.Add(new ColorHelper(colorSelectionDialog.SelectedColor.Red, colorSelectionDialog.SelectedColor.Green, colorSelectionDialog.SelectedColor.Blue));
             }
         }
+        /// <summary>
+        /// Удаляет выбранный цвет в настройках плагина
+        /// </summary>
+        /// <param name="p"></param>
         private void DeleteColor(object p) {
 
             Colors.Remove(SelectedColor);
         }
+        /// <summary>
+        /// Перемещает выбранный цвет вверх в настройках плагина
+        /// </summary>
+        /// <param name="p"></param>
         private void MoveColorUp(object p) {
 
             int index = Colors.IndexOf(SelectedColor);
@@ -463,6 +576,10 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 Colors.Move(index, index - 1);
             }
         }
+        /// <summary>
+        /// Перемещает выбранный цвет вниз в настройках плагина
+        /// </summary>
+        /// <param name="p"></param>
         private void MoveColorDown(object p) {
 
             int index = Colors.IndexOf(SelectedColor);
@@ -470,7 +587,11 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 Colors.Move(index, index + 1);
             }
         }
-
+        /// <summary>
+        /// Определяет можно ли изменить цвет
+        /// True, если выбран цвет в списке цветов в настройках плагина
+        /// </summary>
+        /// <param name="p"></param>
         private bool CanChangeColor(object p) {
             if(SelectedColor is null) {
                 return false;
@@ -479,7 +600,10 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         }
 
 
-
+        /// <summary>
+        /// Добавляет новую штриховку в настройках плагина
+        /// </summary>
+        /// <param name="p"></param>
         private void AddPattern(object p) {
 
             List<FillPatternElement> allDraftingPatterns = _revitRepository.AllDraftingPatterns;
@@ -488,10 +612,18 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 PatternsInPj.Add(new PatternsHelper(allDraftingPatterns[0], allDraftingPatterns));
             }
         }
+        /// <summary>
+        /// Удаляет выбранный цвет в настройках плагина
+        /// </summary>
+        /// <param name="p"></param>
         private void DeletePattern(object p) {
 
             PatternsInPj.Remove(SelectedPattern);
         }
+        /// <summary>
+        /// Перемещает выбранную штриховку вверх в настройках плагина
+        /// </summary>
+        /// <param name="p"></param>
         private void MovePatternUp(object p) {
 
             int index = PatternsInPj.IndexOf(SelectedPattern);
@@ -499,6 +631,10 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 PatternsInPj.Move(index, index - 1);
             }
         }
+        /// <summary>
+        /// Перемещает выбранную штриховку вниз в настройках плагина
+        /// </summary>
+        /// <param name="p"></param>
         private void MovePatternDown(object p) {
 
             int index = PatternsInPj.IndexOf(SelectedPattern);
@@ -506,6 +642,11 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 PatternsInPj.Move(index, index + 1);
             }
         }
+        /// <summary>
+        /// Определяет можно ли изменить штриховку
+        /// True, если выбрана штриховка в списке штриховок в настройках плагина
+        /// </summary>
+        /// <param name="p"></param>
         private bool CanChangePattern(object p) {
             if(SelectedPattern is null) {
                 return false;

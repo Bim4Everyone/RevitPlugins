@@ -119,7 +119,7 @@ namespace RevitCreatingFiltersByValues.Models {
         /// </summary>
         public void DeleteTempFiltersInView() {
             List<ParameterFilterElement> filters = AllFilterElementsInView;
-            string checkString = string.Format("${0}_", UserName);
+            string checkString = string.Format("${0}/", UserName);
 
             foreach(ParameterFilterElement filter in filters) {
                 if(filter.Name.Contains(checkString)) {
@@ -135,14 +135,14 @@ namespace RevitCreatingFiltersByValues.Models {
         /// <summary>
         /// Получает категории, представленные на виде + элементы в словаре по ним
         /// </summary>
-        public Dictionary<string, CategoryElements> GetDictCategoriesInView() {
+        public ObservableCollection<CategoryElements> GetCategoriesInView(bool checkFlag) {
 
-            Dictionary<string, CategoryElements> dictCategoryElements = new Dictionary<string, CategoryElements>();
+            ObservableCollection<CategoryElements> categoryElements = new ObservableCollection<CategoryElements>();
 
-            foreach(Element item in GetElementsInView()) {
-                if(item.Category is null) { continue; }
+            foreach(Element elem in GetElementsInView()) {
+                if(elem.Category is null) { continue; }
 
-                Category catOfElem = item.Category;
+                Category catOfElem = elem.Category;
                 string elemCategoryName = catOfElem.Name;
                 ElementId elemCategoryId = catOfElem.Id;
 
@@ -150,15 +150,22 @@ namespace RevitCreatingFiltersByValues.Models {
                 if(!FilterableCategories.Contains(elemCategoryId)) { continue; }
 
                 // Добавляем в словарь элементы, разбивая по группам по ключу
-                if(dictCategoryElements.ContainsKey(elemCategoryName)) {
-                    dictCategoryElements[elemCategoryName].ElementsInView.Add(item);
+                bool flag = false;
+                foreach(CategoryElements categoryElement in categoryElements) {
 
-                } else {
-                    dictCategoryElements.Add(elemCategoryName, new CategoryElements(catOfElem, elemCategoryId, new List<Element>() { item }));
+                    if(categoryElement.CategoryName.Equals(elemCategoryName)) {
+                        categoryElement.ElementsInView.Add(elem);
+                        flag = true;
+                        break;
+                    }
+                }
+
+                if(flag is false) {
+                    categoryElements.Add(new CategoryElements(catOfElem, elemCategoryId, checkFlag, new List<Element>() { elem }));
                 }
             }
 
-            return dictCategoryElements;
+            return categoryElements;
         }
 
     }

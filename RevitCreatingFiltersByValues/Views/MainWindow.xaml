@@ -14,12 +14,24 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    MinHeight="700" MinWidth="550"    
+    MinHeight="700" MinWidth="600"    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
     x:Name="window"
     Loaded="window_Loaded">
-
+    <Window.Resources>
+        <Style x:Key="TransparentStyle" TargetType="{x:Type Button}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="Transparent">
+                            <ContentPresenter/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -254,11 +266,27 @@
                VerticalAlignment="Center"/>
 
         <StackPanel Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Right" Orientation="Horizontal">
+            <TextBox 
+                x:Name="searchCategory"
+                Text="{Binding Path=CategoriesFilter, UpdateSourceTrigger=PropertyChanged}"
+                Width="100"
+                Margin="5 0 5 5"
+                VerticalContentAlignment="Center"/>
+
+            <Button 
+                Margin="-18,-7,5,0" 
+                Width="25" 
+                Height="25" 
+                Content="x"
+                FontSize="16"
+                Command="{Binding ClearCategoriesFilterInGUICommand}"
+                Style="{StaticResource TransparentStyle}"/>
+            
             <Button 
                 Content="Выбрать все" 
                 Margin="5 0 5 5" 
                 Padding="5 0" 
-                Click="SelectAllCategories" 
+                Command="{Binding SelectAllCategoriesInGUICommand}"
                 ToolTip="Нажмите, чтобы выбрать все категории представленные в списке ниже"
                 ToolTipService.InitialShowDelay="1000"
                 ToolTipService.ShowDuration="20000"
@@ -267,15 +295,55 @@
                 Content="Отменить выбор" 
                 Margin="5 0 5 5" 
                 Padding="5 0" 
-                Click="UnselectAllCategories"
+                Command="{Binding UnselectAllCategoriesInGUICommand}"
                 ToolTip="Нажмите, чтобы отменить выбор всех категорий представленные в списке ниже"
                 ToolTipService.InitialShowDelay="1000"
                 ToolTipService.ShowDuration="20000"
                 ToolTipService.BetweenShowDelay="1"/>
         </StackPanel>
 
+        <ListView
+            Grid.Row="2" Grid.ColumnSpan="2" 
+            x:Name="categories"
+            Margin="10 5"
+            ScrollViewer.VerticalScrollBarVisibility="Visible"
+            ScrollViewer.CanContentScroll="False"
+            ItemsSource="{Binding Path=CategoryElements, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Категории на виде">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    Content="{Binding Path=CategoryName}"
+                                    Width="400"
+                                    IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
 
-        <ListBox Grid.Row="2" Grid.ColumnSpan="2"
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Checked">
+                                            <i:InvokeCommandAction 
+                                                Command="{Binding DataContext.GetFilterableParametersCommand, 
+                                                    RelativeSource={RelativeSource AncestorType=ListView}}"/>
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="Unchecked">
+                                            <i:InvokeCommandAction 
+                                                Command="{Binding DataContext.GetFilterableParametersCommand, 
+                                                    RelativeSource={RelativeSource AncestorType=ListView}}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </CheckBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        
+
+
+
+
+        <!--<ListBox Grid.Row="2" Grid.ColumnSpan="2"
                  Margin="5 5 5 0" 
                  Name="categories"
                  ItemsSource="{Binding CategoriesInPj}"
@@ -285,7 +353,7 @@
                  ToolTipService.BetweenShowDelay="1">
             <ListBox.ToolTip>
                 <ToolTip>
-                    <TextBlock 
+                    <TextBlock
                         Text="Перечень категорий, элементы которых видны на текущем виде (в т.ч. из связанных файлов). Выберите одну или несколько категорий и параметр для фильтрации (см. ниже), и тогда плагин произведет отбор значений по этому параметру среди элементов выбранных категорий. Выбранные здесь категории будут заданы фильтрам в случае, если стоит галка &quot;Переопределять цвет&quot;. Если этот список пуст, значит на виде не было найдено элементов ни одной категории, которые имеют параметры для фильтрации." 
                         TextWrapping="Wrap"
                         Width="300"
@@ -301,7 +369,7 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
             
-        </ListBox>
+        </ListBox>-->
 
         <Label Grid.Row="3" Grid.ColumnSpan="2" Content="Выберите параметр для фильтрации:"
                VerticalAlignment="Center"/>
