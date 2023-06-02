@@ -12,27 +12,7 @@ namespace RevitCreatingFiltersByValues.Views {
     public partial class MainWindow {
         public MainWindow() {
             InitializeComponent();
-
-            //categories.Items.Filter = CategoryFilter;
-            
-            //categories.Items.Filter = item => String.IsNullOrEmpty(searchCategory.Text) ? true : 
-            //    ((CategoryElements) item).CategoryName.IndexOf(searchCategory.Text, StringComparison.OrdinalIgnoreCase) >= 0;
         }
-
-
-        //private bool CategoryFilter(object item) {
-        //    if(String.IsNullOrEmpty(searchCategory.Text))
-        //        return true;
-        //    else
-        //        return (item as CategoryElements).CategoryName.IndexOf(searchCategory.Text, StringComparison.OrdinalIgnoreCase) >= 0;
-        //}
-
-        //private void searchCategory_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) {
-        //    CollectionViewSource.GetDefaultView(categories.ItemsSource).Refresh();
-        //}
-
-
-
 
 
         public override string PluginName => nameof(RevitCreatingFiltersByValues);

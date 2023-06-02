@@ -39,7 +39,7 @@
             <RowDefinition Height="30" />
             <RowDefinition Height="*" />
             <RowDefinition Height="30" />
-            <RowDefinition Height="30" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="30" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -267,15 +267,13 @@
 
         <StackPanel Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Right" Orientation="Horizontal">
             <TextBox 
-                x:Name="searchCategory"
                 Text="{Binding Path=CategoriesFilter, UpdateSourceTrigger=PropertyChanged}"
                 Width="100"
                 Margin="5 0 5 5"
                 VerticalContentAlignment="Center"/>
-
             <Button 
-                Margin="-18,-7,5,0" 
-                Width="25" 
+                Margin="-18,-6,5,0" 
+                Width="15" 
                 Height="25" 
                 Content="x"
                 FontSize="16"
@@ -293,7 +291,7 @@
                 ToolTipService.BetweenShowDelay="1"/>
             <Button 
                 Content="Отменить выбор" 
-                Margin="5 0 5 5" 
+                Margin="5 0 10 5" 
                 Padding="5 0" 
                 Command="{Binding UnselectAllCategoriesInGUICommand}"
                 ToolTip="Нажмите, чтобы отменить выбор всех категорий представленные в списке ниже"
@@ -305,7 +303,7 @@
         <ListView
             Grid.Row="2" Grid.ColumnSpan="2" 
             x:Name="categories"
-            Margin="10 5"
+            Margin="10 5 10 10"
             ScrollViewer.VerticalScrollBarVisibility="Visible"
             ScrollViewer.CanContentScroll="False"
             ItemsSource="{Binding Path=CategoryElements, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
@@ -340,41 +338,30 @@
         </ListView>
         
 
-
-
-
-        <!--<ListBox Grid.Row="2" Grid.ColumnSpan="2"
-                 Margin="5 5 5 0" 
-                 Name="categories"
-                 ItemsSource="{Binding CategoriesInPj}"
-                 SelectionMode="Multiple"
-                 ToolTipService.InitialShowDelay="1000"
-                 ToolTipService.ShowDuration="20000"
-                 ToolTipService.BetweenShowDelay="1">
-            <ListBox.ToolTip>
-                <ToolTip>
-                    <TextBlock
-                        Text="Перечень категорий, элементы которых видны на текущем виде (в т.ч. из связанных файлов). Выберите одну или несколько категорий и параметр для фильтрации (см. ниже), и тогда плагин произведет отбор значений по этому параметру среди элементов выбранных категорий. Выбранные здесь категории будут заданы фильтрам в случае, если стоит галка &quot;Переопределять цвет&quot;. Если этот список пуст, значит на виде не было найдено элементов ни одной категории, которые имеют параметры для фильтрации." 
-                        TextWrapping="Wrap"
-                        Width="300"
-                        TextAlignment="Justify"
-                        FlowDirection="LeftToRight"/>
-                </ToolTip>
-            </ListBox.ToolTip>
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectionChanged">
-                    <i:InvokeCommandAction 
-                        Command="{Binding GetFilterableParametersCommand}"
-                        CommandParameter="{Binding SelectedItems, ElementName=categories}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-            
-        </ListBox>-->
-
         <Label Grid.Row="3" Grid.ColumnSpan="2" Content="Выберите параметр для фильтрации:"
                VerticalAlignment="Center"/>
 
-        <ComboBox 
+        <StackPanel 
+            Grid.Row="3" 
+            Grid.ColumnSpan="2"
+            HorizontalAlignment="Right" 
+            Orientation="Horizontal">
+            <TextBox 
+                Text="{Binding Path=ParamsFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                Width="100"
+                Margin="5 0 10 5"
+                VerticalContentAlignment="Center"/>
+            <Button 
+                Margin="-32,-6,0,0" 
+                Width="15" 
+                Height="25" 
+                Content="x"
+                FontSize="16"
+                Command="{Binding ClearParametersFilterInGUICommand}"
+                Style="{StaticResource TransparentStyle}"/>
+        </StackPanel>
+
+        <!--<ComboBox 
             Grid.Row="4" Grid.ColumnSpan="2"
             Name="parameters"
             Margin="5"
@@ -400,13 +387,13 @@
                         Command="{Binding GetPossibleValuesCommand}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-        </ComboBox>
+        </ComboBox>-->
 
 
-        <!--<ListBox Grid.Row="4" Grid.ColumnSpan="2"
+        <ListBox Grid.Row="4" Grid.ColumnSpan="2"
                  Margin="5 5 5 0"
                  Name="parameters"
-                 ItemsSource="{Binding FilterableParameters}"
+                 ItemsSource="{Binding Path=FilterableParameters, UpdateSourceTrigger=PropertyChanged}"
                  DisplayMemberPath="ParamName"
                  SelectedItem="{Binding SelectedFilterableParameter}"
                  SelectionMode="Single"
@@ -429,7 +416,7 @@
                         Command="{Binding GetPossibleValuesCommand}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-        </ListBox>-->
+        </ListBox>
 
         <Label Grid.Row="5" Grid.ColumnSpan="2" Content="Выберите значения для перекраса:"
                VerticalAlignment="Center"/>

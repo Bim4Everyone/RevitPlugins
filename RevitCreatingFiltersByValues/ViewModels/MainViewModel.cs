@@ -37,7 +37,9 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         private bool _overrideByPattern;
         private bool _overridingWithFilters = true;
         private ICollectionView _categoriesView;
-        private string _categoriesFilter;
+        private string _categoriesFilter = string.Empty;
+        private ICollectionView _paramsView;
+        private string _paramsFilter = string.Empty;
         private ParametersHelper _selectedFilterableParameter;
         private List<PossibleValue> _selectedPossibleValues = new List<PossibleValue>();
         //private List<CategoryElements> _categoryElements = new List<CategoryElements>();
@@ -63,11 +65,12 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             CategoryElements = _revitRepository.GetCategoriesInView(false);
             SolidFillPattern = _revitRepository.SolidFillPattern;
             PatternsInPj = _revitRepository.GetPatternsByNames(patternNames);
-            SetFilters();
+            SetCategoriesFilters();
 
             ClearCategoriesFilterInGUICommand = new RelayCommand(ClearCategoriesFilterInGUI);
             SelectAllCategoriesInGUICommand = new RelayCommand(SelectAllCategoriesInGUI);
             UnselectAllCategoriesInGUICommand = new RelayCommand(UnselectAllCategoriesInGUI);
+            ClearParametersFilterInGUICommand = new RelayCommand(ClearParametersFilterInGUI);
 
             GetFilterableParametersCommand = new RelayCommand(GetFilterableParameters);
             GetPossibleValuesCommand = new RelayCommand(GetPossibleValues);
@@ -95,6 +98,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
 
         public ICommand ClearCategoriesFilterInGUICommand { get; }
+        public ICommand ClearParametersFilterInGUICommand { get; }
         public ICommand SelectAllCategoriesInGUICommand { get; }
         public ICommand UnselectAllCategoriesInGUICommand { get; }
 
@@ -177,6 +181,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             get => _selectedPattern;
             set => this.RaiseAndSetIfChanged(ref _selectedPattern, value);
         }
+
         /// <summary>
         /// Текстовое поле для привязки к TextBlock GUI фильтра списка категорий
         /// </summary>
@@ -187,6 +192,20 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                     _categoriesFilter = value;
                     _categoriesView.Refresh();
                     OnPropertyChanged(nameof(CategoriesFilter));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Текстовое поле для привязки к TextBlock GUI фильтра списка параметров
+        /// </summary>
+        public string ParamsFilter {
+            get => _paramsFilter;
+            set {
+                if(value != _paramsFilter) {
+                    _paramsFilter = value;
+                    _paramsView.Refresh();
+                    OnPropertyChanged(nameof(ParamsFilter));
                 }
             }
         }
@@ -254,6 +273,8 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
             FilterableParameters = new ObservableCollection<ParametersHelper>(FilterableParameters.OrderBy(i => i.ParamName));
             OnPropertyChanged(nameof(FilterableParameters));
+
+            SetParamsFilters();
         }
 
 
@@ -471,12 +492,26 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         /// Назначает фильтр привязанный к тексту, через который фильтруется список категорий в GUI
         /// </summary>
         /// <param name="p"></param>
-        private void SetFilters() {
+        private void SetCategoriesFilters() {
             // Организуем фильтрацию списка категорий
             _categoriesView = CollectionViewSource.GetDefaultView(CategoryElements);
             _categoriesView.Filter = item => String.IsNullOrEmpty(CategoriesFilter) ? true :
                 ((CategoryElements) item).CategoryName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
         }
+
+        /// <summary>
+        /// Назначает фильтр привязанный к тексту, через который фильтруется список параметров в GUI
+        /// </summary>
+        /// <param name="p"></param>
+        private void SetParamsFilters() {
+            // Организуем фильтрацию списка параметров
+            _paramsView = CollectionViewSource.GetDefaultView(FilterableParameters);
+            _paramsView.Filter = item => String.IsNullOrEmpty(ParamsFilter) ? true :
+                ((ParametersHelper) item).ParamName.IndexOf(ParamsFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+
+
 
 
         /// <summary>
@@ -485,7 +520,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         /// </summary>
         /// <param name="p"></param>
         private void ClearCategoriesFilterInGUI(object p) {
-            CategoriesFilter = null;
+            CategoriesFilter = string.Empty;
         }
 
         /// <summary>
@@ -525,6 +560,14 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             GetFilterableParameters(null);
         }
 
+        /// <summary>
+        /// Обнуление строки фильтра привязанного к тексту, через который фильтруется список параметров в GUI
+        /// Работает при нажатии "x" в правой части области поиска
+        /// </summary>
+        /// <param name="p"></param>
+        private void ClearParametersFilterInGUI(object p) {
+            ParamsFilter = string.Empty;
+        }
 
 
         /// <summary>
