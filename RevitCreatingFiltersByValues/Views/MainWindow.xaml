@@ -274,13 +274,13 @@
             <Button 
                 Margin="-18,-6,5,0" 
                 Width="15" 
-                Height="25" 
+                Height="25"
                 Content="x"
                 FontSize="16"
                 Command="{Binding ClearCategoriesFilterInGUICommand}"
                 Style="{StaticResource TransparentStyle}"/>
             
-            <Button 
+            <Button
                 Content="Выбрать все" 
                 Margin="5 0 5 5" 
                 Padding="5 0" 
@@ -391,7 +391,7 @@
 
 
         <ListBox Grid.Row="4" Grid.ColumnSpan="2"
-                 Margin="5 5 5 0"
+                 Margin="5 5 5 10"
                  Name="parameters"
                  ItemsSource="{Binding Path=FilterableParameters, UpdateSourceTrigger=PropertyChanged}"
                  DisplayMemberPath="ParamName"
@@ -422,9 +422,23 @@
                VerticalAlignment="Center"/>
 
         <StackPanel Grid.Row="5" Grid.ColumnSpan="2" HorizontalAlignment="Right" Orientation="Horizontal">
+            <TextBox 
+                Text="{Binding Path=PossibleValuesFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                Width="100"
+                Margin="5 0 10 5"
+                VerticalContentAlignment="Center"/>
+            <Button 
+                Margin="-32,-6,0,0"
+                Width="15" 
+                Height="25" 
+                Content="x"
+                FontSize="16"
+                Command="{Binding ClearPossibleValuesFilterInGUICommand}"
+                Style="{StaticResource TransparentStyle}"/>
+            
             <Button 
                 Content="Выбрать все" 
-                Margin="5 5 5 0" 
+                Margin="5 0 5 5" 
                 Padding="5 0" 
                 Click="SelectAllValues"
                 ToolTip="Нажмите, чтобы выбрать все значения представленные в списке ниже"
@@ -433,7 +447,7 @@
                 ToolTipService.BetweenShowDelay="1"/>
             <Button 
                 Content="Отменить выбор"
-                Margin="5 5 5 0"
+                Margin="5 0 5 5"
                 Padding="5 0" 
                 Click="UnselectAllValues"
                 ToolTip="Нажмите, чтобы отменить выбор всех значений представленных в списке ниже"
@@ -443,7 +457,7 @@
         </StackPanel>
 
 
-        <ListBox Grid.Row="6" Grid.ColumnSpan="2"
+        <!--<ListBox Grid.Row="6" Grid.ColumnSpan="2"
                  Margin="5 5 5 0"
                  Name="values"
                  ItemsSource="{Binding PossibleValues}"
@@ -469,7 +483,38 @@
                         CommandParameter="{Binding SelectedItems, ElementName=values}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-        </ListBox>
+        </ListBox>-->
+
+
+
+        <ListView
+            Grid.Row="6" Grid.ColumnSpan="2" 
+            Name="values"
+            Margin="5 5 5 0"
+            ItemsSource="{Binding Path=PossibleValues}"
+            ScrollViewer.VerticalScrollBarVisibility="Visible"
+            ScrollViewer.CanContentScroll="False">
+            
+  
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Возможные значения">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    Width="400"
+                                    IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                    <TextBlock
+                                        Width="400"
+                                        Text="{Binding Path=ValueAsString}"/>
+                                </CheckBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
 
 
         <GroupBox 

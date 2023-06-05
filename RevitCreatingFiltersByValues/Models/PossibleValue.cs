@@ -26,10 +26,12 @@ namespace RevitCreatingFiltersByValues.Models {
         public List<Element> ElementsInPj { get; set; } = new List<Element>();
         public ParametersHelper SelectedFilterableParameter { get; set; }
 
+        public bool IsCheck { get; set; } = false;
+
 
         public StorageType StorageParamType { get; set; }
 
-        public string ValueAsString { get; set; }// = string.Empty;
+        public string ValueAsString { get; set; }
         public int ValueAsInteger { get; set; }
         public ElementId ValueAsElementId { get; set; }
         public double ValueAsDouble { get; set; }

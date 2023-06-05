@@ -40,6 +40,8 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         private string _categoriesFilter = string.Empty;
         private ICollectionView _paramsView;
         private string _paramsFilter = string.Empty;
+        private ICollectionView _possibleValuesView;
+        private string _possibleValuesFilter = string.Empty;
         private ParametersHelper _selectedFilterableParameter;
         private List<PossibleValue> _selectedPossibleValues = new List<PossibleValue>();
         //private List<CategoryElements> _categoryElements = new List<CategoryElements>();
@@ -71,10 +73,11 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             SelectAllCategoriesInGUICommand = new RelayCommand(SelectAllCategoriesInGUI);
             UnselectAllCategoriesInGUICommand = new RelayCommand(UnselectAllCategoriesInGUI);
             ClearParametersFilterInGUICommand = new RelayCommand(ClearParametersFilterInGUI);
+            ClearPossibleValuesFilterInGUICommand = new RelayCommand(ClearPossibleValuesFilterInGUI);
 
             GetFilterableParametersCommand = new RelayCommand(GetFilterableParameters);
             GetPossibleValuesCommand = new RelayCommand(GetPossibleValues);
-            SetPossibleValuesCommand = new RelayCommand(SetPossibleValues);
+            //SetPossibleValuesCommand = new RelayCommand(SetPossibleValues);
             CreateCommand = new RelayCommand(Create, CanCreate);
 
             ChangeColorCommand = new RelayCommand(ChangeColor, CanChangeColor);
@@ -99,6 +102,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
         public ICommand ClearCategoriesFilterInGUICommand { get; }
         public ICommand ClearParametersFilterInGUICommand { get; }
+        public ICommand ClearPossibleValuesFilterInGUICommand { get; }
         public ICommand SelectAllCategoriesInGUICommand { get; }
         public ICommand UnselectAllCategoriesInGUICommand { get; }
 
@@ -210,13 +214,25 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             }
         }
 
+        /// <summary>
+        /// Текстовое поле для привязки к TextBlock GUI фильтра списка возможных значений
+        /// </summary>
+        public string PossibleValuesFilter {
+            get => _possibleValuesFilter;
+            set {
+                if(value != _possibleValuesFilter) {
+                    _possibleValuesFilter = value;
+                    _possibleValuesView.Refresh();
+                    OnPropertyChanged(nameof(PossibleValuesFilter));
+                }
+            }
+        }
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
        
-
 
         /// <summary>
         /// Получает параметры по которым доступна фильтрация из выбранных категорий.
@@ -325,29 +341,31 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
             PossibleValues = new ObservableCollection<PossibleValue>(PossibleValues.OrderBy(i => i.ValueAsString));
             OnPropertyChanged(nameof(PossibleValues));
+
+            SetPossibleValuesFilters();
         }
 
 
 
-        /// <summary>
-        /// Переводит выбранные значений для фильтрации в нормальный формат
-        /// Отрабатывает при выборе возможных значений выбранного параметра фильтрации в списке значений GUI
-        /// </summary>
-        /// <param name="p"></param>
-        private void SetPossibleValues(object p) {
-            SelectedPossibleValues.Clear();
+        ///// <summary>
+        ///// Переводит выбранные значений для фильтрации в нормальный формат
+        ///// Отрабатывает при выборе возможных значений выбранного параметра фильтрации в списке значений GUI
+        ///// </summary>
+        ///// <param name="p"></param>
+        //private void SetPossibleValues(object p) {
+        //    SelectedPossibleValues.Clear();
 
-            // Забираем список выбранных значений через CommandParameter
-            System.Collections.IList selectedPossibleValues = p as System.Collections.IList;
+        //    // Забираем список выбранных значений через CommandParameter
+        //    System.Collections.IList selectedPossibleValues = p as System.Collections.IList;
 
-            // Получаем элементы, которые выбрал пользователь
-            foreach(var item in selectedPossibleValues) {
-                PossibleValue possibleValue = item as PossibleValue;
-                if(possibleValue == null) { continue; }
+        //    // Получаем элементы, которые выбрал пользователь
+        //    foreach(var item in selectedPossibleValues) {
+        //        PossibleValue possibleValue = item as PossibleValue;
+        //        if(possibleValue == null) { continue; }
 
-                SelectedPossibleValues.Add(possibleValue);
-            }
-        }
+        //        SelectedPossibleValues.Add(possibleValue);
+        //    }
+        //}
 
 
         /// <summary>
@@ -370,7 +388,8 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 // Удаляем временные фильтры пользователя на виде
                 _revitRepository.DeleteTempFiltersInView();
 
-                foreach(PossibleValue pos in SelectedPossibleValues) {
+                foreach(PossibleValue pos in PossibleValues) {
+                    if(pos.IsCheck is false) { continue; }
 
                     // Либо создаем фильтры и переопределяем видимость через них
                     if(OverridingWithFilters) {
@@ -510,7 +529,16 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 ((ParametersHelper) item).ParamName.IndexOf(ParamsFilter, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-
+        /// <summary>
+        /// Назначает фильтр привязанный к тексту, через который фильтруется список возможных значений в GUI
+        /// </summary>
+        /// <param name="p"></param>
+        private void SetPossibleValuesFilters() {
+            // Организуем фильтрацию списка возможных значений
+            _possibleValuesView = CollectionViewSource.GetDefaultView(PossibleValues);
+            _possibleValuesView.Filter = item => String.IsNullOrEmpty(PossibleValuesFilter) ? true :
+                ((PossibleValue) item).ValueAsString.IndexOf(PossibleValuesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
 
 
 
@@ -569,6 +597,14 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             ParamsFilter = string.Empty;
         }
 
+        /// <summary>
+        /// Обнуление строки фильтра привязанного к тексту, через который фильтруется список возможных значений в GUI
+        /// Работает при нажатии "x" в правой части области поиска
+        /// </summary>
+        /// <param name="p"></param>
+        private void ClearPossibleValuesFilterInGUI(object p) {
+            PossibleValuesFilter = string.Empty;
+        }
 
         /// <summary>
         /// Отработка изменений выбранного цвет в настройках плагина
