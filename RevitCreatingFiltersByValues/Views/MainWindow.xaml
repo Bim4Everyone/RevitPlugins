@@ -439,8 +439,8 @@
             <Button 
                 Content="Выбрать все" 
                 Margin="5 0 5 5" 
-                Padding="5 0" 
-                Click="SelectAllValues"
+                Padding="5 0"
+                Command="{Binding SelectAllValuesInGUICommand}"
                 ToolTip="Нажмите, чтобы выбрать все значения представленные в списке ниже"
                 ToolTipService.InitialShowDelay="1000"
                 ToolTipService.ShowDuration="20000"
@@ -448,43 +448,13 @@
             <Button 
                 Content="Отменить выбор"
                 Margin="5 0 5 5"
-                Padding="5 0" 
-                Click="UnselectAllValues"
+                Padding="5 0"
+                Command="{Binding UnselectAllValuesInGUICommand}"
                 ToolTip="Нажмите, чтобы отменить выбор всех значений представленных в списке ниже"
                 ToolTipService.InitialShowDelay="1000"
                 ToolTipService.ShowDuration="20000"
                 ToolTipService.BetweenShowDelay="1"/>
         </StackPanel>
-
-
-        <!--<ListBox Grid.Row="6" Grid.ColumnSpan="2"
-                 Margin="5 5 5 0"
-                 Name="values"
-                 ItemsSource="{Binding PossibleValues}"
-                 DisplayMemberPath="ValueAsString"
-                 SelectionMode="Multiple"
-                 ToolTipService.InitialShowDelay="1000"
-                 ToolTipService.ShowDuration="20000"
-                 ToolTipService.BetweenShowDelay="1">
-            <ListBox.ToolTip>
-                <ToolTip>
-                    <TextBlock 
-                        Text="Перечень возможных значений выбранного параметра среди элементов выбранных категорий. Выберите одно или несколько значений, и тогда плагин произведет перекрасит элементы с выбранными значениями. Если стоит галка &quot;Переопределять цвет&quot;, то плагин создаст фильтр на каждое из выбраннох значений. Если этот список пуст, значит не выбран параметр для фильтрации (см. выше) или элементы выбранных категорий не имеют значений в выбранном параметре для фильтрации." 
-                        TextWrapping="Wrap"
-                        Width="300"
-                        TextAlignment="Justify"
-                        FlowDirection="LeftToRight"/>
-                </ToolTip>
-            </ListBox.ToolTip>
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectionChanged">
-                    <i:InvokeCommandAction 
-                        Command="{Binding SetPossibleValuesCommand}"
-                        CommandParameter="{Binding SelectedItems, ElementName=values}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-        </ListBox>-->
-
 
 
         <ListView
@@ -494,8 +464,6 @@
             ItemsSource="{Binding Path=PossibleValues}"
             ScrollViewer.VerticalScrollBarVisibility="Visible"
             ScrollViewer.CanContentScroll="False">
-            
-  
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Возможные значения">
@@ -513,6 +481,19 @@
                     </GridViewColumn>
                 </GridView>
             </ListView.View>
+            <ListView.ToolTip>
+                <ToolTip>
+                    <TextBlock 
+                        Text="Перечень возможных значений выбранного параметра среди элементов выбранных категорий. Выберите одно или несколько значений, и тогда плагин произведет перекрасит элементы с выбранными значениями. Если стоит галка &quot;Переопределять цвет&quot;, то плагин создаст фильтр на каждое из выбраннох значений. Если этот список пуст, значит не выбран параметр для фильтрации (см. выше) или элементы выбранных категорий не имеют значений в выбранном параметре для фильтрации." 
+                        TextWrapping="Wrap"
+                        Width="300"
+                        TextAlignment="Justify"
+                        FlowDirection="LeftToRight"
+                        ToolTipService.InitialShowDelay="3000"
+                        ToolTipService.ShowDuration="20000"
+                        ToolTipService.BetweenShowDelay="1"/>
+                </ToolTip>
+            </ListView.ToolTip>
         </ListView>
 
 

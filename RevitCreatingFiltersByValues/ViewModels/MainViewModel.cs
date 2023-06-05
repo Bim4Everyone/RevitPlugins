@@ -70,14 +70,16 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             SetCategoriesFilters();
 
             ClearCategoriesFilterInGUICommand = new RelayCommand(ClearCategoriesFilterInGUI);
-            SelectAllCategoriesInGUICommand = new RelayCommand(SelectAllCategoriesInGUI);
-            UnselectAllCategoriesInGUICommand = new RelayCommand(UnselectAllCategoriesInGUI);
             ClearParametersFilterInGUICommand = new RelayCommand(ClearParametersFilterInGUI);
             ClearPossibleValuesFilterInGUICommand = new RelayCommand(ClearPossibleValuesFilterInGUI);
+            SelectAllCategoriesInGUICommand = new RelayCommand(SelectAllCategoriesInGUI);
+            UnselectAllCategoriesInGUICommand = new RelayCommand(UnselectAllCategoriesInGUI);
+            SelectAllValuesInGUICommand = new RelayCommand(SelectAllValuesInGUI);
+            UnselectAllValuesInGUICommand = new RelayCommand(UnselectAllValuesInGUI);
+
 
             GetFilterableParametersCommand = new RelayCommand(GetFilterableParameters);
             GetPossibleValuesCommand = new RelayCommand(GetPossibleValues);
-            //SetPossibleValuesCommand = new RelayCommand(SetPossibleValues);
             CreateCommand = new RelayCommand(Create, CanCreate);
 
             ChangeColorCommand = new RelayCommand(ChangeColor, CanChangeColor);
@@ -96,7 +98,6 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
         public ICommand GetFilterableParametersCommand { get; }
         public ICommand GetPossibleValuesCommand { get; }
-        public ICommand SetPossibleValuesCommand { get; }
         public ICommand CreateCommand { get; }
 
 
@@ -105,6 +106,8 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         public ICommand ClearPossibleValuesFilterInGUICommand { get; }
         public ICommand SelectAllCategoriesInGUICommand { get; }
         public ICommand UnselectAllCategoriesInGUICommand { get; }
+        public ICommand SelectAllValuesInGUICommand { get; }
+        public ICommand UnselectAllValuesInGUICommand { get; }
 
 
         public ICommand ChangeColorCommand { get; }
@@ -347,27 +350,6 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
 
 
-        ///// <summary>
-        ///// Переводит выбранные значений для фильтрации в нормальный формат
-        ///// Отрабатывает при выборе возможных значений выбранного параметра фильтрации в списке значений GUI
-        ///// </summary>
-        ///// <param name="p"></param>
-        //private void SetPossibleValues(object p) {
-        //    SelectedPossibleValues.Clear();
-
-        //    // Забираем список выбранных значений через CommandParameter
-        //    System.Collections.IList selectedPossibleValues = p as System.Collections.IList;
-
-        //    // Получаем элементы, которые выбрал пользователь
-        //    foreach(var item in selectedPossibleValues) {
-        //        PossibleValue possibleValue = item as PossibleValue;
-        //        if(possibleValue == null) { continue; }
-
-        //        SelectedPossibleValues.Add(possibleValue);
-        //    }
-        //}
-
-
         /// <summary>
         /// Создает фильтры на виде. Старые временные фильтры удаляет с вида. У существующих в проекте меняет категории
         /// Отрабатывает при нажатии кнопки "Ок" в GUI
@@ -586,6 +568,39 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             _categoriesView.Refresh();
 
             GetFilterableParameters(null);
+        }
+
+        /// <summary>
+        /// Ставит галку выбора всем видимым возможным значениям в списке возможных значений.
+        /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка возможных значений в GUI
+        /// </summary>
+        /// <param name="p"></param>
+        private void SelectAllValuesInGUI(object p) {
+            foreach(PossibleValue pos in PossibleValues) {
+                if(String.IsNullOrEmpty(PossibleValuesFilter) ? true :
+                (pos.ValueAsString.IndexOf(PossibleValuesFilter, StringComparison.OrdinalIgnoreCase) >= 0)) {
+                    pos.IsCheck = true;
+                }
+            }
+            // Иначе не работало:
+            _possibleValuesView.Refresh();
+        }
+
+
+        /// <summary>
+        /// Снимает галку выбора всем видимым возможным значениям в списке возможных значений.
+        /// Отрабатывает при нажатии на кнопку "Отменить выбор" возле списка возможных значений в GUI
+        /// </summary>
+        /// <param name="p"></param>
+        private void UnselectAllValuesInGUI(object p) {
+            foreach(PossibleValue pos in PossibleValues) {
+                if(String.IsNullOrEmpty(PossibleValuesFilter) ? true :
+                (pos.ValueAsString.IndexOf(PossibleValuesFilter, StringComparison.OrdinalIgnoreCase) >= 0)) {
+                    pos.IsCheck = false;
+                }
+            }
+            // Иначе не работало:
+            _possibleValuesView.Refresh();
         }
 
         /// <summary>

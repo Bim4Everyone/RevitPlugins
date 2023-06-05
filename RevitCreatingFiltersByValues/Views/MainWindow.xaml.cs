@@ -26,14 +26,6 @@ namespace RevitCreatingFiltersByValues.Views {
             DialogResult = false;
         }
 
-
-        private void SelectAllValues(object sender, RoutedEventArgs e) {
-            values.SelectAll();
-        }
-        private void UnselectAllValues(object sender, RoutedEventArgs e) {
-            values.UnselectAll();
-        }
-
         private void window_Loaded(object sender, RoutedEventArgs e) {
             expander.MaxHeight = window.ActualHeight * 0.88;
         }
