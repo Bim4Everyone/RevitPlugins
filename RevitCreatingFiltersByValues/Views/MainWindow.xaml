@@ -14,7 +14,8 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    MinHeight="700" MinWidth="600"    
+    MinHeight="700" MinWidth="600"
+    Height="700" Width="600"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
     x:Name="window"
@@ -263,14 +264,32 @@
             VerticalAlignment="Center"/>
 
         <Label Grid.Row="1" Grid.ColumnSpan="2" Content="Выберите категории элементов на виде:"
-               VerticalAlignment="Center"/>
+               VerticalAlignment="Center">
+            <Label.ToolTip>
+                <ToolTip>
+                    <TextBlock 
+                        Text="Перечень категорий элементов, видимых на текущем виде (в т.ч. из связанных файлов). которые имеют параметры для фильтрации. Выберите одну или несколько категорий, и тогда плагин произведет отбор параметров, по которым можно произвести фильтрацию одновременно по всем выбранным категориям. Если этот список пуст, значит на виде не виден ни один элемент из категорий, по которым доступна фильтрация." 
+                        TextWrapping="Wrap"
+                        Width="300"
+                        TextAlignment="Justify"
+                        FlowDirection="LeftToRight"
+                        ToolTipService.InitialShowDelay="1000"
+                        ToolTipService.ShowDuration="20000"
+                        ToolTipService.BetweenShowDelay="1"/>
+                </ToolTip>
+            </Label.ToolTip>
+        </Label>
 
         <StackPanel Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Right" Orientation="Horizontal">
             <TextBox 
                 Text="{Binding Path=CategoriesFilter, UpdateSourceTrigger=PropertyChanged}"
                 Width="100"
                 Margin="5 0 5 5"
-                VerticalContentAlignment="Center"/>
+                VerticalContentAlignment="Center"
+                ToolTip="Напишите, чтобы произвести фильтрацию списка категорий"
+                ToolTipService.InitialShowDelay="1000"
+                ToolTipService.ShowDuration="20000"
+                ToolTipService.BetweenShowDelay="1"/>
             <Button 
                 Margin="-18,-6,5,0" 
                 Width="15" 
@@ -285,7 +304,7 @@
                 Margin="5 0 5 5" 
                 Padding="5 0" 
                 Command="{Binding SelectAllCategoriesInGUICommand}"
-                ToolTip="Нажмите, чтобы выбрать все категории представленные в списке ниже"
+                ToolTip="Нажмите, чтобы выбрать все категории отображенные в списке ниже"
                 ToolTipService.InitialShowDelay="1000"
                 ToolTipService.ShowDuration="20000"
                 ToolTipService.BetweenShowDelay="1"/>
@@ -294,7 +313,7 @@
                 Margin="5 0 10 5" 
                 Padding="5 0" 
                 Command="{Binding UnselectAllCategoriesInGUICommand}"
-                ToolTip="Нажмите, чтобы отменить выбор всех категорий представленные в списке ниже"
+                ToolTip="Нажмите, чтобы отменить выбор всех категорий отображенных в списке ниже"
                 ToolTipService.InitialShowDelay="1000"
                 ToolTipService.ShowDuration="20000"
                 ToolTipService.BetweenShowDelay="1"/>
@@ -336,10 +355,24 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        
+
 
         <Label Grid.Row="3" Grid.ColumnSpan="2" Content="Выберите параметр для фильтрации:"
-               VerticalAlignment="Center"/>
+               VerticalAlignment="Center">
+            <Label.ToolTip>
+                <ToolTip>
+                    <TextBlock 
+                        Text="Перечень параметров, по которым возможна фильтрация среди выбранных категорий. Выберите параметр для фильтрации, и тогда плагин произведет отбор значений по этому параметру среди элементов выбранных категорий. По выбранному здесь параметру будут работать созданные плагином фильтры в случае, если стоит галка &quot;Переопределять цвет&quot;. Если этот список пуст, значит не выбрана ни одна категория (см. выше)." 
+                        TextWrapping="Wrap"
+                        Width="300"
+                        TextAlignment="Justify"
+                        FlowDirection="LeftToRight"
+                        ToolTipService.InitialShowDelay="1000"
+                        ToolTipService.ShowDuration="20000"
+                        ToolTipService.BetweenShowDelay="1"/>
+                </ToolTip>
+            </Label.ToolTip>
+        </Label>
 
         <StackPanel 
             Grid.Row="3" 
@@ -350,7 +383,11 @@
                 Text="{Binding Path=ParamsFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 Width="100"
                 Margin="5 0 10 5"
-                VerticalContentAlignment="Center"/>
+                VerticalContentAlignment="Center"
+                ToolTip="Напишите, чтобы произвести фильтрацию списка параметров"
+                ToolTipService.InitialShowDelay="1000"
+                ToolTipService.ShowDuration="20000"
+                ToolTipService.BetweenShowDelay="1"/>
             <Button 
                 Margin="-32,-6,0,0" 
                 Width="15" 
@@ -400,16 +437,6 @@
                  ToolTipService.InitialShowDelay="1000"
                  ToolTipService.ShowDuration="20000"
                  ToolTipService.BetweenShowDelay="1">
-            <ListBox.ToolTip>
-                <ToolTip>
-                    <TextBlock 
-                        Text="Перечень параметров, по которым возможна фильтрация среди выбранных категорий. Выберите параметр для фильтрации, и тогда плагин произведет отбор значений по этому параметру среди элементов выбранных категорий. По выбранному здесь параметру будут работать созданные плагином фильтры в случае, если стоит галка &quot;Переопределять цвет&quot;. Если этот список пуст, значит не выбрана ни одна категория (см. выше)." 
-                        TextWrapping="Wrap"
-                        Width="300"
-                        TextAlignment="Justify"
-                        FlowDirection="LeftToRight"/>
-                </ToolTip>
-            </ListBox.ToolTip>
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction 
@@ -419,14 +446,30 @@
         </ListBox>
 
         <Label Grid.Row="5" Grid.ColumnSpan="2" Content="Выберите значения для перекраса:"
-               VerticalAlignment="Center"/>
+               VerticalAlignment="Center">
+            <Label.ToolTip>
+                <TextBlock 
+                        Text="Перечень возможных значений выбранного параметра среди элементов выбранных категорий. Выберите одно или несколько значений, и тогда плагин перекрасит элементы с выбранными значениями. Если стоит галка &quot;Переопределять цвет&quot;, то плагин создаст фильтр на каждое из выбраннох значений. Если этот список пуст, значит не выбран параметр для фильтрации (см. выше) или элементы выбранных категорий не имеют значений в выбранном параметре для фильтрации." 
+                        TextWrapping="Wrap"
+                        Width="300"
+                        TextAlignment="Justify"
+                        FlowDirection="LeftToRight"
+                        ToolTipService.InitialShowDelay="1000"
+                        ToolTipService.ShowDuration="20000"
+                        ToolTipService.BetweenShowDelay="1"/>
+            </Label.ToolTip>
+        </Label>
 
         <StackPanel Grid.Row="5" Grid.ColumnSpan="2" HorizontalAlignment="Right" Orientation="Horizontal">
             <TextBox 
                 Text="{Binding Path=PossibleValuesFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 Width="100"
                 Margin="5 0 10 5"
-                VerticalContentAlignment="Center"/>
+                VerticalContentAlignment="Center"
+                ToolTip="Напишите, чтобы произвести фильтрацию списка возможных значений"
+                ToolTipService.InitialShowDelay="1000"
+                ToolTipService.ShowDuration="20000"
+                ToolTipService.BetweenShowDelay="1"/>
             <Button 
                 Margin="-32,-6,0,0"
                 Width="15" 
@@ -441,7 +484,7 @@
                 Margin="5 0 5 5" 
                 Padding="5 0"
                 Command="{Binding SelectAllValuesInGUICommand}"
-                ToolTip="Нажмите, чтобы выбрать все значения представленные в списке ниже"
+                ToolTip="Нажмите, чтобы выбрать все значения отображенные в списке ниже"
                 ToolTipService.InitialShowDelay="1000"
                 ToolTipService.ShowDuration="20000"
                 ToolTipService.BetweenShowDelay="1"/>
@@ -450,7 +493,7 @@
                 Margin="5 0 5 5"
                 Padding="5 0"
                 Command="{Binding UnselectAllValuesInGUICommand}"
-                ToolTip="Нажмите, чтобы отменить выбор всех значений представленных в списке ниже"
+                ToolTip="Нажмите, чтобы отменить выбор всех значений отображенных в списке ниже"
                 ToolTipService.InitialShowDelay="1000"
                 ToolTipService.ShowDuration="20000"
                 ToolTipService.BetweenShowDelay="1"/>
@@ -481,19 +524,6 @@
                     </GridViewColumn>
                 </GridView>
             </ListView.View>
-            <ListView.ToolTip>
-                <ToolTip>
-                    <TextBlock 
-                        Text="Перечень возможных значений выбранного параметра среди элементов выбранных категорий. Выберите одно или несколько значений, и тогда плагин произведет перекрасит элементы с выбранными значениями. Если стоит галка &quot;Переопределять цвет&quot;, то плагин создаст фильтр на каждое из выбраннох значений. Если этот список пуст, значит не выбран параметр для фильтрации (см. выше) или элементы выбранных категорий не имеют значений в выбранном параметре для фильтрации." 
-                        TextWrapping="Wrap"
-                        Width="300"
-                        TextAlignment="Justify"
-                        FlowDirection="LeftToRight"
-                        ToolTipService.InitialShowDelay="3000"
-                        ToolTipService.ShowDuration="20000"
-                        ToolTipService.BetweenShowDelay="1"/>
-                </ToolTip>
-            </ListView.ToolTip>
         </ListView>
 
 
@@ -568,7 +598,8 @@
                         Grid.Row="1"
                         Grid.Column="1"
                         Margin="10 5"
-                        GroupName="ways" 
+                        GroupName="ways"
+                        IsChecked="{Binding OverridingWithRepaint}"
                         Content="Переопределение графики элементов" />
                 </Grid>
                 

@@ -36,6 +36,7 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         private bool _overrideByColor = true;
         private bool _overrideByPattern;
         private bool _overridingWithFilters = true;
+        private bool _overridingWithRepaint = false;
         private ICollectionView _categoriesView;
         private string _categoriesFilter = string.Empty;
         private ICollectionView _paramsView;
@@ -44,7 +45,6 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         private string _possibleValuesFilter = string.Empty;
         private ParametersHelper _selectedFilterableParameter;
         private List<PossibleValue> _selectedPossibleValues = new List<PossibleValue>();
-        //private List<CategoryElements> _categoryElements = new List<CategoryElements>();
 
         private ColorHelper _selectedColor;
         private PatternsHelper _selectedPattern;
@@ -63,6 +63,8 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
+            
+            LoadConfig();
 
             CategoryElements = _revitRepository.GetCategoriesInView(false);
             SolidFillPattern = _revitRepository.SolidFillPattern;
@@ -158,6 +160,11 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _overridingWithFilters, value);
         }
 
+        public bool OverridingWithRepaint {
+            get => _overridingWithRepaint;
+            set => this.RaiseAndSetIfChanged(ref _overridingWithRepaint, value);
+        }
+
         public ObservableCollection<ColorHelper> Colors { get; set; } = new ObservableCollection<ColorHelper>() {
             new ColorHelper(255, 0, 0),
             new ColorHelper(0, 255, 0),
@@ -170,7 +177,6 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             new ColorHelper(255, 128, 0),
             new ColorHelper(64, 128, 128),
             new ColorHelper(192, 192, 192),
-            new ColorHelper(250, 180, 135),
             new ColorHelper(250, 180, 135),
             new ColorHelper(240, 100, 10),
             new ColorHelper(240, 230, 115),
@@ -441,8 +447,16 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
                 transaction.Commit();
             }
+
+            SaveConfig();
         }
 
+        /// <summary>
+        /// Корректирует имя фильтра так, чтобы его принял конструктор фильтра.
+        /// Заменяет запрещенные символы на нижнее подчеркивание
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private string CorrectName(string name) {
             
             if(name.Contains('\\')) { name = name.Replace('\\', '-'); }
@@ -484,6 +498,28 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         }
 
         private bool CanCreate(object p) {
+
+            bool catsChecked = false;
+            foreach(CategoryElements cat in CategoryElements) {
+                if(cat.IsCheck) {
+                    catsChecked = true;
+                    break;
+                }
+            }
+            if(!catsChecked) { ErrorText = "Не выбрана ни одна категория"; return false; }
+           
+            if(SelectedFilterableParameter is null) { ErrorText = "Не выбран параметр фильтрации"; return false; }
+
+            bool valsChecked = false;
+            foreach(PossibleValue pos in PossibleValues) {
+                if(pos.IsCheck) {
+                    valsChecked = true;
+                    break;
+                }
+            }
+            if(!valsChecked) { ErrorText = "Не выбрано ни одного значения для фильтрации"; return false; }
+
+            ErrorText = string.Empty;
             return true;
         }
 
@@ -746,6 +782,40 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 return false;
             }
             return true;
+        }
+
+
+        private void LoadConfig() {
+            var setting = _pluginConfig.GetSettings(_revitRepository.Document);
+
+            if(setting is null) { return; }
+
+            OverrideByPattern = setting.OverrideByPattern;
+            OverrideByColor = setting.OverrideByColor;
+            OverridingWithFilters = setting.OverridingWithFilters;
+            OverridingWithRepaint = setting.OverridingWithRepaint;
+
+            Colors = setting.Colors;
+            patternNames = setting.PatternNames;
+        }
+
+        private void SaveConfig() {
+            var setting = _pluginConfig.GetSettings(_revitRepository.Document);
+
+            if(setting is null) {
+                setting = _pluginConfig.AddSettings(_revitRepository.Document);
+            }
+
+            setting.OverrideByPattern = OverrideByPattern;
+            setting.OverrideByColor = OverrideByColor;
+            setting.OverridingWithFilters = OverridingWithFilters;
+            setting.OverridingWithRepaint = OverridingWithRepaint;
+
+            setting.Colors = Colors;
+            setting.PatternNames = new List<string>(PatternsInPj.Select(item => item.PatternName));
+
+
+            _pluginConfig.SaveProjectConfig();
         }
     }
 }
