@@ -38,3 +38,8 @@ dotnet tool install Nuke.GlobalTool --global
 ```
 nuke compile --plugin-name RevitPlugins
 ```
+
+Публикация проекта:
+```
+nuke publish --plugin-name RevitPlugins
+```
