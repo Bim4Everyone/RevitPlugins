@@ -186,14 +186,26 @@ namespace RevitRooms.ViewModels {
 
             var startNumber = GetStartNumber();
 
-            var levels = Levels.Where(item => item.IsSelected).SelectMany(item => item.Levels.Select(level => level.Id))
+            var levels = Levels
+                .Where(item => item.IsSelected)
+                .SelectMany(item => item.Levels
+                    .Select(level => level.Id))
                 .ToArray();
-            var groups = Groups.Where(item => item.IsSelected).Select(item => item.ElementId).ToArray();
-            var sections = Sections.Where(item => item.IsSelected).Select(item => item.ElementId).ToArray();
+
+            var groups = Groups
+                .Where(item => item.IsSelected)
+                .Select(item => item.ElementId)
+                .ToArray();
+
+            var sections = Sections
+                .Where(item => item.IsSelected)
+                .Select(item => item.ElementId)
+                .ToArray();
 
             var workingObjects = SpatialElements
                 .Where(item => item.Phase == Phase)
-                .Where(item => levels.Contains(item.LevelId));
+                .Where(item => levels.Contains(item.LevelId))
+                .ToArray();
 
             if(CheckWorkingObjects(workingObjects)) {
                 return;
@@ -201,7 +213,8 @@ namespace RevitRooms.ViewModels {
 
             var orderedObjects = workingObjects
                 .Where(item => item.RoomGroup != null && groups.Contains(item.RoomGroup.Id))
-                .Where(item => item.RoomSection != null && sections.Contains(item.RoomSection.Id));
+                .Where(item => item.RoomSection != null && sections.Contains(item.RoomSection.Id))
+                .ToArray();
 
             var notFoundNames = GetNotFoundNames(orderedObjects);
             if(notFoundNames.Length > 0) {
@@ -214,8 +227,9 @@ namespace RevitRooms.ViewModels {
                     orderedObjects = orderedObjects
                         .OrderBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
                         .ThenBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
-                        .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
-                        .ThenBy(item => GetDistance(item.Element));
+                        .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level)?.Elevation)
+                        .ThenBy(item => GetDistance(item.Element))
+                        .ToArray();
 
                     int flatCount = startNumber;
                     foreach(var section in orderedObjects.GroupBy(item => item.RoomSection.Id)) {
@@ -243,9 +257,10 @@ namespace RevitRooms.ViewModels {
                         orderedObjects = orderedObjects
                             .OrderBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
                             .ThenBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
-                            .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
+                            .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level)?.Elevation)
                             .ThenBy(item => GetOrder(selectedOrder, item.Room))
-                            .ThenBy(item => GetDistance(item.Element));
+                            .ThenBy(item => GetDistance(item.Element))
+                            .ToArray();
 
                         foreach(var section in orderedObjects.GroupBy(item => item.RoomSection.Id)) {
                             foreach(var level in section.GroupBy(item => item.LevelId)) {
@@ -266,10 +281,11 @@ namespace RevitRooms.ViewModels {
                     using(var transaction = _revitRepository.StartTransaction("Нумерация помещений по секции")) {
                         orderedObjects = orderedObjects
                             .OrderBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
-                            .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
+                            .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level)?.Elevation)
                             .ThenBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
                             .ThenBy(item => GetOrder(selectedOrder, item.Room))
-                            .ThenBy(item => GetDistance(item.Element));
+                            .ThenBy(item => GetDistance(item.Element))
+                            .ToArray();
 
                         int roomCount = startNumber;
                         foreach(var room in orderedObjects) {
@@ -284,17 +300,24 @@ namespace RevitRooms.ViewModels {
                           _revitRepository.StartTransaction("Нумерация помещений по секции и этажу")) {
                         orderedObjects = orderedObjects
                             .OrderBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
-                            .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
+                            .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level)?.Elevation)
                             .ThenBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
                             .ThenBy(item => GetOrder(selectedOrder, item.Room))
-                            .ThenBy(item => GetDistance(item.Element));
+                            .ThenBy(item => GetDistance(item.Element))
+                            .ToArray();
 
                         foreach(var section in orderedObjects.GroupBy(item => item.RoomSection.Id)) {
-                            foreach(var level in section.GroupBy(item =>  (_revitRepository.GetElement(item.LevelId) as Level)?.Name.Split('_').FirstOrDefault())) {
+                            foreach(var level in section.GroupBy(item =>
+                                        (_revitRepository.GetElement(item.LevelId) as Level)?.Name.Split('_')
+                                        .FirstOrDefault())) {
                                 int roomCount = startNumber;
-                                foreach(var group in level.OrderBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer()).GroupBy(item => item.RoomGroup.Id)) {
+                                foreach(var group in level
+                                            .OrderBy(item => item.RoomGroup,
+                                                new dosymep.Revit.Comparators.ElementComparer())
+                                            .GroupBy(item => item.RoomGroup.Id)) {
                                     foreach(var room in group) {
-                                        room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER, Prefix + roomCount + Suffix);
+                                        room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER,
+                                            Prefix + roomCount + Suffix);
                                         roomCount++;
                                     }
                                 }
@@ -362,12 +385,13 @@ namespace RevitRooms.ViewModels {
             }
         }
 
-        private bool CheckWorkingObjects(IEnumerable<SpatialElementViewModel> workingObjects) {
+        private bool CheckWorkingObjects(SpatialElementViewModel[] workingObjects) {
             var errorElements = new Dictionary<string, InfoElementViewModel>();
 
             // Все помещения которые
             // избыточные или не окруженные
-            var redundantRooms = workingObjects.Where(item => item.IsRedundant == true || item.NotEnclosed == true);
+            var redundantRooms = workingObjects
+                .Where(item => item.IsRedundant == true || item.NotEnclosed == true);
             AddElements(InfoElement.RedundantRooms, redundantRooms, errorElements);
 
             // Все помещения у которых
@@ -489,7 +513,7 @@ namespace RevitRooms.ViewModels {
             value.Elements.Add(new MessageElementViewModel() {Element = element, Description = message});
         }
 
-        private bool ShowInfoElementsWindow(string title, IEnumerable<InfoElementViewModel> infoElements) {
+        private bool ShowInfoElementsWindow(string title, ICollection<InfoElementViewModel> infoElements) {
             if(infoElements.Any()) {
                 var window = new InfoElementsWindow() {
                     Title = title,
@@ -558,11 +582,19 @@ namespace RevitRooms.ViewModels {
             settings.PhaseElementId = Phase.ElementId.IntegerValue;
             settings.DocumentName = _revitRepository.DocumentName;
 
-            settings.Levels = Levels.Where(item => item.IsSelected).Select(item => item.ElementId.IntegerValue)
+            settings.Levels = Levels
+                .Where(item => item.IsSelected)
+                .Select(item => item.ElementId.IntegerValue)
                 .ToList();
-            settings.Groups = Groups.Where(item => item.IsSelected).Select(item => item.ElementId.IntegerValue)
+
+            settings.Groups = Groups
+                .Where(item => item.IsSelected)
+                .Select(item => item.ElementId.IntegerValue)
                 .ToList();
-            settings.Sections = Sections.Where(item => item.IsSelected).Select(item => item.ElementId.IntegerValue)
+
+            settings.Sections = Sections
+                .Where(item => item.IsSelected)
+                .Select(item => item.ElementId.IntegerValue)
                 .ToList();
 
             RoomsNumsConfig.SaveConfig(roomsConfig);
