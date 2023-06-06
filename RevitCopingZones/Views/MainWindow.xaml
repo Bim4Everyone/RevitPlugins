@@ -140,11 +140,6 @@
                 Header="Зоны на плане зонирования"
                 Binding="{Binding HasAreasInPlan, 
                     Converter={StaticResource HasNotConverter}}" />
-
-            <dxg:GridColumn
-                Header="Разрешение копирования"
-                Binding="{Binding CanCopyAreas, 
-                    Converter={StaticResource PermitConverter}}"/>
         </dxg:GridControl>
 
         <StackPanel

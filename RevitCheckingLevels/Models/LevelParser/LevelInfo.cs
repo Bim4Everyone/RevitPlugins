@@ -73,7 +73,11 @@ namespace RevitCheckingLevels.Models.LevelParser {
         }
 
         public string GetElevation() {
-            return Elevation?.ToString("F3", LevelParserImpl.CultureInfo);
+            return FormatElevation(Elevation);
+        }
+        
+        public string FormatElevation(double? elevation) {
+            return elevation?.ToString("F3", LevelParserImpl.CultureInfo);
         }
 
         public override string ToString() {

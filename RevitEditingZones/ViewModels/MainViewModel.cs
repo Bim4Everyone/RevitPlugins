@@ -21,6 +21,7 @@ namespace RevitEditingZones.ViewModels {
 
         private string _errorText;
         private ObservableCollection<LevelViewModel> _levels;
+        private ObservableCollection<LevelViewModel> _allLevels;
         
         private ZonePlansViewModel _leftZonePlans;
         private ZonePlansViewModel _rightZonePlans;
@@ -48,6 +49,11 @@ namespace RevitEditingZones.ViewModels {
             get => _levels;
             set => this.RaiseAndSetIfChanged(ref _levels, value);
         }
+        
+        public ObservableCollection<LevelViewModel> AllLevels {
+            get => _allLevels;
+            set => this.RaiseAndSetIfChanged(ref _allLevels, value);
+        }
 
         public ZonePlansViewModel LeftZonePlans {
             get => _leftZonePlans;
@@ -63,17 +69,23 @@ namespace RevitEditingZones.ViewModels {
 
         private void LoadView(object p) {
             var levels = _revitRepository.GetLevels()
-                .Select(item => new LevelViewModel(item));
-            Levels = new ObservableCollection<LevelViewModel>(levels);
-
-            LeftZonePlans = new ZonePlansViewModel() {HintText = "Ошибки не найдены"};
-            RightZonePlans = new ZonePlansViewModel(){HintText = "Настроенные зоны не найдены"};
+                .Select(item => new LevelViewModel(item))
+                .ToList();
             
+            Levels = new ObservableCollection<LevelViewModel>(levels);
+            AllLevels = new ObservableCollection<LevelViewModel>(levels);
+            
+            LeftZonePlans = new ZonePlansViewModel() {HintText = "Ошибки не найдены"};
+            RightZonePlans = new ZonePlansViewModel() {HintText = "Настроенные зоны не найдены"};
+
             LeftZonePlans.ZonePlans = new ObservableCollection<ZonePlanViewModel>();
             RightZonePlans.ZonePlans = new ObservableCollection<ZonePlanViewModel>();
+            
             foreach(ViewPlan areaPlane in _revitRepository.GetAreaPlanes()) {
                 foreach(Area area in _revitRepository.GetAreas(areaPlane)) {
-                    var level = RemoveLevel(_revitRepository.GetLevel(area));
+                    var level = GetLevel(area);
+                    Levels.Remove(level);
+                    
                     var zonePlan = new ZonePlanViewModel(area, areaPlane) {Level = level, Levels = Levels};
                     zonePlan.ErrorType = GetErrorType(zonePlan);
                     if(zonePlan.ErrorType == ErrorType.Default) {
@@ -83,6 +95,10 @@ namespace RevitEditingZones.ViewModels {
                     }
                 }
             }
+
+            LeftZonePlans.HintText = Levels.Count == 0
+                ? "Ошибки не найдены"
+                : "Ошибки в зонах не найдены. Имеются уровни без зон!";
         }
 
         private void UpdateLinks(object obj) {
@@ -104,14 +120,9 @@ namespace RevitEditingZones.ViewModels {
             _levelWindowService.ShowLevels(Levels);
         }
 
-        private LevelViewModel RemoveLevel(Level level) {
-            if(level == null) {
-                return null;
-            }
-
-            var foundLevel = Levels.FirstOrDefault(item => item.Level.Id == level.Id);
-            Levels.Remove(foundLevel);
-            return foundLevel;
+        private LevelViewModel GetLevel(Area area) {
+            var level = _revitRepository.GetLevel(area);
+            return AllLevels.FirstOrDefault(item => item.Level.Id == level?.Id);
         }
 
         private ErrorType GetErrorType(ZonePlanViewModel zonePlan) {

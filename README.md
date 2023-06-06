@@ -5,7 +5,7 @@
 
 | #   | Плагин                    | Проект                                             | Справка                                                                 | Вкладка                                             | Панель        |
 |-----|---------------------------|----------------------------------------------------|-------------------------------------------------------------------------|-----------------------------------------------------|---------------|
-| 1.  | Настройки                 | [PlatformSettings](PlatformSettings)               | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829987)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Установки     |
+| 1.  | Настройки                 | [RevitPlatformSettings](RevitPlatformSettings)     | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829987)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Установки     |
 | 2.  | Печать                    | [RevitBatchPrint](RevitBatchPrint)                 | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829996)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Листы         |
 | 3.  | Поиск коллизий            | [RevitClashDetective](RevitClashDetective)         | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67830002)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Проверки      |
 | 4.  | Копирование стандартов    | [RevitCopyStandarts](RevitCopyStandarts)           | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67846251)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Прочее        |
@@ -25,6 +25,7 @@
 | 18. | Проверка уровней          | [RevitCheckingLevels](RevitCheckingLevels)         | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67844245)  | [BIM](https://github.com/dosymep/BIMExtensions)     | СМР           |
 | 19. | Копирование зон СМР       | [RevitCopingZones](RevitCopingZones)               | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67844245)  | [BIM](https://github.com/dosymep/BIMExtensions)     | СМР           |
 | 20. | Документация пилонов      | [RevitPylonDocumentation](RevitPylonDocumentation) | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829985)  | [КР](https://github.com/dosymep/KRExtensions)       | Документация  |
+| 21. | Удалить неиспользуемые    | [RevitDeleteUnused](RevitDeleteUnused)             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67830008)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Прочее        |
 
 # Сборка проекта
 
@@ -36,4 +37,9 @@ dotnet tool install Nuke.GlobalTool --global
 Компиляция проекта:
 ```
 nuke compile --plugin-name RevitPlugins
+```
+
+Публикация проекта:
+```
+nuke publish --plugin-name RevitPlugins
 ```

@@ -71,6 +71,9 @@ namespace RevitLintelPlacement.Models {
 
         [Description("Ширина проема")]
         public string OpeningWidth { get; set; }
+        
+        [Description("Вырезание стены ниже двери")]
+        public string OpeningDown { get; set; }
 
         [Description("Фиксация перемычки")]
         public string OpeningFixation { get; set; }
@@ -107,6 +110,7 @@ namespace RevitLintelPlacement.Models {
             {nameof(LintelFixation), StorageType.Integer },
             {nameof(OpeningHeight), StorageType.Double },
             {nameof(OpeningWidth), StorageType.Double },
+            {nameof(OpeningDown), StorageType.Double },
             {nameof(OpeningFixation), StorageType.Integer }
         };
 

@@ -1,0 +1,88 @@
+﻿<base:PlatformWindow
+    x:Class="RevitShakeSpecs.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitShakeSpecs.Views"
+    xmlns:vms="clr-namespace:RevitShakeSpecs.ViewModels"
+	  xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+
+
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+    
+    Title="Встряхнуть спецификации"
+    Height="200" Width="650"  
+    MinHeight="200" MinWidth="650"    
+    ResizeMode="NoResize"
+
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Content="Параметр для группировки листов:"/>
+        <ComboBox Grid.Row="1" Margin="5 0"
+                  VerticalContentAlignment="Center"
+                  ItemsSource="{Binding ProjectSectionParamNames}" 
+                  SelectedItem="{Binding SelectedProjectSectionParamName}">
+
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction 
+                        Command="{Binding GetProjectSectionsCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ComboBox>
+
+
+        <Label Grid.Row="2" Content="Выберите нужный комплект документации:"/>
+        <ComboBox Grid.Row="3" Grid.Column="0"  Margin="5 0"
+                  VerticalContentAlignment="Center"
+                  ItemsSource="{Binding ProjectSections}" 
+                  SelectedItem="{Binding SelectedProjectSection}">
+        </ComboBox>
+
+
+        <StackPanel
+            Grid.Row="4"
+            Height="45"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+
+            <Button
+                Margin="10"
+                Width="110"
+                Content="Вариант 1"
+                Command="{Binding RegenerateCommand}"
+                Click="ButtonOk_Click" />
+
+            <Button
+                Margin="10"
+                Width="110"
+                Content="Вариант 2"
+                Command="{Binding ShakeCommand}"
+                Click="ButtonOk_Click" />
+
+            <Button
+                Margin="10"
+                Width="80"
+                Content="Отмена"
+                Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</base:PlatformWindow>

@@ -104,6 +104,7 @@ namespace RevitSetLevelSection {
 
                 UpdateParams(uiApplication);
 
+                CheckLevels();
                 Check(kernel);
                 ShowDialog(kernel);
             }
@@ -124,6 +125,17 @@ namespace RevitSetLevelSection {
             if(revitRepository.IsKoordFile()) {
                 TaskDialog.Show(PluginName,
                     $"Данный скрипт не работает в координационном файле.");
+                throw new OperationCanceledException();
+            }
+        }
+        
+        private void CheckLevels() {
+            var service = GetPlatformService<IPlatformCommandsService>();
+            string message = null;
+            Guid commandId = PlatformCommandIds.CheckLevelsCommandId;
+            Result commandResult = service.InvokeCommand(commandId, ref message, new ElementSet());
+            if(commandResult == Result.Failed) {
+                TaskDialog.Show(PluginName, message);
                 throw new OperationCanceledException();
             }
         }

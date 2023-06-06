@@ -31,16 +31,15 @@ class Build : NukeBuild {
 
     [GitVersion] readonly GitVersion GitVersion;
 
-    readonly IEnumerable<RevitConfiguration> Configurations = IsLocalBuild
-        ? RevitConfiguration.GetDebugConfiguration()
-        : RevitConfiguration.GetReleaseConfiguration();
+    readonly IEnumerable<RevitConfiguration> DebugConfigurations = RevitConfiguration.GetDebugConfiguration();
+    readonly IEnumerable<RevitConfiguration> ReleaseConfigurations = RevitConfiguration.GetReleaseConfiguration();
 
     AbsolutePath SourceDirectory => RootDirectory / PluginName;
 
     Target Clean => _ => _
         .Requires(() => PluginName)
         .Executes(() => {
-            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory); 
+            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
             EnsureCleanDirectory(Output);
         });
 
@@ -53,7 +52,20 @@ class Build : NukeBuild {
                 .SetProjectFile(PluginName)
                 .DisableNoRestore()
                 .SetOutputDirectory(Output)
-                .CombineWith(Configurations, (settings, config) => settings
+                .CombineWith(DebugConfigurations, (settings, config) => settings
+                    .SetConfiguration(config)));
+        });
+
+    Target Publish => _ => _
+        .DependsOn(Clean)
+        .Requires(() => Output)
+        .Requires(() => PluginName)
+        .Executes(() => {
+            DotNetBuild(s => s
+                .SetProjectFile(PluginName)
+                .DisableNoRestore()
+                .SetOutputDirectory(Output)
+                .CombineWith(ReleaseConfigurations, (settings, config) => settings
                     .SetConfiguration(config)));
         });
 
@@ -66,7 +78,7 @@ class Build : NukeBuild {
                 .SetProjectFile(PluginName)
                 .DisableNoRestore()
                 .SetOutputDirectory(Output)
-                .CombineWith(Configurations, (settings, config) => settings
+                .CombineWith(DebugConfigurations, (settings, config) => settings
                     .SetConfiguration(config)
                     .SetAssemblyVersion(UpdateMajorVersion(config, GitVersion.AssemblySemVer))
                     .SetFileVersion(UpdateMajorVersion(config, GitVersion.AssemblySemFileVer))
@@ -80,7 +92,7 @@ class Build : NukeBuild {
                 .ForEach(DeleteDirectory);
             EnsureCleanDirectory(Output);
         });
-    
+
     Target FullCompile => _ => _
         .DependsOn(FullClean)
         .Requires(() => Output)
@@ -88,7 +100,7 @@ class Build : NukeBuild {
             DotNetBuild(s => s
                 .DisableNoRestore()
                 .SetOutputDirectory(Output)
-                .CombineWith(Configurations, (settings, config) => settings
+                .CombineWith(DebugConfigurations, (settings, config) => settings
                     .SetConfiguration(config)));
         });
 

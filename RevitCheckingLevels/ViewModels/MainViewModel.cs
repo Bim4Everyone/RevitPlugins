@@ -174,11 +174,48 @@ namespace RevitCheckingLevels.ViewModels {
         }
 
         private void UpdateElevation(object p) {
-            _revitRepository.UpdateElevations(Levels
-                .Where(item => item.ErrorType == ErrorType.NotElevation)
-                .Select(item => item.LevelInfo));
+            var levelCreationNames = _revitRepository.GetLevelCreationNames(Levels
+                    .Where(item => item.ErrorType == ErrorType.NotElevation)
+                    .Select(item => item.LevelInfo))
+                .ToArray();
+
+            var duplicateNames = levelCreationNames
+                .Where(item => item.DuplicateName)
+                .Select(item => $"{item.LevelInfo.Level.Name} -> {item.LevelName}")
+                .OrderBy(item => item)
+                .ToArray();
+
+            if(duplicateNames.Length > 0) {
+                TaskDialog taskDialog = CreateTaskDialog(duplicateNames);
+                if(taskDialog.Show() == TaskDialogResult.CommandLink1) {
+                    _revitRepository.UpdateElevations(levelCreationNames);
+                } else {
+                    throw new OperationCanceledException();
+                }
+            } else {
+                _revitRepository.UpdateElevations(levelCreationNames);
+            }
 
             LoadView(null);
+        }
+
+        private static TaskDialog CreateTaskDialog(string[] duplicateNames) {
+            var taskDialog = new TaskDialog("Обновление отметки");
+            taskDialog.TitleAutoPrefix = false;
+            taskDialog.AllowCancellation = true;
+            taskDialog.MainIcon = TaskDialogIcon.TaskDialogIconWarning;
+            taskDialog.MainContent = "Имена уровней должны быть уникальными";
+            taskDialog.MainInstruction = "Обновление отметки в имени невозможно.";
+            taskDialog.ExpandedContent = Environment.NewLine + " - "
+                                               + string.Join(Environment.NewLine + " - ", duplicateNames);
+
+            taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1,
+                "Игнорировать ошибки",
+                "Пропускает уровни с дублирующимися именами.");
+            taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2,
+                "Отменить",
+                "Отменяет переименование всех уровней.");
+            return taskDialog;
         }
     }
 }

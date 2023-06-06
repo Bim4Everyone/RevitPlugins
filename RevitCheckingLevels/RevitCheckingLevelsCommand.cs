@@ -59,6 +59,14 @@ namespace RevitCheckingLevels {
                     .WithPropertyValue(nameof(Window.DataContext),
                         c => c.Kernel.Get<MainViewModel>());
 
+                if(!FromGui) {
+                    var mainViewModel = kernel.Get<MainViewModel>();
+                    mainViewModel.ViewLoadCommand.Execute(null);
+                    if(!mainViewModel.HasErrors) {
+                        return;
+                    }
+                }
+
                 Window mainWindow = kernel.Get<MainWindow>();
                 bool? dialogResult = mainWindow.ShowDialog();
 
@@ -69,17 +77,7 @@ namespace RevitCheckingLevels {
                     }
                 }
 
-                if(dialogResult == null) {
-                    GetPlatformService<INotificationService>()
-                        .CreateNotification(PluginName, "Выход из скрипта.", "C#")
-                        .ShowAsync();
-                } else if(dialogResult == true) {
-                    GetPlatformService<INotificationService>()
-                        .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                        .ShowAsync();
-                } else if(dialogResult == false) {
-                    throw new OperationCanceledException();
-                }
+                Notification(dialogResult);
             }
         }
     }

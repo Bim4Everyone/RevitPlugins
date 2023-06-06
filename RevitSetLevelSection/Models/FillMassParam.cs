@@ -40,12 +40,8 @@ namespace RevitSetLevelSection.Models {
             if(!element.IsExistsParam(_paramOption.RevitParam)) {
                 return;
             }
-            
-            if(!element.IsExistsParamValue(SharedParamsConfig.Instance.FixBuildingWorks)) {
-                return;
-            }
-            
-            if(element.GetParamValue<int>(SharedParamsConfig.Instance.FixBuildingWorks) == 1) {
+
+            if(element.GetParamValueOrDefault(SharedParamsConfig.Instance.FixBuildingWorks, 0) == 1) {
                 return;
             }
 

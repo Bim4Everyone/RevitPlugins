@@ -27,6 +27,7 @@ namespace RevitLintelPlacement.ViewModels {
         private ParameterViewModel _lintelFixation;
         private string _openingHeight;
         private string _openingWidth;
+        private string _openingDown;
         private string _openingFixation;
         private string _holesFilter;
         private string _lintelsConfigPath;
@@ -102,6 +103,11 @@ namespace RevitLintelPlacement.ViewModels {
         public string OpeningWidth {
             get => _openingWidth;
             set => this.RaiseAndSetIfChanged(ref _openingWidth, value);
+        }
+        
+        public string OpeningDown {
+            get => _openingDown;
+            set => this.RaiseAndSetIfChanged(ref _openingDown, value);
         }
 
         public string OpeningFixation {
@@ -185,6 +191,7 @@ namespace RevitLintelPlacement.ViewModels {
         private void Initialize() {
             OpeningHeight = _revitRepository.LintelsCommonConfig.OpeningHeight;
             OpeningWidth = _revitRepository.LintelsCommonConfig.OpeningWidth;
+            OpeningDown = _revitRepository.LintelsCommonConfig.OpeningDown;
             OpeningFixation = _revitRepository.LintelsCommonConfig.OpeningFixation;
             if(_revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter == null ||
                 _revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter.Count == 0) {
@@ -262,6 +269,7 @@ namespace RevitLintelPlacement.ViewModels {
             _revitRepository.LintelsCommonConfig.LintelLeftOffset = LintelLeftOffset.Name;
             _revitRepository.LintelsCommonConfig.LintelFixation = LintelFixation.Name;
             _revitRepository.LintelsCommonConfig.OpeningHeight = OpeningHeight;
+            _revitRepository.LintelsCommonConfig.OpeningDown = OpeningDown;
             _revitRepository.LintelsCommonConfig.OpeningWidth = OpeningWidth;
             _revitRepository.LintelsCommonConfig.OpeningFixation = OpeningFixation;
             _revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter = ReinforcedConcreteFilter.Select(e => e.Name).ToList();

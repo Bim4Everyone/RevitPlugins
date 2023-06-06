@@ -61,17 +61,39 @@ namespace RevitCheckingLevels.Models {
                 .OrderBy(item => item.Name);
         }
 
-        public void UpdateElevations(IEnumerable<LevelInfo> levels) {
+        public IEnumerable<LevelCreationName> GetLevelCreationNames(IEnumerable<LevelInfo> levelInfos) {
+            var levels = GetLevels(Document).ToList();
+            return levelInfos
+                .Select(item => CreateLevelCreationName(item, levels));
+        }
+
+        public void UpdateElevations(IEnumerable<LevelCreationName> levels) {
             using(Transaction transaction = Document.StartTransaction("Обновление отметок уровня")) {
-                foreach(LevelInfo levelInfo in levels) {
-                    double elevation = levelInfo.Level.GetMeterElevation();
-                    var elements = levelInfo.Level.Name.Split('_');
-                    elements[2] = elevation.ToString(LevelParserImpl.CultureInfo);
-                    levelInfo.Level.Name = string.Join("_", elements);
+                foreach(LevelCreationName levelCreationName in levels.Where(item => !item.DuplicateName)) {
+                    levelCreationName.LevelInfo.Level.Name = levelCreationName.LevelName;
                 }
 
                 transaction.Commit();
             }
+        }
+
+        private string GetLevelName(LevelInfo levelInfo) {
+            double elevation = levelInfo.Level.GetMeterElevation();
+            string elevationName = levelInfo.FormatElevation(elevation);
+
+            var elements = levelInfo.Level.Name.Split('_');
+            elements[2] = elevationName;
+            return string.Join("_", elements);
+        }
+
+        private LevelCreationName CreateLevelCreationName(LevelInfo levelInfo, List<Level> levels) {
+            var levelName = GetLevelName(levelInfo);
+            var duplicateName = IsDuplicateLevelName(levelName, levels);
+            return new LevelCreationName() {LevelInfo = levelInfo, LevelName = levelName, DuplicateName = duplicateName};
+        }
+
+        private bool IsDuplicateLevelName(string levelName, List<Level> levels) {
+            return levels.Any(item => item.Name.Equals(levelName));
         }
 
         private IEnumerable<Level> GetLevels(Document document) {
@@ -79,5 +101,11 @@ namespace RevitCheckingLevels.Models {
                 .OfCategory(BuiltInCategory.OST_Levels)
                 .OfType<Level>();
         }
+    }
+
+    internal class LevelCreationName {
+        public bool DuplicateName { get; set; }
+        public string LevelName { get; set; }
+        public LevelInfo LevelInfo { get; set; }
     }
 }

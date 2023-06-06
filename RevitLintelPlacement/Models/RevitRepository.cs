@@ -23,6 +23,12 @@ namespace RevitLintelPlacement.Models {
     internal class RevitRepository {
         private readonly string _view3DName = "3D_Перемычки";
         private static readonly string _settingsPath = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101\";
+        
+        private readonly BuiltInParameter[] _bottomBarHeightsParams = new[] {
+            BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM,
+            BuiltInParameter.INSTANCE_ELEVATION_PARAM,
+            BuiltInParameter.INSTANCE_FREE_HOST_OFFSET_PARAM
+        };
 
         private readonly Application _application;
         private readonly UIApplication _uiApplication;
@@ -31,18 +37,12 @@ namespace RevitLintelPlacement.Models {
         private readonly UIDocument _uiDocument;
         private readonly RevitEventHandler _revitEventHandler;
 
-        private readonly double _baseHeight;
-
         public RevitRepository(Application application, Document document, LintelsConfig lintelsConfig) {
             _application = application;
             _uiApplication = new UIApplication(application);
 
             _document = document;
             _uiDocument = new UIDocument(document);
-            
-            // Получаем высоту базовой точки, 
-            // так как она влияет на вставку элементов (перемычки)
-            _baseHeight = GetBasePoint().Position.Z;
 
             _revitEventHandler = new RevitEventHandler();
 
@@ -521,7 +521,7 @@ namespace RevitLintelPlacement.Models {
         /// <param name="element"></param>
         /// <returns>Возвращает высоту уровня с учетом базовой точки.</returns>
         private double GetElevation(FamilyInstance element) {
-            return ((Level) _document.GetElement(element.LevelId)).Elevation + _baseHeight;
+            return ((Level) _document.GetElement(element.LevelId)).ProjectElevation;
         }
 
         public XYZ GetLocationPoint(FamilyInstance elementInWall) {
@@ -533,21 +533,20 @@ namespace RevitLintelPlacement.Models {
             var height = elementInWall.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningHeight)
                          ?? elementInWall.Symbol.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningHeight);
 
-            var bottomBarHeight =
-                elementInWall.GetParamValueOrDefault<double>(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
-            if(bottomBarHeight == 0) {
-                bottomBarHeight =
-                    elementInWall.GetParamValueOrDefault<double>(BuiltInParameter.INSTANCE_ELEVATION_PARAM);
-            }
+            double? down = null;
+            if(!string.IsNullOrEmpty(LintelsCommonConfig.OpeningDown)) {
+                down = elementInWall.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningDown)
+                       ?? elementInWall.Symbol.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningDown);
 
-            if(bottomBarHeight == 0) {
-                bottomBarHeight =
-                    elementInWall.GetParamValueOrDefault<double>(BuiltInParameter.INSTANCE_FREE_HOST_OFFSET_PARAM);
             }
 
             double z;
             if(height.HasValue) {
-                z = height.Value + bottomBarHeight;
+                var bottomBarHeight = _bottomBarHeightsParams
+                    .Select(item => elementInWall.GetParamValueOrDefault<double>(item))
+                    .FirstOrDefault(item => item > 0);
+
+                z = height.Value + bottomBarHeight - (down ?? 0);
             } else {
                 z = elementInWall.GetParamValueOrDefault<double>(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
             }
