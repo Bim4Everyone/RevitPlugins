@@ -76,7 +76,8 @@
               "Compile",
               "CompileVersion",
               "FullClean",
-              "FullCompile"
+              "FullCompile",
+              "Publish"
             ]
           }
         },
@@ -90,7 +91,8 @@
               "Compile",
               "CompileVersion",
               "FullClean",
-              "FullCompile"
+              "FullCompile",
+              "Publish"
             ]
           }
         },
