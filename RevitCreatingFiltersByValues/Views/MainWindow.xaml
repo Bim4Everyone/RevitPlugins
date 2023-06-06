@@ -55,7 +55,7 @@
             Grid.Column="1" 
             Width="{Binding ActualWidth, ElementName=expander}" 
             Panel.ZIndex="1"
-            Margin="0 5 5 0">
+            Margin="0 5 10 0">
             <Expander 
                 x:Name="expander"
                 ExpandDirection="Down"
@@ -258,12 +258,15 @@
             Grid.Column="0"
             Grid.ColumnSpan="2"
             
-            Margin="5"
+            Margin="10 5"
             Text="Плагин создает пакет фильтров или перекрашивает элементы"
             TextWrapping="Wrap"
             VerticalAlignment="Center"/>
 
-        <Label Grid.Row="1" Grid.ColumnSpan="2" Content="Выберите категории элементов на виде:"
+        <Label Grid.Row="1" 
+               Grid.ColumnSpan="2"
+               Margin="5 0 0 0"
+               Content="Выберите категории элементов на виде:"
                VerticalAlignment="Center">
             <Label.ToolTip>
                 <ToolTip>
@@ -357,7 +360,10 @@
         </ListView>
 
 
-        <Label Grid.Row="3" Grid.ColumnSpan="2" Content="Выберите параметр для фильтрации:"
+        <Label Grid.Row="3" 
+               Grid.ColumnSpan="2"
+               Margin="5 0 0 0"
+               Content="Выберите параметр для фильтрации:"
                VerticalAlignment="Center">
             <Label.ToolTip>
                 <ToolTip>
@@ -428,7 +434,7 @@
 
 
         <ListBox Grid.Row="4" Grid.ColumnSpan="2"
-                 Margin="5 5 5 10"
+                 Margin="10 5 10 10"
                  Name="parameters"
                  ItemsSource="{Binding Path=FilterableParameters, UpdateSourceTrigger=PropertyChanged}"
                  DisplayMemberPath="ParamName"
@@ -445,7 +451,10 @@
             </i:Interaction.Triggers>
         </ListBox>
 
-        <Label Grid.Row="5" Grid.ColumnSpan="2" Content="Выберите значения для перекраса:"
+        <Label Grid.Row="5" 
+               Grid.ColumnSpan="2"
+               Margin="5 0 0 0"
+               Content="Выберите значения для перекраса:"
                VerticalAlignment="Center">
             <Label.ToolTip>
                 <TextBlock 
@@ -460,7 +469,12 @@
             </Label.ToolTip>
         </Label>
 
-        <StackPanel Grid.Row="5" Grid.ColumnSpan="2" HorizontalAlignment="Right" Orientation="Horizontal">
+        <StackPanel 
+            Grid.Row="5" 
+            Grid.ColumnSpan="2"
+            Margin="0 0 5 0"
+            HorizontalAlignment="Right" 
+            Orientation="Horizontal">
             <TextBox 
                 Text="{Binding Path=PossibleValuesFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 Width="100"
@@ -503,7 +517,7 @@
         <ListView
             Grid.Row="6" Grid.ColumnSpan="2" 
             Name="values"
-            Margin="5 5 5 0"
+            Margin="10 5 10 0"
             ItemsSource="{Binding Path=PossibleValues}"
             ScrollViewer.VerticalScrollBarVisibility="Visible"
             ScrollViewer.CanContentScroll="False">
@@ -532,7 +546,7 @@
             Grid.Row="7"
             Grid.ColumnSpan="2"
             Header="Выберите способ перекраса:" 
-            Margin="5"
+            Margin="10 5"
             ToolTipService.InitialShowDelay="1000"
             ToolTipService.ShowDuration="20000"
             ToolTipService.BetweenShowDelay="1">
