@@ -229,12 +229,15 @@ namespace RevitRooms.ViewModels {
                         .ThenBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
                         .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level)?.Elevation)
                         .ThenBy(item => GetDistance(item.Element))
+                        .ThenByDescending(item => item.IsRoomMainLevel)
                         .ToArray();
 
                     int flatCount = startNumber;
                     foreach(var section in orderedObjects.GroupBy(item => item.RoomSection.Id)) {
                         foreach(var level in section.GroupBy(item => item.LevelId)) {
-                            foreach(var group in level.GroupBy(item => item.RoomGroup.Id)) {
+                            foreach(var group in level.GroupBy(
+                                        item => new {item.RoomGroup.Id, item.RoomMultilevelGroup})) {
+                                
                                 foreach(var room in group) {
                                     room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentNumber,
                                         Prefix + flatCount + Suffix);
@@ -283,6 +286,7 @@ namespace RevitRooms.ViewModels {
                             .OrderBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
                             .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level)?.Elevation)
                             .ThenBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
+                            .ThenBy(item => item.RoomMultilevelGroup)
                             .ThenBy(item => GetOrder(selectedOrder, item.Room))
                             .ThenBy(item => GetDistance(item.Element))
                             .ToArray();
