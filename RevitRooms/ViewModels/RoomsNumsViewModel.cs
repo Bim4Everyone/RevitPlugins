@@ -419,6 +419,36 @@ namespace RevitRooms.ViewModels {
                 }
             }
 
+            // Все многоуровневые помещения
+            var multiLevelRooms = workingObjects
+                .Where(item => !string.IsNullOrEmpty(item.RoomMultilevelGroup))
+                .GroupBy(item => item.RoomMultilevelGroup);
+
+            foreach(IGrouping<string, SpatialElementViewModel> multiLevelRoomGroup in multiLevelRooms) {
+                bool allRoomManLevel = false;
+
+                foreach(IGrouping<string, SpatialElementViewModel> levelMultiLevelRoom in multiLevelRoomGroup
+                            .GroupBy(item => item.LevelName)) {
+
+                    allRoomManLevel = levelMultiLevelRoom.All(item => item.IsRoomMainLevel);
+                    if(!allRoomManLevel) {
+                        break;
+                    }
+                }
+
+                if(allRoomManLevel) {
+                    var error = multiLevelRoomGroup
+                        .Select(item => item.IsRoomMainLevel)
+                        .Distinct()
+                        .Count() != 2;
+                    if(error) {
+                        AddElements(InfoElement.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
+                    }
+                } else {
+                    AddElements(InfoElement.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
+                }
+            }
+
             return ShowInfoElementsWindow("Информация", errorElements.Values);
         }
 
