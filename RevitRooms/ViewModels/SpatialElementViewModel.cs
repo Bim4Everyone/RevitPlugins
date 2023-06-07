@@ -47,6 +47,14 @@ namespace RevitRooms.ViewModels {
         public Element RoomSection {
             get { return GetParamElement(ProjectParamsConfig.Instance.RoomSectionName); }
         }
+        
+        public string RoomMultilevelGroup {
+            get { return Element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.RoomMultilevelGroup); }
+        }
+
+        public bool IsRoomMainLevel {
+            get { return Element.GetParamValueOrDefault(ProjectParamsConfig.Instance.IsRoomMainLevel, 0) == 1; }
+        }
 
         public ElementId LevelId {
             get { return Element.LevelId; }
