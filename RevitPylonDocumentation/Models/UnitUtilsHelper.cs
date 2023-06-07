@@ -26,10 +26,10 @@ namespace RevitPylonDocumentation.Models {
         public static double ConvertToInternalValue(double value) {
             // Перевод во внутренние единицы Revit
 
-#if D2020 || R2020
+#if REVIT_2020
             DisplayUnitType unitType = DisplayUnitType.DUT_MILLIMETERS;
             double convertedValue = UnitUtils.ConvertToInternalUnits(value, unitType);
-#elif D2021 || D2022 || R2021 || R2022
+#elif REVIT_2021_OR_GREATER
             ForgeTypeId unitType = UnitTypeId.Millimeters;
             double convertedValue = UnitUtils.ConvertToInternalUnits(value, unitType);
 #else
