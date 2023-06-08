@@ -124,6 +124,9 @@ namespace RevitPylonDocumentation.Models {
 
 
 
+
+
+
         // Метод для размещения основного вида пилона.
         // Позиционирование - левый верхний угол листа
         internal void PlaceGeneralViewport() {
