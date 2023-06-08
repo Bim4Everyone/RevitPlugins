@@ -423,7 +423,7 @@ namespace RevitPylonDocumentation.ViewModels {
             HostMarks.Clear();
             ErrorText= string.Empty;
 
-            // Перебираем арматуру выбранного
+            // Перебираем хосты выбранного раздела
             foreach(FamilyInstance host in hostData[SelectedProjectSection]) 
             {
                 Autodesk.Revit.DB.Parameter hostMarkParameter = host.LookupParameter(MARK);
