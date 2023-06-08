@@ -118,6 +118,12 @@
             <Button
                 Margin="10"
                 Width="80"
+                Content="Тест"
+                Command="{Binding TestCommand}"
+                CommandParameter="{Binding SelectedItems, ElementName=hostMarks}"/>
+            <Button
+                Margin="10"
+                Width="80"
                 Content="ОК"
                 Click="ButtonOk_Click"
                 Command="{Binding CreateSheetsCommand}"

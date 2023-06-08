@@ -25,37 +25,139 @@ using View = Autodesk.Revit.DB.View;
 
 namespace RevitPylonDocumentation.ViewModels {
     internal class MainViewModel : BaseViewModel {
-        #region Системные
         private readonly PluginConfig _pluginConfig;
         public readonly RevitRepository _revitRepository;
 
-        public bool _edited = false;
+        /// <summary>
+        /// Указывает вносил ли пользователь изменения в настройки
+        /// </summary>
+        private bool _edited = false;
+        private string _errorText;
 
 
-        ReportHelper reportHelper = new ReportHelper();
-        public string Report {
-            get => reportHelper.GetAsString();
+        private string _selectedProjectSection = string.Empty;
+        private string _hostMarkForSearch = string.Empty;
+
+
+        private string _projectSectionTemp = "обр_ФОП_Раздел проекта";
+        private string _markTemp = "Марка";
+        private string _sheetGroupingTemp = "_Группа видов 1";
+        private string _sheetSizeTemp = "А";
+        private string _sheetCoefficientTemp = "х";
+
+        private string _generalViewPrefixTemp = "";
+        private string _generalViewSuffixTemp = "";
+        private string _transverseViewFirstPrefixTemp = "";
+        private string _transverseViewFirstSuffixTemp = "_Сеч.1-1";
+        private string _transverseViewSecondPrefixTemp = "";
+        private string _transverseViewSecondSuffixTemp = "_Сеч.2-2";
+        private string _transverseViewThirdPrefixTemp = "";
+        private string _transverseViewThirdSuffixTemp = "_Сеч.3-3";
+
+        private string _rebarSchedulePrefixTemp = "Пилон ";
+        private string _rebarScheduleSuffixTemp = "";
+        private string _materialSchedulePrefixTemp = "!СМ_Пилон ";
+        private string _materialScheduleSuffixTemp = "";
+        private string _partsSchedulePrefixTemp = "!ВД_IFC_";
+        private string _partsScheduleSuffixTemp = "";
+        
+        public static string DEF_TITLEBLOCK_NAME = "Создать типы по комплектам";
+
+        /// <summary>
+        /// Инфо про существующие в проекте листы пилонов
+        /// </summary>
+        public Dictionary<string, PylonSheetInfo> existingPylonSheetsInfo = new Dictionary<string, PylonSheetInfo>();
+        /// <summary>
+        /// Инфо про листы пилонов, которые нужно создать
+        /// </summary>
+        public Dictionary<string, PylonSheetInfo> missingPylonSheetsInfo = new Dictionary<string, PylonSheetInfo>();
+        // Вспомогательный список
+        public Dictionary<string, List<FamilyInstance>> hostData = new Dictionary<string, List<FamilyInstance>>();
+
+        public ReportHelper reportHelper = new ReportHelper();
+
+
+        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
+            _pluginConfig = pluginConfig;
+            _revitRepository = revitRepository;
+
+            GetRebarProjectSections();
+            
+            GetTitleBlocks();
+            GetLegends();
+
+            CreateSheetsCommand = new RelayCommand(CreateSheets, CanCreateSheets);
+            ApplySettingsCommands = new RelayCommand(ApplySettings, CanApplySettings);
+        }
+
+
+
+        public ICommand ApplySettingsCommands { get; }
+        public ICommand CreateSheetsCommand { get; }
+
+
+
+        // Рабочие наборы
+        /// <summary>
+        /// Список всех комплектов документации (по ум. обр_ФОП_Раздел проекта)
+        /// </summary>
+        public ObservableCollection<string> ProjectSections { get; set; } = new ObservableCollection<string>();
+
+        /// <summary>
+        /// Выбранный пользователем комплект документации
+        /// </summary>
+        public string SelectedProjectSection {
+            get => _selectedProjectSection;
             set {
-                reportHelper.AppendLine(value);
-                this.OnPropertyChanged();
+                _selectedProjectSection = value;
+                // Запуск обновления списка доступных марок пилонов
+                GetHostMarks();                                                                                     
             }
         }
 
 
-        private string _errorText;
-        public string ErrorText {
-            get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
-        }
-        #endregion
+        // Вспомогательные для документации
+        /// <summary>
+        /// Рамки листов, имеющиеся в проекте
+        /// </summary>
+        public ObservableCollection<FamilySymbol> TitleBlocks { get; set; } = new ObservableCollection<FamilySymbol>();
+        /// <summary>
+        /// Выбранная пользователем рамка листа
+        /// </summary>
+        public FamilySymbol SelectedTitleBlocks { get; set; }
+        /// <summary>
+        /// Легенды, имеющиеся в проекте
+        /// </summary>
+        public ObservableCollection<View> Legends { get; set; } = new ObservableCollection<View>();
+        /// <summary>
+        /// Выбранная пользователем легенда
+        /// </summary>
+        public static View SelectedLegend { get; set; }
 
+
+        // Инфо по пилонам
+        /// <summary>
+        /// Список всех марок пилонов (напр., "12.30.25-20⌀32")
+        /// </summary>
+        public ObservableCollection<string> HostMarks { get; set; } = new ObservableCollection<string>();
+        /// <summary>
+        /// Список меток основ, которые выбрал пользователь
+        /// </summary>
+        public System.Collections.IList SelectedHostMarks { get; set; }
+
+        public string HostMarkForSearch {
+            get => _hostMarkForSearch;
+            set {
+                _hostMarkForSearch = value;
+                GetHostMarks();
+            }
+        }
 
 
 
         #region Свойства для параметров и правил
         #region Параметры
         public string PROJECT_SECTION { get; set; } = "обр_ФОП_Раздел проекта";
-        private string _projectSectionTemp = "обр_ФОП_Раздел проекта";
         public string PROJECT_SECTION_TEMP {
             get => _projectSectionTemp;
             set {
@@ -65,7 +167,6 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         public string MARK { get; set; } = "Марка";
-        private string _markTemp = "Марка";
         public string MARK_TEMP {
             get => _markTemp;
             set {
@@ -76,7 +177,6 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
         public string SHEET_GROUPING { get; set; } = "_Группа видов 1";
-        private string _sheetGroupingTemp = "_Группа видов 1";
         public string SHEET_GROUPING_TEMP {
             get => _sheetGroupingTemp;
             set {
@@ -87,7 +187,6 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
         public string SHEET_SIZE { get; set; } = "А";
-        private string _sheetSizeTemp = "А";
         public string SHEET_SIZE_TEMP {
             get => _sheetSizeTemp;
             set {
@@ -97,7 +196,6 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         public string SHEET_COEFFICIENT { get; set; } = "х";
-        private string _sheetCoefficientTemp = "х";
         public string SHEET_COEFFICIENT_TEMP {
             get => _sheetCoefficientTemp;
             set {
@@ -105,11 +203,11 @@ namespace RevitPylonDocumentation.ViewModels {
                 _edited = true;
             }
         }
-        #endregion
 
-        #region Виды
+
+
+
         public string GENERAL_VIEW_PREFIX { get; set; } = "";
-        private string _generalViewPrefixTemp = "";
         public string GENERAL_VIEW_PREFIX_TEMP {
             get => _generalViewPrefixTemp;
             set {
@@ -119,7 +217,6 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         public string GENERAL_VIEW_SUFFIX { get; set; } = "";
-        private string _generalViewSuffixTemp = "";
         public string GENERAL_VIEW_SUFFIX_TEMP {
             get => _generalViewSuffixTemp;
             set {
@@ -130,7 +227,6 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
         public string TRANSVERSE_VIEW_FIRST_PREFIX { get; set; } = "";
-        private string _transverseViewFirstPrefixTemp = "";
         public string TRANSVERSE_VIEW_FIRST_PREFIX_TEMP {
             get => _transverseViewFirstPrefixTemp;
             set {
@@ -140,7 +236,6 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         public string TRANSVERSE_VIEW_FIRST_SUFFIX { get; set; } = "_Сеч.1-1";
-        private string _transverseViewFirstSuffixTemp = "_Сеч.1-1";
         public string TRANSVERSE_VIEW_FIRST_SUFFIX_TEMP {
             get => _transverseViewFirstSuffixTemp;
             set {
@@ -151,7 +246,6 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
         public string TRANSVERSE_VIEW_SECOND_PREFIX { get; set; } = "";
-        private string _transverseViewSecondPrefixTemp = "";
         public string TRANSVERSE_VIEW_SECOND_PREFIX_TEMP {
             get => _transverseViewSecondPrefixTemp;
             set {
@@ -161,7 +255,6 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         public string TRANSVERSE_VIEW_SECOND_SUFFIX { get; set; } = "_Сеч.2-2";
-        private string _transverseViewSecondSuffixTemp = "_Сеч.2-2";
         public string TRANSVERSE_VIEW_SECOND_SUFFIX_TEMP {
             get => _transverseViewSecondSuffixTemp;
             set {
@@ -172,7 +265,6 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
         public string TRANSVERSE_VIEW_THIRD_PREFIX { get; set; } = "";
-        private string _transverseViewThirdPrefixTemp = "";
         public string TRANSVERSE_VIEW_THIRD_PREFIX_TEMP {
             get => _transverseViewThirdPrefixTemp;
             set {
@@ -182,7 +274,6 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         public string TRANSVERSE_VIEW_THIRD_SUFFIX { get; set; } = "_Сеч.3-3";
-        private string _transverseViewThirdSuffixTemp = "_Сеч.3-3";
         public string TRANSVERSE_VIEW_THIRD_SUFFIX_TEMP {
             get => _transverseViewThirdSuffixTemp;
             set {
@@ -190,11 +281,11 @@ namespace RevitPylonDocumentation.ViewModels {
                 _edited = true;
             }
         }
-        #endregion
 
-        #region Спецификации
+
+
+
         public string REBAR_SCHEDULE_PREFIX { get; set; } = "Пилон ";
-        private string _rebarSchedulePrefixTemp = "Пилон ";
         public string REBAR_SCHEDULE_PREFIX_TEMP {
             get => _rebarSchedulePrefixTemp;
             set {
@@ -204,7 +295,6 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         public string REBAR_SCHEDULE_SUFFIX { get; set; } = "";
-        private string _rebarScheduleSuffixTemp = "";
         public string REBAR_SCHEDULE_SUFFIX_TEMP {
             get => _rebarScheduleSuffixTemp;
             set {
@@ -215,7 +305,6 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
         public string MATERIAL_SCHEDULE_PREFIX { get; set; } = "!СМ_Пилон ";
-        private string _materialSchedulePrefixTemp = "!СМ_Пилон ";
         public string MATERIAL_SCHEDULE_PREFIX_TEMP {
             get => _materialSchedulePrefixTemp;
             set {
@@ -225,7 +314,6 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         public string MATERIAL_SCHEDULE_SUFFIX { get; set; } = "";
-        private string _materialScheduleSuffixTemp = "";
         public string MATERIAL_SCHEDULE_SUFFIX_TEMP {
             get => _materialScheduleSuffixTemp;
             set {
@@ -236,7 +324,6 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
         public string PARTS_SCHEDULE_PREFIX { get; set; } = "!ВД_IFC_ ";
-        private string _partsSchedulePrefixTemp = "!ВД_IFC_ ";
         public string PARTS_SCHEDULE_PREFIX_TEMP {
             get => _partsSchedulePrefixTemp;
             set {
@@ -246,7 +333,6 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         public string PARTS_SCHEDULE_SUFFIX { get; set; } = "";
-        private string _partsScheduleSuffixTemp = "";
         public string PARTS_SCHEDULE_SUFFIX_TEMP {
             get => _partsScheduleSuffixTemp;
             set {
@@ -254,95 +340,22 @@ namespace RevitPylonDocumentation.ViewModels {
                 _edited = true;
             }
         }
-        #endregion
+
+#endregion
 
 
-        // Не будем делать как другие, т.к. это не нужно сохранять для пользователя для следующего запуска
-        public static string DEF_TITLEBLOCK_NAME = "Создать типы по комплектам";
-        #endregion
-
-
-
-
-        #region Инфо проекта
-        // Рабочие наборы
-        public ObservableCollection<string> ProjectSections { get; set; } = new ObservableCollection<string>();     // Список всех комплектов док-ции (обр_ФОП_Раздел проекта)
-        private string _selectedProjectSection { get; set; }                                                        // Выбранный пользователем комплект док-ции
-        public string SelectedProjectSection {
-            get => _selectedProjectSection;
+        public string Report {
+            get => reportHelper.GetAsString();
             set {
-                _selectedProjectSection = value;
-                GetHostMarks();                                                                                     // Запуск обновления списка доступных марок пилонов
-            }
-        }
-        // Листы
-        public Dictionary<string, PylonSheetInfo> existingPylonSheetsInfo = new Dictionary<string, PylonSheetInfo>();       // Инфо про существующие в проекте листы пилонов
-        public Dictionary<string, PylonSheetInfo> missingPylonSheetsInfo = new Dictionary<string, PylonSheetInfo>();        // Инфо про листы пилонов, которые нужно создать
-
-        // Вспомогательные для документации
-        public ObservableCollection<FamilySymbol> TitleBlocks { get; set; } = new ObservableCollection<FamilySymbol>();     // Рамки листов, имеющиеся в проекте
-        public FamilySymbol SelectedTitleBlocks { get; set; }                                                               // Выбранная пользователем рамка листа
-
-        public ObservableCollection<View> Legends { get; set; } = new ObservableCollection<View>();                         // Легенды, имеющиеся в проекте
-        public static View SelectedLegend { get; set; }                                                                            // Выбранная пользователем легенда
-        #endregion
-
-
-
-
-
-
-
-        #region Инфо пилонов (hosts)
-        public ObservableCollection<string> HostMarks { get; set; } = new ObservableCollection<string>();       // Список всех марок пилонов (12.30.25-20⌀32)
-        public System.Collections.IList SelectedHostMarks { get; set; }             // Список меток основ, которые выбрал пользователь
-
-        private string _hostMarkForSearch = string.Empty;
-        public string HostMarkForSearch {
-            get => _hostMarkForSearch;
-            set {
-                //this.RaiseAndSetIfChanged(ref _hostMarkForSearch, value);
-                _hostMarkForSearch = value;
-                GetHostMarks();
+                reportHelper.AppendLine(value);
+                this.OnPropertyChanged();
             }
         }
 
-
-        public Dictionary<string, List<FamilyInstance>> hostData = new Dictionary<string, List<FamilyInstance>>();  // Вспомогательный список
-        #endregion
-
-
-
-
-
-        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
-            _pluginConfig = pluginConfig;
-            _revitRepository = revitRepository;
-
-            GetRebarProjectSections();
-            
-            CreateSheetsCommand = new RelayCommand(CreateSheets, CanCreateSheets);
-            ApplySettingsCommands = new RelayCommand(ApplySettings, CanApplySettings);
-
-
-            GetTitleBlocks();
-            GetLegends();
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
-
-
-
-
-        /* Вывод ошибок в футере + блок доступа к кнопке
-        private void CanExecute(object p) 
-        {
-            if(SomeMethod()) {
-                ErrorText = "Some Error";
-                return false;
-            }
-
-            return true;
-        }
-        */
 
 
 
@@ -486,11 +499,6 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
 
-
-
-
-
-        public ICommand ApplySettingsCommands { get; }
         private void ApplySettings(object p) {
             // Необходимо будет написать метод проверки имен параметров - есть ли такие параметры у нужных категорий
             
@@ -530,7 +538,6 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
 
-        public ICommand CreateSheetsCommand { get; }
         private void CreateSheets(object p) {
             // Забираем список выбранных элементов через CommandParameter
             SelectedHostMarks = p as System.Collections.IList;
@@ -665,7 +672,6 @@ namespace RevitPylonDocumentation.ViewModels {
 
             return true;
         }
-
 
 
         public void AnalyzeExistingSheets() {
