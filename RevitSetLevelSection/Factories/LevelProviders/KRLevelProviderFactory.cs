@@ -71,7 +71,9 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
                 BuiltInCategory.OST_Floors, BuiltInCategory.OST_Walls, BuiltInCategory.OST_StructuralFraming
             };
 
-            var filter = new ElementMulticategoryFilter(categories);
+            var filter = new LogicalAndFilter(
+                new ElementMulticategoryFilter(categories),
+                new ExclusionFilter(new[] {wall.Id}));
 
             // Надеюсь что нужный вид существует
             var intersector = new ReferenceIntersector(filter, FindReferenceTarget.Face, GetView3D(wall));
@@ -80,14 +82,14 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
             var point = ((LocationCurve) wall.Location).Curve.GetEndPoint(0);
             point = new XYZ(point.X, point.Y,
                 point.Z
-                + 0.459317585301837 // 140 mm
+                - 0.00003 // magic number (нижний фейс, при выравнивании)
                 + wall.GetParamValue<double>(BuiltInParameter.WALL_BASE_OFFSET)
                 + wall.GetParamValue<double>(BuiltInParameter.WALL_USER_HEIGHT_PARAM)); 
             
             var result = intersector.FindNearest(point, XYZ.BasisZ);
             
             // 140 mm
-            return result?.Proximity >= 0.0;
+            return result?.Proximity <= (0.459317585301837 + 0.00003);
         }
 
         private View3D GetView3D(Element element) {
