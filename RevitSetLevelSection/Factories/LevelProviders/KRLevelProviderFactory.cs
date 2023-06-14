@@ -81,6 +81,7 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
             point = new XYZ(point.X, point.Y,
                 point.Z
                 + 0.459317585301837 // 140 mm
+                + wall.GetParamValue<double>(BuiltInParameter.WALL_BASE_OFFSET)
                 + wall.GetParamValue<double>(BuiltInParameter.WALL_USER_HEIGHT_PARAM)); 
             
             var result = intersector.FindNearest(point, XYZ.BasisZ);
