@@ -8,7 +8,6 @@ using System.Xml.Linq;
 
 using Autodesk.Revit.DB;
 
-using Microsoft.SqlServer.Server;
 
 using RevitPylonDocumentation.ViewModels;
 
@@ -32,8 +31,16 @@ namespace RevitPylonDocumentation.Models {
 
         internal  MainViewModel mainViewModel { get; set; }
 
-        // Марка пилона
+        public bool IsCheck { get; set; } = false;
+        public bool SheetInProject { get; set; } = false;
+        public bool SheetInProjectEditableInGUI { get; set; } = true;
+
+
+        // Марка пилона 
         public string PylonKeyName { get; set; }
+        public string ProjectSection { get; set; }
+
+        public List<Element> HostElems { get; set; } = new List<Element>();
         public ViewSheet PylonViewSheet { get; set; }
 
 
@@ -59,14 +66,6 @@ namespace RevitPylonDocumentation.Models {
 
         // Легенда
         public PylonView LegendView { get; set; }
-
-
-
-
-
-
-
-
 
 
 

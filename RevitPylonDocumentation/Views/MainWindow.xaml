@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
 
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitPylonDocumentation.Views"
@@ -17,6 +18,10 @@
     MinHeight="500" MinWidth="745"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <Window.Resources>
+        <vms:BooleanConverter x:Key="BooleanConverter" />
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
@@ -40,6 +45,13 @@
         <ComboBox Grid.Row="1" Grid.Column="0"  Margin="5 0 5 5"
                   ItemsSource="{Binding ProjectSections}" 
                   SelectedItem="{Binding SelectedProjectSection}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction 
+                        Command="{Binding GetHostMarksInGUICommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+
         </ComboBox>
 
 
@@ -58,10 +70,137 @@
 
 
         </StackPanel>
-        <ListBox Grid.Row="4" Grid.Column="0" Margin="5 5 5 0" Name="hostMarks"
-                 ItemsSource="{Binding HostMarks}"
+        <!--<ListBox Grid.Row="4" Grid.Column="0" Margin="5 5 5 0" Name="hostMarks"
+                 ItemsSource="{Binding SelectedHostsInfo}"
+                 DisplayMemberPath="PylonKeyName"
                  SelectionMode="Multiple">
-        </ListBox>
+        </ListBox>-->
+
+
+
+
+        <ListView
+            Grid.Row="4" 
+            x:Name="hostMarks"
+            Margin="5"
+            ScrollViewer.VerticalScrollBarVisibility="Visible"
+            ScrollViewer.CanContentScroll="False"
+            ItemsSource="{Binding Path=SelectedHostsInfo, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Возможные значения">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    Width="150"
+                                    IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                    <TextBlock
+                                        Width="500"
+                                        Text="{Binding Path=PylonKeyName}"/>
+                                </CheckBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Лист">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    Margin="10 5"
+                                    IsChecked="{Binding Path=SheetInProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                    IsEnabled="{Binding Path=SheetInProjectEditableInGUI}">
+                                </CheckBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                   
+                    <GridViewColumn Header="Основной">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox
+                                        IsChecked="{Binding Path=GeneralView.InProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=GeneralView.InProjectEditableInGUI}">
+                                    </CheckBox>
+                                    <CheckBox
+                                        IsChecked="{Binding Path=GeneralView.OnSheet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=GeneralView.OnSheetEditableInGUI}">
+                                    </CheckBox>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Поперечный 1">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox
+                                        IsChecked="{Binding Path=TransverseViewFirst.InProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=TransverseViewFirst.InProjectEditableInGUI}">
+                                    </CheckBox>
+                                    <CheckBox
+                                        IsChecked="{Binding Path=TransverseViewFirst.OnSheet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=TransverseViewFirst.OnSheetEditableInGUI}">
+                                    </CheckBox>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Поперечный 2">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox
+                                        IsChecked="{Binding Path=TransverseViewSecond.InProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=TransverseViewSecond.InProjectEditableInGUI}">
+                                    </CheckBox>
+                                    <CheckBox
+                                        IsChecked="{Binding Path=TransverseViewSecond.OnSheet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=TransverseViewSecond.OnSheetEditableInGUI}">
+                                    </CheckBox>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Поперечный 3">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox
+                                        IsChecked="{Binding Path=TransverseViewThird.InProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=TransverseViewThird.InProjectEditableInGUI}">
+                                    </CheckBox>
+                                    <CheckBox
+                                        IsChecked="{Binding Path=TransverseViewThird.OnSheet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=TransverseViewThird.OnSheetEditableInGUI}">
+                                    </CheckBox>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+
+
+
+
+
+
+
+
 
 
 
@@ -119,8 +258,7 @@
                 Margin="10"
                 Width="80"
                 Content="Тест"
-                Command="{Binding TestCommand}"
-                CommandParameter="{Binding SelectedItems, ElementName=hostMarks}"/>
+                Command="{Binding TestCommand}"/>
             <Button
                 Margin="10"
                 Width="80"

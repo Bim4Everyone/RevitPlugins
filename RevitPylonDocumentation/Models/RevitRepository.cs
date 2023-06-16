@@ -1,8 +1,17 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Web.UI.WebControls;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+
+using RevitPylonDocumentation.ViewModels;
+
+using Document = Autodesk.Revit.DB.Document;
+using Parameter = Autodesk.Revit.DB.Parameter;
+using View = Autodesk.Revit.DB.View;
 
 namespace RevitPylonDocumentation.Models {
     internal class RevitRepository {
@@ -16,14 +25,189 @@ namespace RevitPylonDocumentation.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        public IList<Element> AllSectionViews => new FilteredElementCollector(Document)
+        public List<ViewSheet> AllSheets => new FilteredElementCollector(Document)
+                .OfClass(typeof(ViewSheet))
+                .OfType<ViewSheet>()
+                .ToList();
+
+        public List<ViewSection> AllSectionViews => new FilteredElementCollector(Document)
                 .OfClass(typeof(ViewSection))
                 .WhereElementIsNotElementType()
-                .ToElements();
+                .OfType<ViewSection>()
+                .ToList();
 
         public IList<Element> AllScheduleViews => new FilteredElementCollector(Document)
                 .OfClass(typeof(ViewSchedule))
                 .WhereElementIsNotElementType()
                 .ToElements();
+
+        public List<PylonSheetInfo> HostsInfo { get; set; } = new List<PylonSheetInfo>();
+
+        public List<string> HostProjectSections { get; set; } = new List<string>();
+
+
+
+        public void GetHostData(MainViewModel mainViewModel) {
+
+            HostsInfo.Clear();
+            HostProjectSections.Clear();
+
+            foreach(var cat in new List<BuiltInCategory>() { BuiltInCategory.OST_Walls, BuiltInCategory.OST_StructuralColumns }) {
+
+                IList<Element> elems = new FilteredElementCollector(Document)
+                    .OfCategory(cat)
+                    .WhereElementIsNotElementType()
+                    .ToElements();
+
+
+                foreach(Element elem in elems) {
+                    if(!elem.Name.Contains("Пилон")) {
+                        continue;
+                    }
+
+
+                    // Запрашиваем Раздел проекта
+                    Parameter projectSectionParameter = elem.LookupParameter(mainViewModel.PROJECT_SECTION);
+                    if(projectSectionParameter == null) {
+                        mainViewModel.ErrorText = "Параметр раздела не найден у элементов Стен или Несущих колонн";
+                        return;
+                    }
+                    string projectSection = projectSectionParameter.AsString();
+                    if(projectSection is null) { continue; }
+
+
+                    // Запрашиваем Марку пилона
+                    Parameter hostMarkParameter = elem.LookupParameter(mainViewModel.MARK);
+                    if(hostMarkParameter == null) {
+                        mainViewModel.ErrorText = "Параметр марки не найден у элементов Стен или Несущих колонн";
+                        return;
+                    }
+                    string hostMark = hostMarkParameter.AsString();
+                    if(hostMark is null) { continue; }
+
+
+                    PylonSheetInfo testPylonSheetInfo = HostsInfo
+                        .Where(item => item.PylonKeyName.Equals(hostMark))
+                        .FirstOrDefault();
+
+                    if(testPylonSheetInfo is null) {
+                        PylonSheetInfo pylonSheetInfo = new PylonSheetInfo(mainViewModel, hostMark);
+                        pylonSheetInfo.ProjectSection = projectSection;
+                        pylonSheetInfo.HostElems.Add(elem);
+                        FindSheets(pylonSheetInfo);
+                        AnalizeViews(mainViewModel, pylonSheetInfo);
+
+                        HostsInfo.Add(pylonSheetInfo);
+                    } else {
+                        testPylonSheetInfo.HostElems.Add(elem);
+                    }
+                }
+            }
+
+            HostsInfo = new List<PylonSheetInfo>(HostsInfo
+                .OrderBy(i => i.PylonKeyName));
+
+            // Получаем список разделов в проекте (комплектов документации)
+            HostProjectSections = new List<string>(HostsInfo
+                .Select(item => item.ProjectSection)
+                .Distinct()
+                .OrderBy(i => i));
+
+            return;
+        }
+
+
+        public void FindSheets(PylonSheetInfo pylonSheetInfo) {
+
+
+            ViewSheet sheet = AllSheets
+                .Where(item => item.Name.Equals("Пилон " + pylonSheetInfo.PylonKeyName))
+                .FirstOrDefault();
+
+            if(sheet != null) {
+                pylonSheetInfo.SheetInProject = true;
+                pylonSheetInfo.SheetInProjectEditableInGUI = false;
+                pylonSheetInfo.PylonViewSheet = sheet;
+            }
+
+            return;
+        }
+
+
+
+
+
+
+
+
+
+
+
+        public void AnalizeViews(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
+
+
+            foreach(ViewSection view in AllSectionViews) {
+
+                if(view.Name == mainViewModel.GENERAL_VIEW_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.GENERAL_VIEW_SUFFIX) {
+                    pylonSheetInfo.GeneralView.InProject = true;
+                    pylonSheetInfo.GeneralView.InProjectEditableInGUI = false;
+
+                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
+                    
+                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
+                        pylonSheetInfo.GeneralView.OnSheet = true;
+                        pylonSheetInfo.GeneralView.OnSheetEditableInGUI = false;
+                    }
+
+                }
+
+                if(view.Name == mainViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX) {
+                    pylonSheetInfo.TransverseViewFirst.InProject = true;
+                    pylonSheetInfo.TransverseViewFirst.InProjectEditableInGUI = false;
+
+                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
+
+                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
+                        pylonSheetInfo.TransverseViewFirst.OnSheet = true;
+                        pylonSheetInfo.TransverseViewFirst.OnSheetEditableInGUI = false;
+                    }
+                }
+
+                if(view.Name == mainViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX) {
+                    pylonSheetInfo.TransverseViewSecond.InProject = true;
+                    pylonSheetInfo.TransverseViewSecond.InProjectEditableInGUI = false;
+
+                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
+
+                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
+                        pylonSheetInfo.TransverseViewSecond.OnSheet = true;
+                        pylonSheetInfo.TransverseViewSecond.OnSheetEditableInGUI = false;
+                    }
+                }
+
+                if(view.Name == mainViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX) {
+                    pylonSheetInfo.TransverseViewThird.InProject = true;
+                    pylonSheetInfo.TransverseViewThird.InProjectEditableInGUI = false;
+
+                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
+
+                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
+                        pylonSheetInfo.TransverseViewThird.OnSheet = true;
+                        pylonSheetInfo.TransverseViewThird.OnSheetEditableInGUI = false;
+                    }
+                }
+
+
+
+                //if(pylonSheetInfo.GeneralView.ViewElement != null
+                //    && pylonSheetInfo.TransverseViewFirst.ViewElement != null
+                //    && pylonSheetInfo.TransverseViewSecond.ViewElement != null
+                //    && pylonSheetInfo.TransverseViewThird.ViewElement != null) {
+                //    break;
+                //}
+            }
+
+            return;
+        }
     }
 }

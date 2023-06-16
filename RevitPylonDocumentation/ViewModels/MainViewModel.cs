@@ -4,16 +4,22 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 
+using Autodesk.AdvanceSteel.Modelling;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
+//using Autodesk.SteelConnectionsDB;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -21,7 +27,10 @@ using dosymep.WPF.ViewModels;
 using MS.WindowsAPICodePack.Internal;
 
 using RevitPylonDocumentation.Models;
+
+using Transform = Autodesk.Revit.DB.Transform;
 using View = Autodesk.Revit.DB.View;
+using Wall = Autodesk.Revit.DB.Wall;
 
 namespace RevitPylonDocumentation.ViewModels {
     internal class MainViewModel : BaseViewModel {
@@ -45,7 +54,7 @@ namespace RevitPylonDocumentation.ViewModels {
         private string _sheetSizeTemp = "А";
         private string _sheetCoefficientTemp = "х";
 
-        private string _generalViewPrefixTemp = "";
+        private string _generalViewPrefixTemp = "Пилон ";
         private string _generalViewSuffixTemp = "";
         private string _transverseViewFirstPrefixTemp = "";
         private string _transverseViewFirstSuffixTemp = "_Сеч.1-1";
@@ -62,6 +71,11 @@ namespace RevitPylonDocumentation.ViewModels {
         private string _partsScheduleSuffixTemp = "";
         
         public static string DEF_TITLEBLOCK_NAME = "Создать типы по комплектам";
+
+        private List<PylonSheetInfo> _selectedHostsInfo = new List<PylonSheetInfo>();
+
+
+
 
         /// <summary>
         /// Инфо про существующие в проекте листы пилонов
@@ -82,9 +96,14 @@ namespace RevitPylonDocumentation.ViewModels {
             _revitRepository = revitRepository;
 
             GetRebarProjectSections();
-            
-            GetTitleBlocks();
-            GetLegends();
+
+            //GetTitleBlocks();
+            //GetLegends();
+
+            GetHostMarksInGUICommand = new RelayCommand(GetHostMarksInGUI);
+
+
+            TestCommand = new RelayCommand(Test);
 
             CreateSheetsCommand = new RelayCommand(CreateSheets, CanCreateSheets);
             ApplySettingsCommands = new RelayCommand(ApplySettings, CanApplySettings);
@@ -94,26 +113,40 @@ namespace RevitPylonDocumentation.ViewModels {
 
         public ICommand ApplySettingsCommands { get; }
         public ICommand CreateSheetsCommand { get; }
+        public ICommand GetHostMarksInGUICommand { get; }
+        public ICommand TestCommand { get; }
 
 
 
-        // Рабочие наборы
         /// <summary>
         /// Список всех комплектов документации (по ум. обр_ФОП_Раздел проекта)
         /// </summary>
         public ObservableCollection<string> ProjectSections { get; set; } = new ObservableCollection<string>();
+
+        public ObservableCollection<PylonSheetInfo> HostsInfo { get; set; } = new ObservableCollection<PylonSheetInfo>();
+
+
+
+
 
         /// <summary>
         /// Выбранный пользователем комплект документации
         /// </summary>
         public string SelectedProjectSection {
             get => _selectedProjectSection;
-            set {
-                _selectedProjectSection = value;
-                // Запуск обновления списка доступных марок пилонов
-                GetHostMarks();                                                                                     
-            }
+            set => this.RaiseAndSetIfChanged(ref _selectedProjectSection, value);
         }
+
+
+        /// <summary>
+        /// Выбранный пользователем комплект документации
+        /// </summary>
+        public List<PylonSheetInfo> SelectedHostsInfo {
+            get => _selectedHostsInfo;
+            set => this.RaiseAndSetIfChanged(ref _selectedHostsInfo, value);
+        }
+
+
 
 
         // Вспомогательные для документации
@@ -149,7 +182,6 @@ namespace RevitPylonDocumentation.ViewModels {
             get => _hostMarkForSearch;
             set {
                 _hostMarkForSearch = value;
-                GetHostMarks();
             }
         }
 
@@ -207,7 +239,7 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
 
-        public string GENERAL_VIEW_PREFIX { get; set; } = "";
+        public string GENERAL_VIEW_PREFIX { get; set; } = "Пилон ";
         public string GENERAL_VIEW_PREFIX_TEMP {
             get => _generalViewPrefixTemp;
             set {
@@ -366,87 +398,23 @@ namespace RevitPylonDocumentation.ViewModels {
             // Пользователь может перезадать параметр раздела, поэтому сначала чистим
             ProjectSections.Clear();
             ErrorText = string.Empty;
-            // Пилоны могут быть выполнены категорией Стены или Несущие колонны
-            List<BuiltInCategory> pylonCategories = new List<BuiltInCategory>() { BuiltInCategory.OST_Walls, BuiltInCategory.OST_StructuralColumns };
 
-            foreach(var cat in pylonCategories) {
-
-                var elems = new FilteredElementCollector(_revitRepository.Document)
-                                    .OfCategory(cat)
-                                    .WhereElementIsNotElementType()
-                                    .ToElements();
+            _revitRepository.GetHostData(this);
 
 
-                foreach(var item in elems) {
-                    FamilyInstance elem = item as FamilyInstance;
-
-                    if(elem is null || !elem.Name.Contains("Пилон")) {
-                        continue;
-                    }
-
-
-                    // Запрашиваем Раздел проекта
-                    Autodesk.Revit.DB.Parameter projectSectionParameter = elem.LookupParameter(PROJECT_SECTION);
-                    if(projectSectionParameter == null) {
-                        ErrorText = "Параметр раздела не найден у элементов Стен или Несущих колонн";
-                        return;
-                    }
-                    string projectSection = projectSectionParameter.AsString();
-
-                    if(projectSection is null) {
-                        continue;
-                    }
-                    // Заполнение словаря Комплект документации - Пилон
-                    if(!hostData.ContainsKey(projectSection)) {
-                        List<FamilyInstance> hostList = new List<FamilyInstance>() { elem };
-
-                        hostData.Add(projectSection, hostList);
-                    } else {
-                        hostData[projectSection].Add(elem);
-                    }
-
-
-                    // Заполнение списка разделов проекта
-                    if(!ProjectSections.Contains(projectSection)) {
-                        ProjectSections.Add(projectSection);
-                    }
-                }
-            }
-            // Сортируем
-            ProjectSections = new ObservableCollection<string>(ProjectSections.OrderBy(i => i));
+            HostsInfo = new ObservableCollection<PylonSheetInfo>(_revitRepository.HostsInfo);
+            ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
         }
 
 
         // Метод для авто обновления списка марок пилонов при выборе рабочего набора
-        private void GetHostMarks() 
+        private void GetHostMarksInGUI(object p) 
         {
-            HostMarks.Clear();
             ErrorText= string.Empty;
 
-            // Перебираем хосты выбранного раздела
-            foreach(FamilyInstance host in hostData[SelectedProjectSection]) 
-            {
-                Autodesk.Revit.DB.Parameter hostMarkParameter = host.LookupParameter(MARK);
-                if(hostMarkParameter == null) {
-                    ErrorText = "Параметр марки не найден у элементов Стен или Несущих колонн";
-                    return;
-                }
-
-                string hostMark = hostMarkParameter.AsString();
-                if(hostMark is null) {
-                    continue;
-                }
-
-                if(!hostMark.Contains(HostMarkForSearch)) {
-                    continue;
-                }
-
-
-                // Заполнение списка марок основ
-                if(!HostMarks.Contains(hostMark)) {
-                    HostMarks.Add(hostMark);
-                }
-            }
+            SelectedHostsInfo = new List<PylonSheetInfo>(HostsInfo
+                .Where(item => item.ProjectSection.Equals(SelectedProjectSection))
+                .ToList());
         }
 
 
@@ -736,5 +704,156 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
+        private void Test(object p) {
+
+            using(Transaction transaction = _revitRepository.Document.StartTransaction("Добавление видов")) {
+
+
+                ViewFamilyType viewFamilyType = new FilteredElementCollector(_revitRepository.Document)
+                    .OfClass(typeof(ViewFamilyType))
+                    .Cast<ViewFamilyType>()
+                    .FirstOrDefault<ViewFamilyType>(a => ViewFamily.Section == a.ViewFamily);
+
+
+                foreach(PylonSheetInfo hostsInfo in SelectedHostsInfo) {
+                    try {
+                        if(!hostsInfo.IsCheck) { continue; }
+
+
+                        if(hostsInfo.GeneralView.InProjectEditableInGUI && hostsInfo.GeneralView.InProject) {
+                            // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
+                            int count = 0;
+                            Element elemForWork = null;
+                            foreach(Element elem in hostsInfo.HostElems) {
+                                elemForWork = elem;
+                                count++;
+                            }
+
+                            if(elemForWork is null) { continue; }
+
+                            ViewSection viewSection = null;
+                            BoundingBoxXYZ bb = elemForWork.get_BoundingBox(null);
+                            double minZ = bb.Min.Z;
+                            double maxZ = bb.Max.Z;
+
+
+                            double hostLength;
+                            double hostWidth;
+                            double offset;
+
+                            XYZ sectionBoxMin = null;
+                            XYZ sectionBoxMax = null;
+
+                            // Переменные для данных для объекта Transform
+                            XYZ originPoint = null;
+                            XYZ hostDir = null;
+                            XYZ upDir = null;
+                            XYZ viewDir = null;
+
+                            XYZ midlePoint = null;
+                            XYZ hostVector = null;
+
+
+                            if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_StructuralColumns) {
+                                FamilyInstance column = elemForWork as FamilyInstance;
+
+                                LocationPoint locationPoint = column.Location as LocationPoint;
+                                midlePoint = locationPoint.Point;
+                                double rotation = locationPoint.Rotation + (90 * Math.PI / 180);
+                                hostVector = Transform.CreateRotation(XYZ.BasisZ, rotation).OfVector(XYZ.BasisX);
+
+                                FamilySymbol hostSymbol = column.Symbol;
+                                hostLength = hostSymbol.LookupParameter("ADSK_Размер_Ширина").AsDouble();
+                                hostWidth = hostSymbol.LookupParameter("ADSK_Размер_Высота").AsDouble();
+                            }
+
+
+                            else if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_Walls) {
+                                Wall wall = elemForWork as Wall;
+                                if(wall is null) { continue; }
+                                LocationCurve locationCurve = wall.Location as LocationCurve;
+                                Line line = locationCurve.Curve as Line;
+
+                                if(line is null) { continue; }
+
+                                XYZ wallLineStart = line.GetEndPoint(0);
+                                XYZ wallLineEnd = line.GetEndPoint(1);
+                                hostVector = wallLineEnd - wallLineStart;
+                                hostLength = hostVector.GetLength();
+
+                                hostWidth = wall.WallType.Width;
+                                midlePoint = wallLineStart + 0.5 * hostVector;
+                            } else { continue; }
+
+
+                            offset = 0.1 * hostLength;
+
+                            // Формируем данные для объекта Transform
+                            originPoint = midlePoint;
+                            hostDir = hostVector.Normalize();
+                            upDir = XYZ.BasisZ;
+                            viewDir = hostDir.CrossProduct(upDir);
+
+
+                            // Передаем данные для объекта Transform
+                            Transform t = Transform.Identity;
+                            t.Origin = originPoint;
+                            t.BasisX = hostDir;
+                            t.BasisY = upDir;
+                            t.BasisZ = viewDir;
+
+
+                            sectionBoxMin = new XYZ(-hostLength * 0.6, minZ - originPoint.Z - offset, -hostWidth);
+                            sectionBoxMax = new XYZ(hostLength * 0.6, maxZ - originPoint.Z + offset, hostWidth);
+
+
+                            BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
+                            sectionBox.Transform = t;
+                            sectionBox.Min = sectionBoxMin;
+                            sectionBox.Max = sectionBoxMax;
+
+                            viewSection = ViewSection.CreateSection(_revitRepository.Document, viewFamilyType.Id, sectionBox);
+
+                            if(viewSection != null) { viewSection.Name = GENERAL_VIEW_PREFIX + hostsInfo.PylonKeyName + GENERAL_VIEW_SUFFIX; }
+                        }
+                    } catch(Exception) {}
+                }
+
+
+
+                transaction.Commit();
+            }
+
+
+        }
+
+
+
+    }
+
+
+
+    public class BooleanConverter : IValueConverter {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+
+            if(value is true) { return false; } else { return true; }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+            
+            if(value is true) { return false; } else { return true; }
+        }
     }
 }

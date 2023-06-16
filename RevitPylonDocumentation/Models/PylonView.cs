@@ -18,6 +18,11 @@ namespace RevitPylonDocumentation.Models {
 
         internal MainViewModel mainViewModel { get; set; }
 
+        public bool InProject { get; set; } = false;
+        public bool InProjectEditableInGUI { get; set; } = true;
+        public bool OnSheet { get; set; } = false;
+        public bool OnSheetEditableInGUI { get; set; } = true;
+
 
         public View ViewElement { get; set; }
 
