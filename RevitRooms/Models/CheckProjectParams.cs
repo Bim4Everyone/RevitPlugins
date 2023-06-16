@@ -52,7 +52,9 @@ namespace RevitRooms.Models {
                 SharedParamsConfig.Instance.RoomTypeGroupShortName,
                 SharedParamsConfig.Instance.ApartmentAreaSpec,
                 SharedParamsConfig.Instance.ApartmentAreaMinSpec,
-                SharedParamsConfig.Instance.ApartmentAreaMaxSpec);
+                SharedParamsConfig.Instance.ApartmentAreaMaxSpec,
+                ProjectParamsConfig.Instance.IsRoomMainLevel,
+                SharedParamsConfig.Instance.RoomMultilevelGroup);
             //SharedParamsConfig.Instance.ApartmentAreaRatioFix,
             //SharedParamsConfig.Instance.ApartmentAreaNoBalconyFix,
             //SharedParamsConfig.Instance.ApartmentLivingAreaFix,
@@ -73,7 +75,9 @@ namespace RevitRooms.Models {
                 SharedParamsConfig.Instance.ApartmentFullArea,
                 SharedParamsConfig.Instance.ApartmentNumber,
                 SharedParamsConfig.Instance.ApartmentNumberExtra,
-                SharedParamsConfig.Instance.Level);
+                SharedParamsConfig.Instance.Level,
+                ProjectParamsConfig.Instance.IsRoomMainLevel,
+                SharedParamsConfig.Instance.RoomMultilevelGroup);
 #endif
 
             return this;
