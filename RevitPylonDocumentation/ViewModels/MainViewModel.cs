@@ -56,6 +56,8 @@ namespace RevitPylonDocumentation.ViewModels {
 
         private string _generalViewPrefixTemp = "Пилон ";
         private string _generalViewSuffixTemp = "";
+        private string _generalViewPerpendicularPrefixTemp = "Пилон ";
+        private string _generalViewPerpendicularSuffixTemp = "_Перпендикулярный";
         private string _transverseViewFirstPrefixTemp = "";
         private string _transverseViewFirstSuffixTemp = "_Сеч.1-1";
         private string _transverseViewSecondPrefixTemp = "";
@@ -97,8 +99,16 @@ namespace RevitPylonDocumentation.ViewModels {
 
             GetRebarProjectSections();
 
-            //GetTitleBlocks();
-            //GetLegends();
+            ViewFamilyTypes = _revitRepository.ViewFamilyTypes;
+
+            TitleBlocks = _revitRepository.TitleBlocksInProject;
+            SelectedTitleBlocks = TitleBlocks
+                .FirstOrDefault(titleBlock => titleBlock.Name == DEF_TITLEBLOCK_NAME);
+
+            Legends = _revitRepository.LegendsInProject;
+            SelectedLegend = Legends
+                .FirstOrDefault(view => view.Name.Contains("илон"));
+
 
             GetHostMarksInGUICommand = new RelayCommand(GetHostMarksInGUI);
 
@@ -153,7 +163,7 @@ namespace RevitPylonDocumentation.ViewModels {
         /// <summary>
         /// Рамки листов, имеющиеся в проекте
         /// </summary>
-        public ObservableCollection<FamilySymbol> TitleBlocks { get; set; } = new ObservableCollection<FamilySymbol>();
+        public List<FamilySymbol> TitleBlocks { get; set; } = new List<FamilySymbol>();
         /// <summary>
         /// Выбранная пользователем рамка листа
         /// </summary>
@@ -161,11 +171,19 @@ namespace RevitPylonDocumentation.ViewModels {
         /// <summary>
         /// Легенды, имеющиеся в проекте
         /// </summary>
-        public ObservableCollection<View> Legends { get; set; } = new ObservableCollection<View>();
+        public List<View> Legends { get; set; } = new List<View>();
         /// <summary>
         /// Выбранная пользователем легенда
         /// </summary>
         public static View SelectedLegend { get; set; }
+        /// <summary>
+        /// Типоразмеры видов, имеющиеся в проекте
+        /// </summary>
+        public List<ViewFamilyType> ViewFamilyTypes { get; set; } = new List<ViewFamilyType>();
+        /// <summary>
+        /// Выбранный пользователем типоразмер вида для создания новых видов
+        /// </summary>
+        public static ViewFamilyType SelectedViewFamilyType { get; set; }
 
 
         // Инфо по пилонам
@@ -253,6 +271,24 @@ namespace RevitPylonDocumentation.ViewModels {
             get => _generalViewSuffixTemp;
             set {
                 _generalViewSuffixTemp = value;
+                _edited = true;
+            }
+        }
+
+        public string GENERAL_VIEW_PERPENDICULAR_PREFIX { get; set; } = "Пилон ";
+        public string GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP {
+            get => _generalViewPerpendicularPrefixTemp;
+            set {
+                _generalViewPerpendicularPrefixTemp = value;
+                _edited = true;
+            }
+        }
+
+        public string GENERAL_VIEW_PERPENDICULAR_SUFFIX { get; set; } = "_Перпендикулярный";
+        public string GENERAL_VIEW_PERPENDICULAR_SUFFIX_TEMP {
+            get => _generalViewPerpendicularSuffixTemp;
+            set {
+                _generalViewPerpendicularSuffixTemp = value;
                 _edited = true;
             }
         }
@@ -355,7 +391,7 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-        public string PARTS_SCHEDULE_PREFIX { get; set; } = "!ВД_IFC_ ";
+        public string PARTS_SCHEDULE_PREFIX { get; set; } = "!ВД_IFC_";
         public string PARTS_SCHEDULE_PREFIX_TEMP {
             get => _partsSchedulePrefixTemp;
             set {
@@ -418,52 +454,10 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-        private void GetTitleBlocks() {
-            var titleBlocksInProject = new FilteredElementCollector(_revitRepository.Document)
-                .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                .WhereElementIsElementType()
-                .ToElements();
 
 
-            // Перевод и отбор листов с пилонами
-            foreach(var item in titleBlocksInProject) {
-                FamilySymbol titleBlock = item as FamilySymbol;
-                if(titleBlock == null) {
-                    continue;
-                }
-
-                TitleBlocks.Add(titleBlock);
-
-                if(titleBlock.Name == DEF_TITLEBLOCK_NAME) {
-                    SelectedTitleBlocks = titleBlock;
-                }
-            }
-        }
 
 
-        private void GetLegends() {
-            var legendsInProject = new FilteredElementCollector(_revitRepository.Document)
-                .OfClass(typeof(View))
-                .WhereElementIsNotElementType()
-                .ToElements();
-
-
-            // Перевод и отбор легенд
-            foreach(var item in legendsInProject) {
-                View view = item as View;
-                if(view == null) {
-                    continue;
-                }
-
-                if(view.ViewType == ViewType.Legend) {
-                    Legends.Add(view);
-
-                    if(view.Name.Contains("илон")) {
-                        SelectedLegend = view;
-                    }
-                }
-            }
-        }
 
 
 
@@ -481,6 +475,8 @@ namespace RevitPylonDocumentation.ViewModels {
             SHEET_COEFFICIENT = _sheetCoefficientTemp;
             GENERAL_VIEW_PREFIX = _generalViewPrefixTemp;
             GENERAL_VIEW_SUFFIX = _generalViewSuffixTemp;
+            GENERAL_VIEW_PERPENDICULAR_PREFIX = _generalViewPerpendicularPrefixTemp;
+            GENERAL_VIEW_PERPENDICULAR_SUFFIX = _generalViewPerpendicularSuffixTemp;
             TRANSVERSE_VIEW_FIRST_PREFIX = _transverseViewFirstPrefixTemp;
             TRANSVERSE_VIEW_FIRST_SUFFIX = _transverseViewFirstSuffixTemp;
             TRANSVERSE_VIEW_SECOND_PREFIX = _transverseViewSecondPrefixTemp;
@@ -674,7 +670,7 @@ namespace RevitPylonDocumentation.ViewModels {
                 }
 
                 if(selectedHostMarks.Contains(sheetKeyName)) {
-                    existingPylonSheetsInfo.Add(sheetKeyName, new PylonSheetInfo(this, sheetKeyName) {
+                    existingPylonSheetsInfo.Add(sheetKeyName, new PylonSheetInfo(this, _revitRepository, sheetKeyName) {
                         PylonViewSheet = sheet,
                     });
                     selectedHostMarks.Remove(sheetKeyName);     // Удаляем имена листов, которые уже есть
@@ -692,7 +688,7 @@ namespace RevitPylonDocumentation.ViewModels {
             // Формируем список листов, выбранных для обработки и еще не созданных - wbGeneratingPylonSheetsInfo
             if(selectedHostMarks.Count > 0) {
                 foreach(string hostMark in selectedHostMarks) {
-                    missingPylonSheetsInfo.Add(hostMark, new PylonSheetInfo(this, hostMark));
+                    missingPylonSheetsInfo.Add(hostMark, new PylonSheetInfo(this, _revitRepository, hostMark));
                 }
             }
             Report = "Будут созданы листы в количестве: " + missingPylonSheetsInfo.Count.ToString();
@@ -721,114 +717,39 @@ namespace RevitPylonDocumentation.ViewModels {
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Добавление видов")) {
 
 
-                ViewFamilyType viewFamilyType = new FilteredElementCollector(_revitRepository.Document)
-                    .OfClass(typeof(ViewFamilyType))
-                    .Cast<ViewFamilyType>()
-                    .FirstOrDefault<ViewFamilyType>(a => ViewFamily.Section == a.ViewFamily);
-
-
                 foreach(PylonSheetInfo hostsInfo in SelectedHostsInfo) {
-                    try {
-                        if(!hostsInfo.IsCheck) { continue; }
+                    //try {
+
+                    //} catch(Exception) {}
 
 
-                        if(hostsInfo.GeneralView.InProjectEditableInGUI && hostsInfo.GeneralView.InProject) {
-                            // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-                            int count = 0;
-                            Element elemForWork = null;
-                            foreach(Element elem in hostsInfo.HostElems) {
-                                elemForWork = elem;
-                                count++;
-                            }
-
-                            if(elemForWork is null) { continue; }
-
-                            ViewSection viewSection = null;
-                            BoundingBoxXYZ bb = elemForWork.get_BoundingBox(null);
-                            double minZ = bb.Min.Z;
-                            double maxZ = bb.Max.Z;
+                    if(!hostsInfo.IsCheck) { continue; }
 
 
-                            double hostLength;
-                            double hostWidth;
-                            double offset;
+                    if(hostsInfo.GeneralView.InProjectEditableInGUI && hostsInfo.GeneralView.InProject) {
 
-                            XYZ sectionBoxMin = null;
-                            XYZ sectionBoxMax = null;
+                        hostsInfo.GeneralView.ViewCreator.CreateGeneralView(SelectedViewFamilyType);
+                    }
 
-                            // Переменные для данных для объекта Transform
-                            XYZ originPoint = null;
-                            XYZ hostDir = null;
-                            XYZ upDir = null;
-                            XYZ viewDir = null;
+                    if(hostsInfo.GeneralViewPerpendicular.InProjectEditableInGUI && hostsInfo.GeneralViewPerpendicular.InProject) {
 
-                            XYZ midlePoint = null;
-                            XYZ hostVector = null;
+                        hostsInfo.GeneralViewPerpendicular.ViewCreator.CreateGeneralPerpendicularView(SelectedViewFamilyType);
+                    }
 
+                    if(hostsInfo.TransverseViewFirst.InProjectEditableInGUI && hostsInfo.TransverseViewFirst.InProject) {
 
-                            if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_StructuralColumns) {
-                                FamilyInstance column = elemForWork as FamilyInstance;
+                        hostsInfo.TransverseViewFirst.ViewCreator.CreateTransverseView(SelectedViewFamilyType, 1);
+                    }
 
-                                LocationPoint locationPoint = column.Location as LocationPoint;
-                                midlePoint = locationPoint.Point;
-                                double rotation = locationPoint.Rotation + (90 * Math.PI / 180);
-                                hostVector = Transform.CreateRotation(XYZ.BasisZ, rotation).OfVector(XYZ.BasisX);
+                    if(hostsInfo.TransverseViewSecond.InProjectEditableInGUI && hostsInfo.TransverseViewSecond.InProject) {
 
-                                FamilySymbol hostSymbol = column.Symbol;
-                                hostLength = hostSymbol.LookupParameter("ADSK_Размер_Ширина").AsDouble();
-                                hostWidth = hostSymbol.LookupParameter("ADSK_Размер_Высота").AsDouble();
-                            }
+                        hostsInfo.TransverseViewSecond.ViewCreator.CreateTransverseView(SelectedViewFamilyType, 2);
+                    }
 
+                    if(hostsInfo.TransverseViewThird.InProjectEditableInGUI && hostsInfo.TransverseViewThird.InProject) {
 
-                            else if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_Walls) {
-                                Wall wall = elemForWork as Wall;
-                                if(wall is null) { continue; }
-                                LocationCurve locationCurve = wall.Location as LocationCurve;
-                                Line line = locationCurve.Curve as Line;
-
-                                if(line is null) { continue; }
-
-                                XYZ wallLineStart = line.GetEndPoint(0);
-                                XYZ wallLineEnd = line.GetEndPoint(1);
-                                hostVector = wallLineEnd - wallLineStart;
-                                hostLength = hostVector.GetLength();
-
-                                hostWidth = wall.WallType.Width;
-                                midlePoint = wallLineStart + 0.5 * hostVector;
-                            } else { continue; }
-
-
-                            offset = 0.1 * hostLength;
-
-                            // Формируем данные для объекта Transform
-                            originPoint = midlePoint;
-                            hostDir = hostVector.Normalize();
-                            upDir = XYZ.BasisZ;
-                            viewDir = hostDir.CrossProduct(upDir);
-
-
-                            // Передаем данные для объекта Transform
-                            Transform t = Transform.Identity;
-                            t.Origin = originPoint;
-                            t.BasisX = hostDir;
-                            t.BasisY = upDir;
-                            t.BasisZ = viewDir;
-
-
-                            sectionBoxMin = new XYZ(-hostLength * 0.6, minZ - originPoint.Z - offset, -hostWidth);
-                            sectionBoxMax = new XYZ(hostLength * 0.6, maxZ - originPoint.Z + offset, hostWidth);
-
-
-                            BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
-                            sectionBox.Transform = t;
-                            sectionBox.Min = sectionBoxMin;
-                            sectionBox.Max = sectionBoxMax;
-
-                            viewSection = ViewSection.CreateSection(_revitRepository.Document, viewFamilyType.Id, sectionBox);
-
-                            if(viewSection != null) { viewSection.Name = GENERAL_VIEW_PREFIX + hostsInfo.PylonKeyName + GENERAL_VIEW_SUFFIX; }
-                        }
-                    } catch(Exception) {}
+                        hostsInfo.TransverseViewThird.ViewCreator.CreateTransverseView(SelectedViewFamilyType, 3);
+                    }
                 }
 
 

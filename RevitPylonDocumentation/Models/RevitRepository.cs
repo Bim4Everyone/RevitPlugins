@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Web.UI.WebControls;
@@ -40,6 +41,30 @@ namespace RevitPylonDocumentation.Models {
                 .OfClass(typeof(ViewSchedule))
                 .WhereElementIsNotElementType()
                 .ToElements();
+
+
+        public List<FamilySymbol> TitleBlocksInProject => new FilteredElementCollector(Document)
+                .OfCategory(BuiltInCategory.OST_TitleBlocks)
+                .WhereElementIsElementType()
+                .OfType<FamilySymbol>()
+                .ToList();
+
+
+        public List<ViewFamilyType> ViewFamilyTypes => new FilteredElementCollector(Document)
+                .OfClass(typeof(ViewFamilyType))
+                .OfType<ViewFamilyType>()
+                .Where(a => ViewFamily.Section == a.ViewFamily)
+                .ToList();        
+        
+        public List<View> LegendsInProject => new FilteredElementCollector(Document)
+                .OfClass(typeof(View))
+                .OfType<View>()
+                .Where(view => view.ViewType == ViewType.Legend)
+                .ToList();
+
+
+
+
 
         public List<PylonSheetInfo> HostsInfo { get; set; } = new List<PylonSheetInfo>();
 
@@ -91,7 +116,7 @@ namespace RevitPylonDocumentation.Models {
                         .FirstOrDefault();
 
                     if(testPylonSheetInfo is null) {
-                        PylonSheetInfo pylonSheetInfo = new PylonSheetInfo(mainViewModel, hostMark);
+                        PylonSheetInfo pylonSheetInfo = new PylonSheetInfo(mainViewModel, this, hostMark);
                         pylonSheetInfo.ProjectSection = projectSection;
                         pylonSheetInfo.HostElems.Add(elem);
                         FindSheets(pylonSheetInfo);
@@ -158,7 +183,18 @@ namespace RevitPylonDocumentation.Models {
                         pylonSheetInfo.GeneralView.OnSheet = true;
                         pylonSheetInfo.GeneralView.OnSheetEditableInGUI = false;
                     }
+                }
 
+                if(view.Name == mainViewModel.GENERAL_VIEW_PERPENDICULAR_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.GENERAL_VIEW_PERPENDICULAR_SUFFIX) {
+                    pylonSheetInfo.GeneralViewPerpendicular.InProject = true;
+                    pylonSheetInfo.GeneralViewPerpendicular.InProjectEditableInGUI = false;
+
+                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
+
+                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
+                        pylonSheetInfo.GeneralViewPerpendicular.OnSheet = true;
+                        pylonSheetInfo.GeneralViewPerpendicular.OnSheetEditableInGUI = false;
+                    }
                 }
 
                 if(view.Name == mainViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX) {

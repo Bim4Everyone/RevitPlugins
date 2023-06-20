@@ -12,11 +12,17 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace RevitPylonDocumentation.Models {
     public class PylonView {
-        internal PylonView(MainViewModel mvm) {
-            mainViewModel = mvm;
+        internal PylonView(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
+            ViewModel = mvm;
+            Repository = repository;
+            SheetInfo = pylonSheetInfo;
+
+            ViewCreator = new PylonViewCreator(mvm, repository, pylonSheetInfo);
         }
 
-        internal MainViewModel mainViewModel { get; set; }
+        internal MainViewModel ViewModel { get; set; }
+        internal RevitRepository Repository { get; set; }
+        internal PylonSheetInfo SheetInfo { get; set; }
 
         public bool InProject { get; set; } = false;
         public bool InProjectEditableInGUI { get; set; } = true;
@@ -39,6 +45,11 @@ namespace RevitPylonDocumentation.Models {
         public double ViewportHalfHeight { get; set; }
 
         public XYZ ViewportCenter { get; set; }
+
+
+
+        public PylonViewCreator ViewCreator { get; set; }
+
 
 
 

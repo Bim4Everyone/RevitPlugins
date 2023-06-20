@@ -18,10 +18,7 @@
     MinHeight="500" MinWidth="745"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
-    <Window.Resources>
-        <vms:BooleanConverter x:Key="BooleanConverter" />
-    </Window.Resources>
-
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
@@ -29,6 +26,8 @@
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />
@@ -127,6 +126,25 @@
                                         IsChecked="{Binding Path=GeneralView.OnSheet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                         Margin="10 5"
                                         IsEnabled="{Binding Path=GeneralView.OnSheetEditableInGUI}">
+                                    </CheckBox>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Основной 90">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox
+                                        IsChecked="{Binding Path=GeneralViewPerpendicular.InProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=GeneralViewPerpendicular.InProjectEditableInGUI}">
+                                    </CheckBox>
+                                    <CheckBox
+                                        IsChecked="{Binding Path=GeneralViewPerpendicular.OnSheet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=GeneralViewPerpendicular.OnSheetEditableInGUI}">
                                     </CheckBox>
                                 </StackPanel>
                             </DataTemplate>
@@ -237,11 +255,24 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
 
-        
+        <Label Grid.Row="9" Content="Выберите типоразмер для создаваемых видов:"/>
+        <ComboBox Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="5 0 5 5"
+                  ItemsSource="{Binding ViewFamilyTypes}" 
+                  SelectedItem="{Binding SelectedViewFamilyType}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <Binding Path="Name"/>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
         
         
         <StackPanel
-            Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2"
+            Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
@@ -342,6 +373,17 @@
                                              VerticalContentAlignment="Center"/>
                                     <Label Content="Марка пилона"/>
                                     <TextBox Text="{Binding GENERAL_VIEW_SUFFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="105"
+                                             VerticalContentAlignment="Center"/>
+                                </StackPanel>
+
+                                <Label Content="Маска поиска основного перпендикулярного вида пилона"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox Text="{Binding GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="105"
+                                             VerticalContentAlignment="Center"/>
+                                    <Label Content="Марка пилона"/>
+                                    <TextBox Text="{Binding GENERAL_VIEW_PERPENDICULAR_SUFFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
                                              Width="105"
                                              VerticalContentAlignment="Center"/>
                                 </StackPanel>
