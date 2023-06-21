@@ -31,22 +31,6 @@ namespace RevitIsolateByParameter.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        //public void CreateFilter(ElementId parameter) 
-        //{
-        //    List<ElementId> categories = new List<ElementId>();
-        //    categories.Add(Category.GetCategory(Document, BuiltInCategory.OST_Walls).Id);
-
-        //    string value = "1";
-        //    FilterRule filterRule = ParameterFilterRuleFactory.CreateEqualsRule(parameter, value, true);
-        //    ElementParameterFilter elemParamFilter = new ElementParameterFilter(filterRule);
-
-        //    using(Transaction t = Document.StartTransaction("Создать фильтры")) 
-        //    {
-        //        ParameterFilterElement.Create(Document, "Test_filter", categories, elemParamFilter);
-        //        t.Commit();
-        //    }
-        //}
-
         public List<ElementId> GetFilteredElements(ParameterElement parameter, string selectedValue) {
             View activeView = Document.ActiveView;
             IList<Element> elements = new FilteredElementCollector(Document, activeView.Id).ToElements();
@@ -61,18 +45,16 @@ namespace RevitIsolateByParameter.Models {
             return filteredElements;
         }
 
-        public async Task IsolateElements(List<ElementId> filteredElements) {
-            for(int i = 0; i < 2; i++) {
+        public async Task IsolateElements(ParameterElement parameter, string selectedValue) {
                 _revitEventHandler.TransactAction = () => {
-                    ActiveUIDocument.Selection.SetElementIds(filteredElements);
-                    //var commandId = RevitCommandId.LookupPostableCommandId(PostableCommand.HideElements);
-                    var commandId = RevitCommandId.LookupCommandId("ID_TEMPHIDE_HIDE");
-                    if(!(commandId is null) && ActiveUIDocument.Application.CanPostCommand(commandId)) {
-                        UIApplication.PostCommand(commandId);
-                    }
+                    Transaction tr = new Transaction(Document);
+                    tr.Start("Hide elements");
+                    Document.ActiveView.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
+                    List<ElementId> filteredElements = GetFilteredElements(parameter, selectedValue);
+                    Document.ActiveView.IsolateElementsTemporary(filteredElements);
+                    tr.Commit();
                 };
                 await _revitEventHandler.Raise();
-            }
         }
 
         public ObservableCollection<ParameterElement> GetParameters() {
@@ -85,21 +67,27 @@ namespace RevitIsolateByParameter.Models {
             return parameters;
         }
 
-        public ObservableCollection<string> GetParameterValues(ParameterElement parameter) {
+        public Dictionary<string, List<string>> GetParameterValues(ObservableCollection<ParameterElement> parameters) {
             View activeView = Document.ActiveView;
             IList<Element> elements = new FilteredElementCollector(Document, activeView.Id).ToElements();
-            string paramName = parameter.GetDefinition().Name;
+            
+            Dictionary<string, List<string>> parametersValues = new Dictionary<string, List<string>>();
 
-            List<string> values = elements
-                .Where(x => x.IsExistsParam(paramName))
-                .Select(x => (string)x.GetParamValue(paramName))
-                .Where(x => x != null)
-                .Distinct()
-                .ToList();
+            foreach(var parameter in parameters) { 
+                string paramName = parameter.GetDefinition().Name;
 
-            ObservableCollection<string> parameterValues = new ObservableCollection<string>(values.OrderBy(i => i));
+                List<string> values = elements
+                    .Where(x => x.IsExistsParam(paramName))
+                    .Select(x => (string)x.GetParamValue(paramName))
+                    .Where(x => x != null)
+                    .Distinct()
+                    .OrderBy(i => i)
+                    .ToList();
 
-            return parameterValues;
+                parametersValues.Add(paramName, values);
+            }
+
+            return parametersValues;
         }
     }
 }

@@ -17,7 +17,6 @@ namespace RevitIsolateByParameter.ViewModels {
         private readonly RevitRepository _revitRepository;
 
         private ParameterElement _selectedParameter;
-        private ObservableCollection<string> _parameterValues;
         private string _selectedValue;
 
         private string _errorText;
@@ -30,10 +29,10 @@ namespace RevitIsolateByParameter.ViewModels {
             GetParameterValuesCommand = new RelayCommand(GetPossibleValues);
 
             Parameters = _revitRepository.GetParameters();
+            ParametersValues = _revitRepository.GetParameterValues(Parameters);
 
         }
 
-        //public ICommand CreateFilterCommand { get; }
         public ICommand IsolateElementsCommand { get; }
         public ICommand GetParameterValuesCommand { get; }
 
@@ -44,8 +43,9 @@ namespace RevitIsolateByParameter.ViewModels {
         }
 
         public ObservableCollection<ParameterElement> Parameters { get; }
+        public Dictionary<string, List<string>> ParametersValues { get; }
 
-        public ObservableCollection<string> ParameterValues { get; set; } = new ObservableCollection<string>();
+        public List<string> ParameterValues { get; set; } = new List<string>();
 
         public string SelectedValue {
             get => _selectedValue;
@@ -53,12 +53,11 @@ namespace RevitIsolateByParameter.ViewModels {
         }
 
         private async void IsolateElement(object p) {
-            List<ElementId> filteredElements = _revitRepository.GetFilteredElements(SelectedParameter, SelectedValue);
-            await _revitRepository.IsolateElements(filteredElements);
+            await _revitRepository.IsolateElements(SelectedParameter, SelectedValue);
         }
 
         public void GetPossibleValues(object p) {
-            ParameterValues = _revitRepository.GetParameterValues(SelectedParameter);
+            ParameterValues = ParametersValues[SelectedParameter.GetDefinition().Name];
             OnPropertyChanged(nameof(ParameterValues));
         }
 
