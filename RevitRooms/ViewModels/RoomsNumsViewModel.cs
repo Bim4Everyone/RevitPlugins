@@ -23,6 +23,8 @@ using Autodesk.Revit.UI;
 
 using DevExpress.Mvvm.Native;
 
+using RevitRooms.Commands.Numerates;
+
 namespace RevitRooms.ViewModels {
     internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
         public Guid _id;
@@ -223,33 +225,9 @@ namespace RevitRooms.ViewModels {
             }
 
             if(IsNumFlats) {
-                using(var transaction = _revitRepository.StartTransaction("Нумерация групп помещений")) {
-                    orderedObjects = orderedObjects
-                        .OrderBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
-                        .ThenBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
-                        .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level)?.Elevation)
-                        .ThenBy(item => GetDistance(item.Element))
-                        .ThenByDescending(item => item.IsRoomMainLevel)
-                        .ToArray();
-
-                    int flatCount = startNumber;
-                    foreach(var section in orderedObjects.GroupBy(item => item.RoomSection.Id)) {
-                        foreach(var level in section.GroupBy(item => item.LevelId)) {
-                            foreach(var group in level.GroupBy(
-                                        item => new {item.RoomGroup.Id, item.RoomMultilevelGroup})) {
-                                
-                                foreach(var room in group) {
-                                    room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentNumber,
-                                        Prefix + flatCount + Suffix);
-                                }
-
-                                flatCount++;
-                            }
-                        }
-                    }
-
-                    transaction.Commit();
-                }
+                var numerateCommand =
+                    new NumFlatsCommand(_revitRepository) {Start = startNumber, Prefix = Prefix, Suffix = Suffix};
+                numerateCommand.Numerate(orderedObjects);
             } else {
                 UpdateNumeringOrder();
 
@@ -429,7 +407,6 @@ namespace RevitRooms.ViewModels {
 
                 foreach(IGrouping<string, SpatialElementViewModel> levelMultiLevelRoom in multiLevelRoomGroup
                             .GroupBy(item => item.LevelName)) {
-
                     allRoomManLevel = levelMultiLevelRoom.All(item => item.IsRoomMainLevel);
                     if(!allRoomManLevel) {
                         break;
@@ -442,10 +419,10 @@ namespace RevitRooms.ViewModels {
                         .Distinct()
                         .Count() != 2;
                     if(error) {
-                        AddElements(InfoElement.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
+                        //AddElements(InfoElement.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
                     }
                 } else {
-                    AddElements(InfoElement.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
+                    //AddElements(InfoElement.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
                 }
             }
 

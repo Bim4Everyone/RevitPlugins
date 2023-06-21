@@ -60,6 +60,9 @@ namespace RevitRooms.ViewModels {
             get { return Element.LevelId; }
         }
 
+        public Level Level => (Level) Element.Document.GetElement(LevelId);
+        public double? LevelElevation => Level?.Elevation;
+
         public override string PhaseName {
             get { return Phase.Name; }
         }
