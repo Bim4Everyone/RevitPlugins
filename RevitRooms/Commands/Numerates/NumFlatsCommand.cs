@@ -36,7 +36,6 @@ namespace RevitRooms.Commands.Numerates {
                 .OrderBy(item=> item.RoomSection, _elementComparer)
                 .ThenBy(item => item, new NumFlatComparer(elements))
                 .ThenBy(item=> item.RoomGroup, _elementComparer)
-                .ThenBy(item=> GetDistance(item.Element))
                 .ToArray();
         }
 
