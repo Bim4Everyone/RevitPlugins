@@ -39,7 +39,7 @@ namespace RevitRooms.Commands.Numerates {
                 .ToArray();
         }
 
-        protected override bool CountFlat(int currentCount, SpatialElementViewModel spatialElement) {
+        protected override NumMode CountFlat(SpatialElementViewModel spatialElement) {
             // начало нумерации
             // используется стартовое значение
             bool notChangeCount = _levelId == null
@@ -65,7 +65,9 @@ namespace RevitRooms.Commands.Numerates {
             _sectionId = spatialElement.RoomSection.Id;
             _multiRoom = spatialElement.RoomMultilevelGroup;
 
-            return !notChangeCount;
+            return notChangeCount 
+                ? NumMode.NotChange
+                : NumMode.Increment;
         }
     }
 }

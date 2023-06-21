@@ -39,7 +39,13 @@ namespace RevitRooms.Commands.Numerates {
                 int flatCount = Start;
 
                 foreach(var element in orderedElements) {
-                    flatCount = CountFlat(flatCount, element) ? ++flatCount : flatCount;
+                    var numMode = CountFlat(element);
+                    if(numMode == NumMode.Reset) {
+                        flatCount = Start;
+                    } else if(numMode == NumMode.Increment) {
+                        ++flatCount;
+                    }
+                    
                     element.Element.SetParamValue(RevitParam, Prefix + flatCount + Suffix);
                 }
 
@@ -47,7 +53,7 @@ namespace RevitRooms.Commands.Numerates {
             }
         }
 
-        protected abstract bool CountFlat(int currentCount, SpatialElementViewModel spatialElement);
+        protected abstract NumMode CountFlat(SpatialElementViewModel spatialElement);
 
         protected abstract SpatialElementViewModel[] OrderElements(IEnumerable<SpatialElementViewModel> spatialElements);
 
@@ -57,5 +63,11 @@ namespace RevitRooms.Commands.Numerates {
                 ? 0
                 : Math.Sqrt((point.X * point.X) + (point.Y * point.Y));
         }
+    }
+
+    internal enum NumMode {
+        Reset,
+        Increment,
+        NotChange,
     }
 }
