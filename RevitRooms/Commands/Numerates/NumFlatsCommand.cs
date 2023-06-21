@@ -34,7 +34,7 @@ namespace RevitRooms.Commands.Numerates {
             SpatialElementViewModel[] elements = spatialElements.ToArray();
             return elements
                 .OrderBy(item=> item.RoomSection, _elementComparer)
-                .ThenBy(item => item, new NumFlatComparer(elements.ToArray()))
+                .ThenBy(item => item, new NumFlatComparer(elements))
                 .ThenBy(item=> item.RoomGroup, _elementComparer)
                 .ThenBy(item=> GetDistance(item.Element))
                 .ToArray();
