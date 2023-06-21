@@ -1,0 +1,90 @@
+﻿<base:PlatformWindow
+    x:Class="RevitIsolateByParameter.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitIsolateByParameter.Views"
+    xmlns:vms="clr-namespace:RevitIsolateByParameter.ViewModels"
+	xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+    
+    Title="MainWindow"
+    Height="200" Width="400"    
+
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="45" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            Margin="10"
+            Text="Координаты СМР"/>
+        <ComboBox Grid.Row="1"
+                  Margin="10"
+                  ItemsSource="{Binding Parameters}"
+                  DisplayMemberPath = "Name"
+                  SelectedItem="{Binding SelectedParameter}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding GetParameterValuesCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ComboBox>
+
+        <StackPanel
+            Grid.Row="2"
+            Height="45"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <ComboBox
+                Width="150" 
+                Margin="10"
+                ItemsSource="{Binding ParameterValues}"
+                SelectedItem="{Binding SelectedValue}"/>
+            <Button
+                Margin="10"
+                Width="80"
+                Content="Вверх"/>
+            <Button
+                Margin="10"
+                Width="80"
+                Content="Вниз"/>
+        </StackPanel>
+        
+        <StackPanel
+            Grid.Row="3"
+            Height="45"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+
+            <Button
+                Margin="10"
+                Width="80"
+                Content="ОК"
+                Command="{Binding IsolateElementsCommand}" />
+
+            <Button
+                Margin="10"
+                Width="80"
+                Content="Отмена"/>
+        </StackPanel>
+    </Grid>
+</base:PlatformWindow>
