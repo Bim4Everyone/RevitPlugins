@@ -33,9 +33,9 @@ namespace RevitRooms.Commands.Numerates {
         protected override SpatialElementViewModel[] OrderElements(IEnumerable<SpatialElementViewModel> spatialElements) {
             SpatialElementViewModel[] elements = spatialElements.ToArray();
             return elements
-                .OrderBy(item=> item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
+                .OrderBy(item=> item.RoomSection, _elementComparer)
                 .ThenBy(item => item, new NumFlatComparer(elements.ToArray()))
-                .ThenBy(item=> item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
+                .ThenBy(item=> item.RoomGroup, _elementComparer)
                 .ThenBy(item=> GetDistance(item.Element))
                 .ToArray();
         }
