@@ -44,7 +44,7 @@ namespace RevitClashDetective.Models.Clashes {
                                        _revitRepository.GetElement(OtherElement.DocumentName, OtherElement.Id)};
 
             return clashDocuments.All(item => documentNames.Any(d => d.Contains(item))) && clashElements.Any(item => item != null)
-                   && clashElements.All(item => item.GetTypeId().IsNotNull());
+                   && clashElements.All(item => item?.GetTypeId().IsNotNull() == true);
         }
 
         public override bool Equals(object obj) {
