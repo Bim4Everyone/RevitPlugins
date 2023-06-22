@@ -63,11 +63,6 @@ namespace RevitRooms.Commands.Numerates {
                                       && _multiRoom == spatialElement.RoomMultilevelGroup;
             
                 }
-            
-                _levelId = spatialElement.LevelId;
-                _groupId = spatialElement.RoomGroup.Id;
-                _sectionId = spatialElement.RoomSection.Id;
-                _multiRoom = spatialElement.RoomMultilevelGroup;
 
                 // если не было изменений меняем счетчик
                 // если были изменения сбрасываем счетчик
