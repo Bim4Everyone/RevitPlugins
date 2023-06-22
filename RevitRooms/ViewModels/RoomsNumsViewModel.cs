@@ -234,30 +234,9 @@ namespace RevitRooms.ViewModels {
                 var selectedOrder = SelectedNumberingOrders.ToDictionary(item => item.ElementId, item => item.Order);
 
                 if(IsNumRoomsGroup) {
-                    using(var transaction = _revitRepository.StartTransaction("Нумерация помещений по группе")) {
-                        orderedObjects = orderedObjects
-                            .OrderBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
-                            .ThenBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
-                            .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level)?.Elevation)
-                            .ThenBy(item => GetOrder(selectedOrder, item.Room))
-                            .ThenBy(item => GetDistance(item.Element))
-                            .ToArray();
-
-                        foreach(var section in orderedObjects.GroupBy(item => item.RoomSection.Id)) {
-                            foreach(var level in section.GroupBy(item => item.LevelId)) {
-                                foreach(var group in level.GroupBy(item => item.RoomGroup.Id)) {
-                                    int roomCount = startNumber;
-                                    foreach(var room in group) {
-                                        room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER,
-                                            Prefix + roomCount + Suffix);
-                                        roomCount++;
-                                    }
-                                }
-                            }
-                        }
-
-                        transaction.Commit();
-                    }
+                    var numerateCommand =
+                        new NumSectionGroup(_revitRepository, selectedOrder) {Start = startNumber, Prefix = Prefix, Suffix = Suffix};
+                    numerateCommand.Numerate(orderedObjects);
                 } else if(IsNumRoomsSection) {
                     using(var transaction = _revitRepository.StartTransaction("Нумерация помещений по секции")) {
                         orderedObjects = orderedObjects
