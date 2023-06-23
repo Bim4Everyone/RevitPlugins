@@ -54,7 +54,10 @@ namespace RevitPylonDocumentation.ViewModels {
         private string _sheetSizeTemp = "А";
         private string _sheetCoefficientTemp = "х";
 
-        private string _generalViewPrefixTemp = "Пилон ";
+        private string _sheetPrefixTemp = "Пилон ";
+        private string _sheetSuffixTemp = "";
+
+        private string _generalViewPrefixTemp = "";
         private string _generalViewSuffixTemp = "";
         private string _generalViewPerpendicularPrefixTemp = "Пилон ";
         private string _generalViewPerpendicularSuffixTemp = "_Перпендикулярный";
@@ -255,9 +258,27 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
+        public string SHEET_PREFIX { get; set; } = "Пилон ";
+        public string SHEET_PREFIX_TEMP {
+            get => _sheetPrefixTemp;
+            set {
+                _sheetPrefixTemp = value;
+                _edited = true;
+            }
+        }
+
+        public string SHEET_SUFFIX { get; set; } = "";
+        public string SHEET_SUFFIX_TEMP {
+            get => _sheetSuffixTemp;
+            set {
+                _sheetSuffixTemp = value;
+                _edited = true;
+            }
+        }
 
 
-        public string GENERAL_VIEW_PREFIX { get; set; } = "Пилон ";
+
+        public string GENERAL_VIEW_PREFIX { get; set; } = "";
         public string GENERAL_VIEW_PREFIX_TEMP {
             get => _generalViewPrefixTemp;
             set {
@@ -440,6 +461,8 @@ namespace RevitPylonDocumentation.ViewModels {
 
             HostsInfo = new ObservableCollection<PylonSheetInfo>(_revitRepository.HostsInfo);
             ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
+            OnPropertyChanged(nameof(HostsInfo));
+            OnPropertyChanged(nameof(ProjectSections));
         }
 
 
@@ -593,7 +616,7 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
                 // Размещение видовых экранов
-                missingPylonSheetsInfo[sheetKeyName].PlaceGeneralViewport();
+                //missingPylonSheetsInfo[sheetKeyName].PlaceGeneralViewport();
                 missingPylonSheetsInfo[sheetKeyName].PlaceTransverseViewPorts();
 
                 // Размещение спецификаций
@@ -725,6 +748,10 @@ namespace RevitPylonDocumentation.ViewModels {
 
                     if(!hostsInfo.IsCheck) { continue; }
 
+                    if(hostsInfo.SheetInProjectEditableInGUI && hostsInfo.SheetInProject) {
+
+                        hostsInfo.CreateSheet();
+                    }
 
                     if(hostsInfo.GeneralView.InProjectEditableInGUI && hostsInfo.GeneralView.InProject) {
 
@@ -749,6 +776,13 @@ namespace RevitPylonDocumentation.ViewModels {
                     if(hostsInfo.TransverseViewThird.InProjectEditableInGUI && hostsInfo.TransverseViewThird.InProject) {
 
                         hostsInfo.TransverseViewThird.ViewCreator.CreateTransverseView(SelectedViewFamilyType, 3);
+                    }
+
+
+
+                    if(hostsInfo.GeneralView.OnSheetEditableInGUI && hostsInfo.GeneralView.OnSheet) {
+
+                        hostsInfo.GeneralView.ViewPlacer.PlaceGeneralViewport();
                     }
                 }
 

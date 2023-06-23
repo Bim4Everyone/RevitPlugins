@@ -8,10 +8,14 @@ using System.Windows.Controls;
 using System.Xml.Linq;
 
 using Autodesk.Revit.DB;
-
+using Autodesk.Revit.DB.Mechanical;
+using Autodesk.Revit.UI;
 
 using RevitPylonDocumentation.ViewModels;
 
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
+
+using Document = Autodesk.Revit.DB.Document;
 using Parameter = Autodesk.Revit.DB.Parameter;
 
 namespace RevitPylonDocumentation.Models {
@@ -77,6 +81,49 @@ namespace RevitPylonDocumentation.Models {
 
 
 
+        public bool CreateSheet() {
+            if(PylonViewSheet != null ) {
+                return false; 
+            }
+
+            PylonViewSheet = ViewSheet.Create(Repository.Document, ViewModel.SelectedTitleBlocks.Id);
+            PylonViewSheet.Name = ViewModel.SHEET_PREFIX + PylonKeyName + ViewModel.SHEET_SUFFIX;
+
+
+            Parameter viewSheetGroupingParameter = PylonViewSheet.LookupParameter(ViewModel.SHEET_GROUPING);
+            if(viewSheetGroupingParameter == null) {
+            } else {
+                viewSheetGroupingParameter.Set(ViewModel.SelectedProjectSection);
+            }
+
+            // Ищем рамку листа
+            FamilyInstance titleBlock = new FilteredElementCollector(Repository.Document, PylonViewSheet.Id)
+                .OfCategory(BuiltInCategory.OST_TitleBlocks)
+                .WhereElementIsNotElementType()
+                .FirstOrDefault() as FamilyInstance;
+
+            if(titleBlock is null) { return false; }
+
+            TitleBlock = titleBlock;
+            SetTitleBlockSize(Repository.Document);
+
+            return true;
+        }
+
+
+        /// <summary>
+        /// Получает габарит рамки листа и записывает в параметры TitleBlockWidth и TitleBlockHeight
+        /// </summary>
+        internal void GetTitleBlockSize() {
+            if(TitleBlock is null) {
+                return;
+            }
+
+            // Получение габаритов рамки листа
+            BoundingBoxXYZ boundingBoxXYZ = TitleBlock.get_BoundingBox(PylonViewSheet);
+            TitleBlockWidth = -1 * boundingBoxXYZ.Min.X;
+            TitleBlockHeight = boundingBoxXYZ.Max.Y;
+        }
 
 
 
@@ -121,11 +168,7 @@ namespace RevitPylonDocumentation.Models {
             }
 
             // Получение итоговых габаритов рамки листа
-            BoundingBoxXYZ boundingBoxXYZ = this.TitleBlock.get_BoundingBox(PylonViewSheet);
-            this.TitleBlockWidth = -1 * boundingBoxXYZ.Min.X;
-            this.TitleBlockHeight = boundingBoxXYZ.Max.Y;
-
-            return;
+            GetTitleBlockSize();
         }
 
 
@@ -135,84 +178,88 @@ namespace RevitPylonDocumentation.Models {
 
         // Метод для размещения основного вида пилона.
         // Позиционирование - левый верхний угол листа
-        internal void PlaceGeneralViewport() {
-            #region Отчет
-            ViewModel.Report = "Основной вид";
-            #endregion
-            // Ищем основное сечение пилона пока не найдем
-            foreach(var item in ViewModel._revitRepository.AllSectionViews) {
-                ViewSection view = item as ViewSection;
-                if(view == null) {
-                    continue;
-                }
+        //internal void PlaceGeneralViewport() {
+        //    #region Отчет
+        //    ViewModel.Report = "Основной вид";
+        //    #endregion
+        //    // Ищем основное сечение пилона пока не найдем
+        //    foreach(var item in ViewModel._revitRepository.AllSectionViews) {
+        //        ViewSection view = item as ViewSection;
+        //        if(view == null) {
+        //            continue;
+        //        }
 
-                if(view.Name == ViewModel.GENERAL_VIEW_PREFIX + PylonKeyName + ViewModel.GENERAL_VIEW_SUFFIX) {
-                    // Заполнеяем данные для задания
-                    GeneralView.ViewElement = view;
-                    GeneralView.ViewportTypeName = "Заголовок на листе";
-                    GeneralView.ViewportNumber = "100";
-                    GeneralView.ViewportName = "Пилон " + PylonKeyName;
-                    #region Отчет
-                    ViewModel.Report = string.Format("\tОсновной вид пилона \"{0}\" для листа \"{1}\" успешно найден",
-                        ViewModel.GENERAL_VIEW_PREFIX + PylonKeyName + ViewModel.GENERAL_VIEW_SUFFIX, PylonViewSheet.Name);
-                    #endregion
-                    break;
-                }
-            }
-            // Проверка вдруг вид не найден
-            if(GeneralView.ViewElement is null) {
-                #region Отчет
-                ViewModel.Report = string.Format("\tПроизошла ошибка! Не найден основной вид пилона \"{0}\" для листа \"{1}\"", 
-                    ViewModel.GENERAL_VIEW_PREFIX + PylonKeyName + ViewModel.GENERAL_VIEW_SUFFIX, PylonViewSheet.Name);
-                #endregion
-                return;
-            }
+        //        if(view.Name == ViewModel.GENERAL_VIEW_PREFIX + PylonKeyName + ViewModel.GENERAL_VIEW_SUFFIX) {
+        //            // Заполнеяем данные для задания
+        //            GeneralView.ViewElement = view;
+        //            GeneralView.ViewportTypeName = "Заголовок на листе";
+        //            GeneralView.ViewportNumber = "100";
+        //            GeneralView.ViewportName = "Пилон " + PylonKeyName;
+        //            #region Отчет
+        //            ViewModel.Report = string.Format("\tОсновной вид пилона \"{0}\" для листа \"{1}\" успешно найден",
+        //                ViewModel.GENERAL_VIEW_PREFIX + PylonKeyName + ViewModel.GENERAL_VIEW_SUFFIX, PylonViewSheet.Name);
+        //            #endregion
+        //            break;
+        //        }
+        //    }
+        //    // Проверка вдруг вид не найден
+        //    if(GeneralView.ViewElement is null) {
+        //        #region Отчет
+        //        ViewModel.Report = string.Format("\tПроизошла ошибка! Не найден основной вид пилона \"{0}\" для листа \"{1}\"", 
+        //            ViewModel.GENERAL_VIEW_PREFIX + PylonKeyName + ViewModel.GENERAL_VIEW_SUFFIX, PylonViewSheet.Name);
+        //        #endregion
+        //        return;
+        //    }
 
-            // Передаем основной вид пилона в метод по созданию видов в (0.0.0)
-            string answer = GeneralView.PlacePylonViewport(ViewModel._revitRepository.Document, this);
-            if(answer.Length > 0) {
-                ViewModel.Report = answer;
-            }
+        //    // Передаем основной вид пилона в метод по созданию видов в (0.0.0)
+        //    string answer = GeneralView.PlacePylonViewport(ViewModel._revitRepository.Document, this);
+        //    if(answer.Length > 0) {
+        //        ViewModel.Report = answer;
+        //    }
 
-            if(GeneralView.ViewportElement is null) {
-                #region Отчет
-                ViewModel.Report = string.Format("\tРабота с размещением основного вида пилона на листе \"{0}\" прервана", PylonViewSheet.Name);
-                #endregion
-                return;
-            } else {
-                #region Отчет
-                ViewModel.Report = string.Format("\tОсновной вид пилона \"{0}\" успешно размещен на листе \"{1}\"", GeneralView.ViewElement.Name, PylonViewSheet.Name);
-                #endregion
-            }
+        //    if(GeneralView.ViewportElement is null) {
+        //        #region Отчет
+        //        ViewModel.Report = string.Format("\tРабота с размещением основного вида пилона на листе \"{0}\" прервана", PylonViewSheet.Name);
+        //        #endregion
+        //        return;
+        //    } else {
+        //        #region Отчет
+        //        ViewModel.Report = string.Format("\tОсновной вид пилона \"{0}\" успешно размещен на листе \"{1}\"", GeneralView.ViewElement.Name, PylonViewSheet.Name);
+        //        #endregion
+        //    }
 
-            // Если высота видового экрана основного вида больше, чем высота рамки, то он не поместится - меняем рамку
-            if(GeneralView.ViewportHalfHeight * 2 > TitleBlockHeight) {
-                #region Отчет
-                ViewModel.Report = string.Format("\tОсновной вид \"{0}\" не вмещается в рамку на листе, поэтому изменим ее габарит", PylonViewSheet.Name);
-                #endregion
+        //    // Если высота видового экрана основного вида больше, чем высота рамки, то он не поместится - меняем рамку
+        //    if(GeneralView.ViewportHalfHeight * 2 > TitleBlockHeight) {
+        //        #region Отчет
+        //        ViewModel.Report = string.Format("\tОсновной вид \"{0}\" не вмещается в рамку на листе, поэтому изменим ее габарит", PylonViewSheet.Name);
+        //        #endregion
 
-                SetTitleBlockSize(ViewModel._revitRepository.Document, 2, 1);
-            }
+        //        SetTitleBlockSize(ViewModel._revitRepository.Document, 2, 1);
+        //    }
 
-            // Рассчитываем и задаем корректную точку вставки основного вида пилона
-            XYZ newCenter = new XYZ(
-                - TitleBlockWidth + GeneralView.ViewportHalfWidth + 0.065,
-                TitleBlockHeight - GeneralView.ViewportHalfHeight - 0.016,
-                0);
-            (GeneralView.ViewportElement as Viewport).SetBoxCenter(newCenter);
+        //    // Рассчитываем и задаем корректную точку вставки основного вида пилона
+        //    XYZ newCenter = new XYZ(
+        //        - TitleBlockWidth + GeneralView.ViewportHalfWidth + 0.065,
+        //        TitleBlockHeight - GeneralView.ViewportHalfHeight - 0.016,
+        //        0);
+        //    (GeneralView.ViewportElement as Viewport).SetBoxCenter(newCenter);
 
-            GeneralView.ViewportCenter = newCenter;
-            #region Отчет
-            ViewModel.Report = string.Format("\tОсновной вид пилона \"{0}\" спозиционирован", PylonViewSheet.Name);
-            ViewModel.Report = "Основной вид - работа завершена";
-            #endregion
+        //    GeneralView.ViewportCenter = newCenter;
+        //    #region Отчет
+        //    ViewModel.Report = string.Format("\tОсновной вид пилона \"{0}\" спозиционирован", PylonViewSheet.Name);
+        //    ViewModel.Report = "Основной вид - работа завершена";
+        //    #endregion
 
-            return;
-        }
+        //    return;
+        //}
 
 
         // Метод для размещения поперечных видов пилона.
         // Позиционирование - снизу вверх  от нижней границы листа правее от основного вида
+
+
+
+
         internal void PlaceTransverseViewPorts() {
             double coordinateX = 0;
             double coordinateY = 0;

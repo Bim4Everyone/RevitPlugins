@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Web.UI.WebControls;
+using System.Windows.Controls;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using RevitPylonDocumentation.ViewModels;
+
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 
 using Document = Autodesk.Revit.DB.Document;
 using Parameter = Autodesk.Revit.DB.Parameter;
@@ -61,8 +64,6 @@ namespace RevitPylonDocumentation.Models {
                 .OfType<View>()
                 .Where(view => view.ViewType == ViewType.Legend)
                 .ToList();
-
-
 
 
 
@@ -119,7 +120,7 @@ namespace RevitPylonDocumentation.Models {
                         PylonSheetInfo pylonSheetInfo = new PylonSheetInfo(mainViewModel, this, hostMark);
                         pylonSheetInfo.ProjectSection = projectSection;
                         pylonSheetInfo.HostElems.Add(elem);
-                        FindSheets(pylonSheetInfo);
+                        FindSheets(mainViewModel, pylonSheetInfo);
                         AnalizeViews(mainViewModel, pylonSheetInfo);
 
                         HostsInfo.Add(pylonSheetInfo);
@@ -142,50 +143,58 @@ namespace RevitPylonDocumentation.Models {
         }
 
 
-        public void FindSheets(PylonSheetInfo pylonSheetInfo) {
-
-
+        public void FindSheets(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
+            
             ViewSheet sheet = AllSheets
-                .Where(item => item.Name.Equals("Пилон " + pylonSheetInfo.PylonKeyName))
+                .Where(item => item.Name.Equals(mainViewModel.SHEET_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.SHEET_SUFFIX))
                 .FirstOrDefault();
 
             if(sheet != null) {
                 pylonSheetInfo.SheetInProject = true;
                 pylonSheetInfo.SheetInProjectEditableInGUI = false;
                 pylonSheetInfo.PylonViewSheet = sheet;
+
+                // Сразу ищем рамку листа
+                FamilyInstance titleBlock = new FilteredElementCollector(Document, sheet.Id)
+                    .OfCategory(BuiltInCategory.OST_TitleBlocks)
+                    .WhereElementIsNotElementType()
+                    .FirstOrDefault() as FamilyInstance;
+
+                if(titleBlock is null) { return; }
+
+                pylonSheetInfo.TitleBlock = titleBlock;
+
+                // Получаем габариты рамки листа
+                pylonSheetInfo.GetTitleBlockSize();
             }
 
             return;
         }
 
 
-
-
-
-
-
-
-
-
-
         public void AnalizeViews(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
-
 
             foreach(ViewSection view in AllSectionViews) {
 
                 if(view.Name == mainViewModel.GENERAL_VIEW_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.GENERAL_VIEW_SUFFIX) {
+                    pylonSheetInfo.GeneralView.ViewElement = view;
                     pylonSheetInfo.GeneralView.InProject = true;
                     pylonSheetInfo.GeneralView.InProjectEditableInGUI = false;
 
                     string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
                     
                     if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
+                        // Значит видовой экран вида есть на листе, но мы не знаем где
                         pylonSheetInfo.GeneralView.OnSheet = true;
                         pylonSheetInfo.GeneralView.OnSheetEditableInGUI = false;
+
+                        // Ищем видовой экран вида на листе, собираем инфу по нему
+                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.GeneralView);
                     }
                 }
 
                 if(view.Name == mainViewModel.GENERAL_VIEW_PERPENDICULAR_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.GENERAL_VIEW_PERPENDICULAR_SUFFIX) {
+                    pylonSheetInfo.GeneralViewPerpendicular.ViewElement = view;
                     pylonSheetInfo.GeneralViewPerpendicular.InProject = true;
                     pylonSheetInfo.GeneralViewPerpendicular.InProjectEditableInGUI = false;
 
@@ -194,10 +203,14 @@ namespace RevitPylonDocumentation.Models {
                     if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
                         pylonSheetInfo.GeneralViewPerpendicular.OnSheet = true;
                         pylonSheetInfo.GeneralViewPerpendicular.OnSheetEditableInGUI = false;
+
+                        // Ищем видовой экран вида на листе, собираем инфу по нему
+                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.GeneralViewPerpendicular);
                     }
                 }
 
                 if(view.Name == mainViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX) {
+                    pylonSheetInfo.TransverseViewFirst.ViewElement = view;
                     pylonSheetInfo.TransverseViewFirst.InProject = true;
                     pylonSheetInfo.TransverseViewFirst.InProjectEditableInGUI = false;
 
@@ -206,10 +219,14 @@ namespace RevitPylonDocumentation.Models {
                     if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
                         pylonSheetInfo.TransverseViewFirst.OnSheet = true;
                         pylonSheetInfo.TransverseViewFirst.OnSheetEditableInGUI = false;
+
+                        // Ищем видовой экран вида на листе, собираем инфу по нему
+                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.TransverseViewFirst);
                     }
                 }
 
                 if(view.Name == mainViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX) {
+                    pylonSheetInfo.TransverseViewSecond.ViewElement = view;
                     pylonSheetInfo.TransverseViewSecond.InProject = true;
                     pylonSheetInfo.TransverseViewSecond.InProjectEditableInGUI = false;
 
@@ -218,10 +235,14 @@ namespace RevitPylonDocumentation.Models {
                     if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
                         pylonSheetInfo.TransverseViewSecond.OnSheet = true;
                         pylonSheetInfo.TransverseViewSecond.OnSheetEditableInGUI = false;
+
+                        // Ищем видовой экран вида на листе, собираем инфу по нему
+                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.TransverseViewSecond);
                     }
                 }
 
                 if(view.Name == mainViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX) {
+                    pylonSheetInfo.TransverseViewThird.ViewElement = view;
                     pylonSheetInfo.TransverseViewThird.InProject = true;
                     pylonSheetInfo.TransverseViewThird.InProjectEditableInGUI = false;
 
@@ -230,6 +251,9 @@ namespace RevitPylonDocumentation.Models {
                     if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
                         pylonSheetInfo.TransverseViewThird.OnSheet = true;
                         pylonSheetInfo.TransverseViewThird.OnSheetEditableInGUI = false;
+
+                        // Ищем видовой экран вида на листе, собираем инфу по нему
+                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.TransverseViewThird);
                     }
                 }
 
@@ -244,6 +268,31 @@ namespace RevitPylonDocumentation.Models {
             }
 
             return;
+        }
+
+
+        public void GetInfoAboutViewport(ViewSheet viewSheet, PylonView pylonView) {
+
+            // Ищем видовой экран вида на листе
+            Viewport viewport = new FilteredElementCollector(Document, viewSheet.Id)
+                .OfClass(typeof(Viewport))
+                .WhereElementIsNotElementType()
+                .FirstOrDefault(item =>
+                    item.OwnerViewId.Equals(pylonView.ViewElement.Id)) as Viewport;
+
+            // Вообще мы уже выяснили, что видЭкран вида на листе есть, но на всякий
+            if(viewport != null) {
+                pylonView.ViewportElement = viewport;
+
+                // Получение центра и габаритов видового экрана
+                XYZ viewportCenter = viewport.GetBoxCenter();
+                Outline viewportOutline = viewport.GetBoxOutline();
+                double viewportHalfWidth = viewportOutline.MaximumPoint.X;
+                double viewportHalfHeight = viewportOutline.MaximumPoint.Y;
+
+                pylonView.ViewportHalfWidth = viewportHalfWidth;
+                pylonView.ViewportHalfHeight = viewportHalfHeight;
+            }
         }
     }
 }

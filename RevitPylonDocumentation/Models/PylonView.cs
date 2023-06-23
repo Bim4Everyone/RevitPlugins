@@ -18,6 +18,7 @@ namespace RevitPylonDocumentation.Models {
             SheetInfo = pylonSheetInfo;
 
             ViewCreator = new PylonViewCreator(mvm, repository, pylonSheetInfo);
+            ViewPlacer = new PylonViewPlacer(mvm, repository, pylonSheetInfo);
         }
 
         internal MainViewModel ViewModel { get; set; }
@@ -49,6 +50,7 @@ namespace RevitPylonDocumentation.Models {
 
 
         public PylonViewCreator ViewCreator { get; set; }
+        public PylonViewPlacer ViewPlacer { get; set; }
 
 
 
