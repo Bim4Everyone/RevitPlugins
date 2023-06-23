@@ -533,20 +533,13 @@ namespace RevitLintelPlacement.Models {
             var height = elementInWall.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningHeight)
                          ?? elementInWall.Symbol.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningHeight);
 
-            double? down = null;
-            if(!string.IsNullOrEmpty(LintelsCommonConfig.OpeningDown)) {
-                down = elementInWall.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningDown)
-                       ?? elementInWall.Symbol.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningDown);
-
-            }
-
             double z;
             if(height.HasValue) {
                 var bottomBarHeight = _bottomBarHeightsParams
                     .Select(item => elementInWall.GetParamValueOrDefault<double>(item))
                     .FirstOrDefault(item => item > 0);
 
-                z = height.Value + bottomBarHeight - (down ?? 0);
+                z = height.Value + bottomBarHeight;
             } else {
                 z = elementInWall.GetParamValueOrDefault<double>(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
             }
