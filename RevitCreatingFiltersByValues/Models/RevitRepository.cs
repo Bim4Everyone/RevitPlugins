@@ -82,12 +82,14 @@ namespace RevitCreatingFiltersByValues.Models {
                 .ToList();
 
             // Получаем и добавляем элементы из связей, видимые на виде
-            foreach(RevitLinkInstance link in links) {
-                elementsInView.AddRange(new FilteredElementCollector(link.GetLinkDocument(), Document.ActiveView.Id)
-                    .WhereElementIsNotElementType()
-                    .ToElements()
-                    .ToList());
-            }
+            try {
+                foreach(RevitLinkInstance link in links) {
+                    elementsInView.AddRange(new FilteredElementCollector(link.GetLinkDocument(), Document.ActiveView.Id)
+                        .WhereElementIsNotElementType()
+                        .ToElements()
+                        .ToList());
+                }
+            } catch(Exception) {}
 
             return elementsInView;
         }
