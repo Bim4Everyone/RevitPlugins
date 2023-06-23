@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 
 using Autodesk.Revit.DB;
 
@@ -66,12 +67,16 @@ namespace RevitLintelPlacement.Models {
         [Description("Фиксация решения")]
         public string LintelFixation { get; set; }
 
+        [JsonIgnore]
         [Description("Высота проема")]
-        public string OpeningHeight { get; set; }
+        // не стал переделывать всю логику, оставил как есть
+        public string OpeningHeight => LabelUtils.GetLabelFor(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
 
+        [JsonIgnore]
         [Description("Ширина проема")]
-        public string OpeningWidth { get; set; }
-
+        // не стал переделывать всю логику, оставил как есть
+        public string OpeningWidth => LabelUtils.GetLabelFor(BuiltInParameter.FAMILY_WIDTH_PARAM);
+        
         [Description("Фиксация перемычки")]
         public string OpeningFixation { get; set; }
 
@@ -88,8 +93,6 @@ namespace RevitLintelPlacement.Models {
                 || LintelLeftCorner == null
                 || LintelRightCorner == null
                 || LintelFixation == null
-                || OpeningHeight == null
-                || OpeningWidth == null
                 || OpeningFixation == null
                 || ReinforcedConcreteFilter == null
                 || HolesFilter == null

@@ -332,9 +332,9 @@ namespace RevitLintelPlacement.Models {
             //Если жб-стены или колонны не найдены, то уголок не нужен
             if(refWithContext == null)
                 return false;
+            
             var elementWidth = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningWidth)
-                ?? elementInWall.Symbol.GetParamValueOrDefault(LintelsCommonConfig.OpeningWidth)
-                ?? elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
+                               ?? elementInWall.Symbol.GetParamValueOrDefault(LintelsCommonConfig.OpeningWidth);
 
             if(elementWidth == null) {
                 elementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id,
@@ -533,18 +533,7 @@ namespace RevitLintelPlacement.Models {
             var height = elementInWall.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningHeight)
                          ?? elementInWall.Symbol.GetParamValueOrDefault<double?>(LintelsCommonConfig.OpeningHeight);
 
-            double z;
-            if(height.HasValue) {
-                var bottomBarHeight = _bottomBarHeightsParams
-                    .Select(item => elementInWall.GetParamValueOrDefault<double>(item))
-                    .FirstOrDefault(item => item > 0);
-
-                z = height.Value + bottomBarHeight;
-            } else {
-                z = elementInWall.GetParamValueOrDefault<double>(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
-            }
-            
-            return new XYZ(location.X, location.Y, z);
+            return new XYZ(location.X, location.Y, height ?? 0);
         }
 
         public bool CheckLintelType(FamilySymbol lintelType, ElementInfosViewModel elementInfos) {
@@ -641,14 +630,6 @@ namespace RevitLintelPlacement.Models {
             if(string.IsNullOrEmpty(LintelsCommonConfig.OpeningFixation)) {
                 result = false;
                 AddBlankParameterInfo(elementInfos, nameof(LintelsCommonConfig.OpeningFixation));
-            }
-            if(string.IsNullOrEmpty(LintelsCommonConfig.OpeningHeight)) {
-                result = false;
-                AddBlankParameterInfo(elementInfos, nameof(LintelsCommonConfig.OpeningHeight));
-            }
-            if(string.IsNullOrEmpty(LintelsCommonConfig.OpeningWidth)) {
-                result = false;
-                AddBlankParameterInfo(elementInfos, nameof(LintelsCommonConfig.OpeningWidth));
             }
             if(string.IsNullOrEmpty(LintelsCommonConfig.HolesFilter)) {
                 result = false;

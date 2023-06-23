@@ -141,9 +141,10 @@ namespace RevitLintelPlacement.Models {
         }
 
         private ParameterCheckResult CheckLintelWidth(FamilyInstance lintel, FamilyInstance elementInWall) {
-            var elementInWallWidth = elementInWall.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningWidth)
-                ?? elementInWall.Symbol.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningWidth)
-                ?? elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
+            var elementInWallWidth =
+                elementInWall.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningWidth)
+                ?? elementInWall.Symbol.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningWidth);
+            
             if(elementInWallWidth == null) {
                 _elementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id,
                    InfoElement.MissingOpeningParameter.FormatMessage(_revitRepository.LintelsCommonConfig.OpeningWidth)) {
@@ -152,6 +153,7 @@ namespace RevitLintelPlacement.Models {
                 });
                 return ParameterCheckResult.Correct;
             }
+            
             var lintelWidth = (double) lintel.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.LintelWidth);
             if(Math.Abs((double) elementInWallWidth - lintelWidth) < 0.01) {
                 return ParameterCheckResult.Correct;

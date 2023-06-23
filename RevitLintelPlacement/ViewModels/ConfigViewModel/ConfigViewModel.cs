@@ -261,8 +261,6 @@ namespace RevitLintelPlacement.ViewModels {
             _revitRepository.LintelsCommonConfig.LintelLeftCorner = LintelLeftCorner.Name;
             _revitRepository.LintelsCommonConfig.LintelLeftOffset = LintelLeftOffset.Name;
             _revitRepository.LintelsCommonConfig.LintelFixation = LintelFixation.Name;
-            _revitRepository.LintelsCommonConfig.OpeningHeight = OpeningHeight;
-            _revitRepository.LintelsCommonConfig.OpeningWidth = OpeningWidth;
             _revitRepository.LintelsCommonConfig.OpeningFixation = OpeningFixation;
             _revitRepository.LintelsCommonConfig.ReinforcedConcreteFilter = ReinforcedConcreteFilter.Select(e => e.Name).ToList();
             _revitRepository.LintelsCommonConfig.HolesFilter = HolesFilter;
