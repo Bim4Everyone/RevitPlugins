@@ -238,24 +238,9 @@ namespace RevitRooms.ViewModels {
                         new NumSectionGroup(_revitRepository, selectedOrder) {Start = startNumber, Prefix = Prefix, Suffix = Suffix};
                     numerateCommand.Numerate(orderedObjects);
                 } else if(IsNumRoomsSection) {
-                    using(var transaction = _revitRepository.StartTransaction("Нумерация помещений по секции")) {
-                        orderedObjects = orderedObjects
-                            .OrderBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
-                            .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level)?.Elevation)
-                            .ThenBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
-                            .ThenBy(item => item.RoomMultilevelGroup)
-                            .ThenBy(item => GetOrder(selectedOrder, item.Room))
-                            .ThenBy(item => GetDistance(item.Element))
-                            .ToArray();
-
-                        int roomCount = startNumber;
-                        foreach(var room in orderedObjects) {
-                            room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER, Prefix + roomCount + Suffix);
-                            roomCount++;
-                        }
-
-                        transaction.Commit();
-                    }
+                    var numerateCommand =
+                        new NumSectionCommand(_revitRepository, selectedOrder) {Start = startNumber, Prefix = Prefix, Suffix = Suffix};
+                    numerateCommand.Numerate(orderedObjects);
                 } else if(IsNumRoomsSectionLevels) {
                     using(var transaction =
                           _revitRepository.StartTransaction("Нумерация помещений по секции и этажу")) {
