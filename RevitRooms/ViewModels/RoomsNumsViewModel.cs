@@ -23,6 +23,8 @@ using Autodesk.Revit.UI;
 
 using DevExpress.Mvvm.Native;
 
+using dosymep.SimpleServices;
+
 using RevitRooms.Commands.Numerates;
 
 namespace RevitRooms.ViewModels {
@@ -213,7 +215,7 @@ namespace RevitRooms.ViewModels {
                 return;
             }
 
-            var orderedObjects = workingObjects
+            SpatialElementViewModel[] orderedObjects = workingObjects
                 .Where(item => item.RoomGroup != null && groups.Contains(item.RoomGroup.Id))
                 .Where(item => item.RoomSection != null && sections.Contains(item.RoomSection.Id))
                 .ToArray();
@@ -224,32 +226,41 @@ namespace RevitRooms.ViewModels {
                 return;
             }
 
-            if(IsNumFlats) {
-                var numerateCommand =
-                    new NumFlatsCommand(_revitRepository) {Start = startNumber, Prefix = Prefix, Suffix = Suffix};
-                numerateCommand.Numerate(orderedObjects);
-            } else {
-                UpdateNumeringOrder();
-
-                var selectedOrder = SelectedNumberingOrders
-                    .ToDictionary(
-                        item => item.ElementId,
-                        item => item.Order);
-
-                if(IsNumRoomsGroup) {
+            using(var window = SetupProgressDialog(orderedObjects)) {
+                window.Show();
+                if(IsNumFlats) {
                     var numerateCommand =
-                        new NumSectionGroup(_revitRepository, selectedOrder) {Start = startNumber, Prefix = Prefix, Suffix = Suffix};
-                    numerateCommand.Numerate(orderedObjects);
-                } else if(IsNumRoomsSection) {
-                    var numerateCommand =
-                        new NumSectionCommand(_revitRepository, selectedOrder) {Start = startNumber, Prefix = Prefix, Suffix = Suffix};
-                    numerateCommand.Numerate(orderedObjects);
-                } else if(IsNumRoomsSectionLevels) {
-                    var numerateCommand =
-                        new NumerateSectionLevel(_revitRepository, selectedOrder) {Start = startNumber, Prefix = Prefix, Suffix = Suffix};
-                    numerateCommand.Numerate(orderedObjects);
+                        new NumFlatsCommand(_revitRepository) {Start = startNumber, Prefix = Prefix, Suffix = Suffix};
+                    numerateCommand.Numerate(orderedObjects, window.CreateProgress(), window.CreateCancellationToken());
                 } else {
-                    throw new InvalidOperationException("Выбран неизвестный режим работы.");
+                    UpdateNumeringOrder();
+
+                    var selectedOrder = SelectedNumberingOrders
+                        .ToDictionary(
+                            item => item.ElementId,
+                            item => item.Order);
+
+                    if(IsNumRoomsGroup) {
+                        var numerateCommand =
+                            new NumSectionGroup(_revitRepository, selectedOrder) {
+                                Start = startNumber, Prefix = Prefix, Suffix = Suffix
+                            };
+                        numerateCommand.Numerate(orderedObjects, window.CreateProgress(), window.CreateCancellationToken());
+                    } else if(IsNumRoomsSection) {
+                        var numerateCommand =
+                            new NumSectionCommand(_revitRepository, selectedOrder) {
+                                Start = startNumber, Prefix = Prefix, Suffix = Suffix
+                            };
+                        numerateCommand.Numerate(orderedObjects, window.CreateProgress(), window.CreateCancellationToken());
+                    } else if(IsNumRoomsSectionLevels) {
+                        var numerateCommand =
+                            new NumerateSectionLevel(_revitRepository, selectedOrder) {
+                                Start = startNumber, Prefix = Prefix, Suffix = Suffix
+                            };
+                        numerateCommand.Numerate(orderedObjects, window.CreateProgress(), window.CreateCancellationToken());
+                    } else {
+                        throw new InvalidOperationException("Выбран неизвестный режим работы.");
+                    }
                 }
             }
 
@@ -258,6 +269,14 @@ namespace RevitRooms.ViewModels {
             ParentWindow.DialogResult = true;
             ParentWindow.Close();
             TaskDialog.Show("Предупреждение!", "Расчет завершен!");
+        }
+
+        private IProgressDialogService SetupProgressDialog(SpatialElementViewModel[] orderedObjects) {
+            var service = GetPlatformService<IProgressDialogService>();
+            service.StepValue = 10;
+            service.MaxValue = orderedObjects.Length;
+            service.DisplayTitleFormat = "Нумерация [{0}]\\{1}]";
+            return service;
         }
 
         private bool ShowNotFoundNames(string[] notFoundNames) {

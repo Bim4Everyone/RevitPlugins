@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 
 using Autodesk.Revit.DB;
 
@@ -9,6 +10,7 @@ using DevExpress.XtraSpellChecker;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.SimpleServices;
 
 using RevitRooms.Comparators;
 using RevitRooms.Models;
@@ -28,17 +30,20 @@ namespace RevitRooms.Commands.Numerates {
         public int Start { get; set; }
         public string Prefix { get; set; }
         public string Suffix { get; set; }
-
-
+        
         protected RevitParam RevitParam { get; set; }
         protected string TransactionName { get; set; }
 
-        public void Numerate(SpatialElementViewModel[] spatialElements) {
+        public void Numerate(SpatialElementViewModel[] spatialElements, IProgress<int> progress = default, CancellationToken cancellationToken = default) {
             SpatialElementViewModel[] orderedElements = OrderElements(spatialElements);
             using(var transaction = _revitRepository.StartTransaction(TransactionName)) {
                 int flatCount = Start;
 
+                int count = 0;
                 foreach(var element in orderedElements) {
+                    progress?.Report(++count);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    
                     var numMode = CountFlat(element);
                     if(numMode == NumMode.Reset) {
                         flatCount = Start;
