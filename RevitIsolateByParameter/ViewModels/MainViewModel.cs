@@ -25,11 +25,14 @@ namespace RevitIsolateByParameter.ViewModels {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
-            IsolateElementsCommand = new RelayCommand(IsolateElement);
-            GetParameterValuesCommand = new RelayCommand(GetPossibleValues);
-
             Parameters = _revitRepository.GetParameters();
-            ParametersValues = _revitRepository.GetParameterValues(Parameters);
+            if(Parameters.Count == 3) {
+                ParametersValues = _revitRepository.GetParameterValues(Parameters);
+            }
+
+            IsolateElementsCommand = new RelayCommand(IsolateElement, CanIsolate);
+            GetParameterValuesCommand = new RelayCommand(GetPossibleValues, CanIsolate);
+
 
         }
 
@@ -54,6 +57,19 @@ namespace RevitIsolateByParameter.ViewModels {
 
         private async void IsolateElement(object p) {
             await _revitRepository.IsolateElements(SelectedParameter, SelectedValue);
+        }
+
+        private bool CanIsolate(object p) { 
+            if(Parameters.Count != 3) {
+                ErrorText = "В проекте отсутствуют параметры СМР";
+                return false;
+            }
+            if(ParametersValues == null) {
+                ErrorText = "Параметры не заполнены";
+                return false;
+            }
+
+            return true;
         }
 
         public void GetPossibleValues(object p) {

@@ -17,6 +17,8 @@ using RevitIsolateByParameter.Handlers;
 namespace RevitIsolateByParameter.Models {
     internal class RevitRepository {
 
+        private const string ParameterNoValueText = "<Параметр не заполнен>";
+
         private readonly RevitEventHandler _revitEventHandler;
 
         public RevitRepository(UIApplication uiApplication) {
@@ -31,7 +33,22 @@ namespace RevitIsolateByParameter.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
+        public ObservableCollection<ParameterElement> GetParameters() {
+            ObservableCollection<ParameterElement> parameters = new ObservableCollection<ParameterElement>();
+
+            if(SharedParamsConfig.Instance.BuildingWorksLevel.IsExistsParam(Document))
+                parameters.Add(SharedParamsConfig.Instance.BuildingWorksLevel.GetRevitParamElement(Document));
+            if(SharedParamsConfig.Instance.BuildingWorksSection.IsExistsParam(Document)) 
+                parameters.Add(SharedParamsConfig.Instance.BuildingWorksSection.GetRevitParamElement(Document));
+            if(SharedParamsConfig.Instance.BuildingWorksBlock.IsExistsParam(Document)) 
+                parameters.Add(SharedParamsConfig.Instance.BuildingWorksBlock.GetRevitParamElement(Document));
+
+            return parameters;
+        }
+
         public List<ElementId> GetFilteredElements(ParameterElement parameter, string selectedValue) {
+            if(selectedValue == ParameterNoValueText)
+                selectedValue = null;
             View activeView = Document.ActiveView;
             IList<Element> elements = new FilteredElementCollector(Document, activeView.Id).ToElements();
             string paramName = parameter.GetDefinition().Name;
@@ -43,28 +60,6 @@ namespace RevitIsolateByParameter.Models {
                 .ToList();
 
             return filteredElements;
-        }
-
-        public async Task IsolateElements(ParameterElement parameter, string selectedValue) {
-                _revitEventHandler.TransactAction = () => {
-                    Transaction tr = new Transaction(Document);
-                    tr.Start("Hide elements");
-                    Document.ActiveView.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
-                    List<ElementId> filteredElements = GetFilteredElements(parameter, selectedValue);
-                    Document.ActiveView.IsolateElementsTemporary(filteredElements);
-                    tr.Commit();
-                };
-                await _revitEventHandler.Raise();
-        }
-
-        public ObservableCollection<ParameterElement> GetParameters() {
-            ObservableCollection<ParameterElement> parameters = new ObservableCollection<ParameterElement>();
-
-            parameters.Add(SharedParamsConfig.Instance.BuildingWorksLevel.GetRevitParamElement(Document));
-            parameters.Add(SharedParamsConfig.Instance.BuildingWorksSection.GetRevitParamElement(Document));
-            parameters.Add(SharedParamsConfig.Instance.BuildingWorksBlock.GetRevitParamElement(Document));
-         
-            return parameters;
         }
 
         public Dictionary<string, List<string>> GetParameterValues(ObservableCollection<ParameterElement> parameters) {
@@ -79,7 +74,7 @@ namespace RevitIsolateByParameter.Models {
                 List<string> values = elements
                     .Where(x => x.IsExistsParam(paramName))
                     .Select(x => (string)x.GetParamValue(paramName))
-                    .Where(x => x != null)
+                    .Select(x => x ?? ParameterNoValueText)
                     .Distinct()
                     .OrderBy(i => i)
                     .ToList();
@@ -88,6 +83,18 @@ namespace RevitIsolateByParameter.Models {
             }
 
             return parametersValues;
+        }
+
+        public async Task IsolateElements(ParameterElement parameter, string selectedValue) {
+            _revitEventHandler.TransactAction = () => {
+                Transaction tr = new Transaction(Document);
+                tr.Start("Hide elements");
+                Document.ActiveView.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
+                List<ElementId> filteredElements = GetFilteredElements(parameter, selectedValue);
+                Document.ActiveView.IsolateElementsTemporary(filteredElements);
+                tr.Commit();
+            };
+            await _revitEventHandler.Raise();
         }
     }
 }
