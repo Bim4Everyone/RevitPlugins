@@ -409,29 +409,29 @@ namespace RevitRooms.ViewModels {
             // Все многоуровневые помещения
             var multiLevelRooms = workingObjects
                 .Where(item => !string.IsNullOrEmpty(item.RoomMultilevelGroup))
+                .GroupBy(item => new {item.RoomMultilevelGroup, item.LevelName});
+
+            foreach(var multiLevelRoomGroup in multiLevelRooms) {
+                bool notSameValue = multiLevelRoomGroup
+                    .GroupBy(item => item.IsRoomMainLevel)
+                    .Count() > 1;
+
+                if(notSameValue) {
+                    AddElements(InfoElement.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
+                }
+            }
+
+            var newMultiLevelRooms = workingObjects
+                .Where(item => !string.IsNullOrEmpty(item.RoomMultilevelGroup))
                 .GroupBy(item => item.RoomMultilevelGroup);
 
-            foreach(IGrouping<string, SpatialElementViewModel> multiLevelRoomGroup in multiLevelRooms) {
-                bool allRoomManLevel = false;
+            foreach(var multiLevelRoomGroup in newMultiLevelRooms) {
+                bool notSameValue = multiLevelRoomGroup
+                    .GroupBy(item => item.IsRoomMainLevel)
+                    .Count() != 2;
 
-                foreach(IGrouping<string, SpatialElementViewModel> levelMultiLevelRoom in multiLevelRoomGroup
-                            .GroupBy(item => item.LevelName)) {
-                    allRoomManLevel = levelMultiLevelRoom.All(item => item.IsRoomMainLevel);
-                    if(!allRoomManLevel) {
-                        break;
-                    }
-                }
-
-                if(allRoomManLevel) {
-                    var error = multiLevelRoomGroup
-                        .Select(item => item.IsRoomMainLevel)
-                        .Distinct()
-                        .Count() != 2;
-                    if(error) {
-                        //AddElements(InfoElement.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
-                    }
-                } else {
-                    //AddElements(InfoElement.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
+                if(notSameValue) {
+                    AddElements(InfoElement.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
                 }
             }
 

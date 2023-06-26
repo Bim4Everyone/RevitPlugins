@@ -82,8 +82,8 @@ namespace RevitRooms.ViewModels {
         
         public static InfoElement ErrorMultiLevelRoom { get; } = new InfoElement() {
             TypeInfo = TypeInfo.Error,
-            Message = $"Ошибка в заполнении параметра \"{SharedParamsConfig.Instance.RoomMultilevelGroup}\".",
-            Description = $"Ошибка в заполнении параметра \"{SharedParamsConfig.Instance.RoomMultilevelGroup}\". Параметр должен быть заполнен только для помещений одного этажа группы."
+            Message = $"Ошибка в заполнении параметра \"{ProjectParamsConfig.Instance.IsRoomMainLevel.Name}\".",
+            Description = $"Ошибка в заполнении параметра \"{ProjectParamsConfig.Instance.IsRoomMainLevel.Name}\". Параметр должен быть заполнен только для помещений одного этажа группы."
         };
         
         public static InfoElement NotEqualSectionDoors { get; } = new InfoElement() {
