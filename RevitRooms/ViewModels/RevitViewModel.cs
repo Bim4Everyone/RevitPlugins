@@ -30,8 +30,8 @@ namespace RevitRooms.ViewModels {
         private string _errorText;
         private bool _isAllowSelectLevels;
 
-        public RevitViewModel(Application application, Document document) {
-            _revitRepository = new RevitRepository(application, document);
+        public RevitViewModel(RevitRepository revitRepository) {
+            _revitRepository = revitRepository;
 
             Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels().OrderBy(item => item.Element.Elevation).Where(item => item.SpartialElements.Count > 0));
             AdditionalPhases = new ObservableCollection<PhaseViewModel>(_revitRepository.GetAdditionalPhases().Select(item => new PhaseViewModel(item, _revitRepository)));

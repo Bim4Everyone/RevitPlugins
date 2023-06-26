@@ -11,8 +11,8 @@ using RevitRooms.Models;
 
 namespace RevitRooms.ViewModels.Revit.RoomsNums {
     internal class ViewRevitViewModel : RoomsNumsViewModel {
-        public ViewRevitViewModel(Application application, Document document)
-            : base(application, document) {
+        public ViewRevitViewModel(RevitRepository revitRepository) 
+            : base(revitRepository) {
             _id = new Guid("38DF60C2-1D99-4256-9D41-0CB34A95E0AE");
         }
 

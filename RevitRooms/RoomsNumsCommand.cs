@@ -33,8 +33,7 @@ namespace RevitRooms {
 
             if(isChecked) {
                 var window = new RoomsNumsWindows();
-                window.DataContext = new RoomNumsViewModel(uiApplication.Application,
-                    uiApplication.ActiveUIDocument.Document, window);
+                window.DataContext = new RoomNumsViewModel(new RevitRepository(uiApplication), window);
                 if(window.ShowDialog() == true) {
                     GetPlatformService<INotificationService>()
                         .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")

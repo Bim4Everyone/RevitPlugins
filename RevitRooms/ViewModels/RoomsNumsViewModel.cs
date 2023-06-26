@@ -43,8 +43,8 @@ namespace RevitRooms.ViewModels {
 
         public System.Windows.Window ParentWindow { get; set; }
 
-        public RoomsNumsViewModel(Application application, Document document) {
-            _revitRepository = new RevitRepository(application, document);
+        public RoomsNumsViewModel(RevitRepository revitRepository) {
+            _revitRepository = revitRepository;
 
             var additionalPhases = _revitRepository.GetAdditionalPhases()
                 .Select(item => new PhaseViewModel(item, _revitRepository));

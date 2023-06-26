@@ -30,7 +30,7 @@ namespace RevitRooms {
                 .GetIsChecked();
 
             if(isChecked) {
-                var viewModel = new RoomsViewModel(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
+                var viewModel = new RoomsViewModel(new RevitRepository(uiApplication));
                 var window = new RoomsWindow() { DataContext = viewModel };
                 if(window.ShowDialog() == true) {
                     GetPlatformService<INotificationService>()
