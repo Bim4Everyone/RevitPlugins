@@ -4,16 +4,19 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:vms="clr-namespace:RevitRooms.ViewModels"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    Title="Нумерация помещений с приоритетом" Height="650" Width="850"
+
+    Title="MainWindow"
+    Height="650" Width="850"
+
     x:Name="_this"
 
     d:DataContext="{d:DesignInstance vms:RoomNumsViewModel, IsDesignTimeCreatable=False}">
@@ -21,6 +24,13 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
+    
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand
+            EventName="Loaded"
+            Command="{Binding RoomsNums.LoadViewCommand}" />
+    </dxmvvm:Interaction.Behaviors>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />

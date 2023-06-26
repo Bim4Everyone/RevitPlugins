@@ -16,7 +16,7 @@ namespace RevitRooms.ViewModels.Revit.RoomsNums {
             _id = new Guid("38DF60C2-1D99-4256-9D41-0CB34A95E0AE");
         }
 
-        protected override IEnumerable<SpatialElementViewModel> GetSpartialElements() {
+        protected override IEnumerable<SpatialElementViewModel> GetSpatialElements() {
             return _revitRepository.GetRoomsOnActiveView()
                 .Select(item => new SpatialElementViewModel(item, _revitRepository));
         }

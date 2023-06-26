@@ -35,7 +35,7 @@ namespace RevitRooms {
                 throw new OperationCanceledException();
             }
 
-            var window = new RoomsNumsWindows();
+            var window = new RoomsNumsWindows() {Title = PluginName};
             window.DataContext = new RoomNumsViewModel(new RevitRepository(uiApplication), window);
             Notification(window);
         }

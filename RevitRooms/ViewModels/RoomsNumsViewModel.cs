@@ -40,28 +40,21 @@ namespace RevitRooms.ViewModels {
         private bool _isNumRoomsSectionLevels;
         private string _startNumber;
         protected readonly RevitRepository _revitRepository;
+        private PhaseViewModel _phase;
+        private ObservableCollection<PhaseViewModel> _phases;
+        private ObservableCollection<SpatialElementViewModel> _spatialElements;
+        private ObservableCollection<LevelViewModel> _levels;
+        private ObservableCollection<IElementViewModel<Element>> _groups;
+        private ObservableCollection<IElementViewModel<Element>> _sections;
+        private ObservableCollection<NumberingOrderViewModel> _numberingOrders;
+        private ObservableCollection<NumberingOrderViewModel> _selectedNumberingOrders;
 
         public System.Windows.Window ParentWindow { get; set; }
 
         public RoomsNumsViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
 
-            var additionalPhases = _revitRepository.GetAdditionalPhases()
-                .Select(item => new PhaseViewModel(item, _revitRepository));
-            SpatialElements = new ObservableCollection<SpatialElementViewModel>(GetSpartialElements()
-                .Where(item => item.Phase != null).Where(item => !additionalPhases.Contains(item.Phase))
-                .Where(item => item.IsPlaced));
-
-            Phases = new ObservableCollection<PhaseViewModel>(GetPhases());
-            Levels = new ObservableCollection<LevelViewModel>(GetLevels());
-            Groups = new ObservableCollection<IElementViewModel<Element>>(GetGroups());
-            Sections = new ObservableCollection<IElementViewModel<Element>>(GetSections());
-            NumberingOrders =
-                new ObservableCollection<NumberingOrderViewModel>(GetNumberingOrders().Where(item => item.Order == 0));
-            SelectedNumberingOrders =
-                new ObservableCollection<NumberingOrderViewModel>(GetNumberingOrders().Where(item => item.Order > 0));
-
-            Phase = Phases.FirstOrDefault();
+            LoadViewCommand = RelayCommand.Create(LoadView);
             NumerateRoomsCommand = new RelayCommand(NumerateRooms, CanNumerateRooms);
 
             UpOrderCommand = new UpOrderCommand(this);
@@ -69,13 +62,39 @@ namespace RevitRooms.ViewModels {
             AddOrderCommand = new AddOrderCommand(this);
             RemoveOrderCommand = new RemoveOrderCommand(this);
             SaveOrderCommand = new SaveOrderCommand(this, _revitRepository);
+        }
+
+        private void LoadView() {
+            PhaseViewModel[] additionalPhases = _revitRepository.GetAdditionalPhases()
+                .Select(item => new PhaseViewModel(item, _revitRepository))
+                .ToArray();
+
+            SpatialElements = new ObservableCollection<SpatialElementViewModel>(GetSpatialElements()
+                .Where(item => item.Phase != null)
+                .Where(item => !additionalPhases.Contains(item.Phase))
+                .Where(item => item.IsPlaced));
+
+            Phases = new ObservableCollection<PhaseViewModel>(GetPhases());
+            Levels = new ObservableCollection<LevelViewModel>(GetLevels());
+            Groups = new ObservableCollection<IElementViewModel<Element>>(GetGroups());
+            Sections = new ObservableCollection<IElementViewModel<Element>>(GetSections());
+
+            NumberingOrders = new ObservableCollection<NumberingOrderViewModel>(
+                GetNumberingOrders()
+                    .Where(item => item.Order == 0));
+
+            SelectedNumberingOrders = new ObservableCollection<NumberingOrderViewModel>(
+                GetNumberingOrders()
+                    .Where(item => item.Order > 0));
 
             StartNumber = "1";
-            SetRoomsNumsConfig();
+            Phase = Phases.FirstOrDefault();
+            
+            LoadPluginConfig();
         }
 
         public string Name { get; set; }
-        protected abstract IEnumerable<SpatialElementViewModel> GetSpartialElements();
+        protected abstract IEnumerable<SpatialElementViewModel> GetSpatialElements();
 
         public string ErrorText {
             get => _errorText;
@@ -122,6 +141,7 @@ namespace RevitRooms.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _isNumRoomsSectionLevels, value);
         }
 
+        public ICommand LoadViewCommand { get; }
         public ICommand NumerateRoomsCommand { get; }
 
         public ICommand UpOrderCommand { get; }
@@ -130,15 +150,45 @@ namespace RevitRooms.ViewModels {
         public ICommand RemoveOrderCommand { get; }
         public ICommand SaveOrderCommand { get; }
 
-        public PhaseViewModel Phase { get; set; }
-        public ObservableCollection<PhaseViewModel> Phases { get; }
-        public ObservableCollection<SpatialElementViewModel> SpatialElements { get; }
+        public PhaseViewModel Phase {
+            get => _phase;
+            set => this.RaiseAndSetIfChanged(ref _phase, value);
+        }
 
-        public ObservableCollection<LevelViewModel> Levels { get; }
-        public ObservableCollection<IElementViewModel<Element>> Groups { get; }
-        public ObservableCollection<IElementViewModel<Element>> Sections { get; }
-        public ObservableCollection<NumberingOrderViewModel> NumberingOrders { get; }
-        public ObservableCollection<NumberingOrderViewModel> SelectedNumberingOrders { get; }
+        public ObservableCollection<PhaseViewModel> Phases {
+            get => _phases;
+            set => this.RaiseAndSetIfChanged(ref _phases, value);
+        }
+
+        public ObservableCollection<SpatialElementViewModel> SpatialElements {
+            get => _spatialElements;
+            set => this.RaiseAndSetIfChanged(ref _spatialElements, value);
+        }
+
+        public ObservableCollection<LevelViewModel> Levels {
+            get => _levels;
+            set => this.RaiseAndSetIfChanged(ref _levels, value);
+        }
+
+        public ObservableCollection<IElementViewModel<Element>> Groups {
+            get => _groups;
+            set => this.RaiseAndSetIfChanged(ref _groups, value);
+        }
+
+        public ObservableCollection<IElementViewModel<Element>> Sections {
+            get => _sections;
+            set => this.RaiseAndSetIfChanged(ref _sections, value);
+        }
+
+        public ObservableCollection<NumberingOrderViewModel> NumberingOrders {
+            get => _numberingOrders;
+            set => this.RaiseAndSetIfChanged(ref _numberingOrders, value);
+        }
+
+        public ObservableCollection<NumberingOrderViewModel> SelectedNumberingOrders {
+            get => _selectedNumberingOrders;
+            set => this.RaiseAndSetIfChanged(ref _selectedNumberingOrders, value);
+        }
 
         private IEnumerable<PhaseViewModel> GetPhases() {
             return SpatialElements.Select(item => item.Phase)
@@ -264,7 +314,7 @@ namespace RevitRooms.ViewModels {
                 }
             }
 
-            SaveRoomsNumsConfig();
+            SavePluginConfig();
 
             ParentWindow.DialogResult = true;
             ParentWindow.Close();
@@ -483,7 +533,7 @@ namespace RevitRooms.ViewModels {
             return false;
         }
 
-        private void SetRoomsNumsConfig() {
+        private void LoadPluginConfig() {
             var roomsConfig = RoomsNumsConfig.GetConfig();
             var settings = roomsConfig.GetRoomsNumsSettingsConfig(_revitRepository.DocumentName);
             if(settings == null) {
@@ -516,7 +566,7 @@ namespace RevitRooms.ViewModels {
             }
         }
 
-        private void SaveRoomsNumsConfig() {
+        private void SavePluginConfig() {
             var roomsConfig = RoomsNumsConfig.GetConfig();
             var settings = roomsConfig.GetRoomsNumsSettingsConfig(_revitRepository.DocumentName);
             if(settings == null) {
