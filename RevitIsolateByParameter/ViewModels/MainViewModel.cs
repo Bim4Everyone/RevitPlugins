@@ -32,19 +32,15 @@ namespace RevitIsolateByParameter.ViewModels {
 
             IsolateElementsCommand = new RelayCommand(IsolateElement, CanIsolate);
             GetParameterValuesCommand = new RelayCommand(GetPossibleValues, CanIsolate);
-
-
         }
 
         public ICommand IsolateElementsCommand { get; }
         public ICommand GetParameterValuesCommand { get; }
 
-
         public ParameterElement SelectedParameter {
             get => _selectedParameter;
             set => RaiseAndSetIfChanged(ref _selectedParameter, value);
         }
-
         public ObservableCollection<ParameterElement> Parameters { get; }
         public Dictionary<string, List<string>> ParametersValues { get; }
 
@@ -64,8 +60,9 @@ namespace RevitIsolateByParameter.ViewModels {
                 ErrorText = "В проекте отсутствуют параметры СМР";
                 return false;
             }
-            if(ParametersValues == null) {
-                ErrorText = "Параметры не заполнены";
+
+            if(!_revitRepository.Document.ActiveView.CanEnableTemporaryViewPropertiesMode()) {
+                ErrorText = "Должен быть открыт вид с геометрией здания";
                 return false;
             }
 

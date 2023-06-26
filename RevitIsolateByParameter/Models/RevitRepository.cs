@@ -87,12 +87,13 @@ namespace RevitIsolateByParameter.Models {
 
         public async Task IsolateElements(ParameterElement parameter, string selectedValue) {
             _revitEventHandler.TransactAction = () => {
-                Transaction tr = new Transaction(Document);
-                tr.Start("Hide elements");
-                Document.ActiveView.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
-                List<ElementId> filteredElements = GetFilteredElements(parameter, selectedValue);
-                Document.ActiveView.IsolateElementsTemporary(filteredElements);
-                tr.Commit();
+
+                using(Transaction t = Document.StartTransaction("Изолировать элементы")) {
+                    Document.ActiveView.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
+                    List<ElementId> filteredElements = GetFilteredElements(parameter, selectedValue);
+                    Document.ActiveView.IsolateElementsTemporary(filteredElements);
+                    t.Commit();
+                }
             };
             await _revitEventHandler.Raise();
         }
