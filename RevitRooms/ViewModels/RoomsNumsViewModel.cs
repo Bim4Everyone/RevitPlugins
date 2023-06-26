@@ -444,23 +444,6 @@ namespace RevitRooms.ViewModels {
             return int.TryParse(StartNumber, out var value) ? value : 0;
         }
 
-        private double GetDistance(Element element) {
-            var point = (element.Location as LocationPoint)?.Point;
-            if(point == null) {
-                return 0;
-            }
-
-            return Math.Sqrt((point.X * point.X) + (point.Y * point.Y));
-        }
-
-        private int GetOrder(Dictionary<ElementId, int> ordering, Element element) {
-            if(ordering.TryGetValue(element.Id, out int value)) {
-                return value;
-            }
-
-            return 0;
-        }
-
         private void AddElements(InfoElement infoElement, IEnumerable<IElementViewModel<Element>> elements,
             Dictionary<string, InfoElementViewModel> infoElements) {
             foreach(var element in elements) {
