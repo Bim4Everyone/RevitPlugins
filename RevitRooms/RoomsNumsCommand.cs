@@ -31,19 +31,13 @@ namespace RevitRooms {
                 .CheckKeySchedules()
                 .GetIsChecked();
 
-            if(isChecked) {
-                var window = new RoomsNumsWindows();
-                window.DataContext = new RoomNumsViewModel(new RevitRepository(uiApplication), window);
-                if(window.ShowDialog() == true) {
-                    GetPlatformService<INotificationService>()
-                        .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                        .ShowAsync();
-                } else {
-                    GetPlatformService<INotificationService>()
-                        .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                        .ShowAsync();
-                }
+            if(!isChecked) {
+                throw new OperationCanceledException();
             }
+
+            var window = new RoomsNumsWindows();
+            window.DataContext = new RoomNumsViewModel(new RevitRepository(uiApplication), window);
+            Notification(window);
         }
     }
 }
