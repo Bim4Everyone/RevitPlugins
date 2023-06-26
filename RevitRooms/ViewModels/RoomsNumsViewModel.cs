@@ -231,7 +231,10 @@ namespace RevitRooms.ViewModels {
             } else {
                 UpdateNumeringOrder();
 
-                var selectedOrder = SelectedNumberingOrders.ToDictionary(item => item.ElementId, item => item.Order);
+                var selectedOrder = SelectedNumberingOrders
+                    .ToDictionary(
+                        item => item.ElementId,
+                        item => item.Order);
 
                 if(IsNumRoomsGroup) {
                     var numerateCommand =
@@ -242,36 +245,9 @@ namespace RevitRooms.ViewModels {
                         new NumSectionCommand(_revitRepository, selectedOrder) {Start = startNumber, Prefix = Prefix, Suffix = Suffix};
                     numerateCommand.Numerate(orderedObjects);
                 } else if(IsNumRoomsSectionLevels) {
-                    using(var transaction =
-                          _revitRepository.StartTransaction("Нумерация помещений по секции и этажу")) {
-                        orderedObjects = orderedObjects
-                            .OrderBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
-                            .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level)?.Elevation)
-                            .ThenBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
-                            .ThenBy(item => GetOrder(selectedOrder, item.Room))
-                            .ThenBy(item => GetDistance(item.Element))
-                            .ToArray();
-
-                        foreach(var section in orderedObjects.GroupBy(item => item.RoomSection.Id)) {
-                            foreach(var level in section.GroupBy(item =>
-                                        (_revitRepository.GetElement(item.LevelId) as Level)?.Name.Split('_')
-                                        .FirstOrDefault())) {
-                                int roomCount = startNumber;
-                                foreach(var group in level
-                                            .OrderBy(item => item.RoomGroup,
-                                                new dosymep.Revit.Comparators.ElementComparer())
-                                            .GroupBy(item => item.RoomGroup.Id)) {
-                                    foreach(var room in group) {
-                                        room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER,
-                                            Prefix + roomCount + Suffix);
-                                        roomCount++;
-                                    }
-                                }
-                            }
-                        }
-
-                        transaction.Commit();
-                    }
+                    var numerateCommand =
+                        new NumerateSectionLevel(_revitRepository, selectedOrder) {Start = startNumber, Prefix = Prefix, Suffix = Suffix};
+                    numerateCommand.Numerate(orderedObjects);
                 } else {
                     throw new InvalidOperationException("Выбран неизвестный режим работы.");
                 }
