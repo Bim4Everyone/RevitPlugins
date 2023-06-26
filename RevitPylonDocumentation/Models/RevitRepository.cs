@@ -284,6 +284,8 @@ namespace RevitPylonDocumentation.Models {
             if(viewport != null) {
                 pylonView.ViewportElement = viewport;
 
+                // !!!!!!!!!!!!!!!! Добавить метод по выключению разрезов и осей (в т.ч. через шаблон вида), а затем по возвращению значения
+
                 // Получение центра и габаритов видового экрана
                 XYZ viewportCenter = viewport.GetBoxCenter();
                 Outline viewportOutline = viewport.GetBoxOutline();

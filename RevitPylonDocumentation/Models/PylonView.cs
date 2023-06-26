@@ -32,6 +32,7 @@ namespace RevitPylonDocumentation.Models {
 
 
         public View ViewElement { get; set; }
+        public int ViewScale { get; set; }
 
         public Element ViewportElement { get; set; }
 
@@ -46,6 +47,7 @@ namespace RevitPylonDocumentation.Models {
         public double ViewportHalfHeight { get; set; }
 
         public XYZ ViewportCenter { get; set; }
+
 
 
 

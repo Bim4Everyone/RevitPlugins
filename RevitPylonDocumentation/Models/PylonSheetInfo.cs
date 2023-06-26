@@ -260,239 +260,239 @@ namespace RevitPylonDocumentation.Models {
 
 
 
-        internal void PlaceTransverseViewPorts() {
-            double coordinateX = 0;
-            double coordinateY = 0;
+        //internal void PlaceTransverseViewPorts() {
+        //    double coordinateX = 0;
+        //    double coordinateY = 0;
 
-            #region Отчет
-            ViewModel.Report = "Поперечные виды";
-            #endregion
+        //    #region Отчет
+        //    ViewModel.Report = "Поперечные виды";
+        //    #endregion
 
-            #region Поиск поперечных сечений пилона 1-1, 2-2, 3-3 
-            foreach(var item in ViewModel._revitRepository.AllSectionViews) {
-                ViewSection view = item as ViewSection;
-                if(view == null) {
-                    continue;
-                }
+        //    #region Поиск поперечных сечений пилона 1-1, 2-2, 3-3 
+        //    foreach(var item in ViewModel._revitRepository.AllSectionViews) {
+        //        ViewSection view = item as ViewSection;
+        //        if(view == null) {
+        //            continue;
+        //        }
 
-                if(view.Name == ViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX) {
-                    TransverseViewFirst.ViewElement = view;
-                    TransverseViewFirst.ViewportTypeName = "Сечение_Номер вида";
-                    TransverseViewFirst.ViewportNumber = "1";
-                    TransverseViewFirst.ViewportName = "";
-                    #region Отчет
-                    ViewModel.Report = string.Format("\tПоперечный вид пилона \"{0}\" для листа \"{1}\" успешно найден",
-                        ViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX, PylonViewSheet.Name);
-                    #endregion
+        //        if(view.Name == ViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX) {
+        //            TransverseViewFirst.ViewElement = view;
+        //            TransverseViewFirst.ViewportTypeName = "Сечение_Номер вида";
+        //            TransverseViewFirst.ViewportNumber = "1";
+        //            TransverseViewFirst.ViewportName = "";
+        //            #region Отчет
+        //            ViewModel.Report = string.Format("\tПоперечный вид пилона \"{0}\" для листа \"{1}\" успешно найден",
+        //                ViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX, PylonViewSheet.Name);
+        //            #endregion
 
-                    // Останавливаем поиск, если ранее нашли сечение 2-2 и 3-3
-                    if(TransverseViewSecond.ViewElement != null && TransverseViewThird.ViewElement != null) {
-                        break;
-                    }
-                }
+        //            // Останавливаем поиск, если ранее нашли сечение 2-2 и 3-3
+        //            if(TransverseViewSecond.ViewElement != null && TransverseViewThird.ViewElement != null) {
+        //                break;
+        //            }
+        //        }
 
-                if(view.Name == ViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX) {
-                    TransverseViewSecond.ViewElement = view;
-                    TransverseViewSecond.ViewportTypeName = "Сечение_Номер вида";
-                    TransverseViewSecond.ViewportNumber = "2";
-                    TransverseViewSecond.ViewportName = "";
-                    #region Отчет
-                    ViewModel.Report = string.Format("\tПоперечный вид пилона \"{0}\" для листа \"{1}\" успешно найден",
-                        ViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX, PylonViewSheet.Name);
-                    #endregion
+        //        if(view.Name == ViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX) {
+        //            TransverseViewSecond.ViewElement = view;
+        //            TransverseViewSecond.ViewportTypeName = "Сечение_Номер вида";
+        //            TransverseViewSecond.ViewportNumber = "2";
+        //            TransverseViewSecond.ViewportName = "";
+        //            #region Отчет
+        //            ViewModel.Report = string.Format("\tПоперечный вид пилона \"{0}\" для листа \"{1}\" успешно найден",
+        //                ViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX, PylonViewSheet.Name);
+        //            #endregion
 
-                    // Останавливаем поиск, если ранее нашли сечение 1-1 и 3-3
-                    if(TransverseViewFirst.ViewElement != null && TransverseViewThird.ViewElement != null) {
-                        break;
-                    }
-                }
+        //            // Останавливаем поиск, если ранее нашли сечение 1-1 и 3-3
+        //            if(TransverseViewFirst.ViewElement != null && TransverseViewThird.ViewElement != null) {
+        //                break;
+        //            }
+        //        }
 
-                if(view.Name == ViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX) {
-                    TransverseViewThird.ViewElement = view;
-                    TransverseViewThird.ViewportTypeName = "Сечение_Номер вида";
-                    TransverseViewThird.ViewportNumber = "3";
-                    TransverseViewThird.ViewportName = "";
-                    #region Отчет
-                    ViewModel.Report = string.Format("\tПоперечный вид пилона \"{0}\" для листа \"{1}\" успешно найден",
-                        ViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX, PylonViewSheet.Name);
-                    #endregion
+        //        if(view.Name == ViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX) {
+        //            TransverseViewThird.ViewElement = view;
+        //            TransverseViewThird.ViewportTypeName = "Сечение_Номер вида";
+        //            TransverseViewThird.ViewportNumber = "3";
+        //            TransverseViewThird.ViewportName = "";
+        //            #region Отчет
+        //            ViewModel.Report = string.Format("\tПоперечный вид пилона \"{0}\" для листа \"{1}\" успешно найден",
+        //                ViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX, PylonViewSheet.Name);
+        //            #endregion
 
-                    // Останавливаем поиск, если ранее нашли сечение 1-1 и 2-2
-                    if(TransverseViewFirst.ViewElement != null && TransverseViewSecond.ViewElement != null) {
-                        break;
-                    }
-                }
-            }
-            #endregion
+        //            // Останавливаем поиск, если ранее нашли сечение 1-1 и 2-2
+        //            if(TransverseViewFirst.ViewElement != null && TransverseViewSecond.ViewElement != null) {
+        //                break;
+        //            }
+        //        }
+        //    }
+        //    #endregion
 
-            double titleBlockOffset = UnitUtilsHelper.ConvertToInternalValue(20);
-
-
-            // Размещение поперечного сечения 1-1 (потому что он ниже)
-            #region Отчет
-            ViewModel.Report = "      Поперечный вид 1-1";
-            #endregion
-            if(TransverseViewFirst.ViewElement != null) {
-                // Передаем первое поперечное сечение пилона
-                string answer = TransverseViewFirst.PlacePylonViewport(ViewModel._revitRepository.Document, this);
-                if(answer.Length > 0) {
-                    ViewModel.Report = answer;
-                }
-
-                if(TransverseViewFirst.ViewportElement is null) {
-                    #region Отчет
-                    ViewModel.Report = string.Format("\tРабота с размещением поперечного вида пилона 1-1 на листе \"{0}\" прервана", PylonViewSheet.Name);
-                    #endregion
-                    return;
-                } else {
-                    #region Отчет
-                    ViewModel.Report = string.Format("\tПоперечный вид 1-1 пилона \"{0}\" успешно размещен на листе \"{1}\"", TransverseViewFirst.ViewElement.Name, PylonViewSheet.Name);
-                    #endregion
-                }
-
-                // Рассчитываем и задаем корректную точку вставки первого попереченого вида пилона
-                XYZ newCenterFirst = new XYZ(
-                    - TitleBlockWidth + titleBlockOffset + GeneralView.ViewportHalfWidth * 2 + TransverseViewFirst.ViewportHalfWidth,
-                    0.015 + TransverseViewFirst.ViewportHalfHeight,
-                    0);
-                (TransverseViewFirst.ViewportElement as Viewport).SetBoxCenter(newCenterFirst);
-
-                TransverseViewFirst.ViewportCenter = newCenterFirst;
-                #region Отчет
-                ViewModel.Report = string.Format("\tПоперечный вид 1-1 пилона \"{0}\" спозиционирован", PylonViewSheet.Name);
-                #endregion
-            } else {
-                #region Отчет
-                ViewModel.Report = string.Format("\tПроизошла ошибка! Не найден поперечный вид пилона \"{0}\" для листа \"{1}\"",
-                    ViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX, PylonViewSheet.Name);
-                #endregion
-            }
-            #region Отчет
-            ViewModel.Report = "      Поперечный вид 1-1 - работа завершена";
-            #endregion
+        //    double titleBlockOffset = UnitUtilsHelper.ConvertToInternalValue(20);
 
 
-            // Размещение поперечного сечения 2-2
-            #region Отчет
-            ViewModel.Report = "      Поперечный вид 2-2";
-            #endregion
-            if(TransverseViewSecond.ViewElement != null) {
-                string answer = TransverseViewSecond.PlacePylonViewport(ViewModel._revitRepository.Document, this);
-                if(answer.Length > 0) {
-                    ViewModel.Report = answer;
-                }
+        //    // Размещение поперечного сечения 1-1 (потому что он ниже)
+        //    #region Отчет
+        //    ViewModel.Report = "      Поперечный вид 1-1";
+        //    #endregion
+        //    if(TransverseViewFirst.ViewElement != null) {
+        //        // Передаем первое поперечное сечение пилона
+        //        string answer = TransverseViewFirst.PlacePylonViewport(ViewModel._revitRepository.Document, this);
+        //        if(answer.Length > 0) {
+        //            ViewModel.Report = answer;
+        //        }
 
-                if(TransverseViewSecond.ViewportElement is null) {
-                    #region Отчет
-                    ViewModel.Report = string.Format("\tРабота с размещением поперечного вида пилона 2-2 на листе \"{0}\" прервана", PylonViewSheet.Name);
-                    #endregion
-                    return;
-                } else {
-                    #region Отчет
-                    ViewModel.Report = string.Format("\tПоперечный вид 2-2 пилона \"{0}\" успешно размещен на листе \"{1}\"", TransverseViewSecond.ViewElement.Name, PylonViewSheet.Name);
-                    #endregion
-                }
+        //        if(TransverseViewFirst.ViewportElement is null) {
+        //            #region Отчет
+        //            ViewModel.Report = string.Format("\tРабота с размещением поперечного вида пилона 1-1 на листе \"{0}\" прервана", PylonViewSheet.Name);
+        //            #endregion
+        //            return;
+        //        } else {
+        //            #region Отчет
+        //            ViewModel.Report = string.Format("\tПоперечный вид 1-1 пилона \"{0}\" успешно размещен на листе \"{1}\"", TransverseViewFirst.ViewElement.Name, PylonViewSheet.Name);
+        //            #endregion
+        //        }
 
+        //        // Рассчитываем и задаем корректную точку вставки первого попереченого вида пилона
+        //        XYZ newCenterFirst = new XYZ(
+        //            - TitleBlockWidth + titleBlockOffset + GeneralView.ViewportHalfWidth * 2 + TransverseViewFirst.ViewportHalfWidth,
+        //            0.015 + TransverseViewFirst.ViewportHalfHeight,
+        //            0);
+        //        (TransverseViewFirst.ViewportElement as Viewport).SetBoxCenter(newCenterFirst);
 
-                // Рассчитываем и задаем корректную точку вставки второго поперечного вида пилона
-                coordinateX = 0;
-                coordinateY = 0;
-                if(TransverseViewFirst.ViewElement == null) {
-                    coordinateX = - TitleBlockWidth + titleBlockOffset + GeneralView.ViewportHalfWidth * 2 + TransverseViewSecond.ViewportHalfWidth;
-                    coordinateY = 0.015 + TransverseViewSecond.ViewportHalfHeight;
-                } else {
-                    coordinateX = TransverseViewFirst.ViewportCenter.X;
-                    coordinateY = TransverseViewFirst.ViewportCenter.Y + TransverseViewFirst.ViewportHalfHeight
-                        + 0.005 + TransverseViewSecond.ViewportHalfHeight;
-                }
-
-                XYZ newCenterSecond = new XYZ(
-                    coordinateX,
-                    coordinateY,
-                    0);
-                (TransverseViewSecond.ViewportElement as Viewport).SetBoxCenter(newCenterSecond);
-
-                TransverseViewSecond.ViewportCenter = newCenterSecond;
-
-                #region Отчет
-                ViewModel.Report = string.Format("\tПоперечный вид 2-2 пилона \"{0}\" спозиционирован", PylonViewSheet.Name);
-                #endregion
-            } else {
-                #region Отчет
-                ViewModel.Report = string.Format("\tПроизошла ошибка! Не найден поперечный вид пилона \"{0}\" для листа \"{1}\"",
-                    ViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX, PylonViewSheet.Name);
-                #endregion
-            }
-            #region Отчет
-            ViewModel.Report = "      Поперечный вид 2-2 - работа завершена";
-            #endregion
+        //        TransverseViewFirst.ViewportCenter = newCenterFirst;
+        //        #region Отчет
+        //        ViewModel.Report = string.Format("\tПоперечный вид 1-1 пилона \"{0}\" спозиционирован", PylonViewSheet.Name);
+        //        #endregion
+        //    } else {
+        //        #region Отчет
+        //        ViewModel.Report = string.Format("\tПроизошла ошибка! Не найден поперечный вид пилона \"{0}\" для листа \"{1}\"",
+        //            ViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX, PylonViewSheet.Name);
+        //        #endregion
+        //    }
+        //    #region Отчет
+        //    ViewModel.Report = "      Поперечный вид 1-1 - работа завершена";
+        //    #endregion
 
 
-            // Размещение поперечного сечения 3-3
-            #region Отчет
-            ViewModel.Report = "      Поперечный вид 3-3";
-            #endregion
-            if(TransverseViewThird.ViewElement != null) {
-                string answer = TransverseViewThird.PlacePylonViewport(ViewModel._revitRepository.Document, this);
-                if(answer.Length > 0) {
-                    ViewModel.Report = answer;
-                }
+        //    // Размещение поперечного сечения 2-2
+        //    #region Отчет
+        //    ViewModel.Report = "      Поперечный вид 2-2";
+        //    #endregion
+        //    if(TransverseViewSecond.ViewElement != null) {
+        //        string answer = TransverseViewSecond.PlacePylonViewport(ViewModel._revitRepository.Document, this);
+        //        if(answer.Length > 0) {
+        //            ViewModel.Report = answer;
+        //        }
 
-                if(TransverseViewThird.ViewportElement is null) {
-                    #region Отчет
-                    ViewModel.Report = string.Format("\tРабота с размещением поперечного вида пилона 3-3 на листе \"{0}\" прервана", PylonViewSheet.Name);
-                    #endregion
-                    return;
-                } else {
-                    #region Отчет
-                    ViewModel.Report = string.Format("\tПоперечный вид 3-3 пилона \"{0}\" успешно размещен на листе \"{1}\"", TransverseViewThird.ViewElement.Name, PylonViewSheet.Name);
-                    #endregion
-                }
+        //        if(TransverseViewSecond.ViewportElement is null) {
+        //            #region Отчет
+        //            ViewModel.Report = string.Format("\tРабота с размещением поперечного вида пилона 2-2 на листе \"{0}\" прервана", PylonViewSheet.Name);
+        //            #endregion
+        //            return;
+        //        } else {
+        //            #region Отчет
+        //            ViewModel.Report = string.Format("\tПоперечный вид 2-2 пилона \"{0}\" успешно размещен на листе \"{1}\"", TransverseViewSecond.ViewElement.Name, PylonViewSheet.Name);
+        //            #endregion
+        //        }
 
 
-                // Рассчитываем и задаем корректную точку вставки третьего поперечного вида пилона
-                coordinateX = 0;
-                coordinateY = 0;
+        //        // Рассчитываем и задаем корректную точку вставки второго поперечного вида пилона
+        //        coordinateX = 0;
+        //        coordinateY = 0;
+        //        if(TransverseViewFirst.ViewElement == null) {
+        //            coordinateX = - TitleBlockWidth + titleBlockOffset + GeneralView.ViewportHalfWidth * 2 + TransverseViewSecond.ViewportHalfWidth;
+        //            coordinateY = 0.015 + TransverseViewSecond.ViewportHalfHeight;
+        //        } else {
+        //            coordinateX = TransverseViewFirst.ViewportCenter.X;
+        //            coordinateY = TransverseViewFirst.ViewportCenter.Y + TransverseViewFirst.ViewportHalfHeight
+        //                + 0.005 + TransverseViewSecond.ViewportHalfHeight;
+        //        }
 
-                if(TransverseViewSecond.ViewElement != null) {
-                    coordinateX = TransverseViewSecond.ViewportCenter.X;
-                    coordinateY = TransverseViewSecond.ViewportCenter.Y + TransverseViewSecond.ViewportHalfHeight
-                        + 0.005 + TransverseViewSecond.ViewportHalfHeight;
-                } else if(TransverseViewSecond.ViewElement == null && TransverseViewFirst.ViewElement != null) {
-                    coordinateX = TransverseViewFirst.ViewportCenter.X;
-                    coordinateY = TransverseViewFirst.ViewportCenter.Y + TransverseViewFirst.ViewportHalfHeight
-                        + 0.005 + TransverseViewFirst.ViewportHalfHeight;
-                } else {
-                    coordinateX = -TitleBlockWidth + titleBlockOffset + GeneralView.ViewportHalfWidth * 2 + TransverseViewThird.ViewportHalfWidth;
-                    coordinateY = 0.015 + TransverseViewThird.ViewportHalfHeight;
-                }
+        //        XYZ newCenterSecond = new XYZ(
+        //            coordinateX,
+        //            coordinateY,
+        //            0);
+        //        (TransverseViewSecond.ViewportElement as Viewport).SetBoxCenter(newCenterSecond);
 
-                XYZ newCenterThird = new XYZ(
-                    coordinateX,
-                    coordinateY,
-                    0);
-                (TransverseViewThird.ViewportElement as Viewport).SetBoxCenter(newCenterThird);
+        //        TransverseViewSecond.ViewportCenter = newCenterSecond;
 
-                TransverseViewThird.ViewportCenter = newCenterThird;
+        //        #region Отчет
+        //        ViewModel.Report = string.Format("\tПоперечный вид 2-2 пилона \"{0}\" спозиционирован", PylonViewSheet.Name);
+        //        #endregion
+        //    } else {
+        //        #region Отчет
+        //        ViewModel.Report = string.Format("\tПроизошла ошибка! Не найден поперечный вид пилона \"{0}\" для листа \"{1}\"",
+        //            ViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX, PylonViewSheet.Name);
+        //        #endregion
+        //    }
+        //    #region Отчет
+        //    ViewModel.Report = "      Поперечный вид 2-2 - работа завершена";
+        //    #endregion
 
-                #region Отчет
-                ViewModel.Report = string.Format("\tПоперечный вид 3-3 пилона \"{0}\" спозиционирован", PylonViewSheet.Name);
-                #endregion
-            } else {
-                #region Отчет
-                ViewModel.Report = string.Format("\tПроизошла ошибка! Не найден поперечный вид пилона \"{0}\" для листа \"{1}\"",
-                    ViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX, PylonViewSheet.Name);
-                #endregion
-            }
-            #region Отчет
-            ViewModel.Report = "      Поперечный вид 3-3 - работа завершена";
-            #endregion
 
-            #region Отчет
-            ViewModel.Report = "Поперечные виды - работа завершена";
-            #endregion
-            return;
-        }
+        //    // Размещение поперечного сечения 3-3
+        //    #region Отчет
+        //    ViewModel.Report = "      Поперечный вид 3-3";
+        //    #endregion
+        //    if(TransverseViewThird.ViewElement != null) {
+        //        string answer = TransverseViewThird.PlacePylonViewport(ViewModel._revitRepository.Document, this);
+        //        if(answer.Length > 0) {
+        //            ViewModel.Report = answer;
+        //        }
+
+        //        if(TransverseViewThird.ViewportElement is null) {
+        //            #region Отчет
+        //            ViewModel.Report = string.Format("\tРабота с размещением поперечного вида пилона 3-3 на листе \"{0}\" прервана", PylonViewSheet.Name);
+        //            #endregion
+        //            return;
+        //        } else {
+        //            #region Отчет
+        //            ViewModel.Report = string.Format("\tПоперечный вид 3-3 пилона \"{0}\" успешно размещен на листе \"{1}\"", TransverseViewThird.ViewElement.Name, PylonViewSheet.Name);
+        //            #endregion
+        //        }
+
+
+        //        // Рассчитываем и задаем корректную точку вставки третьего поперечного вида пилона
+        //        coordinateX = 0;
+        //        coordinateY = 0;
+
+        //        if(TransverseViewSecond.ViewElement != null) {
+        //            coordinateX = TransverseViewSecond.ViewportCenter.X;
+        //            coordinateY = TransverseViewSecond.ViewportCenter.Y + TransverseViewSecond.ViewportHalfHeight
+        //                + 0.005 + TransverseViewSecond.ViewportHalfHeight;
+        //        } else if(TransverseViewSecond.ViewElement == null && TransverseViewFirst.ViewElement != null) {
+        //            coordinateX = TransverseViewFirst.ViewportCenter.X;
+        //            coordinateY = TransverseViewFirst.ViewportCenter.Y + TransverseViewFirst.ViewportHalfHeight
+        //                + 0.005 + TransverseViewFirst.ViewportHalfHeight;
+        //        } else {
+        //            coordinateX = -TitleBlockWidth + titleBlockOffset + GeneralView.ViewportHalfWidth * 2 + TransverseViewThird.ViewportHalfWidth;
+        //            coordinateY = 0.015 + TransverseViewThird.ViewportHalfHeight;
+        //        }
+
+        //        XYZ newCenterThird = new XYZ(
+        //            coordinateX,
+        //            coordinateY,
+        //            0);
+        //        (TransverseViewThird.ViewportElement as Viewport).SetBoxCenter(newCenterThird);
+
+        //        TransverseViewThird.ViewportCenter = newCenterThird;
+
+        //        #region Отчет
+        //        ViewModel.Report = string.Format("\tПоперечный вид 3-3 пилона \"{0}\" спозиционирован", PylonViewSheet.Name);
+        //        #endregion
+        //    } else {
+        //        #region Отчет
+        //        ViewModel.Report = string.Format("\tПроизошла ошибка! Не найден поперечный вид пилона \"{0}\" для листа \"{1}\"",
+        //            ViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX, PylonViewSheet.Name);
+        //        #endregion
+        //    }
+        //    #region Отчет
+        //    ViewModel.Report = "      Поперечный вид 3-3 - работа завершена";
+        //    #endregion
+
+        //    #region Отчет
+        //    ViewModel.Report = "Поперечные виды - работа завершена";
+        //    #endregion
+        //    return;
+        //}
 
 
 
@@ -501,6 +501,9 @@ namespace RevitPylonDocumentation.Models {
 
         // Метод для размещения спецификации армирования
         // Позиционирование - правый верхний угол
+        
+        
+        
         internal void PlaceRebarSchedule() {
             #region Отчет
             ViewModel.Report = "Спецификация арматуры";

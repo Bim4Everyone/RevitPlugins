@@ -479,16 +479,9 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
 
-
-
-
-
-
         private void ApplySettings(object p) {
             // Необходимо будет написать метод проверки имен параметров - есть ли такие параметры у нужных категорий
             
-            // Получаем заново список заполненных разделов проекта
-            GetRebarProjectSections();
 
             // Устанавливаем флаг, что применили параметры и перезаписываем параметры
             PROJECT_SECTION = _projectSectionTemp;
@@ -513,8 +506,10 @@ namespace RevitPylonDocumentation.ViewModels {
             PARTS_SCHEDULE_PREFIX = _partsSchedulePrefixTemp;
             PARTS_SCHEDULE_SUFFIX = _partsScheduleSuffixTemp;
 
-
             _edited = false;
+
+            // Получаем заново список заполненных разделов проекта
+            GetRebarProjectSections();
         }
         private bool CanApplySettings(object p) {
             if(_edited) {
@@ -617,7 +612,7 @@ namespace RevitPylonDocumentation.ViewModels {
 
                 // Размещение видовых экранов
                 //missingPylonSheetsInfo[sheetKeyName].PlaceGeneralViewport();
-                missingPylonSheetsInfo[sheetKeyName].PlaceTransverseViewPorts();
+                //missingPylonSheetsInfo[sheetKeyName].PlaceTransverseViewPorts();
 
                 // Размещение спецификаций
                 missingPylonSheetsInfo[sheetKeyName].PlaceRebarSchedule();
@@ -783,6 +778,26 @@ namespace RevitPylonDocumentation.ViewModels {
                     if(hostsInfo.GeneralView.OnSheetEditableInGUI && hostsInfo.GeneralView.OnSheet) {
 
                         hostsInfo.GeneralView.ViewPlacer.PlaceGeneralViewport();
+                    }
+
+                    if(hostsInfo.GeneralViewPerpendicular.OnSheetEditableInGUI && hostsInfo.GeneralViewPerpendicular.OnSheet) {
+
+                        hostsInfo.GeneralViewPerpendicular.ViewPlacer.PlaceGeneralPerpendicularViewport();
+                    }
+
+                    if(hostsInfo.TransverseViewFirst.OnSheetEditableInGUI && hostsInfo.TransverseViewFirst.OnSheet) {
+
+                        hostsInfo.TransverseViewFirst.ViewPlacer.PlaceTransverseFirstViewPorts();
+                    }
+
+                    if(hostsInfo.TransverseViewSecond.OnSheetEditableInGUI && hostsInfo.TransverseViewSecond.OnSheet) {
+
+                        hostsInfo.TransverseViewSecond.ViewPlacer.PlaceTransverseSecondViewPorts();
+                    }
+
+                    if(hostsInfo.TransverseViewThird.OnSheetEditableInGUI && hostsInfo.TransverseViewThird.OnSheet) {
+
+                        hostsInfo.TransverseViewThird.ViewPlacer.PlaceTransverseThirdViewPorts();
                     }
                 }
 
