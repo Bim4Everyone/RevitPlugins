@@ -15,27 +15,34 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
-    Title="MainWindow"
-    Height="200" Width="400"    
+    Title="Изолировать по параметру"
+    Height="210" Width="300"   
+    MinHeight="210" MinWidth="350"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="45" />
+            <RowDefinition Height="25" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="50" />
         </Grid.RowDefinitions>
 
         <TextBlock
             Grid.Row="0"
-            Margin="10"
-            Text="Координаты СМР"/>
-        <ComboBox Grid.Row="1"
-                  Margin="10"
-                  ItemsSource="{Binding Parameters}"
-                  DisplayMemberPath = "Name"
-                  SelectedItem="{Binding SelectedParameter}">
+            Margin="10,5"
+            VerticalAlignment="Bottom"
+            Text="Параметры координат СМР:"/>
+        
+        <ComboBox 
+            Grid.Row="1"
+            Margin="10,5"
+            Height="25"
+            VerticalAlignment="Center"
+            ItemsSource="{Binding Parameters}"
+            DisplayMemberPath = "Name"
+            SelectedItem="{Binding SelectedParameter}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction Command="{Binding GetParameterValuesCommand}"/>
@@ -43,48 +50,45 @@
             </i:Interaction.Triggers>
         </ComboBox>
 
-        <StackPanel
+        <TextBlock
             Grid.Row="2"
-            Height="45"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
+            Margin="10,5"
+            VerticalAlignment="Bottom"
+            Text="Значения выбранного параметра:"/>
 
-            <ComboBox
-                Width="150" 
-                Margin="10"
-                ItemsSource="{Binding ParameterValues}"
-                SelectedItem="{Binding SelectedValue}"/>
-            <Button
-                Margin="10"
-                Width="80"
-                Content="Вверх"/>
-            <Button
-                Margin="10"
-                Width="80"
-                Content="Вниз"/>
-        </StackPanel>
-        
-        <StackPanel
-            Grid.Row="3"
-            Height="45"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
-            <TextBlock
-                Margin="10"
-                Foreground="Orange"
-                VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
+        <ComboBox
+            Grid.Row="3"    
+            Margin="10,5"
+            Height="25"
+            VerticalAlignment="Center"
+            ItemsSource="{Binding ParameterValues}"
+            SelectedIndex="{Binding SelectedIndex}"
+            SelectedItem="{Binding SelectedValue}"/>
+
+        <Grid
+            Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
 
             <Button
-                Margin="10"
-                Width="80"
-                Content="ОК"
-                Command="{Binding IsolateElementsCommand}" />
+                Margin="10,5,10,10"
+                Content="&lt;&lt;"
+                Command="{Binding SelectPreviousCommand}"/>
 
             <Button
-                Margin="10"
-                Width="80"
-                Content="Отмена"/>
-        </StackPanel>
+                Grid.Column="1"    
+                Margin="10,5,10,10"
+                Content="Изолировать"
+                Command="{Binding IsolateElementsCommand}"/>
+
+            <Button
+                Grid.Column="2"    
+                Margin="10,5,10,10"
+                Content=">>"
+                Command="{Binding SelectNextCommand}"/>
+        </Grid>
     </Grid>
 </base:PlatformWindow>

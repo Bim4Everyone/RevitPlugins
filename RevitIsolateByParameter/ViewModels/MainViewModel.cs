@@ -18,6 +18,7 @@ namespace RevitIsolateByParameter.ViewModels {
 
         private ParameterElement _selectedParameter;
         private string _selectedValue;
+        private int _selectedIndex;
 
         private string _errorText;
 
@@ -32,10 +33,15 @@ namespace RevitIsolateByParameter.ViewModels {
 
             IsolateElementsCommand = new RelayCommand(IsolateElement, CanIsolate);
             GetParameterValuesCommand = new RelayCommand(GetPossibleValues, CanIsolate);
+
+            SelectNextCommand = new RelayCommand(SelectNext, CanSelectNext);
+            SelectPreviousCommand = new RelayCommand(SelectPrevious, CanSelectPrevious);
         }
 
         public ICommand IsolateElementsCommand { get; }
         public ICommand GetParameterValuesCommand { get; }
+        public ICommand SelectNextCommand { get; }
+        public ICommand SelectPreviousCommand { get; }
 
         public ParameterElement SelectedParameter {
             get => _selectedParameter;
@@ -49,6 +55,16 @@ namespace RevitIsolateByParameter.ViewModels {
         public string SelectedValue {
             get => _selectedValue;
             set => RaiseAndSetIfChanged(ref _selectedValue, value);
+        }
+
+        public int SelectedIndex {
+            get => _selectedIndex;
+            set => RaiseAndSetIfChanged(ref _selectedIndex, value);
+        }
+        
+        public void GetPossibleValues(object p) {
+            ParameterValues = ParametersValues[SelectedParameter.GetDefinition().Name];
+            OnPropertyChanged(nameof(ParameterValues));
         }
 
         private async void IsolateElement(object p) {
@@ -69,9 +85,31 @@ namespace RevitIsolateByParameter.ViewModels {
             return true;
         }
 
-        public void GetPossibleValues(object p) {
-            ParameterValues = ParametersValues[SelectedParameter.GetDefinition().Name];
-            OnPropertyChanged(nameof(ParameterValues));
+
+        private async void SelectNext(object p) {
+            SelectedIndex += 1;
+            await _revitRepository.IsolateElements(SelectedParameter, SelectedValue);
+        }
+
+        private bool CanSelectNext(object p) {
+            if(SelectedIndex >= ParameterValues.Count - 1) {
+                return false;
+            }
+
+            return true;
+        }
+
+        private async void SelectPrevious(object p) {
+            SelectedIndex -= 1;
+            await _revitRepository.IsolateElements(SelectedParameter, SelectedValue);
+        }
+
+        private bool CanSelectPrevious(object p) {
+            if(SelectedIndex <= 0) {
+                return false;
+            }
+
+            return true;
         }
 
         public string ErrorText {
