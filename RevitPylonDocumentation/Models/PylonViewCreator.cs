@@ -238,19 +238,21 @@ namespace RevitPylonDocumentation.Models {
 
             XYZ sectionBoxMin;
             XYZ sectionBoxMax;
+            double coordinateX = hostLength * 0.5 + hostWidth;
+            double coordinateY = hostWidth * 1.5;
 
             if(transverseViewNum == 1) {
                 // Располагаем сечение на высоте 1/4 высоты пилона
-                sectionBoxMin = new XYZ(-hostLength * 0.6, -hostWidth, -(minZ + (maxZ - minZ) / 4 - originPoint.Z));
-                sectionBoxMax = new XYZ(hostLength * 0.6, hostWidth, -(minZ + (maxZ - minZ) / 8 - originPoint.Z));
+                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) / 4 - originPoint.Z));
+                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) / 8 - originPoint.Z));
             } else if(transverseViewNum == 2) {
                 // Располагаем сечение на высоте 1/2 высоты пилона
-                sectionBoxMin = new XYZ(-hostLength * 0.6, -hostWidth, -(minZ + (maxZ - minZ) / 2 - originPoint.Z));
-                sectionBoxMax = new XYZ(hostLength * 0.6, hostWidth, -(minZ + (maxZ - minZ) / 8 * 3 - originPoint.Z));
+                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) / 2 - originPoint.Z));
+                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) / 8 * 3 - originPoint.Z));
             } else if(transverseViewNum == 3) {
                 // Располагаем сечение на высоте 5/4 высоты пилона
-                sectionBoxMin = new XYZ(-hostLength * 0.6, -hostWidth, -(minZ + (maxZ - minZ) / 4 * 5 - originPoint.Z));
-                sectionBoxMax = new XYZ(hostLength * 0.6, hostWidth, -(minZ + (maxZ - minZ) / 8 * 7 - originPoint.Z));
+                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) / 4 * 5 - originPoint.Z));
+                sectionBoxMax = new XYZ(coordinateX, coordinateY, - (minZ + (maxZ - minZ) / 8 * 7 - originPoint.Z));
             } else {
                 return null;
             }
