@@ -90,6 +90,7 @@ namespace RevitIsolateByParameter.Models {
 
                 using(Transaction t = Document.StartTransaction("Изолировать элементы")) {
                     Document.ActiveView.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
+
                     List<ElementId> filteredElements = GetFilteredElements(parameter, selectedValue);
                     Document.ActiveView.IsolateElementsTemporary(filteredElements);
                     t.Commit();

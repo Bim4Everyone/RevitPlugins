@@ -85,7 +85,6 @@ namespace RevitIsolateByParameter.ViewModels {
             return true;
         }
 
-
         private async void SelectNext(object p) {
             SelectedIndex += 1;
             await _revitRepository.IsolateElements(SelectedParameter, SelectedValue);

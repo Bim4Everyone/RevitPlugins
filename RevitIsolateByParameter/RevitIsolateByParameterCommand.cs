@@ -25,7 +25,7 @@ namespace RevitIsolateByParameter {
     [Transaction(TransactionMode.Manual)]
     public class RevitIsolateByParameterCommand : BasePluginCommand {
         public RevitIsolateByParameterCommand() {
-            PluginName = "RevitIsolateByParameter";
+            PluginName = "Изолировать по параметру";
         }
 
         protected override void Execute(UIApplication uiApplication) {
@@ -52,15 +52,6 @@ namespace RevitIsolateByParameter {
 
                 MainWindow window = kernel.Get<MainWindow>();
                 window.Show();
-                //if(window.ShowDialog() == true) {
-                //    GetPlatformService<INotificationService>()
-                //        .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                //        .ShowAsync();
-                //} else {
-                //    GetPlatformService<INotificationService>()
-                //        .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                //        .ShowAsync();
-                //}
             }
         }
     }
