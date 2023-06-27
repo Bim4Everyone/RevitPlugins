@@ -80,6 +80,12 @@ namespace RevitRooms.ViewModels {
                 + $"Для всех помещений в пределах одной группы и одного этажа параметры \"{ProjectParamsConfig.Instance.RoomTypeGroupName.Name}\" и \"{ProjectParamsConfig.Instance.RoomGroupName.Name}\" должны соответствовать друг другу."
         };
         
+        public static InfoElement NotEqualMultiLevel { get; } = new InfoElement() {
+            TypeInfo = TypeInfo.Error,
+            Message = "Не совпадают значения параметров у многоуровневых квартир.",
+            Description = $"Для помещений не совпадают значения параметров \"{SharedParamsConfig.Instance.RoomMultilevelGroup.Name}\" и \"{ProjectParamsConfig.Instance.RoomGroupName.Name}\"."
+        };
+        
         public static InfoElement ErrorMultiLevelRoom { get; } = new InfoElement() {
             TypeInfo = TypeInfo.Error,
             Message = $"Ошибка в заполнении параметра \"{ProjectParamsConfig.Instance.IsRoomMainLevel.Name}\".",

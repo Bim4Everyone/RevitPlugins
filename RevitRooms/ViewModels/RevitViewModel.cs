@@ -259,29 +259,43 @@ namespace RevitRooms.ViewModels {
                 // не заполнены обязательные параметры
                 foreach(var room in rooms) {
                     if(room.Room == null) {
-                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomName.Name), null, room, errorElements);
+                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomName.Name),
+                            null, room, errorElements);
                     }
 
                     if(room.RoomGroup == null) {
-                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomGroupName.Name), null, room, errorElements);
+                        AddElement(
+                            InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomGroupName.Name),
+                            null, room, errorElements);
                     }
 
                     if(room.RoomSection == null) {
-                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name), null, room, errorElements);
+                        AddElement(
+                            InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name),
+                            null, room, errorElements);
                     }
                 }
 
                 // Все помещения у которых
                 // не совпадают значения группы и типа группы
                 var checksRooms = rooms.Where(room => room.RoomGroup != null && room.RoomSection != null)
-                    .Where(room => room.Phase == Phase || room.PhaseName.Equals("Межквартирные перегородки", StringComparison.CurrentCultureIgnoreCase))
+                    .Where(room => room.Phase == Phase || room.PhaseName.Equals("Межквартирные перегородки",
+                        StringComparison.CurrentCultureIgnoreCase))
                     .Where(room => ContainGroups(room));
 
-                foreach(var flat in GetFlats(checksRooms)) {
-                    if(IsGroupTypeEqual(flat)) {
+                var flats = checksRooms
+                    .GroupBy(item => new {s = item.RoomSection.Id, g = item.RoomGroup.Id, item.LevelId});
+
+                foreach(var flat in flats) {
+                    if(IsNotEqualGroupType(flat)) {
                         var roomGroup = flat.FirstOrDefault()?.RoomGroup.Name;
                         var roomSection = flat.FirstOrDefault()?.RoomSection.Name;
-                        AddElements(InfoElement.NotEqualGroupType.FormatMessage(roomGroup, roomSection), flat, errorElements);
+                        AddElements(InfoElement.NotEqualGroupType.FormatMessage(roomGroup, roomSection), flat,
+                            errorElements);
+                    }
+
+                    if(IsNotEqualMultiLevel(flat.Where(item => !string.IsNullOrEmpty(item.RoomMultilevelGroup)))) {
+                        AddElements(InfoElement.NotEqualMultiLevel, flat, errorElements);
                     }
                 }
             }
@@ -419,9 +433,15 @@ namespace RevitRooms.ViewModels {
             return Levels.Where(item => item.IsSelected).SelectMany(item => item.GetAreas());
         }
 
-        private static bool IsGroupTypeEqual(IEnumerable<SpatialElementViewModel> rooms) {
+        private static bool IsNotEqualGroupType(IEnumerable<SpatialElementViewModel> rooms) {
             return rooms
                 .Select(group => group.RoomTypeGroup?.Id)
+                .Distinct().Count() > 1;
+        }
+        
+        private static bool IsNotEqualMultiLevel(IEnumerable<SpatialElementViewModel> rooms) {
+            return rooms
+                .Select(group => group.RoomMultilevelGroup)
                 .Distinct().Count() > 1;
         }
 
