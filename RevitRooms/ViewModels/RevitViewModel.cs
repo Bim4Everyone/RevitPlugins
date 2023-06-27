@@ -342,30 +342,48 @@ namespace RevitRooms.ViewModels {
                 }
 
                 // Обработка параметров зависящих от квартир
-                foreach(var level in levels) {
-                    var rooms = level.GetRooms(phases).ToList();
-                    var flats = GetFlats(rooms);
-                    foreach(var flat in flats) {
-                        foreach(var calculation in GetParamCalculations()) {
-                            foreach(var room in flat) {
-                                calculation.CalculateParam(room);
-                            }
+                var flats = levels
+                    .SelectMany(item => item.GetRooms(phases))
+                    .Where(item => string.IsNullOrEmpty(item.RoomMultilevelGroup))
+                    .GroupBy(item=> new {s = item.RoomSection.Id, g = item.RoomGroup.Id, item.LevelId});
 
-                            foreach(var room in flat) {
-                                if(calculation.SetParamValue(room) && IsCheckRoomsChanges && calculation.RevitParam == SharedParamsConfig.Instance.ApartmentArea) {
-                                    var differences = calculation.GetDifferences();
-                                    var percentChange = calculation.GetPercentChange();
-                                    AddElement(InfoElement.BigChangesFlatAreas, FormatMessage(differences, percentChange), room, bigChangesRooms);
-                                }
-                            }
-                        }
-                    }
+                foreach(var flat in flats) {
+                    UpdateParam(flat.ToArray(), bigChangesRooms);
                 }
+
+                // многоуровневые квартиры
+                var multiLevels = levels
+                    .SelectMany(item => item.GetRooms(phases))
+                    .Where(item => !string.IsNullOrEmpty(item.RoomMultilevelGroup))
+                    .GroupBy(item=> new {item.RoomSection.Id, item.RoomMultilevelGroup});
+                
+                foreach(var multiLevel in multiLevels) {
+                    UpdateParam(multiLevel.ToArray(), bigChangesRooms);
+                }
+
 
                 transaction.Commit();
                 InfoElements.AddRange(bigChangesRooms.Values);
                 if(!ShowInfoElementsWindow("Информация", InfoElements)) {
                     TaskDialog.Show("Предупреждение!", "Расчет завершен!");
+                }
+            }
+        }
+
+        private void UpdateParam(SpatialElementViewModel[] flat, Dictionary<string, InfoElementViewModel> bigChangesRooms) {
+            foreach(var calculation in GetParamCalculations()) {
+                foreach(var room in flat) {
+                    calculation.CalculateParam(room);
+                }
+
+                foreach(var room in flat) {
+                    if(calculation.SetParamValue(room) && IsCheckRoomsChanges &&
+                       calculation.RevitParam == SharedParamsConfig.Instance.ApartmentArea) {
+                        var differences = calculation.GetDifferences();
+                        var percentChange = calculation.GetPercentChange();
+                        AddElement(InfoElement.BigChangesFlatAreas, FormatMessage(differences, percentChange), room,
+                            bigChangesRooms);
+                    }
                 }
             }
         }
