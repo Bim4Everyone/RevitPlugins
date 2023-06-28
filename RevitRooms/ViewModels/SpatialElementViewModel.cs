@@ -106,6 +106,8 @@ namespace RevitRooms.ViewModels {
             set { Element.SetParamValue(SharedParamsConfig.Instance.RoomAreaWithRatio, value ?? 0); }
         }
 
+        public bool IsNumberFix => Element.GetParamValueOrDefault<int>(ProjectParamsConfig.Instance.IsRoomNumberFix) == 1;
+
         public double ComputeRoomAreaWithRatio() {
             // Area = 0 - по умолчанию
             // RoomAreaRatio = 1 - по умолчанию

@@ -43,14 +43,18 @@ namespace RevitRooms.Commands.Numerates {
                 foreach(var element in orderedElements) {
                     progress?.Report(++count);
                     cancellationToken.ThrowIfCancellationRequested();
-                    
+
                     var numMode = CountFlat(element);
                     if(numMode == NumMode.Reset) {
                         flatCount = Start;
                     } else if(numMode == NumMode.Increment) {
                         ++flatCount;
                     }
-                    
+
+                    if(element.IsNumberFix) {
+                        continue;
+                    }
+
                     element.Element.SetParamValue(RevitParam, Prefix + flatCount + Suffix);
                 }
 
