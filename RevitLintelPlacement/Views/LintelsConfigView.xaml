@@ -147,20 +147,14 @@
                 <dxe:TextEdit Grid.Row="0" Grid.Column="0" Margin="5" IsReadOnly="True" EditMode="InplaceActive"
                               Text="Высота проема">
                 </dxe:TextEdit>
-                <dxe:TextEdit Grid.Row="0" Grid.Column="1" Margin="5"
+                <dxe:TextEdit Grid.Row="0" Grid.Column="1" Margin="5" IsReadOnly="True"
                               EditValue="{Binding OpeningHeight, UpdateSourceTrigger=PropertyChanged}">
                 </dxe:TextEdit>
                 <dxe:TextEdit Grid.Row="1" Grid.Column="0" Margin="5" IsReadOnly="True" EditMode="InplaceActive"
                               Text="Ширина проема">
                 </dxe:TextEdit>
-                <dxe:TextEdit Grid.Row="1" Grid.Column="1" Margin="5"
+                <dxe:TextEdit Grid.Row="1" Grid.Column="1" Margin="5" IsReadOnly="True"
                               EditValue="{Binding OpeningWidth, UpdateSourceTrigger=PropertyChanged}">
-                </dxe:TextEdit>
-                <dxe:TextEdit Grid.Row="2" Grid.Column="0" Margin="5" IsReadOnly="True" EditMode="InplaceActive"
-                              Text="Вырезание стены ниже двери">
-                </dxe:TextEdit>
-                <dxe:TextEdit Grid.Row="2" Grid.Column="1" Margin="5"
-                              EditValue="{Binding OpeningDown, UpdateSourceTrigger=PropertyChanged}">
                 </dxe:TextEdit>
                 <dxe:TextEdit Grid.Row="3" Grid.Column="0" Margin="5" IsReadOnly="True" EditMode="InplaceActive"
                               Text="Фиксация перемычки">

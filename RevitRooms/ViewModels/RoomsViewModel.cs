@@ -17,17 +17,17 @@ namespace RevitRooms.ViewModels {
     internal class RoomsViewModel : BaseViewModel {
         private RevitViewModel _revitViewModel;
 
-        public RoomsViewModel(Application application, Document document) {
+        public RoomsViewModel(RevitRepository revitRepository) {
             RevitViewModels = new ObservableCollection<RevitViewModel> {
-                new ViewRevitViewModel(application, document) { Name = "Выборка по текущему виду" },
-                new ElementsRevitViewModel(application, document) { Name = "Выборка по всем элементам" },
-                new SelectedRevitViewModel(application, document) { Name = "Выборка по выделенным элементам" }
+                new ViewRevitViewModel(revitRepository) { Name = "Выборка по текущему виду" },
+                new ElementsRevitViewModel(revitRepository) { Name = "Выборка по всем элементам" },
+                new SelectedRevitViewModel(revitRepository) { Name = "Выборка по выделенным элементам" }
             };
 
             RevitViewModel = RevitViewModels[1];
 
             var roomsConfig = RoomsConfig.GetRoomsConfig();
-            var settings = roomsConfig.GetSettings(document);
+            var settings = roomsConfig.GetSettings(revitRepository.Document);
             if(settings != null) {
                 RevitViewModel = RevitViewModels.FirstOrDefault(item => item._id == settings.SelectedRoomId) ?? RevitViewModel;
             }

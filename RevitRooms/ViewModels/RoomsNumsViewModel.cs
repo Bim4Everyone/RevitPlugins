@@ -23,6 +23,10 @@ using Autodesk.Revit.UI;
 
 using DevExpress.Mvvm.Native;
 
+using dosymep.SimpleServices;
+
+using RevitRooms.Commands.Numerates;
+
 namespace RevitRooms.ViewModels {
     internal abstract class RoomsNumsViewModel : BaseViewModel, INumberingOrder {
         public Guid _id;
@@ -36,28 +40,21 @@ namespace RevitRooms.ViewModels {
         private bool _isNumRoomsSectionLevels;
         private string _startNumber;
         protected readonly RevitRepository _revitRepository;
+        private PhaseViewModel _phase;
+        private ObservableCollection<PhaseViewModel> _phases;
+        private ObservableCollection<SpatialElementViewModel> _spatialElements;
+        private ObservableCollection<LevelViewModel> _levels;
+        private ObservableCollection<IElementViewModel<Element>> _groups;
+        private ObservableCollection<IElementViewModel<Element>> _sections;
+        private ObservableCollection<NumberingOrderViewModel> _numberingOrders;
+        private ObservableCollection<NumberingOrderViewModel> _selectedNumberingOrders;
 
         public System.Windows.Window ParentWindow { get; set; }
 
-        public RoomsNumsViewModel(Application application, Document document) {
-            _revitRepository = new RevitRepository(application, document);
+        public RoomsNumsViewModel(RevitRepository revitRepository) {
+            _revitRepository = revitRepository;
 
-            var additionalPhases = _revitRepository.GetAdditionalPhases()
-                .Select(item => new PhaseViewModel(item, _revitRepository));
-            SpatialElements = new ObservableCollection<SpatialElementViewModel>(GetSpartialElements()
-                .Where(item => item.Phase != null).Where(item => !additionalPhases.Contains(item.Phase))
-                .Where(item => item.IsPlaced));
-
-            Phases = new ObservableCollection<PhaseViewModel>(GetPhases());
-            Levels = new ObservableCollection<LevelViewModel>(GetLevels());
-            Groups = new ObservableCollection<IElementViewModel<Element>>(GetGroups());
-            Sections = new ObservableCollection<IElementViewModel<Element>>(GetSections());
-            NumberingOrders =
-                new ObservableCollection<NumberingOrderViewModel>(GetNumberingOrders().Where(item => item.Order == 0));
-            SelectedNumberingOrders =
-                new ObservableCollection<NumberingOrderViewModel>(GetNumberingOrders().Where(item => item.Order > 0));
-
-            Phase = Phases.FirstOrDefault();
+            LoadViewCommand = RelayCommand.Create(LoadView);
             NumerateRoomsCommand = new RelayCommand(NumerateRooms, CanNumerateRooms);
 
             UpOrderCommand = new UpOrderCommand(this);
@@ -65,13 +62,39 @@ namespace RevitRooms.ViewModels {
             AddOrderCommand = new AddOrderCommand(this);
             RemoveOrderCommand = new RemoveOrderCommand(this);
             SaveOrderCommand = new SaveOrderCommand(this, _revitRepository);
+        }
+
+        private void LoadView() {
+            PhaseViewModel[] additionalPhases = _revitRepository.GetAdditionalPhases()
+                .Select(item => new PhaseViewModel(item, _revitRepository))
+                .ToArray();
+
+            SpatialElements = new ObservableCollection<SpatialElementViewModel>(GetSpatialElements()
+                .Where(item => item.Phase != null)
+                .Where(item => !additionalPhases.Contains(item.Phase))
+                .Where(item => item.IsPlaced));
+
+            Phases = new ObservableCollection<PhaseViewModel>(GetPhases());
+            Levels = new ObservableCollection<LevelViewModel>(GetLevels());
+            Groups = new ObservableCollection<IElementViewModel<Element>>(GetGroups());
+            Sections = new ObservableCollection<IElementViewModel<Element>>(GetSections());
+
+            NumberingOrders = new ObservableCollection<NumberingOrderViewModel>(
+                GetNumberingOrders()
+                    .Where(item => item.Order == 0));
+
+            SelectedNumberingOrders = new ObservableCollection<NumberingOrderViewModel>(
+                GetNumberingOrders()
+                    .Where(item => item.Order > 0));
 
             StartNumber = "1";
-            SetRoomsNumsConfig();
+            Phase = Phases.FirstOrDefault();
+            
+            LoadPluginConfig();
         }
 
         public string Name { get; set; }
-        protected abstract IEnumerable<SpatialElementViewModel> GetSpartialElements();
+        protected abstract IEnumerable<SpatialElementViewModel> GetSpatialElements();
 
         public string ErrorText {
             get => _errorText;
@@ -118,6 +141,7 @@ namespace RevitRooms.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _isNumRoomsSectionLevels, value);
         }
 
+        public ICommand LoadViewCommand { get; }
         public ICommand NumerateRoomsCommand { get; }
 
         public ICommand UpOrderCommand { get; }
@@ -126,15 +150,45 @@ namespace RevitRooms.ViewModels {
         public ICommand RemoveOrderCommand { get; }
         public ICommand SaveOrderCommand { get; }
 
-        public PhaseViewModel Phase { get; set; }
-        public ObservableCollection<PhaseViewModel> Phases { get; }
-        public ObservableCollection<SpatialElementViewModel> SpatialElements { get; }
+        public PhaseViewModel Phase {
+            get => _phase;
+            set => this.RaiseAndSetIfChanged(ref _phase, value);
+        }
 
-        public ObservableCollection<LevelViewModel> Levels { get; }
-        public ObservableCollection<IElementViewModel<Element>> Groups { get; }
-        public ObservableCollection<IElementViewModel<Element>> Sections { get; }
-        public ObservableCollection<NumberingOrderViewModel> NumberingOrders { get; }
-        public ObservableCollection<NumberingOrderViewModel> SelectedNumberingOrders { get; }
+        public ObservableCollection<PhaseViewModel> Phases {
+            get => _phases;
+            set => this.RaiseAndSetIfChanged(ref _phases, value);
+        }
+
+        public ObservableCollection<SpatialElementViewModel> SpatialElements {
+            get => _spatialElements;
+            set => this.RaiseAndSetIfChanged(ref _spatialElements, value);
+        }
+
+        public ObservableCollection<LevelViewModel> Levels {
+            get => _levels;
+            set => this.RaiseAndSetIfChanged(ref _levels, value);
+        }
+
+        public ObservableCollection<IElementViewModel<Element>> Groups {
+            get => _groups;
+            set => this.RaiseAndSetIfChanged(ref _groups, value);
+        }
+
+        public ObservableCollection<IElementViewModel<Element>> Sections {
+            get => _sections;
+            set => this.RaiseAndSetIfChanged(ref _sections, value);
+        }
+
+        public ObservableCollection<NumberingOrderViewModel> NumberingOrders {
+            get => _numberingOrders;
+            set => this.RaiseAndSetIfChanged(ref _numberingOrders, value);
+        }
+
+        public ObservableCollection<NumberingOrderViewModel> SelectedNumberingOrders {
+            get => _selectedNumberingOrders;
+            set => this.RaiseAndSetIfChanged(ref _selectedNumberingOrders, value);
+        }
 
         private IEnumerable<PhaseViewModel> GetPhases() {
             return SpatialElements.Select(item => item.Phase)
@@ -186,22 +240,35 @@ namespace RevitRooms.ViewModels {
 
             var startNumber = GetStartNumber();
 
-            var levels = Levels.Where(item => item.IsSelected).SelectMany(item => item.Levels.Select(level => level.Id))
+            var levels = Levels
+                .Where(item => item.IsSelected)
+                .SelectMany(item => item.Levels
+                    .Select(level => level.Id))
                 .ToArray();
-            var groups = Groups.Where(item => item.IsSelected).Select(item => item.ElementId).ToArray();
-            var sections = Sections.Where(item => item.IsSelected).Select(item => item.ElementId).ToArray();
+
+            var groups = Groups
+                .Where(item => item.IsSelected)
+                .Select(item => item.ElementId)
+                .ToArray();
+
+            var sections = Sections
+                .Where(item => item.IsSelected)
+                .Select(item => item.ElementId)
+                .ToArray();
 
             var workingObjects = SpatialElements
                 .Where(item => item.Phase == Phase)
-                .Where(item => levels.Contains(item.LevelId));
+                .Where(item => levels.Contains(item.LevelId))
+                .ToArray();
 
             if(CheckWorkingObjects(workingObjects)) {
                 return;
             }
 
-            var orderedObjects = workingObjects
+            SpatialElementViewModel[] orderedObjects = workingObjects
                 .Where(item => item.RoomGroup != null && groups.Contains(item.RoomGroup.Id))
-                .Where(item => item.RoomSection != null && sections.Contains(item.RoomSection.Id));
+                .Where(item => item.RoomSection != null && sections.Contains(item.RoomSection.Id))
+                .ToArray();
 
             var notFoundNames = GetNotFoundNames(orderedObjects);
             if(notFoundNames.Length > 0) {
@@ -209,110 +276,57 @@ namespace RevitRooms.ViewModels {
                 return;
             }
 
-            if(IsNumFlats) {
-                using(var transaction = _revitRepository.StartTransaction("Нумерация групп помещений")) {
-                    orderedObjects = orderedObjects
-                        .OrderBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
-                        .ThenBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
-                        .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
-                        .ThenBy(item => GetDistance(item.Element));
-
-                    int flatCount = startNumber;
-                    foreach(var section in orderedObjects.GroupBy(item => item.RoomSection.Id)) {
-                        foreach(var level in section.GroupBy(item => item.LevelId)) {
-                            foreach(var group in level.GroupBy(item => item.RoomGroup.Id)) {
-                                foreach(var room in group) {
-                                    room.Element.SetParamValue(SharedParamsConfig.Instance.ApartmentNumber,
-                                        Prefix + flatCount + Suffix);
-                                }
-
-                                flatCount++;
-                            }
-                        }
-                    }
-
-                    transaction.Commit();
-                }
-            } else {
-                UpdateNumeringOrder();
-
-                var selectedOrder = SelectedNumberingOrders.ToDictionary(item => item.ElementId, item => item.Order);
-
-                if(IsNumRoomsGroup) {
-                    using(var transaction = _revitRepository.StartTransaction("Нумерация помещений по группе")) {
-                        orderedObjects = orderedObjects
-                            .OrderBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
-                            .ThenBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
-                            .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
-                            .ThenBy(item => GetOrder(selectedOrder, item.Room))
-                            .ThenBy(item => GetDistance(item.Element));
-
-                        foreach(var section in orderedObjects.GroupBy(item => item.RoomSection.Id)) {
-                            foreach(var level in section.GroupBy(item => item.LevelId)) {
-                                foreach(var group in level.GroupBy(item => item.RoomGroup.Id)) {
-                                    int roomCount = startNumber;
-                                    foreach(var room in group) {
-                                        room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER,
-                                            Prefix + roomCount + Suffix);
-                                        roomCount++;
-                                    }
-                                }
-                            }
-                        }
-
-                        transaction.Commit();
-                    }
-                } else if(IsNumRoomsSection) {
-                    using(var transaction = _revitRepository.StartTransaction("Нумерация помещений по секции")) {
-                        orderedObjects = orderedObjects
-                            .OrderBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
-                            .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
-                            .ThenBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
-                            .ThenBy(item => GetOrder(selectedOrder, item.Room))
-                            .ThenBy(item => GetDistance(item.Element));
-
-                        int roomCount = startNumber;
-                        foreach(var room in orderedObjects) {
-                            room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER, Prefix + roomCount + Suffix);
-                            roomCount++;
-                        }
-
-                        transaction.Commit();
-                    }
-                } else if(IsNumRoomsSectionLevels) {
-                    using(var transaction =
-                          _revitRepository.StartTransaction("Нумерация помещений по секции и этажу")) {
-                        orderedObjects = orderedObjects
-                            .OrderBy(item => item.RoomSection, new dosymep.Revit.Comparators.ElementComparer())
-                            .ThenBy(item => (_revitRepository.GetElement(item.LevelId) as Level).Elevation)
-                            .ThenBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer())
-                            .ThenBy(item => GetOrder(selectedOrder, item.Room))
-                            .ThenBy(item => GetDistance(item.Element));
-
-                        foreach(var section in orderedObjects.GroupBy(item => item.RoomSection.Id)) {
-                            foreach(var level in section.GroupBy(item =>  (_revitRepository.GetElement(item.LevelId) as Level)?.Name.Split('_').FirstOrDefault())) {
-                                int roomCount = startNumber;
-                                foreach(var group in level.OrderBy(item => item.RoomGroup, new dosymep.Revit.Comparators.ElementComparer()).GroupBy(item => item.RoomGroup.Id)) {
-                                    foreach(var room in group) {
-                                        room.Element.SetParamValue(BuiltInParameter.ROOM_NUMBER, Prefix + roomCount + Suffix);
-                                        roomCount++;
-                                    }
-                                }
-                            }
-                        }
-
-                        transaction.Commit();
-                    }
+            using(var window = SetupProgressDialog(orderedObjects)) {
+                window.Show();
+                if(IsNumFlats) {
+                    var numerateCommand =
+                        new NumFlatsCommand(_revitRepository) {Start = startNumber, Prefix = Prefix, Suffix = Suffix};
+                    numerateCommand.Numerate(orderedObjects, window.CreateProgress(), window.CreateCancellationToken());
                 } else {
-                    throw new InvalidOperationException("Выбран неизвестный режим работы.");
+                    UpdateNumeringOrder();
+
+                    var selectedOrder = SelectedNumberingOrders
+                        .ToDictionary(
+                            item => item.ElementId,
+                            item => item.Order);
+
+                    if(IsNumRoomsGroup) {
+                        var numerateCommand =
+                            new NumSectionGroup(_revitRepository, selectedOrder) {
+                                Start = startNumber, Prefix = Prefix, Suffix = Suffix
+                            };
+                        numerateCommand.Numerate(orderedObjects, window.CreateProgress(), window.CreateCancellationToken());
+                    } else if(IsNumRoomsSection) {
+                        var numerateCommand =
+                            new NumSectionCommand(_revitRepository, selectedOrder) {
+                                Start = startNumber, Prefix = Prefix, Suffix = Suffix
+                            };
+                        numerateCommand.Numerate(orderedObjects, window.CreateProgress(), window.CreateCancellationToken());
+                    } else if(IsNumRoomsSectionLevels) {
+                        var numerateCommand =
+                            new NumerateSectionLevel(_revitRepository, selectedOrder) {
+                                Start = startNumber, Prefix = Prefix, Suffix = Suffix
+                            };
+                        numerateCommand.Numerate(orderedObjects, window.CreateProgress(), window.CreateCancellationToken());
+                    } else {
+                        throw new InvalidOperationException("Выбран неизвестный режим работы.");
+                    }
                 }
             }
 
-            SaveRoomsNumsConfig();
+            SavePluginConfig();
 
             ParentWindow.DialogResult = true;
             ParentWindow.Close();
             TaskDialog.Show("Предупреждение!", "Расчет завершен!");
+        }
+
+        private IProgressDialogService SetupProgressDialog(SpatialElementViewModel[] orderedObjects) {
+            var service = GetPlatformService<IProgressDialogService>();
+            service.StepValue = 10;
+            service.MaxValue = orderedObjects.Length;
+            service.DisplayTitleFormat = "Нумерация [{0}]\\{1}]";
+            return service;
         }
 
         private bool ShowNotFoundNames(string[] notFoundNames) {
@@ -362,12 +376,13 @@ namespace RevitRooms.ViewModels {
             }
         }
 
-        private bool CheckWorkingObjects(IEnumerable<SpatialElementViewModel> workingObjects) {
+        private bool CheckWorkingObjects(SpatialElementViewModel[] workingObjects) {
             var errorElements = new Dictionary<string, InfoElementViewModel>();
 
             // Все помещения которые
             // избыточные или не окруженные
-            var redundantRooms = workingObjects.Where(item => item.IsRedundant == true || item.NotEnclosed == true);
+            var redundantRooms = workingObjects
+                .Where(item => item.IsRedundant == true || item.NotEnclosed == true);
             AddElements(InfoElement.RedundantRooms, redundantRooms, errorElements);
 
             // Все помещения у которых
@@ -388,6 +403,35 @@ namespace RevitRooms.ViewModels {
                     AddElement(
                         InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name),
                         null, room, errorElements);
+                }
+            }
+
+            // Все многоуровневые помещения
+            var multiLevelRooms = workingObjects
+                .Where(item => !string.IsNullOrEmpty(item.RoomMultilevelGroup))
+                .GroupBy(item => new {item.RoomMultilevelGroup, item.LevelName});
+
+            foreach(var multiLevelRoomGroup in multiLevelRooms) {
+                bool notSameValue = multiLevelRoomGroup
+                    .GroupBy(item => item.IsRoomMainLevel)
+                    .Count() > 1;
+
+                if(notSameValue) {
+                    AddElements(InfoElement.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
+                }
+            }
+
+            var newMultiLevelRooms = workingObjects
+                .Where(item => !string.IsNullOrEmpty(item.RoomMultilevelGroup))
+                .GroupBy(item => item.RoomMultilevelGroup);
+
+            foreach(var multiLevelRoomGroup in newMultiLevelRooms) {
+                bool notSameValue = multiLevelRoomGroup
+                    .GroupBy(item => item.IsRoomMainLevel)
+                    .Count() != 2;
+
+                if(notSameValue) {
+                    AddElements(InfoElement.ErrorMultiLevelRoom, multiLevelRoomGroup, errorElements);
                 }
             }
 
@@ -450,23 +494,6 @@ namespace RevitRooms.ViewModels {
             return int.TryParse(StartNumber, out var value) ? value : 0;
         }
 
-        private double GetDistance(Element element) {
-            var point = (element.Location as LocationPoint)?.Point;
-            if(point == null) {
-                return 0;
-            }
-
-            return Math.Sqrt((point.X * point.X) + (point.Y * point.Y));
-        }
-
-        private int GetOrder(Dictionary<ElementId, int> ordering, Element element) {
-            if(ordering.TryGetValue(element.Id, out int value)) {
-                return value;
-            }
-
-            return 0;
-        }
-
         private void AddElements(InfoElement infoElement, IEnumerable<IElementViewModel<Element>> elements,
             Dictionary<string, InfoElementViewModel> infoElements) {
             foreach(var element in elements) {
@@ -489,7 +516,7 @@ namespace RevitRooms.ViewModels {
             value.Elements.Add(new MessageElementViewModel() {Element = element, Description = message});
         }
 
-        private bool ShowInfoElementsWindow(string title, IEnumerable<InfoElementViewModel> infoElements) {
+        private bool ShowInfoElementsWindow(string title, ICollection<InfoElementViewModel> infoElements) {
             if(infoElements.Any()) {
                 var window = new InfoElementsWindow() {
                     Title = title,
@@ -506,7 +533,7 @@ namespace RevitRooms.ViewModels {
             return false;
         }
 
-        private void SetRoomsNumsConfig() {
+        private void LoadPluginConfig() {
             var roomsConfig = RoomsNumsConfig.GetConfig();
             var settings = roomsConfig.GetRoomsNumsSettingsConfig(_revitRepository.DocumentName);
             if(settings == null) {
@@ -539,7 +566,7 @@ namespace RevitRooms.ViewModels {
             }
         }
 
-        private void SaveRoomsNumsConfig() {
+        private void SavePluginConfig() {
             var roomsConfig = RoomsNumsConfig.GetConfig();
             var settings = roomsConfig.GetRoomsNumsSettingsConfig(_revitRepository.DocumentName);
             if(settings == null) {
@@ -558,11 +585,19 @@ namespace RevitRooms.ViewModels {
             settings.PhaseElementId = Phase.ElementId.IntegerValue;
             settings.DocumentName = _revitRepository.DocumentName;
 
-            settings.Levels = Levels.Where(item => item.IsSelected).Select(item => item.ElementId.IntegerValue)
+            settings.Levels = Levels
+                .Where(item => item.IsSelected)
+                .Select(item => item.ElementId.IntegerValue)
                 .ToList();
-            settings.Groups = Groups.Where(item => item.IsSelected).Select(item => item.ElementId.IntegerValue)
+
+            settings.Groups = Groups
+                .Where(item => item.IsSelected)
+                .Select(item => item.ElementId.IntegerValue)
                 .ToList();
-            settings.Sections = Sections.Where(item => item.IsSelected).Select(item => item.ElementId.IntegerValue)
+
+            settings.Sections = Sections
+                .Where(item => item.IsSelected)
+                .Select(item => item.ElementId.IntegerValue)
                 .ToList();
 
             RoomsNumsConfig.SaveConfig(roomsConfig);

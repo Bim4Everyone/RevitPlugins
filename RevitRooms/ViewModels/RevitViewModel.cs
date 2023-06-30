@@ -30,8 +30,8 @@ namespace RevitRooms.ViewModels {
         private string _errorText;
         private bool _isAllowSelectLevels;
 
-        public RevitViewModel(Application application, Document document) {
-            _revitRepository = new RevitRepository(application, document);
+        public RevitViewModel(RevitRepository revitRepository) {
+            _revitRepository = revitRepository;
 
             Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels().OrderBy(item => item.Element.Elevation).Where(item => item.SpartialElements.Count > 0));
             AdditionalPhases = new ObservableCollection<PhaseViewModel>(_revitRepository.GetAdditionalPhases().Select(item => new PhaseViewModel(item, _revitRepository)));
@@ -259,29 +259,43 @@ namespace RevitRooms.ViewModels {
                 // не заполнены обязательные параметры
                 foreach(var room in rooms) {
                     if(room.Room == null) {
-                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomName.Name), null, room, errorElements);
+                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomName.Name),
+                            null, room, errorElements);
                     }
 
                     if(room.RoomGroup == null) {
-                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomGroupName.Name), null, room, errorElements);
+                        AddElement(
+                            InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomGroupName.Name),
+                            null, room, errorElements);
                     }
 
                     if(room.RoomSection == null) {
-                        AddElement(InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name), null, room, errorElements);
+                        AddElement(
+                            InfoElement.RequiredParams.FormatMessage(ProjectParamsConfig.Instance.RoomSectionName.Name),
+                            null, room, errorElements);
                     }
                 }
 
                 // Все помещения у которых
                 // не совпадают значения группы и типа группы
                 var checksRooms = rooms.Where(room => room.RoomGroup != null && room.RoomSection != null)
-                    .Where(room => room.Phase == Phase || room.PhaseName.Equals("Межквартирные перегородки", StringComparison.CurrentCultureIgnoreCase))
+                    .Where(room => room.Phase == Phase || room.PhaseName.Equals("Межквартирные перегородки",
+                        StringComparison.CurrentCultureIgnoreCase))
                     .Where(room => ContainGroups(room));
 
-                foreach(var flat in GetFlats(checksRooms)) {
-                    if(IsGroupTypeEqual(flat)) {
+                var flats = checksRooms
+                    .GroupBy(item => new {s = item.RoomSection.Id, g = item.RoomGroup.Id, item.LevelId});
+
+                foreach(var flat in flats) {
+                    if(IsNotEqualGroupType(flat)) {
                         var roomGroup = flat.FirstOrDefault()?.RoomGroup.Name;
                         var roomSection = flat.FirstOrDefault()?.RoomSection.Name;
-                        AddElements(InfoElement.NotEqualGroupType.FormatMessage(roomGroup, roomSection), flat, errorElements);
+                        AddElements(InfoElement.NotEqualGroupType.FormatMessage(roomGroup, roomSection), flat,
+                            errorElements);
+                    }
+
+                    if(IsNotEqualMultiLevel(flat.Where(item => !string.IsNullOrEmpty(item.RoomMultilevelGroup)))) {
+                        AddElements(InfoElement.NotEqualMultiLevel, flat, errorElements);
                     }
                 }
             }
@@ -342,30 +356,48 @@ namespace RevitRooms.ViewModels {
                 }
 
                 // Обработка параметров зависящих от квартир
-                foreach(var level in levels) {
-                    var rooms = level.GetRooms(phases).ToList();
-                    var flats = GetFlats(rooms);
-                    foreach(var flat in flats) {
-                        foreach(var calculation in GetParamCalculations()) {
-                            foreach(var room in flat) {
-                                calculation.CalculateParam(room);
-                            }
+                var flats = levels
+                    .SelectMany(item => item.GetRooms(phases))
+                    .Where(item => string.IsNullOrEmpty(item.RoomMultilevelGroup))
+                    .GroupBy(item=> new {s = item.RoomSection.Id, g = item.RoomGroup.Id, item.LevelId});
 
-                            foreach(var room in flat) {
-                                if(calculation.SetParamValue(room) && IsCheckRoomsChanges && calculation.RevitParam == SharedParamsConfig.Instance.ApartmentArea) {
-                                    var differences = calculation.GetDifferences();
-                                    var percentChange = calculation.GetPercentChange();
-                                    AddElement(InfoElement.BigChangesFlatAreas, FormatMessage(differences, percentChange), room, bigChangesRooms);
-                                }
-                            }
-                        }
-                    }
+                foreach(var flat in flats) {
+                    UpdateParam(flat.ToArray(), bigChangesRooms);
                 }
+
+                // многоуровневые квартиры
+                var multiLevels = levels
+                    .SelectMany(item => item.GetRooms(phases))
+                    .Where(item => !string.IsNullOrEmpty(item.RoomMultilevelGroup))
+                    .GroupBy(item=> new {item.RoomSection.Id, item.RoomMultilevelGroup});
+                
+                foreach(var multiLevel in multiLevels) {
+                    UpdateParam(multiLevel.ToArray(), bigChangesRooms);
+                }
+
 
                 transaction.Commit();
                 InfoElements.AddRange(bigChangesRooms.Values);
                 if(!ShowInfoElementsWindow("Информация", InfoElements)) {
                     TaskDialog.Show("Предупреждение!", "Расчет завершен!");
+                }
+            }
+        }
+
+        private void UpdateParam(SpatialElementViewModel[] flat, Dictionary<string, InfoElementViewModel> bigChangesRooms) {
+            foreach(var calculation in GetParamCalculations()) {
+                foreach(var room in flat) {
+                    calculation.CalculateParam(room);
+                }
+
+                foreach(var room in flat) {
+                    if(calculation.SetParamValue(room) && IsCheckRoomsChanges &&
+                       calculation.RevitParam == SharedParamsConfig.Instance.ApartmentArea) {
+                        var differences = calculation.GetDifferences();
+                        var percentChange = calculation.GetPercentChange();
+                        AddElement(InfoElement.BigChangesFlatAreas, FormatMessage(differences, percentChange), room,
+                            bigChangesRooms);
+                    }
                 }
             }
         }
@@ -401,9 +433,15 @@ namespace RevitRooms.ViewModels {
             return Levels.Where(item => item.IsSelected).SelectMany(item => item.GetAreas());
         }
 
-        private static bool IsGroupTypeEqual(IEnumerable<SpatialElementViewModel> rooms) {
+        private static bool IsNotEqualGroupType(IEnumerable<SpatialElementViewModel> rooms) {
             return rooms
                 .Select(group => group.RoomTypeGroup?.Id)
+                .Distinct().Count() > 1;
+        }
+        
+        private static bool IsNotEqualMultiLevel(IEnumerable<SpatialElementViewModel> rooms) {
+            return rooms
+                .Select(group => group.RoomMultilevelGroup)
                 .Distinct().Count() > 1;
         }
 

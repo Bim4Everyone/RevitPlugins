@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -80,19 +81,15 @@ namespace RevitEditingZones.ViewModels {
 
             LeftZonePlans.ZonePlans = new ObservableCollection<ZonePlanViewModel>();
             RightZonePlans.ZonePlans = new ObservableCollection<ZonePlanViewModel>();
-            
-            foreach(ViewPlan areaPlane in _revitRepository.GetAreaPlanes()) {
-                foreach(Area area in _revitRepository.GetAreas(areaPlane)) {
-                    var level = GetLevel(area);
-                    Levels.Remove(level);
-                    
-                    var zonePlan = new ZonePlanViewModel(area, areaPlane) {Level = level, Levels = Levels};
-                    zonePlan.ErrorType = GetErrorType(zonePlan);
-                    if(zonePlan.ErrorType == ErrorType.Default) {
-                        RightZonePlans.ZonePlans.Add(zonePlan);
-                    } else {
-                        LeftZonePlans.ZonePlans.Add(zonePlan);
-                    }
+
+            var zonePlans = GetZonePlans().ToArray();
+            foreach(ZonePlanViewModel zonePlan in zonePlans) {
+                Levels.Remove(zonePlan.Level);
+                zonePlan.ErrorType = GetErrorType(zonePlan, zonePlans);
+                if(zonePlan.ErrorType == ErrorType.Default) {
+                    RightZonePlans.ZonePlans.Add(zonePlan);
+                } else {
+                    LeftZonePlans.ZonePlans.Add(zonePlan);
                 }
             }
 
@@ -124,8 +121,17 @@ namespace RevitEditingZones.ViewModels {
             var level = _revitRepository.GetLevel(area);
             return AllLevels.FirstOrDefault(item => item.Level.Id == level?.Id);
         }
+        
+        private IEnumerable<ZonePlanViewModel> GetZonePlans() {
+            foreach(ViewPlan areaPlane in _revitRepository.GetAreaPlanes()) {
+                foreach(Area area in _revitRepository.GetAreas(areaPlane)) {
+                    var level = GetLevel(area);
+                    yield return new ZonePlanViewModel(area, areaPlane) {Level = level, Levels = Levels};
+                }
+            }
+        }
 
-        private ErrorType GetErrorType(ZonePlanViewModel zonePlan) {
+        private ErrorType GetErrorType(ZonePlanViewModel zonePlan, IEnumerable<ZonePlanViewModel> zonePlans) {
             if(zonePlan.IsNotLinkedZones()) {
                 return ErrorType.NotLinkedZones;
             }
@@ -134,7 +140,7 @@ namespace RevitEditingZones.ViewModels {
                 return ErrorType.ZoneNotMatchViewPlan;
             }
 
-            if(zonePlan.IsZoneMatchWithSameLevels(LeftZonePlans.ZonePlans)) {
+            if(zonePlan.IsZoneMatchWithSameLevels(zonePlans.Where(item=> item != zonePlan))) {
                 return ErrorType.ZoneMatchWithSameLevels;
             }
 

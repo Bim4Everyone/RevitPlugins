@@ -9,6 +9,7 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.WPF.ViewModels;
 
 using RevitRooms.Views;
@@ -77,6 +78,18 @@ namespace RevitRooms.ViewModels {
             Description = $"Для помещений  данной группы на указанных этажах не совпадает значение параметра \"{ProjectParamsConfig.Instance.RoomTypeGroupName.Name}\"."
                 + Environment.NewLine
                 + $"Для всех помещений в пределах одной группы и одного этажа параметры \"{ProjectParamsConfig.Instance.RoomTypeGroupName.Name}\" и \"{ProjectParamsConfig.Instance.RoomGroupName.Name}\" должны соответствовать друг другу."
+        };
+        
+        public static InfoElement NotEqualMultiLevel { get; } = new InfoElement() {
+            TypeInfo = TypeInfo.Error,
+            Message = "Не совпадают значения параметров у многоуровневых квартир.",
+            Description = $"Для помещений не совпадают значения параметров \"{SharedParamsConfig.Instance.RoomMultilevelGroup.Name}\" и \"{ProjectParamsConfig.Instance.RoomGroupName.Name}\"."
+        };
+        
+        public static InfoElement ErrorMultiLevelRoom { get; } = new InfoElement() {
+            TypeInfo = TypeInfo.Error,
+            Message = $"Ошибка в заполнении параметра \"{ProjectParamsConfig.Instance.IsRoomMainLevel.Name}\".",
+            Description = $"Ошибка в заполнении параметра \"{ProjectParamsConfig.Instance.IsRoomMainLevel.Name}\". Параметр должен быть заполнен только для помещений одного этажа группы."
         };
         
         public static InfoElement NotEqualSectionDoors { get; } = new InfoElement() {
