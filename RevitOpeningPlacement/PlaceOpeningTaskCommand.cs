@@ -10,7 +10,6 @@ using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
-using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitOpeningPlacement.Models;
@@ -33,9 +32,6 @@ namespace RevitOpeningPlacement {
         /// </summary>
         private readonly List<int> _duplicatedInstancesIds = new List<int>();
 
-        //только для отладки, удалить
-        private RevitRepository _repository;
-
 
         public PlaceOpeningTaskCommand() {
             PluginName = "Расстановка заданий на отверстия";
@@ -44,7 +40,6 @@ namespace RevitOpeningPlacement {
         protected override void Execute(UIApplication uiApplication) {
             _duplicatedInstancesIds.Clear();
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            _repository = revitRepository;
             if(!CheckModel(revitRepository)) {
                 return;
             }
@@ -198,18 +193,6 @@ namespace RevitOpeningPlacement {
                         }
                     }
                 };
-                if((definition == BuiltInFailures.FamilyFailures.CannotMakeType) || (definition == BuiltInFailures.FamilyFailures.CannotMakeTypeCB)) {
-                    var ids = fma.GetFailingElementIds().Select(id => id.IntegerValue);
-                    foreach(var id in ids) {
-                        var el = _repository.GetElement(new ElementId(id));
-                        if(el.Name == "Прямоугольное") {
-
-                            var width = el.GetParamValue<double>("ADSK_Размер_Ширина");
-                            var depth = el.GetParamValue<double>("ADSK_Размер_Глубина");
-                            var height = el.GetParamValue<double>("ADSK_Размер_Высота");
-                        }
-                    }
-                }
             }
         }
 
