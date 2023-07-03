@@ -11,12 +11,14 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Xml.Linq;
 
 using Autodesk.AdvanceSteel.Modelling;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
 //using Autodesk.SteelConnectionsDB;
 
 using dosymep.Revit;
@@ -72,9 +74,18 @@ namespace RevitPylonDocumentation.ViewModels {
         private string _rebarScheduleSuffixTemp = "";
         private string _materialSchedulePrefixTemp = "!СМ_Пилон ";
         private string _materialScheduleSuffixTemp = "";
-        private string _partsSchedulePrefixTemp = "!ВД_IFC_";
-        private string _partsScheduleSuffixTemp = "";
-        
+        private string _systemPartsSchedulePrefixTemp = "!ВД_СИС_";
+        private string _systemPartsScheduleSuffixTemp = "";
+        private string _IFCPartsSchedulePrefixTemp = "!ВД_IFC_";
+        private string _IFCPartsScheduleSuffixTemp = "";
+
+        private string _rebarScheduleNameTemp = "!СА_Базовая";
+        private string _materialScheduleNameTemp = "!СМ";
+        private string _systemPartsScheduleNameTemp = "!ВД_СИС";
+        private string _IFCPartsScheduleNameTemp = "!ВД_IFC";
+        private string _scheduleMarkParamNameTemp = "обр_Метка основы_универсальная";
+
+
         public static string DEF_TITLEBLOCK_NAME = "Создать типы по комплектам";
 
         private List<PylonSheetInfo> _selectedHostsInfo = new List<PylonSheetInfo>();
@@ -112,7 +123,8 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectedLegend = Legends
                 .FirstOrDefault(view => view.Name.Contains("илон"));
 
-
+            FindReferenceSchedules();
+            
             GetHostMarksInGUICommand = new RelayCommand(GetHostMarksInGUI);
 
 
@@ -187,6 +199,22 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Выбранный пользователем типоразмер вида для создания новых видов
         /// </summary>
         public static ViewFamilyType SelectedViewFamilyType { get; set; }
+        /// <summary>
+        /// Эталонная спецификация арматуры
+        /// </summary>
+        public ViewSchedule ReferenceRebarSchedule { get; set; }
+        /// <summary>
+        /// Эталонная спецификация материалов
+        /// </summary>
+        public ViewSchedule ReferenceMaterialSchedule { get; set; }
+        /// <summary>
+        /// Эталонная ведомость деталей для системной арматуры
+        /// </summary>
+        public ViewSchedule ReferenceSystemPartsSchedule { get; set; }
+        /// <summary>
+        /// Эталонная ведомость деталей для IFC арматуры
+        /// </summary>
+        public ViewSchedule ReferenceIFCPartsSchedule { get; set; }
 
 
         // Инфо по пилонам
@@ -411,26 +439,93 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-
-        public string PARTS_SCHEDULE_PREFIX { get; set; } = "!ВД_IFC_";
-        public string PARTS_SCHEDULE_PREFIX_TEMP {
-            get => _partsSchedulePrefixTemp;
+        public string SYSTEM_PARTS_SCHEDULE_PREFIX { get; set; } = "!ВД_СИС_";
+        public string SYSTEM_PARTS_SCHEDULE_PREFIX_TEMP {
+            get => _systemPartsSchedulePrefixTemp;
             set {
-                _partsSchedulePrefixTemp = value;
+                _systemPartsSchedulePrefixTemp = value;
                 _edited = true;
             }
         }
 
-        public string PARTS_SCHEDULE_SUFFIX { get; set; } = "";
-        public string PARTS_SCHEDULE_SUFFIX_TEMP {
-            get => _partsScheduleSuffixTemp;
+        public string SYSTEM_PARTS_SCHEDULE_SUFFIX { get; set; } = "";
+        public string SYSTEM_PARTS_SCHEDULE_SUFFIX_TEMP {
+            get => _systemPartsScheduleSuffixTemp;
             set {
-                _partsScheduleSuffixTemp = value;
+                _systemPartsScheduleSuffixTemp = value;
                 _edited = true;
             }
         }
 
-#endregion
+
+        public string IFC_PARTS_SCHEDULE_PREFIX { get; set; } = "!ВД_IFC_";
+        public string IFC_PARTS_SCHEDULE_PREFIX_TEMP {
+            get => _IFCPartsSchedulePrefixTemp;
+            set {
+                _IFCPartsSchedulePrefixTemp = value;
+                _edited = true;
+            }
+        }
+
+        public string IFC_PARTS_SCHEDULE_SUFFIX { get; set; } = "";
+        public string IFC_PARTS_SCHEDULE_SUFFIX_TEMP {
+            get => _IFCPartsScheduleSuffixTemp;
+            set {
+                _IFCPartsScheduleSuffixTemp = value;
+                _edited = true;
+            }
+        }
+
+
+
+
+        public string REBAR_SCHEDULE_NAME { get; set; } = "!СА_Базовая";
+        public string REBAR_SCHEDULE_NAME_TEMP {
+            get => _rebarScheduleNameTemp;
+            set {
+                _rebarScheduleNameTemp = value;
+                _edited = true;
+            }
+        }
+
+        public string MATERIAL_SCHEDULE_NAME { get; set; } = "!СМ";
+        public string MATERIAL_SCHEDULE_NAME_TEMP {
+            get => _materialScheduleNameTemp;
+            set {
+                _materialScheduleNameTemp = value;
+                _edited = true;
+            }
+        }
+
+
+        public string SYSTEM_PARTS_SCHEDULE_NAME { get; set; } = "!ВД_СИС";
+        public string SYSTEM_PARTS_SCHEDULE_NAME_TEMP {
+            get => _systemPartsScheduleNameTemp;
+            set {
+                _systemPartsScheduleNameTemp = value;
+                _edited = true;
+            }
+        }
+
+        public string IFC_PARTS_SCHEDULE_NAME { get; set; } = "!ВД_IFC";
+        public string IFC_PARTS_SCHEDULE_NAME_TEMP {
+            get => _IFCPartsScheduleNameTemp;
+            set {
+                _IFCPartsScheduleNameTemp = value;
+                _edited = true;
+            }
+        }
+
+
+        public string SCHEDULE_MARK_PARAM_NAME_TEMP { get; set; } = "обр_Метка основы_универсальная";
+        public string SCHEDULE_MARK_PARAM_NAME {
+            get => _scheduleMarkParamNameTemp;
+            set {
+                _scheduleMarkParamNameTemp = value;
+                _edited = true;
+            }
+        }
+        #endregion
 
 
         public string Report {
@@ -444,6 +539,20 @@ namespace RevitPylonDocumentation.ViewModels {
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+
+
+
+
+        /// <summary>
+        /// Находим эталонные спецификации
+        /// </summary>
+        private void FindReferenceSchedules() {
+            ReferenceRebarSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(REBAR_SCHEDULE_NAME)) as ViewSchedule;
+            ReferenceMaterialSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(MATERIAL_SCHEDULE_NAME)) as ViewSchedule;
+            ReferenceSystemPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SYSTEM_PARTS_SCHEDULE_NAME)) as ViewSchedule;
+            ReferenceIFCPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(IFC_PARTS_SCHEDULE_NAME)) as ViewSchedule;
         }
 
 
@@ -503,8 +612,10 @@ namespace RevitPylonDocumentation.ViewModels {
             REBAR_SCHEDULE_SUFFIX = _rebarScheduleSuffixTemp;
             MATERIAL_SCHEDULE_PREFIX = _materialSchedulePrefixTemp;
             MATERIAL_SCHEDULE_SUFFIX = _materialScheduleSuffixTemp;
-            PARTS_SCHEDULE_PREFIX = _partsSchedulePrefixTemp;
-            PARTS_SCHEDULE_SUFFIX = _partsScheduleSuffixTemp;
+            SYSTEM_PARTS_SCHEDULE_PREFIX = _systemPartsSchedulePrefixTemp;
+            SYSTEM_PARTS_SCHEDULE_SUFFIX = _systemPartsScheduleSuffixTemp;
+            IFC_PARTS_SCHEDULE_PREFIX = _IFCPartsSchedulePrefixTemp;
+            IFC_PARTS_SCHEDULE_SUFFIX = _IFCPartsScheduleSuffixTemp;
 
             _edited = false;
 
@@ -645,7 +756,7 @@ namespace RevitPylonDocumentation.ViewModels {
             // Проверяем правила поиска спек на уникальность
             string rebSchedule = REBAR_SCHEDULE_PREFIX + REBAR_SCHEDULE_SUFFIX;
             string matSchedule = MATERIAL_SCHEDULE_PREFIX + MATERIAL_SCHEDULE_SUFFIX;
-            string partsSchedule = PARTS_SCHEDULE_PREFIX + PARTS_SCHEDULE_SUFFIX;
+            string partsSchedule = SYSTEM_PARTS_SCHEDULE_PREFIX + SYSTEM_PARTS_SCHEDULE_SUFFIX;
 
             if(rebSchedule == matSchedule || rebSchedule == partsSchedule || matSchedule == partsSchedule) {
                 ErrorText = "Правила поиска спецификаций некорректны. Задайте уникальные правила в настройках";
@@ -732,7 +843,10 @@ namespace RevitPylonDocumentation.ViewModels {
 
         private void Test(object p) {
 
+
+
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Добавление видов")) {
+
 
 
                 foreach(PylonSheetInfo hostsInfo in SelectedHostsInfo) {
@@ -773,6 +887,27 @@ namespace RevitPylonDocumentation.ViewModels {
                         hostsInfo.TransverseViewThird.ViewCreator.CreateTransverseView(SelectedViewFamilyType, 3);
                     }
 
+                    if(hostsInfo.RebarSchedule.InProjectEditableInGUI && hostsInfo.RebarSchedule.InProject) {
+
+                        hostsInfo.RebarSchedule.ViewCreator.CreateRebarSchedule();
+                    }
+
+                    if(hostsInfo.MaterialSchedule.InProjectEditableInGUI && hostsInfo.MaterialSchedule.InProject) {
+
+                        hostsInfo.MaterialSchedule.ViewCreator.CreateMaterialSchedule();
+                    }
+
+                    if(hostsInfo.SystemPartsSchedule.InProjectEditableInGUI && hostsInfo.SystemPartsSchedule.InProject) {
+
+                        hostsInfo.SystemPartsSchedule.ViewCreator.CreateSystemPartsSchedule();
+                    }
+
+                    if(hostsInfo.IFCPartsSchedule.InProjectEditableInGUI && hostsInfo.IFCPartsSchedule.InProject) {
+
+                        hostsInfo.IFCPartsSchedule.ViewCreator.CreateIFCPartsSchedule();
+                    }
+
+
 
 
                     if(hostsInfo.GeneralView.OnSheetEditableInGUI && hostsInfo.GeneralView.OnSheet) {
@@ -802,18 +937,133 @@ namespace RevitPylonDocumentation.ViewModels {
                 }
 
 
-
                 transaction.Commit();
             }
 
 
+
+            //SomeMagicFunc();
         }
 
 
 
+
+
+
+
+        public void SomeMagicFunc() {
+            Solid union = null;
+
+            Document familyDocument = null;
+
+
+            // Element selection
+            IList<Reference> selectelem = _revitRepository.ActiveUIDocument.Selection.PickObjects(ObjectType.Element);
+
+
+
+
+
+            List<Element> elems = new List<Element>();
+
+            // I don't know how to convert from reference to element.
+            foreach(Reference elem in selectelem) {
+                elems.Add(_revitRepository.Document.GetElement(elem));
+            }
+
+
+            // Solid Union
+            union = GetTargetSolids(elems);
+
+
+
+            // create a new family document using Generic Model.rft template
+            string templateFileName = @"C:\ProgramData\Autodesk\RVT 2022\Family Templates\Russian\Метрическая система, типовая модель.rft";
+
+            familyDocument = _revitRepository.UIApplication.Application.NewFamilyDocument(templateFileName);
+
+
+
+
+
+
+
+
+
+
+
+
+            // Create Generic Model
+            using(Transaction trans = new Transaction(familyDocument, "Transaction")) {
+                trans.Start();
+                FreeFormElement f = FreeFormElement.Create(familyDocument, union);
+
+                TaskDialog.Show("f", f.Id.ToString());
+                trans.Commit();
+            }
+
+            familyDocument.LoadFamily(_revitRepository.Document, new Ffffff());
+        }
+
+        public static Solid GetTargetSolids(List<Element> elements) {
+            List<Solid> solids = new List<Solid>();
+
+
+            foreach(Element elem in elements) {
+
+                Options options = new Options();
+                options.DetailLevel = ViewDetailLevel.Fine;
+                GeometryElement geomElem = elem.get_Geometry(options);
+                foreach(GeometryObject geomObj in geomElem) {
+                    if(geomObj is Solid) {
+                        Solid solid = (Solid) geomObj;
+                        if(solid.Faces.Size > 0 && solid.Volume > 0.0) {
+                            solids.Add(solid);
+                        }
+                        // Single-level recursive check of instances. If viable solids are more than
+                        // one level deep, this example ignores them.
+                    } else if(geomObj is GeometryInstance) {
+                        GeometryInstance geomInst = (GeometryInstance) geomObj;
+                        GeometryElement instGeomElem = geomInst.GetInstanceGeometry();
+                        foreach(GeometryObject instGeomObj in instGeomElem) {
+                            if(instGeomObj is Solid) {
+                                Solid solid = (Solid) instGeomObj;
+                                if(solid.Faces.Size > 0 && solid.Volume > 0.0) {
+                                    solids.Add(solid);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            Solid sss = solids[0];
+
+            for(int i = 1; i < solids.Count; i++) {
+                try {
+                    sss = BooleanOperationsUtils.ExecuteBooleanOperation(sss, solids[i], BooleanOperationsType.Union);
+                } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+
+                }
+            }
+
+
+
+            return sss;
+        }
     }
 
 
+    public class Ffffff : IFamilyLoadOptions {
+        public bool OnFamilyFound(bool familyInUse, out bool overwriteParameterValues) {
+            throw new NotImplementedException();
+        }
+
+        public bool OnSharedFamilyFound(Family sharedFamily, bool familyInUse, out FamilySource source, out bool overwriteParameterValues) {
+            throw new NotImplementedException();
+        }
+    }
 
     public class BooleanConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {

@@ -33,7 +33,8 @@ namespace RevitPylonDocumentation.Models {
 
             RebarSchedule = new PylonView(ViewModel, repository, this);
             MaterialSchedule = new PylonView(ViewModel, repository, this);
-            PartsSchedule = new PylonView(ViewModel, repository, this);
+            SystemPartsSchedule = new PylonView(ViewModel, repository, this);
+            IFCPartsSchedule = new PylonView(ViewModel, repository, this);
 
             LegendView = new PylonView(ViewModel, repository, this);
         }
@@ -72,7 +73,8 @@ namespace RevitPylonDocumentation.Models {
         // Видовые экраны спецификаций
         public PylonView RebarSchedule { get; set; }
         public PylonView MaterialSchedule { get; set; }
-        public PylonView PartsSchedule { get; set; }
+        public PylonView SystemPartsSchedule { get; set; }
+        public PylonView IFCPartsSchedule { get; set; }
 
 
         // Легенда
@@ -654,39 +656,39 @@ namespace RevitPylonDocumentation.Models {
                     continue;
                 }
 
-                if(schedule.Name == ViewModel.PARTS_SCHEDULE_PREFIX + PylonKeyName + ViewModel.PARTS_SCHEDULE_SUFFIX) {
+                if(schedule.Name == ViewModel.IFC_PARTS_SCHEDULE_PREFIX + PylonKeyName + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX) {
                     // Заполняем данные для задания
-                    PartsSchedule.ViewElement = schedule;
+                    IFCPartsSchedule.ViewElement = schedule;
                     #region Отчет
                     ViewModel.Report = string.Format("\tВедомость деталей пилона \"{0}\" для листа \"{1}\" успешно найдена",
-                        ViewModel.PARTS_SCHEDULE_PREFIX + PylonKeyName + ViewModel.PARTS_SCHEDULE_SUFFIX, PylonViewSheet.Name);
+                        ViewModel.IFC_PARTS_SCHEDULE_PREFIX + PylonKeyName + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX, PylonViewSheet.Name);
                     #endregion
                     break;
                 }
             }
             // Проверка вдруг спека не найдена
-            if(PartsSchedule.ViewElement is null) {
+            if(IFCPartsSchedule.ViewElement is null) {
                 #region Отчет
                 ViewModel.Report = string.Format("\tПроизошла ошибка! Не найдена ведомость деталей пилона \"{0}\" для листа \"{1}\"", 
-                    ViewModel.PARTS_SCHEDULE_PREFIX + PylonKeyName + ViewModel.PARTS_SCHEDULE_SUFFIX, PylonViewSheet.Name);
+                    ViewModel.IFC_PARTS_SCHEDULE_PREFIX + PylonKeyName + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX, PylonViewSheet.Name);
                 #endregion
                 return;
             }
 
             // Создаем в дефолтной точке спеку деталей пилона
-            string answer = PartsSchedule.PlaceScheduleViewport(ViewModel._revitRepository.Document, this);
+            string answer = IFCPartsSchedule.PlaceScheduleViewport(ViewModel._revitRepository.Document, this);
             if(answer.Length > 0) {
                 ViewModel.Report = answer;
             }
 
-            if(PartsSchedule.ViewportElement is null) {
+            if(IFCPartsSchedule.ViewportElement is null) {
                 #region Отчет
                 ViewModel.Report = string.Format("\tРабота с размещением ведомости деталей на листе \"{0}\" прервана", PylonViewSheet.Name);
                 #endregion
                 return;
             } else {
                 #region Отчет
-                ViewModel.Report = string.Format("\tВедомость деталей пилона \"{0}\" успешно размещена на листе \"{1}\"", PartsSchedule.ViewElement.Name, PylonViewSheet.Name);
+                ViewModel.Report = string.Format("\tВедомость деталей пилона \"{0}\" успешно размещена на листе \"{1}\"", IFCPartsSchedule.ViewElement.Name, PylonViewSheet.Name);
                 #endregion
             }
 
@@ -694,13 +696,13 @@ namespace RevitPylonDocumentation.Models {
 
             // Рассчитываем и задаем корректную точку вставки спецификации деталей пилона
             XYZ newCenter = new XYZ(
-                -UnitUtilsHelper.ConvertToInternalValue(10) - PartsSchedule.ViewportHalfWidth * 2,
-                UnitUtilsHelper.ConvertToInternalValue(100) + PartsSchedule.ViewportHalfHeight * 2,
+                -UnitUtilsHelper.ConvertToInternalValue(10) - IFCPartsSchedule.ViewportHalfWidth * 2,
+                UnitUtilsHelper.ConvertToInternalValue(100) + IFCPartsSchedule.ViewportHalfHeight * 2,
                 0);
 
-            (PartsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
+            (IFCPartsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
 
-            PartsSchedule.ViewportCenter = newCenter;
+            IFCPartsSchedule.ViewportCenter = newCenter;
 
             #region Отчет
             ViewModel.Report = string.Format("\tВедомость деталей пилона \"{0}\" спозиционирована", PylonViewSheet.Name);

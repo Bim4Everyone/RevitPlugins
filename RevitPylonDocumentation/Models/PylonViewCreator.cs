@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -10,6 +11,8 @@ using Autodesk.Revit.UI;
 using dosymep.Revit;
 
 using RevitPylonDocumentation.ViewModels;
+
+using Parameter = Autodesk.Revit.DB.Parameter;
 
 namespace RevitPylonDocumentation.Models {
     public class PylonViewCreator {
@@ -279,6 +282,124 @@ namespace RevitPylonDocumentation.Models {
             }
 
             return viewSection;
+        }
+
+
+
+
+        public void CreateRebarSchedule() {
+
+            if(ViewModel.ReferenceRebarSchedule is null || !ViewModel.ReferenceRebarSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
+
+            ElementId scheduleId = ViewModel.ReferenceRebarSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
+            if(viewSchedule is null) { return; }
+
+            viewSchedule.Name = ViewModel.REBAR_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.REBAR_SCHEDULE_SUFFIX;
+
+            // Заполняем параметр группировки
+            Parameter ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.SHEET_GROUPING);
+            if(ScheduleGroupingParameter != null) { ScheduleGroupingParameter.Set(ViewModel.SelectedProjectSection);
+            }
+
+
+
+
+            //IList<ScheduleFilter> filters = viewSchedule.Definition.GetFilters();
+            viewSchedule.Definition.ClearFilters();
+
+            ScheduleField scheduleFieldMark = null;
+            ScheduleField scheduleFieldPjSection = null;
+
+            // Ищем "обр_Метка основы_универсальная" и "обр_ФОП_Раздел проекта"
+            for(int i = 0; i < viewSchedule.Definition.GetFieldCount(); i++) {
+                ScheduleField scheduleField = viewSchedule.Definition.GetField(i);
+                if(scheduleField.GetName().Equals(ViewModel.SCHEDULE_MARK_PARAM_NAME)) {
+                    scheduleFieldMark = scheduleField;
+                }
+
+                if(scheduleField.GetName().Equals(ViewModel.PROJECT_SECTION)) {
+                    scheduleFieldPjSection = scheduleField;
+                }
+
+                if(scheduleFieldMark != null && scheduleFieldPjSection != null) {
+                    break;
+                }
+            }
+
+            if(scheduleFieldPjSection != null) {
+                ScheduleFilter scheduleFilter = new ScheduleFilter(scheduleFieldPjSection.FieldId, ScheduleFilterType.Equal, SheetInfo.ProjectSection);
+                viewSchedule.Definition.AddFilter(scheduleFilter);
+            }
+
+            if(scheduleFieldMark != null) {
+                ScheduleFilter scheduleFilter = new ScheduleFilter(scheduleFieldMark.FieldId, ScheduleFilterType.Equal, SheetInfo.PylonKeyName);
+                viewSchedule.Definition.AddFilter(scheduleFilter);
+            }
+
+
+
+
+
+
+            SheetInfo.RebarSchedule.ViewElement = viewSchedule;
+        }
+
+        public void CreateMaterialSchedule() {
+
+            if(ViewModel.ReferenceMaterialSchedule is null || !ViewModel.ReferenceMaterialSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
+
+            ElementId scheduleId = ViewModel.ReferenceMaterialSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
+            if(viewSchedule is null) { return; }
+
+            viewSchedule.Name = ViewModel.MATERIAL_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.MATERIAL_SCHEDULE_SUFFIX;
+
+            // Заполняем параметр группировки
+            Parameter ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.SHEET_GROUPING);
+            if(ScheduleGroupingParameter != null) {
+                ScheduleGroupingParameter.Set(ViewModel.SelectedProjectSection);
+            }
+
+            SheetInfo.MaterialSchedule.ViewElement = viewSchedule;
+        }
+
+        public void CreateSystemPartsSchedule() {
+
+            if(ViewModel.ReferenceSystemPartsSchedule is null || !ViewModel.ReferenceSystemPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
+
+            ElementId scheduleId = ViewModel.ReferenceSystemPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
+            if(viewSchedule is null) { return; }
+
+            viewSchedule.Name = ViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX;
+
+            // Заполняем параметр группировки
+            Parameter ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.SHEET_GROUPING);
+            if(ScheduleGroupingParameter != null) {
+                ScheduleGroupingParameter.Set(ViewModel.SelectedProjectSection);
+            }
+
+            SheetInfo.SystemPartsSchedule.ViewElement = viewSchedule;
+        }
+
+        public void CreateIFCPartsSchedule() {
+
+            if(ViewModel.ReferenceSystemPartsSchedule is null || !ViewModel.ReferenceSystemPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
+
+            ElementId scheduleId = ViewModel.ReferenceSystemPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
+            if(viewSchedule is null) { return; }
+
+            viewSchedule.Name = ViewModel.IFC_PARTS_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX;
+
+            // Заполняем параметр группировки
+            Parameter ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.SHEET_GROUPING);
+            if(ScheduleGroupingParameter != null) {
+                ScheduleGroupingParameter.Set(ViewModel.SelectedProjectSection);
+            }
+
+            SheetInfo.SystemPartsSchedule.ViewElement = viewSchedule;
         }
 
     }

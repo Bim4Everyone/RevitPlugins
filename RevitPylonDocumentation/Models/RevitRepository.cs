@@ -40,10 +40,11 @@ namespace RevitPylonDocumentation.Models {
                 .OfType<ViewSection>()
                 .ToList();
 
-        public IList<Element> AllScheduleViews => new FilteredElementCollector(Document)
+        public List<ViewSchedule> AllScheduleViews => new FilteredElementCollector(Document)
                 .OfClass(typeof(ViewSchedule))
                 .WhereElementIsNotElementType()
-                .ToElements();
+                .OfType<ViewSchedule>()
+                .ToList();
 
 
         public List<FamilySymbol> TitleBlocksInProject => new FilteredElementCollector(Document)
@@ -70,6 +71,17 @@ namespace RevitPylonDocumentation.Models {
         public List<PylonSheetInfo> HostsInfo { get; set; } = new List<PylonSheetInfo>();
 
         public List<string> HostProjectSections { get; set; } = new List<string>();
+
+
+
+        public ViewSchedule FindReferenceRebarSchedule(MainViewModel vm) {
+            
+             return AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(vm.REBAR_SCHEDULE_NAME)) as ViewSchedule;
+        }
+        public ViewSchedule FindReferenceMaterialchedule(MainViewModel vm) {
+
+            return AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(vm.MATERIAL_SCHEDULE_NAME)) as ViewSchedule;
+        }
 
 
 
@@ -121,7 +133,8 @@ namespace RevitPylonDocumentation.Models {
                         pylonSheetInfo.ProjectSection = projectSection;
                         pylonSheetInfo.HostElems.Add(elem);
                         FindSheets(mainViewModel, pylonSheetInfo);
-                        AnalizeViews(mainViewModel, pylonSheetInfo);
+                        AnalizeSectionViews(mainViewModel, pylonSheetInfo);
+                        AnalizeScheduleViews(mainViewModel, pylonSheetInfo);
 
                         HostsInfo.Add(pylonSheetInfo);
                     } else {
@@ -172,10 +185,10 @@ namespace RevitPylonDocumentation.Models {
         }
 
 
-        public void AnalizeViews(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
+        public void AnalizeSectionViews(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
 
             foreach(ViewSection view in AllSectionViews) {
-
+                // GENERAL_VIEW_PREFIX
                 if(view.Name == mainViewModel.GENERAL_VIEW_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.GENERAL_VIEW_SUFFIX) {
                     pylonSheetInfo.GeneralView.ViewElement = view;
                     pylonSheetInfo.GeneralView.InProject = true;
@@ -193,6 +206,7 @@ namespace RevitPylonDocumentation.Models {
                     }
                 }
 
+                // GENERAL_VIEW_PERPENDICULAR_PREFIX
                 if(view.Name == mainViewModel.GENERAL_VIEW_PERPENDICULAR_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.GENERAL_VIEW_PERPENDICULAR_SUFFIX) {
                     pylonSheetInfo.GeneralViewPerpendicular.ViewElement = view;
                     pylonSheetInfo.GeneralViewPerpendicular.InProject = true;
@@ -209,6 +223,7 @@ namespace RevitPylonDocumentation.Models {
                     }
                 }
 
+                // TRANSVERSE_VIEW_FIRST_PREFIX
                 if(view.Name == mainViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX) {
                     pylonSheetInfo.TransverseViewFirst.ViewElement = view;
                     pylonSheetInfo.TransverseViewFirst.InProject = true;
@@ -225,6 +240,7 @@ namespace RevitPylonDocumentation.Models {
                     }
                 }
 
+                // TRANSVERSE_VIEW_SECOND_PREFIX
                 if(view.Name == mainViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX) {
                     pylonSheetInfo.TransverseViewSecond.ViewElement = view;
                     pylonSheetInfo.TransverseViewSecond.InProject = true;
@@ -241,6 +257,7 @@ namespace RevitPylonDocumentation.Models {
                     }
                 }
 
+                // TRANSVERSE_VIEW_THIRD_PREFIX
                 if(view.Name == mainViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX) {
                     pylonSheetInfo.TransverseViewThird.ViewElement = view;
                     pylonSheetInfo.TransverseViewThird.InProject = true;
@@ -258,18 +275,97 @@ namespace RevitPylonDocumentation.Models {
                 }
 
 
-
-                //if(pylonSheetInfo.GeneralView.ViewElement != null
-                //    && pylonSheetInfo.TransverseViewFirst.ViewElement != null
-                //    && pylonSheetInfo.TransverseViewSecond.ViewElement != null
-                //    && pylonSheetInfo.TransverseViewThird.ViewElement != null) {
-                //    break;
-                //}
+                if(pylonSheetInfo.GeneralView.ViewElement != null
+                    &&  pylonSheetInfo.GeneralViewPerpendicular.ViewElement != null
+                    && pylonSheetInfo.TransverseViewFirst.ViewElement != null
+                    && pylonSheetInfo.TransverseViewSecond.ViewElement != null
+                    && pylonSheetInfo.TransverseViewThird.ViewElement != null) {
+                    break;
+                }
             }
-
-            return;
         }
 
+        public void AnalizeScheduleViews(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
+
+            foreach(ViewSchedule view in AllScheduleViews) {
+                
+                // REBAR_SCHEDULE_PREFIX
+                if(view.Name == mainViewModel.REBAR_SCHEDULE_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.REBAR_SCHEDULE_SUFFIX) {
+                    pylonSheetInfo.RebarSchedule.ViewElement = view;
+                    pylonSheetInfo.RebarSchedule.InProject = true;
+                    pylonSheetInfo.RebarSchedule.InProjectEditableInGUI = false;
+
+                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
+
+                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
+                        pylonSheetInfo.RebarSchedule.OnSheet = true;
+                        pylonSheetInfo.RebarSchedule.OnSheetEditableInGUI = false;
+
+                        // Ищем видовой экран вида на листе, собираем инфу по нему
+                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.RebarSchedule);
+                    }
+                }
+
+                // MATERIAL_SCHEDULE_PREFIX
+                if(view.Name == mainViewModel.MATERIAL_SCHEDULE_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.MATERIAL_SCHEDULE_SUFFIX) {
+                    pylonSheetInfo.MaterialSchedule.ViewElement = view;
+                    pylonSheetInfo.MaterialSchedule.InProject = true;
+                    pylonSheetInfo.MaterialSchedule.InProjectEditableInGUI = false;
+
+                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
+
+                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
+                        pylonSheetInfo.MaterialSchedule.OnSheet = true;
+                        pylonSheetInfo.MaterialSchedule.OnSheetEditableInGUI = false;
+
+                        // Ищем видовой экран вида на листе, собираем инфу по нему
+                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.MaterialSchedule);
+                    }
+                }
+
+                // SYSTEM_PARTS_SCHEDULE_PREFIX
+                if(view.Name == mainViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX) {
+                    pylonSheetInfo.SystemPartsSchedule.ViewElement = view;
+                    pylonSheetInfo.SystemPartsSchedule.InProject = true;
+                    pylonSheetInfo.SystemPartsSchedule.InProjectEditableInGUI = false;
+
+                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
+
+                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
+                        pylonSheetInfo.SystemPartsSchedule.OnSheet = true;
+                        pylonSheetInfo.SystemPartsSchedule.OnSheetEditableInGUI = false;
+
+                        // Ищем видовой экран вида на листе, собираем инфу по нему
+                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.SystemPartsSchedule);
+                    }
+                }
+
+
+                // IFC_PARTS_SCHEDULE_PREFIX
+                if(view.Name == mainViewModel.IFC_PARTS_SCHEDULE_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.IFC_PARTS_SCHEDULE_SUFFIX) {
+                    pylonSheetInfo.IFCPartsSchedule.ViewElement = view;
+                    pylonSheetInfo.IFCPartsSchedule.InProject = true;
+                    pylonSheetInfo.IFCPartsSchedule.InProjectEditableInGUI = false;
+
+                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
+
+                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
+                        pylonSheetInfo.IFCPartsSchedule.OnSheet = true;
+                        pylonSheetInfo.IFCPartsSchedule.OnSheetEditableInGUI = false;
+
+                        // Ищем видовой экран вида на листе, собираем инфу по нему
+                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.IFCPartsSchedule);
+                    }
+                }
+
+                if(pylonSheetInfo.RebarSchedule.ViewElement != null
+                    && pylonSheetInfo.MaterialSchedule.ViewElement != null
+                    && pylonSheetInfo.IFCPartsSchedule.ViewElement != null
+                    && pylonSheetInfo.SystemPartsSchedule.ViewElement != null) {
+                    break;
+                }
+            }
+        }
 
         public void GetInfoAboutViewport(ViewSheet viewSheet, PylonView pylonView) {
 

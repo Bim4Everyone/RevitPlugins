@@ -207,6 +207,84 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+
+
+                    
+                    <GridViewColumn Header="Спец-я арматуры">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox
+                                        IsChecked="{Binding Path=RebarSchedule.InProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=RebarSchedule.InProjectEditableInGUI}">
+                                    </CheckBox>
+                                    <CheckBox
+                                        IsChecked="{Binding Path=RebarSchedule.OnSheet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=RebarSchedule.OnSheetEditableInGUI}">
+                                    </CheckBox>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Спец-я материалов">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox
+                                        IsChecked="{Binding Path=MaterialSchedule.InProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=MaterialSchedule.InProjectEditableInGUI}">
+                                    </CheckBox>
+                                    <CheckBox
+                                        IsChecked="{Binding Path=MaterialSchedule.OnSheet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=MaterialSchedule.OnSheetEditableInGUI}">
+                                    </CheckBox>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Вед-ть СИС деталей">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox
+                                        IsChecked="{Binding Path=SystemPartsSchedule.InProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=SystemPartsSchedule.InProjectEditableInGUI}">
+                                    </CheckBox>
+                                    <CheckBox
+                                        IsChecked="{Binding Path=SystemPartsSchedule.OnSheet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=SystemPartsSchedule.OnSheetEditableInGUI}">
+                                    </CheckBox>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Вед-ть IFC деталей">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox
+                                        IsChecked="{Binding Path=IFCPartsSchedule.InProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=IFCPartsSchedule.InProjectEditableInGUI}">
+                                    </CheckBox>
+                                    <CheckBox
+                                        IsChecked="{Binding Path=IFCPartsSchedule.OnSheet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Margin="10 5"
+                                        IsEnabled="{Binding Path=IFCPartsSchedule.OnSheetEditableInGUI}">
+                                    </CheckBox>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
@@ -284,6 +362,8 @@
                 Margin="10"
                 Width="80"
                 Content="Тест"
+                Click="ButtonOk_Click"
+
                 Command="{Binding TestCommand}"/>
             <Button
                 Margin="10"
@@ -338,7 +418,7 @@
                                 Text="{Binding MARK_TEMP, UpdateSourceTrigger=PropertyChanged}" 
                                 Width="290" VerticalContentAlignment="Center"/>
 
-                                <Label Content="Параметр для группировки листов"/>
+                                <Label Content="Параметр для группировки листов, видов, спец-й"/>
                                 <TextBox
                                 HorizontalAlignment="Left" Margin="5 0"                        
                                 Text="{Binding SHEET_GROUPING_TEMP, UpdateSourceTrigger=PropertyChanged}" 
@@ -460,17 +540,54 @@
                                              VerticalContentAlignment="Center"/>
                                 </StackPanel>
 
-                                <Label Content="Маска поиска ведомости деталей"/>
+                                <Label Content="Маска поиска ведомости системных деталей"/>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBox Text="{Binding PARTS_SCHEDULE_PREFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                    <TextBox Text="{Binding SYSTEM_PARTS_SCHEDULE_PREFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
                                              Width="105" 
                                              VerticalContentAlignment="Center"/>
                                     <Label Content="Марка пилона"/>
-                                    <TextBox Text="{Binding PARTS_SCHEDULE_SUFFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                    <TextBox Text="{Binding SYSTEM_PARTS_SCHEDULE_SUFFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
                                              Width="105"
                                              VerticalContentAlignment="Center"/>
                                 </StackPanel>
 
+                                <Label Content="Маска поиска ведомости IFC деталей"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox Text="{Binding IFC_PARTS_SCHEDULE_PREFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="105" 
+                                             VerticalContentAlignment="Center"/>
+                                    <Label Content="Марка пилона"/>
+                                    <TextBox Text="{Binding IFC_PARTS_SCHEDULE_SUFFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="105"
+                                             VerticalContentAlignment="Center"/>
+                                </StackPanel>
+                                
+                                
+                                
+                                <Label Content="Имя для поиска спецификации армирования"/>
+                                <TextBox Text="{Binding REBAR_SCHEDULE_NAME_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="300" 
+                                             VerticalContentAlignment="Center"/>
+
+                                <Label Content="Имя для поиска спецификации материалов"/>
+                                <TextBox Text="{Binding MATERIAL_SCHEDULE_NAME_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="300" 
+                                             VerticalContentAlignment="Center"/>
+
+                                <Label Content="Имя для поиска ведомости системных деталей"/>
+                                <TextBox Text="{Binding SYSTEM_PARTS_SCHEDULE_NAME_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="300" 
+                                             VerticalContentAlignment="Center"/>
+
+                                <Label Content="Имя для поиска ведомости IFC деталей"/>
+                                <TextBox Text="{Binding IFC_PARTS_SCHEDULE_NAME_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="300" 
+                                             VerticalContentAlignment="Center"/>
+
+                                <Label Content="Имя параметра марки пилона в спеках"/>
+                                <TextBox Text="{Binding SCHEDULE_MARK_PARAM_NAME_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="300" 
+                                             VerticalContentAlignment="Center"/>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
