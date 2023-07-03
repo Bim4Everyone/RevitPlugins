@@ -4,8 +4,6 @@ using System.Linq;
 using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Configs;
-using RevitOpeningPlacement.Models.Exceptions;
-using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
@@ -24,9 +22,6 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
             var size = _max - _min;
             if(_mepCategories != null && _mepCategories.Length > 0) {
                 size += _mepCategories.Max(item => item.GetOffset(_max - _min));
-            }
-            if(size < XYZExtension.FeetRound) {
-                throw new SizeTooSmallException("Заданный габарит отверстия слишком мал");
             }
             return new DoubleParamValue(size);
         }
