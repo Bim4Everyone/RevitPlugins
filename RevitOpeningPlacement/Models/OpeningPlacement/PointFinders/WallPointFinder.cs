@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.DB;
+﻿using System;
+
+using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models.Value;
 
@@ -38,7 +40,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
                     point -= _sizeGetter.GetValue().TValue / 2 * XYZ.BasisZ;
                 }
                 return point;
-            } catch {
+            } catch(NullReferenceException) {
                 throw IntersectionNotFoundException.GetException(_clash.Element1, _clash.Element2);
             }
 
