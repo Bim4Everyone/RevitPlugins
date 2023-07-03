@@ -178,12 +178,12 @@ namespace RevitOpeningPlacement {
         private void FailureProcessor(object sender, FailuresProcessingEventArgs e) {
             FailuresAccessor fas = e.GetFailuresAccessor();
 
-            List<FailureMessageAccessor> fma = fas.GetFailureMessages().ToList();
+            List<FailureMessageAccessor> fmas = fas.GetFailureMessages().ToList();
 
-            foreach(FailureMessageAccessor fa in fma) {
-                var definition = fa.GetFailureDefinitionId();
+            foreach(FailureMessageAccessor fma in fmas) {
+                var definition = fma.GetFailureDefinitionId();
                 if(definition == BuiltInFailures.OverlapFailures.DuplicateInstances) {
-                    var ids = fa.GetFailingElementIds().Select(id => id.IntegerValue);
+                    var ids = fma.GetFailingElementIds().Select(id => id.IntegerValue);
                     foreach(var id in ids) {
                         if(!_duplicatedInstancesIds.Contains(id)) {
                             _duplicatedInstancesIds.Add(id);
