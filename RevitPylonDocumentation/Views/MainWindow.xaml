@@ -408,33 +408,42 @@
                             <StackPanel>
                                 <Label Content="Параметр раздела проекта"/>
                                 <TextBox 
-                                HorizontalAlignment="Left" Margin="5 0"
-                                Text="{Binding PROJECT_SECTION_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                Width="290" VerticalContentAlignment="Center"/>
+                                    HorizontalAlignment="Left" Margin="5 0"
+                                    Text="{Binding PROJECT_SECTION_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                    Width="290" VerticalContentAlignment="Center"/>
+
+                                                                
+                                
 
                                 <Label Content="Параметр марки пилона"/>
                                 <TextBox
-                                HorizontalAlignment="Left" Margin="5 0"
-                                Text="{Binding MARK_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                Width="290" VerticalContentAlignment="Center"/>
+                                    HorizontalAlignment="Left" Margin="5 0"
+                                    Text="{Binding MARK_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                    Width="290" VerticalContentAlignment="Center"/>
 
-                                <Label Content="Параметр для группировки листов, видов, спец-й"/>
+                                <Label Content="Параметр для группировки диспетчера 1"/>
                                 <TextBox
-                                HorizontalAlignment="Left" Margin="5 0"                        
-                                Text="{Binding SHEET_GROUPING_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                Width="290" VerticalContentAlignment="Center"/>
+                                    HorizontalAlignment="Left" Margin="5 0"                        
+                                    Text="{Binding SHEET_GROUPING_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                    Width="290" VerticalContentAlignment="Center"/>
+
+                                <Label Content="Параметр для группировки диспетчера 2"/>
+                                <TextBox
+                                    HorizontalAlignment="Left" Margin="5 0"                        
+                                    Text="{Binding SHEET_GROUPING_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                    Width="290" VerticalContentAlignment="Center"/>
 
                                 <Label Content="Параметр для формата листа"/>
                                 <TextBox
-                                HorizontalAlignment="Left" Margin="5 0"
-                                Text="{Binding SHEET_SIZE_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                Width="290" VerticalContentAlignment="Center"/>
+                                    HorizontalAlignment="Left" Margin="5 0"
+                                    Text="{Binding SHEET_SIZE_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                    Width="290" VerticalContentAlignment="Center"/>
 
                                 <Label Content="Параметр для множителя формата листа"/>
                                 <TextBox
-                                HorizontalAlignment="Left" Margin="5 0"
-                                Text="{Binding SHEET_COEFFICIENT_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                Width="290" VerticalContentAlignment="Center"/>
+                                    HorizontalAlignment="Left" Margin="5 0"
+                                    Text="{Binding SHEET_COEFFICIENT_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                    Width="290" VerticalContentAlignment="Center"/>
                             </StackPanel>
                         </GroupBox>
 
@@ -569,25 +578,116 @@
                                              Width="300" 
                                              VerticalContentAlignment="Center"/>
 
+                                <Label Content="В параметр диспетчера 1"/>
+                                <TextBox Text="{Binding REBAR_SCHEDULE_DISP1_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="300" 
+                                             VerticalContentAlignment="Center"/>
+                                <Label Content="В параметр диспетчера 2"/>
+                                <TextBox Text="{Binding REBAR_SCHEDULE_DISP2_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="300" 
+                                             VerticalContentAlignment="Center"/>
+
+
                                 <Label Content="Имя для поиска спецификации материалов"/>
                                 <TextBox Text="{Binding MATERIAL_SCHEDULE_NAME_TEMP, UpdateSourceTrigger=PropertyChanged}" 
                                              Width="300" 
                                              VerticalContentAlignment="Center"/>
 
+                                <Label Content="В параметр диспетчера 1"/>
+                                <TextBox Text="{Binding MATERIAL_SCHEDULE_DISP1_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="300" 
+                                             VerticalContentAlignment="Center"/>
+                                <Label Content="В параметр диспетчера 2"/>
+                                <TextBox Text="{Binding MATERIAL_SCHEDULE_DISP2_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="300" 
+                                             VerticalContentAlignment="Center"/>
+
+                                
                                 <Label Content="Имя для поиска ведомости системных деталей"/>
                                 <TextBox Text="{Binding SYSTEM_PARTS_SCHEDULE_NAME_TEMP, UpdateSourceTrigger=PropertyChanged}" 
                                              Width="300" 
                                              VerticalContentAlignment="Center"/>
 
+                                <Label Content="В параметр диспетчера 1"/>
+                                <TextBox Text="{Binding SYSTEM_PARTS_SCHEDULE_DISP1_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="300" 
+                                             VerticalContentAlignment="Center"/>
+                                <Label Content="В параметр диспетчера 2"/>
+                                <TextBox Text="{Binding SYSTEM_PARTS_SCHEDULE_DISP2_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="300" 
+                                             VerticalContentAlignment="Center"/>
+                                
+                                
                                 <Label Content="Имя для поиска ведомости IFC деталей"/>
                                 <TextBox Text="{Binding IFC_PARTS_SCHEDULE_NAME_TEMP, UpdateSourceTrigger=PropertyChanged}" 
                                              Width="300" 
                                              VerticalContentAlignment="Center"/>
 
-                                <Label Content="Имя параметра марки пилона в спеках"/>
-                                <TextBox Text="{Binding SCHEDULE_MARK_PARAM_NAME_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                <Label Content="В параметр диспетчера 1"/>
+                                <TextBox Text="{Binding IFC_PARTS_SCHEDULE_DISP1_TEMP, UpdateSourceTrigger=PropertyChanged}" 
                                              Width="300" 
                                              VerticalContentAlignment="Center"/>
+                                <Label Content="В параметр диспетчера 2"/>
+                                <TextBox Text="{Binding IFC_PARTS_SCHEDULE_DISP2_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="300" 
+                                             VerticalContentAlignment="Center"/>
+                                
+                               
+
+
+                                <Label Content="Список параметров фильтрации для спеки"/>
+                                <ListView
+                                        ItemsSource="{Binding ParamsForScheduleFilters, UpdateSourceTrigger=PropertyChanged}"
+                                        Margin="5 0">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn>
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <CheckBox
+                                                            IsChecked="{Binding Path=IsCheck}"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Header="Поле в спеке">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBox 
+                                                                Text="{Binding Path=ParamNameInSchedule, UpdateSourceTrigger=PropertyChanged}"
+                                                                Width="200"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Header="Параметр в основе">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBox 
+                                                                Text="{Binding Path=ParamNameInHost, UpdateSourceTrigger=PropertyChanged}"
+                                                                Width="200"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button
+                                        Grid.Column="0"
+                                        Margin="0 5 3 0"
+                                        Content="Добавить"
+                                        Command="{Binding AddScheduleFilterParamCommand}"/>
+                                    <Button
+                                        Grid.Column="1"
+                                        Margin="3 5 3 0"
+                                        Content="Удалить"
+                                        Command="{Binding DeleteScheduleFilterParamCommand}"/>
+                                </Grid>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>

@@ -297,53 +297,122 @@ namespace RevitPylonDocumentation.Models {
 
             viewSchedule.Name = ViewModel.REBAR_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.REBAR_SCHEDULE_SUFFIX;
 
-            // Заполняем параметр группировки
-            Parameter ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.SHEET_GROUPING);
-            if(ScheduleGroupingParameter != null) { ScheduleGroupingParameter.Set(ViewModel.SelectedProjectSection);
-            }
+
+
+            SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.REBAR_SCHEDULE_DISP1);
+            SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.REBAR_SCHEDULE_DISP2);
 
 
 
 
-            //IList<ScheduleFilter> filters = viewSchedule.Definition.GetFilters();
-            viewSchedule.Definition.ClearFilters();
+            //// Заполняем параметр группировки 1
+            //Parameter ScheduleGroupingParameter1 = viewSchedule.LookupParameter(ViewModel.DISPATCHER_GROUPING_FIRST);
+            //Parameter HostGroupingParameterValue1 = SheetInfo.HostElems[0].LookupParameter(ViewModel.REBAR_SCHEDULE_DISP1);
 
-            ScheduleField scheduleFieldMark = null;
-            ScheduleField scheduleFieldPjSection = null;
+            //string GroupingParameterValue1 = string.Empty;
 
-            // Ищем "обр_Метка основы_универсальная" и "обр_ФОП_Раздел проекта"
-            for(int i = 0; i < viewSchedule.Definition.GetFieldCount(); i++) {
-                ScheduleField scheduleField = viewSchedule.Definition.GetField(i);
-                if(scheduleField.GetName().Equals(ViewModel.SCHEDULE_MARK_PARAM_NAME)) {
-                    scheduleFieldMark = scheduleField;
-                }
+            //// Если такого параметра нет, значит просто записываем то, что записал пользователь
+            //if(HostGroupingParameterValue1 is null) {
+            //    GroupingParameterValue1 = ViewModel.REBAR_SCHEDULE_DISP1;
+            //} else {
+            //    // Иначе получаем значение этого параметра из пилона
+            //    GroupingParameterValue1 = HostGroupingParameterValue1.AsValueString();
+            //}
 
-                if(scheduleField.GetName().Equals(ViewModel.PROJECT_SECTION)) {
-                    scheduleFieldPjSection = scheduleField;
-                }
+            //if(ScheduleGroupingParameter1 != null && ScheduleGroupingParameter1.StorageType == StorageType.String) { 
+            //    ScheduleGroupingParameter1.Set(GroupingParameterValue1);
+            //}
 
-                if(scheduleFieldMark != null && scheduleFieldPjSection != null) {
-                    break;
-                }
-            }
 
-            if(scheduleFieldPjSection != null) {
-                ScheduleFilter scheduleFilter = new ScheduleFilter(scheduleFieldPjSection.FieldId, ScheduleFilterType.Equal, SheetInfo.ProjectSection);
-                viewSchedule.Definition.AddFilter(scheduleFilter);
-            }
 
-            if(scheduleFieldMark != null) {
-                ScheduleFilter scheduleFilter = new ScheduleFilter(scheduleFieldMark.FieldId, ScheduleFilterType.Equal, SheetInfo.PylonKeyName);
-                viewSchedule.Definition.AddFilter(scheduleFilter);
-            }
+            //// Заполняем параметр группировки 2
+            //ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.DISPATCHER_GROUPING_SECOND);
+            //if(ScheduleGroupingParameter != null) {
+            //    ScheduleGroupingParameter.Set("!СА_Пилоны");
+            //}
 
 
 
 
 
+
+
+
+            // Задаем фильтры спецификации
+            SetScheduleFilters(viewSchedule);
 
             SheetInfo.RebarSchedule.ViewElement = viewSchedule;
         }
+
+
+
+        public void SetDispatcherParameter(ViewSchedule viewSchedule, string dispGroupingParam, string hostDispGroupingParam) {
+
+            Parameter ScheduleGroupingParameter = viewSchedule.LookupParameter(dispGroupingParam);
+            Parameter HostGroupingParameterValue = SheetInfo.HostElems[0].LookupParameter(hostDispGroupingParam);
+
+            string GroupingParameterValue = string.Empty;
+
+            // Если такого параметра нет, значит просто записываем то, что записал пользователь
+            if(HostGroupingParameterValue is null) {
+                GroupingParameterValue = hostDispGroupingParam;
+            } else {
+                // Иначе получаем значение этого параметра из пилона
+                GroupingParameterValue = HostGroupingParameterValue.AsValueString();
+            }
+
+            if(ScheduleGroupingParameter != null && ScheduleGroupingParameter.StorageType == StorageType.String) {
+                ScheduleGroupingParameter.Set(GroupingParameterValue);
+            }
+        }
+
+
+
+
+        public void SetScheduleFilters(ViewSchedule viewSchedule) {
+
+            ScheduleDefinition scheduleDefinition = viewSchedule.Definition;
+
+            IList<ScheduleFilter> viewScheduleFilters = scheduleDefinition.GetFilters();
+
+            // Идем в обратном порядке, т.к. удаление фильтра происходит по НОМЕРУ фильтра в общем списке в спеке
+            // Поэтому, если идти прямо, то номера сдивгаются
+            for(int i = viewScheduleFilters.Count - 1; i >= 0; i--) {
+                ScheduleFilter currentFilter = viewScheduleFilters[i];
+
+                // Получаем поле спеки из фильтра
+                ScheduleField scheduleFieldFromFilter = scheduleDefinition.GetField(currentFilter.FieldId);
+
+                // Определяем есть ли параметр фильтра в списке нужных
+                ScheduleFilterParamHelper filterParam = ViewModel.ParamsForScheduleFilters
+                    .FirstOrDefault(item => item.ParamNameInSchedule.Equals(scheduleFieldFromFilter.GetName()));
+
+                // Если его нет в списке нужных - удаляем
+                if(filterParam is null) {
+                    scheduleDefinition.RemoveFilter(i);
+                } else {
+                    // Если параметр есть в списке нужных, то пытаемся найти соответствующий параметр в пилоне
+                    Parameter paramInHost = SheetInfo.HostElems[0].LookupParameter(filterParam.ParamNameInHost);
+                    if(paramInHost is null) {
+                        continue;
+                    }
+
+                    // Если он есть в пилоне, то задаем значение как в соответствующем параметре пилона
+                    if(currentFilter.IsDoubleValue) {
+                        currentFilter.SetValue(paramInHost.AsDouble());
+                    } else if(currentFilter.IsIntegerValue) {
+                        currentFilter.SetValue(paramInHost.AsInteger());
+                    } else if(currentFilter.IsElementIdValue) {
+                        currentFilter.SetValue(paramInHost.AsElementId());
+                    } else {
+                        currentFilter.SetValue(paramInHost.AsValueString());
+                    }
+
+                    scheduleDefinition.SetFilter(i, currentFilter);
+                }
+            }
+        }
+
 
         public void CreateMaterialSchedule() {
 
@@ -355,10 +424,16 @@ namespace RevitPylonDocumentation.Models {
 
             viewSchedule.Name = ViewModel.MATERIAL_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.MATERIAL_SCHEDULE_SUFFIX;
 
-            // Заполняем параметр группировки
-            Parameter ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.SHEET_GROUPING);
+            // Заполняем параметр группировки 1
+            Parameter ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.DISPATCHER_GROUPING_FIRST);
             if(ScheduleGroupingParameter != null) {
                 ScheduleGroupingParameter.Set(ViewModel.SelectedProjectSection);
+            }
+
+            // Заполняем параметр группировки 2
+            ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.DISPATCHER_GROUPING_SECOND);
+            if(ScheduleGroupingParameter != null) {
+                ScheduleGroupingParameter.Set("СМ_Пилоны");
             }
 
             SheetInfo.MaterialSchedule.ViewElement = viewSchedule;
@@ -374,10 +449,16 @@ namespace RevitPylonDocumentation.Models {
 
             viewSchedule.Name = ViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX;
 
-            // Заполняем параметр группировки
-            Parameter ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.SHEET_GROUPING);
+            // Заполняем параметр группировки 1
+            Parameter ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.DISPATCHER_GROUPING_FIRST);
             if(ScheduleGroupingParameter != null) {
                 ScheduleGroupingParameter.Set(ViewModel.SelectedProjectSection);
+            }
+
+            // Заполняем параметр группировки 2
+            ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.DISPATCHER_GROUPING_SECOND);
+            if(ScheduleGroupingParameter != null) {
+                ScheduleGroupingParameter.Set("ВД_СИС_Пилоны");
             }
 
             SheetInfo.SystemPartsSchedule.ViewElement = viewSchedule;
@@ -393,10 +474,16 @@ namespace RevitPylonDocumentation.Models {
 
             viewSchedule.Name = ViewModel.IFC_PARTS_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX;
 
-            // Заполняем параметр группировки
-            Parameter ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.SHEET_GROUPING);
+            // Заполняем параметр группировки 1
+            Parameter ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.DISPATCHER_GROUPING_FIRST);
             if(ScheduleGroupingParameter != null) {
                 ScheduleGroupingParameter.Set(ViewModel.SelectedProjectSection);
+            }
+
+            // Заполняем параметр группировки 2
+            ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.DISPATCHER_GROUPING_SECOND);
+            if(ScheduleGroupingParameter != null) {
+                ScheduleGroupingParameter.Set("ВД_IFC_Пилоны");
             }
 
             SheetInfo.SystemPartsSchedule.ViewElement = viewSchedule;

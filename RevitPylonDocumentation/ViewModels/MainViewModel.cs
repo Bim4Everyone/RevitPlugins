@@ -52,7 +52,8 @@ namespace RevitPylonDocumentation.ViewModels {
 
         private string _projectSectionTemp = "обр_ФОП_Раздел проекта";
         private string _markTemp = "Марка";
-        private string _sheetGroupingTemp = "_Группа видов 1";
+        private string _dispatcherGroupingFirstTemp = "_Группа видов 1";
+        private string _dispatcherGroupingSecondTemp = "_Группа видов 1";
         private string _sheetSizeTemp = "А";
         private string _sheetCoefficientTemp = "х";
 
@@ -83,12 +84,21 @@ namespace RevitPylonDocumentation.ViewModels {
         private string _materialScheduleNameTemp = "!СМ";
         private string _systemPartsScheduleNameTemp = "!ВД_СИС";
         private string _IFCPartsScheduleNameTemp = "!ВД_IFC";
-        private string _scheduleMarkParamNameTemp = "обр_Метка основы_универсальная";
+        //private string _scheduleMarkParamNameTemp = "обр_Метка основы_универсальная";
 
+        private string _rebarScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
+        private string _rebarScheduleDisp2Temp = "!СА_Пилоны";
+        private string _materialScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
+        private string _materialScheduleDisp2Temp = "СМ_Пилоны";
+        private string _systemPartsScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
+        private string _systemPartsScheduleDisp2Temp = "ВД_СИС_Пилоны";
+        private string _IFCPartsScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
+        private string _IFCPartsScheduleDisp2Temp = "ВД_IFC_Пилоны";
 
         public static string DEF_TITLEBLOCK_NAME = "Создать типы по комплектам";
 
         private List<PylonSheetInfo> _selectedHostsInfo = new List<PylonSheetInfo>();
+        private ScheduleFilterParamHelper _selectedScheduleFilterParam;
 
 
 
@@ -132,7 +142,11 @@ namespace RevitPylonDocumentation.ViewModels {
 
             CreateSheetsCommand = new RelayCommand(CreateSheets, CanCreateSheets);
             ApplySettingsCommands = new RelayCommand(ApplySettings, CanApplySettings);
+
+            AddScheduleFilterParamCommand = new RelayCommand(AddScheduleFilterParam);
+            DeleteScheduleFilterParamCommand = new RelayCommand(DeleteScheduleFilterParam, CanChangeScheduleFilterParam);
         }
+
 
 
 
@@ -143,12 +157,21 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
 
+
+        public ICommand AddScheduleFilterParamCommand { get; }
+        public ICommand DeleteScheduleFilterParamCommand { get; }
+
+
+
+
+
         /// <summary>
         /// Список всех комплектов документации (по ум. обр_ФОП_Раздел проекта)
         /// </summary>
         public ObservableCollection<string> ProjectSections { get; set; } = new ObservableCollection<string>();
 
         public ObservableCollection<PylonSheetInfo> HostsInfo { get; set; } = new ObservableCollection<PylonSheetInfo>();
+
 
 
 
@@ -256,16 +279,23 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-
-        public string SHEET_GROUPING { get; set; } = "_Группа видов 1";
-        public string SHEET_GROUPING_TEMP {
-            get => _sheetGroupingTemp;
+        // dispatcher grouping
+        public string DISPATCHER_GROUPING_FIRST { get; set; } = "_Группа видов 1";
+        public string DISPATCHER_GROUPING_FIRST_TEMP {
+            get => _dispatcherGroupingFirstTemp;
             set {
-                _sheetGroupingTemp = value;
+                _dispatcherGroupingFirstTemp = value;
                 _edited = true;
             }
         }
-
+        public string DISPATCHER_GROUPING_SECOND { get; set; } = "_Группа видов 2";
+        public string DISPATCHER_GROUPING_SECOND_TEMP {
+            get => _dispatcherGroupingSecondTemp;
+            set {
+                _dispatcherGroupingSecondTemp = value;
+                _edited = true;
+            }
+        }
 
         public string SHEET_SIZE { get; set; } = "А";
         public string SHEET_SIZE_TEMP {
@@ -517,14 +547,102 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-        public string SCHEDULE_MARK_PARAM_NAME_TEMP { get; set; } = "обр_Метка основы_универсальная";
-        public string SCHEDULE_MARK_PARAM_NAME {
-            get => _scheduleMarkParamNameTemp;
+        //public string SCHEDULE_MARK_PARAM_NAME { get; set; } = "обр_Метка основы_универсальная";
+        //public string SCHEDULE_MARK_PARAM_NAME_TEMP {
+        //    get => _scheduleMarkParamNameTemp;
+        //    set {
+        //        _scheduleMarkParamNameTemp = value;
+        //        _edited = true;
+        //    }
+        //}
+
+        public string REBAR_SCHEDULE_DISP1 { get; set; } = "обр_ФОП_Раздел проекта";
+        public string REBAR_SCHEDULE_DISP1_TEMP {
+            get => _rebarScheduleDisp1Temp;
             set {
-                _scheduleMarkParamNameTemp = value;
+                _rebarScheduleDisp1Temp = value;
                 _edited = true;
             }
         }
+        public string MATERIAL_SCHEDULE_DISP1 { get; set; } = "обр_ФОП_Раздел проекта";
+        public string MATERIAL_SCHEDULE_DISP1_TEMP {
+            get => _materialScheduleDisp1Temp;
+            set {
+                _materialScheduleDisp1Temp = value;
+                _edited = true;
+            }
+        }
+        public string SYSTEM_PARTS_SCHEDULE_DISP1 { get; set; } = "обр_ФОП_Раздел проекта";
+        public string SYSTEM_PARTS_SCHEDULE_DISP1_TEMP {
+            get => _systemPartsScheduleDisp1Temp;
+            set {
+                _systemPartsScheduleDisp1Temp = value;
+                _edited = true;
+            }
+        }
+        public string IFC_PARTS_SCHEDULE_DISP1 { get; set; } = "обр_ФОП_Раздел проекта";
+        public string IFC_PARTS_SCHEDULE_DISP1_TEMP {
+            get => _IFCPartsScheduleDisp1Temp;
+            set {
+                _IFCPartsScheduleDisp1Temp = value;
+                _edited = true;
+            }
+        }
+
+
+
+        public string REBAR_SCHEDULE_DISP2 { get; set; } = "!СА_Пилоны";
+        public string REBAR_SCHEDULE_DISP2_TEMP {
+            get => _rebarScheduleDisp2Temp;
+            set {
+                _rebarScheduleDisp2Temp = value;
+                _edited = true;
+            }
+        }
+        public string MATERIAL_SCHEDULE_DISP2 { get; set; } = "СМ_Пилоны";
+        public string MATERIAL_SCHEDULE_DISP2_TEMP {
+            get => _materialScheduleDisp2Temp;
+            set {
+                _materialScheduleDisp2Temp = value;
+                _edited = true;
+            }
+        }
+        public string SYSTEM_PARTS_SCHEDULE_DISP2 { get; set; } = "ВД_СИС_Пилоны";
+        public string SYSTEM_PARTS_SCHEDULE_DISP2_TEMP {
+            get => _systemPartsScheduleDisp2Temp;
+            set {
+                _systemPartsScheduleDisp2Temp = value;
+                _edited = true;
+            }
+        }
+        public string IFC_PARTS_SCHEDULE_DISP2 { get; set; } = "ВД_IFC_Пилоны";
+        public string IFC_PARTS_SCHEDULE_DISP2_TEMP {
+            get => _IFCPartsScheduleDisp2Temp;
+            set {
+                _IFCPartsScheduleDisp2Temp = value;
+                _edited = true;
+            }
+        }
+
+        private ObservableCollection<ScheduleFilterParamHelper> _paramsForScheduleFilters = new ObservableCollection<ScheduleFilterParamHelper>() {
+            new ScheduleFilterParamHelper("обр_ФОП_Форма_номер", ""),
+            new ScheduleFilterParamHelper("обр_ФОП_Раздел проекта", "обр_ФОП_Раздел проекта"),
+            new ScheduleFilterParamHelper("обр_Метка основы_универсальная", "Марка"),
+            new ScheduleFilterParamHelper("обр_ФОП_Орг. уровень", "обр_ФОП_Орг. уровень")
+        };
+
+        public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFilters {
+            get => _paramsForScheduleFilters;
+            set {
+                _paramsForScheduleFilters = value;
+                _edited = true;
+            }
+        }
+
+        //public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFilters { get; set; } = new ObservableCollection<ScheduleFilterParamHelper> {
+        //    new ScheduleFilterParamHelper("обр_ФОП_Раздел проекта", "обр_ФОП_Раздел проекта"),
+        //    new ScheduleFilterParamHelper("обр_Метка основы_универсальная", "Марка")
+        //};
         #endregion
 
 
@@ -595,7 +713,7 @@ namespace RevitPylonDocumentation.ViewModels {
             // Устанавливаем флаг, что применили параметры и перезаписываем параметры
             PROJECT_SECTION = _projectSectionTemp;
             MARK = _markTemp;
-            SHEET_GROUPING= _sheetGroupingTemp;
+            DISPATCHER_GROUPING_FIRST = _dispatcherGroupingFirstTemp;
             SHEET_SIZE = _sheetSizeTemp;
             SHEET_COEFFICIENT = _sheetCoefficientTemp;
             GENERAL_VIEW_PREFIX = _generalViewPrefixTemp;
@@ -689,15 +807,15 @@ namespace RevitPylonDocumentation.ViewModels {
                 viewSheet.Name = "Пилон " + sheetKeyName;
 
 
-                Autodesk.Revit.DB.Parameter viewSheetGroupingParameter = viewSheet.LookupParameter(SHEET_GROUPING);
+                Autodesk.Revit.DB.Parameter viewSheetGroupingParameter = viewSheet.LookupParameter(DISPATCHER_GROUPING_FIRST);
                 if(viewSheetGroupingParameter == null) {
                     #region Отчет
-                    Report = "\tПараметр \"" + SHEET_GROUPING + "\" не заполнен, т.к. не был найден у листа";
+                    Report = "\tПараметр \"" + DISPATCHER_GROUPING_FIRST + "\" не заполнен, т.к. не был найден у листа";
                     #endregion
                 } else {
                     viewSheetGroupingParameter.Set(SelectedProjectSection);
                     #region Отчет
-                    Report = "\tГруппировка по параметру \"" + SHEET_GROUPING + "\": " + SelectedProjectSection;
+                    Report = "\tГруппировка по параметру \"" + DISPATCHER_GROUPING_FIRST + "\": " + SelectedProjectSection;
                     #endregion
                 }
 
@@ -1051,6 +1169,53 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
             return sss;
+        }
+
+
+
+
+        /// <summary>
+        /// Добавляет новое имя параметра фильтра спецификаций в настройках плагина
+        /// </summary>
+        /// <param name="p"></param>
+        private void AddScheduleFilterParam(object p) {
+
+            ParamsForScheduleFilters.Add(new ScheduleFilterParamHelper("Введите название", "Введите название"));
+        }
+
+        /// <summary>
+        /// Удаляет выбранное имя параметра фильтра спецификаций в настройках плагина
+        /// </summary>
+        /// <param name="p"></param>
+        private void DeleteScheduleFilterParam(object p) {
+
+            List <ScheduleFilterParamHelper> forDel= new List <ScheduleFilterParamHelper>();
+
+            foreach(ScheduleFilterParamHelper param in ParamsForScheduleFilters) {
+                if(param.IsCheck) {
+                    forDel.Add(param);
+                }
+            }
+
+            foreach(ScheduleFilterParamHelper param in forDel) {
+                ParamsForScheduleFilters.Remove(param);
+            }
+        }
+
+        /// <summary>
+        /// Определяет можно ли выбранное имя параметра фильтра спецификаций в настройках плагина
+        /// True, если выбрана штриховка в списке штриховок в настройках плагина
+        /// </summary>
+        /// <param name="p"></param>
+        private bool CanChangeScheduleFilterParam(object p) {
+            
+            foreach(ScheduleFilterParamHelper param in ParamsForScheduleFilters) {
+                if(param.IsCheck) {
+                    return true;
+                }
+            }
+            
+            return false;
         }
     }
 

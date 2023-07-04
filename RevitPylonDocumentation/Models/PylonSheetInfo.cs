@@ -92,7 +92,7 @@ namespace RevitPylonDocumentation.Models {
             PylonViewSheet.Name = ViewModel.SHEET_PREFIX + PylonKeyName + ViewModel.SHEET_SUFFIX;
 
 
-            Parameter viewSheetGroupingParameter = PylonViewSheet.LookupParameter(ViewModel.SHEET_GROUPING);
+            Parameter viewSheetGroupingParameter = PylonViewSheet.LookupParameter(ViewModel.DISPATCHER_GROUPING_FIRST);
             if(viewSheetGroupingParameter == null) {
             } else {
                 viewSheetGroupingParameter.Set(ViewModel.SelectedProjectSection);
