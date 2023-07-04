@@ -5,7 +5,6 @@ using Autodesk.Revit.DB;
 using RevitClashDetective.Models.Clashes;
 
 using RevitOpeningPlacement.Models.Exceptions;
-using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement {
@@ -44,7 +43,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         public FamilyInstance Place() {
             XYZ point;
             try {
-                point = PointFinder.GetPoint().Round();
+                point = PointFinder.GetPoint();
             } catch(IntersectionNotFoundException) {
                 throw new OpeningNotPlacedException("Не удалось найти точку вставки");
             }
