@@ -8,7 +8,7 @@ using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
-    internal class WidthValueGetter : IValueGetter<DoubleParamValue> {
+    internal class WidthValueGetter : RoundValueGetter, IValueGetter<DoubleParamValue> {
         private readonly MEPCurve _curve;
         private readonly MepCategory _categoryOptions;
 
@@ -20,8 +20,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         public DoubleParamValue GetValue() {
             var width = _curve.GetWidth();
             width += _categoryOptions.GetOffset(width);
+            var roundWidth = RoundFeetToMillimeters(width, _categoryOptions.Rounding);
 
-            return new DoubleParamValue(width);
+            return new DoubleParamValue(roundWidth);
         }
     }
 }

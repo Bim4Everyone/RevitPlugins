@@ -3,26 +3,36 @@ using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models.Value;
 
+using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
-    internal class InclinedSizeValueGetter : IValueGetter<DoubleParamValue> {
+    internal class InclinedSizeValueGetter : RoundValueGetter, IValueGetter<DoubleParamValue> {
         private readonly MepCurveClash<Wall> _clash;
         private readonly Plane _plane;
         private readonly IValueGetter<DoubleParamValue> _sizeValueGetter;
         private readonly IDirectionsGetter _directionsGetter;
+        private readonly MepCategory _mepCategory;
 
-        public InclinedSizeValueGetter(MepCurveClash<Wall> clash, IValueGetter<DoubleParamValue> sizeValueGetter, Plane plane, IDirectionsGetter directionsGetter) {
+        public InclinedSizeValueGetter(
+            MepCurveClash<Wall> clash,
+            IValueGetter<DoubleParamValue> sizeValueGetter,
+            Plane plane,
+            IDirectionsGetter directionsGetter,
+            MepCategory mepCategory) {
+
             _clash = clash;
             _sizeValueGetter = sizeValueGetter;
             _plane = plane;
             _directionsGetter = directionsGetter;
+            _mepCategory = mepCategory;
         }
 
         public DoubleParamValue GetValue() {
             var size = GetSize();
-            return new DoubleParamValue(size);
+            var roundSize = RoundFeetToMillimeters(size, _mepCategory.Rounding);
+            return new DoubleParamValue(roundSize);
         }
 
         private double GetSize() {
