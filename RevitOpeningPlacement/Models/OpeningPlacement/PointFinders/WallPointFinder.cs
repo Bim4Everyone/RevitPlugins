@@ -7,11 +7,16 @@ using RevitClashDetective.Models.Value;
 using RevitOpeningPlacement.Models.Exceptions;
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
-    internal class WallPointFinder : IPointFinder {
+    internal class WallPointFinder : RoundValueGetter, IPointFinder {
         private readonly MepCurveClash<Wall> _clash;
         private readonly IValueGetter<DoubleParamValue> _sizeGetter;
+        /// <summary>
+        /// Округление высотной отметки отверстия в мм
+        /// </summary>
+        private const int _heightRound = 10;
 
         public WallPointFinder(MepCurveClash<Wall> clash, IValueGetter<DoubleParamValue> sizeGetter = null) {
             _clash = clash;
@@ -39,11 +44,11 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
                 if(_sizeGetter != null) {
                     point -= _sizeGetter.GetValue().TValue / 2 * XYZ.BasisZ;
                 }
-                return point;
+                var zRoundCoordinate = RoundFeetToMillimeters(point.Z, _heightRound);
+                return new XYZ(point.X, point.Y, zRoundCoordinate);
             } catch(NullReferenceException) {
                 throw IntersectionNotFoundException.GetException(_clash.Element1, _clash.Element2);
             }
-
         }
     }
 }

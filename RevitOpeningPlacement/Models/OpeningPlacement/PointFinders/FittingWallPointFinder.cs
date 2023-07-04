@@ -1,8 +1,6 @@
 ﻿
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
-
 using RevitClashDetective.Models.Extensions;
 using RevitClashDetective.Models.Value;
 
@@ -11,10 +9,14 @@ using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
-    internal class FittingWallPointFinder : IPointFinder {
+    internal class FittingWallPointFinder : RoundValueGetter, IPointFinder {
         private readonly FittingClash<Wall> _clash;
         private readonly IAngleFinder _angleFinder;
         private readonly IValueGetter<DoubleParamValue> _sizeGetter;
+        /// <summary>
+        /// Округление высотной отметки отверстия в мм
+        /// </summary>
+        private const int _heightRound = 10;
 
         public FittingWallPointFinder(FittingClash<Wall> clash, IAngleFinder angleFinder, IValueGetter<DoubleParamValue> sizeGetter = null) {
             _clash = clash;
@@ -36,6 +38,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
             if(_sizeGetter != null) {
                 z = center.Z - _sizeGetter.GetValue().TValue / 2;
             }
+            z = RoundFeetToMillimeters(z, _heightRound);
 
             //проекция центра на грань стены
             var sizeInit = new WallOpeningSizeInitializer(transformedSolid);
