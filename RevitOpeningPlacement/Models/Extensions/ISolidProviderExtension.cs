@@ -15,12 +15,17 @@ namespace RevitOpeningPlacement.Models.Extensions {
         /// <summary>
         /// Точность для определения расстояний и координат 1 мм.
         /// </summary>
-        private static double _toleranceDistance => 1 / 304.8;
+        private const double _toleranceDistance = 1 / 304.8;
 
         /// <summary>
         /// Точность для определения объемов 1 см3
         /// </summary>
-        private static double _toleranceVolume => (10 / 304.8) * (10 / 304.8) * (10 / 304.8);
+        private const double _toleranceVolume = (10 / 304.8) * (10 / 304.8) * (10 / 304.8);
+
+        /// <summary>
+        /// Процент толерантности объемов солидов
+        /// </summary>
+        private const double _toleranceVolumePercentage = 0.01;
 
 
         /// <summary>
@@ -121,7 +126,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
 
         /// <summary>
         /// Проверяет на равенство текущего <see cref="ISolidProvider">ISolidProvider</see> и поданного <see cref="Solid"/>
-        /// Под равенством понимается равенство объемов с точностью до 1 см3 и равенство координат ограничивающих <see cref="BoundingBoxXYZ"/> 
+        /// Под равенством понимается равенство объемов с точностью до 1% и равенство координат ограничивающих <see cref="BoundingBoxXYZ"/> 
         /// с точностью до <paramref name="tolerance"/> в единицах длины Revit (футах)
         /// </summary>
         /// <param name="solidProvider">Текущий <see cref="ISolidProvider">ISolidProvider</see></param>
@@ -143,11 +148,20 @@ namespace RevitOpeningPlacement.Models.Extensions {
             return BBoxesEqual(thisSolidBBox, otherSolidBBox, tolerance);
         }
 
+        /// <summary>
+        /// Проверяет объемы солидов на равенство.
+        /// Если абсолютная разность объемов солидов не превышает 1% объема меньшего солида, возвращается True, иначе False
+        /// </summary>
+        /// <param name="solid1"></param>
+        /// <param name="solid2"></param>
+        /// <returns></returns>
         private static bool SolidsVolumesEqual(Solid solid1, Solid solid2) {
             if((solid1 is null) || (solid2 is null)) {
                 return false;
             }
-            return Math.Abs(solid1.Volume - solid2.Volume) <= _toleranceVolume;
+            var minVolume = Math.Min(solid1.Volume, solid2.Volume);
+            var volumeTolerance = minVolume * _toleranceVolumePercentage;
+            return Math.Abs(solid1.Volume - solid2.Volume) <= volumeTolerance;
         }
 
         private static bool BBoxesEqual(BoundingBoxXYZ bbox1, BoundingBoxXYZ bbox2) {
