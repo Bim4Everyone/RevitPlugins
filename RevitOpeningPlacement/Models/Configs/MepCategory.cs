@@ -12,6 +12,11 @@ namespace RevitOpeningPlacement.Models.Configs {
         public List<StructureCategory> Intersections { get; set; } = new List<StructureCategory>();
         public int Rounding { get; set; }
 
+        /// <summary>
+        /// Возвращает значение отступа (суммарно с двух сторон) от габаритов элемента инженерной системы в единицах Revit
+        /// </summary>
+        /// <param name="size">Габарит инженерного элемента</param>
+        /// <returns></returns>
         public double GetOffset(double size) {
             return Offsets.Select(item => item.GetTransformedToInternalUnit())
                 .FirstOrDefault(item => item.From <= size && item.To >= size)?.OffsetValue * 2 ?? 0;
