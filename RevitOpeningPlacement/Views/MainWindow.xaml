@@ -14,6 +14,7 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     x:Name="_this"
+     d:DesignHeight="750"
     Height="600" Width="1300"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">

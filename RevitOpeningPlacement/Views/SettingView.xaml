@@ -11,7 +11,7 @@
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance vm:MepCategoryViewModel, IsDesignTimeCreatable=False}"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="750" d:DesignWidth="800">
     <Grid>
 
         <Grid.RowDefinitions>
