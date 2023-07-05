@@ -89,7 +89,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
             foreach(var filterProvider in _fittingFilterProviders) {
                 var mepFilter = GetFittingFilter(filterProvider.Key, filterProvider.Value);
-                var categories = _categories.GetCategoties(filterProvider.Key).ToArray();
+                var categories = _categories.GetCategories(filterProvider.Key).ToArray();
                 placers.AddRange(GetFittingPlacers(mepFilter,
                     structureFilter,
                     structureCheckerFunc.Invoke(categories),

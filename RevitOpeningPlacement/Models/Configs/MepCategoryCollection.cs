@@ -16,7 +16,7 @@ namespace RevitOpeningPlacement.Models.Configs {
         public IEnumerator<MepCategory> GetEnumerator() => Categories.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
-        public IEnumerable<MepCategory> GetCategoties(FittingCategoryEnum fittingCategory) {
+        public IEnumerable<MepCategory> GetCategories(FittingCategoryEnum fittingCategory) {
             switch(fittingCategory) {
                 case FittingCategoryEnum.PipeFitting: {
                     yield return this[MepCategoryEnum.Pipe];
