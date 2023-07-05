@@ -205,10 +205,6 @@ namespace RevitOpeningPlacement.Models {
         public DocTypeEnum GetDocumentType() {
             var bimModelPartsService = GetPlatformService<IBimModelPartsService>();
 
-            if(bimModelPartsService.GetBimModelPart(_document) == null) {
-                return DocTypeEnum.NotDefined;
-            }
-
             if(bimModelPartsService.InAnyBimModelParts(_document, BimModelPart.ARPart)) {
                 return DocTypeEnum.AR;
             }
