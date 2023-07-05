@@ -142,7 +142,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         }
 
         private Filter GetRectangleMepFilter(MepCategoryEnum category, Func<RevitClashDetective.Models.RevitRepository, double, double, Filter> filterProvider) {
-            var minSizes = _categories[MepCategoryEnum.CableTray]?.MinSizes;
+            var minSizes = _categories[category]?.MinSizes;
             if(minSizes != null) {
                 var height = minSizes[Parameters.Height];
                 var width = minSizes[Parameters.Width];
