@@ -70,8 +70,11 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         private List<OpeningPlacer> GetRoundMepPlacers(Filter structureFilter, IClashChecker structureChecker, IMepCurvePlacerInitializer placerInitializer) {
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
             foreach(var filterProvider in _roundMepFilterProviders) {
-                var mepFilter = GetRoundMepFilter(filterProvider.Key, filterProvider.Value);
-                placers.AddRange(GetMepPlacers(mepFilter, structureFilter, structureChecker, _categories[filterProvider.Key], placerInitializer));
+                MepCategory mepCategory = _categories[filterProvider.Key];
+                if(mepCategory.IsSelected && MepCategoryIntersectionWithStructureCategoryEnabled(mepCategory, structureFilter.Name)) {
+                    var mepFilter = GetRoundMepFilter(filterProvider.Key, filterProvider.Value);
+                    placers.AddRange(GetMepPlacers(mepFilter, structureFilter, structureChecker, _categories[filterProvider.Key], placerInitializer));
+                }
             };
             return placers;
         }
@@ -79,8 +82,11 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         private List<OpeningPlacer> GetRectangleMepPlacers(Filter structureFilter, IClashChecker structureChecker, IMepCurvePlacerInitializer placerInitializer) {
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
             foreach(var filterProvider in _rectangleMepFilterProviders) {
-                var mepFilter = GetRectangleMepFilter(filterProvider.Key, filterProvider.Value);
-                placers.AddRange(GetMepPlacers(mepFilter, structureFilter, structureChecker, _categories[filterProvider.Key], placerInitializer));
+                MepCategory mepCategory = _categories[filterProvider.Key];
+                if(mepCategory.IsSelected && MepCategoryIntersectionWithStructureCategoryEnabled(mepCategory, structureFilter.Name)) {
+                    var mepFilter = GetRectangleMepFilter(filterProvider.Key, filterProvider.Value);
+                    placers.AddRange(GetMepPlacers(mepFilter, structureFilter, structureChecker, _categories[filterProvider.Key], placerInitializer));
+                }
             };
             return placers;
         }
@@ -90,11 +96,15 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             foreach(var filterProvider in _fittingFilterProviders) {
                 var mepFilter = GetFittingFilter(filterProvider.Key, filterProvider.Value);
                 var categories = _categories.GetCategories(filterProvider.Key).ToArray();
-                placers.AddRange(GetFittingPlacers(mepFilter,
-                    structureFilter,
-                    structureCheckerFunc.Invoke(categories),
-                    placerInitializer,
-                    categories));
+                foreach(var category in categories) {
+                    if(category.IsSelected && MepCategoryIntersectionWithStructureCategoryEnabled(category, structureFilter.Name)) {
+                        placers.AddRange(GetFittingPlacers(mepFilter,
+                            structureFilter,
+                            structureCheckerFunc.Invoke(categories),
+                            placerInitializer,
+                            category));
+                    }
+                }
             };
             return placers;
         }
@@ -145,6 +155,19 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
 
         private Filter GetFittingFilter(FittingCategoryEnum category, Func<RevitClashDetective.Models.RevitRepository, Filter> filterProvider) {
             return filterProvider.Invoke(_revitRepository.GetClashRevitRepository());
+        }
+
+
+        /// <summary>
+        /// Проверяет, включена ли расстановка отверстий в местах пересечений заданной категории элементов инженерных систем с элементами заданной категории конструкций
+        /// </summary>
+        /// <param name="mepCategory">Настройки расстановки отверстий для категории инженерных элементов</param>
+        /// <param name="structureCategoryName">Название категории конструкций</param>
+        /// <returns>True, если в настройках расстановки включена проверка на пересечения с заданной категорией конструкций, иначе False</returns>
+        private bool MepCategoryIntersectionWithStructureCategoryEnabled(MepCategory mepCategory, string structureCategoryName) {
+            return mepCategory.Intersections.Any(intersection =>
+                intersection.IsSelected
+                && intersection.Name.Equals(structureCategoryName));
         }
     }
 }
