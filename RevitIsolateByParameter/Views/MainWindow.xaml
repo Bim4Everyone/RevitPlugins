@@ -37,6 +37,7 @@
 
         <TextBlock
             Grid.Row="0"
+            Grid.Column="0"
             Margin="10,5"
             Grid.ColumnSpan="3"
             VerticalAlignment="Bottom"
@@ -44,6 +45,7 @@
         
         <ComboBox 
             Grid.Row="1"
+            Grid.Column="0"
             Margin="10,5"
             Height="25"
             Grid.ColumnSpan="3"
@@ -60,20 +62,21 @@
 
         <TextBlock
             Grid.Row="2"
+            Grid.Column="0"
             Margin="10,5"
             Grid.ColumnSpan="3"
             VerticalAlignment="Bottom"
             Text="Значения выбранного параметра:"/>
 
         <ComboBox
-            Grid.Row="3"    
+            Grid.Row="3"
+            Grid.Column="0"
             Margin="10,5,0,5"
             Height="25"
             VerticalAlignment="Center"
             ItemsSource="{Binding ParameterValues}"
             SelectedIndex="{Binding SelectedIndex}"
             SelectedItem="{Binding SelectedValue}"/>
-
 
         <Button
             Grid.Row="3"

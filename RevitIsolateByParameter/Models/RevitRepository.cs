@@ -33,59 +33,57 @@ namespace RevitIsolateByParameter.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        public ObservableCollection<ParameterElement> GetParameters() {
-            ObservableCollection<ParameterElement> parameters = new ObservableCollection<ParameterElement>();
+        public ObservableCollection<SharedParam> GetParameters() {
+            ObservableCollection<SharedParam> parameters = new ObservableCollection<SharedParam>();
 
             if(SharedParamsConfig.Instance.BuildingWorksLevel.IsExistsParam(Document))
-                parameters.Add(SharedParamsConfig.Instance.BuildingWorksLevel.GetRevitParamElement(Document));
+                parameters.Add(SharedParamsConfig.Instance.BuildingWorksLevel);
             if(SharedParamsConfig.Instance.BuildingWorksSection.IsExistsParam(Document)) 
-                parameters.Add(SharedParamsConfig.Instance.BuildingWorksSection.GetRevitParamElement(Document));
+                parameters.Add(SharedParamsConfig.Instance.BuildingWorksSection);
             if(SharedParamsConfig.Instance.BuildingWorksBlock.IsExistsParam(Document)) 
-                parameters.Add(SharedParamsConfig.Instance.BuildingWorksBlock.GetRevitParamElement(Document));
+                parameters.Add(SharedParamsConfig.Instance.BuildingWorksBlock);
 
             return parameters;
         }
 
-        public List<ElementId> GetFilteredElements(ParameterElement parameter, string selectedValue) {
+        public List<ElementId> GetFilteredElements(SharedParam parameter, string selectedValue) {
             if(selectedValue == ParameterNoValueText)
                 selectedValue = null;
             View activeView = Document.ActiveView;
             IList<Element> elements = new FilteredElementCollector(Document, activeView.Id).ToElements();
-            string paramName = parameter.GetDefinition().Name;
 
             List<ElementId> filteredElements = elements
-                .Where(x => x.IsExistsParam(paramName))
-                .Where(x => (string) x.GetParamValue(paramName) == selectedValue)
+                .Where(x => x.IsExistsParam(parameter))
+                .Where(x => x.GetParamValue<string>(parameter) == selectedValue)
                 .Select(x => x.Id)
                 .ToList();
 
             return filteredElements;
         }
 
-        public Dictionary<string, List<string>> GetParameterValues(ObservableCollection<ParameterElement> parameters) {
+        public Dictionary<string, List<string>> GetParameterValues(ObservableCollection<SharedParam> parameters) {
             View activeView = Document.ActiveView;
             IList<Element> elements = new FilteredElementCollector(Document, activeView.Id).ToElements();
             
             Dictionary<string, List<string>> parametersValues = new Dictionary<string, List<string>>();
 
             foreach(var parameter in parameters) { 
-                string paramName = parameter.GetDefinition().Name;
 
                 List<string> values = elements
-                    .Where(x => x.IsExistsParam(paramName))
-                    .Select(x => (string)x.GetParamValue(paramName))
+                    .Where(x => x.IsExistsParam(parameter))
+                    .Select(x => x.GetParamValue<string>(parameter))
                     .Select(x => x ?? ParameterNoValueText)
                     .Distinct()
                     .OrderBy(i => i)
                     .ToList();
 
-                parametersValues.Add(paramName, values);
+                parametersValues.Add(parameter.Name, values);
             }
 
             return parametersValues;
         }
 
-        public async Task IsolateElements(ParameterElement parameter, string selectedValue) {
+        public async Task IsolateElements(SharedParam parameter, string selectedValue) {
             _revitEventHandler.TransactAction = () => {
 
                 using(Transaction t = Document.StartTransaction("Изолировать элементы")) {

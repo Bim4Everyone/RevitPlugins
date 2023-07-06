@@ -10,13 +10,14 @@ using RevitIsolateByParameter.Models;
 using System.Windows.Input;
 using System.Collections.ObjectModel;
 using System.Windows;
+using dosymep.Bim4Everyone.SharedParams;
 
 namespace RevitIsolateByParameter.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
-        private ParameterElement _selectedParameter;
+        private SharedParam _selectedParameter;
         private string _selectedValue;
         private int _selectedIndex;
 
@@ -43,11 +44,11 @@ namespace RevitIsolateByParameter.ViewModels {
         public ICommand SelectNextCommand { get; }
         public ICommand SelectPreviousCommand { get; }
 
-        public ParameterElement SelectedParameter {
+        public SharedParam SelectedParameter {
             get => _selectedParameter;
             set => RaiseAndSetIfChanged(ref _selectedParameter, value);
         }
-        public ObservableCollection<ParameterElement> Parameters { get; }
+        public ObservableCollection<SharedParam> Parameters { get; }
         public Dictionary<string, List<string>> ParametersValues { get; }
 
         public List<string> ParameterValues { get; set; } = new List<string>();
@@ -63,7 +64,7 @@ namespace RevitIsolateByParameter.ViewModels {
         }
         
         public void GetPossibleValues(object p) {
-            ParameterValues = ParametersValues[SelectedParameter.GetDefinition().Name];
+            ParameterValues = ParametersValues[SelectedParameter.Name];
             OnPropertyChanged(nameof(ParameterValues));
         }
 
