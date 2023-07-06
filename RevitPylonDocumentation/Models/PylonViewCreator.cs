@@ -297,45 +297,9 @@ namespace RevitPylonDocumentation.Models {
 
             viewSchedule.Name = ViewModel.REBAR_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.REBAR_SCHEDULE_SUFFIX;
 
-
-
+            // Задаем сортировку
             SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.REBAR_SCHEDULE_DISP1);
             SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.REBAR_SCHEDULE_DISP2);
-
-
-
-
-            //// Заполняем параметр группировки 1
-            //Parameter ScheduleGroupingParameter1 = viewSchedule.LookupParameter(ViewModel.DISPATCHER_GROUPING_FIRST);
-            //Parameter HostGroupingParameterValue1 = SheetInfo.HostElems[0].LookupParameter(ViewModel.REBAR_SCHEDULE_DISP1);
-
-            //string GroupingParameterValue1 = string.Empty;
-
-            //// Если такого параметра нет, значит просто записываем то, что записал пользователь
-            //if(HostGroupingParameterValue1 is null) {
-            //    GroupingParameterValue1 = ViewModel.REBAR_SCHEDULE_DISP1;
-            //} else {
-            //    // Иначе получаем значение этого параметра из пилона
-            //    GroupingParameterValue1 = HostGroupingParameterValue1.AsValueString();
-            //}
-
-            //if(ScheduleGroupingParameter1 != null && ScheduleGroupingParameter1.StorageType == StorageType.String) { 
-            //    ScheduleGroupingParameter1.Set(GroupingParameterValue1);
-            //}
-
-
-
-            //// Заполняем параметр группировки 2
-            //ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.DISPATCHER_GROUPING_SECOND);
-            //if(ScheduleGroupingParameter != null) {
-            //    ScheduleGroupingParameter.Set("!СА_Пилоны");
-            //}
-
-
-
-
-
-
 
 
             // Задаем фильтры спецификации
@@ -343,6 +307,73 @@ namespace RevitPylonDocumentation.Models {
 
             SheetInfo.RebarSchedule.ViewElement = viewSchedule;
         }
+
+        public void CreateMaterialSchedule() {
+
+            if(ViewModel.ReferenceMaterialSchedule is null || !ViewModel.ReferenceMaterialSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
+
+            ElementId scheduleId = ViewModel.ReferenceMaterialSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
+            if(viewSchedule is null) { return; }
+
+            viewSchedule.Name = ViewModel.MATERIAL_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.MATERIAL_SCHEDULE_SUFFIX;
+
+
+            // Задаем сортировку
+            SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.MATERIAL_SCHEDULE_DISP1);
+            SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.MATERIAL_SCHEDULE_DISP2);
+
+
+            // Задаем фильтры спецификации
+            SetScheduleFilters(viewSchedule);
+
+            SheetInfo.MaterialSchedule.ViewElement = viewSchedule;
+        }
+
+        public void CreateSystemPartsSchedule() {
+
+            if(ViewModel.ReferenceSystemPartsSchedule is null || !ViewModel.ReferenceSystemPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
+
+            ElementId scheduleId = ViewModel.ReferenceSystemPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
+            if(viewSchedule is null) { return; }
+
+            viewSchedule.Name = ViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX;
+
+
+            // Задаем сортировку
+            SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.SYSTEM_PARTS_SCHEDULE_DISP1);
+            SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.SYSTEM_PARTS_SCHEDULE_DISP2);
+
+
+            // Задаем фильтры спецификации
+            SetScheduleFilters(viewSchedule);
+
+            SheetInfo.SystemPartsSchedule.ViewElement = viewSchedule;
+        }
+
+        public void CreateIFCPartsSchedule() {
+
+            if(ViewModel.ReferenceIFCPartsSchedule is null || !ViewModel.ReferenceIFCPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
+
+            ElementId scheduleId = ViewModel.ReferenceIFCPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
+            if(viewSchedule is null) { return; }
+
+            viewSchedule.Name = ViewModel.IFC_PARTS_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX;
+            
+            
+            // Задаем сортировку
+            SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.IFC_PARTS_SCHEDULE_DISP1);
+            SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.IFC_PARTS_SCHEDULE_DISP2);
+
+
+            // Задаем фильтры спецификации
+            SetScheduleFilters(viewSchedule);
+
+            SheetInfo.IFCPartsSchedule.ViewElement = viewSchedule;
+        }
+
 
 
 
@@ -365,9 +396,6 @@ namespace RevitPylonDocumentation.Models {
                 ScheduleGroupingParameter.Set(GroupingParameterValue);
             }
         }
-
-
-
 
         public void SetScheduleFilters(ViewSchedule viewSchedule) {
 
@@ -411,82 +439,6 @@ namespace RevitPylonDocumentation.Models {
                     scheduleDefinition.SetFilter(i, currentFilter);
                 }
             }
-        }
-
-
-        public void CreateMaterialSchedule() {
-
-            if(ViewModel.ReferenceMaterialSchedule is null || !ViewModel.ReferenceMaterialSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
-
-            ElementId scheduleId = ViewModel.ReferenceMaterialSchedule.Duplicate(ViewDuplicateOption.Duplicate);
-            ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
-            if(viewSchedule is null) { return; }
-
-            viewSchedule.Name = ViewModel.MATERIAL_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.MATERIAL_SCHEDULE_SUFFIX;
-
-            // Заполняем параметр группировки 1
-            Parameter ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.DISPATCHER_GROUPING_FIRST);
-            if(ScheduleGroupingParameter != null) {
-                ScheduleGroupingParameter.Set(ViewModel.SelectedProjectSection);
-            }
-
-            // Заполняем параметр группировки 2
-            ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.DISPATCHER_GROUPING_SECOND);
-            if(ScheduleGroupingParameter != null) {
-                ScheduleGroupingParameter.Set("СМ_Пилоны");
-            }
-
-            SheetInfo.MaterialSchedule.ViewElement = viewSchedule;
-        }
-
-        public void CreateSystemPartsSchedule() {
-
-            if(ViewModel.ReferenceSystemPartsSchedule is null || !ViewModel.ReferenceSystemPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
-
-            ElementId scheduleId = ViewModel.ReferenceSystemPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
-            ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
-            if(viewSchedule is null) { return; }
-
-            viewSchedule.Name = ViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX;
-
-            // Заполняем параметр группировки 1
-            Parameter ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.DISPATCHER_GROUPING_FIRST);
-            if(ScheduleGroupingParameter != null) {
-                ScheduleGroupingParameter.Set(ViewModel.SelectedProjectSection);
-            }
-
-            // Заполняем параметр группировки 2
-            ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.DISPATCHER_GROUPING_SECOND);
-            if(ScheduleGroupingParameter != null) {
-                ScheduleGroupingParameter.Set("ВД_СИС_Пилоны");
-            }
-
-            SheetInfo.SystemPartsSchedule.ViewElement = viewSchedule;
-        }
-
-        public void CreateIFCPartsSchedule() {
-
-            if(ViewModel.ReferenceSystemPartsSchedule is null || !ViewModel.ReferenceSystemPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
-
-            ElementId scheduleId = ViewModel.ReferenceSystemPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
-            ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
-            if(viewSchedule is null) { return; }
-
-            viewSchedule.Name = ViewModel.IFC_PARTS_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX;
-
-            // Заполняем параметр группировки 1
-            Parameter ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.DISPATCHER_GROUPING_FIRST);
-            if(ScheduleGroupingParameter != null) {
-                ScheduleGroupingParameter.Set(ViewModel.SelectedProjectSection);
-            }
-
-            // Заполняем параметр группировки 2
-            ScheduleGroupingParameter = viewSchedule.LookupParameter(ViewModel.DISPATCHER_GROUPING_SECOND);
-            if(ScheduleGroupingParameter != null) {
-                ScheduleGroupingParameter.Set("ВД_IFC_Пилоны");
-            }
-
-            SheetInfo.SystemPartsSchedule.ViewElement = viewSchedule;
         }
 
     }

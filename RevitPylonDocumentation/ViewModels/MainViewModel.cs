@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Linq;
 
+using Autodesk.AdvanceSteel.CADAccess;
 using Autodesk.AdvanceSteel.Modelling;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
@@ -30,6 +31,7 @@ using MS.WindowsAPICodePack.Internal;
 
 using RevitPylonDocumentation.Models;
 
+using Transaction = Autodesk.Revit.DB.Transaction;
 using Transform = Autodesk.Revit.DB.Transform;
 using View = Autodesk.Revit.DB.View;
 using Wall = Autodesk.Revit.DB.Wall;
@@ -683,8 +685,15 @@ namespace RevitPylonDocumentation.ViewModels {
             ProjectSections.Clear();
             ErrorText = string.Empty;
 
-            _revitRepository.GetHostData(this);
+            using(Transaction transaction = _revitRepository.Document.StartTransaction("Добавление видов")) {
 
+                _revitRepository.GetHostData(this);
+
+                transaction.RollBack();
+                //transaction.Commit();
+            }
+
+            
 
             HostsInfo = new ObservableCollection<PylonSheetInfo>(_revitRepository.HostsInfo);
             ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
@@ -965,8 +974,6 @@ namespace RevitPylonDocumentation.ViewModels {
 
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Добавление видов")) {
 
-
-
                 foreach(PylonSheetInfo hostsInfo in SelectedHostsInfo) {
                     //try {
 
@@ -979,6 +986,8 @@ namespace RevitPylonDocumentation.ViewModels {
 
                         hostsInfo.CreateSheet();
                     }
+
+
 
                     if(hostsInfo.GeneralView.InProjectEditableInGUI && hostsInfo.GeneralView.InProject) {
 
@@ -1051,6 +1060,26 @@ namespace RevitPylonDocumentation.ViewModels {
                     if(hostsInfo.TransverseViewThird.OnSheetEditableInGUI && hostsInfo.TransverseViewThird.OnSheet) {
 
                         hostsInfo.TransverseViewThird.ViewPlacer.PlaceTransverseThirdViewPorts();
+                    }
+
+                    if(hostsInfo.RebarSchedule.OnSheetEditableInGUI && hostsInfo.RebarSchedule.OnSheet) {
+
+                        hostsInfo.RebarSchedule.ViewPlacer.PlaceRebarSchedule();
+                    }
+
+                    if(hostsInfo.MaterialSchedule.OnSheetEditableInGUI && hostsInfo.MaterialSchedule.OnSheet) {
+
+                        hostsInfo.MaterialSchedule.ViewPlacer.PlaceMaterialSchedule();
+                    }
+
+                    if(hostsInfo.SystemPartsSchedule.OnSheetEditableInGUI && hostsInfo.SystemPartsSchedule.OnSheet) {
+
+                        hostsInfo.SystemPartsSchedule.ViewPlacer.PlaceSystemPartsSchedule();
+                    }
+
+                    if(hostsInfo.IFCPartsSchedule.OnSheetEditableInGUI && hostsInfo.IFCPartsSchedule.OnSheet) {
+
+                        hostsInfo.IFCPartsSchedule.ViewPlacer.PlaceIFCPartsSchedule();
                     }
                 }
 

@@ -188,7 +188,7 @@ namespace RevitPylonDocumentation.Models {
         public void AnalizeSectionViews(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
 
             foreach(ViewSection view in AllSectionViews) {
-                // GENERAL_VIEW_PREFIX
+                // GENERAL_VIEW
                 if(view.Name == mainViewModel.GENERAL_VIEW_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.GENERAL_VIEW_SUFFIX) {
                     pylonSheetInfo.GeneralView.ViewElement = view;
                     pylonSheetInfo.GeneralView.InProject = true;
@@ -203,10 +203,12 @@ namespace RevitPylonDocumentation.Models {
 
                         // Ищем видовой экран вида на листе, собираем инфу по нему
                         GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.GeneralView);
+
+                        
                     }
                 }
 
-                // GENERAL_VIEW_PERPENDICULAR_PREFIX
+                // GENERAL_VIEW_PERPENDICULAR
                 if(view.Name == mainViewModel.GENERAL_VIEW_PERPENDICULAR_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.GENERAL_VIEW_PERPENDICULAR_SUFFIX) {
                     pylonSheetInfo.GeneralViewPerpendicular.ViewElement = view;
                     pylonSheetInfo.GeneralViewPerpendicular.InProject = true;
@@ -223,7 +225,7 @@ namespace RevitPylonDocumentation.Models {
                     }
                 }
 
-                // TRANSVERSE_VIEW_FIRST_PREFIX
+                // TRANSVERSE_VIEW_FIRST
                 if(view.Name == mainViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX) {
                     pylonSheetInfo.TransverseViewFirst.ViewElement = view;
                     pylonSheetInfo.TransverseViewFirst.InProject = true;
@@ -240,7 +242,7 @@ namespace RevitPylonDocumentation.Models {
                     }
                 }
 
-                // TRANSVERSE_VIEW_SECOND_PREFIX
+                // TRANSVERSE_VIEW_SECOND
                 if(view.Name == mainViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX) {
                     pylonSheetInfo.TransverseViewSecond.ViewElement = view;
                     pylonSheetInfo.TransverseViewSecond.InProject = true;
@@ -257,7 +259,7 @@ namespace RevitPylonDocumentation.Models {
                     }
                 }
 
-                // TRANSVERSE_VIEW_THIRD_PREFIX
+                // TRANSVERSE_VIEW_THIRD
                 if(view.Name == mainViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX) {
                     pylonSheetInfo.TransverseViewThird.ViewElement = view;
                     pylonSheetInfo.TransverseViewThird.InProject = true;
@@ -289,74 +291,32 @@ namespace RevitPylonDocumentation.Models {
 
             foreach(ViewSchedule view in AllScheduleViews) {
                 
-                // REBAR_SCHEDULE_PREFIX
+                // REBAR_SCHEDULE
                 if(view.Name == mainViewModel.REBAR_SCHEDULE_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.REBAR_SCHEDULE_SUFFIX) {
-                    pylonSheetInfo.RebarSchedule.ViewElement = view;
-                    pylonSheetInfo.RebarSchedule.InProject = true;
-                    pylonSheetInfo.RebarSchedule.InProjectEditableInGUI = false;
+                    // Нашли спеку армирования с нужным названием в проекте
 
-                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
-
-                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
-                        pylonSheetInfo.RebarSchedule.OnSheet = true;
-                        pylonSheetInfo.RebarSchedule.OnSheetEditableInGUI = false;
-
-                        // Ищем видовой экран вида на листе, собираем инфу по нему
-                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.RebarSchedule);
-                    }
+                    CheckSchedule(pylonSheetInfo.RebarSchedule, view);
                 }
 
-                // MATERIAL_SCHEDULE_PREFIX
+                // MATERIAL_SCHEDULE
                 if(view.Name == mainViewModel.MATERIAL_SCHEDULE_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.MATERIAL_SCHEDULE_SUFFIX) {
-                    pylonSheetInfo.MaterialSchedule.ViewElement = view;
-                    pylonSheetInfo.MaterialSchedule.InProject = true;
-                    pylonSheetInfo.MaterialSchedule.InProjectEditableInGUI = false;
 
-                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
-
-                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
-                        pylonSheetInfo.MaterialSchedule.OnSheet = true;
-                        pylonSheetInfo.MaterialSchedule.OnSheetEditableInGUI = false;
-
-                        // Ищем видовой экран вида на листе, собираем инфу по нему
-                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.MaterialSchedule);
-                    }
+                    CheckSchedule(pylonSheetInfo.MaterialSchedule, view);
                 }
 
-                // SYSTEM_PARTS_SCHEDULE_PREFIX
+                // SYSTEM_PARTS_SCHEDULE
                 if(view.Name == mainViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX) {
-                    pylonSheetInfo.SystemPartsSchedule.ViewElement = view;
-                    pylonSheetInfo.SystemPartsSchedule.InProject = true;
-                    pylonSheetInfo.SystemPartsSchedule.InProjectEditableInGUI = false;
 
-                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
-
-                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
-                        pylonSheetInfo.SystemPartsSchedule.OnSheet = true;
-                        pylonSheetInfo.SystemPartsSchedule.OnSheetEditableInGUI = false;
-
-                        // Ищем видовой экран вида на листе, собираем инфу по нему
-                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.SystemPartsSchedule);
-                    }
+                    CheckSchedule(pylonSheetInfo.SystemPartsSchedule, view);
                 }
 
 
-                // IFC_PARTS_SCHEDULE_PREFIX
+                // IFC_PARTS_SCHEDULE
                 if(view.Name == mainViewModel.IFC_PARTS_SCHEDULE_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.IFC_PARTS_SCHEDULE_SUFFIX) {
-                    pylonSheetInfo.IFCPartsSchedule.ViewElement = view;
-                    pylonSheetInfo.IFCPartsSchedule.InProject = true;
-                    pylonSheetInfo.IFCPartsSchedule.InProjectEditableInGUI = false;
 
-                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
-
-                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
-                        pylonSheetInfo.IFCPartsSchedule.OnSheet = true;
-                        pylonSheetInfo.IFCPartsSchedule.OnSheetEditableInGUI = false;
-
-                        // Ищем видовой экран вида на листе, собираем инфу по нему
-                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.IFCPartsSchedule);
-                    }
+                    CheckSchedule(pylonSheetInfo.IFCPartsSchedule, view);
                 }
+
 
                 if(pylonSheetInfo.RebarSchedule.ViewElement != null
                     && pylonSheetInfo.MaterialSchedule.ViewElement != null
@@ -367,29 +327,83 @@ namespace RevitPylonDocumentation.Models {
             }
         }
 
+
+
+
+        public void CheckSchedule(PylonView pylonView, ViewSchedule view) {
+
+            PylonSheetInfo pylonSheetInfo = pylonView.SheetInfo;
+
+            pylonView.ViewElement = view;
+            pylonView.InProject = true;
+            pylonView.InProjectEditableInGUI = false;
+
+            // Находим через зависимые элементы вида видовой экран на листе
+            ElementId viewportId = view.GetDependentElements(new ElementClassFilter(typeof(ScheduleSheetInstance))).FirstOrDefault();
+            if(viewportId is null) { return; }
+
+            ScheduleSheetInstance viewport = Document.GetElement(viewportId) as ScheduleSheetInstance;
+            ElementId sheetId = viewport.OwnerViewId;
+
+            if(pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Id.Equals(sheetId)) {
+                pylonView.OnSheet = true;
+                pylonView.OnSheetEditableInGUI = false;
+
+                // Запоминаем инфо по видовому экрану вида на листе
+
+                pylonSheetInfo.RebarSchedule.ViewportElement = viewport;
+
+                pylonSheetInfo.RebarSchedule.ViewPlacer.GetAndWriteScheduleViewportInfo(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.RebarSchedule, viewport);
+            }
+        }
+
+
+
         public void GetInfoAboutViewport(ViewSheet viewSheet, PylonView pylonView) {
 
-            // Ищем видовой экран вида на листе
-            Viewport viewport = new FilteredElementCollector(Document, viewSheet.Id)
-                .OfClass(typeof(Viewport))
-                .WhereElementIsNotElementType()
-                .FirstOrDefault(item =>
-                    item.OwnerViewId.Equals(pylonView.ViewElement.Id)) as Viewport;
+            // Находим через зависимые элементы вида видовые экраны на листах
+            // У вида есть по два видовых экрана. Чтобы получить правильный - сравниваем с id листа
+            Viewport viewport = pylonView.ViewElement
+                .GetDependentElements(new ElementClassFilter(typeof(Viewport)))
+                .Select(id => Document.GetElement(id) as Viewport)
+                .FirstOrDefault(vp => vp.OwnerViewId == viewSheet.Id);
 
-            // Вообще мы уже выяснили, что видЭкран вида на листе есть, но на всякий
+
+
+            // Если видовой экран на листе есть, то получаем из него инфу
             if(viewport != null) {
                 pylonView.ViewportElement = viewport;
 
-                // !!!!!!!!!!!!!!!! Добавить метод по выключению разрезов и осей (в т.ч. через шаблон вида), а затем по возвращению значения
+                Categories categories = Document.Settings.Categories;
+
+                // Определяем скрыты ли категории
+                bool sectionsHidden = pylonView.ViewElement.GetCategoryHidden(categories.get_Item(BuiltInCategory.OST_Sections).Id);
+                bool gridsHidden = pylonView.ViewElement.GetCategoryHidden(categories.get_Item(BuiltInCategory.OST_Grids).Id);
+                bool levelsHidden = pylonView.ViewElement.GetCategoryHidden(categories.get_Item(BuiltInCategory.OST_Levels).Id);
+
+                // Скрытие категории Разразы, Оси и Уровни
+                pylonView.ViewPlacer.SetSectionCategoryVisibility(pylonView.ViewElement, new List<BuiltInCategory> {
+                    BuiltInCategory.OST_Sections,
+                    BuiltInCategory.OST_Grids,
+                    BuiltInCategory.OST_Levels
+                }, false);
+
 
                 // Получение центра и габаритов видового экрана
                 XYZ viewportCenter = viewport.GetBoxCenter();
                 Outline viewportOutline = viewport.GetBoxOutline();
-                double viewportHalfWidth = viewportOutline.MaximumPoint.X;
-                double viewportHalfHeight = viewportOutline.MaximumPoint.Y;
+                double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
+                double viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
 
+                pylonView.ViewportCenter = viewportCenter;
                 pylonView.ViewportHalfWidth = viewportHalfWidth;
                 pylonView.ViewportHalfHeight = viewportHalfHeight;
+
+
+                // Возвращаем видимость как было
+                pylonView.ViewPlacer.SetSectionCategoryVisibility(pylonView.ViewElement, new List<BuiltInCategory> { BuiltInCategory.OST_Sections }, !sectionsHidden);
+                pylonView.ViewPlacer.SetSectionCategoryVisibility(pylonView.ViewElement, new List<BuiltInCategory> { BuiltInCategory.OST_Grids }, !gridsHidden);
+                pylonView.ViewPlacer.SetSectionCategoryVisibility(pylonView.ViewElement, new List<BuiltInCategory> { BuiltInCategory.OST_Levels }, !levelsHidden);
             }
         }
     }
