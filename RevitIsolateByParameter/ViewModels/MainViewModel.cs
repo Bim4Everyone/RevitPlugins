@@ -18,7 +18,7 @@ namespace RevitIsolateByParameter.ViewModels {
         private readonly RevitRepository _revitRepository;
 
         private ParamViewModel _selectedParameter;
-        private string _selectedValue;
+        private ParamValue _selectedValue;
         private int _selectedIndex;
 
         private string _errorText;
@@ -56,9 +56,9 @@ namespace RevitIsolateByParameter.ViewModels {
 
         public ObservableCollection<ParamViewModel> ParamViewModels { get; }
 
-        public IList<string> ParameterValues { get; set; } = new List<string>();
+        public IList<ParamValue> ParameterValues { get; set; } = new List<ParamValue>();
 
-        public string SelectedValue {
+        public ParamValue SelectedValue {
             get => _selectedValue;
             set => RaiseAndSetIfChanged(ref _selectedValue, value);
         }

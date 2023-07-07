@@ -11,16 +11,14 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
+using RevitIsolateByParameter.Models;
 
 namespace RevitIsolateByParameter.ViewModels {
     internal class ParamViewModel {
-
-        private const string ParameterNoValueText = "<Параметр не заполнен>";
-
         private readonly Document _document;
         public SharedParam Param { get; }
         public string Name { get; }
-        public IList<string> Values { get; }
+        public IList<ParamValue> Values { get; }
 
         public ParamViewModel(Document document, SharedParam parameter) {
             _document = document;
@@ -29,14 +27,14 @@ namespace RevitIsolateByParameter.ViewModels {
             Values = GetParameterValues(parameter);
         }
 
-        private IList<string> GetParameterValues(SharedParam parameter) {
+        private IList<ParamValue> GetParameterValues(SharedParam parameter) {
             return new FilteredElementCollector(_document, _document.ActiveView.Id)
                 .ToElements()
                 .Where(x => x.IsExistsParam(parameter))
-                .Select(x => x.GetParamValue<string>(parameter))
-                .Select(x => x ?? ParameterNoValueText)
-                .Distinct()
-                .OrderBy(i => i)
+                .Select(x => new ParamValue(x.GetParamValue<string>(parameter)))
+                .GroupBy(x => x.Value)
+                .Select(g => g.First())
+                .OrderBy(i => i.Value)
                 .ToList();
         }
     }

@@ -75,6 +75,7 @@
             Height="25"
             VerticalAlignment="Center"
             ItemsSource="{Binding ParameterValues}"
+            DisplayMemberPath = "UserValue"
             SelectedIndex="{Binding SelectedIndex}"
             SelectedItem="{Binding SelectedValue}"/>
 
