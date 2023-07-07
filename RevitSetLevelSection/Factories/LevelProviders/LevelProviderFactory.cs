@@ -115,9 +115,9 @@ namespace RevitSetLevelSection.Factories.LevelProviders {
             return elementType
                        ?.GetParamValue<string>(BuiltInParameter.UNIFORMAT_CODE)
                        ?.StartsWith("ОС.КЭ.3.5") == true
-                   || elementType?.FamilyName.IndexOf("лестн", StringComparison.CurrentCultureIgnoreCase) >= 0
-                   || elementType?.FamilyName.IndexOf("марш", StringComparison.CurrentCultureIgnoreCase) >= 0
-                   || elementType?.FamilyName.IndexOf("площад", StringComparison.CurrentCultureIgnoreCase) >= 0;
+                   || elementType?.Name.IndexOf("лестн", StringComparison.CurrentCultureIgnoreCase) >= 0
+                   || elementType?.Name.IndexOf("марш", StringComparison.CurrentCultureIgnoreCase) >= 0
+                   || elementType?.Name.IndexOf("площад", StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
 
         private IEnumerable<BuiltInCategory> GetAllCategories() {

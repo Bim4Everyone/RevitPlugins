@@ -47,10 +47,21 @@ namespace RevitRooms.ViewModels {
         public Element RoomSection {
             get { return GetParamElement(ProjectParamsConfig.Instance.RoomSectionName); }
         }
+        
+        public string RoomMultilevelGroup {
+            get { return Element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.RoomMultilevelGroup); }
+        }
+
+        public bool IsRoomMainLevel {
+            get { return Element.GetParamValueOrDefault(ProjectParamsConfig.Instance.IsRoomMainLevel, 0) == 1; }
+        }
 
         public ElementId LevelId {
             get { return Element.LevelId; }
         }
+
+        public Level Level => (Level) Element.Document.GetElement(LevelId);
+        public double? LevelElevation => Level?.Elevation;
 
         public override string PhaseName {
             get { return Phase.Name; }
@@ -94,6 +105,8 @@ namespace RevitRooms.ViewModels {
             get { return (double?) Element.GetParamValueOrDefault(SharedParamsConfig.Instance.RoomAreaWithRatio); }
             set { Element.SetParamValue(SharedParamsConfig.Instance.RoomAreaWithRatio, value ?? 0); }
         }
+
+        public bool IsNumberFix => Element.GetParamValueOrDefault<int>(ProjectParamsConfig.Instance.IsRoomNumberFix) == 1;
 
         public double ComputeRoomAreaWithRatio() {
             // Area = 0 - по умолчанию

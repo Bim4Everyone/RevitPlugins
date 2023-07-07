@@ -12,22 +12,23 @@ using dosymep.WPF.ViewModels;
 
 using RevitRooms.Models;
 using RevitRooms.ViewModels.Revit.RoomsNums;
+using RevitRooms.Views;
 
 namespace RevitRooms.ViewModels {
     internal class RoomNumsViewModel : BaseViewModel {
         private RoomsNumsViewModel _roomsNums;
 
-        public RoomNumsViewModel(Application application, Document document, System.Windows.Window window) {
+        public RoomNumsViewModel(RevitRepository revitRepository, RoomsNumsWindows window) {
             RoomsNumsViewModels = new ObservableCollection<RoomsNumsViewModel> {
-                new ViewRevitViewModel(application, document) { Name = "Выборка по текущему виду", ParentWindow = window },
-                new ElementsRevitViewModel(application, document) { Name = "Выборка по всем элементам", ParentWindow = window },
-                new SelectedRevitViewModel(application, document) { Name = "Выборка по выделенным элементам", ParentWindow = window }
+                new ViewRevitViewModel(revitRepository) { Name = "Выборка по текущему виду", ParentWindow = window },
+                new ElementsRevitViewModel(revitRepository) { Name = "Выборка по всем элементам", ParentWindow = window },
+                new SelectedRevitViewModel(revitRepository) { Name = "Выборка по выделенным элементам", ParentWindow = window }
             };
 
             RoomsNums = RoomsNumsViewModels[1];
 
             var roomsConfig = RoomsNumsConfig.GetConfig();
-            var settings = roomsConfig.GetRoomsNumsSettingsConfig(document.Title);
+            var settings = roomsConfig.GetRoomsNumsSettingsConfig(revitRepository.DocumentName);
             if(settings != null) {
                 RoomsNums = RoomsNumsViewModels.FirstOrDefault(item => item._id == settings.SelectedRoomId) ?? RoomsNums;
             }

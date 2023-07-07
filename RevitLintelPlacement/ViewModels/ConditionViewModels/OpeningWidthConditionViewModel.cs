@@ -38,13 +38,10 @@ namespace RevitLintelPlacement.ViewModels {
             if(elementInWall == null || elementInWall.Id == ElementId.InvalidElementId)
                 throw new ArgumentNullException(nameof(elementInWall));
 
-            var elementWidth = elementInWall.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningWidth);
-            if(elementWidth == null) {
-                elementWidth = elementInWall.Symbol.GetParamValueOrDefault(_revitRepository.LintelsCommonConfig.OpeningWidth);
-            }
-            if(elementWidth == null) {
-                elementWidth = elementInWall.Symbol.GetParamValueOrDefault(BuiltInParameter.FAMILY_WIDTH_PARAM);
-            }
+            var elementWidth =
+                elementInWall.GetParamValueOrDefault<double?>(_revitRepository.LintelsCommonConfig.OpeningWidth)
+                ?? elementInWall.Symbol.GetParamValueOrDefault<double?>(_revitRepository.LintelsCommonConfig.OpeningWidth);
+
             if(elementWidth == null) {
                 _elementInfos.ElementInfos.Add(new ElementInfoViewModel(elementInWall.Id,
                     InfoElement.MissingOpeningParameter.FormatMessage(_revitRepository.LintelsCommonConfig.OpeningWidth)) {
@@ -54,15 +51,12 @@ namespace RevitLintelPlacement.ViewModels {
                 return false;
             }
 
-            double openingWidth;
 #if REVIT_2020_OR_LESS
-            openingWidth = UnitUtils.ConvertFromInternalUnits((double) elementWidth, DisplayUnitType.DUT_MILLIMETERS);
+            double openingWidth = UnitUtils.ConvertFromInternalUnits((double) elementWidth, DisplayUnitType.DUT_MILLIMETERS);
 #elif REVIT_2021
-            openingWidth = UnitUtils.ConvertFromInternalUnits((double) elementWidth, UnitTypeId.Millimeters);
-
+            double openingWidth = UnitUtils.ConvertFromInternalUnits((double) elementWidth, UnitTypeId.Millimeters);
 #else
-            openingWidth = UnitUtils.ConvertFromInternalUnits(
-                (double) elementWidth, UnitTypeId.Millimeters);
+            double openingWidth = UnitUtils.ConvertFromInternalUnits( (double) elementWidth, UnitTypeId.Millimeters);
 #endif
             return MinWidth <= openingWidth && openingWidth <= MaxWidth;
         }
