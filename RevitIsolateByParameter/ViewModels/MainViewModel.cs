@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.Windows;
+using System.Windows.Input;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
@@ -6,18 +9,15 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.ViewModels;
 using dosymep.WPF.Commands;
 
-using RevitIsolateByParameter.Models;
-using System.Windows.Input;
-using System.Collections.ObjectModel;
-using System.Windows;
 using dosymep.Bim4Everyone.SharedParams;
+using RevitIsolateByParameter.Models;
 
 namespace RevitIsolateByParameter.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
-        private SharedParam _selectedParameter;
+        private ParamViewModel _selectedParameter;
         private string _selectedValue;
         private int _selectedIndex;
 
@@ -27,10 +27,14 @@ namespace RevitIsolateByParameter.ViewModels {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
-            Parameters = _revitRepository.GetParameters();
-            if(Parameters.Count == 3) {
-                ParametersValues = _revitRepository.GetParameterValues(Parameters);
-            }
+            ParamViewModels = new ObservableCollection<ParamViewModel>();
+
+            if(SharedParamsConfig.Instance.BuildingWorksLevel.IsExistsParam(revitRepository.Document))
+                ParamViewModels.Add(new ParamViewModel(revitRepository.Document, SharedParamsConfig.Instance.BuildingWorksLevel));
+            if(SharedParamsConfig.Instance.BuildingWorksSection.IsExistsParam(revitRepository.Document))
+                ParamViewModels.Add(new ParamViewModel(revitRepository.Document, SharedParamsConfig.Instance.BuildingWorksSection));
+            if(SharedParamsConfig.Instance.BuildingWorksBlock.IsExistsParam(revitRepository.Document))
+                ParamViewModels.Add(new ParamViewModel(revitRepository.Document, SharedParamsConfig.Instance.BuildingWorksBlock));
 
             IsolateElementsCommand = new RelayCommand(IsolateElement, CanIsolate);
             GetParameterValuesCommand = new RelayCommand(GetPossibleValues, CanIsolate);
@@ -44,14 +48,15 @@ namespace RevitIsolateByParameter.ViewModels {
         public ICommand SelectNextCommand { get; }
         public ICommand SelectPreviousCommand { get; }
 
-        public SharedParam SelectedParameter {
+
+        public ParamViewModel SelectedParameter {
             get => _selectedParameter;
             set => RaiseAndSetIfChanged(ref _selectedParameter, value);
         }
-        public ObservableCollection<SharedParam> Parameters { get; }
-        public Dictionary<string, List<string>> ParametersValues { get; }
 
-        public List<string> ParameterValues { get; set; } = new List<string>();
+        public ObservableCollection<ParamViewModel> ParamViewModels { get; }
+
+        public IList<string> ParameterValues { get; set; } = new List<string>();
 
         public string SelectedValue {
             get => _selectedValue;
@@ -64,7 +69,7 @@ namespace RevitIsolateByParameter.ViewModels {
         }
         
         public void GetPossibleValues(object p) {
-            ParameterValues = ParametersValues[SelectedParameter.Name];
+            ParameterValues = SelectedParameter.Values;
             OnPropertyChanged(nameof(ParameterValues));
         }
 
@@ -73,7 +78,7 @@ namespace RevitIsolateByParameter.ViewModels {
         }
 
         private bool CanIsolate(object p) { 
-            if(Parameters.Count != 3) {
+            if(ParamViewModels.Count != 3) {
                 ErrorText = "В проекте отсутствуют параметры СМР";
                 return false;
             }

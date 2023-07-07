@@ -50,7 +50,7 @@
             Height="25"
             Grid.ColumnSpan="3"
             VerticalAlignment="Top"
-            ItemsSource="{Binding Parameters}"
+            ItemsSource="{Binding ParamViewModels}"
             DisplayMemberPath = "Name"
             SelectedItem="{Binding SelectedParameter}">
             <i:Interaction.Triggers>
