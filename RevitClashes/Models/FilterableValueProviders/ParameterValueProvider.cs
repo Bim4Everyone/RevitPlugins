@@ -1,20 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
-using dosymep.Revit.Comparators;
 
 using pyRevitLabs.Json;
 
 using RevitClashDetective.Models.Evaluators;
-using RevitClashDetective.Models.FilterGenerators;
 using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.Models.Utils;
 using RevitClashDetective.Models.Value;
@@ -46,7 +42,12 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
 
         public ParameterValueProvider(RevitRepository revitRepository, RevitParam revitParam, string displayValue = null) {
             RevitRepository = revitRepository;
-            RevitParam = revitParam;
+            if((revitParam is SystemParam systemParam) && (systemParam.StorageType == StorageType.None)) {
+                var systemParamRecreated = SystemParamsConfig.Instance.CreateRevitParam(systemParam.SystemParamId);
+                RevitParam = systemParamRecreated;
+            } else {
+                RevitParam = revitParam;
+            }
             DisplayValue = displayValue ?? revitParam.Name;
         }
 
