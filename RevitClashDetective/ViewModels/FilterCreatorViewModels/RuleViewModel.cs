@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
-using RevitClashDetective.Models.Evaluators;
-using RevitClashDetective.Models.FilterableValueProviders;
 using RevitClashDetective.Models.FilterModel;
-using RevitClashDetective.Models.Interfaces;
-using RevitClashDetective.Models.Value;
 using RevitClashDetective.ViewModels.FilterCreatorViewModels.Interfaces;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
@@ -124,7 +116,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         public void Initialize() {
             if(_rule != null) {
-                if(!_categoriesInfo.Parameters.Any(item => item.FilterableValueProvider.Equals(_rule.Provider))) {
+                if(!_categoriesInfo.Parameters.Any(item => item.FilterableValueProvider.Provider.Equals(_rule.Provider))) {
                     _categoriesInfo.Parameters.Add(new ParameterViewModel(_rule.Provider));
                 }
                 SelectedParameter = _categoriesInfo.Parameters.First(item => item.FilterableValueProvider.Provider.Equals(_rule.Provider));
