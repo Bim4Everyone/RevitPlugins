@@ -46,11 +46,6 @@ namespace RevitPylonDocumentation.Models {
                     + ViewModel.GENERAL_VIEW_SUFFIX;
             }
 
-            // Передаем основной вид пилона в метод по созданию видов в (0.0.0)
-            if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralView)) {
-                return false;
-            }
-
             // Скрытие категории Разразы, Оси и Уровни
             SetSectionCategoryVisibility(SheetInfo.GeneralView.ViewElement, new List<BuiltInCategory> { 
                 BuiltInCategory.OST_Sections,
@@ -58,6 +53,11 @@ namespace RevitPylonDocumentation.Models {
                 BuiltInCategory.OST_Levels
             }, false);
 
+
+            // Передаем основной вид пилона в метод по созданию видов в (0.0.0)
+            if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralView)) {
+                return false;
+            }
 
             // Если высота видового экрана основного вида больше, чем высота рамки, то он не поместится - меняем рамку
             if(SheetInfo.GeneralView.ViewportHalfHeight * 2 > SheetInfo.TitleBlockHeight) {
@@ -108,20 +108,28 @@ namespace RevitPylonDocumentation.Models {
                     + ViewModel.GENERAL_VIEW_PERPENDICULAR_SUFFIX;
             }
 
+
+            // Скрытие категории Разразы, Оси и Уровни
+            SetSectionCategoryVisibility(SheetInfo.GeneralViewPerpendicular.ViewElement, new List<BuiltInCategory> {
+                BuiltInCategory.OST_Sections,
+                BuiltInCategory.OST_Grids,
+                BuiltInCategory.OST_Levels
+            }, false);
+
             // Передаем основной перпендикулярный вид пилона в метод по созданию видов в (0.0.0)
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralViewPerpendicular)) {
                 return false;
             }
 
-            // Скрытие категории Разразы
-            SheetInfo.GeneralViewPerpendicular.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, true);
-            SheetInfo.GeneralViewPerpendicular.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Grids).Id, true);
-            SheetInfo.GeneralViewPerpendicular.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Levels).Id, true);
+            //// Скрытие категории Разразы
+            //SheetInfo.GeneralViewPerpendicular.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, true);
+            //SheetInfo.GeneralViewPerpendicular.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Grids).Id, true);
+            //SheetInfo.GeneralViewPerpendicular.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Levels).Id, true);
 
             // Рассчитываем и задаем корректную точку вставки основного перпендикулярного вида пилона
             double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + 0.065;
 
-            // Рассчитываем и задаем корректную точку вставки основного вида пилона
+            // Рассчитываем и задаем корректную точку вставки основного перпендикулярного вида пилона, если размещен основной вид
             if(SheetInfo.GeneralView.ViewportElement != null) {
                 newCenterX = newCenterX - SheetInfo.GeneralView.ViewportHalfWidth - SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth - 0.065;
             }
@@ -135,8 +143,12 @@ namespace RevitPylonDocumentation.Models {
 
             SheetInfo.GeneralViewPerpendicular.ViewportCenter = newCenter;
 
+            //// Включение видимости категории Разразы
+            //SheetInfo.GeneralViewPerpendicular.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, false);
             // Включение видимости категории Разразы
-            SheetInfo.GeneralViewPerpendicular.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, false);
+            SetSectionCategoryVisibility(SheetInfo.GeneralViewPerpendicular.ViewElement, new List<BuiltInCategory> {
+                BuiltInCategory.OST_Sections
+            }, true);
 
             return true;
         }
@@ -154,16 +166,24 @@ namespace RevitPylonDocumentation.Models {
                 SheetInfo.TransverseViewFirst.ViewportNumber = "1";
                 SheetInfo.TransverseViewFirst.ViewportName = "";
             }
+
+
+            // Скрытие категории Разразы, Оси и Уровни
+            SetSectionCategoryVisibility(SheetInfo.TransverseViewFirst.ViewElement, new List<BuiltInCategory> {
+                BuiltInCategory.OST_Sections,
+                BuiltInCategory.OST_Grids,
+                BuiltInCategory.OST_Levels
+            }, false);
+
             
             // Передаем первый поперечный вид пилона в метод по созданию видов в (0.0.0)
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewFirst)) {
                 return false;
             }
-
-            // Скрытие категории Разразы
-            SheetInfo.TransverseViewFirst.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, true);
-            SheetInfo.TransverseViewFirst.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Grids).Id, true);
-            SheetInfo.TransverseViewFirst.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Levels).Id, true);
+            //// Скрытие категории Разразы
+            //SheetInfo.TransverseViewFirst.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, true);
+            //SheetInfo.TransverseViewFirst.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Grids).Id, true);
+            //SheetInfo.TransverseViewFirst.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Levels).Id, true);
 
             // Рассчитываем и задаем корректную точку вставки первого поперечного вида пилона
             double GeneralViewX = 0;
@@ -234,15 +254,23 @@ namespace RevitPylonDocumentation.Models {
                 SheetInfo.TransverseViewSecond.ViewportName = "";
             }
 
-            // Передаем первый поперечный вид пилона в метод по созданию видов в (0.0.0)
+
+            // Скрытие категории Разразы, Оси и Уровни
+            SetSectionCategoryVisibility(SheetInfo.TransverseViewSecond.ViewElement, new List<BuiltInCategory> {
+                BuiltInCategory.OST_Sections,
+                BuiltInCategory.OST_Grids,
+                BuiltInCategory.OST_Levels
+            }, false);
+
+            // Передаем второй поперечный вид пилона в метод по созданию видов в (0.0.0)
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewSecond)) {
                 return false;
             }
 
-            // Скрытие категории Разразы
-            SheetInfo.TransverseViewSecond.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, true);
-            SheetInfo.TransverseViewSecond.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Grids).Id, true);
-            SheetInfo.TransverseViewSecond.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Levels).Id, true);
+            //// Скрытие категории Разразы
+            //SheetInfo.TransverseViewSecond.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, true);
+            //SheetInfo.TransverseViewSecond.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Grids).Id, true);
+            //SheetInfo.TransverseViewSecond.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Levels).Id, true);
 
             // Рассчитываем и задаем корректную точку вставки первого поперечного вида пилона
             double GeneralViewX = 0;
@@ -313,15 +341,22 @@ namespace RevitPylonDocumentation.Models {
                 SheetInfo.TransverseViewThird.ViewportName = "";
             }
 
-            // Передаем первый поперечный вид пилона в метод по созданию видов в (0.0.0)
+
+            // Скрытие категории Разразы, Оси и Уровни
+            SetSectionCategoryVisibility(SheetInfo.TransverseViewThird.ViewElement, new List<BuiltInCategory> {
+                BuiltInCategory.OST_Sections,
+                BuiltInCategory.OST_Grids,
+                BuiltInCategory.OST_Levels
+            }, false);
+
+            // Передаем третий поперечный вид пилона в метод по созданию видов в (0.0.0)
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewThird)) {
                 return false;
             }
-
-            // Скрытие категории Разразы
-            SheetInfo.TransverseViewThird.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, true);
-            SheetInfo.TransverseViewThird.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Grids).Id, true);
-            SheetInfo.TransverseViewThird.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Levels).Id, true);
+            //// Скрытие категории Разразы
+            //SheetInfo.TransverseViewThird.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, true);
+            //SheetInfo.TransverseViewThird.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Grids).Id, true);
+            //SheetInfo.TransverseViewThird.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Levels).Id, true);
 
             // Рассчитываем и задаем корректную точку вставки первого поперечного вида пилона
             double GeneralViewX = 0;

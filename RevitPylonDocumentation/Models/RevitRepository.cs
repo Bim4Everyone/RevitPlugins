@@ -104,6 +104,9 @@ namespace RevitPylonDocumentation.Models {
                     }
 
 
+
+
+
                     // Запрашиваем Раздел проекта
                     Parameter projectSectionParameter = elem.LookupParameter(mainViewModel.PROJECT_SECTION);
                     if(projectSectionParameter == null) {
