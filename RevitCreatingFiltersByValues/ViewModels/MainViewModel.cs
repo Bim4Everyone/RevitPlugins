@@ -49,13 +49,18 @@ namespace RevitCreatingFiltersByValues.ViewModels {
         private ColorHelper _selectedColor;
         private PatternsHelper _selectedPattern;
         private List<string> patternNames = new List<string>() {
-            "Алюминий",
-            "Вертикальный",
-            "Горизонтальный",
-            "Диагональ вверх",
-            "Диагональ вниз",
-            "Диагональ крест-накрест",
-            "Древесина - Окончательная отделка",
+            "ADSK_Линия_Диагональ_Вверх_2 мм",
+            "ADSK_Линия_Диагональ_Вниз_2 мм",
+            "ADSK_Линия_Накрест косая_2x2 мм",
+            "04_Песок",
+            "08.Грунт естественный",
+            "ADSK_Грунт_Гравий",
+            "ADSK_Древесина_01",
+            "ADSK_Древесина_02",
+            "ADSK_Формы_Зигзаг_01",
+            "ADSK_Формы_Зигзаг_02",
+            "ADSK_Формы_Соты",
+            "ADSK_Формы_Треугольники",
         };
 
 
