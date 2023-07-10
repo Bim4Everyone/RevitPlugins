@@ -51,6 +51,7 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
 
+
         #region Свойства для параметров и правил
         #region Параметры
         public string PROJECT_SECTION { get; set; } = "обр_ФОП_Раздел проекта";
