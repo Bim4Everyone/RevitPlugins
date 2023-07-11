@@ -27,8 +27,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, floorThicknessValueGetter).GetParamValue();
 
             //отметки отверстия
-            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, new CenterOffsetValueGetter(_pointFinder)).GetParamValue();
-            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, new BottomOffsetValueGetter(_pointFinder, floorThicknessValueGetter)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, new BottomOffsetOfOpeningInFloorValueGetter(_pointFinder, floorThicknessValueGetter)).GetParamValue();
 
             //текстовые данные отверстия
             yield return new StringParameterGetter(RevitRepository.OpeningDate, new DateValueGetter()).GetParamValue();
