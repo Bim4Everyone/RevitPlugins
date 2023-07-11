@@ -11,7 +11,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         private readonly IPointFinder _pointFinder;
 
         /// <summary>
-        /// Конструктор класса, предоставляющего значение высотной отметки центра отверстия
+        /// Конструктор класса, предоставляющего значение высотной отметки центра отверстия, кроме прямоугольных отверстий в стенах и кроме отверстий в перекрытиях
+        /// Для прямоугольных отверстий в стенах использовать <see cref="CenterOffsetOfRectangleOpeningInWallValueGetter"/>
         /// </summary>
         /// <param name="pointFinder">Объект, предоставляющий координату центра отверстия</param>
         /// <exception cref="ArgumentNullException">Исключение, если <paramref name="pointFinder"/> null</exception>
