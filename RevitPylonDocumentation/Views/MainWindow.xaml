@@ -352,10 +352,10 @@
 
             <StackPanel Orientation="Vertical">
                 <TextBlock
-                Margin="10"
-                Foreground="Orange"
-                VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
+                    Margin="10"
+                    Foreground="Orange"
+                    VerticalAlignment="Center"
+                    Text="{Binding ErrorText}" />
             </StackPanel>
 
             <Button
@@ -412,8 +412,19 @@
                                     Text="{Binding PROJECT_SECTION_TEMP, UpdateSourceTrigger=PropertyChanged}" 
                                     Width="290" VerticalContentAlignment="Center"/>
 
-                                                                
+
+                                <Label Content="Параметр фильтрации типовых пилонов"/>
+                                <TextBox
+                                    HorizontalAlignment="Left" Margin="5 0"
+                                    Text="{Binding TYPICAL_PYLON_FILTER_PARAMETER_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                    Width="290" VerticalContentAlignment="Center"/>
                                 
+                                
+                                <Label Content="Значение параметра фильтрации типовых пилонов"/>
+                                <TextBox
+                                    HorizontalAlignment="Left" Margin="5 0"
+                                    Text="{Binding TYPICAL_PYLON_FILTER_VALUE_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                    Width="290" VerticalContentAlignment="Center"/>
 
                                 <Label Content="Параметр марки пилона"/>
                                 <TextBox

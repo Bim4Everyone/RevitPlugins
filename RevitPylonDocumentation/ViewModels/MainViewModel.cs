@@ -96,6 +96,8 @@ namespace RevitPylonDocumentation.ViewModels {
         private string _systemPartsScheduleDisp2Temp = "ВД_СИС_Пилоны";
         private string _IFCPartsScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
         private string _IFCPartsScheduleDisp2Temp = "ВД_IFC_Пилоны";
+        private string _typicalPylonFilterParameterTemp = "обр_ФОП_Фильтрация 1";
+        private string _typicalPylonFilterValueTemp = "на 1 шт.";
 
         public static string DEF_TITLEBLOCK_NAME = "Создать типы по комплектам";
 
@@ -147,6 +149,7 @@ namespace RevitPylonDocumentation.ViewModels {
 
             AddScheduleFilterParamCommand = new RelayCommand(AddScheduleFilterParam);
             DeleteScheduleFilterParamCommand = new RelayCommand(DeleteScheduleFilterParam, CanChangeScheduleFilterParam);
+
         }
 
 
@@ -549,15 +552,6 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-        //public string SCHEDULE_MARK_PARAM_NAME { get; set; } = "обр_Метка основы_универсальная";
-        //public string SCHEDULE_MARK_PARAM_NAME_TEMP {
-        //    get => _scheduleMarkParamNameTemp;
-        //    set {
-        //        _scheduleMarkParamNameTemp = value;
-        //        _edited = true;
-        //    }
-        //}
-
         public string REBAR_SCHEDULE_DISP1 { get; set; } = "обр_ФОП_Раздел проекта";
         public string REBAR_SCHEDULE_DISP1_TEMP {
             get => _rebarScheduleDisp1Temp;
@@ -626,6 +620,24 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
+        public string TYPICAL_PYLON_FILTER_PARAMETER { get; set; } = "обр_ФОП_Фильтрация 1";
+        public string TYPICAL_PYLON_FILTER_PARAMETER_TEMP {
+            get => _typicalPylonFilterParameterTemp;
+            set {
+                _typicalPylonFilterParameterTemp = value;
+                _edited = true;
+            }
+        }
+
+        public string TYPICAL_PYLON_FILTER_VALUE { get; set; } = "на 1 шт.";
+        public string TYPICAL_PYLON_FILTER_VALUE_TEMP {
+            get => _typicalPylonFilterValueTemp;
+            set {
+                _typicalPylonFilterValueTemp = value;
+                _edited = true;
+            }
+        }
+
         private ObservableCollection<ScheduleFilterParamHelper> _paramsForScheduleFilters = new ObservableCollection<ScheduleFilterParamHelper>() {
             new ScheduleFilterParamHelper("обр_ФОП_Форма_номер", ""),
             new ScheduleFilterParamHelper("обр_ФОП_Раздел проекта", "обр_ФОП_Раздел проекта"),
@@ -640,11 +652,6 @@ namespace RevitPylonDocumentation.ViewModels {
                 _edited = true;
             }
         }
-
-        //public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFilters { get; set; } = new ObservableCollection<ScheduleFilterParamHelper> {
-        //    new ScheduleFilterParamHelper("обр_ФОП_Раздел проекта", "обр_ФОП_Раздел проекта"),
-        //    new ScheduleFilterParamHelper("обр_Метка основы_универсальная", "Марка")
-        //};
         #endregion
 
 
@@ -705,7 +712,7 @@ namespace RevitPylonDocumentation.ViewModels {
         // Метод для авто обновления списка марок пилонов при выборе рабочего набора
         private void GetHostMarksInGUI(object p) 
         {
-            ErrorText= string.Empty;
+            //ErrorText= string.Empty;
 
             SelectedHostsInfo = new List<PylonSheetInfo>(HostsInfo
                 .Where(item => item.ProjectSection.Equals(SelectedProjectSection))

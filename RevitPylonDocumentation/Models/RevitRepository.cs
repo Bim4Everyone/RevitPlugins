@@ -87,6 +87,7 @@ namespace RevitPylonDocumentation.Models {
 
         public void GetHostData(MainViewModel mainViewModel) {
 
+
             HostsInfo.Clear();
             HostProjectSections.Clear();
 
@@ -104,7 +105,14 @@ namespace RevitPylonDocumentation.Models {
                     }
 
 
+                    // Запрашиваем параметр фильтрации типовых пилонов. Если он не равен заданному, то отсеиваем этот пилон
+                    Parameter typicalPylonParameter = elem.LookupParameter(mainViewModel.TYPICAL_PYLON_FILTER_PARAMETER);
+                    if(typicalPylonParameter == null) {
+                        mainViewModel.ErrorText = "Параметр фильтрации типовых пилонов не найден";
+                        return;
+                    }
 
+                    if(typicalPylonParameter.AsString() is null || typicalPylonParameter.AsString() != mainViewModel.TYPICAL_PYLON_FILTER_VALUE) { continue; }
 
 
                     // Запрашиваем Раздел проекта
@@ -142,9 +150,11 @@ namespace RevitPylonDocumentation.Models {
                         HostsInfo.Add(pylonSheetInfo);
                     } else {
                         testPylonSheetInfo.HostElems.Add(elem);
+                        mainViewModel.ErrorText = "Найдены пилоны с одинаковой маркой";
                     }
                 }
             }
+
 
             HostsInfo = new List<PylonSheetInfo>(HostsInfo
                 .OrderBy(i => i.PylonKeyName));
