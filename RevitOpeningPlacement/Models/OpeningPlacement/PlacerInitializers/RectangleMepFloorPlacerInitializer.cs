@@ -27,7 +27,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
                 placer.ParameterGetter = new PerpendicularRectangleCurveFloorParamGetter(clash, categoryOption, pointFinder);
             } else {
                 placer.AngleFinder = new ZeroAngleFinder();
-                placer.ParameterGetter = new FloorSolidParameterGetter(new MepCurveClashSolidProvider<CeilingAndFloor>(clash), categoryOption);
+                placer.ParameterGetter = new FloorSolidParameterGetter(new MepCurveClashSolidProvider<CeilingAndFloor>(clash), pointFinder, clash.Element1, clash.Element2, categoryOption);
             }
 
             return placer;
