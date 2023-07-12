@@ -105,11 +105,14 @@ namespace RevitCreatingFiltersByValues.Models {
             ObservableCollection<PatternsHelper> patterns= new ObservableCollection<PatternsHelper>();
             List<FillPatternElement> allDraftingPatterns = AllDraftingPatterns;
 
-            foreach(FillPatternElement pattern in allDraftingPatterns) {
-                if(patternNames.Contains(pattern.Name)) {
-                    patterns.Add(new PatternsHelper(pattern, allDraftingPatterns));
+            foreach(string patternName in patternNames) {
+                foreach(FillPatternElement pattern in allDraftingPatterns) {
+                    if(patternName.Equals(pattern.Name)) {
+                        patterns.Add(new PatternsHelper(pattern, allDraftingPatterns));
+                    }
                 }
             }
+
 
             return patterns;
         }
