@@ -105,10 +105,15 @@ namespace RevitOpeningPlacement.Models {
             {OpeningType.WallRound, "Круглое" },
         };
 
-        public static string OpeningDiameter => "ADSK_Размер_Диаметр";
-        public static string OpeningThickness => "ADSK_Размер_Глубина";
-        public static string OpeningHeight => "ADSK_Размер_Высота";
-        public static string OpeningWidth => "ADSK_Размер_Ширина";
+        public const string OpeningDiameter = "ADSK_Размер_Диаметр";
+        public const string OpeningThickness = "ADSK_Размер_Глубина";
+        public const string OpeningHeight = "ADSK_Размер_Высота";
+        public const string OpeningWidth = "ADSK_Размер_Ширина";
+        public const string OpeningDate = "ФОП_Дата";
+        public const string OpeningDescription = "ФОП_Описание";
+        public const string OpeningMepSystem = "ФОП_ВИС_Имя системы";
+        public const string OpeningOffsetCenter = "ФОП_ВИС_Отметка оси от нуля";
+        public const string OpeningOffsetBottom = "ФОП_ВИС_Отметка низа от нуля";
 
         public static List<BuiltInParameter> MepCurveDiameters => new List<BuiltInParameter>() {
             BuiltInParameter.RBS_PIPE_OUTER_DIAMETER,

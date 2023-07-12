@@ -42,7 +42,7 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
 
         /// <summary>
         /// Добавляет поданный экземпляр семейства в <see cref="Elements">список элементов</see>, 
-        /// а также объединяет Solid поданного элемента с Solid из списка уже добавленнымх <see cref="_solids">солидов элементов</see>, если они пересекаются.
+        /// а также объединяет Solid поданного элемента с Solid из списка уже добавленных <see cref="_solids">солидов элементов</see>, если они пересекаются.
         /// </summary>
         /// <param name="element">Экземпляр семейства отверстия для добавления</param>
         public void AddElement(FamilyInstance element) {

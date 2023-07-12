@@ -19,13 +19,14 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             var angleFinder = new WallAngleFinder(clash.Element2, clash.Element2Transform);
             var solidProvider = new FittingClashSolidProvider<Wall>(clash, angleFinder);
             var heightGetter = new WallOpeningSizeInitializer(solidProvider.GetSolid(), categoryOptions).GetHeight();
+            var pointFinder = new FittingWallPointFinder(clash, angleFinder, heightGetter);
 
             return new OpeningPlacer(revitRepository, clashModel) {
                 Type = revitRepository.GetOpeningType(OpeningType.WallRectangle),
                 LevelFinder = new ClashLevelFinder(revitRepository, clashModel),
                 AngleFinder = angleFinder,
-                ParameterGetter = new WallSolidParameterGetter(solidProvider, categoryOptions),
-                PointFinder = new FittingWallPointFinder(clash, angleFinder, heightGetter)
+                ParameterGetter = new WallSolidParameterGetter(solidProvider, pointFinder, clash.Element1, clash.Element2, categoryOptions),
+                PointFinder = pointFinder
             };
         }
     }

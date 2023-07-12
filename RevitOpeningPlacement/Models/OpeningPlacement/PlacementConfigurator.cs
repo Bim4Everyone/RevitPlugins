@@ -96,14 +96,12 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             foreach(var filterProvider in _fittingFilterProviders) {
                 var mepFilter = GetFittingFilter(filterProvider.Key, filterProvider.Value);
                 var categories = _categories.GetCategories(filterProvider.Key).ToArray();
-                foreach(var category in categories) {
-                    if(category.IsSelected && MepCategoryIntersectionWithStructureCategoryEnabled(category, structureFilter.Name)) {
-                        placers.AddRange(GetFittingPlacers(mepFilter,
-                            structureFilter,
-                            structureCheckerFunc.Invoke(categories),
-                            placerInitializer,
-                            category));
-                    }
+                if(categories.Any(category => category.IsSelected && MepCategoryIntersectionWithStructureCategoryEnabled(category, structureFilter.Name))) {
+                    placers.AddRange(GetFittingPlacers(mepFilter,
+                        structureFilter,
+                        structureCheckerFunc.Invoke(categories),
+                        placerInitializer,
+                        categories));
                 }
             };
             return placers;

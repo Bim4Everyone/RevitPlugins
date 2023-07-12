@@ -21,12 +21,14 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
                 AngleFinder = new WallAngleFinder(clash.Element2, clash.Element2Transform)
             };
             if(clash.Element1.IsPerpendicular(clash.Element2)) {
-                placer.PointFinder = new WallPointFinder(clash);
-                placer.ParameterGetter = new PerpendicularRoundCurveWallParamGetter(clash, categoryOption);
+                var pointFinder = new WallPointFinder(clash);
+                placer.PointFinder = pointFinder;
+                placer.ParameterGetter = new PerpendicularRoundCurveWallParamGetter(clash, categoryOption, pointFinder);
                 placer.Type = revitRepository.GetOpeningType(OpeningType.WallRound);
             } else {
-                placer.PointFinder = new WallPointFinder(clash, new InclinedSizeInitializer(clash, categoryOption).GetRoundMepHeightGetter());
-                placer.ParameterGetter = new InclinedRoundCurveWallParamGetter(clash, categoryOption);
+                var pointFinder = new WallPointFinder(clash, new InclinedSizeInitializer(clash, categoryOption).GetRoundMepHeightGetter());
+                placer.PointFinder = pointFinder;
+                placer.ParameterGetter = new InclinedRoundCurveWallParamGetter(clash, categoryOption, pointFinder);
                 placer.Type = revitRepository.GetOpeningType(OpeningType.WallRectangle);
             };
 

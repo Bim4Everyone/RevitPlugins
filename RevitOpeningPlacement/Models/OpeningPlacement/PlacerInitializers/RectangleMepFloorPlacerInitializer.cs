@@ -15,18 +15,19 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
     internal class RectangleMepFloorPlacerInitializer : IMepCurvePlacerInitializer {
         public OpeningPlacer GetPlacer(RevitRepository revitRepository, ClashModel clashModel, MepCategory categoryOption) {
             var clash = new MepCurveClash<CeilingAndFloor>(revitRepository, clashModel);
+            var pointFinder = new FloorPointFinder<MEPCurve>(clash);
             var placer = new OpeningPlacer(revitRepository, clashModel) {
                 LevelFinder = new ClashLevelFinder(revitRepository, clashModel),
-                PointFinder = new FloorPointFinder<MEPCurve>(clash),
+                PointFinder = pointFinder,
                 Type = revitRepository.GetOpeningType(OpeningType.FloorRectangle),
             };
 
             if(clash.Element2.IsHorizontal() && clash.Element1.IsVertical()) {
                 placer.AngleFinder = new FloorAngleFinder(clash.Element1);
-                placer.ParameterGetter = new PerpendicularRectangleCurveFloorParamGetter(clash, categoryOption);
+                placer.ParameterGetter = new PerpendicularRectangleCurveFloorParamGetter(clash, categoryOption, pointFinder);
             } else {
                 placer.AngleFinder = new ZeroAngleFinder();
-                placer.ParameterGetter = new FloorSolidParameterGetter(new MepCurveClashSolidProvider<CeilingAndFloor>(clash), categoryOption);
+                placer.ParameterGetter = new FloorSolidParameterGetter(new MepCurveClashSolidProvider<CeilingAndFloor>(clash), pointFinder, clash.Element1, clash.Element2, categoryOption);
             }
 
             return placer;

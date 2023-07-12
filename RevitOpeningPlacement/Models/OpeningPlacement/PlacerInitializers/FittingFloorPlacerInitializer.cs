@@ -15,12 +15,18 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
     internal class FittingFloorPlacerInitializer : IFittingPlacerInitializer {
         public OpeningPlacer GetPlacer(RevitRepository revitRepository, ClashModel clashModel, params MepCategory[] categoryOptions) {
             var clash = new FittingClash<CeilingAndFloor>(revitRepository, clashModel);
+            var pointFinder = new FloorPointFinder<FamilyInstance>(clash);
             return new OpeningPlacer(revitRepository, clashModel) {
                 Type = revitRepository.GetOpeningType(OpeningType.FloorRectangle),
-                PointFinder = new FloorPointFinder<FamilyInstance>(clash),
+                PointFinder = pointFinder,
                 LevelFinder = new ClashLevelFinder(revitRepository, clashModel),
                 AngleFinder = new ZeroAngleFinder(),
-                ParameterGetter = new FloorSolidParameterGetter(new FittingClashSolidProvider<CeilingAndFloor>(clash, new ZeroAngleFinder()), categoryOptions)
+                ParameterGetter = new FloorSolidParameterGetter(
+                    new FittingClashSolidProvider<CeilingAndFloor>(clash, new ZeroAngleFinder()),
+                    pointFinder,
+                    clash.Element1,
+                    clash.Element2,
+                    categoryOptions)
             };
         }
     }
