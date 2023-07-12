@@ -98,12 +98,6 @@ namespace RevitPylonDocumentation.Models {
 
 
 
-
-
-
-
-
-
         public void GetHostData(MainViewModel mainViewModel) {
 
 

@@ -1078,6 +1078,7 @@ namespace RevitPylonDocumentation.ViewModels {
                     }
 
 
+                    _revitRepository.Document.Regenerate();
 
 
                     if(hostsInfo.GeneralView.OnSheetEditableInGUI && hostsInfo.GeneralView.OnSheet) {

@@ -64,21 +64,21 @@ namespace RevitPylonDocumentation.Models {
                 SheetInfo.SetTitleBlockSize(ViewModel._revitRepository.Document, 2, 1);
             }
 
-            ////double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralView.ViewportHalfWidth + 0.065;
+            double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralView.ViewportHalfWidth + 0.065;
 
-            ////// Рассчитываем и задаем корректную точку вставки основного вида пилон, если есть еще и перпендикулярный
-            ////if(SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
-            ////    newCenterX = newCenterX - SheetInfo.GeneralView.ViewportHalfWidth - SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth - 0.065;
-            ////}
+            // Рассчитываем и задаем корректную точку вставки основного вида пилон, если есть еще и перпендикулярный
+            if(SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
+                newCenterX = newCenterX - SheetInfo.GeneralView.ViewportHalfWidth - SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth - 0.065;
+            }
 
-            ////XYZ newCenter = new XYZ(
-            ////        newCenterX,
-            ////        SheetInfo.TitleBlockHeight - SheetInfo.GeneralView.ViewportHalfHeight - 0.016,
-            ////        0);
+            XYZ newCenter = new XYZ(
+                    newCenterX,
+                    SheetInfo.TitleBlockHeight - SheetInfo.GeneralView.ViewportHalfHeight - 0.016,
+                    0);
 
-            ////(SheetInfo.GeneralView.ViewportElement as Viewport).SetBoxCenter(newCenter);
+            (SheetInfo.GeneralView.ViewportElement as Viewport).SetBoxCenter(newCenter);
 
-            ////SheetInfo.GeneralView.ViewportCenter = newCenter;
+            SheetInfo.GeneralView.ViewportCenter = newCenter;
 
             //// Включение видимости категории Разразы
             //SetSectionCategoryVisibility(SheetInfo.GeneralView.ViewElement, new List<BuiltInCategory> {
@@ -99,7 +99,7 @@ namespace RevitPylonDocumentation.Models {
                 return false;
             } else {
                 // Заполнеяем данные для задания
-                SheetInfo.GeneralViewPerpendicular.ViewScale = 25;
+                //SheetInfo.GeneralViewPerpendicular.ViewScale = 25;
                 SheetInfo.GeneralViewPerpendicular.ViewportTypeName = "Заголовок на листе";
                 SheetInfo.GeneralViewPerpendicular.ViewportNumber = "101";
                 SheetInfo.GeneralViewPerpendicular.ViewportName =
@@ -109,12 +109,12 @@ namespace RevitPylonDocumentation.Models {
             }
 
 
-            // Скрытие категории Разразы, Оси и Уровни
-            SetSectionCategoryVisibility(SheetInfo.GeneralViewPerpendicular.ViewElement, new List<BuiltInCategory> {
-                BuiltInCategory.OST_Sections,
-                BuiltInCategory.OST_Grids,
-                BuiltInCategory.OST_Levels
-            }, false);
+            //// Скрытие категории Разразы, Оси и Уровни
+            //SetSectionCategoryVisibility(SheetInfo.GeneralViewPerpendicular.ViewElement, new List<BuiltInCategory> {
+            //    BuiltInCategory.OST_Sections,
+            //    BuiltInCategory.OST_Grids,
+            //    BuiltInCategory.OST_Levels
+            //}, false);
 
             // Передаем основной перпендикулярный вид пилона в метод по созданию видов в (0.0.0)
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralViewPerpendicular)) {
@@ -146,9 +146,9 @@ namespace RevitPylonDocumentation.Models {
             //// Включение видимости категории Разразы
             //SheetInfo.GeneralViewPerpendicular.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, false);
             // Включение видимости категории Разразы
-            SetSectionCategoryVisibility(SheetInfo.GeneralViewPerpendicular.ViewElement, new List<BuiltInCategory> {
-                BuiltInCategory.OST_Sections
-            }, true);
+            //SetSectionCategoryVisibility(SheetInfo.GeneralViewPerpendicular.ViewElement, new List<BuiltInCategory> {
+            //    BuiltInCategory.OST_Sections
+            //}, true);
 
             return true;
         }
@@ -161,19 +161,19 @@ namespace RevitPylonDocumentation.Models {
                 return false;
             } else {
                 // Заполнеяем данные для задания
-                SheetInfo.TransverseViewFirst.ViewScale = 20;
+                //SheetInfo.TransverseViewFirst.ViewScale = 20;
                 SheetInfo.TransverseViewFirst.ViewportTypeName = "Сечение_Номер вида";
                 SheetInfo.TransverseViewFirst.ViewportNumber = "1";
                 SheetInfo.TransverseViewFirst.ViewportName = "";
             }
 
 
-            // Скрытие категории Разразы, Оси и Уровни
-            SetSectionCategoryVisibility(SheetInfo.TransverseViewFirst.ViewElement, new List<BuiltInCategory> {
-                BuiltInCategory.OST_Sections,
-                BuiltInCategory.OST_Grids,
-                BuiltInCategory.OST_Levels
-            }, false);
+            //// Скрытие категории Разразы, Оси и Уровни
+            //SetSectionCategoryVisibility(SheetInfo.TransverseViewFirst.ViewElement, new List<BuiltInCategory> {
+            //    BuiltInCategory.OST_Sections,
+            //    BuiltInCategory.OST_Grids,
+            //    BuiltInCategory.OST_Levels
+            //}, false);
 
             
             // Передаем первый поперечный вид пилона в метод по созданию видов в (0.0.0)
@@ -248,19 +248,19 @@ namespace RevitPylonDocumentation.Models {
                 return false;
             } else {
                 // Заполнеяем данные для задания
-                SheetInfo.TransverseViewSecond.ViewScale = 20;
+                //SheetInfo.TransverseViewSecond.ViewScale = 20;
                 SheetInfo.TransverseViewSecond.ViewportTypeName = "Сечение_Номер вида";
                 SheetInfo.TransverseViewSecond.ViewportNumber = "2";
                 SheetInfo.TransverseViewSecond.ViewportName = "";
             }
 
 
-            // Скрытие категории Разразы, Оси и Уровни
-            SetSectionCategoryVisibility(SheetInfo.TransverseViewSecond.ViewElement, new List<BuiltInCategory> {
-                BuiltInCategory.OST_Sections,
-                BuiltInCategory.OST_Grids,
-                BuiltInCategory.OST_Levels
-            }, false);
+            //// Скрытие категории Разразы, Оси и Уровни
+            //SetSectionCategoryVisibility(SheetInfo.TransverseViewSecond.ViewElement, new List<BuiltInCategory> {
+            //    BuiltInCategory.OST_Sections,
+            //    BuiltInCategory.OST_Grids,
+            //    BuiltInCategory.OST_Levels
+            //}, false);
 
             // Передаем второй поперечный вид пилона в метод по созданию видов в (0.0.0)
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewSecond)) {
@@ -335,19 +335,19 @@ namespace RevitPylonDocumentation.Models {
                 return false;
             } else {
                 // Заполнеяем данные для задания
-                SheetInfo.TransverseViewThird.ViewScale = 20;
+                //SheetInfo.TransverseViewThird.ViewScale = 20;
                 SheetInfo.TransverseViewThird.ViewportTypeName = "Сечение_Номер вида";
                 SheetInfo.TransverseViewThird.ViewportNumber = "3";
                 SheetInfo.TransverseViewThird.ViewportName = "";
             }
 
 
-            // Скрытие категории Разразы, Оси и Уровни
-            SetSectionCategoryVisibility(SheetInfo.TransverseViewThird.ViewElement, new List<BuiltInCategory> {
-                BuiltInCategory.OST_Sections,
-                BuiltInCategory.OST_Grids,
-                BuiltInCategory.OST_Levels
-            }, false);
+            //// Скрытие категории Разразы, Оси и Уровни
+            //SetSectionCategoryVisibility(SheetInfo.TransverseViewThird.ViewElement, new List<BuiltInCategory> {
+            //    BuiltInCategory.OST_Sections,
+            //    BuiltInCategory.OST_Grids,
+            //    BuiltInCategory.OST_Levels
+            //}, false);
 
             // Передаем третий поперечный вид пилона в метод по созданию видов в (0.0.0)
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewThird)) {
@@ -643,8 +643,8 @@ namespace RevitPylonDocumentation.Models {
             pylonView.ViewportHalfWidth = viewportHalfWidth;
             pylonView.ViewportHalfHeight = viewportHalfHeight;
 
-            TaskDialog.Show("ViewportHalfWidth", UnitUtilsHelper.ConvertFromInternalValue(pylonView.ViewportHalfWidth).ToString());
-            TaskDialog.Show("ViewportHalfHeight", UnitUtilsHelper.ConvertFromInternalValue(pylonView.ViewportHalfHeight).ToString());
+            //TaskDialog.Show("ViewportHalfWidth", UnitUtilsHelper.ConvertFromInternalValue(pylonView.ViewportHalfWidth).ToString());
+            //TaskDialog.Show("ViewportHalfHeight", UnitUtilsHelper.ConvertFromInternalValue(pylonView.ViewportHalfHeight).ToString());
 
             // Задание правильного положения метки видового экрана
 #if REVIT_2021_OR_LESS
