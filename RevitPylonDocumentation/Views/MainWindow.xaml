@@ -328,6 +328,7 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
 
+
         <Label Grid.Row="9" Content="Выберите типоразмер для создаваемых видов:"/>
         <ComboBox Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="5 0 5 5"
                   ItemsSource="{Binding ViewFamilyTypes}" 
@@ -477,6 +478,36 @@
 
                         <GroupBox Header="Правила поиска видов" Margin="5">
                             <StackPanel>
+                                <Label Content="Выберите шаблон основного вида:"/>
+                                <ComboBox
+                                      ItemsSource="{Binding ViewTemplatesInPj}" 
+                                      SelectedItem="{Binding SelectedGeneralViewTemplate}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock>
+                                                    <TextBlock.Text>
+                                                        <Binding Path="Name"/>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                </ComboBox>
+
+                                <Label Content="Выберите шаблон поперечного вида:"/>
+                                <ComboBox
+                                      ItemsSource="{Binding ViewTemplatesInPj}" 
+                                      SelectedItem="{Binding SelectedTransverseViewTemplate}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock>
+                                                <TextBlock.Text>
+                                                    <Binding Path="Name"/>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+
                                 <Label Content="Маска поиска основного вида пилона"/>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBox Text="{Binding GENERAL_VIEW_PREFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 

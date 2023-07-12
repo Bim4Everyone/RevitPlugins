@@ -66,12 +66,15 @@ namespace RevitPylonDocumentation.ViewModels {
         private string _generalViewSuffixTemp = "";
         private string _generalViewPerpendicularPrefixTemp = "Пилон ";
         private string _generalViewPerpendicularSuffixTemp = "_Перпендикулярный";
+        private string _generalViewTemplateNameTemp = "КЖ0.2_пилоны_орг.ур.-2";
+
         private string _transverseViewFirstPrefixTemp = "";
         private string _transverseViewFirstSuffixTemp = "_Сеч.1-1";
         private string _transverseViewSecondPrefixTemp = "";
         private string _transverseViewSecondSuffixTemp = "_Сеч.2-2";
         private string _transverseViewThirdPrefixTemp = "";
         private string _transverseViewThirdSuffixTemp = "_Сеч.3-3";
+        private string _transverseViewTemplateNameTemp = "";
 
         private string _rebarSchedulePrefixTemp = "Пилон ";
         private string _rebarScheduleSuffixTemp = "";
@@ -136,6 +139,13 @@ namespace RevitPylonDocumentation.ViewModels {
             Legends = _revitRepository.LegendsInProject;
             SelectedLegend = Legends
                 .FirstOrDefault(view => view.Name.Contains("илон"));
+
+
+            ViewTemplatesInPj = _revitRepository.AllViewTemplates;
+            SelectedGeneralViewTemplate = ViewTemplatesInPj
+                .FirstOrDefault(view => view.Name.Equals(GENERAL_VIEW_TEMPLATE_NAME));
+            SelectedTransverseViewTemplate = ViewTemplatesInPj
+                .FirstOrDefault(view => view.Name.Equals(TRANSVERSE_VIEW_TEMPLATE_NAME));
 
             FindReferenceSchedules();
             
@@ -243,6 +253,20 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Эталонная ведомость деталей для IFC арматуры
         /// </summary>
         public ViewSchedule ReferenceIFCPartsSchedule { get; set; }
+
+        /// <summary>
+        /// Перечень шаблонов видов в проекте
+        /// </summary>
+        public List<ViewSection> ViewTemplatesInPj { get; set; } = new List<ViewSection>();
+        /// <summary>
+        /// Выбранный пользователем шаблон вида основных видов
+        /// </summary>
+        public View SelectedGeneralViewTemplate { get; set; }
+        /// <summary>
+        /// Выбранный пользователем шаблон вида поперечных видов
+        /// </summary>
+        public View SelectedTransverseViewTemplate { get; set; }
+
 
 
         // Инфо по пилонам
@@ -359,6 +383,7 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
+
         public string GENERAL_VIEW_PERPENDICULAR_PREFIX { get; set; } = "Пилон ";
         public string GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP {
             get => _generalViewPerpendicularPrefixTemp;
@@ -373,6 +398,15 @@ namespace RevitPylonDocumentation.ViewModels {
             get => _generalViewPerpendicularSuffixTemp;
             set {
                 _generalViewPerpendicularSuffixTemp = value;
+                _edited = true;
+            }
+        }
+
+        public string GENERAL_VIEW_TEMPLATE_NAME { get; set; } = "КЖ0.2_пилоны_орг.ур.-2";
+        public string GENERAL_VIEW_TEMPLATE_NAME_TEMP {
+            get => _generalViewTemplateNameTemp;
+            set {
+                _generalViewTemplateNameTemp = value;
                 _edited = true;
             }
         }
@@ -434,7 +468,14 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-
+        public string TRANSVERSE_VIEW_TEMPLATE_NAME { get; set; } = "";
+        public string TRANSVERSE_VIEW_TEMPLATE_NAME_TEMP {
+            get => _transverseViewTemplateNameTemp;
+            set {
+                _transverseViewTemplateNameTemp = value;
+                _edited = true;
+            }
+        }
 
 
         public string REBAR_SCHEDULE_PREFIX { get; set; } = "Пилон ";
@@ -628,6 +669,7 @@ namespace RevitPylonDocumentation.ViewModels {
                 _edited = true;
             }
         }
+
 
         public string TYPICAL_PYLON_FILTER_VALUE { get; set; } = "на 1 шт.";
         public string TYPICAL_PYLON_FILTER_VALUE_TEMP {
@@ -970,13 +1012,7 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
 
-
-
-
-
-
         private void Test(object p) {
-
 
 
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Добавление видов")) {

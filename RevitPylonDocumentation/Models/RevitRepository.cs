@@ -66,6 +66,12 @@ namespace RevitPylonDocumentation.Models {
                 .Where(view => view.ViewType == ViewType.Legend)
                 .ToList();
 
+        public List<ViewSection> AllViewTemplates => new FilteredElementCollector(Document)
+                .OfClass(typeof(ViewSection))
+                .WhereElementIsNotElementType()
+                .OfType<ViewSection>()
+                .Where(v => v.IsTemplate == true)
+                .ToList();
 
 
         public List<PylonSheetInfo> HostsInfo { get; set; } = new List<PylonSheetInfo>();
@@ -82,6 +88,19 @@ namespace RevitPylonDocumentation.Models {
 
             return AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(vm.MATERIAL_SCHEDULE_NAME)) as ViewSchedule;
         }
+
+
+
+        public ViewSchedule FindViewTemplateForGeneralView(MainViewModel vm) {
+
+            return AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(vm.MATERIAL_SCHEDULE_NAME)) as ViewSchedule;
+        }
+
+
+
+
+
+
 
 
 

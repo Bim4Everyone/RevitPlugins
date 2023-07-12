@@ -81,7 +81,12 @@ namespace RevitPylonDocumentation.Models {
 
             ViewSection viewSection = ViewSection.CreateSection(Repository.Document, SelectedViewFamilyType.Id, sectionBox);
 
-            if(viewSection != null) { viewSection.Name = ViewModel.GENERAL_VIEW_PREFIX + SheetInfo.PylonKeyName + ViewModel.GENERAL_VIEW_SUFFIX; }
+            if(viewSection != null) { 
+                viewSection.Name = ViewModel.GENERAL_VIEW_PREFIX + SheetInfo.PylonKeyName + ViewModel.GENERAL_VIEW_SUFFIX;
+                if(ViewModel.SelectedGeneralViewTemplate != null) {
+                    viewSection.ViewTemplateId = ViewModel.SelectedGeneralViewTemplate.Id;
+                }
+            }
 
             SheetInfo.GeneralView.ViewElement = viewSection;
 
@@ -185,7 +190,12 @@ namespace RevitPylonDocumentation.Models {
 
             ViewSection viewSection = ViewSection.CreateSection(Repository.Document, SelectedViewFamilyType.Id, sectionBox);
 
-            if(viewSection != null) { viewSection.Name = ViewModel.GENERAL_VIEW_PERPENDICULAR_PREFIX + SheetInfo.PylonKeyName + ViewModel.GENERAL_VIEW_PERPENDICULAR_SUFFIX; }
+            if(viewSection != null) { 
+                viewSection.Name = ViewModel.GENERAL_VIEW_PERPENDICULAR_PREFIX + SheetInfo.PylonKeyName + ViewModel.GENERAL_VIEW_PERPENDICULAR_SUFFIX;
+                if(ViewModel.SelectedGeneralViewTemplate != null) {
+                    viewSection.ViewTemplateId = ViewModel.SelectedGeneralViewTemplate.Id;
+                }
+            }
 
             SheetInfo.GeneralViewPerpendicular.ViewElement = viewSection;
 
@@ -271,12 +281,21 @@ namespace RevitPylonDocumentation.Models {
             if(viewSection != null) {
                 if(transverseViewNum == 1) {
                     viewSection.Name = ViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + SheetInfo.PylonKeyName + ViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX;
+                    if(ViewModel.SelectedTransverseViewTemplate != null) {
+                        viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
+                    }
                     SheetInfo.TransverseViewFirst.ViewElement = viewSection;
                 } else if(transverseViewNum == 2) {
                     viewSection.Name = ViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + SheetInfo.PylonKeyName + ViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX;
+                    if(ViewModel.SelectedTransverseViewTemplate != null) {
+                        viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
+                    }
                     SheetInfo.TransverseViewSecond.ViewElement = viewSection;
                 } else if(transverseViewNum == 3) {
                     viewSection.Name = ViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + SheetInfo.PylonKeyName + ViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX;
+                    if(ViewModel.SelectedTransverseViewTemplate != null) {
+                        viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
+                    }
                     SheetInfo.TransverseViewThird.ViewElement = viewSection;
                 }
             }
