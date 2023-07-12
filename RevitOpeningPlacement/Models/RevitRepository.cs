@@ -269,7 +269,7 @@ namespace RevitOpeningPlacement.Models {
             }
             var typeId = element.GetTypeId();
             if(typeId.IsNotNull()) {
-                type = _document.GetElement(typeId) as ElementType;
+                type = element.Document.GetElement(typeId) as ElementType;
                 return type?.FamilyName;
             }
             return null;
