@@ -86,7 +86,7 @@ namespace RevitOpeningPlacement {
         /// <param name="uiApplication"></param>
         /// <param name="revitRepository"></param>
         private void GetIncomingTaskInDocAR(UIApplication uiApplication, RevitRepository revitRepository) {
-
+            GetOpeningsTaskInDocumentMEP(uiApplication, revitRepository);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace RevitOpeningPlacement {
         /// <param name="revitRepository"></param>
         private void GetOpeningsTaskInDocumentMEP(UIApplication uiApplication, RevitRepository revitRepository) {
             var configurator = new UnionGroupsConfigurator(revitRepository);
-            var openingsGroups = GetOpeningsGroups(revitRepository, configurator);
+            var openingsGroups = GetOpeningsGroupsMepTasksOutcoming(revitRepository, configurator);
             var viewModel = new OpeningsViewModel(revitRepository, openingsGroups);
 
             var window = new NavigatorView() { Title = PluginName, DataContext = viewModel };
@@ -167,7 +167,7 @@ namespace RevitOpeningPlacement {
             }
         }
 
-        private List<OpeningsGroup> GetOpeningsGroups(RevitRepository revitRepository, UnionGroupsConfigurator configurator) {
+        private List<OpeningsGroup> GetOpeningsGroupsMepTasksOutcoming(RevitRepository revitRepository, UnionGroupsConfigurator configurator) {
             var groups = new List<OpeningsGroup>();
             using(var pb = GetPlatformService<IProgressDialogService>()) {
                 IProgress<int> progress;
@@ -175,7 +175,7 @@ namespace RevitOpeningPlacement {
                 var maxValue = revitRepository.GetPlacedOutcomingTasks().Count;
                 InitializeProgress(maxValue, pb, out progress, out ct);
 
-                groups.AddRange(configurator.GetGroups(progress, ct));
+                groups.AddRange(configurator.GetGroupsMepTasksOutcoming(progress, ct));
             }
             return groups;
         }

@@ -18,10 +18,16 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
             _revitRepository = revitRepository;
         }
 
-        public List<OpeningPlacer> GetPlacers(IProgress<int> progress, CancellationToken ct) {
-            var wallOpeningsGroup = GetOpeningsGroupsInWall(progress, ct);
+        /// <summary>
+        /// Возвращает список сущностей для дальнейшей расстановки исходящих заданий на отверстия от инженера из текущего файла Revit
+        /// </summary>
+        /// <param name="progress"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public List<OpeningPlacer> GetPlacersMepTasksOutcoming(IProgress<int> progress, CancellationToken ct) {
+            var wallOpeningsGroup = GetOpeningsGroupsMepTasksOutcomingInWall(progress, ct);
             _elementsToDelete.AddRange(wallOpeningsGroup.SelectMany(item => item.Elements));
-            var floorOpeningsGroup = GetOpeningsGroupsInFloor(progress, ct);
+            var floorOpeningsGroup = GetOpeningsGroupsMepTasksOutcomingInFloor(progress, ct);
             _elementsToDelete.AddRange(floorOpeningsGroup.SelectMany(item => item.Elements));
             var wallOpeningGroupPlacerInitializer = new WallOpeningGroupPlacerInitializer();
             var floorOpeningGroupPlacerInitializer = new FloorOpeningGroupPlacerInitializer();
@@ -30,18 +36,36 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
                 .ToList();
         }
 
-        public List<OpeningsGroup> GetGroups(IProgress<int> progress, CancellationToken ct) {
-            return GetOpeningsGroupsInWall(progress, ct)
-                .Union(GetOpeningsGroupsInFloor(progress, ct))
+        /// <summary>
+        /// Возвращает список групп исходящих заданий на отверстия от инженера из текущего документа Revit, в которых находятся пересекающие друг друга задания на отверстия
+        /// </summary>
+        /// <param name="progress"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public List<OpeningsGroup> GetGroupsMepTasksOutcoming(IProgress<int> progress, CancellationToken ct) {
+            return GetOpeningsGroupsMepTasksOutcomingInWall(progress, ct)
+                .Union(GetOpeningsGroupsMepTasksOutcomingInFloor(progress, ct))
                 .ToList();
         }
 
-        private List<OpeningsGroup> GetOpeningsGroupsInWall(IProgress<int> progress, CancellationToken ct) {
-            return new UnionGroupProvider(new WallIntersectionProvider()).GetOpeningGroups(_revitRepository.GetWallOpenings(), progress, ct, 0);
+        /// <summary>
+        /// Возвращает список групп исходящих заданий на отверстия в стенах от инженера из текущего документа Revit, в которых находятся пересекающие друг друга задания на отверстия
+        /// </summary>
+        /// <param name="progress"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        private List<OpeningsGroup> GetOpeningsGroupsMepTasksOutcomingInWall(IProgress<int> progress, CancellationToken ct) {
+            return new UnionGroupProvider(new WallIntersectionProvider()).GetOpeningGroups(_revitRepository.GetWallOpeningsMepTasksOutcoming(), progress, ct, 0);
         }
 
-        private List<OpeningsGroup> GetOpeningsGroupsInFloor(IProgress<int> progress, CancellationToken ct) {
-            return new UnionGroupProvider(new FloorIntersectionProvider()).GetOpeningGroups(_revitRepository.GetFloorOpenings(), progress, ct, _revitRepository.GetWallOpenings().Count);
+        /// <summary>
+        /// Возвращает список групп исходящих заданий на отверстия в перекрытиях от инженера из текущего документа Revit, в которых находятся пересекающие друг друга задания на отверстия
+        /// </summary>
+        /// <param name="progress"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        private List<OpeningsGroup> GetOpeningsGroupsMepTasksOutcomingInFloor(IProgress<int> progress, CancellationToken ct) {
+            return new UnionGroupProvider(new FloorIntersectionProvider()).GetOpeningGroups(_revitRepository.GetFloorOpeningsMepTasksOutcoming(), progress, ct, _revitRepository.GetWallOpeningsMepTasksOutcoming().Count);
         }
 
         public List<Element> GetElementsToDelete() {

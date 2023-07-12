@@ -245,14 +245,22 @@ namespace RevitOpeningPlacement.Models {
             }
         }
 
-        public List<FamilyInstance> GetWallOpenings() {
+        /// <summary>
+        /// Возвращает исходящие задания на отверстия в стенах от инженера из текущего файла Revit
+        /// </summary>
+        /// <returns></returns>
+        public List<FamilyInstance> GetWallOpeningsMepTasksOutcoming() {
             var wallTypes = new[] { OpeningType.WallRectangle, OpeningType.WallRound };
-            return GetOpenings(wallTypes);
+            return GetOpeningsMepTasksOutcoming(wallTypes);
         }
 
-        public List<FamilyInstance> GetFloorOpenings() {
+        /// <summary>
+        /// Возвращает исходящие задания на отверстия в перекрытиях от инженера из текущего файла Revit
+        /// </summary>
+        /// <returns></returns>
+        public List<FamilyInstance> GetFloorOpeningsMepTasksOutcoming() {
             var floorTypes = new[] { OpeningType.FloorRectangle, OpeningType.FloorRound };
-            return GetOpenings(floorTypes);
+            return GetOpeningsMepTasksOutcoming(floorTypes);
         }
 
         public string GetFamilyName(Element element) {
@@ -322,14 +330,16 @@ namespace RevitOpeningPlacement.Models {
             _clashRevitRepository.DoAction(action);
         }
 
+        //public ICollection<>
+
         /// <summary>
-        /// Возвращает список экземпляров семейств-заданий на отверстия из текущего файла ревит ("исходящие" задания).
+        /// Возвращает список экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит ("исходящие" задания).
         /// </summary>
         /// <returns>Список экземпляров семейств, названия семейств и типов которых заданы в соответствующих словарях
         /// <see cref="TypeName">названий типов</see> и
         /// <see cref="FamilyName">названий семейств</see></returns>
         private List<FamilyInstance> GetOpeningsTaskFromCurrentDoc() {
-            return GetFamilyInstances()
+            return GetGenericModelsFamilyInstances()
                 .Where(item => TypeName.Any(n => n.Value.Equals(item.Name))
                             && FamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
                 .ToList();
@@ -341,14 +351,24 @@ namespace RevitOpeningPlacement.Models {
             }
         }
 
-        private IEnumerable<FamilyInstance> GetFamilyInstances() {
+
+        /// <summary>
+        /// Возвращает экземпляры семейств категории "Обобщенные модели" из текущего документа Revit
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<FamilyInstance> GetGenericModelsFamilyInstances() {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .OfType<FamilyInstance>();
         }
 
-        private List<FamilyInstance> GetOpenings(ICollection<OpeningType> types) {
-            return GetFamilyInstances()
+        /// <summary>
+        /// Возвращает задания на отверстия от инженера из текущего файла Revit
+        /// </summary>
+        /// <param name="types"></param>
+        /// <returns></returns>
+        private List<FamilyInstance> GetOpeningsMepTasksOutcoming(ICollection<OpeningType> types) {
+            return GetGenericModelsFamilyInstances()
                .Where(item => types.Any(e => TypeName[e].Equals(item.Name))
                            && types.Any(e => FamilyName[e].Equals(GetFamilyName(item))))
                .ToList();
