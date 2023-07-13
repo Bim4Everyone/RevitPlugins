@@ -18,6 +18,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             }
             _openingTask = incomingOpeningTask;
 
+            OpeningId = _openingTask.Id.ToString();
             FileName = Path.GetFileNameWithoutExtension(incomingOpeningTask.FileName);
             Date = _openingTask.Date;
             MepSystem = _openingTask.MepSystem;
@@ -26,6 +27,8 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             BottomOffset = _openingTask.BottomOffset;
         }
 
+
+        public string OpeningId { get; } = string.Empty;
 
         public string FileName { get; } = string.Empty;
 
