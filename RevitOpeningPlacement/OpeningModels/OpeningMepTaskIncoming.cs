@@ -101,7 +101,10 @@ namespace RevitOpeningPlacement.OpeningModels {
             }
             string value = string.Empty;
             if(_familyInstance.IsExistsParam(paramName)) {
-                value = _familyInstance.GetParamValue<string>(paramName);
+                object paramValue = _familyInstance.GetParamValue(paramName);
+                if(!(paramValue is null)) {
+                    value = paramValue.ToString();
+                }
             }
             return value;
         }
