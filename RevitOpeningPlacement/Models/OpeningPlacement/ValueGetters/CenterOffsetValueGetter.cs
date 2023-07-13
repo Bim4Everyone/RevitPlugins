@@ -26,7 +26,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
 
         public DoubleParamValue GetValue() {
             var offsetInFeet = _pointFinder.GetPoint().Z;
-            return new DoubleParamValue(GetOffsetInMm(offsetInFeet));
+            return new DoubleParamValue(Math.Round(GetOffsetInMm(offsetInFeet)));
         }
 
         private double GetOffsetInMm(double offsetInFeet) {
