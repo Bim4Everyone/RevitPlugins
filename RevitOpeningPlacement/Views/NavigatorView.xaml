@@ -126,13 +126,17 @@
             </mvvm:Interaction.Behaviors>
             <dxg:GridControl.View>
                 <dxg:TableView x:Name="view"
-                                  AutoWidth="True"
-                                  DataNavigatorButtons="Navigation"
-                                  ShowDataNavigator="True" 
-                                  ShowSearchPanelMode="Always"
-                                  IndicatorWidth="0"
-                                  FocusedRowHandleChanged="view_FocusedRowHandleChanged"
-                                  GroupRowTemplateSelector="{StaticResource GroupedRowTemplateSelector}" NavigationStyle="Cell" >
+                               AutoWidth="True"
+                               DataNavigatorButtons="Navigation"
+                               ShowDataNavigator="True" 
+                               ShowSearchPanelMode="Always"
+                               IndicatorWidth="0"
+                               FocusedRowHandleChanged="view_FocusedRowHandleChanged"
+                               GroupRowTemplateSelector="{StaticResource GroupedRowTemplateSelector}" 
+                               NavigationStyle="Cell" 
+                               VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                               VirtualizingPanel.VirtualizationMode="Recycling"
+                               VirtualizingPanel.IsVirtualizing="True">
                 </dxg:TableView>
             </dxg:GridControl.View>
             <dxg:GridControl.Columns>

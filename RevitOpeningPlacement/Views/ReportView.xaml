@@ -31,8 +31,13 @@
                 <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectionDataChangedCommand}"/>
             </mvvm:Interaction.Behaviors>
             <dxg:GridControl.View>
-                <dxg:TableView Name="_gridView" AutoWidth="True" DataNavigatorButtons="Navigation"
-                               ShowDataNavigator="True">
+                <dxg:TableView Name="_gridView" 
+                               AutoWidth="True" 
+                               DataNavigatorButtons="Navigation"
+                               ShowDataNavigator="True"
+                               VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                               VirtualizingPanel.VirtualizationMode="Recycling"
+                               VirtualizingPanel.IsVirtualizing="True">
                 </dxg:TableView>
             </dxg:GridControl.View>
             <dxg:GridControl.Columns>
