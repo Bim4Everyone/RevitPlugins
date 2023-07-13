@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Windows.Interop;
 
@@ -12,6 +13,7 @@ using dosymep.SimpleServices;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.OpeningUnion;
+using RevitOpeningPlacement.OpeningModels;
 using RevitOpeningPlacement.ViewModels.Navigator;
 using RevitOpeningPlacement.Views;
 
@@ -86,7 +88,16 @@ namespace RevitOpeningPlacement {
         /// <param name="uiApplication"></param>
         /// <param name="revitRepository"></param>
         private void GetIncomingTaskInDocAR(UIApplication uiApplication, RevitRepository revitRepository) {
-            GetOpeningsTaskInDocumentMEP(uiApplication, revitRepository);
+            var incomingTasks = revitRepository
+                .GetOpeningMepTasksIncoming()
+                .Select(famInst => new OpeningMepTaskIncomingViewModel(new OpeningMepTaskIncoming(famInst)))
+                .ToList();
+            var navigatorViewModel = new OpeningsMepTaskIncomingViewModel(revitRepository, incomingTasks);
+
+            var window = new NavigatorMepIncoming() { Title = PluginName, DataContext = navigatorViewModel };
+            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
+
+            window.Show();
         }
 
         /// <summary>
@@ -95,7 +106,7 @@ namespace RevitOpeningPlacement {
         /// <param name="uiApplication"></param>
         /// <param name="revitRepository"></param>
         private void GetOutgoingTaskInDocAR(UIApplication uiApplication, RevitRepository revitRepository) {
-
+            TaskDialog.Show("Навигатор по заданиям на отверстия", "Навигатор по исходящим заданиям на отверстия в файле АР находится в разработке");
         }
 
         /// <summary>
@@ -104,7 +115,7 @@ namespace RevitOpeningPlacement {
         /// <param name="uiApplication"></param>
         /// <param name="revitRepository"></param>
         private void GetOpeningsTaskInDocumentKR(UIApplication uiApplication, RevitRepository revitRepository) {
-
+            GetIncomingTaskInDocAR(uiApplication, revitRepository);
         }
 
         /// <summary>
