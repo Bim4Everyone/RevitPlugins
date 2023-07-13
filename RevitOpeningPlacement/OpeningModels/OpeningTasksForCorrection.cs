@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace RevitOpeningPlacement.OpeningModels {
     /// <summary>
-    /// Класс, обозначающий коллекцию <see cref="OpeningTaskIncoming">входящих заданий на отверстия</see>, 
+    /// Класс, обозначающий коллекцию <see cref="OpeningMepTaskIncoming">входящих заданий на отверстия</see>, 
     /// к которым есть замечания от получателя, для последующей отправки этой коллекции отправителю заданий
     /// </summary>
     internal class OpeningTasksForCorrection {
@@ -13,21 +13,21 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Создает экземпляр <see cref="OpeningTasksForCorrection"/>
         /// </summary>
         /// <param name="incomingTasks">Коллекция заданий на отверстия с одинаковым файлом источника, 
-        /// с имеющимися <seealso cref="OpeningTaskIncoming.Comment">комментариями</seealso></param>
+        /// с имеющимися <seealso cref="OpeningMepTaskIncoming.Comment">комментариями</seealso></param>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public OpeningTasksForCorrection(ICollection<OpeningTaskIncoming> incomingTasks) {
+        public OpeningTasksForCorrection(ICollection<OpeningMepTaskIncoming> incomingTasks) {
             Validate(incomingTasks);
 
             TaskFile = incomingTasks.First().FileName;
-            Tasks = new ReadOnlyCollection<OpeningTaskIncoming>(incomingTasks as IList<OpeningTaskIncoming>);
+            Tasks = new ReadOnlyCollection<OpeningMepTaskIncoming>(incomingTasks as IList<OpeningMepTaskIncoming>);
         }
 
 
         /// <summary>
         /// Коллекция заданий на отверстия, к которым есть замечания (комментарии)
         /// </summary>
-        public IReadOnlyCollection<OpeningTaskIncoming> Tasks { get; }
+        public IReadOnlyCollection<OpeningMepTaskIncoming> Tasks { get; }
 
         /// <summary>
         /// Название файла-источника заданий на отверстия
@@ -41,7 +41,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="incomingTasks"></param>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        private void Validate(ICollection<OpeningTaskIncoming> incomingTasks) {
+        private void Validate(ICollection<OpeningMepTaskIncoming> incomingTasks) {
             var tasksCount = incomingTasks.Count;
             if(tasksCount < 1) {
                 throw new ArgumentOutOfRangeException($"Коллекция {nameof(incomingTasks)} пустая. Необходим хотя бы 1 элемент");
