@@ -67,6 +67,9 @@ namespace RevitPylonDocumentation.ViewModels {
         private string _generalViewPerpendicularPrefixTemp = "Пилон ";
         private string _generalViewPerpendicularSuffixTemp = "_Перпендикулярный";
         private string _generalViewTemplateNameTemp = "КЖ0.2_пилоны_орг.ур.-2";
+        private string _generalViewXOffsetTemp = "200";
+        private string _generalViewYTopOffsetTemp = "2300";
+        private string _generalViewYBottomOffsetTemp = "200";
 
         private string _transverseViewFirstPrefixTemp = "";
         private string _transverseViewFirstSuffixTemp = "_Сеч.1-1";
@@ -75,6 +78,8 @@ namespace RevitPylonDocumentation.ViewModels {
         private string _transverseViewThirdPrefixTemp = "";
         private string _transverseViewThirdSuffixTemp = "_Сеч.3-3";
         private string _transverseViewTemplateNameTemp = "";
+        private string _transverseViewXOffsetTemp = "200";
+        private string _transverseViewYOffsetTemp = "200";
 
         private string _rebarSchedulePrefixTemp = "Пилон ";
         private string _rebarScheduleSuffixTemp = "";
@@ -89,7 +94,6 @@ namespace RevitPylonDocumentation.ViewModels {
         private string _materialScheduleNameTemp = "!СМ";
         private string _systemPartsScheduleNameTemp = "!ВД_СИС";
         private string _IFCPartsScheduleNameTemp = "!ВД_IFC";
-        //private string _scheduleMarkParamNameTemp = "обр_Метка основы_универсальная";
 
         private string _rebarScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
         private string _rebarScheduleDisp2Temp = "!СА_Пилоны";
@@ -105,7 +109,7 @@ namespace RevitPylonDocumentation.ViewModels {
         public static string DEF_TITLEBLOCK_NAME = "Создать типы по комплектам";
 
         private List<PylonSheetInfo> _selectedHostsInfo = new List<PylonSheetInfo>();
-        private ScheduleFilterParamHelper _selectedScheduleFilterParam;
+        //private ScheduleFilterParamHelper _selectedScheduleFilterParam;
 
 
 
@@ -411,6 +415,33 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
+        public string GENERAL_VIEW_X_OFFSET { get; set; } = "200";
+        public string GENERAL_VIEW_X_OFFSET_TEMP {
+            get => _generalViewXOffsetTemp;
+            set {
+                _generalViewXOffsetTemp = value;
+                _edited = true;
+            }
+        }
+
+        public string GENERAL_VIEW_Y_TOP_OFFSET { get; set; } = "2300";
+        public string GENERAL_VIEW_Y_TOP_OFFSET_TEMP {
+            get => _generalViewYTopOffsetTemp;
+            set {
+                _generalViewYTopOffsetTemp = value;
+                _edited = true;
+            }
+        }
+
+        public string GENERAL_VIEW_Y_BOTTOM_OFFSET { get; set; } = "200";
+        public string GENERAL_VIEW_Y_BOTTOM_OFFSET_TEMP {
+            get => _generalViewYBottomOffsetTemp;
+            set {
+                _generalViewYBottomOffsetTemp = value;
+                _edited = true;
+            }
+        }
+
 
         public string TRANSVERSE_VIEW_FIRST_PREFIX { get; set; } = "";
         public string TRANSVERSE_VIEW_FIRST_PREFIX_TEMP {
@@ -477,6 +508,23 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
+        public string TRANSVERSE_VIEW_X_OFFSET { get; set; } = "200";
+        public string TRANSVERSE_VIEW_X_OFFSET_TEMP {
+            get => _transverseViewXOffsetTemp;
+            set {
+                _transverseViewXOffsetTemp = value;
+                _edited = true;
+            }
+        }
+
+        public string TRANSVERSE_VIEW_Y_OFFSET { get; set; } = "200";
+        public string TRANSVERSE_VIEW_Y_OFFSET_TEMP {
+            get => _transverseViewYOffsetTemp;
+            set {
+                _transverseViewYOffsetTemp = value;
+                _edited = true;
+            }
+        }
 
         public string REBAR_SCHEDULE_PREFIX { get; set; } = "Пилон ";
         public string REBAR_SCHEDULE_PREFIX_TEMP {
@@ -680,6 +728,7 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
+
         private ObservableCollection<ScheduleFilterParamHelper> _paramsForScheduleFilters = new ObservableCollection<ScheduleFilterParamHelper>() {
             new ScheduleFilterParamHelper("обр_ФОП_Форма_номер", ""),
             new ScheduleFilterParamHelper("обр_ФОП_Раздел проекта", "обр_ФОП_Раздел проекта"),
@@ -772,26 +821,60 @@ namespace RevitPylonDocumentation.ViewModels {
             PROJECT_SECTION = _projectSectionTemp;
             MARK = _markTemp;
             DISPATCHER_GROUPING_FIRST = _dispatcherGroupingFirstTemp;
+            DISPATCHER_GROUPING_SECOND = _dispatcherGroupingSecondTemp;
             SHEET_SIZE = _sheetSizeTemp;
             SHEET_COEFFICIENT = _sheetCoefficientTemp;
+            SHEET_PREFIX = _sheetPrefixTemp;
+            SHEET_SUFFIX = _sheetSuffixTemp;
+            TYPICAL_PYLON_FILTER_PARAMETER = _typicalPylonFilterParameterTemp;
+            TYPICAL_PYLON_FILTER_VALUE = _typicalPylonFilterValueTemp;
+
+
             GENERAL_VIEW_PREFIX = _generalViewPrefixTemp;
             GENERAL_VIEW_SUFFIX = _generalViewSuffixTemp;
             GENERAL_VIEW_PERPENDICULAR_PREFIX = _generalViewPerpendicularPrefixTemp;
             GENERAL_VIEW_PERPENDICULAR_SUFFIX = _generalViewPerpendicularSuffixTemp;
+            GENERAL_VIEW_TEMPLATE_NAME = _generalViewTemplateNameTemp;
+            GENERAL_VIEW_X_OFFSET = _generalViewXOffsetTemp;
+            GENERAL_VIEW_Y_TOP_OFFSET = _generalViewYTopOffsetTemp;
+            GENERAL_VIEW_Y_BOTTOM_OFFSET = _generalViewYBottomOffsetTemp;
+
+
             TRANSVERSE_VIEW_FIRST_PREFIX = _transverseViewFirstPrefixTemp;
             TRANSVERSE_VIEW_FIRST_SUFFIX = _transverseViewFirstSuffixTemp;
             TRANSVERSE_VIEW_SECOND_PREFIX = _transverseViewSecondPrefixTemp;
             TRANSVERSE_VIEW_SECOND_SUFFIX = _transverseViewSecondSuffixTemp;
             TRANSVERSE_VIEW_THIRD_PREFIX = _transverseViewThirdPrefixTemp;
             TRANSVERSE_VIEW_THIRD_SUFFIX = _transverseViewThirdSuffixTemp;
+            TRANSVERSE_VIEW_TEMPLATE_NAME = _transverseViewTemplateNameTemp;
+            TRANSVERSE_VIEW_X_OFFSET = _transverseViewXOffsetTemp;
+            TRANSVERSE_VIEW_Y_OFFSET = _transverseViewYOffsetTemp;
+
+
             REBAR_SCHEDULE_PREFIX = _rebarSchedulePrefixTemp;
             REBAR_SCHEDULE_SUFFIX = _rebarScheduleSuffixTemp;
+            REBAR_SCHEDULE_NAME = _rebarScheduleNameTemp;
+            REBAR_SCHEDULE_DISP1 = _rebarScheduleDisp1Temp;
+            REBAR_SCHEDULE_DISP2 = _rebarScheduleDisp2Temp;
+
             MATERIAL_SCHEDULE_PREFIX = _materialSchedulePrefixTemp;
             MATERIAL_SCHEDULE_SUFFIX = _materialScheduleSuffixTemp;
+            MATERIAL_SCHEDULE_NAME = _materialScheduleNameTemp;
+            MATERIAL_SCHEDULE_DISP1 = _materialScheduleDisp1Temp;
+            MATERIAL_SCHEDULE_DISP2 = _materialScheduleDisp2Temp;
+
             SYSTEM_PARTS_SCHEDULE_PREFIX = _systemPartsSchedulePrefixTemp;
             SYSTEM_PARTS_SCHEDULE_SUFFIX = _systemPartsScheduleSuffixTemp;
+            SYSTEM_PARTS_SCHEDULE_NAME = _systemPartsScheduleNameTemp;
+            SYSTEM_PARTS_SCHEDULE_DISP1 = _systemPartsScheduleDisp1Temp;
+            SYSTEM_PARTS_SCHEDULE_DISP2 = _systemPartsScheduleDisp2Temp;
+
             IFC_PARTS_SCHEDULE_PREFIX = _IFCPartsSchedulePrefixTemp;
             IFC_PARTS_SCHEDULE_SUFFIX = _IFCPartsScheduleSuffixTemp;
+            IFC_PARTS_SCHEDULE_NAME = _IFCPartsScheduleNameTemp;
+            IFC_PARTS_SCHEDULE_DISP1 = _IFCPartsScheduleDisp1Temp;
+            IFC_PARTS_SCHEDULE_DISP2 = _IFCPartsScheduleDisp2Temp;
+
 
             _edited = false;
 
@@ -1010,8 +1093,6 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
 
-
-
         private void Test(object p) {
 
 
@@ -1041,6 +1122,10 @@ namespace RevitPylonDocumentation.ViewModels {
 
                         hostsInfo.GeneralViewPerpendicular.ViewCreator.CreateGeneralPerpendicularView(SelectedViewFamilyType);
                     }
+
+
+
+
 
                     if(hostsInfo.TransverseViewFirst.InProjectEditableInGUI && hostsInfo.TransverseViewFirst.InProject) {
 

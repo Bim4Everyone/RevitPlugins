@@ -68,10 +68,14 @@ namespace RevitPylonDocumentation.Models {
             BoundingBoxXYZ bb = elemForWork.get_BoundingBox(null);
             double minZ = bb.Min.Z;
             double maxZ = bb.Max.Z;
-            double offset = 0.1 * hostLength;
 
-            XYZ sectionBoxMin = new XYZ(-hostLength * 0.6, minZ - originPoint.Z - offset, -hostWidth);
-            XYZ sectionBoxMax = new XYZ(hostLength * 0.6, maxZ - originPoint.Z + offset, hostWidth);
+            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.GENERAL_VIEW_X_OFFSET));
+            double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.GENERAL_VIEW_Y_TOP_OFFSET));
+            double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.GENERAL_VIEW_Y_BOTTOM_OFFSET));
+
+
+            XYZ sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostWidth);
+            XYZ sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, -hostWidth);
 
 
             BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
@@ -178,10 +182,15 @@ namespace RevitPylonDocumentation.Models {
             BoundingBoxXYZ bb = elemForWork.get_BoundingBox(null);
             double minZ = bb.Min.Z;
             double maxZ = bb.Max.Z;
-            double offset = 0.1 * hostLength;
 
-            XYZ sectionBoxMin = new XYZ(-hostWidth * 1.5, minZ - originPoint.Z - offset, -hostLength * 0.4);
-            XYZ sectionBoxMax = new XYZ(hostWidth * 1.5, maxZ - originPoint.Z + offset, hostLength * 0.4);
+
+            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.GENERAL_VIEW_X_OFFSET));
+            double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.GENERAL_VIEW_Y_TOP_OFFSET));
+            double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.GENERAL_VIEW_Y_BOTTOM_OFFSET));
+
+
+            XYZ sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.4);
+            XYZ sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, -hostLength * 0.4);
 
 
             BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
@@ -252,8 +261,8 @@ namespace RevitPylonDocumentation.Models {
 
             XYZ sectionBoxMin;
             XYZ sectionBoxMax;
-            double coordinateX = hostLength * 0.5 + hostWidth;
-            double coordinateY = hostWidth * 1.5;
+            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.TRANSVERSE_VIEW_X_OFFSET));
+            double coordinateY = hostWidth * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.TRANSVERSE_VIEW_Y_OFFSET));
 
             if(transverseViewNum == 1) {
                 // Располагаем сечение на высоте 1/4 высоты пилона

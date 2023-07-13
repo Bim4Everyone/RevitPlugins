@@ -71,6 +71,7 @@ namespace RevitPylonDocumentation.Models {
                 .WhereElementIsNotElementType()
                 .OfType<ViewSection>()
                 .Where(v => v.IsTemplate == true)
+                .OrderBy(a => a.Name)
                 .ToList();
 
 

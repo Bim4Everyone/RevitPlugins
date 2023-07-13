@@ -508,6 +508,38 @@
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
 
+                                <Label Content="Отступ по X у основного вида"/>
+                                <TextBox
+                                    HorizontalAlignment="Left" Margin="5 0"
+                                    Text="{Binding GENERAL_VIEW_X_OFFSET_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                    Width="290" VerticalContentAlignment="Center"/>
+                                
+                                <Label Content="Отступ по Y сверху у основного вида"/>
+                                <TextBox
+                                    HorizontalAlignment="Left" Margin="5 0"
+                                    Text="{Binding GENERAL_VIEW_Y_TOP_OFFSET_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                    Width="290" VerticalContentAlignment="Center"/>
+
+                                <Label Content="Отступ по Y снизу у основного вида"/>
+                                <TextBox
+                                    HorizontalAlignment="Left" Margin="5 0"
+                                    Text="{Binding GENERAL_VIEW_Y_BOTTOM_OFFSET_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                    Width="290" VerticalContentAlignment="Center"/>
+
+                                
+                                <Label Content="Отступ по X у поперечного вида"/>
+                                <TextBox
+                                    HorizontalAlignment="Left" Margin="5 0"
+                                    Text="{Binding TRANSVERSE_VIEW_X_OFFSET_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                    Width="290" VerticalContentAlignment="Center"/>
+
+                                <Label Content="Отступ по Y у поперечного вида"/>
+                                <TextBox
+                                    HorizontalAlignment="Left" Margin="5 0"
+                                    Text="{Binding TRANSVERSE_VIEW_Y_OFFSET_TEMP, UpdateSourceTrigger=PropertyChanged}" 
+                                    Width="290" VerticalContentAlignment="Center"/>
+
+                                
                                 <Label Content="Маска поиска основного вида пилона"/>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBox Text="{Binding GENERAL_VIEW_PREFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
