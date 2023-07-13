@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 using Autodesk.Revit.DB;
 
@@ -17,6 +18,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             }
             _openingTask = incomingOpeningTask;
 
+            FileName = Path.GetFileNameWithoutExtension(incomingOpeningTask.FileName);
             Date = _openingTask.Date;
             MepSystem = _openingTask.MepSystem;
             Description = _openingTask.Description;
@@ -25,6 +27,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         }
 
 
+        public string FileName { get; } = string.Empty;
 
         public string Date { get; } = string.Empty;
 
