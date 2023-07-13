@@ -94,7 +94,7 @@ namespace RevitOpeningPlacement {
                 .ToList();
             var navigatorViewModel = new OpeningsMepTaskIncomingViewModel(revitRepository, incomingTasks);
 
-            var window = new NavigatorMepIncoming() { Title = PluginName, DataContext = navigatorViewModel };
+            var window = new NavigatorMepIncomingView() { Title = PluginName, DataContext = navigatorViewModel };
             var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
 
             window.Show();

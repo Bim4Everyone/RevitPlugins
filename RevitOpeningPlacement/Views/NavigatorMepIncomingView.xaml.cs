@@ -3,11 +3,8 @@
 using DevExpress.Xpf.Grid;
 
 namespace RevitOpeningPlacement.Views {
-    /// <summary>
-    /// Interaction logic for NavigatorMepIncoming.xaml
-    /// </summary>
-    public partial class NavigatorMepIncoming {
-        public NavigatorMepIncoming() {
+    public partial class NavigatorMepIncomingView {
+        public NavigatorMepIncomingView() {
             InitializeComponent();
             Loaded += NavigatorView_Loaded;
         }
@@ -18,7 +15,7 @@ namespace RevitOpeningPlacement.Views {
         }
 
         public override string PluginName => nameof(RevitOpeningPlacement);
-        public override string ProjectConfigName => nameof(NavigatorMepIncoming);
+        public override string ProjectConfigName => nameof(NavigatorMepIncomingView);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             Close();
