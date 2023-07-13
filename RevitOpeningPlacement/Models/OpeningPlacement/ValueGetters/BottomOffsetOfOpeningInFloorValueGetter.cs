@@ -36,7 +36,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
 #else
             offsetInMm = UnitUtils.ConvertFromInternalUnits(offsetInFeet, UnitTypeId.Millimeters);
 #endif
-            return new DoubleParamValue(offsetInMm);
+            return new DoubleParamValue(Math.Round(offsetInMm));
         }
     }
 }

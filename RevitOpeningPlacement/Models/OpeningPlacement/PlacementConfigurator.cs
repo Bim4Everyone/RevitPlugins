@@ -42,7 +42,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             _categories = categories;
         }
 
-        public IEnumerable<OpeningPlacer> GetPlacers() {
+        public IEnumerable<OpeningPlacer> GetPlacersMepOutcomingTasks() {
             var wallFilter = FiltersInitializer.GetWallFilter(_revitRepository.GetClashRevitRepository());
             var floorFilter = FiltersInitializer.GetFloorFilter(_revitRepository.GetClashRevitRepository());
 

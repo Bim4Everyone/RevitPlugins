@@ -46,7 +46,7 @@ namespace RevitOpeningPlacement {
             var openingConfig = OpeningConfig.GetOpeningConfig();
             if(openingConfig.Categories.Count > 0) {
                 var placementConfigurator = new PlacementConfigurator(revitRepository, openingConfig.Categories);
-                var placers = placementConfigurator.GetPlacers()
+                var placers = placementConfigurator.GetPlacersMepOutcomingTasks()
                                                    .ToList();
                 uiApplication.Application.FailuresProcessing += FailureProcessor;
                 var unplacedClashes = InitializePlacing(revitRepository, placers)

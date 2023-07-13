@@ -1,10 +1,13 @@
-﻿using Autodesk.Revit.DB;
+﻿using System;
+
+using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
 using RevitClashDetective.Models.Extensions;
 
+using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels.Enums;
 
@@ -13,7 +16,7 @@ namespace RevitOpeningPlacement.OpeningModels {
     /// Класс, обозначающий экземпляры семейств заданий на отверстия из связанного файла-задания на отверстия,
     /// подгруженного в текущий документ получателя
     /// </summary>
-    internal class OpeningTaskIncoming : ISolidProvider {
+    internal class OpeningMepTaskIncoming : ISolidProvider {
         /// <summary>
         /// Экземпляр семейства задания на отверстие
         /// </summary>
@@ -24,12 +27,21 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Экземпляр семейства задания на отверстие, расположенного в связанном файле задания на отверстия
         /// </summary>
         /// <param name="openingTaskIncoming">Экземпляр семейства задания на отверстие из связанного файла</param>
-        /// <param name="fileName">Название связанного файла-источника задания (без суффикса)</param>
-        public OpeningTaskIncoming(FamilyInstance openingTaskIncoming, string fileName) {
+        public OpeningMepTaskIncoming(FamilyInstance openingTaskIncoming) {
+            if(openingTaskIncoming is null) {
+                throw new ArgumentNullException(nameof(openingTaskIncoming));
+            }
             _familyInstance = openingTaskIncoming;
+
             Id = _familyInstance.Id.IntegerValue;
             Location = (_familyInstance.Location as LocationPoint).Point;
-            FileName = fileName;
+            FileName = _familyInstance.Document.PathName;
+
+            Date = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDate);
+            MepSystem = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningMepSystem);
+            Description = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDescription);
+            CenterOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetCenter);
+            BottomOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetBottom);
         }
 
 
@@ -43,7 +55,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Точка расположения экземпляра семейства задания на отверстие
         /// </summary>
-        public XYZ Location { get; private set; }
+        public XYZ Location { get; }
 
         /// <summary>
         /// Комментарий к входящему заданию на отверстие
@@ -55,11 +67,25 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         public bool IsAccepted { get; set; } = true;
 
+        public string Date { get; } = string.Empty;
+
+        public string MepSystem { get; } = string.Empty;
+
+        public string Description { get; } = string.Empty;
+
+        public string CenterOffset { get; } = string.Empty;
+
+        public string BottomOffset { get; } = string.Empty;
+
         /// <summary>
         /// Статус отработки задания на отверстие
         /// </summary>
         public OpeningTaskIncomingStatusEnum Status { get; set; } = OpeningTaskIncomingStatusEnum.NewTask;
 
+
+        public FamilyInstance GetFamilyInstance() {
+            return _familyInstance;
+        }
 
         public Solid GetSolid() {
             return _familyInstance.GetSolid();
@@ -67,6 +93,20 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         public BoundingBoxXYZ GetTransformedBBoxXYZ() {
             return _familyInstance.GetBoundingBox().TransformBoundingBox(_familyInstance.GetTotalTransform().Inverse);
+        }
+
+        private string GetFamilyInstanceStringParamValueOrEmpty(string paramName) {
+            if(_familyInstance is null) {
+                throw new ArgumentNullException(nameof(_familyInstance));
+            }
+            string value = string.Empty;
+            if(_familyInstance.IsExistsParam(paramName)) {
+                object paramValue = _familyInstance.GetParamValue(paramName);
+                if(!(paramValue is null)) {
+                    value = paramValue.ToString();
+                }
+            }
+            return value;
         }
     }
 }

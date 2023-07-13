@@ -43,7 +43,7 @@ namespace RevitOpeningPlacement {
                 var maxValue = revitRepository.GetPlacedOutcomingTasks().Count;
                 InitializeProgress(maxValue, pb, out progress, out ct);
 
-                placers.AddRange(configurator.GetPlacers(progress, ct));
+                placers.AddRange(configurator.GetPlacersMepTasksOutcoming(progress, ct));
             }
             return placers;
         }
