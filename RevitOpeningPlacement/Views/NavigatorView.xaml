@@ -57,7 +57,7 @@
                                                CommandParameter="{Binding RowHandle.Value}"
                                                IsChecked="{Binding Path=IsRowExpanded}" />
                     <TextBlock Margin="2,0" 
-                               Text="Непересекающиеся задания на отверстия" 
+                               Text="Не пересекающиеся задания на отверстия" 
                                VerticalAlignment="Center" 
                                HorizontalAlignment="Left"/>
                 </StackPanel>
