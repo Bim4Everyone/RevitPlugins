@@ -362,6 +362,37 @@ namespace RevitOpeningPlacement.Models {
                 .OfType<FamilyInstance>();
         }
 
+        private IEnumerable<RevitLinkInstance> GetRevitLinks() {
+            return new FilteredElementCollector(_document)
+                .OfCategory(BuiltInCategory.OST_RvtLinks)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(RevitLinkInstance))
+                .Cast<RevitLinkInstance>()
+                .Where(link => RevitLinkType.IsLoaded(
+                                   _document,
+                                   link.GetTypeId()));
+        }
+
+        private IList<FamilyInstance> GetGenericModelsFamilyInstancesFromLinks() {
+            var links = GetRevitLinks();
+            List<FamilyInstance> genericModelsInLinks = new List<FamilyInstance>();
+            foreach(RevitLinkInstance link in links) {
+                var linkDoc = link.GetLinkDocument();
+                var genericModelsInLink = new FilteredElementCollector(linkDoc)
+                    .OfCategory(BuiltInCategory.OST_GenericModel)
+                    .OfType<FamilyInstance>();
+                genericModelsInLinks.AddRange(genericModelsInLink);
+            }
+            return genericModelsInLinks;
+        }
+
+        public IList<FamilyInstance> GetOpeningMepTasksIncoming() {
+            return GetGenericModelsFamilyInstancesFromLinks()
+                .Where(famInst => TypeName.Values.Contains(famInst.Name)
+                               && FamilyName.Values.Contains(GetFamilyName(famInst)))
+                .ToList();
+        }
+
         /// <summary>
         /// Возвращает задания на отверстия от инженера из текущего файла Revit
         /// </summary>
