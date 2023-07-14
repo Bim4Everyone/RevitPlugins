@@ -37,7 +37,6 @@ namespace RevitPylonDocumentation.Models {
                 return false;
             } else {
                 // Заполнеяем данные для задания
-                //SheetInfo.GeneralView.ViewScale = 25;
                 SheetInfo.GeneralView.ViewportTypeName = "Заголовок на листе";
                 SheetInfo.GeneralView.ViewportNumber = "100";
                 SheetInfo.GeneralView.ViewportName = 
@@ -46,13 +45,7 @@ namespace RevitPylonDocumentation.Models {
                     + ViewModel.GENERAL_VIEW_SUFFIX;
             }
 
-            //// Скрытие категории Разразы, Оси и Уровни
-            //SetSectionCategoryVisibility(SheetInfo.GeneralView.ViewElement, new List<BuiltInCategory> { 
-            //    BuiltInCategory.OST_Sections,
-            //    BuiltInCategory.OST_Grids,
-            //    BuiltInCategory.OST_Levels
-            //}, false);
-
+            TaskDialog.Show("ds", SheetInfo.TitleBlockWidth.ToString());
 
             // Передаем основной вид пилона в метод по созданию видов в (0.0.0)
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralView)) {
@@ -80,11 +73,6 @@ namespace RevitPylonDocumentation.Models {
 
             SheetInfo.GeneralView.ViewportCenter = newCenter;
 
-            //// Включение видимости категории Разразы
-            //SetSectionCategoryVisibility(SheetInfo.GeneralView.ViewElement, new List<BuiltInCategory> {
-            //    BuiltInCategory.OST_Sections
-            //}, true);
-
 
             return true;
         }
@@ -99,7 +87,6 @@ namespace RevitPylonDocumentation.Models {
                 return false;
             } else {
                 // Заполнеяем данные для задания
-                //SheetInfo.GeneralViewPerpendicular.ViewScale = 25;
                 SheetInfo.GeneralViewPerpendicular.ViewportTypeName = "Заголовок на листе";
                 SheetInfo.GeneralViewPerpendicular.ViewportNumber = "101";
                 SheetInfo.GeneralViewPerpendicular.ViewportName =
@@ -109,23 +96,12 @@ namespace RevitPylonDocumentation.Models {
             }
 
 
-            //// Скрытие категории Разразы, Оси и Уровни
-            //SetSectionCategoryVisibility(SheetInfo.GeneralViewPerpendicular.ViewElement, new List<BuiltInCategory> {
-            //    BuiltInCategory.OST_Sections,
-            //    BuiltInCategory.OST_Grids,
-            //    BuiltInCategory.OST_Levels
-            //}, false);
-
             // Передаем основной перпендикулярный вид пилона в метод по созданию видов в (0.0.0)
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralViewPerpendicular)) {
                 return false;
             }
 
-            //// Скрытие категории Разразы
-            //SheetInfo.GeneralViewPerpendicular.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, true);
-            //SheetInfo.GeneralViewPerpendicular.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Grids).Id, true);
-            //SheetInfo.GeneralViewPerpendicular.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Levels).Id, true);
-
+           
             // Рассчитываем и задаем корректную точку вставки основного перпендикулярного вида пилона
             double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + 0.065;
 
@@ -143,450 +119,443 @@ namespace RevitPylonDocumentation.Models {
 
             SheetInfo.GeneralViewPerpendicular.ViewportCenter = newCenter;
 
-            //// Включение видимости категории Разразы
-            //SheetInfo.GeneralViewPerpendicular.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, false);
-            // Включение видимости категории Разразы
-            //SetSectionCategoryVisibility(SheetInfo.GeneralViewPerpendicular.ViewElement, new List<BuiltInCategory> {
-            //    BuiltInCategory.OST_Sections
-            //}, true);
-
             return true;
         }
 
 
-        internal bool PlaceTransverseFirstViewPorts() {
-
-            // Проверям вдруг вид не создался
-            if(SheetInfo.TransverseViewFirst.ViewElement == null) {
-                return false;
-            } else {
-                // Заполнеяем данные для задания
-                //SheetInfo.TransverseViewFirst.ViewScale = 20;
-                SheetInfo.TransverseViewFirst.ViewportTypeName = "Сечение_Номер вида";
-                SheetInfo.TransverseViewFirst.ViewportNumber = "1";
-                SheetInfo.TransverseViewFirst.ViewportName = "";
-            }
-
-
-            //// Скрытие категории Разразы, Оси и Уровни
-            //SetSectionCategoryVisibility(SheetInfo.TransverseViewFirst.ViewElement, new List<BuiltInCategory> {
-            //    BuiltInCategory.OST_Sections,
-            //    BuiltInCategory.OST_Grids,
-            //    BuiltInCategory.OST_Levels
-            //}, false);
-
-            
-            // Передаем первый поперечный вид пилона в метод по созданию видов в (0.0.0)
-            if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewFirst)) {
-                return false;
-            }
-            //// Скрытие категории Разразы
-            //SheetInfo.TransverseViewFirst.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, true);
-            //SheetInfo.TransverseViewFirst.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Grids).Id, true);
-            //SheetInfo.TransverseViewFirst.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Levels).Id, true);
-
-            // Рассчитываем и задаем корректную точку вставки первого поперечного вида пилона
-            double GeneralViewX = 0;
-            double GeneralViewPerpendicularX = 0;
-            double newCenterX = 0;
-            double newCenterY = 0;
-
-
-
-            // Если видовой экран основного вида размещен на листе, то находим его Х центра
-            if(SheetInfo.GeneralView.ViewportElement != null) {
-                GeneralViewX = SheetInfo.GeneralView.ViewportCenter.X;
-            }
-
-            // Если видовой экран основного перпендикулярного вида размещен на листе, то находим его Х центра
-            if(SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
-                GeneralViewPerpendicularX = SheetInfo.GeneralViewPerpendicular.ViewportCenter.X;
-            }
-
-
-            // Определяем координату Х первого поперечного вида пилона
-            if(SheetInfo.GeneralView.OnSheet && SheetInfo.GeneralViewPerpendicular.OnSheet) {
-                if(GeneralViewX > GeneralViewPerpendicularX) {
-                    newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
-                } else {
-                    newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
-                }
-            } else if(SheetInfo.GeneralView.OnSheet && !SheetInfo.GeneralViewPerpendicular.OnSheet) {
-                newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
-            } else if(!SheetInfo.GeneralView.OnSheet && SheetInfo.GeneralViewPerpendicular.OnSheet) {
-                newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
-            } else {
-                // Когда обоих видовых экранов нет на листе
-                newCenterX = SheetInfo.TitleBlockWidth / 2;
-            }
-
-            if(SheetInfo.TransverseViewSecond.ViewportElement != null || SheetInfo.TransverseViewThird.ViewportElement != null) {
-                newCenterY = UnitUtilsHelper.ConvertToInternalValue(- 25);
-            } else {
-                newCenterY = 0.016 + SheetInfo.TransverseViewFirst.ViewportHalfHeight;
-            }
-
-            XYZ newCenter = new XYZ(
-                    newCenterX,
-                    newCenterY,
-                    0);
-
-
-            (SheetInfo.TransverseViewFirst.ViewportElement as Viewport).SetBoxCenter(newCenter);
-
-            SheetInfo.TransverseViewFirst.ViewportCenter = newCenter;
-
-            return true;
-        }
-
-        internal bool PlaceTransverseSecondViewPorts() {
-            //double coordinateX = 0;
-            //double coordinateY = 0;
-
-            // Проверям вдруг вид не создался
-            if(SheetInfo.TransverseViewSecond.ViewElement == null) {
-                return false;
-            } else {
-                // Заполнеяем данные для задания
-                //SheetInfo.TransverseViewSecond.ViewScale = 20;
-                SheetInfo.TransverseViewSecond.ViewportTypeName = "Сечение_Номер вида";
-                SheetInfo.TransverseViewSecond.ViewportNumber = "2";
-                SheetInfo.TransverseViewSecond.ViewportName = "";
-            }
-
-
-            //// Скрытие категории Разразы, Оси и Уровни
-            //SetSectionCategoryVisibility(SheetInfo.TransverseViewSecond.ViewElement, new List<BuiltInCategory> {
-            //    BuiltInCategory.OST_Sections,
-            //    BuiltInCategory.OST_Grids,
-            //    BuiltInCategory.OST_Levels
-            //}, false);
-
-            // Передаем второй поперечный вид пилона в метод по созданию видов в (0.0.0)
-            if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewSecond)) {
-                return false;
-            }
-
-            //// Скрытие категории Разразы
-            //SheetInfo.TransverseViewSecond.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, true);
-            //SheetInfo.TransverseViewSecond.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Grids).Id, true);
-            //SheetInfo.TransverseViewSecond.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Levels).Id, true);
-
-            // Рассчитываем и задаем корректную точку вставки первого поперечного вида пилона
-            double GeneralViewX = 0;
-            double GeneralViewPerpendicularX = 0;
-            double newCenterX = 0;
-            double newCenterY = 0;
-
-            // Если видовой экран основного вида размещен на листе, то находим его Х центра
-            if(SheetInfo.GeneralView.ViewportElement != null) {
-                GeneralViewX = SheetInfo.GeneralView.ViewportCenter.X;
-            }
-
-            // Если видовой экран основного перпендикулярного вида размещен на листе, то находим его Х центра
-            if(SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
-                GeneralViewPerpendicularX = SheetInfo.GeneralViewPerpendicular.ViewportCenter.X;
-            }
-
-
-            // Определяем координату Х первого поперечного вида пилона
-            if(SheetInfo.GeneralView.OnSheet && SheetInfo.GeneralViewPerpendicular.OnSheet) {
-                if(GeneralViewX > GeneralViewPerpendicularX) {
-                    newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewSecond.ViewportHalfWidth;
-                } else {
-                    newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewSecond.ViewportHalfWidth;
-                }
-            } else if(SheetInfo.GeneralView.OnSheet && !SheetInfo.GeneralViewPerpendicular.OnSheet) {
-                newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewSecond.ViewportHalfWidth;
-            } else if(!SheetInfo.GeneralView.OnSheet && SheetInfo.GeneralViewPerpendicular.OnSheet) {
-                newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewSecond.ViewportHalfWidth;
-            } else {
-                // Когда обоих видовых экранов нет на листе
-                newCenterX = SheetInfo.TitleBlockWidth / 2;
-            }
-
-            if(SheetInfo.TransverseViewFirst.ViewportElement is null || SheetInfo.TransverseViewThird.ViewportElement != null) {
-                newCenterY = UnitUtilsHelper.ConvertToInternalValue(- 50);
-            } else {
-                newCenterY = SheetInfo.TransverseViewFirst.ViewportCenter.Y
-                    + SheetInfo.TransverseViewFirst.ViewportHalfHeight 
-                    + SheetInfo.TransverseViewSecond.ViewportHalfHeight;
-            }
-
-            XYZ newCenter = new XYZ(
-                    newCenterX,
-                    newCenterY,
-                    0);
-
-
-            (SheetInfo.TransverseViewSecond.ViewportElement as Viewport).SetBoxCenter(newCenter);
-
-            SheetInfo.TransverseViewSecond.ViewportCenter = newCenter;
-
-            return true;
-        }
-
-        internal bool PlaceTransverseThirdViewPorts() {
-            //double coordinateX = 0;
-            //double coordinateY = 0;
-
-            // Проверям вдруг вид не создался
-            if(SheetInfo.TransverseViewThird.ViewElement == null) {
-                return false;
-            } else {
-                // Заполнеяем данные для задания
-                //SheetInfo.TransverseViewThird.ViewScale = 20;
-                SheetInfo.TransverseViewThird.ViewportTypeName = "Сечение_Номер вида";
-                SheetInfo.TransverseViewThird.ViewportNumber = "3";
-                SheetInfo.TransverseViewThird.ViewportName = "";
-            }
-
-
-            //// Скрытие категории Разразы, Оси и Уровни
-            //SetSectionCategoryVisibility(SheetInfo.TransverseViewThird.ViewElement, new List<BuiltInCategory> {
-            //    BuiltInCategory.OST_Sections,
-            //    BuiltInCategory.OST_Grids,
-            //    BuiltInCategory.OST_Levels
-            //}, false);
-
-            // Передаем третий поперечный вид пилона в метод по созданию видов в (0.0.0)
-            if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewThird)) {
-                return false;
-            }
-            //// Скрытие категории Разразы
-            //SheetInfo.TransverseViewThird.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, true);
-            //SheetInfo.TransverseViewThird.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Grids).Id, true);
-            //SheetInfo.TransverseViewThird.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Levels).Id, true);
-
-            // Рассчитываем и задаем корректную точку вставки первого поперечного вида пилона
-            double GeneralViewX = 0;
-            double GeneralViewPerpendicularX = 0;
-            double newCenterX = 0;
-            double newCenterY = 0;
-
-            // Если видовой экран основного вида размещен на листе, то находим его Х центра
-            if(SheetInfo.GeneralView.ViewportElement != null) {
-                GeneralViewX = SheetInfo.GeneralView.ViewportCenter.X;
-            }
-
-            // Если видовой экран основного перпендикулярного вида размещен на листе, то находим его Х центра
-            if(SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
-                GeneralViewPerpendicularX = SheetInfo.GeneralViewPerpendicular.ViewportCenter.X;
-            }
-
-
-            // Определяем координату Х первого поперечного вида пилона
-            if(SheetInfo.GeneralView.OnSheet && SheetInfo.GeneralViewPerpendicular.OnSheet) {
-                if(GeneralViewX > GeneralViewPerpendicularX) {
-                    newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
-                } else {
-                    newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
-                }
-            } else if(SheetInfo.GeneralView.OnSheet && !SheetInfo.GeneralViewPerpendicular.OnSheet) {
-                newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
-            } else if(!SheetInfo.GeneralView.OnSheet && SheetInfo.GeneralViewPerpendicular.OnSheet) {
-                newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
-            } else {
-                // Когда обоих видовых экранов нет на листе
-                newCenterX = SheetInfo.TitleBlockWidth / 2;
-            }
-
-            if(SheetInfo.TransverseViewSecond.ViewportElement is null) {
-                newCenterY = UnitUtilsHelper.ConvertToInternalValue(-75);
-
-            } else {
-                newCenterY = SheetInfo.TransverseViewSecond.ViewportCenter.Y
-                    + SheetInfo.TransverseViewSecond.ViewportHalfHeight
-                    + SheetInfo.TransverseViewThird.ViewportHalfHeight;
-            }
-
-            XYZ newCenter = new XYZ(
-                    newCenterX,
-                    newCenterY,
-                    0);
-
-
-            (SheetInfo.TransverseViewThird.ViewportElement as Viewport).SetBoxCenter(newCenter);
-
-            SheetInfo.TransverseViewThird.ViewportCenter = newCenter;
-
-            return true;
-        }
-
-
-        internal bool PlaceRebarSchedule() {
-
-            // Проверям вдруг спека не создалась
-            if(SheetInfo.RebarSchedule.ViewElement == null) {
-                return false;
-            } else {
-
-                // Заполнеяем данные для задания
-                SheetInfo.RebarSchedule.ViewportName =
-                    ViewModel.REBAR_SCHEDULE_PREFIX
-                        + SheetInfo.PylonKeyName
-                        + ViewModel.REBAR_SCHEDULE_SUFFIX;
-            }
-
-            // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
-            if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.RebarSchedule)) {
-                return false;
-            }
-
-
-            // Рассчитываем и задаем корректную точку вставки спецификации арматуры пилона
-            XYZ newCenter = new XYZ(
-                -SheetInfo.RebarSchedule.ViewportHalfWidth * 2 - 0.0095,
-                SheetInfo.TitleBlockHeight - 0.032,
-                0);
-            (SheetInfo.RebarSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
-
-            SheetInfo.RebarSchedule.ViewportCenter = newCenter;
-
-            return true;
-        }
-
-        internal bool PlaceMaterialSchedule() {
-
-            // Проверям вдруг спека не создалась
-            if(SheetInfo.MaterialSchedule.ViewElement == null) {
-                return false;
-            } else {
-
-                // Заполнеяем данные для задания
-                SheetInfo.MaterialSchedule.ViewportName =
-                    ViewModel.MATERIAL_SCHEDULE_PREFIX
-                        + SheetInfo.PylonKeyName
-                        + ViewModel.MATERIAL_SCHEDULE_SUFFIX;
-            }
+        //internal bool PlaceTransverseFirstViewPorts() {
+
+        //    // Проверям вдруг вид не создался
+        //    if(SheetInfo.TransverseViewFirst.ViewElement == null) {
+        //        return false;
+        //    } else {
+        //        // Заполнеяем данные для задания
+        //        //SheetInfo.TransverseViewFirst.ViewScale = 20;
+        //        SheetInfo.TransverseViewFirst.ViewportTypeName = "Сечение_Номер вида";
+        //        SheetInfo.TransverseViewFirst.ViewportNumber = "1";
+        //        SheetInfo.TransverseViewFirst.ViewportName = "";
+        //    }
+
+
+        //    //// Скрытие категории Разразы, Оси и Уровни
+        //    //SetSectionCategoryVisibility(SheetInfo.TransverseViewFirst.ViewElement, new List<BuiltInCategory> {
+        //    //    BuiltInCategory.OST_Sections,
+        //    //    BuiltInCategory.OST_Grids,
+        //    //    BuiltInCategory.OST_Levels
+        //    //}, false);
+
+
+        //    // Передаем первый поперечный вид пилона в метод по созданию видов в (0.0.0)
+        //    if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewFirst)) {
+        //        return false;
+        //    }
+        //    //// Скрытие категории Разразы
+        //    //SheetInfo.TransverseViewFirst.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, true);
+        //    //SheetInfo.TransverseViewFirst.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Grids).Id, true);
+        //    //SheetInfo.TransverseViewFirst.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Levels).Id, true);
+
+        //    // Рассчитываем и задаем корректную точку вставки первого поперечного вида пилона
+        //    double GeneralViewX = 0;
+        //    double GeneralViewPerpendicularX = 0;
+        //    double newCenterX = 0;
+        //    double newCenterY = 0;
+
+
+
+        //    // Если видовой экран основного вида размещен на листе, то находим его Х центра
+        //    if(SheetInfo.GeneralView.ViewportElement != null) {
+        //        GeneralViewX = SheetInfo.GeneralView.ViewportCenter.X;
+        //    }
+
+        //    // Если видовой экран основного перпендикулярного вида размещен на листе, то находим его Х центра
+        //    if(SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
+        //        GeneralViewPerpendicularX = SheetInfo.GeneralViewPerpendicular.ViewportCenter.X;
+        //    }
+
+
+        //    // Определяем координату Х первого поперечного вида пилона
+        //    if(SheetInfo.GeneralView.OnSheet && SheetInfo.GeneralViewPerpendicular.OnSheet) {
+        //        if(GeneralViewX > GeneralViewPerpendicularX) {
+        //            newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
+        //        } else {
+        //            newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
+        //        }
+        //    } else if(SheetInfo.GeneralView.OnSheet && !SheetInfo.GeneralViewPerpendicular.OnSheet) {
+        //        newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
+        //    } else if(!SheetInfo.GeneralView.OnSheet && SheetInfo.GeneralViewPerpendicular.OnSheet) {
+        //        newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
+        //    } else {
+        //        // Когда обоих видовых экранов нет на листе
+        //        newCenterX = SheetInfo.TitleBlockWidth / 2;
+        //    }
+
+        //    if(SheetInfo.TransverseViewSecond.ViewportElement != null || SheetInfo.TransverseViewThird.ViewportElement != null) {
+        //        newCenterY = UnitUtilsHelper.ConvertToInternalValue(- 25);
+        //    } else {
+        //        newCenterY = 0.016 + SheetInfo.TransverseViewFirst.ViewportHalfHeight;
+        //    }
+
+        //    XYZ newCenter = new XYZ(
+        //            newCenterX,
+        //            newCenterY,
+        //            0);
+
+
+        //    (SheetInfo.TransverseViewFirst.ViewportElement as Viewport).SetBoxCenter(newCenter);
+
+        //    SheetInfo.TransverseViewFirst.ViewportCenter = newCenter;
+
+        //    return true;
+        //}
+
+        //internal bool PlaceTransverseSecondViewPorts() {
+        //    //double coordinateX = 0;
+        //    //double coordinateY = 0;
+
+        //    // Проверям вдруг вид не создался
+        //    if(SheetInfo.TransverseViewSecond.ViewElement == null) {
+        //        return false;
+        //    } else {
+        //        // Заполнеяем данные для задания
+        //        //SheetInfo.TransverseViewSecond.ViewScale = 20;
+        //        SheetInfo.TransverseViewSecond.ViewportTypeName = "Сечение_Номер вида";
+        //        SheetInfo.TransverseViewSecond.ViewportNumber = "2";
+        //        SheetInfo.TransverseViewSecond.ViewportName = "";
+        //    }
+
+
+        //    //// Скрытие категории Разразы, Оси и Уровни
+        //    //SetSectionCategoryVisibility(SheetInfo.TransverseViewSecond.ViewElement, new List<BuiltInCategory> {
+        //    //    BuiltInCategory.OST_Sections,
+        //    //    BuiltInCategory.OST_Grids,
+        //    //    BuiltInCategory.OST_Levels
+        //    //}, false);
+
+        //    // Передаем второй поперечный вид пилона в метод по созданию видов в (0.0.0)
+        //    if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewSecond)) {
+        //        return false;
+        //    }
+
+        //    //// Скрытие категории Разразы
+        //    //SheetInfo.TransverseViewSecond.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, true);
+        //    //SheetInfo.TransverseViewSecond.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Grids).Id, true);
+        //    //SheetInfo.TransverseViewSecond.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Levels).Id, true);
+
+        //    // Рассчитываем и задаем корректную точку вставки первого поперечного вида пилона
+        //    double GeneralViewX = 0;
+        //    double GeneralViewPerpendicularX = 0;
+        //    double newCenterX = 0;
+        //    double newCenterY = 0;
+
+        //    // Если видовой экран основного вида размещен на листе, то находим его Х центра
+        //    if(SheetInfo.GeneralView.ViewportElement != null) {
+        //        GeneralViewX = SheetInfo.GeneralView.ViewportCenter.X;
+        //    }
+
+        //    // Если видовой экран основного перпендикулярного вида размещен на листе, то находим его Х центра
+        //    if(SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
+        //        GeneralViewPerpendicularX = SheetInfo.GeneralViewPerpendicular.ViewportCenter.X;
+        //    }
+
+
+        //    // Определяем координату Х первого поперечного вида пилона
+        //    if(SheetInfo.GeneralView.OnSheet && SheetInfo.GeneralViewPerpendicular.OnSheet) {
+        //        if(GeneralViewX > GeneralViewPerpendicularX) {
+        //            newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewSecond.ViewportHalfWidth;
+        //        } else {
+        //            newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewSecond.ViewportHalfWidth;
+        //        }
+        //    } else if(SheetInfo.GeneralView.OnSheet && !SheetInfo.GeneralViewPerpendicular.OnSheet) {
+        //        newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewSecond.ViewportHalfWidth;
+        //    } else if(!SheetInfo.GeneralView.OnSheet && SheetInfo.GeneralViewPerpendicular.OnSheet) {
+        //        newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewSecond.ViewportHalfWidth;
+        //    } else {
+        //        // Когда обоих видовых экранов нет на листе
+        //        newCenterX = SheetInfo.TitleBlockWidth / 2;
+        //    }
+
+        //    if(SheetInfo.TransverseViewFirst.ViewportElement is null || SheetInfo.TransverseViewThird.ViewportElement != null) {
+        //        newCenterY = UnitUtilsHelper.ConvertToInternalValue(- 50);
+        //    } else {
+        //        newCenterY = SheetInfo.TransverseViewFirst.ViewportCenter.Y
+        //            + SheetInfo.TransverseViewFirst.ViewportHalfHeight 
+        //            + SheetInfo.TransverseViewSecond.ViewportHalfHeight;
+        //    }
+
+        //    XYZ newCenter = new XYZ(
+        //            newCenterX,
+        //            newCenterY,
+        //            0);
+
+
+        //    (SheetInfo.TransverseViewSecond.ViewportElement as Viewport).SetBoxCenter(newCenter);
+
+        //    SheetInfo.TransverseViewSecond.ViewportCenter = newCenter;
+
+        //    return true;
+        //}
+
+        //internal bool PlaceTransverseThirdViewPorts() {
+        //    //double coordinateX = 0;
+        //    //double coordinateY = 0;
+
+        //    // Проверям вдруг вид не создался
+        //    if(SheetInfo.TransverseViewThird.ViewElement == null) {
+        //        return false;
+        //    } else {
+        //        // Заполнеяем данные для задания
+        //        //SheetInfo.TransverseViewThird.ViewScale = 20;
+        //        SheetInfo.TransverseViewThird.ViewportTypeName = "Сечение_Номер вида";
+        //        SheetInfo.TransverseViewThird.ViewportNumber = "3";
+        //        SheetInfo.TransverseViewThird.ViewportName = "";
+        //    }
+
+
+        //    //// Скрытие категории Разразы, Оси и Уровни
+        //    //SetSectionCategoryVisibility(SheetInfo.TransverseViewThird.ViewElement, new List<BuiltInCategory> {
+        //    //    BuiltInCategory.OST_Sections,
+        //    //    BuiltInCategory.OST_Grids,
+        //    //    BuiltInCategory.OST_Levels
+        //    //}, false);
+
+        //    // Передаем третий поперечный вид пилона в метод по созданию видов в (0.0.0)
+        //    if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewThird)) {
+        //        return false;
+        //    }
+        //    //// Скрытие категории Разразы
+        //    //SheetInfo.TransverseViewThird.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Sections).Id, true);
+        //    //SheetInfo.TransverseViewThird.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Grids).Id, true);
+        //    //SheetInfo.TransverseViewThird.ViewElement.SetCategoryHidden(Repository.Document.Settings.Categories.get_Item(BuiltInCategory.OST_Levels).Id, true);
+
+        //    // Рассчитываем и задаем корректную точку вставки первого поперечного вида пилона
+        //    double GeneralViewX = 0;
+        //    double GeneralViewPerpendicularX = 0;
+        //    double newCenterX = 0;
+        //    double newCenterY = 0;
+
+        //    // Если видовой экран основного вида размещен на листе, то находим его Х центра
+        //    if(SheetInfo.GeneralView.ViewportElement != null) {
+        //        GeneralViewX = SheetInfo.GeneralView.ViewportCenter.X;
+        //    }
+
+        //    // Если видовой экран основного перпендикулярного вида размещен на листе, то находим его Х центра
+        //    if(SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
+        //        GeneralViewPerpendicularX = SheetInfo.GeneralViewPerpendicular.ViewportCenter.X;
+        //    }
+
+
+        //    // Определяем координату Х первого поперечного вида пилона
+        //    if(SheetInfo.GeneralView.OnSheet && SheetInfo.GeneralViewPerpendicular.OnSheet) {
+        //        if(GeneralViewX > GeneralViewPerpendicularX) {
+        //            newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
+        //        } else {
+        //            newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
+        //        }
+        //    } else if(SheetInfo.GeneralView.OnSheet && !SheetInfo.GeneralViewPerpendicular.OnSheet) {
+        //        newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
+        //    } else if(!SheetInfo.GeneralView.OnSheet && SheetInfo.GeneralViewPerpendicular.OnSheet) {
+        //        newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
+        //    } else {
+        //        // Когда обоих видовых экранов нет на листе
+        //        newCenterX = SheetInfo.TitleBlockWidth / 2;
+        //    }
+
+        //    if(SheetInfo.TransverseViewSecond.ViewportElement is null) {
+        //        newCenterY = UnitUtilsHelper.ConvertToInternalValue(-75);
+
+        //    } else {
+        //        newCenterY = SheetInfo.TransverseViewSecond.ViewportCenter.Y
+        //            + SheetInfo.TransverseViewSecond.ViewportHalfHeight
+        //            + SheetInfo.TransverseViewThird.ViewportHalfHeight;
+        //    }
+
+        //    XYZ newCenter = new XYZ(
+        //            newCenterX,
+        //            newCenterY,
+        //            0);
+
+
+        //    (SheetInfo.TransverseViewThird.ViewportElement as Viewport).SetBoxCenter(newCenter);
+
+        //    SheetInfo.TransverseViewThird.ViewportCenter = newCenter;
+
+        //    return true;
+        //}
+
+
+        //internal bool PlaceRebarSchedule() {
+
+        //    // Проверям вдруг спека не создалась
+        //    if(SheetInfo.RebarSchedule.ViewElement == null) {
+        //        return false;
+        //    } else {
+
+        //        // Заполнеяем данные для задания
+        //        SheetInfo.RebarSchedule.ViewportName =
+        //            ViewModel.REBAR_SCHEDULE_PREFIX
+        //                + SheetInfo.PylonKeyName
+        //                + ViewModel.REBAR_SCHEDULE_SUFFIX;
+        //    }
+
+        //    // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
+        //    if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.RebarSchedule)) {
+        //        return false;
+        //    }
+
+
+        //    // Рассчитываем и задаем корректную точку вставки спецификации арматуры пилона
+        //    XYZ newCenter = new XYZ(
+        //        -SheetInfo.RebarSchedule.ViewportHalfWidth * 2 - 0.0095,
+        //        SheetInfo.TitleBlockHeight - 0.032,
+        //        0);
+        //    (SheetInfo.RebarSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
 
-            // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
-            if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.MaterialSchedule)) {
-                return false;
-            }
+        //    SheetInfo.RebarSchedule.ViewportCenter = newCenter;
 
-            // Рассчитываем и задаем корректную точку вставки спецификации материалов пилона
-            XYZ newCenter = new XYZ(
-                    -SheetInfo.MaterialSchedule.ViewportHalfWidth * 2 - 0.0095,
-                    SheetInfo.TitleBlockHeight - SheetInfo.RebarSchedule.ViewportHalfHeight * 2 - 0.02505,
-                    0);
+        //    return true;
+        //}
 
+        //internal bool PlaceMaterialSchedule() {
 
-            if(SheetInfo.RebarSchedule.ViewportElement is null) {
-                newCenter = new XYZ(
-                    -SheetInfo.MaterialSchedule.ViewportHalfWidth * 2 - 0.0095,
-                    -0.1,
-                    0);
-            }
-            
-            
-            (SheetInfo.MaterialSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
+        //    // Проверям вдруг спека не создалась
+        //    if(SheetInfo.MaterialSchedule.ViewElement == null) {
+        //        return false;
+        //    } else {
 
-            SheetInfo.MaterialSchedule.ViewportCenter = newCenter;
+        //        // Заполнеяем данные для задания
+        //        SheetInfo.MaterialSchedule.ViewportName =
+        //            ViewModel.MATERIAL_SCHEDULE_PREFIX
+        //                + SheetInfo.PylonKeyName
+        //                + ViewModel.MATERIAL_SCHEDULE_SUFFIX;
+        //    }
 
-            return true;
-        }
+        //    // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
+        //    if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.MaterialSchedule)) {
+        //        return false;
+        //    }
 
+        //    // Рассчитываем и задаем корректную точку вставки спецификации материалов пилона
+        //    XYZ newCenter = new XYZ(
+        //            -SheetInfo.MaterialSchedule.ViewportHalfWidth * 2 - 0.0095,
+        //            SheetInfo.TitleBlockHeight - SheetInfo.RebarSchedule.ViewportHalfHeight * 2 - 0.02505,
+        //            0);
 
-        internal bool PlaceSystemPartsSchedule() {
 
-            // Проверям вдруг спека не создалась
-            if(SheetInfo.SystemPartsSchedule.ViewElement == null) {
-                return false;
-            } else {
+        //    if(SheetInfo.RebarSchedule.ViewportElement is null) {
+        //        newCenter = new XYZ(
+        //            -SheetInfo.MaterialSchedule.ViewportHalfWidth * 2 - 0.0095,
+        //            -0.1,
+        //            0);
+        //    }
 
-                // Заполнеяем данные для задания
-                SheetInfo.SystemPartsSchedule.ViewportName =
-                    ViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX
-                        + SheetInfo.PylonKeyName
-                        + ViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX;
-            }
 
-            // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
-            if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.SystemPartsSchedule)) {
-                return false;
-            }
+        //    (SheetInfo.MaterialSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
 
+        //    SheetInfo.MaterialSchedule.ViewportCenter = newCenter;
 
+        //    return true;
+        //}
 
 
+        //internal bool PlaceSystemPartsSchedule() {
 
+        //    // Проверям вдруг спека не создалась
+        //    if(SheetInfo.SystemPartsSchedule.ViewElement == null) {
+        //        return false;
+        //    } else {
 
+        //        // Заполнеяем данные для задания
+        //        SheetInfo.SystemPartsSchedule.ViewportName =
+        //            ViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX
+        //                + SheetInfo.PylonKeyName
+        //                + ViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX;
+        //    }
 
-            // Рассчитываем и задаем корректную точку вставки спецификации системных деталей пилона
-            XYZ newCenter = new XYZ(
-                    0,
-                    UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2,
-                    0);
+        //    // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
+        //    if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.SystemPartsSchedule)) {
+        //        return false;
+        //    }
 
-            if(SheetInfo.IFCPartsSchedule.ViewportElement is null) {
 
-                newCenter = new XYZ(
-                    -UnitUtilsHelper.ConvertToInternalValue(2.9) - SheetInfo.SystemPartsSchedule.ViewportHalfWidth * 2,
-                    UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2,
-                    0);
-            }
 
-            (SheetInfo.SystemPartsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
 
-            SheetInfo.SystemPartsSchedule.ViewportCenter = newCenter;
 
-            return true;
-        }
 
 
+        //    // Рассчитываем и задаем корректную точку вставки спецификации системных деталей пилона
+        //    XYZ newCenter = new XYZ(
+        //            0,
+        //            UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2,
+        //            0);
 
+        //    if(SheetInfo.IFCPartsSchedule.ViewportElement is null) {
 
-        internal bool PlaceIFCPartsSchedule() {
+        //        newCenter = new XYZ(
+        //            -UnitUtilsHelper.ConvertToInternalValue(2.9) - SheetInfo.SystemPartsSchedule.ViewportHalfWidth * 2,
+        //            UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2,
+        //            0);
+        //    }
 
-            // Проверям вдруг спека не создалась
-            if(SheetInfo.IFCPartsSchedule.ViewElement == null) {
-                return false;
-            } else {
+        //    (SheetInfo.SystemPartsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
 
-                // Заполнеяем данные для задания
-                SheetInfo.IFCPartsSchedule.ViewportName =
-                    ViewModel.IFC_PARTS_SCHEDULE_PREFIX
-                        + SheetInfo.PylonKeyName
-                        + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX;
-            }
+        //    SheetInfo.SystemPartsSchedule.ViewportCenter = newCenter;
 
-            // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
-            if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.IFCPartsSchedule)) {
-                return false;
-            }
+        //    return true;
+        //}
 
 
 
 
+        //internal bool PlaceIFCPartsSchedule() {
 
+        //    // Проверям вдруг спека не создалась
+        //    if(SheetInfo.IFCPartsSchedule.ViewElement == null) {
+        //        return false;
+        //    } else {
 
+        //        // Заполнеяем данные для задания
+        //        SheetInfo.IFCPartsSchedule.ViewportName =
+        //            ViewModel.IFC_PARTS_SCHEDULE_PREFIX
+        //                + SheetInfo.PylonKeyName
+        //                + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX;
+        //    }
 
-            // Рассчитываем и задаем корректную точку вставки спецификации системных деталей пилона
-            XYZ newCenter = new XYZ(
-                    0,
-                    UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.IFCPartsSchedule.ViewportHalfHeight * 2,
-                    0);
+        //    // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
+        //    if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.IFCPartsSchedule)) {
+        //        return false;
+        //    }
 
-            if(SheetInfo.SystemPartsSchedule.ViewportElement is null) {
 
-                newCenter = new XYZ(
-                    -UnitUtilsHelper.ConvertToInternalValue(2.9) - SheetInfo.IFCPartsSchedule.ViewportHalfWidth * 2,
-                    UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.IFCPartsSchedule.ViewportHalfHeight * 2,
-                    0);
-            }
 
 
 
 
 
+        //    // Рассчитываем и задаем корректную точку вставки спецификации системных деталей пилона
+        //    XYZ newCenter = new XYZ(
+        //            0,
+        //            UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.IFCPartsSchedule.ViewportHalfHeight * 2,
+        //            0);
 
-            (SheetInfo.IFCPartsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
+        //    if(SheetInfo.SystemPartsSchedule.ViewportElement is null) {
 
-            SheetInfo.IFCPartsSchedule.ViewportCenter = newCenter;
+        //        newCenter = new XYZ(
+        //            -UnitUtilsHelper.ConvertToInternalValue(2.9) - SheetInfo.IFCPartsSchedule.ViewportHalfWidth * 2,
+        //            UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.IFCPartsSchedule.ViewportHalfHeight * 2,
+        //            0);
+        //    }
 
-            return true;
-        }
+
+
+
+
+
+        //    (SheetInfo.IFCPartsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
+
+        //    SheetInfo.IFCPartsSchedule.ViewportCenter = newCenter;
+
+        //    return true;
+        //}
 
 
         internal bool PlacePylonViewport(ViewSheet viewSheet, PylonView pylonView) {
@@ -598,15 +567,6 @@ namespace RevitPylonDocumentation.Models {
             }
 
 
-            //// Скрытие категории Разразы, Оси и Уровни
-            //SetSectionCategoryVisibility(SheetInfo.GeneralView.ViewElement, new List<BuiltInCategory> {
-            //    BuiltInCategory.OST_Sections,
-            //    BuiltInCategory.OST_Grids,
-            //    BuiltInCategory.OST_Levels
-            //}, false);
-
-
-            //pylonView.ViewElement.Scale = pylonView.ViewScale;
             pylonView.ViewElement.get_Parameter(BuiltInParameter.SECTION_COARSER_SCALE_PULLDOWN_METRIC).Set(100);
 
             // Размещаем сечение пилона на листе
@@ -643,8 +603,8 @@ namespace RevitPylonDocumentation.Models {
             pylonView.ViewportHalfWidth = viewportHalfWidth;
             pylonView.ViewportHalfHeight = viewportHalfHeight;
 
-            //TaskDialog.Show("ViewportHalfWidth", UnitUtilsHelper.ConvertFromInternalValue(pylonView.ViewportHalfWidth).ToString());
-            //TaskDialog.Show("ViewportHalfHeight", UnitUtilsHelper.ConvertFromInternalValue(pylonView.ViewportHalfHeight).ToString());
+            TaskDialog.Show("ViewportHalfWidth", UnitUtilsHelper.ConvertFromInternalValue(pylonView.ViewportHalfWidth).ToString());
+            TaskDialog.Show("ViewportHalfHeight", UnitUtilsHelper.ConvertFromInternalValue(pylonView.ViewportHalfHeight).ToString());
 
             // Задание правильного положения метки видового экрана
 #if REVIT_2021_OR_LESS
@@ -655,14 +615,6 @@ namespace RevitPylonDocumentation.Models {
 #else
             viewPort.LabelOffset = new XYZ(viewportHalfWidth, 2 * viewportHalfHeight - 0.022, 0);
 #endif
-
-
-            //// Включение видимости категории Разразы, Оси и Уровни
-            //SetSectionCategoryVisibility(SheetInfo.GeneralView.ViewElement, new List<BuiltInCategory> {
-            //    BuiltInCategory.OST_Sections,
-            //    BuiltInCategory.OST_Grids,
-            //    BuiltInCategory.OST_Levels
-            //}, true);
 
             return true;
         }

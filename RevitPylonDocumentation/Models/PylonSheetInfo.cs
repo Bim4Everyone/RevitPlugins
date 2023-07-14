@@ -44,7 +44,7 @@ namespace RevitPylonDocumentation.Models {
 
         public bool IsCheck { get; set; } = false;
         public bool SheetInProject { get; set; } = false;
-        public bool SheetInProjectEditableInGUI { get; set; } = true;
+        //public bool SheetInProjectEditableInGUI { get; set; } = true;
 
 
         // Марка пилона 

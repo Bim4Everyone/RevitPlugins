@@ -1099,117 +1099,239 @@ namespace RevitPylonDocumentation.ViewModels {
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Добавление видов")) {
 
                 foreach(PylonSheetInfo hostsInfo in SelectedHostsInfo) {
-                    //try {
-
-                    //} catch(Exception) {}
-
+                    
 
                     if(!hostsInfo.IsCheck) { continue; }
 
-                    if(hostsInfo.SheetInProjectEditableInGUI && hostsInfo.SheetInProject) {
+                    // Заходя сюда у нас уже есть инфа о листе, если он был в проекте
+                    if(hostsInfo.PylonViewSheet is null) {
 
                         hostsInfo.CreateSheet();
+                    } else {
+                        _revitRepository.FindTitleBlock(this, hostsInfo);
                     }
 
 
 
-                    if(hostsInfo.GeneralView.InProjectEditableInGUI && hostsInfo.GeneralView.InProject) {
+                                                    //////////////////
+                                                    // ОСНОВНОЙ ВИД //
+                                                    //////////////////
+                    
+                    if(NeedWorkWithGeneralView) {
+                        string generalViewName = GENERAL_VIEW_PREFIX + hostsInfo.PylonKeyName + GENERAL_VIEW_SUFFIX;
 
-                        hostsInfo.GeneralView.ViewCreator.CreateGeneralView(SelectedViewFamilyType);
+
+                        // Если у пилона был лист до запуска плагина, то видовой экран/вид ищем на листе
+                        if(hostsInfo.SheetInProject) {
+
+                            _revitRepository.FindViewNViewportOnSheet(hostsInfo.PylonViewSheet, hostsInfo.GeneralView, generalViewName);
+                        }
+
+                        // Здесь может быть три варианта: 1) найден и видЭкран, и вид; 2) найден только вид; 3) не найдено ничего
+
+                        if(hostsInfo.GeneralView.ViewElement is null) {
+                            
+                            // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                            if(!hostsInfo.GeneralView.ViewCreator.TryCreateGeneralView(SelectedViewFamilyType)) {
+                                _revitRepository.FindViewSectionInPj(hostsInfo.GeneralView, generalViewName);
+                            }
+                        }
+                        // Тут точно получили вид
                     }
 
-                    if(hostsInfo.GeneralViewPerpendicular.InProjectEditableInGUI && hostsInfo.GeneralViewPerpendicular.InProject) {
 
-                        hostsInfo.GeneralViewPerpendicular.ViewCreator.CreateGeneralPerpendicularView(SelectedViewFamilyType);
+
+                                            ///////////////////////////////////
+                                            // ОСНОВНОЙ ПЕРПЕНДИКУЛЯРНЫЙ ВИД //
+                                            ///////////////////////////////////
+
+                    if(NeedWorkWithGeneralPerpendicularView) {
+
+                        TaskDialog.Show("ds", "перпендикул");
+                        
+                        string generalPerpendicularViewName = GENERAL_VIEW_PERPENDICULAR_PREFIX + hostsInfo.PylonKeyName + GENERAL_VIEW_PERPENDICULAR_SUFFIX;
+
+
+                        // Если у пилона был лист до запуска плагина, то видовой экран/вид ищем на листе
+                        if(hostsInfo.SheetInProject) {
+
+                            _revitRepository.FindViewNViewportOnSheet(hostsInfo.PylonViewSheet, hostsInfo.GeneralViewPerpendicular, generalPerpendicularViewName);
+                        }
+
+                        if(hostsInfo.GeneralViewPerpendicular.ViewElement is null) {
+                            TaskDialog.Show("Вид", "Вид не найден через лист");
+
+                        }
+
+                        if(hostsInfo.GeneralViewPerpendicular.ViewportElement is null) {
+                            TaskDialog.Show("Видовой экран", "Видовой экран не найден через лист");
+
+                        }
+
+
+
+
+                        // Здесь может быть три варианта: 1) найден и видЭкран, и вид; 2) найден только вид; 3) не найдено ничего
+
+                        if(hostsInfo.GeneralViewPerpendicular.ViewElement is null) {
+
+                            // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                            if(!hostsInfo.GeneralViewPerpendicular.ViewCreator.TryCreateGeneralPerpendicularView(SelectedViewFamilyType)) {
+                                _revitRepository.FindViewSectionInPj(hostsInfo.GeneralViewPerpendicular, generalPerpendicularViewName);
+                                
+                                
+                                TaskDialog.Show("Вид", "Вид успешно найден в проекте");
+
+                            } else {
+                                TaskDialog.Show("Вид", "Вид успешно создан");
+
+                            }
+                        }
+                        // Тут точно получили вид
                     }
 
 
 
 
 
-                    if(hostsInfo.TransverseViewFirst.InProjectEditableInGUI && hostsInfo.TransverseViewFirst.InProject) {
-
-                        hostsInfo.TransverseViewFirst.ViewCreator.CreateTransverseView(SelectedViewFamilyType, 1);
-                    }
-
-                    if(hostsInfo.TransverseViewSecond.InProjectEditableInGUI && hostsInfo.TransverseViewSecond.InProject) {
-
-                        hostsInfo.TransverseViewSecond.ViewCreator.CreateTransverseView(SelectedViewFamilyType, 2);
-                    }
-
-                    if(hostsInfo.TransverseViewThird.InProjectEditableInGUI && hostsInfo.TransverseViewThird.InProject) {
-
-                        hostsInfo.TransverseViewThird.ViewCreator.CreateTransverseView(SelectedViewFamilyType, 3);
-                    }
-
-                    if(hostsInfo.RebarSchedule.InProjectEditableInGUI && hostsInfo.RebarSchedule.InProject) {
-
-                        hostsInfo.RebarSchedule.ViewCreator.CreateRebarSchedule();
-                    }
-
-                    if(hostsInfo.MaterialSchedule.InProjectEditableInGUI && hostsInfo.MaterialSchedule.InProject) {
-
-                        hostsInfo.MaterialSchedule.ViewCreator.CreateMaterialSchedule();
-                    }
-
-                    if(hostsInfo.SystemPartsSchedule.InProjectEditableInGUI && hostsInfo.SystemPartsSchedule.InProject) {
-
-                        hostsInfo.SystemPartsSchedule.ViewCreator.CreateSystemPartsSchedule();
-                    }
-
-                    if(hostsInfo.IFCPartsSchedule.InProjectEditableInGUI && hostsInfo.IFCPartsSchedule.InProject) {
-
-                        hostsInfo.IFCPartsSchedule.ViewCreator.CreateIFCPartsSchedule();
-                    }
 
 
                     _revitRepository.Document.Regenerate();
 
 
-                    if(hostsInfo.GeneralView.OnSheetEditableInGUI && hostsInfo.GeneralView.OnSheet) {
+                    if(NeedWorkWithGeneralView) {
 
-                        hostsInfo.GeneralView.ViewPlacer.PlaceGeneralViewport();
+                        // Если видовой экран на листе не найден, то размещаем
+                        if(hostsInfo.GeneralView.ViewportElement is null) {
+
+                            hostsInfo.GeneralView.ViewPlacer.PlaceGeneralViewport();
+                        }
+                    }
+                    if(NeedWorkWithGeneralPerpendicularView) {
+
+                        // Если видовой экран на листе не найден, то размещаем
+                        if(hostsInfo.GeneralViewPerpendicular.ViewportElement is null) {
+
+                            hostsInfo.GeneralViewPerpendicular.ViewPlacer.PlaceGeneralPerpendicularViewport();
+                        }
                     }
 
-                    if(hostsInfo.GeneralViewPerpendicular.OnSheetEditableInGUI && hostsInfo.GeneralViewPerpendicular.OnSheet) {
 
-                        hostsInfo.GeneralViewPerpendicular.ViewPlacer.PlaceGeneralPerpendicularViewport();
-                    }
 
-                    if(hostsInfo.TransverseViewFirst.OnSheetEditableInGUI && hostsInfo.TransverseViewFirst.OnSheet) {
+                    //if(hostsInfo.PylonViewSheet != null && NeedWorkWithGeneralView) {
 
-                        hostsInfo.TransverseViewFirst.ViewPlacer.PlaceTransverseFirstViewPorts();
-                    }
 
-                    if(hostsInfo.TransverseViewSecond.OnSheetEditableInGUI && hostsInfo.TransverseViewSecond.OnSheet) {
+                    //    hostsInfo.GeneralView.ViewCreator.CreateGeneralView(SelectedViewFamilyType);
+                    //}
+                    //if(hostsInfo.PylonViewSheet != null && hostsInfo.GeneralView.ViewElement != null && NeedWorkWithGeneralView) {
 
-                        hostsInfo.TransverseViewSecond.ViewPlacer.PlaceTransverseSecondViewPorts();
-                    }
+                    //    hostsInfo.GeneralView.ViewPlacer.PlaceGeneralViewport();
+                    //}
 
-                    if(hostsInfo.TransverseViewThird.OnSheetEditableInGUI && hostsInfo.TransverseViewThird.OnSheet) {
 
-                        hostsInfo.TransverseViewThird.ViewPlacer.PlaceTransverseThirdViewPorts();
-                    }
 
-                    if(hostsInfo.RebarSchedule.OnSheetEditableInGUI && hostsInfo.RebarSchedule.OnSheet) {
 
-                        hostsInfo.RebarSchedule.ViewPlacer.PlaceRebarSchedule();
-                    }
 
-                    if(hostsInfo.MaterialSchedule.OnSheetEditableInGUI && hostsInfo.MaterialSchedule.OnSheet) {
 
-                        hostsInfo.MaterialSchedule.ViewPlacer.PlaceMaterialSchedule();
-                    }
 
-                    if(hostsInfo.SystemPartsSchedule.OnSheetEditableInGUI && hostsInfo.SystemPartsSchedule.OnSheet) {
 
-                        hostsInfo.SystemPartsSchedule.ViewPlacer.PlaceSystemPartsSchedule();
-                    }
+                    //if(hostsInfo.GeneralView.InProjectEditableInGUI && hostsInfo.GeneralView.InProject) {
 
-                    if(hostsInfo.IFCPartsSchedule.OnSheetEditableInGUI && hostsInfo.IFCPartsSchedule.OnSheet) {
+                    //    hostsInfo.GeneralView.ViewCreator.CreateGeneralView(SelectedViewFamilyType);
+                    //}
 
-                        hostsInfo.IFCPartsSchedule.ViewPlacer.PlaceIFCPartsSchedule();
-                    }
+                    //if(hostsInfo.GeneralViewPerpendicular.InProjectEditableInGUI && hostsInfo.GeneralViewPerpendicular.InProject) {
+
+                    //    hostsInfo.GeneralViewPerpendicular.ViewCreator.CreateGeneralPerpendicularView(SelectedViewFamilyType);
+                    //}
+
+
+
+
+
+                    //if(hostsInfo.TransverseViewFirst.InProjectEditableInGUI && hostsInfo.TransverseViewFirst.InProject) {
+
+                    //    hostsInfo.TransverseViewFirst.ViewCreator.CreateTransverseView(SelectedViewFamilyType, 1);
+                    //}
+
+                    //if(hostsInfo.TransverseViewSecond.InProjectEditableInGUI && hostsInfo.TransverseViewSecond.InProject) {
+
+                    //    hostsInfo.TransverseViewSecond.ViewCreator.CreateTransverseView(SelectedViewFamilyType, 2);
+                    //}
+
+                    //if(hostsInfo.TransverseViewThird.InProjectEditableInGUI && hostsInfo.TransverseViewThird.InProject) {
+
+                    //    hostsInfo.TransverseViewThird.ViewCreator.CreateTransverseView(SelectedViewFamilyType, 3);
+                    //}
+
+                    //if(hostsInfo.RebarSchedule.InProjectEditableInGUI && hostsInfo.RebarSchedule.InProject) {
+
+                    //    hostsInfo.RebarSchedule.ViewCreator.CreateRebarSchedule();
+                    //}
+
+                    //if(hostsInfo.MaterialSchedule.InProjectEditableInGUI && hostsInfo.MaterialSchedule.InProject) {
+
+                    //    hostsInfo.MaterialSchedule.ViewCreator.CreateMaterialSchedule();
+                    //}
+
+                    //if(hostsInfo.SystemPartsSchedule.InProjectEditableInGUI && hostsInfo.SystemPartsSchedule.InProject) {
+
+                    //    hostsInfo.SystemPartsSchedule.ViewCreator.CreateSystemPartsSchedule();
+                    //}
+
+                    //if(hostsInfo.IFCPartsSchedule.InProjectEditableInGUI && hostsInfo.IFCPartsSchedule.InProject) {
+
+                    //    hostsInfo.IFCPartsSchedule.ViewCreator.CreateIFCPartsSchedule();
+                    //}
+
+
+                    //_revitRepository.Document.Regenerate();
+
+
+                    //if(hostsInfo.GeneralView.OnSheetEditableInGUI && hostsInfo.GeneralView.OnSheet) {
+
+                    //    hostsInfo.GeneralView.ViewPlacer.PlaceGeneralViewport();
+                    //}
+
+                    //if(hostsInfo.GeneralViewPerpendicular.OnSheetEditableInGUI && hostsInfo.GeneralViewPerpendicular.OnSheet) {
+
+                    //    hostsInfo.GeneralViewPerpendicular.ViewPlacer.PlaceGeneralPerpendicularViewport();
+                    //}
+
+                    //if(hostsInfo.TransverseViewFirst.OnSheetEditableInGUI && hostsInfo.TransverseViewFirst.OnSheet) {
+
+                    //    hostsInfo.TransverseViewFirst.ViewPlacer.PlaceTransverseFirstViewPorts();
+                    //}
+
+                    //if(hostsInfo.TransverseViewSecond.OnSheetEditableInGUI && hostsInfo.TransverseViewSecond.OnSheet) {
+
+                    //    hostsInfo.TransverseViewSecond.ViewPlacer.PlaceTransverseSecondViewPorts();
+                    //}
+
+                    //if(hostsInfo.TransverseViewThird.OnSheetEditableInGUI && hostsInfo.TransverseViewThird.OnSheet) {
+
+                    //    hostsInfo.TransverseViewThird.ViewPlacer.PlaceTransverseThirdViewPorts();
+                    //}
+
+                    //if(hostsInfo.RebarSchedule.OnSheetEditableInGUI && hostsInfo.RebarSchedule.OnSheet) {
+
+                    //    hostsInfo.RebarSchedule.ViewPlacer.PlaceRebarSchedule();
+                    //}
+
+                    //if(hostsInfo.MaterialSchedule.OnSheetEditableInGUI && hostsInfo.MaterialSchedule.OnSheet) {
+
+                    //    hostsInfo.MaterialSchedule.ViewPlacer.PlaceMaterialSchedule();
+                    //}
+
+                    //if(hostsInfo.SystemPartsSchedule.OnSheetEditableInGUI && hostsInfo.SystemPartsSchedule.OnSheet) {
+
+                    //    hostsInfo.SystemPartsSchedule.ViewPlacer.PlaceSystemPartsSchedule();
+                    //}
+
+                    //if(hostsInfo.IFCPartsSchedule.OnSheetEditableInGUI && hostsInfo.IFCPartsSchedule.OnSheet) {
+
+                    //    hostsInfo.IFCPartsSchedule.ViewPlacer.PlaceIFCPartsSchedule();
+                    //}
                 }
 
 

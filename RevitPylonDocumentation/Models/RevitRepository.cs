@@ -157,9 +157,9 @@ namespace RevitPylonDocumentation.Models {
                         PylonSheetInfo pylonSheetInfo = new PylonSheetInfo(mainViewModel, this, hostMark);
                         pylonSheetInfo.ProjectSection = projectSection;
                         pylonSheetInfo.HostElems.Add(elem);
-                        FindSheets(mainViewModel, pylonSheetInfo);
-                        AnalizeSectionViews(mainViewModel, pylonSheetInfo);
-                        AnalizeScheduleViews(mainViewModel, pylonSheetInfo);
+                        FindSheet(mainViewModel, pylonSheetInfo);
+                        //AnalizeSectionViews(mainViewModel, pylonSheetInfo);
+                        //AnalizeScheduleViews(mainViewModel, pylonSheetInfo);
 
                         HostsInfo.Add(pylonSheetInfo);
                     } else {
@@ -183,7 +183,7 @@ namespace RevitPylonDocumentation.Models {
         }
 
 
-        public void FindSheets(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
+        public void FindSheet(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
             
             ViewSheet sheet = AllSheets
                 .Where(item => item.Name.Equals(mainViewModel.SHEET_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.SHEET_SUFFIX))
@@ -191,25 +191,93 @@ namespace RevitPylonDocumentation.Models {
 
             if(sheet != null) {
                 pylonSheetInfo.SheetInProject = true;
-                pylonSheetInfo.SheetInProjectEditableInGUI = false;
+                //pylonSheetInfo.SheetInProjectEditableInGUI = false;
                 pylonSheetInfo.PylonViewSheet = sheet;
-
-                // Сразу ищем рамку листа
-                FamilyInstance titleBlock = new FilteredElementCollector(Document, sheet.Id)
-                    .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                    .WhereElementIsNotElementType()
-                    .FirstOrDefault() as FamilyInstance;
-
-                if(titleBlock is null) { return; }
-
-                pylonSheetInfo.TitleBlock = titleBlock;
-
-                // Получаем габариты рамки листа
-                pylonSheetInfo.GetTitleBlockSize();
             }
 
             return;
         }
+
+
+
+
+        public void FindTitleBlock(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
+
+            // Сразу ищем рамку листа
+            FamilyInstance titleBlock = new FilteredElementCollector(Document, pylonSheetInfo.PylonViewSheet.Id)
+                .OfCategory(BuiltInCategory.OST_TitleBlocks)
+                .WhereElementIsNotElementType()
+                .FirstOrDefault() as FamilyInstance;
+
+            if(titleBlock is null) { return; }
+
+            pylonSheetInfo.TitleBlock = titleBlock;
+
+            // Получаем габариты рамки листа
+            pylonSheetInfo.GetTitleBlockSize();
+
+            return;
+        }
+
+
+
+
+
+
+        public void FindViewNViewportOnSheet(ViewSheet pylonViewSheet, PylonView pylonView, string viewName) {
+
+
+            foreach(ElementId id in pylonViewSheet.GetAllViewports()) {
+
+                Viewport viewport = Document.GetElement(id) as Viewport;
+
+                ViewSection viewSection = Document.GetElement(viewport.ViewId) as ViewSection;
+
+                if(viewSection is null) { continue; }
+
+                if(viewSection.Name.Equals(viewName)) {
+                    pylonView.ViewElement= viewSection;
+                    pylonView.ViewportElement= viewport;
+                    break;
+                }
+
+            }
+
+            return;
+        }
+
+
+
+
+
+
+
+        public void FindViewSectionInPj(PylonView pylonView, string viewName) {
+
+            foreach(ViewSection view in AllSectionViews) {
+                
+                if(view.Name == viewName) {
+                    pylonView.ViewElement = view;
+
+                    break;
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         public void AnalizeSectionViews(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
@@ -218,171 +286,171 @@ namespace RevitPylonDocumentation.Models {
                 // GENERAL_VIEW
                 if(view.Name == mainViewModel.GENERAL_VIEW_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.GENERAL_VIEW_SUFFIX) {
                     pylonSheetInfo.GeneralView.ViewElement = view;
-                    pylonSheetInfo.GeneralView.InProject = true;
-                    pylonSheetInfo.GeneralView.InProjectEditableInGUI = false;
+                    //pylonSheetInfo.GeneralView.InProject = true;
+                    //pylonSheetInfo.GeneralView.InProjectEditableInGUI = false;
 
                     string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
-                    
+
                     if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
                         // Значит видовой экран вида есть на листе, но мы не знаем где
-                        pylonSheetInfo.GeneralView.OnSheet = true;
-                        pylonSheetInfo.GeneralView.OnSheetEditableInGUI = false;
+                        //pylonSheetInfo.GeneralView.OnSheet = true;
+                        //pylonSheetInfo.GeneralView.OnSheetEditableInGUI = false;
 
                         // Ищем видовой экран вида на листе, собираем инфу по нему
                         GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.GeneralView);
 
-                        
+
                     }
                 }
 
-                // GENERAL_VIEW_PERPENDICULAR
-                if(view.Name == mainViewModel.GENERAL_VIEW_PERPENDICULAR_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.GENERAL_VIEW_PERPENDICULAR_SUFFIX) {
-                    pylonSheetInfo.GeneralViewPerpendicular.ViewElement = view;
-                    pylonSheetInfo.GeneralViewPerpendicular.InProject = true;
-                    pylonSheetInfo.GeneralViewPerpendicular.InProjectEditableInGUI = false;
+                //// GENERAL_VIEW_PERPENDICULAR
+                //if(view.Name == mainViewModel.GENERAL_VIEW_PERPENDICULAR_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.GENERAL_VIEW_PERPENDICULAR_SUFFIX) {
+                //    pylonSheetInfo.GeneralViewPerpendicular.ViewElement = view;
+                //    pylonSheetInfo.GeneralViewPerpendicular.InProject = true;
+                //    pylonSheetInfo.GeneralViewPerpendicular.InProjectEditableInGUI = false;
 
-                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
+                //    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
 
-                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
-                        pylonSheetInfo.GeneralViewPerpendicular.OnSheet = true;
-                        pylonSheetInfo.GeneralViewPerpendicular.OnSheetEditableInGUI = false;
+                //    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
+                //        pylonSheetInfo.GeneralViewPerpendicular.OnSheet = true;
+                //        pylonSheetInfo.GeneralViewPerpendicular.OnSheetEditableInGUI = false;
 
-                        // Ищем видовой экран вида на листе, собираем инфу по нему
-                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.GeneralViewPerpendicular);
-                    }
-                }
+                //        // Ищем видовой экран вида на листе, собираем инфу по нему
+                //        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.GeneralViewPerpendicular);
+                //    }
+                //}
 
-                // TRANSVERSE_VIEW_FIRST
-                if(view.Name == mainViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX) {
-                    pylonSheetInfo.TransverseViewFirst.ViewElement = view;
-                    pylonSheetInfo.TransverseViewFirst.InProject = true;
-                    pylonSheetInfo.TransverseViewFirst.InProjectEditableInGUI = false;
+                //// TRANSVERSE_VIEW_FIRST
+                //if(view.Name == mainViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX) {
+                //    pylonSheetInfo.TransverseViewFirst.ViewElement = view;
+                //    pylonSheetInfo.TransverseViewFirst.InProject = true;
+                //    pylonSheetInfo.TransverseViewFirst.InProjectEditableInGUI = false;
 
-                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
+                //    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
 
-                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
-                        pylonSheetInfo.TransverseViewFirst.OnSheet = true;
-                        pylonSheetInfo.TransverseViewFirst.OnSheetEditableInGUI = false;
+                //    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
+                //        pylonSheetInfo.TransverseViewFirst.OnSheet = true;
+                //        pylonSheetInfo.TransverseViewFirst.OnSheetEditableInGUI = false;
 
-                        // Ищем видовой экран вида на листе, собираем инфу по нему
-                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.TransverseViewFirst);
-                    }
-                }
+                //        // Ищем видовой экран вида на листе, собираем инфу по нему
+                //        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.TransverseViewFirst);
+                //    }
+                //}
 
-                // TRANSVERSE_VIEW_SECOND
-                if(view.Name == mainViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX) {
-                    pylonSheetInfo.TransverseViewSecond.ViewElement = view;
-                    pylonSheetInfo.TransverseViewSecond.InProject = true;
-                    pylonSheetInfo.TransverseViewSecond.InProjectEditableInGUI = false;
+                //// TRANSVERSE_VIEW_SECOND
+                //if(view.Name == mainViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX) {
+                //    pylonSheetInfo.TransverseViewSecond.ViewElement = view;
+                //    pylonSheetInfo.TransverseViewSecond.InProject = true;
+                //    pylonSheetInfo.TransverseViewSecond.InProjectEditableInGUI = false;
 
-                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
+                //    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
 
-                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
-                        pylonSheetInfo.TransverseViewSecond.OnSheet = true;
-                        pylonSheetInfo.TransverseViewSecond.OnSheetEditableInGUI = false;
+                //    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
+                //        pylonSheetInfo.TransverseViewSecond.OnSheet = true;
+                //        pylonSheetInfo.TransverseViewSecond.OnSheetEditableInGUI = false;
 
-                        // Ищем видовой экран вида на листе, собираем инфу по нему
-                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.TransverseViewSecond);
-                    }
-                }
+                //        // Ищем видовой экран вида на листе, собираем инфу по нему
+                //        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.TransverseViewSecond);
+                //    }
+                //}
 
-                // TRANSVERSE_VIEW_THIRD
-                if(view.Name == mainViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX) {
-                    pylonSheetInfo.TransverseViewThird.ViewElement = view;
-                    pylonSheetInfo.TransverseViewThird.InProject = true;
-                    pylonSheetInfo.TransverseViewThird.InProjectEditableInGUI = false;
+                //// TRANSVERSE_VIEW_THIRD
+                //if(view.Name == mainViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX) {
+                //    pylonSheetInfo.TransverseViewThird.ViewElement = view;
+                //    pylonSheetInfo.TransverseViewThird.InProject = true;
+                //    pylonSheetInfo.TransverseViewThird.InProjectEditableInGUI = false;
 
-                    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
+                //    string sheetName = view.get_Parameter(BuiltInParameter.VIEWPORT_SHEET_NAME).AsString();
 
-                    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
-                        pylonSheetInfo.TransverseViewThird.OnSheet = true;
-                        pylonSheetInfo.TransverseViewThird.OnSheetEditableInGUI = false;
+                //    if(sheetName != null && pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Name.Equals(sheetName)) {
+                //        pylonSheetInfo.TransverseViewThird.OnSheet = true;
+                //        pylonSheetInfo.TransverseViewThird.OnSheetEditableInGUI = false;
 
-                        // Ищем видовой экран вида на листе, собираем инфу по нему
-                        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.TransverseViewThird);
-                    }
-                }
+                //        // Ищем видовой экран вида на листе, собираем инфу по нему
+                //        GetInfoAboutViewport(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.TransverseViewThird);
+                //    }
+                //}
 
 
-                if(pylonSheetInfo.GeneralView.ViewElement != null
-                    &&  pylonSheetInfo.GeneralViewPerpendicular.ViewElement != null
-                    && pylonSheetInfo.TransverseViewFirst.ViewElement != null
-                    && pylonSheetInfo.TransverseViewSecond.ViewElement != null
-                    && pylonSheetInfo.TransverseViewThird.ViewElement != null) {
-                    break;
-                }
+                //if(pylonSheetInfo.GeneralView.ViewElement != null
+                //    && pylonSheetInfo.GeneralViewPerpendicular.ViewElement != null
+                //    && pylonSheetInfo.TransverseViewFirst.ViewElement != null
+                //    && pylonSheetInfo.TransverseViewSecond.ViewElement != null
+                //    && pylonSheetInfo.TransverseViewThird.ViewElement != null) {
+                //    break;
+                //}
             }
         }
 
-        public void AnalizeScheduleViews(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
+        //public void AnalizeScheduleViews(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
 
-            foreach(ViewSchedule view in AllScheduleViews) {
-                
-                // REBAR_SCHEDULE
-                if(view.Name == mainViewModel.REBAR_SCHEDULE_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.REBAR_SCHEDULE_SUFFIX) {
-                    // Нашли спеку армирования с нужным названием в проекте
+        //    foreach(ViewSchedule view in AllScheduleViews) {
 
-                    CheckSchedule(pylonSheetInfo.RebarSchedule, view);
-                }
+        //        // REBAR_SCHEDULE
+        //        if(view.Name == mainViewModel.REBAR_SCHEDULE_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.REBAR_SCHEDULE_SUFFIX) {
+        //            // Нашли спеку армирования с нужным названием в проекте
 
-                // MATERIAL_SCHEDULE
-                if(view.Name == mainViewModel.MATERIAL_SCHEDULE_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.MATERIAL_SCHEDULE_SUFFIX) {
+        //            CheckSchedule(pylonSheetInfo.RebarSchedule, view);
+        //        }
 
-                    CheckSchedule(pylonSheetInfo.MaterialSchedule, view);
-                }
+        //        // MATERIAL_SCHEDULE
+        //        if(view.Name == mainViewModel.MATERIAL_SCHEDULE_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.MATERIAL_SCHEDULE_SUFFIX) {
 
-                // SYSTEM_PARTS_SCHEDULE
-                if(view.Name == mainViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX) {
+        //            CheckSchedule(pylonSheetInfo.MaterialSchedule, view);
+        //        }
 
-                    CheckSchedule(pylonSheetInfo.SystemPartsSchedule, view);
-                }
+        //        // SYSTEM_PARTS_SCHEDULE
+        //        if(view.Name == mainViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX) {
 
-
-                // IFC_PARTS_SCHEDULE
-                if(view.Name == mainViewModel.IFC_PARTS_SCHEDULE_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.IFC_PARTS_SCHEDULE_SUFFIX) {
-
-                    CheckSchedule(pylonSheetInfo.IFCPartsSchedule, view);
-                }
+        //            CheckSchedule(pylonSheetInfo.SystemPartsSchedule, view);
+        //        }
 
 
-                if(pylonSheetInfo.RebarSchedule.ViewElement != null
-                    && pylonSheetInfo.MaterialSchedule.ViewElement != null
-                    && pylonSheetInfo.IFCPartsSchedule.ViewElement != null
-                    && pylonSheetInfo.SystemPartsSchedule.ViewElement != null) {
-                    break;
-                }
-            }
-        }
+        //        // IFC_PARTS_SCHEDULE
+        //        if(view.Name == mainViewModel.IFC_PARTS_SCHEDULE_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.IFC_PARTS_SCHEDULE_SUFFIX) {
+
+        //            CheckSchedule(pylonSheetInfo.IFCPartsSchedule, view);
+        //        }
+
+
+        //        if(pylonSheetInfo.RebarSchedule.ViewElement != null
+        //            && pylonSheetInfo.MaterialSchedule.ViewElement != null
+        //            && pylonSheetInfo.IFCPartsSchedule.ViewElement != null
+        //            && pylonSheetInfo.SystemPartsSchedule.ViewElement != null) {
+        //            break;
+        //        }
+        //    }
+        //}
 
 
 
 
-        public void CheckSchedule(PylonView pylonView, ViewSchedule view) {
+        //public void CheckSchedule(PylonView pylonView, ViewSchedule view) {
 
-            PylonSheetInfo pylonSheetInfo = pylonView.SheetInfo;
+        //    PylonSheetInfo pylonSheetInfo = pylonView.SheetInfo;
 
-            pylonView.ViewElement = view;
-            pylonView.InProject = true;
-            pylonView.InProjectEditableInGUI = false;
+        //    pylonView.ViewElement = view;
+        //    pylonView.InProject = true;
+        //    pylonView.InProjectEditableInGUI = false;
 
-            // Находим через зависимые элементы вида видовой экран на листе
-            ElementId viewportId = view.GetDependentElements(new ElementClassFilter(typeof(ScheduleSheetInstance))).FirstOrDefault();
-            if(viewportId is null) { return; }
+        //    // Находим через зависимые элементы вида видовой экран на листе
+        //    ElementId viewportId = view.GetDependentElements(new ElementClassFilter(typeof(ScheduleSheetInstance))).FirstOrDefault();
+        //    if(viewportId is null) { return; }
 
-            ScheduleSheetInstance viewport = Document.GetElement(viewportId) as ScheduleSheetInstance;
-            ElementId sheetId = viewport.OwnerViewId;
+        //    ScheduleSheetInstance viewport = Document.GetElement(viewportId) as ScheduleSheetInstance;
+        //    ElementId sheetId = viewport.OwnerViewId;
 
-            if(pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Id.Equals(sheetId)) {
-                pylonView.OnSheet = true;
-                pylonView.OnSheetEditableInGUI = false;
+        //    if(pylonSheetInfo.SheetInProject && pylonSheetInfo.PylonViewSheet.Id.Equals(sheetId)) {
+        //        pylonView.OnSheet = true;
+        //        pylonView.OnSheetEditableInGUI = false;
 
-                // Запоминаем инфо по видовому экрану вида на листе
+        //        // Запоминаем инфо по видовому экрану вида на листе
 
-                pylonSheetInfo.RebarSchedule.ViewportElement = viewport;
+        //        pylonSheetInfo.RebarSchedule.ViewportElement = viewport;
 
-                pylonSheetInfo.RebarSchedule.ViewPlacer.GetAndWriteScheduleViewportInfo(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.RebarSchedule, viewport);
-            }
-        }
+        //        pylonSheetInfo.RebarSchedule.ViewPlacer.GetAndWriteScheduleViewportInfo(pylonSheetInfo.PylonViewSheet, pylonSheetInfo.RebarSchedule, viewport);
+        //    }
+        //}
 
 
 

@@ -29,7 +29,7 @@ namespace RevitPylonDocumentation.Models {
 
 
 
-        public bool CreateGeneralView(ViewFamilyType SelectedViewFamilyType) {
+        public bool TryCreateGeneralView(ViewFamilyType SelectedViewFamilyType) {
 
             // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
             int count = 0;
@@ -83,17 +83,27 @@ namespace RevitPylonDocumentation.Models {
             sectionBox.Min = sectionBoxMin;
             sectionBox.Max = sectionBoxMax;
 
-            ViewSection viewSection = ViewSection.CreateSection(Repository.Document, SelectedViewFamilyType.Id, sectionBox);
+            ViewSection viewSection = null;
 
-            if(viewSection != null) { 
-                viewSection.Name = ViewModel.GENERAL_VIEW_PREFIX + SheetInfo.PylonKeyName + ViewModel.GENERAL_VIEW_SUFFIX;
-                if(ViewModel.SelectedGeneralViewTemplate != null) {
-                    viewSection.ViewTemplateId = ViewModel.SelectedGeneralViewTemplate.Id;
+            try {
+                viewSection = ViewSection.CreateSection(Repository.Document, SelectedViewFamilyType.Id, sectionBox);
+                
+                if(viewSection != null) {
+                    viewSection.Name = ViewModel.GENERAL_VIEW_PREFIX + SheetInfo.PylonKeyName + ViewModel.GENERAL_VIEW_SUFFIX;
+                    if(ViewModel.SelectedGeneralViewTemplate != null) {
+                        viewSection.ViewTemplateId = ViewModel.SelectedGeneralViewTemplate.Id;
+                    }
                 }
+            } catch(Exception) {
+
+                if(viewSection != null) {
+                    Repository.Document.Delete(viewSection.Id);
+                }
+                return false;
             }
+            
 
             SheetInfo.GeneralView.ViewElement = viewSection;
-
 
             return true;
         }
@@ -139,7 +149,7 @@ namespace RevitPylonDocumentation.Models {
 
 
 
-        public ViewSection CreateGeneralPerpendicularView(ViewFamilyType SelectedViewFamilyType) {
+        public bool TryCreateGeneralPerpendicularView(ViewFamilyType SelectedViewFamilyType) {
 
             // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
             int count = 0;
@@ -149,8 +159,7 @@ namespace RevitPylonDocumentation.Models {
                 count++;
             }
 
-            if(elemForWork is null) { return null; }
-
+            if(elemForWork is null) { return false; }
 
 
             double hostLength = 0;
@@ -160,7 +169,7 @@ namespace RevitPylonDocumentation.Models {
 
 
             // Заполняем нужные для объекта Transform поля
-            if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return null; }
+            if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
 
 
             // Формируем данные для объекта Transform
@@ -198,210 +207,222 @@ namespace RevitPylonDocumentation.Models {
             sectionBox.Min = sectionBoxMin;
             sectionBox.Max = sectionBoxMax;
 
-            ViewSection viewSection = ViewSection.CreateSection(Repository.Document, SelectedViewFamilyType.Id, sectionBox);
 
-            if(viewSection != null) { 
-                viewSection.Name = ViewModel.GENERAL_VIEW_PERPENDICULAR_PREFIX + SheetInfo.PylonKeyName + ViewModel.GENERAL_VIEW_PERPENDICULAR_SUFFIX;
-                if(ViewModel.SelectedGeneralViewTemplate != null) {
-                    viewSection.ViewTemplateId = ViewModel.SelectedGeneralViewTemplate.Id;
+            ViewSection viewSection = null;
+
+            try {
+                viewSection = ViewSection.CreateSection(Repository.Document, SelectedViewFamilyType.Id, sectionBox);
+
+                if(viewSection != null) {
+                    viewSection.Name = ViewModel.GENERAL_VIEW_PERPENDICULAR_PREFIX + SheetInfo.PylonKeyName + ViewModel.GENERAL_VIEW_PERPENDICULAR_SUFFIX;
+                    if(ViewModel.SelectedGeneralViewTemplate != null) {
+                        viewSection.ViewTemplateId = ViewModel.SelectedGeneralViewTemplate.Id;
+                    }
                 }
+            } catch(Exception) {
+
+                if(viewSection != null) {
+                    Repository.Document.Delete(viewSection.Id);
+                }
+                return false;
             }
+            
 
             SheetInfo.GeneralViewPerpendicular.ViewElement = viewSection;
 
-            return viewSection;
+            return true;
         }
 
 
 
 
 
-        public ViewSection CreateTransverseView(ViewFamilyType SelectedViewFamilyType, int transverseViewNum) {
+        //public ViewSection CreateTransverseView(ViewFamilyType SelectedViewFamilyType, int transverseViewNum) {
 
-            // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-            int count = 0;
-            Element elemForWork = null;
-            foreach(Element elem in SheetInfo.HostElems) {
-                elemForWork = elem;
-                count++;
-            }
+        //    // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
+        //    int count = 0;
+        //    Element elemForWork = null;
+        //    foreach(Element elem in SheetInfo.HostElems) {
+        //        elemForWork = elem;
+        //        count++;
+        //    }
 
-            if(elemForWork is null) { return null; }
-
-
-
-            double hostLength = 0;
-            double hostWidth = 0;
-            XYZ midlePoint = null;
-            XYZ hostVector = null;
-
-
-            // Заполняем нужные для объекта Transform поля
-            if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return null; }
-
-
-            // Формируем данные для объекта Transform
-            XYZ originPoint = midlePoint;
-            XYZ hostDir = hostVector.Normalize();
-            XYZ viewDir = XYZ.BasisZ.Negate();
-            XYZ upDir = viewDir.CrossProduct(hostDir);
-
-
-            // Передаем данные для объекта Transform
-            Transform t = Transform.Identity;
-            t.Origin = originPoint;
-            t.BasisX = hostDir;
-            t.BasisY = upDir;
-            t.BasisZ = viewDir;
-
-
-            BoundingBoxXYZ bb = elemForWork.get_BoundingBox(null);
-            double minZ = bb.Min.Z;
-            double maxZ = bb.Max.Z;
-
-            XYZ sectionBoxMin;
-            XYZ sectionBoxMax;
-            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.TRANSVERSE_VIEW_X_OFFSET));
-            double coordinateY = hostWidth * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.TRANSVERSE_VIEW_Y_OFFSET));
-
-            if(transverseViewNum == 1) {
-                // Располагаем сечение на высоте 1/4 высоты пилона
-                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) / 4 - originPoint.Z));
-                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) / 8 - originPoint.Z));
-            } else if(transverseViewNum == 2) {
-                // Располагаем сечение на высоте 1/2 высоты пилона
-                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) / 2 - originPoint.Z));
-                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) / 8 * 3 - originPoint.Z));
-            } else if(transverseViewNum == 3) {
-                // Располагаем сечение на высоте 5/4 высоты пилона
-                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) / 4 * 5 - originPoint.Z));
-                sectionBoxMax = new XYZ(coordinateX, coordinateY, - (minZ + (maxZ - minZ) / 8 * 7 - originPoint.Z));
-            } else {
-                return null;
-            }
-
-
-            BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
-            sectionBox.Transform = t;
-            sectionBox.Min = sectionBoxMin;
-            sectionBox.Max = sectionBoxMax;
-
-            ViewSection viewSection = ViewSection.CreateSection(Repository.Document, SelectedViewFamilyType.Id, sectionBox);
-
-            if(viewSection != null) {
-                if(transverseViewNum == 1) {
-                    viewSection.Name = ViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + SheetInfo.PylonKeyName + ViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX;
-                    if(ViewModel.SelectedTransverseViewTemplate != null) {
-                        viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
-                    }
-                    SheetInfo.TransverseViewFirst.ViewElement = viewSection;
-                } else if(transverseViewNum == 2) {
-                    viewSection.Name = ViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + SheetInfo.PylonKeyName + ViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX;
-                    if(ViewModel.SelectedTransverseViewTemplate != null) {
-                        viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
-                    }
-                    SheetInfo.TransverseViewSecond.ViewElement = viewSection;
-                } else if(transverseViewNum == 3) {
-                    viewSection.Name = ViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + SheetInfo.PylonKeyName + ViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX;
-                    if(ViewModel.SelectedTransverseViewTemplate != null) {
-                        viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
-                    }
-                    SheetInfo.TransverseViewThird.ViewElement = viewSection;
-                }
-            }
-
-            return viewSection;
-        }
+        //    if(elemForWork is null) { return null; }
 
 
 
-
-        public void CreateRebarSchedule() {
-
-            if(ViewModel.ReferenceRebarSchedule is null || !ViewModel.ReferenceRebarSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
-
-            ElementId scheduleId = ViewModel.ReferenceRebarSchedule.Duplicate(ViewDuplicateOption.Duplicate);
-            ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
-            if(viewSchedule is null) { return; }
-
-            viewSchedule.Name = ViewModel.REBAR_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.REBAR_SCHEDULE_SUFFIX;
-
-            // Задаем сортировку
-            SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.REBAR_SCHEDULE_DISP1);
-            SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.REBAR_SCHEDULE_DISP2);
+        //    double hostLength = 0;
+        //    double hostWidth = 0;
+        //    XYZ midlePoint = null;
+        //    XYZ hostVector = null;
 
 
-            // Задаем фильтры спецификации
-            SetScheduleFilters(viewSchedule);
-
-            SheetInfo.RebarSchedule.ViewElement = viewSchedule;
-        }
-
-        public void CreateMaterialSchedule() {
-
-            if(ViewModel.ReferenceMaterialSchedule is null || !ViewModel.ReferenceMaterialSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
-
-            ElementId scheduleId = ViewModel.ReferenceMaterialSchedule.Duplicate(ViewDuplicateOption.Duplicate);
-            ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
-            if(viewSchedule is null) { return; }
-
-            viewSchedule.Name = ViewModel.MATERIAL_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.MATERIAL_SCHEDULE_SUFFIX;
+        //    // Заполняем нужные для объекта Transform поля
+        //    if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return null; }
 
 
-            // Задаем сортировку
-            SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.MATERIAL_SCHEDULE_DISP1);
-            SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.MATERIAL_SCHEDULE_DISP2);
+        //    // Формируем данные для объекта Transform
+        //    XYZ originPoint = midlePoint;
+        //    XYZ hostDir = hostVector.Normalize();
+        //    XYZ viewDir = XYZ.BasisZ.Negate();
+        //    XYZ upDir = viewDir.CrossProduct(hostDir);
 
 
-            // Задаем фильтры спецификации
-            SetScheduleFilters(viewSchedule);
-
-            SheetInfo.MaterialSchedule.ViewElement = viewSchedule;
-        }
-
-        public void CreateSystemPartsSchedule() {
-
-            if(ViewModel.ReferenceSystemPartsSchedule is null || !ViewModel.ReferenceSystemPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
-
-            ElementId scheduleId = ViewModel.ReferenceSystemPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
-            ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
-            if(viewSchedule is null) { return; }
-
-            viewSchedule.Name = ViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX;
+        //    // Передаем данные для объекта Transform
+        //    Transform t = Transform.Identity;
+        //    t.Origin = originPoint;
+        //    t.BasisX = hostDir;
+        //    t.BasisY = upDir;
+        //    t.BasisZ = viewDir;
 
 
-            // Задаем сортировку
-            SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.SYSTEM_PARTS_SCHEDULE_DISP1);
-            SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.SYSTEM_PARTS_SCHEDULE_DISP2);
+        //    BoundingBoxXYZ bb = elemForWork.get_BoundingBox(null);
+        //    double minZ = bb.Min.Z;
+        //    double maxZ = bb.Max.Z;
+
+        //    XYZ sectionBoxMin;
+        //    XYZ sectionBoxMax;
+        //    double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.TRANSVERSE_VIEW_X_OFFSET));
+        //    double coordinateY = hostWidth * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.TRANSVERSE_VIEW_Y_OFFSET));
+
+        //    if(transverseViewNum == 1) {
+        //        // Располагаем сечение на высоте 1/4 высоты пилона
+        //        sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) / 4 - originPoint.Z));
+        //        sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) / 8 - originPoint.Z));
+        //    } else if(transverseViewNum == 2) {
+        //        // Располагаем сечение на высоте 1/2 высоты пилона
+        //        sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) / 2 - originPoint.Z));
+        //        sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) / 8 * 3 - originPoint.Z));
+        //    } else if(transverseViewNum == 3) {
+        //        // Располагаем сечение на высоте 5/4 высоты пилона
+        //        sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) / 4 * 5 - originPoint.Z));
+        //        sectionBoxMax = new XYZ(coordinateX, coordinateY, - (minZ + (maxZ - minZ) / 8 * 7 - originPoint.Z));
+        //    } else {
+        //        return null;
+        //    }
 
 
-            // Задаем фильтры спецификации
-            SetScheduleFilters(viewSchedule);
+        //    BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
+        //    sectionBox.Transform = t;
+        //    sectionBox.Min = sectionBoxMin;
+        //    sectionBox.Max = sectionBoxMax;
 
-            SheetInfo.SystemPartsSchedule.ViewElement = viewSchedule;
-        }
+        //    ViewSection viewSection = ViewSection.CreateSection(Repository.Document, SelectedViewFamilyType.Id, sectionBox);
 
-        public void CreateIFCPartsSchedule() {
+        //    if(viewSection != null) {
+        //        if(transverseViewNum == 1) {
+        //            viewSection.Name = ViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + SheetInfo.PylonKeyName + ViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX;
+        //            if(ViewModel.SelectedTransverseViewTemplate != null) {
+        //                viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
+        //            }
+        //            SheetInfo.TransverseViewFirst.ViewElement = viewSection;
+        //        } else if(transverseViewNum == 2) {
+        //            viewSection.Name = ViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + SheetInfo.PylonKeyName + ViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX;
+        //            if(ViewModel.SelectedTransverseViewTemplate != null) {
+        //                viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
+        //            }
+        //            SheetInfo.TransverseViewSecond.ViewElement = viewSection;
+        //        } else if(transverseViewNum == 3) {
+        //            viewSection.Name = ViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + SheetInfo.PylonKeyName + ViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX;
+        //            if(ViewModel.SelectedTransverseViewTemplate != null) {
+        //                viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
+        //            }
+        //            SheetInfo.TransverseViewThird.ViewElement = viewSection;
+        //        }
+        //    }
 
-            if(ViewModel.ReferenceIFCPartsSchedule is null || !ViewModel.ReferenceIFCPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
-
-            ElementId scheduleId = ViewModel.ReferenceIFCPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
-            ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
-            if(viewSchedule is null) { return; }
-
-            viewSchedule.Name = ViewModel.IFC_PARTS_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX;
-            
-            
-            // Задаем сортировку
-            SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.IFC_PARTS_SCHEDULE_DISP1);
-            SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.IFC_PARTS_SCHEDULE_DISP2);
+        //    return viewSection;
+        //}
 
 
-            // Задаем фильтры спецификации
-            SetScheduleFilters(viewSchedule);
 
-            SheetInfo.IFCPartsSchedule.ViewElement = viewSchedule;
-        }
+
+        //public void CreateRebarSchedule() {
+
+        //    if(ViewModel.ReferenceRebarSchedule is null || !ViewModel.ReferenceRebarSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
+
+        //    ElementId scheduleId = ViewModel.ReferenceRebarSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+        //    ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
+        //    if(viewSchedule is null) { return; }
+
+        //    viewSchedule.Name = ViewModel.REBAR_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.REBAR_SCHEDULE_SUFFIX;
+
+        //    // Задаем сортировку
+        //    SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.REBAR_SCHEDULE_DISP1);
+        //    SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.REBAR_SCHEDULE_DISP2);
+
+
+        //    // Задаем фильтры спецификации
+        //    SetScheduleFilters(viewSchedule);
+
+        //    SheetInfo.RebarSchedule.ViewElement = viewSchedule;
+        //}
+
+        //public void CreateMaterialSchedule() {
+
+        //    if(ViewModel.ReferenceMaterialSchedule is null || !ViewModel.ReferenceMaterialSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
+
+        //    ElementId scheduleId = ViewModel.ReferenceMaterialSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+        //    ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
+        //    if(viewSchedule is null) { return; }
+
+        //    viewSchedule.Name = ViewModel.MATERIAL_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.MATERIAL_SCHEDULE_SUFFIX;
+
+
+        //    // Задаем сортировку
+        //    SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.MATERIAL_SCHEDULE_DISP1);
+        //    SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.MATERIAL_SCHEDULE_DISP2);
+
+
+        //    // Задаем фильтры спецификации
+        //    SetScheduleFilters(viewSchedule);
+
+        //    SheetInfo.MaterialSchedule.ViewElement = viewSchedule;
+        //}
+
+        //public void CreateSystemPartsSchedule() {
+
+        //    if(ViewModel.ReferenceSystemPartsSchedule is null || !ViewModel.ReferenceSystemPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
+
+        //    ElementId scheduleId = ViewModel.ReferenceSystemPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+        //    ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
+        //    if(viewSchedule is null) { return; }
+
+        //    viewSchedule.Name = ViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX;
+
+
+        //    // Задаем сортировку
+        //    SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.SYSTEM_PARTS_SCHEDULE_DISP1);
+        //    SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.SYSTEM_PARTS_SCHEDULE_DISP2);
+
+
+        //    // Задаем фильтры спецификации
+        //    SetScheduleFilters(viewSchedule);
+
+        //    SheetInfo.SystemPartsSchedule.ViewElement = viewSchedule;
+        //}
+
+        //public void CreateIFCPartsSchedule() {
+
+        //    if(ViewModel.ReferenceIFCPartsSchedule is null || !ViewModel.ReferenceIFCPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return; }
+
+        //    ElementId scheduleId = ViewModel.ReferenceIFCPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+        //    ViewSchedule viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
+        //    if(viewSchedule is null) { return; }
+
+        //    viewSchedule.Name = ViewModel.IFC_PARTS_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX;
+
+
+        //    // Задаем сортировку
+        //    SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.IFC_PARTS_SCHEDULE_DISP1);
+        //    SetDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.IFC_PARTS_SCHEDULE_DISP2);
+
+
+        //    // Задаем фильтры спецификации
+        //    SetScheduleFilters(viewSchedule);
+
+        //    SheetInfo.IFCPartsSchedule.ViewElement = viewSchedule;
+        //}
 
 
 
