@@ -82,7 +82,9 @@ namespace RevitPylonDocumentation.Models {
 
 
 
-
+        /// <summary>
+        /// Создание листа, задание имени, поиск рамки и задание ей нужных габаритов
+        /// </summary>
         public bool CreateSheet() {
             if(PylonViewSheet != null ) {
                 return false; 
@@ -91,12 +93,22 @@ namespace RevitPylonDocumentation.Models {
             PylonViewSheet = ViewSheet.Create(Repository.Document, ViewModel.SelectedTitleBlocks.Id);
             PylonViewSheet.Name = ViewModel.SHEET_PREFIX + PylonKeyName + ViewModel.SHEET_SUFFIX;
 
-
             Parameter viewSheetGroupingParameter = PylonViewSheet.LookupParameter(ViewModel.DISPATCHER_GROUPING_FIRST);
             if(viewSheetGroupingParameter == null) {
             } else {
                 viewSheetGroupingParameter.Set(ViewModel.SelectedProjectSection);
             }
+
+            FindTitleBlock();
+            SetTitleBlockSize(Repository.Document);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Поиск рамки на листе
+        /// </summary>
+        public bool FindTitleBlock() {
 
             // Ищем рамку листа
             FamilyInstance titleBlock = new FilteredElementCollector(Repository.Document, PylonViewSheet.Id)
@@ -105,16 +117,15 @@ namespace RevitPylonDocumentation.Models {
                 .FirstOrDefault() as FamilyInstance;
 
             if(titleBlock is null) { return false; }
-
             TitleBlock = titleBlock;
-            SetTitleBlockSize(Repository.Document);
 
             return true;
         }
 
 
+
         /// <summary>
-        /// Получает габарит рамки листа и записывает в параметры TitleBlockWidth и TitleBlockHeight
+        /// Получает габариты рамки листа и записывает в параметры TitleBlockWidth и TitleBlockHeight
         /// </summary>
         internal void GetTitleBlockSize() {
             if(TitleBlock is null) {
@@ -128,8 +139,9 @@ namespace RevitPylonDocumentation.Models {
         }
 
 
-
-        // Метод для задания рамки листа (по дефолту ставит А3)
+        /// <summary>
+        /// Задает размеры рамки листа (по дефолту ставит А3) и запоминает
+        /// </summary>
         internal void SetTitleBlockSize(Document doc, int sheetSize = 3, int sheetCoefficient = 1) {
             if(this.TitleBlock is null) {
                 #region Отчет
@@ -173,7 +185,74 @@ namespace RevitPylonDocumentation.Models {
             GetTitleBlockSize();
         }
 
+        /// <summary>
+        /// Получает и сохраняет имена видов в соответствии с префиксами/суффиксами от пользователя
+        /// </summary>
+        public void WriteViewNames() {
+            
+            GeneralView.ViewName = ViewModel.GENERAL_VIEW_PREFIX + PylonKeyName + ViewModel.GENERAL_VIEW_SUFFIX;
+            GeneralViewPerpendicular.ViewName = ViewModel.GENERAL_VIEW_PERPENDICULAR_PREFIX + PylonKeyName + ViewModel.GENERAL_VIEW_PERPENDICULAR_SUFFIX;
+            TransverseViewFirst.ViewName = ViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX;
+            TransverseViewSecond.ViewName = ViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX;
+            TransverseViewThird.ViewName = ViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX;
 
+            RebarSchedule.ViewName = ViewModel.REBAR_SCHEDULE_PREFIX + PylonKeyName + ViewModel.REBAR_SCHEDULE_SUFFIX;
+            MaterialSchedule.ViewName = ViewModel.MATERIAL_SCHEDULE_PREFIX + PylonKeyName + ViewModel.MATERIAL_SCHEDULE_SUFFIX;
+            SystemPartsSchedule.ViewName = ViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX + PylonKeyName + ViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX;
+            IFCPartsSchedule.ViewName = ViewModel.IFC_PARTS_SCHEDULE_PREFIX + PylonKeyName + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX;
+        }
+
+
+        /// <summary>
+        /// Ищет и запоминает виды и видовые экраны через видовые экраны, размещенные на листе
+        /// </summary>
+        public void FindViewsNViewportsOnSheet() {
+
+            foreach(ElementId id in PylonViewSheet.GetAllViewports()) {
+
+                Viewport viewport = Repository.Document.GetElement(id) as Viewport;
+                ViewSection viewSection = Repository.Document.GetElement(viewport.ViewId) as ViewSection;
+                
+                // Видовые экраны не разрезов нас не интересуют
+                if(viewSection is null) { continue; }
+
+                // Если вид не находили до этого в этом цикле и его имя равно нужному, то сохраняем
+                // GeneralView
+                if(GeneralView.ViewElement is null && viewSection.Name.Equals(GeneralView.ViewName)) {
+                    GeneralView.ViewElement = viewSection;
+                    GeneralView.ViewportElement = viewport;
+                    continue;
+                }
+
+                // GeneralViewPerpendicular
+                if(GeneralViewPerpendicular.ViewElement is null && viewSection.Name.Equals(GeneralViewPerpendicular.ViewName)) {
+                    GeneralViewPerpendicular.ViewElement = viewSection;
+                    GeneralViewPerpendicular.ViewportElement = viewport;
+                    continue;
+                }
+
+                // TransverseViewFirst
+                if(TransverseViewFirst.ViewElement is null && viewSection.Name.Equals(TransverseViewFirst.ViewName)) {
+                    TransverseViewFirst.ViewElement = viewSection;
+                    TransverseViewFirst.ViewportElement = viewport;
+                    continue;
+                }
+
+                // TransverseViewSecond
+                if(TransverseViewSecond.ViewElement is null && viewSection.Name.Equals(TransverseViewSecond.ViewName)) {
+                    TransverseViewSecond.ViewElement = viewSection;
+                    TransverseViewSecond.ViewportElement = viewport;
+                    continue;
+                }
+
+                // TransverseViewThird
+                if(TransverseViewThird.ViewElement is null && viewSection.Name.Equals(TransverseViewThird.ViewName)) {
+                    TransverseViewThird.ViewElement = viewSection;
+                    TransverseViewThird.ViewportElement = viewport;
+                    continue;
+                }
+            }
+        }
 
 
 
@@ -503,9 +582,9 @@ namespace RevitPylonDocumentation.Models {
 
         // Метод для размещения спецификации армирования
         // Позиционирование - правый верхний угол
-        
-        
-        
+
+
+
         internal void PlaceRebarSchedule() {
             #region Отчет
             ViewModel.Report = "Спецификация арматуры";

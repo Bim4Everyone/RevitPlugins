@@ -1099,46 +1099,53 @@ namespace RevitPylonDocumentation.ViewModels {
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Добавление видов")) {
 
                 foreach(PylonSheetInfo hostsInfo in SelectedHostsInfo) {
-                    
 
-                    if(!hostsInfo.IsCheck) { continue; }
+                    // Если текущий PylonSheetInfo не выбран для работы - continue
+                    if(!hostsInfo.IsCheck) { continue; } else {
+                        hostsInfo.WriteViewNames();
+                    }
 
-                    // Заходя сюда у нас уже есть инфа о листе, если он был в проекте
+                    // Если листы был в проекте (когда плагин запускают для создания/размещения видов), то мы об этом знаем из RevitRepository
                     if(hostsInfo.PylonViewSheet is null) {
 
                         hostsInfo.CreateSheet();
                     } else {
-                        _revitRepository.FindTitleBlock(this, hostsInfo);
+                        
+                        hostsInfo.FindTitleBlock();
+                        hostsInfo.GetTitleBlockSize();
+                        hostsInfo.FindViewsNViewportsOnSheet();
                     }
-
-
+                    
+                    // Если вдруг по какой-то причине лист не был создан, то создание видов/видовых экранов не выполняем 
+                    if(hostsInfo.PylonViewSheet is null) { continue; }
 
                                                     //////////////////
                                                     // ОСНОВНОЙ ВИД //
                                                     //////////////////
                     
                     if(NeedWorkWithGeneralView) {
-                        string generalViewName = GENERAL_VIEW_PREFIX + hostsInfo.PylonKeyName + GENERAL_VIEW_SUFFIX;
+                        //string generalViewName = GENERAL_VIEW_PREFIX + hostsInfo.PylonKeyName + GENERAL_VIEW_SUFFIX;
 
 
-                        // Если у пилона был лист до запуска плагина, то видовой экран/вид ищем на листе
-                        if(hostsInfo.SheetInProject) {
+                        //// Если у пилона был лист до запуска плагина, то видовой экран/вид ищем на листе
+                        //if(hostsInfo.SheetInProject) {
 
-                            _revitRepository.FindViewNViewportOnSheet(hostsInfo.PylonViewSheet, hostsInfo.GeneralView, generalViewName);
-                        }
+                        //    _revitRepository.FindViewNViewportOnSheet(hostsInfo.PylonViewSheet, hostsInfo.GeneralView, generalViewName);
+                        //}
 
-                        // Здесь может быть три варианта: 1) найден и видЭкран, и вид; 2) найден только вид; 3) не найдено ничего
+                        // Ранее пытались искать вид/видовой экран через листа
+
+                        // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
 
                         if(hostsInfo.GeneralView.ViewElement is null) {
                             
                             // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
                             if(!hostsInfo.GeneralView.ViewCreator.TryCreateGeneralView(SelectedViewFamilyType)) {
-                                _revitRepository.FindViewSectionInPj(hostsInfo.GeneralView, generalViewName);
+                                _revitRepository.FindViewSectionInPj(hostsInfo.GeneralView);
                             }
                         }
                         // Тут точно получили вид
                     }
-
 
 
                                             ///////////////////////////////////
@@ -1146,52 +1153,45 @@ namespace RevitPylonDocumentation.ViewModels {
                                             ///////////////////////////////////
 
                     if(NeedWorkWithGeneralPerpendicularView) {
-
-                        TaskDialog.Show("ds", "перпендикул");
                         
-                        string generalPerpendicularViewName = GENERAL_VIEW_PERPENDICULAR_PREFIX + hostsInfo.PylonKeyName + GENERAL_VIEW_PERPENDICULAR_SUFFIX;
+                        //string generalPerpendicularViewName = GENERAL_VIEW_PERPENDICULAR_PREFIX + hostsInfo.PylonKeyName + GENERAL_VIEW_PERPENDICULAR_SUFFIX;
 
 
-                        // Если у пилона был лист до запуска плагина, то видовой экран/вид ищем на листе
-                        if(hostsInfo.SheetInProject) {
+                        //// Если у пилона был лист до запуска плагина, то видовой экран/вид ищем на листе
+                        //if(hostsInfo.SheetInProject) {
 
-                            _revitRepository.FindViewNViewportOnSheet(hostsInfo.PylonViewSheet, hostsInfo.GeneralViewPerpendicular, generalPerpendicularViewName);
-                        }
+                        //    _revitRepository.FindViewNViewportOnSheet(hostsInfo.PylonViewSheet, hostsInfo.GeneralViewPerpendicular, generalPerpendicularViewName);
+                        //}
 
                         if(hostsInfo.GeneralViewPerpendicular.ViewElement is null) {
                             TaskDialog.Show("Вид", "Вид не найден через лист");
-
                         }
 
                         if(hostsInfo.GeneralViewPerpendicular.ViewportElement is null) {
                             TaskDialog.Show("Видовой экран", "Видовой экран не найден через лист");
-
                         }
 
 
 
-
-                        // Здесь может быть три варианта: 1) найден и видЭкран, и вид; 2) найден только вид; 3) не найдено ничего
+                        // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
 
                         if(hostsInfo.GeneralViewPerpendicular.ViewElement is null) {
 
                             // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
                             if(!hostsInfo.GeneralViewPerpendicular.ViewCreator.TryCreateGeneralPerpendicularView(SelectedViewFamilyType)) {
-                                _revitRepository.FindViewSectionInPj(hostsInfo.GeneralViewPerpendicular, generalPerpendicularViewName);
-                                
-                                
-                                TaskDialog.Show("Вид", "Вид успешно найден в проекте");
+                                _revitRepository.FindViewSectionInPj(hostsInfo.GeneralViewPerpendicular);
+
+
+                                if(hostsInfo.GeneralViewPerpendicular != null) {
+                                    TaskDialog.Show("Вид", "Вид успешно найден в проекте");
+                                }
 
                             } else {
                                 TaskDialog.Show("Вид", "Вид успешно создан");
-
                             }
                         }
                         // Тут точно получили вид
                     }
-
-
-
 
 
 

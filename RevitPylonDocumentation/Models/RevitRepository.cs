@@ -251,12 +251,14 @@ namespace RevitPylonDocumentation.Models {
 
 
 
-
-        public void FindViewSectionInPj(PylonView pylonView, string viewName) {
+        /// <summary>
+        /// Ищет в проекте вид по имени, указанному в PylonView
+        /// </summary>
+        public void FindViewSectionInPj(PylonView pylonView) {
 
             foreach(ViewSection view in AllSectionViews) {
                 
-                if(view.Name == viewName) {
+                if(view.Name == pylonView.ViewName) {
                     pylonView.ViewElement = view;
 
                     break;

@@ -45,8 +45,6 @@ namespace RevitPylonDocumentation.Models {
                     + ViewModel.GENERAL_VIEW_SUFFIX;
             }
 
-            TaskDialog.Show("ds", SheetInfo.TitleBlockWidth.ToString());
-
             // Передаем основной вид пилона в метод по созданию видов в (0.0.0)
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralView)) {
                 return false;
@@ -100,7 +98,6 @@ namespace RevitPylonDocumentation.Models {
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralViewPerpendicular)) {
                 return false;
             }
-
            
             // Рассчитываем и задаем корректную точку вставки основного перпендикулярного вида пилона
             double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + 0.065;
@@ -603,8 +600,8 @@ namespace RevitPylonDocumentation.Models {
             pylonView.ViewportHalfWidth = viewportHalfWidth;
             pylonView.ViewportHalfHeight = viewportHalfHeight;
 
-            TaskDialog.Show("ViewportHalfWidth", UnitUtilsHelper.ConvertFromInternalValue(pylonView.ViewportHalfWidth).ToString());
-            TaskDialog.Show("ViewportHalfHeight", UnitUtilsHelper.ConvertFromInternalValue(pylonView.ViewportHalfHeight).ToString());
+            //TaskDialog.Show("ViewportHalfWidth", UnitUtilsHelper.ConvertFromInternalValue(pylonView.ViewportHalfWidth).ToString());
+            //TaskDialog.Show("ViewportHalfHeight", UnitUtilsHelper.ConvertFromInternalValue(pylonView.ViewportHalfHeight).ToString());
 
             // Задание правильного положения метки видового экрана
 #if REVIT_2021_OR_LESS

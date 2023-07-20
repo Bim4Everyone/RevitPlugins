@@ -32,6 +32,8 @@ namespace RevitPylonDocumentation.Models {
 
 
         public View ViewElement { get; set; }
+        public string ViewName { get; set; }
+
         public int ViewScale { get; set; }
 
         public Element ViewportElement { get; set; }
