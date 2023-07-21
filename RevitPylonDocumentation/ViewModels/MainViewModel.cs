@@ -600,6 +600,30 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
+        private bool _needWorkWithTransverseViewFirst = false;
+        public bool NeedWorkWithTransverseViewFirst {
+            get => _needWorkWithTransverseViewFirst;
+            set {
+                _needWorkWithTransverseViewFirst = value;
+            }
+        }
+
+        private bool _needWorkWithTransverseViewSecond = false;
+        public bool NeedWorkWithTransverseViewSecond {
+            get => _needWorkWithTransverseViewSecond;
+            set {
+                _needWorkWithTransverseViewSecond = value;
+            }
+        }
+
+        private bool _needWorkWithTransverseViewThird = false;
+        public bool NeedWorkWithTransverseViewThird {
+            get => _needWorkWithTransverseViewThird;
+            set {
+                _needWorkWithTransverseViewThird = value;
+            }
+        }
+
 
 
 
@@ -1124,19 +1148,8 @@ namespace RevitPylonDocumentation.ViewModels {
                                                     //////////////////
                     
                     if(NeedWorkWithGeneralView) {
-                        //string generalViewName = GENERAL_VIEW_PREFIX + hostsInfo.PylonKeyName + GENERAL_VIEW_SUFFIX;
-
-
-                        //// Если у пилона был лист до запуска плагина, то видовой экран/вид ищем на листе
-                        //if(hostsInfo.SheetInProject) {
-
-                        //    _revitRepository.FindViewNViewportOnSheet(hostsInfo.PylonViewSheet, hostsInfo.GeneralView, generalViewName);
-                        //}
-
-                        // Ранее пытались искать вид/видовой экран через листа
-
+                        
                         // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-
                         if(hostsInfo.GeneralView.ViewElement is null) {
                             
                             // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
@@ -1153,25 +1166,6 @@ namespace RevitPylonDocumentation.ViewModels {
                                             ///////////////////////////////////
 
                     if(NeedWorkWithGeneralPerpendicularView) {
-                        
-                        //string generalPerpendicularViewName = GENERAL_VIEW_PERPENDICULAR_PREFIX + hostsInfo.PylonKeyName + GENERAL_VIEW_PERPENDICULAR_SUFFIX;
-
-
-                        //// Если у пилона был лист до запуска плагина, то видовой экран/вид ищем на листе
-                        //if(hostsInfo.SheetInProject) {
-
-                        //    _revitRepository.FindViewNViewportOnSheet(hostsInfo.PylonViewSheet, hostsInfo.GeneralViewPerpendicular, generalPerpendicularViewName);
-                        //}
-
-                        if(hostsInfo.GeneralViewPerpendicular.ViewElement is null) {
-                            TaskDialog.Show("Вид", "Вид не найден через лист");
-                        }
-
-                        if(hostsInfo.GeneralViewPerpendicular.ViewportElement is null) {
-                            TaskDialog.Show("Видовой экран", "Видовой экран не найден через лист");
-                        }
-
-
 
                         // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
 
@@ -1180,22 +1174,67 @@ namespace RevitPylonDocumentation.ViewModels {
                             // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
                             if(!hostsInfo.GeneralViewPerpendicular.ViewCreator.TryCreateGeneralPerpendicularView(SelectedViewFamilyType)) {
                                 _revitRepository.FindViewSectionInPj(hostsInfo.GeneralViewPerpendicular);
-
-
-                                if(hostsInfo.GeneralViewPerpendicular != null) {
-                                    TaskDialog.Show("Вид", "Вид успешно найден в проекте");
-                                }
-
-                            } else {
-                                TaskDialog.Show("Вид", "Вид успешно создан");
                             }
                         }
                         // Тут точно получили вид
                     }
 
 
+                                            ///////////////////////////
+                                            // ПЕРВЫЙ ПОПЕРЕЧНЫЙ ВИД //
+                                            ///////////////////////////
 
+                    if(NeedWorkWithTransverseViewFirst) {
 
+                        // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+
+                        if(hostsInfo.TransverseViewFirst.ViewElement is null) {
+
+                            // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                            if(!hostsInfo.TransverseViewFirst.ViewCreator.TryCreateTransverseView(SelectedViewFamilyType, 1)) {
+                                _revitRepository.FindViewSectionInPj(hostsInfo.TransverseViewFirst);
+                            }
+                        }
+                        // Тут точно получили вид
+                    }
+
+                                            ///////////////////////////
+                                            // ВТОРОЙ ПОПЕРЕЧНЫЙ ВИД //
+                                            ///////////////////////////
+
+                    if(NeedWorkWithTransverseViewSecond) {
+
+                        // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+
+                        if(hostsInfo.TransverseViewSecond.ViewElement is null) {
+
+                            // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                            if(!hostsInfo.TransverseViewSecond.ViewCreator.TryCreateTransverseView(SelectedViewFamilyType, 2)) {
+                                _revitRepository.FindViewSectionInPj(hostsInfo.TransverseViewSecond);
+                            }
+                        }
+                        // Тут точно получили вид
+                    }
+
+                                            ///////////////////////////
+                                            // ТРЕТИЙ ПОПЕРЕЧНЫЙ ВИД //
+                                            ///////////////////////////
+
+                    if(NeedWorkWithTransverseViewThird) {
+
+                        // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+
+                        if(hostsInfo.TransverseViewThird.ViewElement is null) {
+
+                            // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                            if(!hostsInfo.TransverseViewThird.ViewCreator.TryCreateTransverseView(SelectedViewFamilyType, 3)) {
+                                _revitRepository.FindViewSectionInPj(hostsInfo.TransverseViewThird);
+                            }
+                        }
+                        // Тут точно получили вид
+                    }
+
+                    // Принудительно регеним документ, иначе запрашиваемые габариты видовых экранов будут некорректны
                     _revitRepository.Document.Regenerate();
 
 
@@ -1215,6 +1254,32 @@ namespace RevitPylonDocumentation.ViewModels {
                             hostsInfo.GeneralViewPerpendicular.ViewPlacer.PlaceGeneralPerpendicularViewport();
                         }
                     }
+                    if(NeedWorkWithTransverseViewFirst) {
+
+                        // Если видовой экран на листе не найден, то размещаем
+                        if(hostsInfo.TransverseViewFirst.ViewportElement is null) {
+
+                            hostsInfo.TransverseViewFirst.ViewPlacer.PlaceTransverseFirstViewPorts();
+                        }
+                    }
+                    if(NeedWorkWithTransverseViewSecond) {
+
+                        // Если видовой экран на листе не найден, то размещаем
+                        if(hostsInfo.TransverseViewSecond.ViewportElement is null) {
+
+                            hostsInfo.TransverseViewSecond.ViewPlacer.PlaceTransverseSecondViewPorts();
+                        }
+                    }
+                    if(NeedWorkWithTransverseViewThird) {
+
+                        // Если видовой экран на листе не найден, то размещаем
+                        if(hostsInfo.TransverseViewThird.ViewportElement is null) {
+
+                            hostsInfo.TransverseViewThird.ViewPlacer.PlaceTransverseThirdViewPorts();
+                        }
+                    }
+
+
 
 
 

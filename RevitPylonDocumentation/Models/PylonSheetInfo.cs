@@ -203,6 +203,7 @@ namespace RevitPylonDocumentation.Models {
         }
 
 
+
         /// <summary>
         /// Ищет и запоминает виды и видовые экраны через видовые экраны, размещенные на листе
         /// </summary>
@@ -221,6 +222,9 @@ namespace RevitPylonDocumentation.Models {
                 if(GeneralView.ViewElement is null && viewSection.Name.Equals(GeneralView.ViewName)) {
                     GeneralView.ViewElement = viewSection;
                     GeneralView.ViewportElement = viewport;
+
+                    // Получение центра и габаритов видового экрана
+                    GetInfoAboutViewport(GeneralView, viewport);
                     continue;
                 }
 
@@ -228,6 +232,9 @@ namespace RevitPylonDocumentation.Models {
                 if(GeneralViewPerpendicular.ViewElement is null && viewSection.Name.Equals(GeneralViewPerpendicular.ViewName)) {
                     GeneralViewPerpendicular.ViewElement = viewSection;
                     GeneralViewPerpendicular.ViewportElement = viewport;
+
+                    // Получение центра и габаритов видового экрана
+                    GetInfoAboutViewport(GeneralViewPerpendicular, viewport);
                     continue;
                 }
 
@@ -235,6 +242,9 @@ namespace RevitPylonDocumentation.Models {
                 if(TransverseViewFirst.ViewElement is null && viewSection.Name.Equals(TransverseViewFirst.ViewName)) {
                     TransverseViewFirst.ViewElement = viewSection;
                     TransverseViewFirst.ViewportElement = viewport;
+
+                    // Получение центра и габаритов видового экрана
+                    GetInfoAboutViewport(TransverseViewFirst, viewport);
                     continue;
                 }
 
@@ -242,6 +252,9 @@ namespace RevitPylonDocumentation.Models {
                 if(TransverseViewSecond.ViewElement is null && viewSection.Name.Equals(TransverseViewSecond.ViewName)) {
                     TransverseViewSecond.ViewElement = viewSection;
                     TransverseViewSecond.ViewportElement = viewport;
+
+                    // Получение центра и габаритов видового экрана
+                    GetInfoAboutViewport(TransverseViewSecond, viewport);
                     continue;
                 }
 
@@ -249,12 +262,31 @@ namespace RevitPylonDocumentation.Models {
                 if(TransverseViewThird.ViewElement is null && viewSection.Name.Equals(TransverseViewThird.ViewName)) {
                     TransverseViewThird.ViewElement = viewSection;
                     TransverseViewThird.ViewportElement = viewport;
+
+                    // Получение центра и габаритов видового экрана
+                    GetInfoAboutViewport(TransverseViewThird, viewport);
                     continue;
                 }
             }
         }
 
 
+
+
+        /// <summary>
+        /// Получение и сохранение информации о центре и габаритах видового экрана
+        /// </summary>
+        public void GetInfoAboutViewport(PylonView pylonView, Viewport viewport) {
+
+            XYZ viewportCenter = viewport.GetBoxCenter();
+            Outline viewportOutline = viewport.GetBoxOutline();
+            double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
+            double viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
+
+            pylonView.ViewportCenter = viewportCenter;
+            pylonView.ViewportHalfWidth = viewportHalfWidth;
+            pylonView.ViewportHalfHeight = viewportHalfHeight;
+        }
 
 
         // Метод для размещения основного вида пилона.

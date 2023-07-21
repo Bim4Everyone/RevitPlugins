@@ -123,8 +123,11 @@
 
 
             <StackPanel Grid.Column="1">
-                <ToggleButton Content="Основной вид" IsChecked="{Binding NeedWorkWithGeneralView}"/>
-                <ToggleButton Content="Основной перпендикулярный вид" IsChecked="{Binding NeedWorkWithGeneralPerpendicularView}"/>
+                <ToggleButton Content="Основной вид" IsChecked="{Binding Path=NeedWorkWithGeneralView}"/>
+                <ToggleButton Content="Основной перпендикулярный вид" IsChecked="{Binding Path=NeedWorkWithGeneralPerpendicularView}"/>
+                <ToggleButton Content="Первый поперечный вид" IsChecked="{Binding Path=NeedWorkWithTransverseViewFirst}"/>
+                <ToggleButton Content="Второй поперечный вид" IsChecked="{Binding Path=NeedWorkWithTransverseViewSecond}"/>
+                <ToggleButton Content="Третий поперечный вид" IsChecked="{Binding Path=NeedWorkWithTransverseViewThird}"/>
                 
             </StackPanel>
             

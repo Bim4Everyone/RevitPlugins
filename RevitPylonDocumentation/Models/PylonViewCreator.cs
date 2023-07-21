@@ -234,7 +234,116 @@ namespace RevitPylonDocumentation.Models {
         }
 
 
+        public bool TryCreateTransverseView(ViewFamilyType SelectedViewFamilyType, int transverseViewNum) {
 
+            // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
+            int count = 0;
+            Element elemForWork = null;
+            foreach(Element elem in SheetInfo.HostElems) {
+                elemForWork = elem;
+                count++;
+            }
+
+            if(elemForWork is null) { return false; }
+
+
+
+            double hostLength = 0;
+            double hostWidth = 0;
+            XYZ midlePoint = null;
+            XYZ hostVector = null;
+
+
+            // Заполняем нужные для объекта Transform поля
+            if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
+
+
+            // Формируем данные для объекта Transform
+            XYZ originPoint = midlePoint;
+            XYZ hostDir = hostVector.Normalize();
+            XYZ viewDir = XYZ.BasisZ.Negate();
+            XYZ upDir = viewDir.CrossProduct(hostDir);
+
+
+            // Передаем данные для объекта Transform
+            Transform t = Transform.Identity;
+            t.Origin = originPoint;
+            t.BasisX = hostDir;
+            t.BasisY = upDir;
+            t.BasisZ = viewDir;
+
+
+            BoundingBoxXYZ bb = elemForWork.get_BoundingBox(null);
+            double minZ = bb.Min.Z;
+            double maxZ = bb.Max.Z;
+
+            XYZ sectionBoxMin;
+            XYZ sectionBoxMax;
+            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.TRANSVERSE_VIEW_X_OFFSET));
+            double coordinateY = hostWidth * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.TRANSVERSE_VIEW_Y_OFFSET));
+
+            if(transverseViewNum == 1) {
+                // Располагаем сечение на высоте 1/4 высоты пилона
+                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) / 4 - originPoint.Z));
+                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) / 8 - originPoint.Z));
+            } else if(transverseViewNum == 2) {
+                // Располагаем сечение на высоте 1/2 высоты пилона
+                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) / 2 - originPoint.Z));
+                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) / 8 * 3 - originPoint.Z));
+            } else if(transverseViewNum == 3) {
+                // Располагаем сечение на высоте 5/4 высоты пилона
+                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) / 4 * 5 - originPoint.Z));
+                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) / 8 * 7 - originPoint.Z));
+            } else {
+                return false;
+            }
+
+
+            BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
+            sectionBox.Transform = t;
+            sectionBox.Min = sectionBoxMin;
+            sectionBox.Max = sectionBoxMax;
+
+            ViewSection viewSection = null;
+
+            try {
+                viewSection = ViewSection.CreateSection(Repository.Document, SelectedViewFamilyType.Id, sectionBox);
+
+                if(viewSection != null) {
+                    if(transverseViewNum == 1) {
+
+                        viewSection.Name = ViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + SheetInfo.PylonKeyName + ViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX;
+                        // Если был выбран шаблон вида, то назначаем
+                        if(ViewModel.SelectedTransverseViewTemplate != null) {
+                            viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
+                        }
+                        SheetInfo.TransverseViewFirst.ViewElement = viewSection;
+
+                    } else if(transverseViewNum == 2) {
+                        viewSection.Name = ViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + SheetInfo.PylonKeyName + ViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX;
+                        if(ViewModel.SelectedTransverseViewTemplate != null) {
+                            viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
+                        }
+                        SheetInfo.TransverseViewSecond.ViewElement = viewSection;
+                    } else if(transverseViewNum == 3) {
+                        viewSection.Name = ViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + SheetInfo.PylonKeyName + ViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX;
+                        if(ViewModel.SelectedTransverseViewTemplate != null) {
+                            viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
+                        }
+                        SheetInfo.TransverseViewThird.ViewElement = viewSection;
+                    }
+                }
+
+            } catch(Exception) {
+
+                if(viewSection != null) {
+                    Repository.Document.Delete(viewSection.Id);
+                }
+                return false;
+            }
+
+            return true;
+        }
 
 
         //public ViewSection CreateTransverseView(ViewFamilyType SelectedViewFamilyType, int transverseViewNum) {
