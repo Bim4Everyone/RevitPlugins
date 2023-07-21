@@ -8,23 +8,46 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitVolumeOfWork.Views"
     xmlns:vms="clr-namespace:RevitVolumeOfWork.ViewModels"
-	  xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+	xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    Height="450" Width="800"    
+    Height="500" Width="450"    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="45" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel
+        <ComboBox
+            Grid.Row="0"
+            Margin="10"
+            DisplayMemberPath = "Name"
+            ItemsSource="{Binding RevitViewModels}"/>
+
+        <ListView 
             Grid.Row="1"
+            Margin="10,5"
+            SelectionMode="Extended"
+            DataContext="{Binding RevitViewModel}"
+            ItemsSource="{Binding Levels}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox
+                        IsChecked="{Binding IsChecked}">
+                        <TextBlock Text="{Binding Name}"/>
+                    </CheckBox>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListView>
+
+        <StackPanel
+            Grid.Row="2"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
