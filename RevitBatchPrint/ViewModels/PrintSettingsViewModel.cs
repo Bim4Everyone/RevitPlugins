@@ -45,11 +45,6 @@ namespace RevitBatchPrint.ViewModels {
 
             SaveFileCommand = new RelayCommand(SaveFile);
             VisibilitySelectFile = System.Windows.Visibility.Collapsed;
-            VisibilitySelectPrinter = System.Windows.Visibility.Collapsed;
-
-            VisibilitySelectPrinter = _printManager.HasPrinterName(Models.RevitRepository.DefaultPrinterName)
-                ? System.Windows.Visibility.Collapsed
-                : System.Windows.Visibility.Visible;
 
 #if REVIT_2022_OR_GREATER
             VisibilitySelectFile = System.Windows.Visibility.Visible;
@@ -62,16 +57,10 @@ namespace RevitBatchPrint.ViewModels {
                 if(_printManager.HasPrinterName(value)) {
                     this.RaiseAndSetIfChanged(ref _printerName, value);
                 }
-
-                if(_printManager.HasPrinterName(Models.RevitRepository.DefaultPrinterName)) {
-                    this.RaiseAndSetIfChanged(ref _printerName, Models.RevitRepository.DefaultPrinterName);
-                }
             }
         }
 
         public ObservableCollection<string> PrinterNames { get; }
-
-        public System.Windows.Visibility VisibilitySelectPrinter { get; }
 
         public PaperPlacementType PaperPlacement {
             get => _paperPlacement;
