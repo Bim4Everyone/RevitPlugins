@@ -103,11 +103,6 @@ namespace RevitBatchPrint.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public string SelectAlbumsText {
-            get => _selectAlbumsText;
-            set => this.RaiseAndSetIfChanged(ref _selectAlbumsText, value);
-        }
-
         public void RevitPrint(object p) {
             SavePrintConfig();
 
@@ -132,22 +127,12 @@ namespace RevitBatchPrint.ViewModels {
         }
 
         public bool CanRevitPrint(object p) {
-            if(Albums == null) {
-                SelectAlbumsText = "Выберите комплект чертежей...";
-            } else {
-                // HACK: Обновление текста выбора альбома лучше сделать в другом в более очевидном месте
-                SelectAlbumsText = string.Join(", ", SelectedAlbums.Select(item => item.Name));
-                SelectAlbumsText = string.IsNullOrEmpty(SelectAlbumsText)
-                    ? "Выберите комплект чертежей..."
-                    : SelectAlbumsText;
-            }
-
             if(string.IsNullOrEmpty(PrintParamName)) {
                 ErrorText = "Не был выбран параметр комплекта чертежей.";
                 return false;
             }
 
-            if(SelectedAlbums.Count()==0) {
+            if(SelectedAlbums.Count() == 0) {
                 ErrorText = "Не был выбран комплект чертежей.";
                 return false;
             }
@@ -170,7 +155,10 @@ namespace RevitBatchPrint.ViewModels {
             var revitPrint = new RevitPrint2022(_repository);
             revitPrint.Folder = Path.GetDirectoryName(PrintSettings.FileName);
             revitPrint.FilterParamName = PrintParamName;
-            revitPrint.FilterParamValue = SelectAlbumsText;
+            revitPrint.FilterParamValues = SelectedAlbums
+                .Select(item => item.Name)
+                .OrderBy(item => item)
+                .ToArray();
 
             var exportOptions = new PDFExportOptions() {
                 FileName = Path.GetFileNameWithoutExtension(PrintSettings.FileName),
@@ -206,12 +194,13 @@ namespace RevitBatchPrint.ViewModels {
         }
 
         public bool CanRevitSave(object p) {
+            
 #if REVIT_2022_OR_GREATER
             if(string.IsNullOrEmpty(PrintParamName)) {
                 return false;
             }
-
-            if(Albums.All(item => item.IsSelected == false)) {
+            
+            if(SelectedAlbums.Count() == 0) {
                 return false;
             }
 
@@ -220,8 +209,7 @@ namespace RevitBatchPrint.ViewModels {
                 return false;
             }
 #endif
-
-            ErrorText = null;
+            
             return true;
         }
 

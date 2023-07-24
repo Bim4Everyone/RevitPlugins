@@ -32,7 +32,7 @@ namespace RevitBatchPrint.Models {
         /// <summary>
         /// Значение параметра альбома по которому будет фильтрация листов.
         /// </summary>
-        public string FilterParamValue { get; set; }
+        public string[] FilterParamValues { get; set; }
 
         /// <summary>
         /// Список ошибок при выводе на печать.
@@ -41,8 +41,9 @@ namespace RevitBatchPrint.Models {
 
 #if REVIT_2022_OR_GREATER
         public void Execute(PDFExportOptions exportParams) {
-            List<ViewSheet> viewSheets = _revitRepository.GetViewSheets(FilterParamName, FilterParamValue)
-                .OrderBy(item => item, new ViewSheetComparer())
+            List<ViewSheet> viewSheets = FilterParamValues
+                .SelectMany(item => _revitRepository.GetViewSheets(FilterParamName, item))
+                .OrderBy(sheet => sheet, new ViewSheetComparer())
                 .ToList();
 
             // Получаем сообщение со всеми листами
