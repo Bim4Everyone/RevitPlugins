@@ -266,7 +266,20 @@ namespace RevitPylonDocumentation.Models {
             }
         }
 
+        /// <summary>
+        /// Ищет в проекте спеки по имени, указанному в PylonView
+        /// </summary>
+        public void FindViewScheduleInPj(PylonView pylonView) {
 
+            foreach(ViewSchedule view in AllScheduleViews) {
+
+                if(view.Name == pylonView.ViewName) {
+                    pylonView.ViewElement = view;
+
+                    break;
+                }
+            }
+        }
 
 
 

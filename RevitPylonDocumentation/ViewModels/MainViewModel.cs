@@ -624,6 +624,37 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
+        private bool _needWorkWithRebarSchedule = false;
+        public bool NeedWorkWithRebarSchedule {
+            get => _needWorkWithRebarSchedule;
+            set {
+                _needWorkWithRebarSchedule = value;
+            }
+        }
+
+        private bool _needWorkWithMaterialSchedule = false;
+        public bool NeedWorkWithMaterialSchedule {
+            get => _needWorkWithMaterialSchedule;
+            set {
+                _needWorkWithMaterialSchedule = value;
+            }
+        }
+
+        private bool _needWorkWithSystemPartsSchedule = false;
+        public bool NeedWorkWithSystemPartsSchedule {
+            get => _needWorkWithSystemPartsSchedule;
+            set {
+                _needWorkWithSystemPartsSchedule = value;
+            }
+        }
+
+        private bool _needWorkWithIFCPartsSchedule = false;
+        public bool NeedWorkWithIFCPartsSchedule {
+            get => _needWorkWithIFCPartsSchedule;
+            set {
+                _needWorkWithIFCPartsSchedule = value;
+            }
+        }
 
 
 
@@ -1138,6 +1169,7 @@ namespace RevitPylonDocumentation.ViewModels {
                         hostsInfo.FindTitleBlock();
                         hostsInfo.GetTitleBlockSize();
                         hostsInfo.FindViewsNViewportsOnSheet();
+                        hostsInfo.FindSchedulesNViewportsOnSheet();
                     }
                     
                     // Если вдруг по какой-то причине лист не был создан, то создание видов/видовых экранов не выполняем 
@@ -1234,6 +1266,79 @@ namespace RevitPylonDocumentation.ViewModels {
                         // Тут точно получили вид
                     }
 
+                                            ///////////////////////////
+                                            // СПЕЦИФИКАЦИЯ АРМАТУРЫ //
+                                            ///////////////////////////
+
+                    if(NeedWorkWithRebarSchedule) {
+
+                        // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+
+                        if(hostsInfo.RebarSchedule.ViewElement is null) {
+
+                            // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                            if(!hostsInfo.RebarSchedule.ViewCreator.TryCreateRebarSchedule()) {
+                                _revitRepository.FindViewScheduleInPj(hostsInfo.RebarSchedule);
+                            }
+                        }
+                        // Тут точно получили вид
+                    }
+
+                                            /////////////////////////////
+                                            // СПЕЦИФИКАЦИЯ МАТЕРИАЛОВ //
+                                            /////////////////////////////
+
+                    if(NeedWorkWithMaterialSchedule) {
+
+                        // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+
+                        if(hostsInfo.MaterialSchedule.ViewElement is null) {
+
+                            // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                            if(!hostsInfo.MaterialSchedule.ViewCreator.TryCreateMaterialSchedule()) {
+                                _revitRepository.FindViewScheduleInPj(hostsInfo.MaterialSchedule);
+                            }
+                        }
+                        // Тут точно получили вид
+                    }
+
+                                            /////////////////////////////////
+                                            // ВЕДОМОСТЬ СИСТЕМНЫХ ДЕТАЛЕЙ //
+                                            /////////////////////////////////
+
+                    if(NeedWorkWithSystemPartsSchedule) {
+
+                        // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+
+                        if(hostsInfo.SystemPartsSchedule.ViewElement is null) {
+
+                            // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                            if(!hostsInfo.SystemPartsSchedule.ViewCreator.TryCreateSystemPartsSchedule()) {
+                                _revitRepository.FindViewScheduleInPj(hostsInfo.SystemPartsSchedule);
+                            }
+                        }
+                        // Тут точно получили вид
+                    }
+
+                                                ///////////////////////////
+                                                // ВЕДОМОСТЬ IFC ДЕТАЛЕЙ //
+                                                ///////////////////////////
+
+                    if(NeedWorkWithIFCPartsSchedule) {
+
+                        // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+
+                        if(hostsInfo.IFCPartsSchedule.ViewElement is null) {
+
+                            // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                            if(!hostsInfo.IFCPartsSchedule.ViewCreator.TryCreateIFCPartsSchedule()) {
+                                _revitRepository.FindViewScheduleInPj(hostsInfo.IFCPartsSchedule);
+                            }
+                        }
+                        // Тут точно получили вид
+                    }
+
+
                     // Принудительно регеним документ, иначе запрашиваемые габариты видовых экранов будут некорректны
                     _revitRepository.Document.Regenerate();
 
@@ -1278,134 +1383,42 @@ namespace RevitPylonDocumentation.ViewModels {
                             hostsInfo.TransverseViewThird.ViewPlacer.PlaceTransverseThirdViewPorts();
                         }
                     }
+                    if(NeedWorkWithRebarSchedule) {
 
+                        // Если видовой экран на листе не найден, то размещаем
+                        if(hostsInfo.RebarSchedule.ViewportElement is null) {
 
+                            hostsInfo.RebarSchedule.ViewPlacer.PlaceRebarSchedule();
+                        }
+                    }
+                    if(NeedWorkWithMaterialSchedule) {
 
+                        // Если видовой экран на листе не найден, то размещаем
+                        if(hostsInfo.MaterialSchedule.ViewportElement is null) {
 
+                            hostsInfo.MaterialSchedule.ViewPlacer.PlaceMaterialSchedule();
+                        }
+                    }
+                    if(NeedWorkWithSystemPartsSchedule) {
 
-                    //if(hostsInfo.PylonViewSheet != null && NeedWorkWithGeneralView) {
+                        // Если видовой экран на листе не найден, то размещаем
+                        if(hostsInfo.SystemPartsSchedule.ViewportElement is null) {
 
+                            hostsInfo.SystemPartsSchedule.ViewPlacer.PlaceSystemPartsSchedule();
+                        }
+                    }
+                    if(NeedWorkWithIFCPartsSchedule) {
 
-                    //    hostsInfo.GeneralView.ViewCreator.CreateGeneralView(SelectedViewFamilyType);
-                    //}
-                    //if(hostsInfo.PylonViewSheet != null && hostsInfo.GeneralView.ViewElement != null && NeedWorkWithGeneralView) {
+                        // Если видовой экран на листе не найден, то размещаем
+                        if(hostsInfo.IFCPartsSchedule.ViewportElement is null) {
 
-                    //    hostsInfo.GeneralView.ViewPlacer.PlaceGeneralViewport();
-                    //}
-
-
-
-
-
-
-
-
-                    //if(hostsInfo.GeneralView.InProjectEditableInGUI && hostsInfo.GeneralView.InProject) {
-
-                    //    hostsInfo.GeneralView.ViewCreator.CreateGeneralView(SelectedViewFamilyType);
-                    //}
-
-                    //if(hostsInfo.GeneralViewPerpendicular.InProjectEditableInGUI && hostsInfo.GeneralViewPerpendicular.InProject) {
-
-                    //    hostsInfo.GeneralViewPerpendicular.ViewCreator.CreateGeneralPerpendicularView(SelectedViewFamilyType);
-                    //}
-
-
-
-
-
-                    //if(hostsInfo.TransverseViewFirst.InProjectEditableInGUI && hostsInfo.TransverseViewFirst.InProject) {
-
-                    //    hostsInfo.TransverseViewFirst.ViewCreator.CreateTransverseView(SelectedViewFamilyType, 1);
-                    //}
-
-                    //if(hostsInfo.TransverseViewSecond.InProjectEditableInGUI && hostsInfo.TransverseViewSecond.InProject) {
-
-                    //    hostsInfo.TransverseViewSecond.ViewCreator.CreateTransverseView(SelectedViewFamilyType, 2);
-                    //}
-
-                    //if(hostsInfo.TransverseViewThird.InProjectEditableInGUI && hostsInfo.TransverseViewThird.InProject) {
-
-                    //    hostsInfo.TransverseViewThird.ViewCreator.CreateTransverseView(SelectedViewFamilyType, 3);
-                    //}
-
-                    //if(hostsInfo.RebarSchedule.InProjectEditableInGUI && hostsInfo.RebarSchedule.InProject) {
-
-                    //    hostsInfo.RebarSchedule.ViewCreator.CreateRebarSchedule();
-                    //}
-
-                    //if(hostsInfo.MaterialSchedule.InProjectEditableInGUI && hostsInfo.MaterialSchedule.InProject) {
-
-                    //    hostsInfo.MaterialSchedule.ViewCreator.CreateMaterialSchedule();
-                    //}
-
-                    //if(hostsInfo.SystemPartsSchedule.InProjectEditableInGUI && hostsInfo.SystemPartsSchedule.InProject) {
-
-                    //    hostsInfo.SystemPartsSchedule.ViewCreator.CreateSystemPartsSchedule();
-                    //}
-
-                    //if(hostsInfo.IFCPartsSchedule.InProjectEditableInGUI && hostsInfo.IFCPartsSchedule.InProject) {
-
-                    //    hostsInfo.IFCPartsSchedule.ViewCreator.CreateIFCPartsSchedule();
-                    //}
-
-
-                    //_revitRepository.Document.Regenerate();
-
-
-                    //if(hostsInfo.GeneralView.OnSheetEditableInGUI && hostsInfo.GeneralView.OnSheet) {
-
-                    //    hostsInfo.GeneralView.ViewPlacer.PlaceGeneralViewport();
-                    //}
-
-                    //if(hostsInfo.GeneralViewPerpendicular.OnSheetEditableInGUI && hostsInfo.GeneralViewPerpendicular.OnSheet) {
-
-                    //    hostsInfo.GeneralViewPerpendicular.ViewPlacer.PlaceGeneralPerpendicularViewport();
-                    //}
-
-                    //if(hostsInfo.TransverseViewFirst.OnSheetEditableInGUI && hostsInfo.TransverseViewFirst.OnSheet) {
-
-                    //    hostsInfo.TransverseViewFirst.ViewPlacer.PlaceTransverseFirstViewPorts();
-                    //}
-
-                    //if(hostsInfo.TransverseViewSecond.OnSheetEditableInGUI && hostsInfo.TransverseViewSecond.OnSheet) {
-
-                    //    hostsInfo.TransverseViewSecond.ViewPlacer.PlaceTransverseSecondViewPorts();
-                    //}
-
-                    //if(hostsInfo.TransverseViewThird.OnSheetEditableInGUI && hostsInfo.TransverseViewThird.OnSheet) {
-
-                    //    hostsInfo.TransverseViewThird.ViewPlacer.PlaceTransverseThirdViewPorts();
-                    //}
-
-                    //if(hostsInfo.RebarSchedule.OnSheetEditableInGUI && hostsInfo.RebarSchedule.OnSheet) {
-
-                    //    hostsInfo.RebarSchedule.ViewPlacer.PlaceRebarSchedule();
-                    //}
-
-                    //if(hostsInfo.MaterialSchedule.OnSheetEditableInGUI && hostsInfo.MaterialSchedule.OnSheet) {
-
-                    //    hostsInfo.MaterialSchedule.ViewPlacer.PlaceMaterialSchedule();
-                    //}
-
-                    //if(hostsInfo.SystemPartsSchedule.OnSheetEditableInGUI && hostsInfo.SystemPartsSchedule.OnSheet) {
-
-                    //    hostsInfo.SystemPartsSchedule.ViewPlacer.PlaceSystemPartsSchedule();
-                    //}
-
-                    //if(hostsInfo.IFCPartsSchedule.OnSheetEditableInGUI && hostsInfo.IFCPartsSchedule.OnSheet) {
-
-                    //    hostsInfo.IFCPartsSchedule.ViewPlacer.PlaceIFCPartsSchedule();
-                    //}
+                            hostsInfo.IFCPartsSchedule.ViewPlacer.PlaceIFCPartsSchedule();
+                        }
+                    }
                 }
-
 
                 transaction.Commit();
             }
-
-
-
-            //SomeMagicFunc();
         }
 
 

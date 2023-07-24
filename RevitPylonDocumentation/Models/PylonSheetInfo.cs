@@ -11,6 +11,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.UI;
 
+using dosymep.Revit;
+
 using RevitPylonDocumentation.ViewModels;
 
 using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
@@ -272,6 +274,62 @@ namespace RevitPylonDocumentation.Models {
 
 
 
+        /// <summary>
+        /// Ищет и запоминает спеки и их видовые экраны через видовые экраны, размещенные на листе
+        /// </summary>
+        public void FindSchedulesNViewportsOnSheet() {
+
+            foreach(ElementId id in PylonViewSheet.GetDependentElements(new ElementClassFilter(typeof(ScheduleSheetInstance)))) {
+
+                ScheduleSheetInstance viewport = Repository.Document.GetElement(id) as ScheduleSheetInstance;
+                ViewSchedule viewSchedule = Repository.Document.GetElement(viewport.ScheduleId) as ViewSchedule;
+
+                if(viewSchedule is null) { continue; }
+
+                // Если вид не находили до этого в этом цикле и его имя равно нужному, то сохраняем
+                // RebarSchedule
+                if(RebarSchedule.ViewElement is null && viewSchedule.Name.Equals(RebarSchedule.ViewName)) {
+                    RebarSchedule.ViewElement = viewSchedule;
+                    RebarSchedule.ViewportElement = viewport;
+
+                    // Получение центра и габаритов видового экрана
+                    GetInfoAboutScheduleSheetInstance(RebarSchedule, viewport);
+                    continue;
+                }
+
+                // MaterialSchedule
+                if(MaterialSchedule.ViewElement is null && viewSchedule.Name.Equals(MaterialSchedule.ViewName)) {
+                    MaterialSchedule.ViewElement = viewSchedule;
+                    MaterialSchedule.ViewportElement = viewport;
+
+                    // Получение центра и габаритов видового экрана
+                    GetInfoAboutScheduleSheetInstance(MaterialSchedule, viewport);
+                    continue;
+                }
+
+                // SystemPartsSchedule
+                if(SystemPartsSchedule.ViewElement is null && viewSchedule.Name.Equals(SystemPartsSchedule.ViewName)) {
+                    SystemPartsSchedule.ViewElement = viewSchedule;
+                    SystemPartsSchedule.ViewportElement = viewport;
+
+                    // Получение центра и габаритов видового экрана
+                    GetInfoAboutScheduleSheetInstance(SystemPartsSchedule, viewport);
+                    continue;
+                }
+
+                // IFCPartsSchedule
+                if(IFCPartsSchedule.ViewElement is null && viewSchedule.Name.Equals(IFCPartsSchedule.ViewName)) {
+                    IFCPartsSchedule.ViewElement = viewSchedule;
+                    IFCPartsSchedule.ViewportElement = viewport;
+
+                    // Получение центра и габаритов видового экрана
+                    GetInfoAboutScheduleSheetInstance(IFCPartsSchedule, viewport);
+                    continue;
+                }
+            }
+        }
+
+
 
         /// <summary>
         /// Получение и сохранение информации о центре и габаритах видового экрана
@@ -287,6 +345,25 @@ namespace RevitPylonDocumentation.Models {
             pylonView.ViewportHalfWidth = viewportHalfWidth;
             pylonView.ViewportHalfHeight = viewportHalfHeight;
         }
+
+
+
+        /// <summary>
+        /// Получение и сохранение информации о центре и габаритах видового экрана спек
+        /// </summary>
+        public void GetInfoAboutScheduleSheetInstance(PylonView pylonView, ScheduleSheetInstance scheduleSheetInstance) {
+
+            // Получение габаритов видового экрана спецификации
+            XYZ viewportCenter = scheduleSheetInstance.Point;
+            BoundingBoxXYZ boundingBoxXYZ = scheduleSheetInstance.get_BoundingBox(pylonView.SheetInfo.PylonViewSheet);
+            double scheduleHalfWidth = boundingBoxXYZ.Max.X / 2;
+            double scheduleHalfHeight = -boundingBoxXYZ.Min.Y / 2;     // Создается так, что верхний левый угол спеки в нижнем правом углу рамки
+
+            pylonView.ViewportCenter = viewportCenter;
+            pylonView.ViewportHalfWidth = scheduleHalfWidth;
+            pylonView.ViewportHalfHeight = scheduleHalfHeight;
+        }
+
 
 
         // Метод для размещения основного вида пилона.

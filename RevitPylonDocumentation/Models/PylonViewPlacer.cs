@@ -158,21 +158,12 @@ namespace RevitPylonDocumentation.Models {
 
             // Определяем координату Х первого поперечного вида пилона
             if(SheetInfo.GeneralView.ViewportElement != null && SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
-                TaskDialog.Show("ds", "Есть оба");
-                TaskDialog.Show("ds", GeneralViewX.ToString());
-                TaskDialog.Show("ds", GeneralViewPerpendicularX.ToString());
 
                 if(GeneralViewX > GeneralViewPerpendicularX) {
                     newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
                 } else {
                     newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
                 }
-
-                TaskDialog.Show("ds", SheetInfo.GeneralView.ViewportHalfWidth.ToString());
-                TaskDialog.Show("ds", SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth.ToString());
-
-
-
 
             } else if(SheetInfo.GeneralView.ViewportElement != null && SheetInfo.GeneralViewPerpendicular.ViewportElement is null) {
                 newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
@@ -349,180 +340,165 @@ namespace RevitPylonDocumentation.Models {
             return true;
         }
 
+        internal bool PlaceRebarSchedule() {
 
-        //internal bool PlaceRebarSchedule() {
+            // Проверям вдруг спека не создалась
+            if(SheetInfo.RebarSchedule.ViewElement == null) {
+                return false;
+            } else {
 
-        //    // Проверям вдруг спека не создалась
-        //    if(SheetInfo.RebarSchedule.ViewElement == null) {
-        //        return false;
-        //    } else {
+                // Заполнеяем данные для задания
+                SheetInfo.RebarSchedule.ViewportName =
+                    ViewModel.REBAR_SCHEDULE_PREFIX
+                        + SheetInfo.PylonKeyName
+                        + ViewModel.REBAR_SCHEDULE_SUFFIX;
+            }
 
-        //        // Заполнеяем данные для задания
-        //        SheetInfo.RebarSchedule.ViewportName =
-        //            ViewModel.REBAR_SCHEDULE_PREFIX
-        //                + SheetInfo.PylonKeyName
-        //                + ViewModel.REBAR_SCHEDULE_SUFFIX;
-        //    }
+            // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
+            if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.RebarSchedule)) {
+                return false;
+            }
 
-        //    // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
-        //    if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.RebarSchedule)) {
-        //        return false;
-        //    }
+            // Рассчитываем и задаем корректную точку вставки спецификации арматуры пилона
+            XYZ newCenter = new XYZ(
+                -SheetInfo.RebarSchedule.ViewportHalfWidth * 2 - 0.0095,
+                SheetInfo.TitleBlockHeight - 0.032,
+                0);
+            (SheetInfo.RebarSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
 
+            SheetInfo.RebarSchedule.ViewportCenter = newCenter;
 
-        //    // Рассчитываем и задаем корректную точку вставки спецификации арматуры пилона
-        //    XYZ newCenter = new XYZ(
-        //        -SheetInfo.RebarSchedule.ViewportHalfWidth * 2 - 0.0095,
-        //        SheetInfo.TitleBlockHeight - 0.032,
-        //        0);
-        //    (SheetInfo.RebarSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
-
-        //    SheetInfo.RebarSchedule.ViewportCenter = newCenter;
-
-        //    return true;
-        //}
-
-        //internal bool PlaceMaterialSchedule() {
-
-        //    // Проверям вдруг спека не создалась
-        //    if(SheetInfo.MaterialSchedule.ViewElement == null) {
-        //        return false;
-        //    } else {
-
-        //        // Заполнеяем данные для задания
-        //        SheetInfo.MaterialSchedule.ViewportName =
-        //            ViewModel.MATERIAL_SCHEDULE_PREFIX
-        //                + SheetInfo.PylonKeyName
-        //                + ViewModel.MATERIAL_SCHEDULE_SUFFIX;
-        //    }
-
-        //    // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
-        //    if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.MaterialSchedule)) {
-        //        return false;
-        //    }
-
-        //    // Рассчитываем и задаем корректную точку вставки спецификации материалов пилона
-        //    XYZ newCenter = new XYZ(
-        //            -SheetInfo.MaterialSchedule.ViewportHalfWidth * 2 - 0.0095,
-        //            SheetInfo.TitleBlockHeight - SheetInfo.RebarSchedule.ViewportHalfHeight * 2 - 0.02505,
-        //            0);
-
-
-        //    if(SheetInfo.RebarSchedule.ViewportElement is null) {
-        //        newCenter = new XYZ(
-        //            -SheetInfo.MaterialSchedule.ViewportHalfWidth * 2 - 0.0095,
-        //            -0.1,
-        //            0);
-        //    }
-
-
-        //    (SheetInfo.MaterialSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
-
-        //    SheetInfo.MaterialSchedule.ViewportCenter = newCenter;
-
-        //    return true;
-        //}
-
-
-        //internal bool PlaceSystemPartsSchedule() {
-
-        //    // Проверям вдруг спека не создалась
-        //    if(SheetInfo.SystemPartsSchedule.ViewElement == null) {
-        //        return false;
-        //    } else {
-
-        //        // Заполнеяем данные для задания
-        //        SheetInfo.SystemPartsSchedule.ViewportName =
-        //            ViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX
-        //                + SheetInfo.PylonKeyName
-        //                + ViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX;
-        //    }
-
-        //    // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
-        //    if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.SystemPartsSchedule)) {
-        //        return false;
-        //    }
+            return true;
+        }
 
 
 
 
 
+        internal bool PlaceMaterialSchedule() {
+
+            // Проверям вдруг спека не создалась
+            if(SheetInfo.MaterialSchedule.ViewElement == null) {
+                return false;
+            } else {
+
+                // Заполнеяем данные для задания
+                SheetInfo.MaterialSchedule.ViewportName =
+                    ViewModel.MATERIAL_SCHEDULE_PREFIX
+                        + SheetInfo.PylonKeyName
+                        + ViewModel.MATERIAL_SCHEDULE_SUFFIX;
+            }
+
+            // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
+            if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.MaterialSchedule)) {
+                return false;
+            }
+
+            // Рассчитываем и задаем корректную точку вставки спецификации материалов пилона
+            XYZ newCenter = new XYZ(
+                    -SheetInfo.MaterialSchedule.ViewportHalfWidth * 2 - 0.0095,
+                    SheetInfo.TitleBlockHeight - SheetInfo.RebarSchedule.ViewportHalfHeight * 2 - 0.02505,
+                    0);
 
 
-        //    // Рассчитываем и задаем корректную точку вставки спецификации системных деталей пилона
-        //    XYZ newCenter = new XYZ(
-        //            0,
-        //            UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2,
-        //            0);
-
-        //    if(SheetInfo.IFCPartsSchedule.ViewportElement is null) {
-
-        //        newCenter = new XYZ(
-        //            -UnitUtilsHelper.ConvertToInternalValue(2.9) - SheetInfo.SystemPartsSchedule.ViewportHalfWidth * 2,
-        //            UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2,
-        //            0);
-        //    }
-
-        //    (SheetInfo.SystemPartsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
-
-        //    SheetInfo.SystemPartsSchedule.ViewportCenter = newCenter;
-
-        //    return true;
-        //}
+            if(SheetInfo.RebarSchedule.ViewportElement is null) {
+                newCenter = new XYZ(
+                    -SheetInfo.MaterialSchedule.ViewportHalfWidth * 2 - 0.0095,
+                    -0.1,
+                    0);
+            }
 
 
+            (SheetInfo.MaterialSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
 
+            SheetInfo.MaterialSchedule.ViewportCenter = newCenter;
 
-        //internal bool PlaceIFCPartsSchedule() {
-
-        //    // Проверям вдруг спека не создалась
-        //    if(SheetInfo.IFCPartsSchedule.ViewElement == null) {
-        //        return false;
-        //    } else {
-
-        //        // Заполнеяем данные для задания
-        //        SheetInfo.IFCPartsSchedule.ViewportName =
-        //            ViewModel.IFC_PARTS_SCHEDULE_PREFIX
-        //                + SheetInfo.PylonKeyName
-        //                + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX;
-        //    }
-
-        //    // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
-        //    if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.IFCPartsSchedule)) {
-        //        return false;
-        //    }
+            return true;
+        }
 
 
 
+        internal bool PlaceSystemPartsSchedule() {
+
+            // Проверям вдруг спека не создалась
+            if(SheetInfo.SystemPartsSchedule.ViewElement == null) {
+                return false;
+            } else {
+
+                // Заполнеяем данные для задания
+                SheetInfo.SystemPartsSchedule.ViewportName =
+                    ViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX
+                        + SheetInfo.PylonKeyName
+                        + ViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX;
+            }
+
+            // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
+            if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.SystemPartsSchedule)) {
+                return false;
+            }
+
+            // Рассчитываем и задаем корректную точку вставки спецификации системных деталей пилона
+            XYZ newCenter = new XYZ(
+                    0,
+                    UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2,
+                    0);
+
+            if(SheetInfo.IFCPartsSchedule.ViewportElement is null) {
+
+                newCenter = new XYZ(
+                    -UnitUtilsHelper.ConvertToInternalValue(2.9) - SheetInfo.SystemPartsSchedule.ViewportHalfWidth * 2,
+                    UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2,
+                    0);
+            }
+
+            (SheetInfo.SystemPartsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
+
+            SheetInfo.SystemPartsSchedule.ViewportCenter = newCenter;
+
+            return true;
+        }
 
 
+        internal bool PlaceIFCPartsSchedule() {
+
+            // Проверям вдруг спека не создалась
+            if(SheetInfo.IFCPartsSchedule.ViewElement == null) {
+                return false;
+            } else {
+
+                // Заполнеяем данные для задания
+                SheetInfo.IFCPartsSchedule.ViewportName =
+                    ViewModel.IFC_PARTS_SCHEDULE_PREFIX
+                        + SheetInfo.PylonKeyName
+                        + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX;
+            }
+
+            // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
+            if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.IFCPartsSchedule)) {
+                return false;
+            }
+
+            // Рассчитываем и задаем корректную точку вставки спецификации системных деталей пилона
+            XYZ newCenter = new XYZ(
+                    0,
+                    UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.IFCPartsSchedule.ViewportHalfHeight * 2,
+                    0);
+
+            if(SheetInfo.SystemPartsSchedule.ViewportElement is null) {
+
+                newCenter = new XYZ(
+                    -UnitUtilsHelper.ConvertToInternalValue(2.9) - SheetInfo.IFCPartsSchedule.ViewportHalfWidth * 2,
+                    UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.IFCPartsSchedule.ViewportHalfHeight * 2,
+                    0);
+            }
 
 
-        //    // Рассчитываем и задаем корректную точку вставки спецификации системных деталей пилона
-        //    XYZ newCenter = new XYZ(
-        //            0,
-        //            UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.IFCPartsSchedule.ViewportHalfHeight * 2,
-        //            0);
+            (SheetInfo.IFCPartsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
 
-        //    if(SheetInfo.SystemPartsSchedule.ViewportElement is null) {
+            SheetInfo.IFCPartsSchedule.ViewportCenter = newCenter;
 
-        //        newCenter = new XYZ(
-        //            -UnitUtilsHelper.ConvertToInternalValue(2.9) - SheetInfo.IFCPartsSchedule.ViewportHalfWidth * 2,
-        //            UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.IFCPartsSchedule.ViewportHalfHeight * 2,
-        //            0);
-        //    }
-
-
-
-
-
-
-        //    (SheetInfo.IFCPartsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
-
-        //    SheetInfo.IFCPartsSchedule.ViewportCenter = newCenter;
-
-        //    return true;
-        //}
+            return true;
+        }
 
 
         internal bool PlacePylonViewport(ViewSheet viewSheet, PylonView pylonView) {
