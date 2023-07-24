@@ -42,7 +42,8 @@ namespace RevitBatchPrint.Models {
             var pMultiplier = familyInstance.LookupParameter("х")?.AsValueString();
             pMultiplier = pMultiplier?.Equals("1") == true ? null : pMultiplier;
 
-            return _formats.FirstOrDefault(item => item.Equals($"GOST_A{pFormat}x{pMultiplier}"));
+            var formatName = $"GOST_A{pFormat}x{pMultiplier}";
+            return _formats.FirstOrDefault(item => item.Name.Equals(formatName));
         }
 
         public static Format GetFormat(int width, int height) {
@@ -53,7 +54,7 @@ namespace RevitBatchPrint.Models {
             }
 
             return _formats.FirstOrDefault(item => IsNormalWidth(width, item) && IsNormalHeight(height, item))
-                   ?? new Format() {Name = "Шо?", Width = width, Height = height};
+                   ?? new Format() {Name = $"Custom_{height}x{width}", Width = width, Height = height};
         }
 
         private static bool IsNormalHeight(int height, Format item) {
