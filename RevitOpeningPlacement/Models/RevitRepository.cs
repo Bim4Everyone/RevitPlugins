@@ -31,8 +31,8 @@ namespace RevitOpeningPlacement.Models {
         private readonly RevitClashDetective.Models.RevitRepository _clashRevitRepository;
         private readonly RevitEventHandler _revitEventHandler;
 
-        private View3DProvider _view3DProvider;
-        private View3D _view;
+        private readonly View3DProvider _view3DProvider;
+        private readonly View3D _view;
 
         public RevitRepository(Application application, Document document) {
 

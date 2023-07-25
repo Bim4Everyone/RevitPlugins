@@ -12,7 +12,7 @@ using RevitOpeningPlacement.Models.OpeningUnion.IntersectionProviders;
 namespace RevitOpeningPlacement.Models.OpeningUnion {
     internal class UnionGroupsConfigurator {
         private readonly RevitRepository _revitRepository;
-        private List<Element> _elementsToDelete = new List<Element>();
+        private readonly List<Element> _elementsToDelete = new List<Element>();
 
         public UnionGroupsConfigurator(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
