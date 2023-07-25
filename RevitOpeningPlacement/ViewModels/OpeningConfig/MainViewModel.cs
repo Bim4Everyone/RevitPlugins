@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
-
-using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -22,10 +18,12 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private string _messageText;
         private ObservableCollection<MepCategoryViewModel> _mepCategories;
         private DispatcherTimer _timer;
+        private readonly RevitRepository _revitRepository;
 
-        public MainViewModel(UIApplication uiApplication, Models.Configs.OpeningConfig openingConfig) {
+        public MainViewModel(RevitRepository revitRepository, Models.Configs.OpeningConfig openingConfig) {
+            _revitRepository = revitRepository;
             if(openingConfig.Categories.Any()) {
-                MepCategories = new ObservableCollection<MepCategoryViewModel>(openingConfig.Categories.Select(item => new MepCategoryViewModel(item)));
+                MepCategories = new ObservableCollection<MepCategoryViewModel>(openingConfig.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
                 if(MepCategories.All(item => !item.IsRound)) {
                     SetShape();
                 }
@@ -39,21 +37,29 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             SaveConfigCommand = new RelayCommand(SaveConfig, CanSaveConfig);
             SaveAsConfigCommand = new RelayCommand(SaveAsConfig, CanSaveConfig);
             LoadConfigCommand = new RelayCommand(LoadConfig);
+
+            SelectedMepCategoryViewModel = MepCategories.FirstOrDefault();
+        }
+
+        private MepCategoryViewModel _selectedMepCategoryViewModel;
+        public MepCategoryViewModel SelectedMepCategoryViewModel {
+            get => _selectedMepCategoryViewModel;
+            set => RaiseAndSetIfChanged(ref _selectedMepCategoryViewModel, value);
         }
 
         public ObservableCollection<MepCategoryViewModel> MepCategories {
             get => _mepCategories;
-            set => this.RaiseAndSetIfChanged(ref _mepCategories, value);
+            set => RaiseAndSetIfChanged(ref _mepCategories, value);
         }
 
         public string ErrorText {
             get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+            set => RaiseAndSetIfChanged(ref _errorText, value);
         }
 
         public string MessageText {
             get => _messageText;
-            set => this.RaiseAndSetIfChanged(ref _messageText, value);
+            set => RaiseAndSetIfChanged(ref _messageText, value);
         }
 
         public ICommand SaveConfigCommand { get; }
@@ -71,7 +77,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             };
         }
 
-        private MepCategoryViewModel GetPipe() => new MepCategoryViewModel {
+        private MepCategoryViewModel GetPipe() => new MepCategoryViewModel(_revitRepository) {
             Name = RevitRepository.MepCategoryNames[MepCategoryEnum.Pipe],
             MinSizes = new ObservableCollection<SizeViewModel>() {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
@@ -82,7 +88,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             ImageSource = "../Resources/pipe.png"
         };
 
-        private MepCategoryViewModel GetRectangleDuct() => new MepCategoryViewModel {
+        private MepCategoryViewModel GetRectangleDuct() => new MepCategoryViewModel(_revitRepository) {
             Name = RevitRepository.MepCategoryNames[MepCategoryEnum.RectangleDuct],
             MinSizes = new ObservableCollection<SizeViewModel>() {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Width]},
@@ -94,7 +100,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             ImageSource = "../Resources/rectangleDuct.png"
         };
 
-        private MepCategoryViewModel GetRoundDuct() => new MepCategoryViewModel {
+        private MepCategoryViewModel GetRoundDuct() => new MepCategoryViewModel(_revitRepository) {
             Name = RevitRepository.MepCategoryNames[MepCategoryEnum.RoundDuct],
             MinSizes = new ObservableCollection<SizeViewModel>() {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
@@ -105,7 +111,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             ImageSource = "../Resources/roundDuct.png"
         };
 
-        private MepCategoryViewModel GetCableTray() => new MepCategoryViewModel {
+        private MepCategoryViewModel GetCableTray() => new MepCategoryViewModel(_revitRepository) {
             Name = RevitRepository.MepCategoryNames[MepCategoryEnum.CableTray],
             MinSizes = new ObservableCollection<SizeViewModel>() {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Width]},
@@ -117,7 +123,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             ImageSource = "../Resources/tray.png"
         };
 
-        private MepCategoryViewModel GetConduit() => new MepCategoryViewModel {
+        private MepCategoryViewModel GetConduit() => new MepCategoryViewModel(_revitRepository) {
             Name = RevitRepository.MepCategoryNames[MepCategoryEnum.Conduit],
             MinSizes = new ObservableCollection<SizeViewModel>() {
                 new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
@@ -203,7 +209,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             var cls = new ConfigLoaderService();
             var config = cls.Load<Models.Configs.OpeningConfig>();
             if(config != null) {
-                MepCategories = new ObservableCollection<MepCategoryViewModel>(config.Categories.Select(item => new MepCategoryViewModel(item)));
+                MepCategories = new ObservableCollection<MepCategoryViewModel>(config.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
             }
             MessageText = "Файл настроек успешно загружен.";
             _timer.Start();
