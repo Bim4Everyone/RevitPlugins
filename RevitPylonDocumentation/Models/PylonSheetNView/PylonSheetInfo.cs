@@ -26,22 +26,25 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             Repository = repository;
             PylonKeyName = pylonKeyName;
 
-            GeneralView = new PylonView(ViewModel, repository, this);
-            GeneralViewPerpendicular = new PylonView(ViewModel, repository, this);
-            TransverseViewFirst = new PylonView(ViewModel, repository, this);
-            TransverseViewSecond = new PylonView(ViewModel, repository, this);
-            TransverseViewThird = new PylonView(ViewModel, repository, this);
+            Manager = new PylonSheetInfoManager(ViewModel, Repository, this);
 
-            RebarSchedule = new PylonView(ViewModel, repository, this);
-            MaterialSchedule = new PylonView(ViewModel, repository, this);
-            SystemPartsSchedule = new PylonView(ViewModel, repository, this);
-            IFCPartsSchedule = new PylonView(ViewModel, repository, this);
+            GeneralView = new PylonView(ViewModel, Repository, this);
+            GeneralViewPerpendicular = new PylonView(ViewModel, Repository, this);
+            TransverseViewFirst = new PylonView(ViewModel, Repository, this);
+            TransverseViewSecond = new PylonView(ViewModel, Repository, this);
+            TransverseViewThird = new PylonView(ViewModel, Repository, this);
 
-            LegendView = new PylonView(ViewModel, repository, this);
+            RebarSchedule = new PylonView(ViewModel, Repository, this);
+            MaterialSchedule = new PylonView(ViewModel, Repository, this);
+            SystemPartsSchedule = new PylonView(ViewModel, Repository, this);
+            IFCPartsSchedule = new PylonView(ViewModel, Repository, this);
+
+            LegendView = new PylonView(ViewModel, Repository, this);
         }
 
         internal MainViewModel ViewModel { get; set; }
         internal RevitRepository Repository { get; set; }
+        internal PylonSheetInfoManager Manager { get; set; }
 
         public bool IsCheck { get; set; } = false;
         public bool SheetInProject { get; set; } = false;
