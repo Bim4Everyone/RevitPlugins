@@ -37,6 +37,13 @@ namespace RevitVolumeOfWork.ViewModels {
         private void SetWallParameters(object p) {
             var levels = Levels.Where(item => item.IsSelected);
 
+            foreach(var level in levels) {
+                foreach(var room in level.Rooms) {
+
+                }
+            }
+
+
         }
 
         private bool CanSetWallParameters(object p) { 

@@ -26,7 +26,7 @@ namespace RevitVolumeOfWork.Models {
             return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(SpatialElement))
-                .Select(x => new RoomElement((Room)x))
+                .Select(x => new RoomElement((Room)x, Document))
                 .ToList();
         }
 
@@ -34,14 +34,14 @@ namespace RevitVolumeOfWork.Models {
             return new FilteredElementCollector(Document, Document.ActiveView.Id)
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(SpatialElement))
-                .Select(x => new RoomElement((Room) x))
+                .Select(x => new RoomElement((Room) x, Document))
                 .ToList();
         }
 
         public IList<RoomElement> GetSelectedRooms() {
             return ActiveUIDocument.GetSelectedElements()
                 .OfType<Room>()
-                .Select(x => new RoomElement(x))
+                .Select(x => new RoomElement(x, Document))
                 .ToList();
         }
     }
