@@ -69,9 +69,9 @@ namespace RevitPylonDocumentation.Models {
             double minZ = bb.Min.Z;
             double maxZ = bb.Max.Z;
 
-            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.GENERAL_VIEW_X_OFFSET));
-            double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.GENERAL_VIEW_Y_TOP_OFFSET));
-            double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.GENERAL_VIEW_Y_BOTTOM_OFFSET));
+            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_X_OFFSET));
+            double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_Y_TOP_OFFSET));
+            double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_Y_BOTTOM_OFFSET));
 
 
             XYZ sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostWidth);
@@ -89,7 +89,7 @@ namespace RevitPylonDocumentation.Models {
                 viewSection = ViewSection.CreateSection(Repository.Document, SelectedViewFamilyType.Id, sectionBox);
                 
                 if(viewSection != null) {
-                    viewSection.Name = ViewModel.GENERAL_VIEW_PREFIX + SheetInfo.PylonKeyName + ViewModel.GENERAL_VIEW_SUFFIX;
+                    viewSection.Name = ViewModel.ViewSectionSettings.GENERAL_VIEW_PREFIX + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.GENERAL_VIEW_SUFFIX;
                     if(ViewModel.SelectedGeneralViewTemplate != null) {
                         viewSection.ViewTemplateId = ViewModel.SelectedGeneralViewTemplate.Id;
                     }
@@ -156,9 +156,9 @@ namespace RevitPylonDocumentation.Models {
             double maxZ = bb.Max.Z;
 
 
-            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.GENERAL_VIEW_X_OFFSET));
-            double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.GENERAL_VIEW_Y_TOP_OFFSET));
-            double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.GENERAL_VIEW_Y_BOTTOM_OFFSET));
+            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_X_OFFSET));
+            double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_Y_TOP_OFFSET));
+            double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_Y_BOTTOM_OFFSET));
 
 
             XYZ sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.4);
@@ -177,7 +177,7 @@ namespace RevitPylonDocumentation.Models {
                 viewSection = ViewSection.CreateSection(Repository.Document, SelectedViewFamilyType.Id, sectionBox);
 
                 if(viewSection != null) {
-                    viewSection.Name = ViewModel.GENERAL_VIEW_PERPENDICULAR_PREFIX + SheetInfo.PylonKeyName + ViewModel.GENERAL_VIEW_PERPENDICULAR_SUFFIX;
+                    viewSection.Name = ViewModel.ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_PREFIX + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_SUFFIX;
                     if(ViewModel.SelectedGeneralViewTemplate != null) {
                         viewSection.ViewTemplateId = ViewModel.SelectedGeneralViewTemplate.Id;
                     }
@@ -241,8 +241,8 @@ namespace RevitPylonDocumentation.Models {
 
             XYZ sectionBoxMin;
             XYZ sectionBoxMax;
-            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.TRANSVERSE_VIEW_X_OFFSET));
-            double coordinateY = hostWidth * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.TRANSVERSE_VIEW_Y_OFFSET));
+            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_X_OFFSET));
+            double coordinateY = hostWidth * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET));
 
             if(transverseViewNum == 1) {
                 // Располагаем сечение на высоте 1/4 высоты пилона
@@ -274,7 +274,7 @@ namespace RevitPylonDocumentation.Models {
                 if(viewSection != null) {
                     if(transverseViewNum == 1) {
 
-                        viewSection.Name = ViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + SheetInfo.PylonKeyName + ViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX;
+                        viewSection.Name = ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_FIRST_PREFIX + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_FIRST_SUFFIX;
                         // Если был выбран шаблон вида, то назначаем
                         if(ViewModel.SelectedTransverseViewTemplate != null) {
                             viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
@@ -282,13 +282,13 @@ namespace RevitPylonDocumentation.Models {
                         SheetInfo.TransverseViewFirst.ViewElement = viewSection;
 
                     } else if(transverseViewNum == 2) {
-                        viewSection.Name = ViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + SheetInfo.PylonKeyName + ViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX;
+                        viewSection.Name = ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_SECOND_PREFIX + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_SECOND_SUFFIX;
                         if(ViewModel.SelectedTransverseViewTemplate != null) {
                             viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
                         }
                         SheetInfo.TransverseViewSecond.ViewElement = viewSection;
                     } else if(transverseViewNum == 3) {
-                        viewSection.Name = ViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + SheetInfo.PylonKeyName + ViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX;
+                        viewSection.Name = ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_THIRD_PREFIX + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_THIRD_SUFFIX;
                         if(ViewModel.SelectedTransverseViewTemplate != null) {
                             viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
                         }

@@ -37,9 +37,9 @@ namespace RevitPylonDocumentation.Models {
 
                 // Заполнеяем данные для задания
                 SheetInfo.RebarSchedule.ViewportName =
-                    ViewModel.REBAR_SCHEDULE_PREFIX
+                    ViewModel.SchedulesSettings.REBAR_SCHEDULE_PREFIX
                         + SheetInfo.PylonKeyName
-                        + ViewModel.REBAR_SCHEDULE_SUFFIX;
+                        + ViewModel.SchedulesSettings.REBAR_SCHEDULE_SUFFIX;
             }
 
             // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
@@ -72,9 +72,9 @@ namespace RevitPylonDocumentation.Models {
 
                 // Заполнеяем данные для задания
                 SheetInfo.MaterialSchedule.ViewportName =
-                    ViewModel.MATERIAL_SCHEDULE_PREFIX
+                    ViewModel.SchedulesSettings.MATERIAL_SCHEDULE_PREFIX
                         + SheetInfo.PylonKeyName
-                        + ViewModel.MATERIAL_SCHEDULE_SUFFIX;
+                        + ViewModel.SchedulesSettings.MATERIAL_SCHEDULE_SUFFIX;
             }
 
             // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
@@ -115,9 +115,9 @@ namespace RevitPylonDocumentation.Models {
 
                 // Заполнеяем данные для задания
                 SheetInfo.SystemPartsSchedule.ViewportName =
-                    ViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX
+                    ViewModel.SchedulesSettings.SYSTEM_PARTS_SCHEDULE_PREFIX
                         + SheetInfo.PylonKeyName
-                        + ViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX;
+                        + ViewModel.SchedulesSettings.SYSTEM_PARTS_SCHEDULE_SUFFIX;
             }
 
             // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
@@ -156,9 +156,9 @@ namespace RevitPylonDocumentation.Models {
 
                 // Заполнеяем данные для задания
                 SheetInfo.IFCPartsSchedule.ViewportName =
-                    ViewModel.IFC_PARTS_SCHEDULE_PREFIX
+                    ViewModel.SchedulesSettings.IFC_PARTS_SCHEDULE_PREFIX
                         + SheetInfo.PylonKeyName
-                        + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX;
+                        + ViewModel.SchedulesSettings.IFC_PARTS_SCHEDULE_SUFFIX;
             }
 
             // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)

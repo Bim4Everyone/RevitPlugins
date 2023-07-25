@@ -40,9 +40,9 @@ namespace RevitPylonDocumentation.Models {
                 SheetInfo.GeneralView.ViewportTypeName = "Заголовок на листе";
                 SheetInfo.GeneralView.ViewportNumber = "100";
                 SheetInfo.GeneralView.ViewportName = 
-                    ViewModel.GENERAL_VIEW_PREFIX 
+                    ViewModel.ViewSectionSettings.GENERAL_VIEW_PREFIX 
                     + SheetInfo.PylonKeyName 
-                    + ViewModel.GENERAL_VIEW_SUFFIX;
+                    + ViewModel.ViewSectionSettings.GENERAL_VIEW_SUFFIX;
             }
 
             // Передаем основной вид пилона в метод по созданию видов в (0.0.0)
@@ -88,9 +88,9 @@ namespace RevitPylonDocumentation.Models {
                 SheetInfo.GeneralViewPerpendicular.ViewportTypeName = "Заголовок на листе";
                 SheetInfo.GeneralViewPerpendicular.ViewportNumber = "101";
                 SheetInfo.GeneralViewPerpendicular.ViewportName =
-                    ViewModel.GENERAL_VIEW_PERPENDICULAR_PREFIX
+                    ViewModel.ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_PREFIX
                     + SheetInfo.PylonKeyName
-                    + ViewModel.GENERAL_VIEW_PERPENDICULAR_SUFFIX;
+                    + ViewModel.ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_SUFFIX;
             }
 
 

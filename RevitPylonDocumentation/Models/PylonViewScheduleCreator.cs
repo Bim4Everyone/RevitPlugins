@@ -40,11 +40,11 @@ namespace RevitPylonDocumentation.Models {
                 scheduleId = ViewModel.ReferenceRebarSchedule.Duplicate(ViewDuplicateOption.Duplicate);
                 viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
                 if(viewSchedule != null) {
-                    viewSchedule.Name = ViewModel.REBAR_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.REBAR_SCHEDULE_SUFFIX;
+                    viewSchedule.Name = ViewModel.SchedulesSettings.REBAR_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.SchedulesSettings.REBAR_SCHEDULE_SUFFIX;
 
                     // Задаем сортировку
-                    SetScheduleDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.REBAR_SCHEDULE_DISP1);
-                    SetScheduleDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.REBAR_SCHEDULE_DISP2);
+                    SetScheduleDispatcherParameter(viewSchedule, ViewModel.ProjectSettings.DISPATCHER_GROUPING_FIRST, ViewModel.SchedulesSettings.REBAR_SCHEDULE_DISP1);
+                    SetScheduleDispatcherParameter(viewSchedule, ViewModel.ProjectSettings.DISPATCHER_GROUPING_SECOND, ViewModel.SchedulesSettings.REBAR_SCHEDULE_DISP2);
 
 
                     // Задаем фильтры спецификации
@@ -78,11 +78,11 @@ namespace RevitPylonDocumentation.Models {
                 viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
                 if(viewSchedule is null) { return false; }
 
-                viewSchedule.Name = ViewModel.MATERIAL_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.MATERIAL_SCHEDULE_SUFFIX;
+                viewSchedule.Name = ViewModel.SchedulesSettings.MATERIAL_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.SchedulesSettings.MATERIAL_SCHEDULE_SUFFIX;
 
                 // Задаем сортировку
-                SetScheduleDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.MATERIAL_SCHEDULE_DISP1);
-                SetScheduleDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.MATERIAL_SCHEDULE_DISP2);
+                SetScheduleDispatcherParameter(viewSchedule, ViewModel.ProjectSettings.DISPATCHER_GROUPING_FIRST, ViewModel.SchedulesSettings.MATERIAL_SCHEDULE_DISP1);
+                SetScheduleDispatcherParameter(viewSchedule, ViewModel.ProjectSettings.DISPATCHER_GROUPING_SECOND, ViewModel.SchedulesSettings.MATERIAL_SCHEDULE_DISP2);
 
                 // Задаем фильтры спецификации
                 SetScheduleFilters(viewSchedule);
@@ -111,11 +111,11 @@ namespace RevitPylonDocumentation.Models {
                 viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
                 if(viewSchedule is null) { return false; }
 
-                viewSchedule.Name = ViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX;
+                viewSchedule.Name = ViewModel.SchedulesSettings.SYSTEM_PARTS_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.SchedulesSettings.SYSTEM_PARTS_SCHEDULE_SUFFIX;
 
                 // Задаем сортировку
-                SetScheduleDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.SYSTEM_PARTS_SCHEDULE_DISP1);
-                SetScheduleDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.SYSTEM_PARTS_SCHEDULE_DISP2);
+                SetScheduleDispatcherParameter(viewSchedule, ViewModel.ProjectSettings.DISPATCHER_GROUPING_FIRST, ViewModel.SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP1);
+                SetScheduleDispatcherParameter(viewSchedule, ViewModel.ProjectSettings.DISPATCHER_GROUPING_SECOND, ViewModel.SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP2);
 
                 // Задаем фильтры спецификации
                 SetScheduleFilters(viewSchedule);
@@ -144,12 +144,12 @@ namespace RevitPylonDocumentation.Models {
                 viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
                 if(viewSchedule is null) { return false; }
 
-                viewSchedule.Name = ViewModel.IFC_PARTS_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX;
+                viewSchedule.Name = ViewModel.SchedulesSettings.IFC_PARTS_SCHEDULE_PREFIX + SheetInfo.PylonKeyName + ViewModel.SchedulesSettings.IFC_PARTS_SCHEDULE_SUFFIX;
 
 
                 // Задаем сортировку
-                SetScheduleDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_FIRST, ViewModel.IFC_PARTS_SCHEDULE_DISP1);
-                SetScheduleDispatcherParameter(viewSchedule, ViewModel.DISPATCHER_GROUPING_SECOND, ViewModel.IFC_PARTS_SCHEDULE_DISP2);
+                SetScheduleDispatcherParameter(viewSchedule, ViewModel.ProjectSettings.DISPATCHER_GROUPING_FIRST, ViewModel.SchedulesSettings.IFC_PARTS_SCHEDULE_DISP1);
+                SetScheduleDispatcherParameter(viewSchedule, ViewModel.ProjectSettings.DISPATCHER_GROUPING_SECOND, ViewModel.SchedulesSettings.IFC_PARTS_SCHEDULE_DISP2);
 
 
                 // Задаем фильтры спецификации
@@ -214,7 +214,7 @@ namespace RevitPylonDocumentation.Models {
                 ScheduleField scheduleFieldFromFilter = scheduleDefinition.GetField(currentFilter.FieldId);
 
                 // Определяем есть ли параметр фильтра в списке нужных
-                ScheduleFilterParamHelper filterParam = ViewModel.ParamsForScheduleFilters
+                ScheduleFilterParamHelper filterParam = ViewModel.SchedulesSettings.ParamsForScheduleFilters
                     .FirstOrDefault(item => item.ParamNameInSchedule.Equals(scheduleFieldFromFilter.GetName()));
 
                 // Если его нет в списке нужных - удаляем

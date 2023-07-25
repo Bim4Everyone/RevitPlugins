@@ -98,17 +98,17 @@ namespace RevitPylonDocumentation.Models {
 
 
                     // Запрашиваем параметр фильтрации типовых пилонов. Если он не равен заданному, то отсеиваем этот пилон
-                    Parameter typicalPylonParameter = elem.LookupParameter(mainViewModel.TYPICAL_PYLON_FILTER_PARAMETER);
+                    Parameter typicalPylonParameter = elem.LookupParameter(mainViewModel.ProjectSettings.TYPICAL_PYLON_FILTER_PARAMETER);
                     if(typicalPylonParameter == null) {
                         mainViewModel.ErrorText = "Параметр фильтрации типовых пилонов не найден";
                         return;
                     }
 
-                    if(typicalPylonParameter.AsString() is null || typicalPylonParameter.AsString() != mainViewModel.TYPICAL_PYLON_FILTER_VALUE) { continue; }
+                    if(typicalPylonParameter.AsString() is null || typicalPylonParameter.AsString() != mainViewModel.ProjectSettings.TYPICAL_PYLON_FILTER_VALUE) { continue; }
 
 
                     // Запрашиваем Раздел проекта
-                    Parameter projectSectionParameter = elem.LookupParameter(mainViewModel.PROJECT_SECTION);
+                    Parameter projectSectionParameter = elem.LookupParameter(mainViewModel.ProjectSettings.PROJECT_SECTION);
                     if(projectSectionParameter == null) {
                         mainViewModel.ErrorText = "Параметр раздела не найден у элементов Стен или Несущих колонн";
                         return;
@@ -118,7 +118,7 @@ namespace RevitPylonDocumentation.Models {
 
 
                     // Запрашиваем Марку пилона
-                    Parameter hostMarkParameter = elem.LookupParameter(mainViewModel.MARK);
+                    Parameter hostMarkParameter = elem.LookupParameter(mainViewModel.ProjectSettings.MARK);
                     if(hostMarkParameter == null) {
                         mainViewModel.ErrorText = "Параметр марки не найден у элементов Стен или Несущих колонн";
                         return;
@@ -164,7 +164,7 @@ namespace RevitPylonDocumentation.Models {
         public void FindSheetInPj(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
             
             ViewSheet sheet = AllSheets
-                .Where(item => item.Name.Equals(mainViewModel.SHEET_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.SHEET_SUFFIX))
+                .Where(item => item.Name.Equals(mainViewModel.ProjectSettings.SHEET_PREFIX + pylonSheetInfo.PylonKeyName + mainViewModel.ProjectSettings.SHEET_SUFFIX))
                 .FirstOrDefault();
 
             if(sheet != null) {

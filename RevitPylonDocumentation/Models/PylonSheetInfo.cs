@@ -90,9 +90,9 @@ namespace RevitPylonDocumentation.Models {
             }
 
             PylonViewSheet = ViewSheet.Create(Repository.Document, ViewModel.SelectedTitleBlocks.Id);
-            PylonViewSheet.Name = ViewModel.SHEET_PREFIX + PylonKeyName + ViewModel.SHEET_SUFFIX;
+            PylonViewSheet.Name = ViewModel.ProjectSettings.SHEET_PREFIX + PylonKeyName + ViewModel.ProjectSettings.SHEET_SUFFIX;
 
-            Parameter viewSheetGroupingParameter = PylonViewSheet.LookupParameter(ViewModel.DISPATCHER_GROUPING_FIRST);
+            Parameter viewSheetGroupingParameter = PylonViewSheet.LookupParameter(ViewModel.ProjectSettings.DISPATCHER_GROUPING_FIRST);
             if(viewSheetGroupingParameter == null) {
             } else {
                 viewSheetGroupingParameter.Set(ViewModel.SelectedProjectSection);
@@ -146,8 +146,8 @@ namespace RevitPylonDocumentation.Models {
                 return;
             }
             // Пытаемся задать габарит листа
-            Parameter paramA = this.TitleBlock.LookupParameter(ViewModel.SHEET_SIZE);
-            Parameter paramX = this.TitleBlock.LookupParameter(ViewModel.SHEET_COEFFICIENT);
+            Parameter paramA = this.TitleBlock.LookupParameter(ViewModel.ProjectSettings.SHEET_SIZE);
+            Parameter paramX = this.TitleBlock.LookupParameter(ViewModel.ProjectSettings.SHEET_COEFFICIENT);
             
 
             if(paramA != null && paramX != null) {
@@ -173,16 +173,16 @@ namespace RevitPylonDocumentation.Models {
         /// </summary>
         public void GetViewNamesForWork() {
             
-            GeneralView.ViewName = ViewModel.GENERAL_VIEW_PREFIX + PylonKeyName + ViewModel.GENERAL_VIEW_SUFFIX;
-            GeneralViewPerpendicular.ViewName = ViewModel.GENERAL_VIEW_PERPENDICULAR_PREFIX + PylonKeyName + ViewModel.GENERAL_VIEW_PERPENDICULAR_SUFFIX;
-            TransverseViewFirst.ViewName = ViewModel.TRANSVERSE_VIEW_FIRST_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_FIRST_SUFFIX;
-            TransverseViewSecond.ViewName = ViewModel.TRANSVERSE_VIEW_SECOND_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_SECOND_SUFFIX;
-            TransverseViewThird.ViewName = ViewModel.TRANSVERSE_VIEW_THIRD_PREFIX + PylonKeyName + ViewModel.TRANSVERSE_VIEW_THIRD_SUFFIX;
+            GeneralView.ViewName = ViewModel.ViewSectionSettings.GENERAL_VIEW_PREFIX + PylonKeyName + ViewModel.ViewSectionSettings.GENERAL_VIEW_SUFFIX;
+            GeneralViewPerpendicular.ViewName = ViewModel.ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_PREFIX + PylonKeyName + ViewModel.ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_SUFFIX;
+            TransverseViewFirst.ViewName = ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_FIRST_PREFIX + PylonKeyName + ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_FIRST_SUFFIX;
+            TransverseViewSecond.ViewName = ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_SECOND_PREFIX + PylonKeyName + ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_SECOND_SUFFIX;
+            TransverseViewThird.ViewName = ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_THIRD_PREFIX + PylonKeyName + ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_THIRD_SUFFIX;
 
-            RebarSchedule.ViewName = ViewModel.REBAR_SCHEDULE_PREFIX + PylonKeyName + ViewModel.REBAR_SCHEDULE_SUFFIX;
-            MaterialSchedule.ViewName = ViewModel.MATERIAL_SCHEDULE_PREFIX + PylonKeyName + ViewModel.MATERIAL_SCHEDULE_SUFFIX;
-            SystemPartsSchedule.ViewName = ViewModel.SYSTEM_PARTS_SCHEDULE_PREFIX + PylonKeyName + ViewModel.SYSTEM_PARTS_SCHEDULE_SUFFIX;
-            IFCPartsSchedule.ViewName = ViewModel.IFC_PARTS_SCHEDULE_PREFIX + PylonKeyName + ViewModel.IFC_PARTS_SCHEDULE_SUFFIX;
+            RebarSchedule.ViewName = ViewModel.SchedulesSettings.REBAR_SCHEDULE_PREFIX + PylonKeyName + ViewModel.SchedulesSettings.REBAR_SCHEDULE_SUFFIX;
+            MaterialSchedule.ViewName = ViewModel.SchedulesSettings.MATERIAL_SCHEDULE_PREFIX + PylonKeyName + ViewModel.SchedulesSettings.MATERIAL_SCHEDULE_SUFFIX;
+            SystemPartsSchedule.ViewName = ViewModel.SchedulesSettings.SYSTEM_PARTS_SCHEDULE_PREFIX + PylonKeyName + ViewModel.SchedulesSettings.SYSTEM_PARTS_SCHEDULE_SUFFIX;
+            IFCPartsSchedule.ViewName = ViewModel.SchedulesSettings.IFC_PARTS_SCHEDULE_PREFIX + PylonKeyName + ViewModel.SchedulesSettings.IFC_PARTS_SCHEDULE_SUFFIX;
         }
 
 
