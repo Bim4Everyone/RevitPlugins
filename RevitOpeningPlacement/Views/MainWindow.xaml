@@ -14,8 +14,8 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     x:Name="_this"
-     d:DesignHeight="750"
-    Height="600" Width="1300"
+     d:DesignHeight="850"
+    Height="850" Width="1300"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid Margin="10">
@@ -58,7 +58,7 @@
                     <local:CategoryView x:Name="_categoryView" DataContext="{Binding ElementName=_this, Path=DataContext}"/>
                 </dxdo:LayoutControlItem>
                 <dxdo:LayoutControlItem Margin="0 0 -11 0">
-                    <local:SettingView DataContext="{Binding ElementName=_categoryView, Path=SelectedItem}"/>
+                    <local:SettingView DataContext="{Binding SelectedMepCategoryViewModel}"/>
                 </dxdo:LayoutControlItem>
             </dxdo:LayoutGroup>
         </dxdo:DockLayoutManager>
