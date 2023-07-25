@@ -25,6 +25,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Description = _openingTask.Description;
             CenterOffset = _openingTask.CenterOffset;
             BottomOffset = _openingTask.BottomOffset;
+            IsAccepted = _openingTask.IsAccepted;
         }
 
 
@@ -41,6 +42,18 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         public string CenterOffset { get; } = string.Empty;
 
         public string BottomOffset { get; } = string.Empty;
+
+        private bool _isAccepted;
+        public bool IsAccepted {
+            get => _isAccepted;
+            set => RaiseAndSetIfChanged(ref _isAccepted, value);
+        }
+
+        private string _comment;
+        public string Comment {
+            get => _comment;
+            set => RaiseAndSetIfChanged(ref _comment, value);
+        }
 
 
         public FamilyInstance GetFamilyInstance() {
