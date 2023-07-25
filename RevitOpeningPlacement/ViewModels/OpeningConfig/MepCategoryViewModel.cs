@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
+
+using Autodesk.Revit.DB;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -20,8 +20,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private ObservableCollection<OffsetViewModel> _offsets;
         private bool _isSelected;
         private List<StructureCategoryViewModel> _structureCategories;
+        private SetViewModel _setViewModel;
 
-        public MepCategoryViewModel(MepCategory mepCategory = null) {
+        public MepCategoryViewModel(RevitRepository revitRepository, MepCategory mepCategory = null) {
             InitializeStructureCategories();
 
             if(mepCategory != null) {
@@ -33,6 +34,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 Offsets = new ObservableCollection<OffsetViewModel>(mepCategory.Offsets.Select(item => new OffsetViewModel(item, new TypeNamesProvider(mepCategory.IsRound))));
                 SetSelectedCategories(mepCategory);
                 SelectedRounding = mepCategory.Rounding;
+                Category[] revitCategories = revitRepository.GetCategories(revitRepository.GetMepCategoryEnum(mepCategory));
+                var categoriesInfoViewModel = new CategoriesInfoViewModel(revitRepository, revitCategories);
+                SetViewModel = new SetViewModel(revitRepository, categoriesInfoViewModel, mepCategory.Set);
             }
 
             AddOffsetCommand = new RelayCommand(AddOffset);
@@ -43,34 +47,39 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
         public bool IsSelected {
             get => _isSelected;
-            set => this.RaiseAndSetIfChanged(ref _isSelected, value);
+            set => RaiseAndSetIfChanged(ref _isSelected, value);
         }
 
         public int SelectedRounding { get; set; }
 
         public string Name {
             get => _name;
-            set => this.RaiseAndSetIfChanged(ref _name, value);
+            set => RaiseAndSetIfChanged(ref _name, value);
         }
 
         public string ImageSource { get; set; }
 
         public ObservableCollection<SizeViewModel> MinSizes {
             get => _minSizes;
-            set => this.RaiseAndSetIfChanged(ref _minSizes, value);
+            set => RaiseAndSetIfChanged(ref _minSizes, value);
         }
 
         public ObservableCollection<OffsetViewModel> Offsets {
             get => _offsets;
-            set => this.RaiseAndSetIfChanged(ref _offsets, value);
+            set => RaiseAndSetIfChanged(ref _offsets, value);
         }
 
         public List<StructureCategoryViewModel> StructureCategories {
             get => _structureCategories;
-            set => this.RaiseAndSetIfChanged(ref _structureCategories, value);
+            set => RaiseAndSetIfChanged(ref _structureCategories, value);
         }
 
         public List<int> Roundings { get; set; } = new List<int> { 0, 10, 50 };
+
+        public SetViewModel SetViewModel {
+            get => _setViewModel;
+            set => RaiseAndSetIfChanged(ref _setViewModel, value);
+        }
 
         public ICommand AddOffsetCommand { get; }
         public ICommand RemoveOffsetCommand { get; }
@@ -91,6 +100,12 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             if(IsSelected && StructureCategories.All(item => !item.IsSelected)) {
                 return $"Для категории \"{Name}\" выберите категории для пересечения";
             }
+            if(SetViewModel.IsEmpty()) {
+                return $"Все поля в критериях фильтрации категории \'{Name}\' должны быть заполнены.";
+            }
+            if(!string.IsNullOrEmpty(SetViewModel.GetErrorText())) {
+                return SetViewModel.GetErrorText();
+            }
             return null;
         }
 
@@ -103,7 +118,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 IsRound = IsRound,
                 IsSelected = IsSelected,
                 Intersections = StructureCategories.Select(item => new StructureCategory() { Name = item.Name, IsSelected = item.IsSelected }).ToList(),
-                Rounding = SelectedRounding
+                Rounding = SelectedRounding,
+                Set = SetViewModel.GetSet()
             };
         }
 
