@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -33,8 +34,9 @@ namespace RevitVolumeOfWork.ViewModels {
 
         protected abstract IEnumerable<LevelViewModel> GetLevelViewModels();
 
-        private void SetWallParameters(object p) { 
-            
+        private void SetWallParameters(object p) {
+            var levels = Levels.Where(item => item.IsSelected);
+
         }
 
         private bool CanSetWallParameters(object p) { 

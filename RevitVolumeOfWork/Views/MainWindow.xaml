@@ -28,7 +28,8 @@
             Grid.Row="0"
             Margin="10"
             DisplayMemberPath = "Name"
-            ItemsSource="{Binding RevitViewModels}"/>
+            ItemsSource="{Binding RevitViewModels}"
+            SelectedItem="{Binding RevitViewModel}"/>
 
         <ListView 
             Grid.Row="1"
@@ -36,10 +37,11 @@
             SelectionMode="Extended"
             DataContext="{Binding RevitViewModel}"
             ItemsSource="{Binding Levels}">
+            
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <CheckBox
-                        IsChecked="{Binding IsChecked}">
+                        IsChecked="{Binding IsSelected}">
                         <TextBlock Text="{Binding Name}"/>
                     </CheckBox>
                 </DataTemplate>
@@ -61,6 +63,8 @@
                 Margin="10"
                 Width="80"
                 Content="ОК"
+                DataContext="{Binding RevitViewModel}"
+                Command="{Binding SetWallParametersCommand}"
                 Click="ButtonOk_Click" />
 
             <Button

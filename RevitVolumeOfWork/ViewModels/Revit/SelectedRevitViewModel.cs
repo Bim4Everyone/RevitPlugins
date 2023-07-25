@@ -16,8 +16,8 @@ namespace RevitVolumeOfWork.ViewModels.Revit {
         protected override IEnumerable<LevelViewModel> GetLevelViewModels() {
             return _revitRepository.GetSelectedRooms()
                 .Where(item => item.Level != null)
-                .GroupBy(item => item.Level)
-                .Select(item => new LevelViewModel(item.Key.Name, item.Key, _revitRepository, item));
+                .GroupBy(item => item.Level.Name)
+                .Select(item => new LevelViewModel(item.Key, item.Select(room => room.Level).FirstOrDefault(), _revitRepository, item));
         }
     }
 }
