@@ -109,8 +109,6 @@ namespace RevitPylonDocumentation.ViewModels {
         public static string DEF_TITLEBLOCK_NAME = "Создать типы по комплектам";
 
         private List<PylonSheetInfo> _selectedHostsInfo = new List<PylonSheetInfo>();
-        //private ScheduleFilterParamHelper _selectedScheduleFilterParam;
-
 
 
 
@@ -124,8 +122,6 @@ namespace RevitPylonDocumentation.ViewModels {
         public Dictionary<string, PylonSheetInfo> missingPylonSheetsInfo = new Dictionary<string, PylonSheetInfo>();
         // Вспомогательный список
         public Dictionary<string, List<FamilyInstance>> hostData = new Dictionary<string, List<FamilyInstance>>();
-
-        public ReportHelper reportHelper = new ReportHelper();
 
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
@@ -158,19 +154,25 @@ namespace RevitPylonDocumentation.ViewModels {
 
             TestCommand = new RelayCommand(Test);
 
-            CreateSheetsCommand = new RelayCommand(CreateSheets, CanCreateSheets);
+            //CreateSheetsCommand = new RelayCommand(CreateSheets, CanCreateSheets);
             ApplySettingsCommands = new RelayCommand(ApplySettings, CanApplySettings);
 
             AddScheduleFilterParamCommand = new RelayCommand(AddScheduleFilterParam);
             DeleteScheduleFilterParamCommand = new RelayCommand(DeleteScheduleFilterParam, CanChangeScheduleFilterParam);
 
+
+
+            LoadViewCommand = RelayCommand.Create(LoadView);
+            AcceptViewCommand = RelayCommand.Create(AcceptView);
+
         }
 
-
+        public ICommand LoadViewCommand { get; }
+        public ICommand AcceptViewCommand { get; }
 
 
         public ICommand ApplySettingsCommands { get; }
-        public ICommand CreateSheetsCommand { get; }
+        //public ICommand CreateSheetsCommand { get; }
         public ICommand GetHostMarksInGUICommand { get; }
         public ICommand TestCommand { get; }
 
@@ -232,7 +234,7 @@ namespace RevitPylonDocumentation.ViewModels {
         /// <summary>
         /// Выбранная пользователем легенда
         /// </summary>
-        public static View SelectedLegend { get; set; }
+        public View SelectedLegend { get; set; }
         /// <summary>
         /// Типоразмеры видов, имеющиеся в проекте
         /// </summary>
@@ -800,15 +802,6 @@ namespace RevitPylonDocumentation.ViewModels {
         }
         #endregion
 
-
-        public string Report {
-            get => reportHelper.GetAsString();
-            set {
-                reportHelper.AppendLine(value);
-                this.OnPropertyChanged();
-            }
-        }
-
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
@@ -817,9 +810,39 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
 
+        private void LoadView() {
+            LoadConfig();
+        }
+
+        private void AcceptView() {
+
+            SaveConfig();
+        }
+
+
+        private void LoadConfig() {
+            //var setting = _pluginConfig.GetSettings(_revitRepository.Document);
+
+
+            //SaveProperty = setting?.SaveProperty ?? "Привет Revit!";
+        }
+
+        private void SaveConfig() {
+            //var setting = _pluginConfig.GetSettings(_revitRepository.Document)
+            //              ?? _pluginConfig.AddSettings(_revitRepository.Document);
+
+            //setting.SaveProperty = SaveProperty;
+            //_pluginConfig.SaveProjectConfig();
+        }
+
+
+
+
+
+
 
         /// <summary>
-        /// Находим эталонные спецификации
+        /// Ищет эталонные спецификации по указанным именам. На основе эталонных спек создаются спеки для пилонов путем копирования
         /// </summary>
         private void FindReferenceSchedules() {
             ReferenceRebarSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(REBAR_SCHEDULE_NAME)) as ViewSchedule;
@@ -843,9 +866,7 @@ namespace RevitPylonDocumentation.ViewModels {
                 _revitRepository.GetHostData(this);
 
                 transaction.RollBack();
-                //transaction.Commit();
             }
-
             
 
             HostsInfo = new ObservableCollection<PylonSheetInfo>(_revitRepository.HostsInfo);
@@ -944,212 +965,7 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-
-        private void CreateSheets(object p) {
-            // Забираем список выбранных элементов через CommandParameter
-            SelectedHostMarks = p as System.Collections.IList;
-
-            // Перевод списка выбранных марок пилонов в формат листа строк
-            List<string> selectedHostMarks = new List<string>();
-            foreach(var item in SelectedHostMarks) {
-                string hostMark = item as string;
-                if(hostMark == null) {
-                    continue;
-                }
-                selectedHostMarks.Add(hostMark);
-            }
-
-
-            string report = string.Empty;
-            // Получаем инфо о листах, которые нужно создать
-            #region Отчет
-            Report = "Приступаем к созданию документации по выбранным пилонам";
-            Report = "Анализируем...";
-            #endregion
-            AnalyzeExistingSheets();
-
-
-
-            // Проверка,если ли листы для создания
-            if(missingPylonSheetsInfo.Keys.Count > 0) {
-                #region Отчет
-                Report = "Пользователь выбрал типоразмер рамки листа: " + SelectedTitleBlocks.Name;
-                Report = "Пользователь выбрал легенду примечаний: " + SelectedLegend.Name;
-                Report = Environment.NewLine + "Приступаю к созданию листов";
-                #endregion
-            } else {
-                #region Отчет
-                Report = "Все запрошенные листы уже созданы";
-                Report = "Работа завершена";
-                #endregion
-            }
-
-
-            Transaction transaction = new Transaction(_revitRepository.Document, "Создание листов пилонов");
-            transaction.Start();
-
-
-            foreach(string sheetKeyName in missingPylonSheetsInfo.Keys) {
-                // Лист 
-                #region Отчет
-                Report = Environment.NewLine + 
-                    "---------------------------------------------------------------------------" +
-                    "---------------------------------------------------------------------------";
-                Report = " - Пилон " + sheetKeyName;
-                Report = "\tЛист создан";
-                #endregion
-
-                ViewSheet viewSheet = ViewSheet.Create(_revitRepository.Document, SelectedTitleBlocks.Id);
-                viewSheet.Name = "Пилон " + sheetKeyName;
-
-
-                Autodesk.Revit.DB.Parameter viewSheetGroupingParameter = viewSheet.LookupParameter(DISPATCHER_GROUPING_FIRST);
-                if(viewSheetGroupingParameter == null) {
-                    #region Отчет
-                    Report = "\tПараметр \"" + DISPATCHER_GROUPING_FIRST + "\" не заполнен, т.к. не был найден у листа";
-                    #endregion
-                } else {
-                    viewSheetGroupingParameter.Set(SelectedProjectSection);
-                    #region Отчет
-                    Report = "\tГруппировка по параметру \"" + DISPATCHER_GROUPING_FIRST + "\": " + SelectedProjectSection;
-                    #endregion
-                }
-
-
-                // Фиксируем инфо про легенду
-                missingPylonSheetsInfo[sheetKeyName].LegendView.ViewElement = SelectedLegend;
-                missingPylonSheetsInfo[sheetKeyName].LegendView.ViewportTypeName = "Без названия";
-                missingPylonSheetsInfo[sheetKeyName].LegendView.ViewportCenter = new XYZ(-0.34, 0.30, 0);
-
-                missingPylonSheetsInfo[sheetKeyName].PylonViewSheet = viewSheet;
-
-                // Рамка листа
-                FamilyInstance titleBlock = new FilteredElementCollector(_revitRepository.Document, viewSheet.Id)
-                    .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                    .WhereElementIsNotElementType()
-                    .FirstElement() as FamilyInstance;
-
-                missingPylonSheetsInfo[sheetKeyName].TitleBlock = titleBlock;
-
-                // Пытаемся задать габарит листа А3 и получаем габариты рамки
-                missingPylonSheetsInfo[sheetKeyName].SetTitleBlockSize(_revitRepository.Document);
-
-
-                // Размещение видовых экранов
-                //missingPylonSheetsInfo[sheetKeyName].PlaceGeneralViewport();
-                //missingPylonSheetsInfo[sheetKeyName].PlaceTransverseViewPorts();
-
-                // Размещение спецификаций
-                missingPylonSheetsInfo[sheetKeyName].PlaceRebarSchedule();
-                missingPylonSheetsInfo[sheetKeyName].PlaceMaterialSchedule();
-                missingPylonSheetsInfo[sheetKeyName].PlacePartsSchedule();
-
-
-                // Размещение легенды
-                missingPylonSheetsInfo[sheetKeyName].PlaceLegend(_revitRepository);
-            }
-
-            transaction.Commit();
-        }
-        private bool CanCreateSheets(object p) {
-            if(ErrorText.Length > 0) {
-                return false;
-            }
-            // Проверяем правила поиска видов на уникальность
-            string genView = GENERAL_VIEW_PREFIX + GENERAL_VIEW_SUFFIX;
-            string tranViewFirst = TRANSVERSE_VIEW_FIRST_PREFIX + TRANSVERSE_VIEW_FIRST_SUFFIX;
-            string tranViewSecond = TRANSVERSE_VIEW_SECOND_PREFIX + TRANSVERSE_VIEW_SECOND_SUFFIX;
-            string tranViewThird = TRANSVERSE_VIEW_THIRD_PREFIX + TRANSVERSE_VIEW_THIRD_SUFFIX;
-
-            if(genView == tranViewFirst || genView == tranViewSecond || genView == tranViewThird || tranViewFirst == tranViewSecond
-                || tranViewFirst == tranViewThird || tranViewSecond == tranViewThird) {
-                ErrorText = "Правила поиска видов некорректны. Задайте уникальные правила в настройках";
-                return false;
-            }
-
-            // Проверяем правила поиска спек на уникальность
-            string rebSchedule = REBAR_SCHEDULE_PREFIX + REBAR_SCHEDULE_SUFFIX;
-            string matSchedule = MATERIAL_SCHEDULE_PREFIX + MATERIAL_SCHEDULE_SUFFIX;
-            string partsSchedule = SYSTEM_PARTS_SCHEDULE_PREFIX + SYSTEM_PARTS_SCHEDULE_SUFFIX;
-
-            if(rebSchedule == matSchedule || rebSchedule == partsSchedule || matSchedule == partsSchedule) {
-                ErrorText = "Правила поиска спецификаций некорректны. Задайте уникальные правила в настройках";
-                return false;
-            }
-
-            return true;
-        }
-
-
-        public void AnalyzeExistingSheets() {
-            var allExistingSheets = new FilteredElementCollector(_revitRepository.Document)
-                .OfClass(typeof(ViewSheet))
-                .WhereElementIsNotElementType()
-                .ToElements();
-
-            Report = "В проекте найдено листов: " + allExistingSheets.Count.ToString();
-
-            // Перевод списка выбранных марок пилонов в формат листа строк
-            List<string> selectedHostMarks = new List<string>();
-            foreach(var item in SelectedHostMarks) {
-                string hostMark = item as string;
-                if(hostMark == null) {
-                    continue;
-                }
-
-                selectedHostMarks.Add(hostMark);
-            }
-
-            
-            // Формируем список листов, выбранных для обработки, но уже существущих - existingPylonSheetsInfo
-            foreach(var item in allExistingSheets) {
-                ViewSheet sheet = item as ViewSheet;
-                string sheetKeyName;
-                
-                if(sheet == null || !sheet.Name.Contains("Пилон") || !sheet.Name.Contains(" ") || sheet.Name.Split(' ').Length < 2) {
-                    continue;
-                } else {
-                    sheetKeyName = sheet.Name.Split(' ')[1];
-                }
-
-                if(selectedHostMarks.Contains(sheetKeyName)) {
-                    existingPylonSheetsInfo.Add(sheetKeyName, new PylonSheetInfo(this, _revitRepository, sheetKeyName) {
-                        PylonViewSheet = sheet,
-                    });
-                    selectedHostMarks.Remove(sheetKeyName);     // Удаляем имена листов, которые уже есть
-                }
-            }
-            Report = "Из них выбрано для обработки среди уже существующих: " + existingPylonSheetsInfo.Count.ToString();
-            if(existingPylonSheetsInfo.Count > 0) {
-                Report = "Среди которых: ";
-                foreach(string sheetName in existingPylonSheetsInfo.Keys) {
-                    Report = " - " + sheetName;
-                }
-            }
-
-
-            // Формируем список листов, выбранных для обработки и еще не созданных - wbGeneratingPylonSheetsInfo
-            if(selectedHostMarks.Count > 0) {
-                foreach(string hostMark in selectedHostMarks) {
-                    missingPylonSheetsInfo.Add(hostMark, new PylonSheetInfo(this, _revitRepository, hostMark));
-                }
-            }
-            Report = "Будут созданы листы в количестве: " + missingPylonSheetsInfo.Count.ToString();
-            if(missingPylonSheetsInfo.Count > 0) {
-                Report = "Среди которых: ";
-                foreach(string sheetName in missingPylonSheetsInfo.Keys) {
-                    Report = " - " + sheetName;
-                }
-            }
-        }
-
-
-
-
-
-
         private void Test(object p) {
-
 
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Добавление видов")) {
 
@@ -1157,7 +973,7 @@ namespace RevitPylonDocumentation.ViewModels {
 
                     // Если текущий PylonSheetInfo не выбран для работы - continue
                     if(!hostsInfo.IsCheck) { continue; } else {
-                        hostsInfo.WriteViewNames();
+                        hostsInfo.GetViewNamesForWork();
                     }
 
                     // Если листы был в проекте (когда плагин запускают для создания/размещения видов), то мы об этом знаем из RevitRepository
@@ -1170,6 +986,7 @@ namespace RevitPylonDocumentation.ViewModels {
                         hostsInfo.GetTitleBlockSize();
                         hostsInfo.FindViewsNViewportsOnSheet();
                         hostsInfo.FindSchedulesNViewportsOnSheet();
+                        hostsInfo.FindNoteLegendOnSheet();
                     }
                     
                     // Если вдруг по какой-то причине лист не был создан, то создание видов/видовых экранов не выполняем 
@@ -1185,7 +1002,7 @@ namespace RevitPylonDocumentation.ViewModels {
                         if(hostsInfo.GeneralView.ViewElement is null) {
                             
                             // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                            if(!hostsInfo.GeneralView.ViewCreator.TryCreateGeneralView(SelectedViewFamilyType)) {
+                            if(!hostsInfo.GeneralView.ViewSectionCreator.TryCreateGeneralView(SelectedViewFamilyType)) {
                                 _revitRepository.FindViewSectionInPj(hostsInfo.GeneralView);
                             }
                         }
@@ -1204,7 +1021,7 @@ namespace RevitPylonDocumentation.ViewModels {
                         if(hostsInfo.GeneralViewPerpendicular.ViewElement is null) {
 
                             // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                            if(!hostsInfo.GeneralViewPerpendicular.ViewCreator.TryCreateGeneralPerpendicularView(SelectedViewFamilyType)) {
+                            if(!hostsInfo.GeneralViewPerpendicular.ViewSectionCreator.TryCreateGeneralPerpendicularView(SelectedViewFamilyType)) {
                                 _revitRepository.FindViewSectionInPj(hostsInfo.GeneralViewPerpendicular);
                             }
                         }
@@ -1212,9 +1029,9 @@ namespace RevitPylonDocumentation.ViewModels {
                     }
 
 
-                                            ///////////////////////////
-                                            // ПЕРВЫЙ ПОПЕРЕЧНЫЙ ВИД //
-                                            ///////////////////////////
+                                                ///////////////////////////
+                                                // ПЕРВЫЙ ПОПЕРЕЧНЫЙ ВИД //
+                                                ///////////////////////////
 
                     if(NeedWorkWithTransverseViewFirst) {
 
@@ -1223,16 +1040,16 @@ namespace RevitPylonDocumentation.ViewModels {
                         if(hostsInfo.TransverseViewFirst.ViewElement is null) {
 
                             // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                            if(!hostsInfo.TransverseViewFirst.ViewCreator.TryCreateTransverseView(SelectedViewFamilyType, 1)) {
+                            if(!hostsInfo.TransverseViewFirst.ViewSectionCreator.TryCreateTransverseView(SelectedViewFamilyType, 1)) {
                                 _revitRepository.FindViewSectionInPj(hostsInfo.TransverseViewFirst);
                             }
                         }
                         // Тут точно получили вид
                     }
 
-                                            ///////////////////////////
-                                            // ВТОРОЙ ПОПЕРЕЧНЫЙ ВИД //
-                                            ///////////////////////////
+                                                ///////////////////////////
+                                                // ВТОРОЙ ПОПЕРЕЧНЫЙ ВИД //
+                                                ///////////////////////////
 
                     if(NeedWorkWithTransverseViewSecond) {
 
@@ -1241,16 +1058,16 @@ namespace RevitPylonDocumentation.ViewModels {
                         if(hostsInfo.TransverseViewSecond.ViewElement is null) {
 
                             // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                            if(!hostsInfo.TransverseViewSecond.ViewCreator.TryCreateTransverseView(SelectedViewFamilyType, 2)) {
+                            if(!hostsInfo.TransverseViewSecond.ViewSectionCreator.TryCreateTransverseView(SelectedViewFamilyType, 2)) {
                                 _revitRepository.FindViewSectionInPj(hostsInfo.TransverseViewSecond);
                             }
                         }
                         // Тут точно получили вид
                     }
 
-                                            ///////////////////////////
-                                            // ТРЕТИЙ ПОПЕРЕЧНЫЙ ВИД //
-                                            ///////////////////////////
+                                                ///////////////////////////
+                                                // ТРЕТИЙ ПОПЕРЕЧНЫЙ ВИД //
+                                                ///////////////////////////
 
                     if(NeedWorkWithTransverseViewThird) {
 
@@ -1259,16 +1076,16 @@ namespace RevitPylonDocumentation.ViewModels {
                         if(hostsInfo.TransverseViewThird.ViewElement is null) {
 
                             // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                            if(!hostsInfo.TransverseViewThird.ViewCreator.TryCreateTransverseView(SelectedViewFamilyType, 3)) {
+                            if(!hostsInfo.TransverseViewThird.ViewSectionCreator.TryCreateTransverseView(SelectedViewFamilyType, 3)) {
                                 _revitRepository.FindViewSectionInPj(hostsInfo.TransverseViewThird);
                             }
                         }
                         // Тут точно получили вид
                     }
 
-                                            ///////////////////////////
-                                            // СПЕЦИФИКАЦИЯ АРМАТУРЫ //
-                                            ///////////////////////////
+                                                ///////////////////////////
+                                                // СПЕЦИФИКАЦИЯ АРМАТУРЫ //
+                                                ///////////////////////////
 
                     if(NeedWorkWithRebarSchedule) {
 
@@ -1277,16 +1094,16 @@ namespace RevitPylonDocumentation.ViewModels {
                         if(hostsInfo.RebarSchedule.ViewElement is null) {
 
                             // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                            if(!hostsInfo.RebarSchedule.ViewCreator.TryCreateRebarSchedule()) {
+                            if(!hostsInfo.RebarSchedule.ViewScheduleCreator.TryCreateRebarSchedule()) {
                                 _revitRepository.FindViewScheduleInPj(hostsInfo.RebarSchedule);
                             }
                         }
                         // Тут точно получили вид
                     }
 
-                                            /////////////////////////////
-                                            // СПЕЦИФИКАЦИЯ МАТЕРИАЛОВ //
-                                            /////////////////////////////
+                                                /////////////////////////////
+                                                // СПЕЦИФИКАЦИЯ МАТЕРИАЛОВ //
+                                                /////////////////////////////
 
                     if(NeedWorkWithMaterialSchedule) {
 
@@ -1295,16 +1112,16 @@ namespace RevitPylonDocumentation.ViewModels {
                         if(hostsInfo.MaterialSchedule.ViewElement is null) {
 
                             // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                            if(!hostsInfo.MaterialSchedule.ViewCreator.TryCreateMaterialSchedule()) {
+                            if(!hostsInfo.MaterialSchedule.ViewScheduleCreator.TryCreateMaterialSchedule()) {
                                 _revitRepository.FindViewScheduleInPj(hostsInfo.MaterialSchedule);
                             }
                         }
                         // Тут точно получили вид
                     }
 
-                                            /////////////////////////////////
-                                            // ВЕДОМОСТЬ СИСТЕМНЫХ ДЕТАЛЕЙ //
-                                            /////////////////////////////////
+                                                /////////////////////////////////
+                                                // ВЕДОМОСТЬ СИСТЕМНЫХ ДЕТАЛЕЙ //
+                                                /////////////////////////////////
 
                     if(NeedWorkWithSystemPartsSchedule) {
 
@@ -1313,16 +1130,16 @@ namespace RevitPylonDocumentation.ViewModels {
                         if(hostsInfo.SystemPartsSchedule.ViewElement is null) {
 
                             // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                            if(!hostsInfo.SystemPartsSchedule.ViewCreator.TryCreateSystemPartsSchedule()) {
+                            if(!hostsInfo.SystemPartsSchedule.ViewScheduleCreator.TryCreateSystemPartsSchedule()) {
                                 _revitRepository.FindViewScheduleInPj(hostsInfo.SystemPartsSchedule);
                             }
                         }
                         // Тут точно получили вид
                     }
 
-                                                ///////////////////////////
-                                                // ВЕДОМОСТЬ IFC ДЕТАЛЕЙ //
-                                                ///////////////////////////
+                                                    ///////////////////////////
+                                                    // ВЕДОМОСТЬ IFC ДЕТАЛЕЙ //
+                                                    ///////////////////////////
 
                     if(NeedWorkWithIFCPartsSchedule) {
 
@@ -1331,7 +1148,7 @@ namespace RevitPylonDocumentation.ViewModels {
                         if(hostsInfo.IFCPartsSchedule.ViewElement is null) {
 
                             // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                            if(!hostsInfo.IFCPartsSchedule.ViewCreator.TryCreateIFCPartsSchedule()) {
+                            if(!hostsInfo.IFCPartsSchedule.ViewScheduleCreator.TryCreateIFCPartsSchedule()) {
                                 _revitRepository.FindViewScheduleInPj(hostsInfo.IFCPartsSchedule);
                             }
                         }
@@ -1348,7 +1165,7 @@ namespace RevitPylonDocumentation.ViewModels {
                         // Если видовой экран на листе не найден, то размещаем
                         if(hostsInfo.GeneralView.ViewportElement is null) {
 
-                            hostsInfo.GeneralView.ViewPlacer.PlaceGeneralViewport();
+                            hostsInfo.GeneralView.ViewSectionPlacer.PlaceGeneralViewport();
                         }
                     }
                     if(NeedWorkWithGeneralPerpendicularView) {
@@ -1356,7 +1173,7 @@ namespace RevitPylonDocumentation.ViewModels {
                         // Если видовой экран на листе не найден, то размещаем
                         if(hostsInfo.GeneralViewPerpendicular.ViewportElement is null) {
 
-                            hostsInfo.GeneralViewPerpendicular.ViewPlacer.PlaceGeneralPerpendicularViewport();
+                            hostsInfo.GeneralViewPerpendicular.ViewSectionPlacer.PlaceGeneralPerpendicularViewport();
                         }
                     }
                     if(NeedWorkWithTransverseViewFirst) {
@@ -1364,7 +1181,7 @@ namespace RevitPylonDocumentation.ViewModels {
                         // Если видовой экран на листе не найден, то размещаем
                         if(hostsInfo.TransverseViewFirst.ViewportElement is null) {
 
-                            hostsInfo.TransverseViewFirst.ViewPlacer.PlaceTransverseFirstViewPorts();
+                            hostsInfo.TransverseViewFirst.ViewSectionPlacer.PlaceTransverseFirstViewPorts();
                         }
                     }
                     if(NeedWorkWithTransverseViewSecond) {
@@ -1372,7 +1189,7 @@ namespace RevitPylonDocumentation.ViewModels {
                         // Если видовой экран на листе не найден, то размещаем
                         if(hostsInfo.TransverseViewSecond.ViewportElement is null) {
 
-                            hostsInfo.TransverseViewSecond.ViewPlacer.PlaceTransverseSecondViewPorts();
+                            hostsInfo.TransverseViewSecond.ViewSectionPlacer.PlaceTransverseSecondViewPorts();
                         }
                     }
                     if(NeedWorkWithTransverseViewThird) {
@@ -1380,7 +1197,7 @@ namespace RevitPylonDocumentation.ViewModels {
                         // Если видовой экран на листе не найден, то размещаем
                         if(hostsInfo.TransverseViewThird.ViewportElement is null) {
 
-                            hostsInfo.TransverseViewThird.ViewPlacer.PlaceTransverseThirdViewPorts();
+                            hostsInfo.TransverseViewThird.ViewSectionPlacer.PlaceTransverseThirdViewPorts();
                         }
                     }
                     if(NeedWorkWithRebarSchedule) {
@@ -1388,7 +1205,7 @@ namespace RevitPylonDocumentation.ViewModels {
                         // Если видовой экран на листе не найден, то размещаем
                         if(hostsInfo.RebarSchedule.ViewportElement is null) {
 
-                            hostsInfo.RebarSchedule.ViewPlacer.PlaceRebarSchedule();
+                            hostsInfo.RebarSchedule.ViewSchedulePlacer.PlaceRebarSchedule();
                         }
                     }
                     if(NeedWorkWithMaterialSchedule) {
@@ -1396,7 +1213,7 @@ namespace RevitPylonDocumentation.ViewModels {
                         // Если видовой экран на листе не найден, то размещаем
                         if(hostsInfo.MaterialSchedule.ViewportElement is null) {
 
-                            hostsInfo.MaterialSchedule.ViewPlacer.PlaceMaterialSchedule();
+                            hostsInfo.MaterialSchedule.ViewSchedulePlacer.PlaceMaterialSchedule();
                         }
                     }
                     if(NeedWorkWithSystemPartsSchedule) {
@@ -1404,7 +1221,7 @@ namespace RevitPylonDocumentation.ViewModels {
                         // Если видовой экран на листе не найден, то размещаем
                         if(hostsInfo.SystemPartsSchedule.ViewportElement is null) {
 
-                            hostsInfo.SystemPartsSchedule.ViewPlacer.PlaceSystemPartsSchedule();
+                            hostsInfo.SystemPartsSchedule.ViewSchedulePlacer.PlaceSystemPartsSchedule();
                         }
                     }
                     if(NeedWorkWithIFCPartsSchedule) {
@@ -1412,7 +1229,15 @@ namespace RevitPylonDocumentation.ViewModels {
                         // Если видовой экран на листе не найден, то размещаем
                         if(hostsInfo.IFCPartsSchedule.ViewportElement is null) {
 
-                            hostsInfo.IFCPartsSchedule.ViewPlacer.PlaceIFCPartsSchedule();
+                            hostsInfo.IFCPartsSchedule.ViewSchedulePlacer.PlaceIFCPartsSchedule();
+                        }
+                    }
+                    if(NeedWorkWithLegend) {
+
+                        // Если видовой экран на листе не найден, то размещаем
+                        if(hostsInfo.LegendView.ViewportElement is null) {
+
+                            hostsInfo.LegendView.LegendPlacer.PlaceNoteLegend();
                         }
                     }
                 }

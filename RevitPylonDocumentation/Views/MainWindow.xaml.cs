@@ -12,13 +12,6 @@ namespace RevitPylonDocumentation.Views {
         public override string PluginName => nameof(RevitPylonDocumentation);
         public override string ProjectConfigName => nameof(MainWindow);
 
-        private void ButtonOk_Click(object sender, RoutedEventArgs e) 
-        {
-            DialogResult = true;
-            ReportView report = new ReportView() { DataContext = ((ContentControl) sender).DataContext };
-            report.Show();
-        }
-
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) 
         {
             DialogResult = false;
@@ -29,6 +22,10 @@ namespace RevitPylonDocumentation.Views {
         }
         private void UnselectAllHostMarks(object sender, RoutedEventArgs e) {
             hostMarks.UnselectAll();
+        }
+
+        private void ButtonOk_Click(object sender, RoutedEventArgs e) {
+            DialogResult = true;
         }
     }
 }

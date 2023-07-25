@@ -132,10 +132,9 @@
                 <ToggleButton Content="Спецификацию материалов" IsChecked="{Binding Path=NeedWorkWithMaterialSchedule}"/>
                 <ToggleButton Content="Ведомость системных деталей" IsChecked="{Binding Path=NeedWorkWithSystemPartsSchedule}"/>
                 <ToggleButton Content="Ведомость IFC деталей" IsChecked="{Binding Path=NeedWorkWithIFCPartsSchedule}"/>
-                
-            </StackPanel>
-            
+                <ToggleButton Content="Легенда примечаний" IsChecked="{Binding Path=NeedWorkWithLegend}"/>
 
+            </StackPanel>
         </Grid>
         
 
