@@ -18,7 +18,14 @@
     MinHeight="500" MinWidth="745"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
-    
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
@@ -123,7 +130,7 @@
 
 
             <StackPanel Grid.Column="1">
-                <ToggleButton Content="Основной вид" IsChecked="{Binding Path=NeedWorkWithGeneralView}"/>
+                <ToggleButton Content="Основной вид" IsChecked="{Binding Path=UserSelectionSettings.NeedWorkWithGeneralView}"/>
                 <ToggleButton Content="Основной перпендикулярный вид" IsChecked="{Binding Path=NeedWorkWithGeneralPerpendicularView}"/>
                 <ToggleButton Content="Первый поперечный вид" IsChecked="{Binding Path=NeedWorkWithTransverseViewFirst}"/>
                 <ToggleButton Content="Второй поперечный вид" IsChecked="{Binding Path=NeedWorkWithTransverseViewSecond}"/>
@@ -210,23 +217,15 @@
             <Button
                 Margin="10"
                 Width="80"
-                Content="Тест"
-                Click="ButtonOk_Click"
-
-                Command="{Binding TestCommand}"/>
-            <Button
-                Margin="10"
-                Width="80"
                 Content="ОК"
                 Click="ButtonOk_Click"
-                Command="{Binding CreateSheetsCommand}"
-                CommandParameter="{Binding SelectedItems, ElementName=hostMarks}"/>
+                Command="{Binding AcceptViewCommand}"/>
 
             <Button
                 Margin="10"
                 Width="80"
                 Content="Отмена"
-                Click="ButtonCancel_Click" />
+                Click="ButtonCancel_Click"/>
         </StackPanel>
 
 
