@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Input;
 
 using dosymep.WPF.ViewModels;
 
@@ -26,14 +25,12 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             CategoriesInfo = categoriesInfo;
             _rule = rule;
 
+            PropertyChanged += RuleViewModelChanged;
             if(_rule != null) {
                 InitializeRule();
             }
-            PropertyChanged += RuleViewModelChanged;
         }
 
-        public ICommand ParameterSelectionChangedCommand { get; set; }
-        public ICommand EvaluatorSelectionChangedCommand { get; set; }
 
         public bool IsValueEditable {
             get => _isValueEditable;
@@ -120,13 +117,13 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                     _categoriesInfo.Parameters.Add(new ParameterViewModel(_rule.Provider));
                 }
                 SelectedParameter = _categoriesInfo.Parameters.First(item => item.FilterableValueProvider.Provider.Equals(_rule.Provider));
+                SelectedParameterChanged();
                 SelectedRuleEvaluator = new RuleEvaluatorViewModel(_rule.Evaluator);
                 SelectedValue = new ParamValueViewModel(_rule.Value);
                 if(!Values.Contains(SelectedValue)) {
                     SelectedValue = null;
                     StringValue = _rule.Value.DisplayValue;
                 }
-                SelectedParameterChanged();
             }
         }
 
@@ -140,14 +137,13 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
         private void InitializeRule() {
-            SelectedParameter = _categoriesInfo.Parameters.First(item => item.FilterableValueProvider.Provider.Equals(_rule.Provider));
+            SelectedParameter = new ParameterViewModel(_rule.Provider);
             if(!_categoriesInfo.Parameters.Contains(SelectedParameter)) {
                 _categoriesInfo.Parameters.Add(SelectedParameter);
             }
             SelectedRuleEvaluator = new RuleEvaluatorViewModel(_rule.Evaluator);
             SelectedValue = new ParamValueViewModel(_rule.Value);
             StringValue = SelectedValue.ParamValue.DisplayValue;
-            SelectedParameterChanged();
         }
 
         private void RuleViewModelChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
@@ -164,7 +160,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                     SelectedParameter.GetEvaluators()
                         .Select(item => new RuleEvaluatorViewModel(item)));
 
-                if(SelectedRuleEvaluator != null && SelectedRuleEvaluator.Equals(RuleEvaluators.FirstOrDefault())) {
+                if((SelectedRuleEvaluator != null) && RuleEvaluators.Contains(SelectedRuleEvaluator)) {
                     EvaluatorSelectionChanged();
                 } else {
                     SelectedRuleEvaluator = RuleEvaluators.FirstOrDefault();
