@@ -19,7 +19,7 @@ using Document = Autodesk.Revit.DB.Document;
 using Parameter = Autodesk.Revit.DB.Parameter;
 using View = Autodesk.Revit.DB.View;
 
-namespace RevitPylonDocumentation.Models {
+namespace RevitPylonDocumentation.Models.PylonSheetNView {
     public class PylonSheetInfo {
         internal PylonSheetInfo(MainViewModel mvm, RevitRepository repository, string pylonKeyName) {
             ViewModel = mvm;
@@ -40,8 +40,8 @@ namespace RevitPylonDocumentation.Models {
             LegendView = new PylonView(ViewModel, repository, this);
         }
 
-        internal  MainViewModel ViewModel { get; set; }
-        internal  RevitRepository Repository { get; set; }
+        internal MainViewModel ViewModel { get; set; }
+        internal RevitRepository Repository { get; set; }
 
         public bool IsCheck { get; set; } = false;
         public bool SheetInProject { get; set; } = false;
@@ -85,8 +85,8 @@ namespace RevitPylonDocumentation.Models {
         /// Создание листа, задание имени, поиск рамки и задание ей нужных габаритов
         /// </summary>
         public bool CreateSheet() {
-            if(PylonViewSheet != null ) {
-                return false; 
+            if(PylonViewSheet != null) {
+                return false;
             }
 
             PylonViewSheet = ViewSheet.Create(Repository.Document, ViewModel.SelectedTitleBlocks.Id);
@@ -142,13 +142,13 @@ namespace RevitPylonDocumentation.Models {
         /// Задает размеры рамки листа (по дефолту ставит А3) и запоминает
         /// </summary>
         internal void SetTitleBlockSize(Document doc, int sheetSize = 3, int sheetCoefficient = 1) {
-            if(this.TitleBlock is null) {
+            if(TitleBlock is null) {
                 return;
             }
             // Пытаемся задать габарит листа
-            Parameter paramA = this.TitleBlock.LookupParameter(ViewModel.ProjectSettings.SHEET_SIZE);
-            Parameter paramX = this.TitleBlock.LookupParameter(ViewModel.ProjectSettings.SHEET_COEFFICIENT);
-            
+            Parameter paramA = TitleBlock.LookupParameter(ViewModel.ProjectSettings.SHEET_SIZE);
+            Parameter paramX = TitleBlock.LookupParameter(ViewModel.ProjectSettings.SHEET_COEFFICIENT);
+
 
             if(paramA != null && paramX != null) {
                 paramA.Set(sheetSize);
@@ -172,7 +172,7 @@ namespace RevitPylonDocumentation.Models {
         /// Получает и сохраняет имена видов в соответствии с префиксами/суффиксами, которые указал пользователь
         /// </summary>
         public void GetViewNamesForWork() {
-            
+
             GeneralView.ViewName = ViewModel.ViewSectionSettings.GENERAL_VIEW_PREFIX + PylonKeyName + ViewModel.ViewSectionSettings.GENERAL_VIEW_SUFFIX;
             GeneralViewPerpendicular.ViewName = ViewModel.ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_PREFIX + PylonKeyName + ViewModel.ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_SUFFIX;
             TransverseViewFirst.ViewName = ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_FIRST_PREFIX + PylonKeyName + ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_FIRST_SUFFIX;
@@ -195,7 +195,7 @@ namespace RevitPylonDocumentation.Models {
 
                 Viewport viewport = Repository.Document.GetElement(id) as Viewport;
                 ViewSection viewSection = Repository.Document.GetElement(viewport.ViewId) as ViewSection;
-                
+
                 // Видовые экраны не разрезов нас не интересуют
                 if(viewSection is null) { continue; }
 

@@ -9,6 +9,7 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using RevitPylonDocumentation.Models.PylonSheetNView;
 using RevitPylonDocumentation.ViewModels;
 
 using Document = Autodesk.Revit.DB.Document;

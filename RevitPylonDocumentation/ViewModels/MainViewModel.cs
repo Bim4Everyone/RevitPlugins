@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web.UI;
@@ -30,7 +31,8 @@ using dosymep.WPF.ViewModels;
 using MS.WindowsAPICodePack.Internal;
 
 using RevitPylonDocumentation.Models;
-
+using RevitPylonDocumentation.Models.PylonSheetNView;
+using RevitPylonDocumentation.Models.UserSettings;
 
 using Reference = Autodesk.Revit.DB.Reference;
 using Transaction = Autodesk.Revit.DB.Transaction;
@@ -88,7 +90,7 @@ namespace RevitPylonDocumentation.ViewModels {
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView);
-            TestCommand = new RelayCommand(Test);
+            TestCommand = new RelayCommand(CreateSheetsNViews);
 
             ApplySettingsCommands = new RelayCommand(ApplySettings, CanApplySettings);
 
@@ -708,214 +710,28 @@ namespace RevitPylonDocumentation.ViewModels {
 
             SaveConfig();
 
-            Test(null);
+            CreateSheetsNViews(null);
         }
 
 
         private void LoadConfig() {
             
-            var setting = _pluginConfig.GetSettings(_revitRepository.Document);
+            var settings = _pluginConfig.GetSettings(_revitRepository.Document);
 
-            if(setting is null) { return; }
+            if(settings is null) { return; }
 
-            SelectionSettings.NeedWorkWithGeneralView = setting.NeedWorkWithGeneralView;
-            SelectionSettings.NeedWorkWithGeneralPerpendicularView = setting.NeedWorkWithGeneralPerpendicularView;
-            SelectionSettings.NeedWorkWithTransverseViewFirst = setting.NeedWorkWithTransverseViewFirst;
-            SelectionSettings.NeedWorkWithTransverseViewSecond = setting.NeedWorkWithTransverseViewSecond;
-            SelectionSettings.NeedWorkWithTransverseViewThird = setting.NeedWorkWithTransverseViewThird;
-            SelectionSettings.NeedWorkWithRebarSchedule = setting.NeedWorkWithRebarSchedule;
-            SelectionSettings.NeedWorkWithMaterialSchedule = setting.NeedWorkWithMaterialSchedule;
-            SelectionSettings.NeedWorkWithSystemPartsSchedule = setting.NeedWorkWithSystemPartsSchedule;
-            SelectionSettings.NeedWorkWithIFCPartsSchedule = setting.NeedWorkWithIFCPartsSchedule;
-            SelectionSettings.NeedWorkWithLegend = setting.NeedWorkWithLegend;
+            _pluginConfig.GetConfigProps(settings, this);
 
-            ProjectSettings.PROJECT_SECTION = setting.PROJECT_SECTION;
-            ProjectSettings.PROJECT_SECTION_TEMP = setting.PROJECT_SECTION;
-            ProjectSettings.MARK = setting.MARK;
-            ProjectSettings.MARK_TEMP = setting.MARK;
-            ProjectSettings.DISPATCHER_GROUPING_FIRST = setting.DISPATCHER_GROUPING_FIRST;
-            ProjectSettings.DISPATCHER_GROUPING_FIRST_TEMP = setting.DISPATCHER_GROUPING_FIRST;
-            ProjectSettings.DISPATCHER_GROUPING_SECOND = setting.DISPATCHER_GROUPING_SECOND;
-            ProjectSettings.DISPATCHER_GROUPING_SECOND_TEMP = setting.DISPATCHER_GROUPING_SECOND;
-
-            ProjectSettings.SHEET_SIZE = setting.SHEET_SIZE;
-            ProjectSettings.SHEET_SIZE_TEMP = setting.SHEET_SIZE;
-            ProjectSettings.SHEET_COEFFICIENT = setting.SHEET_COEFFICIENT;
-            ProjectSettings.SHEET_COEFFICIENT_TEMP = setting.SHEET_COEFFICIENT;
-            ProjectSettings.SHEET_PREFIX = setting.SHEET_PREFIX;
-            ProjectSettings.SHEET_PREFIX_TEMP = setting.SHEET_PREFIX;
-            ProjectSettings.SHEET_SUFFIX = setting.SHEET_SUFFIX;
-            ProjectSettings.SHEET_SUFFIX_TEMP = setting.SHEET_SUFFIX;
-
-            ViewSectionSettings.GENERAL_VIEW_PREFIX = setting.GENERAL_VIEW_PREFIX;
-            ViewSectionSettings.GENERAL_VIEW_PREFIX_TEMP = setting.GENERAL_VIEW_PREFIX;
-            ViewSectionSettings.GENERAL_VIEW_SUFFIX = setting.GENERAL_VIEW_SUFFIX;
-            ViewSectionSettings.GENERAL_VIEW_SUFFIX_TEMP = setting.GENERAL_VIEW_SUFFIX;
-            ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_PREFIX = setting.GENERAL_VIEW_PERPENDICULAR_PREFIX;
-            ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP = setting.GENERAL_VIEW_PERPENDICULAR_PREFIX;
-            ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_SUFFIX = setting.GENERAL_VIEW_PERPENDICULAR_SUFFIX;
-            ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_SUFFIX_TEMP = setting.GENERAL_VIEW_PERPENDICULAR_SUFFIX;
-            ViewSectionSettings.GENERAL_VIEW_TEMPLATE_NAME = setting.GENERAL_VIEW_TEMPLATE_NAME;
-            ViewSectionSettings.GENERAL_VIEW_TEMPLATE_NAME_TEMP = setting.GENERAL_VIEW_TEMPLATE_NAME;
             FindGeneralViewTemplate();
-
-            ViewSectionSettings.GENERAL_VIEW_X_OFFSET = setting.GENERAL_VIEW_X_OFFSET;
-            ViewSectionSettings.GENERAL_VIEW_X_OFFSET_TEMP = setting.GENERAL_VIEW_X_OFFSET;
-            ViewSectionSettings.GENERAL_VIEW_Y_TOP_OFFSET = setting.GENERAL_VIEW_Y_TOP_OFFSET;
-            ViewSectionSettings.GENERAL_VIEW_Y_TOP_OFFSET_TEMP = setting.GENERAL_VIEW_Y_TOP_OFFSET;
-            ViewSectionSettings.GENERAL_VIEW_Y_BOTTOM_OFFSET = setting.GENERAL_VIEW_Y_BOTTOM_OFFSET;
-            ViewSectionSettings.GENERAL_VIEW_Y_BOTTOM_OFFSET_TEMP = setting.GENERAL_VIEW_Y_BOTTOM_OFFSET;
-
-            ViewSectionSettings.TRANSVERSE_VIEW_FIRST_PREFIX = setting.TRANSVERSE_VIEW_FIRST_PREFIX;
-            ViewSectionSettings.TRANSVERSE_VIEW_FIRST_PREFIX_TEMP = setting.TRANSVERSE_VIEW_FIRST_PREFIX;
-            ViewSectionSettings.TRANSVERSE_VIEW_FIRST_SUFFIX = setting.TRANSVERSE_VIEW_FIRST_SUFFIX;
-            ViewSectionSettings.TRANSVERSE_VIEW_FIRST_SUFFIX_TEMP = setting.TRANSVERSE_VIEW_FIRST_SUFFIX;
-            ViewSectionSettings.TRANSVERSE_VIEW_SECOND_PREFIX = setting.TRANSVERSE_VIEW_SECOND_PREFIX;
-            ViewSectionSettings.TRANSVERSE_VIEW_SECOND_PREFIX_TEMP = setting.TRANSVERSE_VIEW_SECOND_PREFIX;
-            ViewSectionSettings.TRANSVERSE_VIEW_SECOND_SUFFIX = setting.TRANSVERSE_VIEW_SECOND_SUFFIX;
-            ViewSectionSettings.TRANSVERSE_VIEW_SECOND_SUFFIX_TEMP = setting.TRANSVERSE_VIEW_SECOND_SUFFIX;
-            ViewSectionSettings.TRANSVERSE_VIEW_THIRD_PREFIX = setting.TRANSVERSE_VIEW_THIRD_PREFIX;
-            ViewSectionSettings.TRANSVERSE_VIEW_THIRD_PREFIX_TEMP = setting.TRANSVERSE_VIEW_THIRD_PREFIX;
-            ViewSectionSettings.TRANSVERSE_VIEW_THIRD_SUFFIX = setting.TRANSVERSE_VIEW_THIRD_SUFFIX;
-            ViewSectionSettings.TRANSVERSE_VIEW_THIRD_SUFFIX_TEMP = setting.TRANSVERSE_VIEW_THIRD_SUFFIX;
-            ViewSectionSettings.TRANSVERSE_VIEW_TEMPLATE_NAME = setting.TRANSVERSE_VIEW_TEMPLATE_NAME;
-            ViewSectionSettings.TRANSVERSE_VIEW_TEMPLATE_NAME_TEMP = setting.TRANSVERSE_VIEW_TEMPLATE_NAME;
             FindTransverseViewTemplate();
-
-            ViewSectionSettings.TRANSVERSE_VIEW_X_OFFSET = setting.TRANSVERSE_VIEW_X_OFFSET;
-            ViewSectionSettings.TRANSVERSE_VIEW_X_OFFSET_TEMP = setting.TRANSVERSE_VIEW_X_OFFSET;
-            ViewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET = setting.TRANSVERSE_VIEW_Y_OFFSET;
-            ViewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET_TEMP = setting.TRANSVERSE_VIEW_Y_OFFSET;
-
-
-            SchedulesSettings.REBAR_SCHEDULE_PREFIX = setting.REBAR_SCHEDULE_PREFIX;
-            SchedulesSettings.REBAR_SCHEDULE_PREFIX_TEMP = setting.REBAR_SCHEDULE_PREFIX;
-            SchedulesSettings.REBAR_SCHEDULE_SUFFIX = setting.REBAR_SCHEDULE_SUFFIX;
-            SchedulesSettings.REBAR_SCHEDULE_SUFFIX_TEMP = setting.REBAR_SCHEDULE_SUFFIX;
-
-            SchedulesSettings.MATERIAL_SCHEDULE_PREFIX = setting.MATERIAL_SCHEDULE_PREFIX;
-            SchedulesSettings.MATERIAL_SCHEDULE_PREFIX_TEMP = setting.MATERIAL_SCHEDULE_PREFIX;
-            SchedulesSettings.MATERIAL_SCHEDULE_SUFFIX = setting.MATERIAL_SCHEDULE_SUFFIX;
-            SchedulesSettings.MATERIAL_SCHEDULE_SUFFIX_TEMP = setting.MATERIAL_SCHEDULE_SUFFIX;
-
-            SchedulesSettings.SYSTEM_PARTS_SCHEDULE_PREFIX = setting.SYSTEM_PARTS_SCHEDULE_PREFIX;
-            SchedulesSettings.SYSTEM_PARTS_SCHEDULE_PREFIX_TEMP = setting.SYSTEM_PARTS_SCHEDULE_PREFIX;
-            SchedulesSettings.SYSTEM_PARTS_SCHEDULE_SUFFIX = setting.SYSTEM_PARTS_SCHEDULE_SUFFIX;
-            SchedulesSettings.SYSTEM_PARTS_SCHEDULE_SUFFIX_TEMP = setting.SYSTEM_PARTS_SCHEDULE_SUFFIX;
-
-            SchedulesSettings.IFC_PARTS_SCHEDULE_PREFIX = setting.IFC_PARTS_SCHEDULE_PREFIX;
-            SchedulesSettings.IFC_PARTS_SCHEDULE_PREFIX_TEMP = setting.IFC_PARTS_SCHEDULE_PREFIX;
-            SchedulesSettings.IFC_PARTS_SCHEDULE_SUFFIX = setting.IFC_PARTS_SCHEDULE_SUFFIX;
-            SchedulesSettings.IFC_PARTS_SCHEDULE_SUFFIX_TEMP = setting.IFC_PARTS_SCHEDULE_SUFFIX;
-
-            SchedulesSettings.REBAR_SCHEDULE_NAME = setting.REBAR_SCHEDULE_NAME;
-            SchedulesSettings.REBAR_SCHEDULE_NAME_TEMP = setting.REBAR_SCHEDULE_NAME;
-            SchedulesSettings.MATERIAL_SCHEDULE_NAME = setting.MATERIAL_SCHEDULE_NAME;
-            SchedulesSettings.MATERIAL_SCHEDULE_NAME_TEMP = setting.MATERIAL_SCHEDULE_NAME;
-            SchedulesSettings.SYSTEM_PARTS_SCHEDULE_NAME = setting.SYSTEM_PARTS_SCHEDULE_NAME;
-            SchedulesSettings.SYSTEM_PARTS_SCHEDULE_NAME_TEMP = setting.SYSTEM_PARTS_SCHEDULE_NAME;
-            SchedulesSettings.IFC_PARTS_SCHEDULE_NAME = setting.IFC_PARTS_SCHEDULE_NAME;
-            SchedulesSettings.IFC_PARTS_SCHEDULE_NAME_TEMP = setting.IFC_PARTS_SCHEDULE_NAME;
-
-            SchedulesSettings.REBAR_SCHEDULE_DISP1 = setting.REBAR_SCHEDULE_DISP1;
-            SchedulesSettings.REBAR_SCHEDULE_DISP1_TEMP = setting.REBAR_SCHEDULE_DISP1;
-            SchedulesSettings.MATERIAL_SCHEDULE_DISP1 = setting.MATERIAL_SCHEDULE_DISP1;
-            SchedulesSettings.MATERIAL_SCHEDULE_DISP1_TEMP = setting.MATERIAL_SCHEDULE_DISP1;
-            SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP1 = setting.SYSTEM_PARTS_SCHEDULE_DISP1;
-            SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP1_TEMP = setting.SYSTEM_PARTS_SCHEDULE_DISP1;
-            SchedulesSettings.IFC_PARTS_SCHEDULE_DISP1 = setting.IFC_PARTS_SCHEDULE_DISP1;
-            SchedulesSettings.IFC_PARTS_SCHEDULE_DISP1_TEMP = setting.IFC_PARTS_SCHEDULE_DISP1;
-            SchedulesSettings.REBAR_SCHEDULE_DISP2 = setting.REBAR_SCHEDULE_DISP2;
-            SchedulesSettings.REBAR_SCHEDULE_DISP2_TEMP = setting.REBAR_SCHEDULE_DISP2;
-            SchedulesSettings.MATERIAL_SCHEDULE_DISP2 = setting.MATERIAL_SCHEDULE_DISP2;
-            SchedulesSettings.MATERIAL_SCHEDULE_DISP2_TEMP = setting.MATERIAL_SCHEDULE_DISP2;
-            SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP2 = setting.SYSTEM_PARTS_SCHEDULE_DISP2;
-            SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP2_TEMP = setting.SYSTEM_PARTS_SCHEDULE_DISP2;
-            SchedulesSettings.IFC_PARTS_SCHEDULE_DISP2 = setting.IFC_PARTS_SCHEDULE_DISP2;
-            SchedulesSettings.IFC_PARTS_SCHEDULE_DISP2_TEMP = setting.IFC_PARTS_SCHEDULE_DISP2;
-
-            ProjectSettings.TYPICAL_PYLON_FILTER_PARAMETER = setting.TYPICAL_PYLON_FILTER_PARAMETER;
-            ProjectSettings.TYPICAL_PYLON_FILTER_PARAMETER_TEMP = setting.TYPICAL_PYLON_FILTER_PARAMETER;
-            ProjectSettings.TYPICAL_PYLON_FILTER_VALUE = setting.TYPICAL_PYLON_FILTER_VALUE;
-            ProjectSettings.TYPICAL_PYLON_FILTER_VALUE_TEMP = setting.TYPICAL_PYLON_FILTER_VALUE;
         }
 
         private void SaveConfig() {
-            var setting = _pluginConfig.GetSettings(_revitRepository.Document)
+            
+            var settings = _pluginConfig.GetSettings(_revitRepository.Document)
                           ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-            setting.NeedWorkWithGeneralView = SelectionSettings.NeedWorkWithGeneralView;
-            setting.NeedWorkWithGeneralPerpendicularView = SelectionSettings.NeedWorkWithGeneralPerpendicularView;
-            setting.NeedWorkWithTransverseViewFirst = SelectionSettings.NeedWorkWithTransverseViewFirst;
-            setting.NeedWorkWithTransverseViewSecond = SelectionSettings.NeedWorkWithTransverseViewSecond;
-            setting.NeedWorkWithTransverseViewThird = SelectionSettings.NeedWorkWithTransverseViewThird;
-            setting.NeedWorkWithRebarSchedule = SelectionSettings.NeedWorkWithRebarSchedule;
-            setting.NeedWorkWithMaterialSchedule = SelectionSettings.NeedWorkWithMaterialSchedule;
-            setting.NeedWorkWithSystemPartsSchedule = SelectionSettings.NeedWorkWithSystemPartsSchedule;
-            setting.NeedWorkWithIFCPartsSchedule = SelectionSettings.NeedWorkWithIFCPartsSchedule;
-            setting.NeedWorkWithLegend = SelectionSettings.NeedWorkWithLegend;
-
-
-            setting.PROJECT_SECTION = ProjectSettings.PROJECT_SECTION;
-            setting.MARK = ProjectSettings.MARK;
-            setting.DISPATCHER_GROUPING_FIRST = ProjectSettings.DISPATCHER_GROUPING_FIRST;
-            setting.DISPATCHER_GROUPING_SECOND = ProjectSettings.DISPATCHER_GROUPING_SECOND;
-
-            setting.SHEET_SIZE = ProjectSettings.SHEET_SIZE;
-            setting.SHEET_COEFFICIENT = ProjectSettings.SHEET_COEFFICIENT;
-            setting.SHEET_PREFIX = ProjectSettings.SHEET_PREFIX;
-            setting.SHEET_SUFFIX = ProjectSettings.SHEET_SUFFIX;
-
-            setting.GENERAL_VIEW_PREFIX = ViewSectionSettings.GENERAL_VIEW_PREFIX;
-            setting.GENERAL_VIEW_SUFFIX = ViewSectionSettings.GENERAL_VIEW_SUFFIX;
-            setting.GENERAL_VIEW_PERPENDICULAR_PREFIX = ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_PREFIX;
-            setting.GENERAL_VIEW_PERPENDICULAR_SUFFIX = ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_SUFFIX;
-            setting.GENERAL_VIEW_TEMPLATE_NAME = ViewSectionSettings.GENERAL_VIEW_TEMPLATE_NAME;
-            setting.GENERAL_VIEW_X_OFFSET = ViewSectionSettings.GENERAL_VIEW_X_OFFSET;
-            setting.GENERAL_VIEW_Y_TOP_OFFSET = ViewSectionSettings.GENERAL_VIEW_Y_TOP_OFFSET;
-            setting.GENERAL_VIEW_Y_BOTTOM_OFFSET = ViewSectionSettings.GENERAL_VIEW_Y_BOTTOM_OFFSET;
-
-            setting.TRANSVERSE_VIEW_FIRST_PREFIX = ViewSectionSettings.TRANSVERSE_VIEW_FIRST_PREFIX;
-            setting.TRANSVERSE_VIEW_FIRST_SUFFIX = ViewSectionSettings.TRANSVERSE_VIEW_FIRST_SUFFIX;
-            setting.TRANSVERSE_VIEW_SECOND_PREFIX = ViewSectionSettings.TRANSVERSE_VIEW_SECOND_PREFIX;
-            setting.TRANSVERSE_VIEW_SECOND_SUFFIX = ViewSectionSettings.TRANSVERSE_VIEW_SECOND_SUFFIX;
-            setting.TRANSVERSE_VIEW_THIRD_PREFIX = ViewSectionSettings.TRANSVERSE_VIEW_THIRD_PREFIX;
-            setting.TRANSVERSE_VIEW_THIRD_SUFFIX = ViewSectionSettings.TRANSVERSE_VIEW_THIRD_SUFFIX;
-            setting.TRANSVERSE_VIEW_TEMPLATE_NAME = ViewSectionSettings.TRANSVERSE_VIEW_TEMPLATE_NAME;
-
-            setting.TRANSVERSE_VIEW_X_OFFSET = ViewSectionSettings.TRANSVERSE_VIEW_X_OFFSET;
-            setting.TRANSVERSE_VIEW_Y_OFFSET = ViewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET;
-
-
-            setting.REBAR_SCHEDULE_PREFIX = SchedulesSettings.REBAR_SCHEDULE_PREFIX;
-            setting.REBAR_SCHEDULE_SUFFIX = SchedulesSettings.REBAR_SCHEDULE_SUFFIX;
-
-            setting.MATERIAL_SCHEDULE_PREFIX = SchedulesSettings.MATERIAL_SCHEDULE_PREFIX;
-            setting.MATERIAL_SCHEDULE_SUFFIX = SchedulesSettings.MATERIAL_SCHEDULE_SUFFIX;
-
-            setting.SYSTEM_PARTS_SCHEDULE_PREFIX = SchedulesSettings.SYSTEM_PARTS_SCHEDULE_PREFIX;
-            setting.SYSTEM_PARTS_SCHEDULE_SUFFIX = SchedulesSettings.SYSTEM_PARTS_SCHEDULE_SUFFIX;
-
-            setting.IFC_PARTS_SCHEDULE_PREFIX = SchedulesSettings.IFC_PARTS_SCHEDULE_PREFIX;
-            setting.IFC_PARTS_SCHEDULE_SUFFIX = SchedulesSettings.IFC_PARTS_SCHEDULE_SUFFIX;
-
-            setting.REBAR_SCHEDULE_NAME = SchedulesSettings.REBAR_SCHEDULE_NAME;
-            setting.MATERIAL_SCHEDULE_NAME = SchedulesSettings.MATERIAL_SCHEDULE_NAME;
-            setting.SYSTEM_PARTS_SCHEDULE_NAME = SchedulesSettings.SYSTEM_PARTS_SCHEDULE_NAME;
-            setting.IFC_PARTS_SCHEDULE_NAME = SchedulesSettings.IFC_PARTS_SCHEDULE_NAME;
-
-            setting.REBAR_SCHEDULE_DISP1 = SchedulesSettings.REBAR_SCHEDULE_DISP1;
-            setting.MATERIAL_SCHEDULE_DISP1 = SchedulesSettings.MATERIAL_SCHEDULE_DISP1;
-            setting.SYSTEM_PARTS_SCHEDULE_DISP1 = SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP1;
-            setting.IFC_PARTS_SCHEDULE_DISP1 = SchedulesSettings.IFC_PARTS_SCHEDULE_DISP1;
-            setting.REBAR_SCHEDULE_DISP2 = SchedulesSettings.REBAR_SCHEDULE_DISP2;
-            setting.MATERIAL_SCHEDULE_DISP2 = SchedulesSettings.MATERIAL_SCHEDULE_DISP2;
-            setting.SYSTEM_PARTS_SCHEDULE_DISP2 = SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP2;
-            setting.IFC_PARTS_SCHEDULE_DISP2 = SchedulesSettings.IFC_PARTS_SCHEDULE_DISP2;
-
-            setting.TYPICAL_PYLON_FILTER_PARAMETER = ProjectSettings.TYPICAL_PYLON_FILTER_PARAMETER;
-            setting.TYPICAL_PYLON_FILTER_VALUE = ProjectSettings.TYPICAL_PYLON_FILTER_VALUE;
-
+            _pluginConfig.SetConfigProps(settings, this);
 
             _pluginConfig.SaveProjectConfig();
         }
@@ -975,71 +791,11 @@ namespace RevitPylonDocumentation.ViewModels {
 
 
         private void ApplySettings(object p) {
-            // Необходимо будет написать метод проверки имен параметров - есть ли такие параметры у нужных категорий
-
-            // Устанавливаем флаг, что применили параметры и перезаписываем параметры
-            ProjectSettings.PROJECT_SECTION = ProjectSettings.PROJECT_SECTION_TEMP;
-            ProjectSettings.MARK = ProjectSettings.MARK_TEMP;
-            ProjectSettings.DISPATCHER_GROUPING_FIRST = ProjectSettings.DISPATCHER_GROUPING_FIRST_TEMP;
-            ProjectSettings.DISPATCHER_GROUPING_SECOND = ProjectSettings.DISPATCHER_GROUPING_SECOND_TEMP;
-
-            ProjectSettings.SHEET_SIZE = ProjectSettings.SHEET_SIZE_TEMP;
-            ProjectSettings.SHEET_COEFFICIENT = ProjectSettings.SHEET_COEFFICIENT_TEMP;
-            ProjectSettings.SHEET_PREFIX = ProjectSettings.SHEET_PREFIX_TEMP;
-            ProjectSettings.SHEET_SUFFIX = ProjectSettings.SHEET_SUFFIX_TEMP;
-
-            ViewSectionSettings.GENERAL_VIEW_PREFIX = ViewSectionSettings.GENERAL_VIEW_PREFIX_TEMP;
-            ViewSectionSettings.GENERAL_VIEW_SUFFIX = ViewSectionSettings.GENERAL_VIEW_SUFFIX_TEMP;
-            ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_PREFIX = ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP;
-            ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_SUFFIX = ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_SUFFIX_TEMP;
-
-            ViewSectionSettings.GENERAL_VIEW_TEMPLATE_NAME = ViewSectionSettings.GENERAL_VIEW_TEMPLATE_NAME_TEMP;
-            ViewSectionSettings.GENERAL_VIEW_X_OFFSET = ViewSectionSettings.GENERAL_VIEW_X_OFFSET_TEMP;
-            ViewSectionSettings.GENERAL_VIEW_Y_TOP_OFFSET = ViewSectionSettings.GENERAL_VIEW_Y_TOP_OFFSET_TEMP;
-            ViewSectionSettings.GENERAL_VIEW_Y_BOTTOM_OFFSET = ViewSectionSettings.GENERAL_VIEW_Y_BOTTOM_OFFSET_TEMP;
-
-            ViewSectionSettings.TRANSVERSE_VIEW_FIRST_PREFIX = ViewSectionSettings.TRANSVERSE_VIEW_FIRST_PREFIX_TEMP;
-            ViewSectionSettings.TRANSVERSE_VIEW_FIRST_SUFFIX = ViewSectionSettings.TRANSVERSE_VIEW_FIRST_SUFFIX_TEMP;
-            ViewSectionSettings.TRANSVERSE_VIEW_SECOND_PREFIX = ViewSectionSettings.TRANSVERSE_VIEW_SECOND_PREFIX_TEMP;
-            ViewSectionSettings.TRANSVERSE_VIEW_SECOND_SUFFIX = ViewSectionSettings.TRANSVERSE_VIEW_SECOND_SUFFIX_TEMP;
-            ViewSectionSettings.TRANSVERSE_VIEW_THIRD_PREFIX = ViewSectionSettings.TRANSVERSE_VIEW_THIRD_PREFIX_TEMP;
-            ViewSectionSettings.TRANSVERSE_VIEW_THIRD_SUFFIX = ViewSectionSettings.TRANSVERSE_VIEW_THIRD_SUFFIX_TEMP;
-
-            ViewSectionSettings.TRANSVERSE_VIEW_TEMPLATE_NAME = ViewSectionSettings.TRANSVERSE_VIEW_TEMPLATE_NAME_TEMP;
-            ViewSectionSettings.TRANSVERSE_VIEW_X_OFFSET = ViewSectionSettings.TRANSVERSE_VIEW_X_OFFSET_TEMP;
-            ViewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET = ViewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET_TEMP;
 
 
-            SchedulesSettings.REBAR_SCHEDULE_PREFIX = SchedulesSettings.REBAR_SCHEDULE_PREFIX_TEMP;
-            SchedulesSettings.REBAR_SCHEDULE_SUFFIX = SchedulesSettings.REBAR_SCHEDULE_SUFFIX_TEMP;
-
-            SchedulesSettings.MATERIAL_SCHEDULE_PREFIX = SchedulesSettings.MATERIAL_SCHEDULE_PREFIX_TEMP;
-            SchedulesSettings.MATERIAL_SCHEDULE_SUFFIX = SchedulesSettings.MATERIAL_SCHEDULE_SUFFIX_TEMP;
-
-            SchedulesSettings.SYSTEM_PARTS_SCHEDULE_PREFIX = SchedulesSettings.SYSTEM_PARTS_SCHEDULE_PREFIX_TEMP;
-            SchedulesSettings.SYSTEM_PARTS_SCHEDULE_SUFFIX = SchedulesSettings.SYSTEM_PARTS_SCHEDULE_SUFFIX_TEMP;
-
-            SchedulesSettings.IFC_PARTS_SCHEDULE_PREFIX = SchedulesSettings.IFC_PARTS_SCHEDULE_PREFIX_TEMP;
-            SchedulesSettings.IFC_PARTS_SCHEDULE_SUFFIX = SchedulesSettings.IFC_PARTS_SCHEDULE_SUFFIX_TEMP;
-
-            SchedulesSettings.REBAR_SCHEDULE_NAME = SchedulesSettings.REBAR_SCHEDULE_NAME_TEMP;
-            SchedulesSettings.MATERIAL_SCHEDULE_NAME = SchedulesSettings.MATERIAL_SCHEDULE_NAME_TEMP;
-            SchedulesSettings.SYSTEM_PARTS_SCHEDULE_NAME = SchedulesSettings.SYSTEM_PARTS_SCHEDULE_NAME_TEMP;
-            SchedulesSettings.IFC_PARTS_SCHEDULE_NAME = SchedulesSettings.IFC_PARTS_SCHEDULE_NAME_TEMP;
-
-            SchedulesSettings.REBAR_SCHEDULE_DISP1 = SchedulesSettings.REBAR_SCHEDULE_DISP1_TEMP;
-            SchedulesSettings.MATERIAL_SCHEDULE_DISP1 = SchedulesSettings.MATERIAL_SCHEDULE_DISP1_TEMP;
-            SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP1 = SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP1_TEMP;
-            SchedulesSettings.IFC_PARTS_SCHEDULE_DISP1 = SchedulesSettings.IFC_PARTS_SCHEDULE_DISP1_TEMP;
-
-            SchedulesSettings.REBAR_SCHEDULE_DISP2 = SchedulesSettings.REBAR_SCHEDULE_DISP2_TEMP;
-            SchedulesSettings.MATERIAL_SCHEDULE_DISP2 = SchedulesSettings.MATERIAL_SCHEDULE_DISP2_TEMP;
-            SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP2 = SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP2_TEMP;
-            SchedulesSettings.IFC_PARTS_SCHEDULE_DISP2 = SchedulesSettings.IFC_PARTS_SCHEDULE_DISP2_TEMP;
-
-            ProjectSettings.TYPICAL_PYLON_FILTER_PARAMETER = ProjectSettings.TYPICAL_PYLON_FILTER_PARAMETER_TEMP;
-            ProjectSettings.TYPICAL_PYLON_FILTER_VALUE = ProjectSettings.TYPICAL_PYLON_FILTER_VALUE_TEMP;
-
+            ProjectSettings.ApplyProjectSettings();
+            ViewSectionSettings.ApplyViewSectionsSettings();
+            SchedulesSettings.ApplySchedulesSettings();
 
             SettingsEdited = false;
 
@@ -1054,7 +810,7 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-        private void Test(object p) {
+        private void CreateSheetsNViews(object p) {
 
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Добавление видов")) {
 

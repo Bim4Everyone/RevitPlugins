@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.ViewModels;
 
-namespace RevitPylonDocumentation.Models
-{
+namespace RevitPylonDocumentation.Models.UserSettings {
     class UserProjectSettings : BaseViewModel {
 
         public UserProjectSettings(MainViewModel mainViewModel) {
@@ -42,7 +42,7 @@ namespace RevitPylonDocumentation.Models
         public string PROJECT_SECTION_TEMP {
             get => _projectSectionTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _projectSectionTemp, value);
+                RaiseAndSetIfChanged(ref _projectSectionTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -51,7 +51,7 @@ namespace RevitPylonDocumentation.Models
         public string MARK_TEMP {
             get => _markTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _markTemp, value);
+                RaiseAndSetIfChanged(ref _markTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -61,7 +61,7 @@ namespace RevitPylonDocumentation.Models
         public string DISPATCHER_GROUPING_FIRST_TEMP {
             get => _dispatcherGroupingFirstTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _dispatcherGroupingFirstTemp, value);
+                RaiseAndSetIfChanged(ref _dispatcherGroupingFirstTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -69,7 +69,7 @@ namespace RevitPylonDocumentation.Models
         public string DISPATCHER_GROUPING_SECOND_TEMP {
             get => _dispatcherGroupingSecondTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _dispatcherGroupingSecondTemp, value);
+                RaiseAndSetIfChanged(ref _dispatcherGroupingSecondTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -78,7 +78,7 @@ namespace RevitPylonDocumentation.Models
         public string SHEET_SIZE_TEMP {
             get => _sheetSizeTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _sheetSizeTemp, value);
+                RaiseAndSetIfChanged(ref _sheetSizeTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -87,7 +87,7 @@ namespace RevitPylonDocumentation.Models
         public string SHEET_COEFFICIENT_TEMP {
             get => _sheetCoefficientTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _sheetCoefficientTemp, value);
+                RaiseAndSetIfChanged(ref _sheetCoefficientTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -97,7 +97,7 @@ namespace RevitPylonDocumentation.Models
         public string SHEET_PREFIX_TEMP {
             get => _sheetPrefixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _sheetPrefixTemp, value);
+                RaiseAndSetIfChanged(ref _sheetPrefixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -106,7 +106,7 @@ namespace RevitPylonDocumentation.Models
         public string SHEET_SUFFIX_TEMP {
             get => _sheetSuffixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _sheetSuffixTemp, value);
+                RaiseAndSetIfChanged(ref _sheetSuffixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -115,7 +115,7 @@ namespace RevitPylonDocumentation.Models
         public string TYPICAL_PYLON_FILTER_PARAMETER_TEMP {
             get => _typicalPylonFilterParameterTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _typicalPylonFilterParameterTemp, value);
+                RaiseAndSetIfChanged(ref _typicalPylonFilterParameterTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -125,9 +125,26 @@ namespace RevitPylonDocumentation.Models
         public string TYPICAL_PYLON_FILTER_VALUE_TEMP {
             get => _typicalPylonFilterValueTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _typicalPylonFilterValueTemp, value);
+                RaiseAndSetIfChanged(ref _typicalPylonFilterValueTemp, value);
                 ViewModel.SettingsEdited = true;
             }
+        }
+
+
+        public void ApplyProjectSettings() {
+
+            PROJECT_SECTION = PROJECT_SECTION_TEMP;
+            MARK = MARK_TEMP;
+            DISPATCHER_GROUPING_FIRST = DISPATCHER_GROUPING_FIRST_TEMP;
+            DISPATCHER_GROUPING_SECOND = DISPATCHER_GROUPING_SECOND_TEMP;
+
+            SHEET_SIZE = SHEET_SIZE_TEMP;
+            SHEET_COEFFICIENT = SHEET_COEFFICIENT_TEMP;
+            SHEET_PREFIX = SHEET_PREFIX_TEMP;
+            SHEET_SUFFIX = SHEET_SUFFIX_TEMP;
+
+            TYPICAL_PYLON_FILTER_PARAMETER = TYPICAL_PYLON_FILTER_PARAMETER_TEMP;
+            TYPICAL_PYLON_FILTER_VALUE = TYPICAL_PYLON_FILTER_VALUE_TEMP;
         }
     }
 }

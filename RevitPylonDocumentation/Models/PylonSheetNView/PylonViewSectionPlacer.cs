@@ -13,7 +13,7 @@ using RevitPylonDocumentation.ViewModels;
 
 using View = Autodesk.Revit.DB.View;
 
-namespace RevitPylonDocumentation.Models {
+namespace RevitPylonDocumentation.Models.PylonSheetNView {
     public class PylonViewSectionPlacer {
         internal PylonViewSectionPlacer(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
             ViewModel = mvm;
@@ -39,9 +39,9 @@ namespace RevitPylonDocumentation.Models {
                 // Заполнеяем данные для задания
                 SheetInfo.GeneralView.ViewportTypeName = "Заголовок на листе";
                 SheetInfo.GeneralView.ViewportNumber = "100";
-                SheetInfo.GeneralView.ViewportName = 
-                    ViewModel.ViewSectionSettings.GENERAL_VIEW_PREFIX 
-                    + SheetInfo.PylonKeyName 
+                SheetInfo.GeneralView.ViewportName =
+                    ViewModel.ViewSectionSettings.GENERAL_VIEW_PREFIX
+                    + SheetInfo.PylonKeyName
                     + ViewModel.ViewSectionSettings.GENERAL_VIEW_SUFFIX;
             }
 
@@ -98,7 +98,7 @@ namespace RevitPylonDocumentation.Models {
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralViewPerpendicular)) {
                 return false;
             }
-           
+
             // Рассчитываем и задаем корректную точку вставки основного перпендикулярного вида пилона
             double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + 0.065;
 
@@ -284,7 +284,7 @@ namespace RevitPylonDocumentation.Models {
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewThird)) {
                 return false;
             }
-            
+
             // Рассчитываем и задаем корректную точку вставки первого поперечного вида пилона
             double GeneralViewX = 0;
             double GeneralViewPerpendicularX = 0;

@@ -14,7 +14,7 @@ using RevitPylonDocumentation.ViewModels;
 
 using Parameter = Autodesk.Revit.DB.Parameter;
 
-namespace RevitPylonDocumentation.Models {
+namespace RevitPylonDocumentation.Models.PylonSheetNView {
     public class PylonViewSectionCreator {
         internal PylonViewSectionCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
             ViewModel = mvm;
@@ -69,9 +69,9 @@ namespace RevitPylonDocumentation.Models {
             double minZ = bb.Min.Z;
             double maxZ = bb.Max.Z;
 
-            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_X_OFFSET));
-            double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_Y_TOP_OFFSET));
-            double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_Y_BOTTOM_OFFSET));
+            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_X_OFFSET));
+            double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_Y_TOP_OFFSET));
+            double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_Y_BOTTOM_OFFSET));
 
 
             XYZ sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostWidth);
@@ -87,7 +87,7 @@ namespace RevitPylonDocumentation.Models {
 
             try {
                 viewSection = ViewSection.CreateSection(Repository.Document, SelectedViewFamilyType.Id, sectionBox);
-                
+
                 if(viewSection != null) {
                     viewSection.Name = ViewModel.ViewSectionSettings.GENERAL_VIEW_PREFIX + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.GENERAL_VIEW_SUFFIX;
                     if(ViewModel.SelectedGeneralViewTemplate != null) {
@@ -101,7 +101,7 @@ namespace RevitPylonDocumentation.Models {
                 }
                 return false;
             }
-            
+
 
             SheetInfo.GeneralView.ViewElement = viewSection;
 
@@ -156,9 +156,9 @@ namespace RevitPylonDocumentation.Models {
             double maxZ = bb.Max.Z;
 
 
-            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_X_OFFSET));
-            double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_Y_TOP_OFFSET));
-            double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_Y_BOTTOM_OFFSET));
+            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_X_OFFSET));
+            double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_Y_TOP_OFFSET));
+            double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GENERAL_VIEW_Y_BOTTOM_OFFSET));
 
 
             XYZ sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.4);
@@ -189,7 +189,7 @@ namespace RevitPylonDocumentation.Models {
                 }
                 return false;
             }
-            
+
 
             SheetInfo.GeneralViewPerpendicular.ViewElement = viewSection;
 
@@ -241,8 +241,8 @@ namespace RevitPylonDocumentation.Models {
 
             XYZ sectionBoxMin;
             XYZ sectionBoxMax;
-            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_X_OFFSET));
-            double coordinateY = hostWidth * 0.5 + UnitUtilsHelper.ConvertToInternalValue(Int32.Parse(ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET));
+            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_X_OFFSET));
+            double coordinateY = hostWidth * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET));
 
             if(transverseViewNum == 1) {
                 // Располагаем сечение на высоте 1/4 высоты пилона
@@ -316,7 +316,7 @@ namespace RevitPylonDocumentation.Models {
 
                 LocationPoint locationPoint = column.Location as LocationPoint;
                 midlePoint = locationPoint.Point;
-                double rotation = locationPoint.Rotation + (90 * Math.PI / 180);
+                double rotation = locationPoint.Rotation + 90 * Math.PI / 180;
                 hostVector = Transform.CreateRotation(XYZ.BasisZ, rotation).OfVector(XYZ.BasisX);
 
                 FamilySymbol hostSymbol = column.Symbol;

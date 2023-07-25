@@ -8,8 +8,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.ViewModels;
 
-namespace RevitPylonDocumentation.Models
-{
+namespace RevitPylonDocumentation.Models.UserSettings {
     class UserViewSectionSettings : BaseViewModel {
         public UserViewSectionSettings(MainViewModel mainViewModel) {
 
@@ -43,7 +42,7 @@ namespace RevitPylonDocumentation.Models
         public string GENERAL_VIEW_PREFIX_TEMP {
             get => _generalViewPrefixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _generalViewPrefixTemp, value);
+                RaiseAndSetIfChanged(ref _generalViewPrefixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -52,7 +51,7 @@ namespace RevitPylonDocumentation.Models
         public string GENERAL_VIEW_SUFFIX_TEMP {
             get => _generalViewSuffixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _generalViewSuffixTemp, value);
+                RaiseAndSetIfChanged(ref _generalViewSuffixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -62,7 +61,7 @@ namespace RevitPylonDocumentation.Models
         public string GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP {
             get => _generalViewPerpendicularPrefixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _generalViewPerpendicularPrefixTemp, value);
+                RaiseAndSetIfChanged(ref _generalViewPerpendicularPrefixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -71,7 +70,7 @@ namespace RevitPylonDocumentation.Models
         public string GENERAL_VIEW_PERPENDICULAR_SUFFIX_TEMP {
             get => _generalViewPerpendicularSuffixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _generalViewPerpendicularSuffixTemp, value);
+                RaiseAndSetIfChanged(ref _generalViewPerpendicularSuffixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -80,7 +79,7 @@ namespace RevitPylonDocumentation.Models
         public string GENERAL_VIEW_TEMPLATE_NAME_TEMP {
             get => _generalViewTemplateNameTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _generalViewTemplateNameTemp, value);
+                RaiseAndSetIfChanged(ref _generalViewTemplateNameTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -89,7 +88,7 @@ namespace RevitPylonDocumentation.Models
         public string GENERAL_VIEW_X_OFFSET_TEMP {
             get => _generalViewXOffsetTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _generalViewXOffsetTemp, value);
+                RaiseAndSetIfChanged(ref _generalViewXOffsetTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -98,7 +97,7 @@ namespace RevitPylonDocumentation.Models
         public string GENERAL_VIEW_Y_TOP_OFFSET_TEMP {
             get => _generalViewYTopOffsetTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _generalViewYTopOffsetTemp, value);
+                RaiseAndSetIfChanged(ref _generalViewYTopOffsetTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -107,7 +106,7 @@ namespace RevitPylonDocumentation.Models
         public string GENERAL_VIEW_Y_BOTTOM_OFFSET_TEMP {
             get => _generalViewYBottomOffsetTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _generalViewYBottomOffsetTemp, value);
+                RaiseAndSetIfChanged(ref _generalViewYBottomOffsetTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -117,7 +116,7 @@ namespace RevitPylonDocumentation.Models
         public string TRANSVERSE_VIEW_FIRST_PREFIX_TEMP {
             get => _transverseViewFirstPrefixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _transverseViewFirstPrefixTemp, value);
+                RaiseAndSetIfChanged(ref _transverseViewFirstPrefixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -126,7 +125,7 @@ namespace RevitPylonDocumentation.Models
         public string TRANSVERSE_VIEW_FIRST_SUFFIX_TEMP {
             get => _transverseViewFirstSuffixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _transverseViewFirstSuffixTemp, value);
+                RaiseAndSetIfChanged(ref _transverseViewFirstSuffixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -136,7 +135,7 @@ namespace RevitPylonDocumentation.Models
         public string TRANSVERSE_VIEW_SECOND_PREFIX_TEMP {
             get => _transverseViewSecondPrefixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _transverseViewSecondPrefixTemp, value);
+                RaiseAndSetIfChanged(ref _transverseViewSecondPrefixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -145,7 +144,7 @@ namespace RevitPylonDocumentation.Models
         public string TRANSVERSE_VIEW_SECOND_SUFFIX_TEMP {
             get => _transverseViewSecondSuffixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _transverseViewSecondSuffixTemp, value);
+                RaiseAndSetIfChanged(ref _transverseViewSecondSuffixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -155,7 +154,7 @@ namespace RevitPylonDocumentation.Models
         public string TRANSVERSE_VIEW_THIRD_PREFIX_TEMP {
             get => _transverseViewThirdPrefixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _transverseViewThirdPrefixTemp, value);
+                RaiseAndSetIfChanged(ref _transverseViewThirdPrefixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -164,7 +163,7 @@ namespace RevitPylonDocumentation.Models
         public string TRANSVERSE_VIEW_THIRD_SUFFIX_TEMP {
             get => _transverseViewThirdSuffixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _transverseViewThirdSuffixTemp, value);
+                RaiseAndSetIfChanged(ref _transverseViewThirdSuffixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -173,7 +172,7 @@ namespace RevitPylonDocumentation.Models
         public string TRANSVERSE_VIEW_TEMPLATE_NAME_TEMP {
             get => _transverseViewTemplateNameTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _transverseViewTemplateNameTemp, value);
+                RaiseAndSetIfChanged(ref _transverseViewTemplateNameTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -182,7 +181,7 @@ namespace RevitPylonDocumentation.Models
         public string TRANSVERSE_VIEW_X_OFFSET_TEMP {
             get => _transverseViewXOffsetTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _transverseViewXOffsetTemp, value);
+                RaiseAndSetIfChanged(ref _transverseViewXOffsetTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -191,10 +190,33 @@ namespace RevitPylonDocumentation.Models
         public string TRANSVERSE_VIEW_Y_OFFSET_TEMP {
             get => _transverseViewYOffsetTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _transverseViewYOffsetTemp, value);
+                RaiseAndSetIfChanged(ref _transverseViewYOffsetTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
 
+        public void ApplyViewSectionsSettings() {
+
+            GENERAL_VIEW_PREFIX = GENERAL_VIEW_PREFIX_TEMP;
+            GENERAL_VIEW_SUFFIX = GENERAL_VIEW_SUFFIX_TEMP;
+            GENERAL_VIEW_PERPENDICULAR_PREFIX = GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP;
+            GENERAL_VIEW_PERPENDICULAR_SUFFIX = GENERAL_VIEW_PERPENDICULAR_SUFFIX_TEMP;
+
+            GENERAL_VIEW_TEMPLATE_NAME = GENERAL_VIEW_TEMPLATE_NAME_TEMP;
+            GENERAL_VIEW_X_OFFSET = GENERAL_VIEW_X_OFFSET_TEMP;
+            GENERAL_VIEW_Y_TOP_OFFSET = GENERAL_VIEW_Y_TOP_OFFSET_TEMP;
+            GENERAL_VIEW_Y_BOTTOM_OFFSET = GENERAL_VIEW_Y_BOTTOM_OFFSET_TEMP;
+
+            TRANSVERSE_VIEW_FIRST_PREFIX = TRANSVERSE_VIEW_FIRST_PREFIX_TEMP;
+            TRANSVERSE_VIEW_FIRST_SUFFIX = TRANSVERSE_VIEW_FIRST_SUFFIX_TEMP;
+            TRANSVERSE_VIEW_SECOND_PREFIX = TRANSVERSE_VIEW_SECOND_PREFIX_TEMP;
+            TRANSVERSE_VIEW_SECOND_SUFFIX = TRANSVERSE_VIEW_SECOND_SUFFIX_TEMP;
+            TRANSVERSE_VIEW_THIRD_PREFIX = TRANSVERSE_VIEW_THIRD_PREFIX_TEMP;
+            TRANSVERSE_VIEW_THIRD_SUFFIX = TRANSVERSE_VIEW_THIRD_SUFFIX_TEMP;
+
+            TRANSVERSE_VIEW_TEMPLATE_NAME = TRANSVERSE_VIEW_TEMPLATE_NAME_TEMP;
+            TRANSVERSE_VIEW_X_OFFSET = TRANSVERSE_VIEW_X_OFFSET_TEMP;
+            TRANSVERSE_VIEW_Y_OFFSET = TRANSVERSE_VIEW_Y_OFFSET_TEMP;
+        }
     }
 }

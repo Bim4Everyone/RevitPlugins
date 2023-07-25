@@ -13,7 +13,7 @@ using RevitPylonDocumentation.ViewModels;
 
 using View = Autodesk.Revit.DB.View;
 
-namespace RevitPylonDocumentation.Models {
+namespace RevitPylonDocumentation.Models.PylonSheetNView {
     public class PylonViewSchedulePlacer {
         internal PylonViewSchedulePlacer(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
             ViewModel = mvm;

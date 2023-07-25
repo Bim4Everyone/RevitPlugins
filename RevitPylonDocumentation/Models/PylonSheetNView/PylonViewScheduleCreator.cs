@@ -14,7 +14,7 @@ using RevitPylonDocumentation.ViewModels;
 
 using Parameter = Autodesk.Revit.DB.Parameter;
 
-namespace RevitPylonDocumentation.Models {
+namespace RevitPylonDocumentation.Models.PylonSheetNView {
     public class PylonViewScheduleCreator {
         internal PylonViewScheduleCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
             ViewModel = mvm;
@@ -71,7 +71,7 @@ namespace RevitPylonDocumentation.Models {
 
             ElementId scheduleId = null;
             ViewSchedule viewSchedule = null;
-            
+
             try {
 
                 scheduleId = ViewModel.ReferenceMaterialSchedule.Duplicate(ViewDuplicateOption.Duplicate);

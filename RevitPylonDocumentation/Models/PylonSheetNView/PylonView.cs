@@ -8,7 +8,7 @@ using Autodesk.Revit.DB;
 
 using RevitPylonDocumentation.ViewModels;
 
-namespace RevitPylonDocumentation.Models {
+namespace RevitPylonDocumentation.Models.PylonSheetNView {
     public class PylonView {
         internal PylonView(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
             ViewModel = mvm;

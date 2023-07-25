@@ -9,10 +9,8 @@ using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.ViewModels;
 
-namespace RevitPylonDocumentation.Models
-{
-    class UserSchedulesSettings : BaseViewModel
-    {
+namespace RevitPylonDocumentation.Models.UserSettings {
+    class UserSchedulesSettings : BaseViewModel {
         public UserSchedulesSettings(MainViewModel mainViewModel) {
 
             ViewModel = mainViewModel;
@@ -56,7 +54,7 @@ namespace RevitPylonDocumentation.Models
         public string REBAR_SCHEDULE_PREFIX_TEMP {
             get => _rebarSchedulePrefixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _rebarSchedulePrefixTemp, value);
+                RaiseAndSetIfChanged(ref _rebarSchedulePrefixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -65,7 +63,7 @@ namespace RevitPylonDocumentation.Models
         public string REBAR_SCHEDULE_SUFFIX_TEMP {
             get => _rebarScheduleSuffixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _rebarScheduleSuffixTemp, value);
+                RaiseAndSetIfChanged(ref _rebarScheduleSuffixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -75,7 +73,7 @@ namespace RevitPylonDocumentation.Models
         public string MATERIAL_SCHEDULE_PREFIX_TEMP {
             get => _materialSchedulePrefixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _materialSchedulePrefixTemp, value);
+                RaiseAndSetIfChanged(ref _materialSchedulePrefixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -84,7 +82,7 @@ namespace RevitPylonDocumentation.Models
         public string MATERIAL_SCHEDULE_SUFFIX_TEMP {
             get => _materialScheduleSuffixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _materialScheduleSuffixTemp, value);
+                RaiseAndSetIfChanged(ref _materialScheduleSuffixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -93,7 +91,7 @@ namespace RevitPylonDocumentation.Models
         public string SYSTEM_PARTS_SCHEDULE_PREFIX_TEMP {
             get => _systemPartsSchedulePrefixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _systemPartsSchedulePrefixTemp, value);
+                RaiseAndSetIfChanged(ref _systemPartsSchedulePrefixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -102,7 +100,7 @@ namespace RevitPylonDocumentation.Models
         public string SYSTEM_PARTS_SCHEDULE_SUFFIX_TEMP {
             get => _systemPartsScheduleSuffixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _systemPartsScheduleSuffixTemp, value);
+                RaiseAndSetIfChanged(ref _systemPartsScheduleSuffixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -112,7 +110,7 @@ namespace RevitPylonDocumentation.Models
         public string IFC_PARTS_SCHEDULE_PREFIX_TEMP {
             get => _IFCPartsSchedulePrefixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _IFCPartsSchedulePrefixTemp, value);
+                RaiseAndSetIfChanged(ref _IFCPartsSchedulePrefixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -121,7 +119,7 @@ namespace RevitPylonDocumentation.Models
         public string IFC_PARTS_SCHEDULE_SUFFIX_TEMP {
             get => _IFCPartsScheduleSuffixTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _IFCPartsScheduleSuffixTemp, value);
+                RaiseAndSetIfChanged(ref _IFCPartsScheduleSuffixTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -133,7 +131,7 @@ namespace RevitPylonDocumentation.Models
         public string REBAR_SCHEDULE_NAME_TEMP {
             get => _rebarScheduleNameTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _rebarScheduleNameTemp, value);
+                RaiseAndSetIfChanged(ref _rebarScheduleNameTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -142,7 +140,7 @@ namespace RevitPylonDocumentation.Models
         public string MATERIAL_SCHEDULE_NAME_TEMP {
             get => _materialScheduleNameTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _materialScheduleNameTemp, value);
+                RaiseAndSetIfChanged(ref _materialScheduleNameTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -152,7 +150,7 @@ namespace RevitPylonDocumentation.Models
         public string SYSTEM_PARTS_SCHEDULE_NAME_TEMP {
             get => _systemPartsScheduleNameTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _systemPartsScheduleNameTemp, value);
+                RaiseAndSetIfChanged(ref _systemPartsScheduleNameTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -161,7 +159,7 @@ namespace RevitPylonDocumentation.Models
         public string IFC_PARTS_SCHEDULE_NAME_TEMP {
             get => _IFCPartsScheduleNameTemp;
             set {
-                this.RaiseAndSetIfChanged(ref _IFCPartsScheduleNameTemp, value);
+                RaiseAndSetIfChanged(ref _IFCPartsScheduleNameTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -171,7 +169,7 @@ namespace RevitPylonDocumentation.Models
         public string REBAR_SCHEDULE_DISP1_TEMP {
             get => _rebarScheduleDisp1Temp;
             set {
-                this.RaiseAndSetIfChanged(ref _rebarScheduleDisp1Temp, value);
+                RaiseAndSetIfChanged(ref _rebarScheduleDisp1Temp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -179,7 +177,7 @@ namespace RevitPylonDocumentation.Models
         public string MATERIAL_SCHEDULE_DISP1_TEMP {
             get => _materialScheduleDisp1Temp;
             set {
-                this.RaiseAndSetIfChanged(ref _materialScheduleDisp1Temp, value);
+                RaiseAndSetIfChanged(ref _materialScheduleDisp1Temp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -187,7 +185,7 @@ namespace RevitPylonDocumentation.Models
         public string SYSTEM_PARTS_SCHEDULE_DISP1_TEMP {
             get => _systemPartsScheduleDisp1Temp;
             set {
-                this.RaiseAndSetIfChanged(ref _systemPartsScheduleDisp1Temp, value);
+                RaiseAndSetIfChanged(ref _systemPartsScheduleDisp1Temp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -195,7 +193,7 @@ namespace RevitPylonDocumentation.Models
         public string IFC_PARTS_SCHEDULE_DISP1_TEMP {
             get => _IFCPartsScheduleDisp1Temp;
             set {
-                this.RaiseAndSetIfChanged(ref _IFCPartsScheduleDisp1Temp, value);
+                RaiseAndSetIfChanged(ref _IFCPartsScheduleDisp1Temp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -206,7 +204,7 @@ namespace RevitPylonDocumentation.Models
         public string REBAR_SCHEDULE_DISP2_TEMP {
             get => _rebarScheduleDisp2Temp;
             set {
-                this.RaiseAndSetIfChanged(ref _rebarScheduleDisp2Temp, value);
+                RaiseAndSetIfChanged(ref _rebarScheduleDisp2Temp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -214,7 +212,7 @@ namespace RevitPylonDocumentation.Models
         public string MATERIAL_SCHEDULE_DISP2_TEMP {
             get => _materialScheduleDisp2Temp;
             set {
-                this.RaiseAndSetIfChanged(ref _materialScheduleDisp2Temp, value);
+                RaiseAndSetIfChanged(ref _materialScheduleDisp2Temp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -222,7 +220,7 @@ namespace RevitPylonDocumentation.Models
         public string SYSTEM_PARTS_SCHEDULE_DISP2_TEMP {
             get => _systemPartsScheduleDisp2Temp;
             set {
-                this.RaiseAndSetIfChanged(ref _systemPartsScheduleDisp2Temp, value);
+                RaiseAndSetIfChanged(ref _systemPartsScheduleDisp2Temp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -230,7 +228,7 @@ namespace RevitPylonDocumentation.Models
         public string IFC_PARTS_SCHEDULE_DISP2_TEMP {
             get => _IFCPartsScheduleDisp2Temp;
             set {
-                this.RaiseAndSetIfChanged(ref _IFCPartsScheduleDisp2Temp, value);
+                RaiseAndSetIfChanged(ref _IFCPartsScheduleDisp2Temp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -241,9 +239,39 @@ namespace RevitPylonDocumentation.Models
         public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFilters {
             get => _paramsForScheduleFilters;
             set {
-                this.RaiseAndSetIfChanged(ref _paramsForScheduleFilters, value);
+                RaiseAndSetIfChanged(ref _paramsForScheduleFilters, value);
                 ViewModel.SettingsEdited = true;
             }
+        }
+
+        public void ApplySchedulesSettings() {
+            
+            REBAR_SCHEDULE_PREFIX = REBAR_SCHEDULE_PREFIX_TEMP;
+            REBAR_SCHEDULE_SUFFIX = REBAR_SCHEDULE_SUFFIX_TEMP;
+
+            MATERIAL_SCHEDULE_PREFIX = MATERIAL_SCHEDULE_PREFIX_TEMP;
+            MATERIAL_SCHEDULE_SUFFIX = MATERIAL_SCHEDULE_SUFFIX_TEMP;
+
+            SYSTEM_PARTS_SCHEDULE_PREFIX = SYSTEM_PARTS_SCHEDULE_PREFIX_TEMP;
+            SYSTEM_PARTS_SCHEDULE_SUFFIX = SYSTEM_PARTS_SCHEDULE_SUFFIX_TEMP;
+
+            IFC_PARTS_SCHEDULE_PREFIX = IFC_PARTS_SCHEDULE_PREFIX_TEMP;
+            IFC_PARTS_SCHEDULE_SUFFIX = IFC_PARTS_SCHEDULE_SUFFIX_TEMP;
+
+            REBAR_SCHEDULE_NAME = REBAR_SCHEDULE_NAME_TEMP;
+            MATERIAL_SCHEDULE_NAME = MATERIAL_SCHEDULE_NAME_TEMP;
+            SYSTEM_PARTS_SCHEDULE_NAME = SYSTEM_PARTS_SCHEDULE_NAME_TEMP;
+            IFC_PARTS_SCHEDULE_NAME = IFC_PARTS_SCHEDULE_NAME_TEMP;
+
+            REBAR_SCHEDULE_DISP1 = REBAR_SCHEDULE_DISP1_TEMP;
+            MATERIAL_SCHEDULE_DISP1 = MATERIAL_SCHEDULE_DISP1_TEMP;
+            SYSTEM_PARTS_SCHEDULE_DISP1 = SYSTEM_PARTS_SCHEDULE_DISP1_TEMP;
+            IFC_PARTS_SCHEDULE_DISP1 = IFC_PARTS_SCHEDULE_DISP1_TEMP;
+
+            REBAR_SCHEDULE_DISP2 = REBAR_SCHEDULE_DISP2_TEMP;
+            MATERIAL_SCHEDULE_DISP2 = MATERIAL_SCHEDULE_DISP2_TEMP;
+            SYSTEM_PARTS_SCHEDULE_DISP2 = SYSTEM_PARTS_SCHEDULE_DISP2_TEMP;
+            IFC_PARTS_SCHEDULE_DISP2 = IFC_PARTS_SCHEDULE_DISP2_TEMP;
         }
     }
 }
