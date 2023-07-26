@@ -6,6 +6,8 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
+using pyRevitLabs.Json;
+
 using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.Models.Visiter;
 
@@ -16,6 +18,7 @@ namespace RevitClashDetective.Models.Value {
 
         }
 
+        [JsonConstructor]
         public ElementIdParamValue(int[] categories, string value, string stringValue) : base(value, stringValue) {
             Categories = categories;
         }
@@ -23,6 +26,9 @@ namespace RevitClashDetective.Models.Value {
         public int[] Categories { get; }
 
         public override FilterRule GetFilterRule(IVisiter visiter, Document doc, RevitParam param) {
+            if(Categories is null) {
+                throw new ArgumentNullException(nameof(Categories));
+            }
             var paramId = GetParamId(doc, param);
             if(paramId == ElementId.InvalidElementId)
                 return null;
