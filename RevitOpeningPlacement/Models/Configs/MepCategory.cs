@@ -51,7 +51,7 @@ namespace RevitOpeningPlacement.Models.Configs {
         /// <summary>
         /// Правила фильтрации элементов данной категории
         /// </summary>
-        public Set Set { get; set; }
+        public Set Set { get; set; } = new Set();
 
         /// <summary>
         /// Возвращает значение отступа (суммарно с двух сторон) от габаритов элемента инженерной системы в единицах Revit
