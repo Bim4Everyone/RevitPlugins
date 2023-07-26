@@ -113,27 +113,62 @@
             <dxe:TextEdit
                 EditValue="{Binding RoomsNums.StartNumber, UpdateSourceTrigger=PropertyChanged}" />
         </DockPanel>
-
-        <RadioButton Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" Margin="10" GroupName="nums"
-                     Content="Нумерация групп помещений (квартир, МОП)"
-                     IsChecked="{Binding RoomsNums.IsNumFlats}" />
-        <RadioButton x:Name="_roomsNums" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Margin="10" GroupName="nums"
-                     Content="Нумерация помещений"
-                     IsChecked="{Binding RoomsNums.IsNumRooms}" />
-        <RadioButton Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums"
-                     Content="Нумерация помещений в пределах каждой секции, этажа и группы"
-                     Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
-                     IsChecked="{Binding RoomsNums.IsNumRoomsGroup}" />
-        <RadioButton Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums"
-                     Content="Сквозная нумерация помещений в пределах секции"
-                     Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
-                     IsChecked="{Binding RoomsNums.IsNumRoomsSection}" />
-        <RadioButton Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="4" Margin="20,10,10,10" GroupName="rooms_nums"
-                     Content="Сквозная нумерация помещений в пределах секции и этажа"
-                     Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, Converter={StaticResource BoolToVis}}"
-                     IsChecked="{Binding RoomsNums.IsNumRoomsSectionLevels}" />
-
-
+        
+        <RadioButton
+            Grid.Row="3" 
+            Grid.Column="0"
+            Grid.ColumnSpan="4"
+            Margin="10"
+            GroupName="nums"
+            IsChecked="{Binding RoomsNums.IsNumFlats}">
+            <TextBlock Text="{Binding ApartmentNumberParamName, 
+                Mode=OneWay, StringFormat='Нумерация квартир ({0})'}" />
+        </RadioButton>
+        
+        <RadioButton
+            x:Name="_roomsNums"
+            Grid.Row="4" 
+            Grid.Column="0"
+            Grid.ColumnSpan="4" 
+            Margin="10"
+            GroupName="nums"
+            IsChecked="{Binding RoomsNums.IsNumRooms}">
+            <TextBlock Text="{Binding NumberParamName, 
+                Mode=OneWay, StringFormat='Нумерация, помещений ({0})'}" />
+        </RadioButton>
+        
+        <RadioButton 
+            Grid.Row="5"
+            Grid.Column="0" 
+            Grid.ColumnSpan="4" 
+            Margin="20,10,10,10" 
+            GroupName="rooms_nums"
+            Content="Нумерация помещений в пределах секции, этажа и группы"
+            Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, 
+                Converter={StaticResource BoolToVis}}"
+            IsChecked="{Binding RoomsNums.IsNumRoomsGroup}" />
+        
+        <RadioButton 
+            Grid.Row="6" 
+            Grid.Column="0" 
+            Grid.ColumnSpan="4" 
+            Margin="20,10,10,10"
+            GroupName="rooms_nums"
+            Content="Нумерация помещений в пределах секции и этажа"
+            Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, 
+                Converter={StaticResource BoolToVis}}"
+            IsChecked="{Binding RoomsNums.IsNumRoomsSectionLevels}" />
+        
+        <RadioButton 
+            Grid.Row="7" 
+            Grid.Column="0" 
+            Grid.ColumnSpan="4" 
+            Margin="20,10,10,10" GroupName="rooms_nums"
+            Content="Нумерация помещений в пределах секции"
+            Visibility="{Binding ElementName=_roomsNums,Path=IsChecked, 
+                Converter={StaticResource BoolToVis}}"
+            IsChecked="{Binding RoomsNums.IsNumRoomsSection}" />
+        
         <DockPanel Grid.Row="8" Grid.Column="0" Margin="10" LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" Margin="0,0,0,10" Text="Секции для нумерации" />
 
