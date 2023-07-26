@@ -47,6 +47,8 @@ namespace RevitPylonDocumentation.Models {
             projectSettings.PROJECT_SECTION_TEMP = settings.PROJECT_SECTION;
             projectSettings.MARK = settings.MARK;
             projectSettings.MARK_TEMP = settings.MARK;
+            projectSettings.TITLEBLOCK_NAME = settings.TITLEBLOCK_NAME;
+            projectSettings.TITLEBLOCK_NAME_TEMP = settings.TITLEBLOCK_NAME;
             projectSettings.DISPATCHER_GROUPING_FIRST = settings.DISPATCHER_GROUPING_FIRST;
             projectSettings.DISPATCHER_GROUPING_FIRST_TEMP = settings.DISPATCHER_GROUPING_FIRST;
             projectSettings.DISPATCHER_GROUPING_SECOND = settings.DISPATCHER_GROUPING_SECOND;
@@ -60,6 +62,14 @@ namespace RevitPylonDocumentation.Models {
             projectSettings.SHEET_PREFIX_TEMP = settings.SHEET_PREFIX;
             projectSettings.SHEET_SUFFIX = settings.SHEET_SUFFIX;
             projectSettings.SHEET_SUFFIX_TEMP = settings.SHEET_SUFFIX;
+
+            projectSettings.TYPICAL_PYLON_FILTER_PARAMETER = settings.TYPICAL_PYLON_FILTER_PARAMETER;
+            projectSettings.TYPICAL_PYLON_FILTER_PARAMETER_TEMP = settings.TYPICAL_PYLON_FILTER_PARAMETER;
+            projectSettings.TYPICAL_PYLON_FILTER_VALUE = settings.TYPICAL_PYLON_FILTER_VALUE;
+            projectSettings.TYPICAL_PYLON_FILTER_VALUE_TEMP = settings.TYPICAL_PYLON_FILTER_VALUE;
+
+            projectSettings.LEGEND_NAME = settings.LEGEND_NAME;
+            projectSettings.LEGEND_NAME_TEMP = settings.LEGEND_NAME;
 
             viewSectionSettings.GENERAL_VIEW_PREFIX = settings.GENERAL_VIEW_PREFIX;
             viewSectionSettings.GENERAL_VIEW_PREFIX_TEMP = settings.GENERAL_VIEW_PREFIX;
@@ -101,6 +111,8 @@ namespace RevitPylonDocumentation.Models {
             viewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET = settings.TRANSVERSE_VIEW_Y_OFFSET;
             viewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET_TEMP = settings.TRANSVERSE_VIEW_Y_OFFSET;
 
+            viewSectionSettings.VIEW_FAMILY_TYPE_NAME = settings.VIEW_FAMILY_TYPE_NAME;
+            viewSectionSettings.VIEW_FAMILY_TYPE_NAME_TEMP = settings.VIEW_FAMILY_TYPE_NAME;
 
             schedulesSettings.REBAR_SCHEDULE_PREFIX = settings.REBAR_SCHEDULE_PREFIX;
             schedulesSettings.REBAR_SCHEDULE_PREFIX_TEMP = settings.REBAR_SCHEDULE_PREFIX;
@@ -148,10 +160,6 @@ namespace RevitPylonDocumentation.Models {
             schedulesSettings.IFC_PARTS_SCHEDULE_DISP2 = settings.IFC_PARTS_SCHEDULE_DISP2;
             schedulesSettings.IFC_PARTS_SCHEDULE_DISP2_TEMP = settings.IFC_PARTS_SCHEDULE_DISP2;
 
-            projectSettings.TYPICAL_PYLON_FILTER_PARAMETER = settings.TYPICAL_PYLON_FILTER_PARAMETER;
-            projectSettings.TYPICAL_PYLON_FILTER_PARAMETER_TEMP = settings.TYPICAL_PYLON_FILTER_PARAMETER;
-            projectSettings.TYPICAL_PYLON_FILTER_VALUE = settings.TYPICAL_PYLON_FILTER_VALUE;
-            projectSettings.TYPICAL_PYLON_FILTER_VALUE_TEMP = settings.TYPICAL_PYLON_FILTER_VALUE;
         }
 
         internal void SetConfigProps(PluginSettings settings, MainViewModel mainViewModel) {
@@ -176,6 +184,7 @@ namespace RevitPylonDocumentation.Models {
 
             settings.PROJECT_SECTION = projectSettings.PROJECT_SECTION;
             settings.MARK = projectSettings.MARK;
+            settings.TITLEBLOCK_NAME = projectSettings.TITLEBLOCK_NAME;
             settings.DISPATCHER_GROUPING_FIRST = projectSettings.DISPATCHER_GROUPING_FIRST;
             settings.DISPATCHER_GROUPING_SECOND = projectSettings.DISPATCHER_GROUPING_SECOND;
 
@@ -183,6 +192,11 @@ namespace RevitPylonDocumentation.Models {
             settings.SHEET_COEFFICIENT = projectSettings.SHEET_COEFFICIENT;
             settings.SHEET_PREFIX = projectSettings.SHEET_PREFIX;
             settings.SHEET_SUFFIX = projectSettings.SHEET_SUFFIX;
+
+            settings.TYPICAL_PYLON_FILTER_PARAMETER = projectSettings.TYPICAL_PYLON_FILTER_PARAMETER;
+            settings.TYPICAL_PYLON_FILTER_VALUE = projectSettings.TYPICAL_PYLON_FILTER_VALUE;
+
+            settings.LEGEND_NAME = projectSettings.LEGEND_NAME;
 
             settings.GENERAL_VIEW_PREFIX = viewSectionSettings.GENERAL_VIEW_PREFIX;
             settings.GENERAL_VIEW_SUFFIX = viewSectionSettings.GENERAL_VIEW_SUFFIX;
@@ -203,6 +217,8 @@ namespace RevitPylonDocumentation.Models {
 
             settings.TRANSVERSE_VIEW_X_OFFSET = viewSectionSettings.TRANSVERSE_VIEW_X_OFFSET;
             settings.TRANSVERSE_VIEW_Y_OFFSET = viewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET;
+
+            settings.VIEW_FAMILY_TYPE_NAME = viewSectionSettings.VIEW_FAMILY_TYPE_NAME;
 
 
             settings.REBAR_SCHEDULE_PREFIX = schedulesSettings.REBAR_SCHEDULE_PREFIX;
@@ -231,8 +247,7 @@ namespace RevitPylonDocumentation.Models {
             settings.SYSTEM_PARTS_SCHEDULE_DISP2 = schedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP2;
             settings.IFC_PARTS_SCHEDULE_DISP2 = schedulesSettings.IFC_PARTS_SCHEDULE_DISP2;
 
-            settings.TYPICAL_PYLON_FILTER_PARAMETER = projectSettings.TYPICAL_PYLON_FILTER_PARAMETER;
-            settings.TYPICAL_PYLON_FILTER_VALUE = projectSettings.TYPICAL_PYLON_FILTER_VALUE;
+            
 
         }
     }
@@ -254,12 +269,16 @@ namespace RevitPylonDocumentation.Models {
 
         public string PROJECT_SECTION { get; set; }
         public string MARK { get; set; }
+        public string TITLEBLOCK_NAME { get; set; }
         public string DISPATCHER_GROUPING_FIRST { get; set; }
         public string DISPATCHER_GROUPING_SECOND { get; set; }
         public string SHEET_SIZE { get; set; }
         public string SHEET_COEFFICIENT { get; set; }
         public string SHEET_PREFIX { get; set; }
         public string SHEET_SUFFIX { get; set; }
+        public string TYPICAL_PYLON_FILTER_PARAMETER { get; set; }
+        public string TYPICAL_PYLON_FILTER_VALUE { get; set; }
+        public string LEGEND_NAME { get; set; }
         public string GENERAL_VIEW_PREFIX { get; set; }
         public string GENERAL_VIEW_SUFFIX { get; set; }
         public string GENERAL_VIEW_PERPENDICULAR_PREFIX { get; set; }
@@ -277,6 +296,7 @@ namespace RevitPylonDocumentation.Models {
         public string TRANSVERSE_VIEW_TEMPLATE_NAME { get; set; }
         public string TRANSVERSE_VIEW_X_OFFSET { get; set; }
         public string TRANSVERSE_VIEW_Y_OFFSET { get; set; }
+        public string VIEW_FAMILY_TYPE_NAME { get; set; }
         public string REBAR_SCHEDULE_PREFIX { get; set; }
         public string REBAR_SCHEDULE_SUFFIX { get; set; }
         public string MATERIAL_SCHEDULE_PREFIX { get; set; }
@@ -297,7 +317,6 @@ namespace RevitPylonDocumentation.Models {
         public string MATERIAL_SCHEDULE_DISP2 { get; set; }
         public string SYSTEM_PARTS_SCHEDULE_DISP2 { get; set; }
         public string IFC_PARTS_SCHEDULE_DISP2 { get; set; }
-        public string TYPICAL_PYLON_FILTER_PARAMETER { get; set; }
-        public string TYPICAL_PYLON_FILTER_VALUE { get; set; }
+
     }
 }

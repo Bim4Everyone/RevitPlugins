@@ -28,32 +28,31 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using MS.WindowsAPICodePack.Internal;
 
 using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.Models.PylonSheetNView;
 using RevitPylonDocumentation.Models.UserSettings;
+using RevitPylonDocumentation.Views;
 
-using Reference = Autodesk.Revit.DB.Reference;
 using Transaction = Autodesk.Revit.DB.Transaction;
-using Transform = Autodesk.Revit.DB.Transform;
 using View = Autodesk.Revit.DB.View;
-using Wall = Autodesk.Revit.DB.Wall;
 
 namespace RevitPylonDocumentation.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
-        public readonly RevitRepository _revitRepository;
+        private readonly RevitRepository _revitRepository;
 
-        /// <summary>
-        /// Указывает вносил ли пользователь изменения в настройки
-        /// </summary>
         private string _errorText;
+        private bool _pylonSelectedManually = false;
         private string _selectedProjectSection = string.Empty;
+        private ViewFamilyType _selectedViewFamilyType;
+        private View _selectedGeneralViewTemplate;
+        private View _selectedTransverseViewTemplate;
+        private View _selectedLegend;
+        private FamilySymbol _selectedTitleBlock;
         private List<PylonSheetInfo> _selectedHostsInfo = new List<PylonSheetInfo>();
 
-        public bool SettingsEdited;
-
+        public bool SettingsEdited = false;
 
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
@@ -65,54 +64,34 @@ namespace RevitPylonDocumentation.ViewModels {
             ViewSectionSettings = new UserViewSectionSettings(this);
             SchedulesSettings = new UserSchedulesSettings(this);
 
-            GetRebarProjectSections();
-
             ViewFamilyTypes = _revitRepository.ViewFamilyTypes;
-
             TitleBlocks = _revitRepository.TitleBlocksInProject;
-            SelectedTitleBlocks = TitleBlocks
-                .FirstOrDefault(titleBlock => titleBlock.Name == ProjectSettings.DEF_TITLEBLOCK_NAME);
-
             Legends = _revitRepository.LegendsInProject;
-            SelectedLegend = Legends
-                .FirstOrDefault(view => view.Name.Contains("илон"));
-
-
             ViewTemplatesInPj = _revitRepository.AllViewTemplates;
-            FindGeneralViewTemplate();
-            FindTransverseViewTemplate();
 
+            GetRebarProjectSections();
             FindReferenceSchedules();
             
-            GetHostMarksInGUICommand = new RelayCommand(GetHostMarksInGUI);
-
-
-
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView);
-            TestCommand = new RelayCommand(CreateSheetsNViews);
 
-            ApplySettingsCommands = new RelayCommand(ApplySettings, CanApplySettings);
+            SelectPylonCommand = RelayCommand.Create(SelectPylon);
 
-            AddScheduleFilterParamCommand = new RelayCommand(AddScheduleFilterParam);
-            DeleteScheduleFilterParamCommand = new RelayCommand(DeleteScheduleFilterParam, CanChangeScheduleFilterParam);
+            ApplySettingsCommands = RelayCommand.Create(ApplySettings, CanApplySettings);
+            GetHostMarksInGUICommand = RelayCommand.Create(GetHostMarksInGUI);
+
+            AddScheduleFilterParamCommand = RelayCommand.Create(AddScheduleFilterParam);
+            DeleteScheduleFilterParamCommand = RelayCommand.Create(DeleteScheduleFilterParam, CanChangeScheduleFilterParam);
         }
 
         
-
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
-
-
         public ICommand ApplySettingsCommands { get; }
         public ICommand GetHostMarksInGUICommand { get; }
-        public ICommand TestCommand { get; }
-
-
-
         public ICommand AddScheduleFilterParamCommand { get; }
         public ICommand DeleteScheduleFilterParamCommand { get; }
-
+        public ICommand SelectPylonCommand { get; }
 
 
 
@@ -122,17 +101,15 @@ namespace RevitPylonDocumentation.ViewModels {
         public UserSchedulesSettings SchedulesSettings { get; set; }
 
 
-
         /// <summary>
         /// Список всех комплектов документации (по ум. обр_ФОП_Раздел проекта)
         /// </summary>
         public ObservableCollection<string> ProjectSections { get; set; } = new ObservableCollection<string>();
 
+        /// <summary>
+        /// Список всех найденных пилонов для работы в проекте (оболочек)
+        /// </summary>
         public ObservableCollection<PylonSheetInfo> HostsInfo { get; set; } = new ObservableCollection<PylonSheetInfo>();
-
-
-
-
 
         /// <summary>
         /// Выбранный пользователем комплект документации
@@ -142,77 +119,81 @@ namespace RevitPylonDocumentation.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedProjectSection, value);
         }
 
-
         /// <summary>
-        /// Выбранный пользователем комплект документации
+        /// Список пилонов (оболочек) для работы из выбранного пользователем комплекта документации
         /// </summary>
         public List<PylonSheetInfo> SelectedHostsInfo {
             get => _selectedHostsInfo;
             set => this.RaiseAndSetIfChanged(ref _selectedHostsInfo, value);
         }
 
-
-
-
-        // Вспомогательные для документации
         /// <summary>
         /// Рамки листов, имеющиеся в проекте
         /// </summary>
         public List<FamilySymbol> TitleBlocks { get; set; } = new List<FamilySymbol>();
+
         /// <summary>
         /// Выбранная пользователем рамка листа
         /// </summary>
-        public FamilySymbol SelectedTitleBlocks { get; set; }
+        public FamilySymbol SelectedTitleBlock {
+            get => _selectedTitleBlock;
+            set {
+                this.RaiseAndSetIfChanged(ref _selectedTitleBlock, value);
+                ProjectSettings.TITLEBLOCK_NAME_TEMP = value?.Name;
+            }
+        }
+
         /// <summary>
         /// Легенды, имеющиеся в проекте
         /// </summary>
         public List<View> Legends { get; set; } = new List<View>();
+        
         /// <summary>
         /// Выбранная пользователем легенда
         /// </summary>
-        public View SelectedLegend { get; set; }
+        public View SelectedLegend {
+            get => _selectedLegend;
+            set {
+                this.RaiseAndSetIfChanged(ref _selectedLegend, value);
+                ProjectSettings.LEGEND_NAME_TEMP = value?.Name;
+            }
+        }
+
         /// <summary>
         /// Типоразмеры видов, имеющиеся в проекте
         /// </summary>
         public List<ViewFamilyType> ViewFamilyTypes { get; set; } = new List<ViewFamilyType>();
+        
         /// <summary>
         /// Выбранный пользователем типоразмер вида для создания новых видов
         /// </summary>
-        public ViewFamilyType SelectedViewFamilyType { get; set; }
-        /// <summary>
-        /// Эталонная спецификация арматуры
-        /// </summary>
-        public ViewSchedule ReferenceRebarSchedule { get; set; }
-        /// <summary>
-        /// Эталонная спецификация материалов
-        /// </summary>
-        public ViewSchedule ReferenceMaterialSchedule { get; set; }
-        /// <summary>
-        /// Эталонная ведомость деталей для системной арматуры
-        /// </summary>
-        public ViewSchedule ReferenceSystemPartsSchedule { get; set; }
-        /// <summary>
-        /// Эталонная ведомость деталей для IFC арматуры
-        /// </summary>
-        public ViewSchedule ReferenceIFCPartsSchedule { get; set; }
+        public ViewFamilyType SelectedViewFamilyType {
+            get => _selectedViewFamilyType;
+            set {
+                this.RaiseAndSetIfChanged(ref _selectedViewFamilyType, value);
+                ViewSectionSettings.VIEW_FAMILY_TYPE_NAME_TEMP = value?.Name;
+            }
+        }
 
         /// <summary>
         /// Перечень шаблонов видов в проекте
         /// </summary>
         public List<ViewSection> ViewTemplatesInPj { get; set; } = new List<ViewSection>();
+        
         /// <summary>
         /// Выбранный пользователем шаблон вида основных видов
         /// </summary>
-        public View SelectedGeneralViewTemplate { get; set; }
+        public View SelectedGeneralViewTemplate {
+            get => _selectedGeneralViewTemplate;
+            set {
+                this.RaiseAndSetIfChanged(ref _selectedGeneralViewTemplate, value);
+                ViewSectionSettings.GENERAL_VIEW_TEMPLATE_NAME_TEMP = value?.Name;
+            }
+        }
+
         /// <summary>
         /// Выбранный пользователем шаблон вида поперечных видов
         /// </summary>
-        //public View SelectedTransverseViewTemplate { get; set; }
-
-
-
-
-        private View _selectedTransverseViewTemplate;
         public View SelectedTransverseViewTemplate {
             get => _selectedTransverseViewTemplate;
             set {
@@ -693,6 +674,25 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
+        /// <summary>
+        /// Эталонная спецификация арматуры
+        /// </summary>
+        public ViewSchedule ReferenceRebarSchedule { get; set; }
+
+        /// <summary>
+        /// Эталонная спецификация материалов
+        /// </summary>
+        public ViewSchedule ReferenceMaterialSchedule { get; set; }
+
+        /// <summary>
+        /// Эталонная ведомость деталей для системной арматуры
+        /// </summary>
+        public ViewSchedule ReferenceSystemPartsSchedule { get; set; }
+
+        /// <summary>
+        /// Эталонная ведомость деталей для IFC арматуры
+        /// </summary>
+        public ViewSchedule ReferenceIFCPartsSchedule { get; set; }
 
         public string ErrorText {
             get => _errorText;
@@ -700,75 +700,73 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-
-
+        /// <summary>
+        /// Метод, отрабатывающий при загрузке окна
+        /// </summary>
         private void LoadView() {
-            LoadConfig();
-        }
-
-        private void AcceptView() {
-
-            SaveConfig();
-
-            CreateSheetsNViews(null);
-        }
-
-
-        private void LoadConfig() {
             
-            var settings = _pluginConfig.GetSettings(_revitRepository.Document);
-
-            if(settings is null) { return; }
-
-            _pluginConfig.GetConfigProps(settings, this);
+            LoadConfig();
 
             FindGeneralViewTemplate();
             FindTransverseViewTemplate();
+            FindViewFamilyType();
+            FindLegend();
+            FindTitleBlock();
+
+            SettingsEdited = false;
         }
 
+        /// <summary>
+        /// Метод, отрабатывающий при нажатии кнопки "Ок"
+        /// </summary>
+        private void AcceptView() {
+
+            SaveConfig();
+            CreateSheetsNViews();
+        }
+
+
+        /// <summary>
+        /// Подгружает параметры плагина с предыдущего запуска
+        /// </summary>
+        private void LoadConfig() {
+
+            var settings = _pluginConfig.GetSettings(_revitRepository.Document);
+
+            if(settings != null) {
+
+                _pluginConfig.GetConfigProps(settings, this);
+            }
+        }
+
+        /// <summary>
+        /// Сохраняет параметры плагина для следующего запуска
+        /// </summary>
         private void SaveConfig() {
             
             var settings = _pluginConfig.GetSettings(_revitRepository.Document)
                           ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
             _pluginConfig.SetConfigProps(settings, this);
-
             _pluginConfig.SaveProjectConfig();
         }
 
 
-
-
-
-
-
         /// <summary>
-        /// Ищет эталонные спецификации по указанным именам. На основе эталонных спек создаются спеки для пилонов путем копирования
+        /// Получает названия комплектов документации по пилонам
         /// </summary>
-        private void FindReferenceSchedules() {
-            ReferenceRebarSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.REBAR_SCHEDULE_NAME)) as ViewSchedule;
-            ReferenceMaterialSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.MATERIAL_SCHEDULE_NAME)) as ViewSchedule;
-            ReferenceSystemPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.SYSTEM_PARTS_SCHEDULE_NAME)) as ViewSchedule;
-            ReferenceIFCPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.IFC_PARTS_SCHEDULE_NAME)) as ViewSchedule;
-        }
-
-
-
-
-        // Получаем названия Комплектов документации по пилонам
         private void GetRebarProjectSections() 
         {
             // Пользователь может перезадать параметр раздела, поэтому сначала чистим
             ProjectSections.Clear();
             ErrorText = string.Empty;
 
-            using(Transaction transaction = _revitRepository.Document.StartTransaction("Добавление видов")) {
+            using(Transaction transaction = _revitRepository.Document.StartTransaction("Получение возможных комплектов документации")) {
 
                 _revitRepository.GetHostData(this);
 
                 transaction.RollBack();
             }
-            
 
             HostsInfo = new ObservableCollection<PylonSheetInfo>(_revitRepository.HostsInfo);
             ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
@@ -781,7 +779,7 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Обновляет список пилонов в соответствии с выбранным комплектом документации. 
         /// Отрабатывает в момент выбора комплекта документации в ComboBox
         /// </summary>
-        private void GetHostMarksInGUI(object p) 
+        private void GetHostMarksInGUI() 
         {
             SelectedHostsInfo = new List<PylonSheetInfo>(HostsInfo
                 .Where(item => item.ProjectSection.Equals(SelectedProjectSection))
@@ -789,9 +787,40 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
+        private void SelectPylon() {
 
-        private void ApplySettings(object p) {
+            ElementId elementid = _revitRepository.ActiveUIDocument.Selection.PickObject(ObjectType.Element, "Выберите пилон").ElementId;
+            Element element = _revitRepository.Document.GetElement(elementid);
 
+            if(element != null) {
+
+                HostsInfo.Clear();
+                SelectedHostsInfo.Clear();
+                SelectedProjectSection = string.Empty;
+                _pylonSelectedManually = true;
+
+                _revitRepository.GetHostData(this, new List<Element> { element });
+
+                HostsInfo = new ObservableCollection<PylonSheetInfo>(_revitRepository.HostsInfo);
+                ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
+                OnPropertyChanged(nameof(HostsInfo));
+                OnPropertyChanged(nameof(ProjectSections));
+
+                
+                if(HostsInfo.Count > 0) {
+                    SelectedHostsInfo.Add(HostsInfo.FirstOrDefault());
+                    HostsInfo.FirstOrDefault().IsCheck = true;
+                    SelectedProjectSection = ProjectSections.FirstOrDefault();
+                }
+            }
+
+            MainWindow mainWindow = new MainWindow();
+            mainWindow.DataContext = this;
+            mainWindow.ShowDialog();
+        }
+
+
+        private void ApplySettings() {
 
             ProjectSettings.ApplyProjectSettings();
             ViewSectionSettings.ApplyViewSectionsSettings();
@@ -800,9 +829,12 @@ namespace RevitPylonDocumentation.ViewModels {
             SettingsEdited = false;
 
             // Получаем заново список заполненных разделов проекта
-            GetRebarProjectSections();
+            if(!_pylonSelectedManually) {
+                GetRebarProjectSections();
+            }
+            FindReferenceSchedules();
         }
-        private bool CanApplySettings(object p) {
+        private bool CanApplySettings() {
             if(SettingsEdited) {
                 return true;
             }
@@ -810,19 +842,27 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-        private void CreateSheetsNViews(object p) {
+        private void CreateSheetsNViews() {
 
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Документатор пилонов")) {
 
                 foreach(PylonSheetInfo hostsInfo in SelectedHostsInfo) {
 
-                    hostsInfo.Manager.Manage();
+                    hostsInfo.Manager.WorkWithCreation();
                 }
-
                 transaction.Commit();
             }
         }
 
+        /// <summary>
+        /// Ищет эталонные спецификации по указанным именам. На основе эталонных спек создаются спеки для пилонов путем копирования
+        /// </summary>
+        private void FindReferenceSchedules() {
+            ReferenceRebarSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.REBAR_SCHEDULE_NAME)) as ViewSchedule;
+            ReferenceMaterialSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.MATERIAL_SCHEDULE_NAME)) as ViewSchedule;
+            ReferenceSystemPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.SYSTEM_PARTS_SCHEDULE_NAME)) as ViewSchedule;
+            ReferenceIFCPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.IFC_PARTS_SCHEDULE_NAME)) as ViewSchedule;
+        }
 
 
         public void FindGeneralViewTemplate() {
@@ -833,114 +873,24 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectedTransverseViewTemplate = ViewTemplatesInPj
                 .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TRANSVERSE_VIEW_TEMPLATE_NAME));
         }
-
-
-
-        public void SomeMagicFunc() {
-            Solid union = null;
-
-            Document familyDocument = null;
-
-
-            // Element selection
-            IList<Reference> selectelem = _revitRepository.ActiveUIDocument.Selection.PickObjects(ObjectType.Element);
-
-
-
-
-
-            List<Element> elems = new List<Element>();
-
-            // I don't know how to convert from reference to element.
-            foreach(Reference elem in selectelem) {
-                elems.Add(_revitRepository.Document.GetElement(elem));
-            }
-
-
-            // Solid Union
-            union = GetTargetSolids(elems);
-
-
-
-            // create a new family document using Generic Model.rft template
-            string templateFileName = @"C:\ProgramData\Autodesk\RVT 2022\Family Templates\Russian\Метрическая система, типовая модель.rft";
-
-            familyDocument = _revitRepository.UIApplication.Application.NewFamilyDocument(templateFileName);
-
-
-
-
-
-
-
-            // Create Generic Model
-            using(Transaction trans = new Transaction(familyDocument, "Transaction")) {
-                trans.Start();
-                FreeFormElement f = FreeFormElement.Create(familyDocument, union);
-
-                TaskDialog.Show("f", f.Id.ToString());
-                trans.Commit();
-            }
-
-            familyDocument.LoadFamily(_revitRepository.Document, new Ffffff());
+        public void FindViewFamilyType() {
+            SelectedViewFamilyType = ViewFamilyTypes
+                .FirstOrDefault(familyTypes => familyTypes.Name.Equals(ViewSectionSettings.VIEW_FAMILY_TYPE_NAME));
         }
-
-        public static Solid GetTargetSolids(List<Element> elements) {
-            List<Solid> solids = new List<Solid>();
-
-
-            foreach(Element elem in elements) {
-
-                Options options = new Options();
-                options.DetailLevel = ViewDetailLevel.Fine;
-                GeometryElement geomElem = elem.get_Geometry(options);
-                foreach(GeometryObject geomObj in geomElem) {
-                    if(geomObj is Solid) {
-                        Solid solid = (Solid) geomObj;
-                        if(solid.Faces.Size > 0 && solid.Volume > 0.0) {
-                            solids.Add(solid);
-                        }
-                        // Single-level recursive check of instances. If viable solids are more than
-                        // one level deep, this example ignores them.
-                    } else if(geomObj is GeometryInstance) {
-                        GeometryInstance geomInst = (GeometryInstance) geomObj;
-                        GeometryElement instGeomElem = geomInst.GetInstanceGeometry();
-                        foreach(GeometryObject instGeomObj in instGeomElem) {
-                            if(instGeomObj is Solid) {
-                                Solid solid = (Solid) instGeomObj;
-                                if(solid.Faces.Size > 0 && solid.Volume > 0.0) {
-                                    solids.Add(solid);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-
-            Solid sss = solids[0];
-
-            for(int i = 1; i < solids.Count; i++) {
-                try {
-                    sss = BooleanOperationsUtils.ExecuteBooleanOperation(sss, solids[i], BooleanOperationsType.Union);
-                } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-
-                }
-            }
-
-
-
-            return sss;
+        public void FindLegend() {
+            SelectedLegend = Legends
+                .FirstOrDefault(view => view.Name.Contains(ProjectSettings.LEGEND_NAME));
         }
-
-
+        public void FindTitleBlock() {
+            SelectedTitleBlock = TitleBlocks
+                .FirstOrDefault(titleBlock => titleBlock.Name.Contains(ProjectSettings.TITLEBLOCK_NAME));
+        }
 
 
         /// <summary>
         /// Добавляет новое имя параметра фильтра спецификаций в настройках плагина
         /// </summary>
-        /// <param name="p"></param>
-        private void AddScheduleFilterParam(object p) {
+        private void AddScheduleFilterParam() {
 
             SchedulesSettings.ParamsForScheduleFilters.Add(new ScheduleFilterParamHelper("Введите название", "Введите название"));
         }
@@ -948,8 +898,7 @@ namespace RevitPylonDocumentation.ViewModels {
         /// <summary>
         /// Удаляет выбранное имя параметра фильтра спецификаций в настройках плагина
         /// </summary>
-        /// <param name="p"></param>
-        private void DeleteScheduleFilterParam(object p) {
+        private void DeleteScheduleFilterParam() {
 
             List <ScheduleFilterParamHelper> forDel= new List <ScheduleFilterParamHelper>();
 
@@ -965,11 +914,10 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         /// <summary>
-        /// Определяет можно ли выбранное имя параметра фильтра спецификаций в настройках плагина
+        /// Определяет можно ли удалить выбранное имя параметра фильтра спецификаций в настройках плагина
         /// True, если выбрана штриховка в списке штриховок в настройках плагина
         /// </summary>
-        /// <param name="p"></param>
-        private bool CanChangeScheduleFilterParam(object p) {
+        private bool CanChangeScheduleFilterParam() {
             
             foreach(ScheduleFilterParamHelper param in SchedulesSettings.ParamsForScheduleFilters) {
                 if(param.IsCheck) {
@@ -978,29 +926,6 @@ namespace RevitPylonDocumentation.ViewModels {
             }
             
             return false;
-        }
-    }
-
-
-    public class Ffffff : IFamilyLoadOptions {
-        public bool OnFamilyFound(bool familyInUse, out bool overwriteParameterValues) {
-            throw new NotImplementedException();
-        }
-
-        public bool OnSharedFamilyFound(Family sharedFamily, bool familyInUse, out FamilySource source, out bool overwriteParameterValues) {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class BooleanConverter : IValueConverter {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
-
-            if(value is true) { return false; } else { return true; }
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
-            
-            if(value is true) { return false; } else { return true; }
         }
     }
 }

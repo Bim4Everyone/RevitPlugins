@@ -52,7 +52,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             // Если высота видового экрана основного вида больше, чем высота рамки, то он не поместится - меняем рамку
             if(SheetInfo.GeneralView.ViewportHalfHeight * 2 > SheetInfo.TitleBlockHeight) {
-                SheetInfo.SetTitleBlockSize(ViewModel._revitRepository.Document, 2, 1);
+                SheetInfo.SetTitleBlockSize(Repository.Document, 2, 1);
             }
 
             double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralView.ViewportHalfWidth + 0.065;

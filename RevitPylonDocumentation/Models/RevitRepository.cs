@@ -74,11 +74,14 @@ namespace RevitPylonDocumentation.Models {
                 .ToList();
 
 
+
         public List<PylonSheetInfo> HostsInfo { get; set; } = new List<PylonSheetInfo>();
 
         public List<string> HostProjectSections { get; set; } = new List<string>();
 
-
+        /// <summary>
+        /// Получает информацию о пилонах, размещенных в проекте
+        /// </summary>
         public void GetHostData(MainViewModel mainViewModel) {
 
             HostsInfo.Clear();
@@ -91,63 +94,8 @@ namespace RevitPylonDocumentation.Models {
                     .WhereElementIsNotElementType()
                     .ToElements();
 
-
-                foreach(Element elem in elems) {
-                    if(!elem.Name.Contains("Пилон")) {
-                        continue;
-                    }
-
-
-                    // Запрашиваем параметр фильтрации типовых пилонов. Если он не равен заданному, то отсеиваем этот пилон
-                    Parameter typicalPylonParameter = elem.LookupParameter(mainViewModel.ProjectSettings.TYPICAL_PYLON_FILTER_PARAMETER);
-                    if(typicalPylonParameter == null) {
-                        mainViewModel.ErrorText = "Параметр фильтрации типовых пилонов не найден";
-                        return;
-                    }
-
-                    if(typicalPylonParameter.AsString() is null || typicalPylonParameter.AsString() != mainViewModel.ProjectSettings.TYPICAL_PYLON_FILTER_VALUE) { continue; }
-
-
-                    // Запрашиваем Раздел проекта
-                    Parameter projectSectionParameter = elem.LookupParameter(mainViewModel.ProjectSettings.PROJECT_SECTION);
-                    if(projectSectionParameter == null) {
-                        mainViewModel.ErrorText = "Параметр раздела не найден у элементов Стен или Несущих колонн";
-                        return;
-                    }
-                    string projectSection = projectSectionParameter.AsString();
-                    if(projectSection is null) { continue; }
-
-
-                    // Запрашиваем Марку пилона
-                    Parameter hostMarkParameter = elem.LookupParameter(mainViewModel.ProjectSettings.MARK);
-                    if(hostMarkParameter == null) {
-                        mainViewModel.ErrorText = "Параметр марки не найден у элементов Стен или Несущих колонн";
-                        return;
-                    }
-                    string hostMark = hostMarkParameter.AsString();
-                    if(hostMark is null) { continue; }
-
-
-                    PylonSheetInfo testPylonSheetInfo = HostsInfo
-                        .Where(item => item.PylonKeyName.Equals(hostMark))
-                        .FirstOrDefault();
-
-                    if(testPylonSheetInfo is null) {
-                        PylonSheetInfo pylonSheetInfo = new PylonSheetInfo(mainViewModel, this, hostMark);
-                        pylonSheetInfo.ProjectSection = projectSection;
-                        pylonSheetInfo.HostElems.Add(elem);
-                        FindSheetInPj(mainViewModel, pylonSheetInfo);
-                        //AnalizeSectionViews(mainViewModel, pylonSheetInfo);
-                        //AnalizeScheduleViews(mainViewModel, pylonSheetInfo);
-
-                        HostsInfo.Add(pylonSheetInfo);
-                    } else {
-                        testPylonSheetInfo.HostElems.Add(elem);
-                        mainViewModel.ErrorText = "Найдены пилоны с одинаковой маркой";
-                    }
-                }
+                AnalizePylons(mainViewModel, elems);
             }
-
 
             HostsInfo = new List<PylonSheetInfo>(HostsInfo
                 .OrderBy(i => i.PylonKeyName));
@@ -157,11 +105,85 @@ namespace RevitPylonDocumentation.Models {
                 .Select(item => item.ProjectSection)
                 .Distinct()
                 .OrderBy(i => i));
+        }
 
-            return;
+        /// <summary>
+        /// Получает информацию о выбранном пилоне
+        /// </summary>
+        public void GetHostData(MainViewModel mainViewModel, IList<Element> elems) {
+
+            HostsInfo.Clear();
+            HostProjectSections.Clear();
+
+            AnalizePylons(mainViewModel, elems);
+            
+            // Получаем список разделов в проекте (комплектов документации)
+            HostProjectSections = new List<string>(HostsInfo
+                .Select(item => item.ProjectSection)
+                .Distinct()
+                .OrderBy(i => i));
+        }
+
+        private void AnalizePylons(MainViewModel mainViewModel, IList<Element> elems) {
+
+            foreach(Element elem in elems) {
+                if(!elem.Name.Contains("Пилон")) { continue; }
+
+
+                // Запрашиваем параметр фильтрации типовых пилонов. Если он не равен заданному, то отсеиваем этот пилон
+                Parameter typicalPylonParameter = elem.LookupParameter(mainViewModel.ProjectSettings.TYPICAL_PYLON_FILTER_PARAMETER);
+                if(typicalPylonParameter == null) {
+                    mainViewModel.ErrorText = "Параметр фильтрации типовых пилонов не найден";
+                    return;
+                }
+
+                if(typicalPylonParameter.AsString() is null || typicalPylonParameter.AsString() != mainViewModel.ProjectSettings.TYPICAL_PYLON_FILTER_VALUE) { continue; }
+
+
+                // Запрашиваем Раздел проекта
+                Parameter projectSectionParameter = elem.LookupParameter(mainViewModel.ProjectSettings.PROJECT_SECTION);
+                if(projectSectionParameter == null) {
+                    mainViewModel.ErrorText = "Параметр раздела не найден у элементов Стен или Несущих колонн";
+                    return;
+                }
+                string projectSection = projectSectionParameter.AsString();
+                if(projectSection is null) { continue; }
+
+
+                // Запрашиваем Марку пилона
+                Parameter hostMarkParameter = elem.LookupParameter(mainViewModel.ProjectSettings.MARK);
+                if(hostMarkParameter == null) {
+                    mainViewModel.ErrorText = "Параметр марки не найден у элементов Стен или Несущих колонн";
+                    return;
+                }
+                string hostMark = hostMarkParameter.AsString();
+                if(hostMark is null) { continue; }
+
+
+                PylonSheetInfo testPylonSheetInfo = HostsInfo
+                    .Where(item => item.PylonKeyName.Equals(hostMark))
+                    .FirstOrDefault();
+
+                if(testPylonSheetInfo is null) {
+                    PylonSheetInfo pylonSheetInfo = new PylonSheetInfo(mainViewModel, this, hostMark);
+                    pylonSheetInfo.ProjectSection = projectSection;
+                    pylonSheetInfo.HostElems.Add(elem);
+                    FindSheetInPj(mainViewModel, pylonSheetInfo);
+
+                    HostsInfo.Add(pylonSheetInfo);
+                } else {
+                    testPylonSheetInfo.HostElems.Add(elem);
+                    mainViewModel.ErrorText = "Найдены пилоны с одинаковой маркой";
+                }
+            }
+
         }
 
 
+
+        /// <summary>
+        /// Ищет лист в проекте по информации из оболочки листа пилона PylonSheetInfo
+        /// </summary>
         public void FindSheetInPj(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
             
             ViewSheet sheet = AllSheets
@@ -172,14 +194,10 @@ namespace RevitPylonDocumentation.Models {
                 pylonSheetInfo.SheetInProject = true;
                 pylonSheetInfo.PylonViewSheet = sheet;
             }
-
-            return;
         }
 
-
-
         /// <summary>
-        /// Ищет в проекте вид по имени, указанному в PylonView
+        /// Ищет в проекте вид по имени, указанному в оболочке вида пилона PylonView
         /// </summary>
         public void FindViewSectionInPj(PylonView pylonView) {
 
@@ -187,14 +205,13 @@ namespace RevitPylonDocumentation.Models {
                 
                 if(view.Name == pylonView.ViewName) {
                     pylonView.ViewElement = view;
-
                     break;
                 }
             }
         }
 
         /// <summary>
-        /// Ищет в проекте спеки по имени, указанному в PylonView
+        /// Ищет в проекте спеки по имени, указанному в оболочке вида пилона PylonView
         /// </summary>
         public void FindViewScheduleInPj(PylonView pylonView) {
 

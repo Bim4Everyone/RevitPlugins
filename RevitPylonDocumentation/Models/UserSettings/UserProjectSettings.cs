@@ -21,9 +21,9 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
 
 
-
         private string _projectSectionTemp = "обр_ФОП_Раздел проекта";
         private string _markTemp = "Марка";
+        private string _titleBlockNameTemp = "Создать типы по комплектам";
         private string _dispatcherGroupingFirstTemp = "_Группа видов 1";
         private string _dispatcherGroupingSecondTemp = "_Группа видов 1";
         private string _sheetSizeTemp = "А";
@@ -35,7 +35,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _typicalPylonFilterParameterTemp = "обр_ФОП_Фильтрация 1";
         private string _typicalPylonFilterValueTemp = "на 1 шт.";
 
-        public string DEF_TITLEBLOCK_NAME = "Создать типы по комплектам";
+        private string _legendNameTemp = "Указания для пилонов";
 
 
         public string PROJECT_SECTION { get; set; } = "обр_ФОП_Раздел проекта";
@@ -52,6 +52,15 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             get => _markTemp;
             set {
                 RaiseAndSetIfChanged(ref _markTemp, value);
+                ViewModel.SettingsEdited = true;
+            }
+        }
+
+        public string TITLEBLOCK_NAME { get; set; } = "Создать типы по комплектам";
+        public string TITLEBLOCK_NAME_TEMP {
+            get => _titleBlockNameTemp;
+            set {
+                RaiseAndSetIfChanged(ref _titleBlockNameTemp, value);
                 ViewModel.SettingsEdited = true;
             }
         }
@@ -130,11 +139,21 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
+        public string LEGEND_NAME { get; set; } = "Указания для пилонов";
+        public string LEGEND_NAME_TEMP {
+            get => _legendNameTemp;
+            set {
+                RaiseAndSetIfChanged(ref _legendNameTemp, value);
+                ViewModel.SettingsEdited = true;
+            }
+        }
+
 
         public void ApplyProjectSettings() {
 
             PROJECT_SECTION = PROJECT_SECTION_TEMP;
             MARK = MARK_TEMP;
+            TITLEBLOCK_NAME = TITLEBLOCK_NAME_TEMP;
             DISPATCHER_GROUPING_FIRST = DISPATCHER_GROUPING_FIRST_TEMP;
             DISPATCHER_GROUPING_SECOND = DISPATCHER_GROUPING_SECOND_TEMP;
 
@@ -145,6 +164,8 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
             TYPICAL_PYLON_FILTER_PARAMETER = TYPICAL_PYLON_FILTER_PARAMETER_TEMP;
             TYPICAL_PYLON_FILTER_VALUE = TYPICAL_PYLON_FILTER_VALUE_TEMP;
+
+            LEGEND_NAME = LEGEND_NAME_TEMP;
         }
     }
 }

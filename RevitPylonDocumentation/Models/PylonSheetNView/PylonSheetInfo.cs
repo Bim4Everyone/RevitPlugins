@@ -92,7 +92,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 return false;
             }
 
-            PylonViewSheet = ViewSheet.Create(Repository.Document, ViewModel.SelectedTitleBlocks.Id);
+            PylonViewSheet = ViewSheet.Create(Repository.Document, ViewModel.SelectedTitleBlock.Id);
             PylonViewSheet.Name = ViewModel.ProjectSettings.SHEET_PREFIX + PylonKeyName + ViewModel.ProjectSettings.SHEET_SUFFIX;
 
             Parameter viewSheetGroupingParameter = PylonViewSheet.LookupParameter(ViewModel.ProjectSettings.DISPATCHER_GROUPING_FIRST);

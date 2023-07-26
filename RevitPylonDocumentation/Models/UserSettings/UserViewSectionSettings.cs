@@ -37,6 +37,8 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _transverseViewXOffsetTemp = "200";
         private string _transverseViewYOffsetTemp = "200";
 
+        private string _viewFamilyTypeNameTemp = "РАЗРЕЗ_Без номера листа";
+
 
         public string GENERAL_VIEW_PREFIX { get; set; } = "";
         public string GENERAL_VIEW_PREFIX_TEMP {
@@ -195,6 +197,15 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
+        public string VIEW_FAMILY_TYPE_NAME { get; set; } = "РАЗРЕЗ_Без номера листа";
+        public string VIEW_FAMILY_TYPE_NAME_TEMP {
+            get => _viewFamilyTypeNameTemp;
+            set {
+                RaiseAndSetIfChanged(ref _viewFamilyTypeNameTemp, value);
+                ViewModel.SettingsEdited = true;
+            }
+        }
+
         public void ApplyViewSectionsSettings() {
 
             GENERAL_VIEW_PREFIX = GENERAL_VIEW_PREFIX_TEMP;
@@ -217,6 +228,8 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             TRANSVERSE_VIEW_TEMPLATE_NAME = TRANSVERSE_VIEW_TEMPLATE_NAME_TEMP;
             TRANSVERSE_VIEW_X_OFFSET = TRANSVERSE_VIEW_X_OFFSET_TEMP;
             TRANSVERSE_VIEW_Y_OFFSET = TRANSVERSE_VIEW_Y_OFFSET_TEMP;
+
+            VIEW_FAMILY_TYPE_NAME = VIEW_FAMILY_TYPE_NAME_TEMP;
         }
     }
 }
