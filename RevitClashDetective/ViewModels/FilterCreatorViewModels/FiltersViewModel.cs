@@ -3,13 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-
-using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
@@ -47,16 +43,18 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             SaveAsCommand = new RelayCommand(SaveAs, CanSave);
             LoadCommand = new RelayCommand(Load);
             CheckSearchSetCommand = new RelayCommand(CheckSearchSet, CanSave);
+
+            SelectedFilter = Filters.FirstOrDefault();
         }
 
         public string ErrorText {
             get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+            set => RaiseAndSetIfChanged(ref _errorText, value);
         }
 
         public string MessageText {
             get => _messageText;
-            set => this.RaiseAndSetIfChanged(ref _messageText, value);
+            set => RaiseAndSetIfChanged(ref _messageText, value);
         }
 
         public ICommand CreateCommand { get; }
@@ -72,12 +70,12 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         public FilterViewModel SelectedFilter {
             get => _selectedFilter;
-            set => this.RaiseAndSetIfChanged(ref _selectedFilter, value);
+            set => RaiseAndSetIfChanged(ref _selectedFilter, value);
         }
 
         public ObservableCollection<FilterViewModel> Filters {
             get => _filters;
-            set => this.RaiseAndSetIfChanged(ref _filters, value);
+            set => RaiseAndSetIfChanged(ref _filters, value);
         }
 
         public IEnumerable<Filter> GetFilters() {
