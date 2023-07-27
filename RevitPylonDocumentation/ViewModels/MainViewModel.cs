@@ -60,7 +60,7 @@ namespace RevitPylonDocumentation.ViewModels {
             _revitRepository = revitRepository;
 
             SelectionSettings = new UserSelectionSettings();
-            ProjectSettings = new UserProjectSettings(this);
+            ProjectSettings = new UserProjectSettings(this, _revitRepository);
             ViewSectionSettings = new UserViewSectionSettings(this);
             SchedulesSettings = new UserSchedulesSettings(this);
 
@@ -69,15 +69,16 @@ namespace RevitPylonDocumentation.ViewModels {
             Legends = _revitRepository.LegendsInProject;
             ViewTemplatesInPj = _revitRepository.AllViewTemplates;
 
-            GetRebarProjectSections();
-            FindReferenceSchedules();
+            //GetRebarProjectSections();
+            //FindReferenceSchedules();
             
             LoadViewCommand = RelayCommand.Create(LoadView);
-            AcceptViewCommand = RelayCommand.Create(AcceptView);
+            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
             SelectPylonCommand = RelayCommand.Create(SelectPylon);
 
             ApplySettingsCommands = RelayCommand.Create(ApplySettings, CanApplySettings);
+            CheckSettingsCommands = RelayCommand.Create(CheckSettings);
             GetHostMarksInGUICommand = RelayCommand.Create(GetHostMarksInGUI);
 
             AddScheduleFilterParamCommand = RelayCommand.Create(AddScheduleFilterParam);
@@ -88,6 +89,7 @@ namespace RevitPylonDocumentation.ViewModels {
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
         public ICommand ApplySettingsCommands { get; }
+        public ICommand CheckSettingsCommands { get; }
         public ICommand GetHostMarksInGUICommand { get; }
         public ICommand AddScheduleFilterParamCommand { get; }
         public ICommand DeleteScheduleFilterParamCommand { get; }
@@ -707,13 +709,9 @@ namespace RevitPylonDocumentation.ViewModels {
             
             LoadConfig();
 
-            FindGeneralViewTemplate();
-            FindTransverseViewTemplate();
-            FindViewFamilyType();
-            FindLegend();
-            FindTitleBlock();
+            ApplySettings();
 
-            SettingsEdited = false;
+            CheckSettings();
         }
 
         /// <summary>
@@ -724,7 +722,15 @@ namespace RevitPylonDocumentation.ViewModels {
             SaveConfig();
             CreateSheetsNViews();
         }
-
+        /// <summary>
+        /// Определяет можно ли запустить работу плагина
+        /// </summary>
+        private bool CanAcceptView() {
+            if(ErrorText == string.Empty) {
+                return true;
+            }
+            return false;
+        }
 
         /// <summary>
         /// Подгружает параметры плагина с предыдущего запуска
@@ -759,7 +765,6 @@ namespace RevitPylonDocumentation.ViewModels {
         {
             // Пользователь может перезадать параметр раздела, поэтому сначала чистим
             ProjectSections.Clear();
-            ErrorText = string.Empty;
 
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Получение возможных комплектов документации")) {
 
@@ -786,7 +791,9 @@ namespace RevitPylonDocumentation.ViewModels {
                 .ToList());
         }
 
-
+        /// <summary>
+        /// Дает возможность пользователю выбрать вручную нужный для работы пилон
+        /// </summary>
         private void SelectPylon() {
 
             ElementId elementid = _revitRepository.ActiveUIDocument.Selection.PickObject(ObjectType.Element, "Выберите пилон").ElementId;
@@ -820,20 +827,64 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
+        /// <summary>
+        /// Применяет изменения настроек плагина (передает данные из временных переменных в постоянные, по которым работает плагин)
+        /// </summary>
         private void ApplySettings() {
+
+            ErrorText = string.Empty;
 
             ProjectSettings.ApplyProjectSettings();
             ViewSectionSettings.ApplyViewSectionsSettings();
             SchedulesSettings.ApplySchedulesSettings();
 
-            SettingsEdited = false;
 
             // Получаем заново список заполненных разделов проекта
             if(!_pylonSelectedManually) {
                 GetRebarProjectSections();
             }
             FindReferenceSchedules();
+
+            FindGeneralViewTemplate();
+            FindTransverseViewTemplate();
+            FindViewFamilyType();
+            FindLegend();
+            FindTitleBlock();
+
+            SettingsEdited = false;
         }
+
+        private void CheckSettings() {
+
+            if(SelectedTitleBlock is null) {
+                ErrorText = "Не выбран типоразмер рамки листа";
+                return;
+            }
+            if(SelectedViewFamilyType is null) {
+                ErrorText = "Не выбран типоразмер создаваемого вида";
+                return;
+            }
+            if(SelectedGeneralViewTemplate is null) {
+                ErrorText = "Не выбран шаблон основных видов";
+                return;
+            }
+            if(SelectedTransverseViewTemplate is null) {
+                ErrorText = "Не выбран шаблон поперечных видов";
+                return;
+            }
+            if(SelectedLegend is null) {
+                ErrorText = "Не выбрана легенда примечаний";
+                return;
+            }
+
+            ProjectSettings.CheckProjectSettings();
+            ViewSectionSettings.CheckViewSectionsSettings();
+        }
+
+        /// <summary>
+        /// Определяет можно ли применить изменения настроек плагина (передать данные из временные переменных в постоянные, по которым работает плагин). 
+        /// Доступно при изменении одного из параметров настроек
+        /// </summary>
         private bool CanApplySettings() {
             if(SettingsEdited) {
                 return true;
@@ -841,7 +892,9 @@ namespace RevitPylonDocumentation.ViewModels {
             return false;
         }
 
-
+        /// <summary>
+        /// Анализирует выбранные пользователем элементы вида, создает лист, виды, спецификации, и размещает их на листе
+        /// </summary>
         private void CreateSheetsNViews() {
 
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Документатор пилонов")) {
@@ -864,23 +917,37 @@ namespace RevitPylonDocumentation.ViewModels {
             ReferenceIFCPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.IFC_PARTS_SCHEDULE_NAME)) as ViewSchedule;
         }
 
-
+        /// <summary>
+        /// Получает шаблон для основных видов по имени
+        /// </summary>
         public void FindGeneralViewTemplate() {
             SelectedGeneralViewTemplate = ViewTemplatesInPj
                 .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.GENERAL_VIEW_TEMPLATE_NAME));
         }
+        /// <summary>
+        /// Получает шаблон для поперечных видов по имени
+        /// </summary>
         public void FindTransverseViewTemplate() {
             SelectedTransverseViewTemplate = ViewTemplatesInPj
                 .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TRANSVERSE_VIEW_TEMPLATE_NAME));
         }
+        /// <summary>
+        /// Получает типоразмер вида для создаваемых видов
+        /// </summary>
         public void FindViewFamilyType() {
             SelectedViewFamilyType = ViewFamilyTypes
                 .FirstOrDefault(familyTypes => familyTypes.Name.Equals(ViewSectionSettings.VIEW_FAMILY_TYPE_NAME));
         }
+        /// <summary>
+        /// Получает легенду примечания по имени
+        /// </summary>
         public void FindLegend() {
             SelectedLegend = Legends
                 .FirstOrDefault(view => view.Name.Contains(ProjectSettings.LEGEND_NAME));
         }
+        /// <summary>
+        /// Получает типоразмер рамки листа по имени типа
+        /// </summary>
         public void FindTitleBlock() {
             SelectedTitleBlock = TitleBlocks
                 .FirstOrDefault(titleBlock => titleBlock.Name.Contains(ProjectSettings.TITLEBLOCK_NAME));
@@ -920,11 +987,8 @@ namespace RevitPylonDocumentation.ViewModels {
         private bool CanChangeScheduleFilterParam() {
             
             foreach(ScheduleFilterParamHelper param in SchedulesSettings.ParamsForScheduleFilters) {
-                if(param.IsCheck) {
-                    return true;
-                }
+                if(param.IsCheck) { return true; }
             }
-            
             return false;
         }
     }

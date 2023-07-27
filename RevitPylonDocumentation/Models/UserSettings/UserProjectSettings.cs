@@ -4,7 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+
 using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.ViewModels;
@@ -12,12 +16,15 @@ using RevitPylonDocumentation.ViewModels;
 namespace RevitPylonDocumentation.Models.UserSettings {
     class UserProjectSettings : BaseViewModel {
 
-        public UserProjectSettings(MainViewModel mainViewModel) {
+        public UserProjectSettings(MainViewModel mainViewModel, RevitRepository repository) {
 
             ViewModel = mainViewModel;
+            Repository = repository;
         }
 
         public MainViewModel ViewModel { get; set; }
+        internal RevitRepository Repository { get; set; }
+
 
 
 
@@ -25,7 +32,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _markTemp = "Марка";
         private string _titleBlockNameTemp = "Создать типы по комплектам";
         private string _dispatcherGroupingFirstTemp = "_Группа видов 1";
-        private string _dispatcherGroupingSecondTemp = "_Группа видов 1";
+        private string _dispatcherGroupingSecondTemp = "_Группа видов 2";
         private string _sheetSizeTemp = "А";
         private string _sheetCoefficientTemp = "х";
 
@@ -162,10 +169,59 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             SHEET_PREFIX = SHEET_PREFIX_TEMP;
             SHEET_SUFFIX = SHEET_SUFFIX_TEMP;
 
+
             TYPICAL_PYLON_FILTER_PARAMETER = TYPICAL_PYLON_FILTER_PARAMETER_TEMP;
             TYPICAL_PYLON_FILTER_VALUE = TYPICAL_PYLON_FILTER_VALUE_TEMP;
 
             LEGEND_NAME = LEGEND_NAME_TEMP;
+        }
+
+        public void CheckProjectSettings() {
+
+            //Какиет о проблемы с проверкой прааметров диспетчера
+            //    нужно подчистить классы, так чтобы изначально в не темпах ничего не было, а значение задавалось в Apply
+
+            // Пытаемся проверить виды
+            if(Repository.AllSectionViews.FirstOrDefault()?.LookupParameter(DISPATCHER_GROUPING_FIRST) is null) {
+                ViewModel.ErrorText = "Наименование параметра диспетчера 1 некорректно";
+            }
+            if(Repository.AllSectionViews.FirstOrDefault()?.LookupParameter(DISPATCHER_GROUPING_SECOND) is null) {
+                ViewModel.ErrorText = "Наименование параметра диспетчера 2 некорректно";
+            }
+            
+            // Пытаемся проверить спеки
+            if(Repository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DISPATCHER_GROUPING_FIRST) is null) {
+                ViewModel.ErrorText = "Наименование параметра диспетчера 1 некорректно";
+            }
+            if(Repository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DISPATCHER_GROUPING_SECOND) is null) {
+                ViewModel.ErrorText = "Наименование параметра диспетчера 2 некорректно";
+            }
+
+
+            using(Transaction transaction = Repository.Document.StartTransaction("Проверка параметров на листе")) {
+
+                // Листов в проекте может не быть или рамка может быть другая, поэтому создаем свой лист для тестов с нужной рамкой
+                ViewSheet viewSheet = ViewSheet.Create(Repository.Document, ViewModel.SelectedTitleBlock.Id);
+                if(viewSheet?.LookupParameter(DISPATCHER_GROUPING_FIRST) is null) {
+                    ViewModel.ErrorText = "Наименование параметра диспетчера 1 некорректно";
+                }
+
+                // Ищем рамку листа
+                FamilyInstance titleBlock = new FilteredElementCollector(Repository.Document, viewSheet.Id)
+                    .OfCategory(BuiltInCategory.OST_TitleBlocks)
+                    .WhereElementIsNotElementType()
+                    .FirstOrDefault() as FamilyInstance;
+
+                if(titleBlock?.LookupParameter(SHEET_SIZE) is null) {
+                    ViewModel.ErrorText = "Наименование параметра формата рамки листа некорректно";
+                }
+                if(titleBlock?.LookupParameter(SHEET_COEFFICIENT) is null) {
+                    ViewModel.ErrorText = "Наименование параметра множителя формата рамки листа некорректно";
+                }
+
+                // Удаляем созданный лист
+                Repository.Document.Delete(viewSheet.Id);
+            }
         }
     }
 }

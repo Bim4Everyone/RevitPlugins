@@ -242,13 +242,13 @@
                                     Text="{Binding Path=ProjectSettings.DISPATCHER_GROUPING_SECOND_TEMP, UpdateSourceTrigger=PropertyChanged}" 
                                     Width="290" VerticalContentAlignment="Center"/>
 
-                                <Label Content="Параметр для формата листа"/>
+                                <Label Content="Параметр для формата рамки листа"/>
                                 <TextBox
                                     HorizontalAlignment="Left" Margin="5 0"
                                     Text="{Binding Path=ProjectSettings.SHEET_SIZE_TEMP, UpdateSourceTrigger=PropertyChanged}" 
                                     Width="290" VerticalContentAlignment="Center"/>
 
-                                <Label Content="Параметр для множителя формата листа"/>
+                                <Label Content="Параметр для множителя формата рамки листа"/>
                                 <TextBox
                                     HorizontalAlignment="Left" Margin="5 0"
                                     Text="{Binding Path=ProjectSettings.SHEET_COEFFICIENT_TEMP, UpdateSourceTrigger=PropertyChanged}" 
@@ -611,10 +611,17 @@
                         </GroupBox>
                     </StackPanel>
                 </ScrollViewer>
-               
+
 
                 <Button Grid.Row="4" Margin="5 5 0 0"
-                        Content="Применить" Command="{Binding ApplySettingsCommands}"/>
+                        Content="Применить"
+                        Command="{Binding Path=ApplySettingsCommands}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeave">
+                            <i:InvokeCommandAction Command="{Binding CheckSettingsCommands}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Button>
             </Grid>
         </Expander>
     </Grid>

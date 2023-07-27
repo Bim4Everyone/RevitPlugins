@@ -28,43 +28,61 @@ namespace RevitPylonDocumentation.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
+        /// <summary>
+        /// Возвращает список всех листов, имеющихся  в проекте
+        /// </summary>
         public List<ViewSheet> AllSheets => new FilteredElementCollector(Document)
                 .OfClass(typeof(ViewSheet))
                 .OfType<ViewSheet>()
                 .ToList();
 
+        /// <summary>
+        /// Возвращает список всех сечений, имеющихся в проекте
+        /// </summary>
         public List<ViewSection> AllSectionViews => new FilteredElementCollector(Document)
                 .OfClass(typeof(ViewSection))
                 .WhereElementIsNotElementType()
                 .OfType<ViewSection>()
                 .ToList();
 
+        /// <summary>
+        /// Возвращает список всех спецификаций, имеющихся в проекте
+        /// </summary>
         public List<ViewSchedule> AllScheduleViews => new FilteredElementCollector(Document)
                 .OfClass(typeof(ViewSchedule))
                 .WhereElementIsNotElementType()
                 .OfType<ViewSchedule>()
+                .Where(view => !view.IsTemplate)
                 .ToList();
 
-
+        /// <summary>
+        /// Возвращает список всех типоразмеров рамок листа
+        /// </summary>
         public List<FamilySymbol> TitleBlocksInProject => new FilteredElementCollector(Document)
                 .OfCategory(BuiltInCategory.OST_TitleBlocks)
                 .WhereElementIsElementType()
                 .OfType<FamilySymbol>()
                 .ToList();
 
-
+        /// <summary>
+        /// Возвращает список типоразмеров видов в проекте
+        /// </summary>
         public List<ViewFamilyType> ViewFamilyTypes => new FilteredElementCollector(Document)
                 .OfClass(typeof(ViewFamilyType))
                 .OfType<ViewFamilyType>()
                 .Where(a => ViewFamily.Section == a.ViewFamily)
                 .ToList();        
-        
+        /// <summary>
+        /// Возвращает список всех легенд, присутствующих в проекте
+        /// </summary>
         public List<View> LegendsInProject => new FilteredElementCollector(Document)
                 .OfClass(typeof(View))
                 .OfType<View>()
                 .Where(view => view.ViewType == ViewType.Legend)
                 .ToList();
-
+        /// <summary>
+        /// Возвращает список всех шаблонов сечений в проекте
+        /// </summary>
         public List<ViewSection> AllViewTemplates => new FilteredElementCollector(Document)
                 .OfClass(typeof(ViewSection))
                 .WhereElementIsNotElementType()
@@ -74,7 +92,9 @@ namespace RevitPylonDocumentation.Models {
                 .ToList();
 
 
-
+        /// <summary>
+        /// Хранит оболочки над листами пилонов - центральное хранилище информации по пилону для работы плагина
+        /// </summary>
         public List<PylonSheetInfo> HostsInfo { get; set; } = new List<PylonSheetInfo>();
 
         public List<string> HostProjectSections { get; set; } = new List<string>();
@@ -124,6 +144,9 @@ namespace RevitPylonDocumentation.Models {
                 .OrderBy(i => i));
         }
 
+        /// <summary>
+        /// Анализирует найденные пилоны, извлекая информацию о них и заполняя список оболочек над листами пилонов
+        /// </summary>
         private void AnalizePylons(MainViewModel mainViewModel, IList<Element> elems) {
 
             foreach(Element elem in elems) {

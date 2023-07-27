@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.UI;
+
 using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.ViewModels;
@@ -230,6 +232,27 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             TRANSVERSE_VIEW_Y_OFFSET = TRANSVERSE_VIEW_Y_OFFSET_TEMP;
 
             VIEW_FAMILY_TYPE_NAME = VIEW_FAMILY_TYPE_NAME_TEMP;
+        }
+
+        public void CheckViewSectionsSettings() {
+
+            int temp;
+            if(!int.TryParse(ViewModel.ViewSectionSettings.GENERAL_VIEW_X_OFFSET, out temp)) {
+                ViewModel.ErrorText = "Значение отступа основного вида по X некорректно";
+            }
+            if(!int.TryParse(ViewModel.ViewSectionSettings.GENERAL_VIEW_Y_TOP_OFFSET, out temp)) {
+                ViewModel.ErrorText = "Значение отступа основного вида по Y сверху некорректно";
+            }
+            if(!int.TryParse(ViewModel.ViewSectionSettings.GENERAL_VIEW_Y_BOTTOM_OFFSET, out temp)) {
+                ViewModel.ErrorText = "Значение отступа основного вида по Y сверху некорректно";
+            }
+
+            if(!int.TryParse(ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_X_OFFSET, out temp)) {
+                ViewModel.ErrorText = "Значение отступа поперечного вида по X некорректно";
+            }
+            if(!int.TryParse(ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET_TEMP, out temp)) {
+                ViewModel.ErrorText = "Значение отступа поперечного вида по Y некорректно";
+            }
         }
     }
 }

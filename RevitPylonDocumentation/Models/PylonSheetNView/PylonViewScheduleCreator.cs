@@ -170,11 +170,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
         /// <summary>
-        /// Задает спецификации значение 
+        /// Задает у спецификации значение параметру диспетчера
         /// </summary>
-        /// <param name="viewSchedule"></param>
-        /// <param name="dispGroupingParam"></param>
-        /// <param name="hostDispGroupingParam"></param>
         public void SetScheduleDispatcherParameter(ViewSchedule viewSchedule, string dispGroupingParam, string hostDispGroupingParam) {
 
             Parameter ScheduleGroupingParameter = viewSchedule.LookupParameter(dispGroupingParam);
