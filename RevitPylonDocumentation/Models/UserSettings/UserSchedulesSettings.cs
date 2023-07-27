@@ -50,7 +50,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         };
 
 
-        public string REBAR_SCHEDULE_PREFIX { get; set; } = "Пилон ";
+        public string REBAR_SCHEDULE_PREFIX { get; set; }
         public string REBAR_SCHEDULE_PREFIX_TEMP {
             get => _rebarSchedulePrefixTemp;
             set {
@@ -59,7 +59,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string REBAR_SCHEDULE_SUFFIX { get; set; } = "";
+        public string REBAR_SCHEDULE_SUFFIX { get; set; }
         public string REBAR_SCHEDULE_SUFFIX_TEMP {
             get => _rebarScheduleSuffixTemp;
             set {
@@ -69,7 +69,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         }
 
 
-        public string MATERIAL_SCHEDULE_PREFIX { get; set; } = "!СМ_Пилон ";
+        public string MATERIAL_SCHEDULE_PREFIX { get; set; }
         public string MATERIAL_SCHEDULE_PREFIX_TEMP {
             get => _materialSchedulePrefixTemp;
             set {
@@ -78,7 +78,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string MATERIAL_SCHEDULE_SUFFIX { get; set; } = "";
+        public string MATERIAL_SCHEDULE_SUFFIX { get; set; }
         public string MATERIAL_SCHEDULE_SUFFIX_TEMP {
             get => _materialScheduleSuffixTemp;
             set {
@@ -87,7 +87,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string SYSTEM_PARTS_SCHEDULE_PREFIX { get; set; } = "!ВД_СИС_";
+        public string SYSTEM_PARTS_SCHEDULE_PREFIX { get; set; }
         public string SYSTEM_PARTS_SCHEDULE_PREFIX_TEMP {
             get => _systemPartsSchedulePrefixTemp;
             set {
@@ -96,7 +96,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string SYSTEM_PARTS_SCHEDULE_SUFFIX { get; set; } = "";
+        public string SYSTEM_PARTS_SCHEDULE_SUFFIX { get; set; }
         public string SYSTEM_PARTS_SCHEDULE_SUFFIX_TEMP {
             get => _systemPartsScheduleSuffixTemp;
             set {
@@ -106,7 +106,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         }
 
 
-        public string IFC_PARTS_SCHEDULE_PREFIX { get; set; } = "!ВД_IFC_";
+        public string IFC_PARTS_SCHEDULE_PREFIX { get; set; }
         public string IFC_PARTS_SCHEDULE_PREFIX_TEMP {
             get => _IFCPartsSchedulePrefixTemp;
             set {
@@ -115,7 +115,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string IFC_PARTS_SCHEDULE_SUFFIX { get; set; } = "";
+        public string IFC_PARTS_SCHEDULE_SUFFIX { get; set; }
         public string IFC_PARTS_SCHEDULE_SUFFIX_TEMP {
             get => _IFCPartsScheduleSuffixTemp;
             set {
@@ -124,10 +124,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-
-
-
-        public string REBAR_SCHEDULE_NAME { get; set; } = "!СА_Базовая";
+        public string REBAR_SCHEDULE_NAME { get; set; }
         public string REBAR_SCHEDULE_NAME_TEMP {
             get => _rebarScheduleNameTemp;
             set {
@@ -136,7 +133,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string MATERIAL_SCHEDULE_NAME { get; set; } = "!СМ";
+        public string MATERIAL_SCHEDULE_NAME { get; set; }
         public string MATERIAL_SCHEDULE_NAME_TEMP {
             get => _materialScheduleNameTemp;
             set {
@@ -145,8 +142,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-
-        public string SYSTEM_PARTS_SCHEDULE_NAME { get; set; } = "!ВД_СИС";
+        public string SYSTEM_PARTS_SCHEDULE_NAME { get; set; }
         public string SYSTEM_PARTS_SCHEDULE_NAME_TEMP {
             get => _systemPartsScheduleNameTemp;
             set {
@@ -155,7 +151,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string IFC_PARTS_SCHEDULE_NAME { get; set; } = "!ВД_IFC";
+        public string IFC_PARTS_SCHEDULE_NAME { get; set; }
         public string IFC_PARTS_SCHEDULE_NAME_TEMP {
             get => _IFCPartsScheduleNameTemp;
             set {
@@ -164,8 +160,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-
-        public string REBAR_SCHEDULE_DISP1 { get; set; } = "обр_ФОП_Раздел проекта";
+        public string REBAR_SCHEDULE_DISP1 { get; set; }
         public string REBAR_SCHEDULE_DISP1_TEMP {
             get => _rebarScheduleDisp1Temp;
             set {
@@ -173,7 +168,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
                 ViewModel.SettingsEdited = true;
             }
         }
-        public string MATERIAL_SCHEDULE_DISP1 { get; set; } = "обр_ФОП_Раздел проекта";
+        public string MATERIAL_SCHEDULE_DISP1 { get; set; }
         public string MATERIAL_SCHEDULE_DISP1_TEMP {
             get => _materialScheduleDisp1Temp;
             set {
@@ -181,7 +176,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
                 ViewModel.SettingsEdited = true;
             }
         }
-        public string SYSTEM_PARTS_SCHEDULE_DISP1 { get; set; } = "обр_ФОП_Раздел проекта";
+        public string SYSTEM_PARTS_SCHEDULE_DISP1 { get; set; }
         public string SYSTEM_PARTS_SCHEDULE_DISP1_TEMP {
             get => _systemPartsScheduleDisp1Temp;
             set {
@@ -189,7 +184,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
                 ViewModel.SettingsEdited = true;
             }
         }
-        public string IFC_PARTS_SCHEDULE_DISP1 { get; set; } = "обр_ФОП_Раздел проекта";
+        public string IFC_PARTS_SCHEDULE_DISP1 { get; set; }
         public string IFC_PARTS_SCHEDULE_DISP1_TEMP {
             get => _IFCPartsScheduleDisp1Temp;
             set {
@@ -198,9 +193,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-
-
-        public string REBAR_SCHEDULE_DISP2 { get; set; } = "!СА_Пилоны";
+        public string REBAR_SCHEDULE_DISP2 { get; set; }
         public string REBAR_SCHEDULE_DISP2_TEMP {
             get => _rebarScheduleDisp2Temp;
             set {
@@ -208,7 +201,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
                 ViewModel.SettingsEdited = true;
             }
         }
-        public string MATERIAL_SCHEDULE_DISP2 { get; set; } = "СМ_Пилоны";
+        public string MATERIAL_SCHEDULE_DISP2 { get; set; }
         public string MATERIAL_SCHEDULE_DISP2_TEMP {
             get => _materialScheduleDisp2Temp;
             set {
@@ -216,7 +209,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
                 ViewModel.SettingsEdited = true;
             }
         }
-        public string SYSTEM_PARTS_SCHEDULE_DISP2 { get; set; } = "ВД_СИС_Пилоны";
+        public string SYSTEM_PARTS_SCHEDULE_DISP2 { get; set; }
         public string SYSTEM_PARTS_SCHEDULE_DISP2_TEMP {
             get => _systemPartsScheduleDisp2Temp;
             set {
@@ -224,7 +217,8 @@ namespace RevitPylonDocumentation.Models.UserSettings {
                 ViewModel.SettingsEdited = true;
             }
         }
-        public string IFC_PARTS_SCHEDULE_DISP2 { get; set; } = "ВД_IFC_Пилоны";
+
+        public string IFC_PARTS_SCHEDULE_DISP2 { get; set; }
         public string IFC_PARTS_SCHEDULE_DISP2_TEMP {
             get => _IFCPartsScheduleDisp2Temp;
             set {
@@ -232,9 +226,6 @@ namespace RevitPylonDocumentation.Models.UserSettings {
                 ViewModel.SettingsEdited = true;
             }
         }
-
-
-
 
         public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFilters {
             get => _paramsForScheduleFilters;

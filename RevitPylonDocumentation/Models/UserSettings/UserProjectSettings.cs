@@ -45,7 +45,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _legendNameTemp = "Указания для пилонов";
 
 
-        public string PROJECT_SECTION { get; set; } = "обр_ФОП_Раздел проекта";
+        public string PROJECT_SECTION { get; set; }
         public string PROJECT_SECTION_TEMP {
             get => _projectSectionTemp;
             set {
@@ -54,7 +54,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string MARK { get; set; } = "Марка";
+        public string MARK { get; set; }
         public string MARK_TEMP {
             get => _markTemp;
             set {
@@ -63,7 +63,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string TITLEBLOCK_NAME { get; set; } = "Создать типы по комплектам";
+        public string TITLEBLOCK_NAME { get; set; }
         public string TITLEBLOCK_NAME_TEMP {
             get => _titleBlockNameTemp;
             set {
@@ -72,8 +72,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        // dispatcher grouping
-        public string DISPATCHER_GROUPING_FIRST { get; set; } = "_Группа видов 1";
+        public string DISPATCHER_GROUPING_FIRST { get; set; }
         public string DISPATCHER_GROUPING_FIRST_TEMP {
             get => _dispatcherGroupingFirstTemp;
             set {
@@ -81,7 +80,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
                 ViewModel.SettingsEdited = true;
             }
         }
-        public string DISPATCHER_GROUPING_SECOND { get; set; } = "_Группа видов 2";
+        public string DISPATCHER_GROUPING_SECOND { get; set; }
         public string DISPATCHER_GROUPING_SECOND_TEMP {
             get => _dispatcherGroupingSecondTemp;
             set {
@@ -90,7 +89,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string SHEET_SIZE { get; set; } = "А";
+        public string SHEET_SIZE { get; set; }
         public string SHEET_SIZE_TEMP {
             get => _sheetSizeTemp;
             set {
@@ -99,7 +98,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string SHEET_COEFFICIENT { get; set; } = "х";
+        public string SHEET_COEFFICIENT { get; set; }
         public string SHEET_COEFFICIENT_TEMP {
             get => _sheetCoefficientTemp;
             set {
@@ -109,7 +108,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         }
 
 
-        public string SHEET_PREFIX { get; set; } = "Пилон ";
+        public string SHEET_PREFIX { get; set; }
         public string SHEET_PREFIX_TEMP {
             get => _sheetPrefixTemp;
             set {
@@ -118,7 +117,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string SHEET_SUFFIX { get; set; } = "";
+        public string SHEET_SUFFIX { get; set; }
         public string SHEET_SUFFIX_TEMP {
             get => _sheetSuffixTemp;
             set {
@@ -127,7 +126,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string TYPICAL_PYLON_FILTER_PARAMETER { get; set; } = "обр_ФОП_Фильтрация 1";
+        public string TYPICAL_PYLON_FILTER_PARAMETER { get; set; }
         public string TYPICAL_PYLON_FILTER_PARAMETER_TEMP {
             get => _typicalPylonFilterParameterTemp;
             set {
@@ -137,7 +136,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         }
 
 
-        public string TYPICAL_PYLON_FILTER_VALUE { get; set; } = "на 1 шт.";
+        public string TYPICAL_PYLON_FILTER_VALUE { get; set; }
         public string TYPICAL_PYLON_FILTER_VALUE_TEMP {
             get => _typicalPylonFilterValueTemp;
             set {
@@ -146,7 +145,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string LEGEND_NAME { get; set; } = "Указания для пилонов";
+        public string LEGEND_NAME { get; set; }
         public string LEGEND_NAME_TEMP {
             get => _legendNameTemp;
             set {

@@ -42,7 +42,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _viewFamilyTypeNameTemp = "РАЗРЕЗ_Без номера листа";
 
 
-        public string GENERAL_VIEW_PREFIX { get; set; } = "";
+        public string GENERAL_VIEW_PREFIX { get; set; }
         public string GENERAL_VIEW_PREFIX_TEMP {
             get => _generalViewPrefixTemp;
             set {
@@ -51,7 +51,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string GENERAL_VIEW_SUFFIX { get; set; } = "";
+        public string GENERAL_VIEW_SUFFIX { get; set; }
         public string GENERAL_VIEW_SUFFIX_TEMP {
             get => _generalViewSuffixTemp;
             set {
@@ -60,8 +60,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-
-        public string GENERAL_VIEW_PERPENDICULAR_PREFIX { get; set; } = "Пилон ";
+        public string GENERAL_VIEW_PERPENDICULAR_PREFIX { get; set; }
         public string GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP {
             get => _generalViewPerpendicularPrefixTemp;
             set {
@@ -70,7 +69,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string GENERAL_VIEW_PERPENDICULAR_SUFFIX { get; set; } = "_Перпендикулярный";
+        public string GENERAL_VIEW_PERPENDICULAR_SUFFIX { get; set; }
         public string GENERAL_VIEW_PERPENDICULAR_SUFFIX_TEMP {
             get => _generalViewPerpendicularSuffixTemp;
             set {
@@ -79,7 +78,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string GENERAL_VIEW_TEMPLATE_NAME { get; set; } = "КЖ0.2_пилоны_орг.ур.-2";
+        public string GENERAL_VIEW_TEMPLATE_NAME { get; set; }
         public string GENERAL_VIEW_TEMPLATE_NAME_TEMP {
             get => _generalViewTemplateNameTemp;
             set {
@@ -88,7 +87,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string GENERAL_VIEW_X_OFFSET { get; set; } = "200";
+        public string GENERAL_VIEW_X_OFFSET { get; set; }
         public string GENERAL_VIEW_X_OFFSET_TEMP {
             get => _generalViewXOffsetTemp;
             set {
@@ -97,7 +96,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string GENERAL_VIEW_Y_TOP_OFFSET { get; set; } = "2300";
+        public string GENERAL_VIEW_Y_TOP_OFFSET { get; set; }
         public string GENERAL_VIEW_Y_TOP_OFFSET_TEMP {
             get => _generalViewYTopOffsetTemp;
             set {
@@ -106,7 +105,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string GENERAL_VIEW_Y_BOTTOM_OFFSET { get; set; } = "200";
+        public string GENERAL_VIEW_Y_BOTTOM_OFFSET { get; set; }
         public string GENERAL_VIEW_Y_BOTTOM_OFFSET_TEMP {
             get => _generalViewYBottomOffsetTemp;
             set {
@@ -116,7 +115,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         }
 
 
-        public string TRANSVERSE_VIEW_FIRST_PREFIX { get; set; } = "";
+        public string TRANSVERSE_VIEW_FIRST_PREFIX { get; set; }
         public string TRANSVERSE_VIEW_FIRST_PREFIX_TEMP {
             get => _transverseViewFirstPrefixTemp;
             set {
@@ -125,7 +124,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string TRANSVERSE_VIEW_FIRST_SUFFIX { get; set; } = "_Сеч.1-1";
+        public string TRANSVERSE_VIEW_FIRST_SUFFIX { get; set; }
         public string TRANSVERSE_VIEW_FIRST_SUFFIX_TEMP {
             get => _transverseViewFirstSuffixTemp;
             set {
@@ -135,7 +134,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         }
 
 
-        public string TRANSVERSE_VIEW_SECOND_PREFIX { get; set; } = "";
+        public string TRANSVERSE_VIEW_SECOND_PREFIX { get; set; }
         public string TRANSVERSE_VIEW_SECOND_PREFIX_TEMP {
             get => _transverseViewSecondPrefixTemp;
             set {
@@ -144,7 +143,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string TRANSVERSE_VIEW_SECOND_SUFFIX { get; set; } = "_Сеч.2-2";
+        public string TRANSVERSE_VIEW_SECOND_SUFFIX { get; set; }
         public string TRANSVERSE_VIEW_SECOND_SUFFIX_TEMP {
             get => _transverseViewSecondSuffixTemp;
             set {
@@ -153,8 +152,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-
-        public string TRANSVERSE_VIEW_THIRD_PREFIX { get; set; } = "";
+        public string TRANSVERSE_VIEW_THIRD_PREFIX { get; set; }
         public string TRANSVERSE_VIEW_THIRD_PREFIX_TEMP {
             get => _transverseViewThirdPrefixTemp;
             set {
@@ -163,7 +161,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string TRANSVERSE_VIEW_THIRD_SUFFIX { get; set; } = "_Сеч.3-3";
+        public string TRANSVERSE_VIEW_THIRD_SUFFIX { get; set; }
         public string TRANSVERSE_VIEW_THIRD_SUFFIX_TEMP {
             get => _transverseViewThirdSuffixTemp;
             set {
@@ -172,7 +170,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string TRANSVERSE_VIEW_TEMPLATE_NAME { get; set; } = "";
+        public string TRANSVERSE_VIEW_TEMPLATE_NAME { get; set; }
         public string TRANSVERSE_VIEW_TEMPLATE_NAME_TEMP {
             get => _transverseViewTemplateNameTemp;
             set {
@@ -181,7 +179,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string TRANSVERSE_VIEW_X_OFFSET { get; set; } = "200";
+        public string TRANSVERSE_VIEW_X_OFFSET { get; set; }
         public string TRANSVERSE_VIEW_X_OFFSET_TEMP {
             get => _transverseViewXOffsetTemp;
             set {
@@ -190,7 +188,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string TRANSVERSE_VIEW_Y_OFFSET { get; set; } = "200";
+        public string TRANSVERSE_VIEW_Y_OFFSET { get; set; }
         public string TRANSVERSE_VIEW_Y_OFFSET_TEMP {
             get => _transverseViewYOffsetTemp;
             set {
@@ -199,7 +197,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
         }
 
-        public string VIEW_FAMILY_TYPE_NAME { get; set; } = "РАЗРЕЗ_Без номера листа";
+        public string VIEW_FAMILY_TYPE_NAME { get; set; }
         public string VIEW_FAMILY_TYPE_NAME_TEMP {
             get => _viewFamilyTypeNameTemp;
             set {
