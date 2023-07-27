@@ -150,6 +150,21 @@
                 Click="ButtonCancel_Click"
                 Command="{Binding SelectPylonCommand}"/>
 
+
+
+        <Button
+            Grid.Row="6"    
+                Width="180"
+                Content="Задать цвет"
+                Command="{Binding SelectCOLORCommand}"/>
+
+        <Button
+            Grid.Row="7"    
+                Width="180"
+                Content="Окрасить"
+                Click="ButtonOk_Click"
+                Command="{Binding DOITCommand}"/>
+
         <StackPanel
             Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2"
             Height="45"

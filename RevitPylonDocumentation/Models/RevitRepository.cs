@@ -36,6 +36,24 @@ namespace RevitPylonDocumentation.Models {
                 .OfType<ViewSheet>()
                 .ToList();
 
+
+
+        public List<View> AllViews => new FilteredElementCollector(Document)
+                .OfClass(typeof(View))
+                .WhereElementIsNotElementType()
+                .OfType<View>()
+                .Where(view => !view.IsTemplate)
+                .ToList();
+
+
+
+
+
+
+
+
+
+
         /// <summary>
         /// Возвращает список всех сечений, имеющихся в проекте
         /// </summary>
