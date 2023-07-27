@@ -872,17 +872,15 @@ namespace RevitPylonDocumentation.ViewModels {
         private void DOIT() {
 
 
-            //List<Reference> refs = _revitRepository.ActiveUIDocument.Selection.PickObjects(ObjectType.Element, "Выберите пилон").ToList<Reference>();
 
             List<Element> elemsForWork = new List<Element>();
 
 
+            //List<Reference> refs = _revitRepository.ActiveUIDocument.Selection.PickObjects(ObjectType.Element, "Выберите пилон").ToList<Reference>();
             //foreach(Reference ref1 in refs) {
-
             //    elemsForWork.Add(_revitRepository.Document.GetElement(ref1));
             //}
             
-
 
 
             ICollection<ElementId> selectedIds = _revitRepository.ActiveUIDocument.Selection.GetElementIds();
