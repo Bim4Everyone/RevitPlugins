@@ -84,38 +84,40 @@
                 </dxdo:LayoutControlItem>
 
                 <dxdo:LayoutGroup ItemHeight="100">
-                <dxdo:LayoutControlItem>
-                    <lc:GroupBox Header="Округление размеров отверстий">
-                        <dxe:ComboBoxEdit ItemsSource="{Binding Roundings}"
-                                          SelectedItem="{Binding SelectedRounding}"
-                                          IsTextEditable="False"
-                                          Height="20"
-                                          VerticalAlignment="Top"/>
-                    </lc:GroupBox>
-                </dxdo:LayoutControlItem>
+                    <dxdo:LayoutControlItem>
+                        <lc:GroupBox Header="Округление размеров отверстий">
+                            <dxe:ComboBoxEdit ItemsSource="{Binding Roundings}"
+                                              SelectedItem="{Binding SelectedRounding}"
+                                              IsTextEditable="False"
+                                              Height="20"
+                                              VerticalAlignment="Top"/>
+                        </lc:GroupBox>
+                    </dxdo:LayoutControlItem>
                 
-                <dxdo:LayoutControlItem>
-                    <lc:GroupBox Header="Конструкции для расстановки отверстий">
-                        <dxe:ListBoxEdit ItemsSource="{Binding StructureCategories}">
-                            <dxe:ListBoxEdit.ItemTemplate>
-                                <DataTemplate>
-                                    <dxe:CheckEdit IsChecked="{Binding IsSelected}" Content="{Binding Name}"/>
-                                </DataTemplate>
-                            </dxe:ListBoxEdit.ItemTemplate>
-                        </dxe:ListBoxEdit>
-                    </lc:GroupBox>
-                </dxdo:LayoutControlItem>
+                    <dxdo:LayoutControlItem>
+                        <lc:GroupBox Header="Конструкции для расстановки отверстий">
+                            <dxe:ListBoxEdit ItemsSource="{Binding StructureCategories}">
+                                <dxe:ListBoxEdit.ItemTemplate>
+                                    <DataTemplate>
+                                        <dxe:CheckEdit IsChecked="{Binding IsSelected}" Content="{Binding Name}"/>
+                                    </DataTemplate>
+                                </dxe:ListBoxEdit.ItemTemplate>
+                            </dxe:ListBoxEdit>
+                        </lc:GroupBox>
+                    </dxdo:LayoutControlItem>
                 </dxdo:LayoutGroup>
 
                 <dxdo:LayoutControlItem ItemHeight="*">
                     <lc:GroupBox Header="Критерии фильтрации">
-                        <ContentControl Content="{Binding SetViewModel}">
-                            <ContentControl.ContentTemplate>
-                                <DataTemplate DataType="{x:Type vm:SetViewModel}">
-                                    <views:SetView DataContext="{Binding}"/>
-                                </DataTemplate>
-                            </ContentControl.ContentTemplate>
-                        </ContentControl>
+                        <ScrollViewer>
+                            <ContentControl Content="{Binding SetViewModel}">
+                                <ContentControl.ContentTemplate>
+                                    <DataTemplate DataType="{x:Type vm:SetViewModel}">
+                                        <views:SetView DataContext="{Binding}"/>
+                                    </DataTemplate>
+                                </ContentControl.ContentTemplate>
+                            </ContentControl>
+                        </ScrollViewer>
                     </lc:GroupBox>
                 </dxdo:LayoutControlItem>
 
