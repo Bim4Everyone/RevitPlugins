@@ -135,6 +135,9 @@ namespace RevitRooms.ViewModels {
         private void CalculateAreas(object p) {
             // Удаляем все не размещенные помещения
             _revitRepository.RemoveUnplacedSpatialElements();
+            
+            // Заполняем параметр Этаж
+            _revitRepository.UpdateLevelSharedParam();
 
             // Обрабатываем все зоны
             var errorElements = new Dictionary<string, InfoElementViewModel>();
@@ -154,8 +157,6 @@ namespace RevitRooms.ViewModels {
                 foreach(var spartialElement in GetAreas()) {
                     // Обновление параметра
                     // площади с коэффициентом
-
-                    spartialElement.UpdateLevelSharedParam();
 
                     // Расчет площади
                     var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase?.Element };
@@ -194,6 +195,9 @@ namespace RevitRooms.ViewModels {
         private void Calculate(object p) {
             // Удаляем все не размещенные помещения
             _revitRepository.RemoveUnplacedSpatialElements();
+            
+            // Заполняем параметр Этаж
+            _revitRepository.UpdateLevelSharedParam();
 
             // Получаем список дополнительных стадий
             var phases = AdditionalPhases.ToList();
@@ -332,9 +336,6 @@ namespace RevitRooms.ViewModels {
                         // Заполняем дублирующие
                         // общие параметры
                         spartialElement.UpdateSharedParams();
-
-                        // Обновляем общий параметр этажа
-                        spartialElement.UpdateLevelSharedParam();
 
                         // Обновление параметра площади 
                         var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) {Phase = Phase.Element};

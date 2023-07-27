@@ -139,10 +139,6 @@ namespace RevitRooms.ViewModels {
 #endif
         }
 
-        public void UpdateLevelSharedParam() {
-            Element.SetParamValue(SharedParamsConfig.Instance.Level, Element.Level.Name.Replace(" этаж", string.Empty));
-        }
-
         private Element GetParamElement(RevitParam revitParam) {
             ElementId elementId = (ElementId) Element.GetParamValueOrDefault(revitParam);
             return elementId == null ? null : Element.Document.GetElement(elementId);

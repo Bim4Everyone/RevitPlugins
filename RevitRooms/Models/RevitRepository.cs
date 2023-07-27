@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using Autodesk.Revit.ApplicationServices;
@@ -9,8 +10,12 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
+using DevExpress.Utils.Extensions;
+
+using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.KeySchedules;
 using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
 namespace RevitRooms.Models {
@@ -85,6 +90,64 @@ namespace RevitRooms.Models {
                 .OfCategory(BuiltInCategory.OST_Doors)
                 .OfType<FamilyInstance>()
                 .ToList();
+        }
+
+        public void UpdateLevelSharedParam() {
+            using(var transaction = StartTransaction($"Заполнение {SharedParamsConfig.Instance.Level.Name}")) {
+                IList<SpatialElement> spatialElements = GetSpatialElements();
+                var levelNames = GetLevelNames(spatialElements);
+                foreach(SpatialElement spatialElement in spatialElements) {
+                    var levelName = levelNames.GetValueOrDefault(spatialElement.Level.Id, spatialElement.Level.Name);
+                    spatialElement.SetParamValue(SharedParamsConfig.Instance.Level, levelName);
+                }
+
+                transaction.Commit();
+            }
+        }
+        
+        private string GetLevelName(Level level) {
+            int index = level.Name.IndexOf(' ');
+            return index <= 0
+                ? level.Name
+                : level.Name.Substring(0, index);
+        }
+
+        private Dictionary<ElementId, string> GetLevelNames(IList<SpatialElement> spatialElements) {
+            var levels = spatialElements
+                .Select(item => item.Level)
+                .ToArray();
+
+            (ElementId ElementId, string LevelName)[] levelPairs = levels
+                .Select(item => (item.Id, GetLevelName(item)))
+                .ToArray();
+            
+            bool isOneUnderLevel = levelPairs
+                .Where(item => item.LevelName.StartsWith("П", StringComparison.CurrentCultureIgnoreCase))
+                .GroupBy(item => item.LevelName)
+                .Count() == 1;
+            
+            var levelNames = new Dictionary<ElementId, string>();
+            foreach((ElementId elementId, string levelName) in levelPairs) {
+                if(levelName.StartsWith("К", StringComparison.CurrentCultureIgnoreCase)) {
+                    levelNames.Add(elementId, "Кровля");
+                } else if(levelName.StartsWith("Т", StringComparison.CurrentCultureIgnoreCase)) {
+                    levelNames.Add(elementId, "Технический");
+                } else if(levelName.StartsWith("П", StringComparison.CurrentCultureIgnoreCase)) {
+                    if(isOneUnderLevel) {
+                        levelNames.Add(elementId, "Подземный");
+                    } else if(int.TryParse(levelName.Substring(1), out int index)) {
+                        levelNames.Add(elementId, $"Подземный -{index}");
+                    }
+                } else if(Regex.IsMatch(levelName, "[0-9]+")) {
+                    if(int.TryParse(levelName.Substring(1), out int index)) {
+                        levelNames.Add(elementId, index.ToString());
+                    }
+                } else {
+                    levelNames.Add(elementId, levelName);
+                }
+            }
+
+            return levelNames;
         }
 
         /// <summary>
