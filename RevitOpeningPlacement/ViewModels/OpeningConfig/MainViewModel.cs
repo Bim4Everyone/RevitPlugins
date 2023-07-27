@@ -38,7 +38,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             SaveAsConfigCommand = new RelayCommand(SaveAsConfig, CanSaveConfig);
             LoadConfigCommand = new RelayCommand(LoadConfig);
 
-            SelectedMepCategoryViewModel = MepCategories.FirstOrDefault();
+            SelectedMepCategoryViewModel = MepCategories.FirstOrDefault(category => category.IsSelected) ?? MepCategories.First();
         }
 
         private MepCategoryViewModel _selectedMepCategoryViewModel;
