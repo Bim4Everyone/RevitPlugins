@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using dosymep.WPF.ViewModels;
 
-using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
 
@@ -40,25 +36,25 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
         public double From {
             get => _from;
-            set => this.RaiseAndSetIfChanged(ref _from, value);
+            set => RaiseAndSetIfChanged(ref _from, value);
         }
         public double To {
             get => _to;
-            set => this.RaiseAndSetIfChanged(ref _to, value);
+            set => RaiseAndSetIfChanged(ref _to, value);
         }
         public double Offset {
             get => _offset;
-            set => this.RaiseAndSetIfChanged(ref _offset, value);
+            set => RaiseAndSetIfChanged(ref _offset, value);
         }
 
         public ObservableCollection<string> OpeningTypeNames {
             get => _typeNames;
-            set => this.RaiseAndSetIfChanged(ref _typeNames, value);
+            set => RaiseAndSetIfChanged(ref _typeNames, value);
         }
 
         public string SelectedOpeningType {
             get => _selectedOpeningType;
-            set => this.RaiseAndSetIfChanged(ref _selectedOpeningType, value);
+            set => RaiseAndSetIfChanged(ref _selectedOpeningType, value);
         }
 
         public string GetErrorText() {
@@ -69,7 +65,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 return "значение параметра \"До\" должно быть неотрицательным.";
             }
             if(From > To) {
-                return "значение парметра \"От\" должно быть меньше значения параметра \"До\".";
+                return "значение параметра \"От\" должно быть меньше значения параметра \"До\".";
             }
             if(Offset > To) {
                 return "значение \"Зазора\" должно быть меньше значения параметра \"До\".";
