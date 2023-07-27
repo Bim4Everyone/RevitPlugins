@@ -13,21 +13,26 @@
              xmlns:views="clr-namespace:RevitOpeningPlacement.Views"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance vm:MepCategoryViewModel, IsDesignTimeCreatable=False}"
-             d:DesignHeight="750" d:DesignWidth="800">
+             d:DesignHeight="700"
+             d:DesignWidth="600"
+             >
     <Grid>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <dxdo:DockLayoutManager Grid.Row="1" VerticalContentAlignment="Stretch">
             <dxdo:LayoutGroup  x:Name="layoutRoot" AllowSplitters="True" Orientation="Vertical" LastChildFill="True">
-
-                <dxdo:LayoutControlItem >
+                    
+                <dxdo:LayoutControlItem>
                     <lc:GroupBox Header="Минимальные размеры">
                         <dxg:GridControl MinHeight="110" MaxHeight="2000" ItemsSource="{Binding MinSizes}">
                             <dxg:GridControl.View>
-                                <dxg:TableView AutoWidth="True" AllowGrouping="False" ShowGroupPanel="False" ShowSearchPanelMode="Always" CellValueChanging="TableView_CellValueChanging"/>
+                                <dxg:TableView AutoWidth="True"
+                                               AllowGrouping="False"
+                                               ShowGroupPanel="False"
+                                               ShowSearchPanelMode="Always"
+                                               CellValueChanging="TableView_CellValueChanging"/>
                             </dxg:GridControl.View>
                             <dxg:GridControl.Columns>
                                 <dxg:GridColumn Header="Параметр" FieldName="Name" ReadOnly="True"/>
@@ -43,15 +48,14 @@
 
                             <StackPanel Margin="0 0 0 5" DockPanel.Dock="Top" Orientation="Horizontal">
                                 <dx:SimpleButton 
-                                        Height="32" 
-                                        Width="35" 
-                                        Margin="0 0 10 0"
-                                        Command="{Binding AddOffsetCommand}"    
+                                        Height="25" 
+                                        Width="25" 
+                                        Margin="0 0 5 0"
+                                        Command="{Binding AddOffsetCommand}"
                                         Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Add.svg'}"/>
                                 <dx:SimpleButton 
-                                        Height="32" 
-                                        Width="35" 
-                                        Margin="0 0 10 0"
+                                        Height="25" 
+                                        Width="25"
                                         Command="{Binding RemoveOffsetCommand}" CommandParameter="{Binding ElementName=_offsetgrid, Path=SelectedItem}"
                                         Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Remove.svg'}"/>
                             </StackPanel>
@@ -64,7 +68,7 @@
                                     <dxg:GridColumn Header="От" FieldName="From"/>
                                     <dxg:GridColumn Header="До" FieldName="To"/>
                                     <dxg:GridColumn Header="Зазор" FieldName="Offset"/>
-                                    <dxg:GridColumn Header="Имя типа">
+                                    <!--<dxg:GridColumn Header="Имя типа">
                                         <dxg:GridColumn.CellTemplate>
                                             <DataTemplate>
                                                 <ComboBox
@@ -72,21 +76,26 @@
                                             SelectedItem="{Binding RowData.Row.SelectedOpeningType}"/>
                                             </DataTemplate>
                                         </dxg:GridColumn.CellTemplate>
-                                    </dxg:GridColumn>
+                                    </dxg:GridColumn>-->
                                 </dxg:GridControl.Columns>
                             </dxg:GridControl>
                         </DockPanel>
                     </lc:GroupBox>
                 </dxdo:LayoutControlItem>
 
+                <dxdo:LayoutGroup ItemHeight="100">
                 <dxdo:LayoutControlItem>
-                    <lc:GroupBox Header="Округление размеров отверстия">
-                        <dxe:ComboBoxEdit ItemsSource="{Binding Roundings}" SelectedItem="{Binding SelectedRounding}" IsTextEditable="False"/>
+                    <lc:GroupBox Header="Округление размеров отверстий">
+                        <dxe:ComboBoxEdit ItemsSource="{Binding Roundings}"
+                                          SelectedItem="{Binding SelectedRounding}"
+                                          IsTextEditable="False"
+                                          Height="20"
+                                          VerticalAlignment="Top"/>
                     </lc:GroupBox>
                 </dxdo:LayoutControlItem>
                 
-                <dxdo:LayoutControlItem ItemHeight="100">
-                    <lc:GroupBox Header="Пересечение">
+                <dxdo:LayoutControlItem>
+                    <lc:GroupBox Header="Конструкции для расстановки отверстий">
                         <dxe:ListBoxEdit ItemsSource="{Binding StructureCategories}">
                             <dxe:ListBoxEdit.ItemTemplate>
                                 <DataTemplate>
@@ -96,6 +105,7 @@
                         </dxe:ListBoxEdit>
                     </lc:GroupBox>
                 </dxdo:LayoutControlItem>
+                </dxdo:LayoutGroup>
 
                 <dxdo:LayoutControlItem ItemHeight="*">
                     <lc:GroupBox Header="Критерии фильтрации">

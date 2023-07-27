@@ -9,13 +9,15 @@
     xmlns:vms="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig" 
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
-    xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
-    
-    mc:Ignorable="d"
+    xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking" mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     x:Name="_this"
-     d:DesignHeight="850"
-    Height="850" Width="1300"
+    d:DesignHeight="800"
+    d:DesignWidth="800"
+    Height="800"
+    Width="800"
+    MinHeight="700"
+    MinWidth="550"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid Margin="10">
@@ -28,7 +30,7 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal">
             <dx:SimpleButton
                 Height="32"
-                Width="35"
+                Width="32"
                 Margin="0 0 10 0"
                 ToolTip="Загрузить настройки"
                 Command="{Binding LoadConfigCommand}"
@@ -54,10 +56,10 @@
 
         <dxdo:DockLayoutManager Grid.Row="1">
             <dxdo:LayoutGroup AllowSplitters="True" LastChildFill="True">
-                <dxdo:LayoutControlItem ItemWidth="0.27*" Margin="-11 0">
+                <dxdo:LayoutControlItem ItemWidth="0.4*">
                     <local:CategoryView x:Name="_categoryView" DataContext="{Binding ElementName=_this, Path=DataContext}"/>
                 </dxdo:LayoutControlItem>
-                <dxdo:LayoutControlItem Margin="0 0 -11 0">
+                <dxdo:LayoutControlItem Margin="-13">
                     <local:SettingView DataContext="{Binding SelectedMepCategoryViewModel}"/>
                 </dxdo:LayoutControlItem>
             </dxdo:LayoutGroup>
