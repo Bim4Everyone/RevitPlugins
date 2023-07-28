@@ -141,7 +141,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void Save(object p) {
-            var filtersConfig = FiltersConfig.GetFiltersConfig(Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName()));
+            var revitFilePath = Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName());
+            var filtersConfig = FiltersConfig.GetFiltersConfig(revitFilePath, _revitRepository.Doc);
             filtersConfig.Filters = GetFilters().ToList();
             filtersConfig.RevitVersion = ModuleEnvironment.RevitVersion;
             filtersConfig.SaveProjectConfig();
@@ -150,7 +151,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void SaveAs(object p) {
-            var filtersConfig = FiltersConfig.GetFiltersConfig(Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName()));
+            var revitFilePath = Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName());
+            var filtersConfig = FiltersConfig.GetFiltersConfig(revitFilePath, _revitRepository.Doc);
             filtersConfig.Filters = GetFilters().ToList();
             filtersConfig.RevitVersion = ModuleEnvironment.RevitVersion;
 

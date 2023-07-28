@@ -19,8 +19,8 @@ namespace RevitOpeningPlacement {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            var openingConfig = OpeningConfig.GetOpeningConfig();
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
+            var openingConfig = OpeningConfig.GetOpeningConfig(revitRepository.Doc);
             var viewModel = new MainViewModel(revitRepository, openingConfig);
 
             var window = new MainWindow() { Title = PluginName, DataContext = viewModel };

@@ -43,7 +43,7 @@ namespace RevitOpeningPlacement {
             if(!CheckModel(revitRepository)) {
                 return;
             }
-            var openingConfig = OpeningConfig.GetOpeningConfig();
+            var openingConfig = OpeningConfig.GetOpeningConfig(revitRepository.Doc);
             if(openingConfig.Categories.Count > 0) {
                 var placementConfigurator = new PlacementConfigurator(revitRepository, openingConfig.Categories);
                 var placers = placementConfigurator.GetPlacersMepOutcomingTasks()

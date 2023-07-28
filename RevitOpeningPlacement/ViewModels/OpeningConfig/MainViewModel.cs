@@ -186,7 +186,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             };
         }
         private Models.Configs.OpeningConfig GetOpeningConfig() {
-            var config = Models.Configs.OpeningConfig.GetOpeningConfig();
+            var config = Models.Configs.OpeningConfig.GetOpeningConfig(_revitRepository.Doc);
             config.Categories = new MepCategoryCollection(MepCategories.Select(item => item.GetMepCategory()));
             return config;
         }
@@ -200,14 +200,14 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private void SaveAsConfig(object p) {
             var config = GetOpeningConfig();
             var css = new ConfigSaverService();
-            css.Save(config);
+            css.Save(config, _revitRepository.Doc);
             MessageText = "Файл настроек успешно сохранен.";
             _timer.Start();
         }
 
         private void LoadConfig(object p) {
             var cls = new ConfigLoaderService();
-            var config = cls.Load<Models.Configs.OpeningConfig>();
+            var config = cls.Load<Models.Configs.OpeningConfig>(_revitRepository.Doc);
             if(config != null) {
                 MepCategories = new ObservableCollection<MepCategoryViewModel>(config.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
             }

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -14,7 +10,6 @@ using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
-using RevitClashDetective.ViewModels;
 using RevitClashDetective.ViewModels.FilterCreatorViewModels;
 using RevitClashDetective.Views;
 
@@ -33,7 +28,8 @@ namespace RevitClashDetective {
         public void ExecuteCommand(UIApplication uiApplication, string selectedFilter = null) {
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
 
-            var viewModlel = new FiltersViewModel(revitRepository, FiltersConfig.GetFiltersConfig(Path.Combine(revitRepository.GetObjectName(), revitRepository.GetDocumentName())));
+            var revitFilePath = Path.Combine(revitRepository.GetObjectName(), revitRepository.GetDocumentName());
+            var viewModlel = new FiltersViewModel(revitRepository, FiltersConfig.GetFiltersConfig(revitFilePath, revitRepository.Doc));
             var window = new FilterCreatorView() { DataContext = viewModlel };
             if(selectedFilter != null) {
                 viewModlel.SelectedFilter = viewModlel.Filters.FirstOrDefault(item => item.Name.Equals(selectedFilter, StringComparison.CurrentCultureIgnoreCase));
