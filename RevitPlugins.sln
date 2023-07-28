@@ -241,6 +241,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitShakeSpecs", "RevitSha
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitFamilyParameterAdder", "RevitFamilyParameterAdder\RevitFamilyParameterAdder.csproj", "{2B6FAF2C-CACD-455A-9DE8-1114350B5FF8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitOverridingGraphicsInViews", "RevitOverridingGraphicsInViews\RevitOverridingGraphicsInViews.csproj", "{397CE8C6-5145-495D-820A-DDCB57F3D0EC}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitIsolateByParameter", "RevitIsolateByParameter\RevitIsolateByParameter.csproj", "{26EF3796-6DB1-4220-8E72-20964F436840}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitVolumeOfWork", "RevitVolumeOfWork\RevitVolumeOfWork.csproj", "{68F00EE4-FAE1-48A5-9831-E5A2EB5D76B1}"

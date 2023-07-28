@@ -1,0 +1,111 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ImageBrush x:Key="Palette"
+                    ImageSource="Images/palette.png"
+                    Stretch="Uniform" />
+
+    <Style x:Key="BackStyle"
+               TargetType="Border">
+        
+        <Setter Property="Background"
+                 Value="{StaticResource Palette}" />
+
+        <Setter Property="Margin"
+                 Value="30" />
+
+        <Setter Property="CornerRadius"
+                    Value="50"/>
+        <Setter Property="Border.Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="30"
+                                  ShadowDepth="2"
+                                  Direction="-90"
+                                  Color="Black"
+                                  Opacity="0.3" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    
+    <Style x:Key="Button1" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="27.5"/>
+        <Setter Property="Height" Value="27.5"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate  TargetType="Button">
+                    <Grid>
+                        <Ellipse Fill="Red"></Ellipse>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style x:Key="Button2" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="27.5"/>
+        <Setter Property="Height" Value="27.5"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Ellipse Fill="Blue"></Ellipse>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Button3" TargetType="{x:Type Button}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid>
+                        <Path Data="M102.35891,106.77893 C100.54007,108.11913 99.25034,110.35543 98.53838,112.66929 97.813193,115.02614 97.343004,117.78739 98.100724,120.43941 98.831484,122.99707 99.572297,124.31376 101.26658,126.24126 103.02848,128.24567 106.55926,130.21964 109.58056,130.65125 111.60327,130.94021 114.66889,130.68773 116.63381,130.03276 117.78613,129.64865 119.94904,128.43169 121.09747,127.44654 121.63665,126.98401 119.42563,120.65398 118.77682,118.38314 118.25571,116.55924 117.46601,113.51058 116.87059,111.58541 114.35384,111.55209 113.72744,111.41686 111.28425,111.16829 110.17394,111.05533 106.20691,109.52063 105.23711,108.93875 104.15273,108.28812 103.40259,107.75356 102.35891,106.77893 z" 
+                              Fill="Orange" 
+                              HorizontalAlignment="Left"
+                              Height="24" Margin="143,152,0,0" 
+                              Stretch="Fill" 
+                              VerticalAlignment="Top" 
+                              Width="23"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    
+    <Style x:Key="Button4" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="27.5"/>
+        <Setter Property="Height" Value="27.5"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate  TargetType="Button">
+                    <Grid>
+                        <Ellipse Fill="Pink"></Ellipse>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style x:Key="Button5" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="27.5"/>
+        <Setter Property="Height" Value="27.5"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate  TargetType="Button">
+                    <Grid>
+                        <Ellipse Fill="Yellow"></Ellipse>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+
+</ResourceDictionary>
