@@ -58,6 +58,8 @@ namespace RevitOpeningPlacement.Models {
         public UIApplication UIApplication { get; }
         public List<DocInfo> DocInfos { get; }
 
+        public Document Doc => _document;
+
         public static Dictionary<MepCategoryEnum, string> MepCategoryNames { get; } = new Dictionary<MepCategoryEnum, string> {
             {MepCategoryEnum.Pipe, "Трубы" },
             {MepCategoryEnum.RectangleDuct, "Воздуховоды (прямоугольное сечение)" },
