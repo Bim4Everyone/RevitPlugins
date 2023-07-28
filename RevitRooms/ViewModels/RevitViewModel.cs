@@ -135,9 +135,6 @@ namespace RevitRooms.ViewModels {
         private void CalculateAreas(object p) {
             // Удаляем все не размещенные помещения
             _revitRepository.RemoveUnplacedSpatialElements();
-            
-            // Заполняем параметр Этаж
-            _revitRepository.UpdateLevelSharedParam();
 
             // Обрабатываем все зоны
             var errorElements = new Dictionary<string, InfoElementViewModel>();
@@ -149,29 +146,35 @@ namespace RevitRooms.ViewModels {
                 ShowInfoElementsWindow("Ошибки", InfoElements);
                 return;
             }
+
+            // получаем уже обработанные имена уровней
+            Dictionary<ElementId, string> levelNames = _revitRepository.GetLevelNames();
             
             var bigChangesRooms = new Dictionary<string, InfoElementViewModel>();
             using(var transaction = _revitRepository.StartTransaction("Расчет площадей")) {
                 // Надеюсь будет достаточно быстро отрабатывать :)
                 // Обновление параметра округления у зон
-                foreach(var spartialElement in GetAreas()) {
+                foreach(var spatialElement in GetAreas()) {
+                    // Заполняем параметр Этаж
+                    _revitRepository.UpdateLevelSharedParam(spatialElement.Element, levelNames);
+                    
                     // Обновление параметра
                     // площади с коэффициентом
 
                     // Расчет площади
                     var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase?.Element };
-                    area.CalculateParam(spartialElement);
-                    bool isChangedArea = area.SetParamValue(spartialElement);
+                    area.CalculateParam(spatialElement);
+                    bool isChangedArea = area.SetParamValue(spatialElement);
                     
                     // Площадь с коэффициентом зависит от площади
                     var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) { Phase = Phase?.Element };
-                    areaWithRatio.CalculateParam(spartialElement);
-                    areaWithRatio.SetParamValue(spartialElement);
+                    areaWithRatio.CalculateParam(spatialElement);
+                    areaWithRatio.SetParamValue(spatialElement);
                     
                     if(isChangedArea && IsCheckRoomsChanges) {
                         var differences = areaWithRatio.GetDifferences();
                         var percentChange = areaWithRatio.GetPercentChange();
-                        AddElement(InfoElement.BigChangesAreas, FormatMessage(differences, percentChange), spartialElement, bigChangesRooms);
+                        AddElement(InfoElement.BigChangesAreas, FormatMessage(differences, percentChange), spatialElement, bigChangesRooms);
                     }
                 }
 
@@ -195,9 +198,6 @@ namespace RevitRooms.ViewModels {
         private void Calculate(object p) {
             // Удаляем все не размещенные помещения
             _revitRepository.RemoveUnplacedSpatialElements();
-            
-            // Заполняем параметр Этаж
-            _revitRepository.UpdateLevelSharedParam();
 
             // Получаем список дополнительных стадий
             var phases = AdditionalPhases.ToList();
@@ -327,31 +327,37 @@ namespace RevitRooms.ViewModels {
 
         private void CalculateAreas(List<PhaseViewModel> phases, IEnumerable<LevelViewModel> levels) {
             using(var transaction = _revitRepository.StartTransaction("Расчет площадей")) {
+                // получаем обработанные имена уровней
+                Dictionary<ElementId, string> levelNames = _revitRepository.GetLevelNames();
+               
                 var bigChangesRooms = new Dictionary<string, InfoElementViewModel>();
 
                 // Надеюсь будет достаточно быстро отрабатывать :)
                 // Подсчет площадей помещений
                 foreach(var level in levels) {
-                    foreach(var spartialElement in level.GetRooms(phases)) {
+                    foreach(var spatialElement in level.GetRooms(phases)) {
+                        // Заполняем параметр Этаж
+                        _revitRepository.UpdateLevelSharedParam(spatialElement.Element, levelNames);
+                        
                         // Заполняем дублирующие
                         // общие параметры
-                        spartialElement.UpdateSharedParams();
+                        spatialElement.UpdateSharedParams();
 
                         // Обновление параметра площади 
                         var area = new RoomAreaCalculation(GetRoomAccuracy(), RoundAccuracy) {Phase = Phase.Element};
-                        area.CalculateParam(spartialElement);
-                        bool isChangedRoomArea = area.SetParamValue(spartialElement);
+                        area.CalculateParam(spatialElement);
+                        bool isChangedRoomArea = area.SetParamValue(spatialElement);
 
                         // Площадь с коэффициентном зависит от площади без коэффициента
                         var areaWithRatio = new AreaWithRatioCalculation(GetRoomAccuracy(), RoundAccuracy) {Phase = Phase.Element};
-                        areaWithRatio.CalculateParam(spartialElement);
-                        areaWithRatio.SetParamValue(spartialElement);
+                        areaWithRatio.CalculateParam(spatialElement);
+                        areaWithRatio.SetParamValue(spatialElement);
 
                         if(isChangedRoomArea && IsCheckRoomsChanges) {
                             var differences = areaWithRatio.GetDifferences();
                             var percentChange = areaWithRatio.GetPercentChange();
                             AddElement(InfoElement.BigChangesRoomAreas, FormatMessage(differences, percentChange),
-                                spartialElement, bigChangesRooms);
+                                spatialElement, bigChangesRooms);
                         }
                     }
                 }

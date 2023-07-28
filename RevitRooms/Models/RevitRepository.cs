@@ -92,19 +92,11 @@ namespace RevitRooms.Models {
                 .ToList();
         }
 
-        public void UpdateLevelSharedParam() {
-            using(var transaction = StartTransaction($"Заполнение {SharedParamsConfig.Instance.Level.Name}")) {
-                IList<SpatialElement> spatialElements = GetSpatialElements();
-                var levelNames = GetLevelNames(spatialElements);
-                foreach(SpatialElement spatialElement in spatialElements) {
-                    var levelName = levelNames.GetValueOrDefault(spatialElement.Level.Id, spatialElement.Level.Name);
-                    spatialElement.SetParamValue(SharedParamsConfig.Instance.Level, levelName);
-                }
-
-                transaction.Commit();
-            }
+        public void UpdateLevelSharedParam(SpatialElement spatialElement, Dictionary<ElementId, string> levelNames) {
+            spatialElement.SetParamValue(SharedParamsConfig.Instance.Level,
+                levelNames.GetValueOrDefault(spatialElement.Level.Id, spatialElement.Level.Name));
         }
-        
+
         private string GetLevelName(Level level) {
             int index = level.Name.IndexOf(' ');
             return index <= 0
@@ -112,8 +104,8 @@ namespace RevitRooms.Models {
                 : level.Name.Substring(0, index);
         }
 
-        private Dictionary<ElementId, string> GetLevelNames(IList<SpatialElement> spatialElements) {
-            var levels = spatialElements
+        public Dictionary<ElementId, string> GetLevelNames() {
+            var levels = GetSpatialElements()
                 .Select(item => item.Level)
                 .ToArray();
 
