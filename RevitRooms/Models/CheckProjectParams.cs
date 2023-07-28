@@ -124,6 +124,7 @@ namespace RevitRooms.Models {
             yield return SchedulesConfig.Instance.RoomsCheckDeviationAreas;
             yield return SchedulesConfig.Instance.RoomsCheckTypes;
             yield return SchedulesConfig.Instance.RoomsCheckGroupTypes;
+            yield return SchedulesConfig.Instance.RoomsMultiLevel;
         }
 
         public CheckProjectParams ReplaceKeySchedules(IEnumerable<KeyScheduleRule> keyScheduleRules) {
