@@ -27,6 +27,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -43,24 +44,33 @@
         <dxe:CheckEdit
             Grid.Row="1"
             Margin="10"
+            IsChecked="{Binding RevitViewModel.IsFillLevel}">
+            <TextBlock 
+                Text="{Binding LevelParamName, 
+                    Mode=OneWay, StringFormat='Заполнить {0}'}" />
+        </dxe:CheckEdit>
+
+        <dxe:CheckEdit
+            Grid.Row="2"
+            Margin="10"
             Content="Рассчитать площадь по пятну"
             IsChecked="{Binding RevitViewModel.IsSpotCalcArea}" />
 
         <dxe:CheckEdit
-            Grid.Row="2"
+            Grid.Row="3"
             Margin="10"
             Content="Рассчитать количество комнат"
             IsChecked="{Binding RevitViewModel.IsCountRooms}" />
 
         <dxe:CheckEdit
             x:Name="_checkArea"
-            Grid.Row="3"
+            Grid.Row="4"
             Margin="10"
             Content="Проверить площадь помещений на изменения:"
             IsChecked="{Binding RevitViewModel.IsCheckRoomsChanges}" />
 
         <StackPanel
-            Grid.Row="4"
+            Grid.Row="5"
             Margin="0,5,10,0"
             Orientation="Horizontal"
             Visibility="{Binding ElementName=_checkArea,Path=IsChecked, Converter={StaticResource BoolToVis}}">
@@ -76,7 +86,7 @@
                 Margin="10,0,0,0" Text="%" />
         </StackPanel>
 
-        <DockPanel Grid.Row="5" Margin="10">
+        <DockPanel Grid.Row="6" Margin="10">
             <TextBlock
                 Width="158"
                 Text="Стадии:" />
@@ -88,7 +98,7 @@
                 EditValue="{Binding RevitViewModel.Phase}" />
         </DockPanel>
 
-        <DockPanel Grid.Row="6" Margin="10">
+        <DockPanel Grid.Row="7" Margin="10">
             <TextBlock
                 x:Name="_text"
                 Text="Число знаков после запятой:" />
@@ -101,7 +111,7 @@
         </DockPanel>
 
         <dxg:GridControl
-            Grid.Row="7"
+            Grid.Row="8"
             Margin="10"
             IsEnabled="{Binding RevitViewModel.IsAllowSelectLevels}"
             ItemsSource="{Binding RevitViewModel.Levels}">
@@ -136,7 +146,7 @@
         </dxg:GridControl>
 
         <dxe:CheckEdit
-            Grid.Row="8"
+            Grid.Row="9"
             Margin="10"
             Content="Не показывать предупреждения"
             IsChecked="{Binding RevitViewModel.NotShowWarnings}" />

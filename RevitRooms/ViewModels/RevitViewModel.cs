@@ -29,6 +29,7 @@ namespace RevitRooms.ViewModels {
 
         private string _errorText;
         private bool _isAllowSelectLevels;
+        private bool _isFillLevel;
 
         public RevitViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
@@ -61,6 +62,11 @@ namespace RevitRooms.ViewModels {
             get => _isAllowSelectLevels;
             set => this.RaiseAndSetIfChanged(ref _isAllowSelectLevels, value);
         }
+        
+        public bool IsFillLevel {
+            get => _isFillLevel;
+            set => this.RaiseAndSetIfChanged(ref _isFillLevel, value);
+        }
 
         public string Name { get; set; }
         public PhaseViewModel Phase { get; set; }
@@ -89,6 +95,7 @@ namespace RevitRooms.ViewModels {
                 return;
             }
 
+            IsFillLevel = settings.IsFillLevel;
             NotShowWarnings = settings.NotShowWarnings;
             IsCountRooms = settings.IsCountRooms;
             IsSpotCalcArea = settings.IsSpotCalcArea;
@@ -116,6 +123,7 @@ namespace RevitRooms.ViewModels {
                 settings = roomsConfig.AddSettings(_revitRepository.Document);
             }
 
+            settings.IsFillLevel = IsFillLevel;
             settings.NotShowWarnings = NotShowWarnings;
             settings.IsCountRooms = IsCountRooms;
             settings.IsSpotCalcArea = IsSpotCalcArea;
@@ -155,8 +163,10 @@ namespace RevitRooms.ViewModels {
                 // Надеюсь будет достаточно быстро отрабатывать :)
                 // Обновление параметра округления у зон
                 foreach(var spatialElement in GetAreas()) {
-                    // Заполняем параметр Этаж
-                    _revitRepository.UpdateLevelSharedParam(spatialElement.Element, levelNames);
+                    if(IsFillLevel) {
+                        // Заполняем параметр Этаж
+                        _revitRepository.UpdateLevelSharedParam(spatialElement.Element, levelNames);
+                    }
                     
                     // Обновление параметра
                     // площади с коэффициентом
@@ -336,8 +346,10 @@ namespace RevitRooms.ViewModels {
                 // Подсчет площадей помещений
                 foreach(var level in levels) {
                     foreach(var spatialElement in level.GetRooms(phases)) {
-                        // Заполняем параметр Этаж
-                        _revitRepository.UpdateLevelSharedParam(spatialElement.Element, levelNames);
+                        if(IsFillLevel) {
+                            // Заполняем параметр Этаж
+                            _revitRepository.UpdateLevelSharedParam(spatialElement.Element, levelNames);
+                        }
                         
                         // Заполняем дублирующие
                         // общие параметры

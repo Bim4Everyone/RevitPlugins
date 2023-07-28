@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.WPF.ViewModels;
 
 using RevitRooms.Models;
@@ -39,5 +40,6 @@ namespace RevitRooms.ViewModels {
         }
 
         public ObservableCollection<RevitViewModel> RevitViewModels { get; }
+        public string LevelParamName => SharedParamsConfig.Instance.Level.Name;
     }
 }
