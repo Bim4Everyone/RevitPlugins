@@ -2,7 +2,4 @@
 	<Import Project="..\ProjectProps\Common.props" />
 	<Import Project="..\ProjectProps\DevExpress.props" />
 	<Import Project="..\ProjectProps\RevitClashes.props" />
-	<ItemGroup>
-	  <Compile Update="..\RevitClashes\Models\SystemParamConverter.cs.vsspell" Link="SystemParamConverter.cs.vsspell" />
-	</ItemGroup>
 </Project>
