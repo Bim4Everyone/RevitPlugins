@@ -72,7 +72,7 @@ namespace RevitClashDetective.Models {
                 try {
                     return _sharedParamsConfig.CreateRevitParam(_document, name);
                 } catch(ArgumentNullException) {
-                    throw new JsonSerializationException($"¬ документе \'{_document.PathName}\' отсутствует параметр \'{name}\'");
+                    throw new JsonSerializationException($"¬ документе \'{_document.PathName}\' отсутствует общий параметр \'{name}\'");
                 }
 
             } else if(typeName.Equals(typeof(ProjectParam).FullName)) {
@@ -82,7 +82,7 @@ namespace RevitClashDetective.Models {
                 try {
                     return _projectParamsConfig.CreateRevitParam(_document, name);
                 } catch(ArgumentNullException) {
-                    throw new JsonSerializationException($"¬ документе \'{_document.PathName}\' отсутствует параметр \'{name}\'");
+                    throw new JsonSerializationException($"¬ документе \'{_document.PathName}\' отсутствует параметр проекта \'{name}\'");
                 }
 
             } else if(typeName.Equals(typeof(CustomParam).FullName)) {
