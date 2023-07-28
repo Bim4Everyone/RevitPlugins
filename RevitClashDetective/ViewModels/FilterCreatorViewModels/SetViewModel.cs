@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 using dosymep.WPF.Commands;
@@ -12,7 +9,6 @@ using dosymep.WPF.ViewModels;
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Evaluators;
 using RevitClashDetective.Models.FilterModel;
-using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.ViewModels.FilterCreatorViewModels.Interfaces;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
@@ -109,7 +105,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public Criterion GetCriterion() {
             return new Set() {
                 SetEvaluator = SelectedEvaluator.SetEvaluator,
-                Criteria = Criterions.Select(item => item.GetCriterion()).ToList()
+                Criteria = Criterions.Select(item => item.GetCriterion()).ToList(),
+                RevitRepository = _revitRepository
             };
         }
 
