@@ -77,62 +77,47 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             };
         }
 
-        private MepCategoryViewModel GetPipe() => new MepCategoryViewModel(_revitRepository) {
-            Name = RevitRepository.MepCategoryNames[MepCategoryEnum.Pipe],
-            MinSizes = new ObservableCollection<SizeViewModel>() {
-                new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
-            },
-            Offsets = new ObservableCollection<OffsetViewModel>() {
-                new OffsetViewModel(new TypeNamesProvider(true))
-            },
-            ImageSource = "../Resources/pipe.png"
-        };
+        private MepCategoryViewModel GetPipe() => new MepCategoryViewModel(
+            revitRepository: _revitRepository,
+            name: RevitRepository.MepCategoryNames[MepCategoryEnum.Pipe],
+            minSizesParameters: new Parameters[] { Parameters.Diameter },
+            isRound: true,
+            imageSource: "../Resources/pipe.png"
+            );
 
-        private MepCategoryViewModel GetRectangleDuct() => new MepCategoryViewModel(_revitRepository) {
-            Name = RevitRepository.MepCategoryNames[MepCategoryEnum.RectangleDuct],
-            MinSizes = new ObservableCollection<SizeViewModel>() {
-                new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Width]},
-                new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Height]}
-            },
-            Offsets = new ObservableCollection<OffsetViewModel>() {
-                new OffsetViewModel(new TypeNamesProvider(false))
-            },
-            ImageSource = "../Resources/rectangleDuct.png"
-        };
 
-        private MepCategoryViewModel GetRoundDuct() => new MepCategoryViewModel(_revitRepository) {
-            Name = RevitRepository.MepCategoryNames[MepCategoryEnum.RoundDuct],
-            MinSizes = new ObservableCollection<SizeViewModel>() {
-                new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
-            },
-            Offsets = new ObservableCollection<OffsetViewModel>() {
-                new OffsetViewModel(new TypeNamesProvider(true))
-            },
-            ImageSource = "../Resources/roundDuct.png"
-        };
+        private MepCategoryViewModel GetRectangleDuct() => new MepCategoryViewModel(
+            revitRepository: _revitRepository,
+            name: RevitRepository.MepCategoryNames[MepCategoryEnum.RectangleDuct],
+            minSizesParameters: new Parameters[] { Parameters.Width, Parameters.Height },
+            isRound: false,
+            imageSource: "../Resources/rectangleDuct.png"
+            );
 
-        private MepCategoryViewModel GetCableTray() => new MepCategoryViewModel(_revitRepository) {
-            Name = RevitRepository.MepCategoryNames[MepCategoryEnum.CableTray],
-            MinSizes = new ObservableCollection<SizeViewModel>() {
-                new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Width]},
-                new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Height]}
-            },
-            Offsets = new ObservableCollection<OffsetViewModel>() {
-                new OffsetViewModel(new TypeNamesProvider(false))
-            },
-            ImageSource = "../Resources/tray.png"
-        };
 
-        private MepCategoryViewModel GetConduit() => new MepCategoryViewModel(_revitRepository) {
-            Name = RevitRepository.MepCategoryNames[MepCategoryEnum.Conduit],
-            MinSizes = new ObservableCollection<SizeViewModel>() {
-                new SizeViewModel(){ Name = RevitRepository.ParameterNames[Parameters.Diameter]}
-            },
-            Offsets = new ObservableCollection<OffsetViewModel>() {
-                new OffsetViewModel(new TypeNamesProvider(false))
-            },
-            ImageSource = "../Resources/conduit.png"
-        };
+        private MepCategoryViewModel GetRoundDuct() => new MepCategoryViewModel(
+            revitRepository: _revitRepository,
+            name: RevitRepository.MepCategoryNames[MepCategoryEnum.RoundDuct],
+            minSizesParameters: new Parameters[] { Parameters.Diameter },
+            isRound: true,
+            imageSource: "../Resources/roundDuct.png"
+            );
+
+        private MepCategoryViewModel GetCableTray() => new MepCategoryViewModel(
+            revitRepository: _revitRepository,
+            name: RevitRepository.MepCategoryNames[MepCategoryEnum.CableTray],
+            minSizesParameters: new Parameters[] { Parameters.Width, Parameters.Height },
+            isRound: false,
+            imageSource: "../Resources/tray.png"
+            );
+
+        private MepCategoryViewModel GetConduit() => new MepCategoryViewModel(
+            revitRepository: _revitRepository,
+            name: RevitRepository.MepCategoryNames[MepCategoryEnum.Conduit],
+            minSizesParameters: new Parameters[] { Parameters.Diameter },
+              isRound: false,
+            imageSource: "../Resources/conduit.png"
+            );
 
         private void AddMissingCategories() {
             if(RevitRepository.MepCategoryNames.Count <= MepCategories.Count) {

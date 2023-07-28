@@ -22,26 +22,39 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private List<StructureCategoryViewModel> _structureCategories;
         private SetViewModel _setViewModel;
 
-        public MepCategoryViewModel(RevitRepository revitRepository, MepCategory mepCategory = null) {
+        public MepCategoryViewModel(RevitRepository revitRepository, MepCategory mepCategory) {
             InitializeStructureCategories();
 
-            if(mepCategory != null) {
-                Name = mepCategory.Name;
-                ImageSource = mepCategory.ImageSource;
-                MinSizes = new ObservableCollection<SizeViewModel>(mepCategory.MinSizes.Select(item => new SizeViewModel(item)));
-                IsRound = mepCategory.IsRound;
-                IsSelected = mepCategory.IsSelected;
-                Offsets = new ObservableCollection<OffsetViewModel>(mepCategory.Offsets.Select(item => new OffsetViewModel(item, new TypeNamesProvider(mepCategory.IsRound))));
-                SetSelectedCategories(mepCategory);
-                SelectedRounding = mepCategory.Rounding;
-                Category[] revitCategories = revitRepository.GetCategories(revitRepository.GetMepCategoryEnum(mepCategory));
-                var categoriesInfoViewModel = new CategoriesInfoViewModel(revitRepository, revitCategories);
-                SetViewModel = new SetViewModel(revitRepository, categoriesInfoViewModel, mepCategory.Set);
-            }
+            Name = mepCategory.Name;
+            ImageSource = mepCategory.ImageSource;
+            MinSizes = new ObservableCollection<SizeViewModel>(mepCategory.MinSizes.Select(item => new SizeViewModel(item)));
+            IsRound = mepCategory.IsRound;
+            IsSelected = mepCategory.IsSelected;
+            Offsets = new ObservableCollection<OffsetViewModel>(mepCategory.Offsets.Select(item => new OffsetViewModel(item, new TypeNamesProvider(mepCategory.IsRound))));
+            SetSelectedCategories(mepCategory);
+            SelectedRounding = mepCategory.Rounding;
+            var categoriesInfoViewModel = GetCategoriesInfoViewModel(revitRepository, Name);
+            SetViewModel = new SetViewModel(revitRepository, categoriesInfoViewModel, mepCategory.Set);
 
             AddOffsetCommand = new RelayCommand(AddOffset);
             RemoveOffsetCommand = new RelayCommand(RemoveOffset, CanRemoveOffset);
         }
+
+        public MepCategoryViewModel(RevitRepository revitRepository, string name, Parameters[] minSizesParameters, bool isRound, string imageSource) {
+            InitializeStructureCategories();
+
+            Name = name;
+            ImageSource = imageSource;
+            MinSizes = GetMinSizes(minSizesParameters);
+            IsRound = isRound;
+            Offsets = new ObservableCollection<OffsetViewModel>() { new OffsetViewModel(new TypeNamesProvider(isRound)) };
+            var categoriesInfoViewModel = GetCategoriesInfoViewModel(revitRepository, Name);
+            SetViewModel = new SetViewModel(revitRepository, categoriesInfoViewModel);
+
+            AddOffsetCommand = new RelayCommand(AddOffset);
+            RemoveOffsetCommand = new RelayCommand(RemoveOffset, CanRemoveOffset);
+        }
+
 
         public bool IsRound { get; set; }
 
@@ -158,6 +171,19 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 }
             }
             return error;
+        }
+
+        private ObservableCollection<SizeViewModel> GetMinSizes(Parameters[] minSizesParameters) {
+            var collection = new ObservableCollection<SizeViewModel>();
+            foreach(Parameters parameter in minSizesParameters) {
+                collection.Add(new SizeViewModel() { Name = RevitRepository.ParameterNames[parameter] });
+            }
+            return collection;
+        }
+
+        private CategoriesInfoViewModel GetCategoriesInfoViewModel(RevitRepository revitRepository, string mepCategoryName) {
+            Category[] revitCategories = revitRepository.GetCategories(revitRepository.GetMepCategoryEnum(mepCategoryName));
+            return new CategoriesInfoViewModel(revitRepository, revitCategories);
         }
     }
 }
