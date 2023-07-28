@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -10,8 +8,8 @@ using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.FilterModel {
     internal class Set : Criterion {
-        public SetEvaluator SetEvaluator { get; set; }
-        public List<Criterion> Criteria { get; set; }
+        public SetEvaluator SetEvaluator { get; set; } = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And);
+        public List<Criterion> Criteria { get; set; } = new List<Criterion>();
 
         public override IFilterGenerator Generate(Document doc) {
             return FilterGenerator.SetSetFilter(doc, this);
