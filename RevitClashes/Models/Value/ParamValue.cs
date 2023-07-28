@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -82,7 +79,7 @@ namespace RevitClashDetective.Models.Value {
             if(revitParam is SystemParam systemParam) {
                 paramId = new ElementId(systemParam.SystemParamId);
             } else {
-                paramId = revitParam.GetRevitParamElement(doc)?.Id;
+                paramId = revitParam.GetRevitParamElement(doc)?.Id ?? ElementId.InvalidElementId;
             }
             return paramId;
         }
