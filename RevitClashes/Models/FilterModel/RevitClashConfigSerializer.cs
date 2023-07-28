@@ -12,7 +12,7 @@ namespace RevitClashDetective.Models.FilterModel {
     internal class RevitClashConfigSerializer : IConfigSerializer {
         private readonly ISerializationBinder _serializationBinder;
         private readonly Document _document;
-        private readonly SystemParamConverter _systemParamConverter;
+        private readonly RevitParamConverter _systemParamConverter;
 
         public RevitClashConfigSerializer(ISerializationBinder serializationBinder, Document document) {
             if(serializationBinder is null) { throw new ArgumentNullException(nameof(serializationBinder)); }
@@ -20,7 +20,7 @@ namespace RevitClashDetective.Models.FilterModel {
 
             _serializationBinder = serializationBinder;
             _document = document;
-            _systemParamConverter = new SystemParamConverter(_document);
+            _systemParamConverter = new RevitParamConverter(_document);
         }
 
 

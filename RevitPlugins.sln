@@ -49,8 +49,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Models", "Models", "{968DE2
 		RevitClashes\Models\DocInfo.cs = RevitClashes\Models\DocInfo.cs
 		RevitClashes\Models\NameResolver.cs = RevitClashes\Models\NameResolver.cs
 		RevitClashes\Models\ProjectConfigBuilder.cs = RevitClashes\Models\ProjectConfigBuilder.cs
+		RevitClashes\Models\RevitParamConverter.cs = RevitClashes\Models\RevitParamConverter.cs
 		RevitClashes\Models\RevitRepository.cs = RevitClashes\Models\RevitRepository.cs
-		RevitClashes\Models\SystemParamConverter.cs = RevitClashes\Models\SystemParamConverter.cs
 		RevitClashes\Models\View3DBuilder.cs = RevitClashes\Models\View3DBuilder.cs
 	EndProjectSection
 EndProject

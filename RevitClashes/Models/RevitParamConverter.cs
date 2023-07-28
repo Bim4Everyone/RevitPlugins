@@ -16,7 +16,7 @@ namespace RevitClashDetective.Models {
     /// <summary>
     /// Класс для корректировки сериализации/десериализации типа <see cref="SystemParam"/> для корректировки свойства <see cref="SystemParam.StorageType"/>
     /// </summary>
-    internal class SystemParamConverter : JsonConverter {
+    internal class RevitParamConverter : JsonConverter {
         private readonly Document _document;
         private readonly SystemParamsConfig _systemParamsConfig = SystemParamsConfig.Instance;
         private readonly SharedParamsConfig _sharedParamsConfig = SharedParamsConfig.Instance;
@@ -27,7 +27,7 @@ namespace RevitClashDetective.Models {
         /// </summary>
         /// <param name="document">Документ, в котором запущена конвертация</param>
         /// <exception cref="ArgumentNullException">Исключение, если входной параметр - пустая ссылка</exception>
-        public SystemParamConverter(Document document) {
+        public RevitParamConverter(Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
             _document = document;
