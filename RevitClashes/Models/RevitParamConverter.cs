@@ -51,7 +51,6 @@ namespace RevitClashDetective.Models {
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
             if(reader is null) { throw new ArgumentNullException(nameof(reader)); }
 
-
             JObject jobj = JObject.Load(reader);
             string typeName = jobj["$type"].Value<string>()?.Split(',').FirstOrDefault();
             if(string.IsNullOrWhiteSpace(typeName)) {
@@ -71,8 +70,7 @@ namespace RevitClashDetective.Models {
                 string name = jobj["Name"].Value<string>();
                 if(string.IsNullOrWhiteSpace(name)) { throw new JsonSerializationException($"Не удалось получить свойство {nameof(RevitParam.Name)}"); }
                 try {
-                    SharedParam sharedParam = _sharedParamsConfig.CreateRevitParam(_document, name);
-                    return sharedParam;
+                    return _sharedParamsConfig.CreateRevitParam(_document, name);
                 } catch(ArgumentNullException) {
                     throw new JsonSerializationException($"В документе \'{_document.PathName}\' отсутствует параметр \'{name}\'");
                 }
@@ -82,8 +80,7 @@ namespace RevitClashDetective.Models {
                 string name = jobj["Name"].Value<string>();
                 if(string.IsNullOrWhiteSpace(name)) { throw new JsonSerializationException($"Не удалось получить свойство {nameof(RevitParam.Name)}"); }
                 try {
-                    ProjectParam projectParam = _projectParamsConfig.CreateRevitParam(_document, name);
-                    return projectParam;
+                    return _projectParamsConfig.CreateRevitParam(_document, name);
                 } catch(ArgumentNullException) {
                     throw new JsonSerializationException($"В документе \'{_document.PathName}\' отсутствует параметр \'{name}\'");
                 }
@@ -92,9 +89,7 @@ namespace RevitClashDetective.Models {
 
                 return jobj.ToObject<CustomParam>();
 
-            } else {
-                throw new JsonSerializationException($"Не поддерживаемое название типа параметра: {typeName}");
-            }
+            } else { throw new JsonSerializationException($"Не поддерживаемое название типа параметра: {typeName}"); }
         }
     }
 }
