@@ -70,15 +70,23 @@ namespace RevitClashDetective.Models {
 
                 string name = jobj["Name"].Value<string>();
                 if(string.IsNullOrWhiteSpace(name)) { throw new JsonSerializationException($"Не удалось получить свойство {nameof(RevitParam.Name)}"); }
-                SharedParam sharedParam = _sharedParamsConfig.CreateRevitParam(_document, name);
-                return sharedParam;
+                try {
+                    SharedParam sharedParam = _sharedParamsConfig.CreateRevitParam(_document, name);
+                    return sharedParam;
+                } catch(ArgumentNullException) {
+                    throw new JsonSerializationException($"В документе \'{_document.PathName}\' отсутствует параметр \'{name}\'");
+                }
 
             } else if(typeName.Equals(typeof(ProjectParam).FullName)) {
 
                 string name = jobj["Name"].Value<string>();
                 if(string.IsNullOrWhiteSpace(name)) { throw new JsonSerializationException($"Не удалось получить свойство {nameof(RevitParam.Name)}"); }
-                ProjectParam projectParam = _projectParamsConfig.CreateRevitParam(_document, name);
-                return projectParam;
+                try {
+                    ProjectParam projectParam = _projectParamsConfig.CreateRevitParam(_document, name);
+                    return projectParam;
+                } catch(ArgumentNullException) {
+                    throw new JsonSerializationException($"В документе \'{_document.PathName}\' отсутствует параметр \'{name}\'");
+                }
 
             } else if(typeName.Equals(typeof(CustomParam).FullName)) {
 
