@@ -35,7 +35,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 Criterions = new ObservableCollection<ICriterionViewModel>();
                 SelectedEvaluator = Evaluators.FirstOrDefault();
             } else {
-                SelectedEvaluator = Evaluators.FirstOrDefault(item => item.SetEvaluator.Evaluator == set.SetEvaluator.Evaluator);
+                SelectedEvaluator = Evaluators.FirstOrDefault(item => item.SetEvaluator.Evaluator == set.SetEvaluator?.Evaluator);
                 InitializeCriterions(set.Criteria);
             }
         }
