@@ -107,6 +107,8 @@ namespace RevitRooms.Models {
         public Dictionary<ElementId, string> GetLevelNames() {
             var levels = GetSpatialElements()
                 .Select(item => item.Level)
+                .Distinct(new ElementComparer())
+                .Cast<Level>()
                 .ToArray();
 
             (ElementId ElementId, string LevelName)[] levelPairs = levels
@@ -131,7 +133,7 @@ namespace RevitRooms.Models {
                         levelNames.Add(elementId, $"Подземный -{index}");
                     }
                 } else if(Regex.IsMatch(levelName, "[0-9]+")) {
-                    if(int.TryParse(levelName.Substring(1), out int index)) {
+                    if(int.TryParse(levelName, out int index)) {
                         levelNames.Add(elementId, index.ToString());
                     }
                 } else {
