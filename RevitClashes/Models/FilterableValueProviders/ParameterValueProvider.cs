@@ -5,7 +5,6 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 
 using pyRevitLabs.Json;
@@ -42,12 +41,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
 
         public ParameterValueProvider(RevitRepository revitRepository, RevitParam revitParam, string displayValue = null) {
             RevitRepository = revitRepository;
-            if((revitParam is SystemParam systemParam) && (systemParam.StorageType == StorageType.None)) {
-                var systemParamRecreated = SystemParamsConfig.Instance.CreateRevitParam(systemParam.SystemParamId);
-                RevitParam = systemParamRecreated;
-            } else {
-                RevitParam = revitParam;
-            }
+            RevitParam = revitParam;
             DisplayValue = displayValue ?? revitParam.Name;
         }
 
