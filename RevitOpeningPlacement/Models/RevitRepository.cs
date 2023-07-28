@@ -15,7 +15,6 @@ using dosymep.Revit;
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Handlers;
 
-using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.RevitViews;
@@ -346,10 +345,10 @@ namespace RevitOpeningPlacement.Models {
         /// <summary>
         /// Возвращает значение элемента перечисления категорий инженерных систем
         /// </summary>
-        /// <param name="mepCategory">Категория инженерных систем</param>
+        /// <param name="mepCategoryName">Название категории инженерных систем</param>
         /// <returns></returns>
-        public MepCategoryEnum GetMepCategoryEnum(MepCategory mepCategory) {
-            return MepCategoryNames.First(pair => pair.Value.Equals(mepCategory.Name, StringComparison.CurrentCulture)).Key;
+        public MepCategoryEnum GetMepCategoryEnum(string mepCategoryName) {
+            return MepCategoryNames.First(pair => pair.Value.Equals(mepCategoryName, StringComparison.CurrentCulture)).Key;
         }
 
         /// <summary>
