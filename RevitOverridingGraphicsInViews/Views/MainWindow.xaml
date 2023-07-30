@@ -46,7 +46,10 @@
         <Canvas>
             <Button 
                 Style="{StaticResource Button1}"
-                Canvas.Top="248.1" Canvas.Left="152.8">
+                Canvas.Top="248.1" Canvas.Left="152.8"
+                Click="ColorButton_Click">
+
+
                 <Button.InputBindings>
                     <KeyBinding Command="{Binding Path=PaintCommand}" Key="Return"/>
                 </Button.InputBindings>
@@ -69,7 +72,9 @@
 
             <Button 
                 Style="{StaticResource Button2}" 
-                Canvas.Top="202.1" Canvas.Left="123.2">
+                Canvas.Top="202.1" Canvas.Left="123.2"
+                Click="ColorButton_Click">
+                
                 <Button.InputBindings>
                     <KeyBinding Command="{Binding Path=PaintCommand}" Key="Return"/>
                 </Button.InputBindings>
@@ -92,7 +97,9 @@
 
             <Button 
                 Style="{StaticResource Button3}" 
-                Canvas.Top="0" Canvas.Left="0">
+                Canvas.Top="0" Canvas.Left="0"
+                Click="ColorButton_Click">
+                
                 <Button.InputBindings>
                     <KeyBinding Command="{Binding Path=PaintCommand}" Key="Return"/>
                 </Button.InputBindings>
@@ -115,7 +122,8 @@
 
             <Button 
                 Style="{StaticResource Button4}" 
-                Canvas.Top="134.7" Canvas.Left="206.2">
+                Canvas.Top="134.7" Canvas.Left="206.2"
+                Click="ColorButton_Click">
 
                 <Button.InputBindings>
                     <KeyBinding Command="{Binding Path=PaintCommand}" Key="Return"/>
@@ -139,7 +147,8 @@
 
             <Button 
                 Style="{StaticResource Button5}" 
-                Canvas.Top="181.1" Canvas.Left="242">
+                Canvas.Top="181.1" Canvas.Left="242"
+                Click="ColorButton_Click">
 
                 <Button.InputBindings>
                     <KeyBinding Command="{Binding Path=PaintCommand}" Key="Return"/>
@@ -147,7 +156,7 @@
                 <Button.CommandBindings>
                     <CommandBinding Command="ApplicationCommands.Close" Executed="WindowCloseCommand" />
                 </Button.CommandBindings>
-                
+
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="Click">
                         <i:InvokeCommandAction

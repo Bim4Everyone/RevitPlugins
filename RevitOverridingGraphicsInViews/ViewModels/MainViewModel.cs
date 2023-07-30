@@ -53,6 +53,7 @@ namespace RevitOverridingGraphicsInViews.ViewModels {
             PaintCommand = RelayCommand.Create(Paint);
         }
 
+
         public ICommand PaintCommand { get; }
         public ICommand ChangeColorManuallyCommand { get; }
 
@@ -260,6 +261,8 @@ namespace RevitOverridingGraphicsInViews.ViewModels {
 
                 transaction.Commit();
             }
+
+            _revitRepository.ActiveUIDocument.Selection.SetElementIds(new List<ElementId>());
 
             SaveConfig();
             ApplicationCommands.Close.Execute(null, null);
