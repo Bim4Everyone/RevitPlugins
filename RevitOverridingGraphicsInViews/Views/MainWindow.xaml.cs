@@ -1,5 +1,8 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace RevitOverridingGraphicsInViews.Views {
     public partial class MainWindow {
@@ -25,7 +28,7 @@ namespace RevitOverridingGraphicsInViews.Views {
             }
         }
 
-        private void CloseCommandBinding_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e) {
+        private void WindowCloseCommand(object sender, System.Windows.Input.ExecutedRoutedEventArgs e) {
 
             this.Close();
         }

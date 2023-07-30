@@ -22,5 +22,13 @@ namespace RevitOverridingGraphicsInViews.Models {
 
     internal class PluginSettings : ProjectSettings {
         public override string ProjectName { get; set; }
+
+        public ColorHelper SelectedColor { get; set; }
+        public ColorHelper Color1 { get; set; }
+        public ColorHelper Color2 { get; set; }
+        public ColorHelper Color3 { get; set; }
+        public ColorHelper Color4 { get; set; }
+        public ColorHelper Color5 { get; set; }
+
     }
 }
