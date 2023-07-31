@@ -19,24 +19,20 @@
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="45" />
+            <RowDefinition Height="25" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ComboBox
-            Grid.Row="0"
-            Margin="10"
-            DisplayMemberPath = "Name"
-            ItemsSource="{Binding RevitViewModels}"
-            SelectedItem="{Binding RevitViewModel}"/>
+        <TextBlock
+            Margin="10, 5"
+            HorizontalAlignment="Left"
+            Text="Выберите уровень" />
 
         <ListView 
             Grid.Row="1"
             Margin="10,5"
             SelectionMode="Extended"
-            DataContext="{Binding RevitViewModel}"
-            IsEnabled="{Binding IsAllowSelectLevels}"
             ItemsSource="{Binding Levels}">
             
             <ListBox.ItemTemplate>
@@ -58,14 +54,12 @@
                 Margin="10"
                 Foreground="Orange"
                 VerticalAlignment="Center"
-                DataContext="{Binding RevitViewModel}"
                 Text="{Binding ErrorText}" />
 
             <Button
                 Margin="10"
                 Width="80"
                 Content="ОК"
-                DataContext="{Binding RevitViewModel}"
                 Command="{Binding SetWallParametersCommand}"
                 Click="ButtonOk_Click" />
 
