@@ -5,10 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Xml.Linq;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -22,8 +24,9 @@ namespace RevitVolumeOfWork.ViewModels {
             _revitRepository = revitRepository;
             SetWallParametersCommand = new RelayCommand(SetWallParameters, CanSetWallParameters);
 
-            Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
-                //.OrderBy(item => item.Element.Elevation).Where(item => item.Rooms.Count > 0));
+            Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels()
+                .OrderBy(item => item.Element.Elevation));
+            //.Where(item => item.Rooms.Count > 0));
         }
 
         public ICommand SetWallParametersCommand { get; }
@@ -35,20 +38,28 @@ namespace RevitVolumeOfWork.ViewModels {
         protected abstract IEnumerable<LevelViewModel> GetLevelViewModels();
 
         private void SetWallParameters(object p) {
-            var levels = Levels.Where(item => item.IsSelected);
+            List<RoomElement> rooms = Levels.Where(item => item.IsSelected)
+                .SelectMany(x => x.Rooms)
+                .ToList();
 
-            foreach(var level in levels) {
-                foreach(var room in level.Rooms) {
+            Dictionary<int, WallElement> allWalls = _revitRepository.GetGroupedRoomsByWalls(rooms);
 
+            using(Transaction t = _revitRepository.Document.StartTransaction("Заполнить параметры ВОР")) {
+                foreach(var key in allWalls.Keys) {
+
+                    var wallElement = allWalls[key];
+                    var wall = wallElement.Wall;
+
+                    wall.LookupParameter("Имя помещения").Set(wallElement.GetRoomsParameters("Name"));
+                    wall.LookupParameter("Номер помещения").Set(wallElement.GetRoomsParameters("Number"));
+                    wall.LookupParameter("ID помещения").Set(wallElement.GetRoomsParameters("ID"));
+                    wall.LookupParameter("Номер квартиры").Set(wallElement.GetRoomsParameters("ApartNumber"));
                 }
+                t.Commit();
             }
-
-
         }
 
-        private bool CanSetWallParameters(object p) { 
-            
-
+        private bool CanSetWallParameters(object p) {          
             return true; 
         }
     }

@@ -23,28 +23,22 @@ namespace RevitVolumeOfWork.Models {
         }
 
         public Level Level { get => _room.Level;  }
-
         public string Name { get => _room.Name; }
         public string Number { get => _room.Number; }
         public string ID { get => _room.Id.ToString(); }
         public string ApartNumber { get => _room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.ApartmentNumber); }
 
         public List<Element> GetBoundaryWalls() {
-            List<Element> boundaryWalls = new List<Element>();
-
+            Category wallCategory = Category.GetCategory(_document, BuiltInCategory.OST_Walls);
             SpatialElementBoundaryOptions options = new SpatialElementBoundaryOptions();
-            var boundaries = _room.GetBoundarySegments(options);
-            foreach(var contour in boundaries) {
-                foreach(var element in contour) {
-                    ElementId elementId = element.ElementId;
-                    if(elementId != null) {
-                        boundaryWalls.Add(_document.GetElement(elementId));
-                    }
-                }
-            }
 
-            return boundaryWalls;
+            return _room.GetBoundarySegments(options)
+                .SelectMany(x => x)
+                .Select(x => x.ElementId)
+                .Where(x => x != ElementId.InvalidElementId)
+                .Select(x => _document.GetElement(x))
+                .Where(x => x.Category.Id == wallCategory.Id)
+                .ToList();
         } 
-
     }
 }

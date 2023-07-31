@@ -44,5 +44,28 @@ namespace RevitVolumeOfWork.Models {
                 .Select(x => new RoomElement(x, Document))
                 .ToList();
         }
+
+        public Dictionary<int, WallElement> GetGroupedRoomsByWalls(List<RoomElement> rooms) {
+
+            Dictionary<int, WallElement> allWalls = new Dictionary<int, WallElement>();
+
+            foreach(var room in rooms) {
+                var walls = room.GetBoundaryWalls();
+
+                foreach(var wall in walls) {
+                    int wallId = wall.Id.IntegerValue;
+                    if(allWalls.ContainsKey(wall.Id.IntegerValue)) {
+                        allWalls[wallId].Rooms.Add(room);
+                    } 
+                    else {
+                        var newWall = new WallElement(wall);
+                        newWall.Rooms = new List<RoomElement> { room };
+                        allWalls.Add(wallId, newWall);
+                    }
+                }
+            }
+
+            return allWalls;
+        }
     }
 }

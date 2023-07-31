@@ -39,6 +39,6 @@ namespace RevitVolumeOfWork.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _isSelected, value);
         }
 
-        public ObservableCollection<RoomElement> Rooms { get => (ObservableCollection<RoomElement>) _rooms;  }
+        public IEnumerable<RoomElement> Rooms { get => _rooms;  }
     }
 }
