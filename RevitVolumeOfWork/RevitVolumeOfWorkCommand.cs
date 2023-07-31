@@ -11,6 +11,9 @@ using Autodesk.Revit.UI;
 
 using dosymep;
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.Templates;
 using dosymep.SimpleServices;
 
 using Ninject;
@@ -50,6 +53,8 @@ namespace RevitVolumeOfWork {
                     .WithPropertyValue(nameof(Window.DataContext),
                         c => c.Kernel.Get<MainViewModel>());
 
+                UpdateParams(uiApplication);
+
                 MainWindow window = kernel.Get<MainWindow>();
                 if(window.ShowDialog() == true) {
                     GetPlatformService<INotificationService>()
@@ -61,6 +66,15 @@ namespace RevitVolumeOfWork {
                         .ShowAsync();
                 }
             }
+        }
+
+        private static void UpdateParams(UIApplication uiApplication) {
+            ProjectParameters projectParameters = ProjectParameters.Create(uiApplication.Application);
+            projectParameters.SetupRevitParams(uiApplication.ActiveUIDocument.Document,
+                ProjectParamsConfig.Instance.RelatedRoomName,
+                ProjectParamsConfig.Instance.RelatedRoomNumber,
+                ProjectParamsConfig.Instance.RelatedRoomID,
+                ProjectParamsConfig.Instance.RelatedApartmentNumber);
         }
     }
 }
