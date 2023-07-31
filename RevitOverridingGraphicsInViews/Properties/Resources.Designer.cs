@@ -59,5 +59,23 @@ namespace RevitOverridingGraphicsInViews.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream PaintSound {
+            get {
+                return ResourceManager.GetStream("PaintSound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.IO.UnmanagedMemoryStream, аналогичного System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream SelectColorSound {
+            get {
+                return ResourceManager.GetStream("SelectColorSound", resourceCulture);
+            }
+        }
     }
 }

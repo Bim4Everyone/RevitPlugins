@@ -13,14 +13,8 @@ using Autodesk.Revit.UI;
 namespace RevitOverridingGraphicsInViews.Views {
     public partial class MainWindow {
 
-        private MediaPlayer player = new MediaPlayer();
-        private Uri SelectColorSoundUri;
-        private Uri PaintSoundUri;
-
         public MainWindow() {
             InitializeComponent();
-
-            GetUri();
         }
 
         public override string PluginName => nameof(RevitOverridingGraphicsInViews);
@@ -36,29 +30,18 @@ namespace RevitOverridingGraphicsInViews.Views {
 
         private void WindowCloseCommand(object sender, System.Windows.Input.ExecutedRoutedEventArgs e) {
 
-            player.Open(PaintSoundUri);
-            player.Volume = 0.01;
+            SoundPlayer player = new SoundPlayer();
+            player.Stream = Properties.Resources.PaintSound;
             player.Play();
 
             this.Close();
         }
 
-        private void GetUri() {
-
-            string executableFilePath = Assembly.GetExecutingAssembly().Location;
-            string executableDirectoryPath = Path.GetDirectoryName(executableFilePath);
-
-            string selectColorSoundFilePath = Path.Combine(executableDirectoryPath, "Views/Sounds/SelectColor.wav");
-            string paintSoundFilePath = Path.Combine(executableDirectoryPath, "Views/Sounds/Paint.wav");
-
-            SelectColorSoundUri = new Uri(selectColorSoundFilePath);
-            PaintSoundUri = new Uri(paintSoundFilePath);
-        }
 
         private void ColorButton_Click(object sender, RoutedEventArgs e) {
 
-            player.Open(SelectColorSoundUri);
-            player.Volume = 0.01;
+            SoundPlayer player = new SoundPlayer();
+            player.Stream = Properties.Resources.SelectColorSound;
             player.Play();
         }
     }

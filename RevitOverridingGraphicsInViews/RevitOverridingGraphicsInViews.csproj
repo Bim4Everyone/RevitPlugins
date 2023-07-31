@@ -2,16 +2,8 @@
 	<Import Project="..\ProjectProps\Common.props" />
 	<ItemGroup>
 	  <None Remove="Views\Images\palette.png" />
-	  <None Remove="Views\Sounds\Paint.wav" />
-	  <None Remove="Views\Sounds\selectColor.wav" />
 	</ItemGroup>
 	<ItemGroup>
-	  <EmbeddedResource Include="Views\Sounds\Paint.wav">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Views\Sounds\SelectColor.wav">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </EmbeddedResource>
 	  <Resource Include="Views\Images\palette.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Resource>
@@ -28,8 +20,5 @@
 	    <Generator>ResXFileCodeGenerator</Generator>
 	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Resources\" />
 	</ItemGroup>
 </Project>
