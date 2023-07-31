@@ -14,8 +14,6 @@ namespace RevitVolumeOfWork.ViewModels {
 
         private RevitViewModel _revitViewModel;
 
-        private string _errorText;
-
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
@@ -37,9 +35,6 @@ namespace RevitVolumeOfWork.ViewModels {
 
         public ObservableCollection<RevitViewModel> RevitViewModels { get; }
 
-        public string ErrorText {
-            get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
-        }
+
     }
 }

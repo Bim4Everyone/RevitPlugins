@@ -36,6 +36,7 @@
             Margin="10,5"
             SelectionMode="Extended"
             DataContext="{Binding RevitViewModel}"
+            IsEnabled="{Binding IsAllowSelectLevels}"
             ItemsSource="{Binding Levels}">
             
             <ListBox.ItemTemplate>
@@ -57,6 +58,7 @@
                 Margin="10"
                 Foreground="Orange"
                 VerticalAlignment="Center"
+                DataContext="{Binding RevitViewModel}"
                 Text="{Binding ErrorText}" />
 
             <Button

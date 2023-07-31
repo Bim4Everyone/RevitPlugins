@@ -10,6 +10,8 @@ using System.Xml.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -20,13 +22,15 @@ namespace RevitVolumeOfWork.ViewModels {
     internal abstract class RevitViewModel : BaseViewModel {
         protected readonly RevitRepository _revitRepository;
 
+        private string _errorText;
+        private bool _isAllowSelectLevels;
+
         public RevitViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
             SetWallParametersCommand = new RelayCommand(SetWallParameters, CanSetWallParameters);
 
             Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels()
                 .OrderBy(item => item.Element.Elevation));
-            //.Where(item => item.Rooms.Count > 0));
         }
 
         public ICommand SetWallParametersCommand { get; }
@@ -50,17 +54,35 @@ namespace RevitVolumeOfWork.ViewModels {
                     var wallElement = allWalls[key];
                     var wall = wallElement.Wall;
 
-                    wall.LookupParameter("Имя помещения").Set(wallElement.GetRoomsParameters("Name"));
-                    wall.LookupParameter("Номер помещения").Set(wallElement.GetRoomsParameters("Number"));
-                    wall.LookupParameter("ID помещения").Set(wallElement.GetRoomsParameters("ID"));
-                    wall.LookupParameter("Номер квартиры").Set(wallElement.GetRoomsParameters("ApartNumber"));
+                    wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomName.Name,
+                                                wallElement.GetRoomsParameters("Name"));
+                    wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomNumber.Name,
+                                                wallElement.GetRoomsParameters("Number"));
+                    wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomID.Name,
+                                                wallElement.GetRoomsParameters("ID"));
+                    wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedApartmentNumber.Name,
+                                                wallElement.GetRoomsParameters("ApartNumber"));
                 }
                 t.Commit();
             }
         }
 
-        private bool CanSetWallParameters(object p) {          
-            return true; 
+        private bool CanSetWallParameters(object p) {
+            if(!_revitRepository.Document.IsExistsSharedParam(SharedParamsConfig.Instance.ApartmentNumber.Name)) {
+                ErrorText = "У помещений отсутствует параметр номера квартиры";
+                return false;
+            }
+            return true;
+        }
+
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        public bool IsAllowSelectLevels {
+            get => _isAllowSelectLevels;
+            set => this.RaiseAndSetIfChanged(ref _isAllowSelectLevels, value);
         }
     }
 }

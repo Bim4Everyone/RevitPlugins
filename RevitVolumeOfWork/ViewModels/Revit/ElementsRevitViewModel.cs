@@ -10,7 +10,7 @@ namespace RevitVolumeOfWork.ViewModels.Revit {
     internal class ElementsRevitViewModel : RevitViewModel {
         public ElementsRevitViewModel(RevitRepository revitRepository)
             : base(revitRepository) {
-
+            IsAllowSelectLevels = true;
         }
 
         protected override IEnumerable<LevelViewModel> GetLevelViewModels() {
