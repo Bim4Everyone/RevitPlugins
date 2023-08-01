@@ -19,18 +19,27 @@
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="35" />
             <RowDefinition Height="25" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+        <CheckBox
+            Grid.Row="0"
+            Margin="10, 5"
+            VerticalAlignment="Bottom"
+            Content="Очистить параметры всех стен перед запуском"
+            IsChecked="{Binding ClearWallsParameters}"/>
+
         <TextBlock
+            Grid.Row="1"
             Margin="10, 5"
             HorizontalAlignment="Left"
             Text="Выберите уровень" />
 
         <ListView 
-            Grid.Row="1"
+            Grid.Row="2"
             Margin="10,5"
             SelectionMode="Extended"
             ItemsSource="{Binding Levels}">
@@ -46,7 +55,7 @@
         </ListView>
 
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="3"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">

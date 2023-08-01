@@ -23,7 +23,7 @@ namespace RevitVolumeOfWork.ViewModels {
         protected readonly RevitRepository _revitRepository;
 
         private string _errorText;
-        private bool _isAllowSelectLevels;
+        private bool _clearWallsParameters;
 
         public MainViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
@@ -34,8 +34,6 @@ namespace RevitVolumeOfWork.ViewModels {
         }
 
         public ICommand SetWallParametersCommand { get; }
-
-        public string Name { get; set; }
 
         public ObservableCollection<LevelViewModel> Levels { get; }
 
@@ -53,7 +51,8 @@ namespace RevitVolumeOfWork.ViewModels {
 
             Dictionary<int, WallElement> allWalls = _revitRepository.GetGroupedRoomsByWalls(rooms);
 
-            _revitRepository.CleanWallsParameters(Levels.Select(x => x.Element).ToList());
+            if(ClearWallsParameters)
+                _revitRepository.CleanWallsParameters(Levels.Where(item => item.IsSelected).Select(x => x.Element).ToList());
 
             using(Transaction t = _revitRepository.Document.StartTransaction("Заполнить параметры ВОР")) {
                 foreach(var key in allWalls.Keys) {
@@ -82,14 +81,14 @@ namespace RevitVolumeOfWork.ViewModels {
             return true;
         }
 
+        public bool ClearWallsParameters {
+            get => _clearWallsParameters;
+            set => this.RaiseAndSetIfChanged(ref _clearWallsParameters, value);
+        }        
+
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
-        }
-
-        public bool IsAllowSelectLevels {
-            get => _isAllowSelectLevels;
-            set => this.RaiseAndSetIfChanged(ref _isAllowSelectLevels, value);
         }
     }
 }
