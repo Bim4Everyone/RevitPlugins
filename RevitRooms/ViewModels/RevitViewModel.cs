@@ -34,10 +34,10 @@ namespace RevitRooms.ViewModels {
         public RevitViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
 
-            Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels().OrderBy(item => item.Element.Elevation).Where(item => item.SpartialElements.Count > 0));
+            Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels().OrderBy(item => item.Element.Elevation).Where(item => item.SpatialElements.Count > 0));
             AdditionalPhases = new ObservableCollection<PhaseViewModel>(_revitRepository.GetAdditionalPhases().Select(item => new PhaseViewModel(item, _revitRepository)));
 
-            Phases = new ObservableCollection<PhaseViewModel>(Levels.SelectMany(item => item.SpartialElements).Select(item => item.Phase).Where(item => item != null).Distinct().Except(AdditionalPhases));
+            Phases = new ObservableCollection<PhaseViewModel>(Levels.SelectMany(item => item.SpatialElements).Select(item => item.Phase).Where(item => item != null).Distinct().Except(AdditionalPhases));
             Phase = Phases.FirstOrDefault();
 
             RoundAccuracy = 1;
@@ -316,14 +316,32 @@ namespace RevitRooms.ViewModels {
 
             // Ошибки, которые не останавливают выполнение скрипта
             var warningElements = new Dictionary<string, InfoElementViewModel>();
+
+            var checkPhases = new List<PhaseViewModel>() {Phase};
+            var customPhase = phases.FirstOrDefault(item =>
+                item.PhaseName?.Equals("Межквартирные перегородки", StringComparison.CurrentCultureIgnoreCase) == true);
+            if(customPhase != null) {
+                checkPhases.Add(customPhase);
+            }
+            
             foreach(var level in levels) {
-                var doors = level.GetDoors(phases);
-                var rooms = level.GetRooms(phases);
+                var rooms = level.GetRooms(checkPhases).ToArray();
+                var doors = level.GetDoors(checkPhases).ToArray();
+                var doorsAndWindows = doors.Union(level.GetWindows(checkPhases)).ToArray();
 
                 // Все двери
                 // с не совпадающей секцией
-                var notEqualSectionDoors = doors.Where(room => room.Phase == Phase || room.PhaseName.Equals("Межквартирные перегородки", StringComparison.CurrentCultureIgnoreCase)).Where(item => !item.IsSectionNameEqual);
+                var notEqualSectionDoors = doors
+                    .Where(item => !item.IsSectionNameEqual);
+                
                 AddElements(InfoElement.NotEqualSectionDoors, notEqualSectionDoors, warningElements);
+                
+                // Все окна и двери
+                // с не совпадающей группой
+                var notEqualGroup = doorsAndWindows
+                    .Where(item => !item.IsGroupNameEqual);
+                
+                AddElements(InfoElement.NotEqualGroup, notEqualGroup, warningElements);
 
                 // Все помещений у которых
                 // найдены самопересечения

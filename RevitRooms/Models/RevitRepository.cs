@@ -91,6 +91,14 @@ namespace RevitRooms.Models {
                 .OfType<FamilyInstance>()
                 .ToList();
         }
+        
+        public IList<FamilyInstance> GetWindows() {
+            return new FilteredElementCollector(Document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_Windows)
+                .OfType<FamilyInstance>()
+                .ToList();
+        }
 
         public void UpdateLevelSharedParam(SpatialElement spatialElement, Dictionary<ElementId, string> levelNames) {
             spatialElement.SetParamValue(SharedParamsConfig.Instance.Level,

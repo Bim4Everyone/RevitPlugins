@@ -13,6 +13,8 @@ using dosymep.WPF.ViewModels;
 
 using RevitRooms.Models;
 
+using Element = DevExpress.Map.Kml.Model.Element;
+
 namespace RevitRooms.ViewModels {
     internal class LevelViewModel : ElementViewModel<Level> {
         private readonly string _name;
@@ -23,7 +25,7 @@ namespace RevitRooms.ViewModels {
             : base(levels.FirstOrDefault(), revitRepository) {
             _name = name;
             Levels = levels;
-            SpartialElements =
+            SpatialElements =
                 new ObservableCollection<SpatialElementViewModel>(GetSpatialElements(revitRepository, spatialElements));
         }
 
@@ -46,33 +48,57 @@ namespace RevitRooms.ViewModels {
 #endif
 
         public int RoomsCount {
-            get { return SpartialElements.Count; }
+            get { return SpatialElements.Count; }
         }
 
         public override string LevelName {
             get { return Name; }
         }
 
-        public ObservableCollection<SpatialElementViewModel> SpartialElements { get; }
+        public ObservableCollection<SpatialElementViewModel> SpatialElements { get; }
 
-        public IEnumerable<DoorViewModel> GetDoors(IEnumerable<PhaseViewModel> phases) {
+        private HashSet<ElementId> GetSpatialElementsHashSet() {
+            return new HashSet<ElementId>(SpatialElements.Select(item => item.ElementId));
+        }
+
+        public IEnumerable<FamilyInstanceViewModel> GetDoors(IEnumerable<PhaseViewModel> phases) {
+            HashSet<ElementId> spatialElements = GetSpatialElementsHashSet();
+            HashSet<ElementId> phaseElements = new HashSet<ElementId>(phases
+                .Select(item => item.ElementId));
             return RevitRepository.GetDoors()
-                .SelectMany(item => phases.Select(phase => new DoorViewModel(item, phase, RevitRepository)))
                 .Where(item => item.LevelId == Element.Id)
-                .Where(item => SpartialElements.Contains(item.ToRoom) || SpartialElements.Contains(item.FromRoom));
+                .Where(item => phaseElements.Contains(item.CreatedPhaseId))
+                .Select(item => new FamilyInstanceViewModel(item, new PhaseViewModel((Phase)RevitRepository.GetElement(item.CreatedPhaseId), RevitRepository), RevitRepository))
+                .Where(item => spatialElements.Contains(item.ToRoom?.ElementId)
+                               && spatialElements.Contains(item.FromRoom?.ElementId));
+        }
+
+        public IEnumerable<FamilyInstanceViewModel> GetWindows(IEnumerable<PhaseViewModel> phases) {
+            HashSet<ElementId> phaseElements = new HashSet<ElementId>(phases
+                .Select(item => item.ElementId));
+            HashSet<ElementId> spatialElements = GetSpatialElementsHashSet();
+            return RevitRepository.GetWindows()
+                .Where(item => item.LevelId == Element.Id)
+                .Where(item => item.Symbol.FamilyName.IndexOf("Окн_ББлок_", StringComparison.CurrentCultureIgnoreCase) >= 0)
+                .Where(item => phaseElements.Contains(item.CreatedPhaseId))
+                .Select(item => new FamilyInstanceViewModel(item,
+                    new PhaseViewModel((Phase) RevitRepository.GetElement(item.CreatedPhaseId), RevitRepository),
+                    RevitRepository))
+                .Where(item => spatialElements.Contains(item.ToRoom?.ElementId)
+                               && spatialElements.Contains(item.FromRoom?.ElementId));
         }
 
         public IEnumerable<SpatialElementViewModel> GetAreas() {
-            return SpartialElements.Where(item => item.Element is Area);
+            return SpatialElements.Where(item => item.Element is Area);
         }
 
         public IEnumerable<SpatialElementViewModel> GetRooms(PhaseViewModel phase) {
-            return SpartialElements.Where(item => item.Phase != null).Where(item => item.Phase == phase)
+            return SpatialElements.Where(item => item.Phase != null).Where(item => item.Phase == phase)
                 .Where(item => item.Element is Room);
         }
 
         public IEnumerable<SpatialElementViewModel> GetRooms(IEnumerable<PhaseViewModel> phases) {
-            return SpartialElements.Where(item => item.Phase != null).Where(item => phases.Contains(item.Phase))
+            return SpatialElements.Where(item => item.Phase != null).Where(item => phases.Contains(item.Phase))
                 .Where(item => item.Element is Room);
         }
 

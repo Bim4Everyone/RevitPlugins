@@ -98,6 +98,12 @@ namespace RevitRooms.ViewModels {
             Description = $"Обнаружены помещения принадлежащие разным секциям, но имеющие доступ друг к другу через двери. Проверьте корректность параметра \"{ProjectParamsConfig.Instance.RoomSectionName.Name}\" для помещений, соединенных данными дверьми."
         };
         
+        public static InfoElement NotEqualGroup { get; } = new InfoElement() {
+            TypeInfo = TypeInfo.Warning,
+            Message = $"Проверка параметра \"{ProjectParamsConfig.Instance.RoomGroupName.Name}\" по дверям и окнам",
+            Description = $"Обнаружены помещения принадлежащие разным квартирам, но имеющие доступ друг к другу через двери или окна (балконные блоки). Проверьте корректность параметра \"{ProjectParamsConfig.Instance.RoomGroupName.Name}\" для помещений, соединенных данными дверьми."
+        };
+        
         public static InfoElement CountourIntersectRooms { get; } = new InfoElement() {
             TypeInfo = TypeInfo.Warning,
             Message = "Найдены самопересечения помещений.",

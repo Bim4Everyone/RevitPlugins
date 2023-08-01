@@ -11,9 +11,9 @@ using dosymep.WPF.ViewModels;
 using RevitRooms.Models;
 
 namespace RevitRooms.ViewModels {
-    internal class DoorViewModel : ElementViewModel<FamilyInstance> {
-        public DoorViewModel(FamilyInstance door, PhaseViewModel phase, RevitRepository revitRepository) :
-            base(door, revitRepository) {
+    internal class FamilyInstanceViewModel : ElementViewModel<FamilyInstance> {
+        public FamilyInstanceViewModel(FamilyInstance familyInstance, PhaseViewModel phase, RevitRepository revitRepository) :
+            base(familyInstance, revitRepository) {
 
             Phase = phase;
             try {
@@ -44,6 +44,21 @@ namespace RevitRooms.ViewModels {
                 }
 
                 return ToRoom.RoomSection?.Id == FromRoom.RoomSection?.Id;
+            }
+        }
+
+        public bool IsGroupNameEqual {
+            get {
+                if(ToRoom == null || FromRoom == null) {
+                    return true;
+                }
+
+                if(ToRoom.RoomGroup?.Name.IndexOf("квартира", StringComparison.CurrentCultureIgnoreCase) < 0
+                   || FromRoom.RoomGroup?.Name.IndexOf("квартира", StringComparison.CurrentCultureIgnoreCase) < 0) {
+                    return true;
+                }
+
+                return ToRoom.RoomGroup?.Id == FromRoom.RoomGroup?.Id;
             }
         }
     }
