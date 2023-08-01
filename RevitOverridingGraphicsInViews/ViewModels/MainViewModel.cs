@@ -279,8 +279,8 @@ namespace RevitOverridingGraphicsInViews.ViewModels {
             settings.SetSurfaceBackgroundPatternColor(SelectedColor.UserColor);
 
 
-            settings.SetProjectionLineColor(SelectedColor.UserColor);
-            settings.SetCutLineColor(SelectedColor.UserColor);
+            //settings.SetProjectionLineColor(SelectedColor.UserColor);
+            //settings.SetCutLineColor(SelectedColor.UserColor);
 
 
             settings.SetCutForegroundPatternId(SolidFillPattern.Id);

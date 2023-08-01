@@ -76,8 +76,6 @@ namespace RevitPylonDocumentation.ViewModels {
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
             SelectPylonCommand = RelayCommand.Create(SelectPylon);
-            SelectCOLORCommand = RelayCommand.Create(SelectCOLOR);
-            DOITCommand = RelayCommand.Create(DOIT);
 
             ApplySettingsCommands = RelayCommand.Create(ApplySettings, CanApplySettings);
             CheckSettingsCommands = RelayCommand.Create(CheckSettings);
@@ -96,8 +94,6 @@ namespace RevitPylonDocumentation.ViewModels {
         public ICommand AddScheduleFilterParamCommand { get; }
         public ICommand DeleteScheduleFilterParamCommand { get; }
         public ICommand SelectPylonCommand { get; }
-        public ICommand SelectCOLORCommand { get; }
-        public ICommand DOITCommand { get; }
 
 
 
@@ -828,122 +824,6 @@ namespace RevitPylonDocumentation.ViewModels {
             MainWindow mainWindow = new MainWindow();
             mainWindow.DataContext = this;
             mainWindow.ShowDialog();
-        }
-
-        private Element _elem;
-        public Element Elem {
-            get => _elem;
-            set => this.RaiseAndSetIfChanged(ref _elem, value);
-        }
-
-        private ColorHelper _color;
-        public ColorHelper Color {
-            get => _color;
-            set => this.RaiseAndSetIfChanged(ref _color, value);
-        }
-
-
-        public FillPatternElement SolidFillPattern { get; set; }
-        //public LinePatternElement LineFillPattern { get; set; }
-
-
-        
-
-
-
-        private void SelectCOLOR() {
-
-            ColorSelectionDialog colorSelectionDialog = new ColorSelectionDialog();
-
-            if(colorSelectionDialog.Show() == ItemSelectionDialogResult.Confirmed) {
-
-                Color = new ColorHelper(
-                    colorSelectionDialog.SelectedColor.Red,
-                    colorSelectionDialog.SelectedColor.Green,
-                    colorSelectionDialog.SelectedColor.Blue);
-
-            }
-
-
-        }
-
-
-
-        private void DOIT() {
-
-
-
-            List<Element> elemsForWork = new List<Element>();
-
-
-            //List<Reference> refs = _revitRepository.ActiveUIDocument.Selection.PickObjects(ObjectType.Element, "Выберите пилон").ToList<Reference>();
-            //foreach(Reference ref1 in refs) {
-            //    elemsForWork.Add(_revitRepository.Document.GetElement(ref1));
-            //}
-            
-
-
-            ICollection<ElementId> selectedIds = _revitRepository.ActiveUIDocument.Selection.GetElementIds();
-
-
-            foreach(ElementId id in selectedIds) {
-
-                elemsForWork.Add(_revitRepository.Document.GetElement(id));
-            }
-
-
-
-            SolidFillPattern = FillPatternElement.GetFillPatternElementByName(_revitRepository.Document, FillPatternTarget.Drafting, "<Сплошная заливка>");
-            
-            // Либо выполняем прямое переопределение графики элементов на виде
-            OverrideGraphicSettings settings = GetOverrideGraphicSettings();
-
-
-
-
-            using(Transaction transaction = _revitRepository.Document.StartTransaction("Документатор пилонов")) {
-
-                foreach(View view in _revitRepository.AllViews) {
-
-                    foreach(Element el in elemsForWork) {
-
-                        try {
-                            view.SetElementOverrides(el.Id, settings);
-
-                        } catch(Exception) {
-
-                        }
-                    }
-                }
-
-                transaction.Commit();
-            }
-        }
-
-
-
-        private OverrideGraphicSettings GetOverrideGraphicSettings() {
-           
-            OverrideGraphicSettings settings = new OverrideGraphicSettings();
-
-            settings.SetSurfaceForegroundPatternId(SolidFillPattern.Id);
-            settings.SetSurfaceForegroundPatternColor(Color.UserColor);
-            settings.SetSurfaceBackgroundPatternId(SolidFillPattern.Id);
-            settings.SetSurfaceBackgroundPatternColor(Color.UserColor);
-
-
-            //settings.SetProjectionLinePatternId(LineFillPattern.Id);
-            settings.SetProjectionLineColor(Color.UserColor);
-            //settings.SetCutLinePatternId(LineFillPattern.Id);
-            settings.SetCutLineColor(Color.UserColor);
-
-
-            settings.SetCutForegroundPatternId(SolidFillPattern.Id);
-            settings.SetCutForegroundPatternColor(Color.UserColor);
-            settings.SetCutBackgroundPatternId(SolidFillPattern.Id);
-            settings.SetCutBackgroundPatternColor(Color.UserColor);
-
-            return settings;
         }
 
 

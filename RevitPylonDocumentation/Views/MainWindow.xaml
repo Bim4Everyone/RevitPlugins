@@ -26,7 +26,13 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
-    <Grid>
+    <Window.Resources>
+        <ResourceDictionary Source="ResourceDictionary.xaml"/>
+    </Window.Resources>
+
+
+
+    <Grid Background="{DynamicResource TertiaryBlueColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />
@@ -36,13 +42,14 @@
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />
-            <RowDefinition Height="30" />
+            <RowDefinition Height="70" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
+
 
         <Label Grid.Row="0" Content="Выберите нужный комплект документации:"/>
 
@@ -127,19 +134,139 @@
 
 
 
-            <StackPanel Grid.Column="1">
-                <ToggleButton Content="Основной вид" IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralView}"/>
-                <ToggleButton Content="Основной перпендикулярный вид" IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralPerpendicularView}"/>
-                <ToggleButton Content="Первый поперечный вид" IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewFirst}"/>
-                <ToggleButton Content="Второй поперечный вид" IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewSecond}"/>
-                <ToggleButton Content="Третий поперечный вид" IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewThird}"/>
-                <ToggleButton Content="Спецификацию армирования" IsChecked="{Binding Path=SelectionSettings.NeedWorkWithRebarSchedule}"/>
-                <ToggleButton Content="Спецификацию материалов" IsChecked="{Binding Path=SelectionSettings.NeedWorkWithMaterialSchedule}"/>
-                <ToggleButton Content="Ведомость системных деталей" IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSystemPartsSchedule}"/>
-                <ToggleButton Content="Ведомость IFC деталей" IsChecked="{Binding Path=SelectionSettings.NeedWorkWithIFCPartsSchedule}"/>
-                <ToggleButton Content="Легенда примечаний" IsChecked="{Binding Path=SelectionSettings.NeedWorkWithLegend}"/>
+            <Border Grid.Column="1" Margin="3" 
+                    CornerRadius="15" Background="{DynamicResource SecondaryBackgroundColor}"
+                    Padding="5">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="6*"/>
+                    </Grid.ColumnDefinitions>
 
-            </StackPanel>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+
+                    <CheckBox  
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Style="{DynamicResource ToggleButtonStyle}"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralView}"/>
+                    <TextBlock 
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Style="{StaticResource TextBlockStyle}"
+                        Text="Основной вид"/>
+
+                    <CheckBox  
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Style="{DynamicResource ToggleButtonStyle}"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralPerpendicularView}"/>
+                    <TextBlock 
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Style="{StaticResource TextBlockStyle}"
+                        Text="Основной перпендикулярный вид"/>
+
+                    <CheckBox  
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Style="{DynamicResource ToggleButtonStyle}"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewFirst}"/>
+                    <TextBlock 
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Style="{StaticResource TextBlockStyle}"
+                        Text="Первый поперечный вид"/>
+
+                    <CheckBox  
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        Style="{DynamicResource ToggleButtonStyle}"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewSecond}"/>
+                    <TextBlock 
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        Style="{StaticResource TextBlockStyle}"
+                        Text="Второй поперечный вид"/>
+
+                    <CheckBox  
+                        Grid.Row="4"
+                        Grid.Column="0"
+                        Style="{DynamicResource ToggleButtonStyle}"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewThird}"/>
+                    <TextBlock 
+                        Grid.Row="4"
+                        Grid.Column="1"
+                        Style="{StaticResource TextBlockStyle}"
+                        Text="Третий поперечный вид"/>
+
+                    <CheckBox  
+                        Grid.Row="5"
+                        Grid.Column="0"
+                        Style="{DynamicResource ToggleButtonStyle}"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithRebarSchedule}"/>
+                    <TextBlock 
+                        Grid.Row="5"
+                        Grid.Column="1"
+                        Style="{StaticResource TextBlockStyle}"
+                        Text="Спецификацию армирования"/>
+
+                    <CheckBox  
+                        Grid.Row="6"
+                        Grid.Column="0"
+                        Style="{DynamicResource ToggleButtonStyle}"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithMaterialSchedule}"/>
+                    <TextBlock 
+                        Grid.Row="6"
+                        Grid.Column="1"
+                        Style="{StaticResource TextBlockStyle}"
+                        Text="Спецификацию материалов"/>
+
+                    <CheckBox  
+                        Grid.Row="7"
+                        Grid.Column="0"
+                        Style="{DynamicResource ToggleButtonStyle}"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSystemPartsSchedule}"/>
+                    <TextBlock 
+                        Grid.Row="7"
+                        Grid.Column="1"
+                        Style="{StaticResource TextBlockStyle}"
+                        Text="Ведомость системных деталей"/>
+
+                    <CheckBox  
+                        Grid.Row="8"
+                        Grid.Column="0"
+                        Style="{DynamicResource ToggleButtonStyle}"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithIFCPartsSchedule}"/>
+                    <TextBlock 
+                        Grid.Row="8"
+                        Grid.Column="1"
+                        Style="{StaticResource TextBlockStyle}"
+                        Text="Ведомость IFC деталей"/>
+
+                    <CheckBox  
+                        Grid.Row="9"
+                        Grid.Column="0"
+                        Style="{DynamicResource ToggleButtonStyle}"
+                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithLegend}"/>
+                    <TextBlock 
+                        Grid.Row="9"
+                        Grid.Column="1"
+                        Style="{StaticResource TextBlockStyle}"
+                        Text="Легенда примечаний"/>
+                </Grid>
+            </Border>
         </Grid>
 
 
@@ -150,20 +277,6 @@
                 Click="ButtonCancel_Click"
                 Command="{Binding SelectPylonCommand}"/>
 
-
-
-        <Button
-            Grid.Row="6"    
-                Width="180"
-                Content="Задать цвет"
-                Command="{Binding SelectCOLORCommand}"/>
-
-        <Button
-            Grid.Row="7"    
-                Width="180"
-                Content="Окрасить"
-                Click="ButtonOk_Click"
-                Command="{Binding DOITCommand}"/>
 
         <StackPanel
             Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2"
