@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
 
 namespace RevitVolumeOfWork.Models {
@@ -20,28 +21,11 @@ namespace RevitVolumeOfWork.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-
-
         public IList<RoomElement> GetRooms() {
             return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(SpatialElement))
                 .Select(x => new RoomElement((Room)x, Document))
-                .ToList();
-        }
-
-        public IList<RoomElement> GetRoomsOnActiveView() {
-            return new FilteredElementCollector(Document, Document.ActiveView.Id)
-                .WhereElementIsNotElementType()
-                .OfClass(typeof(SpatialElement))
-                .Select(x => new RoomElement((Room) x, Document))
-                .ToList();
-        }
-
-        public IList<RoomElement> GetSelectedRooms() {
-            return ActiveUIDocument.GetSelectedElements()
-                .OfType<Room>()
-                .Select(x => new RoomElement(x, Document))
                 .ToList();
         }
 
@@ -64,8 +48,27 @@ namespace RevitVolumeOfWork.Models {
                     }
                 }
             }
-
             return allWalls;
+        }
+
+        public void CleanWallsParameters(List<Level> levels) {
+            List<ElementFilter> levelFilters = levels.Select(x => (ElementFilter) new ElementLevelFilter(x.Id)).ToList();
+
+            LogicalOrFilter orFIlter = new LogicalOrFilter(levelFilters);
+
+            FilteredElementCollector collector = new FilteredElementCollector(Document)
+                .OfClass(typeof(Wall))
+                .WherePasses(orFIlter);
+
+            using(Transaction t = Document.StartTransaction("Очистить параметры ВОР стен")) {
+                foreach(var wall in collector) {
+                    wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomName.Name, "");
+                    wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomNumber.Name, "");
+                    wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomID.Name, "");
+                    wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedApartmentNumber.Name, "");
+                }
+                t.Commit();
+            }
         }
     }
 }

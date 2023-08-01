@@ -53,6 +53,8 @@ namespace RevitVolumeOfWork.ViewModels {
 
             Dictionary<int, WallElement> allWalls = _revitRepository.GetGroupedRoomsByWalls(rooms);
 
+            _revitRepository.CleanWallsParameters(Levels.Select(x => x.Element).ToList());
+
             using(Transaction t = _revitRepository.Document.StartTransaction("Заполнить параметры ВОР")) {
                 foreach(var key in allWalls.Keys) {
 
