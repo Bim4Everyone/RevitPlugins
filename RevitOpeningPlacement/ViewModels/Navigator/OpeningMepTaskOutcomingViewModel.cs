@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 using Autodesk.Revit.DB;
 
@@ -9,29 +8,27 @@ using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// <summary>
-    /// Модель представления окна для работы с конкретным входящим заданием на отверстие от инженера в файле архитектора или конструктора
+    /// Модель представления окна для работы с конкретным исходящим заданием на отверстие в файле инженера
     /// </summary>
-    internal class OpeningMepTaskIncomingViewModel : BaseViewModel {
+    internal class OpeningMepTaskOutcomingViewModel : BaseViewModel {
         /// <summary>
-        /// Экземпляр семейства задания на отверстие
+        /// Входящее задание на отверстие
         /// </summary>
-        private readonly OpeningMepTaskIncoming _openingTask;
+        private readonly OpeningMepTaskOutcoming _openingTask;
 
 
-        public OpeningMepTaskIncomingViewModel(OpeningMepTaskIncoming incomingOpeningTask) {
+        public OpeningMepTaskOutcomingViewModel(OpeningMepTaskOutcoming incomingOpeningTask) {
             if(incomingOpeningTask is null) {
                 throw new ArgumentNullException(nameof(incomingOpeningTask));
             }
             _openingTask = incomingOpeningTask;
 
             OpeningId = _openingTask.Id.ToString();
-            FileName = Path.GetFileNameWithoutExtension(incomingOpeningTask.FileName);
             Date = _openingTask.Date;
             MepSystem = _openingTask.MepSystem;
             Description = _openingTask.Description;
             CenterOffset = _openingTask.CenterOffset;
             BottomOffset = _openingTask.BottomOffset;
-            IsAccepted = _openingTask.IsAccepted;
         }
 
 
@@ -41,17 +38,12 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         public string OpeningId { get; } = string.Empty;
 
         /// <summary>
-        /// Название связанного файла-источника задания на отверстие
-        /// </summary>
-        public string FileName { get; } = string.Empty;
-
-        /// <summary>
         /// Дата создания отверстия
         /// </summary>
         public string Date { get; } = string.Empty;
 
         /// <summary>
-        /// Название инженерной системы, для элемента которой создано задание на отверстие
+        /// Название инженерной системы, для элемента которой создан экземпляр семейства задания на отверстие
         /// </summary>
         public string MepSystem { get; } = string.Empty;
 
@@ -69,24 +61,6 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// Отметка низа задания на отверстие
         /// </summary>
         public string BottomOffset { get; } = string.Empty;
-
-        private bool _isAccepted;
-        /// <summary>
-        /// Статус задания: принято/не принято
-        /// </summary>
-        public bool IsAccepted {
-            get => _isAccepted;
-            set => RaiseAndSetIfChanged(ref _isAccepted, value);
-        }
-
-        /// <summary>
-        /// Комментарий к заданию на отверстие
-        /// </summary>
-        private string _comment;
-        public string Comment {
-            get => _comment;
-            set => RaiseAndSetIfChanged(ref _comment, value);
-        }
 
 
         /// <summary>

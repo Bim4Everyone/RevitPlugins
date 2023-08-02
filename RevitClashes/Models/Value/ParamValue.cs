@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -16,7 +13,7 @@ namespace RevitClashDetective.Models.Value {
         public virtual object Value { get; }
         public string DisplayValue { get; set; }
 
-        public static ParamValue GetParamValue(int[] categories, RevitParam revitParam, Element element) {
+        public static ParamValue GetParamValue(RevitParam revitParam, Element element) {
             switch(revitParam.StorageType) {
                 case StorageType.Integer: {
                     return new IntParamValue(element.GetParamValueOrDefault<int>(revitParam), element.GetParamValueStringOrDefault(revitParam));
@@ -28,7 +25,7 @@ namespace RevitClashDetective.Models.Value {
                     return new StringParamValue(element.GetParamValueOrDefault<string>(revitParam), element.GetParamValueStringOrDefault(revitParam));
                 }
                 case StorageType.ElementId: {
-                    return new ElementIdParamValue(categories, element.GetParamValueStringOrDefault(revitParam), element.GetParamValueStringOrDefault(revitParam));
+                    return new ElementIdParamValue(element.GetParamValueStringOrDefault(revitParam), element.GetParamValueStringOrDefault(revitParam));
                 }
                 default: {
                     throw new ArgumentOutOfRangeException(nameof(revitParam.StorageType), $"У параметра {revitParam.Name} не определен тип данных.");
@@ -36,7 +33,7 @@ namespace RevitClashDetective.Models.Value {
             }
         }
 
-        public static ParamValue GetParamValue(int[] categories, RevitParam revitParam, string value, string displayValue) {
+        public static ParamValue GetParamValue(RevitParam revitParam, string value, string displayValue) {
             switch(revitParam.StorageType) {
                 case StorageType.Integer: {
                     return new IntParamValue(value != null ? int.Parse(value) : 0, displayValue);
@@ -48,7 +45,7 @@ namespace RevitClashDetective.Models.Value {
                     return new StringParamValue(value, displayValue);
                 }
                 case StorageType.ElementId: {
-                    return new ElementIdParamValue(categories, value, displayValue);
+                    return new ElementIdParamValue(value, displayValue);
                 }
                 default: {
                     throw new ArgumentOutOfRangeException(nameof(revitParam.StorageType), $"У параметра {revitParam.Name} не определен тип данных.");
@@ -82,7 +79,7 @@ namespace RevitClashDetective.Models.Value {
             if(revitParam is SystemParam systemParam) {
                 paramId = new ElementId(systemParam.SystemParamId);
             } else {
-                paramId = revitParam.GetRevitParamElement(doc)?.Id;
+                paramId = revitParam.GetRevitParamElement(doc)?.Id ?? ElementId.InvalidElementId;
             }
             return paramId;
         }

@@ -52,19 +52,19 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
             return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name);
         }
 
-        public ParamValue GetElementParamValue(int[] categories, Element item) {
+        public ParamValue GetElementParamValue(Element item) {
             if(item.IsExistsParam(BuiltInParameter.ELEM_PARTITION_PARAM)) {
                 return new StringParamValue(item.GetParam(BuiltInParameter.ELEM_PARTITION_PARAM).AsValueString(), item.GetParam(BuiltInParameter.ELEM_PARTITION_PARAM).AsValueString());
             }
             var typeId = item.GetTypeId();
             if(typeId.IsNotNull()) {
                 var type = item.Document.GetElement(typeId);
-                return GetElementParamValue(categories, type);
+                return GetElementParamValue(type);
             }
             return null;
         }
 
-        public ParamValue GetParamValueFormString(int[] categories, string value) {
+        public ParamValue GetParamValueFormString(string value) {
             return new StringParamValue(value, value);
         }
 
@@ -81,19 +81,19 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
             if(ruleEvaluator.Evaluator != RuleEvaluators.FilterHasNoValue && ruleEvaluator.Evaluator != RuleEvaluators.FilterHasValue) {
                 var categoryFilter = new ElementMulticategoryFilter(categories.Select(item => item.Id).ToList());
                 return RevitRepository.GetCollectors()
-                    .SelectMany(item => GetValues(categories.Select(c => c.Id.IntegerValue).ToArray(), item, categoryFilter))
+                    .SelectMany(item => GetValues(item, categoryFilter))
                     .Distinct()
                     .OrderBy(item => item);
             }
             return Enumerable.Empty<ParamValue>();
         }
 
-        private IEnumerable<ParamValue> GetValues(int[] categories, Collector collector, ElementMulticategoryFilter categoryFilter) {
+        private IEnumerable<ParamValue> GetValues(Collector collector, ElementMulticategoryFilter categoryFilter) {
             return collector.RevitCollector
                         .WhereElementIsNotElementType()
                         .WherePasses(categoryFilter)
                         .Where(item => item != null)
-                        .Select(item => GetElementParamValue(categories, item))
+                        .Select(item => GetElementParamValue(item))
                         .Where(item => item != null && item.Value != null && item.Value as ElementId != ElementId.InvalidElementId);
         }
 

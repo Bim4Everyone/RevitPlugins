@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
@@ -12,7 +10,9 @@ using RevitClashDetective.Models;
 
 namespace RevitOpeningPlacement.ViewModels.Services {
     internal class ConfigSaverService {
-        public void Save(ProjectConfig config) {
+        public void Save(ProjectConfig config, Document document) {
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+
             var saveWindow = GetPlatformService<ISaveFileDialogService>();
             saveWindow.AddExtension = true;
             saveWindow.Filter = "ClashConfig |*.json";
@@ -20,7 +20,7 @@ namespace RevitOpeningPlacement.ViewModels.Services {
             if(!saveWindow.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "config")) {
                 throw new OperationCanceledException();
             }
-            var configSaver = new ConfigSaver();
+            var configSaver = new ConfigSaver(document);
             configSaver.Save(config, saveWindow.File.FullName);
         }
 

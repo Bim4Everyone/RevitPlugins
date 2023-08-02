@@ -20,6 +20,8 @@ using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.RevitViews;
 using RevitOpeningPlacement.OpeningModels;
 
+using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
+
 namespace RevitOpeningPlacement.Models {
     internal class RevitRepository {
         private readonly Application _application;
@@ -31,8 +33,8 @@ namespace RevitOpeningPlacement.Models {
         private readonly RevitClashDetective.Models.RevitRepository _clashRevitRepository;
         private readonly RevitEventHandler _revitEventHandler;
 
-        private View3DProvider _view3DProvider;
-        private View3D _view;
+        private readonly View3DProvider _view3DProvider;
+        private readonly View3D _view;
 
         public RevitRepository(Application application, Document document) {
 
@@ -54,6 +56,8 @@ namespace RevitOpeningPlacement.Models {
 
         public UIApplication UIApplication { get; }
         public List<DocInfo> DocInfos { get; }
+
+        public Document Doc => _document;
 
         public static Dictionary<MepCategoryEnum, string> MepCategoryNames { get; } = new Dictionary<MepCategoryEnum, string> {
             {MepCategoryEnum.Pipe, "Трубы" },
@@ -246,6 +250,17 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
+        /// Возвращает все экземпляры семейств исходящих заданий на отверстия из текущего файла инженерных систем
+        /// </summary>
+        /// <returns></returns>
+        public IList<FamilyInstance> GetOpeningsMepTasksOutcoming() {
+            var openingsInWalls = GetWallOpeningsMepTasksOutcoming();
+            var openingsInFloor = GetFloorOpeningsMepTasksOutcoming();
+            openingsInFloor.AddRange(openingsInWalls);
+            return openingsInFloor;
+        }
+
+        /// <summary>
         /// Возвращает исходящие задания на отверстия в стенах от инженера из текущего файла Revit
         /// </summary>
         /// <returns></returns>
@@ -292,8 +307,8 @@ namespace RevitOpeningPlacement.Models {
         /// Возвращает коллекцию исходящих заданий на отверстия, размещенных в текущем файле Revit
         /// </summary>
         /// <returns></returns>
-        public ICollection<OpeningTaskOutcoming> GetPlacedOutcomingTasks() {
-            return GetOpeningsTaskFromCurrentDoc().Select(f => new OpeningTaskOutcoming(f)).ToList();
+        public ICollection<OpeningMepTaskOutcoming> GetPlacedOutcomingTasks() {
+            return GetOpeningsTaskFromCurrentDoc().Select(f => new OpeningMepTaskOutcoming(f)).ToList();
         }
 
         public void DeleteElements(ICollection<Element> elements) {
@@ -330,7 +345,56 @@ namespace RevitOpeningPlacement.Models {
             _clashRevitRepository.DoAction(action);
         }
 
-        //public ICollection<>
+        public IEnumerable<Document> GetDocuments() {
+            return _clashRevitRepository.GetDocuments();
+        }
+
+        public List<ParameterValueProvider> GetParameters(Document doc, IEnumerable<Category> categories) {
+            return _clashRevitRepository.GetParameters(doc, categories);
+        }
+
+        /// <summary>
+        /// Возвращает значение элемента перечисления категорий инженерных систем
+        /// </summary>
+        /// <param name="mepCategoryName">Название категории инженерных систем</param>
+        /// <returns></returns>
+        public MepCategoryEnum GetMepCategoryEnum(string mepCategoryName) {
+            return MepCategoryNames.First(pair => pair.Value.Equals(mepCategoryName, StringComparison.CurrentCulture)).Key;
+        }
+
+        /// <summary>
+        /// Возвращает массив категорий Revit, которые соответствуют заданному <see cref="MepCategoryEnum"/>
+        /// </summary>
+        /// <param name="mepCategory">Категория элементов инженерных систем</param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException">Исключение, если поданная категория <paramref name="mepCategory"/> не поддерживается</exception>
+        public Category[] GetCategories(MepCategoryEnum mepCategory) {
+            switch(mepCategory) {
+                case MepCategoryEnum.Pipe:
+                return new Category[] {
+                    Category.GetCategory(_document, BuiltInCategory.OST_PipeCurves),
+                    Category.GetCategory(_document, BuiltInCategory.OST_PipeFitting)
+                };
+                case MepCategoryEnum.RectangleDuct:
+                case MepCategoryEnum.RoundDuct:
+                return new Category[] {
+                    Category.GetCategory(_document, BuiltInCategory.OST_DuctCurves),
+                    Category.GetCategory(_document, BuiltInCategory.OST_DuctFitting)
+                };
+                case MepCategoryEnum.CableTray:
+                return new Category[] {
+                    Category.GetCategory(_document, BuiltInCategory.OST_CableTray),
+                    Category.GetCategory(_document, BuiltInCategory.OST_CableTrayFitting)
+                };
+                case MepCategoryEnum.Conduit:
+                return new Category[] {
+                    Category.GetCategory(_document, BuiltInCategory.OST_Conduit),
+                    Category.GetCategory(_document, BuiltInCategory.OST_ConduitFitting)
+                };
+                default:
+                throw new NotImplementedException(nameof(mepCategory));
+            }
+        }
 
         /// <summary>
         /// Возвращает список экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит ("исходящие" задания).

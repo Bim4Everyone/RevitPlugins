@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Interop;
+﻿using System.IO;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -14,7 +8,6 @@ using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
-using RevitClashDetective.ViewModels;
 using RevitClashDetective.ViewModels.ClashDetective;
 using RevitClashDetective.Views;
 
@@ -32,8 +25,11 @@ namespace RevitClashDetective {
 
         public void ExecuteCommand(UIApplication uiApplication) {
             var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            var filterConfig = FiltersConfig.GetFiltersConfig(Path.Combine(revitRepository.GetObjectName(), revitRepository.GetDocumentName()));
-            var checkConfig = ChecksConfig.GetChecksConfig(Path.Combine(revitRepository.GetObjectName(), revitRepository.GetDocumentName()));
+
+            var revitFilePath = Path.Combine(revitRepository.GetObjectName(), revitRepository.GetDocumentName());
+            var filterConfig = FiltersConfig.GetFiltersConfig(revitFilePath, revitRepository.Doc);
+
+            var checkConfig = ChecksConfig.GetChecksConfig(revitFilePath, revitRepository.Doc);
             var mainViewModlel = new MainViewModel(checkConfig, filterConfig, revitRepository);
             var window = new MainWindow() { DataContext = mainViewModlel };
             if(window.ShowDialog() == true) {

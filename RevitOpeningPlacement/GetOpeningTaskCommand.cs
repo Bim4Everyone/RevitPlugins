@@ -124,11 +124,13 @@ namespace RevitOpeningPlacement {
         /// <param name="uiApplication"></param>
         /// <param name="revitRepository"></param>
         private void GetOpeningsTaskInDocumentMEP(UIApplication uiApplication, RevitRepository revitRepository) {
-            var configurator = new UnionGroupsConfigurator(revitRepository);
-            var openingsGroups = GetOpeningsGroupsMepTasksOutcoming(revitRepository, configurator);
-            var viewModel = new OpeningsViewModel(revitRepository, openingsGroups);
+            var outcomingTasks = revitRepository
+                .GetOpeningsMepTasksOutcoming()
+                .Select(famInst => new OpeningMepTaskOutcomingViewModel(new OpeningMepTaskOutcoming(famInst)))
+                .ToList();
+            var navigatorViewModel = new OpeningsMepTaskOutcomingViewModel(revitRepository, outcomingTasks);
 
-            var window = new NavigatorView() { Title = PluginName, DataContext = viewModel };
+            var window = new NavigatorMepOutcomingView() { Title = PluginName, DataContext = navigatorViewModel };
             var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
 
             window.Show();

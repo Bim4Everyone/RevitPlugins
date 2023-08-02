@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
 namespace RevitOpeningPlacement.OpeningModels.Comparers {
-    internal class OpeningTaskOutcomingEqualityComparer : IEqualityComparer<OpeningTaskOutcoming> {
-        public bool Equals(OpeningTaskOutcoming x, OpeningTaskOutcoming y) {
+    internal class OpeningTaskOutcomingEqualityComparer : IEqualityComparer<OpeningMepTaskOutcoming> {
+        public bool Equals(OpeningMepTaskOutcoming x, OpeningMepTaskOutcoming y) {
             if((x is null) || (y is null)) {
                 return false;
             } else {
@@ -10,7 +10,7 @@ namespace RevitOpeningPlacement.OpeningModels.Comparers {
             }
         }
 
-        public int GetHashCode(OpeningTaskOutcoming obj) {
+        public int GetHashCode(OpeningMepTaskOutcoming obj) {
             return obj.GetHashCode();
         }
     }

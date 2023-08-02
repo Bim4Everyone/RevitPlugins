@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
@@ -24,7 +23,7 @@ namespace RevitClashDetective.ViewModels.Services {
             if(!saveWindow.ShowDialog(_revitRepository.GetFileDialogPath(), "config")) {
                 throw new OperationCanceledException();
             }
-            var configSaver = new ConfigSaver();
+            var configSaver = new ConfigSaver(_revitRepository.Doc);
             configSaver.Save(config, saveWindow.File.FullName);
 
             _revitRepository.CommonConfig.LastRunPath = saveWindow.File.DirectoryName;

@@ -1,34 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-using RevitClashDetective.Models.FilterModel;
-using RevitClashDetective.Models.FilterableValueProviders;
 using Autodesk.Revit.DB;
 
-using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
-using RevitClashDetective.Models.Evaluators;
-using RevitClashDetective.Models.Value;
-using RevitClashDetective.Models.Utils;
 using dosymep.Bim4Everyone;
+
+using RevitClashDetective.Models.Evaluators;
+using RevitClashDetective.Models.FilterableValueProviders;
+using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.Utils;
+using RevitClashDetective.Models.Value;
+
+using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
 
 namespace RevitOpeningPlacement.Models {
     internal class FiltersInitializer {
 
+        /// <summary>
+        /// Возвращает стандартный фильтр по категории "Стены"
+        /// </summary>
+        /// <param name="revitRepository"></param>
+        /// <returns></returns>
         public static Filter GetWallFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
             return GetArchitectureFilter(RevitRepository.StructureCategoryNames[StructureCategoryEnum.Wall],
                                  revitRepository,
                                  BuiltInCategory.OST_Walls);
         }
 
+        /// <summary>
+        /// Возвращает стандартный фильтр по категории "Перекрытия"
+        /// </summary>
+        /// <param name="revitRepository"></param>
+        /// <returns></returns>
         public static Filter GetFloorFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
             return GetArchitectureFilter(RevitRepository.StructureCategoryNames[StructureCategoryEnum.Floor],
                                  revitRepository,
                                  BuiltInCategory.OST_Floors);
         }
 
+        /// <summary>
+        /// Возвращает фильтр по категории "Трубы" с критерием "больше" заданного диаметра
+        /// </summary>
+        /// <param name="revitRepository"></param>
+        /// <param name="minDiameter">Минимальный диаметр. Трубы с бОльшим диаметром будут проходить фильтр</param>
+        /// <returns></returns>
         public static Filter GetPipeFilter(RevitClashDetective.Models.RevitRepository revitRepository, double minDiameter) {
             var revitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM));
             return GetdMepFilter(RevitRepository.MepCategoryNames[MepCategoryEnum.Pipe],
@@ -37,6 +52,12 @@ namespace RevitOpeningPlacement.Models {
                                  new[] { new ParamValuePair { RevitParam = revitParam, Value = minDiameter } });
         }
 
+        /// <summary>
+        /// Возвращает фильтр по категории "Воздуховоды", семейство "Воздуховоды круглого сечения", с критерием фильтрации "больше" заданного диаметра
+        /// </summary>
+        /// <param name="revitRepository"></param>
+        /// <param name="minDiameter">Минимальный диаметр. Воздуховоды с бОльшим диаметром будут проходить фильтр</param>
+        /// <returns></returns>
         public static Filter GetRoundDuctFilter(RevitClashDetective.Models.RevitRepository revitRepository, double minDiameter) {
             var revitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM));
             return GetdMepFilter(RevitRepository.MepCategoryNames[MepCategoryEnum.RoundDuct],
@@ -45,6 +66,12 @@ namespace RevitOpeningPlacement.Models {
                                  new[] { new ParamValuePair { RevitParam = revitParam, Value = minDiameter } });
         }
 
+        /// <summary>
+        /// Возвращает фильтр по категории "Короба" с критерием фильтрации "больше" заданного диаметра
+        /// </summary>
+        /// <param name="revitRepository"></param>
+        /// <param name="minDiameter">Минимальный диаметр. Короба с бОльшим диаметром будут проходить фильтр</param>
+        /// <returns></returns>
         public static Filter GetConduitFilter(RevitClashDetective.Models.RevitRepository revitRepository, double minDiameter) {
             var revitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_CONDUIT_DIAMETER_PARAM));
             return GetdMepFilter(RevitRepository.MepCategoryNames[MepCategoryEnum.Conduit],
@@ -53,8 +80,15 @@ namespace RevitOpeningPlacement.Models {
                                  new[] { new ParamValuePair { RevitParam = revitParam, Value = minDiameter } });
         }
 
+        /// <summary>
+        /// Возвращает фильтр по категории "Воздуховоды", семейство "Воздуховоды прямоугольного сечения", с критерием фильтрации "больше" заданных высоты и ширины сечения
+        /// </summary>
+        /// <param name="revitRepository"></param>
+        /// <param name="minHeight">Минимальная высота сечения. Воздуховоды с бОльшей высотой сечения будут проходить фильтр</param>
+        /// <param name="minWidth">Минимальная ширина сечения. Воздуховоды с бОльшей шириной сечения будут проходить фильтр</param>
+        /// <returns></returns>
         public static Filter GetRectangleDuctFilter(RevitClashDetective.Models.RevitRepository revitRepository, double minHeight, double minWidth) {
-            var heightParamValuePair = ParamValuePair.GetBuiltInParamValuePair(revitRepository.Doc, BuiltInParameter.RBS_CURVE_HEIGHT_PARAM, minHeight); 
+            var heightParamValuePair = ParamValuePair.GetBuiltInParamValuePair(revitRepository.Doc, BuiltInParameter.RBS_CURVE_HEIGHT_PARAM, minHeight);
             var widthParamValuePair = ParamValuePair.GetBuiltInParamValuePair(revitRepository.Doc, BuiltInParameter.RBS_CURVE_WIDTH_PARAM, minWidth);
 
             return GetdMepFilter(RevitRepository.MepCategoryNames[MepCategoryEnum.RectangleDuct],
@@ -63,6 +97,13 @@ namespace RevitOpeningPlacement.Models {
                                  new[] { heightParamValuePair, widthParamValuePair });
         }
 
+        /// <summary>
+        /// Возвращает фильтр по категории "Кабельные лотки" с критерием фильтрации "больше" заданных высоты и ширины сечения
+        /// </summary>
+        /// <param name="revitRepository"></param>
+        /// <param name="minHeight">Минимальная высота сечения. Кабельные лотки с бОльшей высотой сечения будут проходить фильтр</param>
+        /// <param name="minWidth">Минимальная ширина сечения. Кабельные лотки с бОльшей шириной сечения будут проходить фильтр</param>
+        /// <returns></returns>
         public static Filter GetTrayFilter(RevitClashDetective.Models.RevitRepository revitRepository, double minHeight, double minWidth) {
             var heightParamValuePair = ParamValuePair.GetBuiltInParamValuePair(revitRepository.Doc, BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM, minHeight);
             var widthParamValuePair = ParamValuePair.GetBuiltInParamValuePair(revitRepository.Doc, BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM, minWidth);
@@ -73,22 +114,59 @@ namespace RevitOpeningPlacement.Models {
                                  new[] { heightParamValuePair, widthParamValuePair });
         }
 
+        /// <summary>
+        /// Возвращает стандартный фильтр по категории "Соединительные детали кабельных лотков"
+        /// </summary>
+        /// <param name="revitRepository"></param>
+        /// <returns></returns>
         public static Filter GetTrayFittingFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
-            return GetFittingFilter(RevitRepository.FittingCategoryNames[FittingCategoryEnum.CableTrayFitting], revitRepository, BuiltInCategory.OST_CableTrayFitting);
+            return CreateFilterByCategory(RevitRepository.FittingCategoryNames[FittingCategoryEnum.CableTrayFitting], revitRepository, BuiltInCategory.OST_CableTrayFitting);
         }
 
+        /// <summary>
+        /// Возвращает стандартный фильтр по категории "Соединительные детали трубопроводов"
+        /// </summary>
+        /// <param name="revitRepository"></param>
+        /// <returns></returns>
         public static Filter GetPipeFittingFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
-            return GetFittingFilter(RevitRepository.FittingCategoryNames[FittingCategoryEnum.PipeFitting], revitRepository, BuiltInCategory.OST_PipeFitting);
+            return CreateFilterByCategory(RevitRepository.FittingCategoryNames[FittingCategoryEnum.PipeFitting], revitRepository, BuiltInCategory.OST_PipeFitting);
         }
 
+        /// <summary>
+        /// Возвращает стандартный фильтр по категории "Соединительные детали воздуховодов"
+        /// </summary>
+        /// <param name="revitRepository"></param>
+        /// <returns></returns>
         public static Filter GetDuctFittingFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
-            return GetFittingFilter(RevitRepository.FittingCategoryNames[FittingCategoryEnum.DuctFitting], revitRepository, BuiltInCategory.OST_DuctFitting);
+            return CreateFilterByCategory(RevitRepository.FittingCategoryNames[FittingCategoryEnum.DuctFitting], revitRepository, BuiltInCategory.OST_DuctFitting);
         }
 
+        /// <summary>
+        /// Возвращает стандартный фильтр по категории "Соединительные детали коробов"
+        /// </summary>
+        /// <param name="revitRepository"></param>
+        /// <returns></returns>
         public static Filter GetConduitFittingFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
-            return GetFittingFilter(RevitRepository.FittingCategoryNames[FittingCategoryEnum.ConduitFitting], revitRepository, BuiltInCategory.OST_ConduitFitting);
+            return CreateFilterByCategory(RevitRepository.FittingCategoryNames[FittingCategoryEnum.ConduitFitting], revitRepository, BuiltInCategory.OST_ConduitFitting);
         }
 
+        /// <summary>
+        /// Возвращает стандартный фильтр по заданной категории строительных конструкций
+        /// </summary>
+        /// <param name="revitRepository"></param>
+        /// <returns></returns>
+        public static Filter GetArchitectureFilter(string name, RevitClashDetective.Models.RevitRepository revitRepository, BuiltInCategory category) {
+            return CreateFilterByCategory(name, revitRepository, category);
+        }
+
+        /// <summary>
+        /// Создает фильтр по заданной категории элементов Revit с правилами фильтрации "больше" заданных значений параметров
+        /// </summary>
+        /// <param name="name">Название фильтра</param>
+        /// <param name="revitRepository">Репозиторий Revit, в котором происходит фильтрация</param>
+        /// <param name="category">Категория элементов для фильтрации</param>
+        /// <param name="paramValuePairs">Пары параметров и их значений, по которым формируются правила фильтрации "больше"</param>
+        /// <returns></returns>
         private static Filter GetdMepFilter(string name, RevitClashDetective.Models.RevitRepository revitRepository, BuiltInCategory category, IEnumerable<ParamValuePair> paramValuePairs) {
             return new Filter(revitRepository) {
                 CategoryIds = new List<int> { (int) category },
@@ -102,7 +180,14 @@ namespace RevitOpeningPlacement.Models {
             };
         }
 
-        private static Filter GetFittingFilter(string name, RevitClashDetective.Models.RevitRepository revitRepository, BuiltInCategory category) {
+        /// <summary>
+        /// Возвращает фильтр по заданной категории
+        /// </summary>
+        /// <param name="name">Название фильтра</param>
+        /// <param name="revitRepository">Репозиторий Revit, в котором будет проходить фильтрация элементов</param>
+        /// <param name="category">Категория элементов</param>
+        /// <returns></returns>
+        private static Filter CreateFilterByCategory(string name, RevitClashDetective.Models.RevitRepository revitRepository, BuiltInCategory category) {
             return new Filter(revitRepository) {
                 CategoryIds = new List<int> { (int) category },
                 Name = name,
@@ -110,23 +195,16 @@ namespace RevitOpeningPlacement.Models {
                     SetEvaluator = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And),
                     Criteria = new List<Criterion>(),
                     RevitRepository = revitRepository
-                },
+                }
             };
         }
 
-        public static Filter GetArchitectureFilter(string name, RevitClashDetective.Models.RevitRepository revitRepository, BuiltInCategory category) {
-            return new Filter(revitRepository) {
-                CategoryIds = new List<int> { (int) category },
-                Name = name,
-                Set = new Set() {
-                    SetEvaluator = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And),
-                    Criteria = new List<Criterion>(),
-                    RevitRepository = revitRepository
-                },
-                RevitRepository = revitRepository
-            };
-        }
-
+        /// <summary>
+        /// Создает критерии фильтрации элементов по значениям заданных пар параметров и их значений. Правила критериев формируются как "больше" полученного значения
+        /// </summary>
+        /// <param name="revitRepository">Репозиторий Revit, в котором происходит фильтрация</param>
+        /// <param name="paramValuePairs">Пары параметров и их значений, по которым формируются правила фильтрации "больше"</param>
+        /// <returns>Критерии фильтрации, сформированные по правилу "больше" полученных значений</returns>
         private static IEnumerable<Criterion> GetCriterions(RevitClashDetective.Models.RevitRepository revitRepository, IEnumerable<ParamValuePair> paramValuePairs) {
             foreach(var paramValuePair in paramValuePairs) {
                 var value = DoubleValueParser.TryParse(paramValuePair.Value.ToString(), paramValuePair.RevitParam.UnitType, out double resultValue);

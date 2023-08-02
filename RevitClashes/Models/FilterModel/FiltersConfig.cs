@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
-using dosymep.Bim4Everyone.ProjectConfigs;
+﻿using System;
+using System.Collections.Generic;
+
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
-using System.IO;
+using dosymep.Bim4Everyone.ProjectConfigs;
+
 using pyRevitLabs.Json;
 
 namespace RevitClashDetective.Models.FilterModel {
@@ -12,9 +16,11 @@ namespace RevitClashDetective.Models.FilterModel {
         public override string ProjectConfigPath { get; set; }
         [JsonIgnore]
         public override IConfigSerializer Serializer { get; set; }
-        public static FiltersConfig GetFiltersConfig(string revitFileName) {
+        public static FiltersConfig GetFiltersConfig(string revitFileName, Document document) {
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+
             return new ProjectConfigBuilder()
-                .SetSerializer(new RevitClashConfigSerializer())
+                .SetSerializer(new RevitClashConfigSerializer(new RevitClashesSerializationBinder(), document))
                 .SetPluginName(nameof(RevitClashDetective))
                 .SetRelativePath(revitFileName)
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
