@@ -296,8 +296,8 @@ namespace RevitOpeningPlacement.Models {
         /// Возвращает коллекцию исходящих заданий на отверстия, размещенных в текущем файле Revit
         /// </summary>
         /// <returns></returns>
-        public ICollection<OpeningTaskOutcoming> GetPlacedOutcomingTasks() {
-            return GetOpeningsTaskFromCurrentDoc().Select(f => new OpeningTaskOutcoming(f)).ToList();
+        public ICollection<OpeningMepTaskOutcoming> GetPlacedOutcomingTasks() {
+            return GetOpeningsTaskFromCurrentDoc().Select(f => new OpeningMepTaskOutcoming(f)).ToList();
         }
 
         public void DeleteElements(ICollection<Element> elements) {

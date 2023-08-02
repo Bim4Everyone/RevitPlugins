@@ -86,7 +86,7 @@ namespace RevitOpeningPlacement {
 
         private IList<UnplacedClashModel> PlaceOpenings(IProgress<int> progress, CancellationToken ct, RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers) {
             var placedOpeningTasks = revitRepository.GetPlacedOutcomingTasks();
-            var newOpenings = new List<OpeningTaskOutcoming>();
+            var newOpenings = new List<OpeningMepTaskOutcoming>();
             List<UnplacedClashModel> unplacedClashes = new List<UnplacedClashModel>();
 
             using(var t = revitRepository.GetTransaction("Расстановка заданий")) {
@@ -96,7 +96,7 @@ namespace RevitOpeningPlacement {
                     count++;
                     try {
                         var newOpening = p.Place();
-                        newOpenings.Add(new OpeningTaskOutcoming(newOpening));
+                        newOpenings.Add(new OpeningMepTaskOutcoming(newOpening));
                     } catch(OpeningNotPlacedException e) {
                         var clashModel = p.ClashModel;
                         if(!(clashModel is null)) {
@@ -126,8 +126,8 @@ namespace RevitOpeningPlacement {
 
         private void InitializeRemoving(
             RevitRepository revitRepository,
-            ICollection<OpeningTaskOutcoming> newOpenings,
-            ICollection<OpeningTaskOutcoming> alreadyPlacedOpenings) {
+            ICollection<OpeningMepTaskOutcoming> newOpenings,
+            ICollection<OpeningMepTaskOutcoming> alreadyPlacedOpenings) {
             using(var pb = GetPlatformService<IProgressDialogService>()) {
                 pb.StepValue = _progressBarStepValue;
                 pb.DisplayTitleFormat = "Проверка дублей... [{0}\\{1}]";
@@ -147,8 +147,8 @@ namespace RevitOpeningPlacement {
 
         private void RemoveAlreadyPlacedOpenings(
             RevitRepository revitRepository,
-            ICollection<OpeningTaskOutcoming> newOpenings,
-            ICollection<OpeningTaskOutcoming> alreadyPlacedOpenings,
+            ICollection<OpeningMepTaskOutcoming> newOpenings,
+            ICollection<OpeningMepTaskOutcoming> alreadyPlacedOpenings,
             IProgress<int> progress,
             CancellationToken ct) {
             if(alreadyPlacedOpenings.Count > 0) {
