@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models;
@@ -23,6 +19,9 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         public OpeningViewModel() { }
         public OpeningViewModel(RevitRepository revitRepository, FamilyInstance opening) {
+            if(revitRepository is null) { throw new ArgumentNullException(nameof(revitRepository)); }
+            if(opening is null) { throw new ArgumentNullException(nameof(opening)); }
+
             Id = opening.Id.IntegerValue;
             Level = revitRepository.GetLevelName(opening);
             TypeName = opening.Name;
