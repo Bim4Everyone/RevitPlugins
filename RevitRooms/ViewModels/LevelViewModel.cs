@@ -65,25 +65,27 @@ namespace RevitRooms.ViewModels {
             HashSet<ElementId> spatialElements = GetSpatialElementsHashSet();
             HashSet<ElementId> phaseElements = new HashSet<ElementId>(phases
                 .Select(item => item.ElementId));
+            
             return RevitRepository.GetDoors()
                 .Where(item => item.LevelId == Element.Id)
                 .Where(item => phaseElements.Contains(item.CreatedPhaseId))
-                .Select(item => new FamilyInstanceViewModel(item, new PhaseViewModel((Phase)RevitRepository.GetElement(item.CreatedPhaseId), RevitRepository), RevitRepository))
+                .Select(item => new FamilyInstanceViewModel(item, 
+                    new PhaseViewModel((Phase)RevitRepository.GetElement(item.CreatedPhaseId), RevitRepository), RevitRepository))
                 .Where(item => spatialElements.Contains(item.ToRoom?.ElementId)
                                && spatialElements.Contains(item.FromRoom?.ElementId));
         }
 
         public IEnumerable<FamilyInstanceViewModel> GetWindows(IEnumerable<PhaseViewModel> phases) {
+            HashSet<ElementId> spatialElements = GetSpatialElementsHashSet();
             HashSet<ElementId> phaseElements = new HashSet<ElementId>(phases
                 .Select(item => item.ElementId));
-            HashSet<ElementId> spatialElements = GetSpatialElementsHashSet();
+            
             return RevitRepository.GetWindows()
                 .Where(item => item.LevelId == Element.Id)
                 .Where(item => item.Symbol.FamilyName.IndexOf("Окн_ББлок_", StringComparison.CurrentCultureIgnoreCase) >= 0)
                 .Where(item => phaseElements.Contains(item.CreatedPhaseId))
                 .Select(item => new FamilyInstanceViewModel(item,
-                    new PhaseViewModel((Phase) RevitRepository.GetElement(item.CreatedPhaseId), RevitRepository),
-                    RevitRepository))
+                    new PhaseViewModel((Phase) RevitRepository.GetElement(item.CreatedPhaseId), RevitRepository), RevitRepository))
                 .Where(item => spatialElements.Contains(item.ToRoom?.ElementId)
                                && spatialElements.Contains(item.FromRoom?.ElementId));
         }
