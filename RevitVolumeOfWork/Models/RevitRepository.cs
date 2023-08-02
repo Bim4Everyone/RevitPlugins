@@ -26,8 +26,7 @@ namespace RevitVolumeOfWork.Models {
 
         public IList<RoomElement> GetRooms() {
             return new FilteredElementCollector(Document)
-                .WhereElementIsNotElementType()
-                .OfClass(typeof(SpatialElement))
+                .OfCategory(BuiltInCategory.OST_Rooms)
                 .Select(x => new RoomElement((Room)x, Document))
                 .ToList();
         }
