@@ -37,7 +37,7 @@
             Grid.Row="1"
             Margin="10, 5"
             HorizontalAlignment="Left"
-            Text="Выберите уровень" />
+            Text="Выберите уровни" />
 
         <ListView 
             Grid.Row="2"

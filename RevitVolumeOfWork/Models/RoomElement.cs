@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
@@ -23,10 +21,10 @@ namespace RevitVolumeOfWork.Models {
         }
 
         public Level Level { get => _room.Level;  }
-        public string Name { get => _room.Name; }
-        public string Number { get => _room.Number; }
+        public string Name { get => _room.GetParamValueOrDefault(BuiltInParameter.ROOM_NAME, "<Пусто>"); }
+        public string Number { get => _room.GetParamValueOrDefault(BuiltInParameter.ROOM_NUMBER, "<Пусто>"); }
+        public string ApartNumber => _room.GetParamValueOrDefault(SharedParamsConfig.Instance.ApartmentNumber, "<Пусто>"); 
         public string ID { get => _room.Id.ToString(); }
-        public string ApartNumber { get => _room.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.ApartmentNumber); }
 
         public List<Element> GetBoundaryWalls() {
             Category wallCategory = Category.GetCategory(_document, BuiltInCategory.OST_Walls);

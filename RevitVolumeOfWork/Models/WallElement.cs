@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
 
 namespace RevitVolumeOfWork.Models {
     internal class WallElement {
@@ -17,7 +14,6 @@ namespace RevitVolumeOfWork.Models {
 
         }
         public Element Wall { get => _wall ;  }
-
         public List<RoomElement> Rooms { get; set; }
 
         public string GetRoomsParameters(string fieldName) {
@@ -25,7 +21,7 @@ namespace RevitVolumeOfWork.Models {
                                        .Distinct()
                                        .ToList();
 
-            return String.Join(",", values);
+            return string.Join(", ", values);
         }
 
 

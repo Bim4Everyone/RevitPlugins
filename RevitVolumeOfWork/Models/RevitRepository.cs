@@ -54,7 +54,7 @@ namespace RevitVolumeOfWork.Models {
             return allWalls;
         }
 
-        public void CleanWallsParameters(List<Level> levels) {
+        public void ClearWallsParameters(List<Level> levels) {
             List<ElementFilter> levelFilters = levels.Select(x => (ElementFilter) new ElementLevelFilter(x.Id)).ToList();
 
             LogicalOrFilter orFIlter = new LogicalOrFilter(levelFilters);
@@ -74,11 +74,11 @@ namespace RevitVolumeOfWork.Models {
             }
         }
 
-        public void SetAll(ObservableCollection<LevelViewModel> allLevels, bool value) {
+        public void SetAll(List<LevelViewModel> allLevels, bool value) {
             foreach(var level in allLevels) { level.IsSelected = value; }
         }
 
-        public void InvertAll(ObservableCollection<LevelViewModel> allLevels) {
+        public void InvertAll(List<LevelViewModel> allLevels) {
             foreach(var level in allLevels) { level.IsSelected = !level.IsSelected; }
         }
     }

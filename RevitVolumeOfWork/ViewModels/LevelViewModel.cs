@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
 
 using dosymep.WPF.ViewModels;
 
@@ -15,19 +10,15 @@ using RevitVolumeOfWork.Models;
 namespace RevitVolumeOfWork.ViewModels {
     internal class LevelViewModel : BaseViewModel {
 
-        Level _level;
+        readonly Level _level;
+        readonly IEnumerable<RoomElement> _rooms;
+
         private bool _isSelected;
-
-        IEnumerable<RoomElement> _rooms;
-        
-        public LevelViewModel(string name, Level level, RevitRepository revitRepository,
-            IEnumerable<RoomElement> rooms) {
-
+                
+        public LevelViewModel(string name, Level level, IEnumerable<RoomElement> rooms) {
             _level = level;
             _rooms = rooms;
-
             Name = name;
-
         }
 
         public string Name { get; set; }

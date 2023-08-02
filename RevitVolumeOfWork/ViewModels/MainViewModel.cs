@@ -29,7 +29,7 @@ namespace RevitVolumeOfWork.ViewModels {
             _revitRepository = revitRepository;
             SetWallParametersCommand = new RelayCommand(SetWallParameters, CanSetWallParameters);
 
-            Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels()
+            Levels = new List<LevelViewModel>(GetLevelViewModels()
                 .OrderBy(item => item.Element.Elevation));
 
             CheckAllCommand = new RelayCommand(CheckAll);
@@ -42,13 +42,13 @@ namespace RevitVolumeOfWork.ViewModels {
         public ICommand UnCheckAllCommand { get; }
         public ICommand InvertAllCommand { get; }
 
-        public ObservableCollection<LevelViewModel> Levels { get; }
+        public List<LevelViewModel> Levels { get; }
 
         protected  IEnumerable<LevelViewModel> GetLevelViewModels() {
             return _revitRepository.GetRooms()
                 .Where(item => item.Level != null)
                 .GroupBy(item => item.Level.Name)
-                .Select(item => new LevelViewModel(item.Key, item.Select(room => room.Level).FirstOrDefault(), _revitRepository, item));
+                .Select(item => new LevelViewModel(item.Key, item.Select(room => room.Level).FirstOrDefault(), item));
         }
 
         private void SetWallParameters(object p) {
@@ -59,7 +59,7 @@ namespace RevitVolumeOfWork.ViewModels {
             Dictionary<int, WallElement> allWalls = _revitRepository.GetGroupedRoomsByWalls(rooms);
 
             if(ClearWallsParameters)
-                _revitRepository.CleanWallsParameters(Levels.Where(item => item.IsSelected).Select(x => x.Element).ToList());
+                _revitRepository.ClearWallsParameters(Levels.Where(item => item.IsSelected).Select(x => x.Element).ToList());
 
             using(Transaction t = _revitRepository.Document.StartTransaction("Заполнить параметры ВОР")) {
                 foreach(var key in allWalls.Keys) {
@@ -81,6 +81,10 @@ namespace RevitVolumeOfWork.ViewModels {
         }
 
         private bool CanSetWallParameters(object p) {
+            if(Levels.Count == 0) {
+                ErrorText = "Помещения отсутствуют в проекте";
+                return false;
+            }
             if(!_revitRepository.Document.IsExistsSharedParam(SharedParamsConfig.Instance.ApartmentNumber.Name)) {
                 ErrorText = "У помещений отсутствует параметр номера квартиры";
                 return false;
