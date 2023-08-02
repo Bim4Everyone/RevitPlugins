@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 using RevitPylonDocumentation.ViewModels;
 
@@ -28,6 +29,13 @@ namespace RevitPylonDocumentation.Views {
         }
         private void window_Loaded(object sender, RoutedEventArgs e) {
             expander.MaxHeight = window.ActualHeight * 0.88;
+        }
+
+        private void Grid_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e) {
+
+            if(e.ChangedButton == MouseButton.Left) {
+                this.DragMove();
+            }
         }
     }
 }

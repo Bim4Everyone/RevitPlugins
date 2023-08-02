@@ -169,6 +169,10 @@
                         <Trigger Property="IsPressed" Value="True">
                             <Setter Property="Background" Value="#E8E8E8" />
                         </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" Value="{StaticResource SecondaryGrayColor}" />
+                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
