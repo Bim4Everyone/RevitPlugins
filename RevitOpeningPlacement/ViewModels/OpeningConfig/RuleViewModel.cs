@@ -84,7 +84,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 Evaluator = SelectedRuleEvaluator.RuleEvaluator,
                 Provider = SelectedParameter.FilterableValueProvider.Provider,
                 Value = (SelectedValue == null || SelectedValue.ParamValue == null || SelectedValue.DisplayValue != StringValue)
-                ? SelectedParameter.FilterableValueProvider.Provider.GetParamValueFormString(CategoriesInfo.Categories.Select(item => item.Id.IntegerValue).ToArray(), StringValue)
+                ? SelectedParameter.FilterableValueProvider.Provider.GetParamValueFormString(StringValue)
                 : SelectedValue.ParamValue
             };
         }

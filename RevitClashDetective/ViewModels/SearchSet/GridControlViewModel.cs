@@ -3,20 +3,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Dynamic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Data;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
-using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
-using RevitClashDetective.Models.Extensions;
 using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.Models.Interfaces;
 
@@ -56,7 +51,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             Columns = new ObservableCollection<ColumnViewModel>(
                 _providers.Select(item => new ColumnViewModel() {
                     FieldName = item.Name,
-                    Header = $"Параметр: { item.DisplayValue}"
+                    Header = $"Параметр: {item.DisplayValue}"
                 }).GroupBy(item => item.FieldName)
                 .Select(item => item.First()));
         }
@@ -66,7 +61,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             foreach(var element in _elements) {
                 IDictionary<string, object> row = new ExpandoObject();
                 foreach(var provider in _providers) {
-                    string value = provider.GetElementParamValue(_categoryIds.ToArray(), element).DisplayValue;
+                    string value = provider.GetElementParamValue(element).DisplayValue;
                     if((provider.StorageType == StorageType.Integer || provider.StorageType == StorageType.Double)
                         && double.TryParse(value, out double resultValue)
                         && resultValue != 0) {

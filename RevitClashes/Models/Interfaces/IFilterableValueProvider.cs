@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
-
-using pyRevitLabs.Json;
 
 using RevitClashDetective.Models.Evaluators;
 using RevitClashDetective.Models.Value;
@@ -22,10 +16,10 @@ namespace RevitClashDetective.Models.Interfaces {
         ForgeTypeId UnitType { get; }
 #endif
         StorageType StorageType { get; }
-        ParamValue GetParamValueFormString(int[] categories, string value);
+        ParamValue GetParamValueFormString(string value);
         IEnumerable<RuleEvaluator> GetRuleEvaluators();
         IEnumerable<ParamValue> GetValues(Category[] categories, RuleEvaluator ruleEvaluator);
-        ParamValue GetElementParamValue(int[] categories, Element item);
+        ParamValue GetElementParamValue(Element item);
         FilterRule GetRule(Document doc, IVisiter visiter, ParamValue paramValue);
     }
 }
