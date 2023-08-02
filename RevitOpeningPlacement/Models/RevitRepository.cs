@@ -250,6 +250,17 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
+        /// Возвращает все экземпляры семейств исходящих заданий на отверстия из текущего файла инженерных систем
+        /// </summary>
+        /// <returns></returns>
+        public IList<FamilyInstance> GetOpeningsMepTasksOutcoming() {
+            var openingsInWalls = GetWallOpeningsMepTasksOutcoming();
+            var openingsInFloor = GetFloorOpeningsMepTasksOutcoming();
+            openingsInFloor.AddRange(openingsInWalls);
+            return openingsInFloor;
+        }
+
+        /// <summary>
         /// Возвращает исходящие задания на отверстия в стенах от инженера из текущего файла Revit
         /// </summary>
         /// <returns></returns>
