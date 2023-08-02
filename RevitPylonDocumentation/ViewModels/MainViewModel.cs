@@ -83,6 +83,7 @@ namespace RevitPylonDocumentation.ViewModels {
 
             AddScheduleFilterParamCommand = RelayCommand.Create(AddScheduleFilterParam);
             DeleteScheduleFilterParamCommand = RelayCommand.Create(DeleteScheduleFilterParam, CanChangeScheduleFilterParam);
+
         }
 
         

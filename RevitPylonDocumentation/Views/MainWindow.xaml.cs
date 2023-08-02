@@ -26,6 +26,8 @@ namespace RevitPylonDocumentation.Views {
         private void UnselectAllHostMarks(object sender, RoutedEventArgs e) {
             hostMarks.UnselectAll();
         }
-
+        private void window_Loaded(object sender, RoutedEventArgs e) {
+            expander.MaxHeight = window.ActualHeight * 0.88;
+        }
     }
 }
