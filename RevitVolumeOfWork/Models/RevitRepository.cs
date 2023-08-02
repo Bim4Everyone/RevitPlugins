@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
@@ -8,6 +9,8 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
+
+using RevitVolumeOfWork.ViewModels;
 
 namespace RevitVolumeOfWork.Models {
     internal class RevitRepository {
@@ -69,6 +72,14 @@ namespace RevitVolumeOfWork.Models {
                 }
                 t.Commit();
             }
+        }
+
+        public void SetAll(ObservableCollection<LevelViewModel> allLevels, bool value) {
+            foreach(var level in allLevels) { level.IsSelected = value; }
+        }
+
+        public void InvertAll(ObservableCollection<LevelViewModel> allLevels) {
+            foreach(var level in allLevels) { level.IsSelected = !level.IsSelected; }
         }
     }
 }

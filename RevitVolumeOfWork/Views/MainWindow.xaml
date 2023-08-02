@@ -22,6 +22,7 @@
             <RowDefinition Height="35" />
             <RowDefinition Height="25" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="35" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
@@ -54,8 +55,26 @@
             </ListBox.ItemTemplate>
         </ListView>
 
-        <StackPanel
+        <UniformGrid 
+            Columns="3"
             Grid.Row="3"
+            Margin="10,5">
+            <Button 
+                Content="Выбрать все"
+                Margin="0,0,5,0"
+                Command="{Binding CheckAllCommand}"/>
+            <Button 
+                Content="Снять выбор"
+                Margin="5,0,5,0"
+                Command="{Binding UnCheckAllCommand}"/>
+            <Button 
+                Content="Инвертировать"
+                Margin="5,0,0,0"
+                Command="{Binding InvertAllCommand}"/>
+        </UniformGrid>
+
+        <StackPanel
+            Grid.Row="4"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">

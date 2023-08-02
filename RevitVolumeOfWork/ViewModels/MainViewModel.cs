@@ -31,9 +31,16 @@ namespace RevitVolumeOfWork.ViewModels {
 
             Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels()
                 .OrderBy(item => item.Element.Elevation));
+
+            CheckAllCommand = new RelayCommand(CheckAll);
+            UnCheckAllCommand = new RelayCommand(UnCheckAll);
+            InvertAllCommand = new RelayCommand(InvertAll);
         }
 
         public ICommand SetWallParametersCommand { get; }
+        public ICommand CheckAllCommand { get; }
+        public ICommand UnCheckAllCommand { get; }
+        public ICommand InvertAllCommand { get; }
 
         public ObservableCollection<LevelViewModel> Levels { get; }
 
@@ -84,7 +91,19 @@ namespace RevitVolumeOfWork.ViewModels {
         public bool ClearWallsParameters {
             get => _clearWallsParameters;
             set => this.RaiseAndSetIfChanged(ref _clearWallsParameters, value);
-        }        
+        }
+
+        private void CheckAll(object p) {
+            _revitRepository.SetAll(Levels, true);
+        }
+
+        private void UnCheckAll(object p) {
+            _revitRepository.SetAll(Levels, false);
+        }
+
+        private void InvertAll(object p) {
+            _revitRepository.InvertAll(Levels);
+        }
 
         public string ErrorText {
             get => _errorText;
