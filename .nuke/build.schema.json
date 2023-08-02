@@ -74,9 +74,9 @@
             "enum": [
               "Clean",
               "Compile",
-              "CompileVersion",
               "FullClean",
               "FullCompile",
+              "FullPublish",
               "Publish"
             ]
           }
@@ -89,9 +89,9 @@
             "enum": [
               "Clean",
               "Compile",
-              "CompileVersion",
               "FullClean",
               "FullCompile",
+              "FullPublish",
               "Publish"
             ]
           }

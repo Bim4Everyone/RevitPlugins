@@ -19,4 +19,10 @@
     <PackageDownload Include="GitVersion.Tool" Version="[5.11.1]" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="..\GitVersion.yml">
+      <Link>config\GitVersion.yml</Link>
+    </Content>
+  </ItemGroup>
+
 </Project>

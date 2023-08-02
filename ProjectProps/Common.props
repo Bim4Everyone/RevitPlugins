@@ -113,8 +113,8 @@
         <Version>$(RevitVersion).2.4</Version>
         <FileVersion>$(RevitVersion).2.4</FileVersion>
         <Company>dosymep</Company>
-        <Authors>dosymep, budaevaler</Authors>
-        <PackageTags>dosymep, revit</PackageTags>
+        <Authors>dosymep, budaevaler, sssenya, DivinN, vlastroG</Authors>
+        <PackageTags>dosymep, revit, plugins</PackageTags>
         <Copyright>Copyright © 2022</Copyright>
         <PackageProjectUrl>https://github.com/dosymep/RevitPlugins.git</PackageProjectUrl>
         <RepositoryUrl>https://github.com/dosymep/RevitPlugins.git</RepositoryUrl>

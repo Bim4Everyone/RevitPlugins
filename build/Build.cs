@@ -43,54 +43,26 @@ class Build : NukeBuild {
             EnsureCleanDirectory(Output);
         });
 
-    Target Compile => _ => _
-        .DependsOn(Clean)
-        .Requires(() => Output)
-        .Requires(() => PluginName)
-        .Executes(() => {
-            DotNetBuild(s => s
-                .SetProjectFile(PluginName)
-                .DisableNoRestore()
-                .SetOutputDirectory(Output)
-                .CombineWith(DebugConfigurations, (settings, config) => settings
-                    .SetConfiguration(config)));
-        });
-
-    Target Publish => _ => _
-        .DependsOn(Clean)
-        .Requires(() => Output)
-        .Requires(() => PluginName)
-        .Executes(() => {
-            DotNetBuild(s => s
-                .SetProjectFile(PluginName)
-                .DisableNoRestore()
-                .SetOutputDirectory(Output)
-                .CombineWith(ReleaseConfigurations, (settings, config) => settings
-                    .SetConfiguration(config)));
-        });
-
-    Target CompileVersion => _ => _
-        .DependsOn(Clean)
-        .Requires(() => Output)
-        .Requires(() => PluginName)
-        .Executes(() => {
-            DotNetBuild(s => s
-                .SetProjectFile(PluginName)
-                .DisableNoRestore()
-                .SetOutputDirectory(Output)
-                .CombineWith(DebugConfigurations, (settings, config) => settings
-                    .SetConfiguration(config)
-                    .SetAssemblyVersion(UpdateMajorVersion(config, GitVersion.AssemblySemVer))
-                    .SetFileVersion(UpdateMajorVersion(config, GitVersion.AssemblySemFileVer))
-                    .SetInformationalVersion(UpdateMajorVersion(config, GitVersion.InformationalVersion))));
-        });
-
     Target FullClean => _ => _
         .Executes(() => {
             SourceDirectory.GlobDirectories("**/bin", "**/obj")
                 .Where(item => item != (SourceDirectory / "build" / "bin"))
                 .ForEach(DeleteDirectory);
             EnsureCleanDirectory(Output);
+        });
+
+    Target Compile => _ => _
+        .DependsOn(Clean)
+        .Requires(() => Output)
+        .Requires(() => PluginName)
+        .Executes(() => {
+            DotNetBuild(s => s
+                .DisableNoRestore()
+                .SetProjectFile(PluginName)
+                .SetOutputDirectory(Output)
+                .CombineWith(DebugConfigurations, (settings, config) => settings
+                    .SetConfiguration(config)
+                    .SetSimpleVersion(GitVersion, config)));
         });
 
     Target FullCompile => _ => _
@@ -101,11 +73,50 @@ class Build : NukeBuild {
                 .DisableNoRestore()
                 .SetOutputDirectory(Output)
                 .CombineWith(DebugConfigurations, (settings, config) => settings
-                    .SetConfiguration(config)));
+                    .SetConfiguration(config)
+                    .SetSimpleVersion(GitVersion, config)));
         });
 
-    string UpdateMajorVersion(RevitConfiguration configuration, string versionString) {
-        var index = versionString.IndexOf('.');
+    Target Publish => _ => _
+        .DependsOn(Clean)
+        .Requires(() => Output)
+        .Requires(() => PluginName)
+        .Executes(() => {
+            DotNetBuild(s => s
+                .DisableNoRestore()
+                .SetProjectFile(PluginName)
+                .SetOutputDirectory(Output)
+                .CombineWith(ReleaseConfigurations, (settings, config) => settings
+                    .SetConfiguration(config)
+                    .SetSimpleVersion(GitVersion, config)));
+        });
+
+    Target FullPublish => _ => _
+        .DependsOn(FullClean)
+        .Requires(() => Output)
+        .Executes(() => {
+            DotNetBuild(s => s
+                .DisableNoRestore()
+                .SetOutputDirectory(Output)
+                .CombineWith(ReleaseConfigurations, (settings, config) => settings
+                        .SetConfiguration(config)
+                        .SetSimpleVersion(GitVersion, config)));
+        });
+}
+
+static class VersioningExtensions {
+    public static DotNetBuildSettings SetSimpleVersion(this DotNetBuildSettings settings,
+        GitVersion gitVersion,
+        RevitConfiguration configuration) {
+        return settings
+            .SetCopyright($"Copyright © {DateTime.Now.Year}")
+            .SetAssemblyVersion(InjectRevitVersion(configuration, gitVersion.AssemblySemVer))
+            .SetFileVersion(InjectRevitVersion(configuration, gitVersion.AssemblySemFileVer))
+            .SetInformationalVersion(InjectRevitVersion(configuration, gitVersion.InformationalVersion));
+    }
+
+    public static string InjectRevitVersion(RevitConfiguration configuration, string versionString) {
+        int index = versionString.IndexOf('.');
         return configuration.Version + versionString.Substring(index);
     }
 }

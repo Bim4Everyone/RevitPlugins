@@ -1,0 +1,26 @@
+tag-prefix: '[vV]'
+
+assembly-versioning-scheme: None
+assembly-file-versioning-scheme: None
+
+assembly-versioning-format: '2020.2.4'
+assembly-file-versioning-format: '2020.2.4'
+assembly-informational-format: '2020.2.4{PreReleaseTagWithDash}+{FullBuildMetaData}'
+
+branches:
+  main:
+    tag: ''
+    regex: ^master$
+  develop:
+    tag: beta
+    regex: ^develop
+  other:
+    tag: alpha
+    regex: '^(?!.*master|develop)'
+    source-branches: ['main', 'develop']
+ignore:
+  sha: []
+increment: Inherit
+commit-date-format: yyyy-MM-dd
+merge-message-formats: {}
+update-build-number: true
