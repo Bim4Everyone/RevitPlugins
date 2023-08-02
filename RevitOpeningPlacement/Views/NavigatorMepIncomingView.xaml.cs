@@ -3,7 +3,13 @@
 using DevExpress.Xpf.Grid;
 
 namespace RevitOpeningPlacement.Views {
+    /// <summary>
+    /// Класс окна для отображения входящих заданий на отверстия в файле архитектора или конструктора
+    /// </summary>
     public partial class NavigatorMepIncomingView {
+        /// <summary>
+        /// Конструктор окна для отображения входящих заданий на отверстия в файле архитектора или конструктора
+        /// </summary>
         public NavigatorMepIncomingView() {
             InitializeComponent();
             Loaded += NavigatorView_Loaded;
