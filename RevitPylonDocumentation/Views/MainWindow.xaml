@@ -18,7 +18,7 @@
     AllowsTransparency="True"
     WindowStyle="None"
     Background="Transparent"    
-    Height="510" MinHeight="510" MaxHeight="510"
+    Height="1010" MinHeight="1010" MaxHeight="1010"
     Width="700" MinWidth="700" MaxWidth="700"
     
     
@@ -115,7 +115,14 @@
                                             Text="{Binding Path=ProjectSettings.PROJECT_SECTION_TEMP, 
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -130,7 +137,14 @@
                                             Text="{Binding Path=ProjectSettings.TYPICAL_PYLON_FILTER_PARAMETER_TEMP, 
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
 
@@ -146,7 +160,14 @@
                                             Text="{Binding Path=ProjectSettings.TYPICAL_PYLON_FILTER_VALUE_TEMP, 
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
 
@@ -162,7 +183,14 @@
                                             Text="{Binding Path=ProjectSettings.MARK_TEMP, 
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
 
@@ -178,7 +206,14 @@
                                             Text="{Binding Path=ProjectSettings.DISPATCHER_GROUPING_FIRST_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -193,7 +228,14 @@
                                             Text="{Binding Path=ProjectSettings.DISPATCHER_GROUPING_SECOND_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -208,7 +250,14 @@
                                             Text="{Binding Path=ProjectSettings.SHEET_SIZE_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -223,7 +272,14 @@
                                             Text="{Binding Path=ProjectSettings.SHEET_COEFFICIENT_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
                                     </StackPanel>
                                 </GroupBox>
 
@@ -253,7 +309,14 @@
                                                 Text="{Binding Path=ProjectSettings.SHEET_PREFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
 
                                             <TextBlock 
                                                 Style="{StaticResource TextBlockStyle}"
@@ -266,7 +329,14 @@
                                                 Text="{Binding Path=ProjectSettings.SHEET_SUFFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
                                         </StackPanel>
 
 
@@ -294,6 +364,13 @@
                                                         </TextBlock>
                                                     </DataTemplate>
                                                 </ComboBox.ItemTemplate>
+                                            
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
                                         </ComboBox>
                                     </StackPanel>
                                 </GroupBox>
@@ -332,6 +409,13 @@
                                                     </TextBlock>
                                                 </DataTemplate>
                                             </ComboBox.ItemTemplate>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
                                         </ComboBox>
 
 
@@ -356,6 +440,13 @@
                                                     </TextBlock>
                                                 </DataTemplate>
                                             </ComboBox.ItemTemplate>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
                                         </ComboBox>
 
 
@@ -380,6 +471,13 @@
                                                     </TextBlock>
                                                 </DataTemplate>
                                             </ComboBox.ItemTemplate>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
                                         </ComboBox>
 
 
@@ -404,6 +502,13 @@
                                                     </TextBlock>
                                                 </DataTemplate>
                                             </ComboBox.ItemTemplate>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
                                         </ComboBox>
 
                                         
@@ -419,7 +524,14 @@
                                             Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_X_OFFSET_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -434,7 +546,14 @@
                                             Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_Y_TOP_OFFSET_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
 
@@ -450,7 +569,14 @@
                                             Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_Y_BOTTOM_OFFSET_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -465,7 +591,14 @@
                                             Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_X_OFFSET_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -480,7 +613,14 @@
                                             Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -496,7 +636,14 @@
                                                 Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_PREFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
 
                                             <TextBlock 
                                                 Style="{StaticResource TextBlockStyle}"
@@ -509,7 +656,14 @@
                                                 Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_SUFFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
                                         </StackPanel>
 
 
@@ -526,7 +680,14 @@
                                                 Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
 
                                             <TextBlock 
                                                 Style="{StaticResource TextBlockStyle}"
@@ -539,7 +700,14 @@
                                                 Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_SUFFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
                                         </StackPanel>
 
 
@@ -558,7 +726,14 @@
                                                 Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_FIRST_PREFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
 
                                             <TextBlock 
                                                 Style="{StaticResource TextBlockStyle}"
@@ -571,7 +746,14 @@
                                                 Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_FIRST_SUFFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
                                         </StackPanel>
 
 
@@ -588,7 +770,14 @@
                                                 Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_SECOND_PREFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
 
                                             <TextBlock 
                                                 Style="{StaticResource TextBlockStyle}"
@@ -601,7 +790,14 @@
                                                 Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_SECOND_SUFFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
                                         </StackPanel>
 
 
@@ -620,7 +816,14 @@
                                                 Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_THIRD_PREFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
 
                                             <TextBlock 
                                                 Style="{StaticResource TextBlockStyle}"
@@ -633,7 +836,14 @@
                                                 Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_THIRD_SUFFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
                                         </StackPanel>
                                     </StackPanel>
                                 </GroupBox>
@@ -663,7 +873,14 @@
                                                 Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_PREFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
 
                                             <TextBlock 
                                                 Style="{StaticResource TextBlockStyle}"
@@ -676,7 +893,14 @@
                                                 Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_SUFFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
                                         </StackPanel>
 
 
@@ -693,7 +917,14 @@
                                                 Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_PREFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
 
                                             <TextBlock 
                                                 Style="{StaticResource TextBlockStyle}"
@@ -706,7 +937,14 @@
                                                 Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_SUFFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
                                         </StackPanel>
 
 
@@ -723,7 +961,14 @@
                                                 Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_PREFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
 
                                             <TextBlock 
                                                 Style="{StaticResource TextBlockStyle}"
@@ -736,7 +981,14 @@
                                                 Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_SUFFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
                                         </StackPanel>
 
 
@@ -753,7 +1005,14 @@
                                                 Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_PREFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
 
                                             <TextBlock 
                                                 Style="{StaticResource TextBlockStyle}"
@@ -766,7 +1025,14 @@
                                                 Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_SUFFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
-                                                VerticalContentAlignment="Center"/>
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
                                         </StackPanel>
 
 
@@ -783,7 +1049,14 @@
                                             Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_NAME_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -798,7 +1071,14 @@
                                             Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_DISP1_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -813,7 +1093,14 @@
                                             Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_DISP2_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -828,7 +1115,14 @@
                                             Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_NAME_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -843,7 +1137,14 @@
                                             Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_DISP1_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -858,7 +1159,14 @@
                                             Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_DISP2_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -873,7 +1181,14 @@
                                             Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_NAME_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -888,7 +1203,14 @@
                                             Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP1_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
                                         
                                         <TextBlock 
@@ -903,7 +1225,14 @@
                                             Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP2_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -918,7 +1247,14 @@
                                             Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_NAME_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -933,7 +1269,14 @@
                                             Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_DISP1_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -948,7 +1291,14 @@
                                             Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_DISP2_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
-                                            VerticalContentAlignment="Center"/>
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
 
 
                                         <TextBlock 
@@ -958,7 +1308,7 @@
 
 
                                         <ListView
-                                            ItemsSource="{Binding Path=SchedulesSettings.ParamsForScheduleFilters, 
+                                            ItemsSource="{Binding Path=SchedulesSettings.ParamsForScheduleFiltersTemp, 
                                             UpdateSourceTrigger=PropertyChanged}"
                                             Margin="10 0"
                                             SelectionMode="Multiple">
@@ -1026,41 +1376,6 @@
                                                     </Setter>
                                                 </Style>
                                             </ListView.ItemContainerStyle>
-
-                                            
-                                            
-
-                                            <!--<ListView.View>
-                                                <GridView>
-                                                    <GridViewColumn>
-                                                        <GridViewColumn.CellTemplate>
-                                                            <DataTemplate>
-                                                                <CheckBox IsChecked="{Binding Path=IsCheck}"/>
-                                                            </DataTemplate>
-                                                        </GridViewColumn.CellTemplate>
-                                                    </GridViewColumn>
-                                                    <GridViewColumn Header="Поле в спеке">
-                                                        <GridViewColumn.CellTemplate>
-                                                            <DataTemplate>
-                                                                <TextBox 
-                                                                    Text="{Binding Path=ParamNameInSchedule, 
-                                                                    UpdateSourceTrigger=PropertyChanged}"
-                                                                    Width="200"/>
-                                                            </DataTemplate>
-                                                        </GridViewColumn.CellTemplate>
-                                                    </GridViewColumn>
-                                                    <GridViewColumn Header="Параметр в основе">
-                                                        <GridViewColumn.CellTemplate>
-                                                            <DataTemplate>
-                                                                <TextBox 
-                                                                    Text="{Binding Path=ParamNameInHost, 
-                                                                    UpdateSourceTrigger=PropertyChanged}"
-                                                                    Width="200"/>
-                                                            </DataTemplate>
-                                                        </GridViewColumn.CellTemplate>
-                                                    </GridViewColumn>
-                                                </GridView>
-                                            </ListView.View>-->
                                         </ListView>
 
                                         <Grid Margin="10 0 10 10">

@@ -12,13 +12,6 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.UserSettings {
     class UserViewSectionSettings : BaseViewModel {
-        public UserViewSectionSettings(MainViewModel mainViewModel) {
-
-            ViewModel = mainViewModel;
-        }
-
-        public MainViewModel ViewModel { get; set; }
-
 
         private string _generalViewPrefixTemp = "";
         private string _generalViewSuffixTemp = "";
@@ -41,169 +34,121 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
         private string _viewFamilyTypeNameTemp = "РАЗРЕЗ_Без номера листа";
 
+        public UserViewSectionSettings(MainViewModel mainViewModel) {
+
+            ViewModel = mainViewModel;
+        }
+
+        public MainViewModel ViewModel { get; set; }
 
         public string GENERAL_VIEW_PREFIX { get; set; }
         public string GENERAL_VIEW_PREFIX_TEMP {
             get => _generalViewPrefixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _generalViewPrefixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _generalViewPrefixTemp, value);
         }
 
         public string GENERAL_VIEW_SUFFIX { get; set; }
         public string GENERAL_VIEW_SUFFIX_TEMP {
             get => _generalViewSuffixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _generalViewSuffixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _generalViewSuffixTemp, value);
         }
 
         public string GENERAL_VIEW_PERPENDICULAR_PREFIX { get; set; }
         public string GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP {
             get => _generalViewPerpendicularPrefixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _generalViewPerpendicularPrefixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _generalViewPerpendicularPrefixTemp, value);
         }
 
         public string GENERAL_VIEW_PERPENDICULAR_SUFFIX { get; set; }
         public string GENERAL_VIEW_PERPENDICULAR_SUFFIX_TEMP {
             get => _generalViewPerpendicularSuffixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _generalViewPerpendicularSuffixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _generalViewPerpendicularSuffixTemp, value);
         }
 
         public string GENERAL_VIEW_TEMPLATE_NAME { get; set; }
         public string GENERAL_VIEW_TEMPLATE_NAME_TEMP {
             get => _generalViewTemplateNameTemp;
-            set {
-                RaiseAndSetIfChanged(ref _generalViewTemplateNameTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _generalViewTemplateNameTemp, value);
         }
 
         public string GENERAL_VIEW_X_OFFSET { get; set; }
         public string GENERAL_VIEW_X_OFFSET_TEMP {
             get => _generalViewXOffsetTemp;
-            set {
-                RaiseAndSetIfChanged(ref _generalViewXOffsetTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _generalViewXOffsetTemp, value);
         }
 
         public string GENERAL_VIEW_Y_TOP_OFFSET { get; set; }
         public string GENERAL_VIEW_Y_TOP_OFFSET_TEMP {
             get => _generalViewYTopOffsetTemp;
-            set {
-                RaiseAndSetIfChanged(ref _generalViewYTopOffsetTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _generalViewYTopOffsetTemp, value);
         }
 
         public string GENERAL_VIEW_Y_BOTTOM_OFFSET { get; set; }
         public string GENERAL_VIEW_Y_BOTTOM_OFFSET_TEMP {
             get => _generalViewYBottomOffsetTemp;
-            set {
-                RaiseAndSetIfChanged(ref _generalViewYBottomOffsetTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _generalViewYBottomOffsetTemp, value);
         }
 
 
         public string TRANSVERSE_VIEW_FIRST_PREFIX { get; set; }
         public string TRANSVERSE_VIEW_FIRST_PREFIX_TEMP {
             get => _transverseViewFirstPrefixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _transverseViewFirstPrefixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _transverseViewFirstPrefixTemp, value);
         }
 
         public string TRANSVERSE_VIEW_FIRST_SUFFIX { get; set; }
         public string TRANSVERSE_VIEW_FIRST_SUFFIX_TEMP {
             get => _transverseViewFirstSuffixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _transverseViewFirstSuffixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _transverseViewFirstSuffixTemp, value);
         }
 
 
         public string TRANSVERSE_VIEW_SECOND_PREFIX { get; set; }
         public string TRANSVERSE_VIEW_SECOND_PREFIX_TEMP {
             get => _transverseViewSecondPrefixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _transverseViewSecondPrefixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _transverseViewSecondPrefixTemp, value);
         }
 
         public string TRANSVERSE_VIEW_SECOND_SUFFIX { get; set; }
         public string TRANSVERSE_VIEW_SECOND_SUFFIX_TEMP {
             get => _transverseViewSecondSuffixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _transverseViewSecondSuffixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _transverseViewSecondSuffixTemp, value);
         }
 
         public string TRANSVERSE_VIEW_THIRD_PREFIX { get; set; }
         public string TRANSVERSE_VIEW_THIRD_PREFIX_TEMP {
             get => _transverseViewThirdPrefixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _transverseViewThirdPrefixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _transverseViewThirdPrefixTemp, value);
         }
 
         public string TRANSVERSE_VIEW_THIRD_SUFFIX { get; set; }
         public string TRANSVERSE_VIEW_THIRD_SUFFIX_TEMP {
             get => _transverseViewThirdSuffixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _transverseViewThirdSuffixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _transverseViewThirdSuffixTemp, value);
         }
 
         public string TRANSVERSE_VIEW_TEMPLATE_NAME { get; set; }
         public string TRANSVERSE_VIEW_TEMPLATE_NAME_TEMP {
             get => _transverseViewTemplateNameTemp;
-            set {
-                RaiseAndSetIfChanged(ref _transverseViewTemplateNameTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _transverseViewTemplateNameTemp, value);
         }
 
         public string TRANSVERSE_VIEW_X_OFFSET { get; set; }
         public string TRANSVERSE_VIEW_X_OFFSET_TEMP {
             get => _transverseViewXOffsetTemp;
-            set {
-                RaiseAndSetIfChanged(ref _transverseViewXOffsetTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _transverseViewXOffsetTemp, value);
         }
 
         public string TRANSVERSE_VIEW_Y_OFFSET { get; set; }
         public string TRANSVERSE_VIEW_Y_OFFSET_TEMP {
             get => _transverseViewYOffsetTemp;
-            set {
-                RaiseAndSetIfChanged(ref _transverseViewYOffsetTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _transverseViewYOffsetTemp, value);
         }
 
         public string VIEW_FAMILY_TYPE_NAME { get; set; }
         public string VIEW_FAMILY_TYPE_NAME_TEMP {
             get => _viewFamilyTypeNameTemp;
-            set {
-                RaiseAndSetIfChanged(ref _viewFamilyTypeNameTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _viewFamilyTypeNameTemp, value);
         }
 
         public void ApplyViewSectionsSettings() {

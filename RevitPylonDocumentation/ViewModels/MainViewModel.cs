@@ -964,7 +964,7 @@ namespace RevitPylonDocumentation.ViewModels {
         private void AddScheduleFilterParam() {
 
             SchedulesSettings.ParamsForScheduleFilters.Add(new ScheduleFilterParamHelper("Введите название", "Введите название"));
-            SettingsEdited = true;
+            SettingsChanged();
         }
 
         /// <summary>
@@ -984,7 +984,7 @@ namespace RevitPylonDocumentation.ViewModels {
                 SchedulesSettings.ParamsForScheduleFilters.Remove(param);
             }
 
-            SettingsEdited = true;
+            SettingsChanged();
         }
 
         /// <summary>
@@ -993,6 +993,7 @@ namespace RevitPylonDocumentation.ViewModels {
         private void SettingsChanged() {
 
             SettingsEdited = true;
+            TaskDialog.Show("fd", "Что то изменилось");
         }
 
         /// <summary>

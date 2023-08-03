@@ -16,18 +16,6 @@ using RevitPylonDocumentation.ViewModels;
 namespace RevitPylonDocumentation.Models.UserSettings {
     class UserProjectSettings : BaseViewModel {
 
-        public UserProjectSettings(MainViewModel mainViewModel, RevitRepository repository) {
-
-            ViewModel = mainViewModel;
-            Repository = repository;
-        }
-
-        public MainViewModel ViewModel { get; set; }
-        internal RevitRepository Repository { get; set; }
-
-
-
-
         private string _projectSectionTemp = "обр_ФОП_Раздел проекта";
         private string _markTemp = "Марка";
         private string _titleBlockNameTemp = "Создать типы по комплектам";
@@ -45,114 +33,87 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _legendNameTemp = "Указания для пилонов";
 
 
+        public UserProjectSettings(MainViewModel mainViewModel, RevitRepository repository) {
+
+            ViewModel = mainViewModel;
+            Repository = repository;
+        }
+
+        public MainViewModel ViewModel { get; set; }
+        internal RevitRepository Repository { get; set; }
+
+
         public string PROJECT_SECTION { get; set; }
         public string PROJECT_SECTION_TEMP {
             get => _projectSectionTemp;
-            set {
-                RaiseAndSetIfChanged(ref _projectSectionTemp, value);
-                ViewModel.SettingsEdited = true;
-                TaskDialog.Show("d", "fd");
-            }
+            set => RaiseAndSetIfChanged(ref _projectSectionTemp, value);
         }
 
         public string MARK { get; set; }
         public string MARK_TEMP {
             get => _markTemp;
-            set {
-                RaiseAndSetIfChanged(ref _markTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _markTemp, value);
         }
 
         public string TITLEBLOCK_NAME { get; set; }
         public string TITLEBLOCK_NAME_TEMP {
             get => _titleBlockNameTemp;
-            set {
-                RaiseAndSetIfChanged(ref _titleBlockNameTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _titleBlockNameTemp, value);
         }
 
         public string DISPATCHER_GROUPING_FIRST { get; set; }
         public string DISPATCHER_GROUPING_FIRST_TEMP {
             get => _dispatcherGroupingFirstTemp;
-            set {
-                RaiseAndSetIfChanged(ref _dispatcherGroupingFirstTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _dispatcherGroupingFirstTemp, value);
         }
         public string DISPATCHER_GROUPING_SECOND { get; set; }
         public string DISPATCHER_GROUPING_SECOND_TEMP {
             get => _dispatcherGroupingSecondTemp;
-            set {
-                RaiseAndSetIfChanged(ref _dispatcherGroupingSecondTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _dispatcherGroupingSecondTemp, value);
         }
 
         public string SHEET_SIZE { get; set; }
         public string SHEET_SIZE_TEMP {
             get => _sheetSizeTemp;
-            set {
-                RaiseAndSetIfChanged(ref _sheetSizeTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _sheetSizeTemp, value);
         }
 
         public string SHEET_COEFFICIENT { get; set; }
         public string SHEET_COEFFICIENT_TEMP {
             get => _sheetCoefficientTemp;
-            set {
-                RaiseAndSetIfChanged(ref _sheetCoefficientTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _sheetCoefficientTemp, value);
         }
 
 
         public string SHEET_PREFIX { get; set; }
         public string SHEET_PREFIX_TEMP {
             get => _sheetPrefixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _sheetPrefixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _sheetPrefixTemp, value);
         }
 
         public string SHEET_SUFFIX { get; set; }
         public string SHEET_SUFFIX_TEMP {
             get => _sheetSuffixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _sheetSuffixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _sheetSuffixTemp, value);
         }
 
         public string TYPICAL_PYLON_FILTER_PARAMETER { get; set; }
         public string TYPICAL_PYLON_FILTER_PARAMETER_TEMP {
             get => _typicalPylonFilterParameterTemp;
-            set {
-                RaiseAndSetIfChanged(ref _typicalPylonFilterParameterTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _typicalPylonFilterParameterTemp, value);
         }
 
 
         public string TYPICAL_PYLON_FILTER_VALUE { get; set; }
         public string TYPICAL_PYLON_FILTER_VALUE_TEMP {
             get => _typicalPylonFilterValueTemp;
-            set {
-                RaiseAndSetIfChanged(ref _typicalPylonFilterValueTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _typicalPylonFilterValueTemp, value);
         }
 
         public string LEGEND_NAME { get; set; }
         public string LEGEND_NAME_TEMP {
             get => _legendNameTemp;
-            set {
-                RaiseAndSetIfChanged(ref _legendNameTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _legendNameTemp, value);
         }
 
 
@@ -177,9 +138,6 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         }
 
         public void CheckProjectSettings() {
-
-            //Какиет о проблемы с проверкой прааметров диспетчера
-            //    нужно подчистить классы, так чтобы изначально в не темпах ничего не было, а значение задавалось в Apply
 
             // Пытаемся проверить виды
             if(Repository.AllSectionViews.FirstOrDefault()?.LookupParameter(DISPATCHER_GROUPING_FIRST) is null) {

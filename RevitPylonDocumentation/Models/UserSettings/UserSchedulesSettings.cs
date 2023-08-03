@@ -55,178 +55,118 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         public string REBAR_SCHEDULE_PREFIX { get; set; }
         public string REBAR_SCHEDULE_PREFIX_TEMP {
             get => _rebarSchedulePrefixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _rebarSchedulePrefixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _rebarSchedulePrefixTemp, value);
         }
 
         public string REBAR_SCHEDULE_SUFFIX { get; set; }
         public string REBAR_SCHEDULE_SUFFIX_TEMP {
             get => _rebarScheduleSuffixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _rebarScheduleSuffixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _rebarScheduleSuffixTemp, value);
         }
 
 
         public string MATERIAL_SCHEDULE_PREFIX { get; set; }
         public string MATERIAL_SCHEDULE_PREFIX_TEMP {
             get => _materialSchedulePrefixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _materialSchedulePrefixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _materialSchedulePrefixTemp, value);
         }
 
         public string MATERIAL_SCHEDULE_SUFFIX { get; set; }
         public string MATERIAL_SCHEDULE_SUFFIX_TEMP {
             get => _materialScheduleSuffixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _materialScheduleSuffixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _materialScheduleSuffixTemp, value);
         }
 
         public string SYSTEM_PARTS_SCHEDULE_PREFIX { get; set; }
         public string SYSTEM_PARTS_SCHEDULE_PREFIX_TEMP {
             get => _systemPartsSchedulePrefixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _systemPartsSchedulePrefixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _systemPartsSchedulePrefixTemp, value);
         }
 
         public string SYSTEM_PARTS_SCHEDULE_SUFFIX { get; set; }
         public string SYSTEM_PARTS_SCHEDULE_SUFFIX_TEMP {
             get => _systemPartsScheduleSuffixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _systemPartsScheduleSuffixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _systemPartsScheduleSuffixTemp, value);
         }
 
 
         public string IFC_PARTS_SCHEDULE_PREFIX { get; set; }
         public string IFC_PARTS_SCHEDULE_PREFIX_TEMP {
             get => _IFCPartsSchedulePrefixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _IFCPartsSchedulePrefixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _IFCPartsSchedulePrefixTemp, value);
         }
 
         public string IFC_PARTS_SCHEDULE_SUFFIX { get; set; }
         public string IFC_PARTS_SCHEDULE_SUFFIX_TEMP {
             get => _IFCPartsScheduleSuffixTemp;
-            set {
-                RaiseAndSetIfChanged(ref _IFCPartsScheduleSuffixTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _IFCPartsScheduleSuffixTemp, value);
         }
 
         public string REBAR_SCHEDULE_NAME { get; set; }
         public string REBAR_SCHEDULE_NAME_TEMP {
             get => _rebarScheduleNameTemp;
-            set {
-                RaiseAndSetIfChanged(ref _rebarScheduleNameTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _rebarScheduleNameTemp, value);
         }
 
         public string MATERIAL_SCHEDULE_NAME { get; set; }
         public string MATERIAL_SCHEDULE_NAME_TEMP {
             get => _materialScheduleNameTemp;
-            set {
-                RaiseAndSetIfChanged(ref _materialScheduleNameTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _materialScheduleNameTemp, value);
         }
 
         public string SYSTEM_PARTS_SCHEDULE_NAME { get; set; }
         public string SYSTEM_PARTS_SCHEDULE_NAME_TEMP {
             get => _systemPartsScheduleNameTemp;
-            set {
-                RaiseAndSetIfChanged(ref _systemPartsScheduleNameTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _systemPartsScheduleNameTemp, value);
         }
 
         public string IFC_PARTS_SCHEDULE_NAME { get; set; }
         public string IFC_PARTS_SCHEDULE_NAME_TEMP {
             get => _IFCPartsScheduleNameTemp;
-            set {
-                RaiseAndSetIfChanged(ref _IFCPartsScheduleNameTemp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _IFCPartsScheduleNameTemp, value);
         }
 
         public string REBAR_SCHEDULE_DISP1 { get; set; }
         public string REBAR_SCHEDULE_DISP1_TEMP {
             get => _rebarScheduleDisp1Temp;
-            set {
-                RaiseAndSetIfChanged(ref _rebarScheduleDisp1Temp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _rebarScheduleDisp1Temp, value);
         }
         public string MATERIAL_SCHEDULE_DISP1 { get; set; }
         public string MATERIAL_SCHEDULE_DISP1_TEMP {
             get => _materialScheduleDisp1Temp;
-            set {
-                RaiseAndSetIfChanged(ref _materialScheduleDisp1Temp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _materialScheduleDisp1Temp, value);
         }
         public string SYSTEM_PARTS_SCHEDULE_DISP1 { get; set; }
         public string SYSTEM_PARTS_SCHEDULE_DISP1_TEMP {
             get => _systemPartsScheduleDisp1Temp;
-            set {
-                RaiseAndSetIfChanged(ref _systemPartsScheduleDisp1Temp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _systemPartsScheduleDisp1Temp, value);
         }
         public string IFC_PARTS_SCHEDULE_DISP1 { get; set; }
         public string IFC_PARTS_SCHEDULE_DISP1_TEMP {
             get => _IFCPartsScheduleDisp1Temp;
-            set {
-                RaiseAndSetIfChanged(ref _IFCPartsScheduleDisp1Temp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _IFCPartsScheduleDisp1Temp, value);
         }
 
         public string REBAR_SCHEDULE_DISP2 { get; set; }
         public string REBAR_SCHEDULE_DISP2_TEMP {
             get => _rebarScheduleDisp2Temp;
-            set {
-                RaiseAndSetIfChanged(ref _rebarScheduleDisp2Temp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _rebarScheduleDisp2Temp, value);
         }
         public string MATERIAL_SCHEDULE_DISP2 { get; set; }
         public string MATERIAL_SCHEDULE_DISP2_TEMP {
             get => _materialScheduleDisp2Temp;
-            set {
-                RaiseAndSetIfChanged(ref _materialScheduleDisp2Temp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _materialScheduleDisp2Temp, value);
         }
         public string SYSTEM_PARTS_SCHEDULE_DISP2 { get; set; }
         public string SYSTEM_PARTS_SCHEDULE_DISP2_TEMP {
             get => _systemPartsScheduleDisp2Temp;
-            set {
-                RaiseAndSetIfChanged(ref _systemPartsScheduleDisp2Temp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _systemPartsScheduleDisp2Temp, value);
         }
 
         public string IFC_PARTS_SCHEDULE_DISP2 { get; set; }
         public string IFC_PARTS_SCHEDULE_DISP2_TEMP {
             get => _IFCPartsScheduleDisp2Temp;
-            set {
-                RaiseAndSetIfChanged(ref _IFCPartsScheduleDisp2Temp, value);
-                ViewModel.SettingsEdited = true;
-            }
+            set => RaiseAndSetIfChanged(ref _IFCPartsScheduleDisp2Temp, value);
         }
 
         public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFilters {
