@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -39,6 +40,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             LoadConfigCommand = new RelayCommand(LoadConfig);
 
             SelectedMepCategoryViewModel = MepCategories.FirstOrDefault(category => category.IsSelected) ?? MepCategories.First();
+            foreach(MepCategoryViewModel mepCategoryViewModel in MepCategories) {
+                mepCategoryViewModel.PropertyChanged += MepCategoryIsSelectedPropertyChanged;
+            }
         }
 
         private MepCategoryViewModel _selectedMepCategoryViewModel;
@@ -203,6 +207,23 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private bool CanSaveConfig(object p) {
             ErrorText = MepCategories.FirstOrDefault(item => !string.IsNullOrEmpty(item.GetErrorText()))?.GetErrorText();
             return string.IsNullOrEmpty(ErrorText);
+        }
+
+        /// <summary>
+        /// Если пользователь включил CheckBox у категории инженерных элементов, то сделать ее выбранной
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MepCategoryIsSelectedPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if((e != null)
+                && string.Equals(e.PropertyName, nameof(MepCategoryViewModel.IsSelected))
+                && (sender != null)
+                && (sender is MepCategoryViewModel mepCategoryViewModel)) {
+
+                if(mepCategoryViewModel.IsSelected) {
+                    SelectedMepCategoryViewModel = mepCategoryViewModel;
+                }
+            }
         }
     }
 }
