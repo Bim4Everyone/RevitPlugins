@@ -2,7 +2,7 @@
     /// <summary>
     /// Статусы отработки входящих заданий на отверстия
     /// </summary>
-    internal enum OpeningTaskIncomingStatusEnum {
+    internal enum OpeningTaskIncomingStatus {
         /// <summary>
         /// Новое задание на отверстие
         /// </summary>

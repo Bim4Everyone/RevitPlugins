@@ -80,7 +80,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Статус отработки задания на отверстие
         /// </summary>
-        public OpeningTaskIncomingStatusEnum Status { get; set; } = OpeningTaskIncomingStatusEnum.NewTask;
+        public OpeningTaskIncomingStatus Status { get; set; } = OpeningTaskIncomingStatus.NewTask;
 
 
         public FamilyInstance GetFamilyInstance() {

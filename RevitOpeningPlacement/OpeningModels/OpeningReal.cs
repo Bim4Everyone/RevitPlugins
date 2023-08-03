@@ -46,7 +46,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Статус текущего отверстия относительно полученных заданий
         /// </summary>
-        public OpeningRealTaskStatusEnum Status { get; set; } = OpeningRealTaskStatusEnum.NotDefined;
+        public OpeningRealTaskStatus Status { get; set; } = OpeningRealTaskStatus.NotDefined;
 
 
         public Solid GetSolid() {
