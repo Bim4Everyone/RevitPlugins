@@ -51,6 +51,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             set {
                 RaiseAndSetIfChanged(ref _projectSectionTemp, value);
                 ViewModel.SettingsEdited = true;
+                TaskDialog.Show("d", "fd");
             }
         }
 

@@ -83,6 +83,7 @@ namespace RevitPylonDocumentation.ViewModels {
 
             AddScheduleFilterParamCommand = RelayCommand.Create(AddScheduleFilterParam);
             DeleteScheduleFilterParamCommand = RelayCommand.Create(DeleteScheduleFilterParam, CanChangeScheduleFilterParam);
+            SettingsChangedCommand = RelayCommand.Create(SettingsChanged);
 
         }
 
@@ -94,6 +95,7 @@ namespace RevitPylonDocumentation.ViewModels {
         public ICommand GetHostMarksInGUICommand { get; }
         public ICommand AddScheduleFilterParamCommand { get; }
         public ICommand DeleteScheduleFilterParamCommand { get; }
+        public ICommand SettingsChangedCommand { get; }
         public ICommand SelectPylonCommand { get; }
 
 
@@ -962,6 +964,7 @@ namespace RevitPylonDocumentation.ViewModels {
         private void AddScheduleFilterParam() {
 
             SchedulesSettings.ParamsForScheduleFilters.Add(new ScheduleFilterParamHelper("Введите название", "Введите название"));
+            SettingsEdited = true;
         }
 
         /// <summary>
@@ -980,6 +983,16 @@ namespace RevitPylonDocumentation.ViewModels {
             foreach(ScheduleFilterParamHelper param in forDel) {
                 SchedulesSettings.ParamsForScheduleFilters.Remove(param);
             }
+
+            SettingsEdited = true;
+        }
+
+        /// <summary>
+        /// Добавляет новое имя параметра фильтра спецификаций в настройках плагина
+        /// </summary>
+        private void SettingsChanged() {
+
+            SettingsEdited = true;
         }
 
         /// <summary>

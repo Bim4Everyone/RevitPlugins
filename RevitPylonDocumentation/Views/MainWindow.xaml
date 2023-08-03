@@ -976,15 +976,30 @@
                                                         <CheckBox 
                                                             IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                             VerticalAlignment="Center"/>
-                                                        <TextBox 
+                                                        <TextBox
                                                             Style="{StaticResource TextBoxStyle}"
                                                             Margin="10 0" 
                                                             Text="{Binding Path=ParamNameInSchedule, UpdateSourceTrigger=PropertyChanged}" 
-                                                            Width="200"/>
-                                                        <TextBox 
+                                                            Width="200">
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="TextChanged">
+                                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                        </TextBox>
+
+                                                        <TextBox
                                                             Style="{StaticResource TextBoxStyle}"
                                                             Text="{Binding Path=ParamNameInHost, UpdateSourceTrigger=PropertyChanged}" 
-                                                            Width="200"/>
+                                                            Width="200">
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="TextChanged">
+                                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                        </TextBox>
                                                     </StackPanel>
                                                 </DataTemplate>
                                             </ListView.ItemTemplate>
@@ -1012,6 +1027,8 @@
                                                 </Style>
                                             </ListView.ItemContainerStyle>
 
+                                            
+                                            
 
                                             <!--<ListView.View>
                                                 <GridView>
@@ -1147,15 +1164,15 @@
 
 
                 <TextBlock 
-                Style="{StaticResource TextBlockStyle}"
-                Grid.Row="2" 
-                Margin="10 5"
-                Text="Выберите марки пилонов для обработки:"/>
+                    Style="{StaticResource TextBlockStyle}"
+                    Grid.Row="2" 
+                    Margin="10 5"
+                    Text="Выберите марки пилонов для обработки:"/>
 
 
                 <Grid 
-                Grid.Row="3" Grid.Column="0"
-                HorizontalAlignment="Stretch">
+                    Grid.Row="3" Grid.Column="0"
+                    HorizontalAlignment="Stretch">
 
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1.6*"/>
@@ -1164,38 +1181,38 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBox
-                    Style="{StaticResource TextBoxStyle}"
-                    Grid.Column="0"
-                    Margin="10 0 3 2"
-                    Width="152"
-                    FontSize="12"
-                    Text="{Binding HostMarkForSearch, UpdateSourceTrigger=PropertyChanged}"
-                    HorizontalAlignment="Left"/>
+                        Style="{StaticResource TextBoxStyle}"
+                        Grid.Column="0"
+                        Margin="10 0 3 2"
+                        Width="152"
+                        FontSize="12"
+                        Text="{Binding HostMarkForSearch, UpdateSourceTrigger=PropertyChanged}"
+                        HorizontalAlignment="Left"/>
                     <Button 
-                    Style="{StaticResource SimpleButtonStyle}"
-                    Grid.Column="1"
-                    Margin="3 0 3 2"
-                    HorizontalAlignment="Center"
-                    Width="92"
-                    FontSize="12"
-                    Content="Выбрать все" 
-                    Click="SelectAllHostMarks"/>
+                        Style="{StaticResource SimpleButtonStyle}"
+                        Grid.Column="1"
+                        Margin="3 0 3 2"
+                        HorizontalAlignment="Center"
+                        Width="92"
+                        FontSize="12"
+                        Content="Выбрать все" 
+                        Click="SelectAllHostMarks"/>
 
                     <Button 
-                    Style="{StaticResource SimpleButtonStyle}"
-                    Grid.Column="2"
-                    Margin="3 0 10 2"
-                    HorizontalAlignment="Right"
-                    Width="112"
-                    FontSize="12"
-                    Content="Отменить выбор"   
-                    Click="UnselectAllHostMarks"/>
+                        Style="{StaticResource SimpleButtonStyle}"
+                        Grid.Column="2"
+                        Margin="3 0 10 2"
+                        HorizontalAlignment="Right"
+                        Width="112"
+                        FontSize="12"
+                        Content="Отменить выбор"   
+                        Click="UnselectAllHostMarks"/>
                 </Grid>
 
 
                 <Grid 
-                Grid.Row="3" Grid.Column="1"
-                HorizontalAlignment="Stretch">
+                    Grid.Row="3" Grid.Column="1"
+                    HorizontalAlignment="Stretch">
 
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -1203,24 +1220,24 @@
                     </Grid.ColumnDefinitions>
 
                     <Button
-                    Grid.Column="0"
-                    Style="{StaticResource SimpleButtonStyle}"
-                    Margin="5 0 5 2"
-                    Width="132"
-                    FontSize="12"
-                    Content="Выбрать все"
-                    Click="SelectAllHostMarks"
-                    HorizontalAlignment="Left"/>
+                        Grid.Column="0"
+                        Style="{StaticResource SimpleButtonStyle}"
+                        Margin="5 0 5 2"
+                        Width="132"
+                        FontSize="12"
+                        Content="Выбрать все"
+                        Click="SelectAllHostMarks"
+                        HorizontalAlignment="Left"/>
 
                     <Button 
-                    Grid.Column="1"
-                    Style="{StaticResource SimpleButtonStyle}"
-                    Margin="5 0 10 2"
-                    Width="132"
-                    FontSize="12"
-                    Content="Отменить выбор"   
-                    Click="UnselectAllHostMarks"
-                    HorizontalAlignment="Right"/>
+                        Grid.Column="1"
+                        Style="{StaticResource SimpleButtonStyle}"
+                        Margin="5 0 10 2"
+                        Width="132"
+                        FontSize="12"
+                        Content="Отменить выбор"   
+                        Click="UnselectAllHostMarks"
+                        HorizontalAlignment="Right"/>
                 </Grid>
 
 
@@ -1310,132 +1327,132 @@
                         </Grid.RowDefinitions>
 
                         <CheckBox  
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        Style="{DynamicResource ToggleButtonStyle}"
-                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralView}"/>
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Style="{DynamicResource ToggleButtonStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralView}"/>
                         <TextBlock 
-                        Grid.Row="0"
-                        Grid.Column="1"
-                        Style="{StaticResource TextBlockStyle}"
-                        Text="Основной вид"/>
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Style="{StaticResource TextBlockStyle}"
+                            Text="Основной вид"/>
 
                         <CheckBox  
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        Style="{DynamicResource ToggleButtonStyle}"
-                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralPerpendicularView}"/>
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Style="{DynamicResource ToggleButtonStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralPerpendicularView}"/>
                         <TextBlock 
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        Style="{StaticResource TextBlockStyle}"
-                        Text="Основной перпендикулярный вид"/>
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Style="{StaticResource TextBlockStyle}"
+                            Text="Основной перпендикулярный вид"/>
 
                         <CheckBox  
-                        Grid.Row="2"
-                        Grid.Column="0"
-                        Style="{DynamicResource ToggleButtonStyle}"
-                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewFirst}"/>
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Style="{DynamicResource ToggleButtonStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewFirst}"/>
                         <TextBlock 
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        Style="{StaticResource TextBlockStyle}"
-                        Text="Первый поперечный вид"/>
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Style="{StaticResource TextBlockStyle}"
+                            Text="Первый поперечный вид"/>
 
                         <CheckBox  
-                        Grid.Row="3"
-                        Grid.Column="0"
-                        Style="{DynamicResource ToggleButtonStyle}"
-                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewSecond}"/>
+                            Grid.Row="3"
+                            Grid.Column="0"
+                            Style="{DynamicResource ToggleButtonStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewSecond}"/>
                         <TextBlock 
-                        Grid.Row="3"
-                        Grid.Column="1"
-                        Style="{StaticResource TextBlockStyle}"
-                        Text="Второй поперечный вид"/>
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Style="{StaticResource TextBlockStyle}"
+                            Text="Второй поперечный вид"/>
 
                         <CheckBox  
-                        Grid.Row="4"
-                        Grid.Column="0"
-                        Style="{DynamicResource ToggleButtonStyle}"
-                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewThird}"/>
+                            Grid.Row="4"
+                            Grid.Column="0"
+                            Style="{DynamicResource ToggleButtonStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewThird}"/>
                         <TextBlock 
-                        Grid.Row="4"
-                        Grid.Column="1"
-                        Style="{StaticResource TextBlockStyle}"
-                        Text="Третий поперечный вид"/>
+                            Grid.Row="4"
+                            Grid.Column="1"
+                            Style="{StaticResource TextBlockStyle}"
+                            Text="Третий поперечный вид"/>
 
                         <CheckBox  
-                        Grid.Row="5"
-                        Grid.Column="0"
-                        Style="{DynamicResource ToggleButtonStyle}"
-                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithRebarSchedule}"/>
+                            Grid.Row="5"
+                            Grid.Column="0"
+                            Style="{DynamicResource ToggleButtonStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithRebarSchedule}"/>
                         <TextBlock 
-                        Grid.Row="5"
-                        Grid.Column="1"
-                        Style="{StaticResource TextBlockStyle}"
-                        Text="Спецификацию армирования"/>
+                            Grid.Row="5"
+                            Grid.Column="1"
+                            Style="{StaticResource TextBlockStyle}"
+                            Text="Спецификацию армирования"/>
 
                         <CheckBox  
-                        Grid.Row="6"
-                        Grid.Column="0"
-                        Style="{DynamicResource ToggleButtonStyle}"
-                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithMaterialSchedule}"/>
+                            Grid.Row="6"
+                            Grid.Column="0"
+                            Style="{DynamicResource ToggleButtonStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithMaterialSchedule}"/>
                         <TextBlock 
-                        Grid.Row="6"
-                        Grid.Column="1"
-                        Style="{StaticResource TextBlockStyle}"
-                        Text="Спецификацию материалов"/>
+                            Grid.Row="6"
+                            Grid.Column="1"
+                            Style="{StaticResource TextBlockStyle}"
+                            Text="Спецификацию материалов"/>
 
                         <CheckBox  
-                        Grid.Row="7"
-                        Grid.Column="0"
-                        Style="{DynamicResource ToggleButtonStyle}"
-                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSystemPartsSchedule}"/>
+                            Grid.Row="7"
+                            Grid.Column="0"
+                            Style="{DynamicResource ToggleButtonStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSystemPartsSchedule}"/>
                         <TextBlock 
-                        Grid.Row="7"
-                        Grid.Column="1"
-                        Style="{StaticResource TextBlockStyle}"
-                        Text="Ведомость системных деталей"/>
+                            Grid.Row="7"
+                            Grid.Column="1"
+                            Style="{StaticResource TextBlockStyle}"
+                            Text="Ведомость системных деталей"/>
 
                         <CheckBox  
-                        Grid.Row="8"
-                        Grid.Column="0"
-                        Style="{DynamicResource ToggleButtonStyle}"
-                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithIFCPartsSchedule}"/>
+                            Grid.Row="8"
+                            Grid.Column="0"
+                            Style="{DynamicResource ToggleButtonStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithIFCPartsSchedule}"/>
                         <TextBlock 
-                        Grid.Row="8"
-                        Grid.Column="1"
-                        Style="{StaticResource TextBlockStyle}"
-                        Text="Ведомость IFC деталей"/>
+                            Grid.Row="8"
+                            Grid.Column="1"
+                            Style="{StaticResource TextBlockStyle}"
+                            Text="Ведомость IFC деталей"/>
 
                         <CheckBox  
-                        Grid.Row="9"
-                        Grid.Column="0"
-                        Style="{DynamicResource ToggleButtonStyle}"
-                        IsChecked="{Binding Path=SelectionSettings.NeedWorkWithLegend}"/>
+                            Grid.Row="9"
+                            Grid.Column="0"
+                            Style="{DynamicResource ToggleButtonStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithLegend}"/>
                         <TextBlock 
-                        Grid.Row="9"
-                        Grid.Column="1"
-                        Style="{StaticResource TextBlockStyle}"
-                        Text="Легенда примечаний"/>
+                            Grid.Row="9"
+                            Grid.Column="1"
+                            Style="{StaticResource TextBlockStyle}"
+                            Text="Легенда примечаний"/>
                     </Grid>
                 </Border>
 
 
                 <StackPanel
-                Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
-                Height="45"
-                Orientation="Horizontal"
-                HorizontalAlignment="Right">
+                    Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
+                    Height="45"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
 
                     <StackPanel Orientation="Vertical">
                         <TextBlock
-                        Style="{StaticResource TextBlockStyle}"
+                            Style="{StaticResource TextBlockStyle}"
                         
-                        Margin="10 14"
-                        Foreground="Orange"
-                        VerticalAlignment="Center"
-                        Text="{Binding ErrorText}"/>
+                            Margin="10 14"
+                            Foreground="Orange"
+                            VerticalAlignment="Center"
+                            Text="{Binding ErrorText}"/>
                     </StackPanel>
 
                     <Button

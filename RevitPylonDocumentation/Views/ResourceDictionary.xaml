@@ -130,9 +130,12 @@
                         BorderThickness="1"
                         Background="{TemplateBinding Background}">
                         <Grid>
-                            <TextBox Margin="1" Text="{TemplateBinding Text}" BorderThickness="0"
+                            <!--<TextBox Margin="1" Text="{TemplateBinding Text}" BorderThickness="0"
                                      VerticalContentAlignment="Center"
-                                     Foreground="{TemplateBinding Foreground}"/>
+                                     Foreground="{TemplateBinding Foreground}"/>-->
+
+                            <ScrollViewer x:Name="PART_ContentHost" Foreground="{TemplateBinding Foreground}"
+                              BorderThickness="0" IsTabStop="False" Margin="1" Padding="{TemplateBinding Padding}" />
                         </Grid>
                     </Border>
                 </ControlTemplate>

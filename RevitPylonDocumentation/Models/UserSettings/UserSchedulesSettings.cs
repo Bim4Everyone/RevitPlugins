@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.UI;
+
 using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.ViewModels;
@@ -234,6 +236,12 @@ namespace RevitPylonDocumentation.Models.UserSettings {
                 ViewModel.SettingsEdited = true;
             }
         }
+
+
+
+        //Сделать явно вызов команды изменения настроек
+
+
 
         public void ApplySchedulesSettings() {
             
