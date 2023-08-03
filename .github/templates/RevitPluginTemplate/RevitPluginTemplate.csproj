@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+        <OutputType>Library</OutputType>
+        <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+        <UseWPF>true</UseWPF>
+        <Platforms>x64</Platforms>
+        <Configurations>D2020;D2021;D2022;D2023;D2024;R2020;R2021;R2022;R2023;R2024</Configurations>
+    </PropertyGroup>
+</Project>

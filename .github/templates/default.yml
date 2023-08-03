@@ -1,0 +1,29 @@
+name: ${{ gen.plugin_name }}
+
+on:
+  push:
+    paths:
+      - '${{ gen.plugin_name }}/**'
+      - '**.cs'
+
+env:
+  output: ${{ gen.output }}
+  plugin_name: ${{ gen.plugin_name }}
+
+jobs:
+  windows-latest:
+    name: windows-latest
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache .nuke/temp, ~/.nuget/packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            .nuke/temp
+            ~/.nuget/packages
+          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
+      - name: Run './build.cmd '
+        run: ./build.cmd publish --plugin-name $plugin_name --output $output
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

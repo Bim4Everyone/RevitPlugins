@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "Build Schema",
   "$ref": "#/definitions/build",
+  "title": "Build Schema",
   "definitions": {
     "build": {
       "type": "object",
@@ -74,12 +74,18 @@
             "enum": [
               "Clean",
               "Compile",
+              "CreateProject",
+              "CreateScript",
               "FullClean",
               "FullCompile",
               "FullPublish",
               "Publish"
             ]
           }
+        },
+        "Solution": {
+          "type": "string",
+          "description": "Path to a solution file that is automatically loaded. Default is RevitPlugins.sln"
         },
         "Target": {
           "type": "array",
@@ -89,6 +95,8 @@
             "enum": [
               "Clean",
               "Compile",
+              "CreateProject",
+              "CreateScript",
               "FullClean",
               "FullCompile",
               "FullPublish",
