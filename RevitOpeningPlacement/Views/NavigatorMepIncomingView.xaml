@@ -14,11 +14,14 @@
                            x:Name="_this"
                            mc:Ignorable="d"
                            Title="NavigatorMepIncomingView" 
-                           Height="450" 
-                           Width="800"
+                           d:Width="1000"
+                           d:Height="500"
+                           Height="500" 
+                           Width="1000"
                            MinHeight="300"
-                           MinWidth="500"
-                           d:DataContext="{d:DesignInstance {x:Type vm:OpeningsMepTaskIncomingViewModel}, IsDesignTimeCreatable=False}">
+                           MinWidth="850"
+                           d:DataContext="{d:DesignInstance {x:Type vm:OpeningsMepTaskIncomingViewModel}, IsDesignTimeCreatable=False}"
+                           WindowStartupLocation="Manual" Left="50" Top="50">
     <base:ThemedPlatformWindow.Resources>
         <DataTemplate x:Key="OneParentIdTemplate" DataType="{x:Type dxg:GroupRowData}">
             <Grid x:Name="_grid">
@@ -136,11 +139,15 @@
                 </dxg:GridColumn>
                 <dxg:GridColumn ReadOnly="True" Width="0" Header="Файл" IsSmart="True" FieldName="FileName"/>
                 <dxg:GridColumn ReadOnly="True" Width="0" Header="Дата" IsSmart="True" FieldName="Date"/>
+                <dxg:GridColumn ReadOnly="True" Width="60" Header="Диаметр" FieldName="Diameter"/>
+                <dxg:GridColumn ReadOnly="True" Width="60" Header="Ширина" FieldName="Width"/>
+                <dxg:GridColumn ReadOnly="True" Width="60" Header="Высота" FieldName="Height"/>
+                <dxg:GridColumn ReadOnly="True" Width="60" Header="Толщина" FieldName="Thickness"/>
+                <dxg:GridColumn ReadOnly="True" Width="80" Header="Отметка оси" FieldName="CenterOffset"/>
+                <dxg:GridColumn ReadOnly="True" Width="90" Header="Отметка низа" FieldName="BottomOffset"/>
                 <dxg:GridColumn ReadOnly="True" Width="80" Header="Id отверстия" FieldName="OpeningId"/>
                 <dxg:GridColumn ReadOnly="True" Width="100" Header="Имя системы" FieldName="MepSystem"/>
                 <dxg:GridColumn ReadOnly="True" Width="*" Header="Описание пересечения" FieldName="Description"/>
-                <dxg:GridColumn ReadOnly="True" Width="80" Header="Отметка оси" FieldName="CenterOffset"/>
-                <dxg:GridColumn ReadOnly="True" Width="90" Header="Отметка низа" FieldName="BottomOffset"/>
             </dxg:GridControl.Columns>
         </dxg:GridControl>
 
