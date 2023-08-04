@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -26,7 +27,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
             OpeningId = _openingTask.Id.ToString();
             FileName = Path.GetFileNameWithoutExtension(incomingOpeningTask.FileName);
-            Date = _openingTask.Date;
+            Date = _openingTask.Date.Split().FirstOrDefault() ?? string.Empty;
             MepSystem = _openingTask.MepSystem;
             Description = _openingTask.Description;
             CenterOffset = _openingTask.CenterOffset;
