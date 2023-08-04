@@ -26,5 +26,5 @@ class Build : NukeBuild, IProjectBuild, ISolutionBuild, IProjectCreate {
     ///   - JetBrains Rider            https://nuke.build/rider
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
-    public static int Main() => Execute<Build>(x => ((ISolutionBuild)x).FullCompile);
+    public static int Main() => Execute<Build>();
 }
