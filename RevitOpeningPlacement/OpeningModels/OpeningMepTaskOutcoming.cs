@@ -12,6 +12,7 @@ using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels.Comparers;
+using RevitOpeningPlacement.OpeningModels.Enums;
 
 namespace RevitOpeningPlacement.OpeningModels {
     /// <summary>
@@ -46,6 +47,8 @@ namespace RevitOpeningPlacement.OpeningModels {
             Description = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDescription);
             CenterOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetCenter);
             BottomOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetBottom);
+
+            UpdateStatus();
         }
 
         /// <summary>
@@ -89,12 +92,14 @@ namespace RevitOpeningPlacement.OpeningModels {
         public bool IsRemoved => (_familyInstance is null) || (!_familyInstance.IsValidObject);
 
         /// <summary>
-        /// Флаг, обозначающий, пересекается ли экземпляр семейства задания на отверстие с каким-либо элементом из текущего проекта, 
-        /// для которого (элемента) и был создан этот экземпляр семейства задания на отверстие.
+        /// Флаг, обозначающий статус задания на отверстие
         /// 
-        /// Например, в файле инженерных систем, экземпляр семейства задания должен пересекаться с каким-то элементом этих инженерных систем.
+        /// Например, в файле инженерных систем, 
+        /// если экземпляр семейства задания не пересекается ни с одним элементом инженерных систем, то NoBasis
+        /// если экземпляр семейства задания пересекается с каким-то элементом инженерных систем и это пересечение некорректно, то InaccurateBasis
+        /// если экземпляр семейства задания пересекается с каким-то элементом инженерных систем и это пересечение корректно, то HasBasis
         /// </summary>
-        public bool HasPurpose { get; set; } = false;
+        public OpeningTaskOutcomingStatus Status { get; set; } = OpeningTaskOutcomingStatus.Empty;
 
 
         /// <summary>
@@ -103,6 +108,74 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <returns></returns>
         public FamilyInstance GetFamilyInstance() {
             return _familyInstance;
+        }
+
+        /// <summary>
+        /// Обновляет <see cref="Status"/> задания на отверстие.
+        /// 
+        /// Обновление происходит по соотношению объема пересекаемого Solid задания на отверстие элементами инженерных систем из файла задания на отверстие и исходным Solid этого задания на отверстие.
+        /// Если соотношение объемов >= 0.95, то статус <see cref="OpeningTaskOutcomingStatus.TooSmall"/>,
+        /// Если соотношение объемов в диапазоне [0.2, 0.95), то статус <see cref="OpeningTaskOutcomingStatus.Correct"/>,
+        /// Если соотношение объемов в диапазоне (0; 0.2), то статус <see cref="OpeningTaskOutcomingStatus.TooBig"/>,
+        /// Если соотношение объемов равно 0, то статус <see cref="OpeningTaskOutcomingStatus.Empty"/>.
+        /// 
+        /// Если же объем Solid самого задания на отверстие равен 0, то статус <see cref="OpeningTaskOutcomingStatus.Invalid"/>
+        /// </summary>
+        /// <param name="revitRepository"></param>
+        public void UpdateStatus() {
+            if(!IsRemoved) {
+                var openingSolid = GetSolid();
+                if((openingSolid != null) && (openingSolid.Volume > 0)) {
+                    double openingVolume = openingSolid.Volume;
+                    var t = new FilteredElementCollector(GetDocument())
+                        .WherePasses(FiltersInitializer.GetFilterByAllUsedMepCategories())
+                        .WherePasses(new BoundingBoxIntersectsFilter(openingSolid.GetOutline()))
+                        .WherePasses(new ElementIntersectsSolidFilter(openingSolid));
+                    //TODO убрать разделение linq
+                    var intersectingMepSolids = t
+                        .Select(element => element.GetSolid())
+                        .ToList();
+                    double intersectingMepVolume = 0;
+                    if(Id == 6872355) {
+                        var tryu = 0;
+                    }
+                    foreach(var mepSolid in intersectingMepSolids) {
+                        Solid intersectedSolid;
+                        try {
+                            //TODO вычитать солид MEP из солида, полученного в предыдущей итерации цикла сейчас объем для нескольких пересечений считается завышенным
+                            intersectedSolid = BooleanOperationsUtils.ExecuteBooleanOperation(openingSolid, mepSolid, BooleanOperationsType.Intersect);
+                        } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                            try {
+                                // если один солид касается другого солида изнутри, то будет исключение InvalidOperationException
+                                // здесь производится попытка слегка подвинуть один из солидов, чтобы избежать этого касания
+                                double coordinateOffset = 0.001;
+                                var mepTransformedSolid = SolidUtils.CreateTransformed(mepSolid, Transform.CreateTranslation(new XYZ(coordinateOffset, coordinateOffset, coordinateOffset)));
+                                intersectedSolid = BooleanOperationsUtils.ExecuteBooleanOperation(openingSolid, mepTransformedSolid, BooleanOperationsType.Intersect);
+
+                            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                                Status = OpeningTaskOutcomingStatus.Invalid;
+                                return;
+                            }
+                        }
+                        if(intersectedSolid != null) {
+                            intersectingMepVolume += intersectedSolid.Volume;
+                        }
+                    }
+
+                    double volumeRatio = intersectingMepVolume / openingVolume;
+                    if(0.95 <= volumeRatio) {
+                        Status = OpeningTaskOutcomingStatus.TooSmall;
+                    } else if((0.2 <= volumeRatio) && (volumeRatio < 0.95)) {
+                        Status = OpeningTaskOutcomingStatus.Correct;
+                    } else if((0 < volumeRatio) && (volumeRatio < 0.2)) {
+                        Status = OpeningTaskOutcomingStatus.TooBig;
+                    } else {
+                        Status = OpeningTaskOutcomingStatus.Empty;
+                    }
+                } else {
+                    Status = OpeningTaskOutcomingStatus.Invalid;
+                }
+            }
         }
 
         /// <summary>
