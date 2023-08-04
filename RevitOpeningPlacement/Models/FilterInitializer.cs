@@ -160,6 +160,26 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
+        /// Возвращает фильтр по всем используемым категориям элементов инженерных систем
+        /// </summary>
+        /// <returns></returns>
+        public static ElementMulticategoryFilter GetFilterByAllUsedMepCategories() {
+            return new ElementMulticategoryFilter(new BuiltInCategory[] {
+                BuiltInCategory.OST_PipeCurves,
+                BuiltInCategory.OST_PipeFitting,
+
+                BuiltInCategory.OST_DuctCurves,
+                BuiltInCategory.OST_DuctFitting,
+
+                BuiltInCategory.OST_CableTray,
+                BuiltInCategory.OST_CableTrayFitting,
+
+                BuiltInCategory.OST_Conduit,
+                BuiltInCategory.OST_ConduitFitting,
+            });
+        }
+
+        /// <summary>
         /// Создает фильтр по заданной категории элементов Revit с правилами фильтрации "больше или равно" заданных значений параметров
         /// </summary>
         /// <param name="name">Название фильтра</param>
