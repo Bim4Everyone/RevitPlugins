@@ -42,6 +42,10 @@ namespace RevitOpeningPlacement.OpeningModels {
             Description = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDescription);
             CenterOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetCenter);
             BottomOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetBottom);
+            Diameter = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDiameter);
+            Height = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningHeight);
+            Width = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningWidth);
+            Thickness = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningThickness);
         }
 
 
@@ -77,6 +81,14 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         public string BottomOffset { get; } = string.Empty;
 
+        public string Diameter { get; } = string.Empty;
+
+        public string Width { get; } = string.Empty;
+
+        public string Height { get; } = string.Empty;
+
+        public string Thickness { get; } = string.Empty;
+
         /// <summary>
         /// Статус отработки задания на отверстие
         /// </summary>
@@ -100,10 +112,27 @@ namespace RevitOpeningPlacement.OpeningModels {
                 throw new ArgumentNullException(nameof(_familyInstance));
             }
             string value = string.Empty;
-            if(_familyInstance.IsExistsParam(paramName)) {
+            if(_familyInstance.IsExistsSharedParam(paramName)) {
+#if REVIT_2022_OR_GREATER
+                if(_familyInstance.GetSharedParam(paramName).Definition.GetDataType() == SpecTypeId.Length) {
+                    return Math.Round(UnitUtils.ConvertFromInternalUnits(_familyInstance.GetSharedParamValue<double>(paramName), UnitTypeId.Millimeters)).ToString();
+                }
+#elif REVIT_2021
+                if(_familyInstance.GetSharedParam(paramName).Definition.ParameterType == ParameterType.Length) {
+                    return Math.Round(UnitUtils.ConvertFromInternalUnits(_familyInstance.GetSharedParamValue<double>(paramName), UnitTypeId.Millimeters)).ToString();
+                }
+#else
+                if(_familyInstance.GetSharedParam(paramName).Definition.UnitType == UnitType.UT_Length) {
+                    return Math.Round(UnitUtils.ConvertFromInternalUnits(_familyInstance.GetSharedParamValue<double>(paramName), DisplayUnitType.DUT_MILLIMETERS)).ToString();
+                }
+#endif
                 object paramValue = _familyInstance.GetParamValue(paramName);
                 if(!(paramValue is null)) {
-                    value = paramValue.ToString();
+                    if(paramValue is double doubleValue) {
+                        value = Math.Round(doubleValue).ToString();
+                    } else {
+                        value = paramValue.ToString();
+                    }
                 }
             }
             return value;

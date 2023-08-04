@@ -32,6 +32,10 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             CenterOffset = _openingTask.CenterOffset;
             BottomOffset = _openingTask.BottomOffset;
             IsAccepted = _openingTask.IsAccepted;
+            Diameter = _openingTask.Diameter;
+            Width = _openingTask.Width;
+            Height = _openingTask.Height;
+            Thickness = _openingTask.Thickness;
         }
 
 
@@ -69,6 +73,28 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// Отметка низа задания на отверстие
         /// </summary>
         public string BottomOffset { get; } = string.Empty;
+
+        /// <summary>
+        /// Диаметр
+        /// </summary>
+        public string Diameter { get; } = string.Empty;
+
+        /// <summary>
+        /// Ширина
+        /// </summary>
+        public string Width { get; } = string.Empty;
+
+        /// <summary>
+        /// Высота
+        /// </summary>
+        public string Height { get; } = string.Empty;
+
+        /// <summary>
+        /// Толщина
+        /// </summary>
+        public string Thickness { get; } = string.Empty;
+
+
 
         private bool _isAccepted;
         /// <summary>
