@@ -1,4 +1,6 @@
-﻿using dosymep.Bim4Everyone;
+﻿using System.Collections.ObjectModel;
+
+using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
 
@@ -160,6 +162,7 @@ namespace RevitPylonDocumentation.Models {
             schedulesSettings.IFC_PARTS_SCHEDULE_DISP2 = settings.IFC_PARTS_SCHEDULE_DISP2;
             schedulesSettings.IFC_PARTS_SCHEDULE_DISP2_TEMP = settings.IFC_PARTS_SCHEDULE_DISP2;
 
+            schedulesSettings.ParamsForScheduleFiltersTemp = settings.ParamsForScheduleFilters;
         }
 
         internal void SetConfigProps(PluginSettings settings, MainViewModel mainViewModel) {
@@ -317,6 +320,7 @@ namespace RevitPylonDocumentation.Models {
         public string MATERIAL_SCHEDULE_DISP2 { get; set; }
         public string SYSTEM_PARTS_SCHEDULE_DISP2 { get; set; }
         public string IFC_PARTS_SCHEDULE_DISP2 { get; set; }
+        public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFilters { get; set; }
 
     }
 }

@@ -44,7 +44,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _IFCPartsScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
         private string _IFCPartsScheduleDisp2Temp = "ВД_IFC_Пилоны";
 
-        private ObservableCollection<ScheduleFilterParamHelper> _paramsForScheduleFilters = new ObservableCollection<ScheduleFilterParamHelper>() {
+        private ObservableCollection<ScheduleFilterParamHelper> _paramsForScheduleFiltersTemp = new ObservableCollection<ScheduleFilterParamHelper>() {
             new ScheduleFilterParamHelper("обр_ФОП_Форма_номер", ""),
             new ScheduleFilterParamHelper("обр_ФОП_Раздел проекта", "обр_ФОП_Раздел проекта"),
             new ScheduleFilterParamHelper("обр_Метка основы_универсальная", "Марка"),
@@ -169,17 +169,11 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             set => RaiseAndSetIfChanged(ref _IFCPartsScheduleDisp2Temp, value);
         }
 
-        public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFilters {
-            get => _paramsForScheduleFilters;
-            set {
-                RaiseAndSetIfChanged(ref _paramsForScheduleFilters, value);
-                ViewModel.SettingsEdited = true;
-            }
+        public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFilters { get; set; } = new ObservableCollection<ScheduleFilterParamHelper>();
+        public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFiltersTemp {
+            get => _paramsForScheduleFiltersTemp;
+            set => RaiseAndSetIfChanged(ref _paramsForScheduleFiltersTemp, value);
         }
-
-
-
-        //Сделать явно вызов команды изменения настроек
 
 
 
@@ -211,6 +205,8 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             MATERIAL_SCHEDULE_DISP2 = MATERIAL_SCHEDULE_DISP2_TEMP;
             SYSTEM_PARTS_SCHEDULE_DISP2 = SYSTEM_PARTS_SCHEDULE_DISP2_TEMP;
             IFC_PARTS_SCHEDULE_DISP2 = IFC_PARTS_SCHEDULE_DISP2_TEMP;
+
+            ParamsForScheduleFilters = ParamsForScheduleFiltersTemp;
         }
     }
 }

@@ -925,36 +925,53 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Получает шаблон для основных видов по имени
         /// </summary>
         public void FindGeneralViewTemplate() {
-            SelectedGeneralViewTemplate = ViewTemplatesInPj
+
+            if(ViewSectionSettings.GENERAL_VIEW_TEMPLATE_NAME != string.Empty) {
+                SelectedGeneralViewTemplate = ViewTemplatesInPj
                 .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.GENERAL_VIEW_TEMPLATE_NAME));
+            }
         }
         /// <summary>
         /// Получает шаблон для поперечных видов по имени
         /// </summary>
         public void FindTransverseViewTemplate() {
-            SelectedTransverseViewTemplate = ViewTemplatesInPj
+
+            if(ViewSectionSettings.TRANSVERSE_VIEW_TEMPLATE_NAME != string.Empty) {
+                SelectedTransverseViewTemplate = ViewTemplatesInPj
                 .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TRANSVERSE_VIEW_TEMPLATE_NAME));
+            }
+            
         }
         /// <summary>
         /// Получает типоразмер вида для создаваемых видов
         /// </summary>
         public void FindViewFamilyType() {
-            SelectedViewFamilyType = ViewFamilyTypes
+
+            if(ViewSectionSettings.VIEW_FAMILY_TYPE_NAME != string.Empty) {
+                SelectedViewFamilyType = ViewFamilyTypes
                 .FirstOrDefault(familyTypes => familyTypes.Name.Equals(ViewSectionSettings.VIEW_FAMILY_TYPE_NAME));
+            }
         }
         /// <summary>
         /// Получает легенду примечания по имени
         /// </summary>
         public void FindLegend() {
-            SelectedLegend = Legends
+
+            if(ProjectSettings.LEGEND_NAME != string.Empty) {
+                SelectedLegend = Legends
                 .FirstOrDefault(view => view.Name.Contains(ProjectSettings.LEGEND_NAME));
+            }
+                
         }
         /// <summary>
         /// Получает типоразмер рамки листа по имени типа
         /// </summary>
         public void FindTitleBlock() {
-            SelectedTitleBlock = TitleBlocks
+
+            if(ProjectSettings.TITLEBLOCK_NAME != string.Empty) {
+                SelectedTitleBlock = TitleBlocks
                 .FirstOrDefault(titleBlock => titleBlock.Name.Contains(ProjectSettings.TITLEBLOCK_NAME));
+            }
         }
 
 
@@ -993,7 +1010,6 @@ namespace RevitPylonDocumentation.ViewModels {
         private void SettingsChanged() {
 
             SettingsEdited = true;
-            TaskDialog.Show("fd", "Что то изменилось");
         }
 
         /// <summary>
