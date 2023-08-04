@@ -21,7 +21,7 @@ namespace RevitVolumeOfWork.Models {
                                        .Distinct()
                                        .ToList();
 
-            return string.Join(", ", values);
+            return string.Join("; ", values);
         }
 
 

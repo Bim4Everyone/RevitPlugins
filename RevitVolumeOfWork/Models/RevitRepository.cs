@@ -67,7 +67,7 @@ namespace RevitVolumeOfWork.Models {
                     wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomName.Name, "");
                     wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomNumber.Name, "");
                     wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomID.Name, "");
-                    wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedApartmentNumber.Name, "");
+                    wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomGroup.Name, "");
                 }
                 t.Commit();
             }

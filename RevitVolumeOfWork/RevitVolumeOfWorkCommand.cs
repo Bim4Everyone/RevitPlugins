@@ -74,7 +74,7 @@ namespace RevitVolumeOfWork {
                 ProjectParamsConfig.Instance.RelatedRoomName,
                 ProjectParamsConfig.Instance.RelatedRoomNumber,
                 ProjectParamsConfig.Instance.RelatedRoomID,
-                ProjectParamsConfig.Instance.RelatedApartmentNumber);
+                ProjectParamsConfig.Instance.RelatedRoomGroup);
         }
     }
 }

@@ -73,8 +73,8 @@ namespace RevitVolumeOfWork.ViewModels {
                                                 wallElement.GetRoomsParameters("Number"));
                     wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomID.Name,
                                                 wallElement.GetRoomsParameters("ID"));
-                    wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedApartmentNumber.Name,
-                                                wallElement.GetRoomsParameters("ApartNumber"));
+                    wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomGroup.Name,
+                                                wallElement.GetRoomsParameters("Group"));
                 }
                 t.Commit();
             }
@@ -85,8 +85,7 @@ namespace RevitVolumeOfWork.ViewModels {
                 ErrorText = "Помещения отсутствуют в проекте";
                 return false;
             }
-            if(!_revitRepository.Document.IsExistsSharedParam(SharedParamsConfig.Instance.ApartmentNumber.Name)) {
-                ErrorText = "У помещений отсутствует параметр номера квартиры";
+            if(Levels.Where(item => item.IsSelected).ToList().Count == 0) {
                 return false;
             }
             return true;
