@@ -126,7 +126,8 @@ namespace RevitOpeningPlacement {
         private void GetOpeningsTaskInDocumentMEP(UIApplication uiApplication, RevitRepository revitRepository) {
             var outcomingTasks = revitRepository
                 .GetOpeningsMepTasksOutcoming()
-                .Select(famInst => new OpeningMepTaskOutcomingViewModel(new OpeningMepTaskOutcoming(famInst)))
+                .Select(famInst => new OpeningMepTaskOutcoming(famInst))
+                .Select(mepTaskOutcoming => new OpeningMepTaskOutcomingViewModel(mepTaskOutcoming))
                 .ToList();
             var navigatorViewModel = new OpeningsMepTaskOutcomingViewModel(revitRepository, outcomingTasks);
 
