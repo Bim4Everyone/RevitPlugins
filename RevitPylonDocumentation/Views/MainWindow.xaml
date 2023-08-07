@@ -18,7 +18,7 @@
     AllowsTransparency="True"
     WindowStyle="None"
     Background="Transparent"    
-    Height="1010" MinHeight="1010" MaxHeight="1010"
+    Height="510" MinHeight="510" MaxHeight="510"
     Width="700" MinWidth="700" MaxWidth="700"
     
     
@@ -1501,8 +1501,19 @@
                         Margin="10 0 3 2"
                         Width="152"
                         FontSize="12"
-                        Text="{Binding HostMarkForSearch, UpdateSourceTrigger=PropertyChanged}"
-                        HorizontalAlignment="Left"/>
+                        Text="{Binding HostsInfoFilter, UpdateSourceTrigger=PropertyChanged}"
+                        HorizontalAlignment="Left"
+                        VerticalContentAlignment="Center"/>
+
+                    <Button 
+                        Style="{StaticResource TransparentButton}"
+                        Margin="150,-4,5,0" 
+                        Width="15" 
+                        Height="25"
+                        Content="x"
+                        FontSize="16"
+                        Command="{Binding Path=ClearHostsInfoFilterInGUICommand}"/>
+
                     <Button 
                         Style="{StaticResource SimpleButtonStyle}"
                         Grid.Column="1"
@@ -1511,7 +1522,7 @@
                         Width="92"
                         FontSize="12"
                         Content="Выбрать все" 
-                        Click="SelectAllHostMarks"/>
+                        Command="{Binding Path=SelectAllHostsInfoInGUICommand}"/>
 
                     <Button 
                         Style="{StaticResource SimpleButtonStyle}"
@@ -1520,8 +1531,8 @@
                         HorizontalAlignment="Right"
                         Width="112"
                         FontSize="12"
-                        Content="Отменить выбор"   
-                        Click="UnselectAllHostMarks"/>
+                        Content="Отменить выбор" 
+                        Command="{Binding Path=UnselectAllHostsInfoInGUICommand}"/>
                 </Grid>
 
 
@@ -1541,8 +1552,8 @@
                         Width="132"
                         FontSize="12"
                         Content="Выбрать все"
-                        Click="SelectAllHostMarks"
-                        HorizontalAlignment="Left"/>
+                        HorizontalAlignment="Left"
+                        Command="{Binding Path=SelectAllFuncInGUICommand}"/>
 
                     <Button 
                         Grid.Column="1"
@@ -1551,61 +1562,49 @@
                         Width="132"
                         FontSize="12"
                         Content="Отменить выбор"   
-                        Click="UnselectAllHostMarks"
-                        HorizontalAlignment="Right"/>
+                        HorizontalAlignment="Right"
+                        Command="{Binding Path=UnselectAllFuncInGUICommand}"/>
                 </Grid>
 
 
-                <!--<Border Grid.Row="4" Grid.Column="0"
-                        Margin="10 5 10 0" Padding="5" CornerRadius="15" 
-                        BorderThickness="1"
-                        BorderBrush="{StaticResource SecondaryGrayColor}"
-                        Background="{DynamicResource SecondaryBackgroundColor}">
-
-
-
-                    
-                </Border>-->
-
 
                 <ListView
-                        x:Name="hostMarks"
-                
-                        Grid.Row="4" Grid.Column="0"
-                        Margin="10"
-                        ScrollViewer.VerticalScrollBarVisibility="Visible"
-                        ScrollViewer.CanContentScroll="False"
-                        ItemsSource="{Binding Path=SelectedHostsInfo, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        SelectionMode="Multiple">
+                    x:Name="hostMarks"
+                    Grid.Row="4" Grid.Column="0"
+                    Margin="10"
+                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                    ScrollViewer.CanContentScroll="False"
+                    ItemsSource="{Binding Path=SelectedHostsInfo, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    SelectionMode="Multiple">
 
-                    <ListBox.Resources>
+
+                    <ListView.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="7"/>
                         </Style>
-                    </ListBox.Resources>
+                    </ListView.Resources>
 
-                    <ListBox.ItemTemplate>
+                    <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="5">
-                                <CheckBox IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                <CheckBox x:Name="chk" IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                                 <TextBlock Margin="10 0 0 0" Text="{Binding Path=PylonKeyName}" Style="{StaticResource TextBlockStyle}"/>
                             </StackPanel>
                         </DataTemplate>
-                    </ListBox.ItemTemplate>
+                    </ListView.ItemTemplate>
 
 
-                    <ListBox.ItemContainerStyle>
+                    <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListBoxItem}">
-                            <Setter Property="IsSelected" Value="{Binding Path=IsCheck, Mode=TwoWay}"/>
                             <Setter Property="Margin" Value="3"/>
-
+                            <Setter Property="IsSelected" Value="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                        <Border 
+                                        <Border
                                             CornerRadius="5"
-                                            Background="{TemplateBinding Background}" 
-                                            BorderBrush="{StaticResource SecondaryGrayColor}" 
+                                            Background="{TemplateBinding Background}"
+                                            BorderBrush="{StaticResource SecondaryGrayColor}"
                                             BorderThickness="1">
 
                                             <ContentPresenter/>
@@ -1614,7 +1613,7 @@
                                 </Setter.Value>
                             </Setter>
                         </Style>
-                    </ListBox.ItemContainerStyle>
+                    </ListView.ItemContainerStyle>
                 </ListView>
 
 
@@ -1788,453 +1787,6 @@
                         Click="ButtonCancel_Click"/>
                 </StackPanel>
             </Grid>
-
-
-            <!--<Expander Grid.Row="0" Grid.RowSpan="5" Grid.Column="1"
-                  ExpandDirection="Left" 
-                  HorizontalAlignment="Left">
-            <Expander.Header>
-                <TextBlock Text="Настройки">
-                    <TextBlock.LayoutTransform>
-                        <TransformGroup>
-                            <RotateTransform Angle="-90"/>
-                        </TransformGroup>
-                    </TextBlock.LayoutTransform>
-                </TextBlock>
-            </Expander.Header>
-            
-            
-            
-            <Grid Width="340">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="25"/>
-                </Grid.RowDefinitions>
-
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <GroupBox Header="Правила поиска параметров" Margin="5">
-                            <StackPanel>
-                                <Label Content="Параметр раздела проекта"/>
-                                <TextBox 
-                                    HorizontalAlignment="Left" Margin="5 0"
-                                    Text="{Binding Path=ProjectSettings.PROJECT_SECTION_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                    Width="290" VerticalContentAlignment="Center"/>
-
-
-                                <Label Content="Параметр фильтрации типовых пилонов"/>
-                                <TextBox
-                                    HorizontalAlignment="Left" Margin="5 0"
-                                    Text="{Binding Path=ProjectSettings.TYPICAL_PYLON_FILTER_PARAMETER_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                    Width="290" VerticalContentAlignment="Center"/>
-                                
-                                
-                                <Label Content="Значение параметра фильтрации типовых пилонов"/>
-                                <TextBox
-                                    HorizontalAlignment="Left" Margin="5 0"
-                                    Text="{Binding Path=ProjectSettings.TYPICAL_PYLON_FILTER_VALUE_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                    Width="290" VerticalContentAlignment="Center"/>
-
-                                <Label Content="Параметр марки пилона"/>
-                                <TextBox
-                                    HorizontalAlignment="Left" Margin="5 0"
-                                    Text="{Binding Path=ProjectSettings.MARK_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                    Width="290" VerticalContentAlignment="Center"/>
-
-                                <Label Content="Параметр для группировки диспетчера 1"/>
-                                <TextBox
-                                    HorizontalAlignment="Left" Margin="5 0"                        
-                                    Text="{Binding Path=ProjectSettings.DISPATCHER_GROUPING_FIRST_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                    Width="290" VerticalContentAlignment="Center"/>
-
-                                <Label Content="Параметр для группировки диспетчера 2"/>
-                                <TextBox
-                                    HorizontalAlignment="Left" Margin="5 0"                        
-                                    Text="{Binding Path=ProjectSettings.DISPATCHER_GROUPING_SECOND_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                    Width="290" VerticalContentAlignment="Center"/>
-
-                                <Label Content="Параметр для формата рамки листа"/>
-                                <TextBox
-                                    HorizontalAlignment="Left" Margin="5 0"
-                                    Text="{Binding Path=ProjectSettings.SHEET_SIZE_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                    Width="290" VerticalContentAlignment="Center"/>
-
-                                <Label Content="Параметр для множителя формата рамки листа"/>
-                                <TextBox
-                                    HorizontalAlignment="Left" Margin="5 0"
-                                    Text="{Binding Path=ProjectSettings.SHEET_COEFFICIENT_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                    Width="290" VerticalContentAlignment="Center"/>
-                            </StackPanel>
-                        </GroupBox>
-
-
-                        <GroupBox Header="Правила поиска листов" Margin="5">
-                            <StackPanel>
-                                <Label Content="Маска поиска листа пилона"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBox Text="{Binding Path=ProjectSettings.SHEET_PREFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                    <Label Content="Марка пилона"/>
-                                    <TextBox Text="{Binding Path=ProjectSettings.SHEET_SUFFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                </StackPanel>
-
-                                <Label Content="Выберите типоразмер рамки листа:"/>
-                                <ComboBox Margin="5 0 5 5"
-                                        ItemsSource="{Binding Path=TitleBlocks}" 
-                                        SelectedItem="{Binding Path=SelectedTitleBlock}">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock>
-                                                <TextBlock.Text>
-                                                    <MultiBinding StringFormat="{}{0}: {1}">
-                                                        <Binding Path="FamilyName"/>
-                                                        <Binding Path="Name"/>
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-                            </StackPanel>
-                        </GroupBox>
-
-
-                        <GroupBox Header="Правила поиска видов" Margin="5">
-                            <StackPanel>
-                                <Label Content="Выберите шаблон основного вида:"/>
-                                <ComboBox
-                                      ItemsSource="{Binding ViewTemplatesInPj}" 
-                                      SelectedItem="{Binding SelectedGeneralViewTemplate}">
-                                        <ComboBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <TextBlock>
-                                                    <TextBlock.Text>
-                                                        <Binding Path="Name"/>
-                                                    </TextBlock.Text>
-                                                </TextBlock>
-                                            </DataTemplate>
-                                        </ComboBox.ItemTemplate>
-                                </ComboBox>
-
-                                <Label Content="Выберите шаблон поперечного вида:"/>
-                                <ComboBox
-                                      ItemsSource="{Binding ViewTemplatesInPj}" 
-                                      SelectedItem="{Binding SelectedTransverseViewTemplate}">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock>
-                                                <TextBlock.Text>
-                                                    <Binding Path="Name"/>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-
-                                <Label Content="Выберите типоразмер для создаваемых видов:"/>
-                                <ComboBox
-                                    ItemsSource="{Binding Path=ViewFamilyTypes}" 
-                                    SelectedItem="{Binding Path=SelectedViewFamilyType}">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock>
-                                                <TextBlock.Text>
-                                                    <Binding Path="Name"/>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-
-                                <Label Content="Выберите легенду примечания:"/>
-                                <ComboBox Margin="5 0 5 5"
-                                    ItemsSource="{Binding Path=Legends}" 
-                                    SelectedItem="{Binding Path=SelectedLegend}">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock>
-                                                <TextBlock.Text>
-                                                    <Binding Path="Name"/>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-
-                                <Label Content="Отступ по X у основного вида"/>
-                                <TextBox
-                                    HorizontalAlignment="Left" Margin="5 0"
-                                    Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_X_OFFSET_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                    Width="290" VerticalContentAlignment="Center"/>
-                                
-                                <Label Content="Отступ по Y сверху у основного вида"/>
-                                <TextBox
-                                    HorizontalAlignment="Left" Margin="5 0"
-                                    Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_Y_TOP_OFFSET_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                    Width="290" VerticalContentAlignment="Center"/>
-
-                                <Label Content="Отступ по Y снизу у основного вида"/>
-                                <TextBox
-                                    HorizontalAlignment="Left" Margin="5 0"
-                                    Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_Y_BOTTOM_OFFSET_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                    Width="290" VerticalContentAlignment="Center"/>
-
-                                
-                                <Label Content="Отступ по X у поперечного вида"/>
-                                <TextBox
-                                    HorizontalAlignment="Left" Margin="5 0"
-                                    Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_X_OFFSET_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                    Width="290" VerticalContentAlignment="Center"/>
-
-                                <Label Content="Отступ по Y у поперечного вида"/>
-                                <TextBox
-                                    HorizontalAlignment="Left" Margin="5 0"
-                                    Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                    Width="290" VerticalContentAlignment="Center"/>
-
-                                
-                                <Label Content="Маска поиска основного вида пилона"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBox Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_PREFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                    <Label Content="Марка пилона"/>
-                                    <TextBox Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_SUFFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                </StackPanel>
-
-                                <Label Content="Маска поиска основного перпендикулярного вида пилона"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBox Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                    <Label Content="Марка пилона"/>
-                                    <TextBox Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_SUFFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                </StackPanel>
-
-                                <Label Content="Маска поиска первого поперечного вида пилона"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBox Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_FIRST_PREFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                    <Label Content="Марка пилона"/>
-                                    <TextBox Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_FIRST_SUFFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                </StackPanel>
-
-                                <Label Content="Маска поиска второго поперечного вида пилона"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBox Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_SECOND_PREFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                    <Label Content="Марка пилона"/>
-                                    <TextBox Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_SECOND_SUFFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                </StackPanel>
-
-                                <Label Content="Маска поиска третьего поперечного вида пилона"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBox Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_THIRD_PREFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                    <Label Content="Марка пилона"/>
-                                    <TextBox Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_THIRD_SUFFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                </StackPanel>
-
-                            </StackPanel>
-                        </GroupBox>
-
-
-                        <GroupBox Header="Правила поиска спецификаций" Margin="5">
-                            <StackPanel>
-                                <Label Content="Маска поиска спецификации армирования"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBox Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_PREFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                    <Label Content="Марка пилона"/>
-                                    <TextBox Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_SUFFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                </StackPanel>
-
-                                <Label Content="Маска поиска спецификации материалов"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBox Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_PREFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                    <Label Content="Марка пилона"/>
-                                    <TextBox Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_SUFFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                </StackPanel>
-
-                                <Label Content="Маска поиска ведомости системных деталей"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBox Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_PREFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105" 
-                                             VerticalContentAlignment="Center"/>
-                                    <Label Content="Марка пилона"/>
-                                    <TextBox Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_SUFFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                </StackPanel>
-
-                                <Label Content="Маска поиска ведомости IFC деталей"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBox Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_PREFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105" 
-                                             VerticalContentAlignment="Center"/>
-                                    <Label Content="Марка пилона"/>
-                                    <TextBox Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_SUFFIX_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="105"
-                                             VerticalContentAlignment="Center"/>
-                                </StackPanel>
-                                
-                                
-                                
-                                <Label Content="Имя для поиска спецификации армирования"/>
-                                <TextBox Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_NAME_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="300" 
-                                             VerticalContentAlignment="Center"/>
-
-                                <Label Content="В параметр диспетчера 1"/>
-                                <TextBox Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_DISP1_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="300" 
-                                             VerticalContentAlignment="Center"/>
-                                <Label Content="В параметр диспетчера 2"/>
-                                <TextBox Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_DISP2_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="300" 
-                                             VerticalContentAlignment="Center"/>
-
-
-                                <Label Content="Имя для поиска спецификации материалов"/>
-                                <TextBox Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_NAME_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="300" 
-                                             VerticalContentAlignment="Center"/>
-
-                                <Label Content="В параметр диспетчера 1"/>
-                                <TextBox Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_DISP1_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="300" 
-                                             VerticalContentAlignment="Center"/>
-                                <Label Content="В параметр диспетчера 2"/>
-                                <TextBox Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_DISP2_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="300" 
-                                             VerticalContentAlignment="Center"/>
-
-                                
-                                <Label Content="Имя для поиска ведомости системных деталей"/>
-                                <TextBox Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_NAME_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="300" 
-                                             VerticalContentAlignment="Center"/>
-
-                                <Label Content="В параметр диспетчера 1"/>
-                                <TextBox Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP1_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="300" 
-                                             VerticalContentAlignment="Center"/>
-                                <Label Content="В параметр диспетчера 2"/>
-                                <TextBox Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP2_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="300" 
-                                             VerticalContentAlignment="Center"/>
-                                
-                                
-                                <Label Content="Имя для поиска ведомости IFC деталей"/>
-                                <TextBox Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_NAME_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="300" 
-                                             VerticalContentAlignment="Center"/>
-
-                                <Label Content="В параметр диспетчера 1"/>
-                                <TextBox Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_DISP1_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="300" 
-                                             VerticalContentAlignment="Center"/>
-                                <Label Content="В параметр диспетчера 2"/>
-                                <TextBox Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_DISP2_TEMP, UpdateSourceTrigger=PropertyChanged}" 
-                                             Width="300" 
-                                             VerticalContentAlignment="Center"/>
-                                
-                               
-
-
-                                <Label Content="Список параметров фильтрации для спеки"/>
-                                <ListView
-                                    ItemsSource="{Binding Path=SchedulesSettings.ParamsForScheduleFilters, UpdateSourceTrigger=PropertyChanged}"
-                                    Margin="5 0">
-                                    <ListView.View>
-                                        <GridView>
-                                            <GridViewColumn>
-                                                <GridViewColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <CheckBox
-                                                            IsChecked="{Binding Path=IsCheck}"/>
-                                                    </DataTemplate>
-                                                </GridViewColumn.CellTemplate>
-                                            </GridViewColumn>
-                                            <GridViewColumn Header="Поле в спеке">
-                                                <GridViewColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <TextBox 
-                                                                Text="{Binding Path=ParamNameInSchedule, UpdateSourceTrigger=PropertyChanged}"
-                                                                Width="200"/>
-                                                    </DataTemplate>
-                                                </GridViewColumn.CellTemplate>
-                                            </GridViewColumn>
-                                            <GridViewColumn Header="Параметр в основе">
-                                                <GridViewColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <TextBox 
-                                                                Text="{Binding Path=ParamNameInHost, UpdateSourceTrigger=PropertyChanged}"
-                                                                Width="200"/>
-                                                    </DataTemplate>
-                                                </GridViewColumn.CellTemplate>
-                                            </GridViewColumn>
-                                        </GridView>
-                                    </ListView.View>
-                                </ListView>
-
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <Button
-                                        Grid.Column="0"
-                                        Margin="0 5 3 0"
-                                        Content="Добавить"
-                                        Command="{Binding AddScheduleFilterParamCommand}"/>
-                                    <Button
-                                        Grid.Column="1"
-                                        Margin="3 5 3 0"
-                                        Content="Удалить"
-                                        Command="{Binding DeleteScheduleFilterParamCommand}"/>
-                                </Grid>
-                            </StackPanel>
-                        </GroupBox>
-                    </StackPanel>
-                </ScrollViewer>
-
-
-                <Button Grid.Row="4" Margin="5 5 0 0"
-                        Content="Применить"
-                        Command="{Binding Path=ApplySettingsCommands}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseLeave">
-                            <i:InvokeCommandAction Command="{Binding CheckSettingsCommands}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </Button>
-            </Grid>
-        </Expander>-->
         </Grid>
     </Border>
 </base:PlatformWindow>

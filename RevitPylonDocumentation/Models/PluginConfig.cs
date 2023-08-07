@@ -162,6 +162,7 @@ namespace RevitPylonDocumentation.Models {
             schedulesSettings.IFC_PARTS_SCHEDULE_DISP2 = settings.IFC_PARTS_SCHEDULE_DISP2;
             schedulesSettings.IFC_PARTS_SCHEDULE_DISP2_TEMP = settings.IFC_PARTS_SCHEDULE_DISP2;
 
+            schedulesSettings.ParamsForScheduleFilters = settings.ParamsForScheduleFilters;
             schedulesSettings.ParamsForScheduleFiltersTemp = settings.ParamsForScheduleFilters;
         }
 
@@ -250,8 +251,7 @@ namespace RevitPylonDocumentation.Models {
             settings.SYSTEM_PARTS_SCHEDULE_DISP2 = schedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP2;
             settings.IFC_PARTS_SCHEDULE_DISP2 = schedulesSettings.IFC_PARTS_SCHEDULE_DISP2;
 
-            
-
+            settings.ParamsForScheduleFilters = schedulesSettings.ParamsForScheduleFilters;
         }
     }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime;
 using System.Security.Cryptography;
@@ -54,6 +55,10 @@ namespace RevitPylonDocumentation.ViewModels {
 
         public bool SettingsEdited = false;
 
+        private string _hostsInfoFilter;
+        private ICollectionView _hostsInfoView;
+
+        
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
@@ -69,9 +74,8 @@ namespace RevitPylonDocumentation.ViewModels {
             Legends = _revitRepository.LegendsInProject;
             ViewTemplatesInPj = _revitRepository.AllViewTemplates;
 
-            //GetRebarProjectSections();
-            //FindReferenceSchedules();
-            
+            SetHostsInfoFilters();
+
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
@@ -85,9 +89,16 @@ namespace RevitPylonDocumentation.ViewModels {
             DeleteScheduleFilterParamCommand = RelayCommand.Create(DeleteScheduleFilterParam, CanChangeScheduleFilterParam);
             SettingsChangedCommand = RelayCommand.Create(SettingsChanged);
 
+            ClearHostsInfoFilterInGUICommand = RelayCommand.Create(ClearHostsInfoFilterInGUI);
+            SelectAllHostsInfoInGUICommand = RelayCommand.Create(SelectAllHostsInfoInGUI);
+            UnselectAllHostsInfoInGUICommand = RelayCommand.Create(UnselectAllHostsInfoInGUI);
+
+            SelectAllFuncInGUICommand = RelayCommand.Create(SelectAllFuncInGUI);
+            UnselectAllFuncInGUICommand = RelayCommand.Create(UnselectAllFuncInGUI);
         }
 
-        
+
+
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
         public ICommand ApplySettingsCommands { get; }
@@ -97,7 +108,11 @@ namespace RevitPylonDocumentation.ViewModels {
         public ICommand DeleteScheduleFilterParamCommand { get; }
         public ICommand SettingsChangedCommand { get; }
         public ICommand SelectPylonCommand { get; }
-
+        public ICommand ClearHostsInfoFilterInGUICommand { get; }
+        public ICommand SelectAllHostsInfoInGUICommand { get; }
+        public ICommand UnselectAllHostsInfoInGUICommand { get; }
+        public ICommand SelectAllFuncInGUICommand { get; }
+        public ICommand UnselectAllFuncInGUICommand { get; }
 
 
         public UserSelectionSettings SelectionSettings { get; set; }
@@ -111,10 +126,6 @@ namespace RevitPylonDocumentation.ViewModels {
         /// </summary>
         public ObservableCollection<string> ProjectSections { get; set; } = new ObservableCollection<string>();
 
-        /// <summary>
-        /// Список всех найденных пилонов для работы в проекте (оболочек)
-        /// </summary>
-        public ObservableCollection<PylonSheetInfo> HostsInfo { get; set; } = new ObservableCollection<PylonSheetInfo>();
 
         /// <summary>
         /// Выбранный пользователем комплект документации
@@ -123,6 +134,11 @@ namespace RevitPylonDocumentation.ViewModels {
             get => _selectedProjectSection;
             set => this.RaiseAndSetIfChanged(ref _selectedProjectSection, value);
         }
+
+        /// <summary>
+        /// Список всех найденных пилонов для работы в проекте (оболочек)
+        /// </summary>
+        public ObservableCollection<PylonSheetInfo> HostsInfo { get; set; } = new ObservableCollection<PylonSheetInfo>();
 
         /// <summary>
         /// Список пилонов (оболочек) для работы из выбранного пользователем комплекта документации
@@ -699,6 +715,20 @@ namespace RevitPylonDocumentation.ViewModels {
         /// </summary>
         public ViewSchedule ReferenceIFCPartsSchedule { get; set; }
 
+        /// <summary>
+        /// Фильтр списка марок пилонов
+        /// </summary>
+        public string HostsInfoFilter {
+            get => _hostsInfoFilter;
+            set {
+                if(value != _hostsInfoFilter) {
+                    _hostsInfoFilter = value;
+                    _hostsInfoView.Refresh();
+                    OnPropertyChanged(nameof(HostsInfoFilter));
+                }
+            }
+        }
+
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
@@ -713,7 +743,6 @@ namespace RevitPylonDocumentation.ViewModels {
             LoadConfig();
 
             ApplySettings();
-
             CheckSettings();
         }
 
@@ -792,6 +821,8 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectedHostsInfo = new List<PylonSheetInfo>(HostsInfo
                 .Where(item => item.ProjectSection.Equals(SelectedProjectSection))
                 .ToList());
+
+            SetHostsInfoFilters();
         }
 
         /// <summary>
@@ -1015,13 +1046,106 @@ namespace RevitPylonDocumentation.ViewModels {
         /// <summary>
         /// Определяет можно ли удалить выбранное имя параметра фильтра спецификаций в настройках плагина
         /// True, если выбрана штриховка в списке штриховок в настройках плагина
-        /// </summary>
+        /// </summary> 
         private bool CanChangeScheduleFilterParam() {
-            
+
             foreach(ScheduleFilterParamHelper param in SchedulesSettings.ParamsForScheduleFilters) {
                 if(param.IsCheck) { return true; }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Задает фильтрацию списка марок пилонов
+        /// </summary>
+        private void SetHostsInfoFilters() {
+
+            _hostsInfoView = CollectionViewSource.GetDefaultView(SelectedHostsInfo);
+            _hostsInfoView.Filter = item => String.IsNullOrEmpty(HostsInfoFilter) ? true :
+                ((PylonSheetInfo) item).PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+
+        /// <summary>
+        /// Обнуление строки фильтра привязанного к тексту, через который фильтруется список марок пилонов в GUI
+        /// Работает при нажатии "x" в правой части области поиска
+        /// </summary>
+        private void ClearHostsInfoFilterInGUI() {
+            
+            HostsInfoFilter = string.Empty;
+        }
+
+        /// <summary>
+        /// Ставит галку выбора всем маркам пилонов, видимым в GUI.
+        /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка марок пилонов в GUI
+        /// </summary>
+        private void SelectAllHostsInfoInGUI() {
+            foreach(PylonSheetInfo pylonSheetInfo in SelectedHostsInfo) {
+                
+                if(String.IsNullOrEmpty(HostsInfoFilter) ? true :
+                (pylonSheetInfo.PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >= 0)) {
+                    pylonSheetInfo.IsCheck = true;
+                }
+            }
+            // Иначе не работало:
+            _hostsInfoView.Refresh();
+        }
+
+
+        /// <summary>
+        /// Снимает галку выбора у всех марок пилонов, видимых в GUI.
+        /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка марок пилонов в GUI
+        /// </summary>
+        private void UnselectAllHostsInfoInGUI() {
+
+            foreach(PylonSheetInfo pylonSheetInfo in SelectedHostsInfo) {
+
+                if(String.IsNullOrEmpty(HostsInfoFilter) ? true :
+                (pylonSheetInfo.PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >= 0)) {
+                    pylonSheetInfo.IsCheck = false;
+                }
+            }
+            // Иначе не работало:
+            _hostsInfoView.Refresh();
+        }
+
+
+
+        /// <summary>
+        /// Ставит галку выбора всем элементам, доступным для создания, видимым в GUI.
+        /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка тумблеров в GUI
+        /// </summary>
+        private void SelectAllFuncInGUI() {
+
+            SelectionSettings.NeedWorkWithGeneralView = true;
+            SelectionSettings.NeedWorkWithGeneralPerpendicularView = true;
+            SelectionSettings.NeedWorkWithTransverseViewFirst = true;
+            SelectionSettings.NeedWorkWithTransverseViewSecond = true;
+            SelectionSettings.NeedWorkWithTransverseViewThird = true;
+            SelectionSettings.NeedWorkWithRebarSchedule = true;
+            SelectionSettings.NeedWorkWithMaterialSchedule = true;
+            SelectionSettings.NeedWorkWithSystemPartsSchedule = true;
+            SelectionSettings.NeedWorkWithIFCPartsSchedule = true;
+            SelectionSettings.NeedWorkWithLegend = true;
+        }
+
+
+        /// <summary>
+        /// Снимает галку выбора у всех, доступных для создания, видимых в GUI.
+        /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка тумблеров в GUI
+        /// </summary>
+        private void UnselectAllFuncInGUI() {
+
+            SelectionSettings.NeedWorkWithGeneralView = false;
+            SelectionSettings.NeedWorkWithGeneralPerpendicularView = false;
+            SelectionSettings.NeedWorkWithTransverseViewFirst = false;
+            SelectionSettings.NeedWorkWithTransverseViewSecond = false;
+            SelectionSettings.NeedWorkWithTransverseViewThird = false;
+            SelectionSettings.NeedWorkWithRebarSchedule = false;
+            SelectionSettings.NeedWorkWithMaterialSchedule = false;
+            SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
+            SelectionSettings.NeedWorkWithIFCPartsSchedule = false;
+            SelectionSettings.NeedWorkWithLegend = false;
         }
     }
 }

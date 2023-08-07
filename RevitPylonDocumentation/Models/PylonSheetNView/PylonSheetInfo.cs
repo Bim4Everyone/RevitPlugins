@@ -11,7 +11,10 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Revit;
+using dosymep.WPF;
+using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.ViewModels;
 
@@ -20,7 +23,10 @@ using Parameter = Autodesk.Revit.DB.Parameter;
 using View = Autodesk.Revit.DB.View;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView {
-    public class PylonSheetInfo {
+    class PylonSheetInfo : BaseViewModel {
+
+        private bool _isCheck = false;
+
         internal PylonSheetInfo(MainViewModel mvm, RevitRepository repository, string pylonKeyName) {
             ViewModel = mvm;
             Repository = repository;
@@ -46,7 +52,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         internal RevitRepository Repository { get; set; }
         internal PylonSheetInfoManager Manager { get; set; }
 
-        public bool IsCheck { get; set; } = false;
+
+        public bool IsCheck {
+            get => _isCheck;
+            set => this.RaiseAndSetIfChanged(ref _isCheck, value);
+
+        }
+
         public bool SheetInProject { get; set; } = false;
 
         // Марка пилона 
