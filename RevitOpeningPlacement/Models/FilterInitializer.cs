@@ -183,6 +183,28 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
+        /// Возвращает фильтр по всем используемым категориям конструкций
+        /// </summary>
+        /// <returns></returns>
+        public static ElementMulticategoryFilter GetFilterByAllUsedStructureCategories() {
+            return new ElementMulticategoryFilter(new BuiltInCategory[] {
+                BuiltInCategory.OST_Walls,
+                BuiltInCategory.OST_Floors
+            });
+        }
+
+        /// <summary>
+        /// Возвращает фильтр по всем используемым категориям проемов
+        /// /// </summary>
+        /// <returns></returns>
+        public static ElementMulticategoryFilter GetFilterByAllUsedOpeningsCategories() {
+            return new ElementMulticategoryFilter(new BuiltInCategory[] {
+                BuiltInCategory.OST_Windows,
+                BuiltInCategory.OST_Doors
+            });
+        }
+
+        /// <summary>
         /// Создает фильтр по заданной категории элементов Revit с правилами фильтрации "больше или равно" заданных значений параметров
         /// </summary>
         /// <param name="name">Название фильтра</param>
