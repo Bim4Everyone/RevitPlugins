@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
+using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator {
@@ -37,6 +38,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Width = _openingTask.Width;
             Height = _openingTask.Height;
             Thickness = _openingTask.Thickness;
+            Status = _openingTask.Status.GetEnumDescription();
         }
 
 
@@ -94,6 +96,11 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// Толщина
         /// </summary>
         public string Thickness { get; } = string.Empty;
+
+        /// <summary>
+        /// Статус задания на отверстие
+        /// </summary>
+        public string Status { get; } = string.Empty;
 
 
 
