@@ -126,10 +126,13 @@ namespace RevitOpeningPlacement {
         private void GetOpeningsTaskInDocumentMEP(UIApplication uiApplication, RevitRepository revitRepository) {
             var outcomingTasks = revitRepository
                 .GetOpeningsMepTasksOutcoming()
-                .Select(famInst => new OpeningMepTaskOutcoming(famInst))
-                .Select(mepTaskOutcoming => new OpeningMepTaskOutcomingViewModel(mepTaskOutcoming))
-                .ToList();
-            var navigatorViewModel = new OpeningsMepTaskOutcomingViewModel(revitRepository, outcomingTasks);
+                .Select(famInst => new OpeningMepTaskOutcoming(famInst));
+            var openingTaskOutcomingViewModels = new List<OpeningMepTaskOutcomingViewModel>();
+            foreach(var outcomingTask in outcomingTasks) {
+                outcomingTask.UpdateStatus();
+                openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTask));
+            };
+            var navigatorViewModel = new OpeningsMepTaskOutcomingViewModel(revitRepository, openingTaskOutcomingViewModels);
 
             var window = new NavigatorMepOutcomingView() { Title = PluginName, DataContext = navigatorViewModel };
             var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };

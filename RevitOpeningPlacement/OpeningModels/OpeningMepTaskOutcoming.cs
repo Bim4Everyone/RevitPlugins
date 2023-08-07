@@ -35,6 +35,7 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         /// <summary>
         /// Создает экземпляр класса <see cref="OpeningMepTaskOutcoming"/>
+        /// <para>Примечание: конструткор не обновляет свойство <see cref="Status"/>. Для обновления этого свойства нужно вызвать <see cref="UpdateStatus"/></para>
         /// </summary>
         /// <param name="openingTaskOutcoming">Экземпляр семейства задания на отверстие, расположенного в текущем документе Revit</param>
         public OpeningMepTaskOutcoming(FamilyInstance openingTaskOutcoming) {
@@ -47,8 +48,6 @@ namespace RevitOpeningPlacement.OpeningModels {
             Description = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDescription);
             CenterOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetCenter);
             BottomOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetBottom);
-
-            UpdateStatus();
         }
 
         /// <summary>
@@ -111,7 +110,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
-        /// Обновляет <see cref="Status"/> задания на отверстие.
+        /// <para>Обновляет <see cref="Status"/> задания на отверстие.</para>
         /// 
         /// Обновление происходит по соотношению объема пересекаемого Solid задания на отверстие элементами инженерных систем из файла задания на отверстие и исходным Solid этого задания на отверстие.
         /// Если соотношение объемов >= 0.95, то статус <see cref="OpeningTaskOutcomingStatus.TooSmall"/>,
@@ -119,7 +118,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Если соотношение объемов в диапазоне (0; 0.2), то статус <see cref="OpeningTaskOutcomingStatus.TooBig"/>,
         /// Если соотношение объемов равно 0, то статус <see cref="OpeningTaskOutcomingStatus.Empty"/>.
         /// 
-        /// Если же объем Solid самого задания на отверстие равен 0, то статус <see cref="OpeningTaskOutcomingStatus.Invalid"/>
+        /// <para>Если же объем Solid самого задания на отверстие равен 0, то статус <see cref="OpeningTaskOutcomingStatus.Invalid"/></para>
         /// </summary>
         /// <param name="revitRepository"></param>
         public void UpdateStatus() {
