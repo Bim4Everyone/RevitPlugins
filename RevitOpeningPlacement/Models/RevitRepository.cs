@@ -450,7 +450,7 @@ namespace RevitOpeningPlacement.Models {
                 .OfCategory(BuiltInCategory.OST_RvtLinks)
                 .WhereElementIsElementType()
                 .OfClass(typeof(RevitLinkType))
-                .Where(link => RevitLinkType.IsLoaded(
+                .Where(link => !RevitLinkType.IsLoaded(
                                    _document,
                                    link.Id))
                 .Select(link => link.Name)
