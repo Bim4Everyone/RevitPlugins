@@ -126,52 +126,43 @@ namespace RevitOpeningPlacement.OpeningModels {
             if(!IsRemoved) {
                 var openingSolid = GetSolid();
                 if((openingSolid != null) && (openingSolid.Volume > 0)) {
-                    double openingVolume = openingSolid.Volume;
-                    var t = new FilteredElementCollector(GetDocument())
-                        .WherePasses(FiltersInitializer.GetFilterByAllUsedMepCategories())
-                        .WherePasses(new BoundingBoxIntersectsFilter(openingSolid.GetOutline()))
-                        .WherePasses(new ElementIntersectsSolidFilter(openingSolid));
-                    //TODO убрать разделение linq
-                    var intersectingMepSolids = t
-                        .Select(element => element.GetSolid())
-                        .ToList();
-                    double intersectingMepVolume = 0;
-                    if(Id == 6872355) {
-                        var tryu = 0;
+                    if(ThisOpeningTaskIntersectsOther(openingSolid)) {
+                        Status = OpeningTaskOutcomingStatus.Intersects;
+                        return;
                     }
+                    var intersectingMepSolids = GetIntersectingMepSolids(openingSolid);
+                    Solid openingSolidAfterIntersection = openingSolid;
                     foreach(var mepSolid in intersectingMepSolids) {
-                        Solid intersectedSolid;
                         try {
-                            //TODO вычитать солид MEP из солида, полученного в предыдущей итерации цикла сейчас объем для нескольких пересечений считается завышенным
-                            intersectedSolid = BooleanOperationsUtils.ExecuteBooleanOperation(openingSolid, mepSolid, BooleanOperationsType.Intersect);
+                            openingSolidAfterIntersection = BooleanOperationsUtils.ExecuteBooleanOperation(openingSolidAfterIntersection, mepSolid, BooleanOperationsType.Difference);
                         } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
                             try {
                                 // если один солид касается другого солида изнутри, то будет исключение InvalidOperationException
                                 // здесь производится попытка слегка подвинуть один из солидов, чтобы избежать этого касания
                                 double coordinateOffset = 0.001;
                                 var mepTransformedSolid = SolidUtils.CreateTransformed(mepSolid, Transform.CreateTranslation(new XYZ(coordinateOffset, coordinateOffset, coordinateOffset)));
-                                intersectedSolid = BooleanOperationsUtils.ExecuteBooleanOperation(openingSolid, mepTransformedSolid, BooleanOperationsType.Intersect);
+                                openingSolidAfterIntersection = BooleanOperationsUtils.ExecuteBooleanOperation(openingSolidAfterIntersection, mepTransformedSolid, BooleanOperationsType.Difference);
 
                             } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                                Status = OpeningTaskOutcomingStatus.Invalid;
-                                return;
+                                try {
+                                    // здесь производится попытка слегка подвинуть один из солидов в другую сторону
+                                    double coordinateOffset = -0.001;
+                                    var mepTransformedSolid = SolidUtils.CreateTransformed(mepSolid, Transform.CreateTranslation(new XYZ(coordinateOffset, coordinateOffset, coordinateOffset)));
+                                    openingSolidAfterIntersection = BooleanOperationsUtils.ExecuteBooleanOperation(openingSolidAfterIntersection, mepTransformedSolid, BooleanOperationsType.Difference);
+
+                                } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                                    Status = OpeningTaskOutcomingStatus.Invalid;
+                                    return;
+                                }
                             }
                         }
-                        if(intersectedSolid != null) {
-                            intersectingMepVolume += intersectedSolid.Volume;
-                        }
                     }
-
-                    double volumeRatio = intersectingMepVolume / openingVolume;
-                    if(0.95 <= volumeRatio) {
-                        Status = OpeningTaskOutcomingStatus.TooSmall;
-                    } else if((0.2 <= volumeRatio) && (volumeRatio < 0.95)) {
-                        Status = OpeningTaskOutcomingStatus.Correct;
-                    } else if((0 < volumeRatio) && (volumeRatio < 0.2)) {
-                        Status = OpeningTaskOutcomingStatus.TooBig;
-                    } else {
-                        Status = OpeningTaskOutcomingStatus.Empty;
+                    if(openingSolidAfterIntersection is null) {
+                        Status = OpeningTaskOutcomingStatus.Invalid;
+                        return;
                     }
+                    double volumeRatio = (openingSolid.Volume - openingSolidAfterIntersection.Volume) / openingSolid.Volume;
+                    Status = GetOpeningTaskOutcomingStatus(volumeRatio);
                 } else {
                     Status = OpeningTaskOutcomingStatus.Invalid;
                 }
@@ -298,6 +289,12 @@ namespace RevitOpeningPlacement.OpeningModels {
             return openingTasks.Select(t => new ElementId(t.Id)).ToList();
         }
 
+        /// <summary>
+        /// Возвращает строковое значение параметра по названию или пустую строку, если параметр отсутствует у текущего экземпляра семейства задания на отверстие
+        /// </summary>
+        /// <param name="paramName"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
         private string GetFamilyInstanceStringParamValueOrEmpty(string paramName) {
             if(_familyInstance is null) {
                 throw new ArgumentNullException(nameof(_familyInstance));
@@ -312,5 +309,65 @@ namespace RevitOpeningPlacement.OpeningModels {
             return value;
         }
 
+        /// <summary>
+        /// Возвращает статус задания на отверстие по отношению объема пересечения задания на отверстие с элементом инженерной системы к исходному объему задания на отверстие
+        /// </summary>
+        /// <param name="volumeRatio"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException">Исключение, если коэффициент отношения объемов меньше 0 или больше 1</exception>
+        private OpeningTaskOutcomingStatus GetOpeningTaskOutcomingStatus(double volumeRatio) {
+            if((volumeRatio < 0) || (volumeRatio > 1)) {
+                throw new ArgumentOutOfRangeException($"Значение параметра {nameof(volumeRatio)} должно находиться в интервале [0; 1]");
+            }
+            var status = OpeningTaskOutcomingStatus.Invalid;
+            if(0.95 <= volumeRatio) {
+                status = OpeningTaskOutcomingStatus.TooSmall;
+            } else if((0.2 <= volumeRatio) && (volumeRatio < 0.95)) {
+                status = OpeningTaskOutcomingStatus.Correct;
+            } else if((0 < volumeRatio) && (volumeRatio < 0.2)) {
+                status = OpeningTaskOutcomingStatus.TooBig;
+            } else {
+                status = OpeningTaskOutcomingStatus.Empty;
+            }
+            return status;
+        }
+
+        /// <summary>
+        /// Проверяет, пересекается ли данное задание на отверстие с другим заданием на отверстие из текущего документа
+        /// </summary>
+        /// <param name="thisOpeningTaskSolid"></param>
+        /// <returns></returns>
+        private bool ThisOpeningTaskIntersectsOther(Solid thisOpeningTaskSolid) {
+            if((thisOpeningTaskSolid is null) || (thisOpeningTaskSolid.Volume <= 0)) {
+                return false;
+            } else {
+                return new FilteredElementCollector(GetDocument())
+                    .Excluding(new ElementId[] { new ElementId(Id) })
+                    .OfCategory(BuiltInCategory.OST_GenericModel)
+                    .OfClass(typeof(FamilyInstance))
+                    .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningTaskSolid.GetOutline()))
+                    .WherePasses(new ElementIntersectsSolidFilter(thisOpeningTaskSolid))
+                    .Cast<FamilyInstance>()
+                    .Where(famInst => RevitRepository.FamilyName.Values.Contains(famInst.Symbol.FamilyName))
+                    .Count() > 0;
+            }
+        }
+
+        /// <summary>
+        /// Возвращает перечисление солидов элементов инженерных систем, которые пересекаются с данным заданием на отверстие, из текущего документа
+        /// </summary>
+        /// <param name="thisOpeningTaskSolid"></param>
+        /// <returns></returns>
+        private IEnumerable<Solid> GetIntersectingMepSolids(Solid thisOpeningTaskSolid) {
+            if((thisOpeningTaskSolid is null) || (thisOpeningTaskSolid.Volume <= 0)) {
+                return Enumerable.Empty<Solid>();
+            } else {
+                return new FilteredElementCollector(GetDocument())
+                    .WherePasses(FiltersInitializer.GetFilterByAllUsedMepCategories())
+                    .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningTaskSolid.GetOutline()))
+                    .WherePasses(new ElementIntersectsSolidFilter(thisOpeningTaskSolid))
+                    .Select(element => element.GetSolid());
+            }
+        }
     }
 }
