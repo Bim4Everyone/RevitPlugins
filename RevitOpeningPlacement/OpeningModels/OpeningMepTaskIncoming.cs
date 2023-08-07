@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -8,6 +10,7 @@ using dosymep.Revit.Geometry;
 using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models;
+using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels.Enums;
 
@@ -18,20 +21,29 @@ namespace RevitOpeningPlacement.OpeningModels {
     /// </summary>
     internal class OpeningMepTaskIncoming : ISolidProvider {
         /// <summary>
-        /// Экземпляр семейства задания на отверстие
+        /// Экземпляр семейства задания на отверстие из связанного файла
         /// </summary>
         private readonly FamilyInstance _familyInstance;
+
+        /// <summary>
+        /// Репозиторий текущего документа, в который подгружен связанный документ с заданиями на отверстия
+        /// </summary>
+        private readonly RevitRepository _revitRepository;
 
 
         /// <summary>
         /// Экземпляр семейства задания на отверстие, расположенного в связанном файле задания на отверстия
+        /// 
+        /// <para>Примечание: конструктор не обновляет свойство <see cref="Status"/>. Для обновления этого свойства надо вызвать <see cref="UpdateStatus"/></para>
         /// </summary>
         /// <param name="openingTaskIncoming">Экземпляр семейства задания на отверстие из связанного файла</param>
-        public OpeningMepTaskIncoming(FamilyInstance openingTaskIncoming) {
+        /// <param name="revitRepository">Репозиторий текущего документа, в который подгружен документ с заданиями на отверстия</param>
+        public OpeningMepTaskIncoming(FamilyInstance openingTaskIncoming, RevitRepository revitRepository) {
             if(openingTaskIncoming is null) {
                 throw new ArgumentNullException(nameof(openingTaskIncoming));
             }
             _familyInstance = openingTaskIncoming;
+            _revitRepository = revitRepository;
 
             Id = _familyInstance.Id.IntegerValue;
             Location = (_familyInstance.Location as LocationPoint).Point;
@@ -92,7 +104,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Статус отработки задания на отверстие
         /// </summary>
-        public OpeningTaskIncomingStatus Status { get; set; } = OpeningTaskIncomingStatus.NewTask;
+        public OpeningTaskIncomingStatus Status { get; set; } = OpeningTaskIncomingStatus.New;
 
 
         public FamilyInstance GetFamilyInstance() {
@@ -136,6 +148,50 @@ namespace RevitOpeningPlacement.OpeningModels {
                 }
             }
             return value;
+        }
+
+        public void UpdateStatus(IEnumerable<FamilyInstance> realOpenings) {
+            var openingsReal = GetOpeningsReal(realOpenings);
+            var intersectingStructureSolids = GetIntersectingStructureElementsSolids();
+            var intersectingOpeningsSolids = GetIntersectingOpeningsSolids(openingsReal);
+
+            if((intersectingStructureSolids.Count() == 0) && (intersectingOpeningsSolids.Count() == 0)) {
+                Status = OpeningTaskIncomingStatus.NoIntersection;
+            } else if((intersectingStructureSolids.Count() > 0) && (intersectingOpeningsSolids.Count() == 0)) {
+                Status = OpeningTaskIncomingStatus.New;
+            } else if((intersectingStructureSolids.Count() > 0) && (intersectingOpeningsSolids.Count() > 0)) {
+                Status = OpeningTaskIncomingStatus.NotMatch;
+            } else if((intersectingStructureSolids.Count() == 0) && (intersectingOpeningsSolids.Count() > 0)) {
+                Status = OpeningTaskIncomingStatus.Completed;
+            }
+        }
+
+        private IEnumerable<OpeningReal> GetOpeningsReal(IEnumerable<FamilyInstance> realOpenings) {
+            return realOpenings.Select(opening => new OpeningReal(opening));
+        }
+
+        private IEnumerable<Solid> GetIntersectingStructureElementsSolids() {
+            var thisOpeningSolid = GetSolid();
+            if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
+                return Enumerable.Empty<Solid>();
+            } else {
+                return new FilteredElementCollector(_revitRepository.Doc)
+                    .WherePasses(FiltersInitializer.GetFilterByAllUsedStructureCategories())
+                    .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningSolid.GetOutline()))
+                    .WherePasses(new ElementIntersectsSolidFilter(thisOpeningSolid))
+                    .Select(element => element.GetSolid());
+            }
+        }
+
+        private IEnumerable<Solid> GetIntersectingOpeningsSolids(IEnumerable<OpeningReal> realOpenings) {
+            var thisOpeningSolid = GetSolid();
+            if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
+                return Enumerable.Empty<Solid>();
+            } else {
+                return realOpenings
+                    .Where(realOpening => realOpening.IntersectsSolidProvider(this))
+                    .Select(realOpening => realOpening.GetSolid());
+            }
         }
     }
 }
