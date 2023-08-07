@@ -28,7 +28,7 @@ namespace RevitPylonDocumentation.Views {
             hostMarks.UnselectAll();
         }
         private void window_Loaded(object sender, RoutedEventArgs e) {
-            expander.MaxHeight = window.ActualHeight * 0.88;
+            expander.MaxHeight = window.ActualHeight * 0.83;
         }
 
         private void Grid_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e) {

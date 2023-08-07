@@ -18,7 +18,7 @@
     AllowsTransparency="True"
     WindowStyle="None"
     Background="Transparent"    
-    Height="510" MinHeight="510" MaxHeight="510"
+    Height="550" MinHeight="550" MaxHeight="550"
     Width="700" MinWidth="700" MaxWidth="700"
     
     
@@ -85,6 +85,8 @@
                     </TextBlock>
                     </Expander.Header>
 
+                    
+                    
                     <Grid FlowDirection="LeftToRight">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
@@ -93,20 +95,43 @@
 
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
-                                <GroupBox Margin="5 0">
+                                <GroupBox Margin="5 0 5 10">
                                     <GroupBox.Header>
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Grid.Row="0" 
                                             Margin="5 10 0 0"
                                             FontSize="14"
-                                            Text="Правила поиска параметров"/>
+                                            Text="Параметры пилона"/>
                                     </GroupBox.Header>
+                                    
                                     <StackPanel>
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Параметр раздела проекта"/>
+                                            Text="Параметр марки пилона"/>
+
+                                        <TextBox
+                                            Style="{StaticResource TextBoxStyle}"
+                                            HorizontalAlignment="Left" 
+                                            Margin="10 0"
+                                            Text="{Binding Path=ProjectSettings.MARK_TEMP, 
+                                            UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="460" Height="25"
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+                                        
+                                        
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Параметр комплекта документации пилона"/>
 
                                         <TextBox 
                                             Style="{StaticResource TextBoxStyle}"
@@ -156,7 +181,7 @@
                                         <TextBox 
                                             Style="{StaticResource TextBoxStyle}"
                                             HorizontalAlignment="Left" 
-                                            Margin="10 0"
+                                            Margin="10 0 10 10"
                                             Text="{Binding Path=ProjectSettings.TYPICAL_PYLON_FILTER_VALUE_TEMP, 
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
@@ -168,32 +193,20 @@
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </TextBox>
+                                    </StackPanel>
+                                </GroupBox>
 
 
-
+                                <GroupBox Margin="5 0 5 10">
+                                    <GroupBox.Header>
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="Параметр марки пилона"/>
-
-                                        <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
-                                            HorizontalAlignment="Left" 
-                                            Margin="10 0"
-                                            Text="{Binding Path=ProjectSettings.MARK_TEMP, 
-                                            UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="460" Height="25"
-                                            VerticalContentAlignment="Center">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="TextChanged">
-                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </TextBox>
-
-
-
+                                            Grid.Row="0" 
+                                            Margin="5 10 0 0"
+                                            FontSize="14"
+                                            Text="Параметры проекта"/>
+                                    </GroupBox.Header>
+                                    <StackPanel>
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Margin="10 10 0 5"
@@ -224,52 +237,8 @@
                                         <TextBox 
                                             Style="{StaticResource TextBoxStyle}"
                                             HorizontalAlignment="Left" 
-                                            Margin="10 0"
-                                            Text="{Binding Path=ProjectSettings.DISPATCHER_GROUPING_SECOND_TEMP,
-                                            UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="460" Height="25"
-                                            VerticalContentAlignment="Center">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="TextChanged">
-                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </TextBox>
-
-
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="Параметр для формата рамки листа"/>
-
-                                        <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
-                                            HorizontalAlignment="Left" 
-                                            Margin="10 0"
-                                            Text="{Binding Path=ProjectSettings.SHEET_SIZE_TEMP,
-                                            UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="460" Height="25"
-                                            VerticalContentAlignment="Center">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="TextChanged">
-                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </TextBox>
-
-
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="Параметр для множителя формата рамки листа"/>
-
-                                        <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
-                                            HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=ProjectSettings.SHEET_COEFFICIENT_TEMP,
+                                            Text="{Binding Path=ProjectSettings.DISPATCHER_GROUPING_SECOND_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -283,15 +252,15 @@
                                     </StackPanel>
                                 </GroupBox>
 
-
-                                <GroupBox Margin="5 0">
+                                
+                                <GroupBox Margin="5 0 5 10">
                                     <GroupBox.Header>
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Grid.Row="0" 
                                             Margin="5 10 0 0"
                                             FontSize="14"
-                                            Text="Правила поиска листов"/>
+                                            Text="Правила создания листов"/>
                                     </GroupBox.Header>
                                     
                                     <StackPanel>
@@ -299,10 +268,10 @@
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Маска поиска листа пилона"/>
+                                            Text="Маска имени листа пилона"/>
                                         
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBox 
+                                            <TextBox
                                                 Style="{StaticResource TextBoxStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="10 0 5 0"
@@ -372,26 +341,161 @@
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </ComboBox>
+
+
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Параметр для формата рамки листа"/>
+
+                                        <TextBox 
+                                            Style="{StaticResource TextBoxStyle}"
+                                            HorizontalAlignment="Left" 
+                                            Margin="10 0"
+                                            Text="{Binding Path=ProjectSettings.SHEET_SIZE_TEMP,
+                                            UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="460" Height="25"
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
+
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Параметр для множителя формата рамки листа"/>
+
+                                        <TextBox 
+                                            Style="{StaticResource TextBoxStyle}"
+                                            HorizontalAlignment="Left" 
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=ProjectSettings.SHEET_COEFFICIENT_TEMP,
+                                            UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="460" Height="25"
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
                                     </StackPanel>
                                 </GroupBox>
 
 
-                                <GroupBox Margin="5 0">
+
+
+
+                                <!-- Вертиальные виды -->
+                                <GroupBox Margin="5 0 5 10">
                                     <GroupBox.Header>
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Grid.Row="0" 
                                             Margin="5 10 0 0"
                                             FontSize="14"
-                                            Text="Правила поиска видов"/>
+                                            Text="Правила создания вертикальных видов"/>
                                     </GroupBox.Header>
-                                    
-                                    
+
+
                                     <StackPanel>
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Выберите шаблон основного вида:"/>
+                                            Text="Маска имени основного вида пилона"/>
+
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBox 
+                                                Style="{StaticResource TextBoxStyle}"
+                                                HorizontalAlignment="Left" 
+                                                Margin="10 0 5 0"
+                                                Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_PREFIX_TEMP,
+                                                UpdateSourceTrigger=PropertyChanged}" 
+                                                Width="174" Height="25"
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
+
+                                            <TextBlock 
+                                                Style="{StaticResource TextBlockStyle}"
+                                                Text="Марка пилона"/>
+
+                                            <TextBox 
+                                                Style="{StaticResource TextBoxStyle}"
+                                                HorizontalAlignment="Left" 
+                                                Margin="5 0 10 0"
+                                                Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_SUFFIX_TEMP,
+                                                UpdateSourceTrigger=PropertyChanged}" 
+                                                Width="174" Height="25"
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
+                                        </StackPanel>
+
+
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Маска имени бокового вида пилона"/>
+
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBox 
+                                                Style="{StaticResource TextBoxStyle}"
+                                                HorizontalAlignment="Left" 
+                                                Margin="10 0 5 0"
+                                                Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP,
+                                                UpdateSourceTrigger=PropertyChanged}" 
+                                                Width="174" Height="25"
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
+
+                                            <TextBlock 
+                                                Style="{StaticResource TextBlockStyle}"
+                                                Text="Марка пилона"/>
+
+                                            <TextBox 
+                                                Style="{StaticResource TextBoxStyle}"
+                                                HorizontalAlignment="Left" 
+                                                Margin="5 0 10 0"
+                                                Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_SUFFIX_TEMP,
+                                                UpdateSourceTrigger=PropertyChanged}" 
+                                                Width="174" Height="25"
+                                                VerticalContentAlignment="Center">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="TextChanged">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
+                                        </StackPanel>
+
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Выберите шаблон основного и бокового вида:"/>
 
                                         <ComboBox 
                                             Style="{StaticResource ComboBoxStyle}"
@@ -400,37 +504,6 @@
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=ViewTemplatesInPj}" 
                                             SelectedItem="{Binding Path=SelectedGeneralViewTemplate}">
-                                            <ComboBox.ItemTemplate>
-                                                <DataTemplate>
-                                                    <TextBlock>
-                                                        <TextBlock.Text>
-                                                            <Binding Path="Name"/>
-                                                        </TextBlock.Text>
-                                                    </TextBlock>
-                                                </DataTemplate>
-                                            </ComboBox.ItemTemplate>
-
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="SelectionChanged">
-                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </ComboBox>
-
-
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="Выберите шаблон поперечного вида:"/>
-
-                                        <ComboBox 
-                                            Style="{StaticResource ComboBoxStyle}"
-                                            Margin="10 0 10 10"
-                                            Width="460" Height="25"
-                                            HorizontalAlignment="Left"
-                                            ItemsSource="{Binding Path=ViewTemplatesInPj}" 
-                                            SelectedItem="{Binding Path=SelectedTransverseViewTemplate}">
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
                                                     <TextBlock>
@@ -511,7 +584,7 @@
                                             </i:Interaction.Triggers>
                                         </ComboBox>
 
-                                        
+
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Margin="10 10 0 5"
@@ -578,144 +651,28 @@
                                             </i:Interaction.Triggers>
                                         </TextBox>
 
+                                    </StackPanel>
+                                </GroupBox>
+
+
+                                <!-- Горизонтальные виды -->
+                                <GroupBox Margin="5 0 5 10">
+                                    <GroupBox.Header>
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Grid.Row="0" 
+                                            Margin="5 10 0 0"
+                                            FontSize="14"
+                                            Text="Правила создания горизонтальных видов"/>
+                                    </GroupBox.Header>
+                                    
+                                    
+                                    <StackPanel>
 
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Отступ по X у поперечного вида"/>
-
-                                        <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
-                                            HorizontalAlignment="Left" 
-                                            Margin="10 0 10 10"
-                                            Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_X_OFFSET_TEMP,
-                                            UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="460" Height="25"
-                                            VerticalContentAlignment="Center">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="TextChanged">
-                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </TextBox>
-
-
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="Отступ по Y у поперечного вида"/>
-
-                                        <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
-                                            HorizontalAlignment="Left" 
-                                            Margin="10 0 10 10"
-                                            Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET_TEMP,
-                                            UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="460" Height="25"
-                                            VerticalContentAlignment="Center">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="TextChanged">
-                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </TextBox>
-
-
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="Маска поиска основного вида пилона"/>
-
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBox 
-                                                Style="{StaticResource TextBoxStyle}"
-                                                HorizontalAlignment="Left" 
-                                                Margin="10 0 5 0"
-                                                Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_PREFIX_TEMP,
-                                                UpdateSourceTrigger=PropertyChanged}" 
-                                                Width="174" Height="25"
-                                                VerticalContentAlignment="Center">
-                                                <i:Interaction.Triggers>
-                                                    <i:EventTrigger EventName="TextChanged">
-                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                    </i:EventTrigger>
-                                                </i:Interaction.Triggers>
-                                            </TextBox>
-
-                                            <TextBlock 
-                                                Style="{StaticResource TextBlockStyle}"
-                                                Text="Марка пилона"/>
-
-                                            <TextBox 
-                                                Style="{StaticResource TextBoxStyle}"
-                                                HorizontalAlignment="Left" 
-                                                Margin="5 0 10 0"
-                                                Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_SUFFIX_TEMP,
-                                                UpdateSourceTrigger=PropertyChanged}" 
-                                                Width="174" Height="25"
-                                                VerticalContentAlignment="Center">
-                                                <i:Interaction.Triggers>
-                                                    <i:EventTrigger EventName="TextChanged">
-                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                    </i:EventTrigger>
-                                                </i:Interaction.Triggers>
-                                            </TextBox>
-                                        </StackPanel>
-
-
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="Маска поиска основного перпендикулярного вида пилона"/>
-
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBox 
-                                                Style="{StaticResource TextBoxStyle}"
-                                                HorizontalAlignment="Left" 
-                                                Margin="10 0 5 0"
-                                                Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP,
-                                                UpdateSourceTrigger=PropertyChanged}" 
-                                                Width="174" Height="25"
-                                                VerticalContentAlignment="Center">
-                                                <i:Interaction.Triggers>
-                                                    <i:EventTrigger EventName="TextChanged">
-                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                    </i:EventTrigger>
-                                                </i:Interaction.Triggers>
-                                            </TextBox>
-
-                                            <TextBlock 
-                                                Style="{StaticResource TextBlockStyle}"
-                                                Text="Марка пилона"/>
-
-                                            <TextBox 
-                                                Style="{StaticResource TextBoxStyle}"
-                                                HorizontalAlignment="Left" 
-                                                Margin="5 0 10 0"
-                                                Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_SUFFIX_TEMP,
-                                                UpdateSourceTrigger=PropertyChanged}" 
-                                                Width="174" Height="25"
-                                                VerticalContentAlignment="Center">
-                                                <i:Interaction.Triggers>
-                                                    <i:EventTrigger EventName="TextChanged">
-                                                        <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                    </i:EventTrigger>
-                                                </i:Interaction.Triggers>
-                                            </TextBox>
-                                        </StackPanel>
-
-
-
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="Маска поиска первого поперечного вида пилона"/>
+                                            Text="Маска имени первого горизонтального вида пилона"/>
 
 
                                         <StackPanel Orientation="Horizontal">
@@ -760,7 +717,7 @@
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Маска поиска второго поперечного вида пилона"/>
+                                            Text="Маска имени второго горизонтального вида пилона"/>
 
                                         <StackPanel Orientation="Horizontal">
                                             <TextBox 
@@ -805,7 +762,7 @@
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Маска поиска третьего поперечного вида пилона"/>
+                                            Text="Маска имени третьего горизонтального вида пилона"/>
 
 
                                         <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
@@ -845,25 +802,183 @@
                                                 </i:Interaction.Triggers>
                                             </TextBox>
                                         </StackPanel>
+
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Выберите шаблон горизонтального вида:"/>
+
+                                        <ComboBox 
+                                            Style="{StaticResource ComboBoxStyle}"
+                                            Margin="10 0 10 10"
+                                            Width="460" Height="25"
+                                            HorizontalAlignment="Left"
+                                            ItemsSource="{Binding Path=ViewTemplatesInPj}" 
+                                            SelectedItem="{Binding Path=SelectedTransverseViewTemplate}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock>
+                                                        <TextBlock.Text>
+                                                            <Binding Path="Name"/>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </ComboBox>
+
+
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Выберите типоразмер для создаваемых видов:"/>
+
+                                        <ComboBox 
+                                            Style="{StaticResource ComboBoxStyle}"
+                                            Margin="10 0 10 10"
+                                            Width="460" Height="25"
+                                            HorizontalAlignment="Left"
+                                            ItemsSource="{Binding Path=ViewFamilyTypes}" 
+                                            SelectedItem="{Binding Path=SelectedViewFamilyType}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock>
+                                                        <TextBlock.Text>
+                                                            <Binding Path="Name"/>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </ComboBox>
+
+
+
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Отступ по X у горизонтального вида"/>
+
+                                        <TextBox 
+                                            Style="{StaticResource TextBoxStyle}"
+                                            HorizontalAlignment="Left" 
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_X_OFFSET_TEMP,
+                                            UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="460" Height="25"
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
+
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Отступ по Y у горизонтального вида"/>
+
+                                        <TextBox 
+                                            Style="{StaticResource TextBoxStyle}"
+                                            HorizontalAlignment="Left" 
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET_TEMP,
+                                            UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="460" Height="25"
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
                                     </StackPanel>
                                 </GroupBox>
 
 
-                                <GroupBox Margin="5">
+
+                                <!-- Легенда примечания -->
+                                <GroupBox Margin="5 0 5 10">
                                     <GroupBox.Header>
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Grid.Row="0" 
                                             Margin="5 10 0 0"
                                             FontSize="14"
-                                            Text="Правила поиска спецификаций"/>
+                                            Text="Правила создания легенды примечания"/>
+                                    </GroupBox.Header>
+
+
+                                    <StackPanel>
+
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Выберите легенду примечания:"/>
+
+                                        <ComboBox 
+                                            Style="{StaticResource ComboBoxStyle}"
+                                            Margin="10 0 10 10"
+                                            Width="460" Height="25"
+                                            HorizontalAlignment="Left"
+                                            ItemsSource="{Binding Path=Legends}" 
+                                            SelectedItem="{Binding Path=SelectedLegend}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock>
+                                                        <TextBlock.Text>
+                                                            <Binding Path="Name"/>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </ComboBox>
+
+                                    </StackPanel>
+                                </GroupBox>
+
+
+
+                                <!-- Спека армирования -->
+                                <GroupBox Margin="5 0 5 10">
+                                    <GroupBox.Header>
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Grid.Row="0" 
+                                            Margin="5 10 0 0"
+                                            FontSize="14"
+                                            Text="Правила создания спецификации армирования"/>
                                     </GroupBox.Header>
 
                                     <StackPanel>
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Маска поиска спецификации армирования"/>
+                                            Text="Маска имени спецификации армирования"/>
 
                                         <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
                                             <TextBox 
@@ -907,7 +1022,93 @@
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Маска поиска спецификации материалов"/>
+                                            Text="Имя для поиска эталонной спецификации армирования"/>
+
+                                        <TextBox 
+                                            Style="{StaticResource TextBoxStyle}"
+                                            HorizontalAlignment="Left" 
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_NAME_TEMP,
+                                            UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="460" Height="25"
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
+
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="В параметр для группировки диспетчера 1"/>
+
+                                        <TextBox 
+                                            Style="{StaticResource TextBoxStyle}"
+                                            HorizontalAlignment="Left" 
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_DISP1_TEMP,
+                                            UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="460" Height="25"
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
+
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="В параметр для группировки диспетчера 2"/>
+
+                                        <TextBox 
+                                            Style="{StaticResource TextBoxStyle}"
+                                            HorizontalAlignment="Left" 
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_DISP2_TEMP,
+                                            UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="460" Height="25"
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
+
+
+
+
+                                    </StackPanel>
+                                </GroupBox>
+
+
+                                <!-- Спека материалов -->
+                                <GroupBox Margin="5 0 5 10">
+                                    <GroupBox.Header>
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Grid.Row="0" 
+                                            Margin="5 10 0 0"
+                                            FontSize="14"
+                                            Text="Правила создания спецификации материалов"/>
+                                    </GroupBox.Header>
+
+                                    <StackPanel>
+
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Маска имени спецификации материалов"/>
 
                                         <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
                                             <TextBox 
@@ -948,10 +1149,91 @@
                                         </StackPanel>
 
 
+
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 5 0 5"
+                                            Text="Имя для поиска эталонной спецификации материалов"/>
+
+                                        <TextBox 
+                                            Style="{StaticResource TextBoxStyle}"
+                                            HorizontalAlignment="Left" 
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_NAME_TEMP,
+                                            UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="460" Height="25"
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
+
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Маска поиска ведомости системных деталей"/>
+                                            Text="В параметр для группировки диспетчера 1"/>
+
+                                        <TextBox 
+                                            Style="{StaticResource TextBoxStyle}"
+                                            HorizontalAlignment="Left" 
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_DISP1_TEMP,
+                                            UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="460" Height="25"
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
+
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="В параметр для группировки диспетчера 2"/>
+
+                                        <TextBox 
+                                            Style="{StaticResource TextBoxStyle}"
+                                            HorizontalAlignment="Left" 
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_DISP2_TEMP,
+                                            UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="460" Height="25"
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+                                    </StackPanel>
+                                </GroupBox>
+
+
+                                <!-- Ведомость системных деталей -->
+                                <GroupBox Margin="5 0 5 10">
+                                    <GroupBox.Header>
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Grid.Row="0" 
+                                            Margin="5 10 0 0"
+                                            FontSize="14"
+                                            Text="Правила создания ведомости системных деталей"/>
+                                    </GroupBox.Header>
+
+                                    <StackPanel>
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Маска имени ведомости системных деталей"/>
 
                                         <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
                                             <TextBox 
@@ -992,10 +1274,93 @@
                                         </StackPanel>
 
 
+
+
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Маска поиска ведомости IFC деталей"/>
+                                            Text="Имя для поиска эталонной ведомости системных деталей"/>
+
+                                        <TextBox 
+                                            Style="{StaticResource TextBoxStyle}"
+                                            HorizontalAlignment="Left" 
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_NAME_TEMP,
+                                            UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="460" Height="25"
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
+
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="В параметр для группировки диспетчера 1"/>
+
+                                        <TextBox 
+                                            Style="{StaticResource TextBoxStyle}"
+                                            HorizontalAlignment="Left" 
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP1_TEMP,
+                                            UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="460" Height="25"
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
+
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="В параметр для группировки диспетчера 2"/>
+
+                                        <TextBox 
+                                            Style="{StaticResource TextBoxStyle}"
+                                            HorizontalAlignment="Left" 
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP2_TEMP,
+                                            UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="460" Height="25"
+                                            VerticalContentAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
+                                    </StackPanel>
+                                </GroupBox>
+
+
+                                <!-- Ведомость IFC деталей -->
+                                <GroupBox Margin="5 0 5 10">
+                                    <GroupBox.Header>
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Grid.Row="0" 
+                                            Margin="5 10 0 0"
+                                            FontSize="14"
+                                            Text="Правила создания ведомости IFC-деталей"/>
+                                    </GroupBox.Header>
+
+                                    <StackPanel>
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Маска имени ведомости IFC деталей"/>
 
                                         <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
                                             <TextBox 
@@ -1037,208 +1402,12 @@
 
 
 
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="Имя для поиска спецификации армирования"/>
-
-                                        <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
-                                            HorizontalAlignment="Left" 
-                                            Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_NAME_TEMP,
-                                            UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="460" Height="25"
-                                            VerticalContentAlignment="Center">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="TextChanged">
-                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </TextBox>
 
 
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Margin="10 10 0 5"
-                                            Text="В параметр диспетчера 1"/>
-
-                                        <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
-                                            HorizontalAlignment="Left" 
-                                            Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_DISP1_TEMP,
-                                            UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="460" Height="25"
-                                            VerticalContentAlignment="Center">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="TextChanged">
-                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </TextBox>
-
-
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="В параметр диспетчера 2"/>
-
-                                        <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
-                                            HorizontalAlignment="Left" 
-                                            Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_DISP2_TEMP,
-                                            UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="460" Height="25"
-                                            VerticalContentAlignment="Center">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="TextChanged">
-                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </TextBox>
-
-
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="Имя для поиска спецификации материалов"/>
-
-                                        <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
-                                            HorizontalAlignment="Left" 
-                                            Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_NAME_TEMP,
-                                            UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="460" Height="25"
-                                            VerticalContentAlignment="Center">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="TextChanged">
-                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </TextBox>
-
-
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="В параметр диспетчера 1"/>
-
-                                        <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
-                                            HorizontalAlignment="Left" 
-                                            Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_DISP1_TEMP,
-                                            UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="460" Height="25"
-                                            VerticalContentAlignment="Center">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="TextChanged">
-                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </TextBox>
-
-
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="В параметр диспетчера 2"/>
-
-                                        <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
-                                            HorizontalAlignment="Left" 
-                                            Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_DISP2_TEMP,
-                                            UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="460" Height="25"
-                                            VerticalContentAlignment="Center">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="TextChanged">
-                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </TextBox>
-
-
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="Имя для поиска ведомости системных деталей"/>
-
-                                        <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
-                                            HorizontalAlignment="Left" 
-                                            Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_NAME_TEMP,
-                                            UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="460" Height="25"
-                                            VerticalContentAlignment="Center">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="TextChanged">
-                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </TextBox>
-
-
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="В параметр диспетчера 1"/>
-
-                                        <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
-                                            HorizontalAlignment="Left" 
-                                            Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP1_TEMP,
-                                            UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="460" Height="25"
-                                            VerticalContentAlignment="Center">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="TextChanged">
-                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </TextBox>
-
-                                        
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="В параметр диспетчера 2"/>
-
-                                        <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
-                                            HorizontalAlignment="Left" 
-                                            Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP2_TEMP,
-                                            UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="460" Height="25"
-                                            VerticalContentAlignment="Center">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="TextChanged">
-                                                    <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
-                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </TextBox>
-
-
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
-                                            Margin="10 10 0 5"
-                                            Text="Имя для поиска ведомости IFC деталей"/>
+                                            Text="Имя для поиска эталонной ведомости IFC деталей"/>
 
                                         <TextBox 
                                             Style="{StaticResource TextBoxStyle}"
@@ -1260,7 +1429,7 @@
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Margin="10 10 0 5"
-                                            Text="В параметр диспетчера 1"/>
+                                            Text="В параметр для группировки диспетчера 1"/>
 
                                         <TextBox 
                                             Style="{StaticResource TextBoxStyle}"
@@ -1282,7 +1451,7 @@
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Margin="10 10 0 5"
-                                            Text="В параметр диспетчера 2"/>
+                                            Text="В параметр для группировки диспетчера 2"/>
 
                                         <TextBox 
                                             Style="{StaticResource TextBoxStyle}"
@@ -1301,10 +1470,25 @@
                                         </TextBox>
 
 
+                                    </StackPanel>
+                                </GroupBox>
+
+
+                                <GroupBox Margin="5 0 5 10">
+                                    <GroupBox.Header>
+                                        <TextBlock 
+                                            Style="{StaticResource TextBlockStyle}"
+                                            Grid.Row="0" 
+                                            Margin="5 10 0 0"
+                                            FontSize="14"
+                                            Text="Правила фильтров в спецификациях"/>
+                                    </GroupBox.Header>
+
+                                    <StackPanel>
                                         <TextBlock 
                                             Style="{StaticResource TextBlockStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Список параметров фильтрации для спеки"/>
+                                            Text="Список параметров фильтрации для спецификаций"/>
 
 
                                         <ListView
@@ -1405,16 +1589,16 @@
                         </ScrollViewer>
 
 
-                        <Button 
+                        <Button
                             Style="{StaticResource SimpleButtonStyle}"
                             Grid.Row="4" 
                             Margin="5 5 5 10"
                             Height="30"
                             Content="Применить"
-                            Command="{Binding Path=ApplySettingsCommands}">
+                            Command="{Binding Path=ApplySettingsCommand}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="MouseLeave">
-                                    <i:InvokeCommandAction Command="{Binding CheckSettingsCommands}" />
+                                    <i:InvokeCommandAction Command="{Binding CheckSettingsCommand}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </Button>
@@ -1430,7 +1614,7 @@
                     <RowDefinition Height="50" />
                     <RowDefinition Height="30" />
                     <RowDefinition Height="30" />
-                    <RowDefinition Height="315" />
+                    <RowDefinition Height="355" />
                     <RowDefinition Height="50" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -1628,16 +1812,16 @@
                         </Grid.ColumnDefinitions>
 
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
                         <CheckBox  
@@ -1660,7 +1844,7 @@
                             Grid.Row="1"
                             Grid.Column="1"
                             Style="{StaticResource TextBlockStyle}"
-                            Text="Основной перпендикулярный вид"/>
+                            Text="Боковой вид"/>
 
                         <CheckBox  
                             Grid.Row="2"
@@ -1671,7 +1855,7 @@
                             Grid.Row="2"
                             Grid.Column="1"
                             Style="{StaticResource TextBlockStyle}"
-                            Text="Первый поперечный вид"/>
+                            Text="Первый горизонтальный вид"/>
 
                         <CheckBox  
                             Grid.Row="3"
@@ -1682,7 +1866,7 @@
                             Grid.Row="3"
                             Grid.Column="1"
                             Style="{StaticResource TextBlockStyle}"
-                            Text="Второй поперечный вид"/>
+                            Text="Второй горизонтальный вид"/>
 
                         <CheckBox  
                             Grid.Row="4"
@@ -1693,7 +1877,7 @@
                             Grid.Row="4"
                             Grid.Column="1"
                             Style="{StaticResource TextBlockStyle}"
-                            Text="Третий поперечный вид"/>
+                            Text="Третий горизонтальный вид"/>
 
                         <CheckBox  
                             Grid.Row="5"
@@ -1771,7 +1955,7 @@
 
                     <Button
                         Style="{StaticResource SimpleButtonStyle}"
-                    
+                        
                         Margin="5 10"
                         Width="80"
                         Content="ОК"
@@ -1780,7 +1964,7 @@
 
                     <Button
                         Style="{StaticResource SimpleButtonStyle}"
-                    
+                        
                         Margin="5 10 10 10"
                         Width="80"
                         Content="Отмена"

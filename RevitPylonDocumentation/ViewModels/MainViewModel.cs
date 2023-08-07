@@ -81,8 +81,8 @@ namespace RevitPylonDocumentation.ViewModels {
 
             SelectPylonCommand = RelayCommand.Create(SelectPylon);
 
-            ApplySettingsCommands = RelayCommand.Create(ApplySettings, CanApplySettings);
-            CheckSettingsCommands = RelayCommand.Create(CheckSettings);
+            ApplySettingsCommand = RelayCommand.Create(ApplySettings, CanApplySettings);
+            CheckSettingsCommand = RelayCommand.Create(CheckSettings);
             GetHostMarksInGUICommand = RelayCommand.Create(GetHostMarksInGUI);
 
             AddScheduleFilterParamCommand = RelayCommand.Create(AddScheduleFilterParam);
@@ -101,8 +101,8 @@ namespace RevitPylonDocumentation.ViewModels {
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
-        public ICommand ApplySettingsCommands { get; }
-        public ICommand CheckSettingsCommands { get; }
+        public ICommand ApplySettingsCommand { get; }
+        public ICommand CheckSettingsCommand { get; }
         public ICommand GetHostMarksInGUICommand { get; }
         public ICommand AddScheduleFilterParamCommand { get; }
         public ICommand DeleteScheduleFilterParamCommand { get; }
@@ -854,6 +854,19 @@ namespace RevitPylonDocumentation.ViewModels {
                     SelectedProjectSection = ProjectSections.FirstOrDefault();
                 }
             }
+
+            SelectionSettings.NeedWorkWithGeneralView = false;
+            SelectionSettings.NeedWorkWithGeneralPerpendicularView = false;
+            SelectionSettings.NeedWorkWithTransverseViewFirst = false;
+            SelectionSettings.NeedWorkWithTransverseViewSecond = false;
+            SelectionSettings.NeedWorkWithTransverseViewThird = false;
+
+            SelectionSettings.NeedWorkWithRebarSchedule = false;
+            SelectionSettings.NeedWorkWithMaterialSchedule = false;
+            SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
+            SelectionSettings.NeedWorkWithIFCPartsSchedule = false;
+            SelectionSettings.NeedWorkWithLegend = false;
+
 
             MainWindow mainWindow = new MainWindow();
             mainWindow.DataContext = this;
