@@ -1,0 +1,10 @@
+title:
+  ru: ${{ gen.plugin_name_rus }}
+  en_us: ${{ gen.plugin_name_en_us }}
+
+tooltip:
+  ru: >- ${{ gen.plugin_description_rus }}
+  en_us: >- ${{ gen.plugin_description_en_us }}
+
+assembly: ${{ gen.plugin_name }}.dll
+command_class: ${{ gen.plugin_command }}
