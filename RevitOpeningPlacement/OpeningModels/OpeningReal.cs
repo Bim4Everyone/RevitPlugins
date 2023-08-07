@@ -28,6 +28,8 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="openingReal">Экземпляр семейства чистового отверстия, идущего на чертежи</param>
         public OpeningReal(FamilyInstance openingReal) {
+            if(openingReal is null) { throw new ArgumentNullException(nameof(openingReal)); }
+            if(openingReal.Host is null) { throw new ArgumentException($"{nameof(openingReal)} с Id {openingReal.Id} не содержит ссылки на хост элемент"); }
             _familyInstance = openingReal;
             Id = _familyInstance.Id.IntegerValue;
         }
@@ -71,11 +73,11 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Возвращает хост экземпляра семейства отверстия
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="NullReferenceException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
         private Element GetHost() {
             var host = _familyInstance.Host;
             if(host is null) {
-                throw new NullReferenceException($"Хост элемента с Id: {_familyInstance.Id} - null");
+                throw new ArgumentNullException($"Хост элемента с Id: {_familyInstance.Id} - null");
             }
             return host;
         }
