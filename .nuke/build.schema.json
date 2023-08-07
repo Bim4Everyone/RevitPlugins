@@ -74,7 +74,7 @@
             "enum": [
               "Clean",
               "Compile",
-              "CreateProject",
+              "CreatePlugin",
               "CreateScript",
               "FullClean",
               "FullCompile",
@@ -85,7 +85,7 @@
         },
         "Solution": {
           "type": "string",
-          "description": "Path to a solution file that is automatically loaded. Default is RevitPlugins.sln"
+          "description": "Path to a solution file that is automatically loaded"
         },
         "Target": {
           "type": "array",
@@ -95,7 +95,7 @@
             "enum": [
               "Clean",
               "Compile",
-              "CreateProject",
+              "CreatePlugin",
               "CreateScript",
               "FullClean",
               "FullCompile",

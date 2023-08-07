@@ -12,7 +12,7 @@ interface ICommonParams : INukeBuild {
     IEnumerable<RevitConfiguration> DebugConfigurations => RevitConfiguration.GetDebugConfiguration();
     IEnumerable<RevitConfiguration> ReleaseConfigurations => RevitConfiguration.GetReleaseConfiguration();
     
-    [Solution("RevitPlugins.sln")] Solution Solution => TryGetValue(() => Solution);
+    [Solution] Solution Solution => TryGetValue(() => Solution);
     [GitVersion] GitVersion GitVersion => TryGetValue(() => GitVersion);
     [Parameter("Output")] AbsolutePath Output => TryGetValue(() => Output) ?? RootDirectory / "bin";
     

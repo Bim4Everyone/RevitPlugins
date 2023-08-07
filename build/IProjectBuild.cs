@@ -27,7 +27,7 @@ interface IProjectBuild : ICommonParams, IPluginParams {
                     .SetConfiguration(config)
                     .SetSimpleVersion(GitVersion, config)));
         });
-
+    
     Target Publish => _ => _
         .DependsOn(Clean)
         .Requires(() => Output)

@@ -15,7 +15,7 @@ interface IProjectCreate : ICommonParams, IPluginParams {
 
     AbsolutePath ScriptTemplatePath => RootDirectory / ".github" / "templates" / "default.yml";
     AbsolutePath PluginScriptPath => RootDirectory / ".github" / "workflows" / $"{PluginName}.yml";
-    
+
     AbsolutePath ProjectPath => RootDirectory / PluginName / $"{PluginName}.csproj";
     AbsolutePath TemplatePath => RootDirectory / "RevitPlugins" / "RevitPlugins.csproj";
 
@@ -29,11 +29,11 @@ interface IProjectCreate : ICommonParams, IPluginParams {
             PluginScriptPath.WriteAllText(content);
         });
 
-    Target CreateProject => _ => _
+    Target CreatePlugin => _ => _
         .DependsOn(CreateScript)
         .Requires(() => Output)
         .Requires(() => PluginName)
-        .OnlyWhenStatic(() => Solution.GetProject(PluginName) == null, $"Плагин \"{PluginName}\" уже существует.")
+        .OnlyWhenDynamic(() => Solution.GetProject(PluginName) == null, $"Плагин \"{PluginName}\" уже существует.")
         .Executes(() => {
             CopyDirectory(PluginTemplatePath, RootDirectory / PluginName);
             
