@@ -93,9 +93,15 @@ namespace RevitOpeningPlacement {
             }
             var incomingTasks = revitRepository
                 .GetOpeningMepTasksIncoming()
-                .Select(famInst => new OpeningMepTaskIncomingViewModel(new OpeningMepTaskIncoming(famInst)))
-                .ToList();
-            var navigatorViewModel = new OpeningsMepTaskIncomingViewModel(revitRepository, incomingTasks);
+                .Select(famInst => new OpeningMepTaskIncoming(famInst, revitRepository));
+            var realOpenings = revitRepository.GetRealOpenings();
+
+            var incomingTasksViewModels = new List<OpeningMepTaskIncomingViewModel>();
+            foreach(var incomingTask in incomingTasks) {
+                incomingTask.UpdateStatus(realOpenings);
+                incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTask));
+            };
+            var navigatorViewModel = new OpeningsMepTaskIncomingViewModel(revitRepository, incomingTasksViewModels);
 
             var window = new NavigatorMepIncomingView() { Title = PluginName, DataContext = navigatorViewModel };
             var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
