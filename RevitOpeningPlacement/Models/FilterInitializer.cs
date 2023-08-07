@@ -170,6 +170,9 @@ namespace RevitOpeningPlacement.Models {
 
                 BuiltInCategory.OST_DuctCurves,
                 BuiltInCategory.OST_DuctFitting,
+                BuiltInCategory.OST_DuctAccessory,
+                BuiltInCategory.OST_DuctTerminal,
+                BuiltInCategory.OST_MechanicalEquipment,
 
                 BuiltInCategory.OST_CableTray,
                 BuiltInCategory.OST_CableTrayFitting,
