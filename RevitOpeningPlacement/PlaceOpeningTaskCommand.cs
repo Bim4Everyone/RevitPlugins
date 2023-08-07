@@ -40,6 +40,9 @@ namespace RevitOpeningPlacement {
         protected override void Execute(UIApplication uiApplication) {
             _duplicatedInstancesIds.Clear();
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
+            if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
+                throw new OperationCanceledException();
+            }
             if(!CheckModel(revitRepository)) {
                 return;
             }
