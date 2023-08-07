@@ -138,6 +138,7 @@
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
                 <dxg:GridColumn ReadOnly="True" Width="0" Header="Файл" IsSmart="True" FieldName="FileName"/>
+                <dxg:GridColumn ReadOnly="True" Width="0" Header="Статус" IsSmart="True" FieldName="Status"/>
                 <dxg:GridColumn ReadOnly="True" Width="0" Header="Дата" IsSmart="True" FieldName="Date"/>
                 <dxg:GridColumn ReadOnly="True" Width="60" Header="Диаметр" FieldName="Diameter"/>
                 <dxg:GridColumn ReadOnly="True" Width="60" Header="Ширина" FieldName="Width"/>
