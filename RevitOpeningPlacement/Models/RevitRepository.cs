@@ -425,6 +425,19 @@ namespace RevitOpeningPlacement.Models {
                 .ToList();
         }
 
+        /// <summary>
+        /// Возвращает перечисление чистовых экземпляров семейств отверстий из текущего документа Revit
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<FamilyInstance> GetRealOpenings() {
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .WherePasses(FiltersInitializer.GetFilterByAllUsedOpeningsCategories())
+                .OfClass(typeof(FamilyInstance))
+                .Cast<FamilyInstance>()
+                ;
+        }
+
 
         /// <summary>
         /// Возвращает список экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит ("исходящие" задания).
