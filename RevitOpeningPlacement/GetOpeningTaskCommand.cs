@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Windows;
 using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
@@ -89,18 +88,8 @@ namespace RevitOpeningPlacement {
         /// <param name="uiApplication"></param>
         /// <param name="revitRepository"></param>
         private void GetIncomingTaskInDocAR(UIApplication uiApplication, RevitRepository revitRepository) {
-            var notLoadedLinksNames = revitRepository.GetRevitLinkNotLoadedNames();
-            if(notLoadedLinksNames.Count > 0) {
-                var dialog = GetPlatformService<IMessageBoxService>();
-                if(dialog.Show(
-                    $"Связи:\n{string.Join(";\n", notLoadedLinksNames)} \nне загружены, хотите продолжить?",
-                    "Входящие задания на отверстия",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning,
-                    MessageBoxResult.No) == MessageBoxResult.No) {
-
-                    throw new OperationCanceledException();
-                }
+            if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
+                throw new OperationCanceledException();
             }
             var incomingTasks = revitRepository
                 .GetOpeningMepTasksIncoming()
@@ -113,6 +102,8 @@ namespace RevitOpeningPlacement {
 
             window.Show();
         }
+
+
 
         /// <summary>
         /// Запуск окна навигатора по исходящим заданиям на отверстия в файле архитектуры

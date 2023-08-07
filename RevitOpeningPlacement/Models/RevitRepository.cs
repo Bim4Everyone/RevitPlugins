@@ -11,6 +11,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Handlers;
@@ -397,6 +398,35 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
+        /// Спрашивает у пользователя, нужно ли продолжать операцию, если загружены не все связи
+        /// </summary>
+        /// <param name="revitRepository"></param>
+        /// <returns></returns>
+        public bool ContinueIfNotAllLinksLoaded() {
+            var notLoadedLinksNames = GetRevitLinkNotLoadedNames();
+            if(notLoadedLinksNames.Count > 0) {
+                var dialog = GetPlatformService<IMessageBoxService>();
+                return dialog.Show(
+                    $"Связи:\n{string.Join(";\n", notLoadedLinksNames)} \nне загружены, хотите продолжить?",
+                    "Задания на отверстия",
+                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxImage.Warning,
+                    System.Windows.MessageBoxResult.No) == System.Windows.MessageBoxResult.Yes;
+
+            } else {
+                return true;
+            }
+        }
+
+        public IList<FamilyInstance> GetOpeningMepTasksIncoming() {
+            return GetGenericModelsFamilyInstancesFromLinks()
+                .Where(famInst => TypeName.Values.Contains(famInst.Name)
+                               && FamilyName.Values.Contains(GetFamilyName(famInst)))
+                .ToList();
+        }
+
+
+        /// <summary>
         /// Возвращает список экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит ("исходящие" задания).
         /// </summary>
         /// <returns>Список экземпляров семейств, названия семейств и типов которых заданы в соответствующих словарях
@@ -415,14 +445,7 @@ namespace RevitOpeningPlacement.Models {
             }
         }
 
-        public IList<FamilyInstance> GetOpeningMepTasksIncoming() {
-            return GetGenericModelsFamilyInstancesFromLinks()
-                .Where(famInst => TypeName.Values.Contains(famInst.Name)
-                               && FamilyName.Values.Contains(GetFamilyName(famInst)))
-                .ToList();
-        }
-
-        public IList<string> GetRevitLinkNotLoadedNames() {
+        private IList<string> GetRevitLinkNotLoadedNames() {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_RvtLinks)
                 .WhereElementIsElementType()
