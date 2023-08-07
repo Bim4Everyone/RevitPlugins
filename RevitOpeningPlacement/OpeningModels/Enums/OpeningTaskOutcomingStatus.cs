@@ -25,7 +25,7 @@ namespace RevitOpeningPlacement.OpeningModels.Enums {
         /// Задание на отверстие пересекается с другим заданием
         /// </summary>
         [Description("Пересекающееся отверстие")]
-        HasIntersection,
+        Intersects,
         /// <summary>
         /// Не имеет основания в виде пересекающего его элемента, для которого и было создано задание
         /// </summary>
