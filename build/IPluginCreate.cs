@@ -36,40 +36,4 @@ interface IPluginCreate : IHazSolution, IHazOutput, IHazPluginName, IHazTemplate
             DotNet(arguments: $"sln add {PluginFile}");
             PluginFile.WriteAllText(PluginTemplateFile.ReadAllText());
         });
-
-    // https://learn.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
-    void CopyDirectory(AbsolutePath sourceDir, AbsolutePath targetDir, bool recursive = true) {
-        // Check if the source directory exists
-        if(!sourceDir.Exists())
-            throw new DirectoryNotFoundException($"Source directory not found: {sourceDir}");
-
-        // Cache directories before we start copying
-        AbsolutePath[] children = sourceDir.GetDirectories().ToArray();
-
-        // Create the destination directory
-        targetDir = UpdateName(targetDir).CreateDirectory();
-
-        // Get the files in the source directory and copy to the destination directory
-        foreach(AbsolutePath file in sourceDir.GetFiles()) {
-            AbsolutePath targetFilePath = UpdateName(targetDir / file.Name);
-
-            string content = file.ReadAllText()
-                .Replace(TemplateName, PluginName);
-
-            targetFilePath.WriteAllText(content);
-        }
-
-        // If recursive and copying subdirectories, recursively call this method
-        if(recursive) {
-            foreach(AbsolutePath childDir in children) {
-                CopyDirectory(childDir, targetDir / childDir.Name);
-            }
-        }
-    }
-
-    AbsolutePath UpdateName(AbsolutePath target) {
-        string targetName = target.Name
-            .Replace(TemplateName, PluginName);
-        return target.Parent / targetName;
-    }
 }
