@@ -91,9 +91,7 @@ namespace RevitOpeningPlacement {
             if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
                 throw new OperationCanceledException();
             }
-            var incomingTasks = revitRepository
-                .GetOpeningMepTasksIncoming()
-                .Select(famInst => new OpeningMepTaskIncoming(famInst, revitRepository));
+            var incomingTasks = revitRepository.GetOpeningsMepTasksIncoming();
             var realOpenings = revitRepository.GetRealOpenings();
 
             var incomingTasksViewModels = new List<OpeningMepTaskIncomingViewModel>();
