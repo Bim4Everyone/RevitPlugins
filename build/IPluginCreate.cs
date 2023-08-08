@@ -15,7 +15,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 [ParameterPrefix(nameof(IPluginCreate))]
 interface IPluginCreate : IHazSolution, IHazOutput, IHazPluginName {
     string TemplateName => "RevitPluginTemplate";
-    AbsolutePath TemplateFile => RootDirectory / ".github" / "templates" / TemplateName;
+    AbsolutePath TemplateDirectory => RootDirectory / ".github" / "templates" / TemplateName;
 
     AbsolutePath PluginFile => RootDirectory / PluginName / $"{PluginName}.csproj";
     AbsolutePath PluginTemplateFile => RootDirectory / "RevitPlugins" / "RevitPlugins.csproj";
@@ -25,7 +25,7 @@ interface IPluginCreate : IHazSolution, IHazOutput, IHazPluginName {
         .OnlyWhenDynamic(() => Solution.GetProject(PluginName) == null, $"Plugin \"{PluginName}\" does exists.")
         .Executes(() => {
             Log.Debug("TemplateName: {TemplateName}", TemplateName);
-            Log.Debug("TemplateFile: {TemplateFile}", TemplateFile);
+            Log.Debug("TemplateDirectory: {TemplateDirectory}", TemplateDirectory);
 
             Log.Debug("PluginFile: {PluginFile}", PluginFile);
             Log.Debug("PluginDirectory: {PluginDirectory}", PluginDirectory);
@@ -34,7 +34,7 @@ interface IPluginCreate : IHazSolution, IHazOutput, IHazPluginName {
             Log.Debug("HazProject: {HazProject}", Solution.GetProject(PluginName) != null);
             Log.Debug("HazDirectory: {HazDirectory}", PluginDirectory.Exists());
 
-            CopyDirectory(TemplateFile, PluginDirectory);
+            CopyDirectory(TemplateDirectory, PluginDirectory);
 
             DotNet(arguments: $"sln add {PluginFile}");
             PluginFile.WriteAllText(PluginTemplateFile.ReadAllText());
