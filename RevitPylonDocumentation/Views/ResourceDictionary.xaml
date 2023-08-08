@@ -114,6 +114,16 @@
     </Style>
 
 
+    <Style x:Key="TextBlockWithTooltipStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockStyle}">
+
+        <Setter Property="ToolTipService.InitialShowDelay" Value="1000" />
+        <Setter Property="ToolTipService.ShowDuration" Value="20000" />
+        <Setter Property="ToolTipService.BetweenShowDelay" Value="1" />
+    </Style>
+
+
+
+
     <Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}">
         <Setter Property="Background" Value="White" />
         <Setter Property="Foreground" Value="{StaticResource PrimaryGrayColor}" />
@@ -143,6 +153,15 @@
         </Setter>
     </Style>
 
+
+    <Style x:Key="TextBoxWithTooltipStyle" TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+
+        <Setter Property="ToolTipService.InitialShowDelay" Value="1000" />
+        <Setter Property="ToolTipService.ShowDuration" Value="20000" />
+        <Setter Property="ToolTipService.BetweenShowDelay" Value="1" />
+    </Style>
+    
+    
 
     <Style x:Key="SimpleButtonStyle" TargetType="{x:Type Button}">
         <Setter Property="Background" Value="White" />
@@ -324,9 +343,14 @@
         </Style.Triggers>
     </Style>
 
-    
 
-    
+    <Style x:Key="ComboBoxWithTooltipStyle" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
+
+        <Setter Property="ToolTipService.InitialShowDelay" Value="1000" />
+        <Setter Property="ToolTipService.ShowDuration" Value="20000" />
+        <Setter Property="ToolTipService.BetweenShowDelay" Value="1" />
+    </Style>
+
     <!-- SCROLL -->
     <Style x:Key="ScrollBarLineButtonStyle" TargetType="{x:Type RepeatButton}">
         <Setter Property="Focusable" Value="False"/>
