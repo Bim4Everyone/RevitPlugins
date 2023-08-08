@@ -55,15 +55,20 @@ namespace RevitOpeningPlacement.OpeningModels {
             XYZ openingLocation = (_familyInstance.Location as LocationPoint).Point;
             var hostElement = GetHost();
             Solid hostSolidCut = hostElement.GetSolid();
-            Solid hostSolidOriginal = (hostElement as HostObject).GetHostElementOriginalSolid();
-            var openings = SolidUtils.SplitVolumes(BooleanOperationsUtils.ExecuteBooleanOperation(hostSolidOriginal, hostSolidCut, BooleanOperationsType.Difference));
-            var thisOpeningSolid = openings.OrderBy(solidOpening => (solidOpening.ComputeCentroid() - openingLocation).GetLength()).FirstOrDefault();
-            if(thisOpeningSolid != null) {
-                return thisOpeningSolid;
-            } else {
-                return GetTransformedBBoxXYZ().CreateSolid();
+            try {
+                Solid hostSolidOriginal = (hostElement as HostObject).GetHostElementOriginalSolid();
+                var openings = SolidUtils.SplitVolumes(BooleanOperationsUtils.ExecuteBooleanOperation(hostSolidOriginal, hostSolidCut, BooleanOperationsType.Difference));
+                var thisOpeningSolid = openings.OrderBy(solidOpening => (solidOpening.ComputeCentroid() - openingLocation).GetLength()).FirstOrDefault();
+                if(thisOpeningSolid != null) {
+                    return thisOpeningSolid;
+                } else {
+                    return CreateRawSolid();
+                }
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                return CreateRawSolid();
             }
         }
+
 
         public BoundingBoxXYZ GetTransformedBBoxXYZ() {
             return _familyInstance.GetBoundingBox();
@@ -80,6 +85,10 @@ namespace RevitOpeningPlacement.OpeningModels {
                 throw new ArgumentNullException($"Хост элемента с Id: {_familyInstance.Id} - null");
             }
             return host;
+        }
+
+        private Solid CreateRawSolid() {
+            return GetTransformedBBoxXYZ().CreateSolid();
         }
     }
 }
