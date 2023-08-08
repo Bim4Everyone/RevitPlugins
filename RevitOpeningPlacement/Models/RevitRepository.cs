@@ -418,13 +418,6 @@ namespace RevitOpeningPlacement.Models {
             }
         }
 
-        public IList<FamilyInstance> GetOpeningMepTasksIncoming() {
-            return GetGenericModelsFamilyInstancesFromLinks()
-                .Where(famInst => TypeName.Values.Contains(famInst.Name)
-                               && FamilyName.Values.Contains(GetFamilyName(famInst)))
-                .ToList();
-        }
-
         /// <summary>
         /// Возвращает перечисление чистовых экземпляров семейств отверстий из текущего документа Revit
         /// </summary>
@@ -436,6 +429,28 @@ namespace RevitOpeningPlacement.Models {
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
                 ;
+        }
+
+        /// <summary>
+        /// Возвращает список входящих заданий на отверстия из связанных файлов
+        /// </summary>
+        /// <returns></returns>
+        public IList<OpeningMepTaskIncoming> GetOpeningsMepTasksIncoming() {
+            var links = GetRevitLinks();
+            List<OpeningMepTaskIncoming> genericModelsInLinks = new List<OpeningMepTaskIncoming>();
+            foreach(RevitLinkInstance link in links) {
+                var linkDoc = link.GetLinkDocument();
+                var transform = link.GetTransform();
+                var genericModelsInLink = new FilteredElementCollector(linkDoc)
+                    .OfCategory(BuiltInCategory.OST_GenericModel)
+                    .OfType<FamilyInstance>()
+                    .Where(item => TypeName.Any(n => n.Value.Equals(item.Name))
+                                && FamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
+                    .Select(famInst => new OpeningMepTaskIncoming(famInst, this, transform))
+                    ;
+                genericModelsInLinks.AddRange(genericModelsInLink);
+            }
+            return genericModelsInLinks;
         }
 
 
@@ -491,18 +506,7 @@ namespace RevitOpeningPlacement.Models {
                                    link.GetTypeId()));
         }
 
-        private IList<FamilyInstance> GetGenericModelsFamilyInstancesFromLinks() {
-            var links = GetRevitLinks();
-            List<FamilyInstance> genericModelsInLinks = new List<FamilyInstance>();
-            foreach(RevitLinkInstance link in links) {
-                var linkDoc = link.GetLinkDocument();
-                var genericModelsInLink = new FilteredElementCollector(linkDoc)
-                    .OfCategory(BuiltInCategory.OST_GenericModel)
-                    .OfType<FamilyInstance>();
-                genericModelsInLinks.AddRange(genericModelsInLink);
-            }
-            return genericModelsInLinks;
-        }
+
 
 
         /// <summary>
