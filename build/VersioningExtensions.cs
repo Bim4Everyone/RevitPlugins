@@ -8,7 +8,7 @@ static class VersioningExtensions {
         GitVersion gitVersion,
         RevitConfiguration configuration) {
         return settings
-            .SetAssemblyVersion(InjectRevitVersion(configuration, gitVersion.AssemblySemVer))
+            .SetVersion(InjectRevitVersion(configuration, gitVersion.AssemblySemVer))
             .SetFileVersion(InjectRevitVersion(configuration, gitVersion.AssemblySemFileVer))
             .SetInformationalVersion(InjectRevitVersion(configuration, gitVersion.InformationalVersion));
     }
