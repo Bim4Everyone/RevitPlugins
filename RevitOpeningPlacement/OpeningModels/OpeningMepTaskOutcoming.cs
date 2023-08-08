@@ -8,6 +8,7 @@ using dosymep.Revit;
 
 using RevitClashDetective.Models.Extensions;
 
+using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels.Comparers;
@@ -17,7 +18,7 @@ namespace RevitOpeningPlacement.OpeningModels {
     /// Класс, обозначающий экземпляры семейств заданий на отверстия, 
     /// размещаемые в файлах-источниках заданий на отверстия для последующей передачи этих заданий получателю
     /// </summary>
-    internal class OpeningTaskOutcoming : ISolidProvider, IEquatable<OpeningTaskOutcoming> {
+    internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTaskOutcoming> {
         /// <summary>
         /// Экземпляр семейства задания на отверстие
         /// </summary>
@@ -32,15 +33,45 @@ namespace RevitOpeningPlacement.OpeningModels {
 
 
         /// <summary>
-        /// Создает экземпляр класса <see cref="OpeningTaskOutcoming"/>
+        /// Создает экземпляр класса <see cref="OpeningMepTaskOutcoming"/>
         /// </summary>
         /// <param name="openingTaskOutcoming">Экземпляр семейства задания на отверстие, расположенного в текущем документе Revit</param>
-        public OpeningTaskOutcoming(FamilyInstance openingTaskOutcoming) {
+        public OpeningMepTaskOutcoming(FamilyInstance openingTaskOutcoming) {
             _familyInstance = openingTaskOutcoming;
             Id = _familyInstance.Id.IntegerValue;
             Location = (_familyInstance.Location as LocationPoint).Point;
+
+            Date = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDate);
+            MepSystem = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningMepSystem);
+            Description = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDescription);
+            CenterOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetCenter);
+            BottomOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetBottom);
         }
 
+        /// <summary>
+        /// Дата создания
+        /// </summary>
+        public string Date { get; } = string.Empty;
+
+        /// <summary>
+        /// Название инженерной системы, для элемента которой создано задание на отверстие
+        /// </summary>
+        public string MepSystem { get; } = string.Empty;
+
+        /// <summary>
+        /// Описание задания на отверстие
+        /// </summary>
+        public string Description { get; } = string.Empty;
+
+        /// <summary>
+        /// Отметка центра
+        /// </summary>
+        public string CenterOffset { get; } = string.Empty;
+
+        /// <summary>
+        /// Отметка низа
+        /// </summary>
+        public string BottomOffset { get; } = string.Empty;
 
         /// <summary>
         /// Id экземпляра семейства задания на отверстие
@@ -65,6 +96,14 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         public bool HasPurpose { get; set; } = false;
 
+
+        /// <summary>
+        /// Возвращает экземпляр семейства задания на отверстие
+        /// </summary>
+        /// <returns></returns>
+        public FamilyInstance GetFamilyInstance() {
+            return _familyInstance;
+        }
 
         /// <summary>
         /// Возвращает Solid экземпляра семейства задания на отверстие с трансформированными координатами, 
@@ -97,7 +136,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="placedOpenings">Существующие задания на отверстия в проекте</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public bool IsAlreadyPlaced(ICollection<OpeningTaskOutcoming> placedOpenings) {
+        public bool IsAlreadyPlaced(ICollection<OpeningMepTaskOutcoming> placedOpenings) {
             if(IsRemoved || placedOpenings.Count == 0) {
                 return false;
             }
@@ -105,7 +144,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                 placedOpening.Location
                 .DistanceTo(placedOpening.Location) <= _distance3dTolerance);
 
-            foreach(OpeningTaskOutcoming placedOpening in closestPlacedOpenings) {
+            foreach(OpeningMepTaskOutcoming placedOpening in closestPlacedOpenings) {
                 if(placedOpening.EqualsSolid(GetSolid(), XYZExtension.FeetRound)) {
                     return true;
                 }
@@ -116,7 +155,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         public override bool Equals(object obj) {
             if(obj is null) {
                 return false;
-            } else if(obj is OpeningTaskOutcoming openingOther) {
+            } else if(obj is OpeningMepTaskOutcoming openingOther) {
                 return (Id == openingOther.Id) && GetDocument().Equals(openingOther.GetDocument());
             } else {
                 return false;
@@ -127,7 +166,7 @@ namespace RevitOpeningPlacement.OpeningModels {
             return Id.GetHashCode();
         }
 
-        public bool Equals(OpeningTaskOutcoming other) {
+        public bool Equals(OpeningMepTaskOutcoming other) {
             return (Id == other.Id) && GetDocument().Equals(other.GetDocument());
         }
 
@@ -136,13 +175,13 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="openingTasks"></param>
         /// <returns></returns>
-        private ICollection<OpeningTaskOutcoming> GetIntersectingTasksRaw(ICollection<OpeningTaskOutcoming> openingTasks) {
+        private ICollection<OpeningMepTaskOutcoming> GetIntersectingTasksRaw(ICollection<OpeningMepTaskOutcoming> openingTasks) {
             using(var filter = GetFilterTasks(openingTasks)) {
                 var intersects = filter
                     .Excluding(new ElementId[] { new ElementId(Id) })
                     .WherePasses(GetBoundingBoxFilter())
                     .Cast<FamilyInstance>()
-                    .Select(f => new OpeningTaskOutcoming(f));
+                    .Select(f => new OpeningMepTaskOutcoming(f));
                 return openingTasks.Intersect(intersects, _equalityComparer).ToList();
             }
         }
@@ -175,15 +214,30 @@ namespace RevitOpeningPlacement.OpeningModels {
             return _familyInstance.Document;
         }
 
-        private FilteredElementCollector GetFilterTasks(ICollection<OpeningTaskOutcoming> openingTasks) {
+        private FilteredElementCollector GetFilterTasks(ICollection<OpeningMepTaskOutcoming> openingTasks) {
             if(IsRemoved) {
                 return default;
             }
             return new FilteredElementCollector(GetDocument(), GetTasksIds(openingTasks));
         }
 
-        private ICollection<ElementId> GetTasksIds(ICollection<OpeningTaskOutcoming> openingTasks) {
+        private ICollection<ElementId> GetTasksIds(ICollection<OpeningMepTaskOutcoming> openingTasks) {
             return openingTasks.Select(t => new ElementId(t.Id)).ToList();
         }
+
+        private string GetFamilyInstanceStringParamValueOrEmpty(string paramName) {
+            if(_familyInstance is null) {
+                throw new ArgumentNullException(nameof(_familyInstance));
+            }
+            string value = string.Empty;
+            if(_familyInstance.IsExistsParam(paramName)) {
+                object paramValue = _familyInstance.GetParamValue(paramName);
+                if(!(paramValue is null)) {
+                    value = paramValue.ToString();
+                }
+            }
+            return value;
+        }
+
     }
 }

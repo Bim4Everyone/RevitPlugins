@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
@@ -10,11 +8,11 @@ using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
 
-using RevitOpeningPlacement.Models.Configs;
-
 namespace RevitOpeningPlacement.ViewModels.Services {
     internal class ConfigLoaderService {
-        public T Load<T>() where T : ProjectConfig, new() {
+        public T Load<T>(Document document) where T : ProjectConfig, new() {
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+
             var openWindow = GetPlatformService<IOpenFileDialogService>();
             openWindow.Filter = "ClashConfig |*.json";
             if(!openWindow.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop))) {
@@ -22,7 +20,7 @@ namespace RevitOpeningPlacement.ViewModels.Services {
             }
 
             try {
-                var configLoader = new ConfigLoader();
+                var configLoader = new ConfigLoader(document);
                 return configLoader.Load<T>(openWindow.File.FullName);
             } catch(pyRevitLabs.Json.JsonSerializationException) {
                 ShowError();

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
@@ -29,7 +28,7 @@ namespace RevitClashDetective.ViewModels.Services {
             _revitRepository.CommonConfig.SaveProjectConfig();
 
             try {
-                var configLoader = new ConfigLoader();
+                var configLoader = new ConfigLoader(_revitRepository.Doc);
                 return configLoader.Load<T>(openWindow.File.FullName);
             } catch(pyRevitLabs.Json.JsonSerializationException) {
                 ShowError();

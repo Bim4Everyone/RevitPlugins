@@ -12,6 +12,9 @@ using dosymep.WPF.ViewModels;
 using RevitOpeningPlacement.Models;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator {
+    /// <summary>
+    /// Модель представления окна для просмотра входящих заданий на отверстия от инженера в файле архитектора или конструктора
+    /// </summary>
     internal class OpeningsMepTaskIncomingViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private OpeningMepTaskIncomingViewModel _selectedOpeningMepTaskIncoming;

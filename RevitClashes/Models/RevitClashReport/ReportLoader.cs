@@ -1,14 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-using Autodesk.Revit.DB;
-
-using dosymep.Revit;
 
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Interfaces;
@@ -20,7 +12,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
 
             var loaders = new List<IClashesLoader>() {
                 new RevitClashesLoader(revitRepository, path),
-                new PluginClashesLoader(path),
+                new PluginClashesLoader(path, revitRepository.Doc),
                 new NavisHtmlClashesLoader(revitRepository, path)
             };
 
@@ -32,7 +24,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
             var docNames = revitRepository.GetDocuments().Select(revitRepository.GetDocumentName).ToList();
 
             return loader.GetClashes()
-                         .Select(item=>item.SetRevitRepository(revitRepository))
+                         .Select(item => item.SetRevitRepository(revitRepository))
                          .Where(item => item.IsValid(docNames));
         }
     }

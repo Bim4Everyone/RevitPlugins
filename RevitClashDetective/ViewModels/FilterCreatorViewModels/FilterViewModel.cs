@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
-
-using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
@@ -55,12 +49,12 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         public string Name {
             get => _name;
-            set => this.RaiseAndSetIfChanged(ref _name, value);
+            set => RaiseAndSetIfChanged(ref _name, value);
         }
 
         public bool? IsAllCategoriesSelected {
             get => _isAllCategoriesSelected;
-            set => this.RaiseAndSetIfChanged(ref _isAllCategoriesSelected, value);
+            set => RaiseAndSetIfChanged(ref _isAllCategoriesSelected, value);
         }
 
         public bool IsInitialized { get; set; }
@@ -70,12 +64,12 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         public SetViewModel Set {
             get => _set;
-            set => this.RaiseAndSetIfChanged(ref _set, value);
+            set => RaiseAndSetIfChanged(ref _set, value);
         }
 
         public ObservableCollection<CategoryViewModel> Categories {
             get => _categories;
-            set => this.RaiseAndSetIfChanged(ref _categories, value);
+            set => RaiseAndSetIfChanged(ref _categories, value);
         }
 
         public IEnumerable<CategoryViewModel> SelectedCategories => Categories?.Where(item => item.IsSelected) ?? Enumerable.Empty<CategoryViewModel>();
@@ -115,7 +109,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         private void Category_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
-            if(e.PropertyName.Equals(nameof(CategoryViewModel.IsSelected))){
+            if(e.PropertyName.Equals(nameof(CategoryViewModel.IsSelected))) {
                 _delay.Action();
             }
         }

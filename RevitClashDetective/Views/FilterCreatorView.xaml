@@ -109,8 +109,10 @@
                 <dxdo:LayoutControlItem Margin="-11 0">
                     <lc:GroupBox Grid.Column="4" Grid.Row="1" Header="Критерии фильтрации"
                                  HorizontalAlignment="Stretch" VerticalContentAlignment="Top">
-                        <ContentControl DataContext="{Binding SelectedFilter.Set}"
-                                        DataContextChanged="CriterionControl_DataContextChanged" />
+                        <ScrollViewer>
+                            <ContentControl DataContext="{Binding SelectedFilter.Set}"
+                                            DataContextChanged="CriterionControl_DataContextChanged" />
+                        </ScrollViewer>
                     </lc:GroupBox>
                 </dxdo:LayoutControlItem>
 

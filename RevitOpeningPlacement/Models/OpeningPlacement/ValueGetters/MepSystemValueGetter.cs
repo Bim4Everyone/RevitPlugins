@@ -27,14 +27,16 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
             if(mepElement is null) {
                 throw new ArgumentNullException(nameof(mepElement));
             }
-            if(!mepElement.IsExistsParam(_mepSystemParameter)) {
-                throw new ArgumentException("В элементе отсутствует параметр Имя системы", nameof(mepElement));
-            }
             _mepElement = mepElement;
         }
 
         public StringParamValue GetValue() {
-            return new StringParamValue(_mepElement.GetParamValue<string>(_mepSystemParameter));
+            if(_mepElement.IsExistsParam(_mepSystemParameter)) {
+                return new StringParamValue(_mepElement.GetParamValue<string>(_mepSystemParameter));
+            } else {
+                // у коробов и кабельных лотков нет имени системы
+                return new StringParamValue(string.Empty);
+            }
         }
     }
 }

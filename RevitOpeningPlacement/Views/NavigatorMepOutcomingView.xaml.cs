@@ -4,24 +4,23 @@ using DevExpress.Xpf.Grid;
 
 namespace RevitOpeningPlacement.Views {
     /// <summary>
-    /// Класс окна для отображения входящих заданий на отверстия в файле архитектора или конструктора
+    /// Класс окна для отображения исходящих заданий на отверстия в файле инженерных систем
     /// </summary>
-    public partial class NavigatorMepIncomingView {
+    public partial class NavigatorMepOutcomingView {
         /// <summary>
-        /// Конструктор окна для отображения входящих заданий на отверстия в файле архитектора или конструктора
+        /// Конструктор окна для отображения исходящих заданий на отверстия в файле инженерных систем
         /// </summary>
-        public NavigatorMepIncomingView() {
+        public NavigatorMepOutcomingView() {
             InitializeComponent();
             Loaded += NavigatorView_Loaded;
         }
 
         private void NavigatorView_Loaded(object sender, RoutedEventArgs e) {
             _dg.GroupBy(_dg.Columns[1]);
-            _dg.GroupBy(_dg.Columns[2]);
         }
 
         public override string PluginName => nameof(RevitOpeningPlacement);
-        public override string ProjectConfigName => nameof(NavigatorMepIncomingView);
+        public override string ProjectConfigName => nameof(NavigatorMepOutcomingView);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             Close();

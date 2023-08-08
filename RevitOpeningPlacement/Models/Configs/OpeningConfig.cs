@@ -1,11 +1,13 @@
 ﻿using System;
-using System.Text;
-using System.Threading.Tasks;
+
+using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 
 using pyRevitLabs.Json;
+
+using RevitClashDetective.Models.FilterModel;
 
 namespace RevitOpeningPlacement.Models.Configs {
     internal class OpeningConfig : ProjectConfig {
@@ -16,9 +18,11 @@ namespace RevitOpeningPlacement.Models.Configs {
         public override IConfigSerializer Serializer { get; set; }
         public MepCategoryCollection Categories { get; set; } = new MepCategoryCollection();
 
-        public static OpeningConfig GetOpeningConfig() {
+        public static OpeningConfig GetOpeningConfig(Document document) {
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+
             return new ProjectConfigBuilder()
-                .SetSerializer(new OpeningSerializer())
+                .SetSerializer(new RevitClashConfigSerializer(new OpeningSerializationBinder(), document))
                 .SetPluginName(nameof(RevitOpeningPlacement))
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
                 .SetProjectConfigName(nameof(OpeningConfig) + ".json")

@@ -5,7 +5,6 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 
 using pyRevitLabs.Json;
@@ -42,12 +41,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
 
         public ParameterValueProvider(RevitRepository revitRepository, RevitParam revitParam, string displayValue = null) {
             RevitRepository = revitRepository;
-            if((revitParam is SystemParam systemParam) && (systemParam.StorageType == StorageType.None)) {
-                var systemParamRecreated = SystemParamsConfig.Instance.CreateRevitParam(systemParam.SystemParamId);
-                RevitParam = systemParamRecreated;
-            } else {
-                RevitParam = revitParam;
-            }
+            RevitParam = revitParam;
             DisplayValue = displayValue ?? revitParam.Name;
         }
 
@@ -59,30 +53,32 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
             if(ruleEvaluator.Evaluator != RuleEvaluators.FilterHasNoValue && ruleEvaluator.Evaluator != RuleEvaluators.FilterHasValue) {
                 var categoryFilter = new ElementMulticategoryFilter(categories.Select(item => item.Id).ToList());
                 return RevitRepository.GetCollectors()
-                    .SelectMany(item => GetValues(categories.Select(c => c.Id.IntegerValue).ToArray(), item, categoryFilter))
+                    .SelectMany(item => GetValues(item, categoryFilter))
                     .Distinct()
                     .OrderBy(item => item);
             }
             return Enumerable.Empty<ParamValue>();
         }
 
-        private IEnumerable<ParamValue> GetValues(int[] categories, Collector collector, ElementMulticategoryFilter categoryFilter) {
+        private IEnumerable<ParamValue> GetValues(Collector collector, ElementMulticategoryFilter categoryFilter) {
             return collector.RevitCollector
                         .WhereElementIsNotElementType()
                         .WherePasses(categoryFilter)
                         .Where(item => item != null)
-                        .Select(item => GetElementParamValue(categories, item))
+                        .Select(item => GetElementParamValue(item))
                         .Where(item => item != null && item.Value != null && item.Value as ElementId != ElementId.InvalidElementId);
         }
 
-        public ParamValue GetElementParamValue(int[] categories, Element item) {
+        public ParamValue GetElementParamValue(Element item) {
             if(item.IsExistsParam(RevitParam)) {
-                return ParamValue.GetParamValue(categories, RevitParam, item);
+                return ParamValue.GetParamValue(RevitParam, item);
             } else {
                 var typeId = item.GetTypeId();
                 if(typeId != null) {
                     var type = item.Document.GetElement(typeId);
-                    return ParamValue.GetParamValue(categories, RevitParam, type);
+                    if(type.IsExistsParam(RevitParam)) {
+                        return ParamValue.GetParamValue(RevitParam, type);
+                    }
                 }
             }
             return null;
@@ -92,13 +88,13 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
             return paramValue.GetFilterRule(visiter, doc, RevitParam);
         }
 
-        public ParamValue GetParamValueFormString(int[] categories, string value) {
+        public ParamValue GetParamValueFormString(string value) {
             if(RevitParam.StorageType == StorageType.Double && value != null) {
                 if(DoubleValueParser.TryParse(value, UnitType, out double res)) {
-                    return ParamValue.GetParamValue(categories, RevitParam, res.ToString(), value);
+                    return ParamValue.GetParamValue(RevitParam, res.ToString(), value);
                 }
             }
-            return ParamValue.GetParamValue(categories, RevitParam, value, value);
+            return ParamValue.GetParamValue(RevitParam, value, value);
         }
 
 

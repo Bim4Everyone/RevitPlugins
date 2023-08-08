@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
@@ -22,9 +20,10 @@ namespace RevitClashDetective.Models {
         [JsonIgnore]
         public override IConfigSerializer Serializer { get; set; }
 
-        public static ChecksConfig GetChecksConfig(string revitFileName) {
+        public static ChecksConfig GetChecksConfig(string revitFileName, Document document) {
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
             return new ProjectConfigBuilder()
-                .SetSerializer(new RevitClashConfigSerializer())
+                .SetSerializer(new RevitClashConfigSerializer(new RevitClashesSerializationBinder(), document))
                 .SetPluginName(nameof(RevitClashDetective))
                 .SetRelativePath(revitFileName)
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
