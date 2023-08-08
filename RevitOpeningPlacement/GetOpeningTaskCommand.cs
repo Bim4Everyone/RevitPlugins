@@ -173,24 +173,26 @@ namespace RevitOpeningPlacement {
         /// </summary>
         /// <returns></returns>
         private NavigatorMode GetNavigatorModeFromUser() {
-            var navigatorModeDialog = new TaskDialog("Навигатор по заданиям") {
-                MainInstruction = "Выбор режима навигатора"
-            };
-            navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1,
-                "Посмотреть исходящие задания");
-            navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2,
-                "Посмотреть входящие задания");
-            navigatorModeDialog.CommonButtons = TaskDialogCommonButtons.Close;
-            navigatorModeDialog.DefaultButton = TaskDialogResult.Close;
-            TaskDialogResult result = navigatorModeDialog.Show();
-            switch(result) {
-                case TaskDialogResult.CommandLink1:
-                return NavigatorMode.Outgoing;
-                case TaskDialogResult.CommandLink2:
-                return NavigatorMode.Incoming;
-                default:
-                return NavigatorMode.NotDefined;
-            }
+            return NavigatorMode.Incoming; //TODO убрать после реализации создания заданий на отверстия в файле АР
+
+            //var navigatorModeDialog = new TaskDialog("Навигатор по заданиям") {
+            //    MainInstruction = "Выбор режима навигатора"
+            //};
+            //navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1,
+            //    "Посмотреть исходящие задания");
+            //navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2,
+            //    "Посмотреть входящие задания");
+            //navigatorModeDialog.CommonButtons = TaskDialogCommonButtons.Close;
+            //navigatorModeDialog.DefaultButton = TaskDialogResult.Close;
+            //TaskDialogResult result = navigatorModeDialog.Show();
+            //switch(result) {
+            //    case TaskDialogResult.CommandLink1:
+            //    return NavigatorMode.Outgoing;
+            //    case TaskDialogResult.CommandLink2:
+            //    return NavigatorMode.Incoming;
+            //    default:
+            //    return NavigatorMode.NotDefined;
+            //}
         }
 
         private List<OpeningsGroup> GetOpeningsGroupsMepTasksOutcoming(RevitRepository revitRepository, UnionGroupsConfigurator configurator) {
