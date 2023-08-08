@@ -428,6 +428,7 @@ namespace RevitOpeningPlacement.Models {
                 .WherePasses(FiltersInitializer.GetFilterByAllUsedOpeningsCategories())
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
+                .Where(famInst => famInst.Host != null)
                 .Select(famInst => new OpeningReal(famInst))
                 .ToList();
         }
@@ -490,13 +491,14 @@ namespace RevitOpeningPlacement.Models {
         /// Возвращает экземпляры семейств категории "Обобщенные модели" из текущего документа Revit
         /// </summary>
         /// <returns></returns>
-        private IEnumerable<FamilyInstance> GetGenericModelsFamilyInstances() {
+        private IList<FamilyInstance> GetGenericModelsFamilyInstances() {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
-                .OfType<FamilyInstance>();
+                .OfType<FamilyInstance>()
+                .ToList();
         }
 
-        private IEnumerable<RevitLinkInstance> GetRevitLinks() {
+        private IList<RevitLinkInstance> GetRevitLinks() {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_RvtLinks)
                 .WhereElementIsNotElementType()
@@ -504,7 +506,8 @@ namespace RevitOpeningPlacement.Models {
                 .Cast<RevitLinkInstance>()
                 .Where(link => RevitLinkType.IsLoaded(
                                    _document,
-                                   link.GetTypeId()));
+                                   link.GetTypeId()))
+                .ToList();
         }
 
 
