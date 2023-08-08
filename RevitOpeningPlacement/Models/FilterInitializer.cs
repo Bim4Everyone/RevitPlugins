@@ -199,8 +199,7 @@ namespace RevitOpeningPlacement.Models {
         /// <returns></returns>
         public static ElementMulticategoryFilter GetFilterByAllUsedOpeningsCategories() {
             return new ElementMulticategoryFilter(new BuiltInCategory[] {
-                BuiltInCategory.OST_Windows,
-                BuiltInCategory.OST_Doors
+                BuiltInCategory.OST_Windows
             });
         }
 
