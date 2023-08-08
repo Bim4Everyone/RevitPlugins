@@ -71,7 +71,6 @@
                         <dxg:GridColumn FieldName="Name" Header="Наименование" />
                         <dxg:GridColumn FieldName="LevelName" Header="Уровень" />
                         <dxg:GridColumn FieldName="PhaseName" Header="Стадия" />
-                        <dxg:GridColumn FieldName="Description" Header="Описание" />
                     </dxg:GridControl>
                 </dxdo:LayoutControlItem>
             </dxdo:LayoutGroup>
