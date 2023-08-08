@@ -318,7 +318,7 @@ namespace RevitOpeningPlacement.OpeningModels {
             if((volumeRatio < 0) || (volumeRatio > 1)) {
                 throw new ArgumentOutOfRangeException($"Значение параметра {nameof(volumeRatio)} должно находиться в интервале [0; 1]");
             }
-            var status = OpeningTaskOutcomingStatus.Invalid;
+            OpeningTaskOutcomingStatus status;
             if(0.95 <= volumeRatio) {
                 status = OpeningTaskOutcomingStatus.TooSmall;
             } else if((0.2 <= volumeRatio) && (volumeRatio < 0.95)) {
