@@ -95,13 +95,13 @@ namespace RevitRooms.ViewModels {
         public static InfoElement NotEqualSectionDoors { get; } = new InfoElement() {
             TypeInfo = TypeInfo.Warning,
             Message = $"Проверка параметра \"{ProjectParamsConfig.Instance.RoomSectionName.Name}\" по дверям",
-            Description = $"Обнаружены помещения принадлежащие разным секциям, но имеющие доступ друг к другу через двери. Проверьте корректность параметра \"{ProjectParamsConfig.Instance.RoomSectionName.Name}\" для помещений, соединенных данными дверьми."
+            Description = $"Обнаружены помещения, принадлежащие разным секциям, но имеющие доступ друг к другу через двери, окна (балконные блоки) или разделители помещений. Проверьте корректность параметра \"{ProjectParamsConfig.Instance.RoomSectionName.Name}\" для помещений, соединенных данными элементами."
         };
         
         public static InfoElement NotEqualGroup { get; } = new InfoElement() {
             TypeInfo = TypeInfo.Warning,
             Message = $"Проверка параметра \"{ProjectParamsConfig.Instance.RoomGroupName.Name}\" по дверям и окнам",
-            Description = $"Обнаружены помещения принадлежащие разным квартирам, но имеющие доступ друг к другу через двери или окна (балконные блоки). Проверьте корректность параметра \"{ProjectParamsConfig.Instance.RoomGroupName.Name}\" для помещений, соединенных данными дверьми."
+            Description = $"Обнаружены помещения, принадлежащие разным квартирам, но имеющие доступ друг к другу через двери, окна (балконные блоки) или разделители помещений. Проверьте корректность параметра \"{ProjectParamsConfig.Instance.RoomGroupName.Name}\" для помещений, соединенных данными элементами.."
         };
         
         public static InfoElement CountourIntersectRooms { get; } = new InfoElement() {

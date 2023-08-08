@@ -331,7 +331,7 @@ namespace RevitRooms.ViewModels {
 
                 // Все двери
                 // с не совпадающей секцией
-                var notEqualSectionDoors = doors
+                var notEqualSectionDoors = doorsAndWindows
                     .Where(item => !item.IsSectionNameEqual);
                 
                 AddElements(InfoElement.NotEqualSectionDoors, notEqualSectionDoors, warningElements);
@@ -345,7 +345,8 @@ namespace RevitRooms.ViewModels {
 
                 // Все помещений у которых
                 // найдены самопересечения
-                var countourIntersectRooms = rooms.Where(item => item.IsCountourIntersect == true);
+                var countourIntersectRooms = rooms
+                    .Where(item => item.IsCountourIntersect == true);
                 AddElements(InfoElement.CountourIntersectRooms, countourIntersectRooms, warningElements);
             }
 

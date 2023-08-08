@@ -43,7 +43,10 @@ namespace RevitRooms.ViewModels {
         }
 #else
         public string Elevation {
-            get { return UnitUtils.ConvertFromInternalUnits(Element.Elevation, UnitTypeId.Meters).ToString("0.000", CultureInfo.InvariantCulture); }
+            get {
+                return UnitUtils.ConvertFromInternalUnits(Element.Elevation, UnitTypeId.Meters)
+                    .ToString("0.000", CultureInfo.InvariantCulture);
+            }
         }
 #endif
 
@@ -65,12 +68,12 @@ namespace RevitRooms.ViewModels {
             HashSet<ElementId> spatialElements = GetSpatialElementsHashSet();
             HashSet<ElementId> phaseElements = new HashSet<ElementId>(phases
                 .Select(item => item.ElementId));
-            
+
             return RevitRepository.GetDoors()
                 .Where(item => item.LevelId == Element.Id)
                 .Where(item => phaseElements.Contains(item.CreatedPhaseId))
-                .Select(item => new FamilyInstanceViewModel(item, 
-                    new PhaseViewModel((Phase)RevitRepository.GetElement(item.CreatedPhaseId), RevitRepository), RevitRepository))
+                .Select(item => new FamilyInstanceViewModel(item,
+                    new PhaseViewModel((Phase) RevitRepository.GetElement(item.CreatedPhaseId), RevitRepository), RevitRepository))
                 .Where(item => spatialElements.Contains(item.ToRoom?.ElementId)
                                && spatialElements.Contains(item.FromRoom?.ElementId));
         }
@@ -79,10 +82,11 @@ namespace RevitRooms.ViewModels {
             HashSet<ElementId> spatialElements = GetSpatialElementsHashSet();
             HashSet<ElementId> phaseElements = new HashSet<ElementId>(phases
                 .Select(item => item.ElementId));
-            
+
             return RevitRepository.GetWindows()
                 .Where(item => item.LevelId == Element.Id)
-                .Where(item => item.Symbol.FamilyName.IndexOf("Окн_ББлок_", StringComparison.CurrentCultureIgnoreCase) >= 0)
+                .Where(item =>
+                    item.Symbol.FamilyName.IndexOf("Окн_ББлок_", StringComparison.CurrentCultureIgnoreCase) >= 0)
                 .Where(item => phaseElements.Contains(item.CreatedPhaseId))
                 .Select(item => new FamilyInstanceViewModel(item,
                     new PhaseViewModel((Phase) RevitRepository.GetElement(item.CreatedPhaseId), RevitRepository), RevitRepository))
@@ -95,18 +99,23 @@ namespace RevitRooms.ViewModels {
         }
 
         public IEnumerable<SpatialElementViewModel> GetRooms(PhaseViewModel phase) {
-            return SpatialElements.Where(item => item.Phase != null).Where(item => item.Phase == phase)
+            return SpatialElements
+                .Where(item => item.Phase != null)
+                .Where(item => item.Phase == phase)
                 .Where(item => item.Element is Room);
         }
 
         public IEnumerable<SpatialElementViewModel> GetRooms(IEnumerable<PhaseViewModel> phases) {
-            return SpatialElements.Where(item => item.Phase != null).Where(item => phases.Contains(item.Phase))
+            return SpatialElements
+                .Where(item => item.Phase != null)
+                .Where(item => phases.Contains(item.Phase))
                 .Where(item => item.Element is Room);
         }
 
         private static IEnumerable<SpatialElementViewModel> GetSpatialElements(RevitRepository revitRepository,
             IEnumerable<SpatialElement> spatialElements) {
-            return spatialElements.Select(item => new SpatialElementViewModel(item, revitRepository))
+            return spatialElements
+                .Select(item => new SpatialElementViewModel(item, revitRepository))
                 .Where(item => item.IsPlaced);
         }
     }

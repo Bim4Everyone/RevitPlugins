@@ -23,10 +23,15 @@ namespace RevitRooms.ViewModels {
             if(phase != null) {
                 Phase = new PhaseViewModel(phase, revitRepository);
             }
-
+            var segments = Element.GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions);
+            
+            BoundarySegments = segments
+                .SelectMany(item => item)
+                .Select(item => item.ElementId)
+                .ToHashSet();
+            
             IsCountourIntersect = element.IsSelfCrossBoundaries();
             if(RoomArea == null || RoomArea == 0) {
-                var segments = Element.GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions);
                 IsRedundant = segments.Count > 0;
                 NotEnclosed = segments.Count == 0;
             }
@@ -123,6 +128,7 @@ namespace RevitRooms.ViewModels {
         public bool? IsCountourIntersect { get; }
 
         public PhaseViewModel Phase { get; }
+        public HashSet<ElementId> BoundarySegments { get; }
 
         public void UpdateSharedParams() {
 #if REVIT_2021_OR_LESS
