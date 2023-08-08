@@ -13,10 +13,7 @@ using Serilog;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
 [ParameterPrefix(nameof(IPluginCreate))]
-interface IPluginCreate : IHazSolution, IHazOutput, IHazPluginName {
-    string TemplateName => "RevitPluginTemplate";
-    AbsolutePath TemplateDirectory => RootDirectory / ".github" / "templates" / TemplateName;
-
+interface IPluginCreate : IHazSolution, IHazOutput, IHazPluginName, IHazTemplate {
     AbsolutePath PluginFile => RootDirectory / PluginName / $"{PluginName}.csproj";
     AbsolutePath PluginTemplateFile => RootDirectory / "RevitPlugins" / "RevitPlugins.csproj";
 
