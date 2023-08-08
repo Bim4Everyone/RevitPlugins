@@ -38,7 +38,8 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="openingTaskIncoming">Экземпляр семейства задания на отверстие из связанного файла</param>
         /// <param name="revitRepository">Репозиторий текущего документа, в который подгружен документ с заданиями на отверстия</param>
-        public OpeningMepTaskIncoming(FamilyInstance openingTaskIncoming, RevitRepository revitRepository) {
+        /// <param name="transform">Трансформация связанного файла, в котором создано задание на отверстие</param>
+        public OpeningMepTaskIncoming(FamilyInstance openingTaskIncoming, RevitRepository revitRepository, Transform transform) {
             if(openingTaskIncoming is null) {
                 throw new ArgumentNullException(nameof(openingTaskIncoming));
             }
@@ -48,6 +49,8 @@ namespace RevitOpeningPlacement.OpeningModels {
             Id = _familyInstance.Id.IntegerValue;
             Location = (_familyInstance.Location as LocationPoint).Point;
             FileName = _familyInstance.Document.PathName;
+
+            Transform = transform;
 
             Date = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDate);
             MepSystem = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningMepSystem);
@@ -101,6 +104,8 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         public string Thickness { get; } = string.Empty;
 
+        public Transform Transform { get; } = Transform.Identity;
+
         /// <summary>
         /// Статус отработки задания на отверстие
         /// </summary>
@@ -112,11 +117,11 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         public Solid GetSolid() {
-            return _familyInstance.GetSolid();
+            return SolidUtils.CreateTransformed(_familyInstance.GetSolid(), Transform);
         }
 
         public BoundingBoxXYZ GetTransformedBBoxXYZ() {
-            return _familyInstance.GetBoundingBox().TransformBoundingBox(_familyInstance.GetTotalTransform().Inverse);
+            return _familyInstance.GetBoundingBox().TransformBoundingBox(Transform);
         }
 
         private string GetFamilyInstanceStringParamValueOrEmpty(string paramName) {
@@ -150,47 +155,54 @@ namespace RevitOpeningPlacement.OpeningModels {
             return value;
         }
 
-        public void UpdateStatus(IEnumerable<FamilyInstance> realOpenings) {
-            var openingsReal = GetOpeningsReal(realOpenings);
-            var intersectingStructureSolids = GetIntersectingStructureElementsSolids();
-            var intersectingOpeningsSolids = GetIntersectingOpeningsSolids(openingsReal);
+        public void UpdateStatus(ICollection<OpeningReal> realOpenings) {
+            var thisOpeningSolid = GetSolid();
+            var thisOpeningBBox = GetTransformedBBoxXYZ();
+            var intersectingStructureSolidsCount = GetIntersectingStructureElementsSolidsCount(thisOpeningSolid);
+            var intersectingOpeningsSolidsCount = GetIntersectingOpeningsSolidsCount(realOpenings, thisOpeningSolid, thisOpeningBBox);
 
-            if((intersectingStructureSolids.Count() == 0) && (intersectingOpeningsSolids.Count() == 0)) {
+            if((intersectingStructureSolidsCount == 0) && (intersectingOpeningsSolidsCount == 0)) {
                 Status = OpeningTaskIncomingStatus.NoIntersection;
-            } else if((intersectingStructureSolids.Count() > 0) && (intersectingOpeningsSolids.Count() == 0)) {
+            } else if((intersectingStructureSolidsCount > 0) && (intersectingOpeningsSolidsCount == 0)) {
                 Status = OpeningTaskIncomingStatus.New;
-            } else if((intersectingStructureSolids.Count() > 0) && (intersectingOpeningsSolids.Count() > 0)) {
+            } else if((intersectingStructureSolidsCount > 0) && (intersectingOpeningsSolidsCount > 0)) {
                 Status = OpeningTaskIncomingStatus.NotMatch;
-            } else if((intersectingStructureSolids.Count() == 0) && (intersectingOpeningsSolids.Count() > 0)) {
+            } else if((intersectingStructureSolidsCount == 0) && (intersectingOpeningsSolidsCount > 0)) {
                 Status = OpeningTaskIncomingStatus.Completed;
             }
         }
 
-        private IEnumerable<OpeningReal> GetOpeningsReal(IEnumerable<FamilyInstance> realOpenings) {
-            return realOpenings.Select(opening => new OpeningReal(opening));
-        }
 
-        private IEnumerable<Solid> GetIntersectingStructureElementsSolids() {
-            var thisOpeningSolid = GetSolid();
+        /// <summary>
+        /// Возвращает количество элементов конструкций, с которыми пересекается текущее задание на отерстие
+        /// </summary>
+        /// <param name="thisOpeningSolid">Солид текущего задания на отверстие</param>
+        /// <returns></returns>
+        private int GetIntersectingStructureElementsSolidsCount(Solid thisOpeningSolid) {
             if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
-                return Enumerable.Empty<Solid>();
+                return 0;
             } else {
                 return new FilteredElementCollector(_revitRepository.Doc)
                     .WherePasses(FiltersInitializer.GetFilterByAllUsedStructureCategories())
                     .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningSolid.GetOutline()))
                     .WherePasses(new ElementIntersectsSolidFilter(thisOpeningSolid))
-                    .Select(element => element.GetSolid());
+                    .Count();
             }
         }
 
-        private IEnumerable<Solid> GetIntersectingOpeningsSolids(IEnumerable<OpeningReal> realOpenings) {
-            var thisOpeningSolid = GetSolid();
+        /// <summary>
+        /// Возвращает количество проемов из активного документа, которые пересекаются с текущим заданием на отверстие из связи
+        /// </summary>
+        /// <param name="realOpenings">Перечисление </param>
+        /// <param name="thisOpeningSolid">Солид текущего задания на отверстие</param>
+        /// <returns></returns>
+        private int GetIntersectingOpeningsSolidsCount(ICollection<OpeningReal> realOpenings, Solid thisOpeningSolid, BoundingBoxXYZ thisOpeningBBox) {
             if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
-                return Enumerable.Empty<Solid>();
+                return 0;
             } else {
                 return realOpenings
-                    .Where(realOpening => realOpening.IntersectsSolidProvider(this))
-                    .Select(realOpening => realOpening.GetSolid());
+                    .Where(realOpening => realOpening.IntersectsSolid(thisOpeningSolid, thisOpeningBBox))
+                    .Count();
             }
         }
     }
