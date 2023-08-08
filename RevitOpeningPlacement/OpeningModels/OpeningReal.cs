@@ -66,7 +66,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         public BoundingBoxXYZ GetTransformedBBoxXYZ() {
-            return _familyInstance.GetBoundingBox().TransformBoundingBox(_familyInstance.GetTotalTransform().Inverse);
+            return _familyInstance.GetBoundingBox();
         }
 
         /// <summary>
