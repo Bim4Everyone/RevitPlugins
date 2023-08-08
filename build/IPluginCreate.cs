@@ -19,8 +19,9 @@ interface IPluginCreate : IHazSolution, IHazOutput, IHazPluginName {
 
     AbsolutePath PluginFile => RootDirectory / PluginName / $"{PluginName}.csproj";
     AbsolutePath PluginTemplateFile => RootDirectory / "RevitPlugins" / "RevitPlugins.csproj";
+
     Target CreatePlugin => _ => _
-        .DependsOn<ICreateScript>()
+        .Triggers<ICreateScript>()
         .OnlyWhenDynamic(() => Solution.GetProject(PluginName) == null, $"Plugin \"{PluginName}\" does exists.")
         .Executes(() => {
             Log.Debug("TemplateName: {TemplateName}", TemplateName);
@@ -29,7 +30,7 @@ interface IPluginCreate : IHazSolution, IHazOutput, IHazPluginName {
             Log.Debug("PluginFile: {PluginFile}", PluginFile);
             Log.Debug("PluginDirectory: {PluginDirectory}", PluginDirectory);
             Log.Debug("PluginTemplateFile: {PluginTemplateFile}", PluginTemplateFile);
-            
+
             Log.Debug("HazProject: {HazProject}", Solution.GetProject(PluginName) != null);
             Log.Debug("HazDirectory: {HazDirectory}", PluginDirectory.Exists());
 
