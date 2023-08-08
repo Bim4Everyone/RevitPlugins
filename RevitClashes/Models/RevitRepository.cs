@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -15,14 +12,12 @@ using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
-using dosymep.SimpleServices;
 
-using RevitClashDetective.Models.Handlers;
-using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.Extensions;
 using RevitClashDetective.Models.FilterableValueProviders;
+using RevitClashDetective.Models.Handlers;
 
 using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
-using RevitClashDetective.Models.Extensions;
 
 namespace RevitClashDetective.Models {
     internal class RevitRepository {
@@ -277,7 +272,7 @@ namespace RevitClashDetective.Models {
                 .ToList();
         }
 
-        public IEnumerable<Document> GetDocuments() {
+        public IList<Document> GetDocuments() {
             var linkedDocuments = GetRevitLinkInstances()
                 .Select(item => item.GetLinkDocument())
                 .ToList();
