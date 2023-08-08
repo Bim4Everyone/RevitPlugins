@@ -129,7 +129,8 @@ namespace RevitOpeningPlacement.OpeningModels {
                 throw new ArgumentNullException(nameof(_familyInstance));
             }
             string value = string.Empty;
-            if(_familyInstance.IsExistsSharedParam(paramName)) {
+            //if(_familyInstance.IsExistsSharedParam(paramName)) {
+            if(_familyInstance.GetParameters(paramName).FirstOrDefault(item => item.IsShared) != null) {
 #if REVIT_2022_OR_GREATER
                 if(_familyInstance.GetSharedParam(paramName).Definition.GetDataType() == SpecTypeId.Length) {
                     return Math.Round(UnitUtils.ConvertFromInternalUnits(_familyInstance.GetSharedParamValue<double>(paramName), UnitTypeId.Millimeters)).ToString();
@@ -192,6 +193,7 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         /// <summary>
         /// Возвращает количество проемов из активного документа, которые пересекаются с текущим заданием на отверстие из связи
+        /// <para>Примечание: количество считается упрощенно либо 1, либо 0</para>
         /// </summary>
         /// <param name="realOpenings">Перечисление </param>
         /// <param name="thisOpeningSolid">Солид текущего задания на отверстие</param>
@@ -200,9 +202,8 @@ namespace RevitOpeningPlacement.OpeningModels {
             if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
                 return 0;
             } else {
-                return realOpenings
-                    .Where(realOpening => realOpening.IntersectsSolid(thisOpeningSolid, thisOpeningBBox))
-                    .Count();
+                //для ускорения работы происходит поиск только первого проема
+                return realOpenings.Any(realOpening => realOpening.IntersectsSolid(thisOpeningSolid, thisOpeningBBox)) ? 1 : 0;
             }
         }
     }
