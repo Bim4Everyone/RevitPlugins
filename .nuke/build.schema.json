@@ -41,7 +41,7 @@
         },
         "Output": {
           "type": "string",
-          "description": "Output"
+          "description": "Output folder, default value is \"RootDirectory/bin\""
         },
         "Partition": {
           "type": "string",
@@ -53,7 +53,7 @@
         },
         "PluginName": {
           "type": "string",
-          "description": "PluginName"
+          "description": "Project plugin name in solution"
         },
         "Profile": {
           "type": "array",

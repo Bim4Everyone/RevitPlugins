@@ -1,3 +1,4 @@
 {
-  "$schema": "./build.schema.json"
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln"
 }

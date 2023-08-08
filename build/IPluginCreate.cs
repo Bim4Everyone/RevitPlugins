@@ -6,10 +6,11 @@ using System.Linq;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
+using Nuke.Components;
 
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
-interface IProjectCreate : ICommonParams, IPluginParams {
+interface IPluginCreate : IHazOutput, IHazPluginName, IHazSolution {
     string PluginTemplateName => "RevitPluginTemplate";
     AbsolutePath PluginTemplatePath => RootDirectory / ".github" / "templates" / PluginTemplateName;
 
@@ -24,7 +25,7 @@ interface IProjectCreate : ICommonParams, IPluginParams {
         .Requires(() => PluginName)
         .Executes(() => {
             string content = ScriptTemplatePath.ReadAllText()
-                .Replace("${{ gen.output }}", GetOutput(Output))
+                .Replace("${{ gen.output }}", Output)
                 .Replace("${{ gen.plugin_name }}", PluginName);
             PluginScriptPath.WriteAllText(content);
         });
