@@ -71,7 +71,8 @@ namespace RevitRooms.ViewModels {
             return RevitRepository.GetRoomSeparators()
                 .Where(item => item.LevelId == Element.Id)
                 .Where(item => phaseElements.Contains(item.CreatedPhaseId))
-                .Select(item => new RoomSeparatorViewModel(item, RevitRepository));
+                .Select(item => new RoomSeparatorViewModel(item, 
+                    new PhaseViewModel((Phase) RevitRepository.GetElement(item.CreatedPhaseId), RevitRepository), RevitRepository));
         }
 
         public IEnumerable<FamilyInstanceViewModel> GetDoors(IEnumerable<PhaseViewModel> phases) {

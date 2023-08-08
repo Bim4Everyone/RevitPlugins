@@ -10,8 +10,17 @@ namespace RevitRooms.ViewModels {
     internal sealed class RoomSeparatorViewModel : ElementViewModel<CurveElement> {
         private readonly List<SpatialElementViewModel> _rooms = new List<SpatialElementViewModel>();
 
-        public RoomSeparatorViewModel(CurveElement element, RevitRepository revitRepository)
+        public RoomSeparatorViewModel(CurveElement element, PhaseViewModel phase, RevitRepository revitRepository)
             : base(element, revitRepository) {
+            Phase = phase;
+        }
+        
+        public PhaseViewModel Phase { get; }
+        public ElementId LevelId => Element.LevelId;
+        public override string LevelName => RevitRepository.GetElement(Element.LevelId)?.Name;
+        
+        public override string PhaseName {
+            get { return Phase.Name; }
         }
 
         public void AddRoom(SpatialElementViewModel spatialElement) {
