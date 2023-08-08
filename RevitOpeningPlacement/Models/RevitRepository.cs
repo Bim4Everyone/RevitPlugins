@@ -244,9 +244,9 @@ namespace RevitOpeningPlacement.Models {
 
         public void RotateElement(Element element, XYZ point, Rotates angle) {
             if(point != null) {
-                RotateElement(element, point, Line.CreateBound(point, new XYZ(point.X + 1, point.Y, point.Z)), angle.X);
-                RotateElement(element, point, Line.CreateBound(point, new XYZ(point.X, point.Y + 1, point.Z)), angle.Y);
-                RotateElement(element, point, Line.CreateBound(point, new XYZ(point.X, point.Y, point.Z + 1)), angle.Z);
+                RotateElement(element, Line.CreateBound(point, new XYZ(point.X + 1, point.Y, point.Z)), angle.X);
+                RotateElement(element, Line.CreateBound(point, new XYZ(point.X, point.Y + 1, point.Z)), angle.Y);
+                RotateElement(element, Line.CreateBound(point, new XYZ(point.X, point.Y, point.Z + 1)), angle.Z);
             }
         }
 
@@ -467,7 +467,7 @@ namespace RevitOpeningPlacement.Models {
                 .ToList();
         }
 
-        private void RotateElement(Element element, XYZ point, Line axis, double angle) {
+        private void RotateElement(Element element, Line axis, double angle) {
             if(Math.Abs(angle) > 0.00001) {
                 ElementTransformUtils.RotateElement(_document, element.Id, axis, angle);
             }
