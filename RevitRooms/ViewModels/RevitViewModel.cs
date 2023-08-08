@@ -323,26 +323,13 @@ namespace RevitRooms.ViewModels {
             if(customPhase != null) {
                 checkPhases.Add(customPhase);
             }
-            
+
             foreach(var level in levels) {
                 var rooms = level.GetRooms(checkPhases).ToArray();
-                var doors = level.GetDoors(checkPhases).ToArray();
-                var doorsAndWindows = doors.Union(level.GetWindows(checkPhases)).ToArray();
-
-                // Все двери
-                // с не совпадающей секцией
-                var notEqualSectionDoors = doorsAndWindows
-                    .Where(item => !item.IsSectionNameEqual);
                 
-                AddElements(InfoElement.NotEqualSectionDoors, notEqualSectionDoors, warningElements);
+                CheckRoomSeparators(level, checkPhases, warningElements, rooms);
+                CheckDoorsAndWindows(level, checkPhases, warningElements, rooms);
                 
-                // Все окна и двери
-                // с не совпадающей группой
-                var notEqualGroup = doorsAndWindows
-                    .Where(item => !item.IsGroupNameEqual);
-                
-                AddElements(InfoElement.NotEqualGroup, notEqualGroup, warningElements);
-
                 // Все помещений у которых
                 // найдены самопересечения
                 var countourIntersectRooms = rooms
@@ -352,6 +339,55 @@ namespace RevitRooms.ViewModels {
 
             InfoElements = warningElements.Values.Union(errorElements.Values).ToList();
             return errorElements.Count > 0;
+        }
+
+        private void CheckRoomSeparators(
+            LevelViewModel level,
+            List<PhaseViewModel> checkPhases,
+            Dictionary<string, InfoElementViewModel> warningElements, 
+            SpatialElementViewModel[] rooms) {
+            // добавляем разделители помещений
+            var separators = level.GetRoomSeparators(checkPhases).ToArray();
+            foreach(RoomSeparatorViewModel roomSeparator in separators) {
+                roomSeparator.AddRooms(rooms);
+            }
+            
+            // Все разделители
+            // с не совпадающей секцией
+            var notEqualSectionDoors = separators
+                .Where(item => !item.IsSectionNameEqual);
+
+            AddElements(InfoElement.NotEqualSectionDoors, notEqualSectionDoors, warningElements);
+
+            // Все разделители
+            // с не совпадающей группой
+            var notEqualGroup = separators
+                .Where(item => !item.IsGroupNameEqual);
+
+            AddElements(InfoElement.NotEqualGroup, notEqualGroup, warningElements);
+        }
+
+        private void CheckDoorsAndWindows(
+            LevelViewModel level,
+            List<PhaseViewModel> checkPhases,
+            Dictionary<string, InfoElementViewModel> warningElements,
+            SpatialElementViewModel[] rooms) {
+            var doors = level.GetDoors(checkPhases).ToArray();
+            var doorsAndWindows = doors.Union(level.GetWindows(checkPhases)).ToArray();
+
+            // Все двери
+            // с не совпадающей секцией
+            var notEqualSectionDoors = doorsAndWindows
+                .Where(item => !item.IsSectionNameEqual);
+
+            AddElements(InfoElement.NotEqualSectionDoors, notEqualSectionDoors, warningElements);
+
+            // Все окна и двери
+            // с не совпадающей группой
+            var notEqualGroup = doorsAndWindows
+                .Where(item => !item.IsGroupNameEqual);
+
+            AddElements(InfoElement.NotEqualGroup, notEqualGroup, warningElements);
         }
 
         private void CalculateAreas(List<PhaseViewModel> phases, IEnumerable<LevelViewModel> levels) {

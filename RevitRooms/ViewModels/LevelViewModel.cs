@@ -64,6 +64,16 @@ namespace RevitRooms.ViewModels {
             return new HashSet<ElementId>(SpatialElements.Select(item => item.ElementId));
         }
 
+        public IEnumerable<RoomSeparatorViewModel> GetRoomSeparators(IEnumerable<PhaseViewModel> phases) {
+            HashSet<ElementId> phaseElements = new HashSet<ElementId>(phases
+                .Select(item => item.ElementId));
+
+            return RevitRepository.GetRoomSeparators()
+                .Where(item => item.LevelId == Element.Id)
+                .Where(item => phaseElements.Contains(item.CreatedPhaseId))
+                .Select(item => new RoomSeparatorViewModel(item, RevitRepository));
+        }
+
         public IEnumerable<FamilyInstanceViewModel> GetDoors(IEnumerable<PhaseViewModel> phases) {
             HashSet<ElementId> spatialElements = GetSpatialElementsHashSet();
             HashSet<ElementId> phaseElements = new HashSet<ElementId>(phases

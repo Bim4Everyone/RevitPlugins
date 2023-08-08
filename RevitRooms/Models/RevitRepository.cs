@@ -18,6 +18,8 @@ using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
+using RevitRooms.ViewModels;
+
 namespace RevitRooms.Models {
     internal class RevitRepository {
         private readonly ElementFilter _filter;
@@ -97,6 +99,14 @@ namespace RevitRooms.Models {
                 .WhereElementIsNotElementType()
                 .OfCategory(BuiltInCategory.OST_Windows)
                 .OfType<FamilyInstance>()
+                .ToList();
+        }
+
+        public IEnumerable<CurveElement> GetRoomSeparators() {
+            return new FilteredElementCollector(Document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_RoomSeparationLines)
+                .OfType<CurveElement>()
                 .ToList();
         }
 

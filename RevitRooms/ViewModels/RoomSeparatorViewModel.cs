@@ -8,19 +8,28 @@ using RevitRooms.Models;
 
 namespace RevitRooms.ViewModels {
     internal sealed class RoomSeparatorViewModel : ElementViewModel<CurveElement> {
-        private readonly SpatialElementViewModel[] _rooms;
+        private readonly List<SpatialElementViewModel> _rooms = new List<SpatialElementViewModel>();
 
-        public RoomSeparatorViewModel(CurveElement element,
-            RevitRepository revitRepository,
-            IEnumerable<SpatialElementViewModel> rooms)
+        public RoomSeparatorViewModel(CurveElement element, RevitRepository revitRepository)
             : base(element, revitRepository) {
-            _rooms = rooms.ToArray();
+        }
+
+        public void AddRoom(SpatialElementViewModel spatialElement) {
+            if(spatialElement.BoundarySegments.Contains(ElementId)) {
+                _rooms.Add(spatialElement);
+            }
+        }
+
+        public void AddRooms(IEnumerable<SpatialElementViewModel> spatialElements) {
+            foreach(SpatialElementViewModel spatialElement in spatialElements) {
+                AddRoom(spatialElement);
+            }
         }
 
         public bool IsSectionNameEqual {
             get {
-                if(_rooms.Length == 0
-                   || _rooms.Length == 1) {
+                if(_rooms.Count == 0
+                   || _rooms.Count == 1) {
                     return true;
                 }
                 
@@ -33,8 +42,8 @@ namespace RevitRooms.ViewModels {
 
         public bool IsGroupNameEqual {
             get {
-                if(_rooms.Length == 0
-                   || _rooms.Length == 1) {
+                if(_rooms.Count == 0
+                   || _rooms.Count == 1) {
                     return true;
                 }
 
