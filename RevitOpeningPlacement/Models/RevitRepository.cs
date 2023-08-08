@@ -422,13 +422,14 @@ namespace RevitOpeningPlacement.Models {
         /// Возвращает перечисление чистовых экземпляров семейств отверстий из текущего документа Revit
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<FamilyInstance> GetRealOpenings() {
+        public IList<OpeningReal> GetRealOpenings() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
                 .WherePasses(FiltersInitializer.GetFilterByAllUsedOpeningsCategories())
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
-                ;
+                .Select(famInst => new OpeningReal(famInst))
+                .ToList();
         }
 
         /// <summary>
