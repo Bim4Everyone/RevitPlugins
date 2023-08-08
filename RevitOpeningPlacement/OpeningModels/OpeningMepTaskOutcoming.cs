@@ -357,15 +357,16 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="thisOpeningTaskSolid"></param>
         /// <returns></returns>
-        private IEnumerable<Solid> GetIntersectingMepSolids(Solid thisOpeningTaskSolid) {
+        private IList<Solid> GetIntersectingMepSolids(Solid thisOpeningTaskSolid) {
             if((thisOpeningTaskSolid is null) || (thisOpeningTaskSolid.Volume <= 0)) {
-                return Enumerable.Empty<Solid>();
+                return new List<Solid>();
             } else {
                 return new FilteredElementCollector(GetDocument())
                     .WherePasses(FiltersInitializer.GetFilterByAllUsedMepCategories())
                     .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningTaskSolid.GetOutline()))
                     .WherePasses(new ElementIntersectsSolidFilter(thisOpeningTaskSolid))
-                    .Select(element => element.GetSolid());
+                    .Select(element => element.GetSolid())
+                    .ToList();
             }
         }
     }
