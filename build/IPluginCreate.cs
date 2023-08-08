@@ -8,38 +8,35 @@ using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Components;
 
+using Serilog;
+
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
-interface IPluginCreate : IHazOutput, IHazPluginName, IHazSolution {
-    string PluginTemplateName => "RevitPluginTemplate";
-    AbsolutePath PluginTemplatePath => RootDirectory / ".github" / "templates" / PluginTemplateName;
+[ParameterPrefix(nameof(IPluginCreate))]
+interface IPluginCreate : IHazSolution, IHazOutput, IHazPluginName {
+    string TemplateName => "RevitPluginTemplate";
+    AbsolutePath TemplateFile => RootDirectory / ".github" / "templates" / TemplateName;
 
-    AbsolutePath ScriptTemplatePath => RootDirectory / ".github" / "templates" / "default.yml";
-    AbsolutePath PluginScriptPath => RootDirectory / ".github" / "workflows" / $"{PluginName}.yml";
-
-    AbsolutePath ProjectPath => RootDirectory / PluginName / $"{PluginName}.csproj";
-    AbsolutePath TemplatePath => RootDirectory / "RevitPlugins" / "RevitPlugins.csproj";
-
-    Target CreateScript => _ => _
-        .Requires(() => Output)
-        .Requires(() => PluginName)
-        .Executes(() => {
-            string content = ScriptTemplatePath.ReadAllText()
-                .Replace("${{ gen.output }}", Output)
-                .Replace("${{ gen.plugin_name }}", PluginName);
-            PluginScriptPath.WriteAllText(content);
-        });
-
+    AbsolutePath PluginFile => RootDirectory / PluginName / $"{PluginName}.csproj";
+    AbsolutePath PluginTemplateFile => RootDirectory / "RevitPlugins" / "RevitPlugins.csproj";
     Target CreatePlugin => _ => _
-        .DependsOn(CreateScript)
-        .Requires(() => Output)
-        .Requires(() => PluginName)
-        .OnlyWhenDynamic(() => Solution.GetProject(PluginName) == null, $"Плагин \"{PluginName}\" уже существует.")
+        .DependsOn<ICreateScript>()
+        .OnlyWhenDynamic(() => Solution.GetProject(PluginName) == null, $"Plugin \"{PluginName}\" does exists.")
         .Executes(() => {
-            CopyDirectory(PluginTemplatePath, RootDirectory / PluginName);
+            Log.Debug("TemplateName: {TemplateName}", TemplateName);
+            Log.Debug("TemplateFile: {TemplateFile}", TemplateFile);
+
+            Log.Debug("PluginFile: {PluginFile}", PluginFile);
+            Log.Debug("PluginDirectory: {PluginDirectory}", PluginDirectory);
+            Log.Debug("PluginTemplateFile: {PluginTemplateFile}", PluginTemplateFile);
             
-            DotNet(arguments: $"sln add {ProjectPath}");
-            ProjectPath.WriteAllText(TemplatePath.ReadAllText());
+            Log.Debug("HazProject: {HazProject}", Solution.GetProject(PluginName) != null);
+            Log.Debug("HazDirectory: {HazDirectory}", PluginDirectory.Exists());
+
+            CopyDirectory(TemplateFile, PluginDirectory);
+
+            DotNet(arguments: $"sln add {PluginFile}");
+            PluginFile.WriteAllText(PluginTemplateFile.ReadAllText());
         });
 
     // https://learn.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
@@ -59,7 +56,7 @@ interface IPluginCreate : IHazOutput, IHazPluginName, IHazSolution {
             AbsolutePath targetFilePath = UpdateName(targetDir / file.Name);
 
             string content = file.ReadAllText()
-                .Replace(PluginTemplateName, PluginName);
+                .Replace(TemplateName, PluginName);
 
             targetFilePath.WriteAllText(content);
         }
@@ -74,7 +71,7 @@ interface IPluginCreate : IHazOutput, IHazPluginName, IHazSolution {
 
     AbsolutePath UpdateName(AbsolutePath target) {
         string targetName = target.Name
-            .Replace(PluginTemplateName, PluginName);
+            .Replace(TemplateName, PluginName);
         return target.Parent / targetName;
     }
 }
