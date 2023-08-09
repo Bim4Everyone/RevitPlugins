@@ -22,6 +22,16 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         private readonly FamilyInstance _familyInstance;
 
+        /// <summary>
+        /// Закэшированный солид
+        /// </summary>
+        private Solid _solid;
+
+        /// <summary>
+        /// Закэшированный BBox
+        /// </summary>
+        private BoundingBoxXYZ _boundingBox;
+
 
         /// <summary>
         /// Создает экземпляр класса <see cref="OpeningReal"/>
@@ -52,26 +62,32 @@ namespace RevitOpeningPlacement.OpeningModels {
 
 
         public Solid GetSolid() {
-            XYZ openingLocation = (_familyInstance.Location as LocationPoint).Point;
-            var hostElement = GetHost();
-            Solid hostSolidCut = hostElement.GetSolid();
-            try {
-                Solid hostSolidOriginal = (hostElement as HostObject).GetHostElementOriginalSolid();
-                var openings = SolidUtils.SplitVolumes(BooleanOperationsUtils.ExecuteBooleanOperation(hostSolidOriginal, hostSolidCut, BooleanOperationsType.Difference));
-                var thisOpeningSolid = openings.OrderBy(solidOpening => (solidOpening.ComputeCentroid() - openingLocation).GetLength()).FirstOrDefault();
-                if(thisOpeningSolid != null) {
-                    return thisOpeningSolid;
-                } else {
-                    return CreateRawSolid();
+            if(_solid is null) {
+                XYZ openingLocation = (_familyInstance.Location as LocationPoint).Point;
+                var hostElement = GetHost();
+                Solid hostSolidCut = hostElement.GetSolid();
+                try {
+                    Solid hostSolidOriginal = (hostElement as HostObject).GetHostElementOriginalSolid();
+                    var openings = SolidUtils.SplitVolumes(BooleanOperationsUtils.ExecuteBooleanOperation(hostSolidOriginal, hostSolidCut, BooleanOperationsType.Difference));
+                    var thisOpeningSolid = openings.OrderBy(solidOpening => (solidOpening.ComputeCentroid() - openingLocation).GetLength()).FirstOrDefault();
+                    if(thisOpeningSolid != null) {
+                        _solid = thisOpeningSolid;
+                    } else {
+                        _solid = CreateRawSolid();
+                    }
+                } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                    _solid = CreateRawSolid();
                 }
-            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                return CreateRawSolid();
             }
+            return _solid;
         }
 
 
         public BoundingBoxXYZ GetTransformedBBoxXYZ() {
-            return _familyInstance.GetBoundingBox();
+            if(_boundingBox is null) {
+                _boundingBox = _familyInstance.GetBoundingBox();
+            }
+            return _boundingBox;
         }
 
         /// <summary>
