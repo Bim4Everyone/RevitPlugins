@@ -1498,29 +1498,43 @@
                                 <GroupBox Margin="5 0 5 10">
                                     <GroupBox.Header>
                                         <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Grid.Row="0" 
                                             Margin="5 10 0 0"
                                             FontSize="14"
-                                            Text="Правила создания спецификации материалов"/>
+                                            Text="Правила создания спецификации материалов"
+                                            ToolTip="Правила, по которым будет создаваться спецификация материалов для пилонов"/>
                                     </GroupBox.Header>
 
                                     <StackPanel>
 
-                                        <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Маска имени спецификации материалов"/>
+                                            Text="Маска имени спецификации материалов">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource MaterialScheduleNameStyle}"/>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
 
                                         <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
                                             <TextBox 
-                                                Style="{StaticResource TextBoxStyle}"
+                                                Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="10 0 5 0"
                                                 Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_PREFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
+
+                                                <TextBox.ToolTip>
+                                                    <ToolTip>
+                                                        <TextBlock Style="{StaticResource MaterialSchedulePrefixStyle}"/>
+                                                    </ToolTip>
+                                                </TextBox.ToolTip>
+
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="TextChanged">
                                                         <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
@@ -1534,13 +1548,20 @@
                                                 Text="Марка пилона"/>
 
                                             <TextBox 
-                                                Style="{StaticResource TextBoxStyle}"
+                                                Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="5 0 10 0"
                                                 Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_SUFFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
+
+                                                <TextBox.ToolTip>
+                                                    <ToolTip>
+                                                        <TextBlock Style="{StaticResource MaterialScheduleSuffixStyle}"/>
+                                                    </ToolTip>
+                                                </TextBox.ToolTip>
+
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="TextChanged">
                                                         <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
@@ -1553,18 +1574,31 @@
 
 
                                         <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 5 0 5"
-                                            Text="Имя для поиска эталонной спецификации материалов"/>
+                                            Text="Имя для поиска эталонной спецификации материалов">
+                                            <TextBlock.ToolTip>
+                                                    <ToolTip>
+                                                    <TextBlock Style="{StaticResource ReferenceMaterialScheduleNameStyle}"/>
+                                                    </ToolTip>
+                                                </TextBlock.ToolTip>
+                                        </TextBlock>
 
                                         <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
                                             Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_NAME_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource ReferenceMaterialScheduleNameStyle}"/>
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="TextChanged">
                                                     <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
@@ -1575,18 +1609,31 @@
 
 
                                         <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="В параметр для группировки диспетчера 1"/>
+                                            Text="В параметр для группировки диспетчера 1">
+                                            <TextBlock.ToolTip>
+                                                    <ToolTip>
+                                                    <TextBlock Style="{StaticResource MaterialScheduleDisp1Style}"/>
+                                                    </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
 
                                         <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
                                             Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_DISP1_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource MaterialScheduleDisp1Style}"/>
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="TextChanged">
                                                     <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
@@ -1597,18 +1644,31 @@
 
 
                                         <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="В параметр для группировки диспетчера 2"/>
+                                            Text="В параметр для группировки диспетчера 2">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource MaterialScheduleDisp2Style}"/>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
 
                                         <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
                                             Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_DISP2_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource MaterialScheduleDisp2Style}"/>
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="TextChanged">
                                                     <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
@@ -1628,24 +1688,38 @@
                                             Grid.Row="0" 
                                             Margin="5 10 0 0"
                                             FontSize="14"
-                                            Text="Правила создания ведомости системных деталей"/>
+                                            Text="Правила создания ведомости системных деталей"
+                                            ToolTip="Правила, по которым будет создаваться ведомость системных деталей для пилонов"/>
                                     </GroupBox.Header>
 
                                     <StackPanel>
                                         <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Маска имени ведомости системных деталей"/>
+                                            Text="Маска имени ведомости системных деталей">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource SystemPartsScheduleNameStyle}"/>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
 
                                         <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
                                             <TextBox 
-                                                Style="{StaticResource TextBoxStyle}"
+                                                Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="10 0 5 0"
                                                 Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_PREFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
+
+                                                <TextBox.ToolTip>
+                                                    <ToolTip>
+                                                        <TextBlock Style="{StaticResource SystemPartsSchedulePrefixStyle}"/>
+                                                    </ToolTip>
+                                                </TextBox.ToolTip>
+
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="TextChanged">
                                                         <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
@@ -1659,13 +1733,20 @@
                                                 Text="Марка пилона"/>
 
                                             <TextBox 
-                                                Style="{StaticResource TextBoxStyle}"
+                                                Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="5 0 10 0"
                                                 Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_SUFFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
+
+                                                <TextBox.ToolTip>
+                                                    <ToolTip>
+                                                        <TextBlock Style="{StaticResource SystemPartsScheduleSuffixStyle}"/>
+                                                    </ToolTip>
+                                                </TextBox.ToolTip>
+
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="TextChanged">
                                                         <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
@@ -1679,18 +1760,31 @@
 
 
                                         <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Имя для поиска эталонной ведомости системных деталей"/>
+                                            Text="Имя для поиска эталонной ведомости системных деталей">
+                                            <TextBlock.ToolTip>
+                                                    <ToolTip>
+                                                    <TextBlock Style="{StaticResource ReferenceSystemPartsScheduleNameStyle}"/>
+                                                    </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
 
                                         <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
                                             Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_NAME_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource ReferenceSystemPartsScheduleNameStyle}"/>
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="TextChanged">
                                                     <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
@@ -1701,18 +1795,31 @@
 
 
                                         <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="В параметр для группировки диспетчера 1"/>
+                                            Text="В параметр для группировки диспетчера 1">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource SystemPartsScheduleDisp1Style}"/>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
 
                                         <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
                                             Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP1_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource SystemPartsScheduleDisp1Style}"/>
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="TextChanged">
                                                     <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
@@ -1723,18 +1830,31 @@
 
 
                                         <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="В параметр для группировки диспетчера 2"/>
+                                            Text="В параметр для группировки диспетчера 2">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource SystemPartsScheduleDisp2Style}"/>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
 
                                         <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
                                             Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP2_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource SystemPartsScheduleDisp2Style}"/>
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="TextChanged">
                                                     <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
@@ -1751,28 +1871,42 @@
                                 <GroupBox Margin="5 0 5 10">
                                     <GroupBox.Header>
                                         <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Grid.Row="0" 
                                             Margin="5 10 0 0"
                                             FontSize="14"
-                                            Text="Правила создания ведомости IFC-деталей"/>
+                                            Text="Правила создания ведомости IFC деталей"
+                                            ToolTip="Правила, по которым будет создаваться ведомость IFC деталей для пилонов"/>
                                     </GroupBox.Header>
 
                                     <StackPanel>
                                         <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Маска имени ведомости IFC деталей"/>
+                                            Text="Маска имени ведомости IFC деталей">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource IFCPartsScheduleNameStyle}"/>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
 
                                         <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
                                             <TextBox 
-                                                Style="{StaticResource TextBoxStyle}"
+                                                Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="10 0 5 0"
                                                 Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_PREFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
+
+                                                <TextBox.ToolTip>
+                                                    <ToolTip>
+                                                        <TextBlock Style="{StaticResource IFCPartsSchedulePrefixStyle}"/>
+                                                    </ToolTip>
+                                                </TextBox.ToolTip>
+
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="TextChanged">
                                                         <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
@@ -1786,13 +1920,20 @@
                                                 Text="Марка пилона"/>
 
                                             <TextBox 
-                                                Style="{StaticResource TextBoxStyle}"
+                                                Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="5 0 10 0"
                                                 Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_SUFFIX_TEMP,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
+
+                                                <TextBox.ToolTip>
+                                                    <ToolTip>
+                                                        <TextBlock Style="{StaticResource IFCPartsScheduleSuffixStyle}"/>
+                                                    </ToolTip>
+                                                </TextBox.ToolTip>
+
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="TextChanged">
                                                         <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
@@ -1805,20 +1946,32 @@
 
 
 
-
                                         <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Имя для поиска эталонной ведомости IFC деталей"/>
+                                            Text="Имя для поиска эталонной ведомости IFC деталей">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource ReferenceIFCPartsScheduleNameStyle}"/>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
 
                                         <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
                                             Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_NAME_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource ReferenceIFCPartsScheduleNameStyle}"/>
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="TextChanged">
                                                     <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
@@ -1829,18 +1982,31 @@
 
 
                                         <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="В параметр для группировки диспетчера 1"/>
+                                            Text="В параметр для группировки диспетчера 1">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource IFCPartsScheduleDisp1Style}"/>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
 
                                         <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
                                             Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_DISP1_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource IFCPartsScheduleDisp1Style}"/>
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="TextChanged">
                                                     <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
@@ -1851,18 +2017,31 @@
 
 
                                         <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="В параметр для группировки диспетчера 2"/>
+                                            Text="В параметр для группировки диспетчера 2">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource IFCPartsScheduleDisp2Style}"/>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
 
                                         <TextBox 
-                                            Style="{StaticResource TextBoxStyle}"
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
                                             Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_DISP2_TEMP,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip ToolTipService.ShowDuration="500000">
+                                                    <TextBlock Style="{StaticResource IFCPartsScheduleDisp2Style}"/>
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="TextChanged">
                                                     <i:InvokeCommandAction Command="{Binding DataContext.SettingsChangedCommand, 
@@ -1879,18 +2058,25 @@
                                 <GroupBox Margin="5 0 5 10">
                                     <GroupBox.Header>
                                         <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Grid.Row="0" 
                                             Margin="5 10 0 0"
                                             FontSize="14"
-                                            Text="Правила фильтров в спецификациях"/>
+                                            Text="Правила фильтров в спецификациях"
+                                            ToolTip="Правила, по которым будут формироваться фильтры в спецификациях и ведомостях"/>
                                     </GroupBox.Header>
 
                                     <StackPanel>
                                         <TextBlock 
-                                            Style="{StaticResource TextBlockStyle}"
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Список параметров фильтрации для спецификаций"/>
+                                            Text="Список параметров фильтрации для спецификаций">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock Style="{StaticResource FiltersLongCommentsStyle}"/>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
 
 
                                         <ListView
@@ -1976,14 +2162,22 @@
                                                 Margin="0 5 3 0"
                                                 Height="25"
                                                 Content="Добавить"
-                                                Command="{Binding AddScheduleFilterParamCommand}"/>
+                                                Command="{Binding AddScheduleFilterParamCommand}"
+                                                ToolTip="Добавляет новую строку в списке выше"
+                                                ToolTipService.InitialShowDelay="1000"
+                                                ToolTipService.ShowDuration="20000"
+                                                ToolTipService.BetweenShowDelay="1"/>
                                             <Button
                                                 Style="{StaticResource SimpleButtonStyle}"
                                                 Grid.Column="1"
                                                 Margin="3 5 0 0"
                                                 Height="25"
                                                 Content="Удалить"
-                                                Command="{Binding DeleteScheduleFilterParamCommand}"/>
+                                                Command="{Binding DeleteScheduleFilterParamCommand}"
+                                                ToolTip="Удаляет отмеченные галочкой строки из списка выше"
+                                                ToolTipService.InitialShowDelay="1000"
+                                                ToolTipService.ShowDuration="20000"
+                                                ToolTipService.BetweenShowDelay="1"/>
                                         </Grid>
                                     </StackPanel>
                                 </GroupBox>
@@ -2025,23 +2219,36 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock 
-                    Style="{StaticResource TextBlockStyle}"
+                    Style="{StaticResource TextBlockWithTooltipStyle}"
                     Grid.Row="0" 
                     Margin="10 10 0 0"
-                    Text="Выберите нужный комплект документации:"/>
+                    Text="Выберите нужный комплект документации:">
+                    <TextBlock.ToolTip>
+                        <ToolTip>
+                            <TextBlock Style="{StaticResource ProjectSectionStyle}"/>
+                        </ToolTip>
+                    </TextBlock.ToolTip>
+                </TextBlock>
 
 
                 <StackPanel 
-                Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                Orientation="Horizontal">
+                    Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                    Orientation="Horizontal">
                     <ComboBox 
-                    Style="{StaticResource ComboBoxStyle}"
+                        Style="{StaticResource ComboBoxWithTooltipStyle}"
                     
-                    Margin="10 7 5 0"
-                    MinWidth="250"
-                    Height="36"
-                    ItemsSource="{Binding ProjectSections}" 
-                    SelectedItem="{Binding SelectedProjectSection}">
+                        Margin="10 7 5 0"
+                        MinWidth="250"
+                        Height="36"
+                        ItemsSource="{Binding ProjectSections}" 
+                        SelectedItem="{Binding SelectedProjectSection}">
+
+                        <ComboBox.ToolTip>
+                            <ToolTip>
+                                <TextBlock Style="{StaticResource ProjectSectionStyle}"/>
+                            </ToolTip>
+                        </ComboBox.ToolTip>
+
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="SelectionChanged">
                                 <i:InvokeCommandAction 
@@ -2059,16 +2266,32 @@
                 
                         Content="Выбрать пилон"
                         Click="ButtonCancel_Click"
-                        Command="{Binding SelectPylonCommand}"/>
+                        Command="{Binding SelectPylonCommand}"
+                        
+                        ToolTipService.InitialShowDelay="1000"
+                        ToolTipService.ShowDuration="20000"
+                        ToolTipService.BetweenShowDelay="1">
+                        <Button.ToolTip>
+                            <ToolTip>
+                                <TextBlock Style="{StaticResource SelectPylonStyle}"/>
+                            </ToolTip>
+                        </Button.ToolTip>
+                    </Button>
                 </StackPanel>
 
 
 
                 <TextBlock 
-                    Style="{StaticResource TextBlockStyle}"
+                    Style="{StaticResource TextBlockWithTooltipStyle}"
                     Grid.Row="2" 
                     Margin="10 5"
-                    Text="Выберите марки пилонов для обработки:"/>
+                    Text="Выберите марки пилонов для обработки:">
+                    <TextBlock.ToolTip>
+                        <ToolTip>
+                            <TextBlock Style="{StaticResource MarksStyle}"/>
+                        </ToolTip>
+                    </TextBlock.ToolTip>
+                </TextBlock>
 
 
                 <Grid 
@@ -2082,14 +2305,15 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBox
-                        Style="{StaticResource TextBoxStyle}"
+                        Style="{StaticResource TextBoxWithTooltipStyle}"
                         Grid.Column="0"
                         Margin="10 0 3 2"
                         Width="152"
                         FontSize="12"
                         Text="{Binding HostsInfoFilter, UpdateSourceTrigger=PropertyChanged}"
                         HorizontalAlignment="Left"
-                        VerticalContentAlignment="Center"/>
+                        VerticalContentAlignment="Center"
+                        ToolTip="Введите текст для поиска в списке ниже"/>
 
                     <Button 
                         Style="{StaticResource TransparentButton}"
@@ -2108,7 +2332,11 @@
                         Width="92"
                         FontSize="12"
                         Content="Выбрать все" 
-                        Command="{Binding Path=SelectAllHostsInfoInGUICommand}"/>
+                        Command="{Binding Path=SelectAllHostsInfoInGUICommand}"
+                        ToolTip="Нажмите, чтобы выбрать все марки пилонов, видимые в списке ниже"
+                        ToolTipService.InitialShowDelay="1000"
+                        ToolTipService.ShowDuration="20000"
+                        ToolTipService.BetweenShowDelay="1"/>
 
                     <Button 
                         Style="{StaticResource SimpleButtonStyle}"
@@ -2118,7 +2346,11 @@
                         Width="112"
                         FontSize="12"
                         Content="Отменить выбор" 
-                        Command="{Binding Path=UnselectAllHostsInfoInGUICommand}"/>
+                        Command="{Binding Path=UnselectAllHostsInfoInGUICommand}"                        
+                        ToolTip="Нажмите, чтобы отменить выбор всех марок пилонов, видимых в списке ниже"
+                        ToolTipService.InitialShowDelay="1000"
+                        ToolTipService.ShowDuration="20000"
+                        ToolTipService.BetweenShowDelay="1"/>
                 </Grid>
 
 
@@ -2139,7 +2371,11 @@
                         FontSize="12"
                         Content="Выбрать все"
                         HorizontalAlignment="Left"
-                        Command="{Binding Path=SelectAllFuncInGUICommand}"/>
+                        Command="{Binding Path=SelectAllFuncInGUICommand}"
+                        ToolTip="Нажмите, чтобы передвинуть тумблеры вправо у всех видов/спецификаций ниже"
+                        ToolTipService.InitialShowDelay="1000"
+                        ToolTipService.ShowDuration="20000"
+                        ToolTipService.BetweenShowDelay="1"/>
 
                     <Button 
                         Grid.Column="1"
@@ -2149,7 +2385,11 @@
                         FontSize="12"
                         Content="Отменить выбор"   
                         HorizontalAlignment="Right"
-                        Command="{Binding Path=UnselectAllFuncInGUICommand}"/>
+                        Command="{Binding Path=UnselectAllFuncInGUICommand}"
+                        ToolTip="Нажмите, чтобы передвинуть тумблеры влево у всех видов/спецификаций ниже"
+                        ToolTipService.InitialShowDelay="1000"
+                        ToolTipService.ShowDuration="20000"
+                        ToolTipService.BetweenShowDelay="1"/>
                 </Grid>
 
 
@@ -2229,112 +2469,232 @@
                         <CheckBox  
                             Grid.Row="0"
                             Grid.Column="0"
-                            Style="{DynamicResource ToggleButtonStyle}"
-                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralView}"/>
+                            Style="{DynamicResource ToggleButtonWithTooltipStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralView}">
+                            <CheckBox.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource GeneralViewStyle}"/>
+                                </ToolTip>
+                            </CheckBox.ToolTip>
+                        </CheckBox>
                         <TextBlock 
                             Grid.Row="0"
                             Grid.Column="1"
-                            Style="{StaticResource TextBlockStyle}"
-                            Text="Основной вид"/>
+                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                            Text="Основной вид">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource GeneralViewStyle}"/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
 
                         <CheckBox  
                             Grid.Row="1"
                             Grid.Column="0"
-                            Style="{DynamicResource ToggleButtonStyle}"
-                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralPerpendicularView}"/>
+                            Style="{DynamicResource ToggleButtonWithTooltipStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithGeneralPerpendicularView}">
+                            <CheckBox.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource GeneralViewPerpendicularStyle}"/>
+                                </ToolTip>
+                            </CheckBox.ToolTip>
+                        </CheckBox>
                         <TextBlock 
                             Grid.Row="1"
                             Grid.Column="1"
-                            Style="{StaticResource TextBlockStyle}"
-                            Text="Боковой вид"/>
+                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                            Text="Боковой вид">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource GeneralViewPerpendicularStyle}"/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
 
                         <CheckBox  
                             Grid.Row="2"
                             Grid.Column="0"
-                            Style="{DynamicResource ToggleButtonStyle}"
-                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewFirst}"/>
+                            Style="{DynamicResource ToggleButtonWithTooltipStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewFirst}">
+                            <CheckBox.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource TransverseViewFirstStyle}"/>
+                                </ToolTip>
+                            </CheckBox.ToolTip>
+                        </CheckBox>
                         <TextBlock 
                             Grid.Row="2"
                             Grid.Column="1"
-                            Style="{StaticResource TextBlockStyle}"
-                            Text="Первый горизонтальный вид"/>
+                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                            Text="Первый горизонтальный вид">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource TransverseViewFirstStyle}"/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
 
                         <CheckBox  
                             Grid.Row="3"
                             Grid.Column="0"
-                            Style="{DynamicResource ToggleButtonStyle}"
-                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewSecond}"/>
+                            Style="{DynamicResource ToggleButtonWithTooltipStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewSecond}">
+                            <CheckBox.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource TransverseViewSecondStyle}"/>
+                                </ToolTip>
+                            </CheckBox.ToolTip>
+                        </CheckBox>
                         <TextBlock 
                             Grid.Row="3"
                             Grid.Column="1"
-                            Style="{StaticResource TextBlockStyle}"
-                            Text="Второй горизонтальный вид"/>
+                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                            Text="Второй горизонтальный вид">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource TransverseViewSecondStyle}"/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
 
                         <CheckBox  
                             Grid.Row="4"
                             Grid.Column="0"
-                            Style="{DynamicResource ToggleButtonStyle}"
-                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewThird}"/>
+                            Style="{DynamicResource ToggleButtonWithTooltipStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithTransverseViewThird}">
+                            <CheckBox.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource TransverseViewThirdStyle}"/>
+                                </ToolTip>
+                            </CheckBox.ToolTip>
+                        </CheckBox>
                         <TextBlock 
                             Grid.Row="4"
                             Grid.Column="1"
-                            Style="{StaticResource TextBlockStyle}"
-                            Text="Третий горизонтальный вид"/>
+                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                            Text="Третий горизонтальный вид">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource TransverseViewThirdStyle}"/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
 
                         <CheckBox  
                             Grid.Row="5"
                             Grid.Column="0"
-                            Style="{DynamicResource ToggleButtonStyle}"
-                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithRebarSchedule}"/>
+                            Style="{DynamicResource ToggleButtonWithTooltipStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithRebarSchedule}">
+                            <CheckBox.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource RebarScheduleStyle}"/>
+                                </ToolTip>
+                            </CheckBox.ToolTip>
+                        </CheckBox>
                         <TextBlock 
                             Grid.Row="5"
                             Grid.Column="1"
-                            Style="{StaticResource TextBlockStyle}"
-                            Text="Спецификацию армирования"/>
+                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                            Text="Спецификация армирования">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource RebarScheduleStyle}"/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
 
                         <CheckBox  
                             Grid.Row="6"
                             Grid.Column="0"
-                            Style="{DynamicResource ToggleButtonStyle}"
-                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithMaterialSchedule}"/>
+                            Style="{DynamicResource ToggleButtonWithTooltipStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithMaterialSchedule}">
+                            <CheckBox.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource MaterialScheduleStyle}"/>
+                                </ToolTip>
+                            </CheckBox.ToolTip>
+                        </CheckBox>
                         <TextBlock 
                             Grid.Row="6"
                             Grid.Column="1"
-                            Style="{StaticResource TextBlockStyle}"
-                            Text="Спецификацию материалов"/>
+                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                            Text="Спецификация материалов">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource MaterialScheduleStyle}"/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
 
                         <CheckBox  
                             Grid.Row="7"
                             Grid.Column="0"
-                            Style="{DynamicResource ToggleButtonStyle}"
-                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSystemPartsSchedule}"/>
+                            Style="{DynamicResource ToggleButtonWithTooltipStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSystemPartsSchedule}">
+                            <CheckBox.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource SystemPartsScheduleStyle}"/>
+                                </ToolTip>
+                            </CheckBox.ToolTip>
+                        </CheckBox>
                         <TextBlock 
                             Grid.Row="7"
                             Grid.Column="1"
-                            Style="{StaticResource TextBlockStyle}"
-                            Text="Ведомость системных деталей"/>
+                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                            Text="Ведомость системных деталей">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource SystemPartsScheduleStyle}"/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
 
                         <CheckBox  
                             Grid.Row="8"
                             Grid.Column="0"
-                            Style="{DynamicResource ToggleButtonStyle}"
-                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithIFCPartsSchedule}"/>
+                            Style="{DynamicResource ToggleButtonWithTooltipStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithIFCPartsSchedule}">
+                            <CheckBox.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource IFCPartsScheduleStyle}"/>
+                                </ToolTip>
+                            </CheckBox.ToolTip>
+                        </CheckBox>
                         <TextBlock 
                             Grid.Row="8"
                             Grid.Column="1"
-                            Style="{StaticResource TextBlockStyle}"
-                            Text="Ведомость IFC деталей"/>
+                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                            Text="Ведомость IFC деталей">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource IFCPartsScheduleStyle}"/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
 
                         <CheckBox  
                             Grid.Row="9"
                             Grid.Column="0"
-                            Style="{DynamicResource ToggleButtonStyle}"
-                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithLegend}"/>
+                            Style="{DynamicResource ToggleButtonWithTooltipStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithLegend}">
+                            <CheckBox.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource LegendStyle}"/>
+                                </ToolTip>
+                            </CheckBox.ToolTip>
+                        </CheckBox>
                         <TextBlock 
                             Grid.Row="9"
                             Grid.Column="1"
-                            Style="{StaticResource TextBlockStyle}"
-                            Text="Легенда примечаний"/>
+                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                            Text="Легенда примечаний">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock Style="{StaticResource LegendStyle}"/>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
                     </Grid>
                 </Border>
 

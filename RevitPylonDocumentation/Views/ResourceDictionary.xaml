@@ -103,6 +103,15 @@
     <!-- End: ToggleButtonStyle-->
 
 
+    <Style x:Key="ToggleButtonWithTooltipStyle" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource ToggleButtonStyle}">
+
+        <Setter Property="ToolTipService.InitialShowDelay" Value="1000" />
+        <Setter Property="ToolTipService.ShowDuration" Value="20000" />
+        <Setter Property="ToolTipService.BetweenShowDelay" Value="1" />
+    </Style>
+
+
+
     <Style x:Key="TextBlockStyle" TargetType="{x:Type TextBlock}">
 
         <Setter Property="Foreground" Value="{StaticResource PrimaryGrayColor}" />
