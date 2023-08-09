@@ -445,6 +445,7 @@ namespace RevitOpeningPlacement.Models {
                 var linkDoc = link.GetLinkDocument();
                 var transform = link.GetTransform();
                 var genericModelsInLink = new FilteredElementCollector(linkDoc)
+                    .WhereElementIsNotElementType()
                     .OfCategory(BuiltInCategory.OST_GenericModel)
                     .OfType<FamilyInstance>()
                     .Where(item => TypeName.Any(n => n.Value.Equals(item.Name))
