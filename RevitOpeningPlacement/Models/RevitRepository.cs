@@ -429,6 +429,7 @@ namespace RevitOpeningPlacement.Models {
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
                 .Where(famInst => famInst.Host != null)
+                .Where(famInst => famInst.Symbol.FamilyName.Contains("Отв"))
                 .Select(famInst => new OpeningReal(famInst))
                 .ToList();
         }
