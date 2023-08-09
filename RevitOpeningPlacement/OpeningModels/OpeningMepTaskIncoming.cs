@@ -65,7 +65,7 @@ namespace RevitOpeningPlacement.OpeningModels {
             string[] famNameParts = _familyInstance.Symbol.FamilyName.Split('_');
             if(famNameParts.Length > 0) {
                 HostTypeName = famNameParts.Last();
-        }
+            }
         }
 
 
@@ -123,8 +123,18 @@ namespace RevitOpeningPlacement.OpeningModels {
             return _familyInstance;
         }
 
+        /// <summary>
+        /// Возвращает солид входящего задания на отверстие
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public Solid GetSolid() {
-            return SolidUtils.CreateTransformed(_familyInstance.GetSolid(), Transform);
+            Solid famInstSolid = _familyInstance.GetSolid();
+            if(famInstSolid?.Volume > 0) {
+                return SolidUtils.CreateTransformed(_familyInstance.GetSolid(), Transform);
+            } else {
+                throw new ArgumentException($"Не удалось обработать задание на отверстие с ID {Id} из файла \'{FileName}\'");
+            }
         }
 
         public BoundingBoxXYZ GetTransformedBBoxXYZ() {
@@ -163,20 +173,29 @@ namespace RevitOpeningPlacement.OpeningModels {
             return value;
         }
 
+        /// <summary>
+        /// Обновляет <see cref="Status"/> входящего задания на отверстие
+        /// </summary>
+        /// <param name="realOpenings"></param>
+        /// <exception cref="ArgumentException"></exception>
         public void UpdateStatus(ICollection<OpeningReal> realOpenings) {
-            var thisOpeningSolid = GetSolid();
-            var thisOpeningBBox = GetTransformedBBoxXYZ();
-            var intersectingStructureSolidsCount = GetIntersectingStructureElementsSolidsCount(thisOpeningSolid);
-            var intersectingOpeningsSolidsCount = GetIntersectingOpeningsSolidsCount(realOpenings, thisOpeningSolid, thisOpeningBBox);
+            try {
+                var thisOpeningSolid = GetSolid();
+                var thisOpeningBBox = GetTransformedBBoxXYZ();
+                var intersectingStructureSolidsCount = GetIntersectingStructureElementsSolidsCount(thisOpeningSolid);
+                var intersectingOpeningsSolidsCount = GetIntersectingOpeningsSolidsCount(realOpenings, thisOpeningSolid, thisOpeningBBox);
 
-            if((intersectingStructureSolidsCount == 0) && (intersectingOpeningsSolidsCount == 0)) {
-                Status = OpeningTaskIncomingStatus.NoIntersection;
-            } else if((intersectingStructureSolidsCount > 0) && (intersectingOpeningsSolidsCount == 0)) {
-                Status = OpeningTaskIncomingStatus.New;
-            } else if((intersectingStructureSolidsCount > 0) && (intersectingOpeningsSolidsCount > 0)) {
-                Status = OpeningTaskIncomingStatus.NotMatch;
-            } else if((intersectingStructureSolidsCount == 0) && (intersectingOpeningsSolidsCount > 0)) {
-                Status = OpeningTaskIncomingStatus.Completed;
+                if((intersectingStructureSolidsCount == 0) && (intersectingOpeningsSolidsCount == 0)) {
+                    Status = OpeningTaskIncomingStatus.NoIntersection;
+                } else if((intersectingStructureSolidsCount > 0) && (intersectingOpeningsSolidsCount == 0)) {
+                    Status = OpeningTaskIncomingStatus.New;
+                } else if((intersectingStructureSolidsCount > 0) && (intersectingOpeningsSolidsCount > 0)) {
+                    Status = OpeningTaskIncomingStatus.NotMatch;
+                } else if((intersectingStructureSolidsCount == 0) && (intersectingOpeningsSolidsCount > 0)) {
+                    Status = OpeningTaskIncomingStatus.Completed;
+                }
+            } catch(ArgumentException e) {
+                throw e;
             }
         }
 
