@@ -201,12 +201,14 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Возвращает количество элементов конструкций, с которыми пересекается текущее задание на отверстие
         /// </summary>
         /// <param name="thisOpeningSolid">Солид текущего задания на отверстие</param>
+        /// <param name="thisOpeningBBox">Бокс текущего задания на отверстие</param>
+        /// <param name="constructureElements">Коллекция элементов конструкций из активного документа ревита, для которых были сделаны задания на отверстия</param>
         /// <returns></returns>
         private int GetIntersectingStructureElementsSolidsCount(Solid thisOpeningSolid, BoundingBoxXYZ thisOpeningBBox, ICollection<ConstructureElement> constructureElements) {
             if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
                 return 0;
             } else {
-                return constructureElements.Any(constructureElement => constructureElement.IntersectsSolid(thisOpeningSolid, thisOpeningBBox)) ? 1 : 0;
+                return constructureElements.AsParallel().Any(constructureElement => constructureElement.IntersectsSolid(thisOpeningSolid, thisOpeningBBox)) ? 1 : 0;
 
                 // при 2300~ OpeningMepTaskIncoming на объекте со 14373 стенами и 1080 перекрытиями занимает 200~ мс на каждое OpeningMepTaskIncoming
                 //return new FilteredElementCollector(_revitRepository.Doc)
@@ -221,15 +223,16 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Возвращает количество проемов из активного документа, которые пересекаются с текущим заданием на отверстие из связи
         /// <para>Примечание: количество считается упрощенно либо 1, либо 0</para>
         /// </summary>
-        /// <param name="realOpenings">Перечисление </param>
+        /// <param name="realOpenings">Коллекция чистовых отверстий из активного документа ревита</param>
         /// <param name="thisOpeningSolid">Солид текущего задания на отверстие</param>
+        /// <param name="thisOpeningBBox">Бокс текущего задания на отверстие</param>
         /// <returns></returns>
         private int GetIntersectingOpeningsSolidsCount(ICollection<OpeningReal> realOpenings, Solid thisOpeningSolid, BoundingBoxXYZ thisOpeningBBox) {
             if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
                 return 0;
             } else {
                 //для ускорения работы происходит поиск только первого проема
-                return realOpenings.Any(realOpening => realOpening.IntersectsSolid(thisOpeningSolid, thisOpeningBBox)) ? 1 : 0;
+                return realOpenings.AsParallel().Any(realOpening => realOpening.IntersectsSolid(thisOpeningSolid, thisOpeningBBox)) ? 1 : 0;
             }
         }
     }
