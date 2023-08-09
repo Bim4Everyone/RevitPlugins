@@ -51,18 +51,14 @@ namespace RevitOpeningPlacement.Models.Extensions {
             return BBoxesEqual(thisSolidBBox, otherSolidBBox, tolerance);
         }
 
-        internal static bool IntersectsSolid(this ISolidProvider thisSolidProvider, Solid otherSolid, BoundingBoxXYZ otherSolidBBox) {
-            var thisSolid = thisSolidProvider.GetSolid();
-
-            // первичная проверка на пересечение BoundingBoxXYZ
-            var thisBBox = thisSolidProvider.GetTransformedBBoxXYZ();
-            bool thisBBoxIntersectsOther = thisBBox.IsIntersected(otherSolidBBox);
-            if(!thisBBoxIntersectsOther) {
+        internal static bool SolidsIntersect(Solid firstSolid, BoundingBoxXYZ firstBBox, Solid secondSolid, BoundingBoxXYZ secondBBox) {
+            bool firstBBoxIntersectsSecond = firstBBox.IsIntersected(secondBBox);
+            if(!firstBBoxIntersectsSecond) {
                 return false;
             }
 
             // Проверка объектов на совпадение без использования BooleanOperationUtils
-            if(SolidEquals(thisSolid, thisBBox, otherSolid, otherSolidBBox)) {
+            if(SolidEquals(firstSolid, firstBBox, secondSolid, secondBBox)) {
                 // Оставить проверку на равенство через ISolidProviderExtension.EqualsSolidProvider,
                 // т.к. при солидах, смещенных друг относительно друга на [0.16-0.17] мм,
                 // методы BooleanOperationUtils.ExecuteBooleanOperation могут выбрасывать Autodesk.Revit.Exceptions.InvalidOperationException,
@@ -76,14 +72,20 @@ namespace RevitOpeningPlacement.Models.Extensions {
 
             // Итоговая проверка на пересечение объектов
             try {
-                Solid intersectSolid = BooleanOperationsUtils.ExecuteBooleanOperation(thisSolid, otherSolid, BooleanOperationsType.Intersect);
+                Solid intersectSolid = BooleanOperationsUtils.ExecuteBooleanOperation(firstSolid, secondSolid, BooleanOperationsType.Intersect);
                 if(intersectSolid?.Volume > _toleranceVolume) {
                     return true;
                 }
             } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                return thisBBoxIntersectsOther;
+                return firstBBoxIntersectsSecond;
             }
             return false;
+        }
+
+        internal static bool IntersectsSolid(this ISolidProvider thisSolidProvider, Solid otherSolid, BoundingBoxXYZ otherSolidBBox) {
+            var thisSolid = thisSolidProvider.GetSolid();
+            var thisBBox = thisSolidProvider.GetTransformedBBoxXYZ();
+            return SolidsIntersect(thisSolid, thisBBox, otherSolid, otherSolidBBox);
         }
 
         /// <summary>
@@ -98,6 +100,20 @@ namespace RevitOpeningPlacement.Models.Extensions {
             var otherBBox = solidProvider.GetTransformedBBoxXYZ();
             return IntersectsSolid(thisSolidProvider, otherSolid, otherBBox);
         }
+
+        /// <summary>
+        /// Проверяет на равенство текущего <see cref="ISolidProvider">ISolidProvider</see> и поданного <see cref="Solid"/>
+        /// Под равенством понимается равенство объемов с точностью до 1 см3 и равенство координат ограничивающих <see cref="BoundingBoxXYZ"/> с точностью до 1 мм.
+        /// </summary>
+        /// <param name="solidProvider">Текущий <see cref="ISolidProvider">ISolidProvider</see></param>
+        /// <param name="otherSolid">Поданный <see cref="Solid"/></param>
+        /// <returns>True, если разница объемов текущего и поданного <see cref="ISolidProvider">ISolidProvider</see> меньше, либо равна 1 см3, 
+        /// и если разница координат ограничивающих их <see cref="BoundingBoxXYZ"/> меньше, либо равна 1 мм;
+        /// Иначе False</returns>
+        internal static bool EqualsSolid(this ISolidProvider solidProvider, Solid otherSolid) {
+            return EqualsSolid(solidProvider, otherSolid, _toleranceDistance);
+        }
+
 
         /// <summary>
         /// Проверяет на равенство текущего <see cref="Solid"/> и поданного <see cref="Solid"/>.
@@ -116,20 +132,6 @@ namespace RevitOpeningPlacement.Models.Extensions {
             }
             return BBoxesEqual(thisSolidBBox, otherSolidBBox);
         }
-
-        /// <summary>
-        /// Проверяет на равенство текущего <see cref="ISolidProvider">ISolidProvider</see> и поданного <see cref="Solid"/>
-        /// Под равенством понимается равенство объемов с точностью до 1 см3 и равенство координат ограничивающих <see cref="BoundingBoxXYZ"/> с точностью до 1 мм.
-        /// </summary>
-        /// <param name="solidProvider">Текущий <see cref="ISolidProvider">ISolidProvider</see></param>
-        /// <param name="otherSolid">Поданный <see cref="Solid"/></param>
-        /// <returns>True, если разница объемов текущего и поданного <see cref="ISolidProvider">ISolidProvider</see> меньше, либо равна 1 см3, 
-        /// и если разница координат ограничивающих их <see cref="BoundingBoxXYZ"/> меньше, либо равна 1 мм;
-        /// Иначе False</returns>
-        internal static bool EqualsSolid(this ISolidProvider solidProvider, Solid otherSolid) {
-            return EqualsSolid(solidProvider, otherSolid, _toleranceDistance);
-        }
-
 
         /// <summary>
         /// Проверяет объемы солидов на равенство.
