@@ -52,6 +52,10 @@ namespace RevitOpeningPlacement.Models.Extensions {
         }
 
         internal static bool SolidsIntersect(Solid firstSolid, BoundingBoxXYZ firstBBox, Solid secondSolid, BoundingBoxXYZ secondBBox) {
+            if((firstSolid is null) || (secondSolid is null)) {
+                return false;
+            }
+
             bool firstBBoxIntersectsSecond = firstBBox.IsIntersected(secondBBox);
             if(!firstBBoxIntersectsSecond) {
                 return false;
