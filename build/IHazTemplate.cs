@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Nuke.Common;
@@ -9,7 +11,7 @@ interface IHazTemplate : INukeBuild {
     AbsolutePath TemplateDirectory => RootDirectory / ".github" / "templates" / TemplateName;
 
     // https://learn.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
-    void CopyDirectory(AbsolutePath sourceDir, AbsolutePath targetDir, bool recursive = true) {
+    void CopyDirectory(AbsolutePath sourceDir, AbsolutePath targetDir, Dictionary<string, string> replaceMap = default, bool recursive = true) {
         // Check if the source directory exists
         if(!sourceDir.Exists())
             throw new DirectoryNotFoundException($"Source directory not found: {sourceDir}");
@@ -24,8 +26,15 @@ interface IHazTemplate : INukeBuild {
         foreach(AbsolutePath file in sourceDir.GetFiles()) {
             AbsolutePath targetFilePath = UpdateName(targetDir / file.Name);
 
-            string content = file.ReadAllText()
-                .Replace(TemplateName, this.From<IHazPluginName>().PluginName);
+            string content = file.ReadAllText();
+            if(!file.HasExtension(".png")) {
+                content = content.Replace(TemplateName, this.From<IHazPluginName>().PluginName);
+                if(replaceMap != null) {
+                    foreach((string key, string value) in replaceMap) {
+                        content = content.Replace(key, value);
+                    }
+                }
+            }
 
             targetFilePath.WriteAllText(content);
         }

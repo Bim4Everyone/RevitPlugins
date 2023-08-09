@@ -6,6 +6,16 @@
     "build": {
       "type": "object",
       "properties": {
+        "BundleName": {
+          "type": "string"
+        },
+        "BundleType": {
+          "type": "string",
+          "enum": [
+            "InvokeButton",
+            "PushButton"
+          ]
+        },
         "Continue": {
           "type": "boolean",
           "description": "Indicates to continue a previously failed build attempt"
@@ -34,6 +44,9 @@
             "VisualStudio",
             "VSCode"
           ]
+        },
+        "IconUrl": {
+          "type": "string"
         },
         "NoLogo": {
           "type": "boolean",
@@ -74,6 +87,7 @@
             "enum": [
               "Clean",
               "Compile",
+              "CreateBundle",
               "CreatePlugin",
               "CreateScript",
               "FullClean",
@@ -95,6 +109,7 @@
             "enum": [
               "Clean",
               "Compile",
+              "CreateBundle",
               "CreatePlugin",
               "CreateScript",
               "FullClean",

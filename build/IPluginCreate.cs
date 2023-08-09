@@ -30,7 +30,7 @@ interface IPluginCreate : IHazSolution, IHazOutput, IHazPluginName, IHazTemplate
 
             Log.Debug("HazProject: {HazProject}", Solution.GetProject(PluginName) != null);
             Log.Debug("HazDirectory: {HazDirectory}", PluginDirectory.Exists());
-
+            
             CopyDirectory(TemplateDirectory, PluginDirectory);
 
             DotNet(arguments: $"sln add {PluginFile}");
