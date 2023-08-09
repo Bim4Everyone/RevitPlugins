@@ -8,12 +8,9 @@ using Nuke.Common.IO;
 using Serilog;
 
 interface ICreateBundle : IHazOutput, IHazTemplate {
-    [Parameter]
-    Uri IconUrl => TryGetValue(() => IconUrl)
-                   ?? new Uri("https://icons8.com/icon/UgAl9mP8tniQ/example");
-
-    [Parameter] string BundleName => TryGetValue(() => BundleName) ?? "BundleName";
-    [Parameter] BundleType BundleType => TryGetValue(() => BundleType) ?? BundleType.InvokeButton;
+    [Parameter] Uri IconUrl => TryGetValue(() => IconUrl);
+    [Parameter] string BundleName => TryGetValue(() => BundleName);
+    [Parameter] BundleType BundleType => TryGetValue(() => BundleType);
 
     AbsolutePath TemplateBundleDirectory => TemplateDirectory + BundleType.ExtensionWithDot;
     AbsolutePath BundleDirectory => Output / BundleName + BundleType.ExtensionWithDot;
