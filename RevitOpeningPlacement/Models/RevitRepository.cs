@@ -435,6 +435,18 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
+        /// Возвращает список всех элементов конструкций, для которых создаются задания на отверстия
+        /// </summary>
+        /// <returns></returns>
+        public IList<ConstructureElement> GetConstructureElements() {
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .WherePasses(FiltersInitializer.GetFilterByAllUsedStructureCategories())
+                .Select(element => new ConstructureElement(element))
+                .ToList();
+        }
+
+        /// <summary>
         /// Возвращает список входящих заданий на отверстия из связанных файлов
         /// </summary>
         /// <returns></returns>

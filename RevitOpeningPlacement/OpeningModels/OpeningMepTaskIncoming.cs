@@ -178,42 +178,42 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="realOpenings"></param>
         /// <exception cref="ArgumentException"></exception>
-        public void UpdateStatus(ICollection<OpeningReal> realOpenings) {
-            try {
-                var thisOpeningSolid = GetSolid();
-                var thisOpeningBBox = GetTransformedBBoxXYZ();
-                var intersectingStructureSolidsCount = GetIntersectingStructureElementsSolidsCount(thisOpeningSolid);
-                var intersectingOpeningsSolidsCount = GetIntersectingOpeningsSolidsCount(realOpenings, thisOpeningSolid, thisOpeningBBox);
+        public void UpdateStatus(ICollection<OpeningReal> realOpenings, ICollection<ConstructureElement> constructureElements) {
+            var thisOpeningSolid = GetSolid();
+            var thisOpeningBBox = GetTransformedBBoxXYZ();
 
-                if((intersectingStructureSolidsCount == 0) && (intersectingOpeningsSolidsCount == 0)) {
-                    Status = OpeningTaskIncomingStatus.NoIntersection;
-                } else if((intersectingStructureSolidsCount > 0) && (intersectingOpeningsSolidsCount == 0)) {
-                    Status = OpeningTaskIncomingStatus.New;
-                } else if((intersectingStructureSolidsCount > 0) && (intersectingOpeningsSolidsCount > 0)) {
-                    Status = OpeningTaskIncomingStatus.NotMatch;
-                } else if((intersectingStructureSolidsCount == 0) && (intersectingOpeningsSolidsCount > 0)) {
-                    Status = OpeningTaskIncomingStatus.Completed;
-                }
-            } catch(ArgumentException e) {
-                throw e;
+            var intersectingStructureSolidsCount = GetIntersectingStructureElementsSolidsCount(thisOpeningSolid, thisOpeningBBox, constructureElements);
+            var intersectingOpeningsSolidsCount = GetIntersectingOpeningsSolidsCount(realOpenings, thisOpeningSolid, thisOpeningBBox);
+
+            if((intersectingStructureSolidsCount == 0) && (intersectingOpeningsSolidsCount == 0)) {
+                Status = OpeningTaskIncomingStatus.NoIntersection;
+            } else if((intersectingStructureSolidsCount > 0) && (intersectingOpeningsSolidsCount == 0)) {
+                Status = OpeningTaskIncomingStatus.New;
+            } else if((intersectingStructureSolidsCount > 0) && (intersectingOpeningsSolidsCount > 0)) {
+                Status = OpeningTaskIncomingStatus.NotMatch;
+            } else if((intersectingStructureSolidsCount == 0) && (intersectingOpeningsSolidsCount > 0)) {
+                Status = OpeningTaskIncomingStatus.Completed;
             }
         }
 
 
         /// <summary>
-        /// Возвращает количество элементов конструкций, с которыми пересекается текущее задание на отерстие
+        /// Возвращает количество элементов конструкций, с которыми пересекается текущее задание на отверстие
         /// </summary>
         /// <param name="thisOpeningSolid">Солид текущего задания на отверстие</param>
         /// <returns></returns>
-        private int GetIntersectingStructureElementsSolidsCount(Solid thisOpeningSolid) {
+        private int GetIntersectingStructureElementsSolidsCount(Solid thisOpeningSolid, BoundingBoxXYZ thisOpeningBBox, ICollection<ConstructureElement> constructureElements) {
             if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
                 return 0;
             } else {
-                return new FilteredElementCollector(_revitRepository.Doc)
-                    .WherePasses(FiltersInitializer.GetFilterByAllUsedStructureCategories())
-                    .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningSolid.GetOutline()))
-                    .WherePasses(new ElementIntersectsSolidFilter(thisOpeningSolid))
-                    .Count();
+                return constructureElements.Any(constructureElement => constructureElement.IntersectsSolid(thisOpeningSolid, thisOpeningBBox)) ? 1 : 0;
+
+                // при 2300~ OpeningMepTaskIncoming на объекте со 14373 стенами и 1080 перекрытиями занимает 200~ мс на каждое OpeningMepTaskIncoming
+                //return new FilteredElementCollector(_revitRepository.Doc)
+                //    .WherePasses(FiltersInitializer.GetFilterByAllUsedStructureCategories())
+                //    .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningSolid.GetOutline()))
+                //    .WherePasses(new ElementIntersectsSolidFilter(thisOpeningSolid))
+                //    .Count();
             }
         }
 

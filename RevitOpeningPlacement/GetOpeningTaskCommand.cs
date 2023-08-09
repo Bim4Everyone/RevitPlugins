@@ -93,11 +93,12 @@ namespace RevitOpeningPlacement {
             }
             var incomingTasks = revitRepository.GetOpeningsMepTasksIncoming();
             var realOpenings = revitRepository.GetRealOpenings();
+            var constructureElements = revitRepository.GetConstructureElements();
 
             var incomingTasksViewModels = new List<OpeningMepTaskIncomingViewModel>();
             foreach(var incomingTask in incomingTasks) {
                 try {
-                    incomingTask.UpdateStatus(realOpenings);
+                    incomingTask.UpdateStatus(realOpenings, constructureElements);
                 } catch(ArgumentException) {
                     //не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
                     continue;
