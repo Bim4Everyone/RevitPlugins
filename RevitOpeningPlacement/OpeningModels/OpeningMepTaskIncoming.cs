@@ -61,6 +61,11 @@ namespace RevitOpeningPlacement.OpeningModels {
             Height = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningHeight);
             Width = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningWidth);
             Thickness = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningThickness);
+
+            string[] famNameParts = _familyInstance.Symbol.FamilyName.Split('_');
+            if(famNameParts.Length > 0) {
+                HostTypeName = famNameParts.Last();
+        }
         }
 
 
@@ -105,6 +110,8 @@ namespace RevitOpeningPlacement.OpeningModels {
         public string Thickness { get; } = string.Empty;
 
         public Transform Transform { get; } = Transform.Identity;
+
+        public string HostTypeName { get; } = string.Empty;
 
         /// <summary>
         /// Статус отработки задания на отверстие

@@ -19,7 +19,7 @@
                            Height="500" 
                            Width="1000"
                            MinHeight="300"
-                           MinWidth="850"
+                           MinWidth="950"
                            d:DataContext="{d:DesignInstance {x:Type vm:OpeningsMepTaskIncomingViewModel}, IsDesignTimeCreatable=False}"
                            WindowStartupLocation="Manual" Left="50" Top="50">
     <base:ThemedPlatformWindow.Resources>
@@ -148,6 +148,7 @@
                 <dxg:GridColumn ReadOnly="True" Width="90" Header="Отметка низа" FieldName="BottomOffset"/>
                 <dxg:GridColumn ReadOnly="True" Width="80" Header="Id отверстия" FieldName="OpeningId"/>
                 <dxg:GridColumn ReadOnly="True" Width="100" Header="Имя системы" FieldName="MepSystem"/>
+                <dxg:GridColumn ReadOnly="True" Width="100" Header="Расположение" FieldName="HostTypeName"/>
                 <dxg:GridColumn ReadOnly="True" Width="*" Header="Описание пересечения" FieldName="Description"/>
             </dxg:GridControl.Columns>
         </dxg:GridControl>

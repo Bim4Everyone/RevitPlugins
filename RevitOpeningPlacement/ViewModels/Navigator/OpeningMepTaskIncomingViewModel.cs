@@ -38,6 +38,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Width = _openingTask.Width;
             Height = _openingTask.Height;
             Thickness = _openingTask.Thickness;
+            HostTypeName = _openingTask.HostTypeName;
             Status = _openingTask.Status.GetEnumDescription();
         }
 
@@ -102,6 +103,10 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// </summary>
         public string Status { get; } = string.Empty;
 
+        /// <summary>
+        /// Расположение отверстия - в перекрытии/в стене
+        /// </summary>
+        public string HostTypeName { get; } = string.Empty;
 
 
         private bool _isAccepted;
