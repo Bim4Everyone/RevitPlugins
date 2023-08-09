@@ -42,6 +42,9 @@ namespace RevitOpeningPlacement.OpeningModels {
             if(openingReal.Host is null) { throw new ArgumentException($"{nameof(openingReal)} с Id {openingReal.Id} не содержит ссылки на хост элемент"); }
             _familyInstance = openingReal;
             Id = _familyInstance.Id.IntegerValue;
+
+            SetTransformedBBoxXYZ();
+            SetSolid();
         }
 
 
@@ -62,33 +65,42 @@ namespace RevitOpeningPlacement.OpeningModels {
 
 
         public Solid GetSolid() {
-            if(_solid is null) {
-                XYZ openingLocation = (_familyInstance.Location as LocationPoint).Point;
-                var hostElement = GetHost();
-                Solid hostSolidCut = hostElement.GetSolid();
-                try {
-                    Solid hostSolidOriginal = (hostElement as HostObject).GetHostElementOriginalSolid();
-                    var openings = SolidUtils.SplitVolumes(BooleanOperationsUtils.ExecuteBooleanOperation(hostSolidOriginal, hostSolidCut, BooleanOperationsType.Difference));
-                    var thisOpeningSolid = openings.OrderBy(solidOpening => (solidOpening.ComputeCentroid() - openingLocation).GetLength()).FirstOrDefault();
-                    if(thisOpeningSolid != null) {
-                        _solid = thisOpeningSolid;
-                    } else {
-                        _solid = CreateRawSolid();
-                    }
-                } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                    _solid = CreateRawSolid();
-                }
-            }
             return _solid;
         }
 
 
         public BoundingBoxXYZ GetTransformedBBoxXYZ() {
-            if(_boundingBox is null) {
-                _boundingBox = _familyInstance.GetBoundingBox();
-            }
             return _boundingBox;
         }
+
+        /// <summary>
+        /// Устанавливает значение полю <see cref="_solid"/>
+        /// </summary>
+        private void SetSolid() {
+            XYZ openingLocation = (_familyInstance.Location as LocationPoint).Point;
+            var hostElement = GetHost();
+            Solid hostSolidCut = hostElement.GetSolid();
+            try {
+                Solid hostSolidOriginal = (hostElement as HostObject).GetHostElementOriginalSolid();
+                var openings = SolidUtils.SplitVolumes(BooleanOperationsUtils.ExecuteBooleanOperation(hostSolidOriginal, hostSolidCut, BooleanOperationsType.Difference));
+                var thisOpeningSolid = openings.OrderBy(solidOpening => (solidOpening.ComputeCentroid() - openingLocation).GetLength()).FirstOrDefault();
+                if(thisOpeningSolid != null) {
+                    _solid = thisOpeningSolid;
+                } else {
+                    _solid = CreateRawSolid();
+                }
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                _solid = CreateRawSolid();
+            }
+        }
+
+        /// <summary>
+        /// Устанавливает значение полю <see cref="_boundingBox"/>
+        /// </summary>
+        private void SetTransformedBBoxXYZ() {
+            _boundingBox = _familyInstance.GetBoundingBox();
+        }
+
 
         /// <summary>
         /// Возвращает хост экземпляра семейства отверстия
