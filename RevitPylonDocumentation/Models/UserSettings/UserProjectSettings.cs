@@ -43,75 +43,75 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         internal RevitRepository Repository { get; set; }
 
 
-        public string PROJECT_SECTION { get; set; }
-        public string PROJECT_SECTION_TEMP {
+        public string ProjectSection { get; set; }
+        public string ProjectSectionTemp {
             get => _projectSectionTemp;
             set => RaiseAndSetIfChanged(ref _projectSectionTemp, value);
         }
 
-        public string MARK { get; set; }
-        public string MARK_TEMP {
+        public string Mark { get; set; }
+        public string MarkTemp {
             get => _markTemp;
             set => RaiseAndSetIfChanged(ref _markTemp, value);
         }
 
-        public string TITLEBLOCK_NAME { get; set; }
-        public string TITLEBLOCK_NAME_TEMP {
+        public string TitleBlockName { get; set; }
+        public string TitleBlockNameTemp {
             get => _titleBlockNameTemp;
             set => RaiseAndSetIfChanged(ref _titleBlockNameTemp, value);
         }
 
-        public string DISPATCHER_GROUPING_FIRST { get; set; }
-        public string DISPATCHER_GROUPING_FIRST_TEMP {
+        public string DispatcherGroupingFirst { get; set; }
+        public string DispatcherGroupingFirstTemp {
             get => _dispatcherGroupingFirstTemp;
             set => RaiseAndSetIfChanged(ref _dispatcherGroupingFirstTemp, value);
         }
-        public string DISPATCHER_GROUPING_SECOND { get; set; }
-        public string DISPATCHER_GROUPING_SECOND_TEMP {
+        public string DispatcherGroupingSecond { get; set; }
+        public string DispatcherGroupingSecondTemp {
             get => _dispatcherGroupingSecondTemp;
             set => RaiseAndSetIfChanged(ref _dispatcherGroupingSecondTemp, value);
         }
 
-        public string SHEET_SIZE { get; set; }
-        public string SHEET_SIZE_TEMP {
+        public string SheetSize { get; set; }
+        public string SheetSizeTemp {
             get => _sheetSizeTemp;
             set => RaiseAndSetIfChanged(ref _sheetSizeTemp, value);
         }
 
-        public string SHEET_COEFFICIENT { get; set; }
-        public string SHEET_COEFFICIENT_TEMP {
+        public string SheetCoefficient { get; set; }
+        public string SheetCoefficientTemp {
             get => _sheetCoefficientTemp;
             set => RaiseAndSetIfChanged(ref _sheetCoefficientTemp, value);
         }
 
 
-        public string SHEET_PREFIX { get; set; }
-        public string SHEET_PREFIX_TEMP {
+        public string SheetPrefix { get; set; }
+        public string SheetPrefixTemp {
             get => _sheetPrefixTemp;
             set => RaiseAndSetIfChanged(ref _sheetPrefixTemp, value);
         }
 
-        public string SHEET_SUFFIX { get; set; }
-        public string SHEET_SUFFIX_TEMP {
+        public string SheetSuffix { get; set; }
+        public string SheetSuffixTemp {
             get => _sheetSuffixTemp;
             set => RaiseAndSetIfChanged(ref _sheetSuffixTemp, value);
         }
 
-        public string TYPICAL_PYLON_FILTER_PARAMETER { get; set; }
-        public string TYPICAL_PYLON_FILTER_PARAMETER_TEMP {
+        public string TypicalPylonFilterParameter { get; set; }
+        public string TypicalPylonFilterParameterTemp {
             get => _typicalPylonFilterParameterTemp;
             set => RaiseAndSetIfChanged(ref _typicalPylonFilterParameterTemp, value);
         }
 
 
-        public string TYPICAL_PYLON_FILTER_VALUE { get; set; }
-        public string TYPICAL_PYLON_FILTER_VALUE_TEMP {
+        public string TypicalPylonFilterValue { get; set; }
+        public string TypicalPylonFilterValueTemp {
             get => _typicalPylonFilterValueTemp;
             set => RaiseAndSetIfChanged(ref _typicalPylonFilterValueTemp, value);
         }
 
-        public string LEGEND_NAME { get; set; }
-        public string LEGEND_NAME_TEMP {
+        public string LegendName { get; set; }
+        public string LegendNameTemp {
             get => _legendNameTemp;
             set => RaiseAndSetIfChanged(ref _legendNameTemp, value);
         }
@@ -119,39 +119,39 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
         public void ApplyProjectSettings() {
 
-            PROJECT_SECTION = PROJECT_SECTION_TEMP;
-            MARK = MARK_TEMP;
-            TITLEBLOCK_NAME = TITLEBLOCK_NAME_TEMP;
-            DISPATCHER_GROUPING_FIRST = DISPATCHER_GROUPING_FIRST_TEMP;
-            DISPATCHER_GROUPING_SECOND = DISPATCHER_GROUPING_SECOND_TEMP;
+            ProjectSection = ProjectSectionTemp;
+            Mark = MarkTemp;
+            TitleBlockName = TitleBlockNameTemp;
+            DispatcherGroupingFirst = DispatcherGroupingFirstTemp;
+            DispatcherGroupingSecond = DispatcherGroupingSecondTemp;
 
-            SHEET_SIZE = SHEET_SIZE_TEMP;
-            SHEET_COEFFICIENT = SHEET_COEFFICIENT_TEMP;
-            SHEET_PREFIX = SHEET_PREFIX_TEMP;
-            SHEET_SUFFIX = SHEET_SUFFIX_TEMP;
+            SheetSize = SheetSizeTemp;
+            SheetCoefficient = SheetCoefficientTemp;
+            SheetPrefix = SheetPrefixTemp;
+            SheetSuffix = SheetSuffixTemp;
 
 
-            TYPICAL_PYLON_FILTER_PARAMETER = TYPICAL_PYLON_FILTER_PARAMETER_TEMP;
-            TYPICAL_PYLON_FILTER_VALUE = TYPICAL_PYLON_FILTER_VALUE_TEMP;
+            TypicalPylonFilterParameter = TypicalPylonFilterParameterTemp;
+            TypicalPylonFilterValue = TypicalPylonFilterValueTemp;
 
-            LEGEND_NAME = LEGEND_NAME_TEMP;
+            LegendName = LegendNameTemp;
         }
 
         public void CheckProjectSettings() {
 
             // Пытаемся проверить виды
-            if(Repository.AllSectionViews.FirstOrDefault()?.LookupParameter(DISPATCHER_GROUPING_FIRST) is null) {
+            if(Repository.AllSectionViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingFirst) is null) {
                 ViewModel.ErrorText = "Наименование параметра диспетчера 1 некорректно";
             }
-            if(Repository.AllSectionViews.FirstOrDefault()?.LookupParameter(DISPATCHER_GROUPING_SECOND) is null) {
+            if(Repository.AllSectionViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingSecond) is null) {
                 ViewModel.ErrorText = "Наименование параметра диспетчера 2 некорректно";
             }
             
             // Пытаемся проверить спеки
-            if(Repository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DISPATCHER_GROUPING_FIRST) is null) {
+            if(Repository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingFirst) is null) {
                 ViewModel.ErrorText = "Наименование параметра диспетчера 1 некорректно";
             }
-            if(Repository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DISPATCHER_GROUPING_SECOND) is null) {
+            if(Repository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingSecond) is null) {
                 ViewModel.ErrorText = "Наименование параметра диспетчера 2 некорректно";
             }
 
@@ -160,7 +160,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
                 // Листов в проекте может не быть или рамка может быть другая, поэтому создаем свой лист для тестов с нужной рамкой
                 ViewSheet viewSheet = ViewSheet.Create(Repository.Document, ViewModel.SelectedTitleBlock.Id);
-                if(viewSheet?.LookupParameter(DISPATCHER_GROUPING_FIRST) is null) {
+                if(viewSheet?.LookupParameter(DispatcherGroupingFirst) is null) {
                     ViewModel.ErrorText = "Наименование параметра диспетчера 1 некорректно";
                 }
 
@@ -170,10 +170,10 @@ namespace RevitPylonDocumentation.Models.UserSettings {
                     .WhereElementIsNotElementType()
                     .FirstOrDefault() as FamilyInstance;
 
-                if(titleBlock?.LookupParameter(SHEET_SIZE) is null) {
+                if(titleBlock?.LookupParameter(SheetSize) is null) {
                     ViewModel.ErrorText = "Наименование параметра формата рамки листа некорректно";
                 }
-                if(titleBlock?.LookupParameter(SHEET_COEFFICIENT) is null) {
+                if(titleBlock?.LookupParameter(SheetCoefficient) is null) {
                     ViewModel.ErrorText = "Наименование параметра множителя формата рамки листа некорректно";
                 }
 

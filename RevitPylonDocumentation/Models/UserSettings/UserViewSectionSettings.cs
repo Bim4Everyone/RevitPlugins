@@ -41,159 +41,159 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
         public MainViewModel ViewModel { get; set; }
 
-        public string GENERAL_VIEW_PREFIX { get; set; }
-        public string GENERAL_VIEW_PREFIX_TEMP {
+        public string GeneralViewPrefix { get; set; }
+        public string GeneralViewPrefixTemp {
             get => _generalViewPrefixTemp;
             set => RaiseAndSetIfChanged(ref _generalViewPrefixTemp, value);
         }
 
-        public string GENERAL_VIEW_SUFFIX { get; set; }
-        public string GENERAL_VIEW_SUFFIX_TEMP {
+        public string GeneralViewSuffix { get; set; }
+        public string GeneralViewSuffixTemp {
             get => _generalViewSuffixTemp;
             set => RaiseAndSetIfChanged(ref _generalViewSuffixTemp, value);
         }
 
-        public string GENERAL_VIEW_PERPENDICULAR_PREFIX { get; set; }
-        public string GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP {
+        public string GeneralViewPerpendicularPrefix { get; set; }
+        public string GeneralViewPerpendicularPrefixTemp {
             get => _generalViewPerpendicularPrefixTemp;
             set => RaiseAndSetIfChanged(ref _generalViewPerpendicularPrefixTemp, value);
         }
 
-        public string GENERAL_VIEW_PERPENDICULAR_SUFFIX { get; set; }
-        public string GENERAL_VIEW_PERPENDICULAR_SUFFIX_TEMP {
+        public string GeneralViewPerpendicularSuffix { get; set; }
+        public string GeneralViewPerpendicularSuffixTemp {
             get => _generalViewPerpendicularSuffixTemp;
             set => RaiseAndSetIfChanged(ref _generalViewPerpendicularSuffixTemp, value);
         }
 
-        public string GENERAL_VIEW_TEMPLATE_NAME { get; set; }
-        public string GENERAL_VIEW_TEMPLATE_NAME_TEMP {
+        public string GeneralViewTemplateName { get; set; }
+        public string GeneralViewTemplateNameTemp {
             get => _generalViewTemplateNameTemp;
             set => RaiseAndSetIfChanged(ref _generalViewTemplateNameTemp, value);
         }
 
-        public string GENERAL_VIEW_X_OFFSET { get; set; }
-        public string GENERAL_VIEW_X_OFFSET_TEMP {
+        public string GeneralViewXOffset { get; set; }
+        public string GeneralViewXOffsetTemp {
             get => _generalViewXOffsetTemp;
             set => RaiseAndSetIfChanged(ref _generalViewXOffsetTemp, value);
         }
 
-        public string GENERAL_VIEW_Y_TOP_OFFSET { get; set; }
-        public string GENERAL_VIEW_Y_TOP_OFFSET_TEMP {
+        public string GeneralViewYTopOffset { get; set; }
+        public string GeneralViewYTopOffsetTemp {
             get => _generalViewYTopOffsetTemp;
             set => RaiseAndSetIfChanged(ref _generalViewYTopOffsetTemp, value);
         }
 
-        public string GENERAL_VIEW_Y_BOTTOM_OFFSET { get; set; }
-        public string GENERAL_VIEW_Y_BOTTOM_OFFSET_TEMP {
+        public string GeneralViewYBottomOffset { get; set; }
+        public string GeneralViewYBottomOffsetTemp {
             get => _generalViewYBottomOffsetTemp;
             set => RaiseAndSetIfChanged(ref _generalViewYBottomOffsetTemp, value);
         }
 
 
-        public string TRANSVERSE_VIEW_FIRST_PREFIX { get; set; }
-        public string TRANSVERSE_VIEW_FIRST_PREFIX_TEMP {
+        public string TransverseViewFirstPrefix { get; set; }
+        public string TransverseViewFirstPrefixTemp {
             get => _transverseViewFirstPrefixTemp;
             set => RaiseAndSetIfChanged(ref _transverseViewFirstPrefixTemp, value);
         }
 
-        public string TRANSVERSE_VIEW_FIRST_SUFFIX { get; set; }
-        public string TRANSVERSE_VIEW_FIRST_SUFFIX_TEMP {
+        public string TransverseViewFirstSuffix { get; set; }
+        public string TransverseViewFirstSuffixTemp {
             get => _transverseViewFirstSuffixTemp;
             set => RaiseAndSetIfChanged(ref _transverseViewFirstSuffixTemp, value);
         }
 
 
-        public string TRANSVERSE_VIEW_SECOND_PREFIX { get; set; }
-        public string TRANSVERSE_VIEW_SECOND_PREFIX_TEMP {
+        public string TransverseViewSecondPrefix { get; set; }
+        public string TransverseViewSecondPrefixTemp {
             get => _transverseViewSecondPrefixTemp;
             set => RaiseAndSetIfChanged(ref _transverseViewSecondPrefixTemp, value);
         }
 
-        public string TRANSVERSE_VIEW_SECOND_SUFFIX { get; set; }
-        public string TRANSVERSE_VIEW_SECOND_SUFFIX_TEMP {
+        public string TransverseViewSecondSuffix { get; set; }
+        public string TransverseViewSecondSuffixTemp {
             get => _transverseViewSecondSuffixTemp;
             set => RaiseAndSetIfChanged(ref _transverseViewSecondSuffixTemp, value);
         }
 
-        public string TRANSVERSE_VIEW_THIRD_PREFIX { get; set; }
-        public string TRANSVERSE_VIEW_THIRD_PREFIX_TEMP {
+        public string TransverseViewThirdPrefix { get; set; }
+        public string TransverseViewThirdPrefixTemp {
             get => _transverseViewThirdPrefixTemp;
             set => RaiseAndSetIfChanged(ref _transverseViewThirdPrefixTemp, value);
         }
 
-        public string TRANSVERSE_VIEW_THIRD_SUFFIX { get; set; }
-        public string TRANSVERSE_VIEW_THIRD_SUFFIX_TEMP {
+        public string TransverseViewThirdSuffix { get; set; }
+        public string TransverseViewThirdSuffixTemp {
             get => _transverseViewThirdSuffixTemp;
             set => RaiseAndSetIfChanged(ref _transverseViewThirdSuffixTemp, value);
         }
 
-        public string TRANSVERSE_VIEW_TEMPLATE_NAME { get; set; }
-        public string TRANSVERSE_VIEW_TEMPLATE_NAME_TEMP {
+        public string TransverseViewTemplateName { get; set; }
+        public string TransverseViewTemplateNameTemp {
             get => _transverseViewTemplateNameTemp;
             set => RaiseAndSetIfChanged(ref _transverseViewTemplateNameTemp, value);
         }
 
-        public string TRANSVERSE_VIEW_X_OFFSET { get; set; }
-        public string TRANSVERSE_VIEW_X_OFFSET_TEMP {
+        public string TransverseViewXOffset { get; set; }
+        public string TransverseViewXOffsetTemp {
             get => _transverseViewXOffsetTemp;
             set => RaiseAndSetIfChanged(ref _transverseViewXOffsetTemp, value);
         }
 
-        public string TRANSVERSE_VIEW_Y_OFFSET { get; set; }
-        public string TRANSVERSE_VIEW_Y_OFFSET_TEMP {
+        public string TransverseViewYOffset { get; set; }
+        public string TransverseViewYOffsetTemp {
             get => _transverseViewYOffsetTemp;
             set => RaiseAndSetIfChanged(ref _transverseViewYOffsetTemp, value);
         }
 
-        public string VIEW_FAMILY_TYPE_NAME { get; set; }
-        public string VIEW_FAMILY_TYPE_NAME_TEMP {
+        public string ViewFamilyTypeName { get; set; }
+        public string ViewFamilyTypeNameTemp {
             get => _viewFamilyTypeNameTemp;
             set => RaiseAndSetIfChanged(ref _viewFamilyTypeNameTemp, value);
         }
 
         public void ApplyViewSectionsSettings() {
 
-            GENERAL_VIEW_PREFIX = GENERAL_VIEW_PREFIX_TEMP;
-            GENERAL_VIEW_SUFFIX = GENERAL_VIEW_SUFFIX_TEMP;
-            GENERAL_VIEW_PERPENDICULAR_PREFIX = GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP;
-            GENERAL_VIEW_PERPENDICULAR_SUFFIX = GENERAL_VIEW_PERPENDICULAR_SUFFIX_TEMP;
+            GeneralViewPrefix = GeneralViewPrefixTemp;
+            GeneralViewSuffix = GeneralViewSuffixTemp;
+            GeneralViewPerpendicularPrefix = GeneralViewPerpendicularPrefixTemp;
+            GeneralViewPerpendicularSuffix = GeneralViewPerpendicularSuffixTemp;
 
-            GENERAL_VIEW_TEMPLATE_NAME = GENERAL_VIEW_TEMPLATE_NAME_TEMP;
-            GENERAL_VIEW_X_OFFSET = GENERAL_VIEW_X_OFFSET_TEMP;
-            GENERAL_VIEW_Y_TOP_OFFSET = GENERAL_VIEW_Y_TOP_OFFSET_TEMP;
-            GENERAL_VIEW_Y_BOTTOM_OFFSET = GENERAL_VIEW_Y_BOTTOM_OFFSET_TEMP;
+            GeneralViewTemplateName = GeneralViewTemplateNameTemp;
+            GeneralViewXOffset = GeneralViewXOffsetTemp;
+            GeneralViewYTopOffset = GeneralViewYTopOffsetTemp;
+            GeneralViewYBottomOffset = GeneralViewYBottomOffsetTemp;
 
-            TRANSVERSE_VIEW_FIRST_PREFIX = TRANSVERSE_VIEW_FIRST_PREFIX_TEMP;
-            TRANSVERSE_VIEW_FIRST_SUFFIX = TRANSVERSE_VIEW_FIRST_SUFFIX_TEMP;
-            TRANSVERSE_VIEW_SECOND_PREFIX = TRANSVERSE_VIEW_SECOND_PREFIX_TEMP;
-            TRANSVERSE_VIEW_SECOND_SUFFIX = TRANSVERSE_VIEW_SECOND_SUFFIX_TEMP;
-            TRANSVERSE_VIEW_THIRD_PREFIX = TRANSVERSE_VIEW_THIRD_PREFIX_TEMP;
-            TRANSVERSE_VIEW_THIRD_SUFFIX = TRANSVERSE_VIEW_THIRD_SUFFIX_TEMP;
+            TransverseViewFirstPrefix = TransverseViewFirstPrefixTemp;
+            TransverseViewFirstSuffix = TransverseViewFirstSuffixTemp;
+            TransverseViewSecondPrefix = TransverseViewSecondPrefixTemp;
+            TransverseViewSecondSuffix = TransverseViewSecondSuffixTemp;
+            TransverseViewThirdPrefix = TransverseViewThirdPrefixTemp;
+            TransverseViewThirdSuffix = TransverseViewThirdSuffixTemp;
 
-            TRANSVERSE_VIEW_TEMPLATE_NAME = TRANSVERSE_VIEW_TEMPLATE_NAME_TEMP;
-            TRANSVERSE_VIEW_X_OFFSET = TRANSVERSE_VIEW_X_OFFSET_TEMP;
-            TRANSVERSE_VIEW_Y_OFFSET = TRANSVERSE_VIEW_Y_OFFSET_TEMP;
+            TransverseViewTemplateName = TransverseViewTemplateNameTemp;
+            TransverseViewXOffset = TransverseViewXOffsetTemp;
+            TransverseViewYOffset = TransverseViewYOffsetTemp;
 
-            VIEW_FAMILY_TYPE_NAME = VIEW_FAMILY_TYPE_NAME_TEMP;
+            ViewFamilyTypeName = ViewFamilyTypeNameTemp;
         }
 
         public void CheckViewSectionsSettings() {
 
             int temp;
-            if(!int.TryParse(ViewModel.ViewSectionSettings.GENERAL_VIEW_X_OFFSET, out temp)) {
+            if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewXOffset, out temp)) {
                 ViewModel.ErrorText = "Значение отступа основного вида по X некорректно";
             }
-            if(!int.TryParse(ViewModel.ViewSectionSettings.GENERAL_VIEW_Y_TOP_OFFSET, out temp)) {
+            if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset, out temp)) {
                 ViewModel.ErrorText = "Значение отступа основного вида по Y сверху некорректно";
             }
-            if(!int.TryParse(ViewModel.ViewSectionSettings.GENERAL_VIEW_Y_BOTTOM_OFFSET, out temp)) {
+            if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset, out temp)) {
                 ViewModel.ErrorText = "Значение отступа основного вида по Y сверху некорректно";
             }
 
-            if(!int.TryParse(ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_X_OFFSET, out temp)) {
+            if(!int.TryParse(ViewModel.ViewSectionSettings.TransverseViewXOffset, out temp)) {
                 ViewModel.ErrorText = "Значение отступа поперечного вида по X некорректно";
             }
-            if(!int.TryParse(ViewModel.ViewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET_TEMP, out temp)) {
+            if(!int.TryParse(ViewModel.ViewSectionSettings.TransverseViewYOffsetTemp, out temp)) {
                 ViewModel.ErrorText = "Значение отступа поперечного вида по Y некорректно";
             }
         }

@@ -125,7 +125,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0"
-                                            Text="{Binding Path=ProjectSettings.MARK_TEMP, 
+                                            Text="{Binding Path=ProjectSettings.MarkTemp, 
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -160,7 +160,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0"
-                                            Text="{Binding Path=ProjectSettings.PROJECT_SECTION_TEMP, 
+                                            Text="{Binding Path=ProjectSettings.ProjectSectionTemp, 
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -195,7 +195,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0"
-                                            Text="{Binding Path=ProjectSettings.TYPICAL_PYLON_FILTER_PARAMETER_TEMP, 
+                                            Text="{Binding Path=ProjectSettings.TypicalPylonFilterParameterTemp, 
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -231,7 +231,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=ProjectSettings.TYPICAL_PYLON_FILTER_VALUE_TEMP, 
+                                            Text="{Binding Path=ProjectSettings.TypicalPylonFilterValueTemp, 
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -279,7 +279,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0"
-                                            Text="{Binding Path=ProjectSettings.DISPATCHER_GROUPING_FIRST_TEMP,
+                                            Text="{Binding Path=ProjectSettings.DispatcherGroupingFirstTemp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -314,7 +314,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=ProjectSettings.DISPATCHER_GROUPING_SECOND_TEMP,
+                                            Text="{Binding Path=ProjectSettings.DispatcherGroupingSecondTemp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -365,7 +365,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="10 0 5 0"
-                                                Text="{Binding Path=ProjectSettings.SHEET_PREFIX_TEMP,
+                                                Text="{Binding Path=ProjectSettings.SheetPrefixTemp,
                                                     UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -392,7 +392,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="5 0 10 0"
-                                                Text="{Binding Path=ProjectSettings.SHEET_SUFFIX_TEMP,
+                                                Text="{Binding Path=ProjectSettings.SheetSuffixTemp,
                                                     UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -475,7 +475,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0"
-                                            Text="{Binding Path=ProjectSettings.SHEET_SIZE_TEMP,
+                                            Text="{Binding Path=ProjectSettings.SheetSizeTemp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -510,7 +510,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=ProjectSettings.SHEET_COEFFICIENT_TEMP,
+                                            Text="{Binding Path=ProjectSettings.SheetCoefficientTemp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -565,7 +565,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="10 0 5 0"
-                                                Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_PREFIX_TEMP,
+                                                Text="{Binding Path=ViewSectionSettings.GeneralViewPrefixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -592,7 +592,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="5 0 10 0"
-                                                Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_SUFFIX_TEMP,
+                                                Text="{Binding Path=ViewSectionSettings.GeneralViewSuffixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -629,7 +629,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="10 0 5 0"
-                                                Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP,
+                                                Text="{Binding Path=ViewSectionSettings.GeneralViewPerpendicularPrefixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -656,7 +656,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="5 0 10 0"
-                                                Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_PERPENDICULAR_SUFFIX_TEMP,
+                                                Text="{Binding Path=ViewSectionSettings.GeneralViewPerpendicularSuffixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -780,7 +780,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_X_OFFSET_TEMP,
+                                            Text="{Binding Path=ViewSectionSettings.GeneralViewXOffsetTemp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -815,7 +815,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_Y_TOP_OFFSET_TEMP,
+                                            Text="{Binding Path=ViewSectionSettings.GeneralViewYTopOffsetTemp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -851,7 +851,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=ViewSectionSettings.GENERAL_VIEW_Y_BOTTOM_OFFSET_TEMP,
+                                            Text="{Binding Path=ViewSectionSettings.GeneralViewYBottomOffsetTemp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -906,7 +906,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="10 0 5 0"
-                                                Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_FIRST_PREFIX_TEMP,
+                                                Text="{Binding Path=ViewSectionSettings.TransverseViewFirstPrefixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -933,7 +933,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="5 0 10 0"
-                                                Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_FIRST_SUFFIX_TEMP,
+                                                Text="{Binding Path=ViewSectionSettings.TransverseViewFirstSuffixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -970,7 +970,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="10 0 5 0"
-                                                Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_SECOND_PREFIX_TEMP,
+                                                Text="{Binding Path=ViewSectionSettings.TransverseViewSecondPrefixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -997,7 +997,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="5 0 10 0"
-                                                Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_SECOND_SUFFIX_TEMP,
+                                                Text="{Binding Path=ViewSectionSettings.TransverseViewSecondSuffixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -1036,7 +1036,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="10 0 5 0"
-                                                Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_THIRD_PREFIX_TEMP,
+                                                Text="{Binding Path=ViewSectionSettings.TransverseViewThirdPrefixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -1063,7 +1063,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="5 0 10 0"
-                                                Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_THIRD_SUFFIX_TEMP,
+                                                Text="{Binding Path=ViewSectionSettings.TransverseViewThirdSuffixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -1187,7 +1187,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_X_OFFSET_TEMP,
+                                            Text="{Binding Path=ViewSectionSettings.TransverseViewXOffsetTemp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -1222,7 +1222,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=ViewSectionSettings.TRANSVERSE_VIEW_Y_OFFSET_TEMP,
+                                            Text="{Binding Path=ViewSectionSettings.TransverseViewYOffsetTemp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -1338,7 +1338,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="10 0 5 0"
-                                                Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_PREFIX_TEMP,
+                                                Text="{Binding Path=SchedulesSettings.RebarSchedulePrefixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -1365,7 +1365,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="5 0 10 0"
-                                                Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_SUFFIX_TEMP,
+                                                Text="{Binding Path=SchedulesSettings.RebarScheduleSuffixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -1401,7 +1401,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_NAME_TEMP,
+                                            Text="{Binding Path=SchedulesSettings.RebarScheduleNameTemp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -1436,7 +1436,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_DISP1_TEMP,
+                                            Text="{Binding Path=SchedulesSettings.RebarScheduleDisp1Temp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -1471,7 +1471,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.REBAR_SCHEDULE_DISP2_TEMP,
+                                            Text="{Binding Path=SchedulesSettings.RebarScheduleDisp2Temp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -1524,7 +1524,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="10 0 5 0"
-                                                Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_PREFIX_TEMP,
+                                                Text="{Binding Path=SchedulesSettings.MaterialSchedulePrefixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -1551,7 +1551,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="5 0 10 0"
-                                                Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_SUFFIX_TEMP,
+                                                Text="{Binding Path=SchedulesSettings.MaterialScheduleSuffixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -1588,7 +1588,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_NAME_TEMP,
+                                            Text="{Binding Path=SchedulesSettings.MaterialScheduleNameTemp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -1623,7 +1623,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_DISP1_TEMP,
+                                            Text="{Binding Path=SchedulesSettings.MaterialScheduleDisp1Temp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -1658,7 +1658,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.MATERIAL_SCHEDULE_DISP2_TEMP,
+                                            Text="{Binding Path=SchedulesSettings.MaterialScheduleDisp2Temp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -1709,7 +1709,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="10 0 5 0"
-                                                Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_PREFIX_TEMP,
+                                                Text="{Binding Path=SchedulesSettings.SystemPartsSchedulePrefixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -1736,7 +1736,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="5 0 10 0"
-                                                Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_SUFFIX_TEMP,
+                                                Text="{Binding Path=SchedulesSettings.SystemPartsScheduleSuffixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -1774,7 +1774,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_NAME_TEMP,
+                                            Text="{Binding Path=SchedulesSettings.SytemPartsScheduleNameTemp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -1809,7 +1809,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP1_TEMP,
+                                            Text="{Binding Path=SchedulesSettings.SystemPartsScheduleDisp1Temp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -1844,7 +1844,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.SYSTEM_PARTS_SCHEDULE_DISP2_TEMP,
+                                            Text="{Binding Path=SchedulesSettings.SystemPartsScheduleDisp2Temp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -1896,7 +1896,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="10 0 5 0"
-                                                Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_PREFIX_TEMP,
+                                                Text="{Binding Path=SchedulesSettings.IFCPartsSchedulePrefixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -1923,7 +1923,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="5 0 10 0"
-                                                Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_SUFFIX_TEMP,
+                                                Text="{Binding Path=SchedulesSettings.IFCPartsScheduleSuffixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
@@ -1961,7 +1961,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_NAME_TEMP,
+                                            Text="{Binding Path=SchedulesSettings.IFCPartsScheduleNameTemp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -1996,7 +1996,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_DISP1_TEMP,
+                                            Text="{Binding Path=SchedulesSettings.IFCPartsScheduleDisp1Temp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
@@ -2031,7 +2031,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.IFC_PARTS_SCHEDULE_DISP2_TEMP,
+                                            Text="{Binding Path=SchedulesSettings.IFCPartsScheduleDisp2Temp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">

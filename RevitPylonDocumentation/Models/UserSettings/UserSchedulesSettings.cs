@@ -52,119 +52,119 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         };
 
 
-        public string REBAR_SCHEDULE_PREFIX { get; set; }
-        public string REBAR_SCHEDULE_PREFIX_TEMP {
+        public string RebarSchedulePrefix { get; set; }
+        public string RebarSchedulePrefixTemp {
             get => _rebarSchedulePrefixTemp;
             set => RaiseAndSetIfChanged(ref _rebarSchedulePrefixTemp, value);
         }
 
-        public string REBAR_SCHEDULE_SUFFIX { get; set; }
-        public string REBAR_SCHEDULE_SUFFIX_TEMP {
+        public string RebarScheduleSuffix { get; set; }
+        public string RebarScheduleSuffixTemp {
             get => _rebarScheduleSuffixTemp;
             set => RaiseAndSetIfChanged(ref _rebarScheduleSuffixTemp, value);
         }
 
 
-        public string MATERIAL_SCHEDULE_PREFIX { get; set; }
-        public string MATERIAL_SCHEDULE_PREFIX_TEMP {
+        public string MaterialSchedulePrefix { get; set; }
+        public string MaterialSchedulePrefixTemp {
             get => _materialSchedulePrefixTemp;
             set => RaiseAndSetIfChanged(ref _materialSchedulePrefixTemp, value);
         }
 
-        public string MATERIAL_SCHEDULE_SUFFIX { get; set; }
-        public string MATERIAL_SCHEDULE_SUFFIX_TEMP {
+        public string MaterialScheduleSuffix { get; set; }
+        public string MaterialScheduleSuffixTemp {
             get => _materialScheduleSuffixTemp;
             set => RaiseAndSetIfChanged(ref _materialScheduleSuffixTemp, value);
         }
 
-        public string SYSTEM_PARTS_SCHEDULE_PREFIX { get; set; }
-        public string SYSTEM_PARTS_SCHEDULE_PREFIX_TEMP {
+        public string SystemPartsSchedulePrefix { get; set; }
+        public string SystemPartsSchedulePrefixTemp {
             get => _systemPartsSchedulePrefixTemp;
             set => RaiseAndSetIfChanged(ref _systemPartsSchedulePrefixTemp, value);
         }
 
-        public string SYSTEM_PARTS_SCHEDULE_SUFFIX { get; set; }
-        public string SYSTEM_PARTS_SCHEDULE_SUFFIX_TEMP {
+        public string SystemPartsScheduleSuffix { get; set; }
+        public string SystemPartsScheduleSuffixTemp {
             get => _systemPartsScheduleSuffixTemp;
             set => RaiseAndSetIfChanged(ref _systemPartsScheduleSuffixTemp, value);
         }
 
 
-        public string IFC_PARTS_SCHEDULE_PREFIX { get; set; }
-        public string IFC_PARTS_SCHEDULE_PREFIX_TEMP {
+        public string IFCPartsSchedulePrefix { get; set; }
+        public string IFCPartsSchedulePrefixTemp {
             get => _IFCPartsSchedulePrefixTemp;
             set => RaiseAndSetIfChanged(ref _IFCPartsSchedulePrefixTemp, value);
         }
 
-        public string IFC_PARTS_SCHEDULE_SUFFIX { get; set; }
-        public string IFC_PARTS_SCHEDULE_SUFFIX_TEMP {
+        public string IFCPartsScheduleSuffix { get; set; }
+        public string IFCPartsScheduleSuffixTemp {
             get => _IFCPartsScheduleSuffixTemp;
             set => RaiseAndSetIfChanged(ref _IFCPartsScheduleSuffixTemp, value);
         }
 
-        public string REBAR_SCHEDULE_NAME { get; set; }
-        public string REBAR_SCHEDULE_NAME_TEMP {
+        public string RebarScheduleName { get; set; }
+        public string RebarScheduleNameTemp {
             get => _rebarScheduleNameTemp;
             set => RaiseAndSetIfChanged(ref _rebarScheduleNameTemp, value);
         }
 
-        public string MATERIAL_SCHEDULE_NAME { get; set; }
-        public string MATERIAL_SCHEDULE_NAME_TEMP {
+        public string MaterialScheduleName { get; set; }
+        public string MaterialScheduleNameTemp {
             get => _materialScheduleNameTemp;
             set => RaiseAndSetIfChanged(ref _materialScheduleNameTemp, value);
         }
 
-        public string SYSTEM_PARTS_SCHEDULE_NAME { get; set; }
-        public string SYSTEM_PARTS_SCHEDULE_NAME_TEMP {
+        public string SytemPartsScheduleName { get; set; }
+        public string SytemPartsScheduleNameTemp {
             get => _systemPartsScheduleNameTemp;
             set => RaiseAndSetIfChanged(ref _systemPartsScheduleNameTemp, value);
         }
 
-        public string IFC_PARTS_SCHEDULE_NAME { get; set; }
-        public string IFC_PARTS_SCHEDULE_NAME_TEMP {
+        public string IFCPartsScheduleName { get; set; }
+        public string IFCPartsScheduleNameTemp {
             get => _IFCPartsScheduleNameTemp;
             set => RaiseAndSetIfChanged(ref _IFCPartsScheduleNameTemp, value);
         }
 
-        public string REBAR_SCHEDULE_DISP1 { get; set; }
-        public string REBAR_SCHEDULE_DISP1_TEMP {
+        public string RebarScheduleDisp1 { get; set; }
+        public string RebarScheduleDisp1Temp {
             get => _rebarScheduleDisp1Temp;
             set => RaiseAndSetIfChanged(ref _rebarScheduleDisp1Temp, value);
         }
-        public string MATERIAL_SCHEDULE_DISP1 { get; set; }
-        public string MATERIAL_SCHEDULE_DISP1_TEMP {
+        public string MaterialScheduleDisp1 { get; set; }
+        public string MaterialScheduleDisp1Temp {
             get => _materialScheduleDisp1Temp;
             set => RaiseAndSetIfChanged(ref _materialScheduleDisp1Temp, value);
         }
-        public string SYSTEM_PARTS_SCHEDULE_DISP1 { get; set; }
-        public string SYSTEM_PARTS_SCHEDULE_DISP1_TEMP {
+        public string SystemPartsScheduleDisp1 { get; set; }
+        public string SystemPartsScheduleDisp1Temp {
             get => _systemPartsScheduleDisp1Temp;
             set => RaiseAndSetIfChanged(ref _systemPartsScheduleDisp1Temp, value);
         }
-        public string IFC_PARTS_SCHEDULE_DISP1 { get; set; }
-        public string IFC_PARTS_SCHEDULE_DISP1_TEMP {
+        public string IFCPartsScheduleDisp1 { get; set; }
+        public string IFCPartsScheduleDisp1Temp {
             get => _IFCPartsScheduleDisp1Temp;
             set => RaiseAndSetIfChanged(ref _IFCPartsScheduleDisp1Temp, value);
         }
 
-        public string REBAR_SCHEDULE_DISP2 { get; set; }
-        public string REBAR_SCHEDULE_DISP2_TEMP {
+        public string RebarScheduleDisp2 { get; set; }
+        public string RebarScheduleDisp2Temp {
             get => _rebarScheduleDisp2Temp;
             set => RaiseAndSetIfChanged(ref _rebarScheduleDisp2Temp, value);
         }
-        public string MATERIAL_SCHEDULE_DISP2 { get; set; }
-        public string MATERIAL_SCHEDULE_DISP2_TEMP {
+        public string MaterialScheduleDisp2 { get; set; }
+        public string MaterialScheduleDisp2Temp {
             get => _materialScheduleDisp2Temp;
             set => RaiseAndSetIfChanged(ref _materialScheduleDisp2Temp, value);
         }
-        public string SYSTEM_PARTS_SCHEDULE_DISP2 { get; set; }
-        public string SYSTEM_PARTS_SCHEDULE_DISP2_TEMP {
+        public string SystemPartsScheduleDisp2 { get; set; }
+        public string SystemPartsScheduleDisp2Temp {
             get => _systemPartsScheduleDisp2Temp;
             set => RaiseAndSetIfChanged(ref _systemPartsScheduleDisp2Temp, value);
         }
 
-        public string IFC_PARTS_SCHEDULE_DISP2 { get; set; }
-        public string IFC_PARTS_SCHEDULE_DISP2_TEMP {
+        public string IFCPartsScheduleDisp2 { get; set; }
+        public string IFCPartsScheduleDisp2Temp {
             get => _IFCPartsScheduleDisp2Temp;
             set => RaiseAndSetIfChanged(ref _IFCPartsScheduleDisp2Temp, value);
         }
@@ -179,32 +179,32 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
         public void ApplySchedulesSettings() {
             
-            REBAR_SCHEDULE_PREFIX = REBAR_SCHEDULE_PREFIX_TEMP;
-            REBAR_SCHEDULE_SUFFIX = REBAR_SCHEDULE_SUFFIX_TEMP;
+            RebarSchedulePrefix = RebarSchedulePrefixTemp;
+            RebarScheduleSuffix = RebarScheduleSuffixTemp;
 
-            MATERIAL_SCHEDULE_PREFIX = MATERIAL_SCHEDULE_PREFIX_TEMP;
-            MATERIAL_SCHEDULE_SUFFIX = MATERIAL_SCHEDULE_SUFFIX_TEMP;
+            MaterialSchedulePrefix = MaterialSchedulePrefixTemp;
+            MaterialScheduleSuffix = MaterialScheduleSuffixTemp;
 
-            SYSTEM_PARTS_SCHEDULE_PREFIX = SYSTEM_PARTS_SCHEDULE_PREFIX_TEMP;
-            SYSTEM_PARTS_SCHEDULE_SUFFIX = SYSTEM_PARTS_SCHEDULE_SUFFIX_TEMP;
+            SystemPartsSchedulePrefix = SystemPartsSchedulePrefixTemp;
+            SystemPartsScheduleSuffix = SystemPartsScheduleSuffixTemp;
 
-            IFC_PARTS_SCHEDULE_PREFIX = IFC_PARTS_SCHEDULE_PREFIX_TEMP;
-            IFC_PARTS_SCHEDULE_SUFFIX = IFC_PARTS_SCHEDULE_SUFFIX_TEMP;
+            IFCPartsSchedulePrefix = IFCPartsSchedulePrefixTemp;
+            IFCPartsScheduleSuffix = IFCPartsScheduleSuffixTemp;
 
-            REBAR_SCHEDULE_NAME = REBAR_SCHEDULE_NAME_TEMP;
-            MATERIAL_SCHEDULE_NAME = MATERIAL_SCHEDULE_NAME_TEMP;
-            SYSTEM_PARTS_SCHEDULE_NAME = SYSTEM_PARTS_SCHEDULE_NAME_TEMP;
-            IFC_PARTS_SCHEDULE_NAME = IFC_PARTS_SCHEDULE_NAME_TEMP;
+            RebarScheduleName = RebarScheduleNameTemp;
+            MaterialScheduleName = MaterialScheduleNameTemp;
+            SytemPartsScheduleName = SytemPartsScheduleNameTemp;
+            IFCPartsScheduleName = IFCPartsScheduleNameTemp;
 
-            REBAR_SCHEDULE_DISP1 = REBAR_SCHEDULE_DISP1_TEMP;
-            MATERIAL_SCHEDULE_DISP1 = MATERIAL_SCHEDULE_DISP1_TEMP;
-            SYSTEM_PARTS_SCHEDULE_DISP1 = SYSTEM_PARTS_SCHEDULE_DISP1_TEMP;
-            IFC_PARTS_SCHEDULE_DISP1 = IFC_PARTS_SCHEDULE_DISP1_TEMP;
+            RebarScheduleDisp1 = RebarScheduleDisp1Temp;
+            MaterialScheduleDisp1 = MaterialScheduleDisp1Temp;
+            SystemPartsScheduleDisp1 = SystemPartsScheduleDisp1Temp;
+            IFCPartsScheduleDisp1 = IFCPartsScheduleDisp1Temp;
 
-            REBAR_SCHEDULE_DISP2 = REBAR_SCHEDULE_DISP2_TEMP;
-            MATERIAL_SCHEDULE_DISP2 = MATERIAL_SCHEDULE_DISP2_TEMP;
-            SYSTEM_PARTS_SCHEDULE_DISP2 = SYSTEM_PARTS_SCHEDULE_DISP2_TEMP;
-            IFC_PARTS_SCHEDULE_DISP2 = IFC_PARTS_SCHEDULE_DISP2_TEMP;
+            RebarScheduleDisp2 = RebarScheduleDisp2Temp;
+            MaterialScheduleDisp2 = MaterialScheduleDisp2Temp;
+            SystemPartsScheduleDisp2 = SystemPartsScheduleDisp2Temp;
+            IFCPartsScheduleDisp2 = IFCPartsScheduleDisp2Temp;
 
             ParamsForScheduleFilters = ParamsForScheduleFiltersTemp;
         }

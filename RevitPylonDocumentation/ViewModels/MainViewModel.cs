@@ -160,7 +160,7 @@ namespace RevitPylonDocumentation.ViewModels {
             get => _selectedTitleBlock;
             set {
                 this.RaiseAndSetIfChanged(ref _selectedTitleBlock, value);
-                ProjectSettings.TITLEBLOCK_NAME_TEMP = value?.Name;
+                ProjectSettings.TitleBlockNameTemp = value?.Name;
             }
         }
 
@@ -176,7 +176,7 @@ namespace RevitPylonDocumentation.ViewModels {
             get => _selectedLegend;
             set {
                 this.RaiseAndSetIfChanged(ref _selectedLegend, value);
-                ProjectSettings.LEGEND_NAME_TEMP = value?.Name;
+                ProjectSettings.LegendNameTemp = value?.Name;
             }
         }
 
@@ -192,7 +192,7 @@ namespace RevitPylonDocumentation.ViewModels {
             get => _selectedViewFamilyType;
             set {
                 this.RaiseAndSetIfChanged(ref _selectedViewFamilyType, value);
-                ViewSectionSettings.VIEW_FAMILY_TYPE_NAME_TEMP = value?.Name;
+                ViewSectionSettings.ViewFamilyTypeNameTemp = value?.Name;
             }
         }
 
@@ -208,7 +208,7 @@ namespace RevitPylonDocumentation.ViewModels {
             get => _selectedGeneralViewTemplate;
             set {
                 this.RaiseAndSetIfChanged(ref _selectedGeneralViewTemplate, value);
-                ViewSectionSettings.GENERAL_VIEW_TEMPLATE_NAME_TEMP = value?.Name;
+                ViewSectionSettings.GeneralViewTemplateNameTemp = value?.Name;
             }
         }
 
@@ -959,10 +959,10 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Ищет эталонные спецификации по указанным именам. На основе эталонных спек создаются спеки для пилонов путем копирования
         /// </summary>
         private void FindReferenceSchedules() {
-            ReferenceRebarSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.REBAR_SCHEDULE_NAME)) as ViewSchedule;
-            ReferenceMaterialSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.MATERIAL_SCHEDULE_NAME)) as ViewSchedule;
-            ReferenceSystemPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.SYSTEM_PARTS_SCHEDULE_NAME)) as ViewSchedule;
-            ReferenceIFCPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.IFC_PARTS_SCHEDULE_NAME)) as ViewSchedule;
+            ReferenceRebarSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.RebarScheduleName)) as ViewSchedule;
+            ReferenceMaterialSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.MaterialScheduleName)) as ViewSchedule;
+            ReferenceSystemPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.SytemPartsScheduleName)) as ViewSchedule;
+            ReferenceIFCPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.IFCPartsScheduleName)) as ViewSchedule;
         }
 
         /// <summary>
@@ -970,9 +970,9 @@ namespace RevitPylonDocumentation.ViewModels {
         /// </summary>
         public void FindGeneralViewTemplate() {
 
-            if(ViewSectionSettings.GENERAL_VIEW_TEMPLATE_NAME != string.Empty) {
+            if(ViewSectionSettings.GeneralViewTemplateName != string.Empty) {
                 SelectedGeneralViewTemplate = ViewTemplatesInPj
-                .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.GENERAL_VIEW_TEMPLATE_NAME));
+                .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.GeneralViewTemplateName));
             }
         }
         /// <summary>
@@ -980,9 +980,9 @@ namespace RevitPylonDocumentation.ViewModels {
         /// </summary>
         public void FindTransverseViewTemplate() {
 
-            if(ViewSectionSettings.TRANSVERSE_VIEW_TEMPLATE_NAME != string.Empty) {
+            if(ViewSectionSettings.TransverseViewTemplateName != string.Empty) {
                 SelectedTransverseViewTemplate = ViewTemplatesInPj
-                .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TRANSVERSE_VIEW_TEMPLATE_NAME));
+                .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TransverseViewTemplateName));
             }
             
         }
@@ -991,9 +991,9 @@ namespace RevitPylonDocumentation.ViewModels {
         /// </summary>
         public void FindViewFamilyType() {
 
-            if(ViewSectionSettings.VIEW_FAMILY_TYPE_NAME != string.Empty) {
+            if(ViewSectionSettings.ViewFamilyTypeName != string.Empty) {
                 SelectedViewFamilyType = ViewFamilyTypes
-                .FirstOrDefault(familyTypes => familyTypes.Name.Equals(ViewSectionSettings.VIEW_FAMILY_TYPE_NAME));
+                .FirstOrDefault(familyTypes => familyTypes.Name.Equals(ViewSectionSettings.ViewFamilyTypeName));
             }
         }
         /// <summary>
@@ -1001,9 +1001,9 @@ namespace RevitPylonDocumentation.ViewModels {
         /// </summary>
         public void FindLegend() {
 
-            if(ProjectSettings.LEGEND_NAME != string.Empty) {
+            if(ProjectSettings.LegendName != string.Empty) {
                 SelectedLegend = Legends
-                .FirstOrDefault(view => view.Name.Contains(ProjectSettings.LEGEND_NAME));
+                .FirstOrDefault(view => view.Name.Contains(ProjectSettings.LegendName));
             }
                 
         }
@@ -1012,9 +1012,9 @@ namespace RevitPylonDocumentation.ViewModels {
         /// </summary>
         public void FindTitleBlock() {
 
-            if(ProjectSettings.TITLEBLOCK_NAME != string.Empty) {
+            if(ProjectSettings.TitleBlockName != string.Empty) {
                 SelectedTitleBlock = TitleBlocks
-                .FirstOrDefault(titleBlock => titleBlock.Name.Contains(ProjectSettings.TITLEBLOCK_NAME));
+                .FirstOrDefault(titleBlock => titleBlock.Name.Contains(ProjectSettings.TitleBlockName));
             }
         }
 
