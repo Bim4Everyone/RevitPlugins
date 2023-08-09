@@ -96,7 +96,12 @@ namespace RevitOpeningPlacement {
 
             var incomingTasksViewModels = new List<OpeningMepTaskIncomingViewModel>();
             foreach(var incomingTask in incomingTasks) {
-                incomingTask.UpdateStatus(realOpenings);
+                try {
+                    incomingTask.UpdateStatus(realOpenings);
+                } catch(ArgumentException) {
+                    //не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
+                    continue;
+                }
                 incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTask));
             };
             var navigatorViewModel = new OpeningsMepTaskIncomingViewModel(revitRepository, incomingTasksViewModels);
