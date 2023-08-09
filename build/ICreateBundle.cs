@@ -7,7 +7,7 @@ using Nuke.Common.IO;
 
 using Serilog;
 
-interface ICreateBundle : IClean, IHazTemplate {
+interface ICreateBundle : IHazOutput, IHazTemplate {
     [Parameter]
     Uri IconUrl => TryGetValue(() => IconUrl)
                    ?? new Uri("https://icons8.com/icon/UgAl9mP8tniQ/example");
@@ -24,7 +24,6 @@ interface ICreateBundle : IClean, IHazTemplate {
 
 
     Target CreateBundle => _ => _
-        //.Triggers(Clean)
         .Requires(() => BundleName)
         .Requires(() => BundleType)
         .Executes(async () => {
