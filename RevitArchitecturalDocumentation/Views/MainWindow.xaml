@@ -84,79 +84,126 @@
 
             <Button
                 Margin="10"
-                Width="80"
-                Content="+"
+                Width="200"
+                Content="Добавить строку"
+                FontSize="16"
                 Command="{Binding Path=AddTaskCommand}"/>
 
             <Button
                 Margin="10"
-                Width="80"
-                Content="-"
+                Width="200"
+                Content="Удалить строку"
+                FontSize="16"
                 Command="{Binding Path=DeleteTaskCommand}"/>
         </StackPanel>
-        
-        <StackPanel
-            Grid.Row="2"
-            Height="45"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
 
-            <TextBlock
-                Text="Для листа:"
-                FontSize="20"/>
 
-            <ComboBox
-                Margin="10 0 0 0"
-                Height="36"
-                Width="200"
-                ItemsSource="{Binding Path=TitleBlocksInProject}" 
-                SelectedItem="{Binding Path=SelectedTitleBlock}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock>
-                            <TextBlock.Text>
-                                <MultiBinding StringFormat="{}{0}: {1}">
-                                    <Binding Path="FamilyName"/>
-                                    <Binding Path="Name"/>
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
 
-            <TextBox 
-                Margin="10 0 0 0" 
-                Width="200"
-                Text="{Binding Path=SheetNamePrefix}"/>
 
-        </StackPanel>
-        
-        
-        <StackPanel
-            Grid.Row="3"
-            Height="45"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
-            
-            <TextBlock
-                Text="Для вида:"
-                FontSize="20"/>
-            
-            <ComboBox
-                Margin="10 0 0 0"
-                Height="36"
-                Width="200"
-                DisplayMemberPath="Name"
-                ItemsSource="{Binding Path=ViewFamilyTypes}" 
-                SelectedItem="{Binding Path=SelectedViewFamilyType}">
-            </ComboBox>
+        <GroupBox Margin="5" Grid.Row="2" Height="65">
+            <GroupBox.Header>
+                <TextBlock 
+                    Text="Для листа:"
+                    FontSize="20"/>
+            </GroupBox.Header>
 
-            <TextBox 
-                Margin="10 0 0 0" 
-                Width="200"
-                Text="{Binding Path=ViewNamePrefix}"/>
-        </StackPanel>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+
+                <TextBlock
+                    Grid.Column="0"
+                    Text="Выберите рамку листа:"
+                    FontSize="16"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"/>
+
+                <ComboBox
+                    Grid.Column="1"
+                    ItemsSource="{Binding Path=TitleBlocksInProject}" 
+                    SelectedItem="{Binding Path=SelectedTitleBlock}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0}: {1}">
+                                        <Binding Path="FamilyName"/>
+                                        <Binding Path="Name"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <TextBlock
+                    Grid.Column="2"
+                    Margin="20 0 0 0"
+                    Text="Укажите префикс листа:"
+                    FontSize="16"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"/>
+
+                <TextBox 
+                    Grid.Column="3"
+                    Margin="10 0 0 0" 
+                    Text="{Binding Path=SheetNamePrefix}"/>
+            </Grid>
+        </GroupBox>
+
+
+        <GroupBox Margin="5" Grid.Row="3" Height="65">
+            <GroupBox.Header>
+                <TextBlock 
+                    Text="Для вида:"
+                    FontSize="20"/>
+            </GroupBox.Header>
+
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+
+                <TextBlock
+                    Grid.Column="0"
+                    Text="Выберите тип вида:"
+                    FontSize="16"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"/>
+
+                <ComboBox
+                    Grid.Column="1"
+                    DisplayMemberPath="Name"
+                    ItemsSource="{Binding Path=ViewFamilyTypes}" 
+                    SelectedItem="{Binding Path=SelectedViewFamilyType}">
+                    </ComboBox>
+
+                <TextBlock
+                    Grid.Column="2"
+                    Margin="20 0 0 0"
+                    Text="Для вида:"
+                    FontSize="16"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"/>
+                
+                <TextBox 
+                    Grid.Column="3"
+                    Margin="10 0 0 0" 
+                    Text="{Binding Path=ViewNamePrefix}"/>
+            </Grid>
+        </GroupBox>
+
 
         <StackPanel
             Grid.Row="4"
@@ -173,6 +220,7 @@
                 Margin="10"
                 Width="80"
                 Content="ОК"
+                FontSize="16"
                 Click="ButtonOk_Click"
                 Command="{Binding Path=AcceptViewCommand}"/>
 
@@ -180,6 +228,7 @@
                 Margin="10"
                 Width="80"
                 Content="Отмена"
+                FontSize="16"
                 Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>

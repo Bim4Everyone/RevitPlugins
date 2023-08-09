@@ -298,14 +298,14 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                     double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
                                     double viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
 
-                                    if(viewportHalfWidth < viewportHalfHeight) {
-                                        viewPort.get_Parameter(BuiltInParameter.VIEWPORT_ATTR_ORIENTATION_ON_SHEET).Set(1);
+                                    //if(viewportHalfWidth < viewportHalfHeight) {
+                                    //    viewPort.get_Parameter(BuiltInParameter.VIEWPORT_ATTR_ORIENTATION_ON_SHEET).Set(1);
 
-                                        viewPort.SetBoxCenter(new XYZ());
-                                        viewportOutline = viewPort.GetBoxOutline();
-                                        viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
-                                        viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
-                                    }
+                                    //    viewPort.SetBoxCenter(new XYZ());
+                                    //    viewportOutline = viewPort.GetBoxOutline();
+                                    //    viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
+                                    //    viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
+                                    //}
 
 
 
@@ -317,21 +317,27 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                                     if(titleBlock is null) { continue; }
 
+                                    titleBlock.LookupParameter("Ширина").Set(150 / 304.8);
+                                    titleBlock.LookupParameter("Высота").Set(viewportHalfHeight * 2 + 10 / 304.8);
+
+                                    _revitRepository.Document.Regenerate();
+
                                     // Получение габаритов рамки листа
                                     BoundingBoxXYZ boundingBoxXYZ = titleBlock.get_BoundingBox(newSheet);
                                     double titleBlockWidth = boundingBoxXYZ.Max.X - boundingBoxXYZ.Min.X;
                                     double titleBlockHeight = boundingBoxXYZ.Max.Y - boundingBoxXYZ.Min.Y;
 
                                     double titleBlockMinY = boundingBoxXYZ.Min.Y;
+                                    double titleBlockMinX = boundingBoxXYZ.Min.X;
 
                                     XYZ correctPosition = new XYZ(
-                                        titleBlockWidth - viewportHalfWidth,
+                                        titleBlockMinX + viewportHalfWidth,
                                         titleBlockHeight / 2 + titleBlockMinY,
                                         0);
 
 
-                                    TaskDialog.Show("titleBlockWidth", titleBlockWidth.ToString());
-                                    TaskDialog.Show("viewportHalfWidth", viewportHalfWidth.ToString());
+                                    //TaskDialog.Show("titleBlockWidth", titleBlockWidth.ToString());
+                                    //TaskDialog.Show("viewportHalfWidth", viewportHalfWidth.ToString());
 
 
                                     viewPort.SetBoxCenter(correctPosition);
