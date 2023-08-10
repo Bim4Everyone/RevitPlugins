@@ -38,6 +38,9 @@ namespace RevitOpeningPlacement.Models {
             _element = constructureElement;
             Id = _element.Id.IntegerValue;
             FileName = _element.Document.PathName;
+
+            SetTransformedBBoxXYZ();
+            SetSolid();
         }
 
 
@@ -58,9 +61,6 @@ namespace RevitOpeningPlacement.Models {
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
         public Solid GetSolid() {
-            if(_solid is null) {
-                _solid = _element.GetSolid();
-            }
             return _solid;
         }
 
@@ -69,10 +69,16 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <returns></returns>
         public BoundingBoxXYZ GetTransformedBBoxXYZ() {
-            if(_boundingBox is null) {
-                _boundingBox = _element.GetBoundingBox();
-            }
             return _boundingBox;
+        }
+
+
+        private void SetSolid() {
+            _solid = _element.GetSolid();
+        }
+
+        private void SetTransformedBBoxXYZ() {
+            _boundingBox = _element.GetBoundingBox();
         }
     }
 }
