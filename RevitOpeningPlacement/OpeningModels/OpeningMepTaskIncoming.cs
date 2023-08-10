@@ -208,7 +208,7 @@ namespace RevitOpeningPlacement.OpeningModels {
             if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
                 return 0;
             } else {
-                return constructureElements.AsParallel().Any(constructureElement => constructureElement.IntersectsSolid(thisOpeningSolid, thisOpeningBBox)) ? 1 : 0;
+                return constructureElements.Any(constructureElement => constructureElement.IntersectsSolid(thisOpeningSolid, thisOpeningBBox)) ? 1 : 0;
 
                 // при 2300~ OpeningMepTaskIncoming на объекте со 14373 стенами и 1080 перекрытиями занимает 200~ мс на каждое OpeningMepTaskIncoming
                 //return new FilteredElementCollector(_revitRepository.Doc)
@@ -232,7 +232,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                 return 0;
             } else {
                 //для ускорения работы происходит поиск только первого проема
-                return realOpenings.AsParallel().Any(realOpening => realOpening.IntersectsSolid(thisOpeningSolid, thisOpeningBBox)) ? 1 : 0;
+                return realOpenings.Any(realOpening => realOpening.IntersectsSolid(thisOpeningSolid, thisOpeningBBox)) ? 1 : 0;
             }
         }
     }
