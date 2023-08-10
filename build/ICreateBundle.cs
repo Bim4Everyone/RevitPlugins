@@ -14,8 +14,7 @@ interface ICreateBundle : IHazOutput, IHazTemplate {
 
     AbsolutePath TemplateBundleDirectory => TemplateDirectory + BundleType.ExtensionWithDot;
     AbsolutePath BundleDirectory => Output / BundleName + BundleType.ExtensionWithDot;
-
-
+    
     IconSize IconSize => IconSize.Size96;
     string UriIconFormat => "https://img.icons8.com/?size={0}&id={1}&format=png";
 
@@ -25,7 +24,7 @@ interface ICreateBundle : IHazOutput, IHazTemplate {
         .Requires(() => BundleType)
         .Executes(async () => {
             Log.Debug("TemplateName: {TemplateName}", TemplateName);
-            Log.Debug("TemplateDirectory: {TemplateDirectory}", TemplateDirectory);
+            Log.Debug("TemplateBundleDirectory: {TemplateBundleDirectory}", TemplateBundleDirectory);
 
             Log.Debug("IconUrl: {IconUrl}", IconUrl);
             Log.Debug("BundleName: {BundleName}", BundleName);
