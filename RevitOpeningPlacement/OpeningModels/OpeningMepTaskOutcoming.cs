@@ -98,7 +98,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// если экземпляр семейства задания пересекается с каким-то элементом инженерных систем и это пересечение некорректно, то InaccurateBasis
         /// если экземпляр семейства задания пересекается с каким-то элементом инженерных систем и это пересечение корректно, то HasBasis
         /// </summary>
-        public OpeningTaskOutcomingStatus Status { get; set; } = OpeningTaskOutcomingStatus.Empty;
+        public OpeningTaskOutcomingStatus Status { get; set; } = OpeningTaskOutcomingStatus.NotActual;
 
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Если соотношение объемов >= 0.95, то статус <see cref="OpeningTaskOutcomingStatus.TooSmall"/>,
         /// Если соотношение объемов в диапазоне [0.2, 0.95), то статус <see cref="OpeningTaskOutcomingStatus.Correct"/>,
         /// Если соотношение объемов в диапазоне (0; 0.2), то статус <see cref="OpeningTaskOutcomingStatus.TooBig"/>,
-        /// Если соотношение объемов равно 0, то статус <see cref="OpeningTaskOutcomingStatus.Empty"/>.
+        /// Если соотношение объемов равно 0, то статус <see cref="OpeningTaskOutcomingStatus.NotActual"/>.
         /// 
         /// <para>Если же объем Solid самого задания на отверстие равен 0, то статус <see cref="OpeningTaskOutcomingStatus.Invalid"/></para>
         /// </summary>
@@ -326,7 +326,7 @@ namespace RevitOpeningPlacement.OpeningModels {
             } else if((0 < volumeRatio) && (volumeRatio < 0.2)) {
                 status = OpeningTaskOutcomingStatus.TooBig;
             } else {
-                status = OpeningTaskOutcomingStatus.Empty;
+                status = OpeningTaskOutcomingStatus.NotActual;
             }
             return status;
         }
