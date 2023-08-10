@@ -388,5 +388,30 @@ namespace RevitOpeningPlacement.OpeningModels {
             }
             return openingSolidAfterIntersection;
         }
+
+        /// <summary>
+        /// Возвращает перечисление солидов заданий на отверстия, которые пересекаются с элементами конструкций из связ
+        /// </summary>
+        /// <param name="thisOpeningTaskSolid">Солид текущего задания на отверстие</param>
+        /// <param name="constructureLinkElementsProviders">Коллекция объектов-оберток связанных файлов с элементами конструкций: стенами, перекрытиями и т.п.</param>
+        /// <returns></returns>
+        private bool ThisOpeningTaskIntersectsLinkConstructions(Solid thisOpeningTaskSolid, ICollection<IConstructureLinkElementsProvider> constructureLinkElementsProviders) {
+            if((thisOpeningTaskSolid is null) || (thisOpeningTaskSolid.Volume <= 0)) {
+                return false;
+            } else {
+                foreach(var link in constructureLinkElementsProviders) {
+                    var thisSolidInLinkCoordinates = SolidUtils.CreateTransformed(thisOpeningTaskSolid, link.DocumentTransform.Inverse);
+
+                    bool intersects = new FilteredElementCollector(link.Document, link.GetElementIds())
+                        .WherePasses(new BoundingBoxIntersectsFilter(thisSolidInLinkCoordinates.GetOutline()))
+                        .WherePasses(new ElementIntersectsSolidFilter(thisSolidInLinkCoordinates))
+                        .Any();
+                    if(intersects) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
     }
 }
