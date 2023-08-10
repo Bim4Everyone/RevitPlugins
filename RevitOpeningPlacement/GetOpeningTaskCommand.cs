@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Windows.Interop;
 
@@ -13,13 +12,15 @@ using dosymep.SimpleServices;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.OpeningUnion;
-using RevitOpeningPlacement.OpeningModels;
 using RevitOpeningPlacement.ViewModels.Navigator;
 using RevitOpeningPlacement.Views;
 
 namespace RevitOpeningPlacement {
     [Transaction(TransactionMode.Manual)]
     public class GetOpeningTaskCommand : BasePluginCommand {
+        private const int _progressBarStep = 100;
+
+
         public GetOpeningTaskCommand() {
             PluginName = "Навигатор по заданиям";
         }
@@ -97,8 +98,7 @@ namespace RevitOpeningPlacement {
             var incomingTasksViewModels = new List<OpeningMepTaskIncomingViewModel>();
 
             using(var pb = GetPlatformService<IProgressDialogService>()) {
-                int step = 100;
-                pb.StepValue = step;
+                pb.StepValue = _progressBarStep;
                 pb.DisplayTitleFormat = "Анализ отверстий... [{0}\\{1}]";
                 var progress = pb.CreateProgress();
                 pb.MaxValue = incomingTasks.Count;
@@ -107,7 +107,7 @@ namespace RevitOpeningPlacement {
 
                 for(int i = 0; i < incomingTasks.Count; i++) {
                     ct.ThrowIfCancellationRequested();
-                    if(i % step == 0) {
+                    if(i % _progressBarStep == 0) {
                         progress.Report(i);
                     }
                     try {
@@ -153,14 +153,26 @@ namespace RevitOpeningPlacement {
         /// <param name="uiApplication"></param>
         /// <param name="revitRepository"></param>
         private void GetOpeningsTaskInDocumentMEP(UIApplication uiApplication, RevitRepository revitRepository) {
-            var outcomingTasks = revitRepository
-                .GetOpeningsMepTasksOutcoming()
-                .Select(famInst => new OpeningMepTaskOutcoming(famInst));
+            var outcomingTasks = revitRepository.GetOpeningsMepTasksOutcoming();
             var openingTaskOutcomingViewModels = new List<OpeningMepTaskOutcomingViewModel>();
-            foreach(var outcomingTask in outcomingTasks) {
-                outcomingTask.UpdateStatus();
-                openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTask));
-            };
+
+            using(var pb = GetPlatformService<IProgressDialogService>()) {
+                pb.StepValue = _progressBarStep;
+                pb.DisplayTitleFormat = "Анализ заданий... [{0}\\{1}]";
+                var progress = pb.CreateProgress();
+                pb.MaxValue = outcomingTasks.Count;
+                var ct = pb.CreateCancellationToken();
+                pb.Show();
+
+                for(int i = 0; i < outcomingTasks.Count; i++) {
+                    ct.ThrowIfCancellationRequested();
+                    if(i % _progressBarStep == 0) {
+                        progress.Report(i);
+                    }
+                    outcomingTasks[i].UpdateStatus();
+                    openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTasks[i]));
+                }
+            }
             var navigatorViewModel = new OpeningsMepTaskOutcomingViewModel(revitRepository, openingTaskOutcomingViewModels);
 
             var window = new NavigatorMepOutcomingView() { Title = PluginName, DataContext = navigatorViewModel };
