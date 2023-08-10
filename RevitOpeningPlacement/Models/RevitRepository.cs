@@ -419,7 +419,7 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает перечисление чистовых экземпляров семейств отверстий из текущего документа Revit
+        /// Возвращает список чистовых экземпляров семейств отверстий из текущего документа Revit
         /// </summary>
         /// <returns></returns>
         public IList<OpeningReal> GetRealOpenings() {
@@ -435,15 +435,14 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает список всех элементов конструкций, для которых создаются задания на отверстия
+        /// Возвращает коллекцию всех элементов конструкций, для которых создаются задания на отверстия
         /// </summary>
         /// <returns></returns>
-        public IList<ConstructureElement> GetConstructureElements() {
+        public ICollection<ElementId> GetConstructureElementsIds() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
                 .WherePasses(FiltersInitializer.GetFilterByAllUsedStructureCategories())
-                .Select(element => new ConstructureElement(element))
-                .ToList();
+                .ToElementIds();
         }
 
         /// <summary>

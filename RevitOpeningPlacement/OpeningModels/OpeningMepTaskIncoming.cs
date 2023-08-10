@@ -178,11 +178,11 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="realOpenings"></param>
         /// <exception cref="ArgumentException"></exception>
-        public void UpdateStatus(ICollection<OpeningReal> realOpenings, ICollection<ConstructureElement> constructureElements) {
+        public void UpdateStatus(ICollection<OpeningReal> realOpenings, ICollection<ElementId> constructureElementsIds) {
             var thisOpeningSolid = GetSolid();
             var thisOpeningBBox = GetTransformedBBoxXYZ();
 
-            var intersectingStructureSolidsCount = GetIntersectingStructureElementsSolidsCount(thisOpeningSolid, thisOpeningBBox, constructureElements);
+            var intersectingStructureSolidsCount = GetIntersectingStructureElementsSolidsCount(thisOpeningSolid, constructureElementsIds);
             var intersectingOpeningsSolidsCount = GetIntersectingOpeningsSolidsCount(realOpenings, thisOpeningSolid, thisOpeningBBox);
 
             if((intersectingStructureSolidsCount == 0) && (intersectingOpeningsSolidsCount == 0)) {
@@ -199,23 +199,20 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         /// <summary>
         /// Возвращает количество элементов конструкций, с которыми пересекается текущее задание на отверстие
+        /// <para>Примечание: количество считается упрощенно либо 1, либо 0</para>
         /// </summary>
         /// <param name="thisOpeningSolid">Солид текущего задания на отверстие</param>
-        /// <param name="thisOpeningBBox">Бокс текущего задания на отверстие</param>
-        /// <param name="constructureElements">Коллекция элементов конструкций из активного документа ревита, для которых были сделаны задания на отверстия</param>
+        /// <param name="constructureElementsIds">Коллекция id элементов конструкций из активного документа ревита, для которых были сделаны задания на отверстия</param>
         /// <returns></returns>
-        private int GetIntersectingStructureElementsSolidsCount(Solid thisOpeningSolid, BoundingBoxXYZ thisOpeningBBox, ICollection<ConstructureElement> constructureElements) {
+        private int GetIntersectingStructureElementsSolidsCount(Solid thisOpeningSolid, ICollection<ElementId> constructureElementsIds) {
             if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
                 return 0;
             } else {
-                return constructureElements.Any(constructureElement => constructureElement.IntersectsSolid(thisOpeningSolid, thisOpeningBBox)) ? 1 : 0;
-
-                // при 2300~ OpeningMepTaskIncoming на объекте со 14373 стенами и 1080 перекрытиями занимает 200~ мс на каждое OpeningMepTaskIncoming
-                //return new FilteredElementCollector(_revitRepository.Doc)
-                //    .WherePasses(FiltersInitializer.GetFilterByAllUsedStructureCategories())
-                //    .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningSolid.GetOutline()))
-                //    .WherePasses(new ElementIntersectsSolidFilter(thisOpeningSolid))
-                //    .Count();
+                return new FilteredElementCollector(_revitRepository.Doc, constructureElementsIds)
+                    .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningSolid.GetOutline()))
+                    .WherePasses(new ElementIntersectsSolidFilter(thisOpeningSolid))
+                    .Any() ? 1 : 0;
+                //.Count();
             }
         }
 

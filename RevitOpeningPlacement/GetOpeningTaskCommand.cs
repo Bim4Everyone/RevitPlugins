@@ -93,7 +93,7 @@ namespace RevitOpeningPlacement {
             }
             var incomingTasks = revitRepository.GetOpeningsMepTasksIncoming();
             var realOpenings = revitRepository.GetRealOpenings();
-            var constructureElements = revitRepository.GetConstructureElements();
+            var constructureElementsIds = revitRepository.GetConstructureElementsIds();
             var incomingTasksViewModels = new List<OpeningMepTaskIncomingViewModel>();
 
             using(var pb = GetPlatformService<IProgressDialogService>()) {
@@ -108,10 +108,10 @@ namespace RevitOpeningPlacement {
                 for(int i = 0; i < incomingTasks.Count; i++) {
                     ct.ThrowIfCancellationRequested();
                     if(i % step == 0) {
-                        progress.Report(i + 1);
+                        progress.Report(i);
                     }
                     try {
-                        incomingTasks[i].UpdateStatus(realOpenings, constructureElements);
+                        incomingTasks[i].UpdateStatus(realOpenings, constructureElementsIds);
                     } catch(ArgumentException) {
                         //не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
                         continue;
