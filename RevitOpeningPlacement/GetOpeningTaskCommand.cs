@@ -154,6 +154,9 @@ namespace RevitOpeningPlacement {
         /// <param name="uiApplication"></param>
         /// <param name="revitRepository"></param>
         private void GetOpeningsTaskInDocumentMEP(UIApplication uiApplication, RevitRepository revitRepository) {
+            if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
+                throw new OperationCanceledException();
+            }
             var outcomingTasks = revitRepository.GetOpeningsMepTasksOutcoming();
             var outcomingTasksIds = outcomingTasks.Select(task => new ElementId(task.Id)).ToList();
             var mepElementsIds = revitRepository.GetMepElementsIds();
