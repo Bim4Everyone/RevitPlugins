@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Windows.Interop;
 
@@ -154,6 +155,8 @@ namespace RevitOpeningPlacement {
         /// <param name="revitRepository"></param>
         private void GetOpeningsTaskInDocumentMEP(UIApplication uiApplication, RevitRepository revitRepository) {
             var outcomingTasks = revitRepository.GetOpeningsMepTasksOutcoming();
+            var outcomingTasksIds = outcomingTasks.Select(task => new ElementId(task.Id)).ToList();
+            var mepElementsIds = revitRepository.GetMepElementsIds();
             var openingTaskOutcomingViewModels = new List<OpeningMepTaskOutcomingViewModel>();
 
             using(var pb = GetPlatformService<IProgressDialogService>()) {
@@ -169,7 +172,7 @@ namespace RevitOpeningPlacement {
                     if(i % _progressBarStep == 0) {
                         progress.Report(i);
                     }
-                    outcomingTasks[i].UpdateStatus();
+                    outcomingTasks[i].UpdateStatus(outcomingTasksIds, mepElementsIds);
                     openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTasks[i]));
                 }
             }

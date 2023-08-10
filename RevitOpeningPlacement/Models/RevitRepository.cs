@@ -435,13 +435,23 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает коллекцию всех элементов конструкций, для которых создаются задания на отверстия
+        /// Возвращает коллекцию Id всех элементов конструкций из текущего документа ревита, для которых создаются задания на отверстия
         /// </summary>
         /// <returns></returns>
         public ICollection<ElementId> GetConstructureElementsIds() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
                 .WherePasses(FiltersInitializer.GetFilterByAllUsedStructureCategories())
+                .ToElementIds();
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию Id всех элементов инженерных систем из текущего документа ревита, для которых создаются задания на отверстия
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<ElementId> GetMepElementsIds() {
+            return new FilteredElementCollector(_document)
+                .WherePasses(FiltersInitializer.GetFilterByAllUsedMepCategories())
                 .ToElementIds();
         }
 
@@ -507,7 +517,8 @@ namespace RevitOpeningPlacement.Models {
         private IList<FamilyInstance> GetGenericModelsFamilyInstances() {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
-                .OfType<FamilyInstance>()
+                .OfClass(typeof(FamilyInstance))
+                .Cast<FamilyInstance>()
                 .ToList();
         }
 

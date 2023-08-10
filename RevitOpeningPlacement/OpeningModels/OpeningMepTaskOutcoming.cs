@@ -120,48 +120,29 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// 
         /// <para>Если же объем Solid самого задания на отверстие равен 0, то статус <see cref="OpeningTaskOutcomingStatus.Invalid"/></para>
         /// </summary>
-        /// <param name="revitRepository"></param>
-        public void UpdateStatus() {
+        /// <param name="allOpeningsOutcomingTasksIds">Коллекция Id всех экземпляров семейств заданий на отверстия из текущего файла</param>
+        /// <param name="allMepElementsIds">Коллекция Id всех элементов инженерных систем из файла, в котором размещено задание на отверстие</param>
+        public void UpdateStatus(ICollection<ElementId> allOpeningsOutcomingTasksIds, ICollection<ElementId> allMepElementsIds) {
             if(!IsRemoved) {
                 var openingSolid = GetSolid();
                 if((openingSolid != null) && (openingSolid.Volume > 0)) {
-                    if(ThisOpeningTaskIntersectsOther(openingSolid)) {
+                    if(ThisOpeningTaskIntersectsOther(openingSolid, allOpeningsOutcomingTasksIds)) {
                         Status = OpeningTaskOutcomingStatus.Intersects;
                         return;
                     }
-                    var intersectingMepSolids = GetIntersectingMepSolids(openingSolid);
-                    Solid openingSolidAfterIntersection = openingSolid;
-                    foreach(var mepSolid in intersectingMepSolids) {
-                        try {
-                            openingSolidAfterIntersection = BooleanOperationsUtils.ExecuteBooleanOperation(openingSolidAfterIntersection, mepSolid, BooleanOperationsType.Difference);
-                        } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                            try {
-                                // если один солид касается другого солида изнутри, то будет исключение InvalidOperationException
-                                // здесь производится попытка слегка подвинуть один из солидов, чтобы избежать этого касания
-                                double coordinateOffset = 0.001;
-                                var mepTransformedSolid = SolidUtils.CreateTransformed(mepSolid, Transform.CreateTranslation(new XYZ(coordinateOffset, coordinateOffset, coordinateOffset)));
-                                openingSolidAfterIntersection = BooleanOperationsUtils.ExecuteBooleanOperation(openingSolidAfterIntersection, mepTransformedSolid, BooleanOperationsType.Difference);
-
-                            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                                try {
-                                    // здесь производится попытка слегка подвинуть один из солидов в другую сторону
-                                    double coordinateOffset = -0.001;
-                                    var mepTransformedSolid = SolidUtils.CreateTransformed(mepSolid, Transform.CreateTranslation(new XYZ(coordinateOffset, coordinateOffset, coordinateOffset)));
-                                    openingSolidAfterIntersection = BooleanOperationsUtils.ExecuteBooleanOperation(openingSolidAfterIntersection, mepTransformedSolid, BooleanOperationsType.Difference);
-
-                                } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                                    Status = OpeningTaskOutcomingStatus.Invalid;
-                                    return;
-                                }
-                            }
+                    try {
+                        Solid openingSolidAfterIntersection = GetOpeningAndMepsSolidsDifference(openingSolid, allMepElementsIds);
+                        if(openingSolidAfterIntersection is null) {
+                            Status = OpeningTaskOutcomingStatus.Invalid;
+                            return;
                         }
-                    }
-                    if(openingSolidAfterIntersection is null) {
+                        double volumeRatio = (openingSolid.Volume - openingSolidAfterIntersection.Volume) / openingSolid.Volume;
+                        Status = GetOpeningTaskOutcomingStatus(volumeRatio);
+
+                    } catch(InvalidOperationException) {
                         Status = OpeningTaskOutcomingStatus.Invalid;
                         return;
                     }
-                    double volumeRatio = (openingSolid.Volume - openingSolidAfterIntersection.Volume) / openingSolid.Volume;
-                    Status = GetOpeningTaskOutcomingStatus(volumeRatio);
                 } else {
                     Status = OpeningTaskOutcomingStatus.Invalid;
                 }
@@ -299,7 +280,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                 throw new ArgumentNullException(nameof(_familyInstance));
             }
             string value = string.Empty;
-            if(_familyInstance.IsExistsParam(paramName)) {
+            if(_familyInstance.GetParameters(paramName).FirstOrDefault(item => item.IsShared) != null) {
                 object paramValue = _familyInstance.GetParamValue(paramName);
                 if(!(paramValue is null)) {
                     value = paramValue.ToString();
@@ -336,11 +317,11 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="thisOpeningTaskSolid"></param>
         /// <returns></returns>
-        private bool ThisOpeningTaskIntersectsOther(Solid thisOpeningTaskSolid) {
+        private bool ThisOpeningTaskIntersectsOther(Solid thisOpeningTaskSolid, ICollection<ElementId> allOpeningTasksInDoc) {
             if((thisOpeningTaskSolid is null) || (thisOpeningTaskSolid.Volume <= 0)) {
                 return false;
             } else {
-                return new FilteredElementCollector(GetDocument())
+                return new FilteredElementCollector(GetDocument(), allOpeningTasksInDoc)
                     .Excluding(new ElementId[] { new ElementId(Id) })
                     .OfCategory(BuiltInCategory.OST_GenericModel)
                     .OfClass(typeof(FamilyInstance))
@@ -355,19 +336,57 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Возвращает перечисление солидов элементов инженерных систем, которые пересекаются с данным заданием на отверстие, из текущего документа
         /// </summary>
-        /// <param name="thisOpeningTaskSolid"></param>
+        /// <param name="thisOpeningTaskSolid">Солид текущего задания на отверстие</param>
+        /// <param name="allMepElementsIds">Коллекция Id всех элементов инженерных систем из файла, в котором размещено задание на отверстие</param>
         /// <returns></returns>
-        private IList<Solid> GetIntersectingMepSolids(Solid thisOpeningTaskSolid) {
+        private IList<Solid> GetIntersectingMepSolids(Solid thisOpeningTaskSolid, ICollection<ElementId> allMepElementsIds) {
             if((thisOpeningTaskSolid is null) || (thisOpeningTaskSolid.Volume <= 0)) {
                 return new List<Solid>();
             } else {
-                return new FilteredElementCollector(GetDocument())
-                    .WherePasses(FiltersInitializer.GetFilterByAllUsedMepCategories())
+                return new FilteredElementCollector(GetDocument(), allMepElementsIds)
                     .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningTaskSolid.GetOutline()))
                     .WherePasses(new ElementIntersectsSolidFilter(thisOpeningTaskSolid))
                     .Select(element => element.GetSolid())
                     .ToList();
             }
+        }
+
+        /// <summary>
+        /// Возвращает солид, образованный вычитанием из исходного солида задания на отверстие всех пересекающих его элементов инженерных систем
+        /// </summary>
+        /// <param name="thisOpeningSolid">Солид текущего задания на отверстие</param>
+        /// <param name="allMepElementsIds">Коллекция Id всех элементов инженерных систем из файла, в котором размещено задание на отверстие</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException">Исключение, если не удалось выполнить вычитание солида отверстия и солида элемента инженерной системы</exception>
+        private Solid GetOpeningAndMepsSolidsDifference(Solid thisOpeningSolid, ICollection<ElementId> allMepElementsIds) {
+            var intersectingMepSolids = GetIntersectingMepSolids(thisOpeningSolid, allMepElementsIds);
+            Solid openingSolidAfterIntersection = thisOpeningSolid;
+            foreach(var mepSolid in intersectingMepSolids) {
+                //здесь определяется солид, образованный вычитанием из исходного солида задания на отверстие всех пересекающих его элементов инженерных систем
+                try {
+                    openingSolidAfterIntersection = BooleanOperationsUtils.ExecuteBooleanOperation(openingSolidAfterIntersection, mepSolid, BooleanOperationsType.Difference);
+                } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                    try {
+                        // если один солид касается другого солида изнутри, то будет исключение InvalidOperationException
+                        // здесь производится попытка слегка подвинуть один из солидов, чтобы избежать этого касания
+                        double coordinateOffset = 0.001;
+                        var mepTransformedSolid = SolidUtils.CreateTransformed(mepSolid, Transform.CreateTranslation(new XYZ(coordinateOffset, coordinateOffset, coordinateOffset)));
+                        openingSolidAfterIntersection = BooleanOperationsUtils.ExecuteBooleanOperation(openingSolidAfterIntersection, mepTransformedSolid, BooleanOperationsType.Difference);
+
+                    } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                        try {
+                            // здесь производится попытка слегка подвинуть один из солидов в другую сторону
+                            double coordinateOffset = -0.001;
+                            var mepTransformedSolid = SolidUtils.CreateTransformed(mepSolid, Transform.CreateTranslation(new XYZ(coordinateOffset, coordinateOffset, coordinateOffset)));
+                            openingSolidAfterIntersection = BooleanOperationsUtils.ExecuteBooleanOperation(openingSolidAfterIntersection, mepTransformedSolid, BooleanOperationsType.Difference);
+
+                        } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                            throw new InvalidOperationException();
+                        }
+                    }
+                }
+            }
+            return openingSolidAfterIntersection;
         }
     }
 }
