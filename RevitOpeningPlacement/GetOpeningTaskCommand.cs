@@ -94,17 +94,31 @@ namespace RevitOpeningPlacement {
             var incomingTasks = revitRepository.GetOpeningsMepTasksIncoming();
             var realOpenings = revitRepository.GetRealOpenings();
             var constructureElements = revitRepository.GetConstructureElements();
-
             var incomingTasksViewModels = new List<OpeningMepTaskIncomingViewModel>();
-            foreach(var incomingTask in incomingTasks) {
-                try {
-                    incomingTask.UpdateStatus(realOpenings, constructureElements);
-                } catch(ArgumentException) {
-                    //не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
-                    continue;
+
+            using(var pb = GetPlatformService<IProgressDialogService>()) {
+                int step = 100;
+                pb.StepValue = step;
+                pb.DisplayTitleFormat = "Анализ отверстий... [{0}\\{1}]";
+                var progress = pb.CreateProgress();
+                pb.MaxValue = incomingTasks.Count;
+                var ct = pb.CreateCancellationToken();
+                pb.Show();
+
+                for(int i = 0; i < incomingTasks.Count; i++) {
+                    ct.ThrowIfCancellationRequested();
+                    if(i % step == 0) {
+                        progress.Report(i + 1);
+                    }
+                    try {
+                        incomingTasks[i].UpdateStatus(realOpenings, constructureElements);
+                    } catch(ArgumentException) {
+                        //не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
+                        continue;
+                    }
+                    incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTasks[i]));
                 }
-                incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTask));
-            };
+            }
             var navigatorViewModel = new OpeningsMepTaskIncomingViewModel(revitRepository, incomingTasksViewModels);
 
             var window = new NavigatorMepIncomingView() { Title = PluginName, DataContext = navigatorViewModel };
