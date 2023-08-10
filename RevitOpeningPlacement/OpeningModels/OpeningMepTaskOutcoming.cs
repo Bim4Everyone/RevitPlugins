@@ -123,6 +123,12 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="allOpeningsOutcomingTasksIds">Коллекция Id всех экземпляров семейств заданий на отверстия из текущего файла</param>
         /// <param name="allMepElementsIds">Коллекция Id всех элементов инженерных систем из файла, в котором размещено задание на отверстие</param>
         public void UpdateStatus(ICollection<ElementId> allOpeningsOutcomingTasksIds, ICollection<ElementId> allMepElementsIds) {
+            if(allOpeningsOutcomingTasksIds is null) {
+                throw new ArgumentNullException(nameof(allOpeningsOutcomingTasksIds));
+            }
+            if(allMepElementsIds is null) {
+                throw new ArgumentNullException(nameof(allMepElementsIds));
+            }
             if(!IsRemoved) {
                 var openingSolid = GetSolid();
                 if((openingSolid != null) && (openingSolid.Volume > 0)) {
@@ -304,7 +310,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                 status = OpeningTaskOutcomingStatus.TooSmall;
             } else if((0.2 <= volumeRatio) && (volumeRatio < 0.95)) {
                 status = OpeningTaskOutcomingStatus.Correct;
-            } else if((0 < volumeRatio) && (volumeRatio < 0.2)) {
+            } else if((0.01 < volumeRatio) && (volumeRatio < 0.2)) {
                 status = OpeningTaskOutcomingStatus.TooBig;
             } else {
                 status = OpeningTaskOutcomingStatus.NotActual;
@@ -315,7 +321,8 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Проверяет, пересекается ли данное задание на отверстие с другим заданием на отверстие из текущего документа
         /// </summary>
-        /// <param name="thisOpeningTaskSolid"></param>
+        /// <param name="thisOpeningTaskSolid">Солид текущего задания на отверстие</param>
+        /// <param name="allOpeningTasksInDoc">Id всех экземпляров семейств заданий на отверстия из активного документа ревита, в котором размещены исходящие задания на отверстия</param>
         /// <returns></returns>
         private bool ThisOpeningTaskIntersectsOther(Solid thisOpeningTaskSolid, ICollection<ElementId> allOpeningTasksInDoc) {
             if((thisOpeningTaskSolid is null) || (thisOpeningTaskSolid.Volume <= 0)) {
@@ -323,12 +330,8 @@ namespace RevitOpeningPlacement.OpeningModels {
             } else {
                 return new FilteredElementCollector(GetDocument(), allOpeningTasksInDoc)
                     .Excluding(new ElementId[] { new ElementId(Id) })
-                    .OfCategory(BuiltInCategory.OST_GenericModel)
-                    .OfClass(typeof(FamilyInstance))
                     .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningTaskSolid.GetOutline()))
                     .WherePasses(new ElementIntersectsSolidFilter(thisOpeningTaskSolid))
-                    .Cast<FamilyInstance>()
-                    .Where(famInst => RevitRepository.FamilyName.Values.Contains(famInst.Symbol.FamilyName))
                     .Count() > 0;
             }
         }
