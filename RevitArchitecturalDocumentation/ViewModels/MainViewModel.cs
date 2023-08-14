@@ -205,18 +205,33 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
         private void DoWork() {
 
+
+            List<View> views = new List<View>();
+
+            foreach(ElementId id in _revitRepository.ActiveUIDocument.Selection.GetElementIds()) {
+
+                View view = _revitRepository.Document.GetElement(id) as View;
+                if(view != null) {
+                    views.Add(view);
+                }
+            }
+
+
             var regexForBuildingPart = new Regex(@"К(.*?)_");
             var regexForBuildingSection = new Regex(@"С(.*?)$");
 
             var regexForLevel = new Regex(@"^(.*?) ");
-            
-            
+
+            var regexForView = new Regex(@"ПСО_(.*?) этаж");
+
+
+
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Документатор АР")) {
 
                 foreach(TaskInfo task in TasksForWork) {
 
                     if(task.SelectedVisibilityScope is null) {
-                        TaskDialog.Show("Ошибка!", "Не выбрана область видисоти в одной из строк");
+                        TaskDialog.Show("Ошибка!", "Не выбрана область видимости в одной из строк");
                         continue;
                     }
 
@@ -253,18 +268,111 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                     string temp = string.Empty;
 
-                    foreach(Level level in Levels) {
+                    if(views.Count == 0) {
 
-                        if(level.Name.Contains("К" + numberOfBuildingPart + "_")) {
+                        foreach(Level level in Levels) {
 
-                            //neededLevels.Add(level);
+                            if(level.Name.Contains("К" + numberOfBuildingPart + "_")) {
 
 
-                            string numberOfLevel = regexForLevel.Match(level.Name).Groups[1].Value;
+                                string numberOfLevel = regexForLevel.Match(level.Name).Groups[1].Value;
+
+                                int numberOfLevelAsInt;
+                                if(!int.TryParse(numberOfLevel, out numberOfLevelAsInt)) {
+                                    TaskDialog.Show("Ошибка!", "Не удалось определить номер уровня " + level.Name);
+                                    continue;
+                                }
+
+                                if(numberOfLevelAsInt < startLevelNumberAsInt || numberOfLevelAsInt > endLevelNumberAsInt) {
+
+                                    continue;
+                                }
+
+                                // ДДУ_4 этаж К3
+                                // СК24_дом 37.2_корпус 37.2.3_секция 3_этаж 4
+
+                                try {
+
+                                    ViewPlan newViewPlan = ViewPlan.Create(_revitRepository.Document, SelectedViewFamilyType.Id, level.Id);
+                                    newViewPlan.Name = string.Format("{0}{1} этаж К{2}", ViewNamePrefix, numberOfLevel, numberOfBuildingPart);
+                                    newViewPlan.get_Parameter(BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP).Set(task.SelectedVisibilityScope.Id);
+
+
+                                    ViewSheet newSheet = ViewSheet.Create(_revitRepository.Document, SelectedTitleBlock.Id);
+                                    newSheet.Name = string.Format("{0}корпус {1}_секция {2}_этаж {3}", SheetNamePrefix, numberOfBuildingPart, numberOfBuildingSection, numberOfLevel);
+
+                                    _revitRepository.Document.Regenerate();
+
+                                    if(Viewport.CanAddViewToSheet(_revitRepository.Document, newSheet.Id, newViewPlan.Id)) {
+
+                                        // Размещаем план на листе
+                                        Viewport viewPort = Viewport.Create(_revitRepository.Document, newSheet.Id, newViewPlan.Id, new XYZ(0, 0, 0));
+
+                                        XYZ viewportCenter = viewPort.GetBoxCenter();
+                                        Outline viewportOutline = viewPort.GetBoxOutline();
+                                        double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
+                                        double viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
+
+                                        //if(viewportHalfWidth < viewportHalfHeight) {
+                                        //    viewPort.get_Parameter(BuiltInParameter.VIEWPORT_ATTR_ORIENTATION_ON_SHEET).Set(1);
+
+                                        //    viewPort.SetBoxCenter(new XYZ());
+                                        //    viewportOutline = viewPort.GetBoxOutline();
+                                        //    viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
+                                        //    viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
+                                        //}
+
+
+
+                                        // Ищем рамку листа
+                                        FamilyInstance titleBlock = new FilteredElementCollector(_revitRepository.Document, newSheet.Id)
+                                            .OfCategory(BuiltInCategory.OST_TitleBlocks)
+                                            .WhereElementIsNotElementType()
+                                            .FirstOrDefault() as FamilyInstance;
+
+                                        if(titleBlock is null) { continue; }
+
+                                        titleBlock.LookupParameter("Ширина").Set(150 / 304.8);
+                                        titleBlock.LookupParameter("Высота").Set(viewportHalfHeight * 2 + 10 / 304.8);
+
+                                        _revitRepository.Document.Regenerate();
+
+                                        // Получение габаритов рамки листа
+                                        BoundingBoxXYZ boundingBoxXYZ = titleBlock.get_BoundingBox(newSheet);
+                                        double titleBlockWidth = boundingBoxXYZ.Max.X - boundingBoxXYZ.Min.X;
+                                        double titleBlockHeight = boundingBoxXYZ.Max.Y - boundingBoxXYZ.Min.Y;
+
+                                        double titleBlockMinY = boundingBoxXYZ.Min.Y;
+                                        double titleBlockMinX = boundingBoxXYZ.Min.X;
+
+                                        XYZ correctPosition = new XYZ(
+                                            titleBlockMinX + viewportHalfWidth,
+                                            titleBlockHeight / 2 + titleBlockMinY,
+                                            0);
+
+
+                                        //TaskDialog.Show("titleBlockWidth", titleBlockWidth.ToString());
+                                        //TaskDialog.Show("viewportHalfWidth", viewportHalfWidth.ToString());
+
+
+                                        viewPort.SetBoxCenter(correctPosition);
+                                    }
+
+                                } catch(Exception) {
+                                    temp += "Возникла проблема с " + task.SelectedVisibilityScope.Name + Environment.NewLine;
+
+                                }
+                            }
+                        }
+                    } else {
+
+                        foreach(View view in views) {
+
+                            string numberOfLevel = regexForView.Match(view.Name).Groups[1].Value;
 
                             int numberOfLevelAsInt;
                             if(!int.TryParse(numberOfLevel, out numberOfLevelAsInt)) {
-                                TaskDialog.Show("Ошибка!", "Не удалось определить номер уровня " + level.Name);
+                                temp += "Не удалось определить номер уровня у вида " + view.Name + Environment.NewLine;
                                 continue;
                             }
 
@@ -273,12 +381,15 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                 continue;
                             }
 
-                            // ДДУ_4 этаж К3
-                            // СК24_дом 37.2_корпус 37.2.3_секция 3_этаж 4
-
                             try {
+                                ElementId newViewPlanId = view.Duplicate(ViewDuplicateOption.WithDetailing);
+                                ViewPlan newViewPlan = view.Document.GetElement(newViewPlanId) as ViewPlan;
+                                
+                                if(newViewPlan is null) {
+                                    temp += "Возникла проблема при создании с " + task.SelectedVisibilityScope.Name + Environment.NewLine;
+                                    continue;
+                                }
 
-                                ViewPlan newViewPlan = ViewPlan.Create(_revitRepository.Document, SelectedViewFamilyType.Id, level.Id);
                                 newViewPlan.Name = string.Format("{0}{1} этаж К{2}", ViewNamePrefix, numberOfLevel, numberOfBuildingPart);
                                 newViewPlan.get_Parameter(BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP).Set(task.SelectedVisibilityScope.Id);
 
@@ -298,15 +409,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                     double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
                                     double viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
 
-                                    //if(viewportHalfWidth < viewportHalfHeight) {
-                                    //    viewPort.get_Parameter(BuiltInParameter.VIEWPORT_ATTR_ORIENTATION_ON_SHEET).Set(1);
-
-                                    //    viewPort.SetBoxCenter(new XYZ());
-                                    //    viewportOutline = viewPort.GetBoxOutline();
-                                    //    viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
-                                    //    viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
-                                    //}
-
 
 
                                     // Ищем рамку листа
@@ -317,8 +419,16 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                                     if(titleBlock is null) { continue; }
 
-                                    titleBlock.LookupParameter("Ширина").Set(150 / 304.8);
-                                    titleBlock.LookupParameter("Высота").Set(viewportHalfHeight * 2 + 10 / 304.8);
+                                    Parameter width = titleBlock.LookupParameter("Ширина");
+                                    if(width != null) {
+                                        width.Set(150 / 304.8);
+                                    }
+
+                                    Parameter height = titleBlock.LookupParameter("Высота");
+                                    if(height != null) {
+                                        height.Set(viewportHalfHeight * 2 + 10 / 304.8);
+                                    }
+
 
                                     _revitRepository.Document.Regenerate();
 
@@ -335,11 +445,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                         titleBlockHeight / 2 + titleBlockMinY,
                                         0);
 
-
-                                    //TaskDialog.Show("titleBlockWidth", titleBlockWidth.ToString());
-                                    //TaskDialog.Show("viewportHalfWidth", viewportHalfWidth.ToString());
-
-
                                     viewPort.SetBoxCenter(correctPosition);
                                 }
 
@@ -349,6 +454,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                             }
                         }
                     }
+
+
 
                     TaskDialog.Show("Ошибка!", temp);
                 }
