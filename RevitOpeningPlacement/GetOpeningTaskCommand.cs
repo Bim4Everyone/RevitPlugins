@@ -12,6 +12,7 @@ using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 
 using RevitOpeningPlacement.Models;
+using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningUnion;
 using RevitOpeningPlacement.ViewModels.Navigator;
 using RevitOpeningPlacement.Views;
@@ -161,6 +162,7 @@ namespace RevitOpeningPlacement {
             var outcomingTasksIds = outcomingTasks.Select(task => new ElementId(task.Id)).ToList();
             var mepElementsIds = revitRepository.GetMepElementsIds();
             var openingTaskOutcomingViewModels = new List<OpeningMepTaskOutcomingViewModel>();
+            var constructureLinks = revitRepository.GetConstructureLinks().Select(link => new ConstructureLinkElementsProvider(link) as IConstructureLinkElementsProvider).ToList();
 
             using(var pb = GetPlatformService<IProgressDialogService>()) {
                 pb.StepValue = _progressBarStep;
@@ -175,7 +177,7 @@ namespace RevitOpeningPlacement {
                     if(i % _progressBarStep == 0) {
                         progress.Report(i);
                     }
-                    outcomingTasks[i].UpdateStatus(outcomingTasksIds, mepElementsIds);
+                    outcomingTasks[i].UpdateStatus(outcomingTasksIds, mepElementsIds, constructureLinks);
                     openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTasks[i]));
                 }
             }

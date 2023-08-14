@@ -120,9 +120,13 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// 
         /// <para>Если же объем Solid самого задания на отверстие равен 0, то статус <see cref="OpeningTaskOutcomingStatus.Invalid"/></para>
         /// </summary>
-        /// <param name="allOpeningsOutcomingTasksIds">Коллекция Id всех экземпляров семейств заданий на отверстия из текущего файла</param>
-        /// <param name="allMepElementsIds">Коллекция Id всех элементов инженерных систем из файла, в котором размещено задание на отверстие</param>
-        public void UpdateStatus(ICollection<ElementId> allOpeningsOutcomingTasksIds, ICollection<ElementId> allMepElementsIds) {
+        /// <param name="allOpeningsOutcomingTasksIds">Коллекция Id всех экземпляров семейств заданий на отверстия из активного файла</param>
+        /// <param name="allMepElementsIds">Коллекция Id всех элементов инженерных систем из активного файла</param>
+        public void UpdateStatus(
+            ICollection<ElementId> allOpeningsOutcomingTasksIds,
+            ICollection<ElementId> allMepElementsIds,
+            ICollection<IConstructureLinkElementsProvider> constructureLinkElementsProviders) {
+
             if(allOpeningsOutcomingTasksIds is null) {
                 throw new ArgumentNullException(nameof(allOpeningsOutcomingTasksIds));
             }
@@ -134,6 +138,10 @@ namespace RevitOpeningPlacement.OpeningModels {
                 if((openingSolid != null) && (openingSolid.Volume > 0)) {
                     if(ThisOpeningTaskIntersectsOther(openingSolid, allOpeningsOutcomingTasksIds)) {
                         Status = OpeningTaskOutcomingStatus.Intersects;
+                        return;
+                    }
+                    if(!ThisOpeningTaskIntersectsLinkConstructions(openingSolid, constructureLinkElementsProviders)) {
+                        Status = OpeningTaskOutcomingStatus.NotActual;
                         return;
                     }
                     try {
@@ -393,7 +401,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
-        /// Возвращает перечисление солидов заданий на отверстия, которые пересекаются с элементами конструкций из связ
+        /// Проверяет пересечение солидов заданий на отверстия с элементами конструкций из связанных файлов
         /// </summary>
         /// <param name="thisOpeningTaskSolid">Солид текущего задания на отверстие</param>
         /// <param name="constructureLinkElementsProviders">Коллекция объектов-оберток связанных файлов с элементами конструкций: стенами, перекрытиями и т.п.</param>
@@ -402,6 +410,9 @@ namespace RevitOpeningPlacement.OpeningModels {
             if((thisOpeningTaskSolid is null) || (thisOpeningTaskSolid.Volume <= 0)) {
                 return false;
             } else {
+                if(constructureLinkElementsProviders is null) {
+                    throw new ArgumentNullException(nameof(constructureLinkElementsProviders));
+                }
                 foreach(var link in constructureLinkElementsProviders) {
                     var thisSolidInLinkCoordinates = SolidUtils.CreateTransformed(thisOpeningTaskSolid, link.DocumentTransform.Inverse);
 

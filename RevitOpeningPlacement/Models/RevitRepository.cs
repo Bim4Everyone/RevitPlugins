@@ -478,6 +478,17 @@ namespace RevitOpeningPlacement.Models {
             return genericModelsInLinks;
         }
 
+        /// <summary>
+        /// Возвращает список всех связей АР и КР из документа репозитория
+        /// </summary>
+        /// <returns></returns>
+        public IList<RevitLinkInstance> GetConstructureLinks() {
+            var bimModelPartsService = GetPlatformService<IBimModelPartsService>();
+            return GetRevitLinks()
+                .Where(link => bimModelPartsService.InAnyBimModelParts(link.Name, BimModelPart.ARPart, BimModelPart.KRPart))
+                .ToList();
+        }
+
 
         /// <summary>
         /// Возвращает список экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит ("исходящие" задания).
