@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Runtime;
 using System.Security.Cryptography;
 using System.Text;
@@ -13,6 +14,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using System.Xml.Linq;
 
 using Autodesk.AdvanceSteel.CADAccess;
@@ -35,6 +37,9 @@ using RevitPylonDocumentation.Models.PylonSheetNView;
 using RevitPylonDocumentation.Models.UserSettings;
 using RevitPylonDocumentation.Views;
 
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
+
+using Line = Autodesk.Revit.DB.Line;
 using Transaction = Autodesk.Revit.DB.Transaction;
 using View = Autodesk.Revit.DB.View;
 
@@ -95,7 +100,61 @@ namespace RevitPylonDocumentation.ViewModels {
 
             SelectAllFuncInGUICommand = RelayCommand.Create(SelectAllFuncInGUI);
             UnselectAllFuncInGUICommand = RelayCommand.Create(UnselectAllFuncInGUI);
+
+
+
+
+            //ICollection<ElementId> selectedIds = _revitRepository.ActiveUIDocument.Selection.GetElementIds();
+            //List<ElementId> selected = new List<ElementId>(selectedIds);
+
+            //ReferenceArray referenceArrayNew = new ReferenceArray();
+            //List<Line> lines = new List<Line>();
+
+
+
+
+            //Options options = new Options();
+            //options.ComputeReferences = true;
+            //options.DetailLevel = ViewDetailLevel.Fine;
+
+
+            //FamilyInstance elem = _revitRepository.Document.GetElement(selected[0]) as FamilyInstance;
+
+            //foreach(ElementId id in elem.GetSubComponentIds()) {
+
+            //    Element element = _revitRepository.Document.GetElement(id) as Element;
+            //    referenceArrayNew.Append(new Reference(element));
+
+            //}
+
+
+
+            //Line line1 = Line.CreateBound(new XYZ(), new XYZ(0, 1, 0));
+
+
+
+            //using(Transaction transaction = _revitRepository.Document.StartTransaction("Документатор пилонов")) {
+
+            //    TaskDialog.Show("ghj", referenceArrayNew.Size.ToString());
+
+
+            //    Dimension dimension = _revitRepository.Document.Create.NewDimension(_revitRepository.Document.ActiveView, line1, referenceArrayNew);
+
+            //    TaskDialog.Show("Id", dimension.Id.ToString());
+
+
+
+            //    transaction.Commit();
+            //}
         }
+
+
+
+
+
+
+
+
 
 
 

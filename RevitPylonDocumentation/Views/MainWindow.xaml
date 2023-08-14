@@ -76,8 +76,7 @@
                             <TextBlock.ToolTip>
                                 <ToolTip>
                                     <TextBlock 
-                                        Text="Перечень настроек плагина&#10;
-                                            В блоке &quot;Параметры пилона&quot; необходимо задать ." 
+                                        Text="Перечень настроек плагина. После внемения изменений нажмите кнопку &quot;Применить&quot; внизу." 
                                         TextWrapping="Wrap"
                                         Width="300"
                                         TextAlignment="Justify"
