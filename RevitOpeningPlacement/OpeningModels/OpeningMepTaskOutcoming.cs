@@ -33,6 +33,10 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         private static readonly OpeningTaskOutcomingEqualityComparer _equalityComparer = new OpeningTaskOutcomingEqualityComparer();
 
+        /// <summary>
+        /// Кэш для хранения результата метода <see cref="GetIntersectingMepElementsIds"/>
+        /// </summary>
+        private (ICollection<ElementId> Value, DateTime CacheTime) _intersectingMepElementsCache;
 
         /// <summary>
         /// Создает экземпляр класса <see cref="OpeningMepTaskOutcoming"/>
@@ -121,15 +125,15 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// 
         /// <para>Если же объем Solid самого задания на отверстие равен 0, то статус <see cref="OpeningTaskOutcomingStatus.Invalid"/></para>
         /// </summary>
-        /// <param name="allOpeningsOutcomingTasksIds">Коллекция Id всех экземпляров семейств заданий на отверстия из активного файла</param>
+        /// <param name="openingsOutcomingTasksIdsForChecking">Коллекция Id экземпляров семейств заданий на отверстия из активного файла для проверки</param>
         /// <param name="allMepElementsIds">Коллекция Id всех элементов инженерных систем из активного файла</param>
         public void UpdateStatus(
-            ICollection<ElementId> allOpeningsOutcomingTasksIds,
+            ref IList<ElementId> openingsOutcomingTasksIdsForChecking,
             ICollection<ElementId> allMepElementsIds,
             ICollection<IConstructureLinkElementsProvider> constructureLinkElementsProviders) {
 
-            if(allOpeningsOutcomingTasksIds is null) {
-                throw new ArgumentNullException(nameof(allOpeningsOutcomingTasksIds));
+            if(openingsOutcomingTasksIdsForChecking is null) {
+                throw new ArgumentNullException(nameof(openingsOutcomingTasksIdsForChecking));
             }
             if(allMepElementsIds is null) {
                 throw new ArgumentNullException(nameof(allMepElementsIds));
@@ -137,10 +141,14 @@ namespace RevitOpeningPlacement.OpeningModels {
             if(!IsRemoved) {
                 var openingSolid = GetSolid();
                 if((openingSolid != null) && (openingSolid.Volume > 0)) {
-                    if(ThisOpeningTaskIntersectsOther(openingSolid, allOpeningsOutcomingTasksIds)) {
+                    var intersectingOpeningIds = GetIntersectingOpeningsTasks(openingSolid, openingsOutcomingTasksIdsForChecking);
+                    if(intersectingOpeningIds.Count > 0) {
                         Status = OpeningTaskOutcomingStatus.Intersects;
                         return;
+                    } else {
+                        openingsOutcomingTasksIdsForChecking.Remove(new ElementId(Id));
                     }
+
                     if(ThisOpeningTaskIsNotActual(openingSolid, constructureLinkElementsProviders, allMepElementsIds)) {
                         Status = OpeningTaskOutcomingStatus.NotActual;
                         return;
@@ -323,20 +331,20 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
-        /// Проверяет, пересекается ли данное задание на отверстие с другим заданием на отверстие из текущего документа
+        /// Возвращает Id всех исходящих заданий на отверстия, которые пересекаются с данным заданием на отверстие из текущего документа
         /// </summary>
         /// <param name="thisOpeningTaskSolid">Солид текущего задания на отверстие</param>
-        /// <param name="allOpeningTasksInDoc">Id всех экземпляров семейств заданий на отверстия из активного документа ревита, в котором размещены исходящие задания на отверстия</param>
-        /// <returns></returns>
-        private bool ThisOpeningTaskIntersectsOther(Solid thisOpeningTaskSolid, ICollection<ElementId> allOpeningTasksInDoc) {
+        /// <param name="allOpeningTasksInDoc">Id всех экземпляров семейств заданий на отверстия из активного документа ревита для проверки</param>
+        /// <returns>Коллекция Id экземпляров семейств исходящих заданий на отверстия, которые пересекаются с текущим заданием на отверстие</returns>
+        private ICollection<ElementId> GetIntersectingOpeningsTasks(Solid thisOpeningTaskSolid, ICollection<ElementId> allOpeningTasksInDoc) {
             if((thisOpeningTaskSolid is null) || (thisOpeningTaskSolid.Volume <= 0)) {
-                return false;
+                return Array.Empty<ElementId>();
             } else {
                 return new FilteredElementCollector(GetDocument(), allOpeningTasksInDoc)
                     .Excluding(new ElementId[] { new ElementId(Id) })
                     .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningTaskSolid.GetOutline()))
                     .WherePasses(new ElementIntersectsSolidFilter(thisOpeningTaskSolid))
-                    .Count() > 0;
+                    .ToElementIds();
             }
         }
 
@@ -365,10 +373,16 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <returns></returns>
         private ICollection<ElementId> GetIntersectingMepElementsIds(Solid thisOpeningSolid, ICollection<ElementId> allMepElementsIds) {
             if(!IsRemoved && (thisOpeningSolid != null) && (allMepElementsIds != null)) {
-                return new FilteredElementCollector(GetDocument(), allMepElementsIds)
-                    .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningSolid.GetOutline()))
-                    .WherePasses(new ElementIntersectsSolidFilter(thisOpeningSolid))
-                    .ToElementIds();
+                if((_intersectingMepElementsCache.Value != null) && (_intersectingMepElementsCache.CacheTime.CompareTo(DateTime.Now) >= 0)) {
+                    return _intersectingMepElementsCache.Value;
+                } else {
+                    _intersectingMepElementsCache.Value = new FilteredElementCollector(GetDocument(), allMepElementsIds)
+                        .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningSolid.GetOutline()))
+                        .WherePasses(new ElementIntersectsSolidFilter(thisOpeningSolid))
+                        .ToElementIds();
+                    _intersectingMepElementsCache.CacheTime = DateTime.Now.AddSeconds(1);
+                    return _intersectingMepElementsCache.Value;
+                }
             } else {
                 return Array.Empty<ElementId>();
             }
@@ -438,24 +452,17 @@ namespace RevitOpeningPlacement.OpeningModels {
                 return true;
             }
 
-            bool result = true;
             // проверка на то, что:
             // во-первых есть конструкции в связанных, внутри которых расположено задание на отверстие,
             // во-вторых, что ни один элемент ВИС, проходящий через текущее задание на отверстие не пересекается с этими конструкциями
             foreach(var link in constructureLinkElementsProviders) {
                 var hostConstructions = GetHostConstructionsForThisOpeningTask(thisOpeningTaskSolid, link);
                 if(hostConstructions.Count > 0) {
-                    if(MepElementsIntersectConstructions(thisOpeningTaskSolid, intersectingTaskMepElements, hostConstructions, link)) {
-                        // есть элементы ВИС, которые пересекаются с конструкциями, в которых расположено текущее задание на отверстие
-                        return true;
-                    } else {
-                        // корректная ситуация: задание на отверстие расположено внутри конструкций из связи и элементы ВИС, проходящие через задание на отверстие, не пересекаются с этими конструкциями,
-                        // но надо проверить все оставшиеся связи
-                        result = false;
-                    }
+                    return MepElementsIntersectConstructions(thisOpeningTaskSolid, intersectingTaskMepElements, hostConstructions, link);
                 }
             }
-            return result;
+            // корректная ситуация не найдена, отверстие считается не актуальным
+            return true;
         }
 
         /// <summary>

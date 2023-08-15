@@ -159,7 +159,7 @@ namespace RevitOpeningPlacement {
                 throw new OperationCanceledException();
             }
             var outcomingTasks = revitRepository.GetOpeningsMepTasksOutcoming();
-            var outcomingTasksIds = outcomingTasks.Select(task => new ElementId(task.Id)).ToList();
+            IList<ElementId> outcomingTasksIds = outcomingTasks.Select(task => new ElementId(task.Id)).ToList();
             var mepElementsIds = revitRepository.GetMepElementsIds();
             var openingTaskOutcomingViewModels = new List<OpeningMepTaskOutcomingViewModel>();
             var constructureLinks = revitRepository.GetConstructureLinks().Select(link => new ConstructureLinkElementsProvider(link) as IConstructureLinkElementsProvider).ToList();
@@ -177,7 +177,7 @@ namespace RevitOpeningPlacement {
                     if(i % _progressBarStep == 0) {
                         progress.Report(i);
                     }
-                    outcomingTasks[i].UpdateStatus(outcomingTasksIds, mepElementsIds, constructureLinks);
+                    outcomingTasks[i].UpdateStatus(ref outcomingTasksIds, mepElementsIds, constructureLinks);
                     openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTasks[i]));
                 }
             }
