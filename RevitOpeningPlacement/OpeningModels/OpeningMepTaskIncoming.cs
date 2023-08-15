@@ -124,7 +124,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
-        /// Возвращает солид входящего задания на отверстие
+        /// Возвращает солид входящего задания на отверстие в координатах активного файла - получателя заданий на отверстия
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
@@ -201,7 +201,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Возвращает количество элементов конструкций, с которыми пересекается текущее задание на отверстие
         /// <para>Примечание: количество считается упрощенно либо 1, либо 0</para>
         /// </summary>
-        /// <param name="thisOpeningSolid">Солид текущего задания на отверстие</param>
+        /// <param name="thisOpeningSolid">Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
         /// <param name="constructureElementsIds">Коллекция id элементов конструкций из активного документа ревита, для которых были сделаны задания на отверстия</param>
         /// <returns></returns>
         private int GetIntersectingStructureElementsSolidsCount(Solid thisOpeningSolid, ICollection<ElementId> constructureElementsIds) {
@@ -221,8 +221,8 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <para>Примечание: количество считается упрощенно либо 1, либо 0</para>
         /// </summary>
         /// <param name="realOpenings">Коллекция чистовых отверстий из активного документа ревита</param>
-        /// <param name="thisOpeningSolid">Солид текущего задания на отверстие</param>
-        /// <param name="thisOpeningBBox">Бокс текущего задания на отверстие</param>
+        /// <param name="thisOpeningSolid">Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
+        /// <param name="thisOpeningBBox">Бокс текущего задания на отверстие в координатах активного файла - получателя заданий</param>
         /// <returns></returns>
         private int GetIntersectingOpeningsSolidsCount(ICollection<OpeningReal> realOpenings, Solid thisOpeningSolid, BoundingBoxXYZ thisOpeningBBox) {
             if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
