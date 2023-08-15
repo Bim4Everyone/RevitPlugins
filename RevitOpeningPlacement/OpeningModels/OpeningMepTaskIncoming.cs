@@ -64,7 +64,7 @@ namespace RevitOpeningPlacement.OpeningModels {
 
             string[] famNameParts = _familyInstance.Symbol.FamilyName.Split('_');
             if(famNameParts.Length > 0) {
-                HostTypeName = famNameParts.Last();
+                FamilyShortName = famNameParts.Last();
             }
         }
 
@@ -111,7 +111,7 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         public Transform Transform { get; } = Transform.Identity;
 
-        public string HostTypeName { get; } = string.Empty;
+        public string FamilyShortName { get; } = string.Empty;
 
         /// <summary>
         /// Статус отработки задания на отверстие
