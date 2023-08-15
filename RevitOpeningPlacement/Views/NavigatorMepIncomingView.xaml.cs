@@ -19,7 +19,9 @@ namespace RevitOpeningPlacement.Views {
             _dg.GroupBy(_dg.Columns[1]);
             _dg.GroupBy(_dg.Columns[2]);
             _dg.GroupBy(_dg.Columns[3]);
-            _dg.GroupBy(_dg.Columns[12]);
+
+            _dg.SortBy(_dg.Columns[13], DevExpress.Data.ColumnSortOrder.Descending);
+            _dg.SortBy(_dg.Columns[11]);
         }
 
         public override string PluginName => nameof(RevitOpeningPlacement);

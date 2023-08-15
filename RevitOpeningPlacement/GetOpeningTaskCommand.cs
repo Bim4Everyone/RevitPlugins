@@ -113,7 +113,7 @@ namespace RevitOpeningPlacement {
                         progress.Report(i);
                     }
                     try {
-                        incomingTasks[i].UpdateStatus(realOpenings, constructureElementsIds);
+                        incomingTasks[i].UpdateStatusAndHostName(realOpenings, constructureElementsIds);
                     } catch(ArgumentException) {
                         //не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
                         continue;

@@ -147,8 +147,9 @@
                 <dxg:GridColumn ReadOnly="True" Width="60" Header="Отм. оси" FieldName="CenterOffset"/>
                 <dxg:GridColumn ReadOnly="True" Width="60" Header="Отм. низа" FieldName="BottomOffset"/>
                 <dxg:GridColumn ReadOnly="True" Width="60" Header="Id отверстия" FieldName="OpeningId"/>
-                <dxg:GridColumn ReadOnly="True" Width="60" Header="Имя системы" FieldName="MepSystem"/>
-                <dxg:GridColumn ReadOnly="True" Width="60" Header="Расположение" FieldName="FamilyShortName"/>
+                <dxg:GridColumn ReadOnly="True" Width="60" Header="Основа" FieldName="HostName"/>
+                <dxg:GridColumn ReadOnly="True" Width="60" Header="Система ВИС" FieldName="MepSystem"/>
+                <dxg:GridColumn ReadOnly="True" Width="60" Header="Тип отверстия" FieldName="FamilyShortName"/>
                 <dxg:GridColumn ReadOnly="True" Width="*" Header="Описание пересечения" FieldName="Description"/>
             </dxg:GridControl.Columns>
         </dxg:GridControl>

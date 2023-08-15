@@ -34,7 +34,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Экземпляр семейства задания на отверстие, расположенного в связанном файле задания на отверстия
         /// 
-        /// <para>Примечание: конструктор не обновляет свойство <see cref="Status"/>. Для обновления этого свойства надо вызвать <see cref="UpdateStatus"/></para>
+        /// <para>Примечание: конструктор не обновляет свойство <see cref="Status"/>. Для обновления этого свойства надо вызвать <see cref="UpdateStatusAndHostName"/></para>
         /// </summary>
         /// <param name="openingTaskIncoming">Экземпляр семейства задания на отверстие из связанного файла</param>
         /// <param name="revitRepository">Репозиторий текущего документа, в который подгружен документ с заданиями на отверстия</param>
@@ -109,9 +109,20 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         public string Thickness { get; } = string.Empty;
 
+        /// <summary>
+        /// Трансформация связанного файла с заданием на отверстие относительно активного документа - получателя заданий
+        /// </summary>
         public Transform Transform { get; } = Transform.Identity;
 
+        /// <summary>
+        /// Короткое обозначение семейства задания на отверстие
+        /// </summary>
         public string FamilyShortName { get; } = string.Empty;
+
+        /// <summary>
+        /// Название элемента, в котором расположено задание на отверстие. Предназначено для дальнейшей сортировки входящих заданий в навигаторе по типам стен: штукатурка/монолит/кладка и т.п.
+        /// </summary>
+        public string HostName { get; private set; } = string.Empty;
 
         /// <summary>
         /// Статус отработки задания на отверстие
@@ -174,62 +185,90 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
-        /// Обновляет <see cref="Status"/> входящего задания на отверстие
+        /// Обновляет <see cref="Status"/> и <see cref="HostName"/> входящего задания на отверстие
         /// </summary>
-        /// <param name="realOpenings"></param>
+        /// <param name="realOpenings">Коллекция чистовых отверстий, размещенных в активном документе-получателе заданий на отверстия</param>
         /// <exception cref="ArgumentException"></exception>
-        public void UpdateStatus(ICollection<OpeningReal> realOpenings, ICollection<ElementId> constructureElementsIds) {
+        public void UpdateStatusAndHostName(ICollection<OpeningReal> realOpenings, ICollection<ElementId> constructureElementsIds) {
             var thisOpeningSolid = GetSolid();
             var thisOpeningBBox = GetTransformedBBoxXYZ();
 
-            var intersectingStructureSolidsCount = GetIntersectingStructureElementsSolidsCount(thisOpeningSolid, constructureElementsIds);
-            var intersectingOpeningsSolidsCount = GetIntersectingOpeningsSolidsCount(realOpenings, thisOpeningSolid, thisOpeningBBox);
+            var intersectingStructureElements = GetIntersectingStructureElementsIds(thisOpeningSolid, constructureElementsIds);
+            var intersectingOpenings = GetIntersectingOpeningsIds(realOpenings, thisOpeningSolid, thisOpeningBBox);
+            var hostId = GetOpeningTaskHostId(intersectingStructureElements, intersectingOpenings);
+            SetOpeningTaskHostName(hostId);
 
-            if((intersectingStructureSolidsCount == 0) && (intersectingOpeningsSolidsCount == 0)) {
+            if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count == 0)) {
                 Status = OpeningTaskIncomingStatus.NoIntersection;
-            } else if((intersectingStructureSolidsCount > 0) && (intersectingOpeningsSolidsCount == 0)) {
+            } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count == 0)) {
                 Status = OpeningTaskIncomingStatus.New;
-            } else if((intersectingStructureSolidsCount > 0) && (intersectingOpeningsSolidsCount > 0)) {
+            } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count > 0)) {
                 Status = OpeningTaskIncomingStatus.NotMatch;
-            } else if((intersectingStructureSolidsCount == 0) && (intersectingOpeningsSolidsCount > 0)) {
+            } else if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count > 0)) {
                 Status = OpeningTaskIncomingStatus.Completed;
             }
         }
 
 
         /// <summary>
-        /// Возвращает количество элементов конструкций, с которыми пересекается текущее задание на отверстие
-        /// <para>Примечание: количество считается упрощенно либо 1, либо 0</para>
+        /// Возвращает коллекцию элементов конструкций, с которыми пересекается текущее задание на отверстие
         /// </summary>
         /// <param name="thisOpeningSolid">Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
         /// <param name="constructureElementsIds">Коллекция id элементов конструкций из активного документа ревита, для которых были сделаны задания на отверстия</param>
         /// <returns></returns>
-        private int GetIntersectingStructureElementsSolidsCount(Solid thisOpeningSolid, ICollection<ElementId> constructureElementsIds) {
+        private ICollection<ElementId> GetIntersectingStructureElementsIds(Solid thisOpeningSolid, ICollection<ElementId> constructureElementsIds) {
             if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
-                return 0;
+                return Array.Empty<ElementId>();
             } else {
                 return new FilteredElementCollector(_revitRepository.Doc, constructureElementsIds)
                     .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningSolid.GetOutline()))
                     .WherePasses(new ElementIntersectsSolidFilter(thisOpeningSolid))
-                    .Any() ? 1 : 0;
-                //.Count();
+                    .ToElementIds();
             }
         }
 
         /// <summary>
-        /// Возвращает количество проемов из активного документа, которые пересекаются с текущим заданием на отверстие из связи
-        /// <para>Примечание: количество считается упрощенно либо 1, либо 0</para>
+        /// Возвращает коллекцию Id проемов из активного документа, которые пересекаются с текущим заданием на отверстие из связи
         /// </summary>
         /// <param name="realOpenings">Коллекция чистовых отверстий из активного документа ревита</param>
         /// <param name="thisOpeningSolid">Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
         /// <param name="thisOpeningBBox">Бокс текущего задания на отверстие в координатах активного файла - получателя заданий</param>
         /// <returns></returns>
-        private int GetIntersectingOpeningsSolidsCount(ICollection<OpeningReal> realOpenings, Solid thisOpeningSolid, BoundingBoxXYZ thisOpeningBBox) {
+        private ICollection<ElementId> GetIntersectingOpeningsIds(ICollection<OpeningReal> realOpenings, Solid thisOpeningSolid, BoundingBoxXYZ thisOpeningBBox) {
             if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
-                return 0;
+                return Array.Empty<ElementId>();
             } else {
-                //для ускорения работы происходит поиск только первого проема
-                return realOpenings.Any(realOpening => realOpening.IntersectsSolid(thisOpeningSolid, thisOpeningBBox)) ? 1 : 0;
+                return realOpenings.Where(realOpening => realOpening.IntersectsSolid(thisOpeningSolid, thisOpeningBBox)).Select(opening => new ElementId(opening.Id)).ToList();
+            }
+        }
+
+        /// <summary>
+        /// Возвращает Id основы экземпляра семейства задания на отверстие. 
+        /// Под основой понимается либо элемент конструкции, с которым пересекается задание на отверстие, либо хост чистового отверстия, с которым пересекается задание на отверстие.
+        /// </summary>
+        /// <param name="intersectingStructureElements">Коллекция элементов конструкций из активного документа, с которыми пересекается задание на отверстие</param>
+        /// <param name="intersectingOpenings">Коллекция чистовых отверстий из активного документа, с которыми пересекается задание на отверсите</param>
+        /// <returns></returns>
+        private ElementId GetOpeningTaskHostId(ICollection<ElementId> intersectingStructureElements, ICollection<ElementId> intersectingOpenings) {
+            if((intersectingStructureElements != null) && intersectingStructureElements.Any()) {
+                return intersectingStructureElements.First();
+            } else if((intersectingOpenings != null) && intersectingOpenings.Any()) {
+                return (_revitRepository.GetElement(intersectingOpenings.First()) as FamilyInstance)?.Host?.Id ?? ElementId.InvalidElementId;
+            } else {
+                return ElementId.InvalidElementId;
+            }
+        }
+
+        /// <summary>
+        /// Назначает название хоста задания на отверстие по Id
+        /// </summary>
+        /// <param name="hostId">Id хоста задания на отверстие. Под хостом понимается элемент конструкций из активного документа (стены/перекрытия), с которым пересекается текущее задание на отверстие</param>
+        private void SetOpeningTaskHostName(ElementId hostId) {
+            if(hostId != null) {
+                var hostEl = _revitRepository.GetElement(hostId);
+                if(hostEl != null) {
+                    HostName = hostEl.Name;
+                }
             }
         }
     }
