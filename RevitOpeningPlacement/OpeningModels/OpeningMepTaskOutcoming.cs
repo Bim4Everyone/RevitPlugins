@@ -28,7 +28,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Допустимое расстояние между экземплярами семейств заданий на отверстия, при котором считается, что они размещены в одном и том же месте
         /// </summary>
-        private static readonly double _distance3dTolerance = Math.Sqrt(XYZExtension.FeetRound * XYZExtension.FeetRound * XYZExtension.FeetRound);
+        private static readonly double _distance3dTolerance = Math.Sqrt(3 * XYZExtension.FeetRound * XYZExtension.FeetRound);
 
         private static readonly OpeningTaskOutcomingEqualityComparer _equalityComparer = new OpeningTaskOutcomingEqualityComparer();
 
