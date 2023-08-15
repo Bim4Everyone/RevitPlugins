@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
 using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models {
     internal class ConstructureLinkElementsProvider : IConstructureLinkElementsProvider {
@@ -12,6 +14,8 @@ namespace RevitOpeningPlacement.Models {
         private readonly Transform _transform;
 
         private readonly ICollection<ElementId> _elementIds;
+
+        private readonly ICollection<OpeningReal> _openingsReal;
 
 
         /// <summary>
@@ -27,6 +31,7 @@ namespace RevitOpeningPlacement.Models {
             _document = linkDocument.GetLinkDocument();
             _transform = linkDocument.GetTransform();
             _elementIds = GetElementIds(_document);
+            _openingsReal = GetOpeningsReal(_document);
         }
 
 
@@ -34,16 +39,31 @@ namespace RevitOpeningPlacement.Models {
 
         public Transform DocumentTransform => _transform;
 
-        public ICollection<ElementId> GetElementIds() {
+        public ICollection<ElementId> GetConstructureElementIds() {
             return _elementIds;
         }
 
+        public ICollection<OpeningReal> GetOpeningsReal() {
+            return _openingsReal;
+        }
 
         private ICollection<ElementId> GetElementIds(Document document) {
             return new FilteredElementCollector(document)
                 .WhereElementIsNotElementType()
                 .WherePasses(FiltersInitializer.GetFilterByAllUsedStructureCategories())
                 .ToElementIds();
+        }
+
+        private ICollection<OpeningReal> GetOpeningsReal(Document document) {
+            return new FilteredElementCollector(document)
+                .WhereElementIsNotElementType()
+                .WherePasses(FiltersInitializer.GetFilterByAllUsedOpeningsCategories())
+                .OfClass(typeof(FamilyInstance))
+                .Cast<FamilyInstance>()
+                .Where(famInst => famInst.Host != null)
+                .Where(famInst => famInst.Symbol.FamilyName.Contains("Отв"))
+                .Select(famInst => new OpeningReal(famInst))
+                .ToList();
         }
     }
 }

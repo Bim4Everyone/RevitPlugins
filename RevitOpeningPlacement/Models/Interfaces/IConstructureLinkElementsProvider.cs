@@ -2,6 +2,8 @@
 
 using Autodesk.Revit.DB;
 
+using RevitOpeningPlacement.OpeningModels;
+
 namespace RevitOpeningPlacement.Models.Interfaces {
     /// <summary>
     /// Интерфейс, представляющий обертку над связанным файлом ревита для получения из него элементов конструкций - стен и перекрытий.
@@ -22,6 +24,12 @@ namespace RevitOpeningPlacement.Models.Interfaces {
         /// Возвращает коллекцию Id элементов категорий "Стены" и "Перекрытия" из <see cref="Document">связанного файла</see>
         /// </summary>
         /// <returns></returns>
-        ICollection<ElementId> GetElementIds();
+        ICollection<ElementId> GetConstructureElementIds();
+
+        /// <summary>
+        /// Возвращает коллекцию чистовых отверстий из <see cref="Document">связанного файла</see>
+        /// </summary>
+        /// <returns></returns>
+        ICollection<OpeningReal> GetOpeningsReal();
     }
 }
