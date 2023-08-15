@@ -195,8 +195,8 @@ namespace RevitOpeningPlacement.OpeningModels {
 
             var intersectingStructureElements = GetIntersectingStructureElementsIds(thisOpeningSolid, constructureElementsIds);
             var intersectingOpenings = GetIntersectingOpeningsIds(realOpenings, thisOpeningSolid, thisOpeningBBox);
-            var hostId = GetOpeningTaskHostId(intersectingStructureElements, intersectingOpenings);
-            SetOpeningTaskHostName(hostId);
+            var hostIds = GetOpeningTaskHostsIds(intersectingStructureElements, intersectingOpenings);
+            SetOpeningTaskHostName(hostIds);
 
             if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count == 0)) {
                 Status = OpeningTaskIncomingStatus.NoIntersection;
@@ -243,31 +243,31 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
-        /// Возвращает Id основы экземпляра семейства задания на отверстие. 
-        /// Под основой понимается либо элемент конструкции, с которым пересекается задание на отверстие, либо хост чистового отверстия, с которым пересекается задание на отверстие.
+        /// Возвращает коллекцию Id элементов конструкции, с которым пересекается задание на отверстие, либо хост чистового отверстия, с которым пересекается задание на отверстие.
         /// </summary>
         /// <param name="intersectingStructureElements">Коллекция элементов конструкций из активного документа, с которыми пересекается задание на отверстие</param>
         /// <param name="intersectingOpenings">Коллекция чистовых отверстий из активного документа, с которыми пересекается задание на отверсите</param>
         /// <returns></returns>
-        private ElementId GetOpeningTaskHostId(ICollection<ElementId> intersectingStructureElements, ICollection<ElementId> intersectingOpenings) {
+        private ICollection<ElementId> GetOpeningTaskHostsIds(ICollection<ElementId> intersectingStructureElements, ICollection<ElementId> intersectingOpenings) {
             if((intersectingStructureElements != null) && intersectingStructureElements.Any()) {
-                return intersectingStructureElements.First();
+                return intersectingStructureElements;
             } else if((intersectingOpenings != null) && intersectingOpenings.Any()) {
-                return (_revitRepository.GetElement(intersectingOpenings.First()) as FamilyInstance)?.Host?.Id ?? ElementId.InvalidElementId;
+                return new ElementId[] { (_revitRepository.GetElement(intersectingOpenings.First()) as FamilyInstance)?.Host?.Id ?? ElementId.InvalidElementId };
             } else {
-                return ElementId.InvalidElementId;
+                return new ElementId[] { ElementId.InvalidElementId };
             }
         }
 
         /// <summary>
-        /// Назначает название хоста задания на отверстие по Id
+        /// Записывает названия элементов конструкций, которые пересекаются с заданием на отверстие в свойство <see cref="HostName"/>
         /// </summary>
-        /// <param name="hostId">Id хоста задания на отверстие. Под хостом понимается элемент конструкций из активного документа (стены/перекрытия), с которым пересекается текущее задание на отверстие</param>
-        private void SetOpeningTaskHostName(ElementId hostId) {
-            if(hostId != null) {
-                var hostEl = _revitRepository.GetElement(hostId);
-                if(hostEl != null) {
-                    HostName = hostEl.Name;
+        /// <param name="hostIds">Коллекция Id элементов конструкций из активного документа (стены/перекрытия), с которыми пересекается текущее задание на отверстие</param>
+        private void SetOpeningTaskHostName(ICollection<ElementId> hostIds) {
+            if(hostIds != null) {
+                var names = hostIds.Select(hostId => _revitRepository.GetElement(hostId)).Where(element => element != null).Select(element => element.Name).OrderBy(s => s);
+                if(names.Count() > 0) {
+                    string hostName = string.Join("; ", names);
+                    HostName = hostName;
                 }
             }
         }
