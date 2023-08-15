@@ -74,6 +74,20 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
+        /// Возвращает хост экземпляра семейства отверстия
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public Element GetHost() {
+            var host = _familyInstance.Host;
+            if(host is null) {
+                throw new ArgumentNullException($"Хост элемента с Id: {_familyInstance.Id} - null");
+            }
+            return host;
+        }
+
+
+        /// <summary>
         /// Устанавливает значение полю <see cref="_solid"/>
         /// </summary>
         private void SetSolid() {
@@ -99,20 +113,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         private void SetTransformedBBoxXYZ() {
             _boundingBox = _familyInstance.GetBoundingBox();
-        }
-
-
-        /// <summary>
-        /// Возвращает хост экземпляра семейства отверстия
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        private Element GetHost() {
-            var host = _familyInstance.Host;
-            if(host is null) {
-                throw new ArgumentNullException($"Хост элемента с Id: {_familyInstance.Id} - null");
-            }
-            return host;
         }
 
         private Solid CreateRawSolid() {
