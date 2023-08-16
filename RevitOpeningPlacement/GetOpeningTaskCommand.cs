@@ -18,6 +18,9 @@ using RevitOpeningPlacement.ViewModels.Navigator;
 using RevitOpeningPlacement.Views;
 
 namespace RevitOpeningPlacement {
+    /// <summary>
+    /// Команда для просмотра размещенных в текущем файле исходящих заданий на отверстия и полученных из связей входящих заданий
+    /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class GetOpeningTaskCommand : BasePluginCommand {
         private const int _progressBarStep = 100;

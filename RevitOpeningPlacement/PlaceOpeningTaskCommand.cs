@@ -22,7 +22,9 @@ using RevitOpeningPlacement.ViewModels.ReportViewModel;
 using RevitOpeningPlacement.Views;
 
 namespace RevitOpeningPlacement {
-
+    /// <summary>
+    /// Команда для размещения заданий на отверстия в файле ВИС.
+    /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class PlaceOpeningTaskCommand : BasePluginCommand {
         private readonly int _progressBarStepValue = 10;

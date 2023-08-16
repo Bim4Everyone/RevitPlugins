@@ -12,6 +12,9 @@ using RevitOpeningPlacement.ViewModels.OpeningConfig;
 using RevitOpeningPlacement.Views;
 
 namespace RevitOpeningPlacement {
+    /// <summary>
+    /// Команда для задания настроек расстановки заданий на отверстия в файле ВИС
+    /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class SetOpeningTaskCommand : BasePluginCommand {
         public SetOpeningTaskCommand() {
