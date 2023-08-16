@@ -7,6 +7,7 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
@@ -19,6 +20,7 @@ using RevitClashDetective.Models.Handlers;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.RevitViews;
+using RevitOpeningPlacement.Models.Selection;
 using RevitOpeningPlacement.OpeningModels;
 
 using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
@@ -487,6 +489,38 @@ namespace RevitOpeningPlacement.Models {
             return GetRevitLinks()
                 .Where(link => bimModelPartsService.InAnyBimModelParts(link.Name, BimModelPart.ARPart, BimModelPart.KRPart))
                 .ToList();
+        }
+
+        /// <summary>
+        /// Предлагает пользователю выбрать системную стену или системное перекрытие и возвращает его выбор
+        /// </summary>
+        /// <returns>Выбранный пользователем элемент классов <see cref="Autodesk.Revit.DB.Wall"/> или <see cref="Autodesk.Revit.DB.Floor"/></returns>
+        /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException"/>
+        public Element PickHostForRealOpening() {
+            // фильтр по классам, а не по категориям ревита, так как для хоста нужна системная стена или системное перекрытие,
+            // при этом необходимо исключить выбор моделей в контексте, которые могут быть стенами и перекрытиями
+            ISelectionFilter filter = new SelectionFilterElementsOfClasses(new Type[] { typeof(Wall), typeof(Floor) });
+            Reference reference = _uiDocument.Selection.PickObject(ObjectType.Element, filter, "Выберите стену или перекрытие");
+            return _document.GetElement(reference);
+        }
+
+        /// <summary>
+        /// Предлагает пользователю выбрать экземпляры семейств заданий на отверстия из связанных файлов, подгруженных в активный документ, и возвращает его выбор
+        /// </summary>
+        /// <returns>Выбранная пользователем коллекция элементов</returns>
+        /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException"/>
+        public ICollection<OpeningMepTaskIncoming> PickOpeningTasksIncoming() {
+            ISelectionFilter filter = new SelectionFilterOpeningTasksIncoming(_document);
+            IList<Reference> references = _uiDocument.Selection.PickObjects(ObjectType.LinkedElement, filter, "Выберите задание(я) на отверстие(я) из связи(ей) и нажмите \"Готово\"");
+            var elements = references.Select(reference => _document.GetElement(reference));
+
+            List<OpeningMepTaskIncoming> openingTasks = new List<OpeningMepTaskIncoming>();
+            foreach(var item in elements) {
+                if((item != null) && (item is FamilyInstance famInst)) {
+                    openingTasks.Add(new OpeningMepTaskIncoming(famInst, this, GetTransform(famInst)));
+                }
+            }
+            return openingTasks;
         }
 
 
