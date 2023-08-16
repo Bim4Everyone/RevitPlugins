@@ -36,6 +36,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             SelectCommand = new RelayCommand(SelectElement);
             SelectionChangedCommand = new RelayCommand(SelectionChanged, CanSelect);
             RenewCommand = new RelayCommand(Renew);
+            PlaceRealOpeningCommand = new RelayCommand(PlaceRealOpening);
         }
 
 
@@ -55,6 +56,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         public ICommand RenewCommand { get; }
 
+        public ICommand PlaceRealOpeningCommand { get; }
 
         private void SelectElement(object p) {
             if(!(p is OpeningMepTaskIncomingViewModel opening)) { return; }
@@ -77,6 +79,14 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Action action = () => {
                 var command = new GetOpeningTaskCommand();
                 command.ExecuteCommand(_revitRepository.UIApplication);
+            };
+            _revitRepository.DoAction(action);
+        }
+
+        private void PlaceRealOpening(object p) {
+            Action action = () => {
+                var cmd = new PlaceOpeningRealCommand();
+                cmd.ExecuteCommand(_revitRepository.UIApplication);
             };
             _revitRepository.DoAction(action);
         }
