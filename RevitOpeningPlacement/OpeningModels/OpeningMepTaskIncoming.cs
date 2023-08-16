@@ -47,10 +47,10 @@ namespace RevitOpeningPlacement.OpeningModels {
             _revitRepository = revitRepository;
 
             Id = _familyInstance.Id.IntegerValue;
-            Location = (_familyInstance.Location as LocationPoint).Point;
-            FileName = _familyInstance.Document.PathName;
-
             Transform = transform;
+            Location = Transform.OfPoint((_familyInstance.Location as LocationPoint).Point);
+            FileName = _familyInstance.Document.PathName;
+            OpeningType = _revitRepository.GetOpeningType(openingTaskIncoming.Symbol.Family.Name);
 
             Date = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDate);
             MepSystem = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningMepSystem);
@@ -77,7 +77,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         public int Id { get; }
 
         /// <summary>
-        /// Точка расположения экземпляра семейства задания на отверстие
+        /// Точка расположения экземпляра семейства входящего задания на отверстие в координатах активного документа - получателя заданий
         /// </summary>
         public XYZ Location { get; }
 
@@ -128,6 +128,11 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Статус отработки задания на отверстие
         /// </summary>
         public OpeningTaskIncomingStatus Status { get; set; } = OpeningTaskIncomingStatus.New;
+
+        /// <summary>
+        /// Тип проема
+        /// </summary>
+        public OpeningType OpeningType { get; } = OpeningType.WallRectangle;
 
 
         public FamilyInstance GetFamilyInstance() {

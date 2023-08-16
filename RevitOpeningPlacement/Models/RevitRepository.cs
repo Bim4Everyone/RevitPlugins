@@ -293,6 +293,22 @@ namespace RevitOpeningPlacement.Models {
             return DocTypeEnum.MEP;
         }
 
+        /// <summary>
+        /// Размещает экземпляр заданного типоразмера семейства в хосте по точке вставки с уровнем по хосту
+        /// </summary>
+        /// <param name="point">Точка вставки</param>
+        /// <param name="familySymbol">Типоразмер семейства</param>
+        /// <param name="host">Хост экземпляра семейства</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public FamilyInstance CreateInstance(XYZ point, FamilySymbol familySymbol, Element host) {
+            if(point is null) { throw new ArgumentNullException(nameof(point)); }
+            if(familySymbol is null) { throw new ArgumentNullException(nameof(familySymbol)); }
+            if(host is null) { throw new ArgumentNullException(nameof(host)); }
+
+            var level = GetElement(host.LevelId) as Level;
+            return _document.Create.NewFamilyInstance(point, familySymbol, host, level, StructuralType.NonStructural);
+        }
 
         public FamilyInstance CreateInstance(FamilySymbol type, XYZ point, Level level) {
             if(level != null) {
@@ -573,17 +589,27 @@ namespace RevitOpeningPlacement.Models {
         public ICollection<OpeningMepTaskIncoming> PickOpeningTasksIncoming() {
             ISelectionFilter filter = new SelectionFilterOpeningTasksIncoming(_document);
             IList<Reference> references = _uiDocument.Selection.PickObjects(ObjectType.LinkedElement, filter, "Выберите задание(я) на отверстие(я) из связи(ей) и нажмите \"Готово\"");
-            var elements = references.Select(reference => _document.GetElement(reference));
 
             List<OpeningMepTaskIncoming> openingTasks = new List<OpeningMepTaskIncoming>();
-            foreach(var item in elements) {
-                if((item != null) && (item is FamilyInstance famInst)) {
-                    openingTasks.Add(new OpeningMepTaskIncoming(famInst, this, GetTransform(famInst)));
+            foreach(var reference in references) {
+                if((reference != null) && (_document.GetElement(reference) is RevitLinkInstance link)) {
+                    Element opening = link.GetLinkDocument().GetElement(reference.LinkedElementId);
+                    if(opening is FamilyInstance famInst) {
+                        openingTasks.Add(new OpeningMepTaskIncoming(famInst, this, link.GetTransform()));
+                    }
                 }
             }
             return openingTasks;
         }
 
+        /// <summary>
+        /// Возвращает тип проема по названию семейства задания на отверстие
+        /// </summary>
+        /// <param name="familyName">Название семейства задания на отверстие</param>
+        /// <returns></returns>
+        public OpeningType GetOpeningType(string familyName) {
+            return OpeningTaskFamilyName.FirstOrDefault(pair => pair.Value.Equals(familyName, StringComparison.CurrentCultureIgnoreCase)).Key;
+        }
 
         /// <summary>
         /// Возвращает список экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит ("исходящие" задания).
