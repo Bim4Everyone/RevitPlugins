@@ -9,6 +9,9 @@
         "BundleName": {
           "type": "string"
         },
+        "BundleOutput": {
+          "type": "string"
+        },
         "BundleType": {
           "type": "string",
           "enum": [
