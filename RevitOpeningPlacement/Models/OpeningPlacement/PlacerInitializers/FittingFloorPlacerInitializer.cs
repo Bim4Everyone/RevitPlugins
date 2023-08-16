@@ -17,7 +17,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             var clash = new FittingClash<CeilingAndFloor>(revitRepository, clashModel);
             var pointFinder = new FloorPointFinder<FamilyInstance>(clash);
             return new OpeningPlacer(revitRepository, clashModel) {
-                Type = revitRepository.GetOpeningType(OpeningType.FloorRectangle),
+                Type = revitRepository.GetOpeningTaskType(OpeningType.FloorRectangle),
                 PointFinder = pointFinder,
                 LevelFinder = new ClashLevelFinder(revitRepository, clashModel),
                 AngleFinder = new ZeroAngleFinder(),

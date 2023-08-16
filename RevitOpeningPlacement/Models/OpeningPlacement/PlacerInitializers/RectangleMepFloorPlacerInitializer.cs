@@ -19,7 +19,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             var placer = new OpeningPlacer(revitRepository, clashModel) {
                 LevelFinder = new ClashLevelFinder(revitRepository, clashModel),
                 PointFinder = pointFinder,
-                Type = revitRepository.GetOpeningType(OpeningType.FloorRectangle),
+                Type = revitRepository.GetOpeningTaskType(OpeningType.FloorRectangle),
             };
 
             if(clash.Element2.IsHorizontal() && clash.Element1.IsVertical()) {

@@ -27,7 +27,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             Element element2 = openingsGroup.Elements[1];
 
             return new OpeningPlacer(revitRepository) {
-                Type = revitRepository.GetOpeningType(OpeningType.WallRectangle),
+                Type = revitRepository.GetOpeningTaskType(OpeningType.WallRectangle),
                 PointFinder = pointFinder,
                 LevelFinder = new OpeningsGroupLevelFinder(revitRepository, openingsGroup),
                 AngleFinder = new WallOpeningsGroupAngleFinder(openingsGroup),

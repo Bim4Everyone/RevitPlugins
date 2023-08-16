@@ -24,11 +24,11 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
 
             if(clash.Element2.IsHorizontal() && clash.Element1.IsVertical()) {
                 placer.AngleFinder = new FloorAngleFinder(clash.Element1);
-                placer.Type = revitRepository.GetOpeningType(OpeningType.FloorRound);
+                placer.Type = revitRepository.GetOpeningTaskType(OpeningType.FloorRound);
                 placer.ParameterGetter = new PerpendicularRoundCurveFloorParamGetter(clash, categoryOption, pointFinder);
             } else {
                 placer.AngleFinder = new ZeroAngleFinder();
-                placer.Type = revitRepository.GetOpeningType(OpeningType.FloorRectangle);
+                placer.Type = revitRepository.GetOpeningTaskType(OpeningType.FloorRectangle);
                 placer.ParameterGetter = new FloorSolidParameterGetter(new MepCurveClashSolidProvider<CeilingAndFloor>(clash), pointFinder, clash.Element1, clash.Element2, categoryOption);
             }
 

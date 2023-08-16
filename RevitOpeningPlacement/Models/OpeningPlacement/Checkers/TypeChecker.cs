@@ -9,10 +9,10 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
             _revitRepository = revitRepository;
             _openingType = openingType;
         }
-        public string GetErrorMessage() => $"У семейства \"{RevitRepository.FamilyName[_openingType]}\" отсутствует тип \"{RevitRepository.TypeName[_openingType]}\".";
+        public string GetErrorMessage() => $"У семейства \"{RevitRepository.OpeningTaskFamilyName[_openingType]}\" отсутствует тип \"{RevitRepository.OpeningTaskTypeName[_openingType]}\".";
 
         public bool IsCorrect() {
-            return _revitRepository.GetOpeningType(_openingType) != null;
+            return _revitRepository.GetOpeningTaskType(_openingType) != null;
         }
     }
 }

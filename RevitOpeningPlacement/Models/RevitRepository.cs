@@ -88,28 +88,54 @@ namespace RevitOpeningPlacement.Models {
             {Parameters.Width, "Ширина" }
         };
 
-        public static Dictionary<OpeningType, string> FamilyName { get; } = new Dictionary<OpeningType, string>() {
+        /// <summary>
+        /// Словарь типов проемов и названий семейств заданий на отверстия
+        /// </summary>
+        public static Dictionary<OpeningType, string> OpeningTaskFamilyName { get; } = new Dictionary<OpeningType, string>() {
             {OpeningType.FloorRectangle, "ОбщМд_Отв_Отверстие_Прямоугольное_В перекрытии" },
             {OpeningType.FloorRound, "ОбщМд_Отв_Отверстие_Круглое_В перекрытии" },
             {OpeningType.WallRectangle, "ОбщМд_Отв_Отверстие_Прямоугольное_В стене" },
             {OpeningType.WallRound, "ОбщМд_Отв_Отверстие_Круглое_В стене" },
         };
 
+        /// <summary>
+        /// Словарь типов проемов и названий семейств чистовых отверстий
+        /// </summary>
+        public static Dictionary<OpeningType, string> OpeningRealFamilyName { get; } = new Dictionary<OpeningType, string>() {
+            {OpeningType.FloorRectangle, "Окн_Отв_Прямоуг_Перекрытие" },
+            {OpeningType.FloorRound, "Окн_Отв_Круг_Перекрытие" },
+            {OpeningType.WallRectangle, "Окн_Отв_Прямоуг_Стена" },
+            {OpeningType.WallRound, "Окн_Отв_Круг_Стена" },
+        };
+
         public static List<string> WallFamilyNames { get; } = new List<string> {
-            FamilyName[OpeningType.WallRound],
-            FamilyName[OpeningType.WallRectangle]
+            OpeningTaskFamilyName[OpeningType.WallRound],
+            OpeningTaskFamilyName[OpeningType.WallRectangle]
         };
 
         public static List<string> FloorFamilyNames { get; } = new List<string> {
-            FamilyName[OpeningType.FloorRectangle],
-            FamilyName[OpeningType.FloorRound]
+            OpeningTaskFamilyName[OpeningType.FloorRectangle],
+            OpeningTaskFamilyName[OpeningType.FloorRound]
         };
 
-        public static Dictionary<OpeningType, string> TypeName => new Dictionary<OpeningType, string>() {
+        /// <summary>
+        /// Словарь типов проемов и названий типов семейств заданий на отверстия
+        /// </summary>
+        public static Dictionary<OpeningType, string> OpeningTaskTypeName => new Dictionary<OpeningType, string>() {
             {OpeningType.FloorRectangle, "Прямоугольное" },
             {OpeningType.FloorRound, "Круглое" },
             {OpeningType.WallRectangle, "Прямоугольное" },
             {OpeningType.WallRound, "Круглое" },
+        };
+
+        /// <summary>
+        /// Словарь типов проемов и названий типов семейств чистовых отверстий
+        /// </summary>
+        public static Dictionary<OpeningType, string> OpeningRealTypeName => new Dictionary<OpeningType, string>() {
+            {OpeningType.FloorRectangle, "Окн_Отв_Прямоуг_Перекрытие" },
+            {OpeningType.FloorRound, "Окн_Отв_Круг_Перекрытие" },
+            {OpeningType.WallRectangle, "Окн_Отв_Прямоуг_Стена" },
+            {OpeningType.WallRound, "Окн_Отв_Круг_Стена" },
         };
 
         public const string OpeningDiameter = "ADSK_Размер_Диаметр";
@@ -152,19 +178,54 @@ namespace RevitOpeningPlacement.Models {
 
         public static string SystemCheck => "Системная проверка";
 
-        public FamilySymbol GetOpeningType(OpeningType type) {
+        /// <summary>
+        /// Возвращает типоразмер семейства задания на отверстие из репозитория
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public FamilySymbol GetOpeningTaskType(OpeningType type) {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .WhereElementIsElementType()
                 .OfType<FamilySymbol>()
-                .FirstOrDefault(item => item.Name.Equals(TypeName[type]) && item.FamilyName.Equals(FamilyName[type]));
+                .FirstOrDefault(item => item.Name.Equals(OpeningTaskTypeName[type]) && item.FamilyName.Equals(OpeningTaskFamilyName[type]));
         }
 
-        public Family GetFamily(OpeningType openingType) {
+        /// <summary>
+        /// Возвращает типоразмер семейства чистового отверстия из репозитория
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public FamilySymbol GetOpeningRealType(OpeningType type) {
+            return new FilteredElementCollector(_document)
+                .OfCategory(BuiltInCategory.OST_Windows)
+                .WhereElementIsElementType()
+                .OfType<FamilySymbol>()
+                .FirstOrDefault(item => item.Name.Equals(OpeningRealTypeName[type]) && item.FamilyName.Equals(OpeningRealFamilyName[type]));
+        }
+
+        /// <summary>
+        /// Возвращает семейство задания на отверстие из репозитория
+        /// </summary>
+        /// <param name="openingType"></param>
+        /// <returns></returns>
+        public Family GetOpeningTaskFamily(OpeningType openingType) {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(Family))
                 .OfType<Family>()
-                .FirstOrDefault(item => item?.Name?.Equals(FamilyName[openingType], StringComparison.CurrentCulture) == true);
+                .FirstOrDefault(item => item?.Name?.Equals(OpeningTaskFamilyName[openingType], StringComparison.CurrentCulture) == true);
+        }
+
+        /// <summary>
+        /// Возвращает семейство чистового отверстия из репозитория
+        /// </summary>
+        /// <param name="openingType"></param>
+        /// <returns></returns>
+        public Family GetOpeningRealFamily(OpeningType openingType) {
+            return new FilteredElementCollector(_document)
+                .OfClass(typeof(Family))
+                .OfType<Family>()
+                .FirstOrDefault(item => item?.Name?.Equals(OpeningRealFamilyName[openingType], StringComparison.CurrentCulture) == true);
         }
 
         public Transaction GetTransaction(string transactionName) {
@@ -471,8 +532,8 @@ namespace RevitOpeningPlacement.Models {
                     .WhereElementIsNotElementType()
                     .OfCategory(BuiltInCategory.OST_GenericModel)
                     .OfType<FamilyInstance>()
-                    .Where(item => TypeName.Any(n => n.Value.Equals(item.Name))
-                                && FamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
+                    .Where(item => OpeningTaskTypeName.Any(n => n.Value.Equals(item.Name))
+                                && OpeningTaskFamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
                     .Select(famInst => new OpeningMepTaskIncoming(famInst, this, transform))
                     ;
                 genericModelsInLinks.AddRange(genericModelsInLink);
@@ -528,12 +589,12 @@ namespace RevitOpeningPlacement.Models {
         /// Возвращает список экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит ("исходящие" задания).
         /// </summary>
         /// <returns>Список экземпляров семейств, названия семейств и типов которых заданы в соответствующих словарях
-        /// <see cref="TypeName">названий типов</see> и
-        /// <see cref="FamilyName">названий семейств</see></returns>
+        /// <see cref="OpeningTaskTypeName">названий типов</see> и
+        /// <see cref="OpeningTaskFamilyName">названий семейств</see></returns>
         private List<FamilyInstance> GetOpeningsTaskFromCurrentDoc() {
             return GetGenericModelsFamilyInstances()
-                .Where(item => TypeName.Any(n => n.Value.Equals(item.Name))
-                            && FamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
+                .Where(item => OpeningTaskTypeName.Any(n => n.Value.Equals(item.Name))
+                            && OpeningTaskFamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
                 .ToList();
         }
 
@@ -589,8 +650,8 @@ namespace RevitOpeningPlacement.Models {
         /// <returns></returns>
         private List<FamilyInstance> GetOpeningsMepTasksOutcoming(ICollection<OpeningType> types) {
             return GetGenericModelsFamilyInstances()
-               .Where(item => types.Any(e => TypeName[e].Equals(item.Name))
-                           && types.Any(e => FamilyName[e].Equals(GetFamilyName(item))))
+               .Where(item => types.Any(e => OpeningTaskTypeName[e].Equals(item.Name))
+                           && types.Any(e => OpeningTaskFamilyName[e].Equals(GetFamilyName(item))))
                .ToList();
         }
 

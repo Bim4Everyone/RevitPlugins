@@ -35,8 +35,8 @@ namespace RevitOpeningPlacement.Models.Selection {
                 return (element != null)
                     && (element is FamilyInstance famInst)
                     && (famInst.Category.GetBuiltInCategory() == BuiltInCategory.OST_GenericModel)
-                    && RevitRepository.TypeName.Any(n => n.Value.Equals(famInst.Name))
-                    && RevitRepository.FamilyName.Any(n => n.Value.Equals(famInst.Symbol?.FamilyName));
+                    && RevitRepository.OpeningTaskTypeName.Any(n => n.Value.Equals(famInst.Name))
+                    && RevitRepository.OpeningTaskFamilyName.Any(n => n.Value.Equals(famInst.Symbol?.FamilyName));
             }
             return false;
         }

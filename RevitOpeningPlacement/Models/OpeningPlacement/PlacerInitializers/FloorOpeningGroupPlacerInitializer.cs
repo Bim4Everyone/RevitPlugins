@@ -26,7 +26,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             Element element1 = openingsGroup.Elements[0];
             Element element2 = openingsGroup.Elements[1];
             return new OpeningPlacer(revitRepository) {
-                Type = revitRepository.GetOpeningType(OpeningType.FloorRectangle),
+                Type = revitRepository.GetOpeningTaskType(OpeningType.FloorRectangle),
 
                 PointFinder = pointFinder,
 
