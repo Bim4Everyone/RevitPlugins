@@ -247,6 +247,12 @@ namespace RevitOpeningPlacement.Models {
             return _clashRevitRepository.GetLevel(element);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="Autodesk.Revit.Exceptions.ArgumentNullException"/>
         public Element GetElement(ElementId id) {
             return _document.GetElement(id);
         }
@@ -301,10 +307,14 @@ namespace RevitOpeningPlacement.Models {
         /// <param name="host">Хост экземпляра семейства</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="Autodesk.Revit.Exceptions.ArgumentException"></exception>
+        /// <exception cref="Autodesk.Revit.Exceptions.ArgumentNullException"></exception>
         public FamilyInstance CreateInstance(XYZ point, FamilySymbol familySymbol, Element host) {
             if(point is null) { throw new ArgumentNullException(nameof(point)); }
             if(familySymbol is null) { throw new ArgumentNullException(nameof(familySymbol)); }
             if(host is null) { throw new ArgumentNullException(nameof(host)); }
+
+            if(!familySymbol.IsActive) { familySymbol.Activate(); }
 
             var level = GetElement(host.LevelId) as Level;
             return _document.Create.NewFamilyInstance(point, familySymbol, host, level, StructuralType.NonStructural);
@@ -484,7 +494,7 @@ namespace RevitOpeningPlacement.Models {
         public bool ContinueIfNotAllLinksLoaded() {
             var notLoadedLinksNames = GetRevitLinkNotLoadedNames();
             if(notLoadedLinksNames.Count > 0) {
-                var dialog = GetPlatformService<IMessageBoxService>();
+                var dialog = GetMessageBoxService();
                 return dialog.Show(
                     $"Связи:\n{string.Join(";\n", notLoadedLinksNames)} \nне загружены, хотите продолжить?",
                     "Задания на отверстия",
@@ -495,6 +505,14 @@ namespace RevitOpeningPlacement.Models {
             } else {
                 return true;
             }
+        }
+
+        /// <summary>
+        /// Возвращает сервис диалоговых окон
+        /// </summary>
+        /// <returns></returns>
+        public IMessageBoxService GetMessageBoxService() {
+            return GetPlatformService<IMessageBoxService>();
         }
 
         /// <summary>
