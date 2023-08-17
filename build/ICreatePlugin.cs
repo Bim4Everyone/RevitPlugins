@@ -20,6 +20,7 @@ interface IPluginCreate : IHazSolution, IHazOutput, IHazPluginName, IHazTemplate
     Target CreatePlugin => _ => _
         .Triggers<ICreateScript>()
         .OnlyWhenDynamic(() => Solution.GetProject(PluginName) == null, $"Plugin \"{PluginName}\" does exists.")
+        .OnlyWhenDynamic(() => !PluginDirectory.DirectoryExists(), $"Plugin directory \"{PluginName}\" does exists.")
         .Executes(() => {
             Log.Debug("TemplateName: {TemplateName}", TemplateName);
             Log.Debug("TemplateDirectory: {TemplateDirectory}", TemplateDirectory);
