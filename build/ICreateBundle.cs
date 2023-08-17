@@ -13,6 +13,10 @@ interface ICreateBundle : IHazOutput, IHazTemplate {
     [Parameter] BundleType BundleType => TryGetValue(() => BundleType);
     [Parameter] AbsolutePath BundleOutput => TryGetValue(() => BundleOutput) ?? DefaultOutput;
 
+    Uri DefaultIconUrl => new ("https://icons8.com/icon/22361/money-bag");
+    string DefaultBundleName => "MyAwesomeBundle";
+    BundleType DefaultBundleType => BundleType.InvokeButton;
+
     AbsolutePath TemplateBundle => TemplateDirectory + BundleType.ExtensionWithDot;
     AbsolutePath BundleDirectory => BundleOutput / BundleName + BundleType.ExtensionWithDot;
     
@@ -20,9 +24,10 @@ interface ICreateBundle : IHazOutput, IHazTemplate {
     string UriIconFormat => "https://img.icons8.com/?size={0}&id={1}&format=png";
     
     Target CreateBundle => _ => _
-        .Requires(() => BundleName)
-        .Requires(() => BundleType)
-        .OnlyWhenStatic(() => !BundleDirectory.DirectoryExists(), "Bundle directory is exists")
+        .OnlyWhenStatic(() => 
+            !BundleDirectory.DirectoryExists(), "Bundle directory is exists")
+        .OnlyWhenStatic(() => 
+            !IconUrl.AbsolutePath.StartsWith(@"https://icons8.com/icon/"), "Bundle icon must be from icons8 site")
         .Executes(async () => {
             Log.Debug("TemplateName: {TemplateName}", TemplateName);
             Log.Debug("TemplateBundleDirectory: {TemplateBundleDirectory}", TemplateBundle);
