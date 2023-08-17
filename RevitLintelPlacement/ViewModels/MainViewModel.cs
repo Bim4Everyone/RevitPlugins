@@ -297,14 +297,14 @@ namespace RevitLintelPlacement.ViewModels {
 
                 var offset = rule.LintelRightOffsetParameter.RightOffsetInternal;
 
-                if(_revitRepository.DoesLeftCornerNeeded(view3D, elementInWall, links, ElementInfos, out double leftOffset)) {
+                if(_revitRepository.DoesLeftCornerNeeded(view3D, elementInWall, links, ElementInfos, offset, out double leftOffset)) {
                     lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftOffset, leftOffset > 0 ? leftOffset : 0);
                     lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftCorner, 1);
                 } else {
                     lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftOffset, leftOffset > 0 && leftOffset <= offset ? leftOffset : offset);
                     lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelLeftCorner, 0);
                 }
-                if(_revitRepository.DoesRightCornerNeeded(view3D, elementInWall, links, ElementInfos, out double rightOffset)) {
+                if(_revitRepository.DoesRightCornerNeeded(view3D, elementInWall, links, ElementInfos, offset, out double rightOffset)) {
                     lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightOffset, rightOffset > 0 ? rightOffset : 0);
                     lintel.SetParamValue(_revitRepository.LintelsCommonConfig.LintelRightCorner, 1);
                 } else {

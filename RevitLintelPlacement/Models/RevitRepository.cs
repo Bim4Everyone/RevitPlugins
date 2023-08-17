@@ -304,19 +304,21 @@ namespace RevitLintelPlacement.Models {
             return true;
         }
 
-        public bool DoesRightCornerNeeded(View3D view3D, FamilyInstance elementInWall, IEnumerable<string> linkNames, ElementInfosViewModel elementInfos, out double offset) {
-            return DoesCornerNeeded(view3D, elementInWall, new XYZ(-1, 0, 0), linkNames, elementInfos, out offset);
+        public bool DoesRightCornerNeeded(View3D view3D, FamilyInstance elementInWall, IEnumerable<string> linkNames,
+            ElementInfosViewModel elementInfos, double offset, out double realOffset) {
+            return DoesCornerNeeded(view3D, elementInWall, new XYZ(-1, 0, 0), linkNames, elementInfos, offset, out realOffset);
         }
 
-        public bool DoesLeftCornerNeeded(View3D view3D, FamilyInstance elementInWall, IEnumerable<string> linkNames, ElementInfosViewModel elementInfos, out double offset) {
-            return DoesCornerNeeded(view3D, elementInWall, new XYZ(1, 0, 0), linkNames, elementInfos, out offset);
+        public bool DoesLeftCornerNeeded(View3D view3D, FamilyInstance elementInWall, IEnumerable<string> linkNames,
+            ElementInfosViewModel elementInfos, double offset, out double realOffset) {
+            return DoesCornerNeeded(view3D, elementInWall, new XYZ(1, 0, 0), linkNames, elementInfos, offset, out realOffset);
         }
 
         public void ActivateView() {
             _uiDocument.ActiveView = GetView3D();
         }
 
-        private bool DoesCornerNeeded(View3D view3D, FamilyInstance elementInWall, XYZ direction, IEnumerable<string> linkNames, ElementInfosViewModel elementInfos, out double realOffset) {
+        private bool DoesCornerNeeded(View3D view3D, FamilyInstance elementInWall, XYZ direction, IEnumerable<string> linkNames, ElementInfosViewModel elementInfos, double offset, out double realOffset) {
             realOffset = 0;
             //получение предполагаемой точки вставки перемычки,
             //из которой проводится поиск жб-элементов
@@ -344,12 +346,7 @@ namespace RevitLintelPlacement.Models {
                 });
                 return false;
             }
-
-#if REVIT_2020_OR_LESS
-            var offset = UnitUtils.ConvertToInternalUnits(200, DisplayUnitType.DUT_MILLIMETERS);
-#else
-            var offset = UnitUtils.ConvertToInternalUnits(200, UnitTypeId.Millimeters);
-#endif
+            
             //получение ближайшего элемента и его проверка
             var wallOrColumn = _document.GetElement(refWithContext.GetReference().ElementId);
 

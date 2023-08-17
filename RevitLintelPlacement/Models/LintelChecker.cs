@@ -165,7 +165,7 @@ namespace RevitLintelPlacement.Models {
         private ParameterCheckResult CheckLintelLeftOffset(FamilyInstance lintel, FamilyInstance elementInWall, ConcreteRuleViewModel rule, out double offset) {
             var lintelLeftOffset = lintel.GetParamValueOrDefault<double>(_revitRepository.LintelsCommonConfig.LintelLeftOffset);
             var lintelCorner = lintel.GetParamValueOrDefault<int>(_revitRepository.LintelsCommonConfig.LintelLeftCorner) == 1 ? true : false;
-            if(_revitRepository.DoesLeftCornerNeeded(_view3D, elementInWall, _linkNames, _elementInfos, out offset)) {
+            if(_revitRepository.DoesLeftCornerNeeded(_view3D, elementInWall, _linkNames, _elementInfos, rule.LintelRightOffsetParameter.RightOffsetInternal, out offset)) {
                 if(Math.Abs(lintelLeftOffset - offset) < 0.01 && lintelCorner) {
                     return ParameterCheckResult.Correct;
                 } else {
@@ -186,7 +186,7 @@ namespace RevitLintelPlacement.Models {
             var lintelRightOffset = lintel.GetParamValueOrDefault<double>(_revitRepository.LintelsCommonConfig.LintelRightOffset);
             var lintelCorner = lintel.GetParamValueOrDefault<int>(_revitRepository.LintelsCommonConfig.LintelRightCorner) == 1 ? true : false;
 
-            if(_revitRepository.DoesRightCornerNeeded(_view3D, elementInWall, _linkNames, _elementInfos, out offset)) {
+            if(_revitRepository.DoesRightCornerNeeded(_view3D, elementInWall, _linkNames, _elementInfos, rule.LintelRightOffsetParameter.RightOffsetInternal, out offset)) {
                 if(Math.Abs(lintelRightOffset - offset) < 0.01 && lintelCorner) {
                     return ParameterCheckResult.Correct;
                 } else {
