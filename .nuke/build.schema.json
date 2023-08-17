@@ -78,6 +78,9 @@
             "type": "string"
           }
         },
+        "PublishDirectory": {
+          "type": "string"
+        },
         "Root": {
           "type": "string",
           "description": "Root directory during build execution"
@@ -92,6 +95,7 @@
               "Compile",
               "CreateBundle",
               "CreatePlugin",
+              "CreateProfile",
               "CreateScript",
               "FullClean",
               "FullCompile",
@@ -114,6 +118,7 @@
               "Compile",
               "CreateBundle",
               "CreatePlugin",
+              "CreateProfile",
               "CreateScript",
               "FullClean",
               "FullCompile",
