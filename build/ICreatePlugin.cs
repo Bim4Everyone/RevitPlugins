@@ -13,11 +13,12 @@ using Serilog;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
 [ParameterPrefix(nameof(IPluginCreate))]
-interface IPluginCreate : ICreateScript, ICreateProfile {
+interface IPluginCreate : ICreateScript, ICreateProfile, ICreateBranch {
     AbsolutePath PluginFile => RootDirectory / PluginName / $"{PluginName}.csproj";
     AbsolutePath PluginTemplateFile => RootDirectory / "RevitPlugins" / "RevitPlugins.csproj";
 
     Target CreatePlugin => _ => _
+        .Triggers(CreateBranch)
         .DependsOn(CreateBundle, CreateScript, CreateProfile)
         .OnlyWhenDynamic(() => Solution.GetProject(PluginName) == null, $"Plugin \"{PluginName}\" does exists.")
         .OnlyWhenDynamic(() => !PluginDirectory.DirectoryExists(), $"Plugin directory \"{PluginName}\" does exists.")

@@ -93,6 +93,7 @@
             "enum": [
               "Clean",
               "Compile",
+              "CreateBranch",
               "CreateBundle",
               "CreatePlugin",
               "CreateProfile",
@@ -116,6 +117,7 @@
             "enum": [
               "Clean",
               "Compile",
+              "CreateBranch",
               "CreateBundle",
               "CreatePlugin",
               "CreateProfile",
