@@ -34,10 +34,10 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             CenterOffset = _openingTask.CenterOffset;
             BottomOffset = _openingTask.BottomOffset;
             IsAccepted = _openingTask.IsAccepted;
-            Diameter = _openingTask.Diameter;
-            Width = _openingTask.Width;
-            Height = _openingTask.Height;
-            Thickness = _openingTask.Thickness;
+            Diameter = _openingTask.DisplayDiameter;
+            Width = _openingTask.DisplayWidth;
+            Height = _openingTask.DisplayHeight;
+            Thickness = _openingTask.DisplayThickness;
             FamilyShortName = _openingTask.FamilyShortName;
             HostName = _openingTask.HostName;
             Status = _openingTask.Status.GetEnumDescription();

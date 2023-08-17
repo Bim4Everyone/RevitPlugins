@@ -49,6 +49,8 @@ namespace RevitOpeningPlacement.OpeningModels {
             Id = _familyInstance.Id.IntegerValue;
             Transform = transform;
             Location = Transform.OfPoint((_familyInstance.Location as LocationPoint).Point);
+            // https://forums.autodesk.com/t5/revit-api-forum/get-angle-from-transform-basisx-basisy-and-basisz/td-p/5326059
+            Rotation = (_familyInstance.Location as LocationPoint).Rotation + Transform.BasisX.AngleOnPlaneTo(Transform.OfVector(Transform.BasisX), Transform.BasisZ);
             FileName = _familyInstance.Document.PathName;
             OpeningType = _revitRepository.GetOpeningType(openingTaskIncoming.Symbol.Family.Name);
 
@@ -57,10 +59,15 @@ namespace RevitOpeningPlacement.OpeningModels {
             Description = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDescription);
             CenterOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetCenter);
             BottomOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetBottom);
-            Diameter = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDiameter);
-            Height = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningHeight);
-            Width = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningWidth);
-            Thickness = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningThickness);
+            DisplayDiameter = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDiameter);
+            DisplayHeight = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningHeight);
+            DisplayWidth = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningWidth);
+            DisplayThickness = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningThickness);
+
+            Diameter = GetFamilyInstanceDoubleParamValueOrZero(RevitRepository.OpeningDiameter);
+            Height = GetFamilyInstanceDoubleParamValueOrZero(RevitRepository.OpeningHeight);
+            Width = GetFamilyInstanceDoubleParamValueOrZero(RevitRepository.OpeningWidth);
+            Thickness = GetFamilyInstanceDoubleParamValueOrZero(RevitRepository.OpeningThickness);
 
             string[] famNameParts = _familyInstance.Symbol.FamilyName.Split('_');
             if(famNameParts.Length > 0) {
@@ -101,13 +108,45 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         public string BottomOffset { get; } = string.Empty;
 
-        public string Diameter { get; } = string.Empty;
+        /// <summary>
+        /// Значение диаметра в мм. Если диаметра у отверстия нет, будет пустая строка.
+        /// </summary>
+        public string DisplayDiameter { get; } = string.Empty;
 
-        public string Width { get; } = string.Empty;
+        /// <summary>
+        /// Значение ширины в мм. Если ширины у отверстия нет, будет пустая строка.
+        /// </summary>
+        public string DisplayWidth { get; } = string.Empty;
 
-        public string Height { get; } = string.Empty;
+        /// <summary>
+        /// Значение высоты в мм. Если высоты у отверстия нет, будет пустая строка.
+        /// </summary>
+        public string DisplayHeight { get; } = string.Empty;
 
-        public string Thickness { get; } = string.Empty;
+        /// <summary>
+        /// Значение толщины в мм. Если толщины у отверстия нет, будет пустая строка.
+        /// </summary>
+        public string DisplayThickness { get; } = string.Empty;
+
+        /// <summary>
+        /// Диаметр в единицах ревита или 0, если диаметра нет
+        /// </summary>
+        public double Diameter { get; } = 0;
+
+        /// <summary>
+        /// Ширина в единицах ревита или 0, если ширины нет
+        /// </summary>
+        public double Width { get; } = 0;
+
+        /// <summary>
+        /// Высота в единицах ревита или 0, если высоты нет
+        /// </summary>
+        public double Height { get; } = 0;
+
+        /// <summary>
+        /// Толщина в единицах ревита или 0, если толщины нет
+        /// </summary>
+        public double Thickness { get; } = 0;
 
         /// <summary>
         /// Трансформация связанного файла с заданием на отверстие относительно активного документа - получателя заданий
@@ -134,6 +173,11 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         public OpeningType OpeningType { get; } = OpeningType.WallRectangle;
 
+        /// <summary>
+        /// Угол поворота задания на отверстие в радианах в координатах активного файла, в который подгружена связь с заданием на отверстие
+        /// </summary>
+        public double Rotation { get; } = 0;
+
 
         public FamilyInstance GetFamilyInstance() {
             return _familyInstance;
@@ -157,6 +201,25 @@ namespace RevitOpeningPlacement.OpeningModels {
             return _familyInstance.GetBoundingBox().TransformBoundingBox(Transform);
         }
 
+        /// <summary>
+        /// Возвращает значение double параметра экземпляра семейства задания на отверстие в единицах ревита, или 0, если параметр отсутствует
+        /// </summary>
+        /// <param name="paramName">Название параметра</param>
+        /// <returns></returns>
+        private double GetFamilyInstanceDoubleParamValueOrZero(string paramName) {
+            if(_familyInstance.GetParameters(paramName).FirstOrDefault(item => item.IsShared) != null) {
+                return _familyInstance.GetSharedParamValue<double>(paramName);
+            } else {
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Возвращает значение параметра, или пустую строку, если параметра у семейства нет. Значения параметров с типом данных "длина" конвертируются в мм и округляются до 1 мм.
+        /// </summary>
+        /// <param name="paramName"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
         private string GetFamilyInstanceStringParamValueOrEmpty(string paramName) {
             if(_familyInstance is null) {
                 throw new ArgumentNullException(nameof(_familyInstance));
@@ -166,15 +229,15 @@ namespace RevitOpeningPlacement.OpeningModels {
             if(_familyInstance.GetParameters(paramName).FirstOrDefault(item => item.IsShared) != null) {
 #if REVIT_2022_OR_GREATER
                 if(_familyInstance.GetSharedParam(paramName).Definition.GetDataType() == SpecTypeId.Length) {
-                    return Math.Round(UnitUtils.ConvertFromInternalUnits(_familyInstance.GetSharedParamValue<double>(paramName), UnitTypeId.Millimeters)).ToString();
+                    return Math.Round(UnitUtils.ConvertFromInternalUnits(GetFamilyInstanceDoubleParamValueOrZero(paramName), UnitTypeId.Millimeters)).ToString();
                 }
 #elif REVIT_2021
                 if(_familyInstance.GetSharedParam(paramName).Definition.ParameterType == ParameterType.Length) {
-                    return Math.Round(UnitUtils.ConvertFromInternalUnits(_familyInstance.GetSharedParamValue<double>(paramName), UnitTypeId.Millimeters)).ToString();
+                    return Math.Round(UnitUtils.ConvertFromInternalUnits(GetFamilyInstanceDoubleParamValueOrZero(paramName), UnitTypeId.Millimeters)).ToString();
                 }
 #else
                 if(_familyInstance.GetSharedParam(paramName).Definition.UnitType == UnitType.UT_Length) {
-                    return Math.Round(UnitUtils.ConvertFromInternalUnits(_familyInstance.GetSharedParamValue<double>(paramName), DisplayUnitType.DUT_MILLIMETERS)).ToString();
+                    return Math.Round(UnitUtils.ConvertFromInternalUnits(GetFamilyInstanceDoubleParamValueOrZero(paramName), DisplayUnitType.DUT_MILLIMETERS)).ToString();
                 }
 #endif
                 object paramValue = _familyInstance.GetParamValue(paramName);
