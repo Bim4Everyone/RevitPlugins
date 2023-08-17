@@ -36,7 +36,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement.ValueGetters {
         public DoubleParamValue GetValue() {
             double diameterFeet = _openingMepTaskIncoming.Diameter;
             double zOffset = Math.Abs(_openingMepTaskIncoming.Location.Z - _pointFinder.GetPoint().Z);
-            double diameterWithOffset = diameterFeet + zOffset;
+            double diameterWithOffset = diameterFeet + 2 * zOffset;
 
             double roundHeightFeet = RoundToCeilingFeetToMillimeters(diameterWithOffset, _diameterRound);
             return new DoubleParamValue(roundHeightFeet);
