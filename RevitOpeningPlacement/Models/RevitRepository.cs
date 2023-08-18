@@ -604,7 +604,7 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <returns>Выбранная пользователем коллекция элементов</returns>
         /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException"/>
-        public ICollection<OpeningMepTaskIncoming> PickOpeningTasksIncoming() {
+        public ICollection<OpeningMepTaskIncoming> PickManyOpeningTasksIncoming() {
             ISelectionFilter filter = new SelectionFilterOpeningTasksIncoming(_document);
             IList<Reference> references = _uiDocument.Selection.PickObjects(ObjectType.LinkedElement, filter, "Выберите задание(я) на отверстие(я) из связи(ей) и нажмите \"Готово\"");
 
@@ -612,12 +612,47 @@ namespace RevitOpeningPlacement.Models {
             foreach(var reference in references) {
                 if((reference != null) && (_document.GetElement(reference) is RevitLinkInstance link)) {
                     Element opening = link.GetLinkDocument().GetElement(reference.LinkedElementId);
-                    if(opening is FamilyInstance famInst) {
+                    if((opening != null) && (opening is FamilyInstance famInst)) {
                         openingTasks.Add(new OpeningMepTaskIncoming(famInst, this, link.GetTransform()));
                     }
                 }
             }
             return openingTasks;
+        }
+
+        /// <summary>
+        /// Предлагает пользователю выбрать один экземпляр семейства задания на отверстие из связанных файлов, подгруженных в активный документ, и возвращает его выбор
+        /// </summary>
+        /// <returns>Выбранный пользователем элемент</returns>
+        /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException"/>
+        public OpeningMepTaskIncoming PickSingleOpeningTaskIncoming() {
+            ISelectionFilter filter = new SelectionFilterOpeningTasksIncoming(_document);
+            Reference reference = _uiDocument.Selection.PickObject(ObjectType.LinkedElement, filter, "Выберите задание на отверстие из связи и нажмите \"Готово\"");
+
+            if((reference != null) && (_document.GetElement(reference) is RevitLinkInstance link)) {
+                Element opening = link.GetLinkDocument().GetElement(reference.LinkedElementId);
+                if((opening != null) && (opening is FamilyInstance famInst)) {
+                    return new OpeningMepTaskIncoming(famInst, this, link.GetTransform());
+                } else {
+                    var dialog = GetMessageBoxService();
+                    dialog.Show(
+                        $"Выбранный элемент не является экземпляром семейства задания на отверстие",
+                        "Задания на отверстия",
+                        System.Windows.MessageBoxButton.OK,
+                        System.Windows.MessageBoxImage.Error,
+                        System.Windows.MessageBoxResult.OK);
+                    throw new OperationCanceledException();
+                }
+            } else {
+                var dialog = GetMessageBoxService();
+                dialog.Show(
+                    $"Не удалось определить выбранный элемент",
+                    "Задания на отверстия",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error,
+                    System.Windows.MessageBoxResult.OK);
+                throw new OperationCanceledException();
+            }
         }
 
         /// <summary>

@@ -39,15 +39,52 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
 
 
         /// <summary>
-        /// Размещение чистового отверстия
+        /// Размещение чистового отверстия по одному заданию на отверстие из связи
         /// </summary>
-        public void Place() {
+        public void PlaceBySingleTask() {
             Element host = _revitRepository.PickHostForRealOpening();
-            List<OpeningMepTaskIncoming> openingTasks = _revitRepository.PickOpeningTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToList();
+            OpeningMepTaskIncoming openingTask = _revitRepository.PickSingleOpeningTaskIncoming();
+
+            try {
+                if(openingTask.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())) {
+                    PlaceBySimpleAlgorithm(host, openingTask);
+                } else {
+                    _revitRepository.GetMessageBoxService().Show(
+                        "Выбранное задание на отверстие не пересекается c выбранной основой",
+                        "Задания на отверстия",
+                        System.Windows.MessageBoxButton.OK,
+                        System.Windows.MessageBoxImage.Error,
+                        System.Windows.MessageBoxResult.OK);
+                    throw new OperationCanceledException();
+                }
+            } catch(OpeningNotPlacedException e) {
+                IMessageBoxService dialog = _revitRepository.GetMessageBoxService();
+                dialog.Show(
+                    $"{e.Message}",
+                    "Задания на отверстия",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error,
+                    System.Windows.MessageBoxResult.OK);
+                throw new OperationCanceledException();
+            }
+        }
+
+        /// <summary>
+        /// Размещение чистового отверстия по одному или нескольким заданиям на отверстия из связи(ей)
+        /// </summary>
+        public void PlaceByManyTasks() {
+            Element host = _revitRepository.PickHostForRealOpening();
+            List<OpeningMepTaskIncoming> openingTasks = _revitRepository.PickManyOpeningTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToList();
 
             try {
                 if(openingTasks.Count == 0) {
-                    return;
+                    _revitRepository.GetMessageBoxService().Show(
+                        "Ни одно из выбранных заданий на отверстия не пересекается c выбранной основой",
+                        "Задания на отверстия",
+                        System.Windows.MessageBoxButton.OK,
+                        System.Windows.MessageBoxImage.Error,
+                        System.Windows.MessageBoxResult.OK);
+                    throw new OperationCanceledException();
                 } else if(openingTasks.Count == 1) {
                     var openingTask = openingTasks.First();
                     PlaceBySimpleAlgorithm(host, openingTask);
@@ -60,8 +97,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
                     $"{e.Message}",
                     "Задания на отверстия",
                     System.Windows.MessageBoxButton.OK,
-                    System.Windows.MessageBoxImage.Warning,
+                    System.Windows.MessageBoxImage.Error,
                     System.Windows.MessageBoxResult.OK);
+                throw new OperationCanceledException();
             }
         }
 

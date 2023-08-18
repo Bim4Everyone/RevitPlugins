@@ -1,7 +1,6 @@
 ﻿using System;
 
 using Autodesk.Revit.Attributes;
-using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -12,11 +11,11 @@ using RevitOpeningPlacement.Models.RealOpeningPlacement.Checkers;
 
 namespace RevitOpeningPlacement {
     /// <summary>
-    /// Команда для размещения одного чистового отверстия в АР/КР по одному полученному заданию на отверстия из связи ВИС
+    /// Команда для размещения одного чистового отверстия в АР/КР по одному или нескольким полученным заданиям на отверстия из связей ВИС
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-    public class PlaceOpeningRealCommand : BasePluginCommand {
-        public PlaceOpeningRealCommand() {
+    public class PlaceUnitedOpeningRealCommand : BasePluginCommand {
+        public PlaceUnitedOpeningRealCommand() {
             PluginName = "Размещение чистового отверстия";
         }
 
@@ -31,7 +30,7 @@ namespace RevitOpeningPlacement {
                 return;
             }
             var placer = new RealOpeningPlacer(revitRepository);
-            placer.PlaceBySingleTask();
+            placer.PlaceByManyTasks();
         }
 
 
