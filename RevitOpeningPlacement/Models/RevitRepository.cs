@@ -656,6 +656,26 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
+        /// Выбирает элементы из активного документа по Id
+        /// </summary>
+        /// <param name="elementIds">Коллекция Id элементов из активного документа, которые надо выбрать</param>
+        public void SetSelection(ICollection<ElementId> elementIds) {
+            if(elementIds != null) {
+                _uiDocument.Selection.SetElementIds(elementIds);
+            }
+        }
+
+        /// <summary>
+        /// Выбирает элемент из активного документа по Id
+        /// </summary>
+        /// <param name="elementIds">Id элемента из активного документа, который надо выбрать</param>
+        public void SetSelection(ElementId elementId) {
+            if(elementId != null) {
+                _uiDocument.Selection.SetElementIds(new ElementId[] { elementId });
+            }
+        }
+
+        /// <summary>
         /// Возвращает тип проема по названию семейства задания на отверстие
         /// </summary>
         /// <param name="familyName">Название семейства задания на отверстие</param>

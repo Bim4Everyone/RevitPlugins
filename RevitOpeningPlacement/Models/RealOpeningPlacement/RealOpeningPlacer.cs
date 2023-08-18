@@ -125,6 +125,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
                     var angleFinder = GetAngleFinder(openingTask);
                     _revitRepository.RotateElement(instance, point, angleFinder.GetAngle());
 
+                    _revitRepository.SetSelection(instance.Id);
+
                 } catch(Autodesk.Revit.Exceptions.ArgumentNullException exAutodeskNull) {
                     throw new OpeningNotPlacedException(exAutodeskNull.Message);
                 } catch(Autodesk.Revit.Exceptions.ArgumentException exAutodeskArg) {
