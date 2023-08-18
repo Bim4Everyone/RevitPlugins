@@ -7,6 +7,11 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
     /// Абстрактный класс для работы с округлением единиц длины Revit
     /// </summary>
     internal abstract class RoundValueGetter {
+        /// <summary>
+        /// Число знаков после запятой для округления
+        /// </summary>
+        private const int _digitsRound = 5;
+
         protected RoundValueGetter() { }
 
 
@@ -19,7 +24,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         /// <returns>Размер в футах, округленный до заданного количества миллиметров</returns>
         protected double RoundFeetToMillimeters(double ftValue, int mmRound) {
             var ftRound = mmRound > 0 ? GetFeetRound(mmRound) : GetFeetRound(1);
-            return Math.Round(ftValue / ftRound) * ftRound;
+            return Math.Round(ftValue / ftRound, MidpointRounding.AwayFromZero) * ftRound;
         }
 
         /// <summary>
@@ -31,7 +36,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         /// <returns>Размер в футах, округленный до заданного количества миллиметров</returns>
         protected double RoundToCeilingFeetToMillimeters(double ftValue, int mmRound) {
             var ftRound = mmRound > 0 ? GetFeetRound(mmRound) : GetFeetRound(1);
-            return Math.Ceiling(ftValue / ftRound) * ftRound;
+            return Math.Ceiling(Math.Round(ftValue / ftRound, _digitsRound, MidpointRounding.AwayFromZero)) * ftRound;
         }
 
         /// <summary>
@@ -43,7 +48,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         /// <returns>Размер в футах, округленный до заданного количества миллиметров</returns>
         protected double RoundToFloorFeetToMillimeters(double ftValue, int mmRound) {
             var ftRound = mmRound > 0 ? GetFeetRound(mmRound) : GetFeetRound(1);
-            return Math.Floor(ftValue / ftRound) * ftRound;
+            return Math.Floor(Math.Round(ftValue / ftRound, _digitsRound, MidpointRounding.AwayFromZero)) * ftRound;
         }
 
 
