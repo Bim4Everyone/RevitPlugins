@@ -12,6 +12,7 @@ using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitClashDetective.Models.Extensions;
 using RevitClashDetective.Models.FilterableValueProviders;
@@ -288,28 +289,47 @@ namespace RevitClashDetective.Models {
         }
 
         public void SelectAndShowElement(IEnumerable<Element> elements, View3D view = null) {
-            if(view == null) {
-                view = _view;
-            }
-            _uiDocument.ActiveView = view;
+            try {
 
-            _revitEventHandler.TransactAction = () => {
-                var bb = GetCommonBoundingBox(elements);
-                if(bb != null) {
-                    SetSectionBox(bb, view);
+                if(view == null) {
+                    view = _view;
                 }
+                _uiDocument.ActiveView = view;
 
-                if(elements.Where(item => item.IsFromDocument(_document)).Any()) {
-                    _uiDocument.Selection.SetElementIds(elements.Where(item => item.IsFromDocument(_document)).Select(item => item.Id).ToArray());
-                } else {
-                    var border = _view.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_SectionBox)).FirstOrDefault();
-                    if(border != null) {
-                        _uiDocument.Selection.SetElementIds(new[] { border });
+                _revitEventHandler.TransactAction = () => {
+                    var bb = GetCommonBoundingBox(elements);
+                    if(bb != null) {
+                        SetSectionBox(bb, view);
                     }
-                }
-            };
 
-            _revitEventHandler.Raise();
+                    if(elements.Where(item => item.IsFromDocument(_document)).Any()) {
+                        _uiDocument.Selection.SetElementIds(elements.Where(item => item.IsFromDocument(_document)).Select(item => item.Id).ToArray());
+                    } else {
+                        var border = _view.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_SectionBox)).FirstOrDefault();
+                        if(border != null) {
+                            _uiDocument.Selection.SetElementIds(new[] { border });
+                        }
+                    }
+                };
+
+                _revitEventHandler.Raise();
+            } catch(AccessViolationException) {
+                var dialog = GetPlatformService<IMessageBoxService>();
+                dialog.Show(
+                    $"Окно плагина было открыто в другом документе Revit, который был закрыт, нельзя показать элемент.",
+                    $"BIM",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error,
+                    System.Windows.MessageBoxResult.OK);
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                var dialog = GetPlatformService<IMessageBoxService>();
+                dialog.Show(
+                    $"Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент.",
+                    $"BIM",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error,
+                    System.Windows.MessageBoxResult.OK);
+            }
         }
 
         private BoundingBoxXYZ GetCommonBoundingBox(IEnumerable<Element> elements) {
