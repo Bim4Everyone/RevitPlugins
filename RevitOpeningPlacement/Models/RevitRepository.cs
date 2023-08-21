@@ -694,6 +694,7 @@ namespace RevitOpeningPlacement.Models {
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(RevitLinkInstance))
                 .Cast<RevitLinkInstance>()
+                .Where(link => RevitLinkType.IsLoaded(_document, link.GetTypeId()))
                 .GroupBy(inst => inst.GetLinkDocument().Title)
                 .Where(group => group.Count() > 1)
                 .Select(group => group.Key).ToList();
