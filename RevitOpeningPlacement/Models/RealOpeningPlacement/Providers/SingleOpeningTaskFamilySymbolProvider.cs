@@ -6,7 +6,7 @@ using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningPlacement.Providers {
     /// <summary>
-    /// Класс, предоставляющий типоразмер семейства чистового отверстия по заданию на отверстие
+    /// Класс, предоставляющий типоразмер семейства чистового отверстия по заданию на отверстие для размещения по одному заданию на отверстие
     /// </summary>
     internal class SingleOpeningTaskFamilySymbolProvider {
         private readonly RevitRepository _revitRepository;
@@ -14,7 +14,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement.Providers {
         private readonly OpeningMepTaskIncoming _openingMepTaskIncoming;
 
         /// <summary>
-        /// Конструктор класса, предоставляющего типоразмер семейства чистового отверстия по заданию на отверстие
+        /// Конструктор класса, предоставляющего типоразмер семейства чистового отверстия по заданию на отверстие для размещения по одному заданию на отверстие
         /// </summary>
         /// <param name="revitRepository">Репозиторий активного документа, в котором будет происходить размещение чистового семейства отверстия</param>
         /// <param name="host">Хост чистового отверстия - стена или перекрытие</param>

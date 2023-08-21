@@ -6,7 +6,7 @@ using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningPlacement.Providers {
     /// <summary>
-    /// Класс, предоставляющий <see cref="IParametersGetter"/> для чистового отверстия
+    /// Класс, предоставляющий <see cref="IParametersGetter"/> для чистового отверстия для размещения по одному заданию на отверстие
     /// </summary>
     internal class SingleOpeningTaskParameterGettersProvider {
         private readonly OpeningMepTaskIncoming _openingMepTaskIncoming;
@@ -14,7 +14,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement.Providers {
 
 
         /// <summary>
-        /// Конструктор класса, предоставляющего <see cref="IParametersGetter"/> для чистового отверстия
+        /// Конструктор класса, предоставляющего <see cref="IParametersGetter"/> для чистового отверстия для размещения по одному заданию на отверстие
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <param name="pointFinder">Провайдер точки вставки чистового отверстия</param>

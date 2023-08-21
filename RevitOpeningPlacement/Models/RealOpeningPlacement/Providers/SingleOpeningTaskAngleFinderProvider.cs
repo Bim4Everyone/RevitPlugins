@@ -7,7 +7,7 @@ using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningPlacement.Providers {
     /// <summary>
-    /// Класс, предоставляющий <see cref="IAngleFinder"/> для чистового отверстия
+    /// Класс, предоставляющий <see cref="IAngleFinder"/> для чистового отверстия для размещения по одному заданию на отверстие
     /// </summary>
     internal class SingleOpeningTaskAngleFinderProvider {
         private readonly OpeningMepTaskIncoming _openingMepTaskIncoming;
@@ -16,7 +16,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement.Providers {
         /// <summary>
         /// Конструктор класса, предоставляющего <see cref="IAngleFinder"/>
         /// </summary>
-        /// <param name="incomingTask">Входящее задание на отверстие</param> для чистового отверстия
+        /// <param name="incomingTask">Входящее задание на отверстие</param> для чистового отверстия для размещения по одному заданию на отверстие
         /// <exception cref="ArgumentNullException"/>
         public SingleOpeningTaskAngleFinderProvider(OpeningMepTaskIncoming incomingTask) {
             if(incomingTask is null) { throw new ArgumentNullException(nameof(incomingTask)); }

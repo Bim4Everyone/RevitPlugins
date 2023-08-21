@@ -6,14 +6,14 @@ using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningPlacement.Providers {
     /// <summary>
-    /// Класс, предоставляющий <see cref="IPointFinder"/> для чистового отверстия
+    /// Класс, предоставляющий <see cref="IPointFinder"/> для чистового отверстия для размещения по одному заданию на отверстие
     /// </summary>
     internal class SingleOpeningTaskPointFinderProvider {
         private readonly OpeningMepTaskIncoming _openingMepTaskIncoming;
 
 
         /// <summary>
-        /// Конструктор класса, предоставляющего <see cref="IPointFinder"/> для чистового отверстия
+        /// Конструктор класса, предоставляющего <see cref="IPointFinder"/> для чистового отверстия для размещения по одному заданию на отверстие
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <exception cref="ArgumentNullException"></exception>
