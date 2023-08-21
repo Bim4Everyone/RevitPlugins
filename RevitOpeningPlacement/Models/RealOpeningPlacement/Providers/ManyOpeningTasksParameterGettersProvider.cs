@@ -41,8 +41,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement.Providers {
         public IParametersGetter GetParametersGetter() {
             if(_host is Floor) {
                 return new ManyOpeningTasksInFloorParameterGetter(_incomingTasks);
-            } else if(_host is Wall) {
-                return new ManyOpeningTasksInWallParameterGetter(_incomingTasks, _pointFinder);
+            } else if(_host is Wall wall) {
+                return new ManyOpeningTasksInWallParameterGetter(wall, _incomingTasks, _pointFinder);
             } else {
                 throw new ArgumentException("Тип хоста отверстия не поддерживается");
             }
