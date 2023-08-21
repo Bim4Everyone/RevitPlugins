@@ -45,7 +45,7 @@ namespace RevitOpeningPlacement {
             if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
                 throw new OperationCanceledException();
             }
-            if(!CheckModel(revitRepository)) {
+            if(!ModelCorrect(revitRepository)) {
                 return;
             }
             var openingConfig = OpeningConfig.GetOpeningConfig(revitRepository.Doc);
@@ -62,7 +62,7 @@ namespace RevitOpeningPlacement {
             _duplicatedInstancesIds.Clear();
         }
 
-        private bool CheckModel(RevitRepository revitRepository) {
+        private bool ModelCorrect(RevitRepository revitRepository) {
             var checker = new Checkers(revitRepository);
             var errors = checker.GetErrorTexts();
             if(errors == null || errors.Count == 0) {

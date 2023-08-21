@@ -27,7 +27,7 @@ namespace RevitOpeningPlacement {
 
         public void ExecuteCommand(UIApplication uiApplication) {
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            if(!CheckModel(revitRepository)) {
+            if(!ModelCorrect(revitRepository)) {
                 return;
             }
             var placer = new RealOpeningPlacer(revitRepository);
@@ -35,7 +35,7 @@ namespace RevitOpeningPlacement {
         }
 
 
-        private bool CheckModel(RevitRepository revitRepository) {
+        private bool ModelCorrect(RevitRepository revitRepository) {
             var checker = new RealOpeningsChecker(revitRepository);
             var errors = checker.GetErrorTexts();
             if(errors == null || errors.Count == 0) {

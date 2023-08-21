@@ -685,6 +685,21 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
+        /// Возвращает коллекцию заголовков файлов Revit связей, которые дублируются.
+        /// </summary>
+        /// <returns>Список заголовков дублированных Revit-связей</returns>
+        public ICollection<string> GetDuplicatedLinksNames() {
+            return new FilteredElementCollector(_document)
+                .OfCategory(BuiltInCategory.OST_RvtLinks)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(RevitLinkInstance))
+                .Cast<RevitLinkInstance>()
+                .GroupBy(inst => inst.GetLinkDocument().Title)
+                .Where(group => group.Count() > 1)
+                .Select(group => group.Key).ToList();
+        }
+
+        /// <summary>
         /// Возвращает список экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит ("исходящие" задания).
         /// </summary>
         /// <returns>Список экземпляров семейств, названия семейств и типов которых заданы в соответствующих словарях

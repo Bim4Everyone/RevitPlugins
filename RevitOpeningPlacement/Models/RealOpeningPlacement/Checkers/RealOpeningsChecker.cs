@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
 
 namespace RevitOpeningPlacement.Models.RealOpeningPlacement.Checkers {
     /// <summary>
@@ -32,6 +33,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement.Checkers {
             foreach(OpeningType openingType in Enum.GetValues(typeof(OpeningType))) {
                 _checkers.Add(new FamilyAndTypeRealOpeningsChecker(_revitRepository, openingType));
             }
+            // проверка дублированных связей
+            _checkers.Add(new DuplicatedLinksChecker(_revitRepository));
         }
     }
 }

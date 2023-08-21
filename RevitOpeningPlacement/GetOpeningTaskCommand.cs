@@ -13,6 +13,7 @@ using dosymep.SimpleServices;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Models.Navigator.Checkers;
 using RevitOpeningPlacement.Models.OpeningUnion;
 using RevitOpeningPlacement.ViewModels.Navigator;
 using RevitOpeningPlacement.Views;
@@ -36,6 +37,10 @@ namespace RevitOpeningPlacement {
 
         public void ExecuteCommand(UIApplication uiApplication) {
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
+
+            if(!ModelCorrect(revitRepository)) {
+                return;
+            }
             GetOpeningsTask(uiApplication, revitRepository);
         }
 
@@ -132,6 +137,16 @@ namespace RevitOpeningPlacement {
             window.Show();
         }
 
+        private bool ModelCorrect(RevitRepository revitRepository) {
+            var checker = new NavigatorCheckers(revitRepository);
+            var errors = checker.GetErrorTexts();
+            if(errors == null || errors.Count == 0) {
+                return true;
+            }
+
+            TaskDialog.Show("BIM", $"{string.Join($"{Environment.NewLine}", errors)}");
+            return false;
+        }
 
 
         /// <summary>
