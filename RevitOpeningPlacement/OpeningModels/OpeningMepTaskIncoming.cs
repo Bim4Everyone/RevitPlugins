@@ -197,6 +197,10 @@ namespace RevitOpeningPlacement.OpeningModels {
             }
         }
 
+        /// <summary>
+        /// Возвращает BBox в координатах активного документа-получателя заданий на отверстия, в который подгружены связи с заданиями
+        /// </summary>
+        /// <returns></returns>
         public BoundingBoxXYZ GetTransformedBBoxXYZ() {
             return _familyInstance.GetBoundingBox().TransformBoundingBox(Transform);
         }
