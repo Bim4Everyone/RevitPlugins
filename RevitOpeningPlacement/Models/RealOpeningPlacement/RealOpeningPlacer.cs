@@ -58,13 +58,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
                     throw new OperationCanceledException();
                 }
             } catch(OpeningNotPlacedException e) {
-                IMessageBoxService dialog = _revitRepository.GetMessageBoxService();
-                dialog.Show(
-                    $"{e.Message}",
-                    "Задания на отверстия",
-                    System.Windows.MessageBoxButton.OK,
-                    System.Windows.MessageBoxImage.Error,
-                    System.Windows.MessageBoxResult.OK);
+                ShowErrorMessage(e.Message);
                 throw new OperationCanceledException();
             }
         }
@@ -85,30 +79,35 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
                         System.Windows.MessageBoxImage.Error,
                         System.Windows.MessageBoxResult.OK);
                     throw new OperationCanceledException();
-                } else if(openingTasks.Count == 1) {
-                    var openingTask = openingTasks.First();
-                    PlaceBySimpleAlgorithm(host, openingTask);
                 } else {
                     PlaceByComplexAlgorithm(host, openingTasks);
                 }
             } catch(OpeningNotPlacedException e) {
-                IMessageBoxService dialog = _revitRepository.GetMessageBoxService();
-                dialog.Show(
-                    $"{e.Message}",
-                    "Задания на отверстия",
-                    System.Windows.MessageBoxButton.OK,
-                    System.Windows.MessageBoxImage.Error,
-                    System.Windows.MessageBoxResult.OK);
+                ShowErrorMessage(e.Message);
                 throw new OperationCanceledException();
             }
         }
 
 
         /// <summary>
-        /// Размещает экземпляр семейства чистового отверстия, принимая расположение по точке вставки задания на отверстия
+        /// Выводит сообщение об ошибке пользователю
         /// </summary>
-        /// <param name="host"></param>
-        /// <param name="openingTask"></param>
+        /// <param name="message">Сообщение об ошибке</param>
+        private void ShowErrorMessage(string message) {
+            IMessageBoxService dialog = _revitRepository.GetMessageBoxService();
+            dialog.Show(
+                $"{message}",
+                "Задания на отверстия",
+                System.Windows.MessageBoxButton.OK,
+                System.Windows.MessageBoxImage.Error,
+                System.Windows.MessageBoxResult.OK);
+        }
+
+        /// <summary>
+        /// Размещает экземпляр семейства чистового отверстия, принимая точку вставки и параметры габаритов из задания на отверстия
+        /// </summary>
+        /// <param name="host">Основа для чистового отверстия - стена или перекрытие</param>
+        /// <param name="openingTask">Входящее задание на отверстие</param>
         /// <exception cref="OpeningNotPlacedException"/>
         private void PlaceBySimpleAlgorithm(Element host, OpeningMepTaskIncoming openingTask) {
             using(var transaction = _revitRepository.GetTransaction("Размещение чистового отверстия")) {
@@ -141,18 +140,58 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
             }
         }
 
+        /// <summary>
+        /// Размещает прямоугольное чистовое отверстие на месте одного нескольких заданий на отверстия
+        /// </summary>
+        /// <param name="host">Основа для чистового отверстия</param>
+        /// <param name="openingTasks">Входящие задания на отверстия</param>
+        /// <exception cref="OpeningNotPlacedException"></exception>
         private void PlaceByComplexAlgorithm(Element host, ICollection<OpeningMepTaskIncoming> openingTasks) {
+            using(var transaction = _revitRepository.GetTransaction("Размещение чистового отверстия")) {
+                try {
+                    var symbol = GetFamilySymbol(host);
+                    var pointFinder = GetPointFinder(host, openingTasks);
+                    var point = pointFinder.GetPoint();
 
+                    var instance = _revitRepository.CreateInstance(point, symbol, host) ?? throw new OpeningNotPlacedException("Не удалось создать экземпляр семейства");
+
+                    var parameterGetter = GetParameterGetter(host, openingTasks, pointFinder);
+                    SetParamValues(instance, parameterGetter);
+
+                    _revitRepository.SetSelection(instance.Id);
+
+                } catch(Autodesk.Revit.Exceptions.ArgumentNullException exAutodeskNull) {
+                    throw new OpeningNotPlacedException(exAutodeskNull.Message);
+                } catch(Autodesk.Revit.Exceptions.ArgumentException exAutodeskArg) {
+                    throw new OpeningNotPlacedException(exAutodeskArg.Message);
+                } catch(ArgumentNullException exFrameworkNull) {
+                    throw new OpeningNotPlacedException(exFrameworkNull.Message);
+                } catch(ArgumentException exFrameworkArg) {
+                    throw new OpeningNotPlacedException(exFrameworkArg.Message);
+                }
+
+                transaction.Commit();
+            }
         }
 
         /// <summary>
-        /// Возвращает типоразмер семейства чистового отверстия
+        /// Возвращает типоразмер семейства чистового отверстия на основе хоста и входящего задания на отверстие
         /// </summary>
         /// <param name="host">Хост чистового отверстия - стена или перекрытие</param>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <returns></returns>
         private FamilySymbol GetFamilySymbol(Element host, OpeningMepTaskIncoming incomingTask) {
             var provider = new SingleOpeningTaskFamilySymbolProvider(_revitRepository, host, incomingTask);
+            return provider.GetFamilySymbol();
+        }
+
+        /// <summary>
+        /// Возвращает типоразмер семейства чистового отверстия на основе хоста
+        /// </summary>
+        /// <param name="host">Хост чистового отверстия - стена или перекрытие</param>
+        /// <returns></returns>
+        private FamilySymbol GetFamilySymbol(Element host) {
+            var provider = new FamilySymbolProvider(_revitRepository, host);
             return provider.GetFamilySymbol();
         }
 
@@ -172,10 +211,10 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
         }
 
         /// <summary>
-        /// Возвращает класс, предоставляющий параметры экземпляра чистового отверстия
+        /// Возвращает интерфейс, предоставляющий параметры экземпляра чистового отверстия для размещения по одному входящему заданию
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
-        /// <param name="pointFinder">Провайдер точки вставки чистового отврестия</param>
+        /// <param name="pointFinder">Провайдер точки вставки чистового отверстия</param>
         /// <returns></returns>
         private IParametersGetter GetParameterGetter(OpeningMepTaskIncoming incomingTask, IPointFinder pointFinder) {
             var provider = new SingleOpeningTaskParameterGettersProvider(incomingTask, pointFinder);
@@ -183,7 +222,18 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
         }
 
         /// <summary>
-        /// Возвращает угол поворота чистового отверстия
+        /// Возвращает интерфейс, предоставляющий параметры экземпляра чистового отверстия для размещения по нескольким входящим заданиям
+        /// </summary>
+        /// <param name="host">Хост чистового отверстия - стена или перекрытие</param>
+        /// <param name="incomingTasks">Входящие задания на отверстия</param>
+        /// <param name="pointFinder">Провайдер точки вставки чистового отверстия</param>
+        /// <returns></returns>
+        private IParametersGetter GetParameterGetter(Element host, ICollection<OpeningMepTaskIncoming> incomingTasks, IPointFinder pointFinder) {
+            return new ManyOpeningTasksParameterGettersProvider(host, incomingTasks, pointFinder).GetParametersGetter();
+        }
+
+        /// <summary>
+        /// Возвращает интерфейс, предоставляющий угол поворота чистового отверстия для размещения по одному входящему заданию
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <returns></returns>
@@ -193,12 +243,24 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
         }
 
         /// <summary>
-        /// Возвращает точку вставки
+        /// Возвращает интерфейс, предоставлящий точку вставки
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <returns></returns>
         private IPointFinder GetPointFinder(OpeningMepTaskIncoming incomingTask) {
             var provider = new SingleOpeningTaskPointFinderProvider(incomingTask);
+            return provider.GetPointFinder();
+        }
+
+
+        /// <summary>
+        /// Возвращает интерфейс, предоставляющий точку вставки чистового отверстия для размещения по нескольким входящим заданиям
+        /// </summary>
+        /// <param name="host">Хост чистового отверстия - стена или перекрытие</param>
+        /// <param name="incomingTasks">Входящие задания на отверстия</param>
+        /// <returns></returns>
+        private IPointFinder GetPointFinder(Element host, ICollection<OpeningMepTaskIncoming> incomingTasks) {
+            var provider = new ManyOpeningTasksPointFinderProvider(host, incomingTasks);
             return provider.GetPointFinder();
         }
     }
