@@ -36,24 +36,6 @@ namespace RevitPylonDocumentation.Models {
                 .OfType<ViewSheet>()
                 .ToList();
 
-
-
-        public List<View> AllViews => new FilteredElementCollector(Document)
-                .OfClass(typeof(View))
-                .WhereElementIsNotElementType()
-                .OfType<View>()
-                .Where(view => !view.IsTemplate)
-                .ToList();
-
-
-
-
-
-
-
-
-
-
         /// <summary>
         /// Возвращает список всех сечений, имеющихся в проекте
         /// </summary>
@@ -118,7 +100,7 @@ namespace RevitPylonDocumentation.Models {
         public List<string> HostProjectSections { get; set; } = new List<string>();
 
         /// <summary>
-        /// Получает информацию о пилонах, размещенных в проекте
+        /// Получает информацию о всех пилонах, размещенных в проекте
         /// </summary>
         public void GetHostData(MainViewModel mainViewModel) {
 
@@ -146,7 +128,7 @@ namespace RevitPylonDocumentation.Models {
         }
 
         /// <summary>
-        /// Получает информацию о выбранном пилоне
+        /// Получает информацию толко о выбранном пилоне
         /// </summary>
         public void GetHostData(MainViewModel mainViewModel, IList<Element> elems) {
 

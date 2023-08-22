@@ -55,6 +55,10 @@ namespace RevitPylonDocumentation.Models {
             projectSettings.DispatcherGroupingFirstTemp = settings.DispatcherGroupingFirst;
             projectSettings.DispatcherGroupingSecond = settings.DispatcherGroupingSecond;
             projectSettings.DispatcherGroupingSecondTemp = settings.DispatcherGroupingSecond;
+            projectSettings.PylonLengthParamName = settings.PylonLengthParamName;
+            projectSettings.PylonLengthParamNameTemp = settings.PylonLengthParamName;
+            projectSettings.PylonWidthParamName = settings.PylonWidthParamName;
+            projectSettings.PylonWidthParamNameTemp = settings.PylonWidthParamName;
 
             projectSettings.SheetSize = settings.SheetSize;
             projectSettings.SheetSizeTemp = settings.SheetSize;
@@ -202,6 +206,9 @@ namespace RevitPylonDocumentation.Models {
 
             settings.LegendName = projectSettings.LegendName;
 
+            settings.PylonLengthParamName = projectSettings.PylonLengthParamName;
+            settings.PylonWidthParamName = projectSettings.PylonWidthParamName;
+
             settings.GeneralViewPrefix = viewSectionSettings.GeneralViewPrefix;
             settings.GeneralViewSuffix = viewSectionSettings.GeneralViewSuffix;
             settings.GeneralViewPerpendicularPrefix = viewSectionSettings.GeneralViewPerpendicularPrefix;
@@ -282,6 +289,8 @@ namespace RevitPylonDocumentation.Models {
         public string TypicalPylonFilterParameter { get; set; }
         public string TypicalPylonFilterValue { get; set; }
         public string LegendName { get; set; }
+        public string PylonLengthParamName { get; set; }
+        public string PylonWidthParamName { get; set; }
         public string GeneralViewPrefix { get; set; }
         public string GeneralViewSuffix { get; set; }
         public string GeneralViewPerpendicularPrefix { get; set; }

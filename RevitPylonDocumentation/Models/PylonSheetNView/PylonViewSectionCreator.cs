@@ -47,7 +47,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             XYZ midlePoint = null;
             XYZ hostVector = null;
 
-            // Заполняем нужные для объекта Transform поля
+            // Заполняем нужные поля для объекта Transform
             if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
 
             // Формируем данные для объекта Transform
@@ -320,8 +320,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 hostVector = Transform.CreateRotation(XYZ.BasisZ, rotation).OfVector(XYZ.BasisX);
 
                 FamilySymbol hostSymbol = column.Symbol;
-                hostLength = hostSymbol.LookupParameter("ADSK_Размер_Ширина").AsDouble();
-                hostWidth = hostSymbol.LookupParameter("ADSK_Размер_Высота").AsDouble();
+                hostLength = hostSymbol.LookupParameter(ViewModel.ProjectSettings.PylonLengthParamName).AsDouble();
+                hostWidth = hostSymbol.LookupParameter(ViewModel.ProjectSettings.PylonWidthParamName).AsDouble();
 
             } else if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_Walls) {
                 Wall wall = elemForWork as Wall;

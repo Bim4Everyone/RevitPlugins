@@ -128,14 +128,14 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             // Рассчитываем и задаем корректную точку вставки спецификации системных деталей пилона
             XYZ newCenter = new XYZ(
                     0,
-                    UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2,
+                    SheetInfo.TitleBlockHeight / 2 + SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2,
                     0);
 
             if(SheetInfo.IFCPartsSchedule.ViewportElement is null) {
 
                 newCenter = new XYZ(
                     -UnitUtilsHelper.ConvertToInternalValue(2.9) - SheetInfo.SystemPartsSchedule.ViewportHalfWidth * 2,
-                    UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2,
+                    SheetInfo.TitleBlockHeight / 2 + SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2,
                     0);
             }
 
@@ -169,14 +169,14 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             // Рассчитываем и задаем корректную точку вставки спецификации системных деталей пилона
             XYZ newCenter = new XYZ(
                     0,
-                    UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.IFCPartsSchedule.ViewportHalfHeight * 2,
+                    SheetInfo.TitleBlockHeight / 2 + SheetInfo.IFCPartsSchedule.ViewportHalfHeight * 2,
                     0);
 
             if(SheetInfo.SystemPartsSchedule.ViewportElement is null) {
 
                 newCenter = new XYZ(
                     -UnitUtilsHelper.ConvertToInternalValue(2.9) - SheetInfo.IFCPartsSchedule.ViewportHalfWidth * 2,
-                    UnitUtilsHelper.ConvertToInternalValue(120) + SheetInfo.IFCPartsSchedule.ViewportHalfHeight * 2,
+                    SheetInfo.TitleBlockHeight / 2 + SheetInfo.IFCPartsSchedule.ViewportHalfHeight * 2,
                     0);
             }
 

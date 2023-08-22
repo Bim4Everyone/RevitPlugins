@@ -20,23 +20,25 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
         public MainViewModel ViewModel { get; set; }
 
-
-        private string _rebarSchedulePrefixTemp = "Пилон ";
+        // Префиксы и суффиксы для поиска и новых спек
+        private string _rebarSchedulePrefixTemp = "КЖ..._СА";
         private string _rebarScheduleSuffixTemp = "";
-        private string _materialSchedulePrefixTemp = "!СМ_Пилон ";
+        private string _materialSchedulePrefixTemp = "КЖ..._СМ_";
         private string _materialScheduleSuffixTemp = "";
-        private string _systemPartsSchedulePrefixTemp = "!ВД_СИС_";
-        private string _systemPartsScheduleSuffixTemp = "";
-        private string _IFCPartsSchedulePrefixTemp = "!ВД_IFC_";
-        private string _IFCPartsScheduleSuffixTemp = "";
+        private string _systemPartsSchedulePrefixTemp = "КЖ..._ВД_";
+        private string _systemPartsScheduleSuffixTemp = "_Системная";
+        private string _IFCPartsSchedulePrefixTemp = "КЖ..._ВД_";
+        private string _IFCPartsScheduleSuffixTemp = "_IFC";
 
-        private string _rebarScheduleNameTemp = "!СА_Базовая";
-        private string _materialScheduleNameTemp = "!СМ";
-        private string _systemPartsScheduleNameTemp = "!ВД_СИС";
-        private string _IFCPartsScheduleNameTemp = "!ВД_IFC";
+        // Названия эталонных спек
+        private string _rebarScheduleNameTemp = "(КЖ...)_СА_Базовая_(Марка и/или арматурная группа)";
+        private string _materialScheduleNameTemp = "(КЖ...)_СМ_(Марка)";
+        private string _systemPartsScheduleNameTemp = "(КЖ...)_ВД_(Марка и/или арматурная группа)_Системная";
+        private string _IFCPartsScheduleNameTemp = "(КЖ...)_ВД_(Марка и/или арматурная группа)_IFC";
 
+        // Заполнение параметров диспетчера
         private string _rebarScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
-        private string _rebarScheduleDisp2Temp = "!СА_Пилоны";
+        private string _rebarScheduleDisp2Temp = "СА_Пилоны";
         private string _materialScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
         private string _materialScheduleDisp2Temp = "СМ_Пилоны";
         private string _systemPartsScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
@@ -44,11 +46,12 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _IFCPartsScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
         private string _IFCPartsScheduleDisp2Temp = "ВД_IFC_Пилоны";
 
+        // Фильтрация спек
         private ObservableCollection<ScheduleFilterParamHelper> _paramsForScheduleFiltersTemp = new ObservableCollection<ScheduleFilterParamHelper>() {
             new ScheduleFilterParamHelper("обр_ФОП_Форма_номер", ""),
             new ScheduleFilterParamHelper("обр_ФОП_Раздел проекта", "обр_ФОП_Раздел проекта"),
-            new ScheduleFilterParamHelper("обр_Метка основы_универсальная", "Марка"),
-            new ScheduleFilterParamHelper("обр_ФОП_Орг. уровень", "обр_ФОП_Орг. уровень")
+            new ScheduleFilterParamHelper("обр_ФОП_Орг. уровень", "обр_ФОП_Орг. уровень"),
+            new ScheduleFilterParamHelper("обр_Метка основы_универсальная", "Марка")
         };
 
 

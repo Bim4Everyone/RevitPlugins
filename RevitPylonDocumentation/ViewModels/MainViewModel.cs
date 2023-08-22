@@ -100,61 +100,7 @@ namespace RevitPylonDocumentation.ViewModels {
 
             SelectAllFuncInGUICommand = RelayCommand.Create(SelectAllFuncInGUI);
             UnselectAllFuncInGUICommand = RelayCommand.Create(UnselectAllFuncInGUI);
-
-
-
-
-            //ICollection<ElementId> selectedIds = _revitRepository.ActiveUIDocument.Selection.GetElementIds();
-            //List<ElementId> selected = new List<ElementId>(selectedIds);
-
-            //ReferenceArray referenceArrayNew = new ReferenceArray();
-            //List<Line> lines = new List<Line>();
-
-
-
-
-            //Options options = new Options();
-            //options.ComputeReferences = true;
-            //options.DetailLevel = ViewDetailLevel.Fine;
-
-
-            //FamilyInstance elem = _revitRepository.Document.GetElement(selected[0]) as FamilyInstance;
-
-            //foreach(ElementId id in elem.GetSubComponentIds()) {
-
-            //    Element element = _revitRepository.Document.GetElement(id) as Element;
-            //    referenceArrayNew.Append(new Reference(element));
-
-            //}
-
-
-
-            //Line line1 = Line.CreateBound(new XYZ(), new XYZ(0, 1, 0));
-
-
-
-            //using(Transaction transaction = _revitRepository.Document.StartTransaction("Документатор пилонов")) {
-
-            //    TaskDialog.Show("ghj", referenceArrayNew.Size.ToString());
-
-
-            //    Dimension dimension = _revitRepository.Document.Create.NewDimension(_revitRepository.Document.ActiveView, line1, referenceArrayNew);
-
-            //    TaskDialog.Show("Id", dimension.Id.ToString());
-
-
-
-            //    transaction.Commit();
-            //}
         }
-
-
-
-
-
-
-
-
 
 
 
@@ -173,10 +119,21 @@ namespace RevitPylonDocumentation.ViewModels {
         public ICommand SelectAllFuncInGUICommand { get; }
         public ICommand UnselectAllFuncInGUICommand { get; }
 
-
+        /// <summary>
+        /// Настройки выбора пользователя (с какими компонентами должен работать плагин) с предыдущего сеанса
+        /// </summary>
         public UserSelectionSettings SelectionSettings { get; set; }
+        /// <summary>
+        /// Настройки параметров проекта с предыдущего сеанса
+        /// </summary>
         public UserProjectSettings ProjectSettings { get; set; }
+        /// <summary>
+        /// Настройки параметров и правил создания разрезов с предыдущего сеанса
+        /// </summary>
         public UserViewSectionSettings ViewSectionSettings { get; set; }
+        /// <summary>
+        /// Настройки параметров и правил создания спек с предыдущего сеанса
+        /// </summary>
         public UserSchedulesSettings SchedulesSettings { get; set; }
 
 

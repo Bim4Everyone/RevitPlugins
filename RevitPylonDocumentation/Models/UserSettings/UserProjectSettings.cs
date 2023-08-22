@@ -11,6 +11,7 @@ using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
+using RevitPylonDocumentation.Models.PylonSheetNView;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.UserSettings {
@@ -31,6 +32,9 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _typicalPylonFilterValueTemp = "на 1 шт.";
 
         private string _legendNameTemp = "Указания для пилонов";
+
+        private string _pylonLengthParamNameTemp = "ФОП_РАЗМ_Длина";
+        private string _pylonWidthParamNameTemp = "ФОП_РАЗМ_Ширина";
 
 
         public UserProjectSettings(MainViewModel mainViewModel, RevitRepository repository) {
@@ -116,6 +120,17 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             set => RaiseAndSetIfChanged(ref _legendNameTemp, value);
         }
 
+        public string PylonLengthParamName { get; set; }
+        public string PylonLengthParamNameTemp {
+            get => _pylonLengthParamNameTemp;
+            set => RaiseAndSetIfChanged(ref _pylonLengthParamNameTemp, value);
+        }
+
+        public string PylonWidthParamName { get; set; }
+        public string PylonWidthParamNameTemp {
+            get => _pylonWidthParamNameTemp;
+            set => RaiseAndSetIfChanged(ref _pylonWidthParamNameTemp, value);
+        }
 
         public void ApplyProjectSettings() {
 
@@ -135,6 +150,9 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             TypicalPylonFilterValue = TypicalPylonFilterValueTemp;
 
             LegendName = LegendNameTemp;
+
+            PylonLengthParamName = PylonLengthParamNameTemp;
+            PylonWidthParamName = PylonWidthParamNameTemp;
         }
 
         public void CheckProjectSettings() {
@@ -179,6 +197,27 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
                 // Удаляем созданный лист
                 Repository.Document.Delete(viewSheet.Id);
+                transaction.RollBack();
+            }
+
+
+            // Перебираем пилоны, которые найдены в проекте для работы и проверяем у НесКлн параметры сечения
+            foreach(PylonSheetInfo sheetInfo in Repository.HostsInfo) {
+
+                Element pylon = sheetInfo.HostElems.FirstOrDefault();
+                if(pylon?.Category.GetBuiltInCategory() != BuiltInCategory.OST_StructuralColumns) { continue; }
+
+                FamilySymbol pylonType = Repository.Document.GetElement(pylon?.GetTypeId()) as FamilySymbol;
+
+                if(pylonType?.LookupParameter(PylonLengthParamName) is null) {
+                    ViewModel.ErrorText = "Наименование параметра длины сечения пилона некорректно";
+                    break;
+                }
+
+                if(pylonType?.LookupParameter(PylonWidthParamName) is null) {
+                    ViewModel.ErrorText = "Наименование параметра ширины сечения пилона некорректно";
+                    break;
+                }
             }
         }
     }

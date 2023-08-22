@@ -16,8 +16,8 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _generalViewPrefixTemp = "";
         private string _generalViewSuffixTemp = "";
         private string _generalViewPerpendicularPrefixTemp = "Пилон ";
-        private string _generalViewPerpendicularSuffixTemp = "_Перпендикулярный";
-        private string _generalViewTemplateNameTemp = "КЖ0.2_пилоны_орг.ур.-2";
+        private string _generalViewPerpendicularSuffixTemp = "_Боковой";
+        private string _generalViewTemplateNameTemp = "!Новый РАЗРЕЗ";
         private string _generalViewXOffsetTemp = "200";
         private string _generalViewYTopOffsetTemp = "2300";
         private string _generalViewYBottomOffsetTemp = "200";
@@ -28,7 +28,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _transverseViewSecondSuffixTemp = "_Сеч.2-2";
         private string _transverseViewThirdPrefixTemp = "";
         private string _transverseViewThirdSuffixTemp = "_Сеч.3-3";
-        private string _transverseViewTemplateNameTemp = "";
+        private string _transverseViewTemplateNameTemp = "!Новый РАЗРЕЗ";
         private string _transverseViewXOffsetTemp = "200";
         private string _transverseViewYOffsetTemp = "200";
 
