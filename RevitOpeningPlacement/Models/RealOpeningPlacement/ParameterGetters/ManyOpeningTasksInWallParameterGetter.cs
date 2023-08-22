@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit.Geometry;
 
+using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
@@ -37,31 +38,132 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement.ParameterGetters {
 
 
         public IEnumerable<ParameterValuePair> GetParamValues() {
-            // используется упрощенный алгоритм для получения ширины и высоты из бокса, т.к. большинство стен в проектах прямолинейные и их оси параллельны OX и OY
-            var box = GetUnitedBox(_incomingTasks);
-            double zOffset = Math.Abs(box.Min.Z - _pointFinder.GetPoint().Z);
-            var height = box.Max.Z - box.Min.Z + zOffset;
-
-            // вектор нормали к поверхности стены
-            var orientation = _wall.Orientation;
-            // AngleTo возвращает значение от 0 до Pi
-            var angleToX = XYZ.BasisX.AngleTo(orientation);
-            var angleToY = XYZ.BasisY.AngleTo(orientation);
-            // Ширину брать из координаты Y бокса, если угол между ориентацией стены и осью ОХ в интервалах [0; pi/4] или [3p/4; pi]:
-            // ((0 <= angleToX) && (angleToX <= pi/4)) || ((3pi/4 <= angleToX) && (angleToX <= pi))
-            var width = (((0 <= angleToX) && (angleToX <= (Math.PI / 4)))
-                || (((3 * Math.PI / 4) <= angleToX) && (angleToX <= Math.PI)))
-                ? (box.Max.Y - box.Min.Y)
-                : (box.Max.X - box.Min.X);
+            var height = GetHeight(_incomingTasks);
+            var width = GetWidth(_wall, _incomingTasks);
 
             // габариты отверстия
             yield return new DoubleParameterGetter(RealOpeningPlacer.RealOpeningHeight, new DimensionValueGetter(height)).GetParamValue();
             yield return new DoubleParameterGetter(RealOpeningPlacer.RealOpeningWidth, new DimensionValueGetter(width)).GetParamValue();
         }
 
-
+        /// <summary>
+        /// Возвращает объединенный бокс по входящим заданиям на отверстия
+        /// </summary>
+        /// <param name="incomingTasks"></param>
+        /// <returns></returns>
         private BoundingBoxXYZ GetUnitedBox(ICollection<OpeningMepTaskIncoming> incomingTasks) {
             return incomingTasks.Select(task => task.GetTransformedBBoxXYZ()).ToList().CreateUnitedBoundingBox();
+        }
+
+        /// <summary>
+        /// Возвращает высоту чистового отверстия в футах
+        /// </summary>
+        /// <param name="incomingTasks">Коллекция входящих заданий на отверстия</param>
+        /// <returns></returns>
+        private double GetHeight(ICollection<OpeningMepTaskIncoming> incomingTasks) {
+            var box = GetUnitedBox(incomingTasks);
+            double zOffset = Math.Abs(box.Min.Z - _pointFinder.GetPoint().Z);
+            var height = box.Max.Z - box.Min.Z + zOffset;
+            return height;
+        }
+
+        /// <summary>
+        /// Возвращает ширину чистового отверстия в стене в футах
+        /// </summary>
+        /// <param name="wall">Стена для размещения чистового отверстия</param>
+        /// <param name="incomingTasks">Коллекция входящих заданий на отверстия</param>
+        /// <returns></returns>
+        private double GetWidth(Wall wall, ICollection<OpeningMepTaskIncoming> incomingTasks) {
+            var orientation = wall.Orientation;
+            var box = GetUnitedBox(incomingTasks);
+
+            if((wall.Location as LocationCurve).Curve is Line line) {
+                return GetWidthByPointProjections(line, incomingTasks);
+
+            } else {
+                return GetWidthByBoxAndOrientation(orientation, box);
+            }
+        }
+
+        /// <summary>
+        /// Возвращает ширину чистового отверстия в футах на основе максимального расстояния между вспомогательными точками, 
+        /// определяющими габариты заданий на отверстия в горизонтальной плоскости.
+        /// </summary>
+        /// <param name="line">Ось стены</param>
+        /// <param name="incomingTasks">Входящие задания на отверстия</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException">Исключение, если в коллекции входящих заданий на отверстия меньше 1 элемента</exception>
+        private double GetWidthByPointProjections(Line line, ICollection<OpeningMepTaskIncoming> incomingTasks) {
+            if(incomingTasks.Count < 1) { throw new ArgumentException(nameof(incomingTasks)); }
+
+            List<XYZ> taskSidePoints = new List<XYZ>();
+            foreach(var task in incomingTasks) {
+                double openingWidth = GetOpeningWidth(task);
+                XYZ center = task.GetSolid().ComputeCentroid();
+
+                XYZ forwardOffset = center + line.Direction * (openingWidth / 2);
+                XYZ forwardProjectedOffset = GetProjectionOfPointOntoLine(line, forwardOffset);
+                taskSidePoints.Add(forwardProjectedOffset);
+
+                XYZ backwardOffset = center - line.Direction * (openingWidth / 2);
+                XYZ backwardProjectedOffset = GetProjectionOfPointOntoLine(line, backwardOffset);
+                taskSidePoints.Add(backwardProjectedOffset);
+            }
+            XYZ lineProjectedStart = line.GetEndPoint(0).ProjectOnXoY();
+            XYZ[] orderedPoints = taskSidePoints.OrderBy(point => point.DistanceTo(lineProjectedStart)).ToArray();
+            var nearestToStartPoint = orderedPoints.First();
+            var farthestToStartPoint = orderedPoints.Last();
+            return nearestToStartPoint.DistanceTo(farthestToStartPoint);
+        }
+
+        /// <summary>
+        /// Получает ширину чистового отверстия в футах из размеров бокса, ограничивающего задания на отверстия.
+        /// Размеры бокса берутся в горизонтальной плоскости на основе вектора нормали к стене
+        /// </summary>
+        /// <param name="wallOrientation">Вектор нормали к стене</param>
+        /// <param name="unitedBox">Объединенный бокс входящих заданий на отверстия</param>
+        /// <returns></returns>
+        private double GetWidthByBoxAndOrientation(XYZ wallOrientation, BoundingBoxXYZ unitedBox) {
+            // вектор нормали к поверхности стены
+            // AngleTo возвращает значение от 0 до Pi
+            var angleToX = XYZ.BasisX.AngleTo(wallOrientation);
+            // Ширину брать по длине бокса по оси ОY,
+            // если угол между ориентацией стены и осью ОХ документа в интервалах [0; pi/4] или [3p/4; pi],
+            // иначе брать длину бокса по оси OX:
+            var width = (((0 <= angleToX) && (angleToX <= (Math.PI / 4)))
+                || (((3 * Math.PI / 4) <= angleToX) && (angleToX <= Math.PI)))
+                ? (unitedBox.Max.Y - unitedBox.Min.Y)
+                : (unitedBox.Max.X - unitedBox.Min.X);
+            return width;
+        }
+
+        /// <summary>
+        /// Получает проекцию точки на линию в плоскости XOY и возвращает это новую точку
+        /// </summary>
+        /// <param name="line">Линия, на проекцию которой в плоскости XOY нужно спроецировать точку</param>
+        /// <param name="point">Точка для проецирования</param>
+        /// <returns>Точка в плоскости XOY, спроецированная на проекцию заданной линии по XOY</returns>
+        private XYZ GetProjectionOfPointOntoLine(Line line, XYZ point) {
+            XYZ lineDirectionXoY = line.Direction.ProjectOnXoY().Normalize();
+            XYZ pointXoY = point.ProjectOnXoY();
+
+            XYZ lineProjectedStart = line.GetEndPoint(0).ProjectOnXoY();
+            XYZ startToPointVector = pointXoY - lineProjectedStart;
+            double angle = lineDirectionXoY.AngleTo(startToPointVector);
+
+            double distance = lineProjectedStart.DistanceTo(pointXoY);
+
+            XYZ projectedPoint = lineProjectedStart + Math.Cos(angle) * distance * lineDirectionXoY;
+            return projectedPoint;
+        }
+
+        /// <summary>
+        /// Возвращает ширину задания на отверстие
+        /// </summary>
+        /// <param name="opening"></param>
+        /// <returns></returns>
+        private double GetOpeningWidth(OpeningMepTaskIncoming opening) {
+            return (opening.Width > 0) ? opening.Width : opening.Diameter;
         }
     }
 }
