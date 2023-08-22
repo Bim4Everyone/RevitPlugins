@@ -19,6 +19,7 @@ using RevitClashDetective.Models.Handlers;
 
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
+using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
 using RevitOpeningPlacement.Models.RevitViews;
 using RevitOpeningPlacement.Models.Selection;
 using RevitOpeningPlacement.OpeningModels;
@@ -147,6 +148,7 @@ namespace RevitOpeningPlacement.Models {
         public const string OpeningMepSystem = "ФОП_ВИС_Имя системы";
         public const string OpeningOffsetCenter = "ФОП_ВИС_Отметка оси от нуля";
         public const string OpeningOffsetBottom = "ФОП_ВИС_Отметка низа от нуля";
+        public const string OpeningAuthor = "ФОП_Автор задания";
 
         public static List<BuiltInParameter> MepCurveDiameters => new List<BuiltInParameter>() {
             BuiltInParameter.RBS_PIPE_OUTER_DIAMETER,
@@ -489,7 +491,6 @@ namespace RevitOpeningPlacement.Models {
         /// <summary>
         /// Спрашивает у пользователя, нужно ли продолжать операцию, если загружены не все связи
         /// </summary>
-        /// <param name="revitRepository"></param>
         /// <returns></returns>
         public bool ContinueIfNotAllLinksLoaded() {
             var notLoadedLinksNames = GetRevitLinkNotLoadedNames();
@@ -497,6 +498,28 @@ namespace RevitOpeningPlacement.Models {
                 var dialog = GetMessageBoxService();
                 return dialog.Show(
                     $"Связи:\n{string.Join(";\n", notLoadedLinksNames)} \nне загружены, хотите продолжить?",
+                    "Задания на отверстия",
+                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxImage.Warning,
+                    System.Windows.MessageBoxResult.No) == System.Windows.MessageBoxResult.Yes;
+
+            } else {
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Спрашивает у пользователя, нужно ли продолжать операцию, если семейства заданий на отверстия не самой последней версии
+        /// </summary>
+        /// <returns></returns>
+        public bool ContinueIfTaskFamiliesNotLatest() {
+            var checker = new FamiliesParametersChecker(this);
+            bool familiesLatest = checker.IsCorrect();
+
+            if(!familiesLatest) {
+                var dialog = GetMessageBoxService();
+                return dialog.Show(
+                    $"{checker.GetErrorMessage()}Хотите продолжить?",
                     "Задания на отверстия",
                     System.Windows.MessageBoxButton.YesNo,
                     System.Windows.MessageBoxImage.Warning,
@@ -698,6 +721,19 @@ namespace RevitOpeningPlacement.Models {
                 .GroupBy(inst => inst.GetLinkDocument().Title)
                 .Where(group => group.Count() > 1)
                 .Select(group => group.Key).ToList();
+        }
+
+        /// <summary>
+        /// Возвращает ссылку на документ семейства
+        /// </summary>
+        /// <param name="family"></param>
+        /// <returns></returns>
+        /// <exception cref="Autodesk.Revit.Exceptions.ArgumentNullException"/>
+        /// <exception cref="Autodesk.Revit.Exceptions.ArgumentException"/>
+        /// <exception cref="Autodesk.Revit.Exceptions.InvalidOperationException"/>
+        /// <exception cref="Autodesk.Revit.Exceptions.ForbiddenForDynamicUpdateException"/>
+        public Document EditFamily(Family family) {
+            return _document.EditFamily(family);
         }
 
         /// <summary>
