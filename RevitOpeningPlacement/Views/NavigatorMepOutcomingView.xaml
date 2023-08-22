@@ -134,7 +134,8 @@
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
-                <dxg:GridColumn ReadOnly="True" Width="0" Header="Дата" IsSmart="True" FieldName="Date"/>
+                <dxg:GridColumn ReadOnly="True" Width="60" Header="Статус" IsSmart="True" FieldName="Status"/>
+                <dxg:GridColumn ReadOnly="True" Width="60" Header="Дата" IsSmart="True" FieldName="Date"/>
                 <dxg:GridColumn ReadOnly="True" Width="80" Header="Id отверстия" FieldName="OpeningId"/>
                 <dxg:GridColumn ReadOnly="True" Width="100" Header="Имя системы" FieldName="MepSystem"/>
                 <dxg:GridColumn ReadOnly="True" Width="*" Header="Описание пересечения" FieldName="Description"/>

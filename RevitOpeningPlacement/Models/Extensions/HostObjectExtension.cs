@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
-
-using DevExpress.CodeParser;
 
 using dosymep.Revit;
 
@@ -52,11 +48,11 @@ namespace RevitOpeningPlacement.Models.Extensions {
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentException">Исключение, если <paramref name="hostObject"/> не Стена | Потолок | Перекрытие | Крыша</exception>
-        public static IEnumerable<Face> GetHostBoundFaces(this HostObject hostObject) {
+        public static Face[] GetHostBoundFaces(this HostObject hostObject) {
             if(IsVerticallyCompound(hostObject)) {
                 return hostObject.GetSideFaces().ToArray();
             } else {
-                return new List<Face> {
+                return new Face[] {
                     hostObject.GetBottomFace(),
                     hostObject.GetTopFace()
                 };

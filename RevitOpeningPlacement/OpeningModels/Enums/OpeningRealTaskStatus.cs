@@ -2,7 +2,7 @@
     /// <summary>
     /// Статусы чистовых экземпляров отверстий, которые идут на чертежи, относительно выданных заданий на отверстия 
     /// </summary>
-    internal enum OpeningRealTaskStatusEnum {
+    internal enum OpeningRealTaskStatus {
         /// <summary>
         /// Нет ни одного задания на это отверстие
         /// </summary>

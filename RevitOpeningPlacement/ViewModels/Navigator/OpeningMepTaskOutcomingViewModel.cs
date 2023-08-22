@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
+using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator {
@@ -24,11 +26,13 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             _openingTask = incomingOpeningTask;
 
             OpeningId = _openingTask.Id.ToString();
-            Date = _openingTask.Date;
+            Date = _openingTask.Date.Split().FirstOrDefault() ?? string.Empty;
             MepSystem = _openingTask.MepSystem;
             Description = _openingTask.Description;
             CenterOffset = _openingTask.CenterOffset;
             BottomOffset = _openingTask.BottomOffset;
+
+            Status = _openingTask.Status.GetEnumDescription();
         }
 
 
@@ -61,6 +65,11 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// Отметка низа задания на отверстие
         /// </summary>
         public string BottomOffset { get; } = string.Empty;
+
+        /// <summary>
+        /// Статус задания на отверстие
+        /// </summary>
+        public string Status { get; } = string.Empty;
 
 
         /// <summary>

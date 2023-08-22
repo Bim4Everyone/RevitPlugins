@@ -160,7 +160,51 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Создает фильтр по заданной категории элементов Revit с правилами фильтрации "больше" заданных значений параметров
+        /// Возвращает фильтр по всем используемым категориям элементов инженерных систем
+        /// </summary>
+        /// <returns></returns>
+        public static ElementMulticategoryFilter GetFilterByAllUsedMepCategories() {
+            return new ElementMulticategoryFilter(new BuiltInCategory[] {
+                BuiltInCategory.OST_PipeCurves,
+                BuiltInCategory.OST_PipeFitting,
+
+                BuiltInCategory.OST_DuctCurves,
+                BuiltInCategory.OST_DuctFitting,
+                BuiltInCategory.OST_DuctAccessory,
+                BuiltInCategory.OST_DuctTerminal,
+                BuiltInCategory.OST_MechanicalEquipment,
+
+                BuiltInCategory.OST_CableTray,
+                BuiltInCategory.OST_CableTrayFitting,
+
+                BuiltInCategory.OST_Conduit,
+                BuiltInCategory.OST_ConduitFitting,
+            });
+        }
+
+        /// <summary>
+        /// Возвращает фильтр по всем используемым категориям конструкций
+        /// </summary>
+        /// <returns></returns>
+        public static ElementMulticategoryFilter GetFilterByAllUsedStructureCategories() {
+            return new ElementMulticategoryFilter(new BuiltInCategory[] {
+                BuiltInCategory.OST_Walls,
+                BuiltInCategory.OST_Floors
+            });
+        }
+
+        /// <summary>
+        /// Возвращает фильтр по всем используемым категориям проемов
+        /// /// </summary>
+        /// <returns></returns>
+        public static ElementMulticategoryFilter GetFilterByAllUsedOpeningsCategories() {
+            return new ElementMulticategoryFilter(new BuiltInCategory[] {
+                BuiltInCategory.OST_Windows
+            });
+        }
+
+        /// <summary>
+        /// Создает фильтр по заданной категории элементов Revit с правилами фильтрации "больше или равно" заданных значений параметров
         /// </summary>
         /// <param name="name">Название фильтра</param>
         /// <param name="revitRepository">Репозиторий Revit, в котором происходит фильтрация</param>
@@ -200,7 +244,7 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Создает критерии фильтрации элементов по значениям заданных пар параметров и их значений. Правила критериев формируются как "больше" полученного значения
+        /// Создает критерии фильтрации элементов по значениям заданных пар параметров и их значений. Правила критериев формируются как "больше или равно" полученного значения
         /// </summary>
         /// <param name="revitRepository">Репозиторий Revit, в котором происходит фильтрация</param>
         /// <param name="paramValuePairs">Пары параметров и их значений, по которым формируются правила фильтрации "больше"</param>
@@ -210,7 +254,7 @@ namespace RevitOpeningPlacement.Models {
                 var value = DoubleValueParser.TryParse(paramValuePair.Value.ToString(), paramValuePair.RevitParam.UnitType, out double resultValue);
                 yield return new Rule() {
                     Provider = new ParameterValueProvider(revitRepository, paramValuePair.RevitParam),
-                    Evaluator = RuleEvaluatorUtils.GetRuleEvaluators(paramValuePair.RevitParam.StorageType).FirstOrDefault(item => item.Evaluator == RuleEvaluators.FilterNumericGreater),
+                    Evaluator = RuleEvaluatorUtils.GetRuleEvaluators(paramValuePair.RevitParam.StorageType).FirstOrDefault(item => item.Evaluator == RuleEvaluators.FilterNumericGreaterOrEqual),
                     Value = new DoubleParamValue(resultValue, paramValuePair.Value.ToString()),
                     RevitRepository = revitRepository
                 };

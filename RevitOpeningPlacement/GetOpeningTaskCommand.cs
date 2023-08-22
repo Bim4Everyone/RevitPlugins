@@ -12,14 +12,21 @@ using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 
 using RevitOpeningPlacement.Models;
+using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Models.Navigator.Checkers;
 using RevitOpeningPlacement.Models.OpeningUnion;
-using RevitOpeningPlacement.OpeningModels;
 using RevitOpeningPlacement.ViewModels.Navigator;
 using RevitOpeningPlacement.Views;
 
 namespace RevitOpeningPlacement {
+    /// <summary>
+    /// Команда для просмотра размещенных в текущем файле исходящих заданий на отверстия и полученных из связей входящих заданий
+    /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class GetOpeningTaskCommand : BasePluginCommand {
+        private const int _progressBarStep = 100;
+
+
         public GetOpeningTaskCommand() {
             PluginName = "Навигатор по заданиям";
         }
@@ -30,6 +37,10 @@ namespace RevitOpeningPlacement {
 
         public void ExecuteCommand(UIApplication uiApplication) {
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
+
+            if(!ModelCorrect(revitRepository)) {
+                return;
+            }
             GetOpeningsTask(uiApplication, revitRepository);
         }
 
@@ -88,17 +99,55 @@ namespace RevitOpeningPlacement {
         /// <param name="uiApplication"></param>
         /// <param name="revitRepository"></param>
         private void GetIncomingTaskInDocAR(UIApplication uiApplication, RevitRepository revitRepository) {
-            var incomingTasks = revitRepository
-                .GetOpeningMepTasksIncoming()
-                .Select(famInst => new OpeningMepTaskIncomingViewModel(new OpeningMepTaskIncoming(famInst)))
-                .ToList();
-            var navigatorViewModel = new OpeningsMepTaskIncomingViewModel(revitRepository, incomingTasks);
+            if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
+                throw new OperationCanceledException();
+            }
+            var incomingTasks = revitRepository.GetOpeningsMepTasksIncoming();
+            var realOpenings = revitRepository.GetRealOpenings();
+            var constructureElementsIds = revitRepository.GetConstructureElementsIds();
+            var incomingTasksViewModels = new List<OpeningMepTaskIncomingViewModel>();
+
+            using(var pb = GetPlatformService<IProgressDialogService>()) {
+                pb.StepValue = _progressBarStep;
+                pb.DisplayTitleFormat = "Анализ отверстий... [{0}\\{1}]";
+                var progress = pb.CreateProgress();
+                pb.MaxValue = incomingTasks.Count;
+                var ct = pb.CreateCancellationToken();
+                pb.Show();
+
+                for(int i = 0; i < incomingTasks.Count; i++) {
+                    ct.ThrowIfCancellationRequested();
+                    if(i % _progressBarStep == 0) {
+                        progress.Report(i);
+                    }
+                    try {
+                        incomingTasks[i].UpdateStatusAndHostName(realOpenings, constructureElementsIds);
+                    } catch(ArgumentException) {
+                        //не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
+                        continue;
+                    }
+                    incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTasks[i]));
+                }
+            }
+            var navigatorViewModel = new OpeningsMepTaskIncomingViewModel(revitRepository, incomingTasksViewModels);
 
             var window = new NavigatorMepIncomingView() { Title = PluginName, DataContext = navigatorViewModel };
             var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
 
             window.Show();
         }
+
+        private bool ModelCorrect(RevitRepository revitRepository) {
+            var checker = new NavigatorCheckers(revitRepository);
+            var errors = checker.GetErrorTexts();
+            if(errors == null || errors.Count == 0) {
+                return true;
+            }
+
+            TaskDialog.Show("BIM", $"{string.Join($"{Environment.NewLine}", errors)}");
+            return false;
+        }
+
 
         /// <summary>
         /// Запуск окна навигатора по исходящим заданиям на отверстия в файле архитектуры
@@ -124,11 +173,33 @@ namespace RevitOpeningPlacement {
         /// <param name="uiApplication"></param>
         /// <param name="revitRepository"></param>
         private void GetOpeningsTaskInDocumentMEP(UIApplication uiApplication, RevitRepository revitRepository) {
-            var outcomingTasks = revitRepository
-                .GetOpeningsMepTasksOutcoming()
-                .Select(famInst => new OpeningMepTaskOutcomingViewModel(new OpeningMepTaskOutcoming(famInst)))
-                .ToList();
-            var navigatorViewModel = new OpeningsMepTaskOutcomingViewModel(revitRepository, outcomingTasks);
+            if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
+                throw new OperationCanceledException();
+            }
+            var outcomingTasks = revitRepository.GetOpeningsMepTasksOutcoming();
+            IList<ElementId> outcomingTasksIds = outcomingTasks.Select(task => new ElementId(task.Id)).ToList();
+            var mepElementsIds = revitRepository.GetMepElementsIds();
+            var openingTaskOutcomingViewModels = new List<OpeningMepTaskOutcomingViewModel>();
+            var constructureLinks = revitRepository.GetConstructureLinks().Select(link => new ConstructureLinkElementsProvider(link) as IConstructureLinkElementsProvider).ToList();
+
+            using(var pb = GetPlatformService<IProgressDialogService>()) {
+                pb.StepValue = _progressBarStep;
+                pb.DisplayTitleFormat = "Анализ заданий... [{0}\\{1}]";
+                var progress = pb.CreateProgress();
+                pb.MaxValue = outcomingTasks.Count;
+                var ct = pb.CreateCancellationToken();
+                pb.Show();
+
+                for(int i = 0; i < outcomingTasks.Count; i++) {
+                    ct.ThrowIfCancellationRequested();
+                    if(i % _progressBarStep == 0) {
+                        progress.Report(i);
+                    }
+                    outcomingTasks[i].UpdateStatus(ref outcomingTasksIds, mepElementsIds, constructureLinks);
+                    openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTasks[i]));
+                }
+            }
+            var navigatorViewModel = new OpeningsMepTaskOutcomingViewModel(revitRepository, openingTaskOutcomingViewModels);
 
             var window = new NavigatorMepOutcomingView() { Title = PluginName, DataContext = navigatorViewModel };
             var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
@@ -160,24 +231,26 @@ namespace RevitOpeningPlacement {
         /// </summary>
         /// <returns></returns>
         private NavigatorMode GetNavigatorModeFromUser() {
-            var navigatorModeDialog = new TaskDialog("Навигатор по заданиям") {
-                MainInstruction = "Выбор режима навигатора"
-            };
-            navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1,
-                "Посмотреть исходящие задания");
-            navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2,
-                "Посмотреть входящие задания");
-            navigatorModeDialog.CommonButtons = TaskDialogCommonButtons.Close;
-            navigatorModeDialog.DefaultButton = TaskDialogResult.Close;
-            TaskDialogResult result = navigatorModeDialog.Show();
-            switch(result) {
-                case TaskDialogResult.CommandLink1:
-                return NavigatorMode.Outgoing;
-                case TaskDialogResult.CommandLink2:
-                return NavigatorMode.Incoming;
-                default:
-                return NavigatorMode.NotDefined;
-            }
+            return NavigatorMode.Incoming; //TODO убрать после реализации создания заданий на отверстия в файле АР
+
+            //var navigatorModeDialog = new TaskDialog("Навигатор по заданиям") {
+            //    MainInstruction = "Выбор режима навигатора"
+            //};
+            //navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1,
+            //    "Посмотреть исходящие задания");
+            //navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2,
+            //    "Посмотреть входящие задания");
+            //navigatorModeDialog.CommonButtons = TaskDialogCommonButtons.Close;
+            //navigatorModeDialog.DefaultButton = TaskDialogResult.Close;
+            //TaskDialogResult result = navigatorModeDialog.Show();
+            //switch(result) {
+            //    case TaskDialogResult.CommandLink1:
+            //    return NavigatorMode.Outgoing;
+            //    case TaskDialogResult.CommandLink2:
+            //    return NavigatorMode.Incoming;
+            //    default:
+            //    return NavigatorMode.NotDefined;
+            //}
         }
 
         private List<OpeningsGroup> GetOpeningsGroupsMepTasksOutcoming(RevitRepository revitRepository, UnionGroupsConfigurator configurator) {

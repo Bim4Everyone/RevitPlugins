@@ -2,4 +2,7 @@
 	<Import Project="..\ProjectProps\Common.props" />
 	<Import Project="..\ProjectProps\DevExpress.props" />
 	<Import Project="..\ProjectProps\RevitClashes.props" />
+	<ItemGroup>
+	  <Compile Remove="..\RevitClashes\Models\ClashDetection\SetProvider.cs" />
+	</ItemGroup>
 </Project>

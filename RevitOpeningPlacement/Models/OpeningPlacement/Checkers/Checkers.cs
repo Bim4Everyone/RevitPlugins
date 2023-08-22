@@ -29,6 +29,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
             foreach(OpeningType openingType in Enum.GetValues(typeof(OpeningType))) {
                 _checkers.Add(new FamilyAndTypeChecker(_revitRepository, openingType));
             }
+            // проверка дублированных связей
+            _checkers.Add(new DuplicatedLinksChecker(_revitRepository));
         }
     }
 }

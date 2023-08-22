@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
+using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator {
@@ -26,12 +28,19 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
             OpeningId = _openingTask.Id.ToString();
             FileName = Path.GetFileNameWithoutExtension(incomingOpeningTask.FileName);
-            Date = _openingTask.Date;
+            Date = _openingTask.Date.Split().FirstOrDefault() ?? string.Empty;
             MepSystem = _openingTask.MepSystem;
             Description = _openingTask.Description;
             CenterOffset = _openingTask.CenterOffset;
             BottomOffset = _openingTask.BottomOffset;
             IsAccepted = _openingTask.IsAccepted;
+            Diameter = _openingTask.DisplayDiameter;
+            Width = _openingTask.DisplayWidth;
+            Height = _openingTask.DisplayHeight;
+            Thickness = _openingTask.DisplayThickness;
+            FamilyShortName = _openingTask.FamilyShortName;
+            HostName = _openingTask.HostName;
+            Status = _openingTask.Status.GetEnumDescription();
         }
 
 
@@ -69,6 +78,42 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// Отметка низа задания на отверстие
         /// </summary>
         public string BottomOffset { get; } = string.Empty;
+
+        /// <summary>
+        /// Диаметр
+        /// </summary>
+        public string Diameter { get; } = string.Empty;
+
+        /// <summary>
+        /// Ширина
+        /// </summary>
+        public string Width { get; } = string.Empty;
+
+        /// <summary>
+        /// Высота
+        /// </summary>
+        public string Height { get; } = string.Empty;
+
+        /// <summary>
+        /// Толщина
+        /// </summary>
+        public string Thickness { get; } = string.Empty;
+
+        /// <summary>
+        /// Статус задания на отверстие
+        /// </summary>
+        public string Status { get; } = string.Empty;
+
+        /// <summary>
+        /// Расположение отверстия - в перекрытии/в стене
+        /// </summary>
+        public string FamilyShortName { get; } = string.Empty;
+
+        /// <summary>
+        /// Название хоста задания на отверстие
+        /// </summary>
+        public string HostName { get; } = string.Empty;
+
 
         private bool _isAccepted;
         /// <summary>

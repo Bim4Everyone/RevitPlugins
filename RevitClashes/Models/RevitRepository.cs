@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -17,12 +14,11 @@ using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
-using RevitClashDetective.Models.Handlers;
-using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.Extensions;
 using RevitClashDetective.Models.FilterableValueProviders;
+using RevitClashDetective.Models.Handlers;
 
 using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
-using RevitClashDetective.Models.Extensions;
 
 namespace RevitClashDetective.Models {
     internal class RevitRepository {
@@ -277,7 +273,7 @@ namespace RevitClashDetective.Models {
                 .ToList();
         }
 
-        public IEnumerable<Document> GetDocuments() {
+        public IList<Document> GetDocuments() {
             var linkedDocuments = GetRevitLinkInstances()
                 .Select(item => item.GetLinkDocument())
                 .ToList();
@@ -293,28 +289,47 @@ namespace RevitClashDetective.Models {
         }
 
         public void SelectAndShowElement(IEnumerable<Element> elements, View3D view = null) {
-            if(view == null) {
-                view = _view;
-            }
-            _uiDocument.ActiveView = view;
+            try {
 
-            _revitEventHandler.TransactAction = () => {
-                var bb = GetCommonBoundingBox(elements);
-                if(bb != null) {
-                    SetSectionBox(bb, view);
+                if(view == null) {
+                    view = _view;
                 }
+                _uiDocument.ActiveView = view;
 
-                if(elements.Where(item => item.IsFromDocument(_document)).Any()) {
-                    _uiDocument.Selection.SetElementIds(elements.Where(item => item.IsFromDocument(_document)).Select(item => item.Id).ToArray());
-                } else {
-                    var border = _view.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_SectionBox)).FirstOrDefault();
-                    if(border != null) {
-                        _uiDocument.Selection.SetElementIds(new[] { border });
+                _revitEventHandler.TransactAction = () => {
+                    var bb = GetCommonBoundingBox(elements);
+                    if(bb != null) {
+                        SetSectionBox(bb, view);
                     }
-                }
-            };
 
-            _revitEventHandler.Raise();
+                    if(elements.Where(item => item.IsFromDocument(_document)).Any()) {
+                        _uiDocument.Selection.SetElementIds(elements.Where(item => item.IsFromDocument(_document)).Select(item => item.Id).ToArray());
+                    } else {
+                        var border = _view.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_SectionBox)).FirstOrDefault();
+                        if(border != null) {
+                            _uiDocument.Selection.SetElementIds(new[] { border });
+                        }
+                    }
+                };
+
+                _revitEventHandler.Raise();
+            } catch(AccessViolationException) {
+                var dialog = GetPlatformService<IMessageBoxService>();
+                dialog.Show(
+                    $"Окно плагина было открыто в другом документе Revit, который был закрыт, нельзя показать элемент.",
+                    $"BIM",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error,
+                    System.Windows.MessageBoxResult.OK);
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                var dialog = GetPlatformService<IMessageBoxService>();
+                dialog.Show(
+                    $"Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент.",
+                    $"BIM",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error,
+                    System.Windows.MessageBoxResult.OK);
+            }
         }
 
         private BoundingBoxXYZ GetCommonBoundingBox(IEnumerable<Element> elements) {

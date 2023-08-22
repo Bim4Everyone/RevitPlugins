@@ -9,10 +9,10 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
             _revitRepository = revitRepository;
             _openingType = openingType;
         }
-        public string GetErrorMessage() => $"В проекте отсутствует семейство \"{RevitRepository.FamilyName[_openingType]}\".";
+        public string GetErrorMessage() => $"В проекте отсутствует семейство \"{RevitRepository.OpeningTaskFamilyName[_openingType]}\".";
 
         public bool IsCorrect() {
-            return _revitRepository.GetFamily(_openingType) != null;
+            return _revitRepository.GetOpeningTaskFamily(_openingType) != null;
         }
     }
 }

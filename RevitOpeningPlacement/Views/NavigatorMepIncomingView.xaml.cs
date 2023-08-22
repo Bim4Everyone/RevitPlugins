@@ -18,6 +18,10 @@ namespace RevitOpeningPlacement.Views {
         private void NavigatorView_Loaded(object sender, RoutedEventArgs e) {
             _dg.GroupBy(_dg.Columns[1]);
             _dg.GroupBy(_dg.Columns[2]);
+            _dg.GroupBy(_dg.Columns[3]);
+
+            _dg.SortBy(_dg.Columns[13], DevExpress.Data.ColumnSortOrder.Descending);
+            _dg.SortBy(_dg.Columns[11]);
         }
 
         public override string PluginName => nameof(RevitOpeningPlacement);

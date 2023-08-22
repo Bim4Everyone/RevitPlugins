@@ -7,10 +7,12 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Handlers;
@@ -18,6 +20,7 @@ using RevitClashDetective.Models.Handlers;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.RevitViews;
+using RevitOpeningPlacement.Models.Selection;
 using RevitOpeningPlacement.OpeningModels;
 
 using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
@@ -85,28 +88,54 @@ namespace RevitOpeningPlacement.Models {
             {Parameters.Width, "Ширина" }
         };
 
-        public static Dictionary<OpeningType, string> FamilyName { get; } = new Dictionary<OpeningType, string>() {
+        /// <summary>
+        /// Словарь типов проемов и названий семейств заданий на отверстия
+        /// </summary>
+        public static Dictionary<OpeningType, string> OpeningTaskFamilyName { get; } = new Dictionary<OpeningType, string>() {
             {OpeningType.FloorRectangle, "ОбщМд_Отв_Отверстие_Прямоугольное_В перекрытии" },
             {OpeningType.FloorRound, "ОбщМд_Отв_Отверстие_Круглое_В перекрытии" },
             {OpeningType.WallRectangle, "ОбщМд_Отв_Отверстие_Прямоугольное_В стене" },
             {OpeningType.WallRound, "ОбщМд_Отв_Отверстие_Круглое_В стене" },
         };
 
+        /// <summary>
+        /// Словарь типов проемов и названий семейств чистовых отверстий
+        /// </summary>
+        public static Dictionary<OpeningType, string> OpeningRealFamilyName { get; } = new Dictionary<OpeningType, string>() {
+            {OpeningType.FloorRectangle, "Окн_Отв_Прямоуг_Перекрытие" },
+            {OpeningType.FloorRound, "Окн_Отв_Круг_Перекрытие" },
+            {OpeningType.WallRectangle, "Окн_Отв_Прямоуг_Стена" },
+            {OpeningType.WallRound, "Окн_Отв_Круг_Стена" },
+        };
+
         public static List<string> WallFamilyNames { get; } = new List<string> {
-            FamilyName[OpeningType.WallRound],
-            FamilyName[OpeningType.WallRectangle]
+            OpeningTaskFamilyName[OpeningType.WallRound],
+            OpeningTaskFamilyName[OpeningType.WallRectangle]
         };
 
         public static List<string> FloorFamilyNames { get; } = new List<string> {
-            FamilyName[OpeningType.FloorRectangle],
-            FamilyName[OpeningType.FloorRound]
+            OpeningTaskFamilyName[OpeningType.FloorRectangle],
+            OpeningTaskFamilyName[OpeningType.FloorRound]
         };
 
-        public static Dictionary<OpeningType, string> TypeName => new Dictionary<OpeningType, string>() {
+        /// <summary>
+        /// Словарь типов проемов и названий типов семейств заданий на отверстия
+        /// </summary>
+        public static Dictionary<OpeningType, string> OpeningTaskTypeName => new Dictionary<OpeningType, string>() {
             {OpeningType.FloorRectangle, "Прямоугольное" },
             {OpeningType.FloorRound, "Круглое" },
             {OpeningType.WallRectangle, "Прямоугольное" },
             {OpeningType.WallRound, "Круглое" },
+        };
+
+        /// <summary>
+        /// Словарь типов проемов и названий типов семейств чистовых отверстий
+        /// </summary>
+        public static Dictionary<OpeningType, string> OpeningRealTypeName => new Dictionary<OpeningType, string>() {
+            {OpeningType.FloorRectangle, "Окн_Отв_Прямоуг_Перекрытие" },
+            {OpeningType.FloorRound, "Окн_Отв_Круг_Перекрытие" },
+            {OpeningType.WallRectangle, "Окн_Отв_Прямоуг_Стена" },
+            {OpeningType.WallRound, "Окн_Отв_Круг_Стена" },
         };
 
         public const string OpeningDiameter = "ADSK_Размер_Диаметр";
@@ -149,19 +178,54 @@ namespace RevitOpeningPlacement.Models {
 
         public static string SystemCheck => "Системная проверка";
 
-        public FamilySymbol GetOpeningType(OpeningType type) {
+        /// <summary>
+        /// Возвращает типоразмер семейства задания на отверстие из репозитория
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public FamilySymbol GetOpeningTaskType(OpeningType type) {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .WhereElementIsElementType()
                 .OfType<FamilySymbol>()
-                .FirstOrDefault(item => item.Name.Equals(TypeName[type]) && item.FamilyName.Equals(FamilyName[type]));
+                .FirstOrDefault(item => item.Name.Equals(OpeningTaskTypeName[type]) && item.FamilyName.Equals(OpeningTaskFamilyName[type]));
         }
 
-        public Family GetFamily(OpeningType openingType) {
+        /// <summary>
+        /// Возвращает типоразмер семейства чистового отверстия из репозитория
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public FamilySymbol GetOpeningRealType(OpeningType type) {
+            return new FilteredElementCollector(_document)
+                .OfCategory(BuiltInCategory.OST_Windows)
+                .WhereElementIsElementType()
+                .OfType<FamilySymbol>()
+                .FirstOrDefault(item => item.Name.Equals(OpeningRealTypeName[type]) && item.FamilyName.Equals(OpeningRealFamilyName[type]));
+        }
+
+        /// <summary>
+        /// Возвращает семейство задания на отверстие из репозитория
+        /// </summary>
+        /// <param name="openingType"></param>
+        /// <returns></returns>
+        public Family GetOpeningTaskFamily(OpeningType openingType) {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(Family))
                 .OfType<Family>()
-                .FirstOrDefault(item => item?.Name?.Equals(FamilyName[openingType], StringComparison.CurrentCulture) == true);
+                .FirstOrDefault(item => item?.Name?.Equals(OpeningTaskFamilyName[openingType], StringComparison.CurrentCulture) == true);
+        }
+
+        /// <summary>
+        /// Возвращает семейство чистового отверстия из репозитория
+        /// </summary>
+        /// <param name="openingType"></param>
+        /// <returns></returns>
+        public Family GetOpeningRealFamily(OpeningType openingType) {
+            return new FilteredElementCollector(_document)
+                .OfClass(typeof(Family))
+                .OfType<Family>()
+                .FirstOrDefault(item => item?.Name?.Equals(OpeningRealFamilyName[openingType], StringComparison.CurrentCulture) == true);
         }
 
         public Transaction GetTransaction(string transactionName) {
@@ -183,6 +247,12 @@ namespace RevitOpeningPlacement.Models {
             return _clashRevitRepository.GetLevel(element);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="Autodesk.Revit.Exceptions.ArgumentNullException"/>
         public Element GetElement(ElementId id) {
             return _document.GetElement(id);
         }
@@ -229,6 +299,26 @@ namespace RevitOpeningPlacement.Models {
             return DocTypeEnum.MEP;
         }
 
+        /// <summary>
+        /// Размещает экземпляр заданного типоразмера семейства в хосте по точке вставки с уровнем по хосту
+        /// </summary>
+        /// <param name="point">Точка вставки</param>
+        /// <param name="familySymbol">Типоразмер семейства</param>
+        /// <param name="host">Хост экземпляра семейства</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="Autodesk.Revit.Exceptions.ArgumentException"></exception>
+        /// <exception cref="Autodesk.Revit.Exceptions.ArgumentNullException"></exception>
+        public FamilyInstance CreateInstance(XYZ point, FamilySymbol familySymbol, Element host) {
+            if(point is null) { throw new ArgumentNullException(nameof(point)); }
+            if(familySymbol is null) { throw new ArgumentNullException(nameof(familySymbol)); }
+            if(host is null) { throw new ArgumentNullException(nameof(host)); }
+
+            if(!familySymbol.IsActive) { familySymbol.Activate(); }
+
+            var level = GetElement(host.LevelId) as Level;
+            return _document.Create.NewFamilyInstance(point, familySymbol, host, level, StructuralType.NonStructural);
+        }
 
         public FamilyInstance CreateInstance(FamilySymbol type, XYZ point, Level level) {
             if(level != null) {
@@ -243,21 +333,21 @@ namespace RevitOpeningPlacement.Models {
 
         public void RotateElement(Element element, XYZ point, Rotates angle) {
             if(point != null) {
-                RotateElement(element, point, Line.CreateBound(point, new XYZ(point.X + 1, point.Y, point.Z)), angle.X);
-                RotateElement(element, point, Line.CreateBound(point, new XYZ(point.X, point.Y + 1, point.Z)), angle.Y);
-                RotateElement(element, point, Line.CreateBound(point, new XYZ(point.X, point.Y, point.Z + 1)), angle.Z);
+                RotateElement(element, Line.CreateBound(point, new XYZ(point.X + 1, point.Y, point.Z)), angle.X);
+                RotateElement(element, Line.CreateBound(point, new XYZ(point.X, point.Y + 1, point.Z)), angle.Y);
+                RotateElement(element, Line.CreateBound(point, new XYZ(point.X, point.Y, point.Z + 1)), angle.Z);
             }
         }
 
         /// <summary>
-        /// Возвращает все экземпляры семейств исходящих заданий на отверстия из текущего файла инженерных систем
+        /// Возвращает список всех экземпляров семейств исходящих заданий на отверстия из текущего файла инженерных систем
         /// </summary>
         /// <returns></returns>
-        public IList<FamilyInstance> GetOpeningsMepTasksOutcoming() {
+        public IList<OpeningMepTaskOutcoming> GetOpeningsMepTasksOutcoming() {
             var openingsInWalls = GetWallOpeningsMepTasksOutcoming();
             var openingsInFloor = GetFloorOpeningsMepTasksOutcoming();
             openingsInFloor.AddRange(openingsInWalls);
-            return openingsInFloor;
+            return openingsInFloor.Select(famInst => new OpeningMepTaskOutcoming(famInst)).ToList();
         }
 
         /// <summary>
@@ -397,36 +487,263 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает список экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит ("исходящие" задания).
+        /// Спрашивает у пользователя, нужно ли продолжать операцию, если загружены не все связи
         /// </summary>
-        /// <returns>Список экземпляров семейств, названия семейств и типов которых заданы в соответствующих словарях
-        /// <see cref="TypeName">названий типов</see> и
-        /// <see cref="FamilyName">названий семейств</see></returns>
-        private List<FamilyInstance> GetOpeningsTaskFromCurrentDoc() {
-            return GetGenericModelsFamilyInstances()
-                .Where(item => TypeName.Any(n => n.Value.Equals(item.Name))
-                            && FamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
+        /// <param name="revitRepository"></param>
+        /// <returns></returns>
+        public bool ContinueIfNotAllLinksLoaded() {
+            var notLoadedLinksNames = GetRevitLinkNotLoadedNames();
+            if(notLoadedLinksNames.Count > 0) {
+                var dialog = GetMessageBoxService();
+                return dialog.Show(
+                    $"Связи:\n{string.Join(";\n", notLoadedLinksNames)} \nне загружены, хотите продолжить?",
+                    "Задания на отверстия",
+                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxImage.Warning,
+                    System.Windows.MessageBoxResult.No) == System.Windows.MessageBoxResult.Yes;
+
+            } else {
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Возвращает сервис диалоговых окон
+        /// </summary>
+        /// <returns></returns>
+        public IMessageBoxService GetMessageBoxService() {
+            return GetPlatformService<IMessageBoxService>();
+        }
+
+        /// <summary>
+        /// Возвращает список чистовых экземпляров семейств отверстий из текущего документа Revit
+        /// </summary>
+        /// <returns></returns>
+        public IList<OpeningReal> GetRealOpenings() {
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .WherePasses(FiltersInitializer.GetFilterByAllUsedOpeningsCategories())
+                .OfClass(typeof(FamilyInstance))
+                .Cast<FamilyInstance>()
+                .Where(famInst => famInst.Host != null)
+                .Where(famInst => famInst.Symbol.FamilyName.Contains("Отв"))
+                .Select(famInst => new OpeningReal(famInst))
                 .ToList();
         }
 
-        private void RotateElement(Element element, XYZ point, Line axis, double angle) {
+        /// <summary>
+        /// Возвращает коллекцию Id всех элементов конструкций из текущего документа ревита, для которых создаются задания на отверстия
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<ElementId> GetConstructureElementsIds() {
+            return new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .WherePasses(FiltersInitializer.GetFilterByAllUsedStructureCategories())
+                .ToElementIds();
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию Id всех элементов инженерных систем из текущего документа ревита, для которых создаются задания на отверстия
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<ElementId> GetMepElementsIds() {
+            return new FilteredElementCollector(_document)
+                .WherePasses(FiltersInitializer.GetFilterByAllUsedMepCategories())
+                .ToElementIds();
+        }
+
+        /// <summary>
+        /// Возвращает список входящих заданий на отверстия из связанных файлов
+        /// </summary>
+        /// <returns></returns>
+        public IList<OpeningMepTaskIncoming> GetOpeningsMepTasksIncoming() {
+            var links = GetRevitLinks();
+            List<OpeningMepTaskIncoming> genericModelsInLinks = new List<OpeningMepTaskIncoming>();
+            foreach(RevitLinkInstance link in links) {
+                var linkDoc = link.GetLinkDocument();
+                var transform = link.GetTransform();
+                var genericModelsInLink = new FilteredElementCollector(linkDoc)
+                    .WhereElementIsNotElementType()
+                    .OfCategory(BuiltInCategory.OST_GenericModel)
+                    .OfType<FamilyInstance>()
+                    .Where(item => OpeningTaskTypeName.Any(n => n.Value.Equals(item.Name))
+                                && OpeningTaskFamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
+                    .Select(famInst => new OpeningMepTaskIncoming(famInst, this, transform))
+                    ;
+                genericModelsInLinks.AddRange(genericModelsInLink);
+            }
+            return genericModelsInLinks;
+        }
+
+        /// <summary>
+        /// Возвращает список всех связей АР и КР из документа репозитория
+        /// </summary>
+        /// <returns></returns>
+        public IList<RevitLinkInstance> GetConstructureLinks() {
+            var bimModelPartsService = GetPlatformService<IBimModelPartsService>();
+            return GetRevitLinks()
+                .Where(link => bimModelPartsService.InAnyBimModelParts(link.Name, BimModelPart.ARPart, BimModelPart.KRPart))
+                .ToList();
+        }
+
+        /// <summary>
+        /// Предлагает пользователю выбрать системную стену или системное перекрытие и возвращает его выбор
+        /// </summary>
+        /// <returns>Выбранный пользователем элемент классов <see cref="Autodesk.Revit.DB.Wall"/> или <see cref="Autodesk.Revit.DB.Floor"/></returns>
+        /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException"/>
+        public Element PickHostForRealOpening() {
+            // фильтр по классам, а не по категориям ревита, так как для хоста нужна системная стена или системное перекрытие,
+            // при этом необходимо исключить выбор моделей в контексте, которые могут быть стенами и перекрытиями
+            ISelectionFilter filter = new SelectionFilterElementsOfClasses(new Type[] { typeof(Wall), typeof(Floor) });
+            Reference reference = _uiDocument.Selection.PickObject(ObjectType.Element, filter, "Выберите стену или перекрытие");
+            return _document.GetElement(reference);
+        }
+
+        /// <summary>
+        /// Предлагает пользователю выбрать экземпляры семейств заданий на отверстия из связанных файлов, подгруженных в активный документ, и возвращает его выбор
+        /// </summary>
+        /// <returns>Выбранная пользователем коллекция элементов</returns>
+        /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException"/>
+        public ICollection<OpeningMepTaskIncoming> PickManyOpeningTasksIncoming() {
+            ISelectionFilter filter = new SelectionFilterOpeningTasksIncoming(_document);
+            IList<Reference> references = _uiDocument.Selection.PickObjects(ObjectType.LinkedElement, filter, "Выберите задание(я) на отверстие(я) из связи(ей) и нажмите \"Готово\"");
+
+            List<OpeningMepTaskIncoming> openingTasks = new List<OpeningMepTaskIncoming>();
+            foreach(var reference in references) {
+                if((reference != null) && (_document.GetElement(reference) is RevitLinkInstance link)) {
+                    Element opening = link.GetLinkDocument().GetElement(reference.LinkedElementId);
+                    if((opening != null) && (opening is FamilyInstance famInst)) {
+                        openingTasks.Add(new OpeningMepTaskIncoming(famInst, this, link.GetTransform()));
+                    }
+                }
+            }
+            return openingTasks;
+        }
+
+        /// <summary>
+        /// Предлагает пользователю выбрать один экземпляр семейства задания на отверстие из связанных файлов, подгруженных в активный документ, и возвращает его выбор
+        /// </summary>
+        /// <returns>Выбранный пользователем элемент</returns>
+        /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException"/>
+        public OpeningMepTaskIncoming PickSingleOpeningTaskIncoming() {
+            ISelectionFilter filter = new SelectionFilterOpeningTasksIncoming(_document);
+            Reference reference = _uiDocument.Selection.PickObject(ObjectType.LinkedElement, filter, "Выберите задание на отверстие из связи и нажмите \"Готово\"");
+
+            if((reference != null) && (_document.GetElement(reference) is RevitLinkInstance link)) {
+                Element opening = link.GetLinkDocument().GetElement(reference.LinkedElementId);
+                if((opening != null) && (opening is FamilyInstance famInst)) {
+                    return new OpeningMepTaskIncoming(famInst, this, link.GetTransform());
+                } else {
+                    var dialog = GetMessageBoxService();
+                    dialog.Show(
+                        $"Выбранный элемент не является экземпляром семейства задания на отверстие",
+                        "Задания на отверстия",
+                        System.Windows.MessageBoxButton.OK,
+                        System.Windows.MessageBoxImage.Error,
+                        System.Windows.MessageBoxResult.OK);
+                    throw new OperationCanceledException();
+                }
+            } else {
+                var dialog = GetMessageBoxService();
+                dialog.Show(
+                    $"Не удалось определить выбранный элемент",
+                    "Задания на отверстия",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error,
+                    System.Windows.MessageBoxResult.OK);
+                throw new OperationCanceledException();
+            }
+        }
+
+        /// <summary>
+        /// Выбирает элементы из активного документа по Id
+        /// </summary>
+        /// <param name="elementIds">Коллекция Id элементов из активного документа, которые надо выбрать</param>
+        public void SetSelection(ICollection<ElementId> elementIds) {
+            if(elementIds != null) {
+                _uiDocument.Selection.SetElementIds(elementIds);
+            }
+        }
+
+        /// <summary>
+        /// Выбирает элемент из активного документа по Id
+        /// </summary>
+        /// <param name="elementIds">Id элемента из активного документа, который надо выбрать</param>
+        public void SetSelection(ElementId elementId) {
+            if(elementId != null) {
+                _uiDocument.Selection.SetElementIds(new ElementId[] { elementId });
+            }
+        }
+
+        /// <summary>
+        /// Возвращает тип проема по названию семейства задания на отверстие
+        /// </summary>
+        /// <param name="familyName">Название семейства задания на отверстие</param>
+        /// <returns></returns>
+        public OpeningType GetOpeningType(string familyName) {
+            return OpeningTaskFamilyName.FirstOrDefault(pair => pair.Value.Equals(familyName, StringComparison.CurrentCultureIgnoreCase)).Key;
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию заголовков файлов Revit связей, которые дублируются.
+        /// </summary>
+        /// <returns>Список заголовков дублированных Revit-связей</returns>
+        public ICollection<string> GetDuplicatedLinksNames() {
+            return new FilteredElementCollector(_document)
+                .OfCategory(BuiltInCategory.OST_RvtLinks)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(RevitLinkInstance))
+                .Cast<RevitLinkInstance>()
+                .Where(link => RevitLinkType.IsLoaded(_document, link.GetTypeId()))
+                .GroupBy(inst => inst.GetLinkDocument().Title)
+                .Where(group => group.Count() > 1)
+                .Select(group => group.Key).ToList();
+        }
+
+        /// <summary>
+        /// Возвращает список экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит ("исходящие" задания).
+        /// </summary>
+        /// <returns>Список экземпляров семейств, названия семейств и типов которых заданы в соответствующих словарях
+        /// <see cref="OpeningTaskTypeName">названий типов</see> и
+        /// <see cref="OpeningTaskFamilyName">названий семейств</see></returns>
+        private List<FamilyInstance> GetOpeningsTaskFromCurrentDoc() {
+            return GetGenericModelsFamilyInstances()
+                .Where(item => OpeningTaskTypeName.Any(n => n.Value.Equals(item.Name))
+                            && OpeningTaskFamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
+                .ToList();
+        }
+
+        private void RotateElement(Element element, Line axis, double angle) {
             if(Math.Abs(angle) > 0.00001) {
                 ElementTransformUtils.RotateElement(_document, element.Id, axis, angle);
             }
         }
 
+        private IList<string> GetRevitLinkNotLoadedNames() {
+            return new FilteredElementCollector(_document)
+                .OfCategory(BuiltInCategory.OST_RvtLinks)
+                .WhereElementIsElementType()
+                .OfClass(typeof(RevitLinkType))
+                .Where(link => !RevitLinkType.IsLoaded(
+                                   _document,
+                                   link.Id))
+                .Select(link => link.Name)
+                .ToList();
+        }
 
         /// <summary>
         /// Возвращает экземпляры семейств категории "Обобщенные модели" из текущего документа Revit
         /// </summary>
         /// <returns></returns>
-        private IEnumerable<FamilyInstance> GetGenericModelsFamilyInstances() {
+        private IList<FamilyInstance> GetGenericModelsFamilyInstances() {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
-                .OfType<FamilyInstance>();
+                .OfClass(typeof(FamilyInstance))
+                .Cast<FamilyInstance>()
+                .ToList();
         }
 
-        private IEnumerable<RevitLinkInstance> GetRevitLinks() {
+        private IList<RevitLinkInstance> GetRevitLinks() {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_RvtLinks)
                 .WhereElementIsNotElementType()
@@ -434,28 +751,12 @@ namespace RevitOpeningPlacement.Models {
                 .Cast<RevitLinkInstance>()
                 .Where(link => RevitLinkType.IsLoaded(
                                    _document,
-                                   link.GetTypeId()));
-        }
-
-        private IList<FamilyInstance> GetGenericModelsFamilyInstancesFromLinks() {
-            var links = GetRevitLinks();
-            List<FamilyInstance> genericModelsInLinks = new List<FamilyInstance>();
-            foreach(RevitLinkInstance link in links) {
-                var linkDoc = link.GetLinkDocument();
-                var genericModelsInLink = new FilteredElementCollector(linkDoc)
-                    .OfCategory(BuiltInCategory.OST_GenericModel)
-                    .OfType<FamilyInstance>();
-                genericModelsInLinks.AddRange(genericModelsInLink);
-            }
-            return genericModelsInLinks;
-        }
-
-        public IList<FamilyInstance> GetOpeningMepTasksIncoming() {
-            return GetGenericModelsFamilyInstancesFromLinks()
-                .Where(famInst => TypeName.Values.Contains(famInst.Name)
-                               && FamilyName.Values.Contains(GetFamilyName(famInst)))
+                                   link.GetTypeId()))
                 .ToList();
         }
+
+
+
 
         /// <summary>
         /// Возвращает задания на отверстия от инженера из текущего файла Revit
@@ -464,8 +765,8 @@ namespace RevitOpeningPlacement.Models {
         /// <returns></returns>
         private List<FamilyInstance> GetOpeningsMepTasksOutcoming(ICollection<OpeningType> types) {
             return GetGenericModelsFamilyInstances()
-               .Where(item => types.Any(e => TypeName[e].Equals(item.Name))
-                           && types.Any(e => FamilyName[e].Equals(GetFamilyName(item))))
+               .Where(item => types.Any(e => OpeningTaskTypeName[e].Equals(item.Name))
+                           && types.Any(e => OpeningTaskFamilyName[e].Equals(GetFamilyName(item))))
                .ToList();
         }
 

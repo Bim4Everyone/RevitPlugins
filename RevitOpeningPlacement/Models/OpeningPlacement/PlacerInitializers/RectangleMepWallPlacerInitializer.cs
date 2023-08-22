@@ -19,7 +19,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             var placer = new OpeningPlacer(revitRepository, clashModel) {
                 LevelFinder = new ClashLevelFinder(revitRepository, clashModel),
                 AngleFinder = new WallAngleFinder(clash.Element2, clash.Element2Transform),
-                Type = revitRepository.GetOpeningType(OpeningType.WallRectangle),
+                Type = revitRepository.GetOpeningTaskType(OpeningType.WallRectangle),
             };
             if(clash.Element1.IsPerpendicular(clash.Element2)) {
                 var pointFinder = new WallPointFinder(clash, new HeightValueGetter(clash.Element1, categoryOption));

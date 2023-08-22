@@ -22,7 +22,9 @@ using RevitOpeningPlacement.ViewModels.ReportViewModel;
 using RevitOpeningPlacement.Views;
 
 namespace RevitOpeningPlacement {
-
+    /// <summary>
+    /// Команда для размещения заданий на отверстия в файле ВИС.
+    /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class PlaceOpeningTaskCommand : BasePluginCommand {
         private readonly int _progressBarStepValue = 10;
@@ -40,7 +42,10 @@ namespace RevitOpeningPlacement {
         protected override void Execute(UIApplication uiApplication) {
             _duplicatedInstancesIds.Clear();
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            if(!CheckModel(revitRepository)) {
+            if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
+                throw new OperationCanceledException();
+            }
+            if(!ModelCorrect(revitRepository)) {
                 return;
             }
             var openingConfig = OpeningConfig.GetOpeningConfig(revitRepository.Doc);
@@ -57,7 +62,7 @@ namespace RevitOpeningPlacement {
             _duplicatedInstancesIds.Clear();
         }
 
-        private bool CheckModel(RevitRepository revitRepository) {
+        private bool ModelCorrect(RevitRepository revitRepository) {
             var checker = new Checkers(revitRepository);
             var errors = checker.GetErrorTexts();
             if(errors == null || errors.Count == 0) {

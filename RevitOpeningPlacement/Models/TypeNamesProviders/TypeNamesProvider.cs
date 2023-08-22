@@ -16,9 +16,9 @@ namespace RevitOpeningPlacement.Models.TypeNamesProviders {
 
         public IEnumerable<string> GetTypeNames() {
             if(_mepSystemIsRound) {
-                yield return RevitRepository.TypeName[OpeningType.WallRound];
+                yield return RevitRepository.OpeningTaskTypeName[OpeningType.WallRound];
             }
-            yield return RevitRepository.TypeName[OpeningType.WallRectangle];
+            yield return RevitRepository.OpeningTaskTypeName[OpeningType.WallRectangle];
         }
     }
 }
