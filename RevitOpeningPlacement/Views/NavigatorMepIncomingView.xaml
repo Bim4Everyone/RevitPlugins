@@ -160,8 +160,10 @@
                           Foreground="Orange" />
             <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding MessageText}"
                           Foreground="Green" />
-            <dx:SimpleButton Content="Разместить отверстие" 
-                             Command="{Binding ElementName=_this, Path=DataContext.PlaceRealOpeningCommand}"/>
+            <dx:SimpleButton Content="Принять несколько" Margin="10 0"
+                             Command="{Binding ElementName=_this, Path=DataContext.PlaceRealOpeningByManyTasksCommand}"/>
+            <dx:SimpleButton Content="Принять одно" 
+                             Command="{Binding ElementName=_this, Path=DataContext.PlaceRealOpeningBySingleTaskCommand}"/>
             <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True"
                              Click="ButtonOk_Click"/>
             <dx:SimpleButton Content="Отмена" Height="25" Width="80"  IsCancel="true"
