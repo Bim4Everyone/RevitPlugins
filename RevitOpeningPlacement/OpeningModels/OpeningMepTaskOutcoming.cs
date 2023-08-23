@@ -31,6 +31,11 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         private static readonly double _distance3dTolerance = Math.Sqrt(3 * XYZExtension.FeetRound * XYZExtension.FeetRound);
 
+        /// <summary>
+        /// Допустимый объем, равный кубу <see cref="_distance3dTolerance"/>
+        /// </summary>
+        private static readonly double _volumeTolerance = _distance3dTolerance * _distance3dTolerance * _distance3dTolerance;
+
         private static readonly OpeningTaskOutcomingEqualityComparer _equalityComparer = new OpeningTaskOutcomingEqualityComparer();
 
         /// <summary>
@@ -542,7 +547,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                 // получение объединенного солида для элементов ВИС в координатах текущего файла с заданиями на отверстия
                 var mepSolids = intersectingMepElementsIds.Select(mepId => GetDocument().GetElement(mepId).GetSolid()).Where(solid => (solid != null) && (solid.Volume > 0)).ToList();
                 var mepUnitedSolid = RevitClashDetective.Models.Extensions.ElementExtensions.UniteSolids(mepSolids);
-                if((mepUnitedSolid is null) || mepUnitedSolid.Volume < (_distance3dTolerance * _distance3dTolerance * _distance3dTolerance)) {
+                if((mepUnitedSolid is null) || mepUnitedSolid.Volume < _volumeTolerance) {
                     return false;
                 }
 
