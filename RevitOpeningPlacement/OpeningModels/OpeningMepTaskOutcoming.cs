@@ -141,6 +141,11 @@ namespace RevitOpeningPlacement.OpeningModels {
             if(!IsRemoved) {
                 var openingSolid = GetSolid();
                 if((openingSolid != null) && (openingSolid.Volume > 0)) {
+                    if(ThisOpeningTaskIsNotActual(openingSolid, constructureLinkElementsProviders, allMepElementsIds)) {
+                        Status = OpeningTaskOutcomingStatus.NotActual;
+                        return;
+                    }
+
                     var intersectingOpeningIds = GetIntersectingOpeningsTasks(openingSolid, openingsOutcomingTasksIdsForChecking);
                     if(intersectingOpeningIds.Count > 0) {
                         Status = OpeningTaskOutcomingStatus.Intersects;
@@ -149,10 +154,6 @@ namespace RevitOpeningPlacement.OpeningModels {
                         openingsOutcomingTasksIdsForChecking.Remove(new ElementId(Id));
                     }
 
-                    if(ThisOpeningTaskIsNotActual(openingSolid, constructureLinkElementsProviders, allMepElementsIds)) {
-                        Status = OpeningTaskOutcomingStatus.NotActual;
-                        return;
-                    }
                     try {
                         Solid openingSolidAfterIntersection = GetOpeningAndMepsSolidsDifference(openingSolid, allMepElementsIds);
                         if(openingSolidAfterIntersection is null) {
