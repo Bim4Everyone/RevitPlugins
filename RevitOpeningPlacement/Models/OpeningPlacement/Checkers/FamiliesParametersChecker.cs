@@ -98,13 +98,15 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         /// <param name="family">Семейство, загруженное в активный документ</param>
         /// <returns></returns>
         private ICollection<string> GetFamilySharedParameterNames(RevitRepository revitRepository, Family family) {
-            return revitRepository
-                .EditFamily(family)
-                .FamilyManager
-                .GetParameters()
-                .Where(param => param.IsShared)
-                .Select(param => param.Definition.Name)
-                .ToArray();
+            using(var familyDoc = revitRepository.EditFamily(family)) {
+                string[] paramNames = familyDoc.FamilyManager
+                    .GetParameters()
+                    .Where(param => param.IsShared)
+                    .Select(param => param.Definition.Name)
+                    .ToArray();
+                familyDoc.Close(false);
+                return paramNames;
+            }
         }
 
         /// <summary>
