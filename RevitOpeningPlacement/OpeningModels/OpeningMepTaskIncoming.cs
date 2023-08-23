@@ -206,6 +206,32 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
+        /// Обновляет <see cref="Status"/> и <see cref="HostName"/> входящего задания на отверстие
+        /// </summary>
+        /// <param name="realOpenings">Коллекция чистовых отверстий, размещенных в активном документе-получателе заданий на отверстия</param>
+        /// <exception cref="ArgumentException"></exception>
+        public void UpdateStatusAndHostName(ICollection<OpeningReal> realOpenings, ICollection<ElementId> constructureElementsIds) {
+            var thisOpeningSolid = GetSolid();
+            var thisOpeningBBox = GetTransformedBBoxXYZ();
+
+            var intersectingStructureElements = GetIntersectingStructureElementsIds(thisOpeningSolid, constructureElementsIds);
+            var intersectingOpenings = GetIntersectingOpeningsIds(realOpenings, thisOpeningSolid, thisOpeningBBox);
+            var hostId = GetOpeningTaskHostId(thisOpeningSolid, intersectingStructureElements, intersectingOpenings);
+            SetOpeningTaskHostName(hostId);
+
+            if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count == 0)) {
+                Status = OpeningTaskIncomingStatus.NoIntersection;
+            } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count == 0)) {
+                Status = OpeningTaskIncomingStatus.New;
+            } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count > 0)) {
+                Status = OpeningTaskIncomingStatus.NotMatch;
+            } else if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count > 0)) {
+                Status = OpeningTaskIncomingStatus.Completed;
+            }
+        }
+
+
+        /// <summary>
         /// Возвращает значение double параметра экземпляра семейства задания на отверстие в единицах ревита, или 0, если параметр отсутствует
         /// </summary>
         /// <param name="paramName">Название параметра</param>
@@ -255,32 +281,6 @@ namespace RevitOpeningPlacement.OpeningModels {
             }
             return value;
         }
-
-        /// <summary>
-        /// Обновляет <see cref="Status"/> и <see cref="HostName"/> входящего задания на отверстие
-        /// </summary>
-        /// <param name="realOpenings">Коллекция чистовых отверстий, размещенных в активном документе-получателе заданий на отверстия</param>
-        /// <exception cref="ArgumentException"></exception>
-        public void UpdateStatusAndHostName(ICollection<OpeningReal> realOpenings, ICollection<ElementId> constructureElementsIds) {
-            var thisOpeningSolid = GetSolid();
-            var thisOpeningBBox = GetTransformedBBoxXYZ();
-
-            var intersectingStructureElements = GetIntersectingStructureElementsIds(thisOpeningSolid, constructureElementsIds);
-            var intersectingOpenings = GetIntersectingOpeningsIds(realOpenings, thisOpeningSolid, thisOpeningBBox);
-            var hostId = GetOpeningTaskHostId(thisOpeningSolid, intersectingStructureElements, intersectingOpenings);
-            SetOpeningTaskHostName(hostId);
-
-            if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count == 0)) {
-                Status = OpeningTaskIncomingStatus.NoIntersection;
-            } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count == 0)) {
-                Status = OpeningTaskIncomingStatus.New;
-            } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count > 0)) {
-                Status = OpeningTaskIncomingStatus.NotMatch;
-            } else if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count > 0)) {
-                Status = OpeningTaskIncomingStatus.Completed;
-            }
-        }
-
 
         /// <summary>
         /// Возвращает коллекцию элементов конструкций, с которыми пересекается текущее задание на отверстие
