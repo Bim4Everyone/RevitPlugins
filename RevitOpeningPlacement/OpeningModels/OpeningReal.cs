@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -16,7 +17,7 @@ namespace RevitOpeningPlacement.OpeningModels {
     /// <summary>
     /// Класс, обозначающий чистовое отверстие, идущее на чертежи
     /// </summary>
-    internal class OpeningReal : ISolidProvider {
+    internal class OpeningReal : ISolidProvider, IEquatable<OpeningReal> {
         /// <summary>
         /// Экземпляр семейства чистового отверстия
         /// </summary>
@@ -61,7 +62,20 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Статус текущего отверстия относительно полученных заданий
         /// </summary>
-        public OpeningRealTaskStatus Status { get; set; } = OpeningRealTaskStatus.NotDefined;
+        public OpeningRealTaskStatus Status { get; set; } = OpeningRealTaskStatus.NotActual;
+
+
+        public override bool Equals(object obj) {
+            return (obj is OpeningReal opening) && Equals(opening);
+        }
+
+        public override int GetHashCode() {
+            return Id;
+        }
+
+        public bool Equals(OpeningReal other) {
+            return (other != null) && (Id == other.Id);
+        }
 
 
         public Solid GetSolid() {

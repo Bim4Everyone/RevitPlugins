@@ -19,7 +19,7 @@ namespace RevitOpeningPlacement.OpeningModels {
     /// Класс, обозначающий экземпляры семейств заданий на отверстия из связанного файла-задания на отверстия,
     /// подгруженного в текущий документ получателя
     /// </summary>
-    internal class OpeningMepTaskIncoming : ISolidProvider {
+    internal class OpeningMepTaskIncoming : ISolidProvider, IEquatable<OpeningMepTaskIncoming> {
         /// <summary>
         /// Экземпляр семейства задания на отверстие из связанного файла
         /// </summary>
@@ -34,7 +34,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Экземпляр семейства задания на отверстие, расположенного в связанном файле задания на отверстия
         /// 
-        /// <para>Примечание: конструктор не обновляет свойство <see cref="Status"/>. Для обновления этого свойства надо вызвать <see cref="UpdateStatusAndHostName"/></para>
+        /// <para>Примечание: конструктор не обновляет свойства <see cref="Status"/> и <see cref="HostName"/>. Для обновления этих свойств надо вызвать <see cref="UpdateStatusAndHostName"/></para>
         /// </summary>
         /// <param name="openingTaskIncoming">Экземпляр семейства задания на отверстие из связанного файла</param>
         /// <param name="revitRepository">Репозиторий текущего документа, в который подгружен документ с заданиями на отверстия</param>
@@ -160,11 +160,13 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         /// <summary>
         /// Название элемента, в котором расположено задание на отверстие. Предназначено для дальнейшей сортировки входящих заданий в навигаторе по типам стен: штукатурка/монолит/кладка и т.п.
+        /// <para>Для обновления использовать <see cref="UpdateStatusAndHostName"/></para>
         /// </summary>
         public string HostName { get; private set; } = string.Empty;
 
         /// <summary>
         /// Статус отработки задания на отверстие
+        /// <para>Для обновления использовать <see cref="UpdateStatusAndHostName"/></para>
         /// </summary>
         public OpeningTaskIncomingStatus Status { get; set; } = OpeningTaskIncomingStatus.New;
 
@@ -177,6 +179,18 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Угол поворота задания на отверстие в радианах в координатах активного файла, в который подгружена связь с заданием на отверстие
         /// </summary>
         public double Rotation { get; } = 0;
+
+        public override bool Equals(object obj) {
+            return (obj is OpeningMepTaskIncoming opening) && Equals(opening);
+        }
+
+        public override int GetHashCode() {
+            return Id + FileName.GetHashCode();
+        }
+
+        public bool Equals(OpeningMepTaskIncoming other) {
+            return (other != null) && (Id == other.Id) && FileName.Equals(other.FileName);
+        }
 
 
         public FamilyInstance GetFamilyInstance() {
