@@ -223,21 +223,15 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         public override bool Equals(object obj) {
-            if(obj is null) {
-                return false;
-            } else if(obj is OpeningMepTaskOutcoming openingOther) {
-                return (Id == openingOther.Id) && GetDocument().Equals(openingOther.GetDocument());
-            } else {
-                return false;
-            }
+            return !IsRemoved && (obj is OpeningMepTaskOutcoming otherTask) && Equals(otherTask);
         }
 
         public override int GetHashCode() {
-            return Id.GetHashCode();
+            return Id;
         }
 
         public bool Equals(OpeningMepTaskOutcoming other) {
-            return (Id == other.Id) && GetDocument().Equals(other.GetDocument());
+            return !IsRemoved && (other != null) && (Id == other.Id);
         }
 
         /// <summary>
