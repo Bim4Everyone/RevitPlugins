@@ -1,0 +1,7 @@
+title:
+  ru: ${{ gen.bundle_name }}
+  en_us: ${{ gen.bundle_name }}
+
+tooltip:
+  ru: >- Please Write Description
+  en_us: >- Please Write Description

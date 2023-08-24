@@ -29,6 +29,25 @@ interface ICompile : IClean, IHazSolution, IHazGitVersion, IHazGitRepository, IH
                     .SetSimpleVersion(Versioning, config)));
         });
 
+    Target Publish => _ => _
+        .DependsOn(Clean)
+        .Requires(() => PluginName)
+        .Requires(() => PublishDirectory)
+        .Executes(() => {
+            ReportSummary(_ => _
+                .AddPairWhenValueNotNull(nameof(PluginName), PluginName)
+                .AddPairWhenValueNotNull(nameof(PublishDirectory), PublishDirectory)
+            );
+
+            DotNetBuild(s => s
+                .Apply(CompileSettingsBase)
+                .SetProjectFile(PluginName)
+                .SetOutputDirectory(PublishDirectory)
+                .CombineWith(ReleaseConfigurations, (settings, config) => settings
+                    .SetConfiguration(config)
+                    .SetSimpleVersion(Versioning, config)));
+        });
+
     Target FullCompile => _ => _
         .DependsOn(FullClean)
         .Requires(() => Output)
@@ -40,25 +59,7 @@ interface ICompile : IClean, IHazSolution, IHazGitVersion, IHazGitRepository, IH
                     .SetConfiguration(config)
                     .SetSimpleVersion(Versioning, config)));
         });
-
-    Target Publish => _ => _
-        .DependsOn(Clean)
-        .Requires(() => Output)
-        .Requires(() => PluginName)
-        .Executes(() => {
-            ReportSummary(_ => _
-                .AddPairWhenValueNotNull(nameof(Output), Output)
-                .AddPairWhenValueNotNull(nameof(PluginName), PluginName)
-            );
-
-            DotNetBuild(s => s
-                .Apply(CompileSettingsBase)
-                .SetProjectFile(PluginName)
-                .CombineWith(ReleaseConfigurations, (settings, config) => settings
-                    .SetConfiguration(config)
-                    .SetSimpleVersion(Versioning, config)));
-        });
-
+    
     Target FullPublish => _ => _
         .DependsOn(FullClean)
         .Requires(() => Output)

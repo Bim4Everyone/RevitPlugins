@@ -8,8 +8,11 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitPluginTemplate.Views"
     xmlns:vms="clr-namespace:RevitPluginTemplate.ViewModels"
+    
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
 	xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
@@ -17,11 +20,24 @@
     Height="450" Width="800"    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding LoadViewCommand}"/>
+    </dxmvvm:Interaction.Behaviors>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        
+        <dxe:TextEdit
+            Grid.Row="0"
+            Width="200"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+
+            Text="{Binding SaveProperty}" />
 
         <StackPanel
             Grid.Row="1"
@@ -38,12 +54,15 @@
                 Margin="10"
                 Width="80"
                 Content="ОК"
-                Click="ButtonOk_Click" />
+                IsDefault="True"
+                Click="ButtonOk_Click"
+                Command="{Binding AcceptViewCommand}" />
 
             <dx:SimpleButton
                 Margin="10"
                 Width="80"
                 Content="Отмена"
+                IsCancel="True"
                 Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>

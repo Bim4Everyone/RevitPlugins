@@ -5,7 +5,7 @@ using dosymep.Serializers;
 using pyRevitLabs.Json;
 
 namespace RevitPluginTemplate.Models {
-    internal class PluginConfig :ProjectConfig<RevitSettings> {
+    internal class PluginConfig : ProjectConfig<RevitSettings> {
         [JsonIgnore] public override string ProjectConfigPath { get; set; }
 
         [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
@@ -22,5 +22,6 @@ namespace RevitPluginTemplate.Models {
 
     internal class RevitSettings : ProjectSettings {
         public override string ProjectName { get; set; }
+        public string SaveProperty { get; set; }
     }
 }

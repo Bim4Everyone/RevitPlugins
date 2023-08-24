@@ -6,6 +6,19 @@
     "build": {
       "type": "object",
       "properties": {
+        "BundleName": {
+          "type": "string"
+        },
+        "BundleOutput": {
+          "type": "string"
+        },
+        "BundleType": {
+          "type": "string",
+          "enum": [
+            "InvokeButton",
+            "PushButton"
+          ]
+        },
         "Continue": {
           "type": "boolean",
           "description": "Indicates to continue a previously failed build attempt"
@@ -35,6 +48,9 @@
             "VSCode"
           ]
         },
+        "IconUrl": {
+          "type": "string"
+        },
         "NoLogo": {
           "type": "boolean",
           "description": "Disables displaying the NUKE logo"
@@ -62,6 +78,9 @@
             "type": "string"
           }
         },
+        "PublishDirectory": {
+          "type": "string"
+        },
         "Root": {
           "type": "string",
           "description": "Root directory during build execution"
@@ -74,7 +93,10 @@
             "enum": [
               "Clean",
               "Compile",
+              "CreateBranch",
+              "CreateBundle",
               "CreatePlugin",
+              "CreateProfile",
               "CreateScript",
               "FullClean",
               "FullCompile",
@@ -95,7 +117,10 @@
             "enum": [
               "Clean",
               "Compile",
+              "CreateBranch",
+              "CreateBundle",
               "CreatePlugin",
+              "CreateProfile",
               "CreateScript",
               "FullClean",
               "FullCompile",
