@@ -180,7 +180,7 @@ namespace RevitOpeningPlacement {
             IList<ElementId> outcomingTasksIds = outcomingTasks.Select(task => new ElementId(task.Id)).ToList();
             var mepElementsIds = revitRepository.GetMepElementsIds();
             var openingTaskOutcomingViewModels = new List<OpeningMepTaskOutcomingViewModel>();
-            var constructureLinks = revitRepository.GetConstructureLinks().Select(link => new ConstructureLinkElementsProvider(link) as IConstructureLinkElementsProvider).ToList();
+            var constructureLinks = revitRepository.GetConstructureLinks().Select(link => new ConstructureLinkElementsProvider(link) as IConstructureLinkElementsProvider).ToHashSet();
 
             using(var pb = GetPlatformService<IProgressDialogService>()) {
                 pb.StepValue = _progressBarStep;
@@ -190,13 +190,15 @@ namespace RevitOpeningPlacement {
                 var ct = pb.CreateCancellationToken();
                 pb.Show();
 
-                for(int i = 0; i < outcomingTasks.Count; i++) {
+                int i = 0;
+                foreach(var outcomingTask in outcomingTasks) {
                     ct.ThrowIfCancellationRequested();
                     if(i % _progressBarStep == 0) {
                         progress.Report(i);
                     }
-                    outcomingTasks[i].UpdateStatus(ref outcomingTasksIds, mepElementsIds, constructureLinks);
-                    openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTasks[i]));
+                    outcomingTask.UpdateStatus(ref outcomingTasksIds, mepElementsIds, constructureLinks);
+                    openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTask));
+                    i++;
                 }
             }
             var navigatorViewModel = new OpeningsMepTaskOutcomingViewModel(revitRepository, openingTaskOutcomingViewModels);

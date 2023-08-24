@@ -101,12 +101,8 @@ namespace RevitOpeningPlacement.OpeningModels {
         public bool IsRemoved => (_familyInstance is null) || (!_familyInstance.IsValidObject);
 
         /// <summary>
-        /// Флаг, обозначающий статус задания на отверстие
-        /// 
-        /// Например, в файле инженерных систем, 
-        /// если экземпляр семейства задания не пересекается ни с одним элементом инженерных систем, то NoBasis
-        /// если экземпляр семейства задания пересекается с каким-то элементом инженерных систем и это пересечение некорректно, то InaccurateBasis
-        /// если экземпляр семейства задания пересекается с каким-то элементом инженерных систем и это пересечение корректно, то HasBasis
+        /// Флаг, обозначающий статус исходящего задания на отверстие
+        /// <para>Для обновления использовать <see cref="UpdateStatus"/></para>
         /// </summary>
         public OpeningTaskOutcomingStatus Status { get; set; } = OpeningTaskOutcomingStatus.NotActual;
 
@@ -256,7 +252,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                 .WherePasses(GetBoundingBoxFilter())
                 .Cast<FamilyInstance>()
                 .Select(famInst => new OpeningMepTaskOutcoming(famInst));
-                return openingTasks.Intersect(intersects, _equalityComparer).ToList();
+                return openingTasks.Intersect(intersects, _equalityComparer).ToHashSet();
             } else {
                 return Array.Empty<OpeningMepTaskOutcoming>();
             }
@@ -291,7 +287,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         private ICollection<ElementId> GetTasksIds(ICollection<OpeningMepTaskOutcoming> openingTasks) {
-            return openingTasks.Where(task => !task.IsRemoved).Select(task => new ElementId(task.Id)).ToList();
+            return openingTasks.Where(task => !task.IsRemoved).Select(task => new ElementId(task.Id)).ToHashSet();
         }
 
         /// <summary>
@@ -362,13 +358,13 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="thisOpeningTaskSolid">Солид текущего задания на отверстие</param>
         /// <param name="allMepElementsIds">Коллекция Id всех элементов инженерных систем из файла, в котором размещено задание на отверстие</param>
         /// <returns></returns>
-        private IList<Solid> GetIntersectingMepSolids(Solid thisOpeningTaskSolid, ICollection<ElementId> allMepElementsIds) {
+        private ICollection<Solid> GetIntersectingMepSolids(Solid thisOpeningTaskSolid, ICollection<ElementId> allMepElementsIds) {
             if((thisOpeningTaskSolid is null) || (thisOpeningTaskSolid.Volume <= 0)) {
-                return new List<Solid>();
+                return Array.Empty<Solid>();
             } else {
                 return GetIntersectingMepElementsIds(thisOpeningTaskSolid, allMepElementsIds)
                     .Select(elementId => GetDocument().GetElement(elementId).GetSolid())
-                    .ToList();
+                    .ToHashSet();
             }
         }
 
@@ -519,7 +515,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                     // пересечение с чистовыми отверстиями из связей найдено
 
                     // поиск элементов конструкций - основ чистовых отверстий из связей
-                    intersectingConstructions = intersectingOpeningsReal.Select(opening => opening.GetHost().Id).Distinct().ToList();
+                    intersectingConstructions = intersectingOpeningsReal.Select(opening => opening.GetHost().Id).Distinct().ToHashSet();
                 }
             } else {
                 // если задание на отверстие пересекается с конструкциями из связей, то будем считать, что даже если задание также пересекается с чистовыми отверстиями,
@@ -530,7 +526,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                 //intersectingOpeningsReal = GetIntersectingLinkOpeningsReal(link, thisOpeningTaskSolid);
                 //if(intersectingOpeningsReal.Count > 0) {
 
-                //    var openingsHosts = intersectingOpeningsReal.Select(opening => opening.GetHost().Id).Distinct().ToList();
+                //    var openingsHosts = intersectingOpeningsReal.Select(opening => opening.GetHost().Id).Distinct().ToHashSet();
                 //    var constructions = new List<ElementId>(intersectingConstructions);
                 //    constructions.AddRange(openingsHosts);
                 //    intersectingConstructions = constructions;
@@ -549,7 +545,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         private ICollection<OpeningReal> GetIntersectingLinkOpeningsReal(IConstructureLinkElementsProvider link, Solid thisOpeningTaskSolid) {
             var thisSolidInLinkCoordinates = SolidUtils.CreateTransformed(thisOpeningTaskSolid, link.DocumentTransform.Inverse);
             var thisBBoxInLinkCoordinates = GetTransformedBBoxXYZ().TransformBoundingBox(link.DocumentTransform.Inverse);
-            return link.GetOpeningsReal().Where(realOpening => realOpening.IntersectsSolid(thisSolidInLinkCoordinates, thisBBoxInLinkCoordinates)).ToList();
+            return link.GetOpeningsReal().Where(realOpening => realOpening.IntersectsSolid(thisSolidInLinkCoordinates, thisBBoxInLinkCoordinates)).ToHashSet();
         }
 
         /// <summary>
@@ -582,7 +578,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                 var thisSolidInLinkCoordinates = SolidUtils.CreateTransformed(thisOpeningTaskSolid, link.DocumentTransform.Inverse);
 
                 // получение объединенного солида для элементов ВИС в координатах текущего файла с заданиями на отверстия
-                var mepElements = intersectingMepElementsIds.Select(mepId => GetDocument().GetElement(mepId)).ToList();
+                var mepElements = intersectingMepElementsIds.Select(mepId => GetDocument().GetElement(mepId)).ToHashSet();
                 var mepSolids = mepElements.Select(el => el.GetSolid()).Where(solid => (solid != null) && (solid.Volume > 0)).ToList();
                 var mepUnitedSolid = RevitClashDetective.Models.Extensions.ElementExtensions.UniteSolids(mepSolids);
                 if((mepUnitedSolid is null) || mepUnitedSolid.Volume < _volumeTolerance) {

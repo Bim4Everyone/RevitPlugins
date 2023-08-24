@@ -345,11 +345,11 @@ namespace RevitOpeningPlacement.Models {
         /// Возвращает список всех экземпляров семейств исходящих заданий на отверстия из текущего файла инженерных систем
         /// </summary>
         /// <returns></returns>
-        public IList<OpeningMepTaskOutcoming> GetOpeningsMepTasksOutcoming() {
+        public ICollection<OpeningMepTaskOutcoming> GetOpeningsMepTasksOutcoming() {
             var openingsInWalls = GetWallOpeningsMepTasksOutcoming();
             var openingsInFloor = GetFloorOpeningsMepTasksOutcoming();
             openingsInFloor.AddRange(openingsInWalls);
-            return openingsInFloor.Select(famInst => new OpeningMepTaskOutcoming(famInst)).ToList();
+            return openingsInFloor.Select(famInst => new OpeningMepTaskOutcoming(famInst)).ToHashSet();
         }
 
         /// <summary>
@@ -400,7 +400,7 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <returns></returns>
         public ICollection<OpeningMepTaskOutcoming> GetPlacedOutcomingTasks() {
-            return GetOpeningsTaskFromCurrentDoc().Select(f => new OpeningMepTaskOutcoming(f)).ToList();
+            return GetOpeningsTaskFromCurrentDoc().Select(f => new OpeningMepTaskOutcoming(f)).ToHashSet();
         }
 
         public void DeleteElements(ICollection<Element> elements) {
@@ -602,11 +602,11 @@ namespace RevitOpeningPlacement.Models {
         /// Возвращает список всех связей АР и КР из документа репозитория
         /// </summary>
         /// <returns></returns>
-        public IList<RevitLinkInstance> GetConstructureLinks() {
+        public ICollection<RevitLinkInstance> GetConstructureLinks() {
             var bimModelPartsService = GetPlatformService<IBimModelPartsService>();
             return GetRevitLinks()
                 .Where(link => bimModelPartsService.InAnyBimModelParts(link.Name, BimModelPart.ARPart, BimModelPart.KRPart))
-                .ToList();
+                .ToHashSet();
         }
 
         /// <summary>
@@ -720,7 +720,7 @@ namespace RevitOpeningPlacement.Models {
                 .Where(link => RevitLinkType.IsLoaded(_document, link.GetTypeId()))
                 .GroupBy(inst => inst.GetLinkDocument().Title)
                 .Where(group => group.Count() > 1)
-                .Select(group => group.Key).ToList();
+                .Select(group => group.Key).ToHashSet();
         }
 
         /// <summary>
