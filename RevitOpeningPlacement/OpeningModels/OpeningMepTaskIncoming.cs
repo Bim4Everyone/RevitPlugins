@@ -216,7 +216,16 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <returns></returns>
         public BoundingBoxXYZ GetTransformedBBoxXYZ() {
-            return _familyInstance.GetBoundingBox().TransformBoundingBox(Transform);
+            // _familyInstance.GetBoundingBox().TransformBoundingBox(Transform);
+            // при получении бокса сразу из экземпляра семейства
+            // сначала строится бокс в координатах экземпляра семейства,
+            // а потом строится описанный бокс в координатах проекта.
+            //      B = b*cos(a) + b*sin(a), где
+            //      (a) - угол поворота
+            //      (B) - сторона описанного бокса в координатах проекта
+            //      (b) - сторона вписанного бокса в координатах экземпляра семейства
+            // Если семейство - вертикальный цилиндр, то это приведет к значительной погрешности.
+            return GetSolid().GetTransformedBoundingBox();
         }
 
         /// <summary>
