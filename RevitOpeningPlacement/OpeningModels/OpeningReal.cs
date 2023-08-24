@@ -91,15 +91,100 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Возвращает хост экземпляра семейства отверстия
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public Element GetHost() {
-            var host = _familyInstance.Host;
-            if(host is null) {
-                throw new ArgumentNullException($"Хост элемента с Id: {_familyInstance.Id} - null");
-            }
-            return host;
+            return _familyInstance.Host;
         }
 
+        /// <summary>
+        /// Обновляет свойство <see cref="Status"/>
+        /// </summary>
+        /// <param name="openingsRealInActiveDoc">Коллекция чистовых отверстий их активного документа</param>
+        /// <param name="mepLinkElementsProviders">Коллекция связей с элементами ВИС и заданиями на отверстиями</param>
+        public void UpdateStatus(
+            ref ICollection<OpeningReal> openingsRealInActiveDoc,
+            ICollection<IMepLinkElementsProvider> mepLinkElementsProviders) {
+
+            Solid thisOpeningRealSolid = GetSolid();
+
+            foreach(var link in mepLinkElementsProviders) {
+                ICollection<ElementId> intersectingLinkElements = GetIntersectingLinkElements(link, out Solid thisOpeningRealSolidInLinkCoordinates);
+                if(intersectingLinkElements.Count > 0) {
+                    if(LinkElementsIntersectHost(link, intersectingLinkElements)) {
+                        Status = OpeningRealTaskStatus.NotActual;
+                        return;
+                    }
+
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию солидов заданных элементов из связанного файла в координатах файла c текущим чистовым отверстием
+        /// </summary>
+        /// <param name="mepLink">Связанный файл с элементами ВИС и заданиями на отверстия</param>
+        /// <param name="linkElementsIds">Id элементов из связанного файла, из которых надо получить солиды</param>
+        /// <returns></returns>
+        private ICollection<Solid> GetLinkElementsSolids(IMepLinkElementsProvider mepLink, ICollection<ElementId> linkElementsIds) {
+            var doc = mepLink.Document;
+            return linkElementsIds.Select(id => SolidUtils.CreateTransformed(doc.GetElement(id).GetSolid(), mepLink.DocumentTransform)).ToHashSet();
+        }
+
+        /// <summary>
+        /// Проверяет, пересекаются ли заданные элементы из связи с хостом текущего чистового отверстия
+        /// </summary>
+        /// <param name="mepLink">Связанный файл с элементами ВИС и заданиями на отверстия</param>
+        /// <param name="linkElementsForChecking">Элементы из связи для проверки на пересечение</param>
+        /// <returns>True, если хотя бы 1 элемент пересекается с хостом текущего чистового отверстия, иначе False</returns>
+        private bool LinkElementsIntersectHost(IMepLinkElementsProvider mepLink, ICollection<ElementId> linkElementsForChecking) {
+            var hostSolidInLinkCoordinates = SolidUtils.CreateTransformed(GetHost().GetSolid(), mepLink.DocumentTransform.Inverse);
+            return new FilteredElementCollector(mepLink.Document, linkElementsForChecking)
+                .WherePasses(new BoundingBoxIntersectsFilter(hostSolidInLinkCoordinates.GetOutline()))
+                .WherePasses(new ElementIntersectsSolidFilter(hostSolidInLinkCoordinates))
+                .Any();
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию элементов ВИС и элементов заданий на отверстия из связанного файла
+        /// </summary>
+        /// <param name="mepLink">Связанный файл с элементами ВИС и заданиями на отверстия</param>
+        /// <param name="thisOpeningRealSolidInLinkCoordinates">Солид текущего чистового отверстия в координатах связанного файла</param>
+        /// <returns></returns>
+        private ICollection<ElementId> GetIntersectingLinkElements(IMepLinkElementsProvider mepLink, out Solid thisOpeningRealSolidInLinkCoordinates) {
+            thisOpeningRealSolidInLinkCoordinates = SolidUtils.CreateTransformed(GetSolid(), mepLink.DocumentTransform.Inverse);
+
+            var mepElements = GetIntersectingLinkMepElements(mepLink, thisOpeningRealSolidInLinkCoordinates).ToHashSet();
+            var openingTasks = GetIntersectingLinkOpeningTasks(mepLink, thisOpeningRealSolidInLinkCoordinates);
+            mepElements.UnionWith(openingTasks);
+
+            return mepElements;
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию элементов ВИС из связи, которые пересекаются с солидом текущего чистового отверстия
+        /// </summary>
+        /// <param name="mepLink">Связанный файл с элементами ВИС и заданиями на отверстия</param>
+        /// <param name="thisOpeningRealSolidInLinkCoordinates">Солид текущего чистового отверстия в координатах связанного файла</param>
+        /// <returns></returns>
+        private ICollection<ElementId> GetIntersectingLinkMepElements(IMepLinkElementsProvider mepLink, Solid thisOpeningRealSolidInLinkCoordinates) {
+            return new FilteredElementCollector(mepLink.Document, mepLink.GetMepElementIds())
+                .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningRealSolidInLinkCoordinates.GetOutline()))
+                .WherePasses(new ElementIntersectsSolidFilter(thisOpeningRealSolidInLinkCoordinates))
+                .ToElementIds();
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию экземпляров семейств заданий на отверстия из связи, которые пересекаются с солидом текущего чистового отверстия
+        /// </summary>
+        /// <param name="mepLink">Связанный файл с элементами ВИС и заданиями на отверстия</param>
+        /// <param name="thisOpeningRealSolidInLinkCoordinates">Солид текущего чистового отверстия в координатах связанного файла</param>
+        /// <returns></returns>
+        private ICollection<ElementId> GetIntersectingLinkOpeningTasks(IMepLinkElementsProvider mepLink, Solid thisOpeningRealSolidInLinkCoordinates) {
+            return new FilteredElementCollector(mepLink.Document, mepLink.GetOpeningsTaskIds())
+                .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningRealSolidInLinkCoordinates.GetOutline()))
+                .WherePasses(new ElementIntersectsSolidFilter(thisOpeningRealSolidInLinkCoordinates))
+                .ToElementIds();
+        }
 
         /// <summary>
         /// Устанавливает значение полю <see cref="_solid"/>
