@@ -21,7 +21,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         public MainViewModel ViewModel { get; set; }
 
         // Префиксы и суффиксы для поиска и новых спек
-        private string _rebarSchedulePrefixTemp = "КЖ..._СА";
+        private string _rebarSchedulePrefixTemp = "КЖ..._СА_";
         private string _rebarScheduleSuffixTemp = "";
         private string _materialSchedulePrefixTemp = "КЖ..._СМ_";
         private string _materialScheduleSuffixTemp = "";

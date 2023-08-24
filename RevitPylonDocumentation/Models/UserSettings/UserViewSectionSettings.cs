@@ -15,7 +15,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
         private string _generalViewPrefixTemp = "";
         private string _generalViewSuffixTemp = "";
-        private string _generalViewPerpendicularPrefixTemp = "Пилон ";
+        private string _generalViewPerpendicularPrefixTemp = "";
         private string _generalViewPerpendicularSuffixTemp = "_Боковой";
         private string _generalViewTemplateNameTemp = "!Новый РАЗРЕЗ";
         private string _generalViewXOffsetTemp = "200";
