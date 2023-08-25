@@ -20,7 +20,7 @@ namespace RevitOpeningPlacement.OpeningModels {
     /// Класс, обозначающий экземпляры семейств заданий на отверстия, 
     /// размещаемые в файлах-источниках заданий на отверстия для последующей передачи этих заданий получателю
     /// </summary>
-    internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTaskOutcoming> {
+    internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTaskOutcoming>, IFamilyInstanceProvider {
         /// <summary>
         /// Экземпляр семейства задания на отверстие
         /// </summary>

@@ -7,13 +7,14 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models.Extensions;
+using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// <summary>
     /// Модель представления окна для работы с конкретным входящим заданием на отверстие от инженера в файле архитектора или конструктора
     /// </summary>
-    internal class OpeningMepTaskIncomingViewModel : BaseViewModel {
+    internal class OpeningMepTaskIncomingViewModel : BaseViewModel, IFamilyInstanceProvider {
         /// <summary>
         /// Экземпляр семейства задания на отверстие
         /// </summary>
@@ -26,7 +27,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             }
             _openingTask = incomingOpeningTask;
 
-            OpeningId = _openingTask.Id.ToString();
+            OpeningId = _openingTask.Id;
             FileName = Path.GetFileNameWithoutExtension(incomingOpeningTask.FileName);
             Date = _openingTask.Date.Split().FirstOrDefault() ?? string.Empty;
             MepSystem = _openingTask.MepSystem;
@@ -47,7 +48,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// <summary>
         /// Id экземпляра семейства задания на отверстие
         /// </summary>
-        public string OpeningId { get; } = string.Empty;
+        public int OpeningId { get; } = -1;
 
         /// <summary>
         /// Название связанного файла-источника задания на отверстие
@@ -140,6 +141,18 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// <returns></returns>
         public FamilyInstance GetFamilyInstance() {
             return _openingTask.GetFamilyInstance();
+        }
+
+
+        public override bool Equals(object obj) {
+            return (obj != null)
+                && (obj is OpeningMepTaskIncomingViewModel vmOther)
+                && (OpeningId == vmOther.OpeningId)
+                && FileName.Equals(vmOther.FileName);
+        }
+
+        public override int GetHashCode() {
+            return OpeningId + FileName.GetHashCode();
         }
     }
 }
