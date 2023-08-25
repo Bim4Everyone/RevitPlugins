@@ -11,13 +11,14 @@ using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Models.RealOpeningPlacement;
 using RevitOpeningPlacement.OpeningModels.Enums;
 
 namespace RevitOpeningPlacement.OpeningModels {
     /// <summary>
     /// Класс, обозначающий чистовое отверстие, идущее на чертежи
     /// </summary>
-    internal class OpeningReal : ISolidProvider, IEquatable<OpeningReal> {
+    internal class OpeningReal : ISolidProvider, IEquatable<OpeningReal>, IFamilyInstanceProvider {
         /// <summary>
         /// Экземпляр семейства чистового отверстия
         /// </summary>
@@ -42,7 +43,12 @@ namespace RevitOpeningPlacement.OpeningModels {
             if(openingReal is null) { throw new ArgumentNullException(nameof(openingReal)); }
             if(openingReal.Host is null) { throw new ArgumentException($"{nameof(openingReal)} с Id {openingReal.Id} не содержит ссылки на хост элемент"); }
             _familyInstance = openingReal;
+
             Id = _familyInstance.Id.IntegerValue;
+            Diameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningDiameter);
+            Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningWidth);
+            Height = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningHeight);
+            Name = _familyInstance.Name;
 
             SetTransformedBBoxXYZ();
             SetSolid();
@@ -55,14 +61,26 @@ namespace RevitOpeningPlacement.OpeningModels {
         public int Id { get; }
 
         /// <summary>
-        /// Точка расположения экземпляра семейства задания на отверстие
+        /// Диаметр в мм, если есть
         /// </summary>
-        public XYZ Location { get; private set; }
+        public string Diameter { get; } = string.Empty;
+
+        /// <summary>
+        /// Ширина в мм, если есть
+        /// </summary>
+        public string Width { get; } = string.Empty;
+
+        /// <summary>
+        /// Высота в мм, если есть
+        /// </summary>
+        public string Height { get; } = string.Empty;
+
+        public string Name { get; } = string.Empty;
 
         /// <summary>
         /// Статус текущего отверстия относительно полученных заданий
         /// </summary>
-        public OpeningRealTaskStatus Status { get; set; } = OpeningRealTaskStatus.NotActual;
+        public OpeningRealStatus Status { get; set; } = OpeningRealStatus.NotActual;
 
 
         public override bool Equals(object obj) {
@@ -96,31 +114,102 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
+        /// Возвращает экземпляр семейства чистового отверстия
+        /// </summary>
+        /// <returns></returns>
+        public FamilyInstance GetFamilyInstance() {
+            return _familyInstance;
+        }
+
+        /// <summary>
         /// Обновляет свойство <see cref="Status"/>
         /// </summary>
-        /// <param name="openingsRealInActiveDoc">Коллекция чистовых отверстий их активного документа</param>
         /// <param name="mepLinkElementsProviders">Коллекция связей с элементами ВИС и заданиями на отверстиями</param>
-        public void UpdateStatus(
-            ref ICollection<OpeningReal> openingsRealInActiveDoc,
-            ICollection<IMepLinkElementsProvider> mepLinkElementsProviders) {
+        public void UpdateStatus(ICollection<IMepLinkElementsProvider> mepLinkElementsProviders) {
 
             Solid thisOpeningRealSolid = GetSolid();
+            Solid thisOpeningRealSolidAfterIntersection = thisOpeningRealSolid;
 
-            foreach(var link in mepLinkElementsProviders) {
+            foreach(IMepLinkElementsProvider link in mepLinkElementsProviders) {
                 ICollection<ElementId> intersectingLinkElements = GetIntersectingLinkElements(link, out Solid thisOpeningRealSolidInLinkCoordinates);
                 if(intersectingLinkElements.Count > 0) {
                     if(LinkElementsIntersectHost(link, intersectingLinkElements)) {
-                        Status = OpeningRealTaskStatus.NotActual;
+                        Status = OpeningRealStatus.NotActual;
                         return;
                     }
 
-
+                    ICollection<Solid> linkElementsSolids = GetLinkElementsSolids(link, intersectingLinkElements);
+                    thisOpeningRealSolidAfterIntersection = SubtractLinkSolids(thisOpeningRealSolidAfterIntersection, linkElementsSolids);
                 }
+            }
+            double volumeRatio = GetSolidsVolumesRatio(thisOpeningRealSolid, thisOpeningRealSolidAfterIntersection);
+            OpeningRealStatus status = GetStatusByVolumeRatio(volumeRatio);
+            Status = status;
+        }
+
+
+        /// <summary>
+        /// Возвращает статус текущего чистового отверстия по коэффициенту пересекаемого объема.
+        /// </summary>
+        /// <param name="volumeRatio">
+        /// Отношение объема солида текущего чистового отверстия, который пересекается с элементами из связей, 
+        /// к исходному объему этого солида.
+        /// <para>
+        /// 0 - элементы из связей на 100% пересекают солид текущего чистового отверстия, 
+        /// 1 - солид текущего чистового отверстия не пересекается ни с одним элементом из связи
+        /// </para>
+        /// </param>
+        /// <returns></returns>
+        private OpeningRealStatus GetStatusByVolumeRatio(double volumeRatio) {
+            if(volumeRatio < 0.01) {
+                return OpeningRealStatus.Empty;
+            } else if(volumeRatio < 0.5) {
+                return OpeningRealStatus.TooBig;
+            } else {
+                return OpeningRealStatus.Correct;
             }
         }
 
         /// <summary>
-        /// Возвращает коллекцию солидов заданных элементов из связанного файла в координатах файла c текущим чистовым отверстием
+        /// Возвращает коэффициент, показывающий, какую часть исходного солида пересекают элементы из связей
+        /// </summary>
+        /// <param name="thisOpeningRealSolid">Исходный солид текущего чистового отверстия</param>
+        /// <param name="thisOpeningRealSolidAfterIntersection">
+        /// Солид текущего чистового отверситя, 
+        /// после вычтенных солидов элементов из связей, которые пересекают это отверстие
+        /// </param>
+        /// <returns>
+        /// 0 - элементы из связей на 100% пересекают солид текущего чистового отверстия, 
+        /// 1 - солид текущего чистового отверстия не пересекается ни с одним элементом из связи
+        /// </returns>
+        private double GetSolidsVolumesRatio(Solid thisOpeningRealSolid, Solid thisOpeningRealSolidAfterIntersection) {
+            if(thisOpeningRealSolid.Volume == 0) { return 1; }
+            return (1 - thisOpeningRealSolidAfterIntersection.Volume / thisOpeningRealSolid.Volume);
+        }
+
+        /// <summary>
+        /// Вычитает солиды связанных элементов из солида текущего отверстия и возвращает полученный новый солид
+        /// </summary>
+        /// <param name="thisOpeningRealSolid">Солид текущего чистового отверстия в координатах своего файла</param>
+        /// <param name="linkSolidsInThisCoordinates">Коллекция солидов элементов из связи в координатах файла с чистовыми отверстиями</param>
+        /// <returns></returns>
+        private Solid SubtractLinkSolids(Solid thisOpeningRealSolid, ICollection<Solid> linkSolidsInThisCoordinates) {
+            var thisOpeningRealSolidAfterIntersection = thisOpeningRealSolid;
+            foreach(Solid linkSolid in linkSolidsInThisCoordinates) {
+                try {
+                    thisOpeningRealSolidAfterIntersection = BooleanOperationsUtils.ExecuteBooleanOperation(
+                        thisOpeningRealSolidAfterIntersection,
+                        linkSolid,
+                        BooleanOperationsType.Difference);
+                } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                    continue;
+                }
+            }
+            return thisOpeningRealSolidAfterIntersection;
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию солидов заданных элементов из связанного файла в координатах активного файла c текущим чистовым отверстием
         /// </summary>
         /// <param name="mepLink">Связанный файл с элементами ВИС и заданиями на отверстия</param>
         /// <param name="linkElementsIds">Id элементов из связанного файла, из которых надо получить солиды</param>
@@ -216,6 +305,56 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         private Solid CreateRawSolid() {
             return GetTransformedBBoxXYZ().CreateSolid();
+        }
+
+        /// <summary>
+        /// Возвращает значение параметра, или пустую строку, если параметра у семейства нет. Значения параметров с типом данных "длина" конвертируются в мм и округляются до 1 мм.
+        /// </summary>
+        /// <param name="paramName"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        private string GetFamilyInstanceStringParamValueOrEmpty(string paramName) {
+            if(_familyInstance is null) {
+                throw new ArgumentNullException(nameof(_familyInstance));
+            }
+            string value = string.Empty;
+            if(_familyInstance.GetParameters(paramName).FirstOrDefault(item => item.IsShared) != null) {
+#if REVIT_2022_OR_GREATER
+                if(_familyInstance.GetSharedParam(paramName).Definition.GetDataType() == SpecTypeId.Length) {
+                    return Math.Round(UnitUtils.ConvertFromInternalUnits(GetFamilyInstanceDoubleParamValueOrZero(paramName), UnitTypeId.Millimeters)).ToString();
+                }
+#elif REVIT_2021
+                if(_familyInstance.GetSharedParam(paramName).Definition.ParameterType == ParameterType.Length) {
+                    return Math.Round(UnitUtils.ConvertFromInternalUnits(GetFamilyInstanceDoubleParamValueOrZero(paramName), UnitTypeId.Millimeters)).ToString();
+                }
+#else
+                if(_familyInstance.GetSharedParam(paramName).Definition.UnitType == UnitType.UT_Length) {
+                    return Math.Round(UnitUtils.ConvertFromInternalUnits(GetFamilyInstanceDoubleParamValueOrZero(paramName), DisplayUnitType.DUT_MILLIMETERS)).ToString();
+                }
+#endif
+                object paramValue = _familyInstance.GetParamValue(paramName);
+                if(!(paramValue is null)) {
+                    if(paramValue is double doubleValue) {
+                        value = Math.Round(doubleValue).ToString();
+                    } else {
+                        value = paramValue.ToString();
+                    }
+                }
+            }
+            return value;
+        }
+
+        /// <summary>
+        /// Возвращает значение double параметра экземпляра семейства задания на отверстие в единицах ревита, или 0, если параметр отсутствует
+        /// </summary>
+        /// <param name="paramName">Название параметра</param>
+        /// <returns></returns>
+        private double GetFamilyInstanceDoubleParamValueOrZero(string paramName) {
+            if(_familyInstance.GetParameters(paramName).FirstOrDefault(item => item.IsShared) != null) {
+                return _familyInstance.GetSharedParamValue<double>(paramName);
+            } else {
+                return 0;
+            }
         }
     }
 }
