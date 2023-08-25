@@ -64,13 +64,13 @@ namespace RevitOpeningPlacement.Models.Extensions {
             // Проверка объектов на совпадение без использования BooleanOperationUtils
             if(SolidEquals(firstSolid, firstBBox, secondSolid, secondBBox)) {
                 // Оставить проверку на равенство через ISolidProviderExtension.EqualsSolidProvider,
-                // т.к. при солидах, смещенных друг относительно друга на [0.16-0.17] мм,
+                // т.к. при солидах, смещенных друг относительно друга на [0.16-0.17] мм когда один солид внутри другого,
                 // методы BooleanOperationUtils.ExecuteBooleanOperation могут выбрасывать Autodesk.Revit.Exceptions.InvalidOperationException,
                 // если солиды будет смещены на 0.15 мм или меньше, то BooleanOperationUtils.ExecuteBooleanOperation не будет учитывать эту разницу в координатах,
                 // при разнице 0.18 мм и больше методы BooleanOperationUtils.ExecuteBooleanOperation работают в соответствии со своими названиями операций.
                 //
-                // Если же солиды заходят друг в друга на расстояние, меньше 0.15953 мм, то то методы BooleanOperationUtils.ExecuteBooleanOperation не будут находить пересечение
-                // при пересечении 0.15953 и более методы будут работать в соответствии с названиями своих операций.
+                // Если же солиды заходят друг в друга на расстояние, меньше 0.15953 мм, то методы BooleanOperationUtils.ExecuteBooleanOperation не будут находить пересечение.
+                // При пересечении 0.15953 и более методы будут работать в соответствии с названиями своих операций.
                 return true;
             }
 
