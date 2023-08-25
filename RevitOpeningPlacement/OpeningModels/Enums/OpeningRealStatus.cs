@@ -4,7 +4,7 @@ namespace RevitOpeningPlacement.OpeningModels.Enums {
     /// <summary>
     /// Статусы чистовых экземпляров отверстий, которые идут на чертежи, относительно выданных заданий на отверстия 
     /// </summary>
-    internal enum OpeningRealTaskStatus {
+    internal enum OpeningRealStatus {
         /// <summary>
         /// Нет ни одного элемента задания на отверстие или элемента ВИС, которое пересекается с этим чистовым отверстием
         /// </summary>
