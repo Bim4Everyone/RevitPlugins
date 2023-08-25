@@ -342,7 +342,7 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает список всех экземпляров семейств исходящих заданий на отверстия из текущего файла инженерных систем
+        /// Возвращает коллекцию всех экземпляров семейств исходящих заданий на отверстия из текущего файла инженерных систем
         /// </summary>
         /// <returns></returns>
         public ICollection<OpeningMepTaskOutcoming> GetOpeningsMepTasksOutcoming() {
@@ -539,10 +539,10 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает список чистовых экземпляров семейств отверстий из текущего документа Revit
+        /// Возвращает коллекцию чистовых экземпляров семейств отверстий из текущего документа Revit
         /// </summary>
         /// <returns></returns>
-        public IList<OpeningReal> GetRealOpenings() {
+        public ICollection<OpeningReal> GetRealOpenings() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
                 .WherePasses(FiltersInitializer.GetFilterByAllUsedOpeningsCategories())
@@ -551,7 +551,7 @@ namespace RevitOpeningPlacement.Models {
                 .Where(famInst => famInst.Host != null)
                 .Where(famInst => famInst.Symbol.FamilyName.Contains("Отв"))
                 .Select(famInst => new OpeningReal(famInst))
-                .ToList();
+                .ToHashSet();
         }
 
         /// <summary>
@@ -576,12 +576,12 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает список входящих заданий на отверстия из связанных файлов
+        /// Возвращает коллекцию входящих заданий на отверстия из связанных файлов
         /// </summary>
         /// <returns></returns>
-        public IList<OpeningMepTaskIncoming> GetOpeningsMepTasksIncoming() {
+        public ICollection<OpeningMepTaskIncoming> GetOpeningsMepTasksIncoming() {
             var links = GetRevitLinks();
-            List<OpeningMepTaskIncoming> genericModelsInLinks = new List<OpeningMepTaskIncoming>();
+            HashSet<OpeningMepTaskIncoming> genericModelsInLinks = new HashSet<OpeningMepTaskIncoming>();
             foreach(RevitLinkInstance link in links) {
                 var linkDoc = link.GetLinkDocument();
                 var transform = link.GetTransform();
@@ -592,14 +592,14 @@ namespace RevitOpeningPlacement.Models {
                     .Where(item => OpeningTaskTypeName.Any(n => n.Value.Equals(item.Name))
                                 && OpeningTaskFamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
                     .Select(famInst => new OpeningMepTaskIncoming(famInst, this, transform))
-                    ;
-                genericModelsInLinks.AddRange(genericModelsInLink);
+                    .ToHashSet();
+                genericModelsInLinks.UnionWith(genericModelsInLink);
             }
             return genericModelsInLinks;
         }
 
         /// <summary>
-        /// Возвращает список всех связей АР и КР из документа репозитория
+        /// Возвращает коллекцию всех связей АР и КР из документа репозитория
         /// </summary>
         /// <returns></returns>
         public ICollection<RevitLinkInstance> GetConstructureLinks() {
@@ -726,7 +726,7 @@ namespace RevitOpeningPlacement.Models {
         /// <summary>
         /// Возвращает коллекцию заголовков файлов Revit связей, которые дублируются.
         /// </summary>
-        /// <returns>Список заголовков дублированных Revit-связей</returns>
+        /// <returns>Коллекция заголовков дублированных Revit-связей</returns>
         public ICollection<string> GetDuplicatedLinksNames() {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_RvtLinks)
@@ -736,7 +736,8 @@ namespace RevitOpeningPlacement.Models {
                 .Where(link => RevitLinkType.IsLoaded(_document, link.GetTypeId()))
                 .GroupBy(inst => inst.GetLinkDocument().Title)
                 .Where(group => group.Count() > 1)
-                .Select(group => group.Key).ToHashSet();
+                .Select(group => group.Key)
+                .ToHashSet();
         }
 
         /// <summary>
@@ -753,16 +754,14 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает список экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит ("исходящие" задания).
+        /// Возвращает коллекцию экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит ("исходящие" задания).
         /// </summary>
-        /// <returns>Список экземпляров семейств, названия семейств и типов которых заданы в соответствующих словарях
-        /// <see cref="OpeningTaskTypeName">названий типов</see> и
-        /// <see cref="OpeningTaskFamilyName">названий семейств</see></returns>
-        private List<FamilyInstance> GetOpeningsTaskFromCurrentDoc() {
+        /// <returns>Коллекция экземпляров семейств, названия семейств и типов которых заданы в соответствующих словарях
+        private ICollection<FamilyInstance> GetOpeningsTaskFromCurrentDoc() {
             return GetGenericModelsFamilyInstances()
                 .Where(item => OpeningTaskTypeName.Any(n => n.Value.Equals(item.Name))
                             && OpeningTaskFamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
-                .ToList();
+                .ToHashSet();
         }
 
         private void RotateElement(Element element, Line axis, double angle) {
@@ -771,7 +770,7 @@ namespace RevitOpeningPlacement.Models {
             }
         }
 
-        private IList<string> GetRevitLinkNotLoadedNames() {
+        private ICollection<string> GetRevitLinkNotLoadedNames() {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_RvtLinks)
                 .WhereElementIsElementType()
@@ -780,19 +779,19 @@ namespace RevitOpeningPlacement.Models {
                                    _document,
                                    link.Id))
                 .Select(link => link.Name)
-                .ToList();
+                .ToHashSet();
         }
 
         /// <summary>
         /// Возвращает экземпляры семейств категории "Обобщенные модели" из текущего документа Revit
         /// </summary>
         /// <returns></returns>
-        private IList<FamilyInstance> GetGenericModelsFamilyInstances() {
+        private ICollection<FamilyInstance> GetGenericModelsFamilyInstances() {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
-                .ToList();
+                .ToHashSet();
         }
 
         private IList<RevitLinkInstance> GetRevitLinks() {
