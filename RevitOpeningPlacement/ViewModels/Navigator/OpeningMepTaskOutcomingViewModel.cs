@@ -6,13 +6,14 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models.Extensions;
+using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// <summary>
     /// Модель представления окна для работы с конкретным исходящим заданием на отверстие в файле инженера
     /// </summary>
-    internal class OpeningMepTaskOutcomingViewModel : BaseViewModel {
+    internal class OpeningMepTaskOutcomingViewModel : BaseViewModel, IFamilyInstanceProvider {
         /// <summary>
         /// Входящее задание на отверстие
         /// </summary>
