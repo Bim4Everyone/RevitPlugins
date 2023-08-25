@@ -16,12 +16,14 @@ namespace RevitOpeningPlacement.Views {
         }
 
         private void NavigatorView_Loaded(object sender, RoutedEventArgs e) {
-            _dg.GroupBy(_dg.Columns[1]);
-            _dg.GroupBy(_dg.Columns[2]);
-            _dg.GroupBy(_dg.Columns[3]);
+            _dgIncomingTasks.GroupBy(_dgIncomingTasks.Columns[1]);
+            _dgIncomingTasks.GroupBy(_dgIncomingTasks.Columns[2]);
+            _dgIncomingTasks.GroupBy(_dgIncomingTasks.Columns[3]);
 
-            _dg.SortBy(_dg.Columns[13], DevExpress.Data.ColumnSortOrder.Descending);
-            _dg.SortBy(_dg.Columns[11]);
+            _dgIncomingTasks.SortBy(_dgIncomingTasks.Columns[13], DevExpress.Data.ColumnSortOrder.Descending);
+            _dgIncomingTasks.SortBy(_dgIncomingTasks.Columns[11]);
+
+            _dgOpeningsReal.GroupBy(_dgOpeningsReal.Columns[1]);
         }
 
         public override string PluginName => nameof(RevitOpeningPlacement);
@@ -35,10 +37,15 @@ namespace RevitOpeningPlacement.Views {
             Close();
         }
 
-        private void view_FocusedRowHandleChanged(object sender, FocusedRowHandleChangedEventArgs e) {
-            var handle = _dg.View.FocusedRowHandle;
-            _dg.UnselectAll();
-            _dg.SelectItem(handle);
+        private void viewTasks_FocusedRowHandleChanged(object sender, FocusedRowHandleChangedEventArgs e) {
+            var handle = _dgIncomingTasks.View.FocusedRowHandle;
+            _dgIncomingTasks.UnselectAll();
+            _dgIncomingTasks.SelectItem(handle);
+        }
+        private void viewOpenings_FocusedRowHandleChanged(object sender, FocusedRowHandleChangedEventArgs e) {
+            var handle = _dgOpeningsReal.View.FocusedRowHandle;
+            _dgOpeningsReal.UnselectAll();
+            _dgOpeningsReal.SelectItem(handle);
         }
 
         private void SimpleButton_Click(object sender, RoutedEventArgs e) {
