@@ -15,12 +15,12 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// <summary>
     /// Модель представления окна для просмотра исходящих заданий на отверстия в файле инженера
     /// </summary>
-    internal class OpeningsMepTaskOutcomingViewModel : BaseViewModel {
+    internal class MepNavigatorForOutcomingTasksViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private OpeningMepTaskOutcomingViewModel _selectedOpeningMepTaskOutcoming;
 
 
-        public OpeningsMepTaskOutcomingViewModel(RevitRepository revitRepository, ICollection<OpeningMepTaskOutcomingViewModel> openingsMepTasksOutcoming) {
+        public MepNavigatorForOutcomingTasksViewModel(RevitRepository revitRepository, ICollection<OpeningMepTaskOutcomingViewModel> openingsMepTasksOutcoming) {
             if(revitRepository is null) {
                 throw new ArgumentNullException(nameof(revitRepository));
             }
