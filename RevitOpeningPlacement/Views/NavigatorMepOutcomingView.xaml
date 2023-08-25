@@ -18,7 +18,7 @@
                            Width="800"
                            MinHeight="300"
                            MinWidth="500"
-                           d:DataContext="{d:DesignInstance {x:Type vm:OpeningsMepTaskOutcomingViewModel}, IsDesignTimeCreatable=False}">
+                           d:DataContext="{d:DesignInstance {x:Type vm:MepNavigatorForOutcomingTasksViewModel}, IsDesignTimeCreatable=False}">
     <base:ThemedPlatformWindow.Resources>
         <DataTemplate x:Key="OneParentIdTemplate" DataType="{x:Type dxg:GroupRowData}">
             <Grid x:Name="_grid">
