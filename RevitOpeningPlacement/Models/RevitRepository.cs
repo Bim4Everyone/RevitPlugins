@@ -610,6 +610,22 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
+        /// Возвращает коллекцию всех связей ОВ, ВК, ЭОМ, СС из документа репозитория
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<RevitLinkInstance> GetMepLinks() {
+            var bimModelPartsService = GetPlatformService<IBimModelPartsService>();
+            return GetRevitLinks()
+                .Where(link => bimModelPartsService.InAnyBimModelParts(
+                    link.Name,
+                    BimModelPart.OVPart,
+                    BimModelPart.VKPart,
+                    BimModelPart.EOMPart,
+                    BimModelPart.SSPart))
+                .ToHashSet();
+        }
+
+        /// <summary>
         /// Предлагает пользователю выбрать системную стену или системное перекрытие и возвращает его выбор
         /// </summary>
         /// <returns>Выбранный пользователем элемент классов <see cref="Autodesk.Revit.DB.Wall"/> или <see cref="Autodesk.Revit.DB.Floor"/></returns>
