@@ -228,6 +228,10 @@
                                             FieldName="OwnComment" />
                             <dxg:GridColumn ReadOnly="True"
                                             Width="60"
+                                            Header="Создатель"
+                                            FieldName="Username" />
+                            <dxg:GridColumn ReadOnly="True"
+                                            Width="60"
                                             Header="Тип отверстия"
                                             FieldName="FamilyShortName" />
                             <dxg:GridColumn ReadOnly="True"
