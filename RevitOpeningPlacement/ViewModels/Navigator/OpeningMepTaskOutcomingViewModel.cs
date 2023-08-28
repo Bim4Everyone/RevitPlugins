@@ -6,13 +6,14 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models.Extensions;
+using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// <summary>
     /// Модель представления окна для работы с конкретным исходящим заданием на отверстие в файле инженера
     /// </summary>
-    internal class OpeningMepTaskOutcomingViewModel : BaseViewModel {
+    internal class OpeningMepTaskOutcomingViewModel : BaseViewModel, IFamilyInstanceProvider {
         /// <summary>
         /// Входящее задание на отверстие
         /// </summary>
@@ -31,6 +32,8 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Description = _openingTask.Description;
             CenterOffset = _openingTask.CenterOffset;
             BottomOffset = _openingTask.BottomOffset;
+            Comment = _openingTask.Comment;
+            Username = _openingTask.Username;
 
             Status = _openingTask.Status.GetEnumDescription();
         }
@@ -71,6 +74,15 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// </summary>
         public string Status { get; } = string.Empty;
 
+        /// <summary>
+        /// Комментарий
+        /// </summary>
+        public string Comment { get; } = string.Empty;
+
+        /// <summary>
+        /// Имя пользователя, создавшего задание на отверстие
+        /// </summary>
+        public string Username { get; } = string.Empty;
 
         /// <summary>
         /// Возвращает экземпляр семейства задания на отверстие

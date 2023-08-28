@@ -46,7 +46,10 @@ namespace RevitOpeningPlacement {
                 throw new OperationCanceledException();
             }
             if(!ModelCorrect(revitRepository)) {
-                return;
+                throw new OperationCanceledException();
+            }
+            if(!revitRepository.ContinueIfTaskFamiliesNotLatest()) {
+                throw new OperationCanceledException();
             }
             var openingConfig = OpeningConfig.GetOpeningConfig(revitRepository.Doc);
             if(openingConfig.Categories.Count > 0) {

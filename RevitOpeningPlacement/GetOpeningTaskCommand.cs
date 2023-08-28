@@ -15,6 +15,7 @@ using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.Navigator.Checkers;
 using RevitOpeningPlacement.Models.OpeningUnion;
+using RevitOpeningPlacement.OpeningModels;
 using RevitOpeningPlacement.ViewModels.Navigator;
 using RevitOpeningPlacement.Views;
 
@@ -24,7 +25,8 @@ namespace RevitOpeningPlacement {
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class GetOpeningTaskCommand : BasePluginCommand {
-        private const int _progressBarStep = 100;
+        private const int _progressBarStepLarge = 100;
+        private const int _progressBarStepSmall = 25;
 
 
         public GetOpeningTaskCommand() {
@@ -102,39 +104,97 @@ namespace RevitOpeningPlacement {
             if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
                 throw new OperationCanceledException();
             }
-            var incomingTasks = revitRepository.GetOpeningsMepTasksIncoming();
-            var realOpenings = revitRepository.GetRealOpenings();
-            var constructureElementsIds = revitRepository.GetConstructureElementsIds();
-            var incomingTasksViewModels = new List<OpeningMepTaskIncomingViewModel>();
+            ICollection<OpeningMepTaskIncoming> incomingTasks = revitRepository.GetOpeningsMepTasksIncoming();
+            ICollection<OpeningReal> realOpenings = revitRepository.GetRealOpenings();
+            ICollection<ElementId> constructureElementsIds = revitRepository.GetConstructureElementsIds();
+            ICollection<IMepLinkElementsProvider> mepLinks = revitRepository
+                .GetMepLinks()
+                .Select(link => new MepLinkElementsProvider(link) as IMepLinkElementsProvider)
+                .ToHashSet();
 
-            using(var pb = GetPlatformService<IProgressDialogService>()) {
-                pb.StepValue = _progressBarStep;
-                pb.DisplayTitleFormat = "Анализ отверстий... [{0}\\{1}]";
-                var progress = pb.CreateProgress();
-                pb.MaxValue = incomingTasks.Count;
-                var ct = pb.CreateCancellationToken();
-                pb.Show();
+            var incomingTasksViewModels = GetOpeningsMepIncomingTasksVM(incomingTasks, realOpenings, constructureElementsIds);
+            var openingsRealViewModels = GetOpeningsRealVM(mepLinks, realOpenings);
 
-                for(int i = 0; i < incomingTasks.Count; i++) {
-                    ct.ThrowIfCancellationRequested();
-                    if(i % _progressBarStep == 0) {
-                        progress.Report(i);
-                    }
-                    try {
-                        incomingTasks[i].UpdateStatusAndHostName(realOpenings, constructureElementsIds);
-                    } catch(ArgumentException) {
-                        //не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
-                        continue;
-                    }
-                    incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTasks[i]));
-                }
-            }
-            var navigatorViewModel = new OpeningsMepTaskIncomingViewModel(revitRepository, incomingTasksViewModels);
+            var navigatorViewModel = new ArchitectureNavigatorForIncomingTasksViewModel(
+                revitRepository,
+                incomingTasksViewModels,
+                openingsRealViewModels);
 
             var window = new NavigatorMepIncomingView() { Title = PluginName, DataContext = navigatorViewModel };
             var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
 
             window.Show();
+        }
+
+        /// <summary>
+        /// Получает коллекцию моделей представления для входящих заданий на отверстия
+        /// </summary>
+        /// <param name="incomingTasks">Входящие задания на отверстия из связей</param>
+        /// <param name="realOpenings">Чистовые отверстия из текущего документа</param>
+        /// <param name="constructureElementsIds">Элементы конструкций из текущего документа</param>
+        /// <returns></returns>
+        private ICollection<OpeningMepTaskIncomingViewModel> GetOpeningsMepIncomingTasksVM(
+            ICollection<OpeningMepTaskIncoming> incomingTasks,
+            ICollection<OpeningReal> realOpenings,
+            ICollection<ElementId> constructureElementsIds) {
+
+            var incomingTasksViewModels = new HashSet<OpeningMepTaskIncomingViewModel>();
+
+            using(var pb = GetPlatformService<IProgressDialogService>()) {
+                pb.StepValue = _progressBarStepLarge;
+                pb.DisplayTitleFormat = "Анализ заданий... [{0}\\{1}]";
+                var progress = pb.CreateProgress();
+                pb.MaxValue = incomingTasks.Count;
+                var ct = pb.CreateCancellationToken();
+                pb.Show();
+
+                int i = 0;
+                foreach(var incomingTask in incomingTasks) {
+                    ct.ThrowIfCancellationRequested();
+                    if((i % _progressBarStepLarge) == 0) {
+                        progress.Report(i);
+                    }
+                    try {
+                        incomingTask.UpdateStatusAndHostName(realOpenings, constructureElementsIds);
+                    } catch(ArgumentException) {
+                        //не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
+                        continue;
+                    }
+                    incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTask));
+                    i++;
+                }
+            }
+            return incomingTasksViewModels;
+        }
+
+        private ICollection<OpeningRealViewModel> GetOpeningsRealVM(
+            ICollection<IMepLinkElementsProvider> mepLinks,
+            ICollection<OpeningReal> openingsReal) {
+
+            var openingsRealViewModels = new HashSet<OpeningRealViewModel>();
+
+            using(var pb = GetPlatformService<IProgressDialogService>()) {
+                pb.StepValue = _progressBarStepSmall;
+                pb.DisplayTitleFormat = "Анализ отверстий... [{0}\\{1}]";
+                var progress = pb.CreateProgress();
+                pb.MaxValue = openingsReal.Count;
+                var ct = pb.CreateCancellationToken();
+                pb.Show();
+
+                var i = 0;
+                foreach(var openingReal in openingsReal) {
+                    ct.ThrowIfCancellationRequested();
+                    if((i % _progressBarStepSmall) == 0) {
+                        progress.Report(i);
+                    }
+                    openingReal.UpdateStatus(mepLinks);
+                    if(openingReal.Status != OpeningModels.Enums.OpeningRealStatus.Correct) {
+                        openingsRealViewModels.Add(new OpeningRealViewModel(openingReal));
+                    }
+                    i++;
+                }
+            }
+            return openingsRealViewModels;
         }
 
         private bool ModelCorrect(RevitRepository revitRepository) {
@@ -180,26 +240,28 @@ namespace RevitOpeningPlacement {
             IList<ElementId> outcomingTasksIds = outcomingTasks.Select(task => new ElementId(task.Id)).ToList();
             var mepElementsIds = revitRepository.GetMepElementsIds();
             var openingTaskOutcomingViewModels = new List<OpeningMepTaskOutcomingViewModel>();
-            var constructureLinks = revitRepository.GetConstructureLinks().Select(link => new ConstructureLinkElementsProvider(link) as IConstructureLinkElementsProvider).ToList();
+            var constructureLinks = revitRepository.GetConstructureLinks().Select(link => new ConstructureLinkElementsProvider(link) as IConstructureLinkElementsProvider).ToHashSet();
 
             using(var pb = GetPlatformService<IProgressDialogService>()) {
-                pb.StepValue = _progressBarStep;
+                pb.StepValue = _progressBarStepLarge;
                 pb.DisplayTitleFormat = "Анализ заданий... [{0}\\{1}]";
                 var progress = pb.CreateProgress();
                 pb.MaxValue = outcomingTasks.Count;
                 var ct = pb.CreateCancellationToken();
                 pb.Show();
 
-                for(int i = 0; i < outcomingTasks.Count; i++) {
+                int i = 0;
+                foreach(var outcomingTask in outcomingTasks) {
                     ct.ThrowIfCancellationRequested();
-                    if(i % _progressBarStep == 0) {
+                    if(i % _progressBarStepLarge == 0) {
                         progress.Report(i);
                     }
-                    outcomingTasks[i].UpdateStatus(ref outcomingTasksIds, mepElementsIds, constructureLinks);
-                    openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTasks[i]));
+                    outcomingTask.UpdateStatus(ref outcomingTasksIds, mepElementsIds, constructureLinks);
+                    openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTask));
+                    i++;
                 }
             }
-            var navigatorViewModel = new OpeningsMepTaskOutcomingViewModel(revitRepository, openingTaskOutcomingViewModels);
+            var navigatorViewModel = new MepNavigatorForOutcomingTasksViewModel(revitRepository, openingTaskOutcomingViewModels);
 
             var window = new NavigatorMepOutcomingView() { Title = PluginName, DataContext = navigatorViewModel };
             var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };

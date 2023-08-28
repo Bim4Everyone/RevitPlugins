@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
@@ -19,7 +21,7 @@ namespace RevitOpeningPlacement.OpeningModels {
     /// Класс, обозначающий экземпляры семейств заданий на отверстия из связанного файла-задания на отверстия,
     /// подгруженного в текущий документ получателя
     /// </summary>
-    internal class OpeningMepTaskIncoming : ISolidProvider {
+    internal class OpeningMepTaskIncoming : ISolidProvider, IEquatable<OpeningMepTaskIncoming>, IFamilyInstanceProvider {
         /// <summary>
         /// Экземпляр семейства задания на отверстие из связанного файла
         /// </summary>
@@ -34,7 +36,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Экземпляр семейства задания на отверстие, расположенного в связанном файле задания на отверстия
         /// 
-        /// <para>Примечание: конструктор не обновляет свойство <see cref="Status"/>. Для обновления этого свойства надо вызвать <see cref="UpdateStatusAndHostName"/></para>
+        /// <para>Примечание: конструктор не обновляет свойства <see cref="Status"/> и <see cref="HostName"/>. Для обновления этих свойств надо вызвать <see cref="UpdateStatusAndHostName"/></para>
         /// </summary>
         /// <param name="openingTaskIncoming">Экземпляр семейства задания на отверстие из связанного файла</param>
         /// <param name="revitRepository">Репозиторий текущего документа, в который подгружен документ с заданиями на отверстия</param>
@@ -63,6 +65,12 @@ namespace RevitOpeningPlacement.OpeningModels {
             DisplayHeight = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningHeight);
             DisplayWidth = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningWidth);
             DisplayThickness = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningThickness);
+            OwnComment = _familyInstance.GetParamValueStringOrDefault(
+                SystemParamsConfig.Instance.CreateRevitParam(
+                    _familyInstance.Document,
+                    BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
+                string.Empty);
+            Username = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningAuthor);
 
             Diameter = GetFamilyInstanceDoubleParamValueOrZero(RevitRepository.OpeningDiameter);
             Height = GetFamilyInstanceDoubleParamValueOrZero(RevitRepository.OpeningHeight);
@@ -160,11 +168,23 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         /// <summary>
         /// Название элемента, в котором расположено задание на отверстие. Предназначено для дальнейшей сортировки входящих заданий в навигаторе по типам стен: штукатурка/монолит/кладка и т.п.
+        /// <para>Для обновления использовать <see cref="UpdateStatusAndHostName"/></para>
         /// </summary>
         public string HostName { get; private set; } = string.Empty;
 
         /// <summary>
+        /// Комментарий экземпляра семейства задания на отверстие
+        /// </summary>
+        public string OwnComment { get; } = string.Empty;
+
+        /// <summary>
+        /// Имя пользователя, создавшего задание на отверстие
+        /// </summary>
+        public string Username { get; } = string.Empty;
+
+        /// <summary>
         /// Статус отработки задания на отверстие
+        /// <para>Для обновления использовать <see cref="UpdateStatusAndHostName"/></para>
         /// </summary>
         public OpeningTaskIncomingStatus Status { get; set; } = OpeningTaskIncomingStatus.New;
 
@@ -177,6 +197,18 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Угол поворота задания на отверстие в радианах в координатах активного файла, в который подгружена связь с заданием на отверстие
         /// </summary>
         public double Rotation { get; } = 0;
+
+        public override bool Equals(object obj) {
+            return (obj is OpeningMepTaskIncoming opening) && Equals(opening);
+        }
+
+        public override int GetHashCode() {
+            return Id + FileName.GetHashCode();
+        }
+
+        public bool Equals(OpeningMepTaskIncoming other) {
+            return (other != null) && (Id == other.Id) && FileName.Equals(other.FileName);
+        }
 
 
         public FamilyInstance GetFamilyInstance() {
@@ -202,8 +234,43 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <returns></returns>
         public BoundingBoxXYZ GetTransformedBBoxXYZ() {
-            return _familyInstance.GetBoundingBox().TransformBoundingBox(Transform);
+            // _familyInstance.GetBoundingBox().TransformBoundingBox(Transform);
+            // при получении бокса сразу из экземпляра семейства
+            // сначала строится бокс в координатах экземпляра семейства,
+            // а потом строится описанный бокс в координатах проекта.
+            //      B = b*cos(a) + b*sin(a), где
+            //      (a) - угол поворота
+            //      (B) - сторона описанного бокса в координатах проекта
+            //      (b) - сторона вписанного бокса в координатах экземпляра семейства
+            // Если семейство - вертикальный цилиндр, то это приведет к значительной погрешности.
+            return GetSolid().GetTransformedBoundingBox();
         }
+
+        /// <summary>
+        /// Обновляет <see cref="Status"/> и <see cref="HostName"/> входящего задания на отверстие
+        /// </summary>
+        /// <param name="realOpenings">Коллекция чистовых отверстий, размещенных в активном документе-получателе заданий на отверстия</param>
+        /// <exception cref="ArgumentException"></exception>
+        public void UpdateStatusAndHostName(ICollection<OpeningReal> realOpenings, ICollection<ElementId> constructureElementsIds) {
+            var thisOpeningSolid = GetSolid();
+            var thisOpeningBBox = GetTransformedBBoxXYZ();
+
+            var intersectingStructureElements = GetIntersectingStructureElementsIds(thisOpeningSolid, constructureElementsIds);
+            var intersectingOpenings = GetIntersectingOpeningsIds(realOpenings, thisOpeningSolid, thisOpeningBBox);
+            var hostId = GetOpeningTaskHostId(thisOpeningSolid, intersectingStructureElements, intersectingOpenings);
+            SetOpeningTaskHostName(hostId);
+
+            if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count == 0)) {
+                Status = OpeningTaskIncomingStatus.NoIntersection;
+            } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count == 0)) {
+                Status = OpeningTaskIncomingStatus.New;
+            } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count > 0)) {
+                Status = OpeningTaskIncomingStatus.NotMatch;
+            } else if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count > 0)) {
+                Status = OpeningTaskIncomingStatus.Completed;
+            }
+        }
+
 
         /// <summary>
         /// Возвращает значение double параметра экземпляра семейства задания на отверстие в единицах ревита, или 0, если параметр отсутствует
@@ -257,39 +324,13 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
-        /// Обновляет <see cref="Status"/> и <see cref="HostName"/> входящего задания на отверстие
-        /// </summary>
-        /// <param name="realOpenings">Коллекция чистовых отверстий, размещенных в активном документе-получателе заданий на отверстия</param>
-        /// <exception cref="ArgumentException"></exception>
-        public void UpdateStatusAndHostName(ICollection<OpeningReal> realOpenings, ICollection<ElementId> constructureElementsIds) {
-            var thisOpeningSolid = GetSolid();
-            var thisOpeningBBox = GetTransformedBBoxXYZ();
-
-            var intersectingStructureElements = GetIntersectingStructureElementsIds(thisOpeningSolid, constructureElementsIds);
-            var intersectingOpenings = GetIntersectingOpeningsIds(realOpenings, thisOpeningSolid, thisOpeningBBox);
-            var hostId = GetOpeningTaskHostId(thisOpeningSolid, intersectingStructureElements, intersectingOpenings);
-            SetOpeningTaskHostName(hostId);
-
-            if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count == 0)) {
-                Status = OpeningTaskIncomingStatus.NoIntersection;
-            } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count == 0)) {
-                Status = OpeningTaskIncomingStatus.New;
-            } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count > 0)) {
-                Status = OpeningTaskIncomingStatus.NotMatch;
-            } else if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count > 0)) {
-                Status = OpeningTaskIncomingStatus.Completed;
-            }
-        }
-
-
-        /// <summary>
         /// Возвращает коллекцию элементов конструкций, с которыми пересекается текущее задание на отверстие
         /// </summary>
         /// <param name="thisOpeningSolid">Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
         /// <param name="constructureElementsIds">Коллекция id элементов конструкций из активного документа ревита, для которых были сделаны задания на отверстия</param>
         /// <returns></returns>
         private ICollection<ElementId> GetIntersectingStructureElementsIds(Solid thisOpeningSolid, ICollection<ElementId> constructureElementsIds) {
-            if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
+            if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0) || (!constructureElementsIds.Any())) {
                 return Array.Empty<ElementId>();
             } else {
                 return new FilteredElementCollector(_revitRepository.Doc, constructureElementsIds)
