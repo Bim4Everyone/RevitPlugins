@@ -28,7 +28,6 @@ namespace RevitOpeningPlacement.Models {
             _transform = linkDocument.GetTransform();
             _mepElements = GetMepElementIds(_document);
             _openingTasks = GetOpeningsTaskIds(_document);
-            var t = Benchmark(_document);// TODO удалить метод для сравнения
         }
 
         public Document Document => _document;
@@ -52,44 +51,15 @@ namespace RevitOpeningPlacement.Models {
         }
 
         private ICollection<ElementId> GetOpeningsTaskIds(Document document) {
-            HashSet<ElementId> openingTaskIds = new HashSet<ElementId>();
-            foreach(OpeningType openingType in Enum.GetValues(typeof(OpeningType))) {
-                var openingTaskOfOneTypeIds = GetOpeningTaskIdsByType(document, openingType);
-                foreach(var openingId in openingTaskOfOneTypeIds) {
-                    openingTaskIds.Add(openingId);
-                }
-            }
-            return openingTaskIds;
-        }
-
-        private ICollection<FamilyInstance> Benchmark(Document document) {// TODO удалить метод для сравнения
             var types = Enum.GetValues(typeof(OpeningType));
             return new FilteredElementCollector(document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
-                .Where(item => RevitRepository.OpeningTaskTypeName.Values.Any(value => value.Equals(item.Name))
-                && RevitRepository.OpeningTaskFamilyName.Values.Any(value => value.Equals(item.Name)))
-                .ToList();
-        }
-
-        private ElementId GetOpeningTaskFamilySymbol(Document document, OpeningType openingType) {
-            return new FilteredElementCollector(document)
-                .OfCategory(BuiltInCategory.OST_GenericModel)
-                .WhereElementIsElementType()
-                .OfClass(typeof(FamilySymbol))
-                .FirstOrDefault(item =>
-                        item.Name.Equals(RevitRepository.OpeningTaskTypeName[openingType])
-                    && (item as FamilySymbol).FamilyName.Equals(RevitRepository.OpeningTaskFamilyName[openingType]))
-                ?.Id ?? ElementId.InvalidElementId;
-        }
-
-        private ICollection<ElementId> GetOpeningTaskIdsByType(Document document, OpeningType openingType) {
-            var openingTaskSymbol = GetOpeningTaskFamilySymbol(document, openingType);
-            var famInstFilter = new FamilyInstanceFilter(document, openingTaskSymbol);
-            return new FilteredElementCollector(document)
-                .WherePasses(famInstFilter)
-                .ToElementIds();
+                .Where(item => RevitRepository.OpeningTaskTypeName.Values.Any(value => value.Equals(item.Symbol.Name))
+                && RevitRepository.OpeningTaskFamilyName.Values.Any(value => value.Equals(item.Symbol.FamilyName)))
+                .Select(famInst => famInst.Id)
+                .ToHashSet();
         }
     }
 }
