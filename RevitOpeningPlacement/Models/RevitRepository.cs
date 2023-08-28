@@ -605,12 +605,17 @@ namespace RevitOpeningPlacement.Models {
         public ICollection<RevitLinkInstance> GetConstructureLinks() {
             var bimModelPartsService = GetPlatformService<IBimModelPartsService>();
             return GetRevitLinks()
-                .Where(link => bimModelPartsService.InAnyBimModelParts(link.Name, BimModelPart.ARPart, BimModelPart.KRPart))
+                .Where(link => bimModelPartsService.InAnyBimModelParts(
+                    link.Name,
+                    BimModelPart.ARPart,
+                    BimModelPart.KRPart,
+                    BimModelPart.KMPart
+                    ))
                 .ToHashSet();
         }
 
         /// <summary>
-        /// Возвращает коллекцию всех связей ОВ, ВК, ЭОМ, СС из документа репозитория
+        /// Возвращает коллекцию всех связей инженерных систем из документа репозитория
         /// </summary>
         /// <returns></returns>
         public ICollection<RevitLinkInstance> GetMepLinks() {
@@ -619,10 +624,23 @@ namespace RevitOpeningPlacement.Models {
                 .Where(link => bimModelPartsService.InAnyBimModelParts(
                     link.Name,
                     BimModelPart.OVPart,
+                    BimModelPart.ITPPart,
+                    BimModelPart.HCPart,
                     BimModelPart.VKPart,
                     BimModelPart.EOMPart,
-                    BimModelPart.SSPart))
-                .ToHashSet();
+                    BimModelPart.EGPart,
+                    BimModelPart.SSPart,
+                    BimModelPart.VNPart,
+                    BimModelPart.KVPart,
+                    BimModelPart.OTPart,
+                    BimModelPart.DUPart,
+                    BimModelPart.VSPart,
+                    BimModelPart.KNPart,
+                    BimModelPart.PTPart,
+                    BimModelPart.EOPart,
+                    BimModelPart.EMPart
+                    ))
+            .ToHashSet();
         }
 
         /// <summary>
