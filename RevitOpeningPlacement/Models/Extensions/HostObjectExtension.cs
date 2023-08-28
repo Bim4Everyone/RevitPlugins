@@ -49,6 +49,10 @@ namespace RevitOpeningPlacement.Models.Extensions {
         /// <returns></returns>
         /// <exception cref="ArgumentException">Исключение, если <paramref name="hostObject"/> не Стена | Потолок | Перекрытие | Крыша</exception>
         public static Face[] GetHostBoundFaces(this HostObject hostObject) {
+            // TODO скорректировать алгоритм:
+            // если чистовое отверстие размещено на наружной грани хоста так,
+            // что часть этого отверстия находится вне хоста, то ограничивающие поверхности хоста будут с вырезами,
+            // что в дальнейшем приведет к неправильному определению солида
             if(IsVerticallyCompound(hostObject)) {
                 return hostObject.GetSideFaces().ToArray();
             } else {
