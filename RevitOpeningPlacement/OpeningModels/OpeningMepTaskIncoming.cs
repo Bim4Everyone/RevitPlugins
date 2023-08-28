@@ -70,6 +70,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                     _familyInstance.Document,
                     BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
                 string.Empty);
+            Username = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningAuthor);
 
             Diameter = GetFamilyInstanceDoubleParamValueOrZero(RevitRepository.OpeningDiameter);
             Height = GetFamilyInstanceDoubleParamValueOrZero(RevitRepository.OpeningHeight);
@@ -175,6 +176,11 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Комментарий экземпляра семейства задания на отверстие
         /// </summary>
         public string OwnComment { get; } = string.Empty;
+
+        /// <summary>
+        /// Имя пользователя, создавшего задание на отверстие
+        /// </summary>
+        public string Username { get; } = string.Empty;
 
         /// <summary>
         /// Статус отработки задания на отверстие

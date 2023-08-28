@@ -65,6 +65,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                     _familyInstance.Document,
                     BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
                 string.Empty);
+            Username = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningAuthor);
         }
 
         /// <summary>
@@ -101,6 +102,11 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Комментарий
         /// </summary>
         public string Comment { get; } = string.Empty;
+
+        /// <summary>
+        /// Имя пользователя, создавшего задание на отверстие
+        /// </summary>
+        public string Username { get; } = string.Empty;
 
         /// <summary>
         /// Точка расположения экземпляра семейства задания на отверстие
