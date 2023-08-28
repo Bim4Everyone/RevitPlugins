@@ -141,6 +141,7 @@
                 <dxg:GridColumn ReadOnly="True" Width="*" Header="Описание пересечения" FieldName="Description"/>
                 <dxg:GridColumn ReadOnly="True" Width="80" Header="Отметка оси" FieldName="CenterOffset"/>
                 <dxg:GridColumn ReadOnly="True" Width="90" Header="Отметка низа" FieldName="BottomOffset"/>
+                <dxg:GridColumn ReadOnly="True" Width="90" Header="Комментарий" FieldName="Comment" />
             </dxg:GridControl.Columns>
         </dxg:GridControl>
 

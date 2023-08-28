@@ -224,6 +224,10 @@
                                             FieldName="MepSystem" />
                             <dxg:GridColumn ReadOnly="True"
                                             Width="60"
+                                            Header="Комментарий"
+                                            FieldName="OwnComment" />
+                            <dxg:GridColumn ReadOnly="True"
+                                            Width="60"
                                             Header="Тип отверстия"
                                             FieldName="FamilyShortName" />
                             <dxg:GridColumn ReadOnly="True"
@@ -305,6 +309,11 @@
                                             Header="Высота"
                                             IsSmart="True"
                                             FieldName="Height" />
+                            <dxg:GridColumn ReadOnly="True"
+                                            Width="90"
+                                            Header="Комментарий"
+                                            IsSmart="True"
+                                            FieldName="Comment" />
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
                 </dxdo:LayoutPanel>
