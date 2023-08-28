@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
@@ -63,6 +65,11 @@ namespace RevitOpeningPlacement.OpeningModels {
             DisplayHeight = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningHeight);
             DisplayWidth = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningWidth);
             DisplayThickness = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningThickness);
+            OwnComment = _familyInstance.GetParamValueStringOrDefault(
+                SystemParamsConfig.Instance.CreateRevitParam(
+                    _familyInstance.Document,
+                    BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
+                string.Empty);
 
             Diameter = GetFamilyInstanceDoubleParamValueOrZero(RevitRepository.OpeningDiameter);
             Height = GetFamilyInstanceDoubleParamValueOrZero(RevitRepository.OpeningHeight);
@@ -163,6 +170,11 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <para>Для обновления использовать <see cref="UpdateStatusAndHostName"/></para>
         /// </summary>
         public string HostName { get; private set; } = string.Empty;
+
+        /// <summary>
+        /// Комментарий экземпляра семейства задания на отверстие
+        /// </summary>
+        public string OwnComment { get; } = string.Empty;
 
         /// <summary>
         /// Статус отработки задания на отверстие
@@ -312,7 +324,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="constructureElementsIds">Коллекция id элементов конструкций из активного документа ревита, для которых были сделаны задания на отверстия</param>
         /// <returns></returns>
         private ICollection<ElementId> GetIntersectingStructureElementsIds(Solid thisOpeningSolid, ICollection<ElementId> constructureElementsIds) {
-            if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
+            if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0) || (!constructureElementsIds.Any())) {
                 return Array.Empty<ElementId>();
             } else {
                 return new FilteredElementCollector(_revitRepository.Doc, constructureElementsIds)

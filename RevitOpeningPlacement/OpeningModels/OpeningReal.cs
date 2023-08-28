@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
@@ -49,6 +51,11 @@ namespace RevitOpeningPlacement.OpeningModels {
             Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningWidth);
             Height = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningHeight);
             Name = _familyInstance.Name;
+            Comment = _familyInstance.GetParamValueStringOrDefault(
+                SystemParamsConfig.Instance.CreateRevitParam(
+                    _familyInstance.Document,
+                    BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
+                string.Empty);
 
             SetTransformedBBoxXYZ();
             SetSolid();
@@ -76,6 +83,8 @@ namespace RevitOpeningPlacement.OpeningModels {
         public string Height { get; } = string.Empty;
 
         public string Name { get; } = string.Empty;
+
+        public string Comment { get; } = string.Empty;
 
         /// <summary>
         /// Статус текущего отверстия относительно полученных заданий
@@ -163,7 +172,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         private OpeningRealStatus GetStatusByVolumeRatio(double volumeRatio) {
             if(volumeRatio < 0.01) {
                 return OpeningRealStatus.Empty;
-            } else if(volumeRatio < 0.5) {
+            } else if(volumeRatio < 0.2) {
                 return OpeningRealStatus.TooBig;
             } else {
                 return OpeningRealStatus.Correct;
@@ -226,6 +235,9 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="linkElementsForChecking">Элементы из связи для проверки на пересечение</param>
         /// <returns>True, если хотя бы 1 элемент пересекается с хостом текущего чистового отверстия, иначе False</returns>
         private bool LinkElementsIntersectHost(IMepLinkElementsProvider mepLink, ICollection<ElementId> linkElementsForChecking) {
+            if(!linkElementsForChecking.Any()) {
+                return false;
+            }
             var hostSolidInLinkCoordinates = SolidUtils.CreateTransformed(GetHost().GetSolid(), mepLink.DocumentTransform.Inverse);
             return new FilteredElementCollector(mepLink.Document, linkElementsForChecking)
                 .WherePasses(new BoundingBoxIntersectsFilter(hostSolidInLinkCoordinates.GetOutline()))
@@ -256,7 +268,11 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="thisOpeningRealSolidInLinkCoordinates">Солид текущего чистового отверстия в координатах связанного файла</param>
         /// <returns></returns>
         private ICollection<ElementId> GetIntersectingLinkMepElements(IMepLinkElementsProvider mepLink, Solid thisOpeningRealSolidInLinkCoordinates) {
-            return new FilteredElementCollector(mepLink.Document, mepLink.GetMepElementIds())
+            var ids = mepLink.GetMepElementIds();
+            if(!ids.Any()) {
+                return Array.Empty<ElementId>();
+            }
+            return new FilteredElementCollector(mepLink.Document, ids)
                 .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningRealSolidInLinkCoordinates.GetOutline()))
                 .WherePasses(new ElementIntersectsSolidFilter(thisOpeningRealSolidInLinkCoordinates))
                 .ToElementIds();
@@ -269,7 +285,11 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="thisOpeningRealSolidInLinkCoordinates">Солид текущего чистового отверстия в координатах связанного файла</param>
         /// <returns></returns>
         private ICollection<ElementId> GetIntersectingLinkOpeningTasks(IMepLinkElementsProvider mepLink, Solid thisOpeningRealSolidInLinkCoordinates) {
-            return new FilteredElementCollector(mepLink.Document, mepLink.GetOpeningsTaskIds())
+            ICollection<ElementId> ids = mepLink.GetOpeningsTaskIds();
+            if(!ids.Any()) {
+                return Array.Empty<ElementId>();
+            }
+            return new FilteredElementCollector(mepLink.Document, ids)
                 .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningRealSolidInLinkCoordinates.GetOutline()))
                 .WherePasses(new ElementIntersectsSolidFilter(thisOpeningRealSolidInLinkCoordinates))
                 .ToElementIds();

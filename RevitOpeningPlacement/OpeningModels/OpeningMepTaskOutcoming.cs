@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
@@ -58,6 +60,11 @@ namespace RevitOpeningPlacement.OpeningModels {
             Description = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDescription);
             CenterOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetCenter);
             BottomOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetBottom);
+            Comment = _familyInstance.GetParamValueStringOrDefault(
+                SystemParamsConfig.Instance.CreateRevitParam(
+                    _familyInstance.Document,
+                    BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
+                string.Empty);
         }
 
         /// <summary>
@@ -91,9 +98,14 @@ namespace RevitOpeningPlacement.OpeningModels {
         public int Id { get; }
 
         /// <summary>
+        /// Комментарий
+        /// </summary>
+        public string Comment { get; } = string.Empty;
+
+        /// <summary>
         /// Точка расположения экземпляра семейства задания на отверстие
         /// </summary>
-        public XYZ Location { get; private set; }
+        public XYZ Location { get; }
 
         /// <summary>
         /// Флаг, обозначающий, удален ли экземпляр семейства задания на отверстие из проекта
@@ -334,7 +346,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="allOpeningTasksInDoc">Id всех экземпляров семейств заданий на отверстия из активного документа ревита для проверки</param>
         /// <returns>Коллекция Id экземпляров семейств исходящих заданий на отверстия, которые пересекаются с текущим заданием на отверстие</returns>
         private ICollection<ElementId> GetIntersectingOpeningsTasks(Solid thisOpeningTaskSolid, ICollection<ElementId> allOpeningTasksInDoc) {
-            if((thisOpeningTaskSolid is null) || (thisOpeningTaskSolid.Volume <= 0)) {
+            if((thisOpeningTaskSolid is null) || (thisOpeningTaskSolid.Volume <= 0) || (!allOpeningTasksInDoc.Any())) {
                 return Array.Empty<ElementId>();
             } else {
                 return new FilteredElementCollector(GetDocument(), allOpeningTasksInDoc)
@@ -369,7 +381,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="allMepElementsIds"></param>
         /// <returns></returns>
         private ICollection<ElementId> GetIntersectingMepElementsIds(Solid thisOpeningSolid, ICollection<ElementId> allMepElementsIds) {
-            if(!IsRemoved && (thisOpeningSolid != null) && (allMepElementsIds != null)) {
+            if(!IsRemoved && (thisOpeningSolid != null) && (allMepElementsIds != null) && allMepElementsIds.Any()) {
                 if((_intersectingMepElementsCache.Value != null) && (_intersectingMepElementsCache.CacheTime.CompareTo(DateTime.Now) >= 0)) {
                     return _intersectingMepElementsCache.Value;
                 } else {
@@ -478,7 +490,11 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="constructureLinkElementsProvider">Связанный файл для проверки на пересечение</param>
         /// <returns></returns>
         private ICollection<ElementId> GetIntersectingLinkConstructionElementsIds(Solid thisOpeningSolidInLinkCoordinates, IConstructureLinkElementsProvider constructureLinkElementsProvider) {
-            return new FilteredElementCollector(constructureLinkElementsProvider.Document, constructureLinkElementsProvider.GetConstructureElementIds())
+            ICollection<ElementId> ids = constructureLinkElementsProvider.GetConstructureElementIds();
+            if(!ids.Any()) {
+                return Array.Empty<ElementId>();
+            }
+            return new FilteredElementCollector(constructureLinkElementsProvider.Document, ids)
                 .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningSolidInLinkCoordinates.GetOutline()))
                 .WherePasses(new ElementIntersectsSolidFilter(thisOpeningSolidInLinkCoordinates))
                 .ToElementIds();
