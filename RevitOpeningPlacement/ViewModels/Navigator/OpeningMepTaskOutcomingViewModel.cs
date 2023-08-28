@@ -32,6 +32,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Description = _openingTask.Description;
             CenterOffset = _openingTask.CenterOffset;
             BottomOffset = _openingTask.BottomOffset;
+            Comment = _openingTask.Comment;
 
             Status = _openingTask.Status.GetEnumDescription();
         }
@@ -72,6 +73,10 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// </summary>
         public string Status { get; } = string.Empty;
 
+        /// <summary>
+        /// Комментарий
+        /// </summary>
+        public string Comment { get; } = string.Empty;
 
         /// <summary>
         /// Возвращает экземпляр семейства задания на отверстие

@@ -42,6 +42,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             FamilyShortName = _openingTask.FamilyShortName;
             HostName = _openingTask.HostName;
             Status = _openingTask.Status.GetEnumDescription();
+            OwnComment = _openingTask.OwnComment;
         }
 
 
@@ -114,6 +115,11 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// Название хоста задания на отверстие
         /// </summary>
         public string HostName { get; } = string.Empty;
+
+        /// <summary>
+        /// Комментарий экземпляра семейства задания на отверстие
+        /// </summary>
+        public string OwnComment { get; } = string.Empty;
 
 
         private bool _isAccepted;

@@ -23,6 +23,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Width = _openingReal.Width;
             Height = _openingReal.Height;
             Status = _openingReal.Status.GetEnumDescription();
+            Comment = _openingReal.Comment;
         }
 
 
@@ -50,6 +51,11 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// Статус чистового отверстия
         /// </summary>
         public string Status { get; } = string.Empty;
+
+        /// <summary>
+        /// Комментарий
+        /// </summary>
+        public string Comment { get; } = string.Empty;
 
 
         public override bool Equals(object obj) {
