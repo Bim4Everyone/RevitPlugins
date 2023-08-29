@@ -34,7 +34,8 @@ namespace RevitOpeningPlacement.Models.Navigator.Checkers {
 
         private void InitializeCheckers() {
             _checkers = new List<IChecker> {
-                new DuplicatedLinksChecker(_revitRepository)
+                new DuplicatedLinksChecker(_revitRepository),
+                new DocsTitlesChecker(_revitRepository)
             };
         }
     }
