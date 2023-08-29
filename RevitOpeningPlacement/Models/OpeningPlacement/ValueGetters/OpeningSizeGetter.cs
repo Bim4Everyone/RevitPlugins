@@ -29,8 +29,10 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
             if(_mepCategories != null && _mepCategories.Length > 0) {
                 size += _mepCategories.Max(item => item.GetOffset(_max - _min));
                 mmRound = _mepCategories.Max(x => x.Rounding);
+            } else if(_mepCategories.Length == 0) {
+                mmRound = 10;
             }
-            size = RoundFeetToMillimeters(size, mmRound);
+            size = RoundToCeilingFeetToMillimeters(size, mmRound);
             //проверка на недопустимо малые габариты
             if(size < _minGeometryFeetSize) {
                 throw new SizeTooSmallException("Заданный габарит отверстия слишком мал");
