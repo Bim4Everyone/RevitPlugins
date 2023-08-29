@@ -709,7 +709,7 @@ namespace RevitOpeningPlacement.Models {
         /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException"/>
         public ICollection<OpeningMepTaskOutcoming> PickManyOpeningTasksOutcoming() {
             ISelectionFilter filter = new SelectionFilterOpeningTasksOutcoming();
-            IList<Reference> references = _uiDocument.Selection.PickObjects(ObjectType.Element, filter, "Выберите задание(я) на отверстие(я) и нажмите \"Готово\"");
+            IList<Reference> references = _uiDocument.Selection.PickObjects(ObjectType.Element, filter, "Выберите задания на отверстия и нажмите \"Готово\"");
 
             HashSet<OpeningMepTaskOutcoming> openingTasks = new HashSet<OpeningMepTaskOutcoming>();
             foreach(var reference in references) {
