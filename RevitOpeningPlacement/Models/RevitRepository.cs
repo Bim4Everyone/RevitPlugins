@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -17,9 +16,12 @@ using dosymep.SimpleServices;
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Handlers;
 
+using RevitOpeningPlacement.Models.Exceptions;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
+using RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers;
+using RevitOpeningPlacement.Models.OpeningUnion;
 using RevitOpeningPlacement.Models.RevitViews;
 using RevitOpeningPlacement.Models.Selection;
 using RevitOpeningPlacement.OpeningModels;
@@ -284,7 +286,7 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <returns></returns>
         public DocTypeEnum GetDocumentType() {
-            var bimModelPartsService = GetPlatformService<IBimModelPartsService>();
+            var bimModelPartsService = GetBimModelPartsService();
 
             if(bimModelPartsService.InAnyBimModelParts(_document, BimModelPart.ARPart)) {
                 return DocTypeEnum.AR;
@@ -299,6 +301,14 @@ namespace RevitOpeningPlacement.Models {
             }
 
             return DocTypeEnum.MEP;
+        }
+
+        /// <summary>
+        /// Возвращает сервис для работы с разделами проектной документации
+        /// </summary>
+        /// <returns></returns>
+        public IBimModelPartsService GetBimModelPartsService() {
+            return GetPlatformService<IBimModelPartsService>();
         }
 
         /// <summary>
@@ -403,9 +413,9 @@ namespace RevitOpeningPlacement.Models {
             return GetOpeningsTaskFromCurrentDoc().Select(f => new OpeningMepTaskOutcoming(f)).ToHashSet();
         }
 
-        public void DeleteElements(ICollection<Element> elements) {
+        public void DeleteElements(ICollection<ElementId> elements) {
             using(Transaction t = _document.StartTransaction("Удаление объединенных заданий на отверстия")) {
-                _document.Delete(elements.Select(item => item.Id).ToArray());
+                _document.Delete(elements);
                 t.Commit();
             }
         }
@@ -418,18 +428,33 @@ namespace RevitOpeningPlacement.Models {
             _document.Delete(new ElementId(elementId));
         }
 
-        public async Task<FamilyInstance> UniteOpenings(OpeningPlacer placer, ICollection<Element> elements) {
+        /// <summary>
+        /// Объединяет задания на отверстия из активного документа и удаляет старые
+        /// </summary>
+        /// <param name="placer">Класс, размещающий объединенное задание</param>
+        /// <param name="openingTasks">Коллекция объединяемых заданий на отверстия</param>
+        /// <returns></returns>
+        /// <exception cref="OperationCanceledException"></exception>
+        public FamilyInstance UniteOpenings(ICollection<OpeningMepTaskOutcoming> openingTasks) {
+            var placer = GetOpeningPlacer(openingTasks);
             FamilyInstance createdOpening = null;
-            _revitEventHandler.TransactAction = () => {
+            try {
                 using(var t = GetTransaction("Объединение отверстий")) {
                     createdOpening = placer.Place();
                     t.Commit();
                 }
-                DeleteElements(elements);
-            };
 
-            await _revitEventHandler.Raise();
-
+            } catch(OpeningNotPlacedException e) {
+                var dialog = GetMessageBoxService();
+                dialog.Show(
+                    e.Message,
+                    "Задания на отверстия",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error,
+                    System.Windows.MessageBoxResult.OK);
+                throw new OperationCanceledException();
+            }
+            DeleteElements(openingTasks.Select(task => new ElementId(task.Id)).ToHashSet());
             return createdOpening;
         }
 
@@ -603,7 +628,7 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <returns></returns>
         public ICollection<RevitLinkInstance> GetConstructureLinks() {
-            var bimModelPartsService = GetPlatformService<IBimModelPartsService>();
+            var bimModelPartsService = GetBimModelPartsService();
             return GetRevitLinks()
                 .Where(link => bimModelPartsService.InAnyBimModelParts(
                     link.Name,
@@ -619,7 +644,7 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <returns></returns>
         public ICollection<RevitLinkInstance> GetMepLinks() {
-            var bimModelPartsService = GetPlatformService<IBimModelPartsService>();
+            var bimModelPartsService = GetBimModelPartsService();
             return GetRevitLinks()
                 .Where(link => bimModelPartsService.InAnyBimModelParts(
                     link.Name,
@@ -672,6 +697,24 @@ namespace RevitOpeningPlacement.Models {
                     if((opening != null) && (opening is FamilyInstance famInst)) {
                         openingTasks.Add(new OpeningMepTaskIncoming(famInst, this, link.GetTransform()));
                     }
+                }
+            }
+            return openingTasks;
+        }
+
+        /// <summary>
+        /// Предлагает пользователю выбрать экземпляры семейств заданий на отверстия из активного документа и возвращает его выбор
+        /// </summary>
+        /// <returns>Выбранная пользователем коллекция элементов - заданий на отверстия</returns>
+        /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException"/>
+        public ICollection<OpeningMepTaskOutcoming> PickManyOpeningTasksOutcoming() {
+            ISelectionFilter filter = new SelectionFilterOpeningTasksOutcoming();
+            IList<Reference> references = _uiDocument.Selection.PickObjects(ObjectType.Element, filter, "Выберите задание(я) на отверстие(я) и нажмите \"Готово\"");
+
+            HashSet<OpeningMepTaskOutcoming> openingTasks = new HashSet<OpeningMepTaskOutcoming>();
+            foreach(var reference in references) {
+                if((reference != null) && (_document.GetElement(reference) is FamilyInstance famInst)) {
+                    openingTasks.Add(new OpeningMepTaskOutcoming(famInst));
                 }
             }
             return openingTasks;
@@ -769,6 +812,44 @@ namespace RevitOpeningPlacement.Models {
         /// <exception cref="Autodesk.Revit.Exceptions.ForbiddenForDynamicUpdateException"/>
         public Document EditFamily(Family family) {
             return _document.EditFamily(family);
+        }
+
+        /// <summary>
+        /// Возвращает класс, размещающий объединенное задание на отверстие
+        /// </summary>
+        /// <param name="openingTasks">Задания на отверстия из активного документа, которые надо объединить</param>
+        /// <returns></returns>
+        /// <exception cref="System.OperationCanceledException"/>
+        private OpeningPlacer GetOpeningPlacer(ICollection<OpeningMepTaskOutcoming> openingTasks) {
+            try {
+                OpeningPlacer placer;
+                if(openingTasks.Any(task => (task.OpeningType == OpeningType.FloorRound) || (task.OpeningType == OpeningType.FloorRectangle))) {
+                    placer = new FloorOpeningGroupPlacerInitializer().GetPlacer(this, new OpeningsGroup(openingTasks));
+                } else {
+                    placer = new WallOpeningGroupPlacerInitializer().GetPlacer(this, new OpeningsGroup(openingTasks));
+                }
+                return placer;
+
+            } catch(ArgumentNullException nullEx) {
+                var dialog = GetMessageBoxService();
+                dialog.Show(
+                    nullEx.Message,
+                    "Задания на отверстия",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error,
+                    System.Windows.MessageBoxResult.OK);
+                throw new OperationCanceledException();
+
+            } catch(ArgumentOutOfRangeException) {
+                var dialog = GetMessageBoxService();
+                dialog.Show(
+                    "Необходимо выбрать как минимум 2 задания на отверстия",
+                    "Задания на отверстия",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error,
+                    System.Windows.MessageBoxResult.OK);
+                throw new OperationCanceledException();
+            }
         }
 
         /// <summary>

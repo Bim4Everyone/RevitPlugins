@@ -12,6 +12,8 @@ using RevitOpeningPlacement.Models.OpeningUnion;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
     internal class FloorOpeningGroupPlacerInitializer : IOpeningGroupPlacerInitializer {
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public OpeningPlacer GetPlacer(RevitRepository revitRepository, OpeningsGroup openingsGroup) {
             if(openingsGroup is null) {
                 throw new ArgumentNullException(nameof(openingsGroup));
@@ -31,7 +33,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
                 PointFinder = pointFinder,
 
                 LevelFinder = new OpeningsGroupLevelFinder(revitRepository, openingsGroup),
-                AngleFinder = new ZeroAngleFinder(),
+                AngleFinder = new FloorOpeningsGroupAngleFinder(openingsGroup),
 
                 ParameterGetter = new FloorSolidParameterGetter(new OpeningGroupSolidProvider(openingsGroup), pointFinder, element1, element2)
             };
