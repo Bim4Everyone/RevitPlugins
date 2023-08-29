@@ -54,6 +54,7 @@ namespace RevitOpeningPlacement.OpeningModels {
             _familyInstance = openingTaskOutcoming;
             Id = _familyInstance.Id.IntegerValue;
             Location = (_familyInstance.Location as LocationPoint).Point;
+            OpeningType = RevitRepository.GetOpeningType(openingTaskOutcoming.Symbol.Family.Name);
 
             Date = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDate);
             MepSystem = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningMepSystem);
@@ -123,6 +124,11 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <para>Для обновления использовать <see cref="UpdateStatus"/></para>
         /// </summary>
         public OpeningTaskOutcomingStatus Status { get; set; } = OpeningTaskOutcomingStatus.NotActual;
+
+        /// <summary>
+        /// Тип проема
+        /// </summary>
+        public OpeningType OpeningType { get; } = OpeningType.WallRectangle;
 
 
         /// <summary>
@@ -219,7 +225,11 @@ namespace RevitOpeningPlacement.OpeningModels {
 
 
         /// <summary>
-        /// Проверяет, размещено ли уже такое же задание на отверстие в проекте. Под "таким" же понимается семейство задания на отверстие с координатами
+        /// Проверяет, размещено ли уже такое же задание на отверстие в проекте. 
+        /// Под "таким" же понимается 
+        /// либо экземпляр семейства задания на отверстие, точка вставки которого и объем 
+        ///     не отклоняются от соответствующих величин у текущего задания на отверстие в соответствии с допусками,
+        /// либо экземпляр семейства задания на отверстие, которое полностью содержит в себе текущее задание.
         /// </summary>
         /// <param name="placedOpenings">Существующие задания на отверстия в проекте</param>
         /// <returns></returns>
@@ -228,11 +238,15 @@ namespace RevitOpeningPlacement.OpeningModels {
             if(IsRemoved || placedOpenings.Count == 0) {
                 return false;
             }
-            var closestPlacedOpenings = GetIntersectingTasksRaw(placedOpenings).Where(placedOpening =>
+            var closestPlacedOpenings = GetIntersectingTasksRaw(placedOpenings);
+            if(ThisOpeningIsCompletelyInsideOther(closestPlacedOpenings)) {
+                return true;
+            }
+
+            var similarOpenings = closestPlacedOpenings.Where(placedOpening =>
                 placedOpening.Location
                 .DistanceTo(placedOpening.Location) <= _distance3dTolerance);
-
-            foreach(OpeningMepTaskOutcoming placedOpening in closestPlacedOpenings) {
+            foreach(OpeningMepTaskOutcoming placedOpening in similarOpenings) {
                 if(placedOpening.EqualsSolid(GetSolid(), XYZExtension.FeetRound)) {
                     return true;
                 }
@@ -262,12 +276,36 @@ namespace RevitOpeningPlacement.OpeningModels {
                 var intersects = new FilteredElementCollector(GetDocument(), GetTasksIds(openingTasks))
                 .Excluding(new ElementId[] { new ElementId(Id) })
                 .WherePasses(GetBoundingBoxFilter())
+                .WherePasses(new ElementIntersectsSolidFilter(GetSolid()))
                 .Cast<FamilyInstance>()
                 .Select(famInst => new OpeningMepTaskOutcoming(famInst));
-                return openingTasks.Intersect(intersects, _equalityComparer).ToHashSet();
+                return openingTasks.Intersect(intersects).ToHashSet();
             } else {
                 return Array.Empty<OpeningMepTaskOutcoming>();
             }
+        }
+
+        /// <summary>
+        /// Проверяет, находится ли экземпляр семейства текущего задания на отверстие внутри какого-либо из коллекции
+        /// </summary>
+        /// <param name="othersOpeningTasks">Коллекция с заданиями на отверстия для проверки</param>
+        /// <returns>True, если какой-либо экземпляр семейства задания на отверстие из поданной коллекции полностью содержит в себе текущее задание, иначе False</returns>
+        private bool ThisOpeningIsCompletelyInsideOther(ICollection<OpeningMepTaskOutcoming> othersOpeningTasks) {
+            var thisOpeningSolid = GetSolid();
+            var thisOpeningSolidVolume = thisOpeningSolid.Volume;
+            var intersectionVolumeTolerance = thisOpeningSolidVolume - _volumeTolerance;
+            foreach(var openingTask in othersOpeningTasks) {
+                var otherSolid = openingTask.GetSolid();
+                try {
+                    var intersectionVolume = BooleanOperationsUtils.ExecuteBooleanOperation(thisOpeningSolid, otherSolid, BooleanOperationsType.Intersect).Volume;
+                    if(intersectionVolume > intersectionVolumeTolerance) {
+                        return true;
+                    }
+                } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                    continue;
+                }
+            }
+            return false;
         }
 
         private Outline GetOutline() {
@@ -597,7 +635,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                 var mepElements = intersectingMepElementsIds.Select(mepId => GetDocument().GetElement(mepId)).ToHashSet();
                 var mepSolids = mepElements.Select(el => el.GetSolid()).Where(solid => (solid != null) && (solid.Volume > 0)).ToList();
                 var mepUnitedSolid = RevitClashDetective.Models.Extensions.ElementExtensions.UniteSolids(mepSolids);
-                if((mepUnitedSolid is null) || mepUnitedSolid.Volume < _volumeTolerance) {
+                if((mepUnitedSolid is null) || (mepUnitedSolid.Volume < _volumeTolerance)) {
                     return false;
                 }
 
