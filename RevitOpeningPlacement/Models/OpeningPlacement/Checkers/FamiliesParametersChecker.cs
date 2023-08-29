@@ -59,7 +59,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         /// <param name="family">Семейство для проверки</param>
         /// <returns></returns>
         private ICollection<string> GetNotExistentParameters(RevitRepository revitRepository, Family family) {
-            OpeningType type = revitRepository.GetOpeningType(family.Name);
+            OpeningType type = RevitRepository.GetOpeningType(family.Name);
             var paramNames = GetRequiredParameters(type);
             var familyParameterNames = GetFamilySharedParameterNames(revitRepository, family);
 
@@ -79,7 +79,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         /// <param name="family">Семейство для проверки</param>
         /// <returns></returns>
         private bool HasAllParameters(RevitRepository revitRepository, Family family) {
-            OpeningType type = revitRepository.GetOpeningType(family.Name);
+            OpeningType type = RevitRepository.GetOpeningType(family.Name);
             var paramNames = GetRequiredParameters(type);
             var familyParameterNames = GetFamilySharedParameterNames(revitRepository, family);
 

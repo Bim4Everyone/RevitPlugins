@@ -54,7 +54,7 @@ namespace RevitOpeningPlacement.OpeningModels {
             // https://forums.autodesk.com/t5/revit-api-forum/get-angle-from-transform-basisx-basisy-and-basisz/td-p/5326059
             Rotation = (_familyInstance.Location as LocationPoint).Rotation + Transform.BasisX.AngleOnPlaneTo(Transform.OfVector(Transform.BasisX), Transform.BasisZ);
             FileName = _familyInstance.Document.PathName;
-            OpeningType = _revitRepository.GetOpeningType(openingTaskIncoming.Symbol.Family.Name);
+            OpeningType = RevitRepository.GetOpeningType(openingTaskIncoming.Symbol.Family.Name);
 
             Date = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDate);
             MepSystem = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningMepSystem);

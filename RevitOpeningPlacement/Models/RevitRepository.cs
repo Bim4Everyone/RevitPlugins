@@ -737,7 +737,7 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <param name="familyName">Название семейства задания на отверстие</param>
         /// <returns></returns>
-        public OpeningType GetOpeningType(string familyName) {
+        public static OpeningType GetOpeningType(string familyName) {
             return OpeningTaskFamilyName.FirstOrDefault(pair => pair.Value.Equals(familyName, StringComparison.CurrentCultureIgnoreCase)).Key;
         }
 
