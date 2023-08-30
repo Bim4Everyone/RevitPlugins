@@ -56,7 +56,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             SelectedRounding = Roundings.Last(); // округление 50 мм
             var firstOffset = Offsets.First();
             firstOffset.To = 10000; // максимальный габарит сечения элемента для зазора в мм
-            firstOffset.Offset = isRound ? 30 : 50; // зазор 30 мм для круглых элементов и 50 мм для прямоугольных
+            firstOffset.SelectedOpeningType = firstOffset.OpeningTypeNames.Last(); // тип задания на  отверстие по умолчанию прямоугольный
+            firstOffset.Offset = 50; // зазор 50 мм для прямоугольных заданий на отверстия
             foreach(var structureCategory in StructureCategories) {
                 structureCategory.IsSelected = true; // все категории конструкций выбраны для создания заданий на отверстия
             }
