@@ -81,7 +81,7 @@
                                     <dxg:GridColumn Header="От" FieldName="From"/>
                                     <dxg:GridColumn Header="До" FieldName="To"/>
                                     <dxg:GridColumn Header="Зазор" FieldName="Offset"/>
-                                    <!--<dxg:GridColumn Header="Имя типа">
+                                    <dxg:GridColumn Header="Имя типа">
                                         <dxg:GridColumn.CellTemplate>
                                             <DataTemplate>
                                                 <ComboBox
@@ -89,7 +89,7 @@
                                             SelectedItem="{Binding RowData.Row.SelectedOpeningType}"/>
                                             </DataTemplate>
                                         </dxg:GridColumn.CellTemplate>
-                                    </dxg:GridColumn>-->
+                                    </dxg:GridColumn>
                                 </dxg:GridControl.Columns>
                             </dxg:GridControl>
                         </DockPanel>
