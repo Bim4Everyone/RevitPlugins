@@ -11,17 +11,29 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         private readonly MepCurveClash<CeilingAndFloor> _clash;
         private readonly MepCategory _mepCategory;
         private readonly IPointFinder _pointFinder;
+        private readonly OpeningType _openingType;
 
-        public PerpendicularRoundCurveFloorParamGetter(MepCurveClash<CeilingAndFloor> clash, MepCategory mepCategory, IPointFinder pointFinder) {
-            _clash = clash;
-            _mepCategory = mepCategory;
-            _pointFinder = pointFinder;
+        public PerpendicularRoundCurveFloorParamGetter(MepCurveClash<CeilingAndFloor> clash, MepCategory mepCategory, IPointFinder pointFinder, OpeningType openingType) {
+            _clash = clash ?? throw new System.ArgumentNullException(nameof(clash));
+            _mepCategory = mepCategory ?? throw new System.ArgumentNullException(nameof(mepCategory));
+            _pointFinder = pointFinder ?? throw new System.ArgumentNullException(nameof(pointFinder));
+            _openingType = openingType;
         }
 
         public IEnumerable<ParameterValuePair> GetParamValues() {
-            //габариты отверстия
             var sizeInit = new FloorOpeningSizeInitializer(_clash.GetIntersection(), _mepCategory);
-            yield return new DoubleParameterGetter(RevitRepository.OpeningDiameter, new DiameterValueGetter(_clash.Element1, _mepCategory)).GetParamValue();
+
+            //габариты отверстия
+            var sizeValueGetter = new DiameterValueGetter(_clash.Element1, _mepCategory);
+            if(OpeningTaskIsRound()) {
+                // круглое задание на отверстие
+                yield return new DoubleParameterGetter(RevitRepository.OpeningDiameter, sizeValueGetter).GetParamValue();
+
+            } else {
+                // прямоугольное (квадратное) задание на отверстие
+                yield return new DoubleParameterGetter(RevitRepository.OpeningHeight, sizeValueGetter).GetParamValue();
+                yield return new DoubleParameterGetter(RevitRepository.OpeningWidth, sizeValueGetter).GetParamValue();
+            }
             yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, sizeInit.GetThickness()).GetParamValue();
 
             //отметки отверстия
@@ -32,6 +44,14 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             yield return new StringParameterGetter(RevitRepository.OpeningDescription, new DescriptionValueGetter(_clash.Element1, _clash.Element2)).GetParamValue();
             yield return new StringParameterGetter(RevitRepository.OpeningMepSystem, new MepSystemValueGetter(_clash.Element1)).GetParamValue();
             yield return new StringParameterGetter(RevitRepository.OpeningAuthor, new UsernameGetter(_clash.Element1.Document.Application)).GetParamValue();
+        }
+
+        /// <summary>
+        /// True - если размещаемое задание на отверстие - круглое, иначе False - задание на отверстие прямоугольное (квадратное)
+        /// </summary>
+        /// <returns></returns>
+        private bool OpeningTaskIsRound() {
+            return _openingType == OpeningType.FloorRound;
         }
     }
 }

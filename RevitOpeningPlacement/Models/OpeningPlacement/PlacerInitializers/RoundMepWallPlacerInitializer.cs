@@ -9,7 +9,8 @@ using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.LevelFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
-
+using RevitOpeningPlacement.Models.OpeningPlacement.Providers;
+using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
     internal class RoundMepWallPlacerInitializer : IMepCurvePlacerInitializer {
@@ -21,12 +22,18 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
                 AngleFinder = new WallAngleFinder(clash.Element2, clash.Element2Transform)
             };
             if(clash.Element1.IsPerpendicular(clash.Element2)) {
-                var pointFinder = new WallPointFinder(clash);
+                OpeningType openingType = new RoundMepWallOpeningTaskTypeProvider(clash.Element1, categoryOption).GetOpeningTaskType();
+                var pointFinder =
+                    openingType == OpeningType.WallRound
+                    ? new WallPointFinder(clash)
+                    : new WallPointFinder(clash, new DiameterValueGetter(clash.Element1, categoryOption));
+
                 placer.PointFinder = pointFinder;
-                placer.ParameterGetter = new PerpendicularRoundCurveWallParamGetter(clash, categoryOption, pointFinder);
-                placer.Type = revitRepository.GetOpeningTaskType(OpeningType.WallRound);
+                placer.ParameterGetter = new PerpendicularRoundCurveWallParamGetter(clash, categoryOption, pointFinder, openingType);
+                placer.Type = revitRepository.GetOpeningTaskType(openingType);
             } else {
                 var pointFinder = new WallPointFinder(clash, new InclinedSizeInitializer(clash, categoryOption).GetRoundMepHeightGetter());
+
                 placer.PointFinder = pointFinder;
                 placer.ParameterGetter = new InclinedRoundCurveWallParamGetter(clash, categoryOption, pointFinder);
                 placer.Type = revitRepository.GetOpeningTaskType(OpeningType.WallRectangle);

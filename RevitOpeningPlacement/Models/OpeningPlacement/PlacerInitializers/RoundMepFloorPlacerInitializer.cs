@@ -10,6 +10,7 @@ using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.LevelFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 using RevitOpeningPlacement.Models.OpeningPlacement.PointFinders;
+using RevitOpeningPlacement.Models.OpeningPlacement.Providers;
 using RevitOpeningPlacement.Models.OpeningPlacement.SolidProviders;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
@@ -20,14 +21,15 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             var placer = new OpeningPlacer(revitRepository, clashModel) {
                 LevelFinder = new ClashLevelFinder(revitRepository, clashModel),
                 PointFinder = pointFinder,
+                AngleFinder = new ZeroAngleFinder()
             };
 
             if(clash.Element2.IsHorizontal() && clash.Element1.IsVertical()) {
-                placer.AngleFinder = new FloorAngleFinder(clash.Element1);
-                placer.Type = revitRepository.GetOpeningTaskType(OpeningType.FloorRound);
-                placer.ParameterGetter = new PerpendicularRoundCurveFloorParamGetter(clash, categoryOption, pointFinder);
+                OpeningType openingType = new RoundMepFloorOpeningTaskTypeProvider(clash.Element1, categoryOption).GetOpeningTaskType();
+
+                placer.Type = revitRepository.GetOpeningTaskType(openingType);
+                placer.ParameterGetter = new PerpendicularRoundCurveFloorParamGetter(clash, categoryOption, pointFinder, openingType);
             } else {
-                placer.AngleFinder = new ZeroAngleFinder();
                 placer.Type = revitRepository.GetOpeningTaskType(OpeningType.FloorRectangle);
                 placer.ParameterGetter = new FloorSolidParameterGetter(new MepCurveClashSolidProvider<CeilingAndFloor>(clash), pointFinder, clash.Element1, clash.Element2, categoryOption);
             }
