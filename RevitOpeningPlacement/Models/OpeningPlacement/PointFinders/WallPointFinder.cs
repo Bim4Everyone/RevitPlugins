@@ -12,15 +12,23 @@ using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
     internal class WallPointFinder : RoundValueGetter, IPointFinder {
         private readonly MepCurveClash<Wall> _clash;
-        private readonly IValueGetter<DoubleParamValue> _sizeGetter;
+        private readonly IValueGetter<DoubleParamValue> _rectangleHeightGetter;
         /// <summary>
         /// Округление высотной отметки отверстия в мм
         /// </summary>
         private const int _heightRound = 10;
 
-        public WallPointFinder(MepCurveClash<Wall> clash, IValueGetter<DoubleParamValue> sizeGetter = null) {
+        /// <summary>
+        /// Конструктор класса, предоставляющего точку вставки задания на отверстие в стене
+        /// </summary>
+        /// <param name="clash">Пересечение линейного инженерного элемента со стеной</param>
+        /// <param name="rectangleHeightGetter">
+        /// Высота прямоугольного отверстия - опциональный параметр для прямоугольных отверстий.
+        /// Нужен для корректировки точки вставки, т.к. точка вставки прямоугольного отверстия в стене находится у нижней грани.
+        /// </param>
+        public WallPointFinder(MepCurveClash<Wall> clash, IValueGetter<DoubleParamValue> rectangleHeightGetter = null) {
             _clash = clash;
-            _sizeGetter = sizeGetter;
+            _rectangleHeightGetter = rectangleHeightGetter;
         }
 
         public XYZ GetPoint() {
@@ -41,8 +49,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
 
                 var point = elongatedMepLine.GetPointFromLineEquation(transformedWallLine) - dir * _clash.Element2.Width / 2;
                 //получение точки вставки из уравнения линии 
-                if(_sizeGetter != null) {
-                    point -= _sizeGetter.GetValue().TValue / 2 * XYZ.BasisZ;
+                if(_rectangleHeightGetter != null) {
+                    point -= _rectangleHeightGetter.GetValue().TValue / 2 * XYZ.BasisZ;
                 }
                 var zRoundCoordinate = RoundFeetToMillimeters(point.Z, _heightRound);
                 return new XYZ(point.X, point.Y, zRoundCoordinate);
