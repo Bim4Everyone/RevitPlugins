@@ -11,7 +11,8 @@ namespace RevitOpeningPlacement.Models.Configs {
             return new Offset() {
                 From = TransformToInternalUnits(From),
                 To = TransformToInternalUnits(To),
-                OffsetValue = TransformToInternalUnits(OffsetValue)
+                OffsetValue = TransformToInternalUnits(OffsetValue),
+                OpeningTypeName = OpeningTypeName
             };
         }
 
