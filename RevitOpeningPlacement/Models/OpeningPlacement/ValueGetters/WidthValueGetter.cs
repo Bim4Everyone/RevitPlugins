@@ -25,7 +25,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
 
         public DoubleParamValue GetValue() {
             var width = _curve.GetWidth();
-            width += _categoryOptions.GetOffset(width);
+            width += _categoryOptions.GetOffsetValue(width);
             var roundWidth = RoundFeetToMillimeters(width, _categoryOptions.Rounding);
 
             //проверка на недопустимо малые габариты

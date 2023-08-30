@@ -29,7 +29,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         /// <returns></returns>
         public DoubleParamValue GetValue() {
             var height = _curve.GetHeight();
-            height += _categoryOptions.GetOffset(height);
+            height += _categoryOptions.GetOffsetValue(height);
             var roundHeight = RoundFeetToMillimeters(height, _categoryOptions.Rounding);
 
             //проверка на недопустимо малые габариты

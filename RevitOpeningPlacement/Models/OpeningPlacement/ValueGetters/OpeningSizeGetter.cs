@@ -27,7 +27,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
             var size = _max - _min;
             int mmRound = 0;
             if(_mepCategories != null && _mepCategories.Length > 0) {
-                size += _mepCategories.Max(item => item.GetOffset(_max - _min));
+                size += _mepCategories.Max(item => item.GetOffsetValue(_max - _min));
                 mmRound = _mepCategories.Max(x => x.Rounding);
             } else if(_mepCategories.Length == 0) {
                 mmRound = 10;
