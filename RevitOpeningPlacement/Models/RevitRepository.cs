@@ -266,7 +266,8 @@ namespace RevitOpeningPlacement.Models {
         }
 
         public void SelectAndShowElement(ICollection<Element> elements) {
-            _clashRevitRepository.SelectAndShowElement(elements, _view);
+            double additionalSize = 6;
+            _clashRevitRepository.SelectAndShowElement(elements, additionalSize, _view);
         }
 
         public string GetDocumentName(Document doc) {
