@@ -5,11 +5,18 @@ using Autodesk.Revit.DB;
 namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
     internal class GraphicSettingsInitializer {
         public static OverrideGraphicSettings GetOpeningGraphicSettings(Document doc) {
-            return GetGraphicSettings(doc, new Color(0, 128, 0));
+            // красный
+            return GetGraphicSettings(doc, new Color(255, 0, 0));
         }
 
         public static OverrideGraphicSettings GetMepGraphicSettings(Document doc) {
-            return GetGraphicSettings(doc, new Color(255, 0, 0));
+            // зеленый
+            return GetGraphicSettings(doc, new Color(0, 128, 0));
+        }
+
+        internal static OverrideGraphicSettings GetConstructureGraphicSettings(Document doc) {
+            // серый
+            return GetGraphicSettings(doc, new Color(128, 128, 128));
         }
 
         private static OverrideGraphicSettings GetGraphicSettings(Document doc, Color color) {

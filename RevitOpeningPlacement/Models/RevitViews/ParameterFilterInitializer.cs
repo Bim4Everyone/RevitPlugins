@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -27,15 +25,14 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         public static ParameterFilterElement GetMepFilter(Document doc) {
             return CreateFilter(doc,
                 "BIM_Инж_Системы",
-                new[] { BuiltInCategory.OST_DuctCurves,
-                    BuiltInCategory.OST_CableTray,
-                    BuiltInCategory.OST_PipeCurves,
-                    BuiltInCategory.OST_Conduit,
-                    BuiltInCategory.OST_CableTrayFitting,
-                    BuiltInCategory.OST_DuctFitting,
-                    BuiltInCategory.OST_PipeFitting,
-                    BuiltInCategory.OST_ConduitFitting
-                },
+                FiltersInitializer.GetAllUsedMepCategories(),
+                new FilterRule[] { });
+        }
+
+        public static ParameterFilterElement GetConstructureFilter(Document doc) {
+            return CreateFilter(doc,
+                "BIM_Конструкции",
+                FiltersInitializer.GetAllUsedStructureCategories(),
                 new FilterRule[] { });
         }
 
