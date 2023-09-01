@@ -53,6 +53,8 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
             // TODO исправить баг с не обновлением графики для элемента, для которого создавался предыдущий фильтр
             // возможно поможет после вызова ClearRules добавить правило, чтобы ему удовлетворяли все стены или все перекрытия
             // например, периметр больше 0 и длина больше 0
+
+            // PS после перезапуска документа и запуска плагина без дебага этого бага нет, надо потестить еще
             if(elementToHighlight is Wall wall) {
                 var wallFilter = GetWallHighlightFilter(doc, wall);
                 var floorFilter = GetFloorHighlightFilter(doc);
