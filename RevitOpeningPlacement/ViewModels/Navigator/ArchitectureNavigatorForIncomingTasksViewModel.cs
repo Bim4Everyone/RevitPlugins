@@ -4,8 +4,6 @@ using System.Collections.ObjectModel;
 using System.Windows.Data;
 using System.Windows.Input;
 
-using Autodesk.Revit.DB;
-
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -87,9 +85,8 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         public ICommand PlaceRealOpeningByManyTasksCommand { get; }
 
         private void SelectElement(object p) {
-            if(!(p is IFamilyInstanceProvider famInstanceProvider)) { return; }
-            var elements = new Element[] { famInstanceProvider.GetFamilyInstance() };
-            _revitRepository.SelectAndShowElement(elements);
+            if(!(p is ISelectorAndHighlighter famInstanceProvider)) { return; }
+            _revitRepository.SelectAndShowElement(famInstanceProvider);
         }
 
         private void IncomingTaskSelectionChanged(object p) {
@@ -107,7 +104,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         }
 
         private bool CanSelect(object p) {
-            return p is IFamilyInstanceProvider;
+            return p is ISelectorAndHighlighter;
         }
 
         private void Renew(object p) {

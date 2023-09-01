@@ -17,6 +17,7 @@ using RevitClashDetective.Models;
 using RevitClashDetective.Models.Handlers;
 
 using RevitOpeningPlacement.Models.Exceptions;
+using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
@@ -266,8 +267,22 @@ namespace RevitOpeningPlacement.Models {
         }
 
         public void SelectAndShowElement(ICollection<Element> elements) {
-            double additionalSize = 6;
+            double additionalSize = 2;
             _clashRevitRepository.SelectAndShowElement(elements, additionalSize, _view);
+        }
+
+        public void SelectAndShowElement(ISelectorAndHighlighter selectorAndHighlighter) {
+            var elementToHighlight = selectorAndHighlighter.GetElementToHighlight();
+            if(elementToHighlight != null) {
+                try {
+                    new ElementHighlighter(this, _view, elementToHighlight).HighlightElement();
+                } catch(ArgumentException) {
+                    // элемент для выделения не стена и не перекрытие
+                }
+            }
+            double additionalSize = 2;
+            var elementsToSelect = selectorAndHighlighter.GetElementsToSelect();
+            _clashRevitRepository.SelectAndShowElement(elementsToSelect, additionalSize, _view);
         }
 
         public string GetDocumentName(Document doc) {

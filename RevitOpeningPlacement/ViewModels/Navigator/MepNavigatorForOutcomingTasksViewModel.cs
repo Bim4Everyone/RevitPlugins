@@ -4,12 +4,11 @@ using System.Collections.ObjectModel;
 using System.Windows.Data;
 using System.Windows.Input;
 
-using Autodesk.Revit.DB;
-
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models;
+using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// <summary>
@@ -57,20 +56,19 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
 
         private void SelectElement(object p) {
-            if(!(p is OpeningMepTaskOutcomingViewModel opening)) { return; }
-            var elements = new Element[] { opening.GetFamilyInstance() };
-            _revitRepository.SelectAndShowElement(elements);
+            if(!(p is ISelectorAndHighlighter selectorAndHighlighter)) { return; }
+            _revitRepository.SelectAndShowElement(selectorAndHighlighter);
         }
 
         private void SelectionChanged(object p) {
             if(OpeningsMepTasksOutcomingViewSource.View.CurrentPosition > -1
                 && OpeningsMepTasksOutcomingViewSource.View.CurrentPosition < OpeningsMepTaskOutcoming.Count) {
-                SelectElement((OpeningMepTaskOutcomingViewModel) p);
+                SelectElement((ISelectorAndHighlighter) p);
             }
         }
 
         private bool CanSelect(object p) {
-            return p is OpeningMepTaskOutcomingViewModel;
+            return p is ISelectorAndHighlighter;
         }
 
         private void Renew(object p) {
