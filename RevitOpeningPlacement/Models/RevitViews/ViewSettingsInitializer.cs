@@ -65,7 +65,12 @@ namespace RevitOpeningPlacement.Models.RevitViews {
             categories.UnionWith(FiltersInitializer.GetAllUsedOpeningsCategories());
             categories.UnionWith(new BuiltInCategory[] {
                 BuiltInCategory.OST_RvtLinks,
-                BuiltInCategory.OST_GenericModel });
+                BuiltInCategory.OST_GenericModel ,
+                BuiltInCategory.OST_Doors,
+                BuiltInCategory.OST_Roofs,
+                BuiltInCategory.OST_Ceilings,
+                BuiltInCategory.OST_PlumbingFixtures
+            });
             return new VisibleModelCategoriesSetting(categories);
         }
 
