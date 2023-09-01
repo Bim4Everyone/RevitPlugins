@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -14,7 +15,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// <summary>
     /// Модель представления окна для работы с конкретным входящим заданием на отверстие от инженера в файле архитектора или конструктора
     /// </summary>
-    internal class OpeningMepTaskIncomingViewModel : BaseViewModel, IFamilyInstanceProvider {
+    internal class OpeningMepTaskIncomingViewModel : BaseViewModel, ISelectorAndHighlighter, IEquatable<OpeningMepTaskIncomingViewModel> {
         /// <summary>
         /// Экземпляр семейства задания на отверстие
         /// </summary>
@@ -159,12 +160,35 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         public override bool Equals(object obj) {
             return (obj != null)
                 && (obj is OpeningMepTaskIncomingViewModel vmOther)
-                && (OpeningId == vmOther.OpeningId)
-                && FileName.Equals(vmOther.FileName);
+                && Equals(vmOther);
         }
 
         public override int GetHashCode() {
             return OpeningId + FileName.GetHashCode();
+        }
+
+        public bool Equals(OpeningMepTaskIncomingViewModel other) {
+            return (other != null)
+                && (OpeningId == other.OpeningId)
+                && FileName.Equals(other.FileName);
+        }
+
+        /// <summary>
+        /// Возвращает хост входящего задания на отверстие
+        /// </summary>
+        /// <returns></returns>
+        public Element GetElementToHighlight() {
+            return _openingTask.Host;
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию элементов, в которой находится исходящее задание на отверстие, которое надо выделить на виде
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<Element> GetElementsToSelect() {
+            return new Element[] {
+                _openingTask.GetFamilyInstance()
+            };
         }
     }
 }

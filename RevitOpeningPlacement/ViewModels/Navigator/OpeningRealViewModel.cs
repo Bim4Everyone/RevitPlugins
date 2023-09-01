@@ -1,4 +1,7 @@
-﻿using Autodesk.Revit.DB;
+﻿using System;
+using System.Collections.Generic;
+
+using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
@@ -11,7 +14,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// Модель представления чистового отверстия в навигаторе АР по входящим заданиям на отверстия.
     /// Использовать для отображения чистовых отверстий, которые требуют внимания архитектора
     /// </summary>
-    internal class OpeningRealViewModel : BaseViewModel, IFamilyInstanceProvider {
+    internal class OpeningRealViewModel : BaseViewModel, ISelectorAndHighlighter, IEquatable<OpeningRealViewModel> {
         private readonly OpeningReal _openingReal;
 
 
@@ -61,7 +64,12 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         public override bool Equals(object obj) {
             return (obj != null)
                 && (obj is OpeningRealViewModel otherVM)
-                && (OpeningId == otherVM.OpeningId);
+                && Equals(otherVM);
+        }
+
+        public bool Equals(OpeningRealViewModel other) {
+            return (other != null)
+                && (OpeningId == other.OpeningId);
         }
 
         public override int GetHashCode() {
@@ -69,11 +77,21 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         }
 
         /// <summary>
-        /// Возвращает экземпляр семейства чистового отверстия
+        /// Возвращает хост чистового отверстия
         /// </summary>
         /// <returns></returns>
-        public FamilyInstance GetFamilyInstance() {
-            return _openingReal.GetFamilyInstance();
+        public Element GetElementToHighlight() {
+            return _openingReal.GetHost();
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию, в которой находится чистовое отверстие, которое надо выделить на виде
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<Element> GetElementsToSelect() {
+            return new Element[] {
+                _openingReal.GetFamilyInstance()
+            };
         }
     }
 }
