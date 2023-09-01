@@ -19,6 +19,11 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
             return GetGraphicSettings(doc, new Color(128, 128, 128));
         }
 
+        internal static OverrideGraphicSettings GetHighlightGraphicSettings(Document doc) {
+            // TODO сделать прозрачность 70%, и полутона
+            return GetGraphicSettings(doc, new Color(255, 255, 255)).SetHalftone(true);
+        }
+
         private static OverrideGraphicSettings GetGraphicSettings(Document doc, Color color) {
             var settings = new OverrideGraphicSettings();
 
