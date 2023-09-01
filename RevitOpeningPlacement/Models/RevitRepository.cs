@@ -460,7 +460,8 @@ namespace RevitOpeningPlacement.Models {
         }
 
         public void DoAction(Action action) {
-            _clashRevitRepository.DoAction(action);
+            _revitEventHandler.TransactAction = action;
+            _revitEventHandler.Raise();
         }
 
         public IEnumerable<Document> GetDocuments() {
