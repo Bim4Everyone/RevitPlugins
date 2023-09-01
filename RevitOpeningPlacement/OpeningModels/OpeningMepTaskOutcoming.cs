@@ -115,6 +115,12 @@ namespace RevitOpeningPlacement.OpeningModels {
         public XYZ Location { get; }
 
         /// <summary>
+        /// Элемент из связи, который можно считать хостом текущего задания на отверстие.
+        /// <para>"Можно считать"  - потому что текущее задание на отверстие может пересекаться с несколькими конструкциями из связи, из которых определяется один элемент</para>
+        /// </summary>
+        public Element Host { get; private set; }
+
+        /// <summary>
         /// Флаг, обозначающий, удален ли экземпляр семейства задания на отверстие из проекта
         /// </summary>
         public bool IsRemoved => (_familyInstance is null) || (!_familyInstance.IsValidObject);
@@ -499,10 +505,11 @@ namespace RevitOpeningPlacement.OpeningModels {
             if(constructureLinkElementsProviders is null) { throw new ArgumentNullException(nameof(constructureLinkElementsProviders)); }
             if(allMepElementsIds is null) { throw new ArgumentNullException(nameof(allMepElementsIds)); }
 
+            bool mepElementsNotIntersectThisTask = false;
             var mepElementsIntersectingThisTask = GetIntersectingMepElementsIds(thisOpeningTaskSolid, allMepElementsIds);
             if(mepElementsIntersectingThisTask.Count == 0) {
                 // задание на отверстие не пересекается ни с одним элементом инженерной системы - задание не актуально
-                return true;
+                mepElementsNotIntersectThisTask = true;
             }
 
             // проверка на то, что:
@@ -511,20 +518,73 @@ namespace RevitOpeningPlacement.OpeningModels {
             foreach(var link in constructureLinkElementsProviders) {
                 var hostConstructions = GetHostConstructionsForThisOpeningTask(thisOpeningTaskSolid, link, out ICollection<OpeningReal> intersectingOpenings);
                 if(hostConstructions.Count > 0) {
-                    return MepElementsIntersectConstructionsOrOpenings(
-                        thisOpeningTaskSolid,
-                        mepElementsIntersectingThisTask,
-                        hostConstructions,
-                        intersectingOpenings,
-                        link);
+                    return mepElementsNotIntersectThisTask
+                        || MepElementsIntersectConstructionsOrOpenings(
+                            thisOpeningTaskSolid,
+                            mepElementsIntersectingThisTask,
+                            hostConstructions,
+                            intersectingOpenings,
+                            link
+                            );
                 } else {
                     // если не найдены конструкции, которые можно считать хостами текущего задания на отверстие,
                     // то либо задание на отверстие висит в воздухе, либо задание на отверстие пересекается с другой связью
                     continue;
                 }
             }
+
             // корректная ситуация не найдена, отверстие считается не актуальным
             return true;
+        }
+
+        /// <summary>
+        /// Назначает свойство хоста текущего задания на отверстие <see cref="Host"/>
+        /// </summary>
+        /// <param name="link">Связанный файл с конструкциями</param>
+        /// <param name="intersectingLinkedElements">Элементы из связанного файла с конструкциями, которые пересекаются с текущим заданием на отверстие</param>
+        /// <param name="thisOpeningTaskSolidInLinkCoordinates">Солид текущего задания на отверстие в координатах связанного файла</param>
+        private void SetHostConstruction(
+            IConstructureLinkElementsProvider link,
+            ICollection<ElementId> intersectingLinkedElements,
+            Solid thisOpeningTaskSolidInLinkCoordinates) {
+
+            if((link != null)
+                && intersectingLinkedElements.Any()
+                && (thisOpeningTaskSolidInLinkCoordinates != null)
+                && (thisOpeningTaskSolidInLinkCoordinates.Volume >= _volumeTolerance)) {
+
+                // поиск элемента конструкции, с которым пересечение текущего задания на отверстие имеет наибольший объем
+                double halfOpeningTaskVolume = thisOpeningTaskSolidInLinkCoordinates.Volume / 2;
+                var elements = intersectingLinkedElements.Select(id => link.Document.GetElement(id)).ToHashSet();
+                Element hostCandidate = elements.FirstOrDefault();
+                double intersectingVolumePrevious = 0;
+                foreach(Element element in elements) {
+                    var structureSolid = element?.GetSolid();
+                    if((structureSolid != null) && (structureSolid.Volume > _volumeTolerance)) {
+                        try {
+                            double intersectingVolumeCurrent
+                                = BooleanOperationsUtils.ExecuteBooleanOperation(
+                                    thisOpeningTaskSolidInLinkCoordinates,
+                                    structureSolid,
+                                    BooleanOperationsType.Intersect)?.Volume
+                                    ?? 0;
+                            if(intersectingVolumeCurrent >= halfOpeningTaskVolume) {
+                                Host = element;
+                                return;
+                            }
+                            if(intersectingVolumeCurrent > intersectingVolumePrevious) {
+                                intersectingVolumePrevious = intersectingVolumeCurrent;
+                                hostCandidate = element;
+                            }
+                        } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                            continue;
+                        }
+                    }
+                }
+                Host = hostCandidate;
+            } else {
+                return;
+            }
         }
 
         /// <summary>
@@ -585,6 +645,9 @@ namespace RevitOpeningPlacement.OpeningModels {
                 //    constructions.AddRange(openingsHosts);
                 //    intersectingConstructions = constructions;
                 //}
+            }
+            if(intersectingConstructions.Count > 0) {
+                SetHostConstruction(link, intersectingConstructions, thisSolidInLinkCoordinates);
             }
 
             return intersectingConstructions;

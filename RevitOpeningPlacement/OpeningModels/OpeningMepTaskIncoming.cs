@@ -36,7 +36,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Экземпляр семейства задания на отверстие, расположенного в связанном файле задания на отверстия
         /// 
-        /// <para>Примечание: конструктор не обновляет свойства <see cref="Status"/> и <see cref="HostName"/>. Для обновления этих свойств надо вызвать <see cref="UpdateStatusAndHostName"/></para>
+        /// <para>Примечание: конструктор не обновляет свойства <see cref="Status"/>, <see cref="HostName"/> и <see cref="Host"/>. Для обновления этих свойств надо вызвать <see cref="UpdateStatusAndHostName"/></para>
         /// </summary>
         /// <param name="openingTaskIncoming">Экземпляр семейства задания на отверстие из связанного файла</param>
         /// <param name="revitRepository">Репозиторий текущего документа, в который подгружен документ с заданиями на отверстия</param>
@@ -173,6 +173,12 @@ namespace RevitOpeningPlacement.OpeningModels {
         public string HostName { get; private set; } = string.Empty;
 
         /// <summary>
+        /// Элемент из активного документа, в котором расположено задание на отверстие из связи.
+        /// <para>Для обновления использовать <see cref="UpdateStatusAndHostName"/></para>
+        /// </summary>
+        public Element Host { get; private set; } = default;
+
+        /// <summary>
         /// Комментарий экземпляра семейства задания на отверстие
         /// </summary>
         public string OwnComment { get; } = string.Empty;
@@ -258,7 +264,7 @@ namespace RevitOpeningPlacement.OpeningModels {
             var intersectingStructureElements = GetIntersectingStructureElementsIds(thisOpeningSolid, constructureElementsIds);
             var intersectingOpenings = GetIntersectingOpeningsIds(realOpenings, thisOpeningSolid, thisOpeningBBox);
             var hostId = GetOpeningTaskHostId(thisOpeningSolid, intersectingStructureElements, intersectingOpenings);
-            SetOpeningTaskHostName(hostId);
+            SetOpeningTaskHost(hostId);
 
             if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count == 0)) {
                 Status = OpeningTaskIncomingStatus.NoIntersection;
@@ -388,6 +394,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                                 return structureElementId;
                             }
                             if(intersectingVolumeCurrent > intersectingVolumePrevious) {
+                                intersectingVolumePrevious = intersectingVolumeCurrent;
                                 hostId = structureElementId;
                             }
                         } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
@@ -402,12 +409,13 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
-        /// Записывает название хоста задания на отверстие в свойство <see cref="HostName"/>
+        /// Записывает элемент и название хоста задания на отверстие соответственно в свойства <see cref="Host"/> и <see cref="HostName"/>
         /// </summary>
         /// <param name="hostId">Id хоста задания на отверстие из активного документа (стены/перекрытия)</param>
-        private void SetOpeningTaskHostName(ElementId hostId) {
+        private void SetOpeningTaskHost(ElementId hostId) {
             if(hostId != null) {
-                var name = _revitRepository.GetElement(hostId)?.Name;
+                Host = _revitRepository.GetElement(hostId);
+                var name = Host?.Name;
                 if(!string.IsNullOrWhiteSpace(name)) {
                     HostName = name;
                 }
