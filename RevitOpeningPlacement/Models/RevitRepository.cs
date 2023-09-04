@@ -448,7 +448,6 @@ namespace RevitOpeningPlacement.Models {
         /// <summary>
         /// Объединяет задания на отверстия из активного документа и удаляет старые
         /// </summary>
-        /// <param name="placer">Класс, размещающий объединенное задание</param>
         /// <param name="openingTasks">Коллекция объединяемых заданий на отверстия</param>
         /// <returns></returns>
         /// <exception cref="OperationCanceledException"></exception>
