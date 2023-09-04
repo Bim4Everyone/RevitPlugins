@@ -279,6 +279,74 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
+        /// Возвращает ограничивающий бокс в координатах активного документа, увеличенный на 1% по сравнению с боксом по умолчанию
+        /// </summary>
+        /// <returns></returns>
+        public BoundingBoxXYZ GetExtendedBoxXYZ() {
+            if(IsRemoved) {
+                return default;
+            }
+            var transform = Transform.Identity.ScaleBasis(1.01);
+            return _familyInstance.GetBoundingBox().GetTransformedBoundingBox(transform);
+        }
+
+        /// <summary>
+        /// Проверяет, имеет ли текущее задание на отверстие и другое общую грань.
+        /// Использовать для определения заданий на отверстия в многослойных конструкциях, которые надо объединить.
+        /// </summary>
+        /// <param name="otherOpening">Другое задание на отверстие из активного файла для проверки</param>
+        /// <returns></returns>
+        public bool HasCommonFace(OpeningMepTaskOutcoming otherOpening) {
+            if(IsRemoved || otherOpening.IsRemoved) {
+                return false;
+            }
+            var thisSolid = GetSolid();
+            if((thisSolid is null) || (thisSolid.Volume <= _volumeTolerance)) {
+                return false;
+            }
+            var otherSolid = otherOpening.GetSolid();
+            if((otherSolid is null) || (otherSolid.Volume <= _volumeTolerance)) {
+                return false;
+            }
+
+            ICollection<PlanarFace> thisPlanarFaces = GetPlanarFaces(thisSolid);
+            ICollection<PlanarFace> othersPlanarFaces = GetPlanarFaces(otherSolid);
+
+            foreach(PlanarFace thisFace in thisPlanarFaces) {
+                foreach(PlanarFace otherFace in othersPlanarFaces) {
+                    if((Math.Abs(thisFace.Area - otherFace.Area) < 0.000001)
+                        && thisFace.FaceNormal.IsAlmostEqualTo(otherFace.FaceNormal.Negate())
+                        && thisFace.Origin.IsAlmostEqualTo(otherFace.Origin)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию плоских поверхностей солида
+        /// </summary>
+        /// <param name="solid">Солид</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        private ICollection<PlanarFace> GetPlanarFaces(Solid solid) {
+            if(solid is null) { throw new ArgumentNullException(nameof(solid)); }
+            HashSet<PlanarFace> result = new HashSet<PlanarFace>();
+            var faces = solid.Faces;
+            // заполнение в обратном порядке, потому что в конце Faces находятся бОльшие поверхности, которые интересны в первую очередь
+            for(int i = faces.Size - 1; i >= 0; i++) {
+                var item = faces.get_Item(i);
+                if((item != null) && (item is PlanarFace planarFace)) {
+                    result.Add(planarFace);
+                }
+            }
+            foreach(var face in faces) {
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Первоначальная быстрая проверка поданной коллекции заданий на отверстия из текущего файла на пересечение с текущим заданием на отверстие
         /// </summary>
         /// <param name="openingTasks"></param>
