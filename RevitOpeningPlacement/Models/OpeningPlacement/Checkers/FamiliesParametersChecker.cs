@@ -122,7 +122,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
                 RevitRepository.OpeningMepSystem,
                 RevitRepository.OpeningAuthor,
                 RevitRepository.OpeningThickness,
-                RevitRepository.OpeningOffsetBottom
+                RevitRepository.OpeningOffsetBottom,
+                RevitRepository.OpeningIsManuallyPlaced
             };
             // добавление специфических параметров семейств
             switch(openingType) {

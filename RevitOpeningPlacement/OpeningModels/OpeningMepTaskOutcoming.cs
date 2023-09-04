@@ -176,6 +176,12 @@ namespace RevitOpeningPlacement.OpeningModels {
                     return;
                 }
 
+                if(IsManuallyPlaced()) {
+                    FindAndSetHost(openingSolid, constructureLinkElementsProviders);
+                    Status = OpeningTaskOutcomingStatus.ManuallyPlaced;
+                    return;
+                }
+
                 if(ThisOpeningTaskIsNotActual(openingSolid, constructureLinkElementsProviders, allMepElementsIds)) {
                     Status = OpeningTaskOutcomingStatus.NotActual;
                     return;
@@ -407,6 +413,37 @@ namespace RevitOpeningPlacement.OpeningModels {
             }
         }
 
+        /// <summary>
+        /// Проверяет, размещено ли текущее задание на отверстие вручную
+        /// </summary>
+        /// <returns>True, если присутствует и включен параметр <see cref="RevitRepository.OpeningIsManuallyPlaced"/>, иначе False</returns>
+        private bool IsManuallyPlaced() {
+            if(!IsRemoved) {
+                try {
+                    return _familyInstance.GetSharedParamValue<int>(RevitRepository.OpeningIsManuallyPlaced) == 1;
+
+                } catch(ArgumentException) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Назначает хост задания на отверстие
+        /// </summary>
+        /// <param name="thisOpeningTaskSolid"></param>
+        /// <param name="constructureLinkElementsProviders"></param>
+        private void FindAndSetHost(Solid thisOpeningTaskSolid, ICollection<IConstructureLinkElementsProvider> constructureLinkElementsProviders) {
+            foreach(var link in constructureLinkElementsProviders) {
+                var hostConstructions = GetHostConstructionsForThisOpeningTask(thisOpeningTaskSolid, link, out _);
+                if(hostConstructions.Count > 0) {
+                    break;
+                }
+            }
+        }
+
 
         /// <summary>
         /// Возвращает список солидов элементов инженерных систем, которые пересекаются с данным заданием на отверстие, из текущего документа
@@ -605,7 +642,8 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
-        /// Поиск конструкций из связанного файла, в которых расположено задание на отверстие
+        /// Поиск конструкций из связанного файла, в которых расположено задание на отверстие.
+        /// Если конструкции будут найдены, то также будет вызован метод <see cref="SetHostConstruction"/>
         /// </summary>
         /// <param name="thisOpeningTaskSolid">Солид текущего задания на отверстие</param>
         /// <param name="link">Связь с конструкциями</param>
