@@ -22,9 +22,8 @@ namespace RevitOpeningPlacement.Models.RevitViews {
                 GetOpeningFilterSetting(doc),
                 GetMepFilterSetting(doc),
                 GetConstructureFilterSetting(doc),
-                GetViewDisplayModelSetting(),
                 GetParamSetting(doc),
-                GetVisibleModelCategoriesSetting(),
+                GetSecondaryCategoriesSetting(doc),
                 GetDisciplineSetting(),
             }.Where(item => item != null)
             .ToList();
@@ -43,7 +42,7 @@ namespace RevitOpeningPlacement.Models.RevitViews {
         /// </summary>
         /// <returns></returns>
         private static IView3DSetting GetDisplayStyleSetting() {
-            return new DisplayStyleSetting(DisplayStyle.ShadingWithEdges);
+            return new DisplayStyleSetting(DisplayStyle.FlatColors);
         }
 
         /// <summary>
@@ -58,20 +57,10 @@ namespace RevitOpeningPlacement.Models.RevitViews {
         /// Настройки видимости категорий модели
         /// </summary>
         /// <returns></returns>
-        private static IView3DSetting GetVisibleModelCategoriesSetting() {
-            var categories = new HashSet<BuiltInCategory>();
-            categories.UnionWith(FiltersInitializer.GetAllUsedMepCategories());
-            categories.UnionWith(FiltersInitializer.GetAllUsedStructureCategories());
-            categories.UnionWith(FiltersInitializer.GetAllUsedOpeningsCategories());
-            categories.UnionWith(new BuiltInCategory[] {
-                BuiltInCategory.OST_RvtLinks,
-                BuiltInCategory.OST_GenericModel ,
-                BuiltInCategory.OST_Doors,
-                BuiltInCategory.OST_Roofs,
-                BuiltInCategory.OST_Ceilings,
-                BuiltInCategory.OST_PlumbingFixtures
-            });
-            return new VisibleModelCategoriesSetting(categories);
+        private static IView3DSetting GetSecondaryCategoriesSetting(Document doc) {
+            var filter = ParameterFilterInitializer.GetSecondaryCategoriesFilter(doc);
+            var graphicSettings = GraphicSettingsInitializer.GetSecondaryElementsGraphicSettings();
+            return new FilterSetting(filter, graphicSettings);
         }
 
         /// <summary>
@@ -83,7 +72,17 @@ namespace RevitOpeningPlacement.Models.RevitViews {
                 BuiltInCategory.OST_Levels,
                 BuiltInCategory.OST_WallRefPlanes,
                 BuiltInCategory.OST_Grids,
-                BuiltInCategory.OST_VolumeOfInterest
+                BuiltInCategory.OST_VolumeOfInterest,
+
+                //все, что касается арматуры
+                BuiltInCategory.OST_Coupler,
+                BuiltInCategory.OST_FabricReinforcement,
+                BuiltInCategory.OST_FabricReinforcementWire,
+                BuiltInCategory.OST_FabricAreas,
+                BuiltInCategory.OST_PathRein,
+                BuiltInCategory.OST_Cage,
+                BuiltInCategory.OST_AreaRein,
+                BuiltInCategory.OST_Rebar
             });
         }
 
@@ -118,14 +117,6 @@ namespace RevitOpeningPlacement.Models.RevitViews {
             var filter = ParameterFilterInitializer.GetConstructureFilter(doc);
             var graphicSettings = GraphicSettingsInitializer.GetConstructureGraphicSettings(doc);
             return new FilterSetting(filter, graphicSettings);
-        }
-
-        /// <summary>
-        /// Прозрачность
-        /// </summary>
-        /// <returns></returns>
-        private static IView3DSetting GetViewDisplayModelSetting() {
-            return new TransparencySetting(1);
         }
 
         private static IView3DSetting GetParamSetting(Document doc) {

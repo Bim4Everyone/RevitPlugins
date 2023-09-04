@@ -69,7 +69,7 @@ namespace RevitOpeningPlacement.Models.RevitViews {
         private void ApplyGraphicSettings() {
             var doc = _view3D.Document;
             var filters = ParameterFilterInitializer.GetHighlightFilters(doc, _elementToHighlight);
-            var graphicsSettings = GraphicSettingsInitializer.GetHighlightGraphicSettings(doc);
+            var graphicsSettings = GraphicSettingsInitializer.GetNotInterestingConstructionsGraphicSettings();
             using(Transaction t = doc.StartTransaction("Выделение хоста отверстия")) {
 
                 foreach(var filter in filters) {

@@ -10,6 +10,12 @@ using RevitClashDetective.Models.Visiter;
 
 namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
     internal class ParameterFilterInitializer {
+        /// <summary>
+        /// Возвращает фильтр по заданиям на отверстия
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public static ParameterFilterElement GetOpeningFilter(Document doc) {
             var category = Category.GetCategory(doc, BuiltInCategory.OST_GenericModel);
             var nameParameter = ParameterFilterUtilities.GetFilterableParametersInCommon(doc, new[] { category.Id })
@@ -24,6 +30,11 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
             return CreateFilter(doc, "BIM_Отверстия", new[] { BuiltInCategory.OST_GenericModel }, new[] { filterRule });
         }
 
+        /// <summary>
+        /// Возвращает фильтр по всем категориям инженерных систем, использующимся для расстановки заданий на отверстия
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <returns></returns>
         public static ParameterFilterElement GetMepFilter(Document doc) {
             return CreateFilter(doc,
                 "BIM_Инж_Системы",
@@ -31,10 +42,40 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
                 new FilterRule[] { });
         }
 
+        /// <summary>
+        /// Возвращает фильтр по всем категориям конструкций (стены, перекрытия)
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <returns></returns>
         public static ParameterFilterElement GetConstructureFilter(Document doc) {
             return CreateFilter(doc,
                 "BIM_Конструкции",
                 FiltersInitializer.GetAllUsedStructureCategories(),
+                new FilterRule[] { });
+        }
+
+        /// <summary>
+        /// Возвращает фильтр по всем неинтересным категориям для работы с заданиями на отверстия
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        public static ParameterFilterElement GetSecondaryCategoriesFilter(Document doc) {
+            // все категории, которые не должны попасть в не интересные
+            var mainCategories = new HashSet<BuiltInCategory>();
+            mainCategories.UnionWith(FiltersInitializer.GetAllUsedMepCategories());
+            mainCategories.UnionWith(FiltersInitializer.GetAllUsedStructureCategories());
+            mainCategories.UnionWith(FiltersInitializer.GetAllUsedOpeningsCategories());
+            mainCategories.UnionWith(new BuiltInCategory[] {
+                BuiltInCategory.OST_RvtLinks,
+                BuiltInCategory.OST_GenericModel
+            });
+
+            var secondaryCategories = GetAllModelCategories(doc);
+            secondaryCategories.ExceptWith(mainCategories);
+
+            return CreateFilter(doc,
+                "BIM_Вспомогательные_категории",
+                secondaryCategories,
                 new FilterRule[] { });
         }
 
@@ -50,11 +91,6 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         public static ICollection<ParameterFilterElement> GetHighlightFilters(Document doc, Element elementToHighlight) {
             if(elementToHighlight is null) { throw new ArgumentNullException(nameof(elementToHighlight)); }
 
-            // TODO исправить баг с не обновлением графики для элемента, для которого создавался предыдущий фильтр
-            // возможно поможет после вызова ClearRules добавить правило, чтобы ему удовлетворяли все стены или все перекрытия
-            // например, периметр больше 0 и длина больше 0
-
-            // PS после перезапуска документа и запуска плагина без дебага этого бага нет, надо потестить еще
             if(elementToHighlight is Wall wall) {
                 var wallFilter = GetWallHighlightFilter(doc, wall);
                 var floorFilter = GetFloorHighlightFilter(doc);
@@ -98,6 +134,28 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
             return filter;
         }
 
+        /// <summary>
+        /// Возвращает все категории модели из документа
+        /// </summary>
+        /// <param name="document">Документ с категориями</param>
+        /// <returns></returns>
+        private static HashSet<BuiltInCategory> GetAllModelCategories(Document document) {
+            Categories allCategories = document.Settings.Categories;
+            HashSet<BuiltInCategory> modelCategories = new HashSet<BuiltInCategory>();
+            foreach(Category category in allCategories) {
+                if(category.CategoryType == CategoryType.Model) {
+                    modelCategories.Add(category.GetBuiltInCategory());
+                }
+            }
+            return modelCategories;
+        }
+
+        /// <summary>
+        /// Возвращает фильтр по стенам, которые не являются заданной стеной
+        /// </summary>
+        /// <param name="doc">Документ, в котором происходит фильтрация</param>
+        /// <param name="wall">Заданная стена, которая не проходит фильтр</param>
+        /// <returns></returns>
         private static ParameterFilterElement GetWallHighlightFilter(Document doc, Wall wall = null) {
             var wallsFilter = CreateFilter(doc,
                 $"BIM_Стены_НЕ_Хост_Отверстия_{doc.Application.Username}",
@@ -117,6 +175,12 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
             return wallsFilter;
         }
 
+        /// <summary>
+        /// Возвращает фильтр по перекрытиям, которые не являются заданным перекрытием
+        /// </summary>
+        /// <param name="doc">Документ, в котором происходит фильтрация</param>
+        /// <param name="floor">Заданное перекрытие</param>
+        /// <returns></returns>
         private static ParameterFilterElement GetFloorHighlightFilter(Document doc, Floor floor = null) {
             var floorsFilter = CreateFilter(doc,
                 $"BIM_Перекрытия_НЕ_Хост_Отверстия_{doc.Application.Username}",
