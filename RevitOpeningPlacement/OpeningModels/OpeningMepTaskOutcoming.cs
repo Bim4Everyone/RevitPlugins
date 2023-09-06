@@ -279,15 +279,26 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
-        /// Возвращает ограничивающий бокс в координатах активного документа, увеличенный на 1% по сравнению с боксом по умолчанию
+        /// Возвращает ограничивающий бокс в координатах активного документа, увеличенный на 0.01 единицу длины Revit по сравнению с боксом по умолчанию.
+        /// <para>
+        /// Использовать для создания фильтра <see cref="Autodesk.Revit.DB.BoundingBoxIntersectsFilter"/>, в который должны попадать элементы, которые касаются текущего задания на отверстие.
+        /// </para>
         /// </summary>
         /// <returns></returns>
         public BoundingBoxXYZ GetExtendedBoxXYZ() {
             if(IsRemoved) {
                 return default;
             }
-            var transform = Transform.Identity.ScaleBasis(1.01);
-            return _familyInstance.GetBoundingBox().GetTransformedBoundingBox(transform);
+            BoundingBoxXYZ bbox = _familyInstance.GetBoundingBox();
+            XYZ minToMaxVector = (bbox.Max - bbox.Min).Normalize();
+            double coefficient = 1.01;
+            XYZ addition = minToMaxVector.Multiply(coefficient);
+            XYZ maxExtended = bbox.Max + addition;
+            XYZ minExtended = bbox.Min - addition;
+            return new BoundingBoxXYZ() {
+                Min = minExtended,
+                Max = maxExtended
+            };
         }
 
         /// <summary>
@@ -316,12 +327,49 @@ namespace RevitOpeningPlacement.OpeningModels {
                 foreach(PlanarFace otherFace in othersPlanarFaces) {
                     if((Math.Abs(thisFace.Area - otherFace.Area) < 0.000001)
                         && thisFace.FaceNormal.IsAlmostEqualTo(otherFace.FaceNormal.Negate())
-                        && thisFace.Origin.IsAlmostEqualTo(otherFace.Origin)) {
+                        && TheseAreTheSamePoints(GetCornerPoints(thisFace), GetCornerPoints(otherFace))) {
                         return true;
                     }
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Проверяет, одинаковы ли точки в коллекциях
+        /// </summary>
+        /// <param name="firstPoints">Первая коллекция точек</param>
+        /// <param name="secondPoints">Вторая коллекция точек</param>
+        /// <returns>True, если количество точек в коллекциях одинаково и если все точки из первой коллекции также есть во второй коллекции, иначе False</returns>
+        private bool TheseAreTheSamePoints(ICollection<XYZ> firstPoints, ICollection<XYZ> secondPoints) {
+            if(firstPoints.Count != secondPoints.Count) {
+                return false;
+            }
+            foreach(XYZ point in firstPoints) {
+                if(!secondPoints.Any(secondPoint => secondPoint.IsAlmostEqualTo(point))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Возвращает угловые точки плоской грани.
+        /// Если грань - круг, будут возвращены 2 крайние точки диаметра
+        /// </summary>
+        /// <param name="planarFace"></param>
+        /// <returns></returns>
+        private ICollection<XYZ> GetCornerPoints(PlanarFace planarFace) {
+            CurveLoop longestLoop = planarFace.GetEdgesAsCurveLoops().OrderByDescending(cLoop => cLoop.GetExactLength()).FirstOrDefault();
+            if(longestLoop != null) {
+                HashSet<XYZ> result = new HashSet<XYZ>();
+                foreach(Curve curve in longestLoop) {
+                    result.Add(curve.GetEndPoint(0));
+                }
+                return result;
+            } else {
+                return Array.Empty<XYZ>();
+            }
         }
 
         /// <summary>
@@ -335,13 +383,11 @@ namespace RevitOpeningPlacement.OpeningModels {
             HashSet<PlanarFace> result = new HashSet<PlanarFace>();
             var faces = solid.Faces;
             // заполнение в обратном порядке, потому что в конце Faces находятся бОльшие поверхности, которые интересны в первую очередь
-            for(int i = faces.Size - 1; i >= 0; i++) {
+            for(int i = faces.Size - 1; i >= 0; i--) {
                 var item = faces.get_Item(i);
                 if((item != null) && (item is PlanarFace planarFace)) {
                     result.Add(planarFace);
                 }
-            }
-            foreach(var face in faces) {
             }
             return result;
         }
