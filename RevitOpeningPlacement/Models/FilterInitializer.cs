@@ -164,7 +164,15 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <returns></returns>
         public static ElementMulticategoryFilter GetFilterByAllUsedMepCategories() {
-            return new ElementMulticategoryFilter(new BuiltInCategory[] {
+            return new ElementMulticategoryFilter(GetAllUsedMepCategories());
+        }
+
+        /// <summary>
+        /// Возвращает все используемые категории инженерных систем
+        /// </summary>
+        /// <returns></returns>
+        public static ICollection<BuiltInCategory> GetAllUsedMepCategories() {
+            return new BuiltInCategory[] {
                 BuiltInCategory.OST_PipeCurves,
                 BuiltInCategory.OST_PipeFitting,
 
@@ -179,7 +187,7 @@ namespace RevitOpeningPlacement.Models {
 
                 BuiltInCategory.OST_Conduit,
                 BuiltInCategory.OST_ConduitFitting,
-            });
+            };
         }
 
         /// <summary>
@@ -187,10 +195,18 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <returns></returns>
         public static ElementMulticategoryFilter GetFilterByAllUsedStructureCategories() {
-            return new ElementMulticategoryFilter(new BuiltInCategory[] {
+            return new ElementMulticategoryFilter(GetAllUsedStructureCategories());
+        }
+
+        /// <summary>
+        /// Возвращает все используемые категории конструкций
+        /// </summary>
+        /// <returns></returns>
+        public static ICollection<BuiltInCategory> GetAllUsedStructureCategories() {
+            return new BuiltInCategory[] {
                 BuiltInCategory.OST_Walls,
                 BuiltInCategory.OST_Floors
-            });
+            };
         }
 
         /// <summary>
@@ -198,9 +214,17 @@ namespace RevitOpeningPlacement.Models {
         /// /// </summary>
         /// <returns></returns>
         public static ElementMulticategoryFilter GetFilterByAllUsedOpeningsCategories() {
-            return new ElementMulticategoryFilter(new BuiltInCategory[] {
+            return new ElementMulticategoryFilter(GetAllUsedOpeningsCategories());
+        }
+
+        /// <summary>
+        /// Возвращает все используемые категории проемов
+        /// </summary>
+        /// <returns></returns>
+        public static ICollection<BuiltInCategory> GetAllUsedOpeningsCategories() {
+            return new BuiltInCategory[] {
                 BuiltInCategory.OST_Windows
-            });
+            };
         }
 
         /// <summary>

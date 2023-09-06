@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -6,13 +7,14 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models.Extensions;
+using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// <summary>
     /// Модель представления окна для работы с конкретным исходящим заданием на отверстие в файле инженера
     /// </summary>
-    internal class OpeningMepTaskOutcomingViewModel : BaseViewModel {
+    internal class OpeningMepTaskOutcomingViewModel : BaseViewModel, ISelectorAndHighlighter, IEquatable<OpeningMepTaskOutcomingViewModel> {
         /// <summary>
         /// Входящее задание на отверстие
         /// </summary>
@@ -31,6 +33,8 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Description = _openingTask.Description;
             CenterOffset = _openingTask.CenterOffset;
             BottomOffset = _openingTask.BottomOffset;
+            Comment = _openingTask.Comment;
+            Username = _openingTask.Username;
 
             Status = _openingTask.Status.GetEnumDescription();
         }
@@ -71,13 +75,47 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// </summary>
         public string Status { get; } = string.Empty;
 
+        /// <summary>
+        /// Комментарий
+        /// </summary>
+        public string Comment { get; } = string.Empty;
 
         /// <summary>
-        /// Возвращает экземпляр семейства задания на отверстие
+        /// Имя пользователя, создавшего задание на отверстие
+        /// </summary>
+        public string Username { get; } = string.Empty;
+
+        public override bool Equals(object obj) {
+            return (obj != null)
+                && (obj is OpeningMepTaskOutcomingViewModel otherVM)
+                && Equals(otherVM);
+        }
+
+        public override int GetHashCode() {
+            return _openingTask.Id;
+        }
+
+        public bool Equals(OpeningMepTaskOutcomingViewModel other) {
+            return (other != null)
+                && (_openingTask.Id == other._openingTask.Id);
+        }
+
+        /// <summary>
+        /// Возвращает хост исходящего задания на отверстие
         /// </summary>
         /// <returns></returns>
-        public FamilyInstance GetFamilyInstance() {
-            return _openingTask.GetFamilyInstance();
+        public Element GetElementToHighlight() {
+            return _openingTask.Host;
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию элементов, в которой находится исходищее задание на отверстие, которое надо выделить на виде
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<Element> GetElementsToSelect() {
+            return new Element[] {
+                _openingTask.GetFamilyInstance()
+            };
         }
     }
 }

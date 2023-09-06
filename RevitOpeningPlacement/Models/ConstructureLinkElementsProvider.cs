@@ -63,7 +63,7 @@ namespace RevitOpeningPlacement.Models {
                 .Where(famInst => famInst.Host != null)
                 .Where(famInst => famInst.Symbol.FamilyName.Contains("Отв"))
                 .Select(famInst => new OpeningReal(famInst))
-                .ToList();
+                .ToHashSet();
         }
     }
 }

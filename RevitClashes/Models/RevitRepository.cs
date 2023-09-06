@@ -288,7 +288,22 @@ namespace RevitClashDetective.Models {
                 .WherePasses(filter);
         }
 
+        /// <summary>
+        /// Выбирает и элементы на 3D виде и делает подрезку
+        /// </summary>
+        /// <param name="elements">Элементы для выбора</param>
+        /// <param name="view">3D вид, на котором надо выбрать и показать элементы</param>
         public void SelectAndShowElement(IEnumerable<Element> elements, View3D view = null) {
+            SelectAndShowElement(elements, 10, view);
+        }
+
+        /// <summary>
+        /// Выбирает и элементы на 3D виде и делает подрезку
+        /// </summary>
+        /// <param name="elements">Элементы для выбора</param>
+        /// <param name="additionalSize">Добавочный размер в футах к боксу, ограничивающему элементы</param>
+        /// <param name="view">3D вид, на котором надо выбрать и показать элементы</param>
+        public void SelectAndShowElement(IEnumerable<Element> elements, double additionalSize, View3D view = null) {
             try {
 
                 if(view == null) {
@@ -299,7 +314,7 @@ namespace RevitClashDetective.Models {
                 _revitEventHandler.TransactAction = () => {
                     var bb = GetCommonBoundingBox(elements);
                     if(bb != null) {
-                        SetSectionBox(bb, view);
+                        SetSectionBox(bb, view, additionalSize);
                     }
 
                     if(elements.Where(item => item.IsFromDocument(_document)).Any()) {
@@ -392,12 +407,20 @@ namespace RevitClashDetective.Models {
             return new[] { providers.First() };
         }
 
-        private void SetSectionBox(BoundingBoxXYZ bb, View3D view) {
+        /// <summary>
+        /// Устанавливает область подрезки, увеличивая размеры ограничивающего бокса на заданное количество футов
+        /// <para>Размеры области подрезки будут формироваться как сумма габарита бокса по соответствующей оси и добавочного размера</para>
+        /// </summary>
+        /// <param name="bb">Ограничивающий бокс, на основе которого будет строиться область подрезки</param>
+        /// <param name="view">3D Вид для задания области подрезки</param>
+        /// <param name="additionalSize">Добавочный размер в футах, на который нужно увеличить бокс в каждом направлении: OX, OY, OZ</param>
+        private void SetSectionBox(BoundingBoxXYZ bb, View3D view, double additionalSize) {
             if(bb == null)
                 return;
             using(Transaction t = _document.StartTransaction("Подрезка")) {
-                bb.Max += new XYZ(5, 5, 5);
-                bb.Min -= new XYZ(5, 5, 5);
+                double halfSize = Math.Abs(additionalSize / 2);
+                bb.Max += new XYZ(halfSize, halfSize, halfSize);
+                bb.Min -= new XYZ(halfSize, halfSize, halfSize);
                 view.SetSectionBox(bb);
                 var uiView = _uiDocument.GetOpenUIViews().FirstOrDefault(item => item.ViewId == view.Id);
                 if(uiView != null) {

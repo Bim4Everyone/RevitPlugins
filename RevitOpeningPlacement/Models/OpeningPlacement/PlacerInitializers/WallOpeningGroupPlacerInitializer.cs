@@ -12,6 +12,8 @@ using RevitOpeningPlacement.Models.OpeningUnion;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
     internal class WallOpeningGroupPlacerInitializer : IOpeningGroupPlacerInitializer {
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public OpeningPlacer GetPlacer(RevitRepository revitRepository, OpeningsGroup openingsGroup) {
             if(openingsGroup is null) {
                 throw new ArgumentNullException(nameof(openingsGroup));

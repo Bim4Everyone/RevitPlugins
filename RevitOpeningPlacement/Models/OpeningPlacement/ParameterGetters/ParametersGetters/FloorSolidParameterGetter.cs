@@ -42,6 +42,10 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             yield return new StringParameterGetter(RevitRepository.OpeningDate, new DateValueGetter()).GetParamValue();
             yield return new StringParameterGetter(RevitRepository.OpeningDescription, new DescriptionValueGetter(_mepElement, _structureElement)).GetParamValue();
             yield return new StringParameterGetter(RevitRepository.OpeningMepSystem, new MepSystemValueGetter(_mepElement)).GetParamValue();
+            yield return new StringParameterGetter(RevitRepository.OpeningAuthor, new UsernameGetter(_mepElement.Document.Application)).GetParamValue();
+
+            //флаг для автоматической расстановки
+            yield return new IntegerParameterGetter(RevitRepository.OpeningIsManuallyPlaced, new IsManuallyPlacedValueGetter()).GetParamValue();
         }
     }
 }

@@ -119,7 +119,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             revitRepository: _revitRepository,
             name: RevitRepository.MepCategoryNames[MepCategoryEnum.Conduit],
             minSizesParameters: new Parameters[] { Parameters.Diameter },
-              isRound: false,
+            isRound: true,
             imageSource: "../Resources/conduit.png"
             );
 

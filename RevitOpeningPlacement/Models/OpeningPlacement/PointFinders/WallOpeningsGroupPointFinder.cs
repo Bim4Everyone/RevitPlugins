@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -11,11 +7,16 @@ using dosymep.Revit.Geometry;
 using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
 using RevitOpeningPlacement.Models.OpeningUnion;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
-    internal class WallOpeningsGroupPointFinder : IPointFinder {
+    internal class WallOpeningsGroupPointFinder : RoundValueGetter, IPointFinder {
         private readonly OpeningsGroup _group;
+        /// <summary>
+        /// Округление высотной отметки отверстия в мм
+        /// </summary>
+        private const int _heightRound = 10;
 
         public WallOpeningsGroupPointFinder(OpeningsGroup group) {
             _group = group;
@@ -28,7 +29,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
                 .ToList()
                 .CreateUnitedBoundingBox();
             var center = bb.Min + (bb.Max - bb.Min) / 2;
-            return _group.Elements.First().GetTotalTransform().OfPoint(new XYZ(center.X, bb.Min.Y, bb.Min.Z));
+            var zRoundCoordinate = RoundFeetToMillimeters(bb.Min.Z, _heightRound);
+            return _group.Elements.First().GetTotalTransform().OfPoint(new XYZ(center.X, bb.Min.Y, zRoundCoordinate));
         }
     }
 }

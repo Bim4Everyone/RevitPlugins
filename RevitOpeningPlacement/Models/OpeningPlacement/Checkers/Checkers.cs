@@ -31,6 +31,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
             }
             // проверка дублированных связей
             _checkers.Add(new DuplicatedLinksChecker(_revitRepository));
+            // проверка на соответствие названий файлов бим стандарту
+            _checkers.Add(new DocsTitlesChecker(_revitRepository));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -7,13 +8,14 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models.Extensions;
+using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// <summary>
     /// Модель представления окна для работы с конкретным входящим заданием на отверстие от инженера в файле архитектора или конструктора
     /// </summary>
-    internal class OpeningMepTaskIncomingViewModel : BaseViewModel {
+    internal class OpeningMepTaskIncomingViewModel : BaseViewModel, ISelectorAndHighlighter, IEquatable<OpeningMepTaskIncomingViewModel> {
         /// <summary>
         /// Экземпляр семейства задания на отверстие
         /// </summary>
@@ -26,7 +28,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             }
             _openingTask = incomingOpeningTask;
 
-            OpeningId = _openingTask.Id.ToString();
+            OpeningId = _openingTask.Id;
             FileName = Path.GetFileNameWithoutExtension(incomingOpeningTask.FileName);
             Date = _openingTask.Date.Split().FirstOrDefault() ?? string.Empty;
             MepSystem = _openingTask.MepSystem;
@@ -41,13 +43,15 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             FamilyShortName = _openingTask.FamilyShortName;
             HostName = _openingTask.HostName;
             Status = _openingTask.Status.GetEnumDescription();
+            OwnComment = _openingTask.OwnComment;
+            Username = _openingTask.Username;
         }
 
 
         /// <summary>
         /// Id экземпляра семейства задания на отверстие
         /// </summary>
-        public string OpeningId { get; } = string.Empty;
+        public int OpeningId { get; } = -1;
 
         /// <summary>
         /// Название связанного файла-источника задания на отверстие
@@ -114,6 +118,16 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// </summary>
         public string HostName { get; } = string.Empty;
 
+        /// <summary>
+        /// Комментарий экземпляра семейства задания на отверстие
+        /// </summary>
+        public string OwnComment { get; } = string.Empty;
+
+        /// <summary>
+        /// Имя пользователя, создавшего задание на отверстие
+        /// </summary>
+        public string Username { get; } = string.Empty;
+
 
         private bool _isAccepted;
         /// <summary>
@@ -140,6 +154,41 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// <returns></returns>
         public FamilyInstance GetFamilyInstance() {
             return _openingTask.GetFamilyInstance();
+        }
+
+
+        public override bool Equals(object obj) {
+            return (obj != null)
+                && (obj is OpeningMepTaskIncomingViewModel vmOther)
+                && Equals(vmOther);
+        }
+
+        public override int GetHashCode() {
+            return OpeningId + FileName.GetHashCode();
+        }
+
+        public bool Equals(OpeningMepTaskIncomingViewModel other) {
+            return (other != null)
+                && (OpeningId == other.OpeningId)
+                && FileName.Equals(other.FileName);
+        }
+
+        /// <summary>
+        /// Возвращает хост входящего задания на отверстие
+        /// </summary>
+        /// <returns></returns>
+        public Element GetElementToHighlight() {
+            return _openingTask.Host;
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию элементов, в которой находится исходящее задание на отверстие, которое надо выделить на виде
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<Element> GetElementsToSelect() {
+            return new Element[] {
+                _openingTask.GetFamilyInstance()
+            };
         }
     }
 }

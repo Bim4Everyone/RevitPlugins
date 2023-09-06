@@ -13,17 +13,28 @@ using dosymep.SimpleServices;
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningUnion;
+using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement {
+    /// <summary>
+    /// Класс команды для объединения исходящих заданий на отверстия
+    /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class UniteOpeningTasksCommand : BasePluginCommand {
+
         protected override void Execute(UIApplication uiApplication) {
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            var configurator = new UnionGroupsConfigurator(revitRepository);
-            var placers = GetPlacersForUnion(revitRepository, configurator);
-            UniteOpeningsGroups(revitRepository, placers);
-            revitRepository.DeleteElements(configurator.GetElementsToDelete());
+            ICollection<OpeningMepTaskOutcoming> openingTasks = revitRepository.PickManyOpeningTasksOutcoming();
+
+            var placedOpeningTask = revitRepository.UniteOpenings(openingTasks);
+            uiApplication.ActiveUIDocument.Selection.SetElementIds(new ElementId[] { placedOpeningTask.Id });
         }
+
+
+        public void ExecuteCommand(UIApplication uiApplication) {
+            Execute(uiApplication);
+        }
+
 
         private void UniteOpeningsGroups(RevitRepository revitRepository, List<OpeningPlacer> placers) {
             using(var pb = GetPlatformService<IProgressDialogService>()) {

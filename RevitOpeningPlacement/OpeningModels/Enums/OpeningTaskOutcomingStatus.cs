@@ -36,6 +36,11 @@ namespace RevitOpeningPlacement.OpeningModels.Enums {
         /// Геометрия экземпляра семейства задания на отверстие не корректна
         /// </summary>
         [Description("Ошибка обработки геометрии")]
-        Invalid
+        Invalid,
+        /// <summary>
+        /// Задание на отверстие размещено вручную
+        /// </summary>
+        [Description("Размещено вручную")]
+        ManuallyPlaced
     }
 }

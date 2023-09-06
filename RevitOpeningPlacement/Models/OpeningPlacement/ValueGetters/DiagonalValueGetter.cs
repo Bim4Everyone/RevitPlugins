@@ -32,8 +32,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
             var dirX = coordinateSystem.BasisX;
             var dirY = coordinateSystem.BasisY;
 
-            height += _categoryOptions.GetOffset(height);
-            width += _categoryOptions.GetOffset(width);
+            height += _categoryOptions.GetOffsetValue(height);
+            width += _categoryOptions.GetOffsetValue(width);
 
             //получение длин проекций диагоналей коннектора инженерной системы на плоскость
             var diagonals = new[] { _plane.ProjectVector(dirX * width + dirY * height).GetLength(),

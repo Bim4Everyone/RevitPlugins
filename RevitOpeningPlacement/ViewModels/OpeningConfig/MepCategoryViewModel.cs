@@ -51,6 +51,17 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             var categoriesInfoViewModel = GetCategoriesInfoViewModel(revitRepository, Name);
             SetViewModel = new SetViewModel(revitRepository, categoriesInfoViewModel);
 
+            // инициализация значений по умолчанию
+            IsSelected = true; // категория выбрана для создания заданий на отверстия
+            SelectedRounding = Roundings.Last(); // округление 50 мм
+            var firstOffset = Offsets.First();
+            firstOffset.To = 10000; // максимальный габарит сечения элемента для зазора в мм
+            firstOffset.SelectedOpeningType = firstOffset.OpeningTypeNames.Last(); // тип задания на  отверстие по умолчанию прямоугольный
+            firstOffset.Offset = 50; // зазор 50 мм для прямоугольных заданий на отверстия
+            foreach(var structureCategory in StructureCategories) {
+                structureCategory.IsSelected = true; // все категории конструкций выбраны для создания заданий на отверстия
+            }
+
             AddOffsetCommand = new RelayCommand(AddOffset);
             RemoveOffsetCommand = new RelayCommand(RemoveOffset, CanRemoveOffset);
         }

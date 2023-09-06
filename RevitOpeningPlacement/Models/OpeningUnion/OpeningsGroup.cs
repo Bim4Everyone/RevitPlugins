@@ -5,6 +5,8 @@ using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models.Extensions;
 
+using RevitOpeningPlacement.OpeningModels;
+
 namespace RevitOpeningPlacement.Models.OpeningUnion {
     /// <summary>
     /// Класс для обертки списка экземпляров семейств заданий на отверстия
@@ -16,8 +18,8 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         private List<Solid> _solids = new List<Solid>();
         public OpeningsGroup() { }
 
-        public OpeningsGroup(ICollection<FamilyInstance> familyInstances) {
-            Elements.AddRange(familyInstances);
+        public OpeningsGroup(ICollection<OpeningMepTaskOutcoming> familyInstances) {
+            Elements.AddRange(familyInstances.Select(task => task.GetFamilyInstance()));
         }
         public List<FamilyInstance> Elements { get; } = new List<FamilyInstance>();
 

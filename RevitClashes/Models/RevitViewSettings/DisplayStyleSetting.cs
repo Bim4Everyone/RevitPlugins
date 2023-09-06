@@ -13,7 +13,7 @@ namespace RevitClashDetective.Models.RevitViewSettings {
 
         public void Apply(View3D view3D) {
             if(view3D.CanModifyDisplayStyle()) {
-                view3D.DisplayStyle = DisplayStyle.HLR;
+                view3D.DisplayStyle = _style;
             }
         }
     }

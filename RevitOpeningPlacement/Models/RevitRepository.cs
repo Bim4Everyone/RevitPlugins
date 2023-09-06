@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -17,8 +16,13 @@ using dosymep.SimpleServices;
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Handlers;
 
+using RevitOpeningPlacement.Models.Exceptions;
+using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
+using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
+using RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers;
+using RevitOpeningPlacement.Models.OpeningUnion;
 using RevitOpeningPlacement.Models.RevitViews;
 using RevitOpeningPlacement.Models.Selection;
 using RevitOpeningPlacement.OpeningModels;
@@ -147,6 +151,8 @@ namespace RevitOpeningPlacement.Models {
         public const string OpeningMepSystem = "ФОП_ВИС_Имя системы";
         public const string OpeningOffsetCenter = "ФОП_ВИС_Отметка оси от нуля";
         public const string OpeningOffsetBottom = "ФОП_ВИС_Отметка низа от нуля";
+        public const string OpeningAuthor = "ФОП_Автор задания";
+        public const string OpeningIsManuallyPlaced = "ФОП_Размещено вручную";
 
         public static List<BuiltInParameter> MepCurveDiameters => new List<BuiltInParameter>() {
             BuiltInParameter.RBS_PIPE_OUTER_DIAMETER,
@@ -262,7 +268,22 @@ namespace RevitOpeningPlacement.Models {
         }
 
         public void SelectAndShowElement(ICollection<Element> elements) {
-            _clashRevitRepository.SelectAndShowElement(elements, _view);
+            double additionalSize = 2;
+            _clashRevitRepository.SelectAndShowElement(elements, additionalSize, _view);
+        }
+
+        public void SelectAndShowElement(ISelectorAndHighlighter selectorAndHighlighter) {
+            var elementToHighlight = selectorAndHighlighter.GetElementToHighlight();
+            if(elementToHighlight != null) {
+                try {
+                    new ElementHighlighter(this, _view, elementToHighlight).HighlightElement();
+                } catch(ArgumentException) {
+                    // элемент для выделения не стена и не перекрытие
+                }
+            }
+            double additionalSize = 2;
+            var elementsToSelect = selectorAndHighlighter.GetElementsToSelect();
+            _clashRevitRepository.SelectAndShowElement(elementsToSelect, additionalSize, _view);
         }
 
         public string GetDocumentName(Document doc) {
@@ -282,7 +303,7 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <returns></returns>
         public DocTypeEnum GetDocumentType() {
-            var bimModelPartsService = GetPlatformService<IBimModelPartsService>();
+            var bimModelPartsService = GetBimModelPartsService();
 
             if(bimModelPartsService.InAnyBimModelParts(_document, BimModelPart.ARPart)) {
                 return DocTypeEnum.AR;
@@ -297,6 +318,14 @@ namespace RevitOpeningPlacement.Models {
             }
 
             return DocTypeEnum.MEP;
+        }
+
+        /// <summary>
+        /// Возвращает сервис для работы с разделами проектной документации
+        /// </summary>
+        /// <returns></returns>
+        public IBimModelPartsService GetBimModelPartsService() {
+            return GetPlatformService<IBimModelPartsService>();
         }
 
         /// <summary>
@@ -340,14 +369,14 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает список всех экземпляров семейств исходящих заданий на отверстия из текущего файла инженерных систем
+        /// Возвращает коллекцию всех экземпляров семейств исходящих заданий на отверстия из текущего файла инженерных систем
         /// </summary>
         /// <returns></returns>
-        public IList<OpeningMepTaskOutcoming> GetOpeningsMepTasksOutcoming() {
+        public ICollection<OpeningMepTaskOutcoming> GetOpeningsMepTasksOutcoming() {
             var openingsInWalls = GetWallOpeningsMepTasksOutcoming();
             var openingsInFloor = GetFloorOpeningsMepTasksOutcoming();
             openingsInFloor.AddRange(openingsInWalls);
-            return openingsInFloor.Select(famInst => new OpeningMepTaskOutcoming(famInst)).ToList();
+            return openingsInFloor.Select(famInst => new OpeningMepTaskOutcoming(famInst)).ToHashSet();
         }
 
         /// <summary>
@@ -398,12 +427,12 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <returns></returns>
         public ICollection<OpeningMepTaskOutcoming> GetPlacedOutcomingTasks() {
-            return GetOpeningsTaskFromCurrentDoc().Select(f => new OpeningMepTaskOutcoming(f)).ToList();
+            return GetOpeningsTaskFromCurrentDoc().Select(f => new OpeningMepTaskOutcoming(f)).ToHashSet();
         }
 
-        public void DeleteElements(ICollection<Element> elements) {
+        public void DeleteElements(ICollection<ElementId> elements) {
             using(Transaction t = _document.StartTransaction("Удаление объединенных заданий на отверстия")) {
-                _document.Delete(elements.Select(item => item.Id).ToArray());
+                _document.Delete(elements);
                 t.Commit();
             }
         }
@@ -416,23 +445,39 @@ namespace RevitOpeningPlacement.Models {
             _document.Delete(new ElementId(elementId));
         }
 
-        public async Task<FamilyInstance> UniteOpenings(OpeningPlacer placer, ICollection<Element> elements) {
+        /// <summary>
+        /// Объединяет задания на отверстия из активного документа и удаляет старые
+        /// </summary>
+        /// <param name="placer">Класс, размещающий объединенное задание</param>
+        /// <param name="openingTasks">Коллекция объединяемых заданий на отверстия</param>
+        /// <returns></returns>
+        /// <exception cref="OperationCanceledException"></exception>
+        public FamilyInstance UniteOpenings(ICollection<OpeningMepTaskOutcoming> openingTasks) {
+            var placer = GetOpeningPlacer(openingTasks);
             FamilyInstance createdOpening = null;
-            _revitEventHandler.TransactAction = () => {
+            try {
                 using(var t = GetTransaction("Объединение отверстий")) {
                     createdOpening = placer.Place();
                     t.Commit();
                 }
-                DeleteElements(elements);
-            };
 
-            await _revitEventHandler.Raise();
-
+            } catch(OpeningNotPlacedException e) {
+                var dialog = GetMessageBoxService();
+                dialog.Show(
+                    e.Message,
+                    "Задания на отверстия",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error,
+                    System.Windows.MessageBoxResult.OK);
+                throw new OperationCanceledException();
+            }
+            DeleteElements(openingTasks.Select(task => new ElementId(task.Id)).ToHashSet());
             return createdOpening;
         }
 
         public void DoAction(Action action) {
-            _clashRevitRepository.DoAction(action);
+            _revitEventHandler.TransactAction = action;
+            _revitEventHandler.Raise();
         }
 
         public IEnumerable<Document> GetDocuments() {
@@ -489,7 +534,6 @@ namespace RevitOpeningPlacement.Models {
         /// <summary>
         /// Спрашивает у пользователя, нужно ли продолжать операцию, если загружены не все связи
         /// </summary>
-        /// <param name="revitRepository"></param>
         /// <returns></returns>
         public bool ContinueIfNotAllLinksLoaded() {
             var notLoadedLinksNames = GetRevitLinkNotLoadedNames();
@@ -497,6 +541,28 @@ namespace RevitOpeningPlacement.Models {
                 var dialog = GetMessageBoxService();
                 return dialog.Show(
                     $"Связи:\n{string.Join(";\n", notLoadedLinksNames)} \nне загружены, хотите продолжить?",
+                    "Задания на отверстия",
+                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxImage.Warning,
+                    System.Windows.MessageBoxResult.No) == System.Windows.MessageBoxResult.Yes;
+
+            } else {
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Спрашивает у пользователя, нужно ли продолжать операцию, если семейства заданий на отверстия не самой последней версии
+        /// </summary>
+        /// <returns></returns>
+        public bool ContinueIfTaskFamiliesNotLatest() {
+            var checker = new FamiliesParametersChecker(this);
+            bool familiesLatest = checker.IsCorrect();
+
+            if(!familiesLatest) {
+                var dialog = GetMessageBoxService();
+                return dialog.Show(
+                    $"{checker.GetErrorMessage()}Хотите продолжить?",
                     "Задания на отверстия",
                     System.Windows.MessageBoxButton.YesNo,
                     System.Windows.MessageBoxImage.Warning,
@@ -516,10 +582,10 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает список чистовых экземпляров семейств отверстий из текущего документа Revit
+        /// Возвращает коллекцию чистовых экземпляров семейств отверстий из текущего документа Revit
         /// </summary>
         /// <returns></returns>
-        public IList<OpeningReal> GetRealOpenings() {
+        public ICollection<OpeningReal> GetRealOpenings() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
                 .WherePasses(FiltersInitializer.GetFilterByAllUsedOpeningsCategories())
@@ -528,7 +594,7 @@ namespace RevitOpeningPlacement.Models {
                 .Where(famInst => famInst.Host != null)
                 .Where(famInst => famInst.Symbol.FamilyName.Contains("Отв"))
                 .Select(famInst => new OpeningReal(famInst))
-                .ToList();
+                .ToHashSet();
         }
 
         /// <summary>
@@ -553,12 +619,12 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает список входящих заданий на отверстия из связанных файлов
+        /// Возвращает коллекцию входящих заданий на отверстия из связанных файлов
         /// </summary>
         /// <returns></returns>
-        public IList<OpeningMepTaskIncoming> GetOpeningsMepTasksIncoming() {
+        public ICollection<OpeningMepTaskIncoming> GetOpeningsMepTasksIncoming() {
             var links = GetRevitLinks();
-            List<OpeningMepTaskIncoming> genericModelsInLinks = new List<OpeningMepTaskIncoming>();
+            HashSet<OpeningMepTaskIncoming> genericModelsInLinks = new HashSet<OpeningMepTaskIncoming>();
             foreach(RevitLinkInstance link in links) {
                 var linkDoc = link.GetLinkDocument();
                 var transform = link.GetTransform();
@@ -569,21 +635,55 @@ namespace RevitOpeningPlacement.Models {
                     .Where(item => OpeningTaskTypeName.Any(n => n.Value.Equals(item.Name))
                                 && OpeningTaskFamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
                     .Select(famInst => new OpeningMepTaskIncoming(famInst, this, transform))
-                    ;
-                genericModelsInLinks.AddRange(genericModelsInLink);
+                    .ToHashSet();
+                genericModelsInLinks.UnionWith(genericModelsInLink);
             }
             return genericModelsInLinks;
         }
 
         /// <summary>
-        /// Возвращает список всех связей АР и КР из документа репозитория
+        /// Возвращает коллекцию всех связей АР и КР из документа репозитория
         /// </summary>
         /// <returns></returns>
-        public IList<RevitLinkInstance> GetConstructureLinks() {
-            var bimModelPartsService = GetPlatformService<IBimModelPartsService>();
+        public ICollection<RevitLinkInstance> GetConstructureLinks() {
+            var bimModelPartsService = GetBimModelPartsService();
             return GetRevitLinks()
-                .Where(link => bimModelPartsService.InAnyBimModelParts(link.Name, BimModelPart.ARPart, BimModelPart.KRPart))
-                .ToList();
+                .Where(link => bimModelPartsService.InAnyBimModelParts(
+                    link.Name,
+                    BimModelPart.ARPart,
+                    BimModelPart.KRPart,
+                    BimModelPart.KMPart
+                    ))
+                .ToHashSet();
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию всех связей инженерных систем из документа репозитория
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<RevitLinkInstance> GetMepLinks() {
+            var bimModelPartsService = GetBimModelPartsService();
+            return GetRevitLinks()
+                .Where(link => bimModelPartsService.InAnyBimModelParts(
+                    link.Name,
+                    BimModelPart.OVPart,
+                    BimModelPart.ITPPart,
+                    BimModelPart.HCPart,
+                    BimModelPart.VKPart,
+                    BimModelPart.EOMPart,
+                    BimModelPart.EGPart,
+                    BimModelPart.SSPart,
+                    BimModelPart.VNPart,
+                    BimModelPart.KVPart,
+                    BimModelPart.OTPart,
+                    BimModelPart.DUPart,
+                    BimModelPart.VSPart,
+                    BimModelPart.KNPart,
+                    BimModelPart.PTPart,
+                    BimModelPart.EOPart,
+                    BimModelPart.EMPart
+                    ))
+            .ToHashSet();
         }
 
         /// <summary>
@@ -615,6 +715,24 @@ namespace RevitOpeningPlacement.Models {
                     if((opening != null) && (opening is FamilyInstance famInst)) {
                         openingTasks.Add(new OpeningMepTaskIncoming(famInst, this, link.GetTransform()));
                     }
+                }
+            }
+            return openingTasks;
+        }
+
+        /// <summary>
+        /// Предлагает пользователю выбрать экземпляры семейств заданий на отверстия из активного документа и возвращает его выбор
+        /// </summary>
+        /// <returns>Выбранная пользователем коллекция элементов - заданий на отверстия</returns>
+        /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException"/>
+        public ICollection<OpeningMepTaskOutcoming> PickManyOpeningTasksOutcoming() {
+            ISelectionFilter filter = new SelectionFilterOpeningTasksOutcoming();
+            IList<Reference> references = _uiDocument.Selection.PickObjects(ObjectType.Element, filter, "Выберите задания на отверстия и нажмите \"Готово\"");
+
+            HashSet<OpeningMepTaskOutcoming> openingTasks = new HashSet<OpeningMepTaskOutcoming>();
+            foreach(var reference in references) {
+                if((reference != null) && (_document.GetElement(reference) is FamilyInstance famInst)) {
+                    openingTasks.Add(new OpeningMepTaskOutcoming(famInst));
                 }
             }
             return openingTasks;
@@ -680,14 +798,14 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <param name="familyName">Название семейства задания на отверстие</param>
         /// <returns></returns>
-        public OpeningType GetOpeningType(string familyName) {
+        public static OpeningType GetOpeningType(string familyName) {
             return OpeningTaskFamilyName.FirstOrDefault(pair => pair.Value.Equals(familyName, StringComparison.CurrentCultureIgnoreCase)).Key;
         }
 
         /// <summary>
         /// Возвращает коллекцию заголовков файлов Revit связей, которые дублируются.
         /// </summary>
-        /// <returns>Список заголовков дублированных Revit-связей</returns>
+        /// <returns>Коллекция заголовков дублированных Revit-связей</returns>
         public ICollection<string> GetDuplicatedLinksNames() {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_RvtLinks)
@@ -697,20 +815,70 @@ namespace RevitOpeningPlacement.Models {
                 .Where(link => RevitLinkType.IsLoaded(_document, link.GetTypeId()))
                 .GroupBy(inst => inst.GetLinkDocument().Title)
                 .Where(group => group.Count() > 1)
-                .Select(group => group.Key).ToList();
+                .Select(group => group.Key)
+                .ToHashSet();
         }
 
         /// <summary>
-        /// Возвращает список экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит ("исходящие" задания).
+        /// Возвращает ссылку на документ семейства
         /// </summary>
-        /// <returns>Список экземпляров семейств, названия семейств и типов которых заданы в соответствующих словарях
-        /// <see cref="OpeningTaskTypeName">названий типов</see> и
-        /// <see cref="OpeningTaskFamilyName">названий семейств</see></returns>
-        private List<FamilyInstance> GetOpeningsTaskFromCurrentDoc() {
+        /// <param name="family"></param>
+        /// <returns></returns>
+        /// <exception cref="Autodesk.Revit.Exceptions.ArgumentNullException"/>
+        /// <exception cref="Autodesk.Revit.Exceptions.ArgumentException"/>
+        /// <exception cref="Autodesk.Revit.Exceptions.InvalidOperationException"/>
+        /// <exception cref="Autodesk.Revit.Exceptions.ForbiddenForDynamicUpdateException"/>
+        public Document EditFamily(Family family) {
+            return _document.EditFamily(family);
+        }
+
+        /// <summary>
+        /// Возвращает класс, размещающий объединенное задание на отверстие
+        /// </summary>
+        /// <param name="openingTasks">Задания на отверстия из активного документа, которые надо объединить</param>
+        /// <returns></returns>
+        /// <exception cref="System.OperationCanceledException"/>
+        private OpeningPlacer GetOpeningPlacer(ICollection<OpeningMepTaskOutcoming> openingTasks) {
+            try {
+                OpeningPlacer placer;
+                if(openingTasks.Any(task => (task.OpeningType == OpeningType.FloorRound) || (task.OpeningType == OpeningType.FloorRectangle))) {
+                    placer = new FloorOpeningGroupPlacerInitializer().GetPlacer(this, new OpeningsGroup(openingTasks));
+                } else {
+                    placer = new WallOpeningGroupPlacerInitializer().GetPlacer(this, new OpeningsGroup(openingTasks));
+                }
+                return placer;
+
+            } catch(ArgumentNullException nullEx) {
+                var dialog = GetMessageBoxService();
+                dialog.Show(
+                    nullEx.Message,
+                    "Задания на отверстия",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error,
+                    System.Windows.MessageBoxResult.OK);
+                throw new OperationCanceledException();
+
+            } catch(ArgumentOutOfRangeException) {
+                var dialog = GetMessageBoxService();
+                dialog.Show(
+                    "Необходимо выбрать как минимум 2 задания на отверстия",
+                    "Задания на отверстия",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error,
+                    System.Windows.MessageBoxResult.OK);
+                throw new OperationCanceledException();
+            }
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит ("исходящие" задания).
+        /// </summary>
+        /// <returns>Коллекция экземпляров семейств, названия семейств и типов которых заданы в соответствующих словарях
+        private ICollection<FamilyInstance> GetOpeningsTaskFromCurrentDoc() {
             return GetGenericModelsFamilyInstances()
                 .Where(item => OpeningTaskTypeName.Any(n => n.Value.Equals(item.Name))
                             && OpeningTaskFamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
-                .ToList();
+                .ToHashSet();
         }
 
         private void RotateElement(Element element, Line axis, double angle) {
@@ -719,7 +887,7 @@ namespace RevitOpeningPlacement.Models {
             }
         }
 
-        private IList<string> GetRevitLinkNotLoadedNames() {
+        private ICollection<string> GetRevitLinkNotLoadedNames() {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_RvtLinks)
                 .WhereElementIsElementType()
@@ -728,19 +896,19 @@ namespace RevitOpeningPlacement.Models {
                                    _document,
                                    link.Id))
                 .Select(link => link.Name)
-                .ToList();
+                .ToHashSet();
         }
 
         /// <summary>
         /// Возвращает экземпляры семейств категории "Обобщенные модели" из текущего документа Revit
         /// </summary>
         /// <returns></returns>
-        private IList<FamilyInstance> GetGenericModelsFamilyInstances() {
+        private ICollection<FamilyInstance> GetGenericModelsFamilyInstances() {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
-                .ToList();
+                .ToHashSet();
         }
 
         private IList<RevitLinkInstance> GetRevitLinks() {
