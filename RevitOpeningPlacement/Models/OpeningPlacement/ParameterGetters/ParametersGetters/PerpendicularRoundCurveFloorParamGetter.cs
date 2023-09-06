@@ -21,23 +21,23 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         }
 
         public IEnumerable<ParameterValuePair> GetParamValues() {
-            var sizeInit = new FloorOpeningSizeInitializer(_clash.GetIntersection(), _mepCategory);
+            var floorThicknessValueGetter = new FloorThicknessValueGetter(_clash);
 
             //габариты отверстия
-            var sizeValueGetter = new DiameterValueGetter(_clash.Element1, _mepCategory);
+            var diameterValueGetter = new DiameterValueGetter(_clash.Element1, _mepCategory);
             if(OpeningTaskIsRound()) {
                 // круглое задание на отверстие
-                yield return new DoubleParameterGetter(RevitRepository.OpeningDiameter, sizeValueGetter).GetParamValue();
+                yield return new DoubleParameterGetter(RevitRepository.OpeningDiameter, diameterValueGetter).GetParamValue();
 
             } else {
                 // прямоугольное (квадратное) задание на отверстие
-                yield return new DoubleParameterGetter(RevitRepository.OpeningHeight, sizeValueGetter).GetParamValue();
-                yield return new DoubleParameterGetter(RevitRepository.OpeningWidth, sizeValueGetter).GetParamValue();
+                yield return new DoubleParameterGetter(RevitRepository.OpeningHeight, diameterValueGetter).GetParamValue();
+                yield return new DoubleParameterGetter(RevitRepository.OpeningWidth, diameterValueGetter).GetParamValue();
             }
-            yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, sizeInit.GetThickness()).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, floorThicknessValueGetter).GetParamValue();
 
             //отметки отверстия
-            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, new BottomOffsetOfOpeningInFloorValueGetter(_pointFinder, sizeInit.GetThickness())).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, new BottomOffsetOfOpeningInFloorValueGetter(_pointFinder, floorThicknessValueGetter)).GetParamValue();
 
             //текстовые данные отверстия
             yield return new StringParameterGetter(RevitRepository.OpeningDate, new DateValueGetter()).GetParamValue();
