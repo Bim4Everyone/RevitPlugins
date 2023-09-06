@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
-using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using dosymep;
 using dosymep.Bim4Everyone;
-using dosymep.SimpleServices;
+using dosymep.Bim4Everyone.SimpleServices;
 
 using Ninject;
 
@@ -29,14 +27,7 @@ namespace RevitPluginTemplate {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-			using(IKernel kernel = new StandardKernel()) {
-                kernel.Bind<UIApplication>()
-                    .ToConstant(uiApplication)
-                    .InTransientScope();
-                kernel.Bind<Application>()
-                    .ToConstant(uiApplication.Application)
-                    .InTransientScope();
-
+			using(IKernel kernel = uiApplication.CreatePlatformServices()) {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
