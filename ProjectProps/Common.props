@@ -169,6 +169,11 @@
             <Private>False</Private>
         </Reference>
 
+        <Reference Include="dosymep.Xpf.Core.Ninject">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.Xpf.Core.Ninject.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
         <Reference Include="dosymep.AutodeskApps">
             <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.AutodeskApps.dll</HintPath>
             <Private>False</Private>
