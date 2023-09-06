@@ -21,7 +21,6 @@ using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
-using RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers;
 using RevitOpeningPlacement.Models.OpeningUnion;
 using RevitOpeningPlacement.Models.RevitViews;
 using RevitOpeningPlacement.Models.Selection;
@@ -839,13 +838,8 @@ namespace RevitOpeningPlacement.Models {
         /// <exception cref="System.OperationCanceledException"/>
         private OpeningPlacer GetOpeningPlacer(ICollection<OpeningMepTaskOutcoming> openingTasks) {
             try {
-                OpeningPlacer placer;
-                if(openingTasks.Any(task => (task.OpeningType == OpeningType.FloorRound) || (task.OpeningType == OpeningType.FloorRectangle))) {
-                    placer = new FloorOpeningGroupPlacerInitializer().GetPlacer(this, new OpeningsGroup(openingTasks));
-                } else {
-                    placer = new WallOpeningGroupPlacerInitializer().GetPlacer(this, new OpeningsGroup(openingTasks));
-                }
-                return placer;
+                OpeningsGroup group = new OpeningsGroup(openingTasks);
+                return group.GetOpeningPlacer(this);
 
             } catch(ArgumentNullException nullEx) {
                 var dialog = GetMessageBoxService();

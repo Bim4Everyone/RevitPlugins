@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -25,8 +26,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
                 throw new ArgumentOutOfRangeException(nameof(openingsGroup.Elements.Count));
             }
             var pointFinder = new WallOpeningsGroupPointFinder(openingsGroup);
-            Element element1 = openingsGroup.Elements[0];
-            Element element2 = openingsGroup.Elements[1];
+            Element element1 = openingsGroup.Elements.First().GetFamilyInstance();
+            Element element2 = openingsGroup.Elements.Last().GetFamilyInstance();
 
             return new OpeningPlacer(revitRepository) {
                 Type = revitRepository.GetOpeningTaskType(OpeningType.WallRectangle),
