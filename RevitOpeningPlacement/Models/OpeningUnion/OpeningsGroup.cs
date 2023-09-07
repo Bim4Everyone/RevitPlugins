@@ -14,8 +14,7 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
     /// Экземпляры семейств не повторяются внутри группы.
     /// </summary>
     internal class OpeningsGroup {
-        private HashSet<OpeningMepTaskOutcoming> _elements = new HashSet<OpeningMepTaskOutcoming>();
-
+        private readonly HashSet<OpeningMepTaskOutcoming> _elements = new HashSet<OpeningMepTaskOutcoming>();
         private bool _allOpeningsInMultilayerConstruction = true;
 
 
@@ -25,8 +24,22 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
             }
         }
 
+
         /// <summary>
-        /// 
+        /// Флаг, показывающий, образуют ли все задания на отверстия в группе цилиндр
+        /// </summary>
+        public bool IsCylinder => _allOpeningsInMultilayerConstruction
+            && (_elements.All(opening => opening.OpeningType == OpeningType.WallRound)
+            || _elements.All(opening => opening.OpeningType == OpeningType.FloorRound));
+
+        /// <summary>
+        /// Задания на отверстия, расположенные в группе
+        /// </summary>
+        public ICollection<OpeningMepTaskOutcoming> Elements { get { return _elements; } }
+
+
+        /// <summary>
+        /// Возвращает генератор задания на отверстие, 
         /// </summary>
         /// <param name="revitRepository"></param>
         /// <returns></returns>
@@ -49,10 +62,6 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
                 throw new InvalidOperationException();
             }
         }
-
-
-        public ICollection<OpeningMepTaskOutcoming> Elements { get { return _elements; } }
-
 
         /// <summary>
         /// Добавляет поданный экземпляр семейства в текущую группу элементов, если этот экземпляр еще не добавлен в нее, 
@@ -95,6 +104,29 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         /// <returns></returns>
         public bool ContainsAny(ICollection<OpeningMepTaskOutcoming> openingMepTasks) {
             return _elements.Overlaps(openingMepTasks);
+        }
+
+        /// <summary>
+        /// Возвращает объединенное значение имен систем группы заданий на отверстия
+        /// </summary>
+        /// <returns></returns>
+        public string GetMepSystems() {
+            return string.Join("; ", _elements.Select(element => element.MepSystem.Trim()).Distinct());
+        }
+
+        /// <summary>
+        /// Возвращает объединенное значение описания группы заданий на отверстия
+        /// </summary>
+        /// <returns></returns>
+        public string GetDescription() {
+            HashSet<string> result = new HashSet<string>();
+            foreach(var opening in _elements) {
+                string[] descriptionItems = opening.Description.Split(';');
+                foreach(string descriptionItem in descriptionItems) {
+                    result.Add(descriptionItem.Trim());
+                }
+            }
+            return string.Join("; ", result);
         }
 
 
