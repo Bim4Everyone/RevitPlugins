@@ -1,12 +1,8 @@
-﻿using System;
-
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models.Clashes;
-using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models.Extensions;
-using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement {
     internal class MepCurveClash<T> : Clash<MEPCurve, T> where T : Element {
@@ -26,64 +22,6 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
 
         public override double GetConnectorArea() {
             return Element1.GetConnectorArea();
-        }
-    }
-
-    internal class FittingClash<T> : Clash<FamilyInstance, T> where T : Element {
-        public FittingClash(RevitRepository revitRepository, ClashModel clashModel) : base(revitRepository, clashModel) { }
-        public override double GetConnectorArea() {
-            return Element1.GetMaxConnectorArea();
-        }
-
-        public Solid GetRotatedIntersection(IAngleFinder angleFinder) {
-            var solid = GetIntersection();
-            var zRotates = -angleFinder.GetAngle().Z;
-            var transform = Transform.Identity.GetRotationMatrixAroundZ(zRotates);
-            return SolidUtils.CreateTransformed(solid, transform);
-        }
-    }
-
-    internal abstract class Clash<T1, T2> where T1 : Element
-                                 where T2 : Element {
-        public Clash(RevitRepository revitRepository, ClashModel clashModel) {
-            bool exceptionWasThrown = false;
-            try {
-                Element1 = (T1) clashModel.MainElement.GetElement(revitRepository.DocInfos);
-            } catch(InvalidCastException) {
-                // Дальше этот Clash попадет в Unplaced
-                exceptionWasThrown = true;
-            }
-            try {
-                Element2 = (T2) clashModel.OtherElement.GetElement(revitRepository.DocInfos);
-            } catch(InvalidCastException) {
-                // Дальше этот Clash попадет в Unplaced
-                exceptionWasThrown = true;
-            }
-            if(!exceptionWasThrown) {
-                Element2Transform = revitRepository.GetTransform(Element2);
-            }
-        }
-
-        public T1 Element1 { get; set; }
-        public T2 Element2 { get; set; }
-        public Transform Element2Transform { get; set; }
-
-        public Solid GetIntersection() {
-            return Element1.GetSolid().GetIntersection(Element2.GetSolid(), Element2Transform);
-        }
-
-        public abstract double GetConnectorArea();
-    }
-
-    internal class FittingClashProvider<T> : IClashProvider<FamilyInstance, T> where T : Element {
-        public Clash<FamilyInstance, T> GetClash(RevitRepository revitRepository, ClashModel model) {
-            return new FittingClash<T>(revitRepository, model);
-        }
-    }
-
-    internal class MepCurveClashProvider<T> : IClashProvider<MEPCurve, T> where T : Element {
-        public Clash<MEPCurve, T> GetClash(RevitRepository revitRepository, ClashModel model) {
-            return new MepCurveClash<T>(revitRepository, model);
         }
     }
 }
