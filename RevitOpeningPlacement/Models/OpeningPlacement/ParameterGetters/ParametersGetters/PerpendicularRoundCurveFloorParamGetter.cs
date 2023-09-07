@@ -21,10 +21,10 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         }
 
         public IEnumerable<ParameterValuePair> GetParamValues() {
-            var floorThicknessValueGetter = new FloorThicknessValueGetter(_clash);
+            var floorThicknessValueGetter = new FloorThicknessValueGetter(_clash.Element2);
+            var diameterValueGetter = new DiameterValueGetter(_clash.Element1, _mepCategory);
 
             //габариты отверстия
-            var diameterValueGetter = new DiameterValueGetter(_clash.Element1, _mepCategory);
             if(OpeningTaskIsRound()) {
                 // круглое задание на отверстие
                 yield return new DoubleParameterGetter(RevitRepository.OpeningDiameter, diameterValueGetter).GetParamValue();

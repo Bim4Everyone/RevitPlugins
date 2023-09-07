@@ -19,7 +19,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         }
 
         public IEnumerable<ParameterValuePair> GetParamValues() {
-            var floorThicknessValueGetter = new FloorThicknessValueGetter(_clash);
+            var floorThicknessValueGetter = new FloorThicknessValueGetter(_clash.Element2);
 
             //габариты отверстия
             yield return new DoubleParameterGetter(RevitRepository.OpeningHeight, new HeightValueGetter(_clash.Element1, _mepCategory)).GetParamValue();
