@@ -325,8 +325,11 @@ namespace RevitOpeningPlacement.OpeningModels {
 
             foreach(PlanarFace thisFace in thisPlanarFaces) {
                 foreach(PlanarFace otherFace in othersPlanarFaces) {
+                    // FaceNormal.Negate() для заданий на отверстия, которые касаются снаружи
+                    // FaceNormal для заданий на отверстия, которые находятся внутри другого и касаются изнутри
                     if((Math.Abs(thisFace.Area - otherFace.Area) < 0.000001)
-                        && thisFace.FaceNormal.IsAlmostEqualTo(otherFace.FaceNormal.Negate())
+                        && (thisFace.FaceNormal.IsAlmostEqualTo(otherFace.FaceNormal.Negate()) ||
+                            thisFace.FaceNormal.IsAlmostEqualTo(otherFace.FaceNormal))
                         && TheseAreTheSamePoints(GetCornerPoints(thisFace), GetCornerPoints(otherFace))) {
                         return true;
                     }
