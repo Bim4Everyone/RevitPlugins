@@ -28,26 +28,21 @@ namespace RevitOpeningPlacement {
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class PlaceOpeningTaskCommand : BasePluginCommand {
-        private readonly int _progressBarStepValue = 10;
+        private readonly int _progressBarStepValue = 25;
 
         /// <summary>
-        /// Id всех элементов которые выдают предупреждение дублирования в Revit
+        /// Id элементов которые выдают предупреждение дублирования в Revit и которые нужно удалить
         /// </summary>
-        private readonly HashSet<int> _allDuplicatedInstancesIds = new HashSet<int>();
-
-        /// <summary>
-        /// Id элементов которые выдают предупреждение дублирования в Revit и которые надо удалить.
-        /// Использовать для удаления только что созданных экземпляров семейств заданий, которые
-        /// </summary>
-        private readonly HashSet<int> _duplicatedInstancesIdsToRemove = new HashSet<int>();
+        private readonly HashSet<int> _duplicatedInstancesToRemoveIds = new HashSet<int>();
 
 
         public PlaceOpeningTaskCommand() {
             PluginName = "Расстановка заданий на отверстия";
         }
 
+
         protected override void Execute(UIApplication uiApplication) {
-            _allDuplicatedInstancesIds.Clear();
+            _duplicatedInstancesToRemoveIds.Clear();
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
             if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
                 throw new OperationCanceledException();
@@ -69,7 +64,7 @@ namespace RevitOpeningPlacement {
                 uiApplication.Application.FailuresProcessing -= FailureProcessor;
                 InitializeReport(revitRepository, unplacedClashes);
             }
-            _allDuplicatedInstancesIds.Clear();
+            _duplicatedInstancesToRemoveIds.Clear();
         }
 
         private bool ModelCorrect(RevitRepository revitRepository) {
@@ -138,6 +133,8 @@ namespace RevitOpeningPlacement {
                     InitializeUnion(revitRepository, newOpeningsNotDeleted);
                 }
             } else {
+                // инициализация удаления дубликатов только что созданных заданий на отверстия здесь не запускается,
+                // потому что дубликаты будут объединены в одно задание
                 InitializeUnion(revitRepository, newOpenings);
             }
             return unplacedClashes;
@@ -178,7 +175,7 @@ namespace RevitOpeningPlacement {
                     foreach(var newOpening in newOpenings) {
                         ct.ThrowIfCancellationRequested();
                         progress.Report(count);
-                        bool deleteNewOpening = _allDuplicatedInstancesIds.Contains(newOpening.Id) || newOpening.IsAlreadyPlaced(alreadyPlacedOpenings);
+                        bool deleteNewOpening = _duplicatedInstancesToRemoveIds.Contains(newOpening.Id) || newOpening.IsAlreadyPlaced(alreadyPlacedOpenings);
                         if(deleteNewOpening) {
                             revitRepository.DeleteElement(newOpening.Id);
                         } else {
@@ -255,9 +252,10 @@ namespace RevitOpeningPlacement {
             foreach(FailureMessageAccessor fma in fmas) {
                 var definition = fma.GetFailureDefinitionId();
                 if(definition == BuiltInFailures.OverlapFailures.DuplicateInstances) {
-                    var ids = fma.GetFailingElementIds().Select(id => id.IntegerValue);
+                    // в дубликаты заносить все элементы, кроме самого старого, у которого значение Id наименьшее
+                    var ids = fma.GetFailingElementIds().Select(id => id.IntegerValue).OrderBy(id => id).Skip(1);
                     foreach(var id in ids) {
-                        _allDuplicatedInstancesIds.Add(id);
+                        _duplicatedInstancesToRemoveIds.Add(id);
                     }
                 };
             }
