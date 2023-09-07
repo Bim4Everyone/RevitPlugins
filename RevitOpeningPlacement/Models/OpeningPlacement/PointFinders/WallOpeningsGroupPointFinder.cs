@@ -19,7 +19,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
         private const int _heightRound = 10;
 
         public WallOpeningsGroupPointFinder(OpeningsGroup group) {
-            _group = group;
+            _group = group ?? throw new System.ArgumentNullException(nameof(group));
         }
 
         public XYZ GetPoint() {
@@ -29,7 +29,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
                 .ToList()
                 .CreateUnitedBoundingBox();
             var center = bb.Min + (bb.Max - bb.Min) / 2;
-            var zRoundCoordinate = RoundFeetToMillimeters(bb.Min.Z, _heightRound);
+            var zRoundCoordinate = _group.IsCylinder ? RoundFeetToMillimeters(center.Z, _heightRound) : RoundFeetToMillimeters(bb.Min.Z, _heightRound);
             return _group.Elements.First().GetFamilyInstance().GetTotalTransform().OfPoint(new XYZ(center.X, bb.Min.Y, zRoundCoordinate));
         }
     }
