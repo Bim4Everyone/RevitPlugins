@@ -149,9 +149,7 @@ namespace RevitOpeningPlacement {
                 int i = 0;
                 foreach(var incomingTask in incomingTasks) {
                     ct.ThrowIfCancellationRequested();
-                    if((i % _progressBarStepLarge) == 0) {
-                        progress.Report(i);
-                    }
+                    progress.Report(i);
                     try {
                         incomingTask.UpdateStatusAndHostName(realOpenings, constructureElementsIds);
                     } catch(ArgumentException) {
@@ -182,9 +180,7 @@ namespace RevitOpeningPlacement {
                 var i = 0;
                 foreach(var openingReal in openingsReal) {
                     ct.ThrowIfCancellationRequested();
-                    if((i % _progressBarStepSmall) == 0) {
-                        progress.Report(i);
-                    }
+                    progress.Report(i);
                     openingReal.UpdateStatus(mepLinks);
                     if(openingReal.Status != OpeningModels.Enums.OpeningRealStatus.Correct) {
                         openingsRealViewModels.Add(new OpeningRealViewModel(openingReal));
@@ -251,9 +247,7 @@ namespace RevitOpeningPlacement {
                 int i = 0;
                 foreach(var outcomingTask in outcomingTasks) {
                     ct.ThrowIfCancellationRequested();
-                    if(i % _progressBarStepLarge == 0) {
-                        progress.Report(i);
-                    }
+                    progress.Report(i);
                     outcomingTask.UpdateStatus(ref outcomingTasksIds, mepElementsIds, constructureLinks);
                     openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTask));
                     i++;

@@ -176,8 +176,8 @@ namespace RevitOpeningPlacement {
                 using(var t = revitRepository.GetTransaction("Удаление дублирующих заданий")) {
                     int count = 0;
                     foreach(var newOpening in newOpenings) {
-                        progress.Report(count);
                         ct.ThrowIfCancellationRequested();
+                        progress.Report(count);
                         bool deleteNewOpening = _allDuplicatedInstancesIds.Contains(newOpening.Id) || newOpening.IsAlreadyPlaced(alreadyPlacedOpenings);
                         if(deleteNewOpening) {
                             revitRepository.DeleteElement(newOpening.Id);
