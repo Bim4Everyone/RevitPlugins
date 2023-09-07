@@ -3,5 +3,5 @@
 
 # Сборка проекта
 ```
-nuke compile --plugin-name RevitCopyView
+nuke compile --plugin-name RevitCopyViews
 ```
