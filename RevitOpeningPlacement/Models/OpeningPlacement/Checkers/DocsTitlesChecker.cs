@@ -20,7 +20,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
 
         public string GetErrorMessage() {
             var docs = _revitRepository.DocInfos;
-            IBimModelPartsService bimPartsService = _revitRepository.GetBimModelPartsService();
+            IBimModelPartsService bimPartsService = RevitRepository.GetBimModelPartsService();
             HashSet<string> notValidDocTitles = new HashSet<string>();
             foreach(var doc in docs) {
                 if(bimPartsService.GetBimModelPart(doc.Name) is null) {
@@ -32,7 +32,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
 
         public bool IsCorrect() {
             var docs = _revitRepository.DocInfos;
-            IBimModelPartsService bimPartsService = _revitRepository.GetBimModelPartsService();
+            IBimModelPartsService bimPartsService = RevitRepository.GetBimModelPartsService();
             foreach(var doc in docs) {
                 if(bimPartsService.GetBimModelPart(doc.Name) is null) {
                     return false;

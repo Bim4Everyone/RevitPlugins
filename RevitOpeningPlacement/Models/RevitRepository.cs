@@ -323,7 +323,7 @@ namespace RevitOpeningPlacement.Models {
         /// Возвращает сервис для работы с разделами проектной документации
         /// </summary>
         /// <returns></returns>
-        public IBimModelPartsService GetBimModelPartsService() {
+        public static IBimModelPartsService GetBimModelPartsService() {
             return GetPlatformService<IBimModelPartsService>();
         }
 
@@ -931,7 +931,7 @@ namespace RevitOpeningPlacement.Models {
                .ToList();
         }
 
-        protected T GetPlatformService<T>() {
+        private static T GetPlatformService<T>() {
             return ServicesProvider.GetPlatformService<T>();
         }
     }
