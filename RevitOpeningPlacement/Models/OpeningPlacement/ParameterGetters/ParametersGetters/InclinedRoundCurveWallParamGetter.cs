@@ -26,10 +26,11 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         //которые находятся на максимальном расстоянии друг от друга, далее по теореме Пифагора производится расчет размера.
         public IEnumerable<ParameterValuePair> GetParamValues() {
             var heightValueGetter = new InclinedSizeInitializer(_clash, _mepCategory).GetRoundMepHeightGetter();
+
             //габариты отверстия
             yield return new DoubleParameterGetter(RevitRepository.OpeningHeight, heightValueGetter).GetParamValue();
             yield return new DoubleParameterGetter(RevitRepository.OpeningWidth, new InclinedSizeInitializer(_clash, _mepCategory).GetRoundMepWidthGetter()).GetParamValue();
-            yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new WallThicknessValueGetter(_clash)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new WallThicknessValueGetter(_clash.Element2)).GetParamValue();
 
             //отметки отверстия
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, new CenterOffsetOfRectangleOpeningInWallValueGetter(_pointFinder, heightValueGetter)).GetParamValue();

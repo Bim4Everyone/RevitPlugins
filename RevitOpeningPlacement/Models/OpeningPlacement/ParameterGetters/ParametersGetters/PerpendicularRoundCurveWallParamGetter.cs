@@ -33,7 +33,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
                 yield return new DoubleParameterGetter(RevitRepository.OpeningHeight, openingSizeGetter).GetParamValue();
                 yield return new DoubleParameterGetter(RevitRepository.OpeningWidth, openingSizeGetter).GetParamValue();
             }
-            yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new WallThicknessValueGetter(_clash)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new WallThicknessValueGetter(_clash.Element2)).GetParamValue();
 
             //отметки отверстия
             if(openingTaskIsRound) {
