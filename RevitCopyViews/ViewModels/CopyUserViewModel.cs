@@ -81,8 +81,6 @@ namespace RevitCopyViews.ViewModels {
 
                 transaction.Commit();
             }
-
-            UIDocument.Selection.SetElementIds(createdViews);
         }
 
         private bool CanCopyUser(object p) {

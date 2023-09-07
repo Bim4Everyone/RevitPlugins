@@ -169,8 +169,6 @@ namespace RevitCopyViews.ViewModels {
 
                 transaction.Commit();
             }
-
-            UIDocument.Selection.SetElementIds(createdViews);
         }
 
         private string GetViewName(RevitViewViewModel revitView) {
