@@ -19,9 +19,7 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
 
 
         public OpeningsGroup(ICollection<OpeningMepTaskOutcoming> openingTasks) {
-            foreach(var openingTask in openingTasks) {
-                _elements.Add(openingTask);
-            }
+            AddOpenings(openingTasks);
         }
 
 
@@ -46,7 +44,6 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         /// <exception cref="InvalidOperationException"></exception>
         public OpeningPlacer GetOpeningPlacer(RevitRepository revitRepository) {
             try {
-                // TODO добавить placer для многослойных отверстий
                 OpeningPlacer placer;
                 if(_elements.Any(task => (task.OpeningType == OpeningType.FloorRound) || (task.OpeningType == OpeningType.FloorRectangle))) {
                     placer = new FloorOpeningGroupPlacerInitializer().GetPlacer(revitRepository, this);
