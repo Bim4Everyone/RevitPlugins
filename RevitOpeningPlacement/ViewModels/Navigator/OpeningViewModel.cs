@@ -33,7 +33,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
                 yield break;
             }
 
-            FamilyInstance firstOpening = group.Elements.Take(1).First();
+            FamilyInstance firstOpening = group.Elements.Take(1).First().GetFamilyInstance();
             var firstOpeningViewModel = new OpeningViewModel(revitRepository, firstOpening);
 
             var otherOpenings = group.Elements.Skip(1);
@@ -43,7 +43,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             yield return firstOpeningViewModel;
 
             foreach(var opening in otherOpenings) {
-                var openingViewModel = new OpeningViewModel(revitRepository, opening);
+                var openingViewModel = new OpeningViewModel(revitRepository, opening.GetFamilyInstance());
                 openingViewModel.ParentId = firstOpening.Id.IntegerValue;
                 yield return openingViewModel;
             }

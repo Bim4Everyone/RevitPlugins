@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
@@ -14,7 +13,6 @@ using dosymep.SimpleServices;
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.Navigator.Checkers;
-using RevitOpeningPlacement.Models.OpeningUnion;
 using RevitOpeningPlacement.OpeningModels;
 using RevitOpeningPlacement.ViewModels.Navigator;
 using RevitOpeningPlacement.Views;
@@ -151,9 +149,7 @@ namespace RevitOpeningPlacement {
                 int i = 0;
                 foreach(var incomingTask in incomingTasks) {
                     ct.ThrowIfCancellationRequested();
-                    if((i % _progressBarStepLarge) == 0) {
-                        progress.Report(i);
-                    }
+                    progress.Report(i);
                     try {
                         incomingTask.UpdateStatusAndHostName(realOpenings, constructureElementsIds);
                     } catch(ArgumentException) {
@@ -184,9 +180,7 @@ namespace RevitOpeningPlacement {
                 var i = 0;
                 foreach(var openingReal in openingsReal) {
                     ct.ThrowIfCancellationRequested();
-                    if((i % _progressBarStepSmall) == 0) {
-                        progress.Report(i);
-                    }
+                    progress.Report(i);
                     openingReal.UpdateStatus(mepLinks);
                     if(openingReal.Status != OpeningModels.Enums.OpeningRealStatus.Correct) {
                         openingsRealViewModels.Add(new OpeningRealViewModel(openingReal));
@@ -253,9 +247,7 @@ namespace RevitOpeningPlacement {
                 int i = 0;
                 foreach(var outcomingTask in outcomingTasks) {
                     ct.ThrowIfCancellationRequested();
-                    if(i % _progressBarStepLarge == 0) {
-                        progress.Report(i);
-                    }
+                    progress.Report(i);
                     outcomingTask.UpdateStatus(ref outcomingTasksIds, mepElementsIds, constructureLinks);
                     openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTask));
                     i++;
@@ -313,28 +305,6 @@ namespace RevitOpeningPlacement {
             //    default:
             //    return NavigatorMode.NotDefined;
             //}
-        }
-
-        private List<OpeningsGroup> GetOpeningsGroupsMepTasksOutcoming(RevitRepository revitRepository, UnionGroupsConfigurator configurator) {
-            var groups = new List<OpeningsGroup>();
-            using(var pb = GetPlatformService<IProgressDialogService>()) {
-                IProgress<int> progress;
-                CancellationToken ct;
-                var maxValue = revitRepository.GetPlacedOutcomingTasks().Count;
-                InitializeProgress(maxValue, pb, out progress, out ct);
-
-                groups.AddRange(configurator.GetGroupsMepTasksOutcoming(progress, ct));
-            }
-            return groups;
-        }
-
-        private static void InitializeProgress(int maxValue, IProgressDialogService pb, out IProgress<int> progress, out CancellationToken ct) {
-            pb.StepValue = 10;
-            pb.DisplayTitleFormat = "Идёт расчёт... [{0}\\{1}]";
-            progress = pb.CreateProgress();
-            pb.MaxValue = maxValue;
-            ct = pb.CreateCancellationToken();
-            pb.Show();
         }
     }
 

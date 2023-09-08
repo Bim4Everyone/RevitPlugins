@@ -29,7 +29,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
             if(_mepCategories != null && _mepCategories.Length > 0) {
                 size += _mepCategories.Max(item => item.GetOffsetValue(_max - _min));
                 mmRound = _mepCategories.Max(x => x.Rounding);
-            } else if(_mepCategories.Length == 0) {
+            } else {
                 mmRound = 10;
             }
             size = RoundToCeilingFeetToMillimeters(size, mmRound);
