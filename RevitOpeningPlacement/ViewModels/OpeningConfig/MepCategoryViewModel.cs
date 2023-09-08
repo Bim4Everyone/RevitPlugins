@@ -134,12 +134,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
         public MepCategory GetMepCategory() {
-            return new MepCategory() {
-                Name = Name,
-                ImageSource = ImageSource,
+            return new MepCategory(Name, ImageSource, IsRound) {
                 Offsets = Offsets.Select(item => item.GetOffset()).ToList(),
                 MinSizes = new SizeCollection(MinSizes.Select(item => item.GetSize())),
-                IsRound = IsRound,
                 IsSelected = IsSelected,
                 Intersections = StructureCategories.Select(item => new StructureCategory() { Name = item.Name, IsSelected = item.IsSelected }).ToList(),
                 Rounding = SelectedRounding,
