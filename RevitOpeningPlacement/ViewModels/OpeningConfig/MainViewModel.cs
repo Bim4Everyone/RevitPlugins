@@ -38,6 +38,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             SaveConfigCommand = new RelayCommand(SaveConfig, CanSaveConfig);
             SaveAsConfigCommand = new RelayCommand(SaveAsConfig, CanSaveConfig);
             LoadConfigCommand = new RelayCommand(LoadConfig);
+            CheckSearchSearchSetCommand = new RelayCommand(CheckSearchSet, CanSaveConfig);
 
             SelectedMepCategoryViewModel = MepCategories.FirstOrDefault(category => category.IsSelected) ?? MepCategories.First();
             foreach(MepCategoryViewModel mepCategoryViewModel in MepCategories) {
@@ -69,6 +70,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         public ICommand SaveConfigCommand { get; }
         public ICommand SaveAsConfigCommand { get; }
         public ICommand LoadConfigCommand { get; }
+        public ICommand CheckSearchSearchSetCommand { get; }
 
 
         private void InitializeCategories() {
@@ -174,6 +176,12 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 _timer.Stop();
             };
         }
+
+        private void CheckSearchSet(object p) {
+            var filter = SelectedMepCategoryViewModel.GetMepCategory();
+            throw new NotImplementedException();
+        }
+
         private Models.Configs.OpeningConfig GetOpeningConfig() {
             var config = Models.Configs.OpeningConfig.GetOpeningConfig(_revitRepository.Doc);
             config.Categories = new MepCategoryCollection(MepCategories.Select(item => item.GetMepCategory()));
