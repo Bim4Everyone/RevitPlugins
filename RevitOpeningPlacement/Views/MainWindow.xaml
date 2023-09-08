@@ -71,6 +71,12 @@
                           Foreground="Orange" />
             <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding MessageText}"
                           Foreground="Green" />
+            <dx:SimpleButton Content="Проверить фильтр"
+                             Height="25"
+                             Width="130"
+                             Margin="10 0"
+                             IsDefault="False" 
+                             Command="{Binding CheckSearchSearchSetCommand}"/>
             <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True"
                              Click="ButtonOk_Click" Command="{Binding SaveConfigCommand}"/>
             <dx:SimpleButton Content="Отмена" Height="25" Width="80"  IsCancel="true"
