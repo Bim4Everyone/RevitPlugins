@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -20,7 +16,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.LevelFinders {
         }
 
         public Level GetLevel() {
-            return _revitRepository.GetLevel(_openingsGroup.Elements.First());
+            return _revitRepository.GetLevel(_openingsGroup.Elements.First().GetFamilyInstance());
         }
     }
 }

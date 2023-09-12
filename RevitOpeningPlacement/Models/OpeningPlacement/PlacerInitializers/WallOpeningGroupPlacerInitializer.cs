@@ -1,7 +1,5 @@
 ﻿using System;
 
-using Autodesk.Revit.DB;
-
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.OpeningPlacement.LevelFinders;
@@ -11,7 +9,13 @@ using RevitOpeningPlacement.Models.OpeningPlacement.SolidProviders;
 using RevitOpeningPlacement.Models.OpeningUnion;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
+    /// <summary>
+    /// Класс для размещения объединенного задания на отверстие в стене по группе заданий на отверстия
+    /// </summary>
     internal class WallOpeningGroupPlacerInitializer : IOpeningGroupPlacerInitializer {
+        public WallOpeningGroupPlacerInitializer() { }
+
+
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public OpeningPlacer GetPlacer(RevitRepository revitRepository, OpeningsGroup openingsGroup) {
@@ -25,15 +29,16 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
                 throw new ArgumentOutOfRangeException(nameof(openingsGroup.Elements.Count));
             }
             var pointFinder = new WallOpeningsGroupPointFinder(openingsGroup);
-            Element element1 = openingsGroup.Elements[0];
-            Element element2 = openingsGroup.Elements[1];
 
             return new OpeningPlacer(revitRepository) {
-                Type = revitRepository.GetOpeningTaskType(OpeningType.WallRectangle),
+                Type = openingsGroup.IsCylinder
+                ? revitRepository.GetOpeningTaskType(OpeningType.WallRound)
+                : revitRepository.GetOpeningTaskType(OpeningType.WallRectangle),
+
                 PointFinder = pointFinder,
                 LevelFinder = new OpeningsGroupLevelFinder(revitRepository, openingsGroup),
                 AngleFinder = new WallOpeningsGroupAngleFinder(openingsGroup),
-                ParameterGetter = new WallSolidParameterGetter(new OpeningGroupSolidProvider(openingsGroup), pointFinder, element1, element2)
+                ParameterGetter = new WallSolidParameterGetter(new OpeningGroupSolidProvider(openingsGroup), pointFinder, openingsGroup)
             };
         }
     }

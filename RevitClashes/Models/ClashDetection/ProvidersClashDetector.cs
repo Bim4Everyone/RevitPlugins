@@ -61,14 +61,10 @@ namespace RevitClashDetective.Models.ClashDetection {
             var resultTransform = _firstProvider.MainTransform.GetTransitionMatrix(_secondProvider.MainTransform);
 
             var count = 0;
-            var lastCount = 0;
             foreach(var element in _secondElements) {
-                count++;
-                if((count == 0) || ((count - lastCount) >= _progressBarStep)) {
-                    progress.Report(count);
-                    lastCount = count;
-                }
                 ct.ThrowIfCancellationRequested();
+                progress.Report(count);
+                count++;
 
                 var solids = _secondProvider.GetSolids(element)
                                             .ToArray();
