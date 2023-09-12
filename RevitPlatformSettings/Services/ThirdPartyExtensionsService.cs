@@ -31,7 +31,7 @@ namespace RevitPlatformSettings.Services {
             return JObject.Parse(File.ReadAllText(ExtensionsDefinitionPath))
                 .GetValue("extensions")
                 .ToObject<JToken[]>()
-                .Select(item => _thirdPartyFactory.Create(item));
+                .Select(item => _thirdPartyFactory.Create(item, "Bim4Everyone"));
         }
     }
 }

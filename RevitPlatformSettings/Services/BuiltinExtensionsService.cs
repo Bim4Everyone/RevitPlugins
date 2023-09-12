@@ -43,10 +43,10 @@ namespace RevitPlatformSettings.Services {
 
         public IEnumerable<BuiltinExtension> GetExtensions() {
             if(File.Exists(CoreDefinitionPath)) {
-                yield return _builtinFactory.Create(JToken.Parse(File.ReadAllText(CoreDefinitionPath)));
+                yield return _builtinFactory.Create(JToken.Parse(File.ReadAllText(CoreDefinitionPath)), "pyRevit");
             }
-            yield return _builtinFactory.Create(JToken.Parse(File.ReadAllText(TagsDefinitionPath)));
-            yield return _builtinFactory.Create(JToken.Parse(File.ReadAllText(ToolsDefinitionPath)));
+            yield return _builtinFactory.Create(JToken.Parse(File.ReadAllText(TagsDefinitionPath)), "pyRevit");
+            yield return _builtinFactory.Create(JToken.Parse(File.ReadAllText(ToolsDefinitionPath)), "pyRevit");
         }
     }
 }

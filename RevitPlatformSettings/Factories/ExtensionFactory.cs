@@ -14,8 +14,10 @@ namespace RevitPlatformSettings.Factories {
             _resolutionRoot = resolutionRoot;
         }
 
-        public T Create(JToken token) {
-            return _resolutionRoot.Get<T>(new ConstructorArgument(nameof(token), token));
+        public T Create(JToken token, string category) {
+            return _resolutionRoot.Get<T>(
+                new ConstructorArgument(nameof(token), token),
+                new ConstructorArgument(nameof(category), category));
         }
     }
 }
