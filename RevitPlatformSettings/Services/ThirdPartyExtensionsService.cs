@@ -21,6 +21,11 @@ namespace RevitPlatformSettings.Services {
             Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 @"pyRevit\Extensions\01.BIM.extension\extensions.json");
+        
+        public static readonly string ThirdPartyExtensionsDefinitionPath =
+            Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                @"pyRevit-Master\extensions\extensions.json");
 
 
         public ThirdPartyExtensionsService(IExtensionFactory<ThirdPartyExtension> thirdPartyFactory) {
@@ -28,10 +33,14 @@ namespace RevitPlatformSettings.Services {
         }
 
         public IEnumerable<ThirdPartyExtension> GetExtensions() {
-            return JObject.Parse(File.ReadAllText(ExtensionsDefinitionPath))
+            return GetExtensions(ExtensionsDefinitionPath, "Bim4Everyone");
+        }
+
+        private IEnumerable<ThirdPartyExtension> GetExtensions(string pathExtensions, string category) {
+            return JObject.Parse(File.ReadAllText(pathExtensions))
                 .GetValue("extensions")
                 .ToObject<JToken[]>()
-                .Select(item => _thirdPartyFactory.Create(item));
+                .Select(item => _thirdPartyFactory.Create(item, category));
         }
     }
 }

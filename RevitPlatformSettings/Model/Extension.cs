@@ -9,9 +9,12 @@ namespace RevitPlatformSettings.Model {
     internal abstract class Extension {
         private readonly JToken _token;
 
-        public Extension(JToken token) {
+        public Extension(JToken token, string category) {
             _token = token;
+            Category = category;
         }
+        
+        public string Category { get; }
 
         public virtual bool AllowChangeEnabled { get; set; } = true;
 

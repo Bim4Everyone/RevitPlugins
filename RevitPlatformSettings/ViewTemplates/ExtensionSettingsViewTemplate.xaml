@@ -5,6 +5,7 @@
                     xmlns:vms="clr-namespace:RevitPlatformSettings.ViewModels">
     <DataTemplate DataType="{x:Type vms:ExtensionsSettingsViewModel}">
         <dxg:GridControl
+            AutoExpandAllGroups="True"
             ItemsSource="{Binding Extensions}">
             <dxg:GridControl.View>
                 <dxg:TableView
@@ -41,6 +42,7 @@
 
             </dxg:GridColumn>
 
+            <dxg:GridColumn Header="Категория" Width="100" FieldName="Category" GroupIndex="0" />
             <dxg:GridColumn Header="Имя" Width="250" FieldName="Name" />
             <dxg:GridColumn Header="Описание" Width="250" FieldName="Description" />
         </dxg:GridControl>

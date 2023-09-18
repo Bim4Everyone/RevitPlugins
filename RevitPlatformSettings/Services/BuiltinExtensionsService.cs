@@ -21,6 +21,11 @@ namespace RevitPlatformSettings.Services {
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 @"pyRevit-Master\extensions\extensions.json");
 
+        public static readonly string CoreDefinitionPath =
+            Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                @"pyRevit-Master\extensions\pyRevitCore.extension\extension.json");
+        
         public static readonly string TagsDefinitionPath =
             Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -37,8 +42,11 @@ namespace RevitPlatformSettings.Services {
         }
 
         public IEnumerable<BuiltinExtension> GetExtensions() {
-            yield return _builtinFactory.Create(JToken.Parse(File.ReadAllText(TagsDefinitionPath)));
-            yield return _builtinFactory.Create(JToken.Parse(File.ReadAllText(ToolsDefinitionPath)));
+            if(File.Exists(CoreDefinitionPath)) {
+                yield return _builtinFactory.Create(JToken.Parse(File.ReadAllText(CoreDefinitionPath)), "pyRevit");
+            }
+            yield return _builtinFactory.Create(JToken.Parse(File.ReadAllText(TagsDefinitionPath)), "pyRevit");
+            yield return _builtinFactory.Create(JToken.Parse(File.ReadAllText(ToolsDefinitionPath)), "pyRevit");
         }
     }
 }

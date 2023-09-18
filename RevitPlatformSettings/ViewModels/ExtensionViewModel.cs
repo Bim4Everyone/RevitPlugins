@@ -27,6 +27,8 @@ namespace RevitPlatformSettings.ViewModels {
             }
         }
 
+        public string Category => _extension.Category;
+
         public bool AllowChangeEnabled => _extension.AllowChangeEnabled;
 
         public string Type => _extension.Type;
