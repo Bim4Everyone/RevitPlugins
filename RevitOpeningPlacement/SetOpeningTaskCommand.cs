@@ -31,5 +31,9 @@ namespace RevitOpeningPlacement {
 
             window.ShowDialog();
         }
+
+        public void ExecuteCommand(UIApplication uiApplication) {
+            Execute(uiApplication);
+        }
     }
 }
