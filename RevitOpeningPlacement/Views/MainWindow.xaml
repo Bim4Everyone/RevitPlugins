@@ -76,6 +76,7 @@
                              Width="130"
                              Margin="10 0"
                              IsDefault="False" 
+                             Click="ButtonCheckFilter_Click"
                              Command="{Binding CheckSearchSearchSetCommand}"/>
             <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True"
                              Click="ButtonOk_Click" Command="{Binding SaveConfigCommand}"/>
