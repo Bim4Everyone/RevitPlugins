@@ -8,10 +8,14 @@ using System.Windows.Threading;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitClashDetective.Models.FilterModel;
+
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.TypeNamesProviders;
 using RevitOpeningPlacement.ViewModels.Services;
+using RevitOpeningPlacement.Views;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
     internal class MainViewModel : BaseViewModel {
@@ -178,8 +182,18 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
         private void CheckSearchSet(object p) {
-            var filter = SelectedMepCategoryViewModel.GetMepCategory();
-            throw new NotImplementedException();
+            SaveConfig(null);
+
+            var categories = new MepCategoryCollection(MepCategories.Select(item => item.GetMepCategory()));
+            var configurator = new PlacementConfigurator(_revitRepository, categories);
+
+            MepCategory mepCategory = SelectedMepCategoryViewModel.GetMepCategory();
+            Filter linearFilter = configurator.GetLinearFilter(mepCategory);
+            Filter nonLinearFilter = configurator.GetFittingFilter(mepCategory);
+
+            var vm = new MepCategoryFilterViewModel(_revitRepository, linearFilter, nonLinearFilter);
+            var view = new MepCategoryFilterView() { DataContext = vm };
+            view.Show();
         }
 
         private Models.Configs.OpeningConfig GetOpeningConfig() {
