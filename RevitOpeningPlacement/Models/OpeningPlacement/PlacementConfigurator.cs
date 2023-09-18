@@ -78,7 +78,13 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             return _unplacedClashes;
         }
 
-        public Filter GetClashesFilter(MepCategory mepCategory) {
+        /// <summary>
+        /// Возвращает фильтр по линейным элементам для заданной конфигурации настроек элементов инженерных систем
+        /// </summary>
+        /// <param name="mepCategory">Настройки фильтрации элементов инженерной системы</param>
+        /// <returns>Фильтр по линейным элементам из заданной конфигурации настроек</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public Filter GetLinearFilter(MepCategory mepCategory) {
             if(mepCategory is null) {
                 throw new ArgumentNullException(nameof(mepCategory));
             }
@@ -92,11 +98,26 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             }
             Filter linearMepFilter = CreateMepCategoriesAndFilterSet(_revitRepository.GetClashRevitRepository(), linearMepStandardFilter, mepCategory);
 
+            return linearMepFilter;
+        }
+
+        /// <summary>
+        /// Возвращает фильтр по нелинейным элементам для заданной конфигурации настроек элементов инженерных систем
+        /// </summary>
+        /// <param name="mepCategory">Настройки фильтрации элементов инженерной системы</param>
+        /// <returns>Фильтр по нелинейным элементам из заданной конфигурации настроек</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public Filter GetFittingFilter(MepCategory mepCategory) {
+            if(mepCategory is null) {
+                throw new ArgumentNullException(nameof(mepCategory));
+            }
+
+            MepCategoryEnum mepCategoryType = RevitRepository.MepCategoryNames.First(categoryNamePair => categoryNamePair.Value.Equals(mepCategory.Name)).Key;
             FittingCategoryEnum fittingCategoryType = _fittingCategoryByMep[mepCategoryType];
             Filter fittingMepStandardFilter = GetFittingFilter(_fittingFilterProviders[fittingCategoryType]);
             Filter fittingFilter = CreateMepCategoriesAndFilterSet(_revitRepository.GetClashRevitRepository(), fittingMepStandardFilter, mepCategory);
 
-            throw new NotImplementedException();//TODO создать сводный фильтр
+            return fittingFilter;
         }
 
 
