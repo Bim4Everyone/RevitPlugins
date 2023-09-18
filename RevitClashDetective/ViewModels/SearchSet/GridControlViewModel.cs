@@ -61,7 +61,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             foreach(var element in _elements) {
                 IDictionary<string, object> row = new ExpandoObject();
                 foreach(var provider in _providers) {
-                    string value = provider.GetElementParamValue(element).DisplayValue;
+                    string value = provider.GetElementParamValue(element)?.DisplayValue;
                     if((provider.StorageType == StorageType.Integer || provider.StorageType == StorageType.Double)
                         && double.TryParse(value, out double resultValue)
                         && resultValue != 0) {
