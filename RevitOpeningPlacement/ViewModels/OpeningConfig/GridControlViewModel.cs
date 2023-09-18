@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Dynamic;
 using System.Linq;
@@ -76,7 +75,6 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                     }
 
                 }
-                row.Add("File", _revitRepository.GetDocumentName(element.Document));
                 row.Add("Category", element.Category?.Name);
                 row.Add("FamilyName", element.GetTypeId().IsNotNull() ? (element.Document.GetElement(element.GetTypeId()) as ElementType)?.FamilyName : null);
                 row.Add("Name", element.Name);
@@ -98,28 +96,25 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             Columns.Insert(0, new ColumnViewModel() { FieldName = "FamilyName", Header = "Имя семейства" });
             Columns.Insert(0, new ColumnViewModel() { FieldName = "Category", Header = "Категория" });
             Columns.Insert(0, new ColumnViewModel() { FieldName = "Id", Header = "Id" });
-            Columns.Insert(0, new ColumnViewModel() { FieldName = "File", Header = "Файл" });
         }
 
         private void SelectElement(object p) {
             if(!(p is ExpandoObject row))
                 return;
             ((IDictionary<string, object>) row).TryGetValue("Id", out object resultId);
-            ((IDictionary<string, object>) row).TryGetValue("File", out object resultFile);
             if(resultId == null) {
                 return;
             }
             if(resultId is int id) {
-                var element = GetElement(id, resultFile.ToString());
+                var element = GetElement(id);
                 if(element != null) {
                     _revitRepository.SelectAndShowElement(new[] { element });
                 }
             }
         }
 
-        private Element GetElement(int id, string documentName) {
-            var doc = _revitRepository.GetDocuments()
-                .FirstOrDefault(item => _revitRepository.GetDocumentName(item).Equals(documentName, StringComparison.CurrentCultureIgnoreCase));
+        private Element GetElement(int id) {
+            var doc = _revitRepository.Doc;
             if(doc != null && new ElementId(id).IsNotNull()) {
                 return doc.GetElement(new ElementId(id));
             }
