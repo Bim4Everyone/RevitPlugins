@@ -1,0 +1,10 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitRoomTagPlacement",
+  "PublishDirectory": "C:\\Users\\Tikhomirov_am\\Documents\\Projects - Tikhomirov A. M\\RevitPlugins\\bin",
+  "IconUrl": "/icon/22177/add-tag",
+  "BundleName": null,
+  "BundleType": "InvokeButton",
+  "BundleOutput": "C:\\Users\\Tikhomirov_am\\AppData\\Roaming\\pyRevit\\Extensions\\02.AR.extension\\АР.tab\\Квартирография.panel\\Помещения.pulldown"
+}
