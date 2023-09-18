@@ -421,6 +421,10 @@ namespace RevitOpeningPlacement.Models {
                 ?? Transform.Identity;
         }
 
+        public IEnumerable<Element> GetFilteredElements(Document doc, IEnumerable<ElementId> categories, ElementFilter filter) {
+            return _clashRevitRepository.GetFilteredElements(doc, categories, filter);
+        }
+
         /// <summary>
         /// Возвращает коллекцию исходящих заданий на отверстия, размещенных в текущем файле Revit
         /// </summary>
