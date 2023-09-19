@@ -307,7 +307,7 @@ namespace RevitLintelPlacement.Models {
         private bool ContainsReinforce(string name) {
             return LintelsCommonConfig.ReinforcedConcreteFilter
                 .Where(item => !string.IsNullOrEmpty(item))
-                .Any(f => name.IndexOf(name, StringComparison.OrdinalIgnoreCase) >= 0);
+                .Any(item => name.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0);
         }
 
         public bool DoesRightCornerNeeded(View3D view3D, FamilyInstance elementInWall, IEnumerable<string> linkNames,
