@@ -47,7 +47,7 @@ interface ICreateBundle : IHazPluginName, IHazOutput, IHazTemplate {
                     {"${{ gen.plugin_command }}", PluginName + "Command"},
                 });
 
-            await IconSize.CreateImages(GetImageUri(), BundleDirectory / "image.png");
+            await IconSize.CreateImages(GetImageUri(), BundleDirectory / "icon.png");
         });
 
     Uri GetImageUri() {
