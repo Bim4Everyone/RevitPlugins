@@ -275,20 +275,22 @@ namespace RevitLintelPlacement.ViewModels {
 
         private bool CanSave(object p) {
             if(!string.IsNullOrEmpty(LintelThickness?.Name)
-            && !string.IsNullOrEmpty(LintelWidth?.Name)
-            && !string.IsNullOrEmpty(LintelRightCorner?.Name)
-            && !string.IsNullOrEmpty(LintelRightOffset?.Name)
-            && !string.IsNullOrEmpty(LintelLeftCorner?.Name)
-            && !string.IsNullOrEmpty(LintelLeftOffset?.Name)
-            && !string.IsNullOrEmpty(LintelFixation?.Name)
-            && !string.IsNullOrEmpty(OpeningHeight)
-            && !string.IsNullOrEmpty(OpeningWidth)
-            && !string.IsNullOrEmpty(OpeningFixation)
-            && !string.IsNullOrEmpty(HolesFilter)
-            && !string.IsNullOrEmpty(SelectedFamily?.Name)) {
+               && !string.IsNullOrEmpty(LintelWidth?.Name)
+               && !string.IsNullOrEmpty(LintelRightCorner?.Name)
+               && !string.IsNullOrEmpty(LintelRightOffset?.Name)
+               && !string.IsNullOrEmpty(LintelLeftCorner?.Name)
+               && !string.IsNullOrEmpty(LintelLeftOffset?.Name)
+               && !string.IsNullOrEmpty(LintelFixation?.Name)
+               && !string.IsNullOrEmpty(OpeningHeight)
+               && !string.IsNullOrEmpty(OpeningWidth)
+               && !string.IsNullOrEmpty(OpeningFixation)
+               && !string.IsNullOrEmpty(HolesFilter)
+               && !string.IsNullOrEmpty(SelectedFamily?.Name)
+               && ReinforcedConcreteFilter.All(item => !string.IsNullOrEmpty(item.Name))) {
                 Message = string.Empty;
                 return true;
             }
+
             Message = "Все настройки должны быть заполнены";
             return false;
         }

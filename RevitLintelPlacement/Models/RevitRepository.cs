@@ -284,7 +284,7 @@ namespace RevitLintelPlacement.Models {
                 return false;
             }
             var wallOrColumn = _document.GetElement(refWithContext.GetReference().ElementId);
-            if(LintelsCommonConfig.ReinforcedConcreteFilter.Any(f => wallOrColumn.Name.ToLower().Contains(f.ToLower()))) {
+            if(ContainsReinforce(wallOrColumn.Name)) {
                 return false;
             }
             refWithContext = GetNearestWallOrColumn(view3D, elementInWall, new XYZ(viewPoint.X, viewPoint.Y, viewPoint.Z - 0.32), new XYZ(0, 0, 1), true);
@@ -295,13 +295,19 @@ namespace RevitLintelPlacement.Models {
             }
             wallOrColumn = _document.GetElement(refWithContext.GetReference().ElementId);
             if(wallOrColumn is Wall wall)
-                return !LintelsCommonConfig.ReinforcedConcreteFilter.Any(f => wall.Name.ToLower().Contains(f.ToLower()));
+                return !ContainsReinforce(wall.Name);
             if(wallOrColumn.Category.Id == new ElementId(BuiltInCategory.OST_StructuralColumns) || wallOrColumn.Category.Id == new ElementId(BuiltInCategory.OST_StructuralFraming))
                 return false;
             if(wallOrColumn is RevitLinkInstance linkedInstance) {
                 return !linkNames.Any(l => l.Equals(linkedInstance.GetLinkDocument().Title, StringComparison.CurrentCultureIgnoreCase));
             }
             return true;
+        }
+
+        private bool ContainsReinforce(string name) {
+            return LintelsCommonConfig.ReinforcedConcreteFilter
+                .Where(item => !string.IsNullOrEmpty(item))
+                .Any(item => name.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0);
         }
 
         public bool DoesRightCornerNeeded(View3D view3D, FamilyInstance elementInWall, IEnumerable<string> linkNames,
@@ -350,7 +356,7 @@ namespace RevitLintelPlacement.Models {
             //получение ближайшего элемента и его проверка
             var wallOrColumn = _document.GetElement(refWithContext.GetReference().ElementId);
 
-            if((wallOrColumn is Wall wall && LintelsCommonConfig.ReinforcedConcreteFilter.Any(f => wall.Name.IndexOf(f, StringComparison.CurrentCultureIgnoreCase) > 0))
+            if((wallOrColumn is Wall wall && ContainsReinforce(wall.Name))
             || (wallOrColumn.Category.Id == new ElementId(BuiltInCategory.OST_StructuralColumns) || wallOrColumn.Category.Id == new ElementId(BuiltInCategory.OST_StructuralFraming))
             || (wallOrColumn is RevitLinkInstance linkedInstance && linkNames.Any(l => l.Equals(linkedInstance.GetLinkDocument().Title, StringComparison.CurrentCultureIgnoreCase)))) {
                 //получение смещения от края проема
