@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 using dosymep.WPF.Commands;
@@ -10,6 +11,8 @@ namespace RevitRoomTagPlacement.ViewModels {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
+        private RevitViewModel _revitViewModel;
+
         private string _errorText;
         private string _saveProperty;
 
@@ -19,7 +22,23 @@ namespace RevitRoomTagPlacement.ViewModels {
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView);
+
+            RevitViewModels = new ObservableCollection<RevitViewModel> {
+                new ViewRevitViewModel(revitRepository) { Name = "Выборка по текущему виду" },
+                new SelectedRevitViewModel(revitRepository) { Name = "Выборка по выделенным элементам" }
+            };
+
+            RevitViewModel = RevitViewModels[1];
         }
+
+        public RevitViewModel RevitViewModel {
+            get => _revitViewModel;
+            set => this.RaiseAndSetIfChanged(ref _revitViewModel, value);
+        }
+
+        public ObservableCollection<RevitViewModel> RevitViewModels { get; }
+
+
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
