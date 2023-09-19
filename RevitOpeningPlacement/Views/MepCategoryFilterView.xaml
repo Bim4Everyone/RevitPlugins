@@ -68,6 +68,7 @@
             <dxdo:LayoutGroup x:Name="layoutRoot"
                               AllowSplitters="True"
                               Orientation="Vertical">
+
                 <dxdo:LayoutPanel Caption="Линейные элементы"
                                   ShowPinButton="False"
                                   ShowCloseButton="False">
@@ -83,18 +84,18 @@
                         <dxg:GridControl.View>
                             <dxg:TableView x:Name="_gridLinearView"
                                            AutoWidth="True"
-                                           DataNavigatorButtons="Navigation"
+                                           DataNavigatorButtons="EditFocusedRow"
                                            ShowDataNavigator="True"
                                            AllowMergedGrouping="True" />
                         </dxg:GridControl.View>
                         <mvvm:Interaction.Behaviors>
-                            <mvvm:EventToCommand EventName="SelectedItemChanged"
+                            <mvvm:EventToCommand EventName="MouseLeftButtonDown"
                                                  Command="{Binding LinearElementsSearchSet.Grid.SelectCommand}"
                                                  CommandParameter="{Binding ElementName=_dgLinearElements, Path=SelectedItem}" />
                         </mvvm:Interaction.Behaviors>
                     </dxg:GridControl>
-                    
                 </dxdo:LayoutPanel>
+                    
                 <dxdo:LayoutPanel Caption="Нелинейные элементы"
                                   ShowPinButton="False"
                                   ShowCloseButton="False">
@@ -110,18 +111,18 @@
                         <dxg:GridControl.View>
                             <dxg:TableView x:Name="_gridNonLinearView"
                                            AutoWidth="True"
-                                           DataNavigatorButtons="Navigation"
+                                           DataNavigatorButtons="EditFocusedRow"
                                            ShowDataNavigator="True"
                                            AllowMergedGrouping="True" />
                         </dxg:GridControl.View>
                         <mvvm:Interaction.Behaviors>
-                            <mvvm:EventToCommand EventName="SelectedItemChanged"
+                            <mvvm:EventToCommand EventName="MouseLeftButtonDown"
                                                  Command="{Binding NonLinearElementsSearchSet.Grid.SelectCommand}"
                                                  CommandParameter="{Binding ElementName=_dgNonLinearElements, Path=SelectedItem}" />
                         </mvvm:Interaction.Behaviors>
                     </dxg:GridControl>
-
                 </dxdo:LayoutPanel>
+
             </dxdo:LayoutGroup>
         </dxdo:DockLayoutManager>
         
