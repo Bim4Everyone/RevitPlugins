@@ -8,8 +8,8 @@ using static Nuke.Common.Tools.Git.GitTasks;
 
 interface ICreateBranch : IHazGitRepository, IHazPluginName {
     Target CreateBranch => _ => _
-        //.OnlyWhenDynamic(() => !IsLocalBuild, "Need local build")
-        //.OnlyWhenDynamic(() => !GitRepository.IsOnDevelopBranch(), "Git branch should be develop")
+        .OnlyWhenDynamic(() => !IsLocalBuild, "Need local build")
+        .OnlyWhenDynamic(() => !GitRepository.IsOnDevelopBranch(), "Git branch should be develop")
         .Executes(() => {
             string userName = Git("config --global user.name").First().Text;
             GitRepository.SetBranch($"{userName}/{PluginName}");
