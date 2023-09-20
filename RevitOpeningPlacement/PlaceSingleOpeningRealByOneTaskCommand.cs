@@ -15,8 +15,8 @@ namespace RevitOpeningPlacement {
     /// Команда для размещения одного чистового отверстия в АР/КР по одному полученному заданию на отверстия из связи ВИС
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-    public class PlaceOpeningRealCommand : BasePluginCommand {
-        public PlaceOpeningRealCommand() {
+    public class PlaceSingleOpeningRealByOneTaskCommand : BasePluginCommand {
+        public PlaceSingleOpeningRealByOneTaskCommand() {
             PluginName = "Размещение чистового отверстия";
         }
 
