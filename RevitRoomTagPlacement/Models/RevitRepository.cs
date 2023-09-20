@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI.WebControls;
+using System.Windows.Controls;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -8,6 +10,8 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+
+using RevitRoomTagPlacement.ViewModels;
 
 namespace RevitRoomTagPlacement.Models {
     internal class RevitRepository {
@@ -34,6 +38,26 @@ namespace RevitRoomTagPlacement.Models {
                 .OfCategory(BuiltInCategory.OST_Rooms)
                 .OfType<Room>()
                 .ToList();
+        }
+
+        public void PlaceTagsCommand(IList<RoomGroupViewModel> RoomGroups) {           
+            var rooms = RoomGroups.Where(x => x.IsChecked).SelectMany(x => x.Rooms);
+
+            using(Transaction t = Document.StartTransaction("Маркировать помещения")) {
+                foreach(var room in rooms) {
+                    BoundingBoxXYZ roomBB = room.GetBoundingBox();
+
+                    var xValue = (roomBB.Min.X + roomBB.Max.X) * 0.5;
+                    var yValue = (roomBB.Min.Y + roomBB.Max.Y) * 0.5;
+                    UV point = new UV(xValue, yValue);
+
+                    Document.Create.NewRoomTag(
+                        new LinkElementId(room.Id), 
+                        point, 
+                        Document.ActiveView.Id);
+                }
+                t.Commit();
+            }
         }
     }
 }
