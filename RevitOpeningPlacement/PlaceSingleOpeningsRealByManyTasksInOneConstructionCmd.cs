@@ -1,12 +1,28 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
-using dosymep.Bim4Everyone;
+using RevitOpeningPlacement.Models;
 
 namespace RevitOpeningPlacement {
+    /// <summary>
+    /// Команда для размещения чистовых отверстий АР в одной выбранной конструкции в местах пересечения с выбранными заданиями на отверстия.
+    /// При этом для каждого задания создается отдельное чистовое отверстие, то есть объединения не происходит.
+    /// </summary>
     [Transaction(TransactionMode.Manual)]
-    public class PlaceSingleOpeningsRealByManyTasksInOneConstructionCmd : BasePluginCommand {
+    public class PlaceSingleOpeningsRealByManyTasksInOneConstructionCmd : OpeningRealPlacerCmd {
+        public PlaceSingleOpeningsRealByManyTasksInOneConstructionCmd() : base("Принять несколько заданий без объединения") { }
+
+
+        public void ExecuteCommand(UIApplication uiApplication) {
+            Execute(uiApplication);
+        }
+
+
         protected override void Execute(UIApplication uiApplication) {
+            RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
+            if(!ModelCorrect(revitRepository)) {
+                return;
+            }
             throw new System.NotImplementedException();
         }
     }
