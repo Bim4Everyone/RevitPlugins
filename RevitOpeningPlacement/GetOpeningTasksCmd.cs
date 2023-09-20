@@ -22,12 +22,12 @@ namespace RevitOpeningPlacement {
     /// Команда для просмотра размещенных в текущем файле исходящих заданий на отверстия и полученных из связей входящих заданий
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-    public class GetOpeningTaskCommand : BasePluginCommand {
+    public class GetOpeningTasksCmd : BasePluginCommand {
         private const int _progressBarStepLarge = 100;
         private const int _progressBarStepSmall = 25;
 
 
-        public GetOpeningTaskCommand() {
+        public GetOpeningTasksCmd() {
             PluginName = "Навигатор по заданиям";
         }
 

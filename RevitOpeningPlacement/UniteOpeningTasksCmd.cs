@@ -14,7 +14,7 @@ namespace RevitOpeningPlacement {
     /// Класс команды для объединения исходящих заданий на отверстия
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-    public class UniteOpeningTasksCommand : BasePluginCommand {
+    public class UniteOpeningTasksCmd : BasePluginCommand {
 
         protected override void Execute(UIApplication uiApplication) {
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);

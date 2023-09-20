@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using RevitOpeningPlacement.Models;
@@ -6,12 +7,11 @@ using RevitOpeningPlacement.Models.RealOpeningPlacement;
 
 namespace RevitOpeningPlacement {
     /// <summary>
-    /// Команда для размещения одного чистового отверстия в АР/КР по одному или нескольким полученным заданиям на отверстия из связей ВИС.
-    /// При этом будет создано одно чистовое отверстие, которое объединит все задания на отверстия.
+    /// Команда для размещения одного чистового отверстия в АР/КР по одному полученному заданию на отверстия из связи ВИС
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-    public class PlaceUnitedOpeningRealByManyTasksInOneConstructionCmd : OpeningRealPlacerCmd {
-        public PlaceUnitedOpeningRealByManyTasksInOneConstructionCmd() : base("Принять несколько заданий с объединением") { }
+    public class PlaceOpeningRealByOneTaskCmd : OpeningRealPlacerCmd {
+        public PlaceOpeningRealByOneTaskCmd() : base("Принять одно задание на отверстие") { }
 
 
         public void ExecuteCommand(UIApplication uiApplication) {
@@ -25,7 +25,7 @@ namespace RevitOpeningPlacement {
                 return;
             }
             var placer = new RealOpeningPlacer(revitRepository);
-            placer.PlaceUnitedByManyTasks();
+            placer.PlaceBySingleTask();
         }
     }
 }

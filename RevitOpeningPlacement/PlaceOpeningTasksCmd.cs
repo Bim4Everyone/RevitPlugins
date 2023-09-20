@@ -27,7 +27,7 @@ namespace RevitOpeningPlacement {
     /// Команда для размещения заданий на отверстия в файле ВИС.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-    public class PlaceOpeningTaskCommand : BasePluginCommand {
+    public class PlaceOpeningTasksCmd : BasePluginCommand {
         private readonly int _progressBarStepValue = 25;
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace RevitOpeningPlacement {
         private readonly HashSet<int> _duplicatedInstancesToRemoveIds = new HashSet<int>();
 
 
-        public PlaceOpeningTaskCommand() {
+        public PlaceOpeningTasksCmd() {
             PluginName = "Расстановка заданий на отверстия";
         }
 

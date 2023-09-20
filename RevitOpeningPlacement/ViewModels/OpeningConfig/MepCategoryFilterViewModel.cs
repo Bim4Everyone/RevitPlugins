@@ -80,7 +80,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
         private void Close(object p) {
             Action action = () => {
-                var command = new SetOpeningTaskCommand();
+                var command = new SetOpeningTasksPlacementConfigCmd();
                 command.ExecuteCommand(_revitRepository.UIApplication);
             };
             _revitRepository.DoAction(action);

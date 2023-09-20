@@ -10,8 +10,8 @@ namespace RevitOpeningPlacement {
     /// При этом для каждого задания создается отдельное чистовое отверстие, то есть объединения не происходит.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-    public class PlaceSingleOpeningsRealByManyTasksInManyConstructionsCmd : OpeningRealPlacerCmd {
-        public PlaceSingleOpeningsRealByManyTasksInManyConstructionsCmd() : base("Авторазмещение отверстий по заданиям") { }
+    public class PlaceOpeningRealsByManyTasksInManyHostsCmd : OpeningRealPlacerCmd {
+        public PlaceOpeningRealsByManyTasksInManyHostsCmd() : base("Авторазмещение отверстий по заданиям") { }
 
 
         public void ExecuteCommand(UIApplication uiApplication) {

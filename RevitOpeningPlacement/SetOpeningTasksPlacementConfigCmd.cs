@@ -16,8 +16,8 @@ namespace RevitOpeningPlacement {
     /// Команда для задания настроек расстановки заданий на отверстия в файле ВИС
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-    public class SetOpeningTaskCommand : BasePluginCommand {
-        public SetOpeningTaskCommand() {
+    public class SetOpeningTasksPlacementConfigCmd : BasePluginCommand {
+        public SetOpeningTasksPlacementConfigCmd() {
             PluginName = "Настройка заданий на отверстия";
         }
 
