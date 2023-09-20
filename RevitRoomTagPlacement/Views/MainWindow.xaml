@@ -35,16 +35,18 @@
             Grid.Row="0"
             Margin="10"
             ItemsSource="{Binding RevitViewModels}"
-            DisplayMemberPath="Name"/>
+            DisplayMemberPath="Name"
+            SelectedItem="{Binding RevitViewModel}"/>
 
         <ListBox
             Grid.Row="1"
             Margin="10"
+            DataContext="{Binding RevitViewModel}"
             ItemsSource="{Binding RoomGroups}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <CheckBox Content="{Binding Name}" 
-                              IsChecked="{Binding IsSelected}"/>
+                              IsChecked="{Binding IsChecked}"/>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

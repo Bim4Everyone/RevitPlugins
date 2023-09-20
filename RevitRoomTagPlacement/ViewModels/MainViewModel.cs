@@ -28,7 +28,7 @@ namespace RevitRoomTagPlacement.ViewModels {
                 new SelectedRevitViewModel(revitRepository) { Name = "Выборка по выделенным элементам" }
             };
 
-            RevitViewModel = RevitViewModels[1];
+            RevitViewModel = RevitViewModels[0];
         }
 
         public RevitViewModel RevitViewModel {
