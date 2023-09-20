@@ -2,6 +2,7 @@
 using Autodesk.Revit.UI;
 
 using RevitOpeningPlacement.Models;
+using RevitOpeningPlacement.Models.RealOpeningPlacement;
 
 namespace RevitOpeningPlacement {
     /// <summary>
@@ -23,7 +24,8 @@ namespace RevitOpeningPlacement {
             if(!ModelCorrect(revitRepository)) {
                 return;
             }
-            throw new System.NotImplementedException();
+            var placer = new RealOpeningPlacer(revitRepository);
+            placer.PlaceSinglesByManyTasks();
         }
     }
 }

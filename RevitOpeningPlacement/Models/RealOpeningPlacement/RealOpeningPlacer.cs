@@ -45,12 +45,44 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
             Element host = _revitRepository.PickHostForRealOpening();
             OpeningMepTaskIncoming openingTask = _revitRepository.PickSingleOpeningTaskIncoming();
 
+            using(var transaction = _revitRepository.GetTransaction("Размещение одиночного отверстия")) {
+                try {
+                    if(openingTask.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())) {
+                        PlaceByOneTask(host, openingTask);
+                    } else {
+                        _revitRepository.GetMessageBoxService().Show(
+                            "Выбранное задание на отверстие не пересекается c выбранной основой",
+                            "Задания на отверстия",
+                            System.Windows.MessageBoxButton.OK,
+                            System.Windows.MessageBoxImage.Error,
+                            System.Windows.MessageBoxResult.OK);
+                        throw new OperationCanceledException();
+                    }
+                } catch(OpeningNotPlacedException e) {
+                    ShowErrorMessage(e.Message);
+                    throw new OperationCanceledException();
+                }
+                transaction.Commit();
+            }
+        }
+
+        /// <summary>
+        /// Размещение объединенного чистового отверстия в одной конструкции по одному или нескольким заданиям на отверстия из связи(ей) с их объединением
+        /// </summary>
+        public void PlaceUnitedByManyTasks() {
+            Element host = _revitRepository.PickHostForRealOpening();
+            List<OpeningMepTaskIncoming> openingTasks = _revitRepository.PickManyOpeningTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToList();
+
             try {
-                if(openingTask.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())) {
-                    PlaceBySimpleAlgorithm(host, openingTask);
+                if(openingTasks.Count > 0) {
+                    using(var transaction = _revitRepository.GetTransaction("Размещение объединенного отверстия")) {
+                        PlaceUnitedByManyTasks(host, openingTasks);
+
+                        transaction.Commit();
+                    }
                 } else {
                     _revitRepository.GetMessageBoxService().Show(
-                        "Выбранное задание на отверстие не пересекается c выбранной основой",
+                        "Ни одно из выбранных заданий на отверстия не пересекается c выбранной основой",
                         "Задания на отверстия",
                         System.Windows.MessageBoxButton.OK,
                         System.Windows.MessageBoxImage.Error,
@@ -64,28 +96,20 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
         }
 
         /// <summary>
-        /// Размещение чистового отверстия по одному или нескольким заданиям на отверстия из связи(ей)
+        /// Размещение нескольких одиночных чистовых отверстий в одной конструкции по нескольким заданиям на отверстия из связи(ей) без их объединения
         /// </summary>
-        public void PlaceByManyTasks() {
+        public void PlaceSinglesByManyTasks() {
             Element host = _revitRepository.PickHostForRealOpening();
             List<OpeningMepTaskIncoming> openingTasks = _revitRepository.PickManyOpeningTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToList();
 
-            try {
-                if(openingTasks.Count == 0) {
-                    _revitRepository.GetMessageBoxService().Show(
-                        "Ни одно из выбранных заданий на отверстия не пересекается c выбранной основой",
-                        "Задания на отверстия",
-                        System.Windows.MessageBoxButton.OK,
-                        System.Windows.MessageBoxImage.Error,
-                        System.Windows.MessageBoxResult.OK);
-                    throw new OperationCanceledException();
-                } else {
-                    PlaceByComplexAlgorithm(host, openingTasks);
-                }
-            } catch(OpeningNotPlacedException e) {
-                ShowErrorMessage(e.Message);
-                throw new OperationCanceledException();
-            }
+
+        }
+
+        /// <summary>
+        /// Размещение нескольких одиночных чистовых отверстий в одной или нескольких выбранных конструкциях по нескольким заданиям на отверстия из связи(ей) без их объединения
+        /// </summary>
+        public void FindAndPlaceSingleOpenings() {
+            ICollection<Element> hosts = _revitRepository.PickHostsForRealOpenings();
         }
 
 
@@ -104,73 +128,67 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
         }
 
         /// <summary>
-        /// Размещает экземпляр семейства чистового отверстия, принимая точку вставки и параметры габаритов из задания на отверстия
+        /// Размещает экземпляр семейства чистового отверстия по одному заданию на отверстие, принимая точку вставки и параметры габаритов из задания на отверстие.
+        /// <para>Транзакция внутри метода не запускается</para>
         /// </summary>
         /// <param name="host">Основа для чистового отверстия - стена или перекрытие</param>
         /// <param name="openingTask">Входящее задание на отверстие</param>
         /// <exception cref="OpeningNotPlacedException"/>
-        private void PlaceBySimpleAlgorithm(Element host, OpeningMepTaskIncoming openingTask) {
-            using(var transaction = _revitRepository.GetTransaction("Размещение чистового отверстия")) {
-                try {
-                    var symbol = GetFamilySymbol(host, openingTask);
-                    var pointFinder = GetPointFinder(openingTask);
-                    var point = pointFinder.GetPoint();
+        private void PlaceByOneTask(Element host, OpeningMepTaskIncoming openingTask) {
+            try {
+                var symbol = GetFamilySymbol(host, openingTask);
+                var pointFinder = GetPointFinder(openingTask);
+                var point = pointFinder.GetPoint();
 
-                    var instance = _revitRepository.CreateInstance(point, symbol, host) ?? throw new OpeningNotPlacedException("Не удалось создать экземпляр семейства");
+                var instance = _revitRepository.CreateInstance(point, symbol, host) ?? throw new OpeningNotPlacedException("Не удалось создать экземпляр семейства");
 
-                    var parameterGetter = GetParameterGetter(openingTask, pointFinder);
-                    SetParamValues(instance, parameterGetter);
+                var parameterGetter = GetParameterGetter(openingTask, pointFinder);
+                SetParamValues(instance, parameterGetter);
 
-                    var angleFinder = GetAngleFinder(openingTask);
-                    _revitRepository.RotateElement(instance, point, angleFinder.GetAngle());
+                var angleFinder = GetAngleFinder(openingTask);
+                _revitRepository.RotateElement(instance, point, angleFinder.GetAngle());
 
-                    _revitRepository.SetSelection(instance.Id);
+                _revitRepository.SetSelection(instance.Id);
 
-                } catch(Autodesk.Revit.Exceptions.ArgumentNullException exAutodeskNull) {
-                    throw new OpeningNotPlacedException(exAutodeskNull.Message);
-                } catch(Autodesk.Revit.Exceptions.ArgumentException exAutodeskArg) {
-                    throw new OpeningNotPlacedException(exAutodeskArg.Message);
-                } catch(ArgumentNullException exFrameworkNull) {
-                    throw new OpeningNotPlacedException(exFrameworkNull.Message);
-                } catch(ArgumentException exFrameworkArg) {
-                    throw new OpeningNotPlacedException(exFrameworkArg.Message);
-                }
-
-                transaction.Commit();
+            } catch(Autodesk.Revit.Exceptions.ArgumentNullException exAutodeskNull) {
+                throw new OpeningNotPlacedException(exAutodeskNull.Message);
+            } catch(Autodesk.Revit.Exceptions.ArgumentException exAutodeskArg) {
+                throw new OpeningNotPlacedException(exAutodeskArg.Message);
+            } catch(ArgumentNullException exFrameworkNull) {
+                throw new OpeningNotPlacedException(exFrameworkNull.Message);
+            } catch(ArgumentException exFrameworkArg) {
+                throw new OpeningNotPlacedException(exFrameworkArg.Message);
             }
         }
 
         /// <summary>
-        /// Размещает прямоугольное чистовое отверстие на месте одного нескольких заданий на отверстия
+        /// Размещает объединенное прямоугольное чистовое отверстие по одному или нескольким заданиям на отверстия из коллекции
+        /// <para>Транзакция внутри метода не запускается</para>
         /// </summary>
         /// <param name="host">Основа для чистового отверстия</param>
         /// <param name="openingTasks">Входящие задания на отверстия</param>
         /// <exception cref="OpeningNotPlacedException"></exception>
-        private void PlaceByComplexAlgorithm(Element host, ICollection<OpeningMepTaskIncoming> openingTasks) {
-            using(var transaction = _revitRepository.GetTransaction("Размещение чистового отверстия")) {
-                try {
-                    var symbol = GetFamilySymbol(host);
-                    var pointFinder = GetPointFinder(host, openingTasks);
-                    var point = pointFinder.GetPoint();
+        private void PlaceUnitedByManyTasks(Element host, ICollection<OpeningMepTaskIncoming> openingTasks) {
+            try {
+                var symbol = GetFamilySymbol(host);
+                var pointFinder = GetPointFinder(host, openingTasks);
+                var point = pointFinder.GetPoint();
 
-                    var instance = _revitRepository.CreateInstance(point, symbol, host) ?? throw new OpeningNotPlacedException("Не удалось создать экземпляр семейства");
+                var instance = _revitRepository.CreateInstance(point, symbol, host) ?? throw new OpeningNotPlacedException("Не удалось создать экземпляр семейства");
 
-                    var parameterGetter = GetParameterGetter(host, openingTasks, pointFinder);
-                    SetParamValues(instance, parameterGetter);
+                var parameterGetter = GetParameterGetter(host, openingTasks, pointFinder);
+                SetParamValues(instance, parameterGetter);
 
-                    _revitRepository.SetSelection(instance.Id);
+                _revitRepository.SetSelection(instance.Id);
 
-                } catch(Autodesk.Revit.Exceptions.ArgumentNullException exAutodeskNull) {
-                    throw new OpeningNotPlacedException(exAutodeskNull.Message);
-                } catch(Autodesk.Revit.Exceptions.ArgumentException exAutodeskArg) {
-                    throw new OpeningNotPlacedException(exAutodeskArg.Message);
-                } catch(ArgumentNullException exFrameworkNull) {
-                    throw new OpeningNotPlacedException(exFrameworkNull.Message);
-                } catch(ArgumentException exFrameworkArg) {
-                    throw new OpeningNotPlacedException(exFrameworkArg.Message);
-                }
-
-                transaction.Commit();
+            } catch(Autodesk.Revit.Exceptions.ArgumentNullException exAutodeskNull) {
+                throw new OpeningNotPlacedException(exAutodeskNull.Message);
+            } catch(Autodesk.Revit.Exceptions.ArgumentException exAutodeskArg) {
+                throw new OpeningNotPlacedException(exAutodeskArg.Message);
+            } catch(ArgumentNullException exFrameworkNull) {
+                throw new OpeningNotPlacedException(exFrameworkNull.Message);
+            } catch(ArgumentException exFrameworkArg) {
+                throw new OpeningNotPlacedException(exFrameworkArg.Message);
             }
         }
 

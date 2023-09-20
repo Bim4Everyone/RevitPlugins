@@ -702,6 +702,26 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
+        /// Предлагает пользователю выбрать стены и перекрытия и возвращает его выбор
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<Element> PickHostsForRealOpenings() {
+            // фильтр по классам, а не по категориям ревита, так как для хоста нужна системная стена или системное перекрытие,
+            // при этом необходимо исключить выбор моделей в контексте, которые могут быть стенами и перекрытиями
+            ISelectionFilter filter = new SelectionFilterElementsOfClasses(new Type[] { typeof(Wall), typeof(Floor) });
+            IList<Reference> references = _uiDocument.Selection.PickObjects(ObjectType.Element, filter, "Выберите стену(ы) и(или) перекрытие(я)");
+
+            HashSet<Element> hosts = new HashSet<Element>();
+            foreach(Reference reference in references) {
+                if(reference != null) {
+                    Element element = _document.GetElement(reference);
+                    hosts.Add(element);
+                }
+            }
+            return hosts;
+        }
+
+        /// <summary>
         /// Предлагает пользователю выбрать экземпляры семейств заданий на отверстия из связанных файлов, подгруженных в активный документ, и возвращает его выбор
         /// </summary>
         /// <returns>Выбранная пользователем коллекция элементов</returns>
@@ -710,7 +730,7 @@ namespace RevitOpeningPlacement.Models {
             ISelectionFilter filter = new SelectionFilterOpeningTasksIncoming(_document);
             IList<Reference> references = _uiDocument.Selection.PickObjects(ObjectType.LinkedElement, filter, "Выберите задание(я) на отверстие(я) из связи(ей) и нажмите \"Готово\"");
 
-            List<OpeningMepTaskIncoming> openingTasks = new List<OpeningMepTaskIncoming>();
+            HashSet<OpeningMepTaskIncoming> openingTasks = new HashSet<OpeningMepTaskIncoming>();
             foreach(var reference in references) {
                 if((reference != null) && (_document.GetElement(reference) is RevitLinkInstance link)) {
                     Element opening = link.GetLinkDocument().GetElement(reference.LinkedElementId);
