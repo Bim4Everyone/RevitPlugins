@@ -19,7 +19,7 @@ interface ICreateProfile : ICreateBundle {
             result.Add(nameof(PublishDirectory), PublishDirectory);
             
             // CreateBundle
-            result.Add(nameof(IconUrl), IconUrl.AbsolutePath);
+            result.Add(nameof(IconUrl), IconUrl.ToString());
             result.Add(nameof(BundleName), BundleName);
             result.Add(nameof(BundleType), BundleType);
             result.Add(nameof(BundleOutput), BundleOutput);
