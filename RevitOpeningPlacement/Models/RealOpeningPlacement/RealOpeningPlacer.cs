@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 using Autodesk.Revit.DB;
 
@@ -39,9 +40,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
 
 
         /// <summary>
-        /// Размещение чистового отверстия по одному заданию на отверстие из связи
+        /// Размещение чистового отверстия по одному заданию на отверстие из связи в одном хосте
         /// </summary>
-        public void PlaceBySingleTask() {
+        public void PlaceSingleOpeningByOneTask() {
             Element host = _revitRepository.PickHostForRealOpening();
             OpeningMepTaskIncoming openingTask = _revitRepository.PickSingleOpeningTaskIncoming();
 
@@ -67,11 +68,11 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
         }
 
         /// <summary>
-        /// Размещение объединенного чистового отверстия в одной конструкции по одному или нескольким заданиям на отверстия из связи(ей) с их объединением
+        /// Размещение объединенного чистового отверстия по одному или нескольким заданиям на отверстия из связи(ей) в одном хосте
         /// </summary>
-        public void PlaceUnitedByManyTasks() {
+        public void PlaceUnitedOpeningByManyTasks() {
             Element host = _revitRepository.PickHostForRealOpening();
-            List<OpeningMepTaskIncoming> openingTasks = _revitRepository.PickManyOpeningTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToList();
+            HashSet<OpeningMepTaskIncoming> openingTasks = _revitRepository.PickManyOpeningTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
 
             try {
                 if(openingTasks.Count > 0) {
@@ -96,20 +97,60 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
         }
 
         /// <summary>
-        /// Размещение нескольких одиночных чистовых отверстий в одной конструкции по нескольким заданиям на отверстия из связи(ей) без их объединения
+        /// Размещение нескольких одиночных чистовых отверстий по нескольким заданиям на отверстия из связи(ей) без их объединения в одном хосте
         /// </summary>
-        public void PlaceSinglesByManyTasks() {
+        public void PlaceSingleOpeningsInOneHost() {
             Element host = _revitRepository.PickHostForRealOpening();
-            List<OpeningMepTaskIncoming> openingTasks = _revitRepository.PickManyOpeningTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToList();
+            HashSet<OpeningMepTaskIncoming> openingTasks = _revitRepository.PickManyOpeningTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
 
+            StringBuilder sb = new StringBuilder();
+            using(var transaction = _revitRepository.GetTransaction("Одиночные отверстия в одном хосте")) {
+                foreach(OpeningMepTaskIncoming openingTask in openingTasks) {
+                    try {
+                        PlaceByOneTask(host, openingTask);
 
+                    } catch(OpeningNotPlacedException e) {
+                        sb.AppendLine($"Задание с ID: {openingTask.Id} из файла: \'{openingTask.FileName}\' не удалось принять. Информация об ошибке:");
+                        sb.AppendLine(e.Message);
+                        sb.AppendLine();
+                    }
+                }
+                transaction.Commit();
+            }
+            if(sb.Length > 0) {
+                ShowErrorMessage(sb.ToString());
+            }
         }
 
         /// <summary>
-        /// Размещение нескольких одиночных чистовых отверстий в одной или нескольких выбранных конструкциях по нескольким заданиям на отверстия из связи(ей) без их объединения
+        /// Размещение нескольких одиночных чистовых отверстий в выбранных хостах по всем заданиям на отверстия из связи(ей), которые пересекаются с этими хостами
         /// </summary>
-        public void FindAndPlaceSingleOpenings() {
+        public void PlaceSingleOpeningsInManyHosts() {
             ICollection<Element> hosts = _revitRepository.PickHostsForRealOpenings();
+            ICollection<OpeningMepTaskIncoming> allOpeningTasks = _revitRepository.GetOpeningsMepTasksIncoming();
+
+            StringBuilder sb = new StringBuilder();
+            using(var transaction = _revitRepository.GetTransaction("Одиночные отверстия в нескольких хостах")) {
+                foreach(Element host in hosts) {
+                    ICollection<OpeningMepTaskIncoming> openingTasks = allOpeningTasks.Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
+
+                    foreach(OpeningMepTaskIncoming openingTask in openingTasks) {
+                        try {
+                            PlaceByOneTask(host, openingTask);
+
+                        } catch(OpeningNotPlacedException e) {
+                            sb.AppendLine($"Задание с ID: {openingTask.Id} из файла: \'{openingTask.FileName}\' не удалось принять. Информация об ошибке:");
+                            sb.AppendLine(e.Message);
+                            sb.AppendLine();
+                        }
+                    }
+                }
+
+                transaction.Commit();
+            }
+            if(sb.Length > 0) {
+                ShowErrorMessage(sb.ToString());
+            }
         }
 
 
