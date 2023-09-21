@@ -8,6 +8,7 @@ interface ICreateProfile : ICreateBundle {
     AbsolutePath ProfileFile => RootDirectory / ".nuke" / $"parameters.{PluginName}.json";
     
     Target CreateProfile => _ => _
+        .OnlyWhenDynamic(() => !ProfileFile.FileExists(), $"Profile file does exists.")
         .Executes(() => {
             var result = new Dictionary<string, string>();
             result.Add("$schema","./build.schema.json");
