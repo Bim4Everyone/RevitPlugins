@@ -15,7 +15,7 @@ namespace RevitOpeningPlacement {
 
 
         public void ExecuteCommand(UIApplication uiApplication) {
-            ExecuteCommand(uiApplication);
+            Execute(uiApplication);
         }
 
 

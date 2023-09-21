@@ -31,11 +31,13 @@ namespace RevitOpeningPlacement {
             PluginName = "Навигатор по заданиям";
         }
 
-        protected override void Execute(UIApplication uiApplication) {
-            ExecuteCommand(uiApplication);
-        }
 
         public void ExecuteCommand(UIApplication uiApplication) {
+            Execute(uiApplication);
+        }
+
+
+        protected override void Execute(UIApplication uiApplication) {
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
 
             if(!ModelCorrect(revitRepository)) {
@@ -43,6 +45,7 @@ namespace RevitOpeningPlacement {
             }
             GetOpeningsTask(uiApplication, revitRepository);
         }
+
 
         /// <summary>
         /// Логика вывода окна навигатора по заданиям на отверстия в зависимости от раздела проекта

@@ -15,6 +15,15 @@ namespace RevitOpeningPlacement {
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class UniteOpeningTasksCmd : BasePluginCommand {
+        public UniteOpeningTasksCmd() {
+            PluginName = "Объединение заданий";
+        }
+
+
+        public void ExecuteCommand(UIApplication uiApplication) {
+            Execute(uiApplication);
+        }
+
 
         protected override void Execute(UIApplication uiApplication) {
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
@@ -22,11 +31,6 @@ namespace RevitOpeningPlacement {
 
             var placedOpeningTask = revitRepository.UniteOpenings(openingTasks);
             uiApplication.ActiveUIDocument.Selection.SetElementIds(new ElementId[] { placedOpeningTask.Id });
-        }
-
-
-        public void ExecuteCommand(UIApplication uiApplication) {
-            Execute(uiApplication);
         }
     }
 }

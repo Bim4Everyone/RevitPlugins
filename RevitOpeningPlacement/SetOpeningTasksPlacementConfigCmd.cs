@@ -18,8 +18,14 @@ namespace RevitOpeningPlacement {
     [Transaction(TransactionMode.Manual)]
     public class SetOpeningTasksPlacementConfigCmd : BasePluginCommand {
         public SetOpeningTasksPlacementConfigCmd() {
-            PluginName = "Настройка заданий на отверстия";
+            PluginName = "Настройки расстановки заданий";
         }
+
+
+        public void ExecuteCommand(UIApplication uiApplication) {
+            Execute(uiApplication);
+        }
+
 
         protected override void Execute(UIApplication uiApplication) {
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
@@ -30,10 +36,6 @@ namespace RevitOpeningPlacement {
             var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
 
             window.ShowDialog();
-        }
-
-        public void ExecuteCommand(UIApplication uiApplication) {
-            Execute(uiApplication);
         }
     }
 }
