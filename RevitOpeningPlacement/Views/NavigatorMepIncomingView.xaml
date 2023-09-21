@@ -337,9 +337,19 @@
                           EditMode="InplaceActive"
                           EditValue="{Binding MessageText}"
                           Foreground="Green" />
-            <dx:SimpleButton Content="Принять несколько"
-                             Margin="10 0"
-                             Command="{Binding ElementName=_this, Path=DataContext.PlaceRealOpeningByManyTasksCommand}" />
+            <dx:SimpleButton Content="Авторазмещение"
+                             Command="{Binding ElementName=_this, Path=DataContext.PlaceManyRealOpeningsByManyTasksInManyHostsCommand}" />
+            <dx:DropDownButton Height="25"
+                               Width="160"
+                               Margin="10 0"
+                               Content="Принять несколько">
+                <StackPanel Orientation="Vertical">
+                    <dx:SimpleButton Content="Без объединения"
+                                     Command="{Binding ElementName=_this, Path=DataContext.PlaceManyRealOpeningsByManyTasksCommand}" />
+                    <dx:SimpleButton Content="С объединением"
+                                     Command="{Binding ElementName=_this, Path=DataContext.PlaceOneRealOpeningByManyTasksCommand}" />
+                </StackPanel>
+            </dx:DropDownButton>
             <dx:SimpleButton Content="Принять одно"
                              Command="{Binding ElementName=_this, Path=DataContext.PlaceRealOpeningBySingleTaskCommand}" />
             <dx:SimpleButton Content="ОК"
