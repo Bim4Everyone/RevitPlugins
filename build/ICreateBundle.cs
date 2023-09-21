@@ -8,10 +8,10 @@ using Nuke.Common.IO;
 using Serilog;
 
 interface ICreateBundle : IHazPluginName, IHazOutput, IHazTemplate {
-    [Parameter, Required] Uri IconUrl => TryGetValue(() => IconUrl);
-    [Parameter, Required] string BundleName => TryGetValue(() => BundleName);
-    [Parameter, Required] BundleType BundleType => TryGetValue(() => BundleType);
-    [Parameter, Required] AbsolutePath BundleOutput => TryGetValue(() => BundleOutput) ?? DefaultOutput;
+    [Parameter] Uri IconUrl => TryGetValue(() => IconUrl);
+    [Parameter] string BundleName => TryGetValue(() => BundleName);
+    [Parameter] BundleType BundleType => TryGetValue(() => BundleType);
+    [Parameter] AbsolutePath BundleOutput => TryGetValue(() => BundleOutput) ?? DefaultOutput;
 
     Uri DefaultIconUrl => new("https://icons8.com/icon/22361/money-bag");
     string DefaultBundleName => "MyAwesomeBundle";
@@ -25,6 +25,10 @@ interface ICreateBundle : IHazPluginName, IHazOutput, IHazTemplate {
 
     Target CreateBundle => _ => _
         .Requires(() => PluginName)
+        .Requires(() => IconUrl)
+        .Requires(() => BundleName)
+        .Requires(() => BundleType)
+        .Requires(() => BundleOutput)
         .OnlyWhenStatic(() =>
             !BundleDirectory.DirectoryExists(), "Bundle directory is exists")
         .OnlyWhenStatic(() =>
