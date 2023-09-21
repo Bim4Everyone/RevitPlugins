@@ -42,6 +42,7 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         /// <param name="revitRepository"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="ArgumentOutOfRangeException">В группе находится менее 2-х заданий на отверстия</exception>
         public OpeningPlacer GetOpeningPlacer(RevitRepository revitRepository) {
             try {
                 OpeningPlacer placer;
@@ -53,9 +54,6 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
                 return placer;
 
             } catch(ArgumentNullException) {
-                throw new InvalidOperationException();
-
-            } catch(ArgumentOutOfRangeException) {
                 throw new InvalidOperationException();
             }
         }

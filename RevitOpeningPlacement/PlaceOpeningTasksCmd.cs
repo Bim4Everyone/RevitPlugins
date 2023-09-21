@@ -226,6 +226,8 @@ namespace RevitOpeningPlacement {
                             }
                         }
 
+                    } catch(ArgumentOutOfRangeException) {
+                        continue;
                     } catch(InvalidOperationException) {
                         continue;
                     } catch(OpeningNotPlacedException) {

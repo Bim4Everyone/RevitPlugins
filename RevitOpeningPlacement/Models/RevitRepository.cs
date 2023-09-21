@@ -884,6 +884,15 @@ namespace RevitOpeningPlacement.Models {
                     System.Windows.MessageBoxImage.Error,
                     System.Windows.MessageBoxResult.OK);
                 throw new OperationCanceledException();
+            } catch(InvalidOperationException) {
+                var dialog = GetMessageBoxService();
+                dialog.Show(
+                    "Не удалось выполнить объединение",
+                    "Задания на отверстия",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error,
+                    System.Windows.MessageBoxResult.OK);
+                throw new OperationCanceledException();
             }
         }
 
