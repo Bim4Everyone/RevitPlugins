@@ -12,7 +12,7 @@ interface ICreateScript : IHazOutput, IHazPluginName, IHazSolution {
     Target CreateScript => _ => _
         .Requires(() => PluginName)
         .Requires(() => PublishDirectory)
-        .OnlyWhenDynamic(() => Solution.GetProject(PluginName) == null, $"Plugin \"{PluginName}\" does exists.")
+        .OnlyWhenDynamic(() => !PluginScriptFile.FileExists(), $"Plugin script file does exists.")
         .Executes(() => {
             Log.Debug("TemplateFile: {TemplateFile}", TemplateFile);
             Log.Debug("PluginScriptFile: {PluginScriptFile}", PluginScriptFile);
