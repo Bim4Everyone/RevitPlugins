@@ -10,8 +10,8 @@ namespace RevitOpeningPlacement {
     /// При этом будет создано одно чистовое отверстие, которое объединит все задания на отверстия.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-    public class PlaceOpeningRealByManyTasksCmd : OpeningRealPlacerCmd {
-        public PlaceOpeningRealByManyTasksCmd() : base("Принять несколько заданий с объединением") { }
+    public class PlaceOneOpeningRealByManyTasksCmd : OpeningRealPlacerCmd {
+        public PlaceOneOpeningRealByManyTasksCmd() : base("Принять несколько заданий с объединением") { }
 
 
         public void ExecuteCommand(UIApplication uiApplication) {
@@ -25,7 +25,7 @@ namespace RevitOpeningPlacement {
                 return;
             }
             var placer = new RealOpeningPlacer(revitRepository);
-            placer.PlaceUnitedByManyTasks();
+            placer.PlaceUnitedOpeningByManyTasks();
         }
     }
 }

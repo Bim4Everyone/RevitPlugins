@@ -117,7 +117,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         private void PlaceRealOpeningBySingleTask(object p) {
             Action action = () => {
-                var cmd = new PlaceOpeningRealByOneTaskCmd();
+                var cmd = new PlaceOneOpeningRealByOneTaskCmd();
                 cmd.ExecuteCommand(_revitRepository.UIApplication);
             };
             _revitRepository.DoAction(action);
@@ -125,7 +125,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         private void PlaceRealOpeningByManyTasks(object p) {
             Action action = () => {
-                var cmd = new PlaceOpeningRealByManyTasksCmd();
+                var cmd = new PlaceOneOpeningRealByManyTasksCmd();
                 cmd.ExecuteCommand(_revitRepository.UIApplication);
             };
             _revitRepository.DoAction(action);

@@ -10,8 +10,8 @@ namespace RevitOpeningPlacement {
     /// Команда для размещения одного чистового отверстия в АР/КР по одному полученному заданию на отверстия из связи ВИС
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-    public class PlaceOpeningRealByOneTaskCmd : OpeningRealPlacerCmd {
-        public PlaceOpeningRealByOneTaskCmd() : base("Принять одно задание на отверстие") { }
+    public class PlaceOneOpeningRealByOneTaskCmd : OpeningRealPlacerCmd {
+        public PlaceOneOpeningRealByOneTaskCmd() : base("Принять одно задание на отверстие") { }
 
 
         public void ExecuteCommand(UIApplication uiApplication) {
@@ -25,7 +25,7 @@ namespace RevitOpeningPlacement {
                 return;
             }
             var placer = new RealOpeningPlacer(revitRepository);
-            placer.PlaceBySingleTask();
+            placer.PlaceSingleOpeningByOneTask();
         }
     }
 }

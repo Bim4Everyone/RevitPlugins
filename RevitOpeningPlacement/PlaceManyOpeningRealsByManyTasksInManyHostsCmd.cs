@@ -6,12 +6,12 @@ using RevitOpeningPlacement.Models.RealOpeningPlacement;
 
 namespace RevitOpeningPlacement {
     /// <summary>
-    /// Команда для размещения чистовых отверстий АР в одной выбранной конструкции в местах пересечения с выбранными заданиями на отверстия.
+    /// Команда для размещения чистовых отверстий АР в выбранных конструкциях, которые пересекаются с выбранными заданиями на отверстия.
     /// При этом для каждого задания создается отдельное чистовое отверстие, то есть объединения не происходит.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-    public class PlaceOpeningRealsByManyTasksInOneHostCmd : OpeningRealPlacerCmd {
-        public PlaceOpeningRealsByManyTasksInOneHostCmd() : base("Принять несколько заданий без объединения") { }
+    public class PlaceManyOpeningRealsByManyTasksInManyHostsCmd : OpeningRealPlacerCmd {
+        public PlaceManyOpeningRealsByManyTasksInManyHostsCmd() : base("Авторазмещение отверстий по заданиям") { }
 
 
         public void ExecuteCommand(UIApplication uiApplication) {
@@ -25,7 +25,7 @@ namespace RevitOpeningPlacement {
                 return;
             }
             var placer = new RealOpeningPlacer(revitRepository);
-            placer.PlaceSinglesByManyTasks();
+            placer.PlaceSingleOpeningsInManyHosts();
         }
     }
 }
