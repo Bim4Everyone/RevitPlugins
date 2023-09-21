@@ -621,7 +621,7 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает коллекцию входящих заданий на отверстия из связанных файлов
+        /// Возвращает коллекцию всех входящих заданий на отверстия из связанных файлов
         /// </summary>
         /// <returns></returns>
         public ICollection<OpeningMepTaskIncoming> GetOpeningsMepTasksIncoming() {
