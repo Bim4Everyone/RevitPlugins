@@ -504,7 +504,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                 status = OpeningTaskOutcomingStatus.TooSmall;
             } else if((0.2 <= volumeRatio) && (volumeRatio < 0.95)) {
                 status = OpeningTaskOutcomingStatus.Correct;
-            } else if((0.01 < volumeRatio) && (volumeRatio < 0.2)) {
+            } else if((0.001 <= volumeRatio) && (volumeRatio < 0.2)) {
                 status = OpeningTaskOutcomingStatus.TooBig;
             } else {
                 status = OpeningTaskOutcomingStatus.NotActual;
