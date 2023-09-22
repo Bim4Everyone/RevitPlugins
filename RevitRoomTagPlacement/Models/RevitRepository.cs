@@ -40,7 +40,14 @@ namespace RevitRoomTagPlacement.Models {
                 .ToList();
         }
 
-        public void PlaceTagsCommand(IList<RoomGroupViewModel> RoomGroups) {           
+        public List<RoomTagType> GetRoomTags() {
+            return new FilteredElementCollector(Document)
+                .OfClass(typeof(FamilySymbol))
+                .OfType<RoomTagType>()
+                .ToList();
+        }
+
+        public void PlaceTagsCommand(IList<RoomGroupViewModel> RoomGroups, ElementId SelectedTagType) {           
             var rooms = RoomGroups.Where(x => x.IsChecked).SelectMany(x => x.Rooms);
 
             using(Transaction t = Document.StartTransaction("Маркировать помещения")) {
@@ -51,10 +58,12 @@ namespace RevitRoomTagPlacement.Models {
                     var yValue = (roomBB.Min.Y + roomBB.Max.Y) * 0.5;
                     UV point = new UV(xValue, yValue);
 
-                    Document.Create.NewRoomTag(
+                    var newTag = Document.Create.NewRoomTag(
                         new LinkElementId(room.Id), 
                         point, 
                         Document.ActiveView.Id);
+
+                    newTag.ChangeTypeId(SelectedTagType);
                 }
                 t.Commit();
             }
