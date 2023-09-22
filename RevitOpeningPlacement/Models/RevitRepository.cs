@@ -516,7 +516,8 @@ namespace RevitOpeningPlacement.Models {
                 case MepCategoryEnum.RoundDuct:
                 return new Category[] {
                     Category.GetCategory(_document, BuiltInCategory.OST_DuctCurves),
-                    Category.GetCategory(_document, BuiltInCategory.OST_DuctFitting)
+                    Category.GetCategory(_document, BuiltInCategory.OST_DuctFitting),
+                    Category.GetCategory(_document, BuiltInCategory.OST_DuctAccessory)
                 };
                 case MepCategoryEnum.CableTray:
                 return new Category[] {
@@ -992,10 +993,25 @@ namespace RevitOpeningPlacement.Models {
         Conduit
     }
 
+    /// <summary>
+    /// Перечисление используемых нелинейных элементов
+    /// </summary>
     internal enum FittingCategoryEnum {
+        /// <summary>
+        /// Категории нелинейных элементов для труб (Соединительные детали трубопроводов)
+        /// </summary>
         PipeFitting,
+        /// <summary>
+        /// Категории нелинейных элементов для кабельных лотков (Соединительные детали кабельных лотков)
+        /// </summary>
         CableTrayFitting,
+        /// <summary>
+        /// Категории нелинейных элементов для воздуховодов (Соединительные детали воздуховодов)
+        /// </summary>
         DuctFitting,
+        /// <summary>
+        /// Категории нелинейных элементов для коробов (Соединительные детали коробов)
+        /// </summary>
         ConduitFitting
     }
 

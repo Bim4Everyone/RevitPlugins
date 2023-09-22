@@ -133,12 +133,18 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает стандартный фильтр по категории "Соединительные детали воздуховодов"
+        /// Возвращает стандартный фильтр по категориям "Соединительные детали воздуховодов" и "Арматура воздуховодов"
         /// </summary>
         /// <param name="revitRepository"></param>
         /// <returns></returns>
         public static Filter GetDuctFittingFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
-            return CreateFilterByCategory(RevitRepository.FittingCategoryNames[FittingCategoryEnum.DuctFitting], revitRepository, BuiltInCategory.OST_DuctFitting);
+            return CreateFilterByCategory(
+                RevitRepository.FittingCategoryNames[FittingCategoryEnum.DuctFitting],
+                revitRepository,
+                new BuiltInCategory[] {
+                    BuiltInCategory.OST_DuctFitting,
+                    BuiltInCategory.OST_DuctAccessory }
+                );
         }
 
         /// <summary>
@@ -258,6 +264,25 @@ namespace RevitOpeningPlacement.Models {
         private static Filter CreateFilterByCategory(string name, RevitClashDetective.Models.RevitRepository revitRepository, BuiltInCategory category) {
             return new Filter(revitRepository) {
                 CategoryIds = new List<int> { (int) category },
+                Name = name,
+                Set = new Set() {
+                    SetEvaluator = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And),
+                    Criteria = new List<Criterion>(),
+                    RevitRepository = revitRepository
+                }
+            };
+        }
+
+        /// <summary>
+        /// Возвращает фильтр по заданной коллекции категорий
+        /// </summary>
+        /// <param name="name">Название фильтра</param>
+        /// <param name="revitRepository">Репозиторий Revit, в котором будет проходить фильтрация элементов</param>
+        /// <param name="categories">Коллекция категорий элементов</param>
+        /// <returns></returns>
+        private static Filter CreateFilterByCategory(string name, RevitClashDetective.Models.RevitRepository revitRepository, ICollection<BuiltInCategory> categories) {
+            return new Filter(revitRepository) {
+                CategoryIds = categories.Select(category => (int) category).ToList(),
                 Name = name,
                 Set = new Set() {
                     SetEvaluator = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And),
