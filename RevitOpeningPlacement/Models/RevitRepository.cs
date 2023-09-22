@@ -584,6 +584,14 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
+        /// Возвращает прогресс бар
+        /// </summary>
+        /// <returns></returns>
+        public IProgressDialogService GetProgressDialogService() {
+            return GetPlatformService<IProgressDialogService>();
+        }
+
+        /// <summary>
         /// Возвращает коллекцию чистовых экземпляров семейств отверстий из текущего документа Revit
         /// </summary>
         /// <returns></returns>

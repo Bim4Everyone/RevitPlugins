@@ -131,18 +131,32 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
 
             StringBuilder sb = new StringBuilder();
             using(var transaction = _revitRepository.GetTransaction("Одиночные отверстия в нескольких хостах")) {
-                foreach(Element host in hosts) {
-                    ICollection<OpeningMepTaskIncoming> openingTasks = allOpeningTasks.Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
+                using(var progressBar = _revitRepository.GetProgressDialogService()) {
+                    progressBar.StepValue = 1;
+                    progressBar.DisplayTitleFormat = "Обработка конструкций... [{0}\\{1}]";
+                    var progress = progressBar.CreateProgress();
+                    progressBar.MaxValue = hosts.Count();
+                    var ct = progressBar.CreateCancellationToken();
+                    progressBar.Show();
 
-                    foreach(OpeningMepTaskIncoming openingTask in openingTasks) {
-                        try {
-                            PlaceByOneTask(host, openingTask);
+                    int i = 0;
+                    foreach(Element host in hosts) {
+                        ct.ThrowIfCancellationRequested();
 
-                        } catch(OpeningNotPlacedException e) {
-                            sb.AppendLine($"Задание с ID: {openingTask.Id} из файла: \'{openingTask.FileName}\' не удалось принять. Информация об ошибке:");
-                            sb.AppendLine(e.Message);
-                            sb.AppendLine();
+                        ICollection<OpeningMepTaskIncoming> openingTasks = allOpeningTasks.Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
+                        foreach(OpeningMepTaskIncoming openingTask in openingTasks) {
+                            try {
+                                PlaceByOneTask(host, openingTask);
+
+                            } catch(OpeningNotPlacedException e) {
+                                sb.AppendLine($"Задание с ID: {openingTask.Id} из файла: \'{openingTask.FileName}\' не удалось принять. Информация об ошибке:");
+                                sb.AppendLine(e.Message);
+                                sb.AppendLine();
+                            }
                         }
+
+                        i++;
+                        progress.Report(i);
                     }
                 }
 
