@@ -40,10 +40,11 @@ namespace RevitRoomTagPlacement.Models {
                 .ToList();
         }
 
-        public List<RoomTagType> GetRoomTags() {
+        public List<RoomTagTypeModel> GetRoomTags() {
             return new FilteredElementCollector(Document)
                 .OfClass(typeof(FamilySymbol))
                 .OfType<RoomTagType>()
+                .Select(x => new RoomTagTypeModel(x))
                 .ToList();
         }
 

@@ -20,7 +20,7 @@ namespace RevitRoomTagPlacement.ViewModels {
     internal abstract class RevitViewModel : BaseViewModel {
         protected readonly RevitRepository _revitRepository;
 
-        private RoomTagType _selectedTagType;
+        private RoomTagTypeModel _selectedTagType;
 
         public RevitViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
@@ -31,25 +31,26 @@ namespace RevitRoomTagPlacement.ViewModels {
 
             TagFamilies = revitRepository.GetRoomTags();
 
-            //SelectedTagType = TagFamilies[1].Id;
+            SelectedTagType = TagFamilies[0];
         }
+
         public string Name { get; set; }
 
         public ICommand PlaceCommand { get; }
 
         public ObservableCollection<RoomGroupViewModel> RoomGroups { get; }
 
-        public List<RoomTagType> TagFamilies { get; }
+        public List<RoomTagTypeModel> TagFamilies { get; }
 
         protected abstract IEnumerable<RoomGroupViewModel> GetGroupViewModels();
 
-        public RoomTagType SelectedTagType {
+        public RoomTagTypeModel SelectedTagType {
             get => _selectedTagType;
             set => this.RaiseAndSetIfChanged(ref _selectedTagType, value);
         }
 
         private void PlaceTags(object p) {
-            _revitRepository.PlaceTagsCommand(RoomGroups, SelectedTagType.Id);
+            _revitRepository.PlaceTagsCommand(RoomGroups, SelectedTagType.TagId);
         }
 
         private bool CanPlaceTags(object p) {
