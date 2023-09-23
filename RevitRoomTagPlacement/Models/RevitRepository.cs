@@ -48,11 +48,25 @@ namespace RevitRoomTagPlacement.Models {
                 .ToList();
         }
 
-        public void PlaceTagsCommand(IList<RoomGroupViewModel> RoomGroups, ElementId SelectedTagType) {           
-            var rooms = RoomGroups.Where(x => x.IsChecked).SelectMany(x => x.Rooms);
+        public void PlaceTagsCommand(IList<RoomGroupViewModel> RoomGroups, 
+                                    ElementId SelectedTagType, 
+                                    GroupPlacementWay groupPlacementWay) {
+            var selectedGroups = RoomGroups.Where(x => x.IsChecked);
 
+            if(groupPlacementWay == GroupPlacementWay.EveryRoom) {
+                var rooms = selectedGroups.SelectMany(x => x.Rooms);
+                PlaceTags(rooms, SelectedTagType);
+
+            } 
+            else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroup) {
+                var rooms = selectedGroups.Select(x => x.Rooms.First());
+                PlaceTags(rooms, SelectedTagType);
+            }
+        }
+
+        public void PlaceTags(IEnumerable<Room> Rooms, ElementId SelectedTagType) {           
             using(Transaction t = Document.StartTransaction("Маркировать помещения")) {
-                foreach(var room in rooms) {
+                foreach(var room in Rooms) {
                     BoundingBoxXYZ roomBB = room.GetBoundingBox();
 
                     var xValue = (roomBB.Min.X + roomBB.Max.X) * 0.5;

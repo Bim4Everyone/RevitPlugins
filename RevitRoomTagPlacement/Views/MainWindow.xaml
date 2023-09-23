@@ -26,7 +26,7 @@
             <RowDefinition Height="50" />
             <RowDefinition Height="*" />
             <RowDefinition Height="50" />
-            <RowDefinition Height="100" />
+            <RowDefinition Height="50" />
             <RowDefinition Height="50" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -58,6 +58,20 @@
             ItemsSource="{Binding TagFamilies}"
             DisplayMemberPath="Name"
             SelectedItem="{Binding SelectedTagType}"/>
+
+        <StackPanel
+            Grid.Row="3"
+            Margin="10"
+            DataContext="{Binding RevitViewModel}">
+            <RadioButton
+                GroupName="PlacementWays" 
+                Content="Разместить марки для каждого помещения в группе" 
+                IsChecked="{Binding IsEveryRoom}"/>
+            <RadioButton
+                GroupName="PlacementWays" 
+                Content="Разместить марки для одного помещении в каждой группе" 
+                IsChecked="{Binding IsOneRoomPerGroup}"/>
+        </StackPanel>
 
         <StackPanel
             Grid.Row="5"

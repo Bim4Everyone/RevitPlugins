@@ -22,6 +22,8 @@ namespace RevitRoomTagPlacement.ViewModels {
 
         private RoomTagTypeModel _selectedTagType;
 
+        GroupPlacementWay placementWayByGroups = GroupPlacementWay.EveryRoom;
+
         public RevitViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
 
@@ -44,13 +46,37 @@ namespace RevitRoomTagPlacement.ViewModels {
 
         protected abstract IEnumerable<RoomGroupViewModel> GetGroupViewModels();
 
+        public GroupPlacementWay PlacementWayByGroups {
+            get { return placementWayByGroups; }
+            set {
+                if (placementWayByGroups == value) return;
+
+                placementWayByGroups = value;
+                OnPropertyChanged("PlacementWayByGroups");
+                OnPropertyChanged("IsEveryRoom");
+                OnPropertyChanged("IsOneRoomPerGroup");
+            }
+        }
+
+        public bool IsEveryRoom {
+            get { return PlacementWayByGroups == GroupPlacementWay.EveryRoom; }
+            set { PlacementWayByGroups = value ? GroupPlacementWay.EveryRoom : PlacementWayByGroups; }
+        }
+
+        public bool IsOneRoomPerGroup {
+            get { return PlacementWayByGroups == GroupPlacementWay.OneRoomPerGroup; }
+            set { PlacementWayByGroups = value ? GroupPlacementWay.OneRoomPerGroup : PlacementWayByGroups; }
+        }
+
         public RoomTagTypeModel SelectedTagType {
             get => _selectedTagType;
             set => this.RaiseAndSetIfChanged(ref _selectedTagType, value);
         }
 
         private void PlaceTags(object p) {
-            _revitRepository.PlaceTagsCommand(RoomGroups, SelectedTagType.TagId);
+            _revitRepository.PlaceTagsCommand(RoomGroups, 
+                                              SelectedTagType.TagId,
+                                              PlacementWayByGroups);
         }
 
         private bool CanPlaceTags(object p) {
