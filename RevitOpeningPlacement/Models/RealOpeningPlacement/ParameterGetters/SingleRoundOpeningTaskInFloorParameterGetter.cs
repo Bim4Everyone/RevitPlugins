@@ -29,6 +29,14 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement.ParameterGetters {
         public IEnumerable<ParameterValuePair> GetParamValues() {
             // габариты отверстия
             yield return new DoubleParameterGetter(RealOpeningPlacer.RealOpeningDiameter, new RoundOpeningTaskInFloorDiameterValueGetter(_openingMepTaskIncoming)).GetParamValue();
+
+            // логические флаги для обозначений разделов отверстия
+            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsEom, new IsEomValueGetter(_openingMepTaskIncoming)).GetParamValue();
+            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsSs, new IsSsValueGetter(_openingMepTaskIncoming)).GetParamValue();
+            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsOv, new IsOvValueGetter(_openingMepTaskIncoming)).GetParamValue();
+            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsDu, new IsDuValueGetter(_openingMepTaskIncoming)).GetParamValue();
+            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsVk, new IsVkValueGetter(_openingMepTaskIncoming)).GetParamValue();
+            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsTs, new IsTsValueGetter(_openingMepTaskIncoming)).GetParamValue();
         }
     }
 }
