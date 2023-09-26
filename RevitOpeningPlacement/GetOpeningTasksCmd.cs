@@ -106,7 +106,7 @@ namespace RevitOpeningPlacement {
                 throw new OperationCanceledException();
             }
             ICollection<OpeningMepTaskIncoming> incomingTasks = revitRepository.GetOpeningsMepTasksIncoming();
-            ICollection<OpeningReal> realOpenings = revitRepository.GetRealOpenings();
+            ICollection<OpeningRealAr> realOpenings = revitRepository.GetRealOpenings();
             ICollection<ElementId> constructureElementsIds = revitRepository.GetConstructureElementsIds();
             ICollection<IMepLinkElementsProvider> mepLinks = revitRepository
                 .GetMepLinks()
@@ -136,7 +136,7 @@ namespace RevitOpeningPlacement {
         /// <returns></returns>
         private ICollection<OpeningMepTaskIncomingViewModel> GetOpeningsMepIncomingTasksVM(
             ICollection<OpeningMepTaskIncoming> incomingTasks,
-            ICollection<OpeningReal> realOpenings,
+            ICollection<OpeningRealAr> realOpenings,
             ICollection<ElementId> constructureElementsIds) {
 
             var incomingTasksViewModels = new HashSet<OpeningMepTaskIncomingViewModel>();
@@ -166,11 +166,11 @@ namespace RevitOpeningPlacement {
             return incomingTasksViewModels;
         }
 
-        private ICollection<OpeningRealViewModel> GetOpeningsRealVM(
+        private ICollection<OpeningRealArViewModel> GetOpeningsRealVM(
             ICollection<IMepLinkElementsProvider> mepLinks,
-            ICollection<OpeningReal> openingsReal) {
+            ICollection<OpeningRealAr> openingsReal) {
 
-            var openingsRealViewModels = new HashSet<OpeningRealViewModel>();
+            var openingsRealViewModels = new HashSet<OpeningRealArViewModel>();
 
             using(var pb = GetPlatformService<IProgressDialogService>()) {
                 pb.StepValue = _progressBarStepSmall;
@@ -186,7 +186,7 @@ namespace RevitOpeningPlacement {
                     progress.Report(i);
                     openingReal.UpdateStatus(mepLinks);
                     if(openingReal.Status != OpeningModels.Enums.OpeningRealStatus.Correct) {
-                        openingsRealViewModels.Add(new OpeningRealViewModel(openingReal));
+                        openingsRealViewModels.Add(new OpeningRealArViewModel(openingReal));
                     }
                     i++;
                 }

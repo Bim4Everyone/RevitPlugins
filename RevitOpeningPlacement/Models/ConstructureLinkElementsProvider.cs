@@ -15,7 +15,7 @@ namespace RevitOpeningPlacement.Models {
 
         private readonly ICollection<ElementId> _elementIds;
 
-        private readonly ICollection<OpeningReal> _openingsReal;
+        private readonly ICollection<OpeningRealAr> _openingsReal;
 
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace RevitOpeningPlacement.Models {
             return _elementIds;
         }
 
-        public ICollection<OpeningReal> GetOpeningsReal() {
+        public ICollection<OpeningRealAr> GetOpeningsReal() {
             return _openingsReal;
         }
 
@@ -54,7 +54,7 @@ namespace RevitOpeningPlacement.Models {
                 .ToElementIds();
         }
 
-        private ICollection<OpeningReal> GetOpeningsReal(Document document) {
+        private ICollection<OpeningRealAr> GetOpeningsReal(Document document) {
             return new FilteredElementCollector(document)
                 .WhereElementIsNotElementType()
                 .WherePasses(FiltersInitializer.GetFilterByAllUsedOpeningsCategories())
@@ -62,7 +62,7 @@ namespace RevitOpeningPlacement.Models {
                 .Cast<FamilyInstance>()
                 .Where(famInst => famInst.Host != null)
                 .Where(famInst => famInst.Symbol.FamilyName.Contains("Отв"))
-                .Select(famInst => new OpeningReal(famInst))
+                .Select(famInst => new OpeningRealAr(famInst))
                 .ToHashSet();
         }
     }

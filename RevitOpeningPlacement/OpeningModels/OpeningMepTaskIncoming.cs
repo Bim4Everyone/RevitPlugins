@@ -257,7 +257,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="realOpenings">Коллекция чистовых отверстий, размещенных в активном документе-получателе заданий на отверстия</param>
         /// <exception cref="ArgumentException"></exception>
-        public void UpdateStatusAndHostName(ICollection<OpeningReal> realOpenings, ICollection<ElementId> constructureElementsIds) {
+        public void UpdateStatusAndHostName(ICollection<OpeningRealAr> realOpenings, ICollection<ElementId> constructureElementsIds) {
             var thisOpeningSolid = GetSolid();
             var thisOpeningBBox = GetTransformedBBoxXYZ();
 
@@ -353,7 +353,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="thisOpeningSolid">Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
         /// <param name="thisOpeningBBox">Бокс текущего задания на отверстие в координатах активного файла - получателя заданий</param>
         /// <returns></returns>
-        private ICollection<ElementId> GetIntersectingOpeningsIds(ICollection<OpeningReal> realOpenings, Solid thisOpeningSolid, BoundingBoxXYZ thisOpeningBBox) {
+        private ICollection<ElementId> GetIntersectingOpeningsIds(ICollection<OpeningRealAr> realOpenings, Solid thisOpeningSolid, BoundingBoxXYZ thisOpeningBBox) {
             if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
                 return Array.Empty<ElementId>();
             } else {

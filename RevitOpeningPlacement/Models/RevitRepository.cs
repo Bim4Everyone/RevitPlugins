@@ -596,7 +596,7 @@ namespace RevitOpeningPlacement.Models {
         /// Возвращает коллекцию чистовых экземпляров семейств отверстий из текущего документа Revit
         /// </summary>
         /// <returns></returns>
-        public ICollection<OpeningReal> GetRealOpenings() {
+        public ICollection<OpeningRealAr> GetRealOpenings() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
                 .WherePasses(FiltersInitializer.GetFilterByAllUsedOpeningsCategories())
@@ -604,7 +604,7 @@ namespace RevitOpeningPlacement.Models {
                 .Cast<FamilyInstance>()
                 .Where(famInst => famInst.Host != null)
                 .Where(famInst => famInst.Symbol.FamilyName.Contains("Отв"))
-                .Select(famInst => new OpeningReal(famInst))
+                .Select(famInst => new OpeningRealAr(famInst))
                 .ToHashSet();
         }
 

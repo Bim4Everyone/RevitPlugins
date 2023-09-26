@@ -20,7 +20,7 @@ namespace RevitOpeningPlacement.OpeningModels {
     /// <summary>
     /// Класс, обозначающий чистовое отверстие, идущее на чертежи
     /// </summary>
-    internal class OpeningReal : ISolidProvider, IEquatable<OpeningReal>, IFamilyInstanceProvider {
+    internal class OpeningRealAr : ISolidProvider, IEquatable<OpeningRealAr>, IFamilyInstanceProvider {
         /// <summary>
         /// Экземпляр семейства чистового отверстия
         /// </summary>
@@ -38,10 +38,10 @@ namespace RevitOpeningPlacement.OpeningModels {
 
 
         /// <summary>
-        /// Создает экземпляр класса <see cref="OpeningReal"/>
+        /// Создает экземпляр класса <see cref="OpeningRealAr"/>
         /// </summary>
         /// <param name="openingReal">Экземпляр семейства чистового отверстия, идущего на чертежи</param>
-        public OpeningReal(FamilyInstance openingReal) {
+        public OpeningRealAr(FamilyInstance openingReal) {
             if(openingReal is null) { throw new ArgumentNullException(nameof(openingReal)); }
             if(openingReal.Host is null) { throw new ArgumentException($"{nameof(openingReal)} с Id {openingReal.Id} не содержит ссылки на хост элемент"); }
             _familyInstance = openingReal;
@@ -93,14 +93,14 @@ namespace RevitOpeningPlacement.OpeningModels {
 
 
         public override bool Equals(object obj) {
-            return (obj is OpeningReal opening) && Equals(opening);
+            return (obj is OpeningRealAr opening) && Equals(opening);
         }
 
         public override int GetHashCode() {
             return Id;
         }
 
-        public bool Equals(OpeningReal other) {
+        public bool Equals(OpeningRealAr other) {
             return (other != null) && (Id == other.Id);
         }
 

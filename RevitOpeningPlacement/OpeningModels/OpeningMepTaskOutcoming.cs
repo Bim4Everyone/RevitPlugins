@@ -670,7 +670,7 @@ namespace RevitOpeningPlacement.OpeningModels {
             // во-первых есть конструкции в связанных файлах, внутри которых расположено задание на отверстие,
             // во-вторых, что ни один элемент ВИС, проходящий через текущее задание на отверстие не пересекается с этими конструкциями
             foreach(var link in constructureLinkElementsProviders) {
-                var hostConstructions = GetHostConstructionsForThisOpeningTask(thisOpeningTaskSolid, link, out ICollection<OpeningReal> intersectingOpenings);
+                var hostConstructions = GetHostConstructionsForThisOpeningTask(thisOpeningTaskSolid, link, out ICollection<OpeningRealAr> intersectingOpenings);
                 if(hostConstructions.Count > 0) {
                     return mepElementsNotIntersectThisTask
                         || MepElementsIntersectConstructionsOrOpenings(
@@ -769,7 +769,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Коллекция Id конструкций (стен или перекрытий) из связанного файла, которые пересекаются с солидом текущего задания на отверстие
         /// <para>или коллекция Id конструкций, которые являются хостами чистовых отверстий, с которыми пересекается солид текущего задания на отверстие</para> 
         /// </returns>
-        private ICollection<ElementId> GetHostConstructionsForThisOpeningTask(Solid thisOpeningTaskSolid, IConstructureLinkElementsProvider link, out ICollection<OpeningReal> intersectingOpeningsReal) {
+        private ICollection<ElementId> GetHostConstructionsForThisOpeningTask(Solid thisOpeningTaskSolid, IConstructureLinkElementsProvider link, out ICollection<OpeningRealAr> intersectingOpeningsReal) {
             var thisSolidInLinkCoordinates = SolidUtils.CreateTransformed(thisOpeningTaskSolid, link.DocumentTransform.Inverse);
 
             intersectingOpeningsReal = GetIntersectingLinkOpeningsReal(link, thisOpeningTaskSolid);
@@ -814,7 +814,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="link">Связь с конструкциями и чистовыми отверстиями</param>
         /// <param name="thisOpeningTaskSolid">Солид текущего задания на отверстие</param>
         /// <returns>Коллекция чистовых отверстий из связи, которые пересекаются с солидом текущего задания на отверстие</returns>
-        private ICollection<OpeningReal> GetIntersectingLinkOpeningsReal(IConstructureLinkElementsProvider link, Solid thisOpeningTaskSolid) {
+        private ICollection<OpeningRealAr> GetIntersectingLinkOpeningsReal(IConstructureLinkElementsProvider link, Solid thisOpeningTaskSolid) {
             var thisSolidInLinkCoordinates = SolidUtils.CreateTransformed(thisOpeningTaskSolid, link.DocumentTransform.Inverse);
             var thisBBoxInLinkCoordinates = GetTransformedBBoxXYZ().TransformBoundingBox(link.DocumentTransform.Inverse);
             return link.GetOpeningsReal().Where(realOpening => realOpening.IntersectsSolid(thisSolidInLinkCoordinates, thisBBoxInLinkCoordinates)).ToHashSet();
@@ -834,7 +834,7 @@ namespace RevitOpeningPlacement.OpeningModels {
             Solid thisOpeningTaskSolid,
             ICollection<ElementId> intersectingMepElementsIds,
             ICollection<ElementId> intersectingLinkConstructions,
-            ICollection<OpeningReal> intersectingLinkOpeningsReal,
+            ICollection<OpeningRealAr> intersectingLinkOpeningsReal,
             IConstructureLinkElementsProvider link
             ) {
             if(!IsRemoved

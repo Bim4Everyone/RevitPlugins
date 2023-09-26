@@ -14,11 +14,11 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// Модель представления чистового отверстия в навигаторе АР по входящим заданиям на отверстия.
     /// Использовать для отображения чистовых отверстий, которые требуют внимания архитектора
     /// </summary>
-    internal class OpeningRealViewModel : BaseViewModel, ISelectorAndHighlighter, IEquatable<OpeningRealViewModel> {
-        private readonly OpeningReal _openingReal;
+    internal class OpeningRealArViewModel : BaseViewModel, ISelectorAndHighlighter, IEquatable<OpeningRealArViewModel> {
+        private readonly OpeningRealAr _openingReal;
 
 
-        public OpeningRealViewModel(OpeningReal openingReal) {
+        public OpeningRealArViewModel(OpeningRealAr openingReal) {
             _openingReal = openingReal ?? throw new System.ArgumentNullException(nameof(openingReal));
 
             OpeningId = _openingReal.Id;
@@ -63,11 +63,11 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         public override bool Equals(object obj) {
             return (obj != null)
-                && (obj is OpeningRealViewModel otherVM)
+                && (obj is OpeningRealArViewModel otherVM)
                 && Equals(otherVM);
         }
 
-        public bool Equals(OpeningRealViewModel other) {
+        public bool Equals(OpeningRealArViewModel other) {
             return (other != null)
                 && (OpeningId == other.OpeningId);
         }

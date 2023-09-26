@@ -250,7 +250,7 @@
                                      DefaultSorting="OpeningId"
                                      BorderThickness="0"
                                      SelectionMode="Row"
-                                     CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningRealViewModel"
+                                     CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningRealArViewModel"
                                      SelectedItem="{Binding SelectedOpeningReal}"
                                      MaxHeight="2000">
                         <dxg:GridControl.GroupSummary>

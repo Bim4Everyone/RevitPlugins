@@ -30,6 +30,6 @@ namespace RevitOpeningPlacement.Models.Interfaces {
         /// Возвращает коллекцию чистовых отверстий из <see cref="Document">связанного файла</see>
         /// </summary>
         /// <returns></returns>
-        ICollection<OpeningReal> GetOpeningsReal();
+        ICollection<OpeningRealAr> GetOpeningsReal();
     }
 }
