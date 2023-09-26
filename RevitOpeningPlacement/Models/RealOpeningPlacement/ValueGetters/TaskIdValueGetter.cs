@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using RevitClashDetective.Models.Value;
@@ -9,27 +10,27 @@ using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningPlacement.ValueGetters {
     /// <summary>
-    /// Класс, предоставляющий значение параметра <see cref="RealOpeningPlacer.RealOpeningIsOv"/>
+    /// Класс, предоставляющий значение параметра <see cref="RealOpeningPlacer.RealOpeningTaskId"/>
     /// </summary>
-    internal class IsOvValueGetter : IValueGetter<IntParamValue> {
+    internal class TaskIdValueGetter : IValueGetter<StringParamValue> {
         private ICollection<OpeningMepTaskIncoming> _incomingMepTasks;
 
 
         /// <summary>
-        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningPlacer.RealOpeningIsOv"/>
+        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningPlacer.RealOpeningTaskId"/>
         /// </summary>
         /// <param name="openingMepTaskIncoming">Входящее задание на отверстие</param>
-        public IsOvValueGetter(OpeningMepTaskIncoming openingMepTaskIncoming) {
+        public TaskIdValueGetter(OpeningMepTaskIncoming openingMepTaskIncoming) {
             if(openingMepTaskIncoming == null) { throw new ArgumentNullException(nameof(openingMepTaskIncoming)); }
 
             _incomingMepTasks = new OpeningMepTaskIncoming[] { openingMepTaskIncoming };
         }
 
         /// <summary>
-        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningPlacer.RealOpeningIsOv"/>
+        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningPlacer.RealOpeningTaskId"/>
         /// </summary>
         /// <param name="openingsMepTaskIncoming">Коллекция входящих заданий на отверстия</param>
-        public IsOvValueGetter(ICollection<OpeningMepTaskIncoming> openingsMepTaskIncoming) {
+        public TaskIdValueGetter(ICollection<OpeningMepTaskIncoming> openingsMepTaskIncoming) {
             if(openingsMepTaskIncoming == null) { throw new ArgumentNullException(nameof(openingsMepTaskIncoming)); }
             if(openingsMepTaskIncoming.Count < 1) { throw new ArgumentOutOfRangeException(nameof(openingsMepTaskIncoming)); }
 
@@ -37,17 +38,12 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement.ValueGetters {
         }
 
 
-        public IntParamValue GetValue() {
-            return _incomingMepTasks.Any(task =>
-            task.FileName.Contains("OV")
-            && !task.MepSystem.Contains("Д")
-            && (task.MepSystem.Contains("В") || task.MepSystem.Contains("П")))
-                ? new IntParamValue(1)
-                : new IntParamValue(0);
-        }
-
-        public override string ToString() {
-            return "ОВ";
+        public StringParamValue GetValue() {
+            return new StringParamValue(
+                string.Join("; ",
+                _incomingMepTasks.GroupBy(opening => Path.GetFileNameWithoutExtension(opening.FileName))
+                .Select(group => group.Key + ": " + string.Join("; ", group.Select(opening => opening.Id)))
+                ));
         }
     }
 }

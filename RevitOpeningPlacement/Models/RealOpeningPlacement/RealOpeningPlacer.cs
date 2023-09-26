@@ -32,7 +32,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
         public const string RealOpeningIsDu = "ДУ";
         public const string RealOpeningIsVk = "ВК";
         public const string RealOpeningIsTs = "ТС";
-
+        public const string RealOpeningTaskId = "ФОП_ID задания";
+        public const string RealOpeningIsManualBimModelPart = "ДИСЦИПЛИНА ВРУЧНУЮ";
+        public const string RealOpeningManualBimModelPart = "ДИСЦИПЛИНА ВРУЧНУЮ ТЕКСТ";
 
 
         /// <summary>

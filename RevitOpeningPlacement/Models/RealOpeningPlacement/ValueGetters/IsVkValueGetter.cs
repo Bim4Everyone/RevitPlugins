@@ -44,5 +44,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement.ValueGetters {
                 ? new IntParamValue(1)
                 : new IntParamValue(0);
         }
+
+        public override string ToString() {
+            return "ВК";
+        }
     }
 }

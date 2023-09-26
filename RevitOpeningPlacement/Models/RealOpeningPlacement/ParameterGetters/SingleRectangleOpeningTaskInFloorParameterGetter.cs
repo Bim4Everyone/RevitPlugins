@@ -32,12 +32,31 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement.ParameterGetters {
             yield return new DoubleParameterGetter(RealOpeningPlacer.RealOpeningWidth, new RectangleOpeningTaskWidthValueGetter(_openingMepTaskIncoming)).GetParamValue();
 
             // логические флаги для обозначений разделов отверстия
-            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsEom, new IsEomValueGetter(_openingMepTaskIncoming)).GetParamValue();
-            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsSs, new IsSsValueGetter(_openingMepTaskIncoming)).GetParamValue();
-            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsOv, new IsOvValueGetter(_openingMepTaskIncoming)).GetParamValue();
-            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsDu, new IsDuValueGetter(_openingMepTaskIncoming)).GetParamValue();
-            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsVk, new IsVkValueGetter(_openingMepTaskIncoming)).GetParamValue();
-            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsTs, new IsTsValueGetter(_openingMepTaskIncoming)).GetParamValue();
+            var isEomValueGetter = new IsEomValueGetter(_openingMepTaskIncoming);
+            var isSsValueGetter = new IsSsValueGetter(_openingMepTaskIncoming);
+            var isOvValueGetter = new IsOvValueGetter(_openingMepTaskIncoming);
+            var isDuValueGetter = new IsDuValueGetter(_openingMepTaskIncoming);
+            var isVkValueGetter = new IsVkValueGetter(_openingMepTaskIncoming);
+            var isTsValueGetter = new IsTsValueGetter(_openingMepTaskIncoming);
+            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsEom, isEomValueGetter).GetParamValue();
+            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsSs, isSsValueGetter).GetParamValue();
+            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsOv, isOvValueGetter).GetParamValue();
+            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsDu, isDuValueGetter).GetParamValue();
+            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsVk, isVkValueGetter).GetParamValue();
+            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsTs, isTsValueGetter).GetParamValue();
+            yield return new IntegerParameterGetter(RealOpeningPlacer.RealOpeningIsManualBimModelPart, new IsManualBimModelPartValueGetter()).GetParamValue();
+
+            // текстовые данные отверстия
+            var manualBimModelPartValueGetter = new ManualBimModelPartValueGetter()
+                .SetIsEom(isEomValueGetter)
+                .SetIsSs(isSsValueGetter)
+                .SetIsOv(isOvValueGetter)
+                .SetIsDu(isDuValueGetter)
+                .SetIsVk(isVkValueGetter)
+                .SetIsTs(isTsValueGetter)
+                ;
+            yield return new StringParameterGetter(RealOpeningPlacer.RealOpeningTaskId, new TaskIdValueGetter(_openingMepTaskIncoming)).GetParamValue();
+            yield return new StringParameterGetter(RealOpeningPlacer.RealOpeningManualBimModelPart, manualBimModelPartValueGetter).GetParamValue();
         }
     }
 }
