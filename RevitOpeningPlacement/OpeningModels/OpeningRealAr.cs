@@ -7,45 +7,23 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
-using dosymep.Revit.Geometry;
 
 using RevitClashDetective.Models.Extensions;
 
-using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.RealOpeningPlacement;
 using RevitOpeningPlacement.OpeningModels.Enums;
 
 namespace RevitOpeningPlacement.OpeningModels {
     /// <summary>
-    /// Класс, обозначающий чистовое отверстие, идущее на чертежи
+    /// Класс, обозначающий чистовое отверстие АР, идущее на чертежи. Использовать для обертки проемов из файла АР, когда активный файл - этот же АР или файл ВИС.
     /// </summary>
-    internal class OpeningRealAr : ISolidProvider, IEquatable<OpeningRealAr>, IFamilyInstanceProvider {
+    internal class OpeningRealAr : OpeningRealBase, IEquatable<OpeningRealAr>, IFamilyInstanceProvider {
         /// <summary>
-        /// Экземпляр семейства чистового отверстия
+        /// Создает экземпляр класса <see cref="OpeningRealAr"/>. Использовать для обертки проемов из файла АР, когда активный файл - этот же АР или файл ВИС.
         /// </summary>
-        private readonly FamilyInstance _familyInstance;
-
-        /// <summary>
-        /// Закэшированный солид
-        /// </summary>
-        private Solid _solid;
-
-        /// <summary>
-        /// Закэшированный BBox
-        /// </summary>
-        private BoundingBoxXYZ _boundingBox;
-
-
-        /// <summary>
-        /// Создает экземпляр класса <see cref="OpeningRealAr"/>
-        /// </summary>
-        /// <param name="openingReal">Экземпляр семейства чистового отверстия, идущего на чертежи</param>
-        public OpeningRealAr(FamilyInstance openingReal) {
-            if(openingReal is null) { throw new ArgumentNullException(nameof(openingReal)); }
-            if(openingReal.Host is null) { throw new ArgumentException($"{nameof(openingReal)} с Id {openingReal.Id} не содержит ссылки на хост элемент"); }
-            _familyInstance = openingReal;
-
+        /// <param name="openingReal">Экземпляр семейства чистового отверстия АР, идущего на чертежи</param>
+        public OpeningRealAr(FamilyInstance openingReal) : base(openingReal) {
             Id = _familyInstance.Id.IntegerValue;
             Diameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningDiameter);
             Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningWidth);
@@ -56,9 +34,6 @@ namespace RevitOpeningPlacement.OpeningModels {
                     _familyInstance.Document,
                     BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
                 string.Empty);
-
-            SetTransformedBBoxXYZ();
-            SetSolid();
         }
 
 
@@ -102,24 +77,6 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         public bool Equals(OpeningRealAr other) {
             return (other != null) && (Id == other.Id);
-        }
-
-
-        public Solid GetSolid() {
-            return _solid;
-        }
-
-
-        public BoundingBoxXYZ GetTransformedBBoxXYZ() {
-            return _boundingBox;
-        }
-
-        /// <summary>
-        /// Возвращает хост экземпляра семейства отверстия
-        /// </summary>
-        /// <returns></returns>
-        public Element GetHost() {
-            return _familyInstance.Host;
         }
 
         /// <summary>
@@ -293,38 +250,6 @@ namespace RevitOpeningPlacement.OpeningModels {
                 .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningRealSolidInLinkCoordinates.GetOutline()))
                 .WherePasses(new ElementIntersectsSolidFilter(thisOpeningRealSolidInLinkCoordinates))
                 .ToElementIds();
-        }
-
-        /// <summary>
-        /// Устанавливает значение полю <see cref="_solid"/>
-        /// </summary>
-        private void SetSolid() {
-            XYZ openingLocation = (_familyInstance.Location as LocationPoint).Point;
-            var hostElement = GetHost();
-            Solid hostSolidCut = hostElement.GetSolid();
-            try {
-                Solid hostSolidOriginal = (hostElement as HostObject).GetHostElementOriginalSolid();
-                var openings = SolidUtils.SplitVolumes(BooleanOperationsUtils.ExecuteBooleanOperation(hostSolidOriginal, hostSolidCut, BooleanOperationsType.Difference));
-                var thisOpeningSolid = openings.OrderBy(solidOpening => (solidOpening.ComputeCentroid() - openingLocation).GetLength()).FirstOrDefault();
-                if(thisOpeningSolid != null) {
-                    _solid = thisOpeningSolid;
-                } else {
-                    _solid = CreateRawSolid();
-                }
-            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                _solid = CreateRawSolid();
-            }
-        }
-
-        /// <summary>
-        /// Устанавливает значение полю <see cref="_boundingBox"/>
-        /// </summary>
-        private void SetTransformedBBoxXYZ() {
-            _boundingBox = _familyInstance.GetBoundingBox();
-        }
-
-        private Solid CreateRawSolid() {
-            return GetTransformedBBoxXYZ().CreateSolid();
         }
 
         /// <summary>
