@@ -41,8 +41,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
         /// <param name="revitRepository">Репозиторий активного документа ревита, в котором будет происходить размещение чистовых отверстийЫ</param>
         /// <exception cref="ArgumentNullException"></exception>
         public RealOpeningPlacer(RevitRepository revitRepository) {
-            if(revitRepository == null) { throw new ArgumentNullException(nameof(revitRepository)); }
-            _revitRepository = revitRepository;
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         }
 
 
@@ -323,7 +322,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
         }
 
         /// <summary>
-        /// Возвращает интерфейс, предоставлящий точку вставки
+        /// Возвращает интерфейс, предоставляющий точку вставки
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <returns></returns>

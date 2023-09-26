@@ -184,7 +184,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="thisOpeningRealSolid">Исходный солид текущего чистового отверстия</param>
         /// <param name="thisOpeningRealSolidAfterIntersection">
-        /// Солид текущего чистового отверситя, 
+        /// Солид текущего чистового отверстия, 
         /// после вычтенных солидов элементов из связей, которые пересекают это отверстие
         /// </param>
         /// <returns>
