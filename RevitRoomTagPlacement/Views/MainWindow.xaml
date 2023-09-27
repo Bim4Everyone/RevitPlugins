@@ -20,7 +20,11 @@
     Height="600" Width="500"    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
-    
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50" />
@@ -68,10 +72,21 @@
                 Content="Разместить марки для каждого помещения в группе" 
                 IsChecked="{Binding IsEveryRoom}"/>
             <RadioButton
+                x:Name="_placementWay"
                 GroupName="PlacementWays" 
                 Content="Разместить марки для одного помещении в каждой группе" 
                 IsChecked="{Binding IsOneRoomPerGroup}"/>
         </StackPanel>
+
+        <ComboBox
+            Grid.Row="4"
+            Margin="10"
+            DataContext="{Binding RevitViewModel}"
+            ItemsSource="{Binding RoomNames}"
+            Visibility="{Binding ElementName=_placementWay,
+                         Path=IsChecked, 
+                         Converter={StaticResource BoolToVis}}"
+            SelectedItem="{Binding SelectedRoomName}"/>
 
         <StackPanel
             Grid.Row="5"

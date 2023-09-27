@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,12 +17,13 @@ namespace RevitRoomTagPlacement.ViewModels {
             : base(revitRepository) {
         }
 
-        protected override IEnumerable<RoomGroupViewModel> GetGroupViewModels() {
-            var viewRooms = _revitRepository.GetRoomsOnActiveView();
-
-            return viewRooms
+        protected override BindingList<RoomGroupViewModel> GetGroupViewModels() {
+            var roomGroupsList = _revitRepository.GetRoomsOnActiveView()
                 .GroupBy(x => x.GetParam(ProjectParamsConfig.Instance.RoomGroupName).AsValueString())
-                .Select(x => new RoomGroupViewModel(x.Key.ToString(), x));
+                .Select(x => new RoomGroupViewModel(x.Key.ToString(), x))
+                .ToList();
+
+            return new BindingList<RoomGroupViewModel>(roomGroupsList);
         }
     }
 }

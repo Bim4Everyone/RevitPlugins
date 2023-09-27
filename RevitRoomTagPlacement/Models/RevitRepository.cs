@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Web.UI.WebControls;
 using System.Windows.Controls;
@@ -46,6 +47,21 @@ namespace RevitRoomTagPlacement.Models {
                 .OfType<RoomTagType>()
                 .Select(x => new RoomTagTypeModel(x))
                 .ToList();
+        }
+
+        public ObservableCollection<string> GetRoomNames(IList<RoomGroupViewModel> RoomGroups) {
+            var selectedGroups = RoomGroups.Where(x => x.IsChecked);
+            IEnumerable<string> uniqueNames = new List<string>();
+
+            if(selectedGroups.Count() > 0) {
+               uniqueNames = new List<string>(selectedGroups.First().GroupRoomNames);
+
+                foreach(var group in selectedGroups) {
+                    uniqueNames = uniqueNames.Intersect(group.GroupRoomNames);
+                }
+            }
+
+            return new ObservableCollection<string>(uniqueNames);
         }
 
         public void PlaceTagsCommand(IList<RoomGroupViewModel> RoomGroups, 

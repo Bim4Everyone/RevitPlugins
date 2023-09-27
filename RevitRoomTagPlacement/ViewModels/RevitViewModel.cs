@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,32 +20,43 @@ namespace RevitRoomTagPlacement.ViewModels {
     
     internal abstract class RevitViewModel : BaseViewModel {
         protected readonly RevitRepository _revitRepository;
-
         private RoomTagTypeModel _selectedTagType;
-
-        GroupPlacementWay placementWayByGroups = GroupPlacementWay.EveryRoom;
+        private GroupPlacementWay placementWayByGroups = GroupPlacementWay.EveryRoom;
+        private ObservableCollection<string> roomNames;
 
         public RevitViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
-
-            RoomGroups = new ObservableCollection<RoomGroupViewModel>(GetGroupViewModels());
-
+            RoomGroups = new BindingList<RoomGroupViewModel>(GetGroupViewModels());
             PlaceCommand = new RelayCommand(PlaceTags, CanPlaceTags);
-
             TagFamilies = revitRepository.GetRoomTags();
-
             SelectedTagType = TagFamilies[0];
+            RoomNames = new ObservableCollection<string>();
+            RoomGroups.ListChanged += RoomGroups_ListChanged;
+        }
+
+        private void RoomGroups_ListChanged(object sender, ListChangedEventArgs e) {
+            RoomNames = _revitRepository.GetRoomNames(RoomGroups);
         }
 
         public string Name { get; set; }
 
         public ICommand PlaceCommand { get; }
 
-        public ObservableCollection<RoomGroupViewModel> RoomGroups { get; }
+        public BindingList<RoomGroupViewModel> RoomGroups { get; }
+
+        public ObservableCollection<string> RoomNames {
+            get {
+                return roomNames;                
+            }
+            set {
+                roomNames = value;
+                OnPropertyChanged();
+            }
+        }
 
         public List<RoomTagTypeModel> TagFamilies { get; }
 
-        protected abstract IEnumerable<RoomGroupViewModel> GetGroupViewModels();
+        protected abstract BindingList<RoomGroupViewModel> GetGroupViewModels();
 
         public GroupPlacementWay PlacementWayByGroups {
             get { return placementWayByGroups; }
