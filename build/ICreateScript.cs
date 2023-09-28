@@ -19,7 +19,6 @@ interface ICreateScript : IHazOutput, IHazPluginName, IHazSolution {
             Log.Debug("PluginScriptFile: {PluginScriptFile}", PluginScriptFile);
 
             string content = TemplateFile.ReadAllText()
-                .Replace("${{ gen.output }}", PublishDirectory)
                 .Replace("${{ gen.plugin_name }}", PluginName);
             PluginScriptFile.WriteAllText(content);
         });

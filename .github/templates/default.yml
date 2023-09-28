@@ -7,7 +7,6 @@ on:
       - '**.cs'
 
 env:
-  output: ${{ gen.output }}
   plugin_name: ${{ gen.plugin_name }}
 
 jobs:
