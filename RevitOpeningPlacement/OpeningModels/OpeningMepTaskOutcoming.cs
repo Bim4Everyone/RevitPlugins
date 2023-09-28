@@ -14,7 +14,6 @@ using RevitClashDetective.Models.Extensions;
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
-using RevitOpeningPlacement.OpeningModels.Comparers;
 using RevitOpeningPlacement.OpeningModels.Enums;
 
 namespace RevitOpeningPlacement.OpeningModels {
@@ -37,8 +36,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Допустимый объем, равный кубу <see cref="_distance3dTolerance"/>
         /// </summary>
         private static readonly double _volumeTolerance = _distance3dTolerance * _distance3dTolerance * _distance3dTolerance;
-
-        private static readonly OpeningTaskOutcomingEqualityComparer _equalityComparer = new OpeningTaskOutcomingEqualityComparer();
 
         /// <summary>
         /// Кэш для хранения результата метода <see cref="GetIntersectingMepElementsIds"/>
