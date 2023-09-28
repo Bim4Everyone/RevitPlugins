@@ -593,18 +593,28 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает коллекцию чистовых экземпляров семейств отверстий из текущего документа Revit
+        /// Возвращает коллекцию чистовых экземпляров семейств отверстий из текущего АР документа Revit
         /// </summary>
         /// <returns></returns>
-        public ICollection<OpeningRealAr> GetRealOpenings() {
+        public ICollection<OpeningRealAr> GetRealOpeningsAr() {
+            return GetOpeningsAr(_document)
+                .Select(famInst => new OpeningRealAr(famInst))
+                .ToHashSet();
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию чистовых экземпляров семейств отверстий из текущего КР документа Revit
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<OpeningRealKr> GetRealOpeningsKr() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
-                .WherePasses(FiltersInitializer.GetFilterByAllUsedOpeningsCategories())
+                .WherePasses(FiltersInitializer.GetFilterByAllUsedOpeningsKrCategories())
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
                 .Where(famInst => famInst.Host != null)
-                .Where(famInst => famInst.Symbol.FamilyName.Contains("Отв"))
-                .Select(famInst => new OpeningRealAr(famInst))
+                .Where(famInst => famInst.Symbol.FamilyName.Contains("ОбщМд_Отверстие_"))
+                .Select(famInst => new OpeningRealKr(famInst))
                 .ToHashSet();
         }
 
@@ -630,7 +640,7 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает коллекцию всех входящих заданий на отверстия из связанных файлов
+        /// Возвращает коллекцию всех входящих заданий на отверстия из связанных файлов ВИС
         /// </summary>
         /// <returns></returns>
         public ICollection<OpeningMepTaskIncoming> GetOpeningsMepTasksIncoming() {
@@ -650,6 +660,24 @@ namespace RevitOpeningPlacement.Models {
                 genericModelsInLinks.UnionWith(genericModelsInLink);
             }
             return genericModelsInLinks;
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию всех входящих заданий на отверстия из связанных файлов АР
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<OpeningArTaskIncoming> GetOpeningsArTasksIncoming() {
+            var service = GetBimModelPartsService();
+            var links = GetRevitLinks().Where(link => service.InAnyBimModelParts(link, BimModelPart.ARPart));
+            HashSet<OpeningArTaskIncoming> openingsArInLinks = new HashSet<OpeningArTaskIncoming>();
+            foreach(RevitLinkInstance link in links) {
+                var linkDoc = link.GetLinkDocument();
+                var transform = link.GetTransform();
+                var openingsArInLink = GetOpeningsAr(linkDoc)
+                    .Select(famInst => new OpeningArTaskIncoming(famInst, transform));
+                openingsArInLinks.UnionWith(openingsArInLink);
+            }
+            return openingsArInLinks;
         }
 
         /// <summary>
@@ -695,6 +723,20 @@ namespace RevitOpeningPlacement.Models {
                     BimModelPart.EMPart
                     ))
             .ToHashSet();
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию всех связей архитектурных файлов из документа репозитория
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<RevitLinkInstance> GetArLinks() {
+            var service = GetBimModelPartsService();
+            return GetRevitLinks()
+                .Where(link => service.InAnyBimModelParts(
+                    link,
+                    BimModelPart.ARPart
+                    ))
+                .ToHashSet();
         }
 
         /// <summary>
@@ -825,12 +867,30 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает тип проема по названию семейства задания на отверстие
+        /// Возвращает тип проема по названию семейства
         /// </summary>
-        /// <param name="familyName">Название семейства задания на отверстие</param>
+        /// <param name="familyName">Название семейства</param>
         /// <returns></returns>
         public static OpeningType GetOpeningType(string familyName) {
-            return OpeningTaskFamilyName.FirstOrDefault(pair => pair.Value.Equals(familyName, StringComparison.CurrentCultureIgnoreCase)).Key;
+            IDictionary<OpeningType, string> openingTypeAndFamNameDict;
+
+            if(OpeningTaskFamilyName.Values.Contains(familyName)) {
+                openingTypeAndFamNameDict = OpeningTaskFamilyName;
+            } else if(OpeningRealFamilyName.Values.Contains(familyName)) {
+                openingTypeAndFamNameDict = OpeningRealFamilyName;
+            } else {
+                return OpeningType.WallRectangle;
+            }
+            return openingTypeAndFamNameDict.FirstOrDefault(pair => pair.Value.Equals(familyName, StringComparison.CurrentCultureIgnoreCase)).Key;
+        }
+
+        /// <summary>
+        /// Возвращает тип архитектурного проема по названию семейств
+        /// </summary>
+        /// <param name="familyName">Название семейства архитектурного проема</param>
+        /// <returns></returns>
+        public static OpeningType GetOpeningRealArType(string familyName) {
+            return OpeningRealFamilyName.FirstOrDefault(pair => pair.Value.Equals(familyName, StringComparison.CurrentCultureIgnoreCase)).Key;
         }
 
         /// <summary>
@@ -861,6 +921,21 @@ namespace RevitOpeningPlacement.Models {
         /// <exception cref="Autodesk.Revit.Exceptions.ForbiddenForDynamicUpdateException"/>
         public Document EditFamily(Family family) {
             return _document.EditFamily(family);
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию чистовых экземпляров семейств отверстий АР из документа Revit
+        /// </summary>
+        /// <returns></returns>
+        private ICollection<FamilyInstance> GetOpeningsAr(Document document) {
+            return new FilteredElementCollector(document)
+                .WhereElementIsNotElementType()
+                .WherePasses(FiltersInitializer.GetFilterByAllUsedOpeningsArCategories())
+                .OfClass(typeof(FamilyInstance))
+                .Cast<FamilyInstance>()
+                .Where(famInst => famInst.Host != null)
+                .Where(famInst => famInst.Symbol.FamilyName.Contains("Отв"))
+                .ToHashSet();
         }
 
         /// <summary>
