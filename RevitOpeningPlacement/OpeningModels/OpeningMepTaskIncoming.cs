@@ -65,7 +65,7 @@ namespace RevitOpeningPlacement.OpeningModels {
             DisplayHeight = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningHeight);
             DisplayWidth = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningWidth);
             DisplayThickness = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningThickness);
-            OwnComment = _familyInstance.GetParamValueStringOrDefault(
+            Comment = _familyInstance.GetParamValueStringOrDefault(
                 SystemParamsConfig.Instance.CreateRevitParam(
                     _familyInstance.Document,
                     BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
@@ -95,16 +95,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Точка расположения экземпляра семейства входящего задания на отверстие в координатах активного документа - получателя заданий
         /// </summary>
         public XYZ Location { get; }
-
-        /// <summary>
-        /// Комментарий к входящему заданию на отверстие
-        /// </summary>
-        public string Comment { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Флаг, обозначающий, принято ли задание получателем, или нет
-        /// </summary>
-        public bool IsAccepted { get; set; } = true;
 
         public string Date { get; } = string.Empty;
 
@@ -181,7 +171,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Комментарий экземпляра семейства задания на отверстие
         /// </summary>
-        public string OwnComment { get; } = string.Empty;
+        public string Comment { get; } = string.Empty;
 
         /// <summary>
         /// Имя пользователя, создавшего задание на отверстие
@@ -256,6 +246,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Обновляет <see cref="Status"/> и <see cref="HostName"/> входящего задания на отверстие
         /// </summary>
         /// <param name="realOpenings">Коллекция чистовых отверстий, размещенных в активном документе-получателе заданий на отверстия</param>
+        /// <param name="constructureElementsIds">Коллекция элементов конструкций в активном документе-получателе заданий на отверстия</param>
         /// <exception cref="ArgumentException"></exception>
         public void UpdateStatusAndHostName(ICollection<OpeningRealAr> realOpenings, ICollection<ElementId> constructureElementsIds) {
             var thisOpeningSolid = GetSolid();

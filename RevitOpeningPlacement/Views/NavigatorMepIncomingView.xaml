@@ -225,7 +225,7 @@
                             <dxg:GridColumn ReadOnly="True"
                                             Width="*"
                                             Header="Комментарий"
-                                            FieldName="OwnComment" />
+                                            FieldName="Comment" />
                             <dxg:GridColumn ReadOnly="True"
                                             Width="50"
                                             Header="Создатель"
