@@ -1,0 +1,10 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitGenLookupTables",
+  "PublishDirectory": "C:\\Users\\biseuv_o\\AppData\\Roaming\\pyRevit\\Extensions\\00.Admin.extension\\Admin.tab\\Доработка.panel\\Доработка.stack\\GenLookupTable.invokebutton\\bin",
+  "IconUrl": "https://icons8.com/icon/41134/timetable",
+  "BundleName": "GenLookupTable",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "C:\\Users\\biseuv_o\\AppData\\Roaming\\pyRevit\\Extensions\\00.Admin.extension\\Admin.tab\\Доработка.panel\\Доработка.stack\\GenLookupTable.invokebutton"
+}
