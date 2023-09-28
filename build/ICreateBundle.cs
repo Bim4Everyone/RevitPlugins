@@ -34,6 +34,8 @@ interface ICreateBundle : IHazPluginName, IHazOutput, IHazTemplate, IHazGitUserN
         .OnlyWhenStatic(() =>
             !IconUrl.AbsolutePath.StartsWith(@"https://icons8.com/icon/"), "Bundle icon must be from icons8 site")
         .Executes(async () => {
+            AbsolutePath bundleDirectory = NukeBuildExtensions.GetExtensionsPath(BundleDirectory);
+            
             Log.Debug("PluginName: {PluginName}", PluginName);
             Log.Debug("TemplateName: {TemplateName}", TemplateName);
             Log.Debug("TemplateBundleDirectory: {TemplateBundleDirectory}", TemplateBundle);
@@ -42,9 +44,10 @@ interface ICreateBundle : IHazPluginName, IHazOutput, IHazTemplate, IHazGitUserN
             Log.Debug("BundleName: {BundleName}", BundleName);
             Log.Debug("BundleType: {BundleType}", BundleType);
             Log.Debug("BundleDirectory: {BundleDirectory}", BundleDirectory);
+            Log.Debug("bundleDirectory: {BundleDirectory}", bundleDirectory);
 
-            BundleDirectory.CreateDirectory();
-            CopyDirectory(TemplateBundle, BundleDirectory,
+            bundleDirectory.CreateDirectory();
+            CopyDirectory(TemplateBundle, bundleDirectory,
                 new Dictionary<string, string>() {
                     {"${{ gen.bundle_name }}", BundleName},
                     {"${{ gen.plugin_name }}", PluginName},
@@ -54,7 +57,7 @@ interface ICreateBundle : IHazPluginName, IHazOutput, IHazTemplate, IHazGitUserN
                     {"${{ gen.max_revit_version }}", MaxReleaseVersion.ToString()}
                 });
 
-            await IconSize.CreateImages(GetImageUri(), BundleDirectory / "icon.png");
+            await IconSize.CreateImages(GetImageUri(), bundleDirectory / "icon.png");
         });
 
     Uri GetImageUri() {
