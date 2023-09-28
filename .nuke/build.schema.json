@@ -101,8 +101,7 @@
               "FullClean",
               "FullCompile",
               "FullPublish",
-              "Publish",
-              "TestTarget"
+              "Publish"
             ]
           }
         },
@@ -126,8 +125,7 @@
               "FullClean",
               "FullCompile",
               "FullPublish",
-              "Publish",
-              "TestTarget"
+              "Publish"
             ]
           }
         },
