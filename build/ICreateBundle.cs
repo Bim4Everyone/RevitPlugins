@@ -7,7 +7,7 @@ using Nuke.Common.IO;
 
 using Serilog;
 
-interface ICreateBundle : IHazPluginName, IHazOutput, IHazTemplate {
+interface ICreateBundle : IHazPluginName, IHazOutput, IHazTemplate, IHazGitUserName, IHazConfigurations {
     [Parameter] Uri IconUrl => TryGetValue(() => IconUrl);
     [Parameter] string BundleName => TryGetValue(() => BundleName);
     [Parameter] BundleType BundleType => TryGetValue(() => BundleType);
@@ -49,6 +49,9 @@ interface ICreateBundle : IHazPluginName, IHazOutput, IHazTemplate {
                     {"${{ gen.bundle_name }}", BundleName},
                     {"${{ gen.plugin_name }}", PluginName},
                     {"${{ gen.plugin_command }}", PluginName + "Command"},
+                    {"${{ gen.author }}", UserName},
+                    {"${{ gen.min_revit_version }}", MinReleaseVersion.ToString()},
+                    {"${{ gen.max_revit_version }}", MaxReleaseVersion.ToString()}
                 });
 
             await IconSize.CreateImages(GetImageUri(), BundleDirectory / "icon.png");

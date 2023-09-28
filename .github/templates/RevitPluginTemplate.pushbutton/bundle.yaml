@@ -5,3 +5,8 @@ title:
 tooltip:
   ru: >- Please Write Description
   en_us: >- Please Write Description
+  
+author: ${{ gen.author }}
+
+min_revit_version: ${{ gen.min_revit_version }}
+max_revit_version: ${{ gen.max_revit_version }}
