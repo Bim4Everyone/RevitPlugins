@@ -23,9 +23,16 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement {
     internal class RealOpeningPlacer {
         private readonly RevitRepository _revitRepository;
 
-        public const string RealOpeningDiameter = "ФОП_РАЗМ_Диаметр";
-        public const string RealOpeningWidth = "ФОП_РАЗМ_Ширина проёма";
-        public const string RealOpeningHeight = "ФОП_РАЗМ_Высота проёма";
+        public const string RealOpeningArDiameter = "ФОП_РАЗМ_Диаметр";
+        public const string RealOpeningArWidth = "ФОП_РАЗМ_Ширина проёма";
+        public const string RealOpeningArHeight = "ФОП_РАЗМ_Высота проёма";
+
+        public const string RealOpeningKrDiameter = "ФОП_РАЗМ_Диаметр";
+        public const string RealOpeningKrInWallWidth = "ФОП_РАЗМ_Ширина";
+        public const string RealOpeningKrInWallHeight = "ФОП_РАЗМ_Высота";
+        public const string RealOpeningKrInFloorWidth = "мод_ФОП_Габарит А";
+        public const string RealOpeningKrInFloorHeight = "мод_ФОП_Габарит Б";
+
         public const string RealOpeningIsEom = "ЭОМ";
         public const string RealOpeningIsSs = "СС";
         public const string RealOpeningIsOv = "ОВ";

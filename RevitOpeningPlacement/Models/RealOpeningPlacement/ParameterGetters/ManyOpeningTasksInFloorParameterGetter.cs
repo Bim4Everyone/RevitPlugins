@@ -37,8 +37,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement.ParameterGetters {
             var height = box.Max.Y - box.Min.Y;
             var width = box.Max.X - box.Min.X;
             // габариты отверстия
-            yield return new DoubleParameterGetter(RealOpeningPlacer.RealOpeningHeight, new DimensionValueGetter(height)).GetParamValue();
-            yield return new DoubleParameterGetter(RealOpeningPlacer.RealOpeningWidth, new DimensionValueGetter(width)).GetParamValue();
+            yield return new DoubleParameterGetter(RealOpeningPlacer.RealOpeningArHeight, new DimensionValueGetter(height)).GetParamValue();
+            yield return new DoubleParameterGetter(RealOpeningPlacer.RealOpeningArWidth, new DimensionValueGetter(width)).GetParamValue();
 
             // логические флаги для обозначений разделов отверстия
             var isEomValueGetter = new IsEomValueGetter(_incomingTasks);
