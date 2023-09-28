@@ -1,0 +1,10 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitPlatformSettings",
+  "PublishDirectory": "C:\\Users\\biseuv_o\\AppData\\Roaming\\pyRevit\\Extensions\\01.BIM.extension\\BIM.tab\\bin",
+  "IconUrl": "https://icons8.com/icon/14099/settings",
+  "BundleName": "Настройки",
+  "BundleType": "SmartButton",
+  "BundleOutput": "C:\\Users\\biseuv_o\\AppData\\Roaming\\pyRevit\\Extensions\\01.BIM.extension\\BIM.tab\\Установки.panel\\настройки.stack"
+}
