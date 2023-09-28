@@ -8,3 +8,8 @@ tooltip:
 
 assembly: ${{ gen.plugin_name }}.dll
 command_class: ${{ gen.plugin_command }}
+
+author: ${{ gen.author }}
+
+min_revit_version: ${{ gen.min_revit_version }}
+max_revit_version: ${{ gen.max_revit_version }}
