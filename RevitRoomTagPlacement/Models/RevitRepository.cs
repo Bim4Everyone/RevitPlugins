@@ -66,7 +66,8 @@ namespace RevitRoomTagPlacement.Models {
 
         public void PlaceTagsCommand(IList<RoomGroupViewModel> RoomGroups, 
                                     ElementId SelectedTagType, 
-                                    GroupPlacementWay groupPlacementWay) {
+                                    GroupPlacementWay groupPlacementWay,
+                                    string roomName = "") {
             var selectedGroups = RoomGroups.Where(x => x.IsChecked);
 
             if(groupPlacementWay == GroupPlacementWay.EveryRoom) {
@@ -74,8 +75,12 @@ namespace RevitRoomTagPlacement.Models {
                 PlaceTags(rooms, SelectedTagType);
 
             } 
-            else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroup) {
+            else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupRandom) {
                 var rooms = selectedGroups.Select(x => x.Rooms.First());
+                PlaceTags(rooms, SelectedTagType);
+            } 
+            else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupByName) {
+                var rooms = selectedGroups.Select(x => x.Rooms.Where(y => y.GetParamValue<string>(BuiltInParameter.ROOM_NAME) == roomName).First());
                 PlaceTags(rooms, SelectedTagType);
             }
         }

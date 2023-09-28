@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 namespace RevitRoomTagPlacement.Models {
     public enum GroupPlacementWay {
         EveryRoom = 0,
-        OneRoomPerGroup = 1
+        OneRoomPerGroupRandom = 1,
+        OneRoomPerGroupByName = 2
     }
 
     public enum PositionPlacementWay {

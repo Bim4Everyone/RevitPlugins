@@ -21,6 +21,7 @@ namespace RevitRoomTagPlacement.ViewModels {
     internal abstract class RevitViewModel : BaseViewModel {
         protected readonly RevitRepository _revitRepository;
         private RoomTagTypeModel _selectedTagType;
+        private string _selectedRoomName;
         private GroupPlacementWay placementWayByGroups = GroupPlacementWay.EveryRoom;
         private ObservableCollection<string> roomNames;
 
@@ -35,7 +36,7 @@ namespace RevitRoomTagPlacement.ViewModels {
         }
 
         private void RoomGroups_ListChanged(object sender, ListChangedEventArgs e) {
-            RoomNames = _revitRepository.GetRoomNames(RoomGroups);
+            if(IsOneRoomPerGroupByName) RoomNames = _revitRepository.GetRoomNames(RoomGroups);
         }
 
         public string Name { get; set; }
@@ -66,7 +67,8 @@ namespace RevitRoomTagPlacement.ViewModels {
                 placementWayByGroups = value;
                 OnPropertyChanged("PlacementWayByGroups");
                 OnPropertyChanged("IsEveryRoom");
-                OnPropertyChanged("IsOneRoomPerGroup");
+                OnPropertyChanged("OneRoomPerGroupRandom");
+                OnPropertyChanged("OneRoomPerGroupByName");
             }
         }
 
@@ -75,9 +77,14 @@ namespace RevitRoomTagPlacement.ViewModels {
             set { PlacementWayByGroups = value ? GroupPlacementWay.EveryRoom : PlacementWayByGroups; }
         }
 
-        public bool IsOneRoomPerGroup {
-            get { return PlacementWayByGroups == GroupPlacementWay.OneRoomPerGroup; }
-            set { PlacementWayByGroups = value ? GroupPlacementWay.OneRoomPerGroup : PlacementWayByGroups; }
+        public bool IsOneRoomPerGroupRandom {
+            get { return PlacementWayByGroups == GroupPlacementWay.OneRoomPerGroupRandom; }
+            set { PlacementWayByGroups = value ? GroupPlacementWay.OneRoomPerGroupRandom : PlacementWayByGroups; }
+        }
+
+        public bool IsOneRoomPerGroupByName {
+            get { return PlacementWayByGroups == GroupPlacementWay.OneRoomPerGroupByName; }
+            set { PlacementWayByGroups = value ? GroupPlacementWay.OneRoomPerGroupByName : PlacementWayByGroups; }
         }
 
         public RoomTagTypeModel SelectedTagType {
@@ -85,10 +92,16 @@ namespace RevitRoomTagPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedTagType, value);
         }
 
+        public string SelectedRoomName {
+            get => _selectedRoomName;
+            set => this.RaiseAndSetIfChanged(ref _selectedRoomName, value);
+        }
+
         private void PlaceTags(object p) {
             _revitRepository.PlaceTagsCommand(RoomGroups, 
                                               SelectedTagType.TagId,
-                                              PlacementWayByGroups);
+                                              PlacementWayByGroups,
+                                              SelectedRoomName);
         }
 
         private bool CanPlaceTags(object p) {
