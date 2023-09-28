@@ -24,6 +24,7 @@ namespace RevitRoomTagPlacement.ViewModels {
         private string _selectedRoomName;
         private GroupPlacementWay placementWayByGroups = GroupPlacementWay.EveryRoom;
         private ObservableCollection<string> roomNames;
+        private string _errorText;
 
         public RevitViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
@@ -36,7 +37,8 @@ namespace RevitRoomTagPlacement.ViewModels {
         }
 
         private void RoomGroups_ListChanged(object sender, ListChangedEventArgs e) {
-            if(IsOneRoomPerGroupByName) RoomNames = _revitRepository.GetRoomNames(RoomGroups);
+            if(IsOneRoomPerGroupByName)
+                OnPropertyChanged("RoomNames");
         }
 
         public string Name { get; set; }
@@ -46,13 +48,8 @@ namespace RevitRoomTagPlacement.ViewModels {
         public BindingList<RoomGroupViewModel> RoomGroups { get; }
 
         public ObservableCollection<string> RoomNames {
-            get {
-                return roomNames;                
-            }
-            set {
-                roomNames = value;
-                OnPropertyChanged();
-            }
+            get => _revitRepository.GetRoomNames(RoomGroups);  
+            set { }
         }
 
         public List<RoomTagTypeModel> TagFamilies { get; }
@@ -69,6 +66,7 @@ namespace RevitRoomTagPlacement.ViewModels {
                 OnPropertyChanged("IsEveryRoom");
                 OnPropertyChanged("OneRoomPerGroupRandom");
                 OnPropertyChanged("OneRoomPerGroupByName");
+                OnPropertyChanged("RoomNames");
             }
         }
 
@@ -97,6 +95,11 @@ namespace RevitRoomTagPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedRoomName, value);
         }
 
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
         private void PlaceTags(object p) {
             _revitRepository.PlaceTagsCommand(RoomGroups, 
                                               SelectedTagType.TagId,
@@ -105,6 +108,20 @@ namespace RevitRoomTagPlacement.ViewModels {
         }
 
         private bool CanPlaceTags(object p) {
+            if(RoomGroups.Where(x => x.IsChecked).Count() == 0) {
+                ErrorText = "Группы не выбраны";
+                return false; 
+            }
+            if(IsOneRoomPerGroupByName && RoomNames.Count == 0) {
+                ErrorText = "Для выбранных групп нет общих помещений";
+                return false;
+            }
+            if(IsOneRoomPerGroupByName && SelectedRoomName == null) {
+                ErrorText = "Имя помещения не выбрано";
+                return false;
+            }
+
+            ErrorText = "";
             return true;
         }
     }

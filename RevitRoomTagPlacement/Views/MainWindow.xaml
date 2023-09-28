@@ -101,6 +101,7 @@
                 Margin="10"
                 Foreground="Orange"
                 VerticalAlignment="Center"
+                DataContext="{Binding RevitViewModel}"
                 Text="{Binding ErrorText}" />
 
             <Button

@@ -17,7 +17,6 @@ namespace RevitRoomTagPlacement.ViewModels {
 
         private RevitViewModel _revitViewModel;
 
-        private string _errorText;
         private string _saveProperty;
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
@@ -44,11 +43,6 @@ namespace RevitRoomTagPlacement.ViewModels {
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
-
-        public string ErrorText {
-            get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
-        }
 
         public string SaveProperty {
             get => _saveProperty;
