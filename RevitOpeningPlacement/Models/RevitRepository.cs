@@ -102,26 +102,6 @@ namespace RevitOpeningPlacement.Models {
         };
 
         /// <summary>
-        /// Словарь типов проемов и названий семейств чистовых отверстий
-        /// </summary>
-        public static Dictionary<OpeningType, string> OpeningRealFamilyName { get; } = new Dictionary<OpeningType, string>() {
-            {OpeningType.FloorRectangle, "Окн_Отв_Прямоуг_Перекрытие" },
-            {OpeningType.FloorRound, "Окн_Отв_Круг_Перекрытие" },
-            {OpeningType.WallRectangle, "Окн_Отв_Прямоуг_Стена" },
-            {OpeningType.WallRound, "Окн_Отв_Круг_Стена" },
-        };
-
-        public static List<string> WallFamilyNames { get; } = new List<string> {
-            OpeningTaskFamilyName[OpeningType.WallRound],
-            OpeningTaskFamilyName[OpeningType.WallRectangle]
-        };
-
-        public static List<string> FloorFamilyNames { get; } = new List<string> {
-            OpeningTaskFamilyName[OpeningType.FloorRectangle],
-            OpeningTaskFamilyName[OpeningType.FloorRound]
-        };
-
-        /// <summary>
         /// Словарь типов проемов и названий типов семейств заданий на отверстия
         /// </summary>
         public static Dictionary<OpeningType, string> OpeningTaskTypeName => new Dictionary<OpeningType, string>() {
@@ -132,14 +112,40 @@ namespace RevitOpeningPlacement.Models {
         };
 
         /// <summary>
-        /// Словарь типов проемов и названий типов семейств чистовых отверстий
+        /// Словарь типов проемов и названий семейств чистовых отверстий АР
         /// </summary>
-        public static Dictionary<OpeningType, string> OpeningRealTypeName => new Dictionary<OpeningType, string>() {
+        public static Dictionary<OpeningType, string> OpeningRealArFamilyName { get; } = new Dictionary<OpeningType, string>() {
             {OpeningType.FloorRectangle, "Окн_Отв_Прямоуг_Перекрытие" },
             {OpeningType.FloorRound, "Окн_Отв_Круг_Перекрытие" },
             {OpeningType.WallRectangle, "Окн_Отв_Прямоуг_Стена" },
             {OpeningType.WallRound, "Окн_Отв_Круг_Стена" },
         };
+
+        /// <summary>
+        /// Словарь типов проемов и названий типов семейств чистовых отверстий АР
+        /// </summary>
+        public static Dictionary<OpeningType, string> OpeningRealArTypeName => new Dictionary<OpeningType, string>() {
+            {OpeningType.FloorRectangle, "Окн_Отв_Прямоуг_Перекрытие" },
+            {OpeningType.FloorRound, "Окн_Отв_Круг_Перекрытие" },
+            {OpeningType.WallRectangle, "Окн_Отв_Прямоуг_Стена" },
+            {OpeningType.WallRound, "Окн_Отв_Круг_Стена" },
+        };
+
+        /// <summary>
+        /// Словарь типов проемов и названий семейств чистовых отверстий КР
+        /// </summary>
+        public static Dictionary<OpeningType, string> OpeningRealKrFamilyName { get; } = new Dictionary<OpeningType, string>() {
+            {OpeningType.FloorRectangle, "ОбщМд_Отверстие_Перекрытие_Прямоугольное" },
+            {OpeningType.WallRectangle, "ОбщМд_Отверстие_Стена_Прямоугольное"},
+            {OpeningType.WallRound, "ОбщМд_Отверстие_Стена_Круглое"}
+        };
+
+        public static Dictionary<OpeningType, string> OpeningRealKrTypeName { get; } = new Dictionary<OpeningType, string>() {
+            {OpeningType.FloorRectangle, "Отверстие прямоугольное"},
+            {OpeningType.WallRectangle, "Отверстие прямоугольное" },
+            {OpeningType.WallRound, "Отверстие круглое" }
+        };
+
 
         public const string OpeningDiameter = "ADSK_Размер_Диаметр";
         public const string OpeningThickness = "ADSK_Размер_Глубина";
@@ -206,7 +212,7 @@ namespace RevitOpeningPlacement.Models {
                 .OfCategory(BuiltInCategory.OST_Windows)
                 .WhereElementIsElementType()
                 .OfType<FamilySymbol>()
-                .FirstOrDefault(item => item.Name.Equals(OpeningRealTypeName[type]) && item.FamilyName.Equals(OpeningRealFamilyName[type]));
+                .FirstOrDefault(item => item.Name.Equals(OpeningRealArTypeName[type]) && item.FamilyName.Equals(OpeningRealArFamilyName[type]));
         }
 
         /// <summary>
@@ -230,7 +236,7 @@ namespace RevitOpeningPlacement.Models {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(Family))
                 .OfType<Family>()
-                .FirstOrDefault(item => item?.Name?.Equals(OpeningRealFamilyName[openingType], StringComparison.CurrentCulture) == true);
+                .FirstOrDefault(item => item?.Name?.Equals(OpeningRealArFamilyName[openingType], StringComparison.CurrentCulture) == true);
         }
 
         public Transaction GetTransaction(string transactionName) {
@@ -876,8 +882,8 @@ namespace RevitOpeningPlacement.Models {
 
             if(OpeningTaskFamilyName.Values.Contains(familyName)) {
                 openingTypeAndFamNameDict = OpeningTaskFamilyName;
-            } else if(OpeningRealFamilyName.Values.Contains(familyName)) {
-                openingTypeAndFamNameDict = OpeningRealFamilyName;
+            } else if(OpeningRealArFamilyName.Values.Contains(familyName)) {
+                openingTypeAndFamNameDict = OpeningRealArFamilyName;
             } else {
                 return OpeningType.WallRectangle;
             }
@@ -890,7 +896,7 @@ namespace RevitOpeningPlacement.Models {
         /// <param name="familyName">Название семейства архитектурного проема</param>
         /// <returns></returns>
         public static OpeningType GetOpeningRealArType(string familyName) {
-            return OpeningRealFamilyName.FirstOrDefault(pair => pair.Value.Equals(familyName, StringComparison.CurrentCultureIgnoreCase)).Key;
+            return OpeningRealArFamilyName.FirstOrDefault(pair => pair.Value.Equals(familyName, StringComparison.CurrentCultureIgnoreCase)).Key;
         }
 
         /// <summary>

@@ -18,7 +18,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningPlacement.Checkers {
             _openingType = openingType;
         }
 
-        public string GetErrorMessage() => $"В проекте отсутствует семейство \"{RevitRepository.OpeningRealFamilyName[_openingType]}\".";
+        public string GetErrorMessage() => $"В проекте отсутствует семейство \"{RevitRepository.OpeningRealArFamilyName[_openingType]}\".";
 
         public bool IsCorrect() {
             return _revitRepository.GetOpeningRealFamily(_openingType) != null;
