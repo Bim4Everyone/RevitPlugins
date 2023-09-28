@@ -96,7 +96,7 @@ namespace RevitOpeningPlacement.OpeningModels {
             Solid thisOpeningRealSolidAfterIntersection = thisOpeningRealSolid;
 
             foreach(IMepLinkElementsProvider link in mepLinkElementsProviders) {
-                ICollection<ElementId> intersectingLinkElements = GetIntersectingLinkElements(link, out Solid thisOpeningRealSolidInLinkCoordinates);
+                ICollection<ElementId> intersectingLinkElements = GetIntersectingLinkElements(link);
                 if(intersectingLinkElements.Count > 0) {
                     if(LinkElementsIntersectHost(link, intersectingLinkElements)) {
                         Status = OpeningRealStatus.NotActual;
@@ -205,10 +205,9 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Возвращает коллекцию элементов ВИС и элементов заданий на отверстия из связанного файла
         /// </summary>
         /// <param name="mepLink">Связанный файл с элементами ВИС и заданиями на отверстия</param>
-        /// <param name="thisOpeningRealSolidInLinkCoordinates">Солид текущего чистового отверстия в координатах связанного файла</param>
         /// <returns></returns>
-        private ICollection<ElementId> GetIntersectingLinkElements(IMepLinkElementsProvider mepLink, out Solid thisOpeningRealSolidInLinkCoordinates) {
-            thisOpeningRealSolidInLinkCoordinates = SolidUtils.CreateTransformed(GetSolid(), mepLink.DocumentTransform.Inverse);
+        private ICollection<ElementId> GetIntersectingLinkElements(IMepLinkElementsProvider mepLink) {
+            Solid thisOpeningRealSolidInLinkCoordinates = SolidUtils.CreateTransformed(GetSolid(), mepLink.DocumentTransform.Inverse);
 
             var mepElements = GetIntersectingLinkMepElements(mepLink, thisOpeningRealSolidInLinkCoordinates).ToHashSet();
             var openingTasks = GetIntersectingLinkOpeningTasks(mepLink, thisOpeningRealSolidInLinkCoordinates);
