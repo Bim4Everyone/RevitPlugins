@@ -4,6 +4,7 @@
 2. [Jetbrains Rider](https://www.jetbrains.com/rider) за предоставление IDE.
 2. [Visual Studio](https://visualstudio.microsoft.com/vs/) за предоставление IDE.
 3. [PVS-Studio](https://pvs-studio.com/en/pvs-studio/) за предоставление анализатора кода.
+4. [Nuke Build](https://nuke.build/) за предоставление билд утилиты.
 3. [Ninject](https://github.com/ninject/Ninject) за предоставление библиотеки.
 4. [Vanara](https://github.com/dahall/vanara) за предоставление библиотеки.
 5. [DevExpress](https://www.devexpress.com/) за предоставление фреймворка.
