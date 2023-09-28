@@ -15,14 +15,14 @@ namespace RevitOpeningPlacement.OpeningModels {
     /// <summary>
     /// Базовый класс полого экземпляра семейства
     /// </summary>
-    internal abstract class OpeningRealBase : ISolidProvider {
+    internal abstract class OpeningRealBase : IOpeningReal {
         /// <summary>
         /// Экземпляр семейства чистового отверстия
         /// </summary>
         private protected readonly FamilyInstance _familyInstance;
 
         /// <summary>
-        /// Закэшированный солид
+        /// Закэшированный солид в координатах файла
         /// </summary>
         private protected Solid _solid;
 
@@ -48,14 +48,10 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
 
-        public Solid GetSolid() {
-            return _solid;
-        }
+        public abstract Solid GetSolid();
 
+        public abstract BoundingBoxXYZ GetTransformedBBoxXYZ();
 
-        public BoundingBoxXYZ GetTransformedBBoxXYZ() {
-            return _boundingBox;
-        }
 
         /// <summary>
         /// Возвращает хост экземпляра семейства отверстия
@@ -63,6 +59,61 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <returns></returns>
         public Element GetHost() {
             return _familyInstance.Host;
+        }
+
+        public FamilyInstance GetFamilyInstance() {
+            return _familyInstance;
+        }
+
+
+        /// <summary>
+        /// Возвращает значение параметра, или пустую строку, если параметра у семейства нет. Значения параметров с типом данных "длина" конвертируются в мм и округляются до 1 мм.
+        /// </summary>
+        /// <param name="paramName"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        private protected string GetFamilyInstanceStringParamValueOrEmpty(string paramName) {
+            if(_familyInstance is null) {
+                throw new ArgumentNullException(nameof(_familyInstance));
+            }
+            string value = string.Empty;
+            if(_familyInstance.GetParameters(paramName).FirstOrDefault(item => item.IsShared) != null) {
+#if REVIT_2022_OR_GREATER
+                if(_familyInstance.GetSharedParam(paramName).Definition.GetDataType() == SpecTypeId.Length) {
+                    return Math.Round(UnitUtils.ConvertFromInternalUnits(GetFamilyInstanceDoubleParamValueOrZero(paramName), UnitTypeId.Millimeters)).ToString();
+                }
+#elif REVIT_2021
+                if(_familyInstance.GetSharedParam(paramName).Definition.ParameterType == ParameterType.Length) {
+                    return Math.Round(UnitUtils.ConvertFromInternalUnits(GetFamilyInstanceDoubleParamValueOrZero(paramName), UnitTypeId.Millimeters)).ToString();
+                }
+#else
+                if(_familyInstance.GetSharedParam(paramName).Definition.UnitType == UnitType.UT_Length) {
+                    return Math.Round(UnitUtils.ConvertFromInternalUnits(GetFamilyInstanceDoubleParamValueOrZero(paramName), DisplayUnitType.DUT_MILLIMETERS)).ToString();
+                }
+#endif
+                object paramValue = _familyInstance.GetParamValue(paramName);
+                if(!(paramValue is null)) {
+                    if(paramValue is double doubleValue) {
+                        value = Math.Round(doubleValue).ToString();
+                    } else {
+                        value = paramValue.ToString();
+                    }
+                }
+            }
+            return value;
+        }
+
+        /// <summary>
+        /// Возвращает значение double параметра экземпляра семейства задания на отверстие в единицах ревита, или 0, если параметр отсутствует
+        /// </summary>
+        /// <param name="paramName">Название параметра</param>
+        /// <returns></returns>
+        private protected double GetFamilyInstanceDoubleParamValueOrZero(string paramName) {
+            if(_familyInstance.GetParameters(paramName).FirstOrDefault(item => item.IsShared) != null) {
+                return _familyInstance.GetSharedParamValue<double>(paramName);
+            } else {
+                return 0;
+            }
         }
 
 

@@ -6,7 +6,6 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SystemParams;
-using dosymep.Revit;
 
 using RevitClashDetective.Models.Extensions;
 
@@ -18,16 +17,16 @@ namespace RevitOpeningPlacement.OpeningModels {
     /// <summary>
     /// Класс, обозначающий чистовое отверстие АР, идущее на чертежи. Использовать для обертки проемов из файла АР, когда активный файл - этот же АР или файл ВИС.
     /// </summary>
-    internal class OpeningRealAr : OpeningRealBase, IEquatable<OpeningRealAr>, IFamilyInstanceProvider {
+    internal class OpeningRealAr : OpeningRealBase, IEquatable<OpeningRealAr> {
         /// <summary>
         /// Создает экземпляр класса <see cref="OpeningRealAr"/>. Использовать для обертки проемов из файла АР, когда активный файл - этот же АР или файл ВИС.
         /// </summary>
         /// <param name="openingReal">Экземпляр семейства чистового отверстия АР, идущего на чертежи</param>
         public OpeningRealAr(FamilyInstance openingReal) : base(openingReal) {
             Id = _familyInstance.Id.IntegerValue;
-            Diameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningDiameter);
-            Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningWidth);
-            Height = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningHeight);
+            Diameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningArDiameter);
+            Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningArWidth);
+            Height = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningArHeight);
             Name = _familyInstance.Name;
             Comment = _familyInstance.GetParamValueStringOrDefault(
                 SystemParamsConfig.Instance.CreateRevitParam(
@@ -79,12 +78,12 @@ namespace RevitOpeningPlacement.OpeningModels {
             return (other != null) && (Id == other.Id);
         }
 
-        /// <summary>
-        /// Возвращает экземпляр семейства чистового отверстия
-        /// </summary>
-        /// <returns></returns>
-        public FamilyInstance GetFamilyInstance() {
-            return _familyInstance;
+        public override Solid GetSolid() {
+            return _solid;
+        }
+
+        public override BoundingBoxXYZ GetTransformedBBoxXYZ() {
+            return _boundingBox;
         }
 
         /// <summary>
@@ -250,56 +249,6 @@ namespace RevitOpeningPlacement.OpeningModels {
                 .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningRealSolidInLinkCoordinates.GetOutline()))
                 .WherePasses(new ElementIntersectsSolidFilter(thisOpeningRealSolidInLinkCoordinates))
                 .ToElementIds();
-        }
-
-        /// <summary>
-        /// Возвращает значение параметра, или пустую строку, если параметра у семейства нет. Значения параметров с типом данных "длина" конвертируются в мм и округляются до 1 мм.
-        /// </summary>
-        /// <param name="paramName"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        private string GetFamilyInstanceStringParamValueOrEmpty(string paramName) {
-            if(_familyInstance is null) {
-                throw new ArgumentNullException(nameof(_familyInstance));
-            }
-            string value = string.Empty;
-            if(_familyInstance.GetParameters(paramName).FirstOrDefault(item => item.IsShared) != null) {
-#if REVIT_2022_OR_GREATER
-                if(_familyInstance.GetSharedParam(paramName).Definition.GetDataType() == SpecTypeId.Length) {
-                    return Math.Round(UnitUtils.ConvertFromInternalUnits(GetFamilyInstanceDoubleParamValueOrZero(paramName), UnitTypeId.Millimeters)).ToString();
-                }
-#elif REVIT_2021
-                if(_familyInstance.GetSharedParam(paramName).Definition.ParameterType == ParameterType.Length) {
-                    return Math.Round(UnitUtils.ConvertFromInternalUnits(GetFamilyInstanceDoubleParamValueOrZero(paramName), UnitTypeId.Millimeters)).ToString();
-                }
-#else
-                if(_familyInstance.GetSharedParam(paramName).Definition.UnitType == UnitType.UT_Length) {
-                    return Math.Round(UnitUtils.ConvertFromInternalUnits(GetFamilyInstanceDoubleParamValueOrZero(paramName), DisplayUnitType.DUT_MILLIMETERS)).ToString();
-                }
-#endif
-                object paramValue = _familyInstance.GetParamValue(paramName);
-                if(!(paramValue is null)) {
-                    if(paramValue is double doubleValue) {
-                        value = Math.Round(doubleValue).ToString();
-                    } else {
-                        value = paramValue.ToString();
-                    }
-                }
-            }
-            return value;
-        }
-
-        /// <summary>
-        /// Возвращает значение double параметра экземпляра семейства задания на отверстие в единицах ревита, или 0, если параметр отсутствует
-        /// </summary>
-        /// <param name="paramName">Название параметра</param>
-        /// <returns></returns>
-        private double GetFamilyInstanceDoubleParamValueOrZero(string paramName) {
-            if(_familyInstance.GetParameters(paramName).FirstOrDefault(item => item.IsShared) != null) {
-                return _familyInstance.GetSharedParamValue<double>(paramName);
-            } else {
-                return 0;
-            }
         }
     }
 }
