@@ -43,4 +43,10 @@ class Build : NukeBuild, ICompile, ICreateScript, IPluginCreate, ICreateBundle, 
         Log.Information("Repository Url: {RepoUrl}", this.From<IHazGitRepository>().GitRepository.HttpsUrl);
         Log.Information("Repository Branch: {RepoBranch}", this.From<IHazGitRepository>().GitRepository.Branch);
     }
+
+    public Target TestTarget => _ => _
+        .Executes(() => {
+            Log.Information("PublishDirectory: {PublishDirectory}",
+                NukeBuildExtensions.GetExtensionsPath(this.From<IHazOutput>().PublishDirectory));
+        });
 }
