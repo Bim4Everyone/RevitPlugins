@@ -680,7 +680,7 @@ namespace RevitOpeningPlacement.Models {
                 var linkDoc = link.GetLinkDocument();
                 var transform = link.GetTransform();
                 var openingsArInLink = GetOpeningsAr(linkDoc)
-                    .Select(famInst => new OpeningArTaskIncoming(famInst, transform));
+                    .Select(famInst => new OpeningArTaskIncoming(this, famInst, transform));
                 openingsArInLinks.UnionWith(openingsArInLink);
             }
             return openingsArInLinks;
