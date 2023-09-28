@@ -26,7 +26,6 @@ namespace RevitBatchPrint.ViewModels {
 
         private string _printParamName;
         private string _errorText;
-        private string _selectAlbumsText;
         private readonly RevitRepository _repository;
 
         private Visibility _visibilitySaveFile;
