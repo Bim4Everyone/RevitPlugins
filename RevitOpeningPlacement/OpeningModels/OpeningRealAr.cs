@@ -62,8 +62,9 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         /// <summary>
         /// Статус текущего отверстия относительно полученных заданий
+        /// <para>Для обновления использовать метод <see cref="UpdateStatus"/></para>
         /// </summary>
-        public OpeningRealStatus Status { get; set; } = OpeningRealStatus.NotActual;
+        public OpeningRealStatus Status { get; private set; } = OpeningRealStatus.NotActual;
 
 
         public override bool Equals(object obj) {

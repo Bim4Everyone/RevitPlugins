@@ -70,6 +70,10 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         public OpeningType OpeningType { get; } = OpeningType.WallRectangle;
 
+        /// <summary>
+        /// Статус входящего задания на отверстие от АР
+        /// <para>Для обновления использовать метод <see cref="UpdateStatus"/></para>
+        /// </summary>
         public OpeningTaskIncomingStatus Status { get; private set; } = OpeningTaskIncomingStatus.New;
 
         /// <summary>

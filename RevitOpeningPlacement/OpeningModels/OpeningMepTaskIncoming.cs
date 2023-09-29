@@ -182,7 +182,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Статус отработки задания на отверстие
         /// <para>Для обновления использовать <see cref="UpdateStatusAndHostName"/></para>
         /// </summary>
-        public OpeningTaskIncomingStatus Status { get; set; } = OpeningTaskIncomingStatus.New;
+        public OpeningTaskIncomingStatus Status { get; private set; } = OpeningTaskIncomingStatus.New;
 
         /// <summary>
         /// Тип проема

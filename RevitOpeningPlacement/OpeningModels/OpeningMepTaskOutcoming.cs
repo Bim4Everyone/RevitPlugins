@@ -126,7 +126,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Флаг, обозначающий статус исходящего задания на отверстие
         /// <para>Для обновления использовать <see cref="UpdateStatus"/></para>
         /// </summary>
-        public OpeningTaskOutcomingStatus Status { get; set; } = OpeningTaskOutcomingStatus.NotActual;
+        public OpeningTaskOutcomingStatus Status { get; private set; } = OpeningTaskOutcomingStatus.NotActual;
 
         /// <summary>
         /// Тип проема
