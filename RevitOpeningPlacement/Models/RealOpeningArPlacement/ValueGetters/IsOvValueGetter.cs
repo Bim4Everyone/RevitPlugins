@@ -9,14 +9,14 @@ using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ValueGetters {
     /// <summary>
-    /// Класс, предоставляющий значение параметра <see cref="RealOpeningPlacer.RealOpeningIsOv"/>
+    /// Класс, предоставляющий значение параметра <see cref="RealOpeningArPlacer.RealOpeningIsOv"/>
     /// </summary>
     internal class IsOvValueGetter : IValueGetter<IntParamValue> {
         private ICollection<OpeningMepTaskIncoming> _incomingMepTasks;
 
 
         /// <summary>
-        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningPlacer.RealOpeningIsOv"/>
+        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningArPlacer.RealOpeningIsOv"/>
         /// </summary>
         /// <param name="openingMepTaskIncoming">Входящее задание на отверстие</param>
         public IsOvValueGetter(OpeningMepTaskIncoming openingMepTaskIncoming) {
@@ -26,7 +26,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ValueGetters {
         }
 
         /// <summary>
-        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningPlacer.RealOpeningIsOv"/>
+        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningArPlacer.RealOpeningIsOv"/>
         /// </summary>
         /// <param name="openingsMepTaskIncoming">Коллекция входящих заданий на отверстия</param>
         public IsOvValueGetter(ICollection<OpeningMepTaskIncoming> openingsMepTaskIncoming) {

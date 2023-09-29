@@ -37,18 +37,18 @@ namespace RevitOpeningPlacement.OpeningModels {
             Location = Transform.OfPoint((_familyInstance.Location as LocationPoint).Point);
             OpeningType = RevitRepository.GetOpeningType(_familyInstance.Symbol.FamilyName);
 
-            DisplayDiameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningArDiameter);
-            DisplayWidth = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningArWidth);
-            DisplayHeight = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningArHeight);
+            DisplayDiameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArDiameter);
+            DisplayWidth = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArWidth);
+            DisplayHeight = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArHeight);
             Comment = _familyInstance.GetParamValueStringOrDefault(
                 SystemParamsConfig.Instance.CreateRevitParam(
                     _familyInstance.Document,
                     BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS),
                 string.Empty);
 
-            Diameter = GetFamilyInstanceDoubleParamValueOrZero(RealOpeningPlacer.RealOpeningArDiameter);
-            Height = GetFamilyInstanceDoubleParamValueOrZero(RealOpeningPlacer.RealOpeningArHeight);
-            Width = GetFamilyInstanceDoubleParamValueOrZero(RealOpeningPlacer.RealOpeningArWidth);
+            Diameter = GetFamilyInstanceDoubleParamValueOrZero(RealOpeningArPlacer.RealOpeningArDiameter);
+            Height = GetFamilyInstanceDoubleParamValueOrZero(RealOpeningArPlacer.RealOpeningArHeight);
+            Width = GetFamilyInstanceDoubleParamValueOrZero(RealOpeningArPlacer.RealOpeningArWidth);
         }
 
 

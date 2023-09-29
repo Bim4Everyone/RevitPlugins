@@ -24,9 +24,9 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="openingReal">Экземпляр семейства чистового отверстия АР, идущего на чертежи</param>
         public OpeningRealAr(FamilyInstance openingReal) : base(openingReal) {
             Id = _familyInstance.Id.IntegerValue;
-            Diameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningArDiameter);
-            Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningArWidth);
-            Height = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningArHeight);
+            Diameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArDiameter);
+            Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArWidth);
+            Height = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArHeight);
             Name = _familyInstance.Name;
             Comment = _familyInstance.GetParamValueStringOrDefault(
                 SystemParamsConfig.Instance.CreateRevitParam(

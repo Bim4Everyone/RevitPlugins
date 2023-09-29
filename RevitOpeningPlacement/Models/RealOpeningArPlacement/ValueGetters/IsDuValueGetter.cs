@@ -9,14 +9,14 @@ using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ValueGetters {
     /// <summary>
-    /// Класс, предоставляющий значение параметра <see cref="RealOpeningPlacer.RealOpeningIsDu"/>
+    /// Класс, предоставляющий значение параметра <see cref="RealOpeningArPlacer.RealOpeningIsDu"/>
     /// </summary>
     internal class IsDuValueGetter : IValueGetter<IntParamValue> {
         private ICollection<OpeningMepTaskIncoming> _incomingMepTasks;
 
 
         /// <summary>
-        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningPlacer.RealOpeningIsDu"/>
+        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningArPlacer.RealOpeningIsDu"/>
         /// </summary>
         /// <param name="openingMepTaskIncoming">Входящее задание на отверстие</param>
         public IsDuValueGetter(OpeningMepTaskIncoming openingMepTaskIncoming) {
@@ -26,7 +26,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ValueGetters {
         }
 
         /// <summary>
-        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningPlacer.RealOpeningIsDu"/>
+        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningArPlacer.RealOpeningIsDu"/>
         /// </summary>
         /// <param name="openingsMepTaskIncoming">Коллекция входящих заданий на отверстия</param>
         public IsDuValueGetter(ICollection<OpeningMepTaskIncoming> openingsMepTaskIncoming) {

@@ -10,14 +10,14 @@ using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ValueGetters {
     /// <summary>
-    /// Класс, предоставляющий значение параметра <see cref="RealOpeningPlacer.RealOpeningTaskId"/>
+    /// Класс, предоставляющий значение параметра <see cref="RealOpeningArPlacer.RealOpeningTaskId"/>
     /// </summary>
     internal class TaskIdValueGetter : IValueGetter<StringParamValue> {
         private ICollection<OpeningMepTaskIncoming> _incomingMepTasks;
 
 
         /// <summary>
-        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningPlacer.RealOpeningTaskId"/>
+        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningArPlacer.RealOpeningTaskId"/>
         /// </summary>
         /// <param name="openingMepTaskIncoming">Входящее задание на отверстие</param>
         public TaskIdValueGetter(OpeningMepTaskIncoming openingMepTaskIncoming) {
@@ -27,7 +27,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ValueGetters {
         }
 
         /// <summary>
-        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningPlacer.RealOpeningTaskId"/>
+        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningArPlacer.RealOpeningTaskId"/>
         /// </summary>
         /// <param name="openingsMepTaskIncoming">Коллекция входящих заданий на отверстия</param>
         public TaskIdValueGetter(ICollection<OpeningMepTaskIncoming> openingsMepTaskIncoming) {

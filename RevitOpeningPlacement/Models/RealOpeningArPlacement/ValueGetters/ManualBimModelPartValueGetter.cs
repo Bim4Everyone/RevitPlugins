@@ -7,14 +7,14 @@ using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ValueGetters {
     /// <summary>
-    /// Класс, предоставляющий значение параметра <see cref="RealOpeningPlacer.RealOpeningManualBimModelPart"/>
+    /// Класс, предоставляющий значение параметра <see cref="RealOpeningArPlacer.RealOpeningManualBimModelPart"/>
     /// </summary>
     internal class ManualBimModelPartValueGetter : IValueGetter<StringParamValue> {
         private readonly HashSet<string> _bimModelPartNames = new HashSet<string>();
 
 
         /// <summary>
-        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningPlacer.RealOpeningManualBimModelPart"/>
+        /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningArPlacer.RealOpeningManualBimModelPart"/>
         /// <para>
         /// После вызова конструктора необходимо задать разделы BIM модели через Set-свойства
         /// </para>

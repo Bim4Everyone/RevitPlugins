@@ -20,7 +20,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
     /// <summary>
     /// Класс для размещения чистовых отверстий в активном документа в местах расположений заданий на отверстия из связанных файлов
     /// </summary>
-    internal class RealOpeningPlacer {
+    internal class RealOpeningArPlacer {
         private readonly RevitRepository _revitRepository;
 
         public const string RealOpeningArDiameter = "ФОП_РАЗМ_Диаметр";
@@ -49,7 +49,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// </summary>
         /// <param name="revitRepository">Репозиторий активного документа ревита, в котором будет происходить размещение чистовых отверстийЫ</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public RealOpeningPlacer(RevitRepository revitRepository) {
+        public RealOpeningArPlacer(RevitRepository revitRepository) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         }
 

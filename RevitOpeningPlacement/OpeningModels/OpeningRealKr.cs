@@ -21,9 +21,9 @@ namespace RevitOpeningPlacement.OpeningModels {
     internal class OpeningRealKr : OpeningRealBase, IEquatable<OpeningRealKr> {
         public OpeningRealKr(FamilyInstance openingReal) : base(openingReal) {
             Id = _familyInstance.Id.IntegerValue;
-            Diameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningKrDiameter);
-            Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningKrInWallWidth);
-            Height = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningPlacer.RealOpeningKrInWallHeight);
+            Diameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningKrDiameter);
+            Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningKrInWallWidth);
+            Height = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningKrInWallHeight);
             Comment = _familyInstance.GetParamValueStringOrDefault(
                 SystemParamsConfig.Instance.CreateRevitParam(
                     _familyInstance.Document,

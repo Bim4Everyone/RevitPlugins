@@ -24,7 +24,7 @@ namespace RevitOpeningPlacement {
             if(!ModelCorrect(revitRepository)) {
                 return;
             }
-            var placer = new RealOpeningPlacer(revitRepository);
+            var placer = new RealOpeningArPlacer(revitRepository);
             placer.PlaceUnitedOpeningByManyTasks();
         }
     }
