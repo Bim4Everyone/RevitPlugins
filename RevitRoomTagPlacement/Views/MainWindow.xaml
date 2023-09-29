@@ -22,17 +22,25 @@
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary  Source="Styles/RadioButtonStyle.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        </ResourceDictionary>
     </Window.Resources>
+    
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="50" />
-            <RowDefinition Height="80" />
-            <RowDefinition Height="50" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="110"/>
+            <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
 
         <ComboBox
@@ -94,6 +102,50 @@
 
         <StackPanel
             Grid.Row="5"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <TextBlock
+                Margin="10"
+                VerticalAlignment="Top"                
+                Text="Позиция размещения марки:" />
+
+            <UniformGrid
+                Margin="10"
+                Height="90"
+                Width="90"
+                                VerticalAlignment="Top"   
+                Rows="3"
+                Columns="3">
+                <UniformGrid.Resources>
+                    <Style 
+                        BasedOn="{StaticResource SquareRadioButton}"
+                        TargetType="{x:Type RadioButton}"/>
+                </UniformGrid.Resources>
+                <RadioButton
+                    GroupName="PlacementPosition"/>
+                <RadioButton
+                    GroupName="PlacementPosition"/>
+                <RadioButton
+                    GroupName="PlacementPosition"/>
+                <RadioButton
+                    GroupName="PlacementPosition"/>
+                <RadioButton
+                    GroupName="PlacementPosition"/>
+                <RadioButton
+                    GroupName="PlacementPosition"/>
+                <RadioButton
+                    GroupName="PlacementPosition"/>
+                <RadioButton
+                    GroupName="PlacementPosition"/>
+                <RadioButton
+                    GroupName="PlacementPosition"/>
+            </UniformGrid>
+            
+        </StackPanel>
+
+        <StackPanel
+            Grid.Row="6"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
