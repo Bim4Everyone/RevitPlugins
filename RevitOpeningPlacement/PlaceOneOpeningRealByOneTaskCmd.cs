@@ -3,7 +3,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using RevitOpeningPlacement.Models;
-using RevitOpeningPlacement.Models.RealOpeningPlacement;
+using RevitOpeningPlacement.Models.RealOpeningArPlacement;
 
 namespace RevitOpeningPlacement {
     /// <summary>

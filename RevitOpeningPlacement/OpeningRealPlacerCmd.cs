@@ -5,7 +5,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 
 using RevitOpeningPlacement.Models;
-using RevitOpeningPlacement.Models.RealOpeningPlacement.Checkers;
+using RevitOpeningPlacement.Models.RealOpeningArPlacement.Checkers;
 
 namespace RevitOpeningPlacement {
     /// <summary>

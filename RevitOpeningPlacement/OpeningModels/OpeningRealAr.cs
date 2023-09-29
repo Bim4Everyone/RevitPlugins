@@ -10,7 +10,7 @@ using dosymep.Bim4Everyone.SystemParams;
 using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models.Interfaces;
-using RevitOpeningPlacement.Models.RealOpeningPlacement;
+using RevitOpeningPlacement.Models.RealOpeningArPlacement;
 using RevitOpeningPlacement.OpeningModels.Enums;
 
 namespace RevitOpeningPlacement.OpeningModels {

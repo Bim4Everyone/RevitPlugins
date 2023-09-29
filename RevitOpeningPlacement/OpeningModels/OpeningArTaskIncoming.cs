@@ -12,7 +12,7 @@ using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Extensions;
-using RevitOpeningPlacement.Models.RealOpeningPlacement;
+using RevitOpeningPlacement.Models.RealOpeningArPlacement;
 using RevitOpeningPlacement.OpeningModels.Enums;
 
 namespace RevitOpeningPlacement.OpeningModels {
