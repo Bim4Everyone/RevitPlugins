@@ -203,16 +203,30 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает типоразмер семейства чистового отверстия из репозитория
+        /// Возвращает типоразмер семейства чистового отверстия АР из репозитория
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public FamilySymbol GetOpeningRealType(OpeningType type) {
+        public FamilySymbol GetOpeningRealArType(OpeningType type) {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_Windows)
                 .WhereElementIsElementType()
                 .OfType<FamilySymbol>()
                 .FirstOrDefault(item => item.Name.Equals(OpeningRealArTypeName[type]) && item.FamilyName.Equals(OpeningRealArFamilyName[type]));
+        }
+
+        /// <summary>
+        /// Возвращает типоразмер семейства чистового отверстия КР из репозитория
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public FamilySymbol GetOpeningRealKrType(OpeningType type) {
+            return new FilteredElementCollector(_document)
+                .OfCategory(BuiltInCategory.OST_GenericModel)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(FamilySymbol))
+                .Cast<FamilySymbol>()
+                .FirstOrDefault(item => item.Name.Equals(OpeningRealKrTypeName[type]) && item.FamilyName.Equals(OpeningRealKrFamilyName[type]));
         }
 
         /// <summary>

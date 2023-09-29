@@ -23,7 +23,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Checkers {
         public string GetErrorMessage() => $"У семейства \"{RevitRepository.OpeningRealArFamilyName[_openingType]}\" отсутствует тип \"{RevitRepository.OpeningRealArTypeName[_openingType]}\".";
 
         public bool IsCorrect() {
-            return _revitRepository.GetOpeningRealType(_openingType) != null;
+            return _revitRepository.GetOpeningRealArType(_openingType) != null;
         }
     }
 }

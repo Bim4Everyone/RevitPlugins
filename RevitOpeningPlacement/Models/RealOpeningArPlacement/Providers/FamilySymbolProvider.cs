@@ -33,10 +33,10 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
         /// <exception cref="ArgumentException"></exception>
         public FamilySymbol GetFamilySymbol() {
             if(_host is Wall) {
-                return _revitRepository.GetOpeningRealType(OpeningType.WallRectangle);
+                return _revitRepository.GetOpeningRealArType(OpeningType.WallRectangle);
 
             } else if(_host is Floor) {
-                return _revitRepository.GetOpeningRealType(OpeningType.FloorRectangle);
+                return _revitRepository.GetOpeningRealArType(OpeningType.FloorRectangle);
             } else {
                 throw new ArgumentException(nameof(_host));
             }

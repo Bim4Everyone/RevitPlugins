@@ -40,18 +40,18 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
             if(_host is Wall) {
                 switch(_openingMepTaskIncoming.OpeningType) {
                     case OpeningType.WallRectangle:
-                    return _revitRepository.GetOpeningRealType(OpeningType.WallRectangle);
+                    return _revitRepository.GetOpeningRealArType(OpeningType.WallRectangle);
                     case OpeningType.WallRound:
-                    return _revitRepository.GetOpeningRealType(OpeningType.WallRound);
+                    return _revitRepository.GetOpeningRealArType(OpeningType.WallRound);
                     default:
                     throw new ArgumentException("Тип основы задания на отверстие не является стеной");
                 }
             } else if(_host is Floor) {
                 switch(_openingMepTaskIncoming.OpeningType) {
                     case OpeningType.FloorRectangle:
-                    return _revitRepository.GetOpeningRealType(OpeningType.FloorRectangle);
+                    return _revitRepository.GetOpeningRealArType(OpeningType.FloorRectangle);
                     case OpeningType.FloorRound:
-                    return _revitRepository.GetOpeningRealType(OpeningType.FloorRound);
+                    return _revitRepository.GetOpeningRealArType(OpeningType.FloorRound);
                     default:
                     throw new ArgumentException("Тип основы задания на отверстие не является перекрытием");
                 }
