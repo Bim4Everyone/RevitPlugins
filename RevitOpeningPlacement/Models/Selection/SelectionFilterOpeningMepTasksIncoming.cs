@@ -9,15 +9,15 @@ namespace RevitOpeningPlacement.Models.Selection {
     /// <summary>
     /// Фильтр выбора пользователем экземпляров семейств заданий на отверстия из связанных файлов, подгруженных в активный документ
     /// </summary>
-    internal class SelectionFilterOpeningTasksIncoming : ISelectionFilter {
-        private Document _activeDocument;
+    internal class SelectionFilterOpeningMepTasksIncoming : ISelectionFilter {
+        private readonly Document _activeDocument;
 
         /// <summary>
         /// Конструктор фильтра выбора пользователем экземпляров семейств заданий на отверстия из связанных файлов, подгруженных в активный документ
         /// </summary>
         /// <param name="activeDocument">Активный документ, в который подгружены связи с заданиями на отверстия</param>
-        public SelectionFilterOpeningTasksIncoming(Document activeDocument) {
-            _activeDocument = activeDocument;
+        public SelectionFilterOpeningMepTasksIncoming(Document activeDocument) {
+            _activeDocument = activeDocument ?? throw new System.ArgumentNullException(nameof(activeDocument));
         }
 
 

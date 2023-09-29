@@ -9,11 +9,11 @@ namespace RevitOpeningPlacement.Models.Selection {
     /// <summary>
     /// Фильтр выбора пользователем экземпляров семейств заданий на отверстия из активного документа
     /// </summary>
-    internal class SelectionFilterOpeningTasksOutcoming : ISelectionFilter {
+    internal class SelectionFilterOpeningMepTasksOutcoming : ISelectionFilter {
         /// <summary>
         /// Конструктор фильтра выбора пользователем экземпляров семейств заданий на отверстия из активного документа
         /// </summary>
-        public SelectionFilterOpeningTasksOutcoming() { }
+        public SelectionFilterOpeningMepTasksOutcoming() { }
 
 
         public bool AllowElement(Element elem) {

@@ -6,7 +6,6 @@ using System.Text;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
-using dosymep.SimpleServices;
 
 using RevitClashDetective.Models.Extensions;
 
@@ -18,7 +17,7 @@ using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
     /// <summary>
-    /// Класс для размещения чистовых отверстий в активном документа в местах расположений заданий на отверстия из связанных файлов
+    /// Класс для размещения чистовых отверстий АР в активном документе в местах расположений заданий на отверстия из связанных файлов ВИС
     /// </summary>
     internal class RealOpeningArPlacer {
         private readonly RevitRepository _revitRepository;
@@ -26,13 +25,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         public const string RealOpeningArDiameter = "ФОП_РАЗМ_Диаметр";
         public const string RealOpeningArWidth = "ФОП_РАЗМ_Ширина проёма";
         public const string RealOpeningArHeight = "ФОП_РАЗМ_Высота проёма";
-
-        public const string RealOpeningKrDiameter = "ФОП_РАЗМ_Диаметр";
-        public const string RealOpeningKrInWallWidth = "ФОП_РАЗМ_Ширина";
-        public const string RealOpeningKrInWallHeight = "ФОП_РАЗМ_Высота";
-        public const string RealOpeningKrInFloorWidth = "мод_ФОП_Габарит А";
-        public const string RealOpeningKrInFloorHeight = "мод_ФОП_Габарит Б";
-
         public const string RealOpeningIsEom = "ЭОМ";
         public const string RealOpeningIsSs = "СС";
         public const string RealOpeningIsOv = "ОВ";
@@ -45,9 +37,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
 
 
         /// <summary>
-        /// Конструктор класса для размещения чистовых отверстий в активном документа в местах расположений заданий на отверстия из связанных файлов
+        /// Конструктор класса для размещения чистовых отверстий АР в активном документе в местах расположений заданий на отверстия из связанных файлов ВИС
         /// </summary>
-        /// <param name="revitRepository">Репозиторий активного документа ревита, в котором будет происходить размещение чистовых отверстийЫ</param>
+        /// <param name="revitRepository">Репозиторий активного АР документа ревита, в котором будет происходить размещение чистовых отверстий</param>
         /// <exception cref="ArgumentNullException"></exception>
         public RealOpeningArPlacer(RevitRepository revitRepository) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
@@ -59,23 +51,18 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// </summary>
         public void PlaceSingleOpeningByOneTask() {
             Element host = _revitRepository.PickHostForRealOpening();
-            OpeningMepTaskIncoming openingTask = _revitRepository.PickSingleOpeningTaskIncoming();
+            OpeningMepTaskIncoming openingTask = _revitRepository.PickSingleOpeningMepTaskIncoming();
 
             using(var transaction = _revitRepository.GetTransaction("Размещение одиночного отверстия")) {
                 try {
                     if(openingTask.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())) {
                         PlaceByOneTask(host, openingTask);
                     } else {
-                        _revitRepository.GetMessageBoxService().Show(
-                            "Выбранное задание на отверстие не пересекается c выбранной основой",
-                            "Задания на отверстия",
-                            System.Windows.MessageBoxButton.OK,
-                            System.Windows.MessageBoxImage.Error,
-                            System.Windows.MessageBoxResult.OK);
+                        _revitRepository.ShowErrorMessage("Выбранное задание на отверстие не пересекается c выбранной основой");
                         throw new OperationCanceledException();
                     }
                 } catch(OpeningNotPlacedException e) {
-                    ShowErrorMessage(e.Message);
+                    _revitRepository.ShowErrorMessage(e.Message);
                     throw new OperationCanceledException();
                 }
                 transaction.Commit();
@@ -87,7 +74,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// </summary>
         public void PlaceUnitedOpeningByManyTasks() {
             Element host = _revitRepository.PickHostForRealOpening();
-            HashSet<OpeningMepTaskIncoming> openingTasks = _revitRepository.PickManyOpeningTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
+            HashSet<OpeningMepTaskIncoming> openingTasks = _revitRepository.PickManyOpeningMepTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
 
             try {
                 if(openingTasks.Count > 0) {
@@ -97,16 +84,11 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
                         transaction.Commit();
                     }
                 } else {
-                    _revitRepository.GetMessageBoxService().Show(
-                        "Ни одно из выбранных заданий на отверстия не пересекается c выбранной основой",
-                        "Задания на отверстия",
-                        System.Windows.MessageBoxButton.OK,
-                        System.Windows.MessageBoxImage.Error,
-                        System.Windows.MessageBoxResult.OK);
+                    _revitRepository.ShowErrorMessage("Ни одно из выбранных заданий на отверстия не пересекается c выбранной основой");
                     throw new OperationCanceledException();
                 }
             } catch(OpeningNotPlacedException e) {
-                ShowErrorMessage(e.Message);
+                _revitRepository.ShowErrorMessage(e.Message);
                 throw new OperationCanceledException();
             }
         }
@@ -116,7 +98,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// </summary>
         public void PlaceSingleOpeningsInOneHost() {
             Element host = _revitRepository.PickHostForRealOpening();
-            HashSet<OpeningMepTaskIncoming> openingTasks = _revitRepository.PickManyOpeningTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
+            HashSet<OpeningMepTaskIncoming> openingTasks = _revitRepository.PickManyOpeningMepTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
 
             StringBuilder sb = new StringBuilder();
             using(var transaction = _revitRepository.GetTransaction("Одиночные отверстия в одном хосте")) {
@@ -133,7 +115,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
                 transaction.Commit();
             }
             if(sb.Length > 0) {
-                ShowErrorMessage(sb.ToString());
+                _revitRepository.ShowErrorMessage(sb.ToString());
             }
         }
 
@@ -178,24 +160,10 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
                 transaction.Commit();
             }
             if(sb.Length > 0) {
-                ShowErrorMessage(sb.ToString());
+                _revitRepository.ShowErrorMessage(sb.ToString());
             }
         }
 
-
-        /// <summary>
-        /// Выводит сообщение об ошибке пользователю
-        /// </summary>
-        /// <param name="message">Сообщение об ошибке</param>
-        private void ShowErrorMessage(string message) {
-            IMessageBoxService dialog = _revitRepository.GetMessageBoxService();
-            dialog.Show(
-                $"{message}",
-                "Задания на отверстия",
-                System.Windows.MessageBoxButton.OK,
-                System.Windows.MessageBoxImage.Error,
-                System.Windows.MessageBoxResult.OK);
-        }
 
         /// <summary>
         /// Размещает экземпляр семейства чистового отверстия по одному заданию на отверстие, принимая точку вставки и параметры габаритов из задания на отверстие.

@@ -11,7 +11,7 @@ using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
-using RevitOpeningPlacement.Models.RealOpeningArPlacement;
+using RevitOpeningPlacement.Models.RealOpeningKrPlacement;
 using RevitOpeningPlacement.OpeningModels.Enums;
 
 namespace RevitOpeningPlacement.OpeningModels {
@@ -21,9 +21,9 @@ namespace RevitOpeningPlacement.OpeningModels {
     internal class OpeningRealKr : OpeningRealBase, IEquatable<OpeningRealKr> {
         public OpeningRealKr(FamilyInstance openingReal) : base(openingReal) {
             Id = _familyInstance.Id.IntegerValue;
-            Diameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningKrDiameter);
-            Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningKrInWallWidth);
-            Height = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningKrInWallHeight);
+            Diameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningKrPlacer.RealOpeningKrDiameter);
+            Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningKrPlacer.RealOpeningKrInWallWidth);
+            Height = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningKrPlacer.RealOpeningKrInWallHeight);
             Comment = _familyInstance.GetParamValueStringOrDefault(
                 SystemParamsConfig.Instance.CreateRevitParam(
                     _familyInstance.Document,
