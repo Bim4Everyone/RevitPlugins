@@ -35,6 +35,8 @@ namespace RevitOpeningPlacement.OpeningModels {
             Id = _familyInstance.Id.IntegerValue;
             Transform = transform;
             Location = Transform.OfPoint((_familyInstance.Location as LocationPoint).Point);
+            // https://forums.autodesk.com/t5/revit-api-forum/get-angle-from-transform-basisx-basisy-and-basisz/td-p/5326059
+            Rotation = (_familyInstance.Location as LocationPoint).Rotation + Transform.BasisX.AngleOnPlaneTo(Transform.OfVector(Transform.BasisX), Transform.BasisZ);
             OpeningType = RevitRepository.GetOpeningType(_familyInstance.Symbol.FamilyName);
 
             DisplayDiameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArDiameter);
@@ -65,6 +67,11 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Точка расположения экземпляра семейства входящего задания на отверстие в координатах активного документа - получателя заданий
         /// </summary>
         public XYZ Location { get; }
+
+        /// <summary>
+        /// Угол поворота задания на отверстие в радианах в координатах активного файла, в который подгружена связь с заданием на отверстие от АР
+        /// </summary>
+        public double Rotation { get; }
 
         public string Comment { get; } = string.Empty;
 
