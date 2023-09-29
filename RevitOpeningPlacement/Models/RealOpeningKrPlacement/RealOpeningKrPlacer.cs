@@ -11,6 +11,9 @@ using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models.Exceptions;
 using RevitOpeningPlacement.Models.Extensions;
+using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Models.RealOpeningKrPlacement.PointFinders;
+using RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
@@ -35,6 +38,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         public RealOpeningKrPlacer(RevitRepository revitRepository) {
             _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
         }
+
 
         /// <summary>
         /// Размещение чистового отверстия КР по одному заданию на отверстие из связи АР в одном хосте
@@ -113,7 +117,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
             }
         }
 
-
         /// <summary>
         /// Размещение нескольких одиночных чистовых отверстий КР в выбранных хостах по всем заданиям на отверстия из связи(ей) АР, которые пересекаются с этими хостами
         /// </summary>
@@ -165,7 +168,30 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <param name="openingTask">Входящее задание на отверстие из АР</param>
         /// <exception cref="OpeningNotPlacedException"></exception>
         private void PlaceByOneTask(Element host, OpeningArTaskIncoming openingTask) {
+            try {
+                var symbol = GetFamilySymbol(host, openingTask);
+                var pointFinder = GetPointFinder(openingTask);
+                var point = pointFinder.GetPoint();
 
+                var instance = _revitRepository.CreateInstance(point, symbol, host) ?? throw new OpeningNotPlacedException("Не удалось создать экземпляр семейства");
+
+                var parameterGetter = GetParameterGetter(openingTask, pointFinder);
+                SetParamValues(instance, parameterGetter);
+
+                var angleFinder = GetAngleFinder(openingTask);
+                _revitRepository.RotateElement(instance, point, angleFinder.GetAngle());
+
+                _revitRepository.SetSelection(instance.Id);
+
+            } catch(Autodesk.Revit.Exceptions.ArgumentNullException exAutodeskNull) {
+                throw new OpeningNotPlacedException(exAutodeskNull.Message);
+            } catch(Autodesk.Revit.Exceptions.ArgumentException exAutodeskArg) {
+                throw new OpeningNotPlacedException(exAutodeskArg.Message);
+            } catch(ArgumentNullException exFrameworkNull) {
+                throw new OpeningNotPlacedException(exFrameworkNull.Message);
+            } catch(ArgumentException exFrameworkArg) {
+                throw new OpeningNotPlacedException(exFrameworkArg.Message);
+            }
         }
 
         /// <summary>
@@ -173,10 +199,119 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <para>Транзакция внутри метода не запускается</para>
         /// </summary>
         /// <param name="host">Основа для чистового отверстия КР</param>
-        /// <param name="openingTasks">Входящие задания на отверстия из АР</param>
+        /// <param name="incomingTasks">Входящие задания на отверстия из АР</param>
         /// <exception cref="OpeningNotPlacedException"></exception>
-        private void PlaceUnitedByManyTasks(Element host, HashSet<OpeningArTaskIncoming> openingTasks) {
+        private void PlaceUnitedByManyTasks(Element host, ICollection<OpeningArTaskIncoming> incomingTasks) {
+            try {
+                var symbol = GetFamilySymbol(host);
+                var pointFinder = GetPointFinder(host, incomingTasks);
+                var point = pointFinder.GetPoint();
 
+                var instance = _revitRepository.CreateInstance(point, symbol, host);
+
+                var parameterGetter = GetParameterGetter(host, incomingTasks, pointFinder);
+                SetParamValues(instance, parameterGetter);
+
+                _revitRepository.SetSelection(instance.Id);
+
+            } catch(Autodesk.Revit.Exceptions.ArgumentNullException exAutodeskNull) {
+                throw new OpeningNotPlacedException(exAutodeskNull.Message);
+            } catch(Autodesk.Revit.Exceptions.ArgumentException exAutodeskArg) {
+                throw new OpeningNotPlacedException(exAutodeskArg.Message);
+            } catch(ArgumentNullException exFrameworkNull) {
+                throw new OpeningNotPlacedException(exFrameworkNull.Message);
+            } catch(ArgumentException exFrameworkArg) {
+                throw new OpeningNotPlacedException(exFrameworkArg.Message);
+            }
+        }
+
+        /// <summary>
+        /// Возвращает интерфейс, предоставляющий угол поворота размещаемого КР отверстия
+        /// </summary>
+        /// <param name="incomingTask">Входящее задание на отверстие от АР</param>
+        /// <returns></returns>
+        private IAngleFinder GetAngleFinder(OpeningArTaskIncoming incomingTask) {
+            var provider = new SingleOpeningArTaskAngleFinderProvider(incomingTask);
+            return provider.GetAngleFinder();
+        }
+
+        /// <summary>
+        /// Назначает параметры экземпляра семейства чистового отверстия
+        /// </summary>
+        /// <param name="opening">Размещенное чистовое отверстие</param>
+        /// <param name="parameterGetter">Класс, предоставляющий параметры</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        private void SetParamValues(FamilyInstance opening, IParametersGetter parameterGetter) {
+            if(opening is null) { throw new ArgumentNullException(nameof(opening)); }
+            if(parameterGetter is null) { throw new ArgumentNullException(nameof(parameterGetter)); }
+
+            foreach(var paramValue in parameterGetter.GetParamValues()) {
+                paramValue.Value.SetParamValue(opening, paramValue.ParamName);
+            }
+        }
+
+        /// <summary>
+        /// Возвращает интерфейс, предоставляющий значения параметров для размещаемого отверстия КР
+        /// </summary>
+        /// <param name="incomingTask"></param>
+        /// <param name="pointFinder"></param>
+        /// <returns></returns>
+        private IParametersGetter GetParameterGetter(OpeningArTaskIncoming incomingTask, IPointFinder pointFinder) {
+            var provider = new SingleOpeningArTaskParameterGettersProvider(incomingTask, pointFinder);
+            return provider.GetParametersGetter();
+        }
+
+        /// <summary>
+        /// Возвращает интерфейс, предоставляющий точку вставки отверстия КР для размещения по нескольким заданиям от АР
+        /// </summary>
+        /// <param name="host">Основа для отверстия КР</param>
+        /// <param name="incomingTasks">Входящие задания на отверстия от АР</param>
+        /// <param name="pointFinder"></param>
+        /// <returns></returns>
+        private IParametersGetter GetParameterGetter(Element host, ICollection<OpeningArTaskIncoming> incomingTasks, IPointFinder pointFinder) {
+            var provider = new ManyOpeningArTasksParameterGettersProvider(host, incomingTasks, pointFinder);
+            return provider.GetParametersGetter();
+        }
+
+        /// <summary>
+        /// Возвращает интерфейс, предоставляющий точку вставки отверстия КР
+        /// </summary>
+        /// <param name="openingTask">Входящее задание на отверстие от АР</param>
+        /// <returns></returns>
+        private IPointFinder GetPointFinder(OpeningArTaskIncoming openingTask) {
+            return new SingleOpeningArTaskPointFinder(openingTask);
+        }
+
+        /// <summary>
+        /// Возвращает интерфейс, предоставляющий точку вставки отверстия КР по нескольким заданиям от АР
+        /// </summary>
+        /// <param name="host">Основа для отверстия КР</param>
+        /// <param name="incomingTasks">Входящие задания на отверстия от АР</param>
+        /// <returns></returns>
+        private IPointFinder GetPointFinder(Element host, ICollection<OpeningArTaskIncoming> incomingTasks) {
+            var provider = new ManyOpeningArTasksPointFinderProvider(host, incomingTasks);
+            return provider.GetPointFinder();
+        }
+
+        /// <summary>
+        /// Возвращает типоразмер чистового отверстия КР на основе хоста и входящего задания на отверстие от АР
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="openingTask"></param>
+        /// <returns></returns>
+        private FamilySymbol GetFamilySymbol(Element host, OpeningArTaskIncoming openingTask) {
+            var provider = new SingleOpeningArTaskFamilySymbolProvider(_revitRepository, host, openingTask);
+            return provider.GetFamilySymbol();
+        }
+
+        /// <summary>
+        /// Возвращает типоразмер чистового отверстия КР на основе хоста
+        /// </summary>
+        /// <param name="host"></param>
+        /// <returns></returns>
+        private FamilySymbol GetFamilySymbol(Element host) {
+            var provider = new ManyOpeningArTasksFamilySymbolProvider(_revitRepository, host);
+            return provider.GetFamilySymbol();
         }
     }
 }
