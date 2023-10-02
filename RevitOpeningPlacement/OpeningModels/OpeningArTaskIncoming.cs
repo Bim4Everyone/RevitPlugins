@@ -12,6 +12,7 @@ using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Extensions;
+using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.RealOpeningArPlacement;
 using RevitOpeningPlacement.OpeningModels.Enums;
 
@@ -19,7 +20,7 @@ namespace RevitOpeningPlacement.OpeningModels {
     /// <summary>
     /// Класс для обертки проема из связанного файла АР, подгруженного в активный документ КР
     /// </summary>
-    internal class OpeningArTaskIncoming : OpeningRealBase, IEquatable<OpeningArTaskIncoming> {
+    internal class OpeningArTaskIncoming : OpeningRealBase, IEquatable<OpeningArTaskIncoming>, IOpeningTaskIncoming {
         private readonly RevitRepository _revitRepository;
 
         /// <summary>
