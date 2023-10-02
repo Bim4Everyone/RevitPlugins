@@ -2,19 +2,19 @@
 
 namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Checkers {
     /// <summary>
-    /// Класс для проверки наличия типоразмеров чистовых отверстий в репозитории активного документа ревита
+    /// Класс для проверки наличия типоразмеров чистовых отверстий в репозитории активного документа ревита АР
     /// </summary>
-    internal class RealOpeningTypeChecker : IChecker {
+    internal class RealOpeningArTypeChecker : IChecker {
         private readonly RevitRepository _revitRepository;
         private readonly OpeningType _openingType;
 
 
         /// <summary>
-        /// Конструктор класса для проверки наличия типоразмеров чистовых отверстий в репозитории активного документа ревита
+        /// Конструктор класса для проверки наличия типоразмеров чистовых отверстий в репозитории активного документа ревита АР
         /// </summary>
         /// <param name="revitRepository"></param>
         /// <param name="openingType"></param>
-        public RealOpeningTypeChecker(RevitRepository revitRepository, OpeningType openingType) {
+        public RealOpeningArTypeChecker(RevitRepository revitRepository, OpeningType openingType) {
             _revitRepository = revitRepository;
             _openingType = openingType;
         }
