@@ -27,7 +27,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
             if(host is null) {
                 throw new ArgumentNullException(nameof(host));
             }
-            if(!(host is Wall) || !(host is Floor)) {
+            if(!((host is Wall) || (host is Floor))) {
                 throw new ArgumentException(nameof(host));
             }
             _host = host;
