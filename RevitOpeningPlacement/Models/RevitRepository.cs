@@ -223,7 +223,7 @@ namespace RevitOpeningPlacement.Models {
         public FamilySymbol GetOpeningRealKrType(OpeningType type) {
             return new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
-                .WhereElementIsNotElementType()
+                .WhereElementIsElementType()
                 .OfClass(typeof(FamilySymbol))
                 .Cast<FamilySymbol>()
                 .FirstOrDefault(item => item.Name.Equals(OpeningRealKrTypeName[type]) && item.FamilyName.Equals(OpeningRealKrFamilyName[type]));
@@ -238,19 +238,31 @@ namespace RevitOpeningPlacement.Models {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(Family))
                 .OfType<Family>()
-                .FirstOrDefault(item => item?.Name?.Equals(OpeningTaskFamilyName[openingType], StringComparison.CurrentCulture) == true);
+                .FirstOrDefault(item => item?.Name?.Equals(OpeningTaskFamilyName[openingType], StringComparison.CurrentCultureIgnoreCase) == true);
         }
 
         /// <summary>
-        /// Возвращает семейство чистового отверстия из репозитория
+        /// Возвращает семейство чистового отверстия АР из репозитория
         /// </summary>
         /// <param name="openingType"></param>
         /// <returns></returns>
-        public Family GetOpeningRealFamily(OpeningType openingType) {
+        public Family GetOpeningRealArFamily(OpeningType openingType) {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(Family))
                 .OfType<Family>()
-                .FirstOrDefault(item => item?.Name?.Equals(OpeningRealArFamilyName[openingType], StringComparison.CurrentCulture) == true);
+                .FirstOrDefault(item => item?.Name?.Equals(OpeningRealArFamilyName[openingType], StringComparison.CurrentCultureIgnoreCase) == true);
+        }
+
+        /// <summary>
+        /// Возвращает семейство чистового отверстия КР из репозитория
+        /// </summary>
+        /// <param name="openingType"></param>
+        /// <returns></returns>
+        public Family GetOpeningRealKrFamily(OpeningType openingType) {
+            return new FilteredElementCollector(_document)
+                .OfClass(typeof(Family))
+                .OfType<Family>()
+                .FirstOrDefault(item => item?.Name?.Equals(OpeningRealKrFamilyName[openingType], StringComparison.CurrentCultureIgnoreCase) == true);
         }
 
         public Transaction GetTransaction(string transactionName) {
@@ -516,7 +528,7 @@ namespace RevitOpeningPlacement.Models {
         /// <param name="mepCategoryName">Название категории инженерных систем</param>
         /// <returns></returns>
         public MepCategoryEnum GetMepCategoryEnum(string mepCategoryName) {
-            return MepCategoryNames.First(pair => pair.Value.Equals(mepCategoryName, StringComparison.CurrentCulture)).Key;
+            return MepCategoryNames.First(pair => pair.Value.Equals(mepCategoryName, StringComparison.CurrentCultureIgnoreCase)).Key;
         }
 
         /// <summary>
