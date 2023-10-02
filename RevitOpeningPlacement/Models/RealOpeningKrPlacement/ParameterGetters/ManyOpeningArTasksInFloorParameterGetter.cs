@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement;
+using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
+using RevitOpeningPlacement.Models.RealOpeningKrPlacement.ValueGetters;
+using RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.ParameterGetters {
@@ -24,7 +28,18 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.ParameterGetters {
 
 
         public IEnumerable<ParameterValuePair> GetParamValues() {
-            throw new NotImplementedException();
+            // габариты отверстия
+            yield return new DoubleParameterGetter(
+                RealOpeningKrPlacer.RealOpeningKrInFloorHeight,
+                new RectangleOpeningInFloorHeightValueGetter(_incomingTasks.Cast<IOpeningTaskIncoming>().ToArray())).GetParamValue();
+            yield return new DoubleParameterGetter(
+                RealOpeningKrPlacer.RealOpeningKrInFloorWidth,
+                new RectangleOpeningInFloorWidthValueGetter(_incomingTasks.Cast<IOpeningTaskIncoming>().ToArray())).GetParamValue();
+
+            // текстовые данные отверстия
+            yield return new StringParameterGetter(
+                RealOpeningKrPlacer.RealOpeningTaskId,
+                new KrTaskIdValueGetter(_incomingTasks)).GetParamValue();
         }
     }
 }

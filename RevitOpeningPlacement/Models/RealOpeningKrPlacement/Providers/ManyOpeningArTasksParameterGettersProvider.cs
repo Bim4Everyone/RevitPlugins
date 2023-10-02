@@ -41,8 +41,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
         public IParametersGetter GetParametersGetter() {
             if(_host is Floor) {
                 return new ManyOpeningArTasksInFloorParameterGetter(_incomingTasks);
-            } else if(_host is Wall) {
-                return new ManyOpeningArTasksInWallParameterGetter(_incomingTasks, _pointFinder);
+            } else if(_host is Wall wall) {
+                return new ManyOpeningArTasksInWallParameterGetter(_incomingTasks, _pointFinder, wall);
             } else {
                 throw new ArgumentException(nameof(_host));
             }
