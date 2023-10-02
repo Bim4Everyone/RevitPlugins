@@ -2,14 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Autodesk.Revit.DB;
-
-using dosymep.Revit.Geometry;
-
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 using RevitOpeningPlacement.Models.RealOpeningArPlacement.ValueGetters;
+using RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
@@ -33,12 +30,13 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
 
 
         public IEnumerable<ParameterValuePair> GetParamValues() {
-            var box = GetUnitedBox(_incomingTasks);
-            var height = box.Max.Y - box.Min.Y;
-            var width = box.Max.X - box.Min.X;
             // габариты отверстия
-            yield return new DoubleParameterGetter(RealOpeningArPlacer.RealOpeningArHeight, new DimensionValueGetter(height)).GetParamValue();
-            yield return new DoubleParameterGetter(RealOpeningArPlacer.RealOpeningArWidth, new DimensionValueGetter(width)).GetParamValue();
+            yield return new DoubleParameterGetter(
+                RealOpeningArPlacer.RealOpeningArHeight,
+                new RectangleOpeningInFloorHeightValueGetter(_incomingTasks.Cast<IOpeningTaskIncoming>().ToArray())).GetParamValue();
+            yield return new DoubleParameterGetter(
+                RealOpeningArPlacer.RealOpeningArWidth,
+                new RectangleOpeningInFloorWidthValueGetter(_incomingTasks.Cast<IOpeningTaskIncoming>().ToArray())).GetParamValue();
 
             // логические флаги для обозначений разделов отверстия
             var isEomValueGetter = new IsEomValueGetter(_incomingTasks);
@@ -66,11 +64,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
                 ;
             yield return new StringParameterGetter(RealOpeningArPlacer.RealOpeningTaskId, new TaskIdValueGetter(_incomingTasks)).GetParamValue();
             yield return new StringParameterGetter(RealOpeningArPlacer.RealOpeningManualBimModelPart, manualBimModelPartValueGetter).GetParamValue();
-        }
-
-
-        private BoundingBoxXYZ GetUnitedBox(ICollection<OpeningMepTaskIncoming> incomingTasks) {
-            return incomingTasks.Select(task => task.GetTransformedBBoxXYZ()).ToList().CreateUnitedBoundingBox();
         }
     }
 }

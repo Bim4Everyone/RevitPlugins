@@ -5,6 +5,7 @@ using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 using RevitOpeningPlacement.Models.RealOpeningArPlacement.ValueGetters;
+using RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
@@ -32,7 +33,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
 
         public IEnumerable<ParameterValuePair> GetParamValues() {
             // габариты отверстия
-            yield return new DoubleParameterGetter(RealOpeningArPlacer.RealOpeningArDiameter, new RoundOpeningTaskInWallDiameterValueGetter(_openingMepTaskIncoming, _pointFinder)).GetParamValue();
+            yield return new DoubleParameterGetter(
+                RealOpeningArPlacer.RealOpeningArDiameter,
+                new RoundOpeningInWallDiameterValueGetter(_openingMepTaskIncoming, _pointFinder)).GetParamValue();
 
             // логические флаги для обозначений разделов отверстия
             var isEomValueGetter = new IsEomValueGetter(_openingMepTaskIncoming);
