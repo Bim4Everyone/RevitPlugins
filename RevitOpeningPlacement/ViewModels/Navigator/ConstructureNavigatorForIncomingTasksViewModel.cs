@@ -37,6 +37,10 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             IncomingTaskSelectionChangedCommand = new RelayCommand(IncomingTaskSelectionChanged, CanSelect);
             OpeningRealSelectionChangedCommand = new RelayCommand(OpeningRealSelectionChanged, CanSelect);
             RenewCommand = new RelayCommand(Renew);
+            PlaceRealOpeningBySingleTaskCommand = new RelayCommand(PlaceRealOpeningBySingleTask);
+            PlaceOneRealOpeningByManyTasksCommand = new RelayCommand(PlaceOneRealOpeningByManyTasks);
+            PlaceManyRealOpeningsByManyTasksCommand = new RelayCommand(PlaceManyRealOpeningsByManyTasks);
+            PlaceManyRealOpeningsByManyTasksInManyHostsCommand = new RelayCommand(PlaceManyRealOpeningsByManyTasksInManyHosts);
         }
 
 
@@ -76,6 +80,14 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         public ICommand OpeningRealSelectionChangedCommand { get; }
 
+        public ICommand PlaceRealOpeningBySingleTaskCommand { get; }
+
+        public ICommand PlaceOneRealOpeningByManyTasksCommand { get; }
+
+        public ICommand PlaceManyRealOpeningsByManyTasksCommand { get; }
+
+        public ICommand PlaceManyRealOpeningsByManyTasksInManyHostsCommand { get; }
+
 
         private void SelectElement(object p) {
             if(p is ISelectorAndHighlighter selectorAndHighlighter) {
@@ -104,6 +116,38 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         private void Renew(object p) {
             Action action = () => {
                 var cmd = new GetOpeningTasksCmd();
+                cmd.ExecuteCommand(_revitRepository.UIApplication);
+            };
+            _revitRepository.DoAction(action);
+        }
+
+        private void PlaceRealOpeningBySingleTask(object p) {
+            Action action = () => {
+                var cmd = new PlaceOneOpeningRealByOneTaskCmd();
+                cmd.ExecuteCommand(_revitRepository.UIApplication);
+            };
+            _revitRepository.DoAction(action);
+        }
+
+        private void PlaceOneRealOpeningByManyTasks(object p) {
+            Action action = () => {
+                var cmd = new PlaceOneOpeningRealByManyTasksCmd();
+                cmd.ExecuteCommand(_revitRepository.UIApplication);
+            };
+            _revitRepository.DoAction(action);
+        }
+
+        private void PlaceManyRealOpeningsByManyTasks(object p) {
+            Action action = () => {
+                var cmd = new PlaceManyOpeningRealsByManyTasksInOneHostCmd();
+                cmd.ExecuteCommand(_revitRepository.UIApplication);
+            };
+            _revitRepository.DoAction(action);
+        }
+
+        private void PlaceManyRealOpeningsByManyTasksInManyHosts(object p) {
+            Action action = () => {
+                var cmd = new PlaceManyOpeningRealsByManyTasksInManyHostsCmd();
                 cmd.ExecuteCommand(_revitRepository.UIApplication);
             };
             _revitRepository.DoAction(action);
