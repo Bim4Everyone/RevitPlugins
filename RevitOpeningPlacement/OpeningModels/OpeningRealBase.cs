@@ -132,7 +132,8 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Устанавливает значение полю <see cref="_solid"/>
         /// </summary>
         private void SetSolid() {
-            XYZ openingLocation = (_familyInstance.Location as LocationPoint).Point;
+            BoundingBoxXYZ box = _familyInstance.GetBoundingBox();
+            XYZ openingLocation = (box.Max + box.Min) / 2;
             var hostElement = GetHost();
             Solid hostSolidCut = hostElement.GetSolid();
             try {
