@@ -67,32 +67,39 @@ namespace RevitRoomTagPlacement.Models {
         public void PlaceTagsCommand(IList<RoomGroupViewModel> RoomGroups, 
                                     ElementId SelectedTagType, 
                                     GroupPlacementWay groupPlacementWay,
+                                    PositionPlacementWay positionPlacementWay,
                                     string roomName = "") {
             var selectedGroups = RoomGroups.Where(x => x.IsChecked);
 
             if(groupPlacementWay == GroupPlacementWay.EveryRoom) {
                 var rooms = selectedGroups.SelectMany(x => x.Rooms);
-                PlaceTags(rooms, SelectedTagType);
+                PlaceTags(rooms, SelectedTagType, positionPlacementWay);
 
             } 
             else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupRandom) {
                 var rooms = selectedGroups.Select(x => x.Rooms.First());
-                PlaceTags(rooms, SelectedTagType);
+                PlaceTags(rooms, SelectedTagType, positionPlacementWay);
             } 
             else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupByName) {
                 var rooms = selectedGroups.Select(x => x.Rooms.Where(y => y.GetParamValue<string>(BuiltInParameter.ROOM_NAME) == roomName).First());
-                PlaceTags(rooms, SelectedTagType);
+                PlaceTags(rooms, SelectedTagType, positionPlacementWay);
             }
         }
 
-        public void PlaceTags(IEnumerable<Room> Rooms, ElementId SelectedTagType) {           
+        public void PlaceTags(IEnumerable<Room> Rooms, 
+                              ElementId SelectedTagType,
+                              PositionPlacementWay positionPlacementWay) {           
             using(Transaction t = Document.StartTransaction("Маркировать помещения")) {
                 foreach(var room in Rooms) {
-                    BoundingBoxXYZ roomBB = room.GetBoundingBox();
+                    RoomPathFinder pathFinder = new RoomPathFinder(room);
 
-                    var xValue = (roomBB.Min.X + roomBB.Max.X) * 0.5;
-                    var yValue = (roomBB.Min.Y + roomBB.Max.Y) * 0.5;
-                    UV point = new UV(xValue, yValue);
+                    UV point = pathFinder.GetPointByPlacementWay(positionPlacementWay);
+
+                    XYZ testPoint = new XYZ(point.U, point.V, 0);
+
+                    if(!room.IsPointInRoom(testPoint)) {
+                        point = pathFinder.GetPointByPath();
+                    }
 
                     var newTag = Document.Create.NewRoomTag(
                         new LinkElementId(room.Id), 

@@ -23,6 +23,7 @@ namespace RevitRoomTagPlacement.ViewModels {
         private RoomTagTypeModel _selectedTagType;
         private string _selectedRoomName;
         private GroupPlacementWay placementWayByGroups = GroupPlacementWay.EveryRoom;
+        private PositionPlacementWay placementWayByPosition = PositionPlacementWay.CenterCenter;
         private ObservableCollection<string> roomNames;
         private string _errorText;
 
@@ -62,11 +63,6 @@ namespace RevitRoomTagPlacement.ViewModels {
                 if (placementWayByGroups == value) return;
 
                 placementWayByGroups = value;
-                OnPropertyChanged("PlacementWayByGroups");
-                OnPropertyChanged("IsEveryRoom");
-                OnPropertyChanged("OneRoomPerGroupRandom");
-                OnPropertyChanged("OneRoomPerGroupByName");
-                OnPropertyChanged("RoomNames");
             }
         }
 
@@ -83,6 +79,61 @@ namespace RevitRoomTagPlacement.ViewModels {
         public bool IsOneRoomPerGroupByName {
             get { return PlacementWayByGroups == GroupPlacementWay.OneRoomPerGroupByName; }
             set { PlacementWayByGroups = value ? GroupPlacementWay.OneRoomPerGroupByName : PlacementWayByGroups; }
+        }
+
+        public PositionPlacementWay PlacementWayByPosition {
+            get { return placementWayByPosition; }
+            set {
+                if(placementWayByPosition == value)
+                    return;
+
+                placementWayByPosition = value;
+            }
+        }
+
+        public bool IsPositionLeftTop {
+            get { return PlacementWayByPosition == PositionPlacementWay.LeftTop; }
+            set { PlacementWayByPosition = value ? PositionPlacementWay.LeftTop : PlacementWayByPosition; }
+        }
+
+        public bool IsPositionCenterTop {
+            get { return PlacementWayByPosition == PositionPlacementWay.CenterTop; }
+            set { PlacementWayByPosition = value ? PositionPlacementWay.CenterTop : PlacementWayByPosition; }
+        }
+
+        public bool IsPositionRightTop {
+            get { return PlacementWayByPosition == PositionPlacementWay.RightTop; }
+            set { PlacementWayByPosition = value ? PositionPlacementWay.RightTop : PlacementWayByPosition; }
+        }
+
+        public bool IsPositionLeftCenter {
+            get { return PlacementWayByPosition == PositionPlacementWay.LeftCenter; }
+            set { PlacementWayByPosition = value ? PositionPlacementWay.LeftCenter : PlacementWayByPosition; }
+        }
+
+        public bool IsPositionCenterCenter {
+            get { return PlacementWayByPosition == PositionPlacementWay.CenterCenter; }
+            set { PlacementWayByPosition = value ? PositionPlacementWay.CenterCenter : PlacementWayByPosition; }
+        }
+
+        public bool IsPositionRightCenter {
+            get { return PlacementWayByPosition == PositionPlacementWay.RightCenter; }
+            set { PlacementWayByPosition = value ? PositionPlacementWay.RightCenter : PlacementWayByPosition; }
+        }
+
+        public bool IsPositionLeftBottom {
+            get { return PlacementWayByPosition == PositionPlacementWay.LeftBottom; }
+            set { PlacementWayByPosition = value ? PositionPlacementWay.LeftBottom : PlacementWayByPosition; }
+        }
+
+        public bool IsPositionCenterBottom {
+            get { return PlacementWayByPosition == PositionPlacementWay.CenterBottom; }
+            set { PlacementWayByPosition = value ? PositionPlacementWay.CenterBottom : PlacementWayByPosition; }
+        }
+
+        public bool IsPositionRightBottom {
+            get { return PlacementWayByPosition == PositionPlacementWay.RightBottom; }
+            set { PlacementWayByPosition = value ? PositionPlacementWay.RightBottom : PlacementWayByPosition; }
         }
 
         public RoomTagTypeModel SelectedTagType {
@@ -104,6 +155,7 @@ namespace RevitRoomTagPlacement.ViewModels {
             _revitRepository.PlaceTagsCommand(RoomGroups, 
                                               SelectedTagType.TagId,
                                               PlacementWayByGroups,
+                                              PlacementWayByPosition,
                                               SelectedRoomName);
         }
 

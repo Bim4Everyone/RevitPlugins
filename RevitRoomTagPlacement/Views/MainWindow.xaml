@@ -103,7 +103,8 @@
         <StackPanel
             Grid.Row="5"
             Orientation="Horizontal"
-            HorizontalAlignment="Right">
+            HorizontalAlignment="Right"
+            DataContext="{Binding RevitViewModel}">
 
             <TextBlock
                 Margin="10"
@@ -114,7 +115,7 @@
                 Margin="10"
                 Height="90"
                 Width="90"
-                                VerticalAlignment="Top"   
+                VerticalAlignment="Top"   
                 Rows="3"
                 Columns="3">
                 <UniformGrid.Resources>
@@ -123,23 +124,32 @@
                         TargetType="{x:Type RadioButton}"/>
                 </UniformGrid.Resources>
                 <RadioButton
-                    GroupName="PlacementPosition"/>
+                    GroupName="PlacementPosition"
+                    IsChecked="{Binding IsPositionLeftTop}"/>
                 <RadioButton
-                    GroupName="PlacementPosition"/>
+                    GroupName="PlacementPosition"
+                    IsChecked="{Binding IsPositionCenterTop}"/>
                 <RadioButton
-                    GroupName="PlacementPosition"/>
+                    GroupName="PlacementPosition"
+                    IsChecked="{Binding IsPositionRightTop}"/>
                 <RadioButton
-                    GroupName="PlacementPosition"/>
+                    GroupName="PlacementPosition"
+                    IsChecked="{Binding IsPositionLeftCenter}"/>
                 <RadioButton
-                    GroupName="PlacementPosition"/>
+                    GroupName="PlacementPosition"
+                    IsChecked="{Binding IsPositionCenterCenter}"/>
                 <RadioButton
-                    GroupName="PlacementPosition"/>
+                    GroupName="PlacementPosition"
+                    IsChecked="{Binding IsPositionRightCenter}"/>
                 <RadioButton
-                    GroupName="PlacementPosition"/>
+                    GroupName="PlacementPosition"
+                    IsChecked="{Binding IsPositionLeftBottom}"/>
                 <RadioButton
-                    GroupName="PlacementPosition"/>
+                    GroupName="PlacementPosition"
+                    IsChecked="{Binding IsPositionCenterBottom}"/>
                 <RadioButton
-                    GroupName="PlacementPosition"/>
+                    GroupName="PlacementPosition"
+                    IsChecked="{Binding IsPositionRightBottom}"/>
             </UniformGrid>
             
         </StackPanel>

@@ -12,14 +12,14 @@ namespace RevitRoomTagPlacement.Models {
     }
 
     public enum PositionPlacementWay {
-        LeftUp = 0,
-        CenterUp = 1,
-        RightUp = 2,
+        LeftTop = 0,
+        CenterTop = 1,
+        RightTop = 2,
         LeftCenter = 3,
         CenterCenter = 4,
         RightCenter = 5,
-        LeftDown = 6,
-        CenterDown = 7,
-        RightDown = 8,
+        LeftBottom = 6,
+        CenterBottom = 7,
+        RightBottom = 8,
     }
 }
