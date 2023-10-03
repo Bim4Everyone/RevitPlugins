@@ -117,8 +117,8 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
 
-        private Solid CreateRawSolid() {
-            return GetTransformedBBoxXYZ().CreateSolid();
+        private Solid CreateRawSolid(BoundingBoxXYZ bbox) {
+            return bbox.CreateSolid();
         }
 
         /// <summary>
@@ -143,10 +143,10 @@ namespace RevitOpeningPlacement.OpeningModels {
                 if(thisOpeningSolid != null) {
                     _solid = thisOpeningSolid;
                 } else {
-                    _solid = CreateRawSolid();
+                    _solid = CreateRawSolid(box);
                 }
             } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                _solid = CreateRawSolid();
+                _solid = CreateRawSolid(box);
             }
         }
     }
