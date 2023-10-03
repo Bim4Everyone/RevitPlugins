@@ -63,6 +63,7 @@ namespace RevitRoomTagPlacement.ViewModels {
                 if (placementWayByGroups == value) return;
 
                 placementWayByGroups = value;
+                OnPropertyChanged("RoomNames");
             }
         }
 

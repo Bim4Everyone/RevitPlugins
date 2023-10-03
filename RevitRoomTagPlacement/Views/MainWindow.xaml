@@ -81,12 +81,12 @@
                 IsChecked="{Binding IsEveryRoom}"/>
             <RadioButton
                 GroupName="PlacementWays" 
-                Content="Для одного помещении в каждой группе (случайное помещение)" 
+                Content="Для одного помещения в каждой группе (самое большое помещение)" 
                 IsChecked="{Binding IsOneRoomPerGroupRandom}"/>
             <RadioButton
                 x:Name="_placementWay"
                 GroupName="PlacementWays" 
-                Content="Для одного помещении в каждой группе (выбрать по имени)" 
+                Content="Для одного помещения в каждой группе (выбрать по имени)" 
                 IsChecked="{Binding IsOneRoomPerGroupByName}"/>
         </StackPanel>
 

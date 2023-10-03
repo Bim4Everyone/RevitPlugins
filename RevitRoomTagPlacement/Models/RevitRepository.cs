@@ -77,7 +77,7 @@ namespace RevitRoomTagPlacement.Models {
 
             } 
             else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupRandom) {
-                var rooms = selectedGroups.Select(x => x.Rooms.First());
+                var rooms = selectedGroups.Select(x => x.Rooms.OrderByDescending(r => r.Area).First());
                 PlaceTags(rooms, SelectedTagType, positionPlacementWay);
             } 
             else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupByName) {
@@ -91,22 +91,29 @@ namespace RevitRoomTagPlacement.Models {
                               PositionPlacementWay positionPlacementWay) {           
             using(Transaction t = Document.StartTransaction("Маркировать помещения")) {
                 foreach(var room in Rooms) {
-                    RoomPathFinder pathFinder = new RoomPathFinder(room);
 
-                    UV point = pathFinder.GetPointByPlacementWay(positionPlacementWay);
+                    ElementOwnerViewFilter viewFilter = new ElementOwnerViewFilter(Document.ActiveView.Id);
 
-                    XYZ testPoint = new XYZ(point.U, point.V, 0);
+                    var depElements = room
+                        .GetDependentElements(viewFilter)
+                        .Select(x => Document.GetElement(x))
+                        .Select(x => x.GetTypeId())
+                        .ToList();
 
-                    if(!room.IsPointInRoom(testPoint)) {
-                        point = pathFinder.GetPointByPath();
+                    if(!depElements.Contains(SelectedTagType)) {
+                        RoomPathFinder pathFinder = new RoomPathFinder(room);
+                        UV point = pathFinder.GetPointByPlacementWay(positionPlacementWay);
+                        XYZ testPoint = new XYZ(point.U, point.V, 0);
+
+                        if(!room.IsPointInRoom(testPoint)) point = pathFinder.GetPointByPath();
+
+                        var newTag = Document.Create.NewRoomTag(
+                            new LinkElementId(room.Id), 
+                            point, 
+                            Document.ActiveView.Id);
+
+                        newTag.ChangeTypeId(SelectedTagType);
                     }
-
-                    var newTag = Document.Create.NewRoomTag(
-                        new LinkElementId(room.Id), 
-                        point, 
-                        Document.ActiveView.Id);
-
-                    newTag.ChangeTypeId(SelectedTagType);
                 }
                 t.Commit();
             }

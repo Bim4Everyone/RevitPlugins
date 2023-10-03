@@ -64,8 +64,8 @@ namespace RevitRoomTagPlacement.Models {
                 yValue = _roomBB.Min.Y + (_roomBB.Max.Y - _roomBB.Min.Y) * 0.1;
                 break;
                 default:
-                xValue = _roomBB.Min.X + (_roomBB.Max.X - _roomBB.Min.X) * 0.5;
-                yValue = _roomBB.Min.Y + (_roomBB.Max.Y - _roomBB.Min.Y) * 0.5;
+                xValue = (_roomBB.Min.X + _roomBB.Max.X) * 0.5;
+                yValue = (_roomBB.Min.Y + _roomBB.Max.Y) * 0.5;
                 break;
             }
 
