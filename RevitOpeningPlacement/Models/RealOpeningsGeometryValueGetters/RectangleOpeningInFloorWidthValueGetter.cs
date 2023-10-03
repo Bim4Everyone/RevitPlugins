@@ -12,6 +12,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
     /// </summary>
     internal class RectangleOpeningInFloorWidthValueGetter : RealOpeningSizeValueGetter, IValueGetter<DoubleParamValue> {
         private readonly ICollection<IOpeningTaskIncoming> _openingTasksIncoming;
+        private readonly bool _createdByManyTasks;
 
 
         /// <summary>
@@ -23,6 +24,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
             if(openingTaskIncoming is null) { throw new ArgumentNullException(nameof(openingTaskIncoming)); }
 
             _openingTasksIncoming = new IOpeningTaskIncoming[] { openingTaskIncoming };
+            _createdByManyTasks = false;
         }
 
 
@@ -37,19 +39,20 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
             if(openingTasksIncoming.Count < 1) { throw new ArgumentOutOfRangeException(nameof(openingTasksIncoming.Count)); }
 
             _openingTasksIncoming = openingTasksIncoming;
+            _createdByManyTasks = true;
         }
 
 
         public DoubleParamValue GetValue() {
-            double widthFeet = GetWidth(_openingTasksIncoming);
+            double widthFeet = GetWidth(_openingTasksIncoming, _createdByManyTasks);
             double roundWidthFeet = RoundToCeilingFeetToMillimeters(widthFeet, _widthRound);
             return new DoubleParamValue(roundWidthFeet);
         }
 
 
-        private double GetWidth(ICollection<IOpeningTaskIncoming> incomingTasks) {
+        private double GetWidth(ICollection<IOpeningTaskIncoming> incomingTasks, bool widthByBBox) {
             double width;
-            if(incomingTasks.Count == 1) {
+            if((incomingTasks.Count == 1) && (!widthByBBox)) {
                 width = GetOpeningWidth(incomingTasks.First());
             } else {
                 var box = GetUnitedBox(incomingTasks);
