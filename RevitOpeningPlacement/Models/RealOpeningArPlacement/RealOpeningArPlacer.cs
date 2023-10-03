@@ -247,7 +247,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// <param name="host">Хост чистового отверстия - стена или перекрытие</param>
         /// <returns></returns>
         private FamilySymbol GetFamilySymbol(Element host) {
-            var provider = new FamilySymbolProvider(_revitRepository, host);
+            var provider = new RectangleFamilySymbolProvider(_revitRepository, host);
             return provider.GetFamilySymbol();
         }
 
