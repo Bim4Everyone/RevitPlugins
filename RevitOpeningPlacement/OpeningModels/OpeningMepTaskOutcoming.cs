@@ -863,11 +863,14 @@ namespace RevitOpeningPlacement.OpeningModels {
 
                     // поиск конструкций (стен и перекрытий) и чистовых отверстий из связанного файла, которые пересекаются с проходящими через задание на отверстие элементами ВИС из текущего файла,
                     // с учетом того, что место пересечения находится вне тела задания на отверстие.
-                    var mepElementsSolid = mepElements.Select(el => el.GetBoundingBox()).GetCommonBoundingBox().TransformBoundingBox(link.DocumentTransform.Inverse);
-                    return new FilteredElementCollector(link.Document, intersectingLinkConstructions)
+                    BoundingBoxXYZ mepElementsBBox = mepElements.Select(el => el.GetBoundingBox()).GetCommonBoundingBox().TransformBoundingBox(link.DocumentTransform.Inverse);
+                    bool mepElementsIntersectConstructions =
+                        new FilteredElementCollector(link.Document, intersectingLinkConstructions)
                         .WherePasses(new ElementIntersectsSolidFilter(mepSolidMinusOpeningTask))
-                        .Any()
-                        || intersectingLinkOpeningsReal.Any(openingReal => openingReal.IntersectsSolid(mepSolidMinusOpeningTask, mepElementsSolid));
+                        .Any();
+                    bool mepElementsIntersectOpeningsReal = intersectingLinkOpeningsReal
+                        .Any(openingReal => openingReal.IntersectsSolid(mepSolidMinusOpeningTask, mepElementsBBox));
+                    return mepElementsIntersectConstructions || mepElementsIntersectOpeningsReal;
 
                 } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
                     return false;
