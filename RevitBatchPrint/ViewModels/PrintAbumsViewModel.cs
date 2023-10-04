@@ -44,7 +44,7 @@ namespace RevitBatchPrint.ViewModels {
             RevitSaveCommand = new RelayCommand(RevitSave, CanRevitSave);
             RevitPrintCommand = new RelayCommand(RevitPrint, CanRevitPrint);
 
-#if REVIT_2022_OR_LESS
+#if REVIT_2022_OR_GREATER
             VisibilitySaveFile = System.Windows.Visibility.Visible;
 #else
             VisibilitySaveFile = System.Windows.Visibility.Collapsed;
