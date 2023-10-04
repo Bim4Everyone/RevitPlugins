@@ -131,10 +131,6 @@ namespace RevitOpeningPlacement.Models.Extensions {
 
                 bool curveLoopIsOuter = true;
                 foreach(CurveLoop outerLoop in outerLoops) {
-                    foreach(Curve curveToFindIntersection in outerLoop) {
-                        SetComparisonResult intersectOne = curveToFindIntersection.Intersect(ray);
-                        SetComparisonResult intersectSecond = ray.Intersect(curveToFindIntersection);
-                    }
                     int intersectionsCount = outerLoop.Where(addedCurve => addedCurve.Intersect(ray) != SetComparisonResult.Disjoint).Count();
                     curveLoopIsOuter = curveLoopIsOuter && ((intersectionsCount % 2) == 0);
                     if(!curveLoopIsOuter) {
