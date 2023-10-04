@@ -34,16 +34,11 @@ namespace RevitCreateViewSheet {
             var projectParameters = ProjectParameters.Create(application);
             projectParameters.SetupRevitParams(document, SharedParamsConfig.Instance.AlbumBlueprints, SharedParamsConfig.Instance.StampSheetNumber);
 
-            var window = new CreateViewSheetWindow() { DataContext = new AppViewModel(uiApplication) };
-            if(window.ShowDialog() == true) {
-                GetPlatformService<INotificationService>()
-                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                    .ShowAsync();
-            } else {
-                GetPlatformService<INotificationService>()
-                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                    .ShowAsync();
-            }
+            var window = new CreateViewSheetWindow() {
+                DataContext = new AppViewModel(uiApplication)
+            };
+            
+            Notification(window);
         }
     }
 }
