@@ -101,7 +101,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
             List<XYZ> taskSidePoints = new List<XYZ>();
             foreach(var task in incomingTasks) {
                 double openingWidth = GetOpeningWidth(task);
-                XYZ center = task.GetSolid().ComputeCentroid();
+                XYZ center = task.Location;
 
                 XYZ forwardOffset = center + line.Direction * (openingWidth / 2);
                 XYZ forwardProjectedOffset = GetProjectionOfPointOntoLine(line, forwardOffset);
