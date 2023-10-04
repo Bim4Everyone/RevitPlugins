@@ -18,7 +18,7 @@ namespace RevitCopyViews {
     [Transaction(TransactionMode.Manual)]
     public class UpdateElevationCommand : BasePluginCommand {
         public UpdateElevationCommand() {
-            PluginName = "Обновление отметок этажа";
+            PluginName = "Обновить отметки этажа";
         }
 
         protected override void Execute(UIApplication uiApplication)  {
@@ -35,9 +35,7 @@ namespace RevitCopyViews {
                 .ToArray();
 
             var errors = new List<View>();
-            using(var transaction = new Transaction(document)) {
-                transaction.Start("Обновление отметки этажа");
-
+            using(var transaction = document.StartTransaction("Обновление отметки этажа")) {
                 var views = new FilteredElementCollector(document)
                    .OfClass(typeof(View))
                    .WhereElementIsNotElementType()
@@ -73,8 +71,11 @@ namespace RevitCopyViews {
             }
 
             if(errors.Count > 0) {
-                string message = "Не были изменены имена у следующих видов:" + Environment.NewLine + " - " + string.Join(Environment.NewLine + " - ", errors.Select(item => $"{item.Id.IntegerValue} - {item.Name}"));
+                Notification(false);
+                string message = "Не были изменены имена у следующих видов:" + Environment.NewLine + " - " + string.Join(Environment.NewLine + " - ", errors.Select(item => $"{item.Id.GetIdValue()} - {item.Name}"));
                 TaskDialog.Show("Предупреждение!", message, TaskDialogCommonButtons.Ok);
+            } else {
+                Notification(true);
             }
         }
     }
