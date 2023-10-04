@@ -30,6 +30,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
                 if(solid is null) {
                     solid = currentSolid;
                 } else {
+                    // сложение солидов, чтобы исключить пересечения
                     solid = BooleanOperationsUtils.ExecuteBooleanOperation(solid, currentSolid, BooleanOperationsType.Union);
                 }
             }
@@ -79,18 +80,74 @@ namespace RevitOpeningPlacement.Models.Extensions {
         private static IList<IList<CurveLoop>> GetHostBoundCurveLoops(this HostObject hostObject) {
             Face[] faces = GetHostBoundFaces(hostObject);
             if(faces.Length != 2) { throw new InvalidOperationException(); }
-            IList<CurveLoop> firstLoops = faces[0].GetEdgesAsCurveLoops();
-            IList<CurveLoop> secondLoops = faces[1].GetEdgesAsCurveLoops();
-            if(firstLoops.Count != secondLoops.Count) { throw new InvalidOperationException(); }
+            IList<CurveLoop> firstLoops = GetOuterCurveLoops(faces[0]);
+            IList<CurveLoop> secondLoops = GetOuterCurveLoops(faces[1]);
 
             List<List<CurveLoop>> loops = new List<List<CurveLoop>>();
-            for(int i = 0; i < firstLoops.Count; i++) {
-                loops.Add(new List<CurveLoop>() {
-                    firstLoops[i],
-                    secondLoops[i],
-                });
+            if(firstLoops.Count == secondLoops.Count) {
+                // если количество CurveLoop одинаковое, будем считать их расположенными друг против друга на гранях
+                for(int i = 0; i < firstLoops.Count; i++) {
+                    loops.Add(new List<CurveLoop>() {
+                        firstLoops[i],
+                        secondLoops[i],
+                    });
+                }
+            } else {
+                for(int firstLoopIndex = 0; firstLoopIndex < firstLoops.Count; firstLoopIndex++) {
+                    for(int secondLoopIndex = 0; secondLoopIndex < secondLoops.Count; secondLoopIndex++) {
+                        loops.Add(new List<CurveLoop>() {
+                            firstLoops[firstLoopIndex],
+                            secondLoops[secondLoopIndex],
+                        });
+                    }
+                }
             }
             return loops.Cast<IList<CurveLoop>>().ToList();
+        }
+
+        /// <summary>
+        /// Возвращает список CurveLoop из заданной грани, которые находятся снаружи друг друга
+        /// </summary>
+        /// <param name="face">Грань для получения CurveLoop</param>
+        /// <returns></returns>
+        private static IList<CurveLoop> GetOuterCurveLoops(Face face) {
+            // Полученные CurveLoop из наружных граней хост элемента находятся либо внутри друг друга, либо снаружи.
+            // Поэтому, чтобы определить, лежит ли CurveLoop внутри другой, достаточно проверить, лежит ли хотя бы одна точка первой CurveLoop внутри другой.
+            // Для этого строим луч от точки из первой CurveLoop в любую сторону и считаем количество пересечений с ребрами из второй CurveLoop.
+            // Если число пересечений нечетно, то точка внутри, если четно - снаружи.
+            // Для построения солида хоста без вырезов нам нужны только CurveLoop с каждой из двух ограничивающих поверхностей, которые являются наибольшими и не вложенными друг в друга.
+            // Для неплоских поверхностей хоста этот алгоритм работать не будет и для них будут добавлены все их CurveLoop. Будем считать эту неточность допустимой.
+            IList<CurveLoop> outerLoops = new List<CurveLoop>();
+
+            IList<CurveLoop> curveLoops = face.GetEdgesAsCurveLoops().OrderByDescending(loop => loop.GetExactLength()).ToList();
+            for(int i = 0; i < curveLoops.Count; i++) {
+                CurveLoop curveLoopCurrent = curveLoops[i];
+                Curve curve = curveLoopCurrent.First();
+                XYZ curveStart = curve.GetEndPoint(0);
+                XYZ curveEnd = curve.GetEndPoint(1);
+                XYZ curveDirection = curveEnd - curveStart;
+                // вместо неограниченной прямой делаем отрезок длиной 120 метров, который будем принимать за луч
+                Curve ray = Line.CreateBound(curveStart, curveStart + curveDirection * 400);
+
+                bool curveLoopIsOuter = true;
+                foreach(CurveLoop outerLoop in outerLoops) {
+                    foreach(Curve curveToFindIntersection in outerLoop) {
+                        SetComparisonResult intersectOne = curveToFindIntersection.Intersect(ray);
+                        SetComparisonResult intersectSecond = ray.Intersect(curveToFindIntersection);
+                    }
+                    int intersectionsCount = outerLoop.Where(addedCurve => addedCurve.Intersect(ray) != SetComparisonResult.Disjoint).Count();
+                    curveLoopIsOuter = curveLoopIsOuter && ((intersectionsCount % 2) == 0);
+                    if(!curveLoopIsOuter) {
+                        // текущая CurveLoop находится внутри одной из уже добавленных в список - нет смысла проверять дальше
+                        break;
+                    }
+                }
+                if(curveLoopIsOuter) {
+                    // текущая CurveLoop находится снаружи всех уже добавленных - добавляем ее тоже
+                    outerLoops.Add(curveLoopCurrent);
+                }
+            }
+            return outerLoops;
         }
 
         /// <summary>
