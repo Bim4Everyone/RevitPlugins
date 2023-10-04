@@ -27,7 +27,7 @@ namespace RevitOpeningPlacement {
 
         protected override void Execute(UIApplication uiApplication) {
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            ICollection<OpeningMepTaskOutcoming> openingTasks = revitRepository.PickManyOpeningTasksOutcoming();
+            ICollection<OpeningMepTaskOutcoming> openingTasks = revitRepository.PickManyOpeningMepTasksOutcoming();
 
             var placedOpeningTask = revitRepository.UniteOpenings(openingTasks);
             uiApplication.ActiveUIDocument.Selection.SetElementIds(new ElementId[] { placedOpeningTask.Id });

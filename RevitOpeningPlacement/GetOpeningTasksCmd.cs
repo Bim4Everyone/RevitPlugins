@@ -67,11 +67,9 @@ namespace RevitOpeningPlacement {
                 case DocTypeEnum.KOORD:
                 GetOpeningsTaskInDocumentKoord(revitRepository);
                 break;
-                case DocTypeEnum.NotDefined:
+                default:
                 GetOpeningsTaskInDocumentNotDefined(revitRepository);
                 break;
-                default:
-                throw new ArgumentException(nameof(docType));
             }
         }
 
@@ -81,19 +79,7 @@ namespace RevitOpeningPlacement {
         /// <param name="uiApplication"></param>
         /// <param name="revitRepository"></param>
         private void GetOpeningsTaskInDocumentAR(UIApplication uiApplication, RevitRepository revitRepository) {
-            var navigatorMode = GetNavigatorModeFromUser();
-            switch(navigatorMode) {
-                case NavigatorMode.Outgoing:
-                GetOutgoingTaskInDocAR(uiApplication, revitRepository);
-                break;
-                case NavigatorMode.Incoming:
-                GetIncomingTaskInDocAR(uiApplication, revitRepository);
-                break;
-                case NavigatorMode.NotDefined:
-                throw new OperationCanceledException();
-                default:
-                throw new ArgumentException(nameof(navigatorMode));
-            }
+            GetIncomingTaskInDocAR(uiApplication, revitRepository);
         }
 
         /// <summary>
@@ -106,15 +92,15 @@ namespace RevitOpeningPlacement {
                 throw new OperationCanceledException();
             }
             ICollection<OpeningMepTaskIncoming> incomingTasks = revitRepository.GetOpeningsMepTasksIncoming();
-            ICollection<OpeningReal> realOpenings = revitRepository.GetRealOpenings();
+            ICollection<OpeningRealAr> realOpenings = revitRepository.GetRealOpeningsAr();
             ICollection<ElementId> constructureElementsIds = revitRepository.GetConstructureElementsIds();
             ICollection<IMepLinkElementsProvider> mepLinks = revitRepository
                 .GetMepLinks()
                 .Select(link => new MepLinkElementsProvider(link) as IMepLinkElementsProvider)
                 .ToHashSet();
 
-            var incomingTasksViewModels = GetOpeningsMepIncomingTasksVM(incomingTasks, realOpenings, constructureElementsIds);
-            var openingsRealViewModels = GetOpeningsRealVM(mepLinks, realOpenings);
+            var incomingTasksViewModels = GetOpeningsMepIncomingTasksViewModels(incomingTasks, realOpenings, constructureElementsIds);
+            var openingsRealViewModels = GetOpeningsRealArViewModels(mepLinks, realOpenings);
 
             var navigatorViewModel = new ArchitectureNavigatorForIncomingTasksViewModel(
                 revitRepository,
@@ -127,16 +113,76 @@ namespace RevitOpeningPlacement {
             window.Show();
         }
 
+        private void GetIncomingTaskInDocKR(UIApplication uiApplication, RevitRepository revitRepository) {
+            if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
+                throw new OperationCanceledException();
+            }
+            ICollection<OpeningArTaskIncoming> incomingTasks = revitRepository.GetOpeningsArTasksIncoming();
+            ICollection<OpeningRealKr> realOpenings = revitRepository.GetRealOpeningsKr();
+            ICollection<ElementId> constructureElementsIds = revitRepository.GetConstructureElementsIds();
+            ICollection<IConstructureLinkElementsProvider> arLinks = revitRepository
+                .GetArLinks()
+                .Select(link => new ConstructureLinkElementsProvider(link) as IConstructureLinkElementsProvider)
+                .ToHashSet();
+
+            var incomingTasksViewModels = GetOpeningsArIncomingTasksViewModels(incomingTasks, realOpenings, constructureElementsIds);
+            var openingsRealViewModels = GetOpeningsRealKrViewModels(arLinks, realOpenings);
+
+            var navigatorViewModel = new ConstructureNavigatorForIncomingTasksViewModel(
+                revitRepository,
+                incomingTasksViewModels,
+                openingsRealViewModels);
+
+            var window = new NavigatorArIncomingView() { Title = PluginName, DataContext = navigatorViewModel };
+            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
+
+            window.Show();
+        }
+
         /// <summary>
-        /// Получает коллекцию моделей представления для входящих заданий на отверстия
+        /// Возвращает коллекцию моделей представления для входящих заданий на отверстия из АР
         /// </summary>
         /// <param name="incomingTasks">Входящие задания на отверстия из связей</param>
         /// <param name="realOpenings">Чистовые отверстия из текущего документа</param>
         /// <param name="constructureElementsIds">Элементы конструкций из текущего документа</param>
         /// <returns></returns>
-        private ICollection<OpeningMepTaskIncomingViewModel> GetOpeningsMepIncomingTasksVM(
+        private ICollection<OpeningArTaskIncomingViewModel> GetOpeningsArIncomingTasksViewModels(
+            ICollection<OpeningArTaskIncoming> incomingTasks,
+            ICollection<OpeningRealKr> realOpenings,
+            ICollection<ElementId> constructureElementsIds) {
+
+            var incomintTasksViewModels = new HashSet<OpeningArTaskIncomingViewModel>();
+
+            using(var pb = GetPlatformService<IProgressDialogService>()) {
+                pb.StepValue = _progressBarStepSmall;
+                pb.DisplayTitleFormat = "Анализ заданий... [{0}]\\[{1}]";
+                var progress = pb.CreateProgress();
+                pb.MaxValue = incomingTasks.Count;
+                var ct = pb.CreateCancellationToken();
+                pb.Show();
+
+                int i = 0;
+                foreach(var incomingTask in incomingTasks) {
+                    ct.ThrowIfCancellationRequested();
+                    progress.Report(i);
+                    incomingTask.UpdateStatus(realOpenings, constructureElementsIds);
+                    incomintTasksViewModels.Add(new OpeningArTaskIncomingViewModel(incomingTask));
+                    i++;
+                }
+            }
+            return incomintTasksViewModels;
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию моделей представления для входящих заданий на отверстия из ВИС
+        /// </summary>
+        /// <param name="incomingTasks">Входящие задания на отверстия из связей</param>
+        /// <param name="realOpenings">Чистовые отверстия из текущего документа</param>
+        /// <param name="constructureElementsIds">Элементы конструкций из текущего документа</param>
+        /// <returns></returns>
+        private ICollection<OpeningMepTaskIncomingViewModel> GetOpeningsMepIncomingTasksViewModels(
             ICollection<OpeningMepTaskIncoming> incomingTasks,
-            ICollection<OpeningReal> realOpenings,
+            ICollection<OpeningRealAr> realOpenings,
             ICollection<ElementId> constructureElementsIds) {
 
             var incomingTasksViewModels = new HashSet<OpeningMepTaskIncomingViewModel>();
@@ -166,11 +212,51 @@ namespace RevitOpeningPlacement {
             return incomingTasksViewModels;
         }
 
-        private ICollection<OpeningRealViewModel> GetOpeningsRealVM(
-            ICollection<IMepLinkElementsProvider> mepLinks,
-            ICollection<OpeningReal> openingsReal) {
+        /// <summary>
+        /// Возвращает коллекцию моделей представления чистовых отверстий, размещенных в активном документа КР
+        /// </summary>
+        /// <param name="arLinks">Связи АР</param>
+        /// <param name="openingsReal">Чистовые отверстия, размещенные в активном документа КР</param>
+        /// <returns></returns>
+        private ICollection<OpeningRealKrViewModel> GetOpeningsRealKrViewModels(
+            ICollection<IConstructureLinkElementsProvider> arLinks,
+            ICollection<OpeningRealKr> openingsReal) {
 
-            var openingsRealViewModels = new HashSet<OpeningRealViewModel>();
+            var openingsRealViewModels = new HashSet<OpeningRealKrViewModel>();
+
+            using(var pb = GetPlatformService<IProgressDialogService>()) {
+                pb.StepValue = _progressBarStepSmall;
+                pb.DisplayTitleFormat = "Анализ отверстий... [{0}]\\[{1}]";
+                var progress = pb.CreateProgress();
+                pb.MaxValue = openingsReal.Count;
+                var ct = pb.CreateCancellationToken();
+                pb.Show();
+
+                int i = 0;
+                foreach(var openingReal in openingsReal) {
+                    ct.ThrowIfCancellationRequested();
+                    progress.Report(i);
+                    openingReal.UpdateStatus(arLinks);
+                    if(openingReal.Status != OpeningModels.Enums.OpeningRealStatus.Correct) {
+                        openingsRealViewModels.Add(new OpeningRealKrViewModel(openingReal));
+                    }
+                    i++;
+                }
+            }
+            return openingsRealViewModels;
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию моделей представления чистовых отверстий, размещенных в активном документа АР
+        /// </summary>
+        /// <param name="mepLinks">Связи ВИС</param>
+        /// <param name="openingsReal">Чистовые отверстия, размещенные в активном документе АР</param>
+        /// <returns></returns>
+        private ICollection<OpeningRealArViewModel> GetOpeningsRealArViewModels(
+            ICollection<IMepLinkElementsProvider> mepLinks,
+            ICollection<OpeningRealAr> openingsReal) {
+
+            var openingsRealViewModels = new HashSet<OpeningRealArViewModel>();
 
             using(var pb = GetPlatformService<IProgressDialogService>()) {
                 pb.StepValue = _progressBarStepSmall;
@@ -186,7 +272,7 @@ namespace RevitOpeningPlacement {
                     progress.Report(i);
                     openingReal.UpdateStatus(mepLinks);
                     if(openingReal.Status != OpeningModels.Enums.OpeningRealStatus.Correct) {
-                        openingsRealViewModels.Add(new OpeningRealViewModel(openingReal));
+                        openingsRealViewModels.Add(new OpeningRealArViewModel(openingReal));
                     }
                     i++;
                 }
@@ -205,23 +291,13 @@ namespace RevitOpeningPlacement {
             return false;
         }
 
-
-        /// <summary>
-        /// Запуск окна навигатора по исходящим заданиям на отверстия в файле архитектуры
-        /// </summary>
-        /// <param name="uiApplication"></param>
-        /// <param name="revitRepository"></param>
-        private void GetOutgoingTaskInDocAR(UIApplication uiApplication, RevitRepository revitRepository) {
-            TaskDialog.Show("Навигатор по заданиям на отверстия", "Навигатор по исходящим заданиям на отверстия в файле АР находится в разработке");
-        }
-
         /// <summary>
         /// Логика вывода окна навигатора по заданиям на отверстия в файле несущих конструкций
         /// </summary>
         /// <param name="uiApplication"></param>
         /// <param name="revitRepository"></param>
         private void GetOpeningsTaskInDocumentKR(UIApplication uiApplication, RevitRepository revitRepository) {
-            GetIncomingTaskInDocAR(uiApplication, revitRepository);
+            GetIncomingTaskInDocKR(uiApplication, revitRepository);
         }
 
         /// <summary>
@@ -281,33 +357,6 @@ namespace RevitOpeningPlacement {
         private void GetOpeningsTaskInDocumentKoord(RevitRepository revitRepository) {
             TaskDialog.Show("BIM", $"Команда не может быть запущена в координационном файле \"{revitRepository.GetDocumentName()}\"");
             throw new OperationCanceledException();
-        }
-
-        /// <summary>
-        /// Выбор пользователем режима навигатора по заданиям на отверстия
-        /// </summary>
-        /// <returns></returns>
-        private NavigatorMode GetNavigatorModeFromUser() {
-            return NavigatorMode.Incoming; //TODO убрать после реализации создания заданий на отверстия в файле АР
-
-            //var navigatorModeDialog = new TaskDialog("Навигатор по заданиям") {
-            //    MainInstruction = "Выбор режима навигатора"
-            //};
-            //navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1,
-            //    "Посмотреть исходящие задания");
-            //navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2,
-            //    "Посмотреть входящие задания");
-            //navigatorModeDialog.CommonButtons = TaskDialogCommonButtons.Close;
-            //navigatorModeDialog.DefaultButton = TaskDialogResult.Close;
-            //TaskDialogResult result = navigatorModeDialog.Show();
-            //switch(result) {
-            //    case TaskDialogResult.CommandLink1:
-            //    return NavigatorMode.Outgoing;
-            //    case TaskDialogResult.CommandLink2:
-            //    return NavigatorMode.Incoming;
-            //    default:
-            //    return NavigatorMode.NotDefined;
-            //}
         }
     }
 

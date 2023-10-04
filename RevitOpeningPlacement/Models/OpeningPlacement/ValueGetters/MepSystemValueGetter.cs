@@ -51,7 +51,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         }
 
         private string GetElectricMepSystem(Element element) {
-            var doc = _mepElement?.Document.Title ?? string.Empty;
+            var doc = element?.Document.Title ?? string.Empty;
             if(IsEomTitle(doc)) {
                 return "ЭОМ";
             } else if(IsSsTitle(doc)) {
