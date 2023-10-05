@@ -54,9 +54,7 @@ namespace RevitCopyViews.ViewModels {
 
         private void CopyUser(object p) {
             var createdViews = new List<ElementId>();
-            using(var transaction = new Transaction(Document)) {
-                transaction.Start("Копирование видов");
-
+            using(var transaction = Document.StartTransaction("Копирование видов")) {
                 View viewTemplate = CreateViewTemplate(GroupView);
                 ParameterFilterElement paramFilter = CreateParameterFilterElement(GroupView);
                 AddParamFilter(viewTemplate, paramFilter);
