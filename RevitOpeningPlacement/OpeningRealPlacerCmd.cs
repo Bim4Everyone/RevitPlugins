@@ -4,8 +4,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 
-using RevitOpeningPlacement.Models;
-using RevitOpeningPlacement.Models.RealOpeningPlacement.Checkers;
+using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement {
     /// <summary>
@@ -20,15 +19,13 @@ namespace RevitOpeningPlacement {
         }
 
 
-        private protected bool ModelCorrect(RevitRepository revitRepository) {
-            var checker = new RealOpeningsChecker(revitRepository);
-            var errors = checker.GetErrorTexts();
-            if(errors == null || errors.Count == 0) {
+        private protected bool ModelCorrect(IChecker checker) {
+            if(checker.IsCorrect()) {
                 return true;
+            } else {
+                TaskDialog.Show("BIM", checker.GetErrorMessage());
+                return false;
             }
-
-            TaskDialog.Show("BIM", $"{string.Join($"{Environment.NewLine}", errors)}");
-            return false;
         }
     }
 }
