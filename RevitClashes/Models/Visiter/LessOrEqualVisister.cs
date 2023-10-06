@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -19,7 +15,11 @@ namespace RevitClashDetective.Models.Visiter {
         }
 
         public FilterRule Create(ElementId paramId, string value) {
+#if REVIT_2022_OR_LESS
             return ParameterFilterRuleFactory.CreateLessOrEqualRule(paramId, value, false);
+#else
+            return ParameterFilterRuleFactory.CreateLessOrEqualRule(paramId, value);
+#endif 
         }
 
         public FilterRule Create(ElementId paramId, ElementId value) {
