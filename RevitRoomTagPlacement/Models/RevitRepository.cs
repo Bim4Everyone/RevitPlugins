@@ -12,6 +12,8 @@ using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 
+using pyRevitLabs.Json.Linq;
+
 using RevitRoomTagPlacement.ViewModels;
 
 namespace RevitRoomTagPlacement.Models {
@@ -102,8 +104,9 @@ namespace RevitRoomTagPlacement.Models {
 
                     if(!depElements.Contains(SelectedTagType)) {
                         RoomPathFinder pathFinder = new RoomPathFinder(room);
-                        UV point = pathFinder.GetPointByPlacementWay(positionPlacementWay);
-                        XYZ testPoint = new XYZ(point.U, point.V, 0);
+                        UV point = pathFinder.GetPointByPlacementWay(positionPlacementWay, Document.ActiveView);
+                        LocationPoint roomLocation = (LocationPoint) room.Location;
+                        XYZ testPoint = new XYZ(point.U, point.V, roomLocation.Point.Z);
 
                         if(!room.IsPointInRoom(testPoint)) point = pathFinder.GetPointByPath();
 

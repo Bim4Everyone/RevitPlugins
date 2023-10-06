@@ -13,6 +13,7 @@ using pyRevitLabs.Json.Linq;
 
 namespace RevitRoomTagPlacement.Models {
     internal class RoomPathFinder {
+        private const double Indent = 0.0229659;
         private Room _room;
         private BoundingBoxXYZ _roomBB;
 
@@ -21,47 +22,48 @@ namespace RevitRoomTagPlacement.Models {
             _roomBB = room.GetBoundingBox();
         }
 
-        public UV GetPointByPlacementWay(PositionPlacementWay positionPlacementWay) {
-            
+        public UV GetPointByPlacementWay(PositionPlacementWay positionPlacementWay, View roomView) {
+
             double xValue;
             double yValue;
+            double indentByScale = roomView.Scale * Indent;
 
             switch(positionPlacementWay) {
                 case PositionPlacementWay.LeftTop:
-                xValue = _roomBB.Min.X + (_roomBB.Max.X - _roomBB.Min.X) * 0.1;
-                yValue = _roomBB.Min.Y + (_roomBB.Max.Y - _roomBB.Min.Y) * 0.9;
+                xValue = _roomBB.Min.X + indentByScale;
+                yValue = _roomBB.Max.Y - indentByScale;
                 break;
                 case PositionPlacementWay.CenterTop:
-                xValue = _roomBB.Min.X + (_roomBB.Max.X - _roomBB.Min.X) * 0.5;
-                yValue = _roomBB.Min.Y + (_roomBB.Max.Y - _roomBB.Min.Y) * 0.9;
+                xValue = (_roomBB.Min.X + _roomBB.Max.X) * 0.5;
+                yValue = _roomBB.Max.Y - indentByScale;
                 break;
                 case PositionPlacementWay.RightTop:
-                xValue = _roomBB.Min.X + (_roomBB.Max.X - _roomBB.Min.X) * 0.9;
-                yValue = _roomBB.Min.Y + (_roomBB.Max.Y - _roomBB.Min.Y) * 0.9;
+                xValue = _roomBB.Max.X - roomView.Scale * Indent;
+                yValue = _roomBB.Max.Y - indentByScale;
                 break;
                 case PositionPlacementWay.LeftCenter:
-                xValue = _roomBB.Min.X + (_roomBB.Max.X - _roomBB.Min.X) * 0.1;
-                yValue = _roomBB.Min.Y + (_roomBB.Max.Y - _roomBB.Min.Y) * 0.5;
+                xValue = _roomBB.Min.X + indentByScale;
+                yValue = (_roomBB.Min.Y + _roomBB.Max.Y) * 0.5;
                 break;
                 case PositionPlacementWay.CenterCenter:
                 xValue = (_roomBB.Min.X + _roomBB.Max.X) * 0.5;
                 yValue = (_roomBB.Min.Y + _roomBB.Max.Y) * 0.5;
                 break;
                 case PositionPlacementWay.RightCenter:
-                xValue = _roomBB.Min.X + (_roomBB.Max.X - _roomBB.Min.X) * 0.9;
-                yValue = _roomBB.Min.Y + (_roomBB.Max.Y - _roomBB.Min.Y) * 0.5;
+                xValue = _roomBB.Max.X - indentByScale;
+                yValue = (_roomBB.Min.Y + _roomBB.Max.Y) * 0.5;
                 break;
                 case PositionPlacementWay.LeftBottom:
-                xValue = _roomBB.Min.X + (_roomBB.Max.X - _roomBB.Min.X) * 0.1;
-                yValue = _roomBB.Min.Y + (_roomBB.Max.Y - _roomBB.Min.Y) * 0.1;
+                xValue = _roomBB.Min.X + indentByScale;
+                yValue = _roomBB.Min.Y + indentByScale;
                 break;
                 case PositionPlacementWay.CenterBottom:
-                xValue = _roomBB.Min.X + (_roomBB.Max.X - _roomBB.Min.X) * 0.5;
-                yValue = _roomBB.Min.Y + (_roomBB.Max.Y - _roomBB.Min.Y) * 0.1;
+                xValue = (_roomBB.Min.X + _roomBB.Max.X) * 0.5;
+                yValue = _roomBB.Min.Y + indentByScale;
                 break;
                 case PositionPlacementWay.RightBottom:
-                xValue = _roomBB.Min.X + (_roomBB.Max.X - _roomBB.Min.X) * 0.9;
-                yValue = _roomBB.Min.Y + (_roomBB.Max.Y - _roomBB.Min.Y) * 0.1;
+                xValue = _roomBB.Max.X - indentByScale;
+                yValue = _roomBB.Min.Y + indentByScale;
                 break;
                 default:
                 xValue = (_roomBB.Min.X + _roomBB.Max.X) * 0.5;
