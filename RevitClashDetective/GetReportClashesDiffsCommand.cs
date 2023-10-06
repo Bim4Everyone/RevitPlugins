@@ -1,16 +1,16 @@
-﻿
-using Autodesk.Revit.Attributes;
+﻿using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 
 using RevitClashDetective.Models;
-using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.RevitClashReport;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
 
 namespace RevitClashDetective {
+    //TODO эта команда для дебага и отладки логики выполнения плагина
     [Transaction(TransactionMode.Manual)]
     public class GetReportClashesDiffsCommand : BasePluginCommand {
         public GetReportClashesDiffsCommand() {
@@ -31,7 +31,7 @@ namespace RevitClashDetective {
             var navisClashes = ReportLoader.GetClashes(revitRepository, navisFilePath);
 
             var mainViewModlel = new ClashReportDiffViewModel(revitRepository, revitClashes, pluginClashes);
-           
+
             var window = new ClashReportDiffView() { DataContext = mainViewModlel };
             window.Show();
         }

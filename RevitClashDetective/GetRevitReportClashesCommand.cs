@@ -1,18 +1,14 @@
-﻿
-using System;
-using System.Linq;
-
-using Autodesk.Revit.Attributes;
+﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 
 using RevitClashDetective.Models;
-using RevitClashDetective.Models.Extensions;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
 
 namespace RevitClashDetective {
+    //TODO эта команда для дебага и отладки логики выполнения плагина
     [Transaction(TransactionMode.Manual)]
     public class GetRevitReportClashesCommand : BasePluginCommand {
         public GetRevitReportClashesCommand() {
