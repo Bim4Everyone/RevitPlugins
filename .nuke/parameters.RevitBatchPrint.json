@@ -1,0 +1,10 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitBatchPrint",
+  "PublishDirectory": "01.2D.extension\\2D.tab\\bin",
+  "IconUrl": "https://icons8.com/icon/16138/print",
+  "BundleName": "Печать",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "01.2D.extension\\2D.tab\\Листы.panel"
+}
