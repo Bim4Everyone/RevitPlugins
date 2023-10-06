@@ -140,6 +140,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
                         ct.ThrowIfCancellationRequested();
 
                         ICollection<OpeningArTaskIncoming> openingTasks = allOpeningTasks.Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
+                        if(openingTasks.Count == 0) {
+                            sb.AppendLine($"Конструкция с ID: {host.Id} не пересекается ни с одним заданием");
+                        }
                         foreach(OpeningArTaskIncoming openingTask in openingTasks) {
                             try {
                                 PlaceByOneTask(host, openingTask);
