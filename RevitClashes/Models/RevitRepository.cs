@@ -175,7 +175,8 @@ namespace RevitClashDetective.Models {
 
             return doc.GetElement(elementId);
         }
-#else
+#endif
+
         public Element GetElement(string fileName, ElementId id) {
             Document doc;
             if(fileName == null) {
@@ -190,7 +191,6 @@ namespace RevitClashDetective.Models {
 
             return doc.GetElement(elementId);
         }
-#endif
 
         public Element GetElement(Document doc, ElementId id) {
             return doc.GetElement(id);
