@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -15,13 +11,11 @@ namespace RevitOpeningPlacement.Models.RevitViews {
             var view = new FilteredElementCollector(doc)
                 .OfClass(typeof(View3D))
                 .OfType<View3D>()
-                .FirstOrDefault(item => !item.IsTemplate && item.Name.Equals(name));
-            if(view == null) {
-                view = new View3DBuilder()
-                    .SetName(name)
-                    .SetViewSettings(ViewSettingsInitializer.GetView3DSettings(doc).ToArray())
-                    .Build(doc);
-            }
+                .FirstOrDefault(item => !item.IsTemplate && item.Name.Equals(name))
+                ?? new View3DBuilder()
+                .SetName(name)
+                .SetViewSettings(ViewSettingsInitializer.GetView3DSettings(doc).ToArray())
+                .Build(doc);
 
             return view;
         }
