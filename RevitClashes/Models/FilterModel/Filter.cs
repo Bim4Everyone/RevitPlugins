@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
-using RevitClashDetective.Models.FilterGenerators;
 using pyRevitLabs.Json;
-using System.IO;
+
+using RevitClashDetective.Models.FilterGenerators;
 using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.FilterModel {
@@ -21,7 +19,11 @@ namespace RevitClashDetective.Models.FilterModel {
 
         [JsonIgnore]
         public RevitRepository RevitRepository { get; set; }
+#if REVIT_2023_OR_LESS
         public List<int> CategoryIds { get; set; }
+#else
+        public List<long> CategoryIds { get; set; }
+#endif
 
         public IEnumerable<IFilterableValueProvider> GetProviders() {
             return Set.GetProviders().Distinct();

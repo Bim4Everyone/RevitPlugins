@@ -19,7 +19,11 @@ namespace RevitClashDetective.ViewModels.SearchSet {
     internal class GridControlViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly IEnumerable<IFilterableValueProvider> _providers;
+#if REVIT_2023_OR_LESS
         private readonly List<int> _categoryIds;
+#else
+        private readonly List<long> _categoryIds;
+#endif
         private readonly IEnumerable<Element> _elements;
         private int _elementsCount;
 
@@ -75,7 +79,11 @@ namespace RevitClashDetective.ViewModels.SearchSet {
                 row.Add("Category", element.Category?.Name);
                 row.Add("FamilyName", element.GetTypeId().IsNotNull() ? (element.Document.GetElement(element.GetTypeId()) as ElementType)?.FamilyName : null);
                 row.Add("Name", element.Name);
+#if REVIT_2023_OR_LESS
                 row.Add("Id", element.Id.IntegerValue);
+#else
+                row.Add("Id", element.Id.GetIdValue());
+#endif
                 Rows.Add((ExpandoObject) row);
             }
         }
@@ -104,14 +112,24 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             if(resultId == null) {
                 return;
             }
+#if REVIT_2023_OR_LESS
             if(resultId is int id) {
                 var element = GetElement(id, resultFile.ToString());
                 if(element != null) {
                     _revitRepository.SelectAndShowElement(new[] { element });
                 }
             }
+#else
+            if(resultId is long id) {
+                var element = GetElement(id, resultFile.ToString());
+                if(element != null) {
+                    _revitRepository.SelectAndShowElement(new[] { element });
+                }
+            }
+#endif
         }
 
+#if REVIT_2023_OR_LESS
         private Element GetElement(int id, string documentName) {
             var doc = _revitRepository.GetDocuments()
                 .FirstOrDefault(item => _revitRepository.GetDocumentName(item).Equals(documentName, StringComparison.CurrentCultureIgnoreCase));
@@ -120,5 +138,15 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             }
             return null;
         }
+#else
+        private Element GetElement(long id, string documentName) {
+            var doc = _revitRepository.GetDocuments()
+                .FirstOrDefault(item => _revitRepository.GetDocumentName(item).Equals(documentName, StringComparison.CurrentCultureIgnoreCase));
+            if(doc != null && new ElementId(id).IsNotNull()) {
+                return doc.GetElement(new ElementId(id));
+            }
+            return null;
+        }
+#endif
     }
 }

@@ -2,13 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
-
-using dosymep.Revit;
 
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Interfaces;
@@ -74,6 +70,8 @@ namespace RevitClashDetective.Models.RevitClashReport {
             return _revitRepository.GetDocumentName().Equals(_revitRepository.GetDocumentName(fileName), StringComparison.CurrentCultureIgnoreCase);
         }
 
+
+#if REVIT_2023_OR_LESS
         private Element GetElement(IEnumerable<string> elementString) {
             return _revitRepository.GetElement(GetFile(elementString.FirstOrDefault()?.Trim()), GetId(elementString.LastOrDefault()));
         }
@@ -86,6 +84,20 @@ namespace RevitClashDetective.Models.RevitClashReport {
 
             return -1;
         }
+#else
+        private Element GetElement(IEnumerable<string> elementString) {
+            return _revitRepository.GetElement(GetFile(elementString.FirstOrDefault()?.Trim()), new ElementId(GetId(elementString.LastOrDefault())));
+        }
+
+        private long GetId(string idString) {
+            var match = Regex.Match(idString, @"(?'id'\d+)");
+            if(match.Success) {
+                return long.Parse(match.Groups["id"].Value);
+            }
+
+            return -1;
+        }
+#endif
 
         private string GetFile(string fileString) {
             return fileString.EndsWith(".rvt", StringComparison.CurrentCultureIgnoreCase) ? Path.GetFileNameWithoutExtension(fileString) : null;

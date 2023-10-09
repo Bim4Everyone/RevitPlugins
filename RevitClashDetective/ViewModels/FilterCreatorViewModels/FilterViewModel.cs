@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
 
+using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
@@ -16,7 +17,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly Filter _filter;
         private readonly Delay _delay;
-        private string _id;
+        private readonly string _id;
         private string _name;
         private SetViewModel _set;
         private CategoriesInfoViewModel _categoriesInfoViewModel;
@@ -88,6 +89,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             Set = new SetViewModel(_revitRepository, _categoriesInfoViewModel, set);
         }
 
+#if REVIT_2023_OR_LESS
         private void InitializeCategories(IEnumerable<int> ids = null) {
             Categories = new ObservableCollection<CategoryViewModel>(
                 _revitRepository.GetCategories()
@@ -107,6 +109,27 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
             _categoriesInfoViewModel = new CategoriesInfoViewModel(_revitRepository, SelectedCategories);
         }
+#else
+        private void InitializeCategories(IEnumerable<long> ids = null) {
+            Categories = new ObservableCollection<CategoryViewModel>(
+                _revitRepository.GetCategories()
+                    .Select(item => new CategoryViewModel(item))
+                    .OrderBy(item => item.Name));
+
+            if(ids != null) {
+                foreach(var category in Categories
+                    .Where(item => ids.Any(id => id == item.Category.Id.GetIdValue()))) {
+                    category.IsSelected = true;
+                }
+            }
+
+            foreach(var category in Categories) {
+                category.PropertyChanged += Category_PropertyChanged;
+            }
+
+            _categoriesInfoViewModel = new CategoriesInfoViewModel(_revitRepository, SelectedCategories);
+        }
+#endif
 
         private void Category_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
             if(e.PropertyName.Equals(nameof(CategoryViewModel.IsSelected))) {
@@ -115,11 +138,19 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         public Filter GetFilter() {
+#if REVIT_2023_OR_LESS
             return new Filter(_revitRepository) {
                 Name = Name,
                 Set = (Set) Set.GetCriterion(),
                 CategoryIds = SelectedCategories.Select(item => item.Category.Id.IntegerValue).ToList()
             };
+#else
+            return new Filter(_revitRepository) {
+                Name = Name,
+                Set = (Set) Set.GetCriterion(),
+                CategoryIds = SelectedCategories.Select(item => item.Category.Id.GetIdValue()).ToList()
+            };
+#endif
         }
 
         private void SelectedCategoriesChanged() {

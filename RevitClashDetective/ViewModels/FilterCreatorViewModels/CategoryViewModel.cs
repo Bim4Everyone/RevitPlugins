@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.WPF.ViewModels;
-
-using RevitClashDetective.Models;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
     internal class CategoryViewModel : BaseViewModel, IEquatable<CategoryViewModel> {
@@ -20,9 +16,9 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             Name = Category.Name;
         }
 
-        public bool IsSelected { 
-            get => _isSelected; 
-            set => this.RaiseAndSetIfChanged(ref _isSelected, value); 
+        public bool IsSelected {
+            get => _isSelected;
+            set => this.RaiseAndSetIfChanged(ref _isSelected, value);
         }
         public string Name {
             get => _name;
@@ -40,9 +36,16 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
                 && Category.Id == other.Category.Id;
         }
 
+#if REVIT_2023_OR_LESS
         public override int GetHashCode() {
             return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name)
                 + EqualityComparer<int>.Default.GetHashCode(Category.Id.IntegerValue);
         }
+#else
+        public override int GetHashCode() {
+            return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name)
+                + EqualityComparer<int>.Default.GetHashCode((int) Category.Id.GetIdValue());
+        }
+#endif
     }
 }

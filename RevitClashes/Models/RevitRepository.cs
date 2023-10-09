@@ -160,6 +160,7 @@ namespace RevitClashDetective.Models {
             return _document.GetElement(id);
         }
 
+#if REVIT_2023_OR_LESS
         public Element GetElement(string fileName, int id) {
             Document doc;
             if(fileName == null) {
@@ -174,6 +175,22 @@ namespace RevitClashDetective.Models {
 
             return doc.GetElement(elementId);
         }
+#else
+        public Element GetElement(string fileName, ElementId id) {
+            Document doc;
+            if(fileName == null) {
+                doc = _document;
+            } else {
+                doc = DocInfos.FirstOrDefault(item => item.Name.Equals(GetDocumentName(fileName), StringComparison.CurrentCultureIgnoreCase))?.Doc;
+            }
+            var elementId = id;
+            if(doc == null || elementId.IsNull()) {
+                return null;
+            }
+
+            return doc.GetElement(elementId);
+        }
+#endif
 
         public Element GetElement(Document doc, ElementId id) {
             return doc.GetElement(id);
