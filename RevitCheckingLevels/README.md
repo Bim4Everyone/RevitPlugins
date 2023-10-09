@@ -2,6 +2,13 @@
 Плагин позволяет проверять моделирование уровней на стандарты.
 
 # Сборка проекта
+
 ```
-nuke compile --plugin-name RevitCheckingLevels
+nuke compile --profile RevitCheckingLevels
+```
+
+# Сборка проекта
+
+```
+nuke publish --profile RevitCheckingLevels
 ```
