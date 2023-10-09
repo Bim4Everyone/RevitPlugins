@@ -10,6 +10,7 @@ using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitOpeningPlacement.Models;
@@ -33,7 +34,7 @@ namespace RevitOpeningPlacement {
         /// <summary>
         /// Id элементов которые выдают предупреждение дублирования в Revit и которые нужно удалить
         /// </summary>
-        private readonly HashSet<int> _duplicatedInstancesToRemoveIds = new HashSet<int>();
+        private readonly HashSet<ElementId> _duplicatedInstancesToRemoveIds = new HashSet<ElementId>();
 
 
         public PlaceOpeningTasksCmd() {
@@ -255,7 +256,7 @@ namespace RevitOpeningPlacement {
                 var definition = fma.GetFailureDefinitionId();
                 if(definition == BuiltInFailures.OverlapFailures.DuplicateInstances) {
                     // в дубликаты заносить все элементы, кроме самого старого, у которого значение Id наименьшее
-                    var ids = fma.GetFailingElementIds().Select(id => id.IntegerValue).OrderBy(id => id).Skip(1);
+                    var ids = fma.GetFailingElementIds().OrderBy(elId => elId.GetIdValue()).Skip(1);
                     foreach(var id in ids) {
                         _duplicatedInstancesToRemoveIds.Add(id);
                     }

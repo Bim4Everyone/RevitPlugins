@@ -5,6 +5,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models.Extensions;
@@ -50,7 +51,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// <summary>
         /// Id экземпляра семейства задания на отверстие
         /// </summary>
-        public int OpeningId { get; } = -1;
+        public ElementId OpeningId { get; } = ElementId.InvalidElementId;
 
         /// <summary>
         /// Название связанного файла-источника задания на отверстие
@@ -135,7 +136,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         }
 
         public override int GetHashCode() {
-            return OpeningId + FileName.GetHashCode();
+            return (int) OpeningId.GetIdValue() + FileName.GetHashCode();
         }
 
         public bool Equals(OpeningMepTaskIncomingViewModel other) {

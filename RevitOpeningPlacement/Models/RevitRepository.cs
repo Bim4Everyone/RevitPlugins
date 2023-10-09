@@ -294,9 +294,15 @@ namespace RevitOpeningPlacement.Models {
             return _document.GetElement(id);
         }
 
+        public Element GetElement(string fileName, ElementId id) {
+            return _clashRevitRepository.GetElement(fileName, id);
+        }
+
+#if REVIT_2023_OR_LESS
         public Element GetElement(string fileName, int id) {
             return _clashRevitRepository.GetElement(fileName, id);
         }
+#endif
 
         public void SelectAndShowElement(ICollection<Element> elements) {
             double additionalSize = 2;
@@ -476,8 +482,8 @@ namespace RevitOpeningPlacement.Models {
         /// Удаляет элемент из документа Revit без запуска транзакции
         /// </summary>
         /// <param name="elementId">Id элемента, который нужно удалить</param>
-        public void DeleteElement(int elementId) {
-            _document.Delete(new ElementId(elementId));
+        public void DeleteElement(ElementId elementId) {
+            _document.Delete(elementId);
         }
 
         /// <summary>
@@ -505,7 +511,7 @@ namespace RevitOpeningPlacement.Models {
                     System.Windows.MessageBoxResult.OK);
                 throw new OperationCanceledException();
             }
-            DeleteElements(openingTasks.Select(task => new ElementId(task.Id)).ToHashSet());
+            DeleteElements(openingTasks.Select(task => task.Id).ToHashSet());
             return createdOpening;
         }
 

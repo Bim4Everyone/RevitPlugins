@@ -18,7 +18,7 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         public static ParameterFilterElement GetOpeningFilter(Document doc) {
             var category = Category.GetCategory(doc, BuiltInCategory.OST_GenericModel);
             var nameParameter = ParameterFilterUtilities.GetFilterableParametersInCommon(doc, new[] { category.Id })
-                .FirstOrDefault(item => item.IsSystemId() && (BuiltInParameter) item.IntegerValue == BuiltInParameter.ALL_MODEL_FAMILY_NAME);
+                .FirstOrDefault(item => item.IsSystemId() && (BuiltInParameter) item.GetIdValue() == BuiltInParameter.ALL_MODEL_FAMILY_NAME);
             FilterRule filterRule = default;
             if(nameParameter != null) {
                 string famName = "ОбщМд_Отв";

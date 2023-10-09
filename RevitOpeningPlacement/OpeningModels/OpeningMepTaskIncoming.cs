@@ -48,7 +48,7 @@ namespace RevitOpeningPlacement.OpeningModels {
             _familyInstance = openingTaskIncoming;
             _revitRepository = revitRepository;
 
-            Id = _familyInstance.Id.IntegerValue;
+            Id = _familyInstance.Id;
             Transform = transform;
             Location = Transform.OfPoint((_familyInstance.Location as LocationPoint).Point);
             // https://forums.autodesk.com/t5/revit-api-forum/get-angle-from-transform-basisx-basisy-and-basisz/td-p/5326059
@@ -89,7 +89,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Id экземпляра семейства задания на отверстие
         /// </summary>
-        public int Id { get; }
+        public ElementId Id { get; }
 
         /// <summary>
         /// Точка расположения экземпляра семейства входящего задания на отверстие в координатах активного документа - получателя заданий
@@ -199,7 +199,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         public override int GetHashCode() {
-            return Id + FileName.GetHashCode();
+            return (int) Id.GetIdValue() + FileName.GetHashCode();
         }
 
         public bool Equals(OpeningMepTaskIncoming other) {
@@ -351,7 +351,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                 // для ускорения поиск первого пересечения
                 var opening = realOpenings.FirstOrDefault(realOpening => realOpening.IntersectsSolid(thisOpeningSolid, thisOpeningBBox));
                 if(opening != null) {
-                    return new ElementId[] { new ElementId(opening.Id) };
+                    return new ElementId[] { opening.Id };
                 } else {
                     return Array.Empty<ElementId>();
                 }

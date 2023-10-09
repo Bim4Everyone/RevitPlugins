@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models.Extensions;
@@ -33,7 +34,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// <summary>
         /// Id экземпляра семейства чистового на отверстия
         /// </summary>
-        public int OpeningId { get; } = -1;
+        public ElementId OpeningId { get; } = ElementId.InvalidElementId;
 
         /// <summary>
         /// Диаметр
@@ -73,7 +74,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         }
 
         public override int GetHashCode() {
-            return OpeningId;
+            return (int) OpeningId.GetIdValue();
         }
 
         /// <summary>

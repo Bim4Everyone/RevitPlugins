@@ -23,14 +23,12 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
     internal class GridControlViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly IEnumerable<IFilterableValueProvider> _providers;
-        private readonly List<int> _categoryIds;
         private readonly IEnumerable<Element> _elements;
         private int _elementsCount;
 
         public GridControlViewModel(RevitRepository revitRepository, Filter filter, IEnumerable<Element> elements) {
             _revitRepository = revitRepository;
             _providers = filter.GetProviders();
-            _categoryIds = filter.CategoryIds;
             _elements = elements;
             InitializeColumns();
             InitializeRows();
@@ -78,7 +76,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 row.Add("Category", element.Category?.Name);
                 row.Add("FamilyName", element.GetTypeId().IsNotNull() ? (element.Document.GetElement(element.GetTypeId()) as ElementType)?.FamilyName : null);
                 row.Add("Name", element.Name);
-                row.Add("Id", element.Id.IntegerValue);
+                row.Add("Id", element.Id.GetIdValue());
                 Rows.Add((ExpandoObject) row);
             }
         }
@@ -98,6 +96,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             Columns.Insert(0, new ColumnViewModel() { FieldName = "Id", Header = "Id" });
         }
 
+
+#if REVIT_2023_OR_LESS
         private void SelectElement(object p) {
             if(!(p is ExpandoObject row))
                 return;
@@ -120,5 +120,29 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             }
             return null;
         }
+#else
+        private void SelectElement(object p) {
+            if(!(p is ExpandoObject row))
+                return;
+            ((IDictionary<string, object>) row).TryGetValue("Id", out object resultId);
+            if(resultId == null) {
+                return;
+            }
+            if(resultId is long id) {
+                var element = GetElement(id);
+                if(element != null) {
+                    _revitRepository.SelectAndShowElement(new[] { element });
+                }
+            }
+        }
+
+        private Element GetElement(long id) {
+            var doc = _revitRepository.Doc;
+            if(doc != null && new ElementId(id).IsNotNull()) {
+                return doc.GetElement(new ElementId(id));
+            }
+            return null;
+        }
+#endif
     }
 }

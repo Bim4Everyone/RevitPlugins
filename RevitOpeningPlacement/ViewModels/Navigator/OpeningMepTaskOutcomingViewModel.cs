@@ -4,6 +4,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models.Extensions;
@@ -92,7 +93,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         }
 
         public override int GetHashCode() {
-            return _openingTask.Id;
+            return (int) _openingTask.Id.GetIdValue();
         }
 
         public bool Equals(OpeningMepTaskOutcomingViewModel other) {

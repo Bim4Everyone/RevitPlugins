@@ -4,6 +4,7 @@ using System.IO;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models.Extensions;
@@ -34,7 +35,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         }
 
 
-        public int OpeningId { get; } = -1;
+        public ElementId OpeningId { get; } = ElementId.InvalidElementId;
 
         public string FileName { get; } = string.Empty;
 
@@ -70,7 +71,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         }
 
         public override int GetHashCode() {
-            return OpeningId + FileName.GetHashCode();
+            return (int) OpeningId.GetIdValue() + FileName.GetHashCode();
         }
 
         public bool Equals(OpeningArTaskIncomingViewModel other) {

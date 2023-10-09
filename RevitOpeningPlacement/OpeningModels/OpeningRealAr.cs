@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SystemParams;
+using dosymep.Revit;
 
 using RevitClashDetective.Models.Extensions;
 
@@ -23,7 +24,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="openingReal">Экземпляр семейства чистового отверстия АР, идущего на чертежи</param>
         public OpeningRealAr(FamilyInstance openingReal) : base(openingReal) {
-            Id = _familyInstance.Id.IntegerValue;
+            Id = _familyInstance.Id;
             Diameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArDiameter);
             Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArWidth);
             Height = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArHeight);
@@ -39,7 +40,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Id экземпляра семейства задания на отверстие
         /// </summary>
-        public int Id { get; }
+        public ElementId Id { get; }
 
         /// <summary>
         /// Диаметр в мм, если есть
@@ -72,7 +73,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         public override int GetHashCode() {
-            return Id;
+            return (int) Id.GetIdValue();
         }
 
         public bool Equals(OpeningRealAr other) {
