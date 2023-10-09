@@ -247,7 +247,7 @@
                                   ShowCloseButton="False">
                     <dxg:GridControl x:Name="_dgOpeningsReal"
                                      ItemsSource="{Binding OpeningsRealViewSource.View}"
-                                     DefaultSorting="OpeningId"
+                                     DefaultSorting="Diameter"
                                      BorderThickness="0"
                                      SelectionMode="Row"
                                      CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningRealArViewModel"
