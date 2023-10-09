@@ -1,9 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -27,9 +22,9 @@ namespace dosymep.Serializers {
     internal class ElementIdConverter : JsonConverter<ElementId> {
         public override void WriteJson(JsonWriter writer, ElementId value, JsonSerializer serializer) {
 #if REVIT_2023_OR_LESS
-            writer.WriteValue(value.IntegerValue.ToString());
+            writer.WriteValue(value.IntegerValue);
 #else
-            writer.WriteValue(value.Value.ToString());
+            writer.WriteValue(value.Value);
 #endif
         }
 
