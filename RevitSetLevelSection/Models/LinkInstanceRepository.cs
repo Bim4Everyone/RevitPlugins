@@ -45,7 +45,7 @@ namespace RevitSetLevelSection.Models {
                 .OfType<DesignOption>()
                 .ToList();
         }
-        
+
         public List<FamilyInstance> GetElements() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
@@ -100,7 +100,7 @@ namespace RevitSetLevelSection.Models {
                 }
             }
         }
-        
+
         public AreaScheme GetAreaScheme() {
             return new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
@@ -120,7 +120,7 @@ namespace RevitSetLevelSection.Models {
                 .Select(item => new ZoneInfo() {Area = item, Level = GetLevel(item), Solid = CreateSolid(item)})
                 .ToList();
         }
-        
+
         /// <summary>
         /// Возвращает трансформированный <see cref="Solid"/> по границам зоны расположенный на Z=0.
         /// </summary>
@@ -141,7 +141,7 @@ namespace RevitSetLevelSection.Models {
             var curveLoops = new[] {CurveLoop.Create(curves)};
             return GeometryCreationUtilities.CreateExtrusionGeometry(curveLoops, XYZ.BasisZ, 10);
         }
-        
+
         private Transform CreateAreaTransform(Area area) {
             XYZ areaPoint = ((LocationPoint) area.Location).Point;
             areaPoint = Transform.OfPoint(areaPoint);
@@ -154,9 +154,16 @@ namespace RevitSetLevelSection.Models {
 
         public Level GetLevel(Area area) {
             var paramValue = area.GetParamValue<string>(SharedParamsConfig.Instance.FixComment);
+
+#if REVIT_2023_OR_LESS
             if(int.TryParse(paramValue, out int elementId)) {
                 return _document.GetElement(new ElementId(elementId)) as Level;
             }
+#else
+            if(long.TryParse(paramValue, out long elementId)) {
+                return _document.GetElement(new ElementId(elementId)) as Level;
+            }
+#endif
 
             return null;
         }
@@ -188,7 +195,7 @@ namespace RevitSetLevelSection.Models {
             if(solids.Count == 0) {
                 return false;
             }
-            
+
             Solid solid0 = solids[0];
             for(int index = 1; index < solids.Count; index++) {
                 Solid solid1 = solids[index];
@@ -214,7 +221,7 @@ namespace RevitSetLevelSection.Models {
             }
         }
     }
-    
+
     internal class AreaFilter : ISelectionFilter {
         private readonly AreaScheme _areaScheme;
 

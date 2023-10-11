@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
@@ -31,7 +33,7 @@ namespace RevitSetLevelSection.Models {
 
     public class ParamSettings {
         public int? BuildPartId { get; set; }
-        public int? DesignOptionId { get; set; }
+        public ElementId DesignOptionId { get; set; }
         public string ParamId { get; set; }
         public bool IsEnabled { get; set; }
     }
