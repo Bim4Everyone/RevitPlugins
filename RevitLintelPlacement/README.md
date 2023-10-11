@@ -2,6 +2,13 @@
 Плагин расставляет перемычки согласно настройкам.
 
 # Сборка проекта
+
 ```
-nuke compile --plugin-name RevitLintelPlacement
+nuke compile --profile RevitLintelPlacement
+```
+
+# Публикация проекта
+
+```
+nuke publish --profile RevitLintelPlacement
 ```
