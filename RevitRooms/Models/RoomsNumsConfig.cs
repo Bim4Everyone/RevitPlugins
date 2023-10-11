@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB;
+
 using pyRevitLabs.Json;
 
 namespace RevitRooms.Models {
@@ -57,11 +59,11 @@ namespace RevitRooms.Models {
         
         public bool IsNumRoomsSectionLevels { get; set; }
 
-        public int PhaseElementId { get; set; }
+        public ElementId PhaseElementId { get; set; }
 
-        public List<int> Levels { get; set; } = new List<int>();
-        public List<int> Groups { get; set; } = new List<int>();
-        public List<int> Sections { get; set; } = new List<int>();
+        public List<ElementId> Levels { get; set; } = new List<ElementId>();
+        public List<ElementId> Groups { get; set; } = new List<ElementId>();
+        public List<ElementId> Sections { get; set; } = new List<ElementId>();
     }
 
 }

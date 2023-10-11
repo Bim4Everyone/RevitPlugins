@@ -1,0 +1,10 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitMarkPlacement",
+  "PublishDirectory": "03.KR.extension\\КР.tab\\bin",
+  "IconUrl": "https://icons8.com/icon/21872/left-down-2",
+  "BundleName": "Расставить отметки",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "03.KR.extension\\КР.tab\\Отметки.panel\\Отметки типовых этажей.stack"
+}

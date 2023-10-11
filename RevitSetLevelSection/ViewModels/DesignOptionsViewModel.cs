@@ -28,13 +28,13 @@ namespace RevitSetLevelSection.ViewModels {
             _designOption = designOption;
             _massElements = massRepository.GetElements(designOption).ToList();
 
-            Id = designOption.Id.IntegerValue;
+            Id = designOption.Id;
             Name = designOption.Name;
             Transform = massRepository.Transform;
             HasMassIntersect = massRepository.HasIntersects(designOption);
         }
 
-        public int Id { get; }
+        public ElementId Id { get; }
         public string Name { get; }
         public Transform Transform { get; }
         public bool HasMassIntersect { get; }

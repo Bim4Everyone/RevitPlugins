@@ -155,7 +155,7 @@ namespace RevitMarkPlacement.ViewModels {
                     _settings.LevelHeight = double.Parse(userFloorHeight.FloorHeight);
                 }
                 if(provider is GlobalFloorHeightViewModel globalFloorHeight) {
-                    _settings.GlobalParameterId = globalFloorHeight?.SelectedGlobalParameter?.ElementId?.IntegerValue ?? -1;
+                    _settings.GlobalParameterId = globalFloorHeight?.SelectedGlobalParameter?.ElementId;
                 }
             }
             _config.SaveProjectConfig();

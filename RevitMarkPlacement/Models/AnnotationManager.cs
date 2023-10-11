@@ -73,7 +73,9 @@ namespace RevitMarkPlacement.Models {
             annotation.SetParamValue(RevitRepository.LevelCountParam, count);
             annotation.SetParamValue(RevitRepository.TemplateLevelHeightParam, templateFloorHeight / 1000);
             annotation.SetParamValue(RevitRepository.FirstLevelOnParam, 0);
-            annotation.SetParamValue(RevitRepository.SpotDimensionIdParam, spot.Id.IntegerValue);
+            
+            // могут быть проблемы, если идентификатор будет больше int
+            annotation.SetParamValue(RevitRepository.SpotDimensionIdParam, (int) spot.Id.GetIdValue());
 
 #if REVIT_2020_OR_LESS
             annotation.SetParamValue(RevitRepository.FirstLevelParam, UnitUtils.ConvertFromInternalUnits(level, DisplayUnitType.DUT_METERS));
