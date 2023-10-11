@@ -1,0 +1,10 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitRooms",
+  "PublishDirectory": "02.AR.extension\\АР.tab\\bin",
+  "IconUrl": "https://icons8.com/icon/14124/room",
+  "BundleName": "Квартирография",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "02.AR.extension\\АР.tab\\Квартирография.panel"
+}
