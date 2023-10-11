@@ -42,7 +42,7 @@ namespace RevitRooms.ViewModels {
         public string Description { get; set; }
         public IElementViewModel<Element> Element { get; set; }
 
-        public int ElementId => Element.ElementId.IntegerValue;
+        public ElementId ElementId => Element.ElementId;
 
         public string Name => Element.Name;
         public string PhaseName => Element.PhaseName;

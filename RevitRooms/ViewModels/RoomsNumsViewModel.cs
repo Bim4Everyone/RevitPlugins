@@ -547,21 +547,21 @@ namespace RevitRooms.ViewModels {
             IsNumRoomsSection = settings.IsNumRoomsSection;
             IsNumRoomsSectionLevels = settings.IsNumRoomsSectionLevels;
 
-            if(_revitRepository.GetElement(new ElementId(settings.PhaseElementId)) is Phase phase) {
+            if(_revitRepository.GetElement(settings.PhaseElementId) is Phase phase) {
                 if(!(phase == null || Phase?.ElementId == phase.Id)) {
                     Phase = Phases.FirstOrDefault(item => item.ElementId == phase.Id) ?? Phases.FirstOrDefault();
                 }
             }
 
-            foreach(var level in Levels.Where(item => settings.Levels.Contains(item.ElementId.IntegerValue))) {
+            foreach(var level in Levels.Where(item => settings.Levels.Contains(item.ElementId))) {
                 level.IsSelected = true;
             }
 
-            foreach(var group in Groups.Where(item => settings.Groups.Contains(item.ElementId.IntegerValue))) {
+            foreach(var group in Groups.Where(item => settings.Groups.Contains(item.ElementId))) {
                 group.IsSelected = true;
             }
 
-            foreach(var section in Sections.Where(item => settings.Sections.Contains(item.ElementId.IntegerValue))) {
+            foreach(var section in Sections.Where(item => settings.Sections.Contains(item.ElementId))) {
                 section.IsSelected = true;
             }
         }
@@ -582,22 +582,22 @@ namespace RevitRooms.ViewModels {
             settings.IsNumRoomsSectionLevels = IsNumRoomsSectionLevels;
 
             settings.SelectedRoomId = _id;
-            settings.PhaseElementId = Phase.ElementId.IntegerValue;
+            settings.PhaseElementId = Phase.ElementId;
             settings.DocumentName = _revitRepository.DocumentName;
 
             settings.Levels = Levels
                 .Where(item => item.IsSelected)
-                .Select(item => item.ElementId.IntegerValue)
+                .Select(item => item.ElementId)
                 .ToList();
 
             settings.Groups = Groups
                 .Where(item => item.IsSelected)
-                .Select(item => item.ElementId.IntegerValue)
+                .Select(item => item.ElementId)
                 .ToList();
 
             settings.Sections = Sections
                 .Where(item => item.IsSelected)
-                .Select(item => item.ElementId.IntegerValue)
+                .Select(item => item.ElementId)
                 .ToList();
 
             RoomsNumsConfig.SaveConfig(roomsConfig);
