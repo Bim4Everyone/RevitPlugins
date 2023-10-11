@@ -3,5 +3,10 @@
 
 # Сборка проекта
 ```
-nuke compile --plugin-name RevitEditingZones
+nuke compile --profile RevitEditingZones
+```
+
+# Публикация проекта
+```
+nuke publish --profile RevitEditingZones
 ```

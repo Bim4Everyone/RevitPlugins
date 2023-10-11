@@ -65,7 +65,7 @@ namespace RevitCheckingLevels.ViewModels {
             var settings = _checkingLevelConfig.GetSettings(_revitRepository.Document)
                            ?? _checkingLevelConfig.AddSettings(_revitRepository.Document);
 
-            settings.LinkTypeId = LinkType?.Id.IntegerValue ?? 0;
+            settings.LinkTypeId = LinkType?.Id ?? ElementId.InvalidElementId;
             _checkingLevelConfig.SaveProjectConfig();
         }
 

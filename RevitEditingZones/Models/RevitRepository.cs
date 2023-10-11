@@ -26,11 +26,11 @@ namespace RevitEditingZones.Models {
         public Document Document => ActiveUIDocument.Document;
 
         public AreaScheme AreaScheme { get; }
-        
+
         public bool IsKoordFile() {
             return Document.Title.Contains("_KOORD");
         }
-        
+
         public bool IsKoordFile(RevitLinkType revitLinkType) {
             return revitLinkType.Name.Contains("_KOORD");
         }
@@ -100,10 +100,15 @@ namespace RevitEditingZones.Models {
             var fixCommentParam = SharedParamsConfig.Instance.FixComment;
             if(area.IsExistsParamValue(fixCommentParam)) {
                 var paramValue = area.GetParamValue<string>(fixCommentParam);
+#if REVIT_2023_OR_LESS
                 var levelId = int.TryParse(paramValue, out int elementId)
                     ? new ElementId(elementId)
                     : ElementId.InvalidElementId;
-
+#else
+                var levelId = long.TryParse(paramValue, out long elementId)
+                    ? new ElementId(elementId)
+                    : ElementId.InvalidElementId;
+#endif
                 return Document.GetElement(levelId) as Level;
             }
 
@@ -113,7 +118,7 @@ namespace RevitEditingZones.Models {
         public void UpdateAreaName(Area area, string areaName) {
             area.SetParamValue(BuiltInParameter.ROOM_NAME, areaName);
         }
-        
+
         public void UpdateAreaLevel(Area area, Level level) {
             area.SetParamValue(SharedParamsConfig.Instance.FixComment, level?.Id.ToString());
         }
@@ -135,7 +140,7 @@ namespace RevitEditingZones.Models {
             return false;
         }
     }
-    
+
     internal class FloorData {
         public FloorData(string floorName) {
             string[] split = floorName.Split('_');

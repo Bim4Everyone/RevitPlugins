@@ -1,0 +1,10 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitCopyStandarts",
+  "PublishDirectory": "01.BIM.extension\\BIM.tab\\bin",
+  "IconUrl": "https://icons8.com/icon/18448/books",
+  "BundleName": "Копирование стандартов",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "01.BIM.extension\\BIM.tab\\Прочее.panel\\Прочее 1.stack\\Стандарты.pulldown"
+}

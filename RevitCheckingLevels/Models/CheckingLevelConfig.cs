@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone;
 using dosymep.Serializers;
@@ -26,7 +28,7 @@ namespace RevitCheckingLevels.Models {
     }
 
     internal class CheckingLevelSettings : ProjectSettings {
-        public int LinkTypeId { get; set; }
+        public ElementId LinkTypeId { get; set; }
         public override string ProjectName { get; set; }
     }
 }
