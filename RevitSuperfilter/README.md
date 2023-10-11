@@ -2,6 +2,13 @@
 Плагин выделения элементов по параметрам и категориям.
 
 # Сборка проекта
+
 ```
-nuke compile --plugin-name RevitSuperfilter
+nuke compile --profile RevitSuperfilter
+```
+
+# Публикация проекта
+
+```
+nuke publish --profile RevitSuperfilter
 ```

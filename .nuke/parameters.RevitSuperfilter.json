@@ -1,0 +1,10 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitSuperfilter",
+  "PublishDirectory": "01.BIM.extension\\BIM.tab\\bin",
+  "IconUrl": "",
+  "BundleName": "Суперфильтр",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "01.BIM.extension\\BIM.tab\\Выборка.panel"
+}
