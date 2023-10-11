@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SystemParams;
+using dosymep.Revit;
 
 using RevitClashDetective.Models.Extensions;
 
@@ -20,7 +21,7 @@ namespace RevitOpeningPlacement.OpeningModels {
     /// </summary>
     internal class OpeningRealKr : OpeningRealBase, IEquatable<OpeningRealKr> {
         public OpeningRealKr(FamilyInstance openingReal) : base(openingReal) {
-            Id = _familyInstance.Id.IntegerValue;
+            Id = _familyInstance.Id;
             Diameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningKrPlacer.RealOpeningKrDiameter);
             Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningKrPlacer.RealOpeningKrInWallWidth);
             Height = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningKrPlacer.RealOpeningKrInWallHeight);
@@ -35,7 +36,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Id экземпляра семейства задания на отверстие
         /// </summary>
-        public int Id { get; }
+        public ElementId Id { get; }
 
         /// <summary>
         /// Диаметр в мм, если есть
@@ -69,7 +70,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         public override int GetHashCode() {
-            return Id;
+            return (int) Id.GetIdValue();
         }
 
         public bool Equals(OpeningRealKr other) {

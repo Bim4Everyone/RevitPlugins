@@ -131,7 +131,6 @@
                     <dxg:GridControl x:Name="_dgIncomingTasks"
                                      Grid.Row="0"
                                      ItemsSource="{Binding OpeningsArTasksIncomingViewSource.View}"
-                                     DefaultSorting="ArSystem"
                                      BorderThickness="0"
                                      SelectionMode="Row"
                                      CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningArTaskIncomingViewModel"
@@ -210,7 +209,7 @@
                                   ShowCloseButton="False">
                     <dxg:GridControl x:Name="_dgOpeningsReal"
                                      ItemsSource="{Binding OpeningsRealViewSource.View}"
-                                     DefaultSorting="OpeningId"
+                                     DefaultSorting="Diameter"
                                      BorderThickness="0"
                                      SelectionMode="Row"
                                      CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningRealKrViewModel"

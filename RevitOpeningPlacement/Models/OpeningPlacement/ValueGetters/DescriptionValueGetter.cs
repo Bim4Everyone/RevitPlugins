@@ -2,6 +2,8 @@
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Interfaces;
@@ -31,9 +33,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
                 return new StringParamValue(_openingsGroup.GetDescription());
             } else {
                 var firstElementName = _element1.Name;
-                var firstElementId = _element1.Id.IntegerValue;
+                var firstElementId = _element1.Id.GetIdValue();
                 var secondElementName = _element2.Name;
-                var secondElementId = _element2.Id.IntegerValue;
+                var secondElementId = _element2.Id.GetIdValue();
 
                 var description = firstElementName + ": " + firstElementId + "; " + secondElementName + ": " + secondElementId;
                 return new StringParamValue(description);

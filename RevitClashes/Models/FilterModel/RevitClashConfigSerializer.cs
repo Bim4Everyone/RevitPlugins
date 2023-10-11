@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 using pyRevitLabs.Json.Serialization;
@@ -13,6 +14,7 @@ namespace RevitClashDetective.Models.FilterModel {
         private readonly ISerializationBinder _serializationBinder;
         private readonly Document _document;
         private readonly RevitParamConverter _systemParamConverter;
+        private readonly ElementIdConverter _elementIdConverter;
 
         public RevitClashConfigSerializer(ISerializationBinder serializationBinder, Document document) {
             if(serializationBinder is null) { throw new ArgumentNullException(nameof(serializationBinder)); }
@@ -21,6 +23,7 @@ namespace RevitClashDetective.Models.FilterModel {
             _serializationBinder = serializationBinder;
             _document = document;
             _systemParamConverter = new RevitParamConverter(_document);
+            _elementIdConverter = new ElementIdConverter();
         }
 
 
@@ -28,7 +31,7 @@ namespace RevitClashDetective.Models.FilterModel {
             return JsonConvert.DeserializeObject<T>(text, new JsonSerializerSettings {
                 TypeNameHandling = TypeNameHandling.Objects,
                 SerializationBinder = _serializationBinder,
-                Converters = new List<JsonConverter>() { _systemParamConverter }
+                Converters = new List<JsonConverter>() { _systemParamConverter, _elementIdConverter }
             });
         }
 
@@ -36,7 +39,7 @@ namespace RevitClashDetective.Models.FilterModel {
             return JsonConvert.SerializeObject(@object, Formatting.Indented, new JsonSerializerSettings {
                 TypeNameHandling = TypeNameHandling.Objects,
                 SerializationBinder = _serializationBinder,
-                Converters = new List<JsonConverter>() { _systemParamConverter }
+                Converters = new List<JsonConverter>() { _systemParamConverter, _elementIdConverter }
             });
         }
     }

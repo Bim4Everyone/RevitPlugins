@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SystemParams;
+using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
 using RevitClashDetective.Models.Extensions;
@@ -33,7 +34,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         public OpeningArTaskIncoming(RevitRepository revitRepository, FamilyInstance openingTask, Transform transform) : base(openingTask) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             FileName = _familyInstance.Document.PathName;
-            Id = _familyInstance.Id.IntegerValue;
+            Id = _familyInstance.Id;
             Transform = transform;
             Location = Transform.OfPoint((_familyInstance.Location as LocationPoint).Point);
             // https://forums.autodesk.com/t5/revit-api-forum/get-angle-from-transform-basisx-basisy-and-basisz/td-p/5326059
@@ -57,7 +58,7 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         public string FileName { get; }
 
-        public int Id { get; }
+        public ElementId Id { get; }
 
         /// <summary>
         /// Трансформация связанного файла с заданием на отверстие относительно активного документа - получателя заданий
@@ -120,7 +121,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         public override int GetHashCode() {
-            return Id + FileName.GetHashCode();
+            return (int) Id.GetIdValue() + FileName.GetHashCode();
         }
 
         public bool Equals(OpeningArTaskIncoming other) {
@@ -197,7 +198,7 @@ namespace RevitOpeningPlacement.OpeningModels {
             } else {
                 var opening = realOpenings.FirstOrDefault(realOpening => realOpening.IntersectsSolid(thisOpeningSolid, thisOpeningBBox));
                 if(opening != null) {
-                    return new ElementId[] { new ElementId(opening.Id) };
+                    return new ElementId[] { opening.Id };
                 } else {
                     return Array.Empty<ElementId>();
                 }

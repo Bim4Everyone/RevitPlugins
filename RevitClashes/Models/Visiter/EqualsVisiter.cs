@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Autodesk.Revit.DB;
-
-using dosymep.Bim4Everyone;
+﻿using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models.Interfaces;
 
@@ -21,7 +13,11 @@ namespace RevitClashDetective.Models.Visiter {
         }
 
         public FilterRule Create(ElementId paramId, string value) {
+#if REVIT_2022_OR_LESS
             return ParameterFilterRuleFactory.CreateEqualsRule(paramId, value, false);
+#else
+            return ParameterFilterRuleFactory.CreateEqualsRule(paramId, value);
+#endif
         }
 
         public FilterRule Create(ElementId paramId, ElementId value) {

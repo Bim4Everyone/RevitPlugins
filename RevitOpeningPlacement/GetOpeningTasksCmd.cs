@@ -310,7 +310,7 @@ namespace RevitOpeningPlacement {
                 throw new OperationCanceledException();
             }
             var outcomingTasks = revitRepository.GetOpeningsMepTasksOutcoming();
-            IList<ElementId> outcomingTasksIds = outcomingTasks.Select(task => new ElementId(task.Id)).ToList();
+            IList<ElementId> outcomingTasksIds = outcomingTasks.Select(task => task.Id).ToList();
             var mepElementsIds = revitRepository.GetMepElementsIds();
             var openingTaskOutcomingViewModels = new List<OpeningMepTaskOutcomingViewModel>();
             var constructureLinks = revitRepository.GetConstructureLinks().Select(link => new ConstructureLinkElementsProvider(link) as IConstructureLinkElementsProvider).ToHashSet();

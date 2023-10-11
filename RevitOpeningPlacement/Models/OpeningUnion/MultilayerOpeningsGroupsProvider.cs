@@ -82,7 +82,7 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         }
 
         private IDictionary<ElementId, OpeningMepTaskOutcoming> GetElementIdAndOpeningTaskPairs(ICollection<OpeningMepTaskOutcoming> openingMepTasks) {
-            return openingMepTasks.ToDictionary(task => new ElementId(task.Id));
+            return openingMepTasks.ToDictionary(task => task.Id);
         }
 
         private ICollection<ElementId> GetNearestOpeningTasks(

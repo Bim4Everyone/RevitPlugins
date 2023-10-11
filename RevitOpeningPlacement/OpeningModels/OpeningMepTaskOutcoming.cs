@@ -49,7 +49,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="openingTaskOutcoming">Экземпляр семейства задания на отверстие, расположенного в текущем документе Revit</param>
         public OpeningMepTaskOutcoming(FamilyInstance openingTaskOutcoming) {
             _familyInstance = openingTaskOutcoming;
-            Id = _familyInstance.Id.IntegerValue;
+            Id = _familyInstance.Id;
             Location = (_familyInstance.Location as LocationPoint).Point;
             OpeningType = RevitRepository.GetOpeningType(openingTaskOutcoming.Symbol.Family.Name);
 
@@ -94,7 +94,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Id экземпляра семейства задания на отверстие
         /// </summary>
-        public int Id { get; }
+        public ElementId Id { get; }
 
         /// <summary>
         /// Комментарий
@@ -189,7 +189,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                     Status = OpeningTaskOutcomingStatus.Intersects;
                     return;
                 } else {
-                    openingsOutcomingTasksIdsForChecking.Remove(new ElementId(Id));
+                    openingsOutcomingTasksIdsForChecking.Remove(Id);
                 }
 
                 try {
@@ -268,7 +268,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         public override int GetHashCode() {
-            return Id;
+            return (int) Id.GetIdValue();
         }
 
         public bool Equals(OpeningMepTaskOutcoming other) {
@@ -400,7 +400,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         private ICollection<OpeningMepTaskOutcoming> GetIntersectingTasksRaw(ICollection<OpeningMepTaskOutcoming> openingTasks) {
             if(!IsRemoved) {
                 var intersects = new FilteredElementCollector(GetDocument(), GetTasksIds(openingTasks))
-                .Excluding(new ElementId[] { new ElementId(Id) })
+                .Excluding(new ElementId[] { Id })
                 .WherePasses(GetBoundingBoxFilter())
                 .WherePasses(new ElementIntersectsSolidFilter(GetSolid()))
                 .Cast<FamilyInstance>()
@@ -463,7 +463,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         private ICollection<ElementId> GetTasksIds(ICollection<OpeningMepTaskOutcoming> openingTasks) {
-            return openingTasks.Where(task => !task.IsRemoved).Select(task => new ElementId(task.Id)).ToHashSet();
+            return openingTasks.Where(task => !task.IsRemoved).Select(task => task.Id).ToHashSet();
         }
 
         /// <summary>
@@ -520,7 +520,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                 return Array.Empty<ElementId>();
             } else {
                 return new FilteredElementCollector(GetDocument(), allOpeningTasksInDoc)
-                    .Excluding(new ElementId[] { new ElementId(Id) })
+                    .Excluding(new ElementId[] { Id })
                     .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningTaskSolid.GetOutline()))
                     .WherePasses(new ElementIntersectsSolidFilter(thisOpeningTaskSolid))
                     .ToElementIds();
