@@ -29,22 +29,26 @@ namespace RevitRoomTagPlacement.ViewModels {
 
         public RevitViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
+
             RoomGroups = new BindingList<RoomGroupViewModel>(GetGroupViewModels());
-            PlaceCommand = new RelayCommand(PlaceTags, CanPlaceTags);
+            RoomNames = new ObservableCollection<string>();
+
             TagFamilies = revitRepository.GetRoomTags();
             SelectedTagType = TagFamilies[0];
-            RoomNames = new ObservableCollection<string>();
+
+            PlaceTagsCommand = new RelayCommand(PlaceTags, CanPlaceTags);
+
             RoomGroups.ListChanged += RoomGroups_ListChanged;
         }
 
         private void RoomGroups_ListChanged(object sender, ListChangedEventArgs e) {
             if(IsOneRoomPerGroupByName)
-                OnPropertyChanged("RoomNames");
+                OnPropertyChanged(nameof(RoomNames));
         }
 
         public string Name { get; set; }
 
-        public ICommand PlaceCommand { get; }
+        public ICommand PlaceTagsCommand { get; }
 
         public BindingList<RoomGroupViewModel> RoomGroups { get; }
 
@@ -63,7 +67,7 @@ namespace RevitRoomTagPlacement.ViewModels {
                 if (placementWayByGroups == value) return;
 
                 placementWayByGroups = value;
-                OnPropertyChanged("RoomNames");
+                OnPropertyChanged(nameof(RoomNames));
             }
         }
 
@@ -153,7 +157,7 @@ namespace RevitRoomTagPlacement.ViewModels {
         }
 
         private void PlaceTags(object p) {
-            _revitRepository.PlaceTagsCommand(RoomGroups, 
+            _revitRepository.PlaceTagsByPositionAndGroup(RoomGroups, 
                                               SelectedTagType.TagId,
                                               PlacementWayByGroups,
                                               PlacementWayByPosition,

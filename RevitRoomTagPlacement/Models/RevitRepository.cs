@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Web.UI.WebControls;
+using System.Web.Security;
 using System.Windows.Controls;
 
 using Autodesk.Revit.ApplicationServices;
@@ -10,11 +10,15 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
 using pyRevitLabs.Json.Linq;
 
 using RevitRoomTagPlacement.ViewModels;
+
+using View = Autodesk.Revit.DB.View;
 
 namespace RevitRoomTagPlacement.Models {
     internal class RevitRepository {
@@ -66,36 +70,43 @@ namespace RevitRoomTagPlacement.Models {
             return new ObservableCollection<string>(uniqueNames);
         }
 
-        public void PlaceTagsCommand(IList<RoomGroupViewModel> RoomGroups, 
-                                    ElementId SelectedTagType, 
-                                    GroupPlacementWay groupPlacementWay,
-                                    PositionPlacementWay positionPlacementWay,
-                                    string roomName = "") {
+        public void PlaceTagsByPositionAndGroup(IList<RoomGroupViewModel> RoomGroups, 
+                                            ElementId SelectedTagType, 
+                                            GroupPlacementWay groupPlacementWay,
+                                            PositionPlacementWay positionPlacementWay,
+                                            string roomName = "") {
             var selectedGroups = RoomGroups.Where(x => x.IsChecked);
+            List<Room> rooms = new List<Room>();
 
             if(groupPlacementWay == GroupPlacementWay.EveryRoom) {
-                var rooms = selectedGroups.SelectMany(x => x.Rooms);
-                PlaceTags(rooms, SelectedTagType, positionPlacementWay);
+                rooms = selectedGroups.SelectMany(x => x.Rooms).ToList();
 
             } 
             else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupRandom) {
-                var rooms = selectedGroups.Select(x => x.Rooms.OrderByDescending(r => r.Area).First());
-                PlaceTags(rooms, SelectedTagType, positionPlacementWay);
+                RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
+                rooms = selectedGroups
+                    .SelectMany(x => x.Rooms
+                        .GroupBy(r => r.GetParamValue<string>(sectionParam))
+                        .Select(g => g.OrderByDescending(r => r.Area)
+                        .First()))
+                    .ToList();
+
             } 
             else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupByName) {
-                var rooms = selectedGroups.Select(x => x.Rooms.Where(y => y.GetParamValue<string>(BuiltInParameter.ROOM_NAME) == roomName).First());
-                PlaceTags(rooms, SelectedTagType, positionPlacementWay);
+                RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
+                rooms = selectedGroups
+                    .SelectMany(x => x.Rooms
+                        .GroupBy(r => r.GetParamValue<string>(sectionParam))
+                        .Select(g => g.Where(y => y.GetParamValue<string>(BuiltInParameter.ROOM_NAME) == roomName)
+                        .First()))
+                    .ToList();
             }
-        }
 
-        public void PlaceTags(IEnumerable<Room> Rooms, 
-                              ElementId SelectedTagType,
-                              PositionPlacementWay positionPlacementWay) {           
+            View activeView = Document.ActiveView;
+            ElementOwnerViewFilter viewFilter = new ElementOwnerViewFilter(activeView.Id);
+
             using(Transaction t = Document.StartTransaction("Маркировать помещения")) {
-                foreach(var room in Rooms) {
-
-                    ElementOwnerViewFilter viewFilter = new ElementOwnerViewFilter(Document.ActiveView.Id);
-
+                foreach(var room in rooms) {
                     var depElements = room
                         .GetDependentElements(viewFilter)
                         .Select(x => Document.GetElement(x))
@@ -104,16 +115,14 @@ namespace RevitRoomTagPlacement.Models {
 
                     if(!depElements.Contains(SelectedTagType)) {
                         RoomPathFinder pathFinder = new RoomPathFinder(room);
-                        UV point = pathFinder.GetPointByPlacementWay(positionPlacementWay, Document.ActiveView);
+                        UV point = pathFinder.GetPointByPlacementWay(positionPlacementWay, activeView);
+
                         LocationPoint roomLocation = (LocationPoint) room.Location;
                         XYZ testPoint = new XYZ(point.U, point.V, roomLocation.Point.Z);
 
                         if(!room.IsPointInRoom(testPoint)) point = pathFinder.GetPointByPath();
 
-                        var newTag = Document.Create.NewRoomTag(
-                            new LinkElementId(room.Id), 
-                            point, 
-                            Document.ActiveView.Id);
+                        var newTag = Document.Create.NewRoomTag(new LinkElementId(room.Id), point, activeView.Id);
 
                         newTag.ChangeTypeId(SelectedTagType);
                     }

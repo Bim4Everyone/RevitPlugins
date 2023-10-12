@@ -173,7 +173,7 @@
                 IsDefault="True"
                 Click="ButtonOk_Click"
                 DataContext="{Binding RevitViewModel}"
-                Command="{Binding PlaceCommand}" />
+                Command="{Binding PlaceTagsCommand}" />
 
             <Button
                 Margin="10"
