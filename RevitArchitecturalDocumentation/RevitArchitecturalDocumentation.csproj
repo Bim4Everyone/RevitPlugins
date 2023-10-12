@@ -1,3 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<Import Project="..\ProjectProps\Common.props" />
+	<PropertyGroup>
+		<Configurations>D2020;D2021;D2022;D2023;D2024;R2020;R2021;R2022;R2023;R2024</Configurations>
+	</PropertyGroup>
 </Project>
