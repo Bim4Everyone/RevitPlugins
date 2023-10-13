@@ -34,10 +34,15 @@ namespace dosymep.Serializers {
             ElementId existingValue,
             bool hasExistingValue,
             JsonSerializer serializer) {
+            
+            if(reader.Value is null) {
+                return ElementId.InvalidElementId;
+            }
+            
 #if REVIT_2023_OR_LESS
-            return new ElementId((int) reader.Value);
+            return new ElementId(Convert.ToInt32(reader.Value));
 #else
-            return new ElementId((long) reader.Value);
+            return new ElementId(Convert.ToInt64(reader.Value));
 #endif
         }
     }
