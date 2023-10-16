@@ -52,5 +52,5 @@ nuke compile --plugin-name RevitPlugins
 
 Публикация проекта:
 ```
-nuke publish --plugin-name RevitPlugins
+nuke publish --profile RevitPlugins
 ```
