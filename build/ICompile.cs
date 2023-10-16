@@ -16,17 +16,21 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 interface ICompile : IClean, IHazSolution, IHazGitVersion, IHazGitRepository, IHazConfigurations {
     Target Compile => _ => _
         .DependsOn(Clean)
-        .Requires(() => Output)
         .Requires(() => PluginName)
+        .Requires(() => PublishDirectory)
         .Executes(() => {
+            string publishDirectory = NukeBuildExtensions.GetExtensionsPath(PublishDirectory);
+            Log.Debug("publishDirectory: {PublishDirectory}", publishDirectory);
+            
             ReportSummary(_ => _
-                .AddPairWhenValueNotNull(nameof(Output), Output)
                 .AddPairWhenValueNotNull(nameof(PluginName), PluginName)
+                .AddPairWhenValueNotNull(nameof(PublishDirectory), PublishDirectory)
             );
 
             DotNetBuild(s => s
                 .Apply(CompileSettingsBase)
                 .SetProjectFile(PluginName)
+                .SetOutputDirectory(publishDirectory)
                 .CombineWith(DebugConfigurations, (settings, config) => settings
                     .SetConfiguration(config)
                     .SetSimpleVersion(Versioning, config)));
