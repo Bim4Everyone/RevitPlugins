@@ -219,10 +219,11 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             var regexForBuildingPart = new Regex(@"К(.*?)_");
             var regexForBuildingSection = new Regex(@"С(.*?)$");
+            var regexForBuildingSectionPart = new Regex(@"часть (.*?)$");
 
             var regexForLevel = new Regex(@"^(.*?) ");
 
-            var regexForView = new Regex(@"ПСО_(.*?) этаж");
+            var regexForView = new Regex(@"псо_(.*?) этаж");
 
 
 
@@ -368,7 +369,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                         foreach(View view in views) {
 
-                            string numberOfLevel = regexForView.Match(view.Name).Groups[1].Value;
+                            string numberOfLevel = regexForView.Match(view.Name.ToLower()).Groups[1].Value;
 
                             int numberOfLevelAsInt;
                             if(!int.TryParse(numberOfLevel, out numberOfLevelAsInt)) {
@@ -381,6 +382,13 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                 continue;
                             }
 
+                            string viewNamePartWithSectionPart = string.Empty;
+
+                            if(view.Name.ToLower().Contains("_часть ")) {
+                                viewNamePartWithSectionPart = "_часть ";
+                                viewNamePartWithSectionPart += regexForBuildingSectionPart.Match(view.Name.ToLower()).Groups[1].Value;
+                            }
+
                             try {
                                 ElementId newViewPlanId = view.Duplicate(ViewDuplicateOption.WithDetailing);
                                 ViewPlan newViewPlan = view.Document.GetElement(newViewPlanId) as ViewPlan;
@@ -390,7 +398,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                     continue;
                                 }
 
-                                newViewPlan.Name = string.Format("{0}{1} этаж К{2}", ViewNamePrefix, numberOfLevel, numberOfBuildingPart);
+                                newViewPlan.Name = string.Format("{0}{1} этаж К{2}_С{3}{4}", 
+                                    ViewNamePrefix, numberOfLevel, numberOfBuildingPart, numberOfBuildingSection, viewNamePartWithSectionPart);
                                 newViewPlan.get_Parameter(BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP).Set(task.SelectedVisibilityScope.Id);
 
 
@@ -456,8 +465,11 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                     }
 
 
-
-                    TaskDialog.Show("Ошибка!", temp);
+                    if(temp.Length == 0) {
+                        TaskDialog.Show("Отчет", "Ошибок с " + task.SelectedVisibilityScope.Name + " не было!");
+                    } else {
+                        TaskDialog.Show("Ошибка!", temp);
+                    }
                 }
 
 
