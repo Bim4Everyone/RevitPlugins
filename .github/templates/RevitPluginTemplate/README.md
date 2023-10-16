@@ -8,5 +8,5 @@ nuke compile --plugin-name RevitPluginTemplate
 
 # Публикация проекта
 ```
-nuke publish --plugin-name RevitPluginTemplate
+nuke publish --profile RevitPluginTemplate
 ```
