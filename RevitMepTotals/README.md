@@ -8,5 +8,5 @@ nuke compile --plugin-name RevitMepTotals
 
 # Публикация проекта
 ```
-nuke publish --plugin-name RevitMepTotals
+nuke publish --profile RevitMepTotals
 ```
