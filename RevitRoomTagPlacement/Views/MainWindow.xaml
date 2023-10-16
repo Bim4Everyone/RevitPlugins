@@ -53,6 +53,7 @@
         <ListBox
             Grid.Row="1"
             Margin="10"
+            SelectionMode="Extended"
             DataContext="{Binding RevitViewModel}"
             ItemsSource="{Binding RoomGroups}">
             <ListBox.ItemTemplate>

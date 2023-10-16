@@ -34,7 +34,6 @@ namespace RevitRoomTagPlacement.ViewModels {
             RoomNames = new ObservableCollection<string>();
 
             TagFamilies = revitRepository.GetRoomTags();
-            SelectedTagType = TagFamilies[0];
 
             PlaceTagsCommand = new RelayCommand(PlaceTags, CanPlaceTags);
 
@@ -165,6 +164,14 @@ namespace RevitRoomTagPlacement.ViewModels {
         }
 
         private bool CanPlaceTags(object p) {
+            if(RoomGroups.Count() == 0) {
+                ErrorText = "В проекте отсутствуют помещения";
+                return false;
+            }
+            if(TagFamilies.Count() == 0) {
+                ErrorText = "В проекте отсутствуют марки помещений";
+                return false;
+            }
             if(RoomGroups.Where(x => x.IsChecked).Count() == 0) {
                 ErrorText = "Группы не выбраны";
                 return false; 
