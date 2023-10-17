@@ -9,14 +9,20 @@ using dosymep.Bim4Everyone.SimpleServices;
 using Ninject;
 
 using RevitMepTotals.Models;
+using RevitMepTotals.Models.Interfaces;
+using RevitMepTotals.Services;
+using RevitMepTotals.Services.Implements;
 using RevitMepTotals.ViewModels;
 using RevitMepTotals.Views;
 
 namespace RevitMepTotals {
+    /// <summary>
+    /// Команда для выбора моделей Revit и последующей выгрузки информации из них в Excel файл.
+    /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class RevitMepTotalsCommand : BasePluginCommand {
         public RevitMepTotalsCommand() {
-            PluginName = "RevitMepTotals";
+            PluginName = "Выгрузить объемы";
         }
 
         protected override void Execute(UIApplication uiApplication) {
@@ -25,8 +31,9 @@ namespace RevitMepTotals {
                     .ToSelf()
                     .InSingletonScope();
 
-                kernel.Bind<PluginConfig>()
-                    .ToMethod(c => PluginConfig.GetPluginConfig());
+                kernel.Bind<IDocument>().To<RevitDocument>();
+                kernel.Bind<IDocumentsProvider>().To<DocumentsProvider>();
+                kernel.Bind<IDocumentsProcessor>().To<DocumentsProcessor>();
 
                 kernel.Bind<MainViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()

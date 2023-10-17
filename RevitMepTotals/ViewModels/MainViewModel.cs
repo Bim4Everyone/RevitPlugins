@@ -1,59 +1,107 @@
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitMepTotals.Models;
+using RevitMepTotals.Services;
 
 namespace RevitMepTotals.ViewModels {
     internal class MainViewModel : BaseViewModel {
-        private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
+        private readonly IDocumentsProvider _documentsProvider;
+        private readonly IMessageBoxService _messageBoxService;
+        private readonly IDocumentsProcessor _documentsProcessor;
+
+        public MainViewModel(
+            RevitRepository revitRepository,
+            IDocumentsProvider documentsProvider,
+            IMessageBoxService messageBoxService,
+            IDocumentsProcessor documentsProcessor) {
+
+            _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
+            _documentsProvider = documentsProvider ?? throw new System.ArgumentNullException(nameof(documentsProvider));
+            _messageBoxService = messageBoxService ?? throw new System.ArgumentNullException(nameof(messageBoxService));
+            _documentsProcessor = documentsProcessor ?? throw new System.ArgumentNullException(nameof(documentsProcessor));
+
+            AddDocumentCommand = new RelayCommand(AddDocument);
+            RemoveDocumentCommand = new RelayCommand(RemoveDocument, CanRemoveDocument);
+            ProcessDocumentsCommand = new RelayCommand(ProcessDocuments, CanProcessDocuments);
+        }
+
+
+        public ICommand AddDocumentCommand { get; }
+
+        public ICommand RemoveDocumentCommand { get; }
+
+        public ICommand ProcessDocumentsCommand { get; }
+
+        public ObservableCollection<DocumentViewModel> Documents { get; } = new ObservableCollection<DocumentViewModel>() { };
+
+
+        private DocumentViewModel _selectedDocument;
+        public DocumentViewModel SelectedDocument {
+            get => _selectedDocument;
+            set => RaiseAndSetIfChanged(ref _selectedDocument, value);
+        }
+
 
         private string _errorText;
-        private string _saveProperty;
-
-        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
-            _pluginConfig = pluginConfig;
-            _revitRepository = revitRepository;
-
-            LoadViewCommand = RelayCommand.Create(LoadView);
-            AcceptViewCommand = RelayCommand.Create(AcceptView);
-        }
-
-        public ICommand LoadViewCommand { get; }
-        public ICommand AcceptViewCommand { get; }
-
         public string ErrorText {
             get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+            set => RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public string SaveProperty {
-            get => _saveProperty;
-            set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
+
+        private void AddDocument(object p) {
+            var docViewModels = _documentsProvider.GetDocuments().Select(doc => new DocumentViewModel(doc));
+            List<string> errors = new List<string>();
+            foreach(var docViewModel in docViewModels) {
+                if(!Documents.Contains(docViewModel)) {
+                    Documents.Add(docViewModel);
+                } else {
+                    errors.Add($"{docViewModel} уже добавлен в список");
+                }
+            }
+            if(errors.Count > 0) {
+                ShowMessageBoxError(string.Join("\n", errors));
+            }
         }
 
-        private void LoadView() {
-            LoadConfig();
+
+        private void RemoveDocument(object p) {
+            if(_messageBoxService.Show(
+                $"Из списка будет удален документ:\n{SelectedDocument.Name}\nПродолжить?",
+                "BIM",
+                MessageBoxButton.OKCancel,
+                MessageBoxImage.Warning,
+                MessageBoxResult.Cancel) == MessageBoxResult.OK) {
+
+                Documents.Remove(SelectedDocument);
+                SelectedDocument = Documents.FirstOrDefault();
+            }
         }
 
-        private void AcceptView() {
-            SaveConfig();
+        private bool CanRemoveDocument(object p) => SelectedDocument != null;
+
+
+        private void ProcessDocuments(object p) {
+            _documentsProcessor.ProcessDocuments(Documents.Select(vm => vm.GetDocument()).ToHashSet());
         }
 
-        private void LoadConfig() {
-            RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+        private bool CanProcessDocuments(object p) => Documents.Count > 0;
 
-            SaveProperty = setting?.SaveProperty ?? "РџСЂРёРІРµС‚ Revit!";
-        }
 
-        private void SaveConfig() {
-            RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                                    ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
-            setting.SaveProperty = SaveProperty;
-            _pluginConfig.SaveProjectConfig();
+        private void ShowMessageBoxError(string error) {
+            _messageBoxService.Show(error, "BIM",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error,
+                MessageBoxResult.OK);
         }
     }
 }

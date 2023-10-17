@@ -8,18 +8,20 @@
                            xmlns:vms="clr-namespace:RevitMepTotals.ViewModels"
                            xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                            xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                           xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
                            xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                           xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
                            mc:Ignorable="d"
                            WindowStartupLocation="CenterOwner"
+                           x:Name="_this"
                            Title="MainWindow"
+                           d:DesignHeight="600"
+                           d:DesignWidth="600"
                            Height="450"
-                           Width="800"
+                           Width="500"
+                           MinHeight="300"
+                           MinWidth="300"
                            d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
-
-    <dxmvvm:Interaction.Behaviors>
-        <dxmvvm:EventToCommand EventName="Loaded"
-                               Command="{Binding LoadViewCommand}" />
-    </dxmvvm:Interaction.Behaviors>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -27,11 +29,14 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <dxe:TextEdit Grid.Row="0"
-                      Width="200"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Center"
-                      Text="{Binding SaveProperty}" />
+        <dxdo:LayoutControlItem>
+            <lc:GroupBox Header="Выбранные проекты">
+                <dxe:ListBoxEdit ItemsSource="{Binding Documents}"
+                                 EditValue="{Binding SelectedDocument, UpdateSourceTrigger=PropertyChanged}">
+                </dxe:ListBoxEdit>
+            </lc:GroupBox>
+
+        </dxdo:LayoutControlItem>
 
         <StackPanel Grid.Row="1"
                     Height="45"
@@ -44,10 +49,20 @@
 
             <dx:SimpleButton Margin="10"
                              Width="80"
+                             Content="Удалить"
+                             Command="{Binding RemoveDocumentCommand}" />
+
+            <dx:SimpleButton Margin="10"
+                             Width="80"
+                             Content="Добавить"
+                             Command="{Binding AddDocumentCommand}" />
+
+            <dx:SimpleButton Margin="10"
+                             Width="80"
                              Content="ОК"
                              IsDefault="True"
                              Click="ButtonOk_Click"
-                             Command="{Binding AcceptViewCommand}" />
+                             Command="{Binding ProcessDocumentsCommand}" />
 
             <dx:SimpleButton Margin="10"
                              Width="80"
