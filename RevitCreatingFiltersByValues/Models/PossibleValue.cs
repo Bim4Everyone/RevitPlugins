@@ -16,7 +16,7 @@ namespace RevitCreatingFiltersByValues.Models {
             SelectedFilterableParameter = parameter;
 
             if(SelectedFilterableParameter.IsBInParam) {
-                StorageParamType = SelectedFilterableParameter.BInParameter.GetStorageType();
+                StorageParamType = elem.Document.GetStorageType(SelectedFilterableParameter.BInParameter);
             } else {
                 StorageParamType = SelectedFilterableParameter.ParamElement.GetStorageType();
             }
