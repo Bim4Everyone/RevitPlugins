@@ -56,6 +56,7 @@ namespace RevitMepTotals.Services.Implements {
                         IList<IPipeInsulationData> pipeInsulationData = GetOrderedPipeInsulationData(data[sheetIndex]);
                         WritePipeInsulationData(worksheet, pipeInsulationStart, pipeInsulationData);
 
+                        worksheet.Columns.AutoFit(0, typeof(IDuctInsulationData).GetProperties().Count());
                         workbook.Worksheets.Add(); //добавляем следующий лист
                     }
                     workbook.Worksheets.RemoveAt(workbook.Worksheets.Count - 1); // удаляем последний пустой лист, который мы не заполняли
