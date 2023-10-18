@@ -35,6 +35,8 @@ namespace RevitRoomTagPlacement.ViewModels {
 
             TagFamilies = revitRepository.GetRoomTags();
 
+            if(TagFamilies.Count != 0) SelectedTagType = TagFamilies[0];
+
             PlaceTagsCommand = new RelayCommand(PlaceTags, CanPlaceTags);
 
             RoomGroups.ListChanged += RoomGroups_ListChanged;
@@ -175,6 +177,10 @@ namespace RevitRoomTagPlacement.ViewModels {
             if(RoomGroups.Where(x => x.IsChecked).Count() == 0) {
                 ErrorText = "Группы не выбраны";
                 return false; 
+            }
+            if(SelectedTagType == null) {
+                ErrorText = "Марка не выбрана";
+                return false;
             }
             if(IsOneRoomPerGroupByName && RoomNames.Count == 0) {
                 ErrorText = "Для выбранных групп нет общих помещений";
