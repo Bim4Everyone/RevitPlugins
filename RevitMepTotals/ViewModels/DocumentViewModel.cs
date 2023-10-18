@@ -8,7 +8,7 @@ namespace RevitMepTotals.ViewModels {
     /// <summary>
     /// Модель представления выбранного документа ревита для обработки
     /// </summary>
-    internal class DocumentViewModel : BaseViewModel {
+    internal class DocumentViewModel : BaseViewModel, IEquatable<DocumentViewModel> {
         private readonly IDocument _document;
 
         /// <summary>
@@ -21,7 +21,10 @@ namespace RevitMepTotals.ViewModels {
         }
 
 
-        public string Name => _document.Name;
+        public string ShortName => _document.Name;
+
+
+        public string Name => _document.Path;
 
 
         public override string ToString() {
@@ -31,15 +34,20 @@ namespace RevitMepTotals.ViewModels {
         public override bool Equals(object obj) {
             return (obj != null)
                 && (obj is DocumentViewModel vmOther)
-                && string.Equals(vmOther.Name, Name, StringComparison.CurrentCultureIgnoreCase);
+                && Equals(vmOther);
+
         }
 
         public override int GetHashCode() {
-            return Name.GetHashCode();
+            return ShortName.ToLower().GetHashCode();
         }
 
         public IDocument GetDocument() {
             return _document;
+        }
+
+        public bool Equals(DocumentViewModel other) {
+            return (other != null) && string.Equals(other.ShortName, ShortName, StringComparison.CurrentCultureIgnoreCase);
         }
     }
 }
