@@ -8,23 +8,19 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using RevitMepTotals.Models;
 using RevitMepTotals.Services;
 
 namespace RevitMepTotals.ViewModels {
     internal class MainViewModel : BaseViewModel {
-        private readonly RevitRepository _revitRepository;
         private readonly IDocumentsProvider _documentsProvider;
         private readonly IMessageBoxService _messageBoxService;
         private readonly IDocumentsProcessor _documentsProcessor;
 
         public MainViewModel(
-            RevitRepository revitRepository,
             IDocumentsProvider documentsProvider,
             IMessageBoxService messageBoxService,
             IDocumentsProcessor documentsProcessor) {
 
-            _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
             _documentsProvider = documentsProvider ?? throw new System.ArgumentNullException(nameof(documentsProvider));
             _messageBoxService = messageBoxService ?? throw new System.ArgumentNullException(nameof(messageBoxService));
             _documentsProcessor = documentsProcessor ?? throw new System.ArgumentNullException(nameof(documentsProcessor));
