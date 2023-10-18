@@ -75,10 +75,12 @@ namespace RevitRoomTagPlacement.Models {
         }
 
         public UV GetPointByPath() {
+            RoomPath path = new RoomPath(_room);
+
             var xValue = (_roomBB.Min.X + _roomBB.Max.X) * 0.5;
             var yValue = (_roomBB.Min.Y + _roomBB.Max.Y) * 0.5;
 
-            return new UV(xValue, yValue);
+            return path.TagPoint;
         }
     }
 }

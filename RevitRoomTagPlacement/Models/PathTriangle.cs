@@ -12,6 +12,8 @@ namespace RevitRoomTagPlacement.Models {
         public XYZ Vertex2;
         public XYZ Vertex3;
 
+        public List<XYZ> Vertices;
+
         public XYZ Center;
         public double Weight;
 
@@ -23,6 +25,8 @@ namespace RevitRoomTagPlacement.Models {
             Vertex1 = triangle.get_Vertex(0);
             Vertex2 = triangle.get_Vertex(1);
             Vertex3 = triangle.get_Vertex(2);
+
+            Vertices = new List<XYZ>() { Vertex1, Vertex2, Vertex3};
 
             Center = GetCenter();
             Weight = GetWeight();
