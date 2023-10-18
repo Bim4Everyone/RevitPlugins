@@ -24,6 +24,7 @@ namespace RevitMepTotals.Services.Implements {
         public void ExportData(DirectoryInfo exportDirectory, IList<IDocumentData> data) {
             if(exportDirectory is null) { throw new ArgumentNullException(nameof(exportDirectory)); }
             if(data is null) { throw new ArgumentNullException(nameof(data)); }
+            if(data.Count == 0) { return; }
             CheckDistinctDocument(data);
 
             string path = CreateFileName(exportDirectory);
