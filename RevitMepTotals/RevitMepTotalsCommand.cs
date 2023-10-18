@@ -34,6 +34,9 @@ namespace RevitMepTotals {
                 kernel.Bind<IDocument>().To<RevitDocument>();
                 kernel.Bind<IDocumentsProvider>().To<DocumentsProvider>();
                 kernel.Bind<IDocumentsProcessor>().To<DocumentsProcessor>();
+                kernel.Bind<IDataExporter>().To<DataExporter>();
+                kernel.Bind<ICopyNameProvider>().To<CopyNameProvider>();
+                kernel.Bind<IDirectoryProvider>().To<DirectoryProvider>();
 
                 kernel.Bind<MainViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()
