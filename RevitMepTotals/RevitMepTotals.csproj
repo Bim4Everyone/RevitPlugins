@@ -1,4 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\ProjectProps\Common.props" />
-    <Import Project="..\ProjectProps\DevExpress.props" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\ProjectProps\Common.props" />
+	<Import Project="..\ProjectProps\DevExpress.props" />
+
+	<ItemGroup>
+		<PackageReference Include="DevExpress.Document.Processor" Version="21.2.3">
+			<PrivateAssets>all</PrivateAssets>
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</PackageReference>
+	</ItemGroup>
+	
 </Project>
