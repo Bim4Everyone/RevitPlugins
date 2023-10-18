@@ -7,5 +7,10 @@
         /// Название документа
         /// </summary>
         string Name { get; }
+
+        /// <summary>
+        /// Путь к Revit документу
+        /// </summary>
+        string Path { get; }
     }
 }
