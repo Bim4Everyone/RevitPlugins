@@ -9,12 +9,12 @@ using Autodesk.Revit.DB;
 
 namespace RevitFamilyParameterAdder.Models {
     internal class DefaultParam {
-        public DefaultParam(string name, BuiltInParameterGroup builtInParameterGroup) {
+        public DefaultParam(string name, object builtInParameterGroup) {
             ParamName = name;
             BINParameterGroup = new ParameterGroupHelper(builtInParameterGroup);
         }
 
-        public DefaultParam(string name, BuiltInParameterGroup builtInParameterGroup, string formula) {
+        public DefaultParam(string name, object builtInParameterGroup, string formula) {
             ParamName = name;
             BINParameterGroup = new ParameterGroupHelper(builtInParameterGroup);
             Formula = formula;

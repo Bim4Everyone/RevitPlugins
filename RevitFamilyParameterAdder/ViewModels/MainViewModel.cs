@@ -38,6 +38,7 @@ namespace RevitFamilyParameterAdder.ViewModels {
         private List<SharedParam> _selectedParams = new List<SharedParam>();
         private List<ParameterGroupHelper> _bINParameterGroups = new List<ParameterGroupHelper>();
         private List<DefaultParam> _defaultParamsKR = new List<DefaultParam>() {
+#if REVIT_2023_OR_LESS
             new DefaultParam("обр_ФОП_Форма_префикс", BuiltInParameterGroup.PG_CONSTRUCTION, 
                 "\"П\""),
             new DefaultParam("обр_ФОП_Форма_номер", BuiltInParameterGroup.PG_CONSTRUCTION, 
@@ -59,6 +60,29 @@ namespace RevitFamilyParameterAdder.ViewModels {
                 "roundup((мод_ФОП_Габарит Б) / 5 мм) * 5 мм"),
             new DefaultParam("обр_ФОП_Габарит В_ВД", BuiltInParameterGroup.INVALID,
                 "roundup((мод_ФОП_Габарит В) / 5 мм) * 5 мм")
+#else
+            new DefaultParam("обр_ФОП_Форма_префикс", GroupTypeId.Construction,
+                "\"П\""),
+            new DefaultParam("обр_ФОП_Форма_номер", GroupTypeId.Construction,
+                "201"),
+            new DefaultParam("обр_ФОП_Количество типовых этажей", GroupTypeId.RebarArray),
+            new DefaultParam("обр_ФОП_Количество типовых на этаже", GroupTypeId.RebarArray),
+            new DefaultParam("обр_ФОП_Длина", GroupTypeId.Geometry,
+                "roundup(мод_ФОП_Габарит А / 5 мм) * 5 мм + roundup(мод_ФОП_Габарит Б / 5 мм) * 5 мм + roundup(мод_ФОП_Габарит В / 5 мм) * 5 мм"),
+            new DefaultParam("мод_ФОП_Габарит А", GroupTypeId.Geometry),
+            new DefaultParam("мод_ФОП_Габарит Б", GroupTypeId.Geometry),
+            new DefaultParam("мод_ФОП_Габарит В", GroupTypeId.Geometry),
+            new DefaultParam("обр_ФОП_Изделие_Обозначение", GroupTypeId.General),
+            new DefaultParam("обр_ФОП_Изделие_Наименование", GroupTypeId.General),
+            new DefaultParam("обр_ФОП_Изделие_Марка", GroupTypeId.General),
+            new DefaultParam("обр_ФОП_Изделие_Главная деталь", GroupTypeId.General),
+            new DefaultParam("обр_ФОП_Габарит А_ВД", GroupTypeId.General,
+                "roundup((мод_ФОП_Габарит А) / 5 мм) * 5 мм"),
+            new DefaultParam("обр_ФОП_Габарит Б_ВД", GroupTypeId.General,
+                "roundup((мод_ФОП_Габарит Б) / 5 мм) * 5 мм"),
+            new DefaultParam("обр_ФОП_Габарит В_ВД", GroupTypeId.General,
+                "roundup((мод_ФОП_Габарит В) / 5 мм) * 5 мм")
+#endif
         };
 
    
@@ -198,8 +222,18 @@ namespace RevitFamilyParameterAdder.ViewModels {
                     }
 
                     try {
-                        FamilyParameter familyParam = FamilyManagerFm.AddParameter(param.ParamInShPF, param.SelectedParamGroupInFM.BuiltInParamGroup, param.IsInstanceParam);
 
+#if REVIT_2023_OR_LESS
+                        FamilyParameter familyParam = FamilyManagerFm.AddParameter(
+                            param.ParamInShPF, 
+                            (BuiltInParameterGroup) param.SelectedParamGroupInFM.BuiltInParamGroup, 
+                            param.IsInstanceParam);
+#else
+                        FamilyParameter familyParam = FamilyManagerFm.AddParameter(
+                            param.ParamInShPF, 
+                            (ForgeTypeId) param.SelectedParamGroupInFM.BuiltInParamGroup, 
+                            param.IsInstanceParam);
+#endif
                         _reportAdded.AppendLine(param.ParamName);
 
                     } catch(Exception) {
@@ -337,13 +371,24 @@ namespace RevitFamilyParameterAdder.ViewModels {
         /// </summary>
         private void GetBuiltInParameterGroups() {
             // Забираем все встроенные группы параметров
+#if REVIT_2023_OR_LESS
             Array array = Enum.GetValues(typeof(BuiltInParameterGroup));
-            
+#else
+            Array array = typeof(ForgeTypeId).GetProperties();
+#endif
+
+
             // Отбираем только те, что отображаются у пользователя
-            foreach(BuiltInParameterGroup group in array) {
-                if(FamilyManagerFm.IsUserAssignableParameterGroup(group)) {
-                    BINParameterGroups.Add(new ParameterGroupHelper(group));
+            foreach(object group in array) {
+#if REVIT_2023_OR_LESS
+                if(FamilyManagerFm.IsUserAssignableParameterGroup((BuiltInParameterGroup) group)) {
+                    BINParameterGroups.Add(new ParameterGroupHelper((BuiltInParameterGroup) group));
                 }
+#else
+                if(FamilyManagerFm.IsUserAssignableParameterGroup((ForgeTypeId) group)) {
+                    BINParameterGroups.Add(new ParameterGroupHelper((ForgeTypeId) group));
+                }
+#endif
             }
 
             BINParameterGroups.Sort((x, y) => x.GroupName.CompareTo(y.GroupName));
