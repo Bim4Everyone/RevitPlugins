@@ -36,21 +36,31 @@
 # Сборка проекта
 
 Установка nuke-build:
+
 ```
 dotnet tool install Nuke.GlobalTool --global
 ```
 
 Создание проекта:
+
 ```
-nuke CreatePlugin --plugin-name RevitPlugins --publish-directory "path\to\build" --icon-url "https://icons8.com/icon/30466/close-sign" --bundle-name "Bundle Name" --bundle-type InvokeButton --bundle-output "path/to/bundle"
+nuke CreatePlugin `
+    --plugin-name RevitPlugins `
+    --publish-directory "path/to/build" `
+    --icon-url "https://icons8.com/icon/UgAl9mP8tniQ/example" `
+    --bundle-name "Пример плагина" `
+    --bundle-type InvokeButton `
+    --bundle-output "path/to/bundle" `
 ```
 
 Компиляция проекта:
+
 ```
-nuke compile --plugin-name RevitPlugins
+nuke compile --profile RevitPlugins
 ```
 
 Публикация проекта:
+
 ```
 nuke publish --profile RevitPlugins
 ```
