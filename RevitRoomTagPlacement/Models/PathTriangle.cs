@@ -8,33 +8,38 @@ using Autodesk.Revit.DB;
 
 namespace RevitRoomTagPlacement.Models {
     internal class PathTriangle {
-        public XYZ Vertex1;
-        public XYZ Vertex2;
-        public XYZ Vertex3;
+        private readonly XYZ _vertex1;
+        private readonly XYZ _vertex2;
+        private readonly XYZ _vertex3;
+        private readonly XYZ _center;
 
-        public List<XYZ> Vertices;
+        private readonly List<XYZ> _vertices;
 
-        public XYZ Center;
-        public double Weight;
-
-        public bool IsVisited;
-
-        public List<PathTriangle> NextTriangles;
+        private readonly double _weight;
 
         public PathTriangle(MeshTriangle triangle) {
-            Vertex1 = triangle.get_Vertex(0);
-            Vertex2 = triangle.get_Vertex(1);
-            Vertex3 = triangle.get_Vertex(2);
+            _vertex1 = triangle.get_Vertex(0);
+            _vertex2 = triangle.get_Vertex(1);
+            _vertex3 = triangle.get_Vertex(2);
 
-            Vertices = new List<XYZ>() { Vertex1, Vertex2, Vertex3};
+            _vertices = new List<XYZ>() { Vertex1, Vertex2, Vertex3};
 
-            Center = GetCenter();
-            Weight = GetWeight();
+            _center = GetCenter();
+            _weight = GetWeight();
 
             IsVisited = false;
-
             NextTriangles = new List<PathTriangle>();
         }
+
+        public XYZ Vertex1 => _vertex1;
+        public XYZ Vertex2 => _vertex2;
+        public XYZ Vertex3 => _vertex3;
+        public XYZ Center => _center;
+        public List<XYZ> Vertices => _vertices;
+        public double Weight => _weight;
+
+        public bool IsVisited { get; set; }
+        public List<PathTriangle> NextTriangles { get; set; }
 
         private double GetWeight() {
             double value1 = (Vertex2.X - Vertex1.X) * (Vertex3.Y - Vertex1.Y);
@@ -43,10 +48,10 @@ namespace RevitRoomTagPlacement.Models {
         }
 
         private XYZ GetCenter() {
-            double CenterX = (Vertex1.X + Vertex2.X + Vertex3.X) / 3;
-            double CenterY = (Vertex1.Y + Vertex2.Y + Vertex3.Y) / 3;
-            double CenterZ = (Vertex1.Z + Vertex2.Z + Vertex3.Z) / 3;
-            return new XYZ(CenterX, CenterY, CenterZ);
+            double centerX = (Vertex1.X + Vertex2.X + Vertex3.X) / 3;
+            double centerY = (Vertex1.Y + Vertex2.Y + Vertex3.Y) / 3;
+            double centerZ = (Vertex1.Z + Vertex2.Z + Vertex3.Z) / 3;
+            return new XYZ(centerX, centerY, centerZ);
         }
     }
 }
