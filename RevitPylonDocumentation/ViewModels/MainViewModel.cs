@@ -25,12 +25,10 @@ using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 //using Autodesk.SteelConnectionsDB;
-
 using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
-
 
 using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.Models.PylonSheetNView;
@@ -58,12 +56,11 @@ namespace RevitPylonDocumentation.ViewModels {
         private FamilySymbol _selectedTitleBlock;
         private List<PylonSheetInfo> _selectedHostsInfo = new List<PylonSheetInfo>();
 
-        public bool SettingsEdited = false;
+        public bool _settingsEdited = false;
 
         private string _hostsInfoFilter;
         private ICollectionView _hostsInfoView;
 
-        
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
@@ -91,7 +88,8 @@ namespace RevitPylonDocumentation.ViewModels {
             GetHostMarksInGUICommand = RelayCommand.Create(GetHostMarksInGUI);
 
             AddScheduleFilterParamCommand = RelayCommand.Create(AddScheduleFilterParam);
-            DeleteScheduleFilterParamCommand = RelayCommand.Create(DeleteScheduleFilterParam, CanChangeScheduleFilterParam);
+            DeleteScheduleFilterParamCommand =
+                RelayCommand.Create(DeleteScheduleFilterParam, CanChangeScheduleFilterParam);
             SettingsChangedCommand = RelayCommand.Create(SettingsChanged);
 
             ClearHostsInfoFilterInGUICommand = RelayCommand.Create(ClearHostsInfoFilterInGUI);
@@ -101,7 +99,6 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectAllFuncInGUICommand = RelayCommand.Create(SelectAllFuncInGUI);
             UnselectAllFuncInGUICommand = RelayCommand.Create(UnselectAllFuncInGUI);
         }
-
 
 
         public ICommand LoadViewCommand { get; }
@@ -123,14 +120,17 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Настройки выбора пользователя (с какими компонентами должен работать плагин) с предыдущего сеанса
         /// </summary>
         public UserSelectionSettings SelectionSettings { get; set; }
+
         /// <summary>
         /// Настройки параметров проекта с предыдущего сеанса
         /// </summary>
         public UserProjectSettings ProjectSettings { get; set; }
+
         /// <summary>
         /// Настройки параметров и правил создания разрезов с предыдущего сеанса
         /// </summary>
         public UserViewSectionSettings ViewSectionSettings { get; set; }
+
         /// <summary>
         /// Настройки параметров и правил создания спек с предыдущего сеанса
         /// </summary>
@@ -154,7 +154,8 @@ namespace RevitPylonDocumentation.ViewModels {
         /// <summary>
         /// Список всех найденных пилонов для работы в проекте (оболочек)
         /// </summary>
-        public ObservableCollection<PylonSheetInfo> HostsInfo { get; set; } = new ObservableCollection<PylonSheetInfo>();
+        public ObservableCollection<PylonSheetInfo> HostsInfo { get; set; } =
+            new ObservableCollection<PylonSheetInfo>();
 
         /// <summary>
         /// Список пилонов (оболочек) для работы из выбранного пользователем комплекта документации
@@ -184,7 +185,7 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Легенды, имеющиеся в проекте
         /// </summary>
         public List<View> Legends { get; set; } = new List<View>();
-        
+
         /// <summary>
         /// Выбранная пользователем легенда
         /// </summary>
@@ -200,7 +201,7 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Типоразмеры видов, имеющиеся в проекте
         /// </summary>
         public List<ViewFamilyType> ViewFamilyTypes { get; set; } = new List<ViewFamilyType>();
-        
+
         /// <summary>
         /// Выбранный пользователем типоразмер вида для создания новых видов
         /// </summary>
@@ -216,7 +217,7 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Перечень шаблонов видов в проекте
         /// </summary>
         public List<ViewSection> ViewTemplatesInPj { get; set; } = new List<ViewSection>();
-        
+
         /// <summary>
         /// Выбранный пользователем шаблон вида основных видов
         /// </summary>
@@ -235,12 +236,9 @@ namespace RevitPylonDocumentation.ViewModels {
             get => _selectedTransverseViewTemplate;
             set {
                 this.RaiseAndSetIfChanged(ref _selectedTransverseViewTemplate, value);
-                TRANSVERSE_VIEW_TEMPLATE_NAME_TEMP = value?.Name;
+                TransverseViewTemplateNameTemp = value?.Name;
             }
         }
-
-
-
 
 
         // Инфо по пилонам
@@ -248,6 +246,7 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Список всех марок пилонов (напр., "12.30.25-20⌀32")
         /// </summary>
         public ObservableCollection<string> HostMarks { get; set; } = new ObservableCollection<string>();
+
         /// <summary>
         /// Список меток основ, которые выбрал пользователь
         /// </summary>
@@ -260,12 +259,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
+        public string ProjectSection { get; set; } = "обр_ФОП_Раздел проекта";
 
-
-        #region Свойства для параметров и правил
-        #region Параметры
-        public string PROJECT_SECTION { get; set; } = "обр_ФОП_Раздел проекта";
-        public string PROJECT_SECTION_TEMP {
+        public string ProjectSectionTemp {
             get => _projectSectionTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _projectSectionTemp, value);
@@ -273,8 +269,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string MARK { get; set; } = "Марка";
-        public string MARK_TEMP {
+        public string Mark { get; set; } = "Марка";
+
+        public string MarkTemp {
             get => _markTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _markTemp, value);
@@ -283,16 +280,19 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         // dispatcher grouping
-        public string DISPATCHER_GROUPING_FIRST { get; set; } = "_Группа видов 1";
-        public string DISPATCHER_GROUPING_FIRST_TEMP {
+        public string DispatcherGroupingFirst { get; set; } = "_Группа видов 1";
+
+        public string DispatcherGroupingFirstTemp {
             get => _dispatcherGroupingFirstTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _dispatcherGroupingFirstTemp, value);
                 _edited = true;
             }
         }
-        public string DISPATCHER_GROUPING_SECOND { get; set; } = "_Группа видов 2";
-        public string DISPATCHER_GROUPING_SECOND_TEMP {
+
+        public string DispatcherGroupingSecond { get; set; } = "_Группа видов 2";
+
+        public string DispatcherGroupingSecondTemp {
             get => _dispatcherGroupingSecondTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _dispatcherGroupingSecondTemp, value);
@@ -300,8 +300,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string SHEET_SIZE { get; set; } = "А";
-        public string SHEET_SIZE_TEMP {
+        public string SheetSize { get; set; } = "А";
+
+        public string SheetSizeTemp {
             get => _sheetSizeTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _sheetSizeTemp, value);
@@ -309,8 +310,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string SHEET_COEFFICIENT { get; set; } = "х";
-        public string SHEET_COEFFICIENT_TEMP {
+        public string SheetCoefficient { get; set; } = "х";
+
+        public string SheetCoefficientTemp {
             get => _sheetCoefficientTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _sheetCoefficientTemp, value);
@@ -319,8 +321,9 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-        public string SHEET_PREFIX { get; set; } = "Пилон ";
-        public string SHEET_PREFIX_TEMP {
+        public string SheetPrefix { get; set; } = "Пилон ";
+
+        public string SheetPrefixTemp {
             get => _sheetPrefixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _sheetPrefixTemp, value);
@@ -328,8 +331,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string SHEET_SUFFIX { get; set; } = "";
-        public string SHEET_SUFFIX_TEMP {
+        public string SheetSuffix { get; set; } = "";
+
+        public string SheetSuffixTemp {
             get => _sheetSuffixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _sheetSuffixTemp, value);
@@ -338,9 +342,9 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
+        public string GeneralViewPrefix { get; set; } = "";
 
-        public string GENERAL_VIEW_PREFIX { get; set; } = "";
-        public string GENERAL_VIEW_PREFIX_TEMP {
+        public string GeneralViewPrefixTemp {
             get => _generalViewPrefixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _generalViewPrefixTemp, value);
@@ -348,8 +352,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string GENERAL_VIEW_SUFFIX { get; set; } = "";
-        public string GENERAL_VIEW_SUFFIX_TEMP {
+        public string GeneralViewSuffix { get; set; } = "";
+
+        public string GeneralViewSuffixTemp {
             get => _generalViewSuffixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _generalViewSuffixTemp, value);
@@ -358,8 +363,9 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-        public string GENERAL_VIEW_PERPENDICULAR_PREFIX { get; set; } = "Пилон ";
-        public string GENERAL_VIEW_PERPENDICULAR_PREFIX_TEMP {
+        public string GeneralViewPerpendicularPrefix { get; set; } = "Пилон ";
+
+        public string GeneralViewPerpendicularPrefixTemp {
             get => _generalViewPerpendicularPrefixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _generalViewPerpendicularPrefixTemp, value);
@@ -367,8 +373,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string GENERAL_VIEW_PERPENDICULAR_SUFFIX { get; set; } = "_Перпендикулярный";
-        public string GENERAL_VIEW_PERPENDICULAR_SUFFIX_TEMP {
+        public string GeneralViewPerpendicularSuffix { get; set; } = "_Перпендикулярный";
+
+        public string GeneralViewPerpendicularSuffixTemp {
             get => _generalViewPerpendicularSuffixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _generalViewPerpendicularSuffixTemp, value);
@@ -376,8 +383,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string GENERAL_VIEW_TEMPLATE_NAME { get; set; } = "КЖ0.2_пилоны_орг.ур.-2";
-        public string GENERAL_VIEW_TEMPLATE_NAME_TEMP {
+        public string GeneralViewTemplateName { get; set; } = "КЖ0.2_пилоны_орг.ур.-2";
+
+        public string GeneralViewTemplateNameTemp {
             get => _generalViewTemplateNameTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _generalViewTemplateNameTemp, value);
@@ -385,8 +393,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string GENERAL_VIEW_X_OFFSET { get; set; } = "200";
-        public string GENERAL_VIEW_X_OFFSET_TEMP {
+        public string GeneralViewXOffset { get; set; } = "200";
+
+        public string GeneralViewXOffsetTemp {
             get => _generalViewXOffsetTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _generalViewXOffsetTemp, value);
@@ -394,8 +403,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string GENERAL_VIEW_Y_TOP_OFFSET { get; set; } = "2300";
-        public string GENERAL_VIEW_Y_TOP_OFFSET_TEMP {
+        public string GeneralViewYTopOffset { get; set; } = "2300";
+
+        public string GeneralViewYTopOffsetTemp {
             get => _generalViewYTopOffsetTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _generalViewYTopOffsetTemp, value);
@@ -403,8 +413,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string GENERAL_VIEW_Y_BOTTOM_OFFSET { get; set; } = "200";
-        public string GENERAL_VIEW_Y_BOTTOM_OFFSET_TEMP {
+        public string GeneralViewYBottomOffset { get; set; } = "200";
+
+        public string GeneralViewYBottomOffsetTemp {
             get => _generalViewYBottomOffsetTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _generalViewYBottomOffsetTemp, value);
@@ -413,8 +424,9 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-        public string TRANSVERSE_VIEW_FIRST_PREFIX { get; set; } = "";
-        public string TRANSVERSE_VIEW_FIRST_PREFIX_TEMP {
+        public string TransverseViewFirstPrefix { get; set; } = "";
+
+        public string TransverseViewFirstPrefixTemp {
             get => _transverseViewFirstPrefixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _transverseViewFirstPrefixTemp, value);
@@ -422,8 +434,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string TRANSVERSE_VIEW_FIRST_SUFFIX { get; set; } = "_Сеч.1-1";
-        public string TRANSVERSE_VIEW_FIRST_SUFFIX_TEMP {
+        public string TransverseViewFirstSuffix { get; set; } = "_Сеч.1-1";
+
+        public string TransverseViewFirstSuffixTemp {
             get => _transverseViewFirstSuffixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _transverseViewFirstSuffixTemp, value);
@@ -432,8 +445,9 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-        public string TRANSVERSE_VIEW_SECOND_PREFIX { get; set; } = "";
-        public string TRANSVERSE_VIEW_SECOND_PREFIX_TEMP {
+        public string TransverseViewSecondPrefix { get; set; } = "";
+
+        public string TransverseViewSecondPrefixTemp {
             get => _transverseViewSecondPrefixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _transverseViewSecondPrefixTemp, value);
@@ -441,8 +455,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string TRANSVERSE_VIEW_SECOND_SUFFIX { get; set; } = "_Сеч.2-2";
-        public string TRANSVERSE_VIEW_SECOND_SUFFIX_TEMP {
+        public string TransverseViewSecondSuffix { get; set; } = "_Сеч.2-2";
+
+        public string TransverseViewSecondSuffixTemp {
             get => _transverseViewSecondSuffixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _transverseViewSecondSuffixTemp, value);
@@ -451,8 +466,9 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-        public string TRANSVERSE_VIEW_THIRD_PREFIX { get; set; } = "";
-        public string TRANSVERSE_VIEW_THIRD_PREFIX_TEMP {
+        public string TransverseViewThirdPrefix { get; set; } = "";
+
+        public string TransverseViewThirdPrefixTemp {
             get => _transverseViewThirdPrefixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _transverseViewThirdPrefixTemp, value);
@@ -460,8 +476,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string TRANSVERSE_VIEW_THIRD_SUFFIX { get; set; } = "_Сеч.3-3";
-        public string TRANSVERSE_VIEW_THIRD_SUFFIX_TEMP {
+        public string TransverseViewThirdSuffix { get; set; } = "_Сеч.3-3";
+
+        public string TransverseViewThirdSuffixTemp {
             get => _transverseViewThirdSuffixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _transverseViewThirdSuffixTemp, value);
@@ -469,8 +486,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string TRANSVERSE_VIEW_TEMPLATE_NAME { get; set; } = "";
-        public string TRANSVERSE_VIEW_TEMPLATE_NAME_TEMP {
+        public string TransverseViewTemplateName { get; set; } = "";
+
+        public string TransverseViewTemplateNameTemp {
             get => _transverseViewTemplateNameTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _transverseViewTemplateNameTemp, value);
@@ -478,8 +496,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string TRANSVERSE_VIEW_X_OFFSET { get; set; } = "200";
-        public string TRANSVERSE_VIEW_X_OFFSET_TEMP {
+        public string TransverseViewXOffset { get; set; } = "200";
+
+        public string TransverseViewXOffsetTemp {
             get => _transverseViewXOffsetTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _transverseViewXOffsetTemp, value);
@@ -487,8 +506,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string TRANSVERSE_VIEW_Y_OFFSET { get; set; } = "200";
-        public string TRANSVERSE_VIEW_Y_OFFSET_TEMP {
+        public string TransverseViewYOffset { get; set; } = "200";
+
+        public string TransverseViewYOffsetTemp {
             get => _transverseViewYOffsetTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _transverseViewYOffsetTemp, value);
@@ -496,8 +516,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string REBAR_SCHEDULE_PREFIX { get; set; } = "Пилон ";
-        public string REBAR_SCHEDULE_PREFIX_TEMP {
+        public string RebarSchedulePrefix { get; set; } = "Пилон ";
+
+        public string RebarSchedulePrefixTemp {
             get => _rebarSchedulePrefixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _rebarSchedulePrefixTemp, value);
@@ -505,8 +526,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string REBAR_SCHEDULE_SUFFIX { get; set; } = "";
-        public string REBAR_SCHEDULE_SUFFIX_TEMP {
+        public string RebarScheduleSuffix { get; set; } = "";
+
+        public string RebarScheduleSuffixTemp {
             get => _rebarScheduleSuffixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _rebarScheduleSuffixTemp, value);
@@ -515,8 +537,9 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-        public string MATERIAL_SCHEDULE_PREFIX { get; set; } = "!СМ_Пилон ";
-        public string MATERIAL_SCHEDULE_PREFIX_TEMP {
+        public string MaterialSchedulePrefix { get; set; } = "!СМ_Пилон ";
+
+        public string MaterialSchedulePrefixTemp {
             get => _materialSchedulePrefixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _materialSchedulePrefixTemp, value);
@@ -524,8 +547,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string MATERIAL_SCHEDULE_SUFFIX { get; set; } = "";
-        public string MATERIAL_SCHEDULE_SUFFIX_TEMP {
+        public string MaterialScheduleSuffix { get; set; } = "";
+
+        public string MaterialScheduleSuffixTemp {
             get => _materialScheduleSuffixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _materialScheduleSuffixTemp, value);
@@ -533,8 +557,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string SYSTEM_PARTS_SCHEDULE_PREFIX { get; set; } = "!ВД_СИС_";
-        public string SYSTEM_PARTS_SCHEDULE_PREFIX_TEMP {
+        public string SystemPartsSchedulePrefix { get; set; } = "!ВД_СИС_";
+
+        public string SystemPartsSchedulePrefixTemp {
             get => _systemPartsSchedulePrefixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _systemPartsSchedulePrefixTemp, value);
@@ -542,8 +567,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string SYSTEM_PARTS_SCHEDULE_SUFFIX { get; set; } = "";
-        public string SYSTEM_PARTS_SCHEDULE_SUFFIX_TEMP {
+        public string SystemPartsScheduleSuffix { get; set; } = "";
+
+        public string SystemPartsScheduleSuffixTemp {
             get => _systemPartsScheduleSuffixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _systemPartsScheduleSuffixTemp, value);
@@ -552,8 +578,9 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-        public string IFC_PARTS_SCHEDULE_PREFIX { get; set; } = "!ВД_IFC_";
-        public string IFC_PARTS_SCHEDULE_PREFIX_TEMP {
+        public string IFCPartsSchedulePrefix { get; set; } = "!ВД_IFC_";
+
+        public string IFCPartsSchedulePrefixTemp {
             get => _IFCPartsSchedulePrefixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _IFCPartsSchedulePrefixTemp, value);
@@ -561,8 +588,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string IFC_PARTS_SCHEDULE_SUFFIX { get; set; } = "";
-        public string IFC_PARTS_SCHEDULE_SUFFIX_TEMP {
+        public string IFCPartsScheduleSuffix { get; set; } = "";
+
+        public string IFCPartsScheduleSuffixTemp {
             get => _IFCPartsScheduleSuffixTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _IFCPartsScheduleSuffixTemp, value);
@@ -571,6 +599,7 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         private bool _needWorkWithTransverseViewFirst = false;
+
         public bool NeedWorkWithTransverseViewFirst {
             get => _needWorkWithTransverseViewFirst;
             set {
@@ -579,6 +608,7 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         private bool _needWorkWithTransverseViewSecond = false;
+
         public bool NeedWorkWithTransverseViewSecond {
             get => _needWorkWithTransverseViewSecond;
             set {
@@ -587,6 +617,7 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         private bool _needWorkWithTransverseViewThird = false;
+
         public bool NeedWorkWithTransverseViewThird {
             get => _needWorkWithTransverseViewThird;
             set {
@@ -595,6 +626,7 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         private bool _needWorkWithRebarSchedule = false;
+
         public bool NeedWorkWithRebarSchedule {
             get => _needWorkWithRebarSchedule;
             set {
@@ -603,6 +635,7 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         private bool _needWorkWithMaterialSchedule = false;
+
         public bool NeedWorkWithMaterialSchedule {
             get => _needWorkWithMaterialSchedule;
             set {
@@ -611,6 +644,7 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         private bool _needWorkWithSystemPartsSchedule = false;
+
         public bool NeedWorkWithSystemPartsSchedule {
             get => _needWorkWithSystemPartsSchedule;
             set {
@@ -619,6 +653,51 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         private bool _needWorkWithIFCPartsSchedule = false;
+        private bool _edited;
+        private string _rebarScheduleNameTemp;
+        private string _materialScheduleNameTemp;
+        private string _systemPartsScheduleNameTemp;
+        private string _IFCPartsScheduleNameTemp;
+        private string _rebarScheduleDisp1Temp;
+        private string _materialScheduleDisp1Temp;
+        private string _systemPartsScheduleDisp1Temp;
+        private string _IFCPartsScheduleDisp1Temp;
+        private string _rebarScheduleDisp2Temp;
+        private string _hostMarkForSearch;
+        private string _projectSectionTemp;
+        private string _markTemp;
+        private string _dispatcherGroupingFirstTemp;
+        private string _dispatcherGroupingSecondTemp;
+        private string _sheetSizeTemp;
+        private string _sheetCoefficientTemp;
+        private string _sheetPrefixTemp;
+        private string _sheetSuffixTemp;
+        private string _generalViewPrefixTemp;
+        private string _generalViewSuffixTemp;
+        private string _generalViewPerpendicularPrefixTemp;
+        private string _generalViewPerpendicularSuffixTemp;
+        private string _generalViewTemplateNameTemp;
+        private string _generalViewXOffsetTemp;
+        private string _generalViewYTopOffsetTemp;
+        private string _generalViewYBottomOffsetTemp;
+        private string _transverseViewFirstPrefixTemp;
+        private string _transverseViewFirstSuffixTemp;
+        private string _transverseViewSecondPrefixTemp;
+        private string _transverseViewSecondSuffixTemp;
+        private string _transverseViewThirdPrefixTemp;
+        private string _transverseViewThirdSuffixTemp;
+        private string _transverseViewTemplateNameTemp;
+        private string _transverseViewXOffsetTemp;
+        private string _transverseViewYOffsetTemp;
+        private string _rebarSchedulePrefixTemp;
+        private string _rebarScheduleSuffixTemp;
+        private string _materialSchedulePrefixTemp;
+        private string _materialScheduleSuffixTemp;
+        private string _systemPartsSchedulePrefixTemp;
+        private string _systemPartsScheduleSuffixTemp;
+        private string _IFCPartsSchedulePrefixTemp;
+        private string _IFCPartsScheduleSuffixTemp;
+
         public bool NeedWorkWithIFCPartsSchedule {
             get => _needWorkWithIFCPartsSchedule;
             set {
@@ -627,9 +706,9 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
+        public string RebarScheduleName { get; set; } = "!СА_Базовая";
 
-        public string REBAR_SCHEDULE_NAME { get; set; } = "!СА_Базовая";
-        public string REBAR_SCHEDULE_NAME_TEMP {
+        public string RebarScheduleNameTemp {
             get => _rebarScheduleNameTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _rebarScheduleNameTemp, value);
@@ -637,8 +716,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string MATERIAL_SCHEDULE_NAME { get; set; } = "!СМ";
-        public string MATERIAL_SCHEDULE_NAME_TEMP {
+        public string MaterialScheduleName { get; set; } = "!СМ";
+
+        public string MaterialScheduleNameTemp {
             get => _materialScheduleNameTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _materialScheduleNameTemp, value);
@@ -647,8 +727,9 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-        public string SYSTEM_PARTS_SCHEDULE_NAME { get; set; } = "!ВД_СИС";
-        public string SYSTEM_PARTS_SCHEDULE_NAME_TEMP {
+        public string SystemPartsScheduleName { get; set; } = "!ВД_СИС";
+
+        public string SystemPartsScheduleNameTemp {
             get => _systemPartsScheduleNameTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _systemPartsScheduleNameTemp, value);
@@ -656,8 +737,9 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-        public string IFC_PARTS_SCHEDULE_NAME { get; set; } = "!ВД_IFC";
-        public string IFC_PARTS_SCHEDULE_NAME_TEMP {
+        public string IFCPartsScheduleName { get; set; } = "!ВД_IFC";
+
+        public string IFCPartsScheduleNameTemp {
             get => _IFCPartsScheduleNameTemp;
             set {
                 this.RaiseAndSetIfChanged(ref _IFCPartsScheduleNameTemp, value);
@@ -666,32 +748,39 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-        public string REBAR_SCHEDULE_DISP1 { get; set; } = "обр_ФОП_Раздел проекта";
-        public string REBAR_SCHEDULE_DISP1_TEMP {
+        public string RebarScheduleDisp1 { get; set; } = "обр_ФОП_Раздел проекта";
+
+        public string RebarScheduleDisp1Temp {
             get => _rebarScheduleDisp1Temp;
             set {
                 this.RaiseAndSetIfChanged(ref _rebarScheduleDisp1Temp, value);
                 _edited = true;
             }
         }
-        public string MATERIAL_SCHEDULE_DISP1 { get; set; } = "обр_ФОП_Раздел проекта";
-        public string MATERIAL_SCHEDULE_DISP1_TEMP {
+
+        public string MaterialScheduleDisp1 { get; set; } = "обр_ФОП_Раздел проекта";
+
+        public string MaterialScheduleDisp1Temp {
             get => _materialScheduleDisp1Temp;
             set {
                 this.RaiseAndSetIfChanged(ref _materialScheduleDisp1Temp, value);
                 _edited = true;
             }
         }
-        public string SYSTEM_PARTS_SCHEDULE_DISP1 { get; set; } = "обр_ФОП_Раздел проекта";
-        public string SYSTEM_PARTS_SCHEDULE_DISP1_TEMP {
+
+        public string SystemPartsScheduleDisp1 { get; set; } = "обр_ФОП_Раздел проекта";
+
+        public string SystemPartsScheduleDisp1Temp {
             get => _systemPartsScheduleDisp1Temp;
             set {
                 this.RaiseAndSetIfChanged(ref _systemPartsScheduleDisp1Temp, value);
                 _edited = true;
             }
         }
-        public string IFC_PARTS_SCHEDULE_DISP1 { get; set; } = "обр_ФОП_Раздел проекта";
-        public string IFC_PARTS_SCHEDULE_DISP1_TEMP {
+
+        public string IFCPartsScheduleDisp1 { get; set; } = "обр_ФОП_Раздел проекта";
+
+        public string IFCPartsScheduleDisp1Temp {
             get => _IFCPartsScheduleDisp1Temp;
             set {
                 this.RaiseAndSetIfChanged(ref _IFCPartsScheduleDisp1Temp, value);
@@ -700,9 +789,9 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
+        public string RebarScheduleDisp2 { get; set; } = "!СА_Пилоны";
 
-        public string REBAR_SCHEDULE_DISP2 { get; set; } = "!СА_Пилоны";
-        public string REBAR_SCHEDULE_DISP2_TEMP {
+        public string RebarScheduleDisp2Temp {
             get => _rebarScheduleDisp2Temp;
             set {
                 this.RaiseAndSetIfChanged(ref _rebarScheduleDisp2Temp, value);
@@ -755,7 +844,6 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Метод, отрабатывающий при загрузке окна
         /// </summary>
         private void LoadView() {
-            
             LoadConfig();
 
             ApplySettings();
@@ -766,10 +854,10 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Метод, отрабатывающий при нажатии кнопки "Ок"
         /// </summary>
         private void AcceptView() {
-
             SaveConfig();
             CreateSheetsNViews();
         }
+
         /// <summary>
         /// Определяет можно ли запустить работу плагина
         /// </summary>
@@ -777,6 +865,7 @@ namespace RevitPylonDocumentation.ViewModels {
             if(ErrorText == string.Empty) {
                 return true;
             }
+
             return false;
         }
 
@@ -784,11 +873,9 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Подгружает параметры плагина с предыдущего запуска
         /// </summary>
         private void LoadConfig() {
-
             var settings = _pluginConfig.GetSettings(_revitRepository.Document);
 
             if(settings != null) {
-
                 _pluginConfig.GetConfigProps(settings, this);
             }
         }
@@ -797,9 +884,8 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Сохраняет параметры плагина для следующего запуска
         /// </summary>
         private void SaveConfig() {
-            
             var settings = _pluginConfig.GetSettings(_revitRepository.Document)
-                          ?? _pluginConfig.AddSettings(_revitRepository.Document);
+                           ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
             _pluginConfig.SetConfigProps(settings, this);
             _pluginConfig.SaveProjectConfig();
@@ -809,13 +895,12 @@ namespace RevitPylonDocumentation.ViewModels {
         /// <summary>
         /// Получает названия комплектов документации по пилонам
         /// </summary>
-        private void GetRebarProjectSections() 
-        {
+        private void GetRebarProjectSections() {
             // Пользователь может перезадать параметр раздела, поэтому сначала чистим
             ProjectSections.Clear();
 
-            using(Transaction transaction = _revitRepository.Document.StartTransaction("Получение возможных комплектов документации")) {
-
+            using(Transaction transaction =
+                  _revitRepository.Document.StartTransaction("Получение возможных комплектов документации")) {
                 _revitRepository.GetHostData(this);
 
                 transaction.RollBack();
@@ -832,8 +917,7 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Обновляет список пилонов в соответствии с выбранным комплектом документации. 
         /// Отрабатывает в момент выбора комплекта документации в ComboBox
         /// </summary>
-        private void GetHostMarksInGUI() 
-        {
+        private void GetHostMarksInGUI() {
             SelectedHostsInfo = new List<PylonSheetInfo>(HostsInfo
                 .Where(item => item.ProjectSection.Equals(SelectedProjectSection))
                 .ToList());
@@ -845,25 +929,24 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Дает возможность пользователю выбрать вручную нужный для работы пилон
         /// </summary>
         private void SelectPylon() {
-
-            ElementId elementid = _revitRepository.ActiveUIDocument.Selection.PickObject(ObjectType.Element, "Выберите пилон").ElementId;
+            ElementId elementid = _revitRepository.ActiveUIDocument.Selection
+                .PickObject(ObjectType.Element, "Выберите пилон").ElementId;
             Element element = _revitRepository.Document.GetElement(elementid);
 
             if(element != null) {
-
                 HostsInfo.Clear();
                 SelectedHostsInfo.Clear();
                 SelectedProjectSection = string.Empty;
                 _pylonSelectedManually = true;
 
-                _revitRepository.GetHostData(this, new List<Element> { element });
+                _revitRepository.GetHostData(this, new List<Element> {element});
 
                 HostsInfo = new ObservableCollection<PylonSheetInfo>(_revitRepository.HostsInfo);
                 ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
                 OnPropertyChanged(nameof(HostsInfo));
                 OnPropertyChanged(nameof(ProjectSections));
 
-                
+
                 if(HostsInfo.Count > 0) {
                     SelectedHostsInfo.Add(HostsInfo.FirstOrDefault());
                     HostsInfo.FirstOrDefault().IsCheck = true;
@@ -890,12 +973,10 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
 
-
         /// <summary>
         /// Применяет изменения настроек плагина (передает данные из временных переменных в постоянные, по которым работает плагин)
         /// </summary>
         private void ApplySettings() {
-
             ErrorText = string.Empty;
 
             ProjectSettings.ApplyProjectSettings();
@@ -907,6 +988,7 @@ namespace RevitPylonDocumentation.ViewModels {
             if(!_pylonSelectedManually) {
                 GetRebarProjectSections();
             }
+
             FindReferenceSchedules();
 
             FindGeneralViewTemplate();
@@ -915,27 +997,30 @@ namespace RevitPylonDocumentation.ViewModels {
             FindLegend();
             FindTitleBlock();
 
-            SettingsEdited = false;
+            _settingsEdited = false;
         }
 
         private void CheckSettings() {
-
             if(SelectedTitleBlock is null) {
                 ErrorText = "Не выбран типоразмер рамки листа";
                 return;
             }
+
             if(SelectedViewFamilyType is null) {
                 ErrorText = "Не выбран типоразмер создаваемого вида";
                 return;
             }
+
             if(SelectedGeneralViewTemplate is null) {
                 ErrorText = "Не выбран шаблон основных видов";
                 return;
             }
+
             if(SelectedTransverseViewTemplate is null) {
                 ErrorText = "Не выбран шаблон поперечных видов";
                 return;
             }
+
             if(SelectedLegend is null) {
                 ErrorText = "Не выбрана легенда примечаний";
                 return;
@@ -950,9 +1035,10 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Доступно при изменении одного из параметров настроек
         /// </summary>
         private bool CanApplySettings() {
-            if(SettingsEdited) {
+            if(_settingsEdited) {
                 return true;
             }
+
             return false;
         }
 
@@ -960,13 +1046,11 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Анализирует выбранные пользователем элементы вида, создает лист, виды, спецификации, и размещает их на листе
         /// </summary>
         private void CreateSheetsNViews() {
-
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Документатор пилонов")) {
-
                 foreach(PylonSheetInfo hostsInfo in SelectedHostsInfo) {
-
                     hostsInfo.Manager.WorkWithCreation();
                 }
+
                 transaction.Commit();
             }
         }
@@ -975,62 +1059,67 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Ищет эталонные спецификации по указанным именам. На основе эталонных спек создаются спеки для пилонов путем копирования
         /// </summary>
         private void FindReferenceSchedules() {
-            ReferenceRebarSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.RebarScheduleName)) as ViewSchedule;
-            ReferenceMaterialSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.MaterialScheduleName)) as ViewSchedule;
-            ReferenceSystemPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.SytemPartsScheduleName)) as ViewSchedule;
-            ReferenceIFCPartsSchedule = _revitRepository.AllScheduleViews.FirstOrDefault(sch => sch.Name.Equals(SchedulesSettings.IFCPartsScheduleName)) as ViewSchedule;
+            ReferenceRebarSchedule =
+                _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+                    sch.Name.Equals(SchedulesSettings.RebarScheduleName)) as ViewSchedule;
+            ReferenceMaterialSchedule =
+                _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+                    sch.Name.Equals(SchedulesSettings.MaterialScheduleName)) as ViewSchedule;
+            ReferenceSystemPartsSchedule =
+                _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+                    sch.Name.Equals(SchedulesSettings.SytemPartsScheduleName)) as ViewSchedule;
+            ReferenceIFCPartsSchedule =
+                _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+                    sch.Name.Equals(SchedulesSettings.IFCPartsScheduleName)) as ViewSchedule;
         }
 
         /// <summary>
         /// Получает шаблон для основных видов по имени
         /// </summary>
         public void FindGeneralViewTemplate() {
-
             if(ViewSectionSettings.GeneralViewTemplateName != string.Empty) {
                 SelectedGeneralViewTemplate = ViewTemplatesInPj
-                .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.GeneralViewTemplateName));
+                    .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.GeneralViewTemplateName));
             }
         }
+
         /// <summary>
         /// Получает шаблон для поперечных видов по имени
         /// </summary>
         public void FindTransverseViewTemplate() {
-
             if(ViewSectionSettings.TransverseViewTemplateName != string.Empty) {
                 SelectedTransverseViewTemplate = ViewTemplatesInPj
-                .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TransverseViewTemplateName));
+                    .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TransverseViewTemplateName));
             }
-            
         }
+
         /// <summary>
         /// Получает типоразмер вида для создаваемых видов
         /// </summary>
         public void FindViewFamilyType() {
-
             if(ViewSectionSettings.ViewFamilyTypeName != string.Empty) {
                 SelectedViewFamilyType = ViewFamilyTypes
-                .FirstOrDefault(familyTypes => familyTypes.Name.Equals(ViewSectionSettings.ViewFamilyTypeName));
+                    .FirstOrDefault(familyTypes => familyTypes.Name.Equals(ViewSectionSettings.ViewFamilyTypeName));
             }
         }
+
         /// <summary>
         /// Получает легенду примечания по имени
         /// </summary>
         public void FindLegend() {
-
             if(ProjectSettings.LegendName != string.Empty) {
                 SelectedLegend = Legends
-                .FirstOrDefault(view => view.Name.Contains(ProjectSettings.LegendName));
+                    .FirstOrDefault(view => view.Name.Contains(ProjectSettings.LegendName));
             }
-                
         }
+
         /// <summary>
         /// Получает типоразмер рамки листа по имени типа
         /// </summary>
         public void FindTitleBlock() {
-
             if(ProjectSettings.TitleBlockName != string.Empty) {
                 SelectedTitleBlock = TitleBlocks
-                .FirstOrDefault(titleBlock => titleBlock.Name.Contains(ProjectSettings.TitleBlockName));
+                    .FirstOrDefault(titleBlock => titleBlock.Name.Contains(ProjectSettings.TitleBlockName));
             }
         }
 
@@ -1039,8 +1128,8 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Добавляет новое имя параметра фильтра спецификаций в настройках плагина
         /// </summary>
         private void AddScheduleFilterParam() {
-
-            SchedulesSettings.ParamsForScheduleFilters.Add(new ScheduleFilterParamHelper("Введите название", "Введите название"));
+            SchedulesSettings.ParamsForScheduleFilters.Add(
+                new ScheduleFilterParamHelper("Введите название", "Введите название"));
             SettingsChanged();
         }
 
@@ -1048,8 +1137,7 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Удаляет выбранное имя параметра фильтра спецификаций в настройках плагина
         /// </summary>
         private void DeleteScheduleFilterParam() {
-
-            List <ScheduleFilterParamHelper> forDel= new List <ScheduleFilterParamHelper>();
+            List<ScheduleFilterParamHelper> forDel = new List<ScheduleFilterParamHelper>();
 
             foreach(ScheduleFilterParamHelper param in SchedulesSettings.ParamsForScheduleFilters) {
                 if(param.IsCheck) {
@@ -1068,8 +1156,7 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Добавляет новое имя параметра фильтра спецификаций в настройках плагина
         /// </summary>
         private void SettingsChanged() {
-
-            SettingsEdited = true;
+            _settingsEdited = true;
         }
 
         /// <summary>
@@ -1077,10 +1164,10 @@ namespace RevitPylonDocumentation.ViewModels {
         /// True, если выбрана штриховка в списке штриховок в настройках плагина
         /// </summary> 
         private bool CanChangeScheduleFilterParam() {
-
             foreach(ScheduleFilterParamHelper param in SchedulesSettings.ParamsForScheduleFilters) {
                 if(param.IsCheck) { return true; }
             }
+
             return false;
         }
 
@@ -1088,10 +1175,12 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Задает фильтрацию списка марок пилонов
         /// </summary>
         private void SetHostsInfoFilters() {
-
             _hostsInfoView = CollectionViewSource.GetDefaultView(SelectedHostsInfo);
-            _hostsInfoView.Filter = item => String.IsNullOrEmpty(HostsInfoFilter) ? true :
-                ((PylonSheetInfo) item).PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+            _hostsInfoView.Filter = item =>
+                String.IsNullOrEmpty(HostsInfoFilter)
+                    ? true
+                    : ((PylonSheetInfo) item).PylonKeyName.IndexOf(HostsInfoFilter,
+                        StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
 
@@ -1100,7 +1189,6 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Работает при нажатии "x" в правой части области поиска
         /// </summary>
         private void ClearHostsInfoFilterInGUI() {
-            
             HostsInfoFilter = string.Empty;
         }
 
@@ -1110,12 +1198,14 @@ namespace RevitPylonDocumentation.ViewModels {
         /// </summary>
         private void SelectAllHostsInfoInGUI() {
             foreach(PylonSheetInfo pylonSheetInfo in SelectedHostsInfo) {
-                
-                if(String.IsNullOrEmpty(HostsInfoFilter) ? true :
-                (pylonSheetInfo.PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >= 0)) {
+                if(String.IsNullOrEmpty(HostsInfoFilter)
+                       ? true
+                       : (pylonSheetInfo.PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >=
+                          0)) {
                     pylonSheetInfo.IsCheck = true;
                 }
             }
+
             // Иначе не работало:
             _hostsInfoView.Refresh();
         }
@@ -1126,18 +1216,18 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка марок пилонов в GUI
         /// </summary>
         private void UnselectAllHostsInfoInGUI() {
-
             foreach(PylonSheetInfo pylonSheetInfo in SelectedHostsInfo) {
-
-                if(String.IsNullOrEmpty(HostsInfoFilter) ? true :
-                (pylonSheetInfo.PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >= 0)) {
+                if(String.IsNullOrEmpty(HostsInfoFilter)
+                       ? true
+                       : (pylonSheetInfo.PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >=
+                          0)) {
                     pylonSheetInfo.IsCheck = false;
                 }
             }
+
             // Иначе не работало:
             _hostsInfoView.Refresh();
         }
-
 
 
         /// <summary>
@@ -1145,7 +1235,6 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка тумблеров в GUI
         /// </summary>
         private void SelectAllFuncInGUI() {
-
             SelectionSettings.NeedWorkWithGeneralView = true;
             SelectionSettings.NeedWorkWithGeneralPerpendicularView = true;
             SelectionSettings.NeedWorkWithTransverseViewFirst = true;
@@ -1164,7 +1253,6 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка тумблеров в GUI
         /// </summary>
         private void UnselectAllFuncInGUI() {
-
             SelectionSettings.NeedWorkWithGeneralView = false;
             SelectionSettings.NeedWorkWithGeneralPerpendicularView = false;
             SelectionSettings.NeedWorkWithTransverseViewFirst = false;
