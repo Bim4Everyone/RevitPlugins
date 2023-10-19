@@ -18,6 +18,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Text;
 using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
+using System.Reflection;
 
 namespace RevitFamilyParameterAdder.ViewModels {
     internal class MainViewModel : BaseViewModel {
@@ -374,9 +375,8 @@ namespace RevitFamilyParameterAdder.ViewModels {
 #if REVIT_2023_OR_LESS
             Array array = Enum.GetValues(typeof(BuiltInParameterGroup));
 #else
-            Array array = typeof(ForgeTypeId).GetProperties();
+            Array array = typeof(GroupTypeId).GetProperties();
 #endif
-
 
             // Отбираем только те, что отображаются у пользователя
             foreach(object group in array) {
@@ -385,8 +385,9 @@ namespace RevitFamilyParameterAdder.ViewModels {
                     BINParameterGroups.Add(new ParameterGroupHelper((BuiltInParameterGroup) group));
                 }
 #else
-                if(FamilyManagerFm.IsUserAssignableParameterGroup((ForgeTypeId) group)) {
-                    BINParameterGroups.Add(new ParameterGroupHelper((ForgeTypeId) group));
+                PropertyInfo propertyInfo = group as PropertyInfo;
+                if(FamilyManagerFm.IsUserAssignableParameterGroup((ForgeTypeId) propertyInfo.GetValue(null, null))) {
+                    BINParameterGroups.Add(new ParameterGroupHelper((ForgeTypeId) propertyInfo.GetValue(null, null)));
                 }
 #endif
             }
