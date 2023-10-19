@@ -3,8 +3,10 @@ title:
   en_us: ${{ gen.bundle_name }}
 
 tooltip:
-  ru: >- Please Write Description
-  en_us: >- Please Write Description
+  ru: >- 
+    Please Write Description
+  en_us: >- 
+    Please Write Description
   
 author: ${{ gen.author }}
 
