@@ -21,12 +21,17 @@ namespace RevitMepTotals.Services.Implements {
         }
 
 
-        public void ExportData(DirectoryInfo exportDirectory, IList<IDocumentData> data) {
+        public void ExportData(DirectoryInfo exportDirectory, IList<IDocumentData> dataForExport) {
             if(exportDirectory is null) { throw new ArgumentNullException(nameof(exportDirectory)); }
-            if(data is null) { throw new ArgumentNullException(nameof(data)); }
-            if(data.Count == 0) { return; }
-            CheckDistinctDocument(data);
+            if(dataForExport is null) { throw new ArgumentNullException(nameof(dataForExport)); }
+            IList<IDocumentData> data = GetNotConflictedDocuments(dataForExport, out string error);
 
+            if(data.Count == 0) {
+                if(!string.IsNullOrWhiteSpace(error)) {
+                    ShowMessageBoxError(error);
+                }
+                return;
+            }
             string path = CreateFileName(exportDirectory);
             // https://docs.devexpress.com/OfficeFileAPI/15072/spreadsheet-document-api/getting-started?v=21.2
             using(Workbook workbook = new Workbook()) {
@@ -66,30 +71,68 @@ namespace RevitMepTotals.Services.Implements {
                 }
                 workbook.Calculate();
                 workbook.SaveDocument(path, DocumentFormat.OpenXml);
+                if(!string.IsNullOrWhiteSpace(error)) {
+                    ShowMessageBoxError(error);
+                }
             }
         }
 
-        private void CheckDistinctDocument(ICollection<IDocumentData> data) {
-            if(data.Distinct().Count() != data.Count) {
-                ShowMessageBoxError("Нельзя выгрузить данные из документов с одинаковым названием!");
-                throw new OperationCanceledException();
+        /// <summary>
+        /// Проверяет документы на конфликты имен и возвращает коллекцию документов из заданной коллекции, которые НЕ образуют конфликты.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="errorMessage">Сообщение об ошибке, или пустая строка, если ошибок нет</param>
+        /// <returns></returns>
+        private IList<IDocumentData> GetNotConflictedDocuments(ICollection<IDocumentData> data, out string errorMessage) {
+            var docsWithNameConflicts = data
+                .GroupBy(doc => CleanSheetName(doc.Title))
+                .Where(group => group.Count() > 1)
+                .SelectMany(group => group.ToList())
+                .ToArray();
+            if(docsWithNameConflicts.Length > 0) {
+                errorMessage = $"{string.Join(Environment.NewLine, docsWithNameConflicts.Select(doc => doc.Title))}" +
+                    $"\n\nЭти документы нельзя выгрузить за один раз, т.к. они образуют конфликт имен в листах Excel." +
+                    "\nИмя листа Excel должно быть не более 31 символа" +
+                    "\nне должно начинаться или заканчиваться с (')" +
+                    "\nне должно содержать \\, /, ?, :, *, [, ] ";
+            } else {
+                errorMessage = string.Empty;
             }
+            return data.Except(docsWithNameConflicts).ToList();
         }
 
         private IList<IDuctData> GetOrderedDuctData(IDocumentData documentData) {
-            return documentData.Ducts.OrderBy(d => d.TypeName).ToList();
+            return documentData.Ducts
+                .OrderBy(d => d.TypeName)
+                .ThenBy(d => d.Name)
+                .ThenBy(d => d.Size)
+                .ToList();
         }
 
         private IList<IPipeData> GetOrderedPipeData(IDocumentData documentData) {
-            return documentData.Pipes.OrderBy(pipe => pipe.TypeName).ToList();
+            return documentData.Pipes
+                .OrderBy(d => d.TypeName)
+                .ThenBy(d => d.Name)
+                .ThenBy(d => d.Size)
+                .ToList();
         }
 
         private IList<IDuctInsulationData> GetOrderedDuctInsulationData(IDocumentData documentData) {
-            return documentData.DuctInsulations.OrderBy(pipe => pipe.TypeName).ToList();
+            return documentData.DuctInsulations
+                .OrderBy(d => d.TypeName)
+                .ThenBy(d => d.Name)
+                .ThenBy(d => d.DuctSize)
+                .ThenBy(d => d.Thickness)
+                .ToList();
         }
 
         private IList<IPipeInsulationData> GetOrderedPipeInsulationData(IDocumentData documentData) {
-            return documentData.PipeInsulations.OrderBy(pipe => pipe.TypeName).ToList();
+            return documentData.PipeInsulations
+                .OrderBy(d => d.TypeName)
+                .ThenBy(d => d.Name)
+                .ThenBy(d => d.PipeSize)
+                .ThenBy(d => d.Thickness)
+                .ToList();
         }
 
         /// <summary>
@@ -100,13 +143,18 @@ namespace RevitMepTotals.Services.Implements {
         /// <param name="ductData">Данные по воздуховодам</param>
         /// <returns>Индекс последней строчки, на которую были записаны данные</returns>
         private int WriteDuctData(Worksheet worksheet, int startRow, IList<IDuctData> ductData) {
+            worksheet.Rows[startRow][0].Value = "Тип";
+            worksheet.Rows[startRow][1].Value = "ФОП_ВИС_Наименование комбинированное";
+            worksheet.Rows[startRow][2].Value = "Размер";
+            worksheet.Rows[startRow][3].Value = "Длина, м";
+            startRow++;
             int ductsCount = ductData.Count;
             int lastRow = startRow + ductsCount - 1;
             for(int row = startRow; row < lastRow + 1; row++) {
                 worksheet.Rows[row][0].Value = ductData[row - startRow].TypeName;
                 worksheet.Rows[row][1].Value = ductData[row - startRow].Name;
                 worksheet.Rows[row][2].Value = ductData[row - startRow].Size;
-                worksheet.Rows[row][3].Value = ductData[row - startRow].Length;
+                worksheet.Rows[row][3].Value = ductData[row - startRow].Length / 1000;
             }
             return lastRow;
         }
@@ -119,13 +167,18 @@ namespace RevitMepTotals.Services.Implements {
         /// <param name="pipeData">Данные по трубам</param>
         /// <returns>Индекс последней строчки, на которую были записаны данные</returns>
         private int WritePipeData(Worksheet worksheet, int startRow, IList<IPipeData> pipeData) {
+            worksheet.Rows[startRow][0].Value = "Тип";
+            worksheet.Rows[startRow][1].Value = "ФОП_ВИС_Наименование комбинированное";
+            worksheet.Rows[startRow][2].Value = "Размер";
+            worksheet.Rows[startRow][3].Value = "Длина, м";
+            startRow++;
             int pipesCount = pipeData.Count;
             int lastRow = startRow + pipesCount - 1;
             for(int row = startRow; row < lastRow + 1; row++) {
                 worksheet.Rows[row][0].Value = pipeData[row - startRow].TypeName;
                 worksheet.Rows[row][1].Value = pipeData[row - startRow].Name;
                 worksheet.Rows[row][2].Value = pipeData[row - startRow].Size;
-                worksheet.Rows[row][3].Value = pipeData[row - startRow].Length;
+                worksheet.Rows[row][3].Value = pipeData[row - startRow].Length / 1000;
             }
             return lastRow;
         }
@@ -138,6 +191,13 @@ namespace RevitMepTotals.Services.Implements {
         /// <param name="ductInsulationData">Данные по изоляции воздуховодов</param>
         /// <returns>Индекс последней строчки, на которую были записаны данные</returns>
         private int WriteDuctInsulationData(Worksheet worksheet, int startRow, IList<IDuctInsulationData> ductInsulationData) {
+            worksheet.Rows[startRow][0].Value = "Тип";
+            worksheet.Rows[startRow][1].Value = "ФОП_ВИС_Наименование комбинированное";
+            worksheet.Rows[startRow][2].Value = "Размер воздуховода";
+            worksheet.Rows[startRow][3].Value = "Толщина, мм";
+            worksheet.Rows[startRow][4].Value = "Длина, м";
+            worksheet.Rows[startRow][5].Value = "Площадь, м2";
+            startRow++;
             int count = ductInsulationData.Count;
             int lastRow = startRow + count - 1;
             for(int row = startRow; row < lastRow + 1; row++) {
@@ -145,7 +205,7 @@ namespace RevitMepTotals.Services.Implements {
                 worksheet.Rows[row][1].Value = ductInsulationData[row - startRow].Name;
                 worksheet.Rows[row][2].Value = ductInsulationData[row - startRow].DuctSize;
                 worksheet.Rows[row][3].Value = ductInsulationData[row - startRow].Thickness;
-                worksheet.Rows[row][4].Value = ductInsulationData[row - startRow].Length;
+                worksheet.Rows[row][4].Value = ductInsulationData[row - startRow].Length / 1000;
                 worksheet.Rows[row][5].Value = ductInsulationData[row - startRow].Area;
             }
             return lastRow;
@@ -159,6 +219,13 @@ namespace RevitMepTotals.Services.Implements {
         /// <param name="pipeInsulationData">Данные по изоляции труб</param>
         /// <returns>Индекс последней строчки, на которую были записаны данные</returns>
         private int WritePipeInsulationData(Worksheet worksheet, int startRow, IList<IPipeInsulationData> pipeInsulationData) {
+            worksheet.Rows[startRow][0].Value = "Тип";
+            worksheet.Rows[startRow][1].Value = "ФОП_ВИС_Наименование комбинированное";
+            worksheet.Rows[startRow][2].Value = "Размер трубы";
+            worksheet.Rows[startRow][3].Value = "Толщина, мм";
+            worksheet.Rows[startRow][4].Value = "Длина, м";
+            worksheet.Rows[startRow][5].Value = "Площадь, м2";
+            startRow++;
             int count = pipeInsulationData.Count;
             int lastRow = startRow + count - 1;
             for(int row = startRow; row < lastRow + 1; row++) {
@@ -166,7 +233,7 @@ namespace RevitMepTotals.Services.Implements {
                 worksheet.Rows[row][1].Value = pipeInsulationData[row - startRow].Name;
                 worksheet.Rows[row][2].Value = pipeInsulationData[row - startRow].PipeSize;
                 worksheet.Rows[row][3].Value = pipeInsulationData[row - startRow].Thickness;
-                worksheet.Rows[row][4].Value = pipeInsulationData[row - startRow].Length;
+                worksheet.Rows[row][4].Value = pipeInsulationData[row - startRow].Length / 1000;
                 worksheet.Rows[row][5].Value = pipeInsulationData[row - startRow].Area;
             }
             return lastRow;
@@ -205,7 +272,7 @@ namespace RevitMepTotals.Services.Implements {
         /// <param name="name"></param>
         /// <returns></returns>
         private string CleanSheetName(string name) {
-            var charsToRemove = new char[] { '\\', '/', '?', ':', '*', '[', ']' };
+            var charsToRemove = new char[] { '\\', '/', '?', ':', '*', '[', ']', '\'' };
             string trimName = string.Concat(name.Trim().Take(31)).Trim();
             foreach(char charToRemove in charsToRemove) {
                 trimName = trimName.Replace(charToRemove, '_');
