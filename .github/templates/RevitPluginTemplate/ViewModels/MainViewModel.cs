@@ -18,7 +18,7 @@ namespace RevitPluginTemplate.ViewModels {
             _revitRepository = revitRepository;
 
             LoadViewCommand = RelayCommand.Create(LoadView);
-            AcceptViewCommand = RelayCommand.Create(AcceptView);
+            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         }
 
         public ICommand LoadViewCommand { get; }
@@ -40,6 +40,16 @@ namespace RevitPluginTemplate.ViewModels {
 
         private void AcceptView() {
             SaveConfig();
+        }
+        
+        private bool CanAcceptView() {
+            if(string.IsNullOrEmpty(SaveProperty)) {
+                ErrorText = "Введите значение сохраняемого свойства.";
+                return false;
+            }
+
+            ErrorText = null;
+            return true;
         }
 
         private void LoadConfig() {
