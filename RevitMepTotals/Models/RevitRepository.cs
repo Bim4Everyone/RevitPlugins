@@ -14,7 +14,7 @@ using dosymep.Bim4Everyone.SystemParams;
 
 namespace RevitMepTotals.Models {
     internal class RevitRepository {
-        private const string _sharedName = "ФОП_ВИС_Наименование";
+        private const string _sharedName = "ФОП_ВИС_Наименование комбинированное";
         private const string _default = "отсутствует";
 
 
