@@ -29,6 +29,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dosymep", "dosymep", "{0647
 		dosymep\PlatformWindow.cs = dosymep\PlatformWindow.cs
 		dosymep\RelayCommand.cs = dosymep\RelayCommand.cs
 		dosymep\ThemedPlatformWindow.cs = dosymep\ThemedPlatformWindow.cs
+		dosymep\AsyncRelayCommand.cs = dosymep\AsyncRelayCommand.cs
+		dosymep\AsyncRelayCommand.T.cs = dosymep\AsyncRelayCommand.T.cs
+		dosymep\ElementIdConverter.cs = dosymep\ElementIdConverter.cs
+		dosymep\IAsyncCommand.cs = dosymep\IAsyncCommand.cs
+		dosymep\IAsyncCommand.T.cs = dosymep\IAsyncCommand.T.cs
+		dosymep\ICommand.cs = dosymep\ICommand.cs
+		dosymep\ObservableObject.cs = dosymep\ObservableObject.cs
+		dosymep\RelayCommand.T.cs = dosymep\RelayCommand.T.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0C7777D6-5306-4473-A046-497D2B54E4CA}"
