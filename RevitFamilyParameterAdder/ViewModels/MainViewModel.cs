@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.Text;
 using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace RevitFamilyParameterAdder.ViewModels {
     internal class MainViewModel : BaseViewModel {
@@ -77,11 +78,11 @@ namespace RevitFamilyParameterAdder.ViewModels {
             new DefaultParam("обр_ФОП_Изделие_Наименование", GroupTypeId.General),
             new DefaultParam("обр_ФОП_Изделие_Марка", GroupTypeId.General),
             new DefaultParam("обр_ФОП_Изделие_Главная деталь", GroupTypeId.General),
-            new DefaultParam("обр_ФОП_Габарит А_ВД", GroupTypeId.General,
+            new DefaultParam("обр_ФОП_Габарит А_ВД", new ForgeTypeId(),
                 "roundup((мод_ФОП_Габарит А) / 5 мм) * 5 мм"),
-            new DefaultParam("обр_ФОП_Габарит Б_ВД", GroupTypeId.General,
+            new DefaultParam("обр_ФОП_Габарит Б_ВД", new ForgeTypeId(),
                 "roundup((мод_ФОП_Габарит Б) / 5 мм) * 5 мм"),
-            new DefaultParam("обр_ФОП_Габарит В_ВД", GroupTypeId.General,
+            new DefaultParam("обр_ФОП_Габарит В_ВД", new ForgeTypeId(),
                 "roundup((мод_ФОП_Габарит В) / 5 мм) * 5 мм")
 #endif
         };
@@ -157,12 +158,6 @@ namespace RevitFamilyParameterAdder.ViewModels {
 
 
 
-
-
-
-
-
-
         /// <summary>
         /// Метод для команды,отрабатывающей во время загрузки окна
         /// </summary>
@@ -209,7 +204,6 @@ namespace RevitFamilyParameterAdder.ViewModels {
 
 
 
-
         private void Add() {
             using(Transaction t = new Transaction(_revitRepository.Document)) {
                 t.Start("Добавление параметров");
@@ -223,7 +217,6 @@ namespace RevitFamilyParameterAdder.ViewModels {
                     }
 
                     try {
-
 #if REVIT_2023_OR_LESS
                         FamilyParameter familyParam = FamilyManagerFm.AddParameter(
                             param.ParamInShPF, 
@@ -371,26 +364,27 @@ namespace RevitFamilyParameterAdder.ViewModels {
         /// Получение групп параметров семейства (для группировки параметров в списке параметров семейства)
         /// </summary>
         private void GetBuiltInParameterGroups() {
-            // Забираем все встроенные группы параметров
+            
 #if REVIT_2023_OR_LESS
+            // Забираем все встроенные группы параметров
             Array array = Enum.GetValues(typeof(BuiltInParameterGroup));
+            
+            // Отбираем только те, что отображаются у пользователя
+            foreach(BuiltInParameterGroup group in array) {
+                if(FamilyManagerFm.IsUserAssignableParameterGroup(group)) {
+                    BINParameterGroups.Add(new ParameterGroupHelper(group));
+                }
+            }
 #else
             Array array = typeof(GroupTypeId).GetProperties();
-#endif
-
-            // Отбираем только те, что отображаются у пользователя
-            foreach(object group in array) {
-#if REVIT_2023_OR_LESS
-                if(FamilyManagerFm.IsUserAssignableParameterGroup((BuiltInParameterGroup) group)) {
-                    BINParameterGroups.Add(new ParameterGroupHelper((BuiltInParameterGroup) group));
+            BINParameterGroups.Add(new ParameterGroupHelper(new ForgeTypeId()));
+            foreach(PropertyInfo group in array) {
+                //PropertyInfo propertyInfo = group as PropertyInfo;
+                if(FamilyManagerFm.IsUserAssignableParameterGroup((ForgeTypeId) group.GetValue(null, null))) {
+                    BINParameterGroups.Add(new ParameterGroupHelper((ForgeTypeId) group.GetValue(null, null)));
                 }
-#else
-                PropertyInfo propertyInfo = group as PropertyInfo;
-                if(FamilyManagerFm.IsUserAssignableParameterGroup((ForgeTypeId) propertyInfo.GetValue(null, null))) {
-                    BINParameterGroups.Add(new ParameterGroupHelper((ForgeTypeId) propertyInfo.GetValue(null, null)));
-                }
-#endif
             }
+#endif
 
             BINParameterGroups.Sort((x, y) => x.GroupName.CompareTo(y.GroupName));
         }

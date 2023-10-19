@@ -15,7 +15,9 @@ namespace RevitFamilyParameterAdder.Models
 #if REVIT_2023_OR_LESS
             GroupName = LabelUtils.GetLabelFor((BuiltInParameterGroup) builtInParameterGroup);
 #else
-            GroupName = LabelUtils.GetLabelForGroup((ForgeTypeId) builtInParameterGroup);
+            if(builtInParameterGroup != null) {
+                GroupName = LabelUtils.GetLabelForGroup((ForgeTypeId) builtInParameterGroup);
+            }
 #endif
         }
 
