@@ -12,12 +12,13 @@ using dosymep.Revit;
 using pyRevitLabs.Json.Linq;
 
 namespace RevitRoomTagPlacement.Models {
-    internal class RoomPathFinder {
+    internal class TagPointFinder {
+        // Отступ марки от края всегда будет 7 мм
         private const double Indent = 0.0229659;
         private Room _room;
         private BoundingBoxXYZ _roomBB;
 
-        public RoomPathFinder(Room room) {
+        public TagPointFinder(Room room) {
             _room = room;
             _roomBB = room.GetBoundingBox();
         }
@@ -75,10 +76,8 @@ namespace RevitRoomTagPlacement.Models {
         }
 
         public UV GetPointByPath() {
-            RoomPath path = new RoomPath(_room);
-
-            var xValue = (_roomBB.Min.X + _roomBB.Max.X) * 0.5;
-            var yValue = (_roomBB.Min.Y + _roomBB.Max.Y) * 0.5;
+            TriangulatedRoom triangulatedRoom = new TriangulatedRoom(_room);
+            RoomPath path = new RoomPath(triangulatedRoom);
 
             return path.TagPoint;
         }

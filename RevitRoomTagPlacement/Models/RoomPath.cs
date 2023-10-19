@@ -9,29 +9,23 @@ using Autodesk.Revit.DB.Architecture;
 
 namespace RevitRoomTagPlacement.Models {
     internal class RoomPath {
-        private Room room;
-        private Mesh mesh;
+        private TriangulatedRoom triRoom;
+
         private List<PathTriangle> triangles;
-        private BoundingBoxUV roomBB;
         private List<List<PathTriangle>> startTriangles;
         private List<List<PathTriangle>> allPathes;
         private List<PathTriangle> mainPath;
         private double centerPoint;
         public UV TagPoint;
 
-        public RoomPath(Room _room) {
-            room = _room;
-            mesh = GetRoomMesh();
-            triangles = GetTriangleList();
-            
-            FindNextTriangles();
-            startTriangles = GetStartEndTriangles();
+        public RoomPath(TriangulatedRoom _triRoom) {
+            triRoom = _triRoom;
 
+            triangles = triRoom.Triangles;            
+            startTriangles = GetStartEndTriangles();
             allPathes = new List<List<PathTriangle>>();
             GetAllPathes();
-
             mainPath = GetMainPath();
-
             centerPoint = CalculateWeightCenter();
             TagPoint = GetTagPoint();
         }
@@ -89,66 +83,6 @@ namespace RevitRoomTagPlacement.Models {
             return mainPath;
         }
 
-        private Mesh GetRoomMesh() {
-            Solid roomSolid = room.ClosedShell
-                .OfType<Solid>()
-                .First();
-
-            var faceArray = roomSolid.Faces;
-
-            List<Face> faceList = new List<Face>();
-            foreach(Face face in faceArray) {
-                faceList.Add(face);
-            }
-
-            PlanarFace lowestFace = faceList
-                .OfType<PlanarFace>()
-                .Where(y => y.FaceNormal.Z != 0)
-                .First();
-
-            roomBB = lowestFace.GetBoundingBox();
-
-            return lowestFace
-                .Triangulate();
-        }
-
-        private List<PathTriangle> GetTriangleList() { 
-            var triangleList = new List<PathTriangle>();
-            for(int i=0; i < mesh.NumTriangles; i++) {
-                triangleList.Add(new PathTriangle(mesh.get_Triangle(i)));
-            }
-            return triangleList;        
-        }
-
-        private bool CheckIsNextTriangle(PathTriangle triangle1, PathTriangle triangle2) {
-            int commonPoints = 0;
-
-            List<XYZ> points1 = triangle1.Vertices;
-            List<XYZ> points2 = triangle2.Vertices;
-
-            foreach(XYZ point1 in points1) {
-                foreach(XYZ point2 in points2) {
-                    if(point1.X == point2.X && point1.Y == point2.Y) {
-                        commonPoints++;
-                    }
-                }
-            }
-
-            if(commonPoints == 2) return true;
-
-            return false;
-        }
-
-        private void FindNextTriangles() {
-            foreach(PathTriangle triangle1 in triangles) {
-                foreach(PathTriangle triangle2 in triangles) {
-                    if(CheckIsNextTriangle(triangle1, triangle2)) {
-                        triangle1.NextTriangles.Add(triangle2);
-                    }
-                }
-            }
-        }
-
         private List<List<PathTriangle>> GetStartEndTriangles() {
             List<List<PathTriangle>> triangleList = new List<List<PathTriangle>>();
 
@@ -171,43 +105,23 @@ namespace RevitRoomTagPlacement.Models {
                 foreach(var startCouple in startTriangles) {
                     GoFromStartToEnd(new List<PathTriangle>(), startCouple[0], startCouple[1]);
                     foreach(var tri in triangles) {
-                        tri.IsViisted = false;
+                        tri.IsVisited = false;
                      }
                 }
             } 
             else {
-                PathTriangle minTriangle = GetMinTriangle();
+                PathTriangle minTriangle = triRoom.MinTriangle;
                 GoFromStart(new List<PathTriangle>(), minTriangle);
             }
         }
 
-        private PathTriangle GetMinTriangle() {
-            UV minPoint = roomBB.Min;
-            double minDistance = Double.MaxValue;
-
-            PathTriangle minTriangle = null;
-
-            foreach(var tri in triangles) {
-                foreach(var vertex in tri.Vertices) {
-                    var checkPoint = new UV(vertex.X, vertex.Y);
-                    double distance = minPoint.DistanceTo(checkPoint);
-                    if(distance < minDistance) {
-                        minDistance = distance;
-                        minTriangle = tri;
-                    }
-                }
-            }
-
-            return minTriangle;
-        }
-
         private void GoFromStartToEnd(List<PathTriangle> path, PathTriangle startTriangle, PathTriangle endTriangle) {
-            startTriangle.IsViisted = true;
+            startTriangle.IsVisited = true;
             path.Add(startTriangle);
 
             foreach(PathTriangle nextTriangle in startTriangle.NextTriangles) {
                 List<PathTriangle> newPath = new List<PathTriangle>(path);
-                if(!nextTriangle.IsViisted) { 
+                if(!nextTriangle.IsVisited) { 
                     if(nextTriangle == endTriangle) {
                         newPath.Add(nextTriangle);
                         allPathes.Add(newPath);
@@ -220,13 +134,13 @@ namespace RevitRoomTagPlacement.Models {
         }
 
         private void GoFromStart(List<PathTriangle> path, PathTriangle startTriangle) {
-            startTriangle.IsViisted = true;
+            startTriangle.IsVisited = true;
             path.Add(startTriangle);
             List<PathTriangle> newPath = new List<PathTriangle>();
 
             foreach(PathTriangle nextTriangle in startTriangle.NextTriangles) {
                 newPath = new List<PathTriangle> (path);
-                if(!nextTriangle.IsViisted) { 
+                if(!nextTriangle.IsVisited) { 
                     GoFromStart(newPath, nextTriangle);
                 }
             }

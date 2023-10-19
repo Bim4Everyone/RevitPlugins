@@ -17,7 +17,7 @@ namespace RevitRoomTagPlacement.Models {
         public XYZ Center;
         public double Weight;
 
-        public bool IsViisted;
+        public bool IsVisited;
 
         public List<PathTriangle> NextTriangles;
 
@@ -31,7 +31,7 @@ namespace RevitRoomTagPlacement.Models {
             Center = GetCenter();
             Weight = GetWeight();
 
-            IsViisted = false;
+            IsVisited = false;
 
             NextTriangles = new List<PathTriangle>();
         }

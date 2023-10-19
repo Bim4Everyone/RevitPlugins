@@ -114,7 +114,7 @@ namespace RevitRoomTagPlacement.Models {
                         .ToList();
 
                     if(!depElements.Contains(SelectedTagType)) {
-                        RoomPathFinder pathFinder = new RoomPathFinder(room);
+                        TagPointFinder pathFinder = new TagPointFinder(room);
                         UV point = pathFinder.GetPointByPlacementWay(positionPlacementWay, activeView);
 
                         LocationPoint roomLocation = (LocationPoint) room.Location;
