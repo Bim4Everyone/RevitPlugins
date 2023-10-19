@@ -130,19 +130,19 @@
         <Compile Include="..\dosymep\ConfigSerializer.cs" Link="dosymep\ConfigSerializer.cs"/>
         <Compile Include="..\dosymep\ConvertibleExtention.cs" Link="dosymep\ConvertibleExtention.cs"/>
         <Compile Include="..\dosymep\BasePluginCommand.cs" Link="dosymep\BasePluginCommand.cs"/>
-        <Compile Include="..\dosymep\EnumConverter.cs" Link="dosymep\EnumConverter.cs"/>
-        <Compile Include="..\dosymep\EnumToItemsSource.cs" Link="dosymep\EnumToItemsSource.cs"/>
-        <Compile Include="..\dosymep\IndexConverter.cs" Link="dosymep\IndexConverter.cs"/>
-        <Compile Include="..\dosymep\InverseBooleanConverter.cs" Link="dosymep\InverseBooleanConverter.cs"/>
-        <Compile Include="..\dosymep\ElementIdConverter.cs" Link="dosymep\ElementIdConverter.cs"/>
+        <Compile Include="..\dosymep\EnumConverter.cs" Link="dosymep\Converters\EnumConverter.cs"/>
+        <Compile Include="..\dosymep\IndexConverter.cs" Link="dosymep\Converters\IndexConverter.cs"/>
+        <Compile Include="..\dosymep\InverseBooleanConverter.cs" Link="dosymep\Converters\InverseBooleanConverter.cs"/>
+        <Compile Include="..\dosymep\ElementIdConverter.cs" Link="dosymep\Converters\ElementIdConverter.cs"/>
+        <Compile Include="..\dosymep\EnumToItemsSource.cs" Link="dosymep\MarkupExtensions\EnumToItemsSource.cs"/>
         <Compile Include="..\dosymep\PlatformWindow.cs" Link="dosymep\PlatformWindow.cs"/>
-        <Compile Include="..\dosymep\ICommand.cs" Link="dosymep\Commands\ICommand.cs"/>
-        <Compile Include="..\dosymep\IAsyncCommand.cs" Link="dosymep\Commands\IAsyncCommand.cs"/>
-        <Compile Include="..\dosymep\IAsyncCommand.T.cs" Link="dosymep\Commands\IAsyncCommand.T.cs"/>
-        <Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\Commands\RelayCommand.cs"/>
-        <Compile Include="..\dosymep\RelayCommand.T.cs" Link="dosymep\Commands\RelayCommand.T.cs"/>
-        <Compile Include="..\dosymep\AsyncRelayCommand.cs" Link="dosymep\Commands\AsyncRelayCommand.cs"/>
-        <Compile Include="..\dosymep\AsyncRelayCommand.T.cs" Link="dosymep\Commands\AsyncRelayCommand.T.cs"/>
+        <Compile Include="..\dosymep\ICommand.cs" Link="dosymep\BaseCommands\ICommand.cs"/>
+        <Compile Include="..\dosymep\IAsyncCommand.cs" Link="dosymep\BaseCommands\IAsyncCommand.cs"/>
+        <Compile Include="..\dosymep\IAsyncCommand.T.cs" Link="dosymep\BaseCommands\IAsyncCommand.T.cs"/>
+        <Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\BaseCommands\RelayCommand.cs"/>
+        <Compile Include="..\dosymep\RelayCommand.T.cs" Link="dosymep\BaseCommands\RelayCommand.T.cs"/>
+        <Compile Include="..\dosymep\AsyncRelayCommand.cs" Link="dosymep\BaseCommands\AsyncRelayCommand.cs"/>
+        <Compile Include="..\dosymep\AsyncRelayCommand.T.cs" Link="dosymep\BaseCommands\AsyncRelayCommand.T.cs"/>
     </ItemGroup>
 
     <ItemGroup>
