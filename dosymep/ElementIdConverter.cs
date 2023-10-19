@@ -7,7 +7,7 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 
 namespace dosymep.WPF.Converters {
-    internal sealed class ConverterElementId : IValueConverter {
+    internal sealed class ElementIdConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             // ReSharper disable once SuggestVarOrType_BuiltInTypes
             var elementId = (value as ElementId
