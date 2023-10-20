@@ -11,12 +11,10 @@ namespace RevitClashDetective.Models.Clashes {
         private readonly RevitRepository _revitRepository;
 
         public ElementModel(RevitRepository revitRepository, Element element) {
-            _revitRepository = revitRepository;
-#if REVIT_2023_OR_LESS
-            Id = element.Id.IntegerValue;
-#else
+            if(element is null) { throw new ArgumentNullException(nameof(element)); }
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+
             Id = element.Id;
-#endif
             Name = element.Name;
             DocumentName = _revitRepository.GetDocumentName(element.Document);
             Category = element.Category?.Name;
@@ -27,11 +25,7 @@ namespace RevitClashDetective.Models.Clashes {
 
         }
 
-#if REVIT_2023_OR_LESS
-        public int Id { get; set; }
-#else
         public ElementId Id { get; set; }
-#endif
         public string Name { get; set; }
         public string Category { get; set; }
         public string Level { get; set; }
@@ -40,13 +34,8 @@ namespace RevitClashDetective.Models.Clashes {
 
         public Element GetElement(IEnumerable<DocInfo> docInfos) {
             var doc = docInfos.FirstOrDefault(item => item.Name.Equals(DocumentName));
-#if REVIT_2023_OR_LESS
-            var id = new ElementId(Id);
-#else
-            var id = Id;
-#endif
-            if(doc != null && id.IsNotNull()) {
-                return doc.Doc.GetElement(id);
+            if(doc != null && Id.IsNotNull()) {
+                return doc.Doc.GetElement(Id);
             }
             return null;
         }
