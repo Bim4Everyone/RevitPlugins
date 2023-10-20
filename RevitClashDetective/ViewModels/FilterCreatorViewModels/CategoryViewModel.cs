@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
@@ -18,11 +17,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         public bool IsSelected {
             get => _isSelected;
-            set => this.RaiseAndSetIfChanged(ref _isSelected, value);
+            set => RaiseAndSetIfChanged(ref _isSelected, value);
         }
         public string Name {
             get => _name;
-            set => this.RaiseAndSetIfChanged(ref _name, value);
+            set => RaiseAndSetIfChanged(ref _name, value);
         }
 
         public Category Category { get; }
@@ -32,20 +31,17 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         public bool Equals(CategoryViewModel other) {
-            return other != null && Name == other.Name
+            if(ReferenceEquals(null, other)) { return false; }
+            if(ReferenceEquals(this, other)) { return true; }
+            return Name == other.Name
                 && Category.Id == other.Category.Id;
         }
 
-#if REVIT_2023_OR_LESS
         public override int GetHashCode() {
-            return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name)
-                + EqualityComparer<int>.Default.GetHashCode(Category.Id.IntegerValue);
+            int hashCode = -808104057;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+            hashCode = hashCode * -1521134295 + EqualityComparer<ElementId>.Default.GetHashCode(Category.Id);
+            return hashCode;
         }
-#else
-        public override int GetHashCode() {
-            return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name)
-                + EqualityComparer<int>.Default.GetHashCode((int) Category.Id.GetIdValue());
-        }
-#endif
     }
 }
