@@ -250,9 +250,8 @@ namespace RevitOpeningPlacement.Models {
         /// <param name="paramValuePairs">Пары параметров и их значений, по которым формируются правила фильтрации "больше"</param>
         /// <returns></returns>
         private static Filter GetdMepFilter(string name, RevitClashDetective.Models.RevitRepository revitRepository, BuiltInCategory category, IEnumerable<ParamValuePair> paramValuePairs) {
-#if REVIT_2023_OR_LESS
             return new Filter(revitRepository) {
-                CategoryIds = new List<int> { (int) category },
+                CategoryIds = new List<ElementId> { new ElementId(category) },
                 Name = name,
                 Set = new Set() {
                     SetEvaluator = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And),
@@ -261,18 +260,6 @@ namespace RevitOpeningPlacement.Models {
                 },
                 RevitRepository = revitRepository
             };
-#else
-            return new Filter(revitRepository) {
-                CategoryIds = new List<long> { (long) category },
-                Name = name,
-                Set = new Set() {
-                    SetEvaluator = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And),
-                    Criteria = GetCriterions(revitRepository, paramValuePairs).ToList(),
-                    RevitRepository = revitRepository
-                },
-                RevitRepository = revitRepository
-            };
-#endif
         }
 
         /// <summary>
@@ -283,9 +270,8 @@ namespace RevitOpeningPlacement.Models {
         /// <param name="category">Категория элементов</param>
         /// <returns></returns>
         private static Filter CreateFilterByCategory(string name, RevitClashDetective.Models.RevitRepository revitRepository, BuiltInCategory category) {
-#if REVIT_2023_OR_LESS
             return new Filter(revitRepository) {
-                CategoryIds = new List<int> { (int) category },
+                CategoryIds = new List<ElementId> { new ElementId(category) },
                 Name = name,
                 Set = new Set() {
                     SetEvaluator = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And),
@@ -293,17 +279,6 @@ namespace RevitOpeningPlacement.Models {
                     RevitRepository = revitRepository
                 }
             };
-#else
-            return new Filter(revitRepository) {
-                CategoryIds = new List<long> { (long) category },
-                Name = name,
-                Set = new Set() {
-                    SetEvaluator = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And),
-                    Criteria = new List<Criterion>(),
-                    RevitRepository = revitRepository
-                }
-            };
-#endif
         }
 
         /// <summary>
@@ -314,9 +289,8 @@ namespace RevitOpeningPlacement.Models {
         /// <param name="categories">Коллекция категорий элементов</param>
         /// <returns></returns>
         private static Filter CreateFilterByCategory(string name, RevitClashDetective.Models.RevitRepository revitRepository, ICollection<BuiltInCategory> categories) {
-#if REVIT_2023_OR_LESS
             return new Filter(revitRepository) {
-                CategoryIds = categories.Select(category => (int) category).ToList(),
+                CategoryIds = categories.Select(category => new ElementId(category)).ToList(),
                 Name = name,
                 Set = new Set() {
                     SetEvaluator = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And),
@@ -324,17 +298,6 @@ namespace RevitOpeningPlacement.Models {
                     RevitRepository = revitRepository
                 }
             };
-#else
-            return new Filter(revitRepository) {
-                CategoryIds = categories.Select(category => (long) category).ToList(),
-                Name = name,
-                Set = new Set() {
-                    SetEvaluator = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And),
-                    Criteria = new List<Criterion>(),
-                    RevitRepository = revitRepository
-                }
-            };
-#endif
         }
 
         /// <summary>

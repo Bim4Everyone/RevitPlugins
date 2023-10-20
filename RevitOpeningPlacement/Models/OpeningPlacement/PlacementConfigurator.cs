@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Autodesk.Revit.DB;
+
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Evaluators;
 using RevitClashDetective.Models.FilterModel;
@@ -257,19 +259,11 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
                 };
                 mepCategoriesAndFilterSet.Criteria.Add(mepCategoryAndFilterSet);
             }
-#if REVIT_2023_OR_LESS
             return new Filter(revitRepository) {
-                CategoryIds = new List<int>(mepFilterToAdd.CategoryIds),
+                CategoryIds = new List<ElementId>(mepFilterToAdd.CategoryIds),
                 Name = mepFilterToAdd.Name,
                 Set = mepCategoriesAndFilterSet
             };
-#else
-            return new Filter(revitRepository) {
-                CategoryIds = new List<long>(mepFilterToAdd.CategoryIds),
-                Name = mepFilterToAdd.Name,
-                Set = mepCategoriesAndFilterSet
-            };
-#endif
         }
 
         /// <summary>

@@ -32,7 +32,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             var elements = new List<Element>();
             var doc = _revitRepository.Doc;
             var filter = Filter.GetRevitFilter(doc, FilterGenerator);
-            var elems = _revitRepository.GetFilteredElements(doc, Filter.CategoryIds.Select(item => new ElementId(item)), filter).Where(item => item != null && item.IsValidObject).ToList();
+            var elems = _revitRepository.GetFilteredElements(doc, Filter.CategoryIds, filter).Where(item => item != null && item.IsValidObject).ToList();
             elements.AddRange(elems);
 
             Grid = new GridControlViewModel(_revitRepository, Filter, elements);
