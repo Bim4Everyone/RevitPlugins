@@ -298,12 +298,6 @@ namespace RevitOpeningPlacement.Models {
             return _clashRevitRepository.GetElement(fileName, id);
         }
 
-#if REVIT_2023_OR_LESS
-        public Element GetElement(string fileName, int id) {
-            return _clashRevitRepository.GetElement(fileName, id);
-        }
-#endif
-
         public void SelectAndShowElement(ICollection<Element> elements) {
             double additionalSize = 2;
             _clashRevitRepository.SelectAndShowElement(elements, additionalSize, _view);
