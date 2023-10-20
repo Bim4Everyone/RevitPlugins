@@ -11,7 +11,7 @@ indent_size = 4
 indent_style = space
 tab_width = 4
 
-# Guideline for all files. Sets char position of vertical marker in text editor.
+# Guideline for all files. Sets char position of vertical marker in text editor. https://marketplace.visualstudio.com/items?itemName=PaulHarrington.EditorGuidelinesPreview
 guidelines = 120
 
 # New line preferences
