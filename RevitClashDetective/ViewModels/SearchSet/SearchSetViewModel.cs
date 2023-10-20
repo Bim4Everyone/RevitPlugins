@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -11,7 +8,6 @@ using dosymep.WPF.ViewModels;
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterGenerators;
 using RevitClashDetective.Models.FilterModel;
-using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.ViewModels.SearchSet {
     internal class SearchSetViewModel : BaseViewModel {
@@ -33,7 +29,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             var docs = _revitRepository.GetDocuments().ToList();
             foreach(var doc in docs) {
                 var filter = Filter.GetRevitFilter(doc, FilterGenerator);
-                var elems = _revitRepository.GetFilteredElements(doc, Filter.CategoryIds.Select(item => new ElementId(item)), filter).Where(item => item != null && item.IsValidObject).ToList();
+                var elems = _revitRepository.GetFilteredElements(doc, Filter.CategoryIds, filter).Where(item => item != null && item.IsValidObject).ToList();
                 elements.AddRange(elems);
             }
 

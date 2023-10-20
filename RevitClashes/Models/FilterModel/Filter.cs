@@ -19,11 +19,7 @@ namespace RevitClashDetective.Models.FilterModel {
 
         [JsonIgnore]
         public RevitRepository RevitRepository { get; set; }
-#if REVIT_2023_OR_LESS
-        public List<int> CategoryIds { get; set; }
-#else
-        public List<long> CategoryIds { get; set; }
-#endif
+        public List<ElementId> CategoryIds { get; set; }
 
         public IEnumerable<IFilterableValueProvider> GetProviders() {
             return Set.GetProviders().Distinct();

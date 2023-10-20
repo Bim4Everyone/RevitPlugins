@@ -3,6 +3,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 using RevitClashDetective.Models.Extensions;
 using RevitClashDetective.Models.FilterGenerators;
 using RevitClashDetective.Models.FilterModel;
@@ -23,7 +25,7 @@ namespace RevitClashDetective.Models.ClashDetection {
         public Transform MainTransform { get; }
 
         public List<Element> GetElements() {
-            var categories = _filter.CategoryIds.Select(item => (BuiltInCategory) item).ToList();
+            var categories = _filter.CategoryIds.Select(item => (BuiltInCategory) item.GetIdValue()).ToList();
 
             var elements = new FilteredElementCollector(Doc)
                 .WherePasses(new ElementMulticategoryFilter(categories))

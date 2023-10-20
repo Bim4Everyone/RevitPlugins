@@ -5,7 +5,8 @@ using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-using dosymep.Revit;
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
@@ -89,16 +90,12 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             Set = new SetViewModel(_revitRepository, _categoriesInfoViewModel, set);
         }
 
-#if REVIT_2023_OR_LESS
-        private void InitializeCategories(IEnumerable<int> ids = null) {
-            Categories = new ObservableCollection<CategoryViewModel>(
-                _revitRepository.GetCategories()
-                    .Select(item => new CategoryViewModel(item))
-                    .OrderBy(item => item.Name));
+        private void InitializeCategories(IEnumerable<ElementId> categoryIds = null) {
+            Categories = new ObservableCollection<CategoryViewModel>(GetCategoriesViewModels(_revitRepository));
 
-            if(ids != null) {
+            if(categoryIds != null) {
                 foreach(var category in Categories
-                    .Where(item => ids.Any(id => id == item.Category.Id.IntegerValue))) {
+                    .Where(item => categoryIds.Any(id => id == item.Category.Id))) {
                     category.IsSelected = true;
                 }
             }
@@ -109,27 +106,16 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
             _categoriesInfoViewModel = new CategoriesInfoViewModel(_revitRepository, SelectedCategories);
         }
-#else
-        private void InitializeCategories(IEnumerable<long> ids = null) {
-            Categories = new ObservableCollection<CategoryViewModel>(
-                _revitRepository.GetCategories()
-                    .Select(item => new CategoryViewModel(item))
-                    .OrderBy(item => item.Name));
 
-            if(ids != null) {
-                foreach(var category in Categories
-                    .Where(item => ids.Any(id => id == item.Category.Id.GetIdValue()))) {
-                    category.IsSelected = true;
-                }
-            }
+        private ICollection<CategoryViewModel> GetCategoriesViewModels(RevitRepository revitRepository) {
+            if(revitRepository is null) { throw new ArgumentNullException(nameof(revitRepository)); }
 
-            foreach(var category in Categories) {
-                category.PropertyChanged += Category_PropertyChanged;
-            }
-
-            _categoriesInfoViewModel = new CategoriesInfoViewModel(_revitRepository, SelectedCategories);
+            return revitRepository
+                .GetCategories()
+                .Select(item => new CategoryViewModel(item))
+                .OrderBy(item => item.Name)
+                .ToList();
         }
-#endif
 
         private void Category_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
             if(e.PropertyName.Equals(nameof(CategoryViewModel.IsSelected))) {
@@ -138,19 +124,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         public Filter GetFilter() {
-#if REVIT_2023_OR_LESS
             return new Filter(_revitRepository) {
                 Name = Name,
                 Set = (Set) Set.GetCriterion(),
-                CategoryIds = SelectedCategories.Select(item => item.Category.Id.IntegerValue).ToList()
+                CategoryIds = SelectedCategories.Select(item => item.Category.Id).ToList()
             };
-#else
-            return new Filter(_revitRepository) {
-                Name = Name,
-                Set = (Set) Set.GetCriterion(),
-                CategoryIds = SelectedCategories.Select(item => item.Category.Id.GetIdValue()).ToList()
-            };
-#endif
         }
 
         private void SelectedCategoriesChanged() {
@@ -168,7 +146,9 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         public bool Equals(FilterViewModel other) {
-            return other != null && _id == other._id;
+            if(ReferenceEquals(null, other)) { return false; }
+            if(ReferenceEquals(this, other)) { return true; }
+            return _id == other._id;
         }
     }
 
