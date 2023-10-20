@@ -18,7 +18,6 @@
     x:Name="MainView"
     d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=False}">
     <Window.Resources>
-        <converter:EnumConverter x:Key="EnumConverter" />
         <converter:WidthConverter x:Key="WidthConverter" />
         <converter:LinksConverter x:Key="LinkConverter" />
     </Window.Resources>
