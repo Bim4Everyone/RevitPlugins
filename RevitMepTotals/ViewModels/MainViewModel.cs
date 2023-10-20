@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,28 +9,50 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitMepTotals.Models;
+using RevitMepTotals.Models.Interfaces;
 using RevitMepTotals.Services;
 
 namespace RevitMepTotals.ViewModels {
     internal class MainViewModel : BaseViewModel {
-        private readonly IDocumentsProvider _documentsProvider;
         private readonly IMessageBoxService _messageBoxService;
         private readonly IDocumentsProcessor _documentsProcessor;
+        private readonly IDataExporter _dataExporter;
+        private readonly IDirectoryProvider _directoryProvider;
+        private readonly IProgressDialogFactory _progressDialogFactory;
+        private readonly IOpenFileDialogService _openFileDialogService;
 
         public MainViewModel(
-            IDocumentsProvider documentsProvider,
             IMessageBoxService messageBoxService,
-            IDocumentsProcessor documentsProcessor) {
+            IDocumentsProcessor documentsProcessor,
+            IDataExporter dataExporter,
+            IDirectoryProvider directoryProvider,
+            IProgressDialogFactory progressDialogFactory,
+            IOpenFileDialogService openFileDialogService
+            ) {
+            _messageBoxService = messageBoxService
+                ?? throw new System.ArgumentNullException(nameof(messageBoxService));
+            _documentsProcessor = documentsProcessor
+                ?? throw new System.ArgumentNullException(nameof(documentsProcessor));
+            _dataExporter = dataExporter
+                ?? throw new System.ArgumentNullException(nameof(dataExporter));
+            _directoryProvider = directoryProvider
+                ?? throw new System.ArgumentNullException(nameof(directoryProvider));
+            _progressDialogFactory = progressDialogFactory
+                ?? throw new System.ArgumentNullException(nameof(progressDialogFactory));
+            _openFileDialogService = openFileDialogService
+                ?? throw new System.ArgumentNullException(nameof(openFileDialogService));
 
-            _documentsProvider = documentsProvider ?? throw new System.ArgumentNullException(nameof(documentsProvider));
-            _messageBoxService = messageBoxService ?? throw new System.ArgumentNullException(nameof(messageBoxService));
-            _documentsProcessor = documentsProcessor ?? throw new System.ArgumentNullException(nameof(documentsProcessor));
-
-            AddDocumentCommand = new RelayCommand(AddDocument);
-            RemoveDocumentCommand = new RelayCommand(RemoveDocument, CanRemoveDocument);
-            ProcessDocumentsCommand = new RelayCommand(ProcessDocuments, CanProcessDocuments);
+            AddDocumentCommand = RelayCommand.Create(AddDocument);
+            RemoveDocumentCommand = RelayCommand.Create(RemoveDocument, CanRemoveDocument);
+            ProcessDocumentsCommand = RelayCommand.Create(ProcessDocuments, CanProcessDocuments);
         }
 
+        public IProgressDialogFactory ProgressDialogFactory => _progressDialogFactory;
+
+        public IOpenFileDialogService OpenFileDialogService => _openFileDialogService;
+
+        public IMessageBoxService MessageBoxService => _messageBoxService;
 
         public ICommand AddDocumentCommand { get; }
 
@@ -37,7 +60,8 @@ namespace RevitMepTotals.ViewModels {
 
         public ICommand ProcessDocumentsCommand { get; }
 
-        public ObservableCollection<DocumentViewModel> Documents { get; } = new ObservableCollection<DocumentViewModel>() { };
+        public ObservableCollection<DocumentViewModel> Documents { get; }
+            = new ObservableCollection<DocumentViewModel>() { };
 
 
         private DocumentViewModel _selectedDocument;
@@ -54,8 +78,13 @@ namespace RevitMepTotals.ViewModels {
         }
 
 
-        private void AddDocument(object p) {
-            var docViewModels = _documentsProvider.GetDocuments().Select(doc => new DocumentViewModel(doc));
+        private void AddDocument() {
+            if(!_openFileDialogService.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments))) {
+                return;
+            }
+            var docViewModels = _openFileDialogService.Files
+                 .Select(file => new RevitDocument(file))
+                 .Select(doc => new DocumentViewModel(doc));
             List<string> errors = new List<string>();
             foreach(var docViewModel in docViewModels) {
                 if(!Documents.Contains(docViewModel)) {
@@ -70,7 +99,7 @@ namespace RevitMepTotals.ViewModels {
         }
 
 
-        private void RemoveDocument(object p) {
+        private void RemoveDocument() {
             if(_messageBoxService.Show(
                 $"Из списка будет удален документ:\n{SelectedDocument.Name}\nПродолжить?",
                 "BIM",
@@ -83,14 +112,36 @@ namespace RevitMepTotals.ViewModels {
             }
         }
 
-        private bool CanRemoveDocument(object p) => SelectedDocument != null;
+        private bool CanRemoveDocument() => SelectedDocument != null;
 
 
-        private void ProcessDocuments(object p) {
-            _documentsProcessor.ProcessDocuments(Documents.Select(vm => vm.GetDocument()).ToHashSet());
+        private void ProcessDocuments() {
+            var documents = Documents.Select(vm => vm.GetDocument()).ToHashSet();
+            string errorMsg;
+            IList<IDocumentData> processedData;
+            using(var progressDialogService = _progressDialogFactory.CreateDialog()) {
+                progressDialogService.StepValue = 1;
+                progressDialogService.DisplayTitleFormat = "Обработка документов... [{0}]\\[{1}]";
+                var progress = progressDialogService.CreateProgress();
+                progressDialogService.MaxValue = documents.Count;
+                var ct = progressDialogService.CreateCancellationToken();
+                progressDialogService.Show();
+
+                processedData = _documentsProcessor.ProcessDocuments(documents, out string processError, progress, ct);
+                errorMsg = processError;
+            }
+            if(!string.IsNullOrWhiteSpace(errorMsg)) {
+                ShowMessageBoxError(errorMsg);
+            }
+
+            _dataExporter.ExportData(_directoryProvider.GetDirectory(), processedData, out string exportError);
+            errorMsg = exportError;
+            if(!string.IsNullOrWhiteSpace(errorMsg)) {
+                ShowMessageBoxError(errorMsg);
+            }
         }
 
-        private bool CanProcessDocuments(object p) => Documents.Count > 0;
+        private bool CanProcessDocuments() => Documents.Count > 0;
 
 
         private void ShowMessageBoxError(string error) {

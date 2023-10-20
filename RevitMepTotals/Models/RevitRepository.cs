@@ -99,7 +99,8 @@ namespace RevitMepTotals.Models {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
             if(element is null) { throw new ArgumentNullException(nameof(element)); }
 
-            SystemParam param = SystemParamsConfig.Instance.CreateRevitParam(document, BuiltInParameter.CURVE_ELEM_LENGTH);
+            SystemParam param = SystemParamsConfig.Instance
+                .CreateRevitParam(document, BuiltInParameter.CURVE_ELEM_LENGTH);
             double feetValue = element.GetParamValueOrDefault(param, 0.0);
             return ConvertFeetToMillimeters(feetValue);
         }
@@ -115,7 +116,8 @@ namespace RevitMepTotals.Models {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
             if(element is null) { throw new ArgumentNullException(nameof(element)); }
 
-            SystemParam param = SystemParamsConfig.Instance.CreateRevitParam(document, BuiltInParameter.RBS_CURVE_SURFACE_AREA);
+            SystemParam param = SystemParamsConfig.Instance
+                .CreateRevitParam(document, BuiltInParameter.RBS_CURVE_SURFACE_AREA);
             double squareFeetValue = element.GetParamValueOrDefault(param, 0.0);
             return ConvertSquareFeetToSquareMeters(squareFeetValue);
         }
@@ -211,7 +213,8 @@ namespace RevitMepTotals.Models {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
             if(ductInsulation is null) { throw new ArgumentNullException(nameof(ductInsulation)); }
 
-            SystemParam param = SystemParamsConfig.Instance.CreateRevitParam(document, BuiltInParameter.RBS_DUCT_CALCULATED_SIZE);
+            SystemParam param = SystemParamsConfig.Instance
+                .CreateRevitParam(document, BuiltInParameter.RBS_DUCT_CALCULATED_SIZE);
             return ductInsulation.GetParamValueOrDefault(param, _default);
         }
 
@@ -255,7 +258,8 @@ namespace RevitMepTotals.Models {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
             if(pipeInsulation is null) { throw new ArgumentNullException(nameof(pipeInsulation)); }
 
-            SystemParam param = SystemParamsConfig.Instance.CreateRevitParam(document, BuiltInParameter.RBS_PIPE_CALCULATED_SIZE);
+            SystemParam param = SystemParamsConfig.Instance
+                .CreateRevitParam(document, BuiltInParameter.RBS_PIPE_CALCULATED_SIZE);
             return pipeInsulation.GetParamValueOrDefault(param, _default);
         }
 
@@ -284,7 +288,8 @@ namespace RevitMepTotals.Models {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
             if(element is null) { throw new ArgumentNullException(nameof(element)); }
 
-            SystemParam param = SystemParamsConfig.Instance.CreateRevitParam(document, BuiltInParameter.RBS_CALCULATED_SIZE);
+            SystemParam param = SystemParamsConfig.Instance
+                .CreateRevitParam(document, BuiltInParameter.RBS_CALCULATED_SIZE);
             return element.GetParamValueOrDefault(param, _default);
         }
 

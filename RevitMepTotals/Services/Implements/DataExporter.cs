@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows;
 
 using DevExpress.Spreadsheet;
 
@@ -21,15 +20,17 @@ namespace RevitMepTotals.Services.Implements {
         }
 
 
-        public void ExportData(DirectoryInfo exportDirectory, IList<IDocumentData> dataForExport) {
+        public void ExportData(
+            DirectoryInfo exportDirectory,
+            IList<IDocumentData> dataForExport,
+            out string exportError) {
+
             if(exportDirectory is null) { throw new ArgumentNullException(nameof(exportDirectory)); }
             if(dataForExport is null) { throw new ArgumentNullException(nameof(dataForExport)); }
-            IList<IDocumentData> data = GetNotConflictedDocuments(dataForExport, out string error);
+            IList<IDocumentData> data = GetNotConflictedDocuments(dataForExport, out string documentErrors);
+            exportError = documentErrors;
 
             if(data.Count == 0) {
-                if(!string.IsNullOrWhiteSpace(error)) {
-                    ShowMessageBoxError(error);
-                }
                 return;
             }
             string path = CreateFileName(exportDirectory);
@@ -40,7 +41,7 @@ namespace RevitMepTotals.Services.Implements {
                 try {
                     for(int sheetIndex = 0; sheetIndex < data.Count; sheetIndex++) {
                         Worksheet worksheet = workbook.Worksheets[sheetIndex];
-                        worksheet.Name = CleanSheetName(data[sheetIndex].Title); // приводим заголовок документа к корректному заголовку листа
+                        worksheet.Name = CleanSheetName(data[sheetIndex].Title); // корректировка заголовка листа
 
                         worksheet.Rows[0][0].Value = "Воздуховоды";
                         int ductStart = 1;
@@ -65,25 +66,26 @@ namespace RevitMepTotals.Services.Implements {
                         worksheet.Columns.AutoFit(0, typeof(IDuctInsulationData).GetProperties().Count());
                         workbook.Worksheets.Add(); //добавляем следующий лист
                     }
-                    workbook.Worksheets.RemoveAt(workbook.Worksheets.Count - 1); // удаляем последний пустой лист, который мы не заполняли
+                    workbook.Worksheets.RemoveAt(workbook.Worksheets.Count - 1); // удаляем последний пустой лист
                 } finally {
                     workbook.EndUpdate();
                 }
                 workbook.Calculate();
                 workbook.SaveDocument(path, DocumentFormat.OpenXml);
-                if(!string.IsNullOrWhiteSpace(error)) {
-                    ShowMessageBoxError(error);
-                }
             }
         }
 
         /// <summary>
-        /// Проверяет документы на конфликты имен и возвращает коллекцию документов из заданной коллекции, которые НЕ образуют конфликты.
+        /// Проверяет документы на конфликты имен и возвращает коллекцию документов из заданной коллекции,
+        /// которые НЕ образуют конфликты.
         /// </summary>
         /// <param name="data"></param>
         /// <param name="errorMessage">Сообщение об ошибке, или пустая строка, если ошибок нет</param>
         /// <returns></returns>
-        private IList<IDocumentData> GetNotConflictedDocuments(ICollection<IDocumentData> data, out string errorMessage) {
+        private IList<IDocumentData> GetNotConflictedDocuments(
+            ICollection<IDocumentData> data,
+            out string errorMessage) {
+
             var docsWithNameConflicts = data
                 .GroupBy(doc => CleanSheetName(doc.Title))
                 .Where(group => group.Count() > 1)
@@ -91,7 +93,7 @@ namespace RevitMepTotals.Services.Implements {
                 .ToArray();
             if(docsWithNameConflicts.Length > 0) {
                 errorMessage = $"{string.Join(Environment.NewLine, docsWithNameConflicts.Select(doc => doc.Title))}" +
-                    $"\n\nЭти документы нельзя выгрузить за один раз, т.к. они образуют конфликт имен в листах Excel." +
+                    $"\nЭти документы нельзя выгрузить за один раз, т.к. они образуют конфликт имен в листах Excel." +
                     "\nИмя листа Excel должно быть не более 31 символа" +
                     "\nне должно начинаться или заканчиваться с (')" +
                     "\nне должно содержать \\, /, ?, :, *, [, ] ";
@@ -190,7 +192,11 @@ namespace RevitMepTotals.Services.Implements {
         /// <param name="startRow">Индекс первой строчки, с которой нужно начать запись данных</param>
         /// <param name="ductInsulationData">Данные по изоляции воздуховодов</param>
         /// <returns>Индекс последней строчки, на которую были записаны данные</returns>
-        private int WriteDuctInsulationData(Worksheet worksheet, int startRow, IList<IDuctInsulationData> ductInsulationData) {
+        private int WriteDuctInsulationData(
+            Worksheet worksheet,
+            int startRow,
+            IList<IDuctInsulationData> ductInsulationData) {
+
             worksheet.Rows[startRow][0].Value = "Тип";
             worksheet.Rows[startRow][1].Value = "ФОП_ВИС_Наименование комбинированное";
             worksheet.Rows[startRow][2].Value = "Размер воздуховода";
@@ -218,7 +224,11 @@ namespace RevitMepTotals.Services.Implements {
         /// <param name="startRow">Индекс первой строчки, с которой нужно начать запись данных</param>
         /// <param name="pipeInsulationData">Данные по изоляции труб</param>
         /// <returns>Индекс последней строчки, на которую были записаны данные</returns>
-        private int WritePipeInsulationData(Worksheet worksheet, int startRow, IList<IPipeInsulationData> pipeInsulationData) {
+        private int WritePipeInsulationData(
+            Worksheet worksheet,
+            int startRow,
+            IList<IPipeInsulationData> pipeInsulationData) {
+
             worksheet.Rows[startRow][0].Value = "Тип";
             worksheet.Rows[startRow][1].Value = "ФОП_ВИС_Наименование комбинированное";
             worksheet.Rows[startRow][2].Value = "Размер трубы";
@@ -278,13 +288,6 @@ namespace RevitMepTotals.Services.Implements {
                 trimName = trimName.Replace(charToRemove, '_');
             }
             return trimName;
-        }
-
-        private void ShowMessageBoxError(string error) {
-            _messageBoxService.Show(error, "BIM",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error,
-                MessageBoxResult.OK);
         }
     }
 }

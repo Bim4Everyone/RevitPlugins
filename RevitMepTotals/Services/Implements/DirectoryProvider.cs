@@ -9,7 +9,8 @@ namespace RevitMepTotals.Services.Implements {
 
 
         public DirectoryProvider(IOpenFolderDialogService openFolderDialogService) {
-            _openFolderDialogService = openFolderDialogService ?? throw new ArgumentNullException(nameof(openFolderDialogService));
+            _openFolderDialogService = openFolderDialogService
+                ?? throw new ArgumentNullException(nameof(openFolderDialogService));
         }
 
 

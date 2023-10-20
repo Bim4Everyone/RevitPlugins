@@ -11,8 +11,9 @@ namespace RevitMepTotals.Services {
         /// <summary>
         /// Экспортирует заданные данные в заданную директорию
         /// </summary>
-        /// <param name="directory"></param>
-        /// <param name="documentData"></param>
-        void ExportData(DirectoryInfo directory, IList<IDocumentData> documentData);
+        /// <param name="directory">Директория для сохранения данных</param>
+        /// <param name="documentData">Данные для экспорта</param>
+        /// <param name="error">Сообщение об ошибках, возникших при экспорте</param>
+        void ExportData(DirectoryInfo directory, IList<IDocumentData> documentData, out string error);
     }
 }

@@ -1,10 +1,13 @@
+using System;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -32,11 +35,17 @@ namespace RevitMepTotals {
                     .InSingletonScope();
 
                 kernel.Bind<IDocument>().To<RevitDocument>();
-                kernel.Bind<IDocumentsProvider>().To<DocumentsProvider>();
                 kernel.Bind<IDocumentsProcessor>().To<DocumentsProcessor>();
                 kernel.Bind<IDataExporter>().To<DataExporter>();
                 kernel.Bind<ICopyNameProvider>().To<CopyNameProvider>();
                 kernel.Bind<IDirectoryProvider>().To<DirectoryProvider>();
+                kernel.UseXtraProgressDialog<MainViewModel>();
+                kernel.UseXtraOpenFileDialog<MainViewModel>(
+                    filter: "Revit projects |*.rvt",
+                    multiSelect: true,
+                    initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                    );
+                kernel.UseXtraMessageBox<MainViewModel>();
 
                 kernel.Bind<MainViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()

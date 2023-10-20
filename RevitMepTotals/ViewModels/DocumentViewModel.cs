@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using dosymep.WPF.ViewModels;
 
@@ -32,22 +33,24 @@ namespace RevitMepTotals.ViewModels {
         }
 
         public override bool Equals(object obj) {
-            return (obj != null)
-                && (obj is DocumentViewModel vmOther)
-                && Equals(vmOther);
+            return Equals(obj as DocumentViewModel);
 
         }
 
         public override int GetHashCode() {
-            return ShortName.ToLower().GetHashCode();
+            int hashCode = 1671284716;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ShortName);
+            return hashCode;
+        }
+
+        public bool Equals(DocumentViewModel other) {
+            if(ReferenceEquals(null, other)) { return false; }
+            if(ReferenceEquals(this, other)) { return true; }
+            return ShortName == other.ShortName;
         }
 
         public IDocument GetDocument() {
             return _document;
-        }
-
-        public bool Equals(DocumentViewModel other) {
-            return (other != null) && string.Equals(other.ShortName, ShortName, StringComparison.CurrentCultureIgnoreCase);
         }
     }
 }

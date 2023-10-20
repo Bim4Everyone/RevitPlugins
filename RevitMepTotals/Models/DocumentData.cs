@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using RevitMepTotals.Models.Interfaces;
 
 namespace RevitMepTotals.Models {
-    internal class DocumentData : IDocumentData, IEquatable<DocumentData> {
+    internal class DocumentData : IDocumentData {
         private readonly List<IDuctData> _ductData = new List<IDuctData>();
         private readonly List<IPipeData> _pipeData = new List<IPipeData>();
         private readonly List<IDuctInsulationData> _ductInsulationData = new List<IDuctInsulationData>();
@@ -83,18 +83,6 @@ namespace RevitMepTotals.Models {
             foreach(IPipeInsulationData ductInsulationData in data) {
                 AddPipeInsulationData(ductInsulationData);
             }
-        }
-
-        public override bool Equals(object obj) {
-            return (obj != null) && (obj is DocumentData docDataOther) && Equals(docDataOther);
-        }
-
-        public override int GetHashCode() {
-            return Title.GetHashCode();
-        }
-
-        public bool Equals(DocumentData other) {
-            return (other != null) && string.Equals(other.Title, Title, StringComparison.CurrentCultureIgnoreCase);
         }
     }
 }
