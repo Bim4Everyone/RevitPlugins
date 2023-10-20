@@ -12,11 +12,7 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
     internal class ParameterInitializer {
         public static RevitParam InitializeParameter(Document doc, ElementId id) {
             if(id.IsSystemId()) {
-#if REVIT_2023_OR_LESS
-                return SystemParamsConfig.Instance.CreateRevitParam(doc, (BuiltInParameter) id.IntegerValue);
-#else
                 return SystemParamsConfig.Instance.CreateRevitParam(doc, (BuiltInParameter) id.GetIdValue());
-#endif
             } else {
                 var element = doc.GetElement(id);
                 if(element is SharedParameterElement sharedParameterElement) {
