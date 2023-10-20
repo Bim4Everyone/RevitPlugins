@@ -3,7 +3,7 @@
 
 # Сборка проекта
 ```
-nuke compile --plugin-name RevitMepTotals
+nuke compile --profile RevitMepTotals
 ```
 
 # Публикация проекта
