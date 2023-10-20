@@ -49,8 +49,7 @@ namespace RevitMepTotals.Services.Implements {
                 int i = 0;
                 foreach(IDocument documentToProcess in documents) {
                     ct.ThrowIfCancellationRequested();
-                    progress.Report(i);
-                    i++;
+                    progress.Report(i++);
                     ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(documentToProcess.Path);
                     try {
                         using(Document document = _revitRepository.Application.OpenDocumentFile(modelPath, options)) {
