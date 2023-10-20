@@ -5,6 +5,8 @@ using System.Threading;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit.FileInfo;
+
 using RevitMepTotals.Models;
 using RevitMepTotals.Models.Interfaces;
 
@@ -45,8 +47,14 @@ namespace RevitMepTotals.Services.Implements {
                 } catch(Autodesk.Revit.Exceptions.CannotOpenBothCentralAndLocalException) {
                     errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать, т.к. он уже открыт.");
                 } catch(Autodesk.Revit.Exceptions.CorruptModelException) {
-                    errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать, " +
-                        $"т.к. он создан в более поздней версии или в нем слишком много ошибок.");
+                    if(new RevitFileInfo(documentToProcess.Path).BasicFileInfo.FileVersion.ToString()
+                        != _revitRepository.Application.VersionNumber) {
+                        errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать, " +
+                            $"т.к. он создан в более поздней версии.");
+                    } else {
+                        errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать, " +
+                            $"т.к. в нем слишком много ошибок.");
+                    }
                 } catch(Autodesk.Revit.Exceptions.FileAccessException) {
                     errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать.");
                 } catch(Autodesk.Revit.Exceptions.FileNotFoundException) {
