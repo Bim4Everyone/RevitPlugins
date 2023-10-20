@@ -46,6 +46,7 @@ namespace RevitMepTotals.ViewModels {
         public bool Equals(DocumentViewModel other) {
             if(ReferenceEquals(null, other)) { return false; }
             if(ReferenceEquals(this, other)) { return true; }
+
             return ShortName == other.ShortName;
         }
 

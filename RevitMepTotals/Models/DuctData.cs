@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using RevitMepTotals.Models.Interfaces;
 
@@ -24,18 +25,26 @@ namespace RevitMepTotals.Models {
         public double Length { get; set; }
 
         public override bool Equals(object obj) {
-            return (obj != null) && (obj is DuctData other) && Equals(other);
+            return Equals(obj as DuctData);
         }
 
         public override int GetHashCode() {
-            return (TypeName + Size + Name).GetHashCode();
+            int hashCode = 608894917;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(TypeName);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Size);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+            hashCode = hashCode * -1521134295 + Length.GetHashCode();
+            return hashCode;
         }
 
         public bool Equals(DuctData other) {
-            return (other != null)
-                && string.Equals(TypeName, other.TypeName, StringComparison.CurrentCultureIgnoreCase)
-                && string.Equals(Size, other.Size, StringComparison.CurrentCultureIgnoreCase)
-                && string.Equals(Name, other.Name, StringComparison.CurrentCultureIgnoreCase)
+            if(ReferenceEquals(null, other)) { return false; }
+            if(ReferenceEquals(this, other)) { return true; }
+
+            return TypeName == other.TypeName
+                && Size == other.Size
+                && Name == other.Name
+                && Length == other.Length
                 ;
         }
     }

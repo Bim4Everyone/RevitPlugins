@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using RevitMepTotals.Models.Interfaces;
 
@@ -29,18 +30,30 @@ namespace RevitMepTotals.Models {
 
 
         public override bool Equals(object obj) {
-            return (obj != null) && (obj is PipeInsulationData other) && Equals(other);
+            return Equals(obj as PipeInsulationData);
         }
 
         public override int GetHashCode() {
-            return (TypeName + PipeSize + Name).GetHashCode();
+            int hashCode = -151365086;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(TypeName);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(PipeSize);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+            hashCode = hashCode * -1521134295 + Thickness.GetHashCode();
+            hashCode = hashCode * -1521134295 + Length.GetHashCode();
+            hashCode = hashCode * -1521134295 + Area.GetHashCode();
+            return hashCode;
         }
 
         public bool Equals(PipeInsulationData other) {
-            return (other != null)
-                && string.Equals(TypeName, other.TypeName, StringComparison.CurrentCultureIgnoreCase)
-                && string.Equals(PipeSize, other.PipeSize, StringComparison.CurrentCultureIgnoreCase)
-                && string.Equals(Name, other.Name, StringComparison.CurrentCultureIgnoreCase)
+            if(ReferenceEquals(null, other)) { return false; }
+            if(ReferenceEquals(this, other)) { return true; }
+
+            return TypeName == other.TypeName
+                && PipeSize == other.PipeSize
+                && Name == other.Name
+                && Thickness == other.Thickness
+                && Length == other.Length
+                && Area == other.Area
                 ;
         }
     }
