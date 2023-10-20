@@ -19,18 +19,12 @@ namespace RevitClashDetective.ViewModels.SearchSet {
     internal class GridControlViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly IEnumerable<IFilterableValueProvider> _providers;
-#if REVIT_2023_OR_LESS
-        private readonly List<int> _categoryIds;
-#else
-        private readonly List<long> _categoryIds;
-#endif
         private readonly IEnumerable<Element> _elements;
         private int _elementsCount;
 
         public GridControlViewModel(RevitRepository revitRepository, Filter filter, IEnumerable<Element> elements) {
             _revitRepository = revitRepository;
             _providers = filter.GetProviders();
-            _categoryIds = filter.CategoryIds;
             _elements = elements;
             InitializeColumns();
             InitializeRows();
@@ -48,7 +42,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
         public ICommand RenewCountCommand { get; }
         public int ElementsCount {
             get => _elementsCount;
-            set => this.RaiseAndSetIfChanged(ref _elementsCount, value);
+            set => RaiseAndSetIfChanged(ref _elementsCount, value);
         }
 
         private void InitializeColumns() {
@@ -79,11 +73,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
                 row.Add("Category", element.Category?.Name);
                 row.Add("FamilyName", element.GetTypeId().IsNotNull() ? (element.Document.GetElement(element.GetTypeId()) as ElementType)?.FamilyName : null);
                 row.Add("Name", element.Name);
-#if REVIT_2023_OR_LESS
-                row.Add("Id", element.Id.IntegerValue);
-#else
                 row.Add("Id", element.Id.GetIdValue());
-#endif
                 Rows.Add((ExpandoObject) row);
             }
         }
@@ -112,41 +102,38 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             if(resultId == null) {
                 return;
             }
-#if REVIT_2023_OR_LESS
-            if(resultId is int id) {
-                var element = GetElement(id, resultFile.ToString());
+            if(resultFile != null) {
+                var element = GetElement(GetElementId(resultId), resultFile.ToString());
                 if(element != null) {
                     _revitRepository.SelectAndShowElement(new[] { element });
                 }
             }
-#else
-            if(resultId is long id) {
-                var element = GetElement(id, resultFile.ToString());
-                if(element != null) {
-                    _revitRepository.SelectAndShowElement(new[] { element });
-                }
-            }
-#endif
         }
 
+        private Element GetElement(ElementId id, string documentName) {
+            var doc = GetDocument(documentName);
+            if(doc != null && id.IsNotNull()) {
+                return doc.GetElement(id);
+            }
+            return null;
+        }
+        private Document GetDocument(string documentName) {
+            return _revitRepository
+                .GetDocuments()
+                .FirstOrDefault(item => _revitRepository.GetDocumentName(item).Equals(documentName, StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        private ElementId GetElementId(object idValue) {
 #if REVIT_2023_OR_LESS
-        private Element GetElement(int id, string documentName) {
-            var doc = _revitRepository.GetDocuments()
-                .FirstOrDefault(item => _revitRepository.GetDocumentName(item).Equals(documentName, StringComparison.CurrentCultureIgnoreCase));
-            if(doc != null && new ElementId(id).IsNotNull()) {
-                return doc.GetElement(new ElementId(id));
+            if(idValue is int id) {
+                return new ElementId(id);
             }
-            return null;
-        }
 #else
-        private Element GetElement(long id, string documentName) {
-            var doc = _revitRepository.GetDocuments()
-                .FirstOrDefault(item => _revitRepository.GetDocumentName(item).Equals(documentName, StringComparison.CurrentCultureIgnoreCase));
-            if(doc != null && new ElementId(id).IsNotNull()) {
-                return doc.GetElement(new ElementId(id));
+            if(idValue is long id) {
+                return new ElementId(id);
             }
-            return null;
-        }
 #endif
+            return ElementId.InvalidElementId;
+        }
     }
 }
