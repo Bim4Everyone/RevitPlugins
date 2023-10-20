@@ -71,33 +71,29 @@ namespace RevitClashDetective.Models.RevitClashReport {
         }
 
 
-#if REVIT_2023_OR_LESS
         private Element GetElement(IEnumerable<string> elementString) {
             return _revitRepository.GetElement(GetFile(elementString.FirstOrDefault()?.Trim()), GetId(elementString.LastOrDefault()));
         }
 
-        private int GetId(string idString) {
+        private ElementId GetId(string idString) {
+            if(string.IsNullOrWhiteSpace(idString)) { return ElementId.InvalidElementId; }
+
             var match = Regex.Match(idString, @"(?'id'\d+)");
             if(match.Success) {
-                return int.Parse(match.Groups["id"].Value);
-            }
-
-            return -1;
-        }
+                string stringId = match.Groups["id"].Value;
+#if REVIT_2023_OR_LESS
+                bool successParse = int.TryParse(stringId, out int numericId);
 #else
-        private Element GetElement(IEnumerable<string> elementString) {
-            return _revitRepository.GetElement(GetFile(elementString.FirstOrDefault()?.Trim()), new ElementId(GetId(elementString.LastOrDefault())));
-        }
-
-        private long GetId(string idString) {
-            var match = Regex.Match(idString, @"(?'id'\d+)");
-            if(match.Success) {
-                return long.Parse(match.Groups["id"].Value);
-            }
-
-            return -1;
-        }
+                bool successParse = long.TryParse(stringId, out long numericId);
 #endif
+                if(successParse) {
+                    return new ElementId(numericId);
+                } else {
+                    return ElementId.InvalidElementId;
+                }
+            }
+            return ElementId.InvalidElementId;
+        }
 
         private string GetFile(string fileString) {
             return fileString.EndsWith(".rvt", StringComparison.CurrentCultureIgnoreCase) ? Path.GetFileNameWithoutExtension(fileString) : null;
