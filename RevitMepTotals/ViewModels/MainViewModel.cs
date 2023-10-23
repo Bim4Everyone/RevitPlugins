@@ -130,13 +130,11 @@ namespace RevitMepTotals.ViewModels {
                 processedData = _documentsProcessor.ProcessDocuments(documents, out string processError, progress, ct);
                 errorMsg = processError;
             }
-            if(!string.IsNullOrWhiteSpace(errorMsg)) {
-                ShowMessageBoxError(errorMsg);
-            }
+            ShowMessageBoxError(errorMsg);
 
-            _dataExporter.ExportData(_directoryProvider.GetDirectory(), processedData, out string exportError);
-            errorMsg = exportError;
-            if(!string.IsNullOrWhiteSpace(errorMsg)) {
+            if(processedData.Count > 0) {
+                _dataExporter.ExportData(_directoryProvider.GetDirectory(), processedData, out string exportError);
+                errorMsg = exportError;
                 ShowMessageBoxError(errorMsg);
             }
         }
@@ -145,10 +143,12 @@ namespace RevitMepTotals.ViewModels {
 
 
         private void ShowMessageBoxError(string error) {
-            _messageBoxService.Show(error, "BIM",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error,
-                MessageBoxResult.OK);
+            if(!string.IsNullOrWhiteSpace(error)) {
+                _messageBoxService.Show(error, "BIM",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error,
+                    MessageBoxResult.OK);
+            }
         }
     }
 }

@@ -26,12 +26,15 @@ namespace RevitMepTotals.Services.Implements {
             IProgress<int> progress = null,
             CancellationToken ct = default) {
 
-            IList<IDocumentData> data = new List<IDocumentData>();
             List<string> errors = new List<string>();
-
+            ICollection<IDocument> notConflictedDocs = GetNotConflictedDocuments(documents, out string errorDocs);
+            if(!string.IsNullOrWhiteSpace(errorDocs)) {
+                errors.Add(errorDocs);
+            }
+            IList<IDocumentData> data = new List<IDocumentData>();
             OpenOptions options = GetOpenOptions();
             int i = 0;
-            foreach(IDocument documentToProcess in documents) {
+            foreach(IDocument documentToProcess in notConflictedDocs) {
                 ct.ThrowIfCancellationRequested();
                 progress.Report(i++);
                 ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(documentToProcess.Path);
@@ -47,7 +50,8 @@ namespace RevitMepTotals.Services.Implements {
                 } catch(Autodesk.Revit.Exceptions.CannotOpenBothCentralAndLocalException) {
                     errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать, т.к. он уже открыт.");
                 } catch(Autodesk.Revit.Exceptions.CorruptModelException) {
-                    if(new RevitFileInfo(documentToProcess.Path).BasicFileInfo.FileVersion.ToString()
+                    var test = new RevitFileInfo(documentToProcess.Path).BasicFileInfo.AppInfo.Format;
+                    if(new RevitFileInfo(documentToProcess.Path).BasicFileInfo.AppInfo.Format
                         != _revitRepository.Application.VersionNumber) {
                         errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать, " +
                             $"т.к. он создан в более поздней версии.");
@@ -87,6 +91,32 @@ namespace RevitMepTotals.Services.Implements {
             documentData.AddDuctInsulationData(GetDuctInsulationData(document));
             documentData.AddPipeInsulationData(GetPipeInsulationData(document));
             return documentData;
+        }
+
+        /// <summary>
+        /// Проверяет документы на конфликты имен и возвращает коллекцию документов из заданной коллекции,
+        /// которые НЕ образуют конфликты.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="errorMessage">Сообщение об ошибке, или пустая строка, если ошибок нет</param>
+        /// <returns></returns>
+        private ICollection<IDocument> GetNotConflictedDocuments(
+            ICollection<IDocument> data,
+            out string errorMessage) {
+
+            var docsWithNameConflicts = data
+                .GroupBy(doc => string.Concat(doc.Name.Take(31)))
+                .Where(group => group.Count() > 1)
+                .SelectMany(group => group.ToArray())
+                .ToArray();
+            if(docsWithNameConflicts.Length > 0) {
+                errorMessage = $"Документы:\n" +
+                    $"{string.Join(Environment.NewLine, docsWithNameConflicts.Select(doc => doc.Name))}\n" +
+                    $"нельзя выгрузить за один раз, т.к. они образуют конфликты имен";
+            } else {
+                errorMessage = string.Empty;
+            }
+            return data.Except(docsWithNameConflicts).ToArray();
         }
 
         private ICollection<IDuctData> GetDuctData(Document document) {
