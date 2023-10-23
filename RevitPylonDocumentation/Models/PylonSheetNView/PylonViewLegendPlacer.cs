@@ -34,14 +34,18 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         /// </summary>
         internal bool PlaceNoteLegend() {
 
-            // Проверям вдруг спека не создалась
+            // Проверям вдруг легенда не выбрана
             if(ViewModel.SelectedLegend is null) {
                 return false;
             } else {
 
-                // Заполнеяем данные для задания
+                // Заполняем данные для задания
                 SheetInfo.LegendView.ViewportTypeName = "Без названия";
-                SheetInfo.LegendView.ViewportCenter = new XYZ(-0.34, 0.30, 0);
+                
+                double coordinateX = UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ProjectSettings.LegendXOffset));
+                double coordinateY = UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ProjectSettings.LegendYOffset));
+
+                SheetInfo.LegendView.ViewportCenter = new XYZ(coordinateX, coordinateY, 0);
             }
 
 

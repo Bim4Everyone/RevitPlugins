@@ -76,6 +76,10 @@ namespace RevitPylonDocumentation.Models {
 
             projectSettings.LegendName = settings.LegendName;
             projectSettings.LegendNameTemp = settings.LegendName;
+            projectSettings.LegendXOffset = settings.LegendXOffset;
+            projectSettings.LegendXOffsetTemp = settings.LegendXOffset;
+            projectSettings.LegendYOffset = settings.LegendYOffset;
+            projectSettings.LegendYOffsetTemp = settings.LegendYOffset;
 
             viewSectionSettings.GeneralViewPrefix = settings.GeneralViewPrefix;
             viewSectionSettings.GeneralViewPrefixTemp = settings.GeneralViewPrefix;
@@ -205,6 +209,8 @@ namespace RevitPylonDocumentation.Models {
             settings.TypicalPylonFilterValue = projectSettings.TypicalPylonFilterValue;
 
             settings.LegendName = projectSettings.LegendName;
+            settings.LegendXOffset = projectSettings.LegendXOffset;
+            settings.LegendYOffset = projectSettings.LegendYOffset;
 
             settings.PylonLengthParamName = projectSettings.PylonLengthParamName;
             settings.PylonWidthParamName = projectSettings.PylonWidthParamName;
@@ -289,6 +295,8 @@ namespace RevitPylonDocumentation.Models {
         public string TypicalPylonFilterParameter { get; set; }
         public string TypicalPylonFilterValue { get; set; }
         public string LegendName { get; set; }
+        public string LegendXOffset { get; set; }
+        public string LegendYOffset { get; set; }
         public string PylonLengthParamName { get; set; }
         public string PylonWidthParamName { get; set; }
         public string GeneralViewPrefix { get; set; }

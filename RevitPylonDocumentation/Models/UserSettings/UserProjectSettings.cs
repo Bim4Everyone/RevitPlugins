@@ -32,6 +32,8 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _typicalPylonFilterValueTemp = "на 1 шт.";
 
         private string _legendNameTemp = "Указания для пилонов";
+        private string _legendXOffsetTemp = "-100";
+        private string _legendYOffsetTemp = "125";
 
         private string _pylonLengthParamNameTemp = "ФОП_РАЗМ_Длина";
         private string _pylonWidthParamNameTemp = "ФОП_РАЗМ_Ширина";
@@ -120,6 +122,18 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             set => RaiseAndSetIfChanged(ref _legendNameTemp, value);
         }
 
+        public string LegendXOffset { get; set; }
+        public string LegendXOffsetTemp {
+            get => _legendXOffsetTemp;
+            set => RaiseAndSetIfChanged(ref _legendXOffsetTemp, value);
+        }
+
+        public string LegendYOffset { get; set; }
+        public string LegendYOffsetTemp {
+            get => _legendYOffsetTemp;
+            set => RaiseAndSetIfChanged(ref _legendYOffsetTemp, value);
+        }
+
         public string PylonLengthParamName { get; set; }
         public string PylonLengthParamNameTemp {
             get => _pylonLengthParamNameTemp;
@@ -150,6 +164,11 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             TypicalPylonFilterValue = TypicalPylonFilterValueTemp;
 
             LegendName = LegendNameTemp;
+            LegendXOffset = LegendXOffsetTemp;
+            LegendYOffset = LegendYOffsetTemp;
+
+            LegendXOffset = LegendXOffsetTemp;
+
 
             PylonLengthParamName = PylonLengthParamNameTemp;
             PylonWidthParamName = PylonWidthParamNameTemp;
@@ -171,6 +190,11 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
             if(Repository.AllScheduleViews.FirstOrDefault()?.LookupParameter(DispatcherGroupingSecond) is null) {
                 ViewModel.ErrorText = "Наименование параметра диспетчера 2 некорректно";
+            }
+            
+            // Проверяем, чтоб были заданы оффсеты видового экрана легенды
+            if(LegendXOffset is null || LegendYOffset is null) {
+                ViewModel.ErrorText = "Не заданы отступы на листе для легенды примечений";
             }
 
 

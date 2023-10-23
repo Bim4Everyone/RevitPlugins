@@ -133,6 +133,15 @@
         <Setter Property="Text" Value="Выберите из представленного списка легенду, содержащую примечания листа пилона, которую необходимо разместить на листе." />
     </Style>
 
+    <Style x:Key="LegendXOffsetStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Укажите отступ по горизонтали (по оси Х) от нижнего правого угла рамки листа до середины видового экрана легенды примечания" />
+    </Style>
+
+    <Style x:Key="LegendYOffsetStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Укажите отступ по вертикали (по оси Y) от нижнего правого угла рамки листа до середины видового экрана легенды примечания" />
+    </Style>
 
     <Style x:Key="GeneralViewXOffsetStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
