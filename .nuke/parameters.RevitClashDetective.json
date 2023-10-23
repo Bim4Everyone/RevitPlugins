@@ -3,7 +3,7 @@
   "Solution": "RevitPlugins.sln",
   "PluginName": "RevitClashDetective",
   "PublishDirectory": "01.BIM.extension\\BIM.tab\\bin",
-  "IconUrl": "",
+  "IconUrl": "https://icons8.com/icon/14079/search",
   "BundleName": "Навигатор коллизий",
   "BundleType": "InvokeButton",
   "BundleOutput": "01.BIM.extension\\BIM.tab\\Проверки.panel\\коллизии.stack"
