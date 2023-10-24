@@ -14,10 +14,5 @@
         /// Длина в мм
         /// </summary>
         double Length { get; }
-
-        /// <summary>
-        /// Значение параметра "Площадь" в м2
-        /// </summary>
-        double Area { get; }
     }
 }

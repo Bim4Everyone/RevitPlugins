@@ -49,17 +49,6 @@ namespace RevitMepTotals.Models {
                 .ToHashSet();
         }
 
-        public ICollection<DuctInsulation> GetDuctInsulations(Document document) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
-
-            return new FilteredElementCollector(document)
-                .WhereElementIsNotElementType()
-                .OfCategory(BuiltInCategory.OST_DuctInsulations)
-                .OfClass(typeof(DuctInsulation))
-                .Cast<DuctInsulation>()
-                .ToHashSet();
-        }
-
         public ICollection<PipeInsulation> GetPipeInsulations(Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
@@ -103,23 +92,6 @@ namespace RevitMepTotals.Models {
                 .CreateRevitParam(document, BuiltInParameter.CURVE_ELEM_LENGTH);
             double feetValue = element.GetParamValueOrDefault(param, 0.0);
             return ConvertFeetToMillimeters(feetValue);
-        }
-
-        /// <summary>
-        /// Возвращает изоляции труб и воздуховодов в квадратных метрах
-        /// </summary>
-        /// <param name="document"></param>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public double GetMepCurveElementArea(Document document, InsulationLiningBase element) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
-            if(element is null) { throw new ArgumentNullException(nameof(element)); }
-
-            SystemParam param = SystemParamsConfig.Instance
-                .CreateRevitParam(document, BuiltInParameter.RBS_CURVE_SURFACE_AREA);
-            double squareFeetValue = element.GetParamValueOrDefault(param, 0.0);
-            return ConvertSquareFeetToSquareMeters(squareFeetValue);
         }
 
         /// <summary>
@@ -186,50 +158,6 @@ namespace RevitMepTotals.Models {
             if(pipe is null) { throw new ArgumentNullException(nameof(pipe)); }
 
             return GetMepCurveElementSize(document, pipe);
-        }
-
-        /// <summary>
-        /// Возвращает название типоразмера изоляции воздуховодов
-        /// </summary>
-        /// <param name="document"></param>
-        /// <param name="ductInsulation"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public string GetDuctInsulationTypeName(Document document, DuctInsulation ductInsulation) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
-            if(ductInsulation is null) { throw new ArgumentNullException(nameof(ductInsulation)); }
-
-            return GetMepElementTypeName(document, ductInsulation);
-        }
-
-        /// <summary>
-        /// Возвращает значение параметра "Размер воздуховода"
-        /// </summary>
-        /// <param name="document"></param>
-        /// <param name="ductInsulation"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public string GetDuctInsulationSize(Document document, DuctInsulation ductInsulation) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
-            if(ductInsulation is null) { throw new ArgumentNullException(nameof(ductInsulation)); }
-
-            SystemParam param = SystemParamsConfig.Instance
-                .CreateRevitParam(document, BuiltInParameter.RBS_DUCT_CALCULATED_SIZE);
-            return ductInsulation.GetParamValueOrDefault(param, _default);
-        }
-
-        /// <summary>
-        /// Возвращает толщину изоляции воздуховода в мм
-        /// </summary>
-        /// <param name="document"></param>
-        /// <param name="ductInsulation"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public double GetDuctInsulationThickness(Document document, DuctInsulation ductInsulation) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
-            if(ductInsulation is null) { throw new ArgumentNullException(nameof(ductInsulation)); }
-
-            return ConvertFeetToMillimeters(ductInsulation.Thickness);
         }
 
         /// <summary>

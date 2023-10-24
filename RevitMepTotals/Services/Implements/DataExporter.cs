@@ -193,7 +193,6 @@ namespace RevitMepTotals.Services.Implements {
             worksheet.Rows[startRow][2].Value = "Размер трубы";
             worksheet.Rows[startRow][3].Value = "Толщина, мм";
             worksheet.Rows[startRow][4].Value = "Длина, м";
-            worksheet.Rows[startRow][5].Value = "Площадь, м2";
             startRow++;
             int count = pipeInsulationData.Count;
             int lastRow = startRow + count - 1;
@@ -203,7 +202,6 @@ namespace RevitMepTotals.Services.Implements {
                 worksheet.Rows[row][2].Value = pipeInsulationData[row - startRow].PipeSize;
                 worksheet.Rows[row][3].Value = pipeInsulationData[row - startRow].Thickness;
                 worksheet.Rows[row][4].Value = pipeInsulationData[row - startRow].Length / 1000;
-                worksheet.Rows[row][5].Value = pipeInsulationData[row - startRow].Area;
             }
             return lastRow;
         }

@@ -26,8 +26,6 @@ namespace RevitMepTotals.Models {
 
         public double Length { get; set; }
 
-        public double Area { get; set; }
-
 
         public override bool Equals(object obj) {
             return Equals(obj as PipeInsulationData);
@@ -40,7 +38,6 @@ namespace RevitMepTotals.Models {
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
             hashCode = hashCode * -1521134295 + Thickness.GetHashCode();
             hashCode = hashCode * -1521134295 + Length.GetHashCode();
-            hashCode = hashCode * -1521134295 + Area.GetHashCode();
             return hashCode;
         }
 
@@ -53,7 +50,6 @@ namespace RevitMepTotals.Models {
                 && Name == other.Name
                 && Thickness == other.Thickness
                 && Length == other.Length
-                && Area == other.Area
                 ;
         }
     }

@@ -164,9 +164,7 @@ namespace RevitMepTotals.Services.Implements {
                 .Select(group => new PipeInsulationData(group.Key.TypeName, group.Key.PipeSize, group.Key.Name) {
                     Thickness = group.Key.Thickness,
                     Length = group.Sum(
-                        pipeInsulation => _revitRepository.GetMepCurveElementLength(document, pipeInsulation)),
-                    Area = group.Sum(
-                        pipeInsulation => _revitRepository.GetMepCurveElementArea(document, pipeInsulation))
+                        pipeInsulation => _revitRepository.GetMepCurveElementLength(document, pipeInsulation))
                 })
                 .ToArray();
         }
