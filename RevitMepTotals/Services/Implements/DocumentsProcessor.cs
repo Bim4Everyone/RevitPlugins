@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 using Autodesk.Revit.DB;
@@ -125,7 +126,7 @@ namespace RevitMepTotals.Services.Implements {
                 .GetDucts(document)
                 .GroupBy(duct => new {
                     TypeName = _revitRepository.GetDuctTypeName(duct),
-                    Size = _revitRepository.GetDuctSize(document, duct),
+                    Size = GetStandardSizeFormat(_revitRepository.GetDuctSize(document, duct)),
                     Name = _revitRepository.GetMepCurveElementSharedName(document, duct)
                 })
                 .Select(group => new DuctData(group.Key.TypeName, group.Key.Size, group.Key.Name) {
@@ -141,7 +142,7 @@ namespace RevitMepTotals.Services.Implements {
                 .GetPipes(document)
                 .GroupBy(pipe => new {
                     TypeName = _revitRepository.GetPipeTypeName(pipe),
-                    Size = _revitRepository.GetPipeSize(document, pipe),
+                    Size = GetStandardSizeFormat(_revitRepository.GetPipeSize(document, pipe)),
                     Name = _revitRepository.GetMepCurveElementSharedName(document, pipe)
                 })
                 .Select(group => new PipeData(group.Key.TypeName, group.Key.Size, group.Key.Name) {
@@ -157,7 +158,7 @@ namespace RevitMepTotals.Services.Implements {
                 .GetPipeInsulations(document)
                 .GroupBy(pipeInsulation => new {
                     TypeName = _revitRepository.GetPipeInsulationTypeName(document, pipeInsulation),
-                    PipeSize = _revitRepository.GetPipeInsulationSize(document, pipeInsulation),
+                    PipeSize = GetStandardSizeFormat(_revitRepository.GetPipeInsulationSize(document, pipeInsulation)),
                     Name = _revitRepository.GetMepCurveElementSharedName(document, pipeInsulation),
                     Thickness = _revitRepository.GetPipeInsulationThickness(document, pipeInsulation)
                 })
@@ -167,6 +168,30 @@ namespace RevitMepTotals.Services.Implements {
                         pipeInsulation => _revitRepository.GetMepCurveElementLength(document, pipeInsulation))
                 })
                 .ToArray();
+        }
+
+        /// <summary>
+        /// Преобразует строку в формате 650x1000 к 1000x650б то есть наибольшее число вначале.
+        /// Если формат поданной строки другой, вернется эта же строка.
+        /// Символ 'x' может быть RUS или ENG
+        /// </summary>
+        /// <param name="sizeToFormat">Строка для преобразования</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        private string GetStandardSizeFormat(string sizeToFormat) {
+            if(string.IsNullOrWhiteSpace(sizeToFormat)) {
+                throw new ArgumentNullException(nameof(sizeToFormat));
+            }
+
+            var match = Regex.Match(sizeToFormat, @"^(\d+)(x|х)(\d+)$"); // например, 1000x650, где x или RUS, или ENG
+            if(match.Success) {
+                int width = int.Parse(match.Groups[1].Value); // первая цифра
+                string splitter = match.Groups[2].Value; // x
+                int height = int.Parse(match.Groups[3].Value); // вторая цифра
+                return width > height ? sizeToFormat : (height + splitter + width); // наибольшая цифра в начале
+            } else {
+                return sizeToFormat;
+            }
         }
     }
 }
