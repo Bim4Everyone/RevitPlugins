@@ -43,27 +43,21 @@ namespace RevitMepTotals.Services.Implements {
                         Worksheet worksheet = workbook.Worksheets[sheetIndex];
                         worksheet.Name = CleanSheetName(data[sheetIndex].Title); // корректировка заголовка листа
 
-                        worksheet.Rows[0][0].Value = "Воздуховоды";
-                        int ductStart = 1;
-                        IList<IDuctData> ductData = GetOrderedDuctData(data[sheetIndex]);
-                        int ductEnd = WriteDuctData(worksheet, ductStart, ductData);
+                        int rowToWrite = 0;
+                        rowToWrite = WriteDuctData(worksheet, rowToWrite, GetOrderedDuctData(data[sheetIndex]));
 
-                        worksheet.Rows[ductEnd + 1][0].Value = "Трубы";
-                        int pipeStart = ductEnd + 2;
-                        IList<IPipeData> pipeData = GetOrderedPipeData(data[sheetIndex]);
-                        int pipeEnd = WritePipeData(worksheet, pipeStart, pipeData);
+                        rowToWrite++;
+                        rowToWrite = WritePipeData(worksheet, rowToWrite, GetOrderedPipeData(data[sheetIndex]));
 
-                        worksheet.Rows[pipeEnd + 1][0].Value = "Изоляция воздуховодов";
-                        int ductInsulationStart = pipeEnd + 2;
-                        IList<IDuctInsulationData> ductInsulationData = GetOrderedDuctInsulationData(data[sheetIndex]);
-                        int ductInsulationEnd = WriteDuctInsulationData(worksheet, ductInsulationStart, ductInsulationData);
+                        rowToWrite++;
+                        WritePipeInsulationData(worksheet, rowToWrite, GetOrderedPipeInsulationData(data[sheetIndex]));
 
-                        worksheet.Rows[ductInsulationEnd + 1][0].Value = "Изоляция трубопроводов";
-                        int pipeInsulationStart = ductInsulationEnd + 2;
-                        IList<IPipeInsulationData> pipeInsulationData = GetOrderedPipeInsulationData(data[sheetIndex]);
-                        WritePipeInsulationData(worksheet, pipeInsulationStart, pipeInsulationData);
-
-                        worksheet.Columns.AutoFit(0, typeof(IDuctInsulationData).GetProperties().Count());
+                        worksheet.Columns
+                            .AutoFit(0,
+                                typeof(IPipeInsulationData)
+                                .GetProperties()
+                                .Count()
+                            ); // интерфейс с самым большим количеством свойств
                         workbook.Worksheets.Add(); //добавляем следующий лист
                     }
                     workbook.Worksheets.RemoveAt(workbook.Worksheets.Count - 1); // удаляем последний пустой лист
@@ -119,15 +113,6 @@ namespace RevitMepTotals.Services.Implements {
                 .ToList();
         }
 
-        private IList<IDuctInsulationData> GetOrderedDuctInsulationData(IDocumentData documentData) {
-            return documentData.DuctInsulations
-                .OrderBy(d => d.TypeName)
-                .ThenBy(d => d.Name)
-                .ThenBy(d => d.DuctSize)
-                .ThenBy(d => d.Thickness)
-                .ToList();
-        }
-
         private IList<IPipeInsulationData> GetOrderedPipeInsulationData(IDocumentData documentData) {
             return documentData.PipeInsulations
                 .OrderBy(d => d.TypeName)
@@ -145,6 +130,8 @@ namespace RevitMepTotals.Services.Implements {
         /// <param name="ductData">Данные по воздуховодам</param>
         /// <returns>Индекс последней строчки, на которую были записаны данные</returns>
         private int WriteDuctData(Worksheet worksheet, int startRow, IList<IDuctData> ductData) {
+            worksheet.Rows[startRow][0].Value = "Воздуховоды";
+            startRow++;
             worksheet.Rows[startRow][0].Value = "Тип";
             worksheet.Rows[startRow][1].Value = "ФОП_ВИС_Наименование комбинированное";
             worksheet.Rows[startRow][2].Value = "Размер";
@@ -169,6 +156,8 @@ namespace RevitMepTotals.Services.Implements {
         /// <param name="pipeData">Данные по трубам</param>
         /// <returns>Индекс последней строчки, на которую были записаны данные</returns>
         private int WritePipeData(Worksheet worksheet, int startRow, IList<IPipeData> pipeData) {
+            worksheet.Rows[startRow][0].Value = "Трубы";
+            startRow++;
             worksheet.Rows[startRow][0].Value = "Тип";
             worksheet.Rows[startRow][1].Value = "ФОП_ВИС_Наименование комбинированное";
             worksheet.Rows[startRow][2].Value = "Размер";
@@ -186,38 +175,6 @@ namespace RevitMepTotals.Services.Implements {
         }
 
         /// <summary>
-        /// Записывает данные по изоляции воздуховодов на заданный лист Excel, начиная с заданной строчки
-        /// </summary>
-        /// <param name="worksheet">Лист Excel для записи</param>
-        /// <param name="startRow">Индекс первой строчки, с которой нужно начать запись данных</param>
-        /// <param name="ductInsulationData">Данные по изоляции воздуховодов</param>
-        /// <returns>Индекс последней строчки, на которую были записаны данные</returns>
-        private int WriteDuctInsulationData(
-            Worksheet worksheet,
-            int startRow,
-            IList<IDuctInsulationData> ductInsulationData) {
-
-            worksheet.Rows[startRow][0].Value = "Тип";
-            worksheet.Rows[startRow][1].Value = "ФОП_ВИС_Наименование комбинированное";
-            worksheet.Rows[startRow][2].Value = "Размер воздуховода";
-            worksheet.Rows[startRow][3].Value = "Толщина, мм";
-            worksheet.Rows[startRow][4].Value = "Длина, м";
-            worksheet.Rows[startRow][5].Value = "Площадь, м2";
-            startRow++;
-            int count = ductInsulationData.Count;
-            int lastRow = startRow + count - 1;
-            for(int row = startRow; row < lastRow + 1; row++) {
-                worksheet.Rows[row][0].Value = ductInsulationData[row - startRow].TypeName;
-                worksheet.Rows[row][1].Value = ductInsulationData[row - startRow].Name;
-                worksheet.Rows[row][2].Value = ductInsulationData[row - startRow].DuctSize;
-                worksheet.Rows[row][3].Value = ductInsulationData[row - startRow].Thickness;
-                worksheet.Rows[row][4].Value = ductInsulationData[row - startRow].Length / 1000;
-                worksheet.Rows[row][5].Value = ductInsulationData[row - startRow].Area;
-            }
-            return lastRow;
-        }
-
-        /// <summary>
         /// Записывает данные по изоляции труб на заданный лист Excel, начиная с заданной строчки
         /// </summary>
         /// <param name="worksheet">Лист Excel для записи</param>
@@ -229,6 +186,8 @@ namespace RevitMepTotals.Services.Implements {
             int startRow,
             IList<IPipeInsulationData> pipeInsulationData) {
 
+            worksheet.Rows[startRow][0].Value = "Изоляция трубопроводов";
+            startRow++;
             worksheet.Rows[startRow][0].Value = "Тип";
             worksheet.Rows[startRow][1].Value = "ФОП_ВИС_Наименование комбинированное";
             worksheet.Rows[startRow][2].Value = "Размер трубы";

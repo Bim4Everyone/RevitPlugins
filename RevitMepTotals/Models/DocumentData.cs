@@ -7,7 +7,6 @@ namespace RevitMepTotals.Models {
     internal class DocumentData : IDocumentData {
         private readonly List<IDuctData> _ductData = new List<IDuctData>();
         private readonly List<IPipeData> _pipeData = new List<IPipeData>();
-        private readonly List<IDuctInsulationData> _ductInsulationData = new List<IDuctInsulationData>();
         private readonly List<IPipeInsulationData> _pipeInsulationData = new List<IPipeInsulationData>();
 
 
@@ -23,8 +22,6 @@ namespace RevitMepTotals.Models {
         public ICollection<IDuctData> Ducts => _ductData;
 
         public ICollection<IPipeData> Pipes => _pipeData;
-
-        public ICollection<IDuctInsulationData> DuctInsulations => _ductInsulationData;
 
         public ICollection<IPipeInsulationData> PipeInsulations => _pipeInsulationData;
 
@@ -54,20 +51,6 @@ namespace RevitMepTotals.Models {
 
             foreach(IPipeData ductData in data) {
                 AddPipeData(ductData);
-            }
-        }
-
-        public void AddDuctInsulationData(IDuctInsulationData data) {
-            if(data == null) { throw new ArgumentNullException(nameof(data)); }
-
-            _ductInsulationData.Add(data);
-        }
-
-        public void AddDuctInsulationData(ICollection<IDuctInsulationData> data) {
-            if(data == null) { throw new ArgumentNullException(nameof(data)); }
-
-            foreach(IDuctInsulationData ductInsulationData in data) {
-                AddDuctInsulationData(ductInsulationData);
             }
         }
 

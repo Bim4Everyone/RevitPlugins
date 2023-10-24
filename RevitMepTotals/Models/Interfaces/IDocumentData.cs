@@ -21,11 +21,6 @@ namespace RevitMepTotals.Models.Interfaces {
         ICollection<IPipeData> Pipes { get; }
 
         /// <summary>
-        /// Данные по изоляции воздуховодов
-        /// </summary>
-        ICollection<IDuctInsulationData> DuctInsulations { get; }
-
-        /// <summary>
         /// Данные по изоляции трубопроводов
         /// </summary>
         ICollection<IPipeInsulationData> PipeInsulations { get; }

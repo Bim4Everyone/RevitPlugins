@@ -88,7 +88,6 @@ namespace RevitMepTotals.Services.Implements {
             DocumentData documentData = new DocumentData(document.Title);
             documentData.AddDuctData(GetDuctData(document));
             documentData.AddPipeData(GetPipeData(document));
-            documentData.AddDuctInsulationData(GetDuctInsulationData(document));
             documentData.AddPipeInsulationData(GetPipeInsulationData(document));
             return documentData;
         }
@@ -147,27 +146,6 @@ namespace RevitMepTotals.Services.Implements {
                 })
                 .Select(group => new PipeData(group.Key.TypeName, group.Key.Size, group.Key.Name) {
                     Length = group.Sum(pipe => _revitRepository.GetMepCurveElementLength(document, pipe))
-                })
-                .ToArray();
-        }
-
-        private ICollection<IDuctInsulationData> GetDuctInsulationData(Document document) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
-
-            return _revitRepository
-                .GetDuctInsulations(document)
-                .GroupBy(ductInsulation => new {
-                    TypeName = _revitRepository.GetDuctInsulationTypeName(document, ductInsulation),
-                    DuctSize = _revitRepository.GetDuctInsulationSize(document, ductInsulation),
-                    Name = _revitRepository.GetMepCurveElementSharedName(document, ductInsulation),
-                    Thickness = _revitRepository.GetDuctInsulationThickness(document, ductInsulation)
-                })
-                .Select(group => new DuctInsulationData(group.Key.TypeName, group.Key.DuctSize, group.Key.Name) {
-                    Thickness = group.Key.Thickness,
-                    Length = group.Sum(
-                        ductInsulation => _revitRepository.GetMepCurveElementLength(document, ductInsulation)),
-                    Area = group.Sum(
-                        ductInsulation => _revitRepository.GetMepCurveElementArea(document, ductInsulation))
                 })
                 .ToArray();
         }
