@@ -27,29 +27,15 @@ namespace RevitRoomTagPlacement.Models {
             GetAllPathes();
             mainPath = GetMainPath();
             centerPoint = CalculateWeightCenter();
-            TagPoint = GetTagPoint();
+            TagPoint = GetTagPointBySpline();
         }
 
-        private UV GetTagPoint() {
-            double maxWeight = 0;
-            List<PathTriangle> triPair = new List<PathTriangle>();
+        private UV GetTagPointBySpline() {
+            List<XYZ> splinePoints = mainPath.Select(x => x.Center).ToList();
+            HermiteSpline spline = HermiteSpline.Create(splinePoints, false);
+            XYZ point = spline.Evaluate(centerPoint, true);
 
-            foreach(var tri in triangles) {
-                foreach(var nextTri in tri.NextTriangles) { 
-                    double weight = tri.Weight + nextTri.Weight;
-                    if(weight > maxWeight) {
-                        triPair.Add(tri);
-                        triPair.Add(nextTri);
-                    }
-                }
-            }
-
-            XYZ center1 = triPair[0].Center;
-            XYZ center2 = triPair[1].Center;
-
-            return new UV(
-                (center1.X + center2.X) * 0.5,
-                (center1.Y + center2.Y) * 0.5);
+            return new UV(point.X, point.Y);
         }
 
         private double CalculateWeightCenter() {
@@ -106,7 +92,7 @@ namespace RevitRoomTagPlacement.Models {
                     GoFromStartToEnd(new List<PathTriangle>(), startCouple[0], startCouple[1]);
                     foreach(var tri in triangles) {
                         tri.IsVisited = false;
-                     }
+                    }
                 }
             } 
             else {
