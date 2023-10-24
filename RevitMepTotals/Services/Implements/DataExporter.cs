@@ -119,6 +119,7 @@ namespace RevitMepTotals.Services.Implements {
                 .ThenBy(d => d.Name)
                 .ThenBy(d => d.PipeSize)
                 .ThenBy(d => d.Thickness)
+                .Where(d => d.Length > 0)
                 .ToList();
         }
 
