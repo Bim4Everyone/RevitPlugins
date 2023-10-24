@@ -132,11 +132,13 @@ namespace RevitMepTotals.Services.Implements {
         /// <returns>Индекс последней строчки, на которую были записаны данные</returns>
         private int WriteDuctData(Worksheet worksheet, int startRow, IList<IDuctData> ductData) {
             worksheet.Rows[startRow][0].Value = "Воздуховоды";
+            worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
             startRow++;
             worksheet.Rows[startRow][0].Value = "Тип";
             worksheet.Rows[startRow][1].Value = "ФОП_ВИС_Наименование комбинированное";
             worksheet.Rows[startRow][2].Value = "Размер";
             worksheet.Rows[startRow][3].Value = "Длина, м";
+            worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
             startRow++;
             int ductsCount = ductData.Count;
             int lastRow = startRow + ductsCount - 1;
@@ -158,11 +160,13 @@ namespace RevitMepTotals.Services.Implements {
         /// <returns>Индекс последней строчки, на которую были записаны данные</returns>
         private int WritePipeData(Worksheet worksheet, int startRow, IList<IPipeData> pipeData) {
             worksheet.Rows[startRow][0].Value = "Трубы";
+            worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
             startRow++;
             worksheet.Rows[startRow][0].Value = "Тип";
             worksheet.Rows[startRow][1].Value = "ФОП_ВИС_Наименование комбинированное";
             worksheet.Rows[startRow][2].Value = "Размер";
             worksheet.Rows[startRow][3].Value = "Длина, м";
+            worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
             startRow++;
             int pipesCount = pipeData.Count;
             int lastRow = startRow + pipesCount - 1;
@@ -188,12 +192,14 @@ namespace RevitMepTotals.Services.Implements {
             IList<IPipeInsulationData> pipeInsulationData) {
 
             worksheet.Rows[startRow][0].Value = "Изоляция трубопроводов";
+            worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
             startRow++;
             worksheet.Rows[startRow][0].Value = "Тип";
             worksheet.Rows[startRow][1].Value = "ФОП_ВИС_Наименование комбинированное";
             worksheet.Rows[startRow][2].Value = "Размер трубы";
             worksheet.Rows[startRow][3].Value = "Толщина, мм";
             worksheet.Rows[startRow][4].Value = "Длина, м";
+            worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
             startRow++;
             int count = pipeInsulationData.Count;
             int lastRow = startRow + count - 1;
