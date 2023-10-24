@@ -24,10 +24,13 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
         private string _transverseViewFirstPrefixTemp = "";
         private string _transverseViewFirstSuffixTemp = "_Сеч.1-1";
+        private string _transverseViewFirstElevationTemp = "0,25";
         private string _transverseViewSecondPrefixTemp = "";
         private string _transverseViewSecondSuffixTemp = "_Сеч.2-2";
+        private string _transverseViewSecondElevationTemp = "0,5";
         private string _transverseViewThirdPrefixTemp = "";
         private string _transverseViewThirdSuffixTemp = "_Сеч.3-3";
+        private string _transverseViewThirdElevationTemp = "1,25";
         private string _transverseViewTemplateNameTemp = "!Новый РАЗРЕЗ";
         private string _transverseViewXOffsetTemp = "200";
         private string _transverseViewYOffsetTemp = "200";
@@ -102,6 +105,12 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             set => RaiseAndSetIfChanged(ref _transverseViewFirstSuffixTemp, value);
         }
 
+        public string TransverseViewFirstElevation { get; set; }
+        public string TransverseViewFirstElevationTemp {
+            get => _transverseViewFirstElevationTemp;
+            set => RaiseAndSetIfChanged(ref _transverseViewFirstElevationTemp, value);
+        }
+
 
         public string TransverseViewSecondPrefix { get; set; }
         public string TransverseViewSecondPrefixTemp {
@@ -115,6 +124,12 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             set => RaiseAndSetIfChanged(ref _transverseViewSecondSuffixTemp, value);
         }
 
+        public string TransverseViewSecondElevation { get; set; }
+        public string TransverseViewSecondElevationTemp {
+            get => _transverseViewSecondElevationTemp;
+            set => RaiseAndSetIfChanged(ref _transverseViewSecondElevationTemp, value);
+        }
+
         public string TransverseViewThirdPrefix { get; set; }
         public string TransverseViewThirdPrefixTemp {
             get => _transverseViewThirdPrefixTemp;
@@ -125,6 +140,12 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         public string TransverseViewThirdSuffixTemp {
             get => _transverseViewThirdSuffixTemp;
             set => RaiseAndSetIfChanged(ref _transverseViewThirdSuffixTemp, value);
+        }
+
+        public string TransverseViewThirdElevation { get; set; }
+        public string TransverseViewThirdElevationTemp {
+            get => _transverseViewThirdElevationTemp;
+            set => RaiseAndSetIfChanged(ref _transverseViewThirdElevationTemp, value);
         }
 
         public string TransverseViewTemplateName { get; set; }
@@ -165,10 +186,13 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
             TransverseViewFirstPrefix = TransverseViewFirstPrefixTemp;
             TransverseViewFirstSuffix = TransverseViewFirstSuffixTemp;
+            TransverseViewFirstElevation = TransverseViewFirstElevationTemp;
             TransverseViewSecondPrefix = TransverseViewSecondPrefixTemp;
             TransverseViewSecondSuffix = TransverseViewSecondSuffixTemp;
+            TransverseViewSecondElevation = TransverseViewSecondElevationTemp;
             TransverseViewThirdPrefix = TransverseViewThirdPrefixTemp;
             TransverseViewThirdSuffix = TransverseViewThirdSuffixTemp;
+            TransverseViewThirdElevation = TransverseViewThirdElevationTemp;
 
             TransverseViewTemplateName = TransverseViewTemplateNameTemp;
             TransverseViewXOffset = TransverseViewXOffsetTemp;
@@ -179,22 +203,32 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
         public void CheckViewSectionsSettings() {
 
-            int temp;
-            if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewXOffset, out temp)) {
+            int tempInt;
+            double tempDouble;
+            if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewXOffset, out tempInt)) {
                 ViewModel.ErrorText = "Значение отступа основного вида по X некорректно";
             }
-            if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset, out temp)) {
+            if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset, out tempInt)) {
                 ViewModel.ErrorText = "Значение отступа основного вида по Y сверху некорректно";
             }
-            if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset, out temp)) {
+            if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset, out tempInt)) {
                 ViewModel.ErrorText = "Значение отступа основного вида по Y сверху некорректно";
             }
 
-            if(!int.TryParse(ViewModel.ViewSectionSettings.TransverseViewXOffset, out temp)) {
+            if(!int.TryParse(ViewModel.ViewSectionSettings.TransverseViewXOffset, out tempInt)) {
                 ViewModel.ErrorText = "Значение отступа поперечного вида по X некорректно";
             }
-            if(!int.TryParse(ViewModel.ViewSectionSettings.TransverseViewYOffsetTemp, out temp)) {
+            if(!int.TryParse(ViewModel.ViewSectionSettings.TransverseViewYOffsetTemp, out tempInt)) {
                 ViewModel.ErrorText = "Значение отступа поперечного вида по Y некорректно";
+            }
+            if(!double.TryParse(ViewModel.ViewSectionSettings.TransverseViewFirstElevationTemp, out tempDouble)) {
+                ViewModel.ErrorText = "Значение возвышения первого горизонтального вида некорректно";
+            }
+            if(!double.TryParse(ViewModel.ViewSectionSettings.TransverseViewSecondElevationTemp, out tempDouble)) {
+                ViewModel.ErrorText = "Значение возвышения второго горизонтального вида некорректно";
+            }
+            if(!double.TryParse(ViewModel.ViewSectionSettings.TransverseViewThirdElevationTemp, out tempDouble)) {
+                ViewModel.ErrorText = "Значение возвышения третьего горизонтального вида некорректно";
             }
         }
     }

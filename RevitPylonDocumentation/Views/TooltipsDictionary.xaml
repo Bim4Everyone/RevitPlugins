@@ -135,12 +135,12 @@
 
     <Style x:Key="LegendXOffsetStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
-        <Setter Property="Text" Value="Укажите отступ по горизонтали (по оси Х) от нижнего правого угла рамки листа до середины видового экрана легенды примечания" />
+        <Setter Property="Text" Value="Укажите смещение по горизонтали (по оси Х) от нижнего правого угла рамки листа до середины видового экрана легенды примечания" />
     </Style>
 
     <Style x:Key="LegendYOffsetStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
-        <Setter Property="Text" Value="Укажите отступ по вертикали (по оси Y) от нижнего правого угла рамки листа до середины видового экрана легенды примечания" />
+        <Setter Property="Text" Value="Укажите смещение по вертикали (по оси Y) от нижнего правого угла рамки листа до середины видового экрана легенды примечания" />
     </Style>
 
     <Style x:Key="GeneralViewXOffsetStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
@@ -175,7 +175,11 @@
         <Setter Property="Text" Value="Суффикс - часть имени первого горизонтального вида пилона, которая должна идти после указания марки пилона.&#10;Например, в имени первого горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.1-1&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_Сеч.1-1&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_Сеч.1-1&quot;" />
     </Style>
 
+    <Style x:Key="TransViewFirstElevationStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
+        <Setter Property="Text" Value="Положение горизонтального разреза относительно пилона задается при помощи пропорции: высота секущей плоскости горизонтального разреза от низа пилона разделить на высоту пилона.&#10;Так, если задать &quot;0,5&quot;, то сечение разреза будет расположено на половине высоты пилона. &quot;1,25&quot; - на четверть высоты пилона выше верхней грани пилона. В качестве разделителя у пропорции необходимо использовать запятую.&#10;Для первого горизонтального вида стандартным значением является &quot;0,25&quot;" />
+    </Style>
+    
 
     <Style x:Key="TransViewSecondNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
@@ -192,6 +196,10 @@
         <Setter Property="Text" Value="Суффикс - часть имени второго горизонтального вида пилона, которая должна идти после указания марки пилона.&#10;Например, в имени второго горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.2-2&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_Сеч.2-2&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_Сеч.2-2&quot;" />
     </Style>
 
+    <Style x:Key="TransViewSecondElevationStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Положение горизонтального разреза относительно пилона задается при помощи пропорции: высота секущей плоскости горизонтального разреза от низа пилона разделить на высоту пилона.&#10;Так, если задать &quot;0,5&quot;, то сечение разреза будет расположено на половине высоты пилона. &quot;1,25&quot; - на четверть высоты пилона выше верхней грани пилона. В качестве разделителя у пропорции необходимо использовать запятую.&#10;Для второго горизонтального вида стандартным значением является &quot;0,5&quot;" />
+    </Style>
 
     <Style x:Key="TransViewThirdNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
@@ -208,6 +216,10 @@
         <Setter Property="Text" Value="Суффикс - часть имени второго горизонтального вида пилона, которая должна идти после указания марки пилона.&#10;Например, в имени второго горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_Сеч.3-3&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_Сеч.3-3&quot;" />
     </Style>
 
+    <Style x:Key="TransViewThirdElevationStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Положение горизонтального разреза относительно пилона задается при помощи пропорции: высота секущей плоскости горизонтального разреза от низа пилона разделить на высоту пилона.&#10;Так, если задать &quot;0,5&quot;, то сечение разреза будет расположено на половине высоты пилона. &quot;1,25&quot; - на четверть высоты пилона выше верхней грани пилона. В качестве разделителя у пропорции необходимо использовать запятую.&#10;Для третьего горизонтального вида стандартным значением является &quot;1,25&quot;" />
+    </Style>
 
     <Style x:Key="TransViewTemplateStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 

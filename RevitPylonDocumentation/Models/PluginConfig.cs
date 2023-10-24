@@ -105,14 +105,20 @@ namespace RevitPylonDocumentation.Models {
             viewSectionSettings.TransverseViewFirstPrefixTemp = settings.TransverseViewFirstPrefix;
             viewSectionSettings.TransverseViewFirstSuffix = settings.TransverseViewFirstSuffix;
             viewSectionSettings.TransverseViewFirstSuffixTemp = settings.TransverseViewFirstSuffix;
+            viewSectionSettings.TransverseViewFirstElevation = settings.TransverseViewFirstElevation;
+            viewSectionSettings.TransverseViewFirstElevationTemp = settings.TransverseViewFirstElevation;
             viewSectionSettings.TransverseViewSecondPrefix = settings.TransverseViewSecondPrefix;
             viewSectionSettings.TransverseViewSecondPrefixTemp = settings.TransverseViewSecondPrefix;
             viewSectionSettings.TransverseViewSecondSuffix = settings.TransverseViewSecondSuffix;
             viewSectionSettings.TransverseViewSecondSuffixTemp = settings.TransverseViewSecondSuffix;
+            viewSectionSettings.TransverseViewSecondElevation = settings.TransverseViewSecondElevation;
+            viewSectionSettings.TransverseViewSecondElevationTemp = settings.TransverseViewSecondElevation;
             viewSectionSettings.TransverseViewThirdPrefix = settings.TransverseViewThirdPrefix;
             viewSectionSettings.TransverseViewThirdPrefixTemp = settings.TransverseViewThirdPrefix;
             viewSectionSettings.TransverseViewThirdSuffix = settings.TransverseViewThirdSuffix;
             viewSectionSettings.TransverseViewThirdSuffixTemp = settings.TransverseViewThirdSuffix;
+            viewSectionSettings.TransverseViewThirdElevation = settings.TransverseViewThirdElevation;
+            viewSectionSettings.TransverseViewThirdElevationTemp = settings.TransverseViewThirdElevation;
             viewSectionSettings.TransverseViewTemplateName = settings.TransverseViewTemplateName;
             viewSectionSettings.TransverseViewTemplateNameTemp = settings.TransverseViewTemplateName;
 
@@ -226,10 +232,13 @@ namespace RevitPylonDocumentation.Models {
 
             settings.TransverseViewFirstPrefix = viewSectionSettings.TransverseViewFirstPrefix;
             settings.TransverseViewFirstSuffix = viewSectionSettings.TransverseViewFirstSuffix;
+            settings.TransverseViewFirstElevation = viewSectionSettings.TransverseViewFirstElevation;
             settings.TransverseViewSecondPrefix = viewSectionSettings.TransverseViewSecondPrefix;
             settings.TransverseViewSecondSuffix = viewSectionSettings.TransverseViewSecondSuffix;
+            settings.TransverseViewSecondElevation = viewSectionSettings.TransverseViewSecondElevation;
             settings.TransverseViewThirdPrefix = viewSectionSettings.TransverseViewThirdPrefix;
             settings.TransverseViewThirdSuffix = viewSectionSettings.TransverseViewThirdSuffix;
+            settings.TransverseViewThirdElevation = viewSectionSettings.TransverseViewThirdElevation;
             settings.TransverseViewTemplateName = viewSectionSettings.TransverseViewTemplateName;
 
             settings.TransverseViewXOffset = viewSectionSettings.TransverseViewXOffset;
@@ -309,10 +318,13 @@ namespace RevitPylonDocumentation.Models {
         public string GeneralViewYBottomOffset { get; set; }
         public string TransverseViewFirstPrefix { get; set; }
         public string TransverseViewFirstSuffix { get; set; }
+        public string TransverseViewFirstElevation { get; set; }
         public string TransverseViewSecondPrefix { get; set; }
         public string TransverseViewSecondSuffix { get; set; }
+        public string TransverseViewSecondElevation { get; set; }
         public string TransverseViewThirdPrefix { get; set; }
         public string TransverseViewThirdSuffix { get; set; }
+        public string TransverseViewThirdElevation { get; set; }
         public string TransverseViewTemplateName { get; set; }
         public string TransverseViewXOffset { get; set; }
         public string TransverseViewYOffset { get; set; }

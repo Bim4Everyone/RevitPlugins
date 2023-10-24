@@ -241,21 +241,28 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             XYZ sectionBoxMin;
             XYZ sectionBoxMax;
+            double elevation;
             double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewXOffset));
             double coordinateY = hostWidth * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
 
             if(transverseViewNum == 1) {
-                // Располагаем сечение на высоте 1/4 высоты пилона
-                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) / 4 - originPoint.Z));
-                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) / 8 - originPoint.Z));
+                // Располагаем сечение на высоте 1/4 высоты пилона (или по пропорции, указанной пользователем)
+                elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseViewFirstElevation);
+
+                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) * elevation - originPoint.Z));
+                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) * (elevation - 0.125) - originPoint.Z));
             } else if(transverseViewNum == 2) {
-                // Располагаем сечение на высоте 1/2 высоты пилона
-                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) / 2 - originPoint.Z));
-                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) / 8 * 3 - originPoint.Z));
+                // Располагаем сечение на высоте 1/2 высоты пилона (или по пропорции, указанной пользователем)
+                elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseViewSecondElevation);
+
+                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) * elevation - originPoint.Z));
+                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) * (elevation - 0.125) - originPoint.Z));
             } else if(transverseViewNum == 3) {
-                // Располагаем сечение на высоте 5/4 высоты пилона
-                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) / 4 * 5 - originPoint.Z));
-                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) / 8 * 7 - originPoint.Z));
+                // Располагаем сечение на высоте 5/4 высоты пилона (или по пропорции, указанной пользователем)
+                elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseViewThirdElevation);
+
+                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) * elevation - originPoint.Z));
+                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) * (elevation - 0.125) - originPoint.Z));
             } else {
                 return false;
             }
