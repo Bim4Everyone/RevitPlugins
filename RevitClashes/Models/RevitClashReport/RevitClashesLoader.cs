@@ -10,7 +10,7 @@ using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.RevitClashReport {
-    internal class RevitClashesLoader : IClashesLoader {
+    internal class RevitClashesLoader : BaseClashesLoader, IClashesLoader {
         private readonly RevitRepository _revitRepository;
 
         public string FilePath { get; }
@@ -73,26 +73,6 @@ namespace RevitClashDetective.Models.RevitClashReport {
 
         private Element GetElement(IEnumerable<string> elementString) {
             return _revitRepository.GetElement(GetFile(elementString.FirstOrDefault()?.Trim()), GetId(elementString.LastOrDefault()));
-        }
-
-        private ElementId GetId(string idString) {
-            if(string.IsNullOrWhiteSpace(idString)) { return ElementId.InvalidElementId; }
-
-            var match = Regex.Match(idString, @"(?'id'\d+)");
-            if(match.Success) {
-                string stringId = match.Groups["id"].Value;
-#if REVIT_2023_OR_LESS
-                bool successParse = int.TryParse(stringId, out int numericId);
-#else
-                bool successParse = long.TryParse(stringId, out long numericId);
-#endif
-                if(successParse) {
-                    return new ElementId(numericId);
-                } else {
-                    return ElementId.InvalidElementId;
-                }
-            }
-            return ElementId.InvalidElementId;
         }
 
         private string GetFile(string fileString) {

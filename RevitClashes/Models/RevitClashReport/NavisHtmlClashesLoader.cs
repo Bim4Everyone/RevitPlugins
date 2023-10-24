@@ -10,7 +10,7 @@ using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.RevitClashReport {
-    internal class NavisHtmlClashesLoader : IClashesLoader {
+    internal class NavisHtmlClashesLoader : BaseClashesLoader, IClashesLoader {
         private readonly RevitRepository _revitRepository;
         private readonly string[] _extensions = new[] { ".nwc", ".nwf", ".nwd" };
 
@@ -70,25 +70,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
 
         private ElementId GetId(IEnumerable<string> cells) {
             var idString = cells.FirstOrDefault(item => item.IndexOf("ID") > 0);
-            if(idString == null) {
-                return ElementId.InvalidElementId;
-            }
-            var match = Regex.Match(idString, @"(?'id'\d+)");
-            if(match.Success) {
-                string stringId = match.Groups["id"].Value;
-#if REVIT_2023_OR_LESS
-                bool successParse = int.TryParse(stringId, out int numericId);
-#else
-                bool successParse = long.TryParse(stringId, out long numericId);
-#endif
-                if(successParse) {
-                    return new ElementId(numericId);
-                } else {
-                    return ElementId.InvalidElementId;
-                }
-            }
-
-            return ElementId.InvalidElementId;
+            return GetId(idString);
         }
 
         private string GetFileName(IEnumerable<string> cells) {
