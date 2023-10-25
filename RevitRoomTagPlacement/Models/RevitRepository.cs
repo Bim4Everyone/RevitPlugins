@@ -123,7 +123,6 @@ namespace RevitRoomTagPlacement.Models {
                         if(!room.IsPointInRoom(testPoint)) point = pathFinder.GetPointByPath();
 
                         var newTag = Document.Create.NewRoomTag(new LinkElementId(room.Id), point, activeView.Id);
-
                         newTag.ChangeTypeId(SelectedTagType);
                     }
                 }

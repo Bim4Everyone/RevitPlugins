@@ -26,7 +26,7 @@ namespace RevitRoomTagPlacement.Models {
         }
 
         public List<PathTriangle> Triangles => _triangles; 
-        public PathTriangle MinTriangle => _minTriangle; 
+        public PathTriangle MinTriangle => _minTriangle;
 
         public PlanarFace GetRoomHorizontalFace() {
             Solid roomSolid = _room.ClosedShell

@@ -16,7 +16,8 @@ namespace RevitRoomTagPlacement.Models {
         private List<List<PathTriangle>> allPathes;
         private List<PathTriangle> mainPath;
         private double centerPoint;
-        public UV TagPoint;
+
+        public UV _tagPoint;
 
         public RoomPath(TriangulatedRoom _triRoom) {
             triRoom = _triRoom;
@@ -27,15 +28,23 @@ namespace RevitRoomTagPlacement.Models {
             GetAllPathes();
             mainPath = GetMainPath();
             centerPoint = CalculateWeightCenter();
-            TagPoint = GetTagPointBySpline();
+
+            _tagPoint = GetTagPointBySpline();
         }
 
-        private UV GetTagPointBySpline() {
-            List<XYZ> splinePoints = mainPath.Select(x => x.Center).ToList();
-            HermiteSpline spline = HermiteSpline.Create(splinePoints, false);
-            XYZ point = spline.Evaluate(centerPoint, true);
+        public UV TagPoint => _tagPoint;
 
-            return new UV(point.X, point.Y);
+        private UV GetTagPointBySpline() {
+            if(triangles.Count == 1) {
+                return new UV(triangles[0].Center.X, triangles[0].Center.Y);
+            } 
+            else {
+                List<XYZ> splinePoints = mainPath.Select(x => x.Center).ToList();
+                HermiteSpline spline = HermiteSpline.Create(splinePoints, false);
+                XYZ point = spline.Evaluate(centerPoint, true);
+
+                return new UV(point.X, point.Y);
+            }
         }
 
         private double CalculateWeightCenter() {
