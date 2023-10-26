@@ -6,5 +6,5 @@
   "IconUrl": "https://icons8.com/icon/14512/add-list",
   "BundleName": "Менеджер листов",
   "BundleType": "InvokeButton",
-  "BundleOutput": "01.2D.extension\\2D.tab\\Листы.panel\\Листы 2.stack\\Менеджер листов.invokebutton"
+  "BundleOutput": "01.2D.extension\\2D.tab\\Листы.panel\\Листы 2.stack"
 }
