@@ -1,6 +1,13 @@
-# RevitFamilyParameterAdder (Добавление параметров в семейство)
+# RevitFamilyParameterAdder (Добавить параметры в семейство)
 Добавляет параметры в семейство
+
+
 # Сборка проекта
 ```
-nuke compile --plugin-name RevitFamilyParameterAdder
+nuke compile --profile RevitFamilyParameterAdder
+```
+
+# Публикация проекта
+```
+nuke publish --profile RevitFamilyParameterAdder
 ```
