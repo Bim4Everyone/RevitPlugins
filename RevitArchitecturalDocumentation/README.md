@@ -3,5 +3,10 @@
 
 # Сборка проекта
 ```
-nuke compile --plugin-name RevitArchitecturalDocumentation
+nuke compile --profile RevitArchitecturalDocumentation
+```
+
+# Публикация проекта
+```
+nuke publish --profile RevitArchitecturalDocumentation
 ```
