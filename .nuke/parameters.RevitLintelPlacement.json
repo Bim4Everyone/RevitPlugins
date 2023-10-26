@@ -3,7 +3,7 @@
   "Solution": "RevitPlugins.sln",
   "PluginName": "RevitLintelPlacement",
   "PublishDirectory": "02.AR.extension\\АР.tab\\bin",
-  "IconUrl": "",
+  "IconUrl": "https://icons8.com/icon/cd-F_UhFkHiW/view-headline",
   "BundleName": "Расставить",
   "BundleType": "InvokeButton",
   "BundleOutput": "02.AR.extension\\АР.tab\\Перемычки.panel\\Перемычки.stack"
