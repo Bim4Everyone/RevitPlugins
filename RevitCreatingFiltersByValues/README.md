@@ -3,5 +3,10 @@
 
 # Сборка проекта
 ```
-nuke compile --plugin-name RevitCreatingFiltersByValues
+nuke compile --profile RevitCreatingFiltersByValues
+```
+
+# Публикация проекта
+```
+nuke publish --profile RevitCreatingFiltersByValues
 ```
