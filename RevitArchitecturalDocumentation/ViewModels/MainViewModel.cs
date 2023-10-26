@@ -9,13 +9,16 @@ using System.Xml.Linq;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitArchitecturalDocumentation.Models;
+using RevitArchitecturalDocumentation.Views;
 
+using static System.Net.Mime.MediaTypeNames;
 
 namespace RevitArchitecturalDocumentation.ViewModels {
     internal class MainViewModel : BaseViewModel {
@@ -31,7 +34,11 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private ObservableCollection<TaskInfo> _tasksForWork = new ObservableCollection<TaskInfo>();
         private TaskInfo _selectedTask;
         private string _viewNamePrefix = string.Empty;
+        private string _selectedFilterNameForSpecs = string.Empty;
         private string _sheetNamePrefix = string.Empty;
+        private List<SpecHelper> _scheduleSheetInstances = new List<SpecHelper>();
+        private List<string> _filterNamesFromSpecs = new List<string>();
+        private bool _workWithSpecs = false;
 
         private string _errorText;
 
@@ -50,6 +57,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             AddTaskCommand = RelayCommand.Create(AddTask);
             DeleteTaskCommand = RelayCommand.Create(DeleteTask);
+            SelectSpecCommand = RelayCommand.Create(SelectSpec);
         }
 
         public ICommand LoadViewCommand { get; }
@@ -57,6 +65,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
         public ICommand AddTaskCommand { get; }
         public ICommand DeleteTaskCommand { get; }
+        public ICommand SelectSpecCommand { get; }
 
 
 
@@ -79,6 +88,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             get => _levels;
             set => this.RaiseAndSetIfChanged(ref _levels, value);
         }
+
 
         public List<ViewFamilyType> ViewFamilyTypes {
             get => _viewFamilyTypes;
@@ -108,6 +118,25 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         public string SheetNamePrefix {
             get => _sheetNamePrefix;
             set => this.RaiseAndSetIfChanged(ref _sheetNamePrefix, value);
+        }
+
+        public bool WorkWithSpecs {
+            get => _workWithSpecs;
+            set => this.RaiseAndSetIfChanged(ref _workWithSpecs, value);
+        }
+        public List<SpecHelper> ScheduleSheetInstances {
+            get => _scheduleSheetInstances;
+            set => this.RaiseAndSetIfChanged(ref _scheduleSheetInstances, value);
+        }
+
+        public List<string> FilterNamesFromSpecs {
+            get => _filterNamesFromSpecs;
+            set => this.RaiseAndSetIfChanged(ref _filterNamesFromSpecs, value);
+        }
+
+        public string SelectedFilterNameForSpecs {
+            get => _selectedFilterNameForSpecs;
+            set => this.RaiseAndSetIfChanged(ref _selectedFilterNameForSpecs, value);
         }
 
 
@@ -196,9 +225,32 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         }
 
 
+        private void SelectSpec() {
+
+            ScheduleSheetInstances.Clear();
+
+            ISelectionFilter selectFilter = new ScheduleSelectionFilter();
+            IList<Reference> references = _revitRepository.ActiveUIDocument.Selection
+                            .PickObjects(ObjectType.Element, selectFilter, "Выберите спецификации на листе");
+            
+            foreach(Reference reference in references) {
+
+                ScheduleSheetInstance elem = _revitRepository.Document.GetElement(reference) as ScheduleSheetInstance;
+                if(elem is null) {
+                    continue;
+                }
+
+                SpecHelper specHelper = new SpecHelper(elem);
+                ScheduleSheetInstances.Add(specHelper);
+                specHelper.GetInfo();
+                FilterNamesFromSpecs.AddRange(specHelper.GetFilterNames());
+            }
 
 
-
+            MainWindow mainWindow = new MainWindow();
+            mainWindow.DataContext = this;
+            mainWindow.ShowDialog();
+        }
 
 
 
@@ -224,6 +276,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             var regexForLevel = new Regex(@"^(.*?) ");
 
             var regexForView = new Regex(@"псо_(.*?) этаж");
+
+            var regexForSpecs = new Regex(@"_(.*?) этаж");
 
 
 
@@ -271,6 +325,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                     if(views.Count == 0) {
 
+                        // foreach(Level level in Levels)
+
                         foreach(Level level in Levels) {
 
                             if(level.Name.Contains("К" + numberOfBuildingPart + "_")) {
@@ -294,74 +350,128 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                                 try {
 
-                                    ViewPlan newViewPlan = ViewPlan.Create(_revitRepository.Document, SelectedViewFamilyType.Id, level.Id);
-                                    newViewPlan.Name = string.Format("{0}{1} этаж К{2}", ViewNamePrefix, numberOfLevel, numberOfBuildingPart);
-                                    newViewPlan.get_Parameter(BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP).Set(task.SelectedVisibilityScope.Id);
+                                    //ViewPlan newViewPlan = ViewPlan.Create(_revitRepository.Document, SelectedViewFamilyType.Id, level.Id);
+                                    //newViewPlan.Name = string.Format("{0}{1} этаж К{2}", ViewNamePrefix, numberOfLevel, numberOfBuildingPart);
+                                    //newViewPlan.get_Parameter(BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP).Set(task.SelectedVisibilityScope.Id);
 
 
-                                    ViewSheet newSheet = ViewSheet.Create(_revitRepository.Document, SelectedTitleBlock.Id);
-                                    newSheet.Name = string.Format("{0}корпус {1}_секция {2}_этаж {3}", SheetNamePrefix, numberOfBuildingPart, numberOfBuildingSection, numberOfLevel);
+                                    //ViewSheet newSheet = ViewSheet.Create(_revitRepository.Document, SelectedTitleBlock.Id);
+                                    //newSheet.Name = string.Format("{0}корпус {1}_секция {2}_этаж {3}", SheetNamePrefix, numberOfBuildingPart, numberOfBuildingSection, numberOfLevel);
 
-                                    _revitRepository.Document.Regenerate();
+                                    //_revitRepository.Document.Regenerate();
 
-                                    if(Viewport.CanAddViewToSheet(_revitRepository.Document, newSheet.Id, newViewPlan.Id)) {
+                                    //if(Viewport.CanAddViewToSheet(_revitRepository.Document, newSheet.Id, newViewPlan.Id)) {
 
-                                        // Размещаем план на листе
-                                        Viewport viewPort = Viewport.Create(_revitRepository.Document, newSheet.Id, newViewPlan.Id, new XYZ(0, 0, 0));
+                                    //    // Размещаем план на листе
+                                    //    Viewport viewPort = Viewport.Create(_revitRepository.Document, newSheet.Id, newViewPlan.Id, new XYZ(0, 0, 0));
 
-                                        XYZ viewportCenter = viewPort.GetBoxCenter();
-                                        Outline viewportOutline = viewPort.GetBoxOutline();
-                                        double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
-                                        double viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
+                                    //    XYZ viewportCenter = viewPort.GetBoxCenter();
+                                    //    Outline viewportOutline = viewPort.GetBoxOutline();
+                                    //    double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
+                                    //    double viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
 
-                                        //if(viewportHalfWidth < viewportHalfHeight) {
-                                        //    viewPort.get_Parameter(BuiltInParameter.VIEWPORT_ATTR_ORIENTATION_ON_SHEET).Set(1);
+                                    //    //if(viewportHalfWidth < viewportHalfHeight) {
+                                    //    //    viewPort.get_Parameter(BuiltInParameter.VIEWPORT_ATTR_ORIENTATION_ON_SHEET).Set(1);
 
-                                        //    viewPort.SetBoxCenter(new XYZ());
-                                        //    viewportOutline = viewPort.GetBoxOutline();
-                                        //    viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
-                                        //    viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
-                                        //}
-
-
-
-                                        // Ищем рамку листа
-                                        FamilyInstance titleBlock = new FilteredElementCollector(_revitRepository.Document, newSheet.Id)
-                                            .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                                            .WhereElementIsNotElementType()
-                                            .FirstOrDefault() as FamilyInstance;
-
-                                        if(titleBlock is null) { continue; }
-
-                                        titleBlock.LookupParameter("Ширина").Set(150 / 304.8);
-                                        titleBlock.LookupParameter("Высота").Set(viewportHalfHeight * 2 + 10 / 304.8);
-
-                                        _revitRepository.Document.Regenerate();
-
-                                        // Получение габаритов рамки листа
-                                        BoundingBoxXYZ boundingBoxXYZ = titleBlock.get_BoundingBox(newSheet);
-                                        double titleBlockWidth = boundingBoxXYZ.Max.X - boundingBoxXYZ.Min.X;
-                                        double titleBlockHeight = boundingBoxXYZ.Max.Y - boundingBoxXYZ.Min.Y;
-
-                                        double titleBlockMinY = boundingBoxXYZ.Min.Y;
-                                        double titleBlockMinX = boundingBoxXYZ.Min.X;
-
-                                        XYZ correctPosition = new XYZ(
-                                            titleBlockMinX + viewportHalfWidth,
-                                            titleBlockHeight / 2 + titleBlockMinY,
-                                            0);
+                                    //    //    viewPort.SetBoxCenter(new XYZ());
+                                    //    //    viewportOutline = viewPort.GetBoxOutline();
+                                    //    //    viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
+                                    //    //    viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
+                                    //    //}
 
 
-                                        //TaskDialog.Show("titleBlockWidth", titleBlockWidth.ToString());
-                                        //TaskDialog.Show("viewportHalfWidth", viewportHalfWidth.ToString());
+
+                                    //    // Ищем рамку листа
+                                    //    FamilyInstance titleBlock = new FilteredElementCollector(_revitRepository.Document, newSheet.Id)
+                                    //        .OfCategory(BuiltInCategory.OST_TitleBlocks)
+                                    //        .WhereElementIsNotElementType()
+                                    //        .FirstOrDefault() as FamilyInstance;
+
+                                    //    if(titleBlock is null) { continue; }
+
+                                    //    titleBlock.LookupParameter("Ширина").Set(150 / 304.8);
+                                    //    titleBlock.LookupParameter("Высота").Set(viewportHalfHeight * 2 + 10 / 304.8);
+
+                                    //    _revitRepository.Document.Regenerate();
+
+                                    //    // Получение габаритов рамки листа
+                                    //    BoundingBoxXYZ boundingBoxXYZ = titleBlock.get_BoundingBox(newSheet);
+                                    //    double titleBlockWidth = boundingBoxXYZ.Max.X - boundingBoxXYZ.Min.X;
+                                    //    double titleBlockHeight = boundingBoxXYZ.Max.Y - boundingBoxXYZ.Min.Y;
+
+                                    //    double titleBlockMinY = boundingBoxXYZ.Min.Y;
+                                    //    double titleBlockMinX = boundingBoxXYZ.Min.X;
+
+                                    //    XYZ correctPosition = new XYZ(
+                                    //        titleBlockMinX + viewportHalfWidth,
+                                    //        titleBlockHeight / 2 + titleBlockMinY,
+                                    //        0);
 
 
-                                        viewPort.SetBoxCenter(correctPosition);
+                                    //    //TaskDialog.Show("titleBlockWidth", titleBlockWidth.ToString());
+                                    //    //TaskDialog.Show("viewportHalfWidth", viewportHalfWidth.ToString());
+
+
+                                    //    viewPort.SetBoxCenter(correctPosition);
+                                    //}
+
+
+                                    // надо позже сделать перечисление не через спеку на виде, а через оболочку, чтоб сразу хранить и спеку на виде,
+                                    // и спеку, и префикс уровня
+                                    if(WorkWithSpecs) {
+
+                                        foreach(SpecHelper specHelper in ScheduleSheetInstances) {
+
+                                            if(!specHelper.CanWorkWithIt) {
+                                                TaskDialog.Show("Report", "Возникли проблемы с " + specHelper.SpecSheetInstance.Name);
+                                                return;
+                                            }
+
+                                            ViewSchedule newViewSchedule = _revitRepository.Document.GetElement(specHelper.Specification.Duplicate(ViewDuplicateOption.Duplicate)) as ViewSchedule;
+                                            if(newViewSchedule is null) {
+                                                continue;
+                                            }
+
+                                            int test = (int) Math.Log10(specHelper.LevelNumber) + 1;
+                                            int test1 = (int) Math.Log10(numberOfLevelAsInt) + 1;
+
+                                            TaskDialog.Show("LevelNumber", specHelper.LevelNumber.ToString());
+                                            TaskDialog.Show("FirstPartOfSpecName", specHelper.FirstPartOfSpecName.ToString());
+                                            //TaskDialog.Show("PrefixOfSpecName", specHelper.PrefixOfSpecName.ToString());
+                                            TaskDialog.Show("FormatOfLevelNumber", specHelper.FormatOfLevelNumber);
+                                            TaskDialog.Show("FormatOfLevelNumber", String.Format(specHelper.FormatOfLevelNumber, numberOfLevelAsInt));
+                                            TaskDialog.Show("LastPartOfSpecName", specHelper.SuffixOfLevelNumber.ToString());
+                                            TaskDialog.Show("LastPartOfSpecName", specHelper.LastPartOfSpecName.ToString());
+
+                                            TaskDialog.Show("number of digits in level number", test.ToString());
+                                            TaskDialog.Show("number of digits in level number", test1.ToString());
+
+
+
+
+
+                                            //if(test == 1 && test == test1) {
+
+                                            //    newViewSchedule.Name = specHelper.FirstPartOfSpecName
+                                            //        + specHelper.PrefixOfSpecName
+                                            //        + numberOfLevelAsInt.ToString()
+                                            //        + specHelper.LastPartOfSpecName;
+                                            //} else {
+                                                
+                                            //    newViewSchedule.Name = specHelper.FirstPartOfSpecName
+                                            //        + numberOfLevelAsInt.ToString()
+                                            //        + specHelper.LastPartOfSpecName;
+                                            //}
+
+                                            newViewSchedule.Name = specHelper.FirstPartOfSpecName
+                                                                    + String.Format(specHelper.FormatOfLevelNumber, numberOfLevelAsInt)
+                                                                    + specHelper.SuffixOfLevelNumber
+                                                                    + specHelper.LastPartOfSpecName;
+                                        }
                                     }
 
-                                } catch(Exception) {
+                                } catch(DivideByZeroException) {
                                     temp += "Возникла проблема с " + task.SelectedVisibilityScope.Name + Environment.NewLine;
-
                                 }
                             }
                         }
@@ -471,9 +581,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                         TaskDialog.Show("Ошибка!", temp);
                     }
                 }
-
-
-
 
                 transaction.Commit();
             }

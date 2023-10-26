@@ -14,7 +14,8 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    Height="450" Width="800"    
+    Height="500" Width="900"
+    MinHeight="500" MinWidth="900"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -28,6 +29,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -204,9 +206,77 @@
             </Grid>
         </GroupBox>
 
+        <GroupBox Margin="5" Grid.Row="4" Height="65">
+            <GroupBox.Header>
+                <TextBlock 
+                    Text="Спеки:"
+                    FontSize="20"/>
+            </GroupBox.Header>
+
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.2*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="0.5*"/>
+                    <ColumnDefinition Width="0.5*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+
+                <CheckBox 
+                    x:Name="workWithSpecs"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    IsChecked="{Binding Path=WorkWithSpecs}"/>
+                
+                <TextBlock
+                    Grid.Column="1"
+                    Text="Выберите спеки на листе:"
+                    FontSize="16"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"/>
+
+
+                <Button
+                    Grid.Column="2"
+                    Content="Выбрать"
+                    FontSize="16"
+                    HorizontalAlignment="Right"
+                    IsEnabled="{Binding Path=WorkWithSpecs}"
+                    Click="ButtonCancel_Click"
+                    Command="{Binding SelectSpecCommand}"/>
+
+                <TextBlock
+                    Grid.Column="3"
+                    Margin="5"
+                    Text="{Binding Path=ScheduleSheetInstances.Count}"
+                    FontSize="16"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"/>
+
+                <TextBlock
+                    Grid.Column="4"
+                    Margin="20 0 0 0"
+                    Text="Выберите поле этажа:"
+                    FontSize="16"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"/>
+                
+                <ComboBox
+                    Grid.Column="5"
+                    IsEnabled="{Binding Path=WorkWithSpecs}"
+                    ItemsSource="{Binding Path=FilterNamesFromSpecs, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedItem="{Binding Path=SelectedFilterNameForSpecs}">
+                </ComboBox>
+
+               
+            </Grid>
+        </GroupBox>
 
         <StackPanel
-            Grid.Row="4"
+            Grid.Row="5"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
