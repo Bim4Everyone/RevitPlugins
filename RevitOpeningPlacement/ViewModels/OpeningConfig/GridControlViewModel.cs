@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Dynamic;
 using System.Linq;
@@ -27,9 +28,13 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private int _elementsCount;
 
         public GridControlViewModel(RevitRepository revitRepository, Filter filter, IEnumerable<Element> elements) {
-            _revitRepository = revitRepository;
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            if(filter is null) {
+                throw new ArgumentNullException(nameof(filter));
+            }
+            _elements = elements ?? throw new ArgumentNullException(nameof(elements));
+
             _providers = filter.GetProviders();
-            _elements = elements;
             InitializeColumns();
             InitializeRows();
             AddCommonInfo();
@@ -50,11 +55,12 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
         private void InitializeColumns() {
-            Columns = new ObservableCollection<ColumnViewModel>(
-                _providers.Select(item => new ColumnViewModel() {
+            Columns = new ObservableCollection<ColumnViewModel>(_providers
+                .Select(item => new ColumnViewModel() {
                     FieldName = item.Name,
                     Header = $"Параметр: {item.DisplayValue}"
-                }).GroupBy(item => item.FieldName)
+                })
+                .GroupBy(item => item.FieldName)
                 .Select(item => item.First()));
         }
 
@@ -74,7 +80,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
                 }
                 row.Add("Category", element.Category?.Name);
-                row.Add("FamilyName", element.GetTypeId().IsNotNull() ? (element.Document.GetElement(element.GetTypeId()) as ElementType)?.FamilyName : null);
+                row.Add("FamilyName", element.GetTypeId().IsNotNull()
+                    ? (element.Document.GetElement(element.GetTypeId()) as ElementType)?.FamilyName
+                    : null);
                 row.Add("Name", element.Name);
                 row.Add("Id", element.Id.GetIdValue());
                 Rows.Add((ExpandoObject) row);
@@ -97,52 +105,31 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
 
+        private void SelectElement(object p) {
+            if(!(p is ExpandoObject row))
+                return;
+            ((IDictionary<string, object>) row).TryGetValue("Id", out object resultId);
+            if(resultId == null) {
+                return;
+            }
+            var element = GetElement(resultId);
+            if(element != null) {
+                _revitRepository.SelectAndShowElement(new[] { element });
+            }
+        }
+
+        private Element GetElement(object id) {
+            ElementId elementId = ElementId.InvalidElementId;
 #if REVIT_2023_OR_LESS
-        private void SelectElement(object p) {
-            if(!(p is ExpandoObject row))
-                return;
-            ((IDictionary<string, object>) row).TryGetValue("Id", out object resultId);
-            if(resultId == null) {
-                return;
+            if(id is int idInt) {
+                elementId = new ElementId(idInt);
             }
-            if(resultId is int id) {
-                var element = GetElement(id);
-                if(element != null) {
-                    _revitRepository.SelectAndShowElement(new[] { element });
-                }
-            }
-        }
-
-        private Element GetElement(int id) {
-            var doc = _revitRepository.Doc;
-            if(doc != null && new ElementId(id).IsNotNull()) {
-                return doc.GetElement(new ElementId(id));
-            }
-            return null;
-        }
 #else
-        private void SelectElement(object p) {
-            if(!(p is ExpandoObject row))
-                return;
-            ((IDictionary<string, object>) row).TryGetValue("Id", out object resultId);
-            if(resultId == null) {
-                return;
+            if(id is long idLong) {
+                elementId = new ElementId(idLong);
             }
-            if(resultId is long id) {
-                var element = GetElement(id);
-                if(element != null) {
-                    _revitRepository.SelectAndShowElement(new[] { element });
-                }
-            }
-        }
-
-        private Element GetElement(long id) {
-            var doc = _revitRepository.Doc;
-            if(doc != null && new ElementId(id).IsNotNull()) {
-                return doc.GetElement(new ElementId(id));
-            }
-            return null;
-        }
 #endif
+            return _revitRepository.Doc.GetElement(elementId);
+        }
     }
 }

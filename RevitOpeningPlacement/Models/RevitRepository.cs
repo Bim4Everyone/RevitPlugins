@@ -44,10 +44,10 @@ namespace RevitOpeningPlacement.Models {
 
         public RevitRepository(Application application, Document document) {
 
-            _application = application;
+            _application = application ?? throw new ArgumentNullException(nameof(application));
             _uiApplication = new UIApplication(application);
 
-            _document = document;
+            _document = document ?? throw new ArgumentNullException(nameof(document));
             _uiDocument = new UIDocument(document);
 
             _clashRevitRepository = new RevitClashDetective.Models.RevitRepository(_application, _document);
