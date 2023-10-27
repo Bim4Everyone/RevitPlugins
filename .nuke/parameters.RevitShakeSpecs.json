@@ -1,0 +1,10 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitShakeSpecs",
+  "PublishDirectory": "03.KR.extension\\КР.tab\\bin",
+  "IconUrl": "https://icons8.com/icon/14336/data-sheet",
+  "BundleName": "Встряхнуть спецификации",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "03.KR.extension\\КР.tab\\Документация.panel\\Другое.stack"
+}
