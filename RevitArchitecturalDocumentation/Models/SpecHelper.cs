@@ -14,11 +14,21 @@ namespace RevitArchitecturalDocumentation.Models {
             SpecSheetInstance = scheduleSheetInstance;
             SpecSheetInstancePoint = scheduleSheetInstance.Point;
             Specification = scheduleSheetInstance.Document.GetElement(scheduleSheetInstance.ScheduleId) as ViewSchedule;
+            SpecificationDefinition = Specification.Definition;
+            SpecificationFilters = SpecificationDefinition.GetFilters().ToList();
+        }
+
+        public SpecHelper(ViewSchedule viewSchedule) {
+
+            Specification = viewSchedule;
+            SpecificationDefinition = Specification.Definition;
+            SpecificationFilters = SpecificationDefinition.GetFilters().ToList();
         }
 
         public ScheduleSheetInstance SpecSheetInstance { get; set; }
         public XYZ SpecSheetInstancePoint { get; set; }
         public ViewSchedule Specification { get; set; }
+        public ScheduleDefinition SpecificationDefinition { get; set; }
         public List<ScheduleFilter> SpecificationFilters { get; set; }
         public List<string> SpecFilterNames { get; set; }
         public int LevelNumber { get; set; }
@@ -33,11 +43,8 @@ namespace RevitArchitecturalDocumentation.Models {
 
         public List<string> GetFilterNames() {
 
-            ScheduleDefinition scheduleDefinition = Specification.Definition;
-            SpecificationFilters = scheduleDefinition.GetFilters().ToList();
-
             SpecFilterNames = SpecificationFilters
-                .Select(o => scheduleDefinition.GetField(o.FieldId))
+                .Select(o => SpecificationDefinition.GetField(o.FieldId))
                 .Select(o => o.GetName())
                 .Distinct()
                 .OrderBy(o => o)
@@ -55,6 +62,8 @@ namespace RevitArchitecturalDocumentation.Models {
             // [О_ПСО_][0] 5 [ этаж][_Жилье Корпуса 1-3]
 
             if(!Specification.Name.Contains("_") || !Specification.Name.Contains("_")) {
+
+                //TaskDialog.Show("fd", "1");
                 CanWorkWithIt= false;
                 return;
             }
@@ -64,6 +73,8 @@ namespace RevitArchitecturalDocumentation.Models {
                                                 .FirstOrDefault(o => o.Contains("этаж"));
 
             if(keyPartOfName is null) {
+                //TaskDialog.Show("fd", "2");
+
                 CanWorkWithIt = false;
                 return;
             }
@@ -81,18 +92,70 @@ namespace RevitArchitecturalDocumentation.Models {
 
             int levelNumberAsInt;
             if(!int.TryParse(levelNumberAsStr, out levelNumberAsInt)) {
+                //TaskDialog.Show("fd", levelNumberAsStr);
+
                 CanWorkWithIt = false;
                 return;
             }
             LevelNumber = levelNumberAsInt;
 
+            FormatOfLevelNumber = GetStringFormatOrDefault(levelNumberAsStr);
 
-            for(int i = 0; i < levelNumberAsStr.Length; i++) { FormatOfLevelNumber += "0"; }
-
-            FormatOfLevelNumber = "{0:" + FormatOfLevelNumber + "}";
-
-            //PrefixOfSpecName = levelNumberAsStr.Replace(String.Format(FormatOfLevelNumber, levelNumberAsInt), "");
             SuffixOfLevelNumber = keyPartOfName.Replace(levelNumberAsStr, "");
+        }
+
+        /// <summary>
+        /// Получает строку формата на основе количества символов подаваемой строки с числом
+        /// Строка формата представляет собой последовательность "{0:" + "0"*{Длина входной строки} + "}"
+        /// </summary>
+        public string GetStringFormatOrDefault(string numAsString) {
+            string format = string.Empty;
+
+            int test;
+            if(!int.TryParse(numAsString, out test)) {
+                return "{0:0}";
+            }
+
+            for(int i = 0; i < numAsString.Length; i++) { format += "0"; }
+            return "{0:" + format + "}";
+        }
+
+
+        public void ChangeSpecFilters(string specFilterName, int newFilterValue) {
+
+            // В дальнейшем нужно предусмотреть проверки, что поле фильрации принимает строки + сеттеры для других типов
+
+            List<ScheduleFilter> newScheduleFilters = new List<ScheduleFilter>();
+
+            for(int i = 0; i < SpecificationFilters.Count; i++) {
+
+                ScheduleFilter currentFilter = SpecificationFilters[i]; 
+                
+                ScheduleField scheduleFieldFromFilter = SpecificationDefinition.GetField(currentFilter.FieldId);
+
+                //TaskDialog.Show("Поле фильтра", scheduleFieldFromFilter.GetName());
+
+                if(scheduleFieldFromFilter.GetName() == specFilterName) {
+
+
+                    string filterOldValue = currentFilter.GetStringValue();
+                    //TaskDialog.Show("filterOldValue", filterOldValue);
+
+                    string format = GetStringFormatOrDefault(filterOldValue);
+                    //TaskDialog.Show("format", format);
+
+                    string newVal = String.Format(format, newFilterValue);
+                    //TaskDialog.Show("newVal", newVal);
+
+
+                    currentFilter.SetValue(newVal);
+                    newScheduleFilters.Add(currentFilter);
+                } else {
+                    newScheduleFilters.Add(currentFilter);
+                }
+            }
+
+            SpecificationDefinition.SetFilters(newScheduleFilters);
         }
     }
 }

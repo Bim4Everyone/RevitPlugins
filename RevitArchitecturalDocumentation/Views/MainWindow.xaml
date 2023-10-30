@@ -292,6 +292,14 @@
                 Content="ОК"
                 FontSize="16"
                 Click="ButtonOk_Click"
+                Command="{Binding Path=TestCommand}"/>
+            
+            <Button
+                Margin="10"
+                Width="80"
+                Content="ОК"
+                FontSize="16"
+                Click="ButtonOk_Click"
                 Command="{Binding Path=AcceptViewCommand}"/>
 
             <Button
