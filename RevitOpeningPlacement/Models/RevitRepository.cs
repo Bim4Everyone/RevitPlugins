@@ -961,7 +961,9 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает коллекцию заголовков файлов Revit связей, которые дублируются.
+        /// Возвращает коллекцию заголовков файлов Revit связей, 
+        /// которые дублируются и среди которых есть родительские связи.
+        /// То есть дублирующиеся вложенные связи не будут попадать в список.
         /// </summary>
         /// <returns>Коллекция заголовков дублированных Revit-связей</returns>
         public ICollection<string> GetDuplicatedLinksNames() {
@@ -973,6 +975,7 @@ namespace RevitOpeningPlacement.Models {
                 .Where(link => RevitLinkType.IsLoaded(_document, link.GetTypeId()))
                 .GroupBy(inst => inst.GetLinkDocument().Title)
                 .Where(group => group.Count() > 1)
+                .Where(group => group.ToArray().Any(linkInstance => _clashRevitRepository.IsParentLink(linkInstance)))
                 .Select(group => group.Key)
                 .ToHashSet();
         }
