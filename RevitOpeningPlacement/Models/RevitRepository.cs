@@ -65,7 +65,8 @@ namespace RevitOpeningPlacement.Models {
 
         public Document Doc => _document;
 
-        public static Dictionary<MepCategoryEnum, string> MepCategoryNames { get; } = new Dictionary<MepCategoryEnum, string> {
+        public static Dictionary<MepCategoryEnum, string> MepCategoryNames { get; }
+            = new Dictionary<MepCategoryEnum, string> {
             {MepCategoryEnum.Pipe, "Трубы" },
             {MepCategoryEnum.RectangleDuct, "Воздуховоды (прямоугольное сечение)" },
             {MepCategoryEnum.RoundDuct, "Воздуховоды (круглое сечение)" },
@@ -73,14 +74,16 @@ namespace RevitOpeningPlacement.Models {
             {MepCategoryEnum.Conduit, "Короба" }
         };
 
-        public static Dictionary<FittingCategoryEnum, string> FittingCategoryNames { get; } = new Dictionary<FittingCategoryEnum, string> {
+        public static Dictionary<FittingCategoryEnum, string> FittingCategoryNames { get; }
+            = new Dictionary<FittingCategoryEnum, string> {
             {FittingCategoryEnum.CableTrayFitting, "Соединительные детали кабельных лотков" },
             {FittingCategoryEnum.DuctFitting, "Соединительные детали воздуховодов" },
             {FittingCategoryEnum.ConduitFitting, "Соединительные детали коробов" },
             {FittingCategoryEnum.PipeFitting, "Соединительные детали трубопроводов" },
         };
 
-        public static Dictionary<StructureCategoryEnum, string> StructureCategoryNames { get; } = new Dictionary<StructureCategoryEnum, string> {
+        public static Dictionary<StructureCategoryEnum, string> StructureCategoryNames { get; }
+            = new Dictionary<StructureCategoryEnum, string> {
             {StructureCategoryEnum.Wall, "Стены" },
             {StructureCategoryEnum.Floor, "Перекрытия" },
         };
@@ -94,7 +97,8 @@ namespace RevitOpeningPlacement.Models {
         /// <summary>
         /// Словарь типов проемов и названий семейств заданий на отверстия
         /// </summary>
-        public static Dictionary<OpeningType, string> OpeningTaskFamilyName { get; } = new Dictionary<OpeningType, string>() {
+        public static Dictionary<OpeningType, string> OpeningTaskFamilyName { get; }
+            = new Dictionary<OpeningType, string>() {
             {OpeningType.FloorRectangle, "ОбщМд_Отв_Отверстие_Прямоугольное_В перекрытии" },
             {OpeningType.FloorRound, "ОбщМд_Отв_Отверстие_Круглое_В перекрытии" },
             {OpeningType.WallRectangle, "ОбщМд_Отв_Отверстие_Прямоугольное_В стене" },
@@ -114,7 +118,8 @@ namespace RevitOpeningPlacement.Models {
         /// <summary>
         /// Словарь типов проемов и названий семейств чистовых отверстий АР
         /// </summary>
-        public static Dictionary<OpeningType, string> OpeningRealArFamilyName { get; } = new Dictionary<OpeningType, string>() {
+        public static Dictionary<OpeningType, string> OpeningRealArFamilyName { get; }
+            = new Dictionary<OpeningType, string>() {
             {OpeningType.FloorRectangle, "Окн_Отв_Прямоуг_Перекрытие" },
             {OpeningType.FloorRound, "Окн_Отв_Круг_Перекрытие" },
             {OpeningType.WallRectangle, "Окн_Отв_Прямоуг_Стена" },
@@ -134,13 +139,15 @@ namespace RevitOpeningPlacement.Models {
         /// <summary>
         /// Словарь типов проемов и названий семейств чистовых отверстий КР
         /// </summary>
-        public static Dictionary<OpeningType, string> OpeningRealKrFamilyName { get; } = new Dictionary<OpeningType, string>() {
+        public static Dictionary<OpeningType, string> OpeningRealKrFamilyName { get; }
+            = new Dictionary<OpeningType, string>() {
             {OpeningType.FloorRectangle, "ОбщМд_Отверстие_Перекрытие_Прямоугольное" },
             {OpeningType.WallRectangle, "ОбщМд_Отверстие_Стена_Прямоугольное"},
             {OpeningType.WallRound, "ОбщМд_Отверстие_Стена_Круглое"}
         };
 
-        public static Dictionary<OpeningType, string> OpeningRealKrTypeName { get; } = new Dictionary<OpeningType, string>() {
+        public static Dictionary<OpeningType, string> OpeningRealKrTypeName { get; }
+            = new Dictionary<OpeningType, string>() {
             {OpeningType.FloorRectangle, "Отверстие прямоугольное"},
             {OpeningType.WallRectangle, "Отверстие прямоугольное" },
             {OpeningType.WallRound, "Отверстие круглое" }
@@ -199,7 +206,9 @@ namespace RevitOpeningPlacement.Models {
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .WhereElementIsElementType()
                 .OfType<FamilySymbol>()
-                .FirstOrDefault(item => item.Name.Equals(OpeningTaskTypeName[type]) && item.FamilyName.Equals(OpeningTaskFamilyName[type]));
+                .FirstOrDefault(
+                    item => item.Name.Equals(OpeningTaskTypeName[type])
+                    && item.FamilyName.Equals(OpeningTaskFamilyName[type]));
         }
 
         /// <summary>
@@ -212,7 +221,9 @@ namespace RevitOpeningPlacement.Models {
                 .OfCategory(BuiltInCategory.OST_Windows)
                 .WhereElementIsElementType()
                 .OfType<FamilySymbol>()
-                .FirstOrDefault(item => item.Name.Equals(OpeningRealArTypeName[type]) && item.FamilyName.Equals(OpeningRealArFamilyName[type]));
+                .FirstOrDefault(
+                    item => item.Name.Equals(OpeningRealArTypeName[type])
+                    && item.FamilyName.Equals(OpeningRealArFamilyName[type]));
         }
 
         /// <summary>
@@ -226,7 +237,9 @@ namespace RevitOpeningPlacement.Models {
                 .WhereElementIsElementType()
                 .OfClass(typeof(FamilySymbol))
                 .Cast<FamilySymbol>()
-                .FirstOrDefault(item => item.Name.Equals(OpeningRealKrTypeName[type]) && item.FamilyName.Equals(OpeningRealKrFamilyName[type]));
+                .FirstOrDefault(
+                    item => item.Name
+                        .Equals(OpeningRealKrTypeName[type]) && item.FamilyName.Equals(OpeningRealKrFamilyName[type]));
         }
 
         /// <summary>
@@ -238,7 +251,10 @@ namespace RevitOpeningPlacement.Models {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(Family))
                 .OfType<Family>()
-                .FirstOrDefault(item => item?.Name?.Equals(OpeningTaskFamilyName[openingType], StringComparison.CurrentCultureIgnoreCase) == true);
+                .FirstOrDefault(
+                    item => item?.Name
+                        ?.Equals(OpeningTaskFamilyName[openingType], StringComparison.CurrentCultureIgnoreCase)
+                            == true);
         }
 
         /// <summary>
@@ -250,7 +266,10 @@ namespace RevitOpeningPlacement.Models {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(Family))
                 .OfType<Family>()
-                .FirstOrDefault(item => item?.Name?.Equals(OpeningRealArFamilyName[openingType], StringComparison.CurrentCultureIgnoreCase) == true);
+                .FirstOrDefault(
+                    item => item?.Name
+                        ?.Equals(OpeningRealArFamilyName[openingType], StringComparison.CurrentCultureIgnoreCase)
+                            == true);
         }
 
         /// <summary>
@@ -262,7 +281,10 @@ namespace RevitOpeningPlacement.Models {
             return new FilteredElementCollector(_document)
                 .OfClass(typeof(Family))
                 .OfType<Family>()
-                .FirstOrDefault(item => item?.Name?.Equals(OpeningRealKrFamilyName[openingType], StringComparison.CurrentCultureIgnoreCase) == true);
+                .FirstOrDefault(
+                    item => item?.Name
+                        ?.Equals(OpeningRealKrFamilyName[openingType], StringComparison.CurrentCultureIgnoreCase)
+                            == true);
         }
 
         public Transaction GetTransaction(string transactionName) {
@@ -400,7 +422,8 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает коллекцию всех экземпляров семейств исходящих заданий на отверстия из текущего файла инженерных систем
+        /// Возвращает коллекцию всех экземпляров семейств исходящих заданий на отверстия 
+        /// из текущего файла инженерных систем
         /// </summary>
         /// <returns></returns>
         public ICollection<OpeningMepTaskOutcoming> GetOpeningsMepTasksOutcoming() {
@@ -449,11 +472,19 @@ namespace RevitOpeningPlacement.Models {
         }
 
         public Transform GetTransform(Element element) {
-            return DocInfos.FirstOrDefault(item => item.Name.Equals(GetDocumentName(element.Document), StringComparison.CurrentCultureIgnoreCase))?.Transform
+            return DocInfos
+                .FirstOrDefault(
+                    item => item.Name
+                        .Equals(GetDocumentName(element.Document), StringComparison.CurrentCultureIgnoreCase))
+                ?.Transform
                 ?? Transform.Identity;
         }
 
-        public IEnumerable<Element> GetFilteredElements(Document doc, IEnumerable<ElementId> categories, ElementFilter filter) {
+        public IEnumerable<Element> GetFilteredElements(
+            Document doc,
+            IEnumerable<ElementId> categories,
+            ElementFilter filter) {
+
             return _clashRevitRepository.GetFilteredElements(doc, categories, filter);
         }
 
@@ -528,7 +559,9 @@ namespace RevitOpeningPlacement.Models {
         /// <param name="mepCategoryName">Название категории инженерных систем</param>
         /// <returns></returns>
         public MepCategoryEnum GetMepCategoryEnum(string mepCategoryName) {
-            return MepCategoryNames.First(pair => pair.Value.Equals(mepCategoryName, StringComparison.CurrentCultureIgnoreCase)).Key;
+            return MepCategoryNames
+                .First(pair => pair.Value.Equals(mepCategoryName, StringComparison.CurrentCultureIgnoreCase))
+                .Key;
         }
 
         /// <summary>
@@ -536,7 +569,8 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <param name="mepCategory">Категория элементов инженерных систем</param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException">Исключение, если поданная категория <paramref name="mepCategory"/> не поддерживается</exception>
+        /// <exception cref="NotImplementedException">Исключение, 
+        /// если поданная категория <paramref name="mepCategory"/> не поддерживается</exception>
         public Category[] GetCategories(MepCategoryEnum mepCategory) {
             switch(mepCategory) {
                 case MepCategoryEnum.Pipe:
@@ -587,7 +621,8 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Спрашивает у пользователя, нужно ли продолжать операцию, если семейства заданий на отверстия не самой последней версии
+        /// Спрашивает у пользователя, нужно ли продолжать операцию, 
+        /// если семейства заданий на отверстия не самой последней версии
         /// </summary>
         /// <returns></returns>
         public bool ContinueIfTaskFamiliesNotLatest() {
@@ -651,7 +686,8 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает коллекцию Id всех элементов конструкций из текущего документа ревита, для которых создаются задания на отверстия
+        /// Возвращает коллекцию Id всех элементов конструкций из текущего документа ревита, 
+        /// для которых создаются задания на отверстия
         /// </summary>
         /// <returns></returns>
         public ICollection<ElementId> GetConstructureElementsIds() {
@@ -662,7 +698,8 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает коллекцию Id всех элементов инженерных систем из текущего документа ревита, для которых создаются задания на отверстия
+        /// Возвращает коллекцию Id всех элементов инженерных систем из текущего документа ревита, 
+        /// для которых создаются задания на отверстия
         /// </summary>
         /// <returns></returns>
         public ICollection<ElementId> GetMepElementsIds() {
@@ -774,13 +811,18 @@ namespace RevitOpeningPlacement.Models {
         /// <summary>
         /// Предлагает пользователю выбрать системную стену или системное перекрытие и возвращает его выбор
         /// </summary>
-        /// <returns>Выбранный пользователем элемент классов <see cref="Autodesk.Revit.DB.Wall"/> или <see cref="Autodesk.Revit.DB.Floor"/></returns>
+        /// <returns>Выбранный пользователем элемент классов <see cref="Autodesk.Revit.DB.Wall"/> 
+        /// или <see cref="Autodesk.Revit.DB.Floor"/></returns>
         /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException"/>
         public Element PickHostForRealOpening() {
-            // фильтр по классам, а не по категориям ревита, так как для хоста нужна системная стена или системное перекрытие,
+            // фильтр по классам, а не по категориям ревита,
+            // так как для хоста нужна системная стена или системное перекрытие,
             // при этом необходимо исключить выбор моделей в контексте, которые могут быть стенами и перекрытиями
             ISelectionFilter filter = new SelectionFilterElementsOfClasses(new Type[] { typeof(Wall), typeof(Floor) });
-            Reference reference = _uiDocument.Selection.PickObject(ObjectType.Element, filter, "Выберите стену или перекрытие");
+            Reference reference = _uiDocument.Selection.PickObject(
+                ObjectType.Element,
+                filter,
+                "Выберите стену или перекрытие");
             return _document.GetElement(reference);
         }
 
@@ -790,10 +832,14 @@ namespace RevitOpeningPlacement.Models {
         /// <returns></returns>
         /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException"/>
         public ICollection<Element> PickHostsForRealOpenings() {
-            // фильтр по классам, а не по категориям ревита, так как для хоста нужна системная стена или системное перекрытие,
+            // фильтр по классам, а не по категориям ревита,
+            // так как для хоста нужна системная стена или системное перекрытие,
             // при этом необходимо исключить выбор моделей в контексте, которые могут быть стенами и перекрытиями
             ISelectionFilter filter = new SelectionFilterElementsOfClasses(new Type[] { typeof(Wall), typeof(Floor) });
-            IList<Reference> references = _uiDocument.Selection.PickObjects(ObjectType.Element, filter, "Выберите стену(ы) и(или) перекрытие(я)");
+            IList<Reference> references = _uiDocument.Selection.PickObjects(
+                ObjectType.Element,
+                filter,
+                "Выберите стену(ы) и(или) перекрытие(я)");
 
             HashSet<Element> hosts = new HashSet<Element>();
             foreach(Reference reference in references) {
@@ -806,13 +852,17 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Предлагает пользователю выбрать экземпляры семейств заданий на отверстия из связанных файлов, подгруженных в активный документ, и возвращает его выбор
+        /// Предлагает пользователю выбрать экземпляры семейств заданий на отверстия из связанных файлов, 
+        /// подгруженных в активный документ, и возвращает его выбор
         /// </summary>
         /// <returns>Выбранная пользователем коллекция элементов</returns>
         /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException"/>
         public ICollection<OpeningMepTaskIncoming> PickManyOpeningMepTasksIncoming() {
             ISelectionFilter filter = new SelectionFilterOpeningMepTasksIncoming(_document);
-            IList<Reference> references = _uiDocument.Selection.PickObjects(ObjectType.LinkedElement, filter, "Выберите задание(я) на отверстие(я) из связи(ей) ВИС и нажмите \"Готово\"");
+            IList<Reference> references = _uiDocument.Selection.PickObjects(
+                ObjectType.LinkedElement,
+                filter,
+                "Выберите задание(я) на отверстие(я) из связи(ей) ВИС и нажмите \"Готово\"");
 
             HashSet<OpeningMepTaskIncoming> openingTasks = new HashSet<OpeningMepTaskIncoming>();
             foreach(var reference in references) {
@@ -827,13 +877,17 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Предлагает пользователю выбрать экземпляры семейств заданий на отверстия из активного документа и возвращает его выбор
+        /// Предлагает пользователю выбрать экземпляры семейств заданий на отверстия из активного документа 
+        /// и возвращает его выбор
         /// </summary>
         /// <returns>Выбранная пользователем коллекция элементов - заданий на отверстия</returns>
         /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException"/>
         public ICollection<OpeningMepTaskOutcoming> PickManyOpeningMepTasksOutcoming() {
             ISelectionFilter filter = new SelectionFilterOpeningMepTasksOutcoming();
-            IList<Reference> references = _uiDocument.Selection.PickObjects(ObjectType.Element, filter, "Выберите исходящие задания на отверстия и нажмите \"Готово\"");
+            IList<Reference> references = _uiDocument.Selection.PickObjects(
+                ObjectType.Element,
+                filter,
+                "Выберите исходящие задания на отверстия и нажмите \"Готово\"");
 
             HashSet<OpeningMepTaskOutcoming> openingTasks = new HashSet<OpeningMepTaskOutcoming>();
             foreach(var reference in references) {
@@ -845,13 +899,17 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Предлагает пользователю выбрать один экземпляр семейства задания на отверстие из связанных файлов, подгруженных в активный документ, и возвращает его выбор
+        /// Предлагает пользователю выбрать один экземпляр семейства задания на отверстие из связанных файлов, 
+        /// подгруженных в активный документ, и возвращает его выбор
         /// </summary>
         /// <returns>Выбранный пользователем элемент</returns>
         /// <exception cref="OperationCanceledException"/>
         public OpeningMepTaskIncoming PickSingleOpeningMepTaskIncoming() {
             ISelectionFilter filter = new SelectionFilterOpeningMepTasksIncoming(_document);
-            Reference reference = _uiDocument.Selection.PickObject(ObjectType.LinkedElement, filter, "Выберите задание на отверстие из связи ВИС и нажмите \"Готово\"");
+            Reference reference = _uiDocument.Selection.PickObject(
+                ObjectType.LinkedElement,
+                filter,
+                "Выберите задание на отверстие из связи ВИС и нажмите \"Готово\"");
 
             if((reference != null) && (_document.GetElement(reference) is RevitLinkInstance link)) {
                 Element opening = link.GetLinkDocument().GetElement(reference.LinkedElementId);
@@ -868,14 +926,18 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Предлагает пользователю выбрать один экземпляр семейства задания на отверстие из связанных файлов АР, подгруженных в активный документ, и возвращает его выбор
+        /// Предлагает пользователю выбрать один экземпляр семейства задания на отверстие из связанных файлов АР, 
+        /// подгруженных в активный документ, и возвращает его выбор
         /// </summary>
         /// <returns>Выбранный пользователем элемент</returns>
         /// <exception cref="OperationCanceledException"></exception>
         /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException"></exception>
         public OpeningArTaskIncoming PickSingleOpeningArTaskIncoming() {
             ISelectionFilter filter = new SelectionFilterOpeningArTasksIncoming(_document);
-            Reference reference = _uiDocument.Selection.PickObject(ObjectType.LinkedElement, filter, "Выберите задание на отверстие из связи АР и нажмите \"Готово\"");
+            Reference reference = _uiDocument.Selection.PickObject(
+                ObjectType.LinkedElement,
+                filter,
+                "Выберите задание на отверстие из связи АР и нажмите \"Готово\"");
 
             if((reference != null) && (_document.GetElement(reference) is RevitLinkInstance link)) {
                 Element opening = link.GetLinkDocument().GetElement(reference.LinkedElementId);
@@ -892,14 +954,19 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Предлагает пользователю выбрать экземпляры семейств заданий на отверстия из связанных файлов АР, подгруженных в активный документ КР, и вохвращает его выбор
+        /// Предлагает пользователю выбрать экземпляры семейств заданий на отверстия из связанных файлов АР, 
+        /// подгруженных в активный документ КР, и вохвращает его выбор
         /// </summary>
         /// <returns>Выбранная пользователем коллекция элементов</returns>
         /// <exception cref="OperationCanceledException"></exception>
         /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException"></exception>
         public ICollection<OpeningArTaskIncoming> PickManyOpeningArTasksIncoming() {
             ISelectionFilter filter = new SelectionFilterOpeningArTasksIncoming(_document);
-            IList<Reference> references = _uiDocument.Selection.PickObjects(ObjectType.LinkedElement, filter, "Выберите задание(я) на отверстие(я) из связи(ей) АР и нажмите \"Готово\"");
+            IList<Reference> references = _uiDocument.Selection
+                .PickObjects(
+                ObjectType.LinkedElement,
+                filter,
+                "Выберите задание(я) на отверстие(я) из связи(ей) АР и нажмите \"Готово\"");
 
             HashSet<OpeningArTaskIncoming> openingTasks = new HashSet<OpeningArTaskIncoming>();
             foreach(var reference in references) {
@@ -948,7 +1015,9 @@ namespace RevitOpeningPlacement.Models {
             } else {
                 return OpeningType.WallRectangle;
             }
-            return openingTypeAndFamNameDict.FirstOrDefault(pair => pair.Value.Equals(familyName, StringComparison.CurrentCultureIgnoreCase)).Key;
+            return openingTypeAndFamNameDict
+                .FirstOrDefault(pair => pair.Value.Equals(familyName, StringComparison.CurrentCultureIgnoreCase))
+                .Key;
         }
 
         /// <summary>
@@ -957,7 +1026,9 @@ namespace RevitOpeningPlacement.Models {
         /// <param name="familyName">Название семейства архитектурного проема</param>
         /// <returns></returns>
         public static OpeningType GetOpeningRealArType(string familyName) {
-            return OpeningRealArFamilyName.FirstOrDefault(pair => pair.Value.Equals(familyName, StringComparison.CurrentCultureIgnoreCase)).Key;
+            return OpeningRealArFamilyName
+                .FirstOrDefault(pair => pair.Value.Equals(familyName, StringComparison.CurrentCultureIgnoreCase))
+                .Key;
         }
 
         /// <summary>
@@ -1065,7 +1136,8 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает коллекцию экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит ("исходящие" задания).
+        /// Возвращает коллекцию экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит 
+        /// ("исходящие" задания).
         /// </summary>
         /// <returns>Коллекция экземпляров семейств, названия семейств и типов которых заданы в соответствующих словарях
         private ICollection<FamilyInstance> GetOpeningsTaskFromCurrentDoc() {
