@@ -224,7 +224,7 @@ namespace RevitClashDetective.Models {
                 .ToList();
         }
 
-        private bool IsParentLink(RevitLinkInstance link) {
+        public bool IsParentLink(RevitLinkInstance link) {
             if(link.GetTypeId().IsNotNull()) {
                 var type = _document.GetElement(link.GetTypeId());
                 if(type is RevitLinkType linkType) {
