@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Web.Security;
-using System.Windows.Controls;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -14,10 +12,9 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
-using pyRevitLabs.Json.Linq;
-
 using RevitRoomTagPlacement.ViewModels;
 
+using Document = Autodesk.Revit.DB.Document;
 using View = Autodesk.Revit.DB.View;
 
 namespace RevitRoomTagPlacement.Models {
@@ -32,19 +29,39 @@ namespace RevitRoomTagPlacement.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        public List<Room> GetSelectedRooms() {
+        public List<RoomFromRevit> GetSelectedRooms() {
             return ActiveUIDocument.GetSelectedElements()
                 .Where(x => x is Room)
                 .OfType<Room>()
+                .Select(x => new RoomFromRevit(x))
                 .ToList();
         }
 
-        public List<Room> GetRoomsOnActiveView() {
-            return new FilteredElementCollector(Document, Document.ActiveView.Id)
-                .WhereElementIsNotElementType()
+        public List<RoomFromRevit> GetRoomsOnActiveView() {
+            List<RevitLinkInstance> links = new FilteredElementCollector(Document)
+                .OfClass(typeof(RevitLinkInstance))
+                .ToElements()
+                .OfType<RevitLinkInstance>()
+                .ToList();
+
+            List<RoomFromRevit> allRooms = new FilteredElementCollector(Document, Document.ActiveView.Id)
                 .OfCategory(BuiltInCategory.OST_Rooms)
                 .OfType<Room>()
+                .Select(x => new RoomFromRevit(x))
                 .ToList();
+
+            foreach(var link in links) {
+                List<RoomFromRevit> rooms = new FilteredElementCollector(link.GetLinkDocument(), Document.ActiveView.Id)
+                .OfCategory(BuiltInCategory.OST_Rooms)
+                .OfType<Room>()
+                .Select(x => new RoomFromRevit(x, link.Id))
+                .ToList();
+
+                allRooms.AddRange(rooms);
+
+            }
+
+            return allRooms;
         }
 
         public List<RoomTagTypeModel> GetRoomTags() {
@@ -76,7 +93,7 @@ namespace RevitRoomTagPlacement.Models {
                                             PositionPlacementWay positionPlacementWay,
                                             string roomName = "") {
             var selectedGroups = RoomGroups.Where(x => x.IsChecked);
-            List<Room> rooms = new List<Room>();
+            List<RoomFromRevit> rooms = new List<RoomFromRevit>();
 
             if(groupPlacementWay == GroupPlacementWay.EveryRoom) {
                 rooms = selectedGroups.SelectMany(x => x.Rooms).ToList();
@@ -86,8 +103,8 @@ namespace RevitRoomTagPlacement.Models {
                 RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
                 rooms = selectedGroups
                     .SelectMany(x => x.Rooms
-                        .GroupBy(r => r.GetParamValue<string>(sectionParam))
-                        .Select(g => g.OrderByDescending(r => r.Area)
+                        .GroupBy(r => r.RoomObject.GetParamValue<string>(sectionParam))
+                        .Select(g => g.OrderByDescending(r => r.RoomObject.Area)
                         .First()))
                     .ToList();
 
@@ -96,9 +113,9 @@ namespace RevitRoomTagPlacement.Models {
                 RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
                 rooms = selectedGroups
                     .SelectMany(x => x.Rooms
-                        .GroupBy(r => r.GetParamValue<string>(sectionParam))
-                        .Select(g => g.Where(y => y.GetParamValue<string>(BuiltInParameter.ROOM_NAME) == roomName)
-                        .First()))
+                    .GroupBy(r => r.RoomObject.GetParamValue<string>(sectionParam))
+                    .Select(g => g.Where(y => y.RoomObject.GetParamValue<string>(BuiltInParameter.ROOM_NAME) == roomName)
+                    .First()))
                     .ToList();
             }
 
@@ -107,22 +124,32 @@ namespace RevitRoomTagPlacement.Models {
 
             using(Transaction t = Document.StartTransaction("Маркировать помещения")) {
                 foreach(var room in rooms) {
-                    var depElements = room
+                    var depElements = room.RoomObject
                         .GetDependentElements(viewFilter)
                         .Select(x => Document.GetElement(x))
                         .Select(x => x.GetTypeId())
                         .ToList();
 
                     if(!depElements.Contains(SelectedTagType)) {
-                        TagPointFinder pathFinder = new TagPointFinder(room);
+                        TagPointFinder pathFinder = new TagPointFinder(room.RoomObject);
                         UV point = pathFinder.GetPointByPlacementWay(positionPlacementWay, activeView);
 
-                        LocationPoint roomLocation = (LocationPoint) room.Location;
-                        XYZ testPoint = new XYZ(point.U, point.V, roomLocation.Point.Z);
+                        Location roomLocation = room.RoomObject.Location;
 
-                        if(!room.IsPointInRoom(testPoint)) point = pathFinder.GetPointByPath();
+                        LocationPoint roomLocationPoint = (LocationPoint) roomLocation;
+                        XYZ testPoint = new XYZ(point.U, point.V, roomLocationPoint.Point.Z);
 
-                        var newTag = Document.Create.NewRoomTag(new LinkElementId(room.Id), point, activeView.Id);
+                        if(!room.RoomObject.IsPointInRoom(testPoint)) point = pathFinder.GetPointByPath();
+
+                        RoomTag newTag;
+
+                        if(room.LinkId == null) {
+                            newTag = Document.Create.NewRoomTag(new LinkElementId(room.RoomObject.Id), point, activeView.Id);
+                        } 
+                        else {
+                            newTag = Document.Create.NewRoomTag(new LinkElementId(room.LinkId, room.RoomObject.Id), point, activeView.Id);
+                        }
+
                         newTag.ChangeTypeId(SelectedTagType);
                     }
                 }

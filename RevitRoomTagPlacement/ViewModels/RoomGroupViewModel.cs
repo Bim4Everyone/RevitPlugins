@@ -12,24 +12,26 @@ using dosymep.Bim4Everyone;
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
+using RevitRoomTagPlacement.Models;
+
 namespace RevitRoomTagPlacement.ViewModels {
     internal class RoomGroupViewModel : BaseViewModel {
 
         string _name;
-        IEnumerable<Room> _rooms;
+        IEnumerable<RoomFromRevit> _rooms;
         IEnumerable<string> _groupRoomNames;
 
-        public RoomGroupViewModel(string name, IEnumerable<Room> rooms) {
+        public RoomGroupViewModel(string name, IEnumerable<RoomFromRevit> rooms) {
             _name = name;   
             _rooms = rooms;
 
             _groupRoomNames = rooms
-                .Select(x => x.GetParamValue<string>(BuiltInParameter.ROOM_NAME))
+                .Select(x => x.RoomObject.GetParamValue<string>(BuiltInParameter.ROOM_NAME))
                 .Distinct();
         }
 
         public string Name => _name;
-        public IEnumerable<Room> Rooms => _rooms;
+        public IEnumerable<RoomFromRevit> Rooms => _rooms;
 
         public IEnumerable<string> GroupRoomNames => _groupRoomNames;
 
