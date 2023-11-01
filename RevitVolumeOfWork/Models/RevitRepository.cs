@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
 
@@ -31,17 +32,17 @@ namespace RevitVolumeOfWork.Models {
                 .ToList();
         }
 
-        public Dictionary<int, WallElement> GetGroupedRoomsByWalls(List<RoomElement> rooms) {
+        public Dictionary<ElementId, WallElement> GetGroupedRoomsByWalls(List<RoomElement> rooms) {
 
-            Dictionary<int, WallElement> allWalls = new Dictionary<int, WallElement>();
+            Dictionary<ElementId, WallElement> allWalls = new Dictionary<ElementId, WallElement>();
 
             foreach(var room in rooms) {
                 var walls = room.GetBoundaryWalls();
 
                 foreach(var wall in walls) {
-                    int wallId = wall.Id.IntegerValue;
-                    if(allWalls.ContainsKey(wall.Id.IntegerValue)) {
-                        allWalls[wallId].Rooms.Add(room);
+                    ElementId wallId = wall.Id;
+                    if(allWalls.TryGetValue(wall.Id, out WallElement wallElement)) {
+                        wallElement.Rooms.Add(room);
                     } 
                     else {
                         var newWall = new WallElement(wall);
@@ -56,18 +57,18 @@ namespace RevitVolumeOfWork.Models {
         public void ClearWallsParameters(List<Level> levels) {
             List<ElementFilter> levelFilters = levels.Select(x => (ElementFilter) new ElementLevelFilter(x.Id)).ToList();
 
-            LogicalOrFilter orFIlter = new LogicalOrFilter(levelFilters);
+            LogicalOrFilter orFilter = new LogicalOrFilter(levelFilters);
 
             FilteredElementCollector collector = new FilteredElementCollector(Document)
                 .OfClass(typeof(Wall))
-                .WherePasses(orFIlter);
+                .WherePasses(orFilter);
 
             using(Transaction t = Document.StartTransaction("Очистить параметры ВОР стен")) {
                 foreach(var wall in collector) {
-                    wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomName.Name, "");
-                    wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomNumber.Name, "");
-                    wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomID.Name, "");
-                    wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomGroup.Name, "");
+                    wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomName, "");
+                    wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomNumber, "");
+                    wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomID, "");
+                    wall.SetParamValue(ProjectParamsConfig.Instance.RelatedRoomGroup, "");
                 }
                 t.Commit();
             }

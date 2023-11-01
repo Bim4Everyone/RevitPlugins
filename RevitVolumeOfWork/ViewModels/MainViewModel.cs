@@ -56,7 +56,7 @@ namespace RevitVolumeOfWork.ViewModels {
                 .SelectMany(x => x.Rooms)
                 .ToList();
 
-            Dictionary<int, WallElement> allWalls = _revitRepository.GetGroupedRoomsByWalls(rooms);
+            Dictionary<ElementId, WallElement> allWalls = _revitRepository.GetGroupedRoomsByWalls(rooms);
 
             if(ClearWallsParameters)
                 _revitRepository.ClearWallsParameters(Levels.Where(item => item.IsSelected).Select(x => x.Element).ToList());
@@ -68,13 +68,13 @@ namespace RevitVolumeOfWork.ViewModels {
                     var wall = wallElement.Wall;
 
                     wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomName.Name,
-                                                wallElement.GetRoomsParameters("Name"));
+                                                wallElement.GetRoomsParameters(nameof(RoomElement.Name)));
                     wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomNumber.Name,
-                                                wallElement.GetRoomsParameters("Number"));
+                                                wallElement.GetRoomsParameters(nameof(RoomElement.Number)));
                     wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomID.Name,
-                                                wallElement.GetRoomsParameters("ID"));
+                                                wallElement.GetRoomsParameters(nameof(RoomElement.Id)));
                     wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomGroup.Name,
-                                                wallElement.GetRoomsParameters("Group"));
+                                                wallElement.GetRoomsParameters(nameof(RoomElement.Group)));
                 }
                 t.Commit();
             }

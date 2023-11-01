@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 using Autodesk.Revit.DB;
 
@@ -17,9 +18,10 @@ namespace RevitVolumeOfWork.Models {
         public List<RoomElement> Rooms { get; set; }
 
         public string GetRoomsParameters(string fieldName) {
-            List<string> values = Rooms.Select(x => (string) x.GetType().GetProperty(fieldName).GetValue(x))
-                                       .Distinct()
-                                       .ToList();
+            PropertyInfo typeField = typeof(RoomElement).GetProperty(fieldName);
+            IEnumerable<string> values = Rooms
+                .Select(x => (string) typeField?.GetValue(x))
+                .Distinct();
 
             return string.Join("; ", values);
         }
