@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -97,8 +95,8 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
 
         private void InitializeFiles() {
             Files = new ObservableCollection<FileViewModel>(_revitRepository.GetRevitLinkInstances()
-                .Select(item => new FileViewModel(_revitRepository, item.GetLinkDocument(), item.GetTransform())));
-            Files.Add(new FileViewModel(_revitRepository, _revitRepository.Doc, Transform.Identity));
+                .Select(item => new FileViewModel(item.GetLinkDocument(), item.GetTransform())));
+            Files.Add(new FileViewModel(_revitRepository.Doc, Transform.Identity));
 
             IsAllFilesSelected = false;
         }
@@ -107,9 +105,9 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
             InitializeFiles();
 
             SelectedFileObjects = Files
-                .Where(item=>selectionConfig.Files.Any(f=>f.Equals(item.Name, StringComparison.CurrentCultureIgnoreCase)))
+                .Where(item => selectionConfig.Files.Any(f => f.Equals(item.Name, StringComparison.CurrentCultureIgnoreCase)))
                 .Cast<object>()
-                .ToList() ;
+                .ToList();
         }
 
         private void InitializeProviders() {

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 using dosymep.WPF.Commands;
@@ -41,8 +38,10 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private void Select(object p) {
             var clash = (DiffClashViewModel) p;
-            var elements = new[] {_revitRepository.GetElement(clash.Clash.MainElement.DocumentName, clash.Clash.MainElement.Id),
-                                  _revitRepository.GetElement(clash.Clash.OtherElement.DocumentName, clash.Clash.OtherElement.Id)};
+            var elements = new[] {
+                clash.Clash.MainElement,
+                clash.Clash.OtherElement
+            };
             _revitRepository.SelectAndShowElement(elements.Where(item => item != null));
         }
 
