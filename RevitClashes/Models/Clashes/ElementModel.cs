@@ -4,40 +4,72 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
+using pyRevitLabs.Json;
 
 namespace RevitClashDetective.Models.Clashes {
     internal class ElementModel : IEquatable<ElementModel> {
-        private readonly RevitRepository _revitRepository;
+        [JsonConstructor]
+        public ElementModel() { }
 
-        public ElementModel(RevitRepository revitRepository, Element element) {
+        public ElementModel(Element element)
+            : this(element, Transform.Identity) {
+        }
+
+        /// <summary>
+        /// Конструктор для элемента из связанного файла, который подгружен в активный документ с дублированием
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="transform">Трансформация связанного файла</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public ElementModel(Element element, Transform transform)
+            : this(element, new TransformModel(transform)) {
+        }
+
+        public ElementModel(Element element, TransformModel transformModel) {
             if(element is null) { throw new ArgumentNullException(nameof(element)); }
-            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            if(transformModel is null) { throw new ArgumentNullException(nameof(transformModel)); }
 
             Id = element.Id;
             Name = element.Name;
-            DocumentName = _revitRepository.GetDocumentName(element.Document);
             Category = element.Category?.Name;
-            Level = revitRepository.GetLevelName(element);
+            Level = RevitRepository.GetLevelName(element);
+            DocumentName = RevitRepository.GetDocumentName(element.Document);
+            TransformModel = transformModel;
         }
 
-        public ElementModel() {
-
-        }
 
         public ElementId Id { get; set; }
         public string Name { get; set; }
         public string Category { get; set; }
         public string Level { get; set; }
         public string DocumentName { get; set; }
+        public TransformModel TransformModel { get; set; } = new TransformModel(Transform.Identity);
 
 
         public Element GetElement(IEnumerable<DocInfo> docInfos) {
-            var doc = docInfos.FirstOrDefault(item => item.Name.Equals(DocumentName));
-            if(doc != null && Id.IsNotNull()) {
-                return doc.Doc.GetElement(Id);
+            if(docInfos is null) { throw new ArgumentNullException(nameof(docInfos)); }
+            if(docInfos.Any(item => item is null)) { throw new ArgumentNullException(nameof(docInfos)); }
+
+            return GetDocInfo(docInfos)?.Doc.GetElement(Id);
+        }
+
+        public DocInfo GetDocInfo(IEnumerable<DocInfo> docInfos) {
+            if(docInfos is null) { throw new ArgumentNullException(nameof(docInfos)); }
+            if(docInfos.Any(item => item is null)) { throw new ArgumentNullException(nameof(docInfos)); }
+
+            if(TransformModel is null) {
+                return docInfos.FirstOrDefault(item => item.Name.Equals(DocumentName));
+            } else {
+                var docsWithTheSameTitle = docInfos
+                    .Where(item => item.Name.Equals(DocumentName))
+                    .ToArray();
+                // если в активном документе есть дублирующиеся связи,
+                // то сначала пытаемся найти нужный экземпляр связи по трансформации,
+                // если поиск не удался, то берем первый попавшийся экземпляр связи
+                return docsWithTheSameTitle
+                    .FirstOrDefault(item => TransformModel.IsAlmostEqualTo(item.Transform))
+                    ?? docsWithTheSameTitle.FirstOrDefault();
             }
-            return null;
         }
 
         public override bool Equals(object obj) {
@@ -46,7 +78,8 @@ namespace RevitClashDetective.Models.Clashes {
 
         public override int GetHashCode() {
             int hashCode = 426527819;
-            hashCode = hashCode * -1521134295 + Id.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<ElementId>.Default.GetHashCode(Id);
+            hashCode = hashCode * -1521134295 + EqualityComparer<TransformModel>.Default.GetHashCode(TransformModel);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Category);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Level);
@@ -55,12 +88,16 @@ namespace RevitClashDetective.Models.Clashes {
         }
 
         public bool Equals(ElementModel other) {
+            if(ReferenceEquals(null, other)) { return false; }
+            if(ReferenceEquals(this, other)) { return true; }
+
             return other != null
                 && Id == other.Id
                 && Name == other.Name
                 && Category == other.Category
                 && Level == other.Level
-                && DocumentName == other.DocumentName;
+                && DocumentName == other.DocumentName
+                && Equals(TransformModel, other.TransformModel);
         }
     }
 }
