@@ -14,8 +14,8 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    Height="500" Width="900"
-    MinHeight="500" MinWidth="900"
+    Height="600" Width="1060"
+    MinHeight="600" MinWidth="1060"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -37,7 +37,110 @@
         </Grid.RowDefinitions>
 
 
-        <ListView
+
+        <ListView 
+            Margin="10"
+            ScrollViewer.VerticalScrollBarVisibility="Visible"
+            ScrollViewer.CanContentScroll="False"
+            ItemsSource="{Binding Path=TasksForWork, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            SelectedItem="{Binding Path=SelectedTask}"
+            SelectionMode="Single">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn 
+                        Header="Начальный уровень"
+                        Width="180">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox
+                                    Margin="5" 
+                                    Width="155"
+                                    Height="30"
+                                    HorizontalAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    Text="{Binding Path=StartLevelNumber}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn 
+                        Header="Конечный уровень" 
+                        Width="180">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox
+                                    Margin="5" 
+                                    Width="155"
+                                    Height="30"
+                                    HorizontalAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    Text="{Binding Path=EndLevelNumber}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn 
+                        Header="Область видимости">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox
+                                    Margin="5"
+                                    Width="100"
+                                    Height="30"
+                                    HorizontalAlignment="Center"
+                                    DisplayMemberPath="Name"
+                                    ItemsSource="{Binding Path=DataContext.VisibilityScopes, 
+                                        RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
+                                    SelectedItem="{Binding Path=SelectedVisibilityScope}">
+                                </ComboBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Суффикс видов" Width="180">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox 
+                                    Margin="5"
+                                    Width="155"
+                                    Height="30"
+                                    HorizontalAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    Text="{Binding Path=ViewNameSuffix}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Выбор спецификаций" Width="180">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button
+                                    Margin="3"
+                                    Width="155"
+                                    Height="30"
+                                    HorizontalAlignment="Center"
+                                    Content="Выбрать"
+                                    FontSize="14"
+                                    Click="ButtonCancel_Click"
+                                    Command="{Binding Path=DataContext.TestCommand, 
+                                        RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                    CommandParameter="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <GridViewColumn 
+                        Header="Выбрано спецификаций" 
+                        Width="150"
+                        DisplayMemberBinding="{Binding ScheduleSheetInstances.Count}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+
+
+
+        <!--<ListView
             Margin="10"
             ScrollViewer.VerticalScrollBarVisibility="Visible"
             ScrollViewer.CanContentScroll="False"
@@ -52,16 +155,18 @@
                 </Style>
             </ListView.Resources>
 
+            
+            
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <TextBox 
                             Margin="10 0 0 0" 
-                            Width="200"
+                            Width="100"
                             Text="{Binding Path=StartLevelNumber}"/>
                         <TextBox 
                             Margin="10 0 0 0"
-                            Width="200"
+                            Width="100"
                             Text="{Binding Path=EndLevelNumber}"/>
 
                         <ComboBox
@@ -73,10 +178,32 @@
                                 RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
                             SelectedItem="{Binding Path=SelectedVisibilityScope}">
                         </ComboBox>
+                        
+                        <TextBox 
+                            Margin="10 0 0 0"
+                            Width="100"
+                            Text="{Binding Path=ViewNameSuffix}"/>
+                        
+                        <Button
+                            Margin="10 0 0 0"
+                            Width="80"
+                            Content="Выбрать"
+                            FontSize="16"
+                            Click="ButtonCancel_Click"
+                            Command="{Binding Path=DataContext.TestCommand, 
+                                RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                            CommandParameter="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
+
+                        <TextBlock
+                            Margin="5"
+                            Text="{Binding Path=ScheduleSheetInstances.Count}"
+                            FontSize="16"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"/>
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
-        </ListView>
+        </ListView>-->
 
         <StackPanel
             Grid.Row="1"
@@ -85,30 +212,32 @@
             HorizontalAlignment="Right">
 
             <Button
-                Margin="10"
+                Margin="10 5 10 10"
                 Width="200"
                 Content="Добавить строку"
-                FontSize="16"
+                FontSize="14"
                 Command="{Binding Path=AddTaskCommand}"/>
 
             <Button
-                Margin="10"
+                Margin="10 5 10 10"
                 Width="200"
                 Content="Удалить строку"
-                FontSize="16"
+                FontSize="14"
                 Command="{Binding Path=DeleteTaskCommand}"/>
         </StackPanel>
 
 
 
 
-        <GroupBox Margin="5" Grid.Row="2" Height="65">
+        <GroupBox 
+            Grid.Row="2"
+            Margin="5"
+            Height="65">
             <GroupBox.Header>
                 <TextBlock 
                     Text="Для листа:"
-                    FontSize="20"/>
+                    FontSize="14"/>
             </GroupBox.Header>
-
 
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -116,18 +245,28 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-
-                <TextBlock
+                <CheckBox 
                     Grid.Column="0"
+                    Margin="3"
+                    Content="Создавать/размещать листы"
+                    FontSize="14"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    IsChecked="{Binding Path=WorkWithSheets}"/>
+                
+                <TextBlock
+                    Grid.Column="1"
                     Text="Выберите рамку листа:"
-                    FontSize="16"
+                    FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"/>
 
                 <ComboBox
-                    Grid.Column="1"
+                    Grid.Column="2"
+                    VerticalContentAlignment="Center"
                     ItemsSource="{Binding Path=TitleBlocksInProject}" 
                     SelectedItem="{Binding Path=SelectedTitleBlock}">
                     <ComboBox.ItemTemplate>
@@ -145,133 +284,159 @@
                 </ComboBox>
 
                 <TextBlock
-                    Grid.Column="2"
+                    Grid.Column="3"
                     Margin="20 0 0 0"
                     Text="Укажите префикс листа:"
-                    FontSize="16"
+                    FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"/>
 
                 <TextBox 
-                    Grid.Column="3"
-                    Margin="10 0 0 0" 
+                    Grid.Column="4"
+                    Margin="3"
+                    VerticalContentAlignment="Center"
                     Text="{Binding Path=SheetNamePrefix}"/>
             </Grid>
         </GroupBox>
 
-
-        <GroupBox Margin="5" Grid.Row="3" Height="65">
+        <GroupBox 
+            Grid.Row="3"
+            Margin="5"
+            Height="65">
             <GroupBox.Header>
                 <TextBlock 
                     Text="Для вида:"
-                    FontSize="20"/>
+                    FontSize="14"/>
             </GroupBox.Header>
-
 
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1.4*"/>
+                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-
-                <TextBlock
+                <CheckBox 
                     Grid.Column="0"
+                    Margin="3"
+                    Content="Создавать/размещать виды"
+                    FontSize="14"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    IsChecked="{Binding Path=WorkWithViews}"/>
+                
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="3"
                     Text="Выберите тип вида:"
-                    FontSize="16"
+                    FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"/>
 
                 <ComboBox
-                    Grid.Column="1"
+                    Grid.Column="2"
+                    Margin="3"
+                    IsEnabled="{Binding Path=WorkWithViews}"
                     DisplayMemberPath="Name"
                     ItemsSource="{Binding Path=ViewFamilyTypes}" 
                     SelectedItem="{Binding Path=SelectedViewFamilyType}">
-                    </ComboBox>
-
+                </ComboBox>
+                
                 <TextBlock
-                    Grid.Column="2"
-                    Margin="20 0 0 0"
+                    Grid.Column="3"
+                    Margin="3"
+                    Text="Выберите тип видового экрана:"
+                    FontSize="14"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"/>
+                
+                <ComboBox
+                    Grid.Column="4"
+                    Margin="3"
+                    IsEnabled="{Binding Path=WorkWithViews}"
+                    DisplayMemberPath="Name"
+                    ItemsSource="{Binding Path=ViewportTypes}" 
+                    SelectedItem="{Binding Path=SelectedViewportType}">
+                </ComboBox>
+                
+                <TextBlock
+                    Grid.Column="5"
+                    Margin="3"
                     Text="Для вида:"
-                    FontSize="16"
+                    FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"/>
                 
                 <TextBox 
-                    Grid.Column="3"
-                    Margin="10 0 0 0" 
+                    Grid.Column="6"
+                    Margin="3"
+                    VerticalContentAlignment="Center"
+                    IsEnabled="{Binding Path=WorkWithViews}"
                     Text="{Binding Path=ViewNamePrefix}"/>
+
+                <RadioButton 
+                    Grid.Column="7"
+                    GroupName="TypeOfCreate"
+                    IsEnabled="{Binding Path=WorkWithViews}"
+                    Content="Создать на основе выбранных видов"
+                    IsChecked="{Binding Path=CreateViewsBasedOnSelections}"/>
+
+                <RadioButton 
+                    Grid.Column="8"
+                    GroupName="TypeOfCreate"
+                    IsEnabled="{Binding Path=WorkWithViews}"
+                    Content="Создать с нуля"/>
             </Grid>
         </GroupBox>
 
-        <GroupBox Margin="5" Grid.Row="4" Height="65">
+        <GroupBox 
+            Grid.Row="4" 
+            Grid.Column="1"
+            Margin="5" 
+            Height="65">
             <GroupBox.Header>
                 <TextBlock 
                     Text="Спеки:"
-                    FontSize="20"/>
+                    FontSize="14"/>
             </GroupBox.Header>
-
 
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.2*"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="0.5*"/>
-                    <ColumnDefinition Width="0.5*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
 
                 <CheckBox 
-                    x:Name="workWithSpecs"
+                    Margin="3"
+                    Content="Создавать/размещать спецификации"
+                    FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center"
                     IsChecked="{Binding Path=WorkWithSpecs}"/>
-                
+
                 <TextBlock
                     Grid.Column="1"
-                    Text="Выберите спеки на листе:"
-                    FontSize="16"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Right"/>
-
-
-                <Button
-                    Grid.Column="2"
-                    Content="Выбрать"
-                    FontSize="16"
-                    HorizontalAlignment="Right"
-                    IsEnabled="{Binding Path=WorkWithSpecs}"
-                    Click="ButtonCancel_Click"
-                    Command="{Binding SelectSpecCommand}"/>
-
-                <TextBlock
-                    Grid.Column="3"
-                    Margin="5"
-                    Text="{Binding Path=ScheduleSheetInstances.Count}"
-                    FontSize="16"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Left"/>
-
-                <TextBlock
-                    Grid.Column="4"
-                    Margin="20 0 0 0"
+                    Margin="3"
                     Text="Выберите поле этажа:"
-                    FontSize="16"
+                    FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"/>
-                
+
                 <ComboBox
-                    Grid.Column="5"
+                    Grid.Column="2"
+                    Margin="3"
                     IsEnabled="{Binding Path=WorkWithSpecs}"
                     ItemsSource="{Binding Path=FilterNamesFromSpecs, UpdateSourceTrigger=PropertyChanged}"
                     SelectedItem="{Binding Path=SelectedFilterNameForSpecs}">
                 </ComboBox>
-
-               
             </Grid>
         </GroupBox>
 

@@ -7,9 +7,13 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using RevitArchitecturalDocumentation.ViewModels;
+
 namespace RevitArchitecturalDocumentation.Models {
     internal class SpecHelper {
-        public SpecHelper(ScheduleSheetInstance scheduleSheetInstance) {
+        public SpecHelper(MainViewModel mvm, ScheduleSheetInstance scheduleSheetInstance) {
+
+            MVM = mvm;
 
             SpecSheetInstance = scheduleSheetInstance;
             SpecSheetInstancePoint = scheduleSheetInstance.Point;
@@ -25,6 +29,9 @@ namespace RevitArchitecturalDocumentation.Models {
             SpecificationFilters = SpecificationDefinition.GetFilters().ToList();
         }
 
+        public MainViewModel MVM { get; set; }
+        public bool CanWorkWithIt { get; set; } = true;
+
         public ScheduleSheetInstance SpecSheetInstance { get; set; }
         public XYZ SpecSheetInstancePoint { get; set; }
         public ViewSchedule Specification { get; set; }
@@ -37,7 +44,6 @@ namespace RevitArchitecturalDocumentation.Models {
         public string LastPartOfSpecName { get; set; }
         //public string PrefixOfSpecName { get; set; }
         public string SuffixOfLevelNumber { get; set; }
-        public bool CanWorkWithIt { get; set; } = true;
 
 
 
@@ -133,22 +139,16 @@ namespace RevitArchitecturalDocumentation.Models {
                 
                 ScheduleField scheduleFieldFromFilter = SpecificationDefinition.GetField(currentFilter.FieldId);
 
-                //TaskDialog.Show("Поле фильтра", scheduleFieldFromFilter.GetName());
-
                 if(scheduleFieldFromFilter.GetName() == specFilterName) {
 
-
                     string filterOldValue = currentFilter.GetStringValue();
-                    //TaskDialog.Show("filterOldValue", filterOldValue);
 
                     string format = GetStringFormatOrDefault(filterOldValue);
-                    //TaskDialog.Show("format", format);
 
                     string newVal = String.Format(format, newFilterValue);
-                    //TaskDialog.Show("newVal", newVal);
-
 
                     currentFilter.SetValue(newVal);
+                    MVM.Report.AppendLine($"        Фильтру задаем значение {currentFilter.GetStringValue()}");
                     newScheduleFilters.Add(currentFilter);
                 } else {
                     newScheduleFilters.Add(currentFilter);
