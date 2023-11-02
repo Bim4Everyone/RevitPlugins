@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -32,30 +33,34 @@ namespace RevitVolumeOfWork.Models {
                 .ToList();
         }
 
-        public Dictionary<ElementId, WallElement> GetGroupedRoomsByWalls(List<RoomElement> rooms) {
-
+        public ICollection<WallElement> GetGroupedRoomsByWalls(List<RoomElement> rooms) {
             Dictionary<ElementId, WallElement> allWalls = new Dictionary<ElementId, WallElement>();
 
             foreach(var room in rooms) {
                 var walls = room.GetBoundaryWalls();
-
                 foreach(var wall in walls) {
                     ElementId wallId = wall.Id;
                     if(allWalls.TryGetValue(wall.Id, out WallElement wallElement)) {
                         wallElement.Rooms.Add(room);
                     } 
                     else {
-                        var newWall = new WallElement(wall);
-                        newWall.Rooms = new List<RoomElement> { room };
+                        var newWall = new WallElement(wall) {
+                            Rooms = new List<RoomElement> { room }
+                        };
+
                         allWalls.Add(wallId, newWall);
                     }
                 }
             }
-            return allWalls;
+
+            return allWalls.Values;
         }
 
-        public void ClearWallsParameters(List<Level> levels) {
-            List<ElementFilter> levelFilters = levels.Select(x => (ElementFilter) new ElementLevelFilter(x.Id)).ToList();
+        public void ClearWallsParameters(IEnumerable<Level> levels) {
+            List<ElementFilter> levelFilters = levels
+                .Select(x => new ElementLevelFilter(x.Id))
+                .Cast<ElementFilter>()
+                .ToList();
 
             LogicalOrFilter orFilter = new LogicalOrFilter(levelFilters);
 

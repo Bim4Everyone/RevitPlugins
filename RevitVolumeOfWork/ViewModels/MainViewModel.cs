@@ -52,19 +52,20 @@ namespace RevitVolumeOfWork.ViewModels {
         }
 
         private void SetWallParameters(object p) {
+            if(ClearWallsParameters) {
+                _revitRepository.ClearWallsParameters(Levels
+                    .Where(item => item.IsSelected)
+                    .Select(x => x.Element));
+            }
+
             List<RoomElement> rooms = Levels.Where(item => item.IsSelected)
                 .SelectMany(x => x.Rooms)
                 .ToList();
 
-            Dictionary<ElementId, WallElement> allWalls = _revitRepository.GetGroupedRoomsByWalls(rooms);
-
-            if(ClearWallsParameters)
-                _revitRepository.ClearWallsParameters(Levels.Where(item => item.IsSelected).Select(x => x.Element).ToList());
+            ICollection<WallElement> allWalls = _revitRepository.GetGroupedRoomsByWalls(rooms);
 
             using(Transaction t = _revitRepository.Document.StartTransaction("Заполнить параметры ВОР")) {
-                foreach(var key in allWalls.Keys) {
-
-                    var wallElement = allWalls[key];
+                foreach(var wallElement in allWalls) {
                     var wall = wallElement.Wall;
 
                     wall.SetProjectParamValue(ProjectParamsConfig.Instance.RelatedRoomName.Name,
@@ -85,9 +86,12 @@ namespace RevitVolumeOfWork.ViewModels {
                 ErrorText = "Помещения отсутствуют в проекте";
                 return false;
             }
-            if(Levels.Where(item => item.IsSelected).ToList().Count == 0) {
+            if(!Levels.Any(x => x.IsSelected)) {
+                ErrorText = "Выберите уровни";
                 return false;
             }
+
+            ErrorText = "";
             return true;
         }
 

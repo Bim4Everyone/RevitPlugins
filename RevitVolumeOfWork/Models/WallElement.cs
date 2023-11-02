@@ -26,6 +26,16 @@ namespace RevitVolumeOfWork.Models {
             return string.Join("; ", values);
         }
 
+        public override bool Equals(object obj) {
+            return Equals(obj as WallElement);
+        }
 
+        public bool Equals(WallElement wallElement) {
+            return _wall.Id == wallElement.Wall.Id;
+        }
+
+        public override int GetHashCode() {
+            return _wall.Id.GetHashCode();
+        }
     }
 }
