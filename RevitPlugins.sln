@@ -74,6 +74,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clashes", "Clashes", "{4526
 		RevitClashes\Models\Clashes\ClashesConfig.cs = RevitClashes\Models\Clashes\ClashesConfig.cs
 		RevitClashes\Models\Clashes\ClashModel.cs = RevitClashes\Models\Clashes\ClashModel.cs
 		RevitClashes\Models\Clashes\ElementModel.cs = RevitClashes\Models\Clashes\ElementModel.cs
+		RevitClashes\Models\Clashes\TransformModel.cs = RevitClashes\Models\Clashes\TransformModel.cs
+		RevitClashes\Models\Clashes\XYZModel.cs = RevitClashes\Models\Clashes\XYZModel.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Evaluators", "Evaluators", "{84024C31-F7A3-48D1-949D-A529A5C1ED42}"
