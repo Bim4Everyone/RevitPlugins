@@ -7,13 +7,15 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
+using RevitClashDetective.Models.Clashes;
+
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// <summary>
-    /// Модель представления окна для работы с конкретным исходящим заданием на отверстие в файле инженера
+    /// Модель представления окна для работы с конкретным исходящим заданием на отверстие в активном файле инженера
     /// </summary>
     internal class OpeningMepTaskOutcomingViewModel : BaseViewModel, ISelectorAndHighlighter, IEquatable<OpeningMepTaskOutcomingViewModel> {
         /// <summary>
@@ -110,12 +112,12 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         }
 
         /// <summary>
-        /// Возвращает коллекцию элементов, в которой находится исходищее задание на отверстие, которое надо выделить на виде
+        /// Возвращает коллекцию элементов, в которой находится исходящее задание на отверстие, которое надо выделить на виде
         /// </summary>
         /// <returns></returns>
-        public ICollection<Element> GetElementsToSelect() {
-            return new Element[] {
-                _openingTask.GetFamilyInstance()
+        public ICollection<ElementModel> GetElementsToSelect() {
+            return new ElementModel[] {
+                new ElementModel(_openingTask.GetFamilyInstance())
             };
         }
     }
