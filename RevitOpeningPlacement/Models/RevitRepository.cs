@@ -14,6 +14,7 @@ using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Handlers;
 
 using RevitOpeningPlacement.Models.Exceptions;
@@ -298,12 +299,12 @@ namespace RevitOpeningPlacement.Models {
                 .FirstOrDefault(item => item.Name.Equals(name, StringComparison.CurrentCulture));
         }
 
-        public string GetLevelName(Element element) {
-            return _clashRevitRepository.GetLevelName(element);
+        public static string GetLevelName(Element element) {
+            return RevitClashDetective.Models.RevitRepository.GetLevelName(element);
         }
 
-        public Level GetLevel(Element element) {
-            return _clashRevitRepository.GetLevel(element);
+        public static Level GetLevel(Element element) {
+            return RevitClashDetective.Models.RevitRepository.GetLevel(element);
         }
 
         /// <summary>
@@ -320,7 +321,7 @@ namespace RevitOpeningPlacement.Models {
             return _clashRevitRepository.GetElement(fileName, id);
         }
 
-        public void SelectAndShowElement(ICollection<Element> elements) {
+        public void SelectAndShowElement(ICollection<ElementModel> elements) {
             double additionalSize = 2;
             _clashRevitRepository.SelectAndShowElement(elements, additionalSize, _view);
         }
@@ -339,8 +340,8 @@ namespace RevitOpeningPlacement.Models {
             _clashRevitRepository.SelectAndShowElement(elementsToSelect, additionalSize, _view);
         }
 
-        public string GetDocumentName(Document doc) {
-            return _clashRevitRepository.GetDocumentName(doc);
+        public static string GetDocumentName(Document doc) {
+            return RevitClashDetective.Models.RevitRepository.GetDocumentName(doc);
         }
 
         /// <summary>
@@ -543,10 +544,6 @@ namespace RevitOpeningPlacement.Models {
         public void DoAction(Action action) {
             _revitEventHandler.TransactAction = action;
             _revitEventHandler.Raise();
-        }
-
-        public IEnumerable<Document> GetDocuments() {
-            return _clashRevitRepository.GetDocuments();
         }
 
         public List<ParameterValueProvider> GetParameters(Document doc, IEnumerable<Category> categories) {
@@ -1188,7 +1185,6 @@ namespace RevitOpeningPlacement.Models {
                                    link.GetTypeId()))
                 .ToList();
         }
-
 
 
 

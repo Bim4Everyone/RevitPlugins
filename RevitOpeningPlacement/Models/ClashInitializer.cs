@@ -9,20 +9,36 @@ using RevitClashDetective.Models.FilterModel;
 
 namespace RevitOpeningPlacement.Models {
     internal class ClashInitializer {
-        public static IEnumerable<ClashModel> GetClashes(RevitClashDetective.Models.RevitRepository revitRepository, Filter mepFilter, Filter architectureFilter) {
+        /// <summary>
+        /// Находит коллизии между элементами ВИС из активного файла 
+        /// и элементами конструкций (стены, перекрытия) из связей АР, КР, КМ
+        /// </summary>
+        /// <param name="revitRepository"></param>
+        /// <param name="mepFilter"></param>
+        /// <param name="architectureFilter"></param>
+        /// <returns></returns>
+        public static IEnumerable<ClashModel> GetClashes(
+            RevitRepository revitRepository,
+            Filter mepFilter,
+            Filter architectureFilter) {
+
             var mainProvider = new FilterProvider(revitRepository.Doc, mepFilter, Transform.Identity);
             var mainCount = mainProvider.GetElements().Count;
             if(mainCount == 0) {
                 return Enumerable.Empty<ClashModel>();
             }
-            var otherProviders = revitRepository.DocInfos
-                                                .Select(item => new FilterProvider(item.Doc, architectureFilter, item.Transform))
-                                                .Where(item => item.GetElements().Count > 0)
-                                                .ToList();
+            var otherProviders = revitRepository
+                .GetConstructureLinks()
+                .Select(item => new FilterProvider(item.GetLinkDocument(), architectureFilter, item.GetTransform()))
+                .Where(item => item.GetElements().Count > 0)
+                .ToList();
             if(otherProviders.Count == 0) {
                 return Enumerable.Empty<ClashModel>();
             }
-            var clashDetector = new ClashDetector(revitRepository, new[] { mainProvider }, otherProviders);
+            var clashDetector = new ClashDetector(
+                revitRepository.GetClashRevitRepository(),
+                new[] { mainProvider },
+                otherProviders);
             return clashDetector.FindClashes();
         }
     }

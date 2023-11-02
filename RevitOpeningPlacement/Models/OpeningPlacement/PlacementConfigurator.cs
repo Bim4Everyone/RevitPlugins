@@ -182,7 +182,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         }
 
         private IEnumerable<ClashModel> GetClashes(Filter mepFilter, Filter constructionFilter, IClashChecker clashChecker) {
-            var clashes = ClashInitializer.GetClashes(_revitRepository.GetClashRevitRepository(), mepFilter, constructionFilter)
+            var clashes = ClashInitializer.GetClashes(_revitRepository, mepFilter, constructionFilter)
                 .ToList();
             if(clashes.Count == 0) {
                 return Enumerable.Empty<ClashModel>();

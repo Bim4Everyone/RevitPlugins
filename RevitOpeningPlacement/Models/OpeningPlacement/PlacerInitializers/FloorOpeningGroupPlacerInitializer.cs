@@ -36,7 +36,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
 
                 PointFinder = pointFinder,
 
-                LevelFinder = new OpeningsGroupLevelFinder(revitRepository, openingsGroup),
+                LevelFinder = new OpeningsGroupLevelFinder(openingsGroup),
                 AngleFinder = new FloorOpeningsGroupAngleFinder(openingsGroup),
 
                 ParameterGetter = new FloorSolidParameterGetter(new OpeningGroupSolidProvider(openingsGroup), pointFinder, openingsGroup)
