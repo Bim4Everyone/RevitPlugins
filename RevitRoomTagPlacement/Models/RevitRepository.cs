@@ -51,7 +51,7 @@ namespace RevitRoomTagPlacement.Models {
                 .ToList();
 
             foreach(var link in links) {
-                List<RoomFromRevit> rooms = new FilteredElementCollector(link.GetLinkDocument(), Document.ActiveView.Id)
+                List<RoomFromRevit> rooms = new FilteredElementCollector(link.GetLinkDocument())
                 .OfCategory(BuiltInCategory.OST_Rooms)
                 .OfType<Room>()
                 .Select(x => new RoomFromRevit(x, link.Id))
@@ -150,7 +150,9 @@ namespace RevitRoomTagPlacement.Models {
                             newTag = Document.Create.NewRoomTag(new LinkElementId(room.LinkId, room.RoomObject.Id), point, activeView.Id);
                         }
 
-                        newTag.ChangeTypeId(SelectedTagType);
+                        if(newTag != null) { 
+                            newTag.ChangeTypeId(SelectedTagType);                        
+                        }
                     }
                 }
                 t.Commit();
