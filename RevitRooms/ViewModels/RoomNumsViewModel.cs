@@ -28,8 +28,8 @@ namespace RevitRooms.ViewModels {
 
             RoomsNums = RoomsNumsViewModels[1];
 
-            var roomsConfig = RoomsNumsConfig.GetConfig();
-            var settings = roomsConfig.GetRoomsNumsSettingsConfig(revitRepository.DocumentName);
+            var roomsConfig = RoomsNumsConfig.GetPluginConfig();
+            var settings = roomsConfig.GetSettings(revitRepository.DocumentName);
             if(settings != null) {
                 RoomsNums = RoomsNumsViewModels.FirstOrDefault(item => item._id == settings.SelectedRoomId) ?? RoomsNums;
             }
