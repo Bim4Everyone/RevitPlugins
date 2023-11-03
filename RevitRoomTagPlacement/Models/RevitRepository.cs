@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Web.Security;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -42,6 +43,7 @@ namespace RevitRoomTagPlacement.Models {
                 .OfClass(typeof(RevitLinkInstance))
                 .ToElements()
                 .OfType<RevitLinkInstance>()
+                .Where(x => x.GetLinkDocument() != null)
                 .ToList();
 
             List<RoomFromRevit> allRooms = new FilteredElementCollector(Document, Document.ActiveView.Id)
@@ -58,7 +60,6 @@ namespace RevitRoomTagPlacement.Models {
                 .ToList();
 
                 allRooms.AddRange(rooms);
-
             }
 
             return allRooms;
@@ -87,19 +88,15 @@ namespace RevitRoomTagPlacement.Models {
             return new ObservableCollection<string>(uniqueNames);
         }
 
-        public void PlaceTagsByPositionAndGroup(IList<RoomGroupViewModel> RoomGroups, 
-                                            ElementId SelectedTagType, 
-                                            GroupPlacementWay groupPlacementWay,
-                                            PositionPlacementWay positionPlacementWay,
-                                            string roomName = "") {
+        public List<RoomFromRevit> GroupRoomsForPlacement(IList<RoomGroupViewModel> RoomGroups,
+                                                        GroupPlacementWay groupPlacementWay,
+                                                        string roomName = "") {
             var selectedGroups = RoomGroups.Where(x => x.IsChecked);
             List<RoomFromRevit> rooms = new List<RoomFromRevit>();
-
             if(groupPlacementWay == GroupPlacementWay.EveryRoom) {
                 rooms = selectedGroups.SelectMany(x => x.Rooms).ToList();
 
-            } 
-            else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupRandom) {
+            } else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupRandom) {
                 RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
                 rooms = selectedGroups
                     .SelectMany(x => x.Rooms
@@ -108,8 +105,7 @@ namespace RevitRoomTagPlacement.Models {
                         .First()))
                     .ToList();
 
-            } 
-            else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupByName) {
+            } else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupByName) {
                 RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
                 rooms = selectedGroups
                     .SelectMany(x => x.Rooms
@@ -118,6 +114,18 @@ namespace RevitRoomTagPlacement.Models {
                     .First()))
                     .ToList();
             }
+            return rooms;
+        }
+
+        public void PlaceTagsByPositionAndGroup(IList<RoomGroupViewModel> RoomGroups, 
+                                            ElementId SelectedTagType,
+                                            GroupPlacementWay groupPlacementWay,
+                                            PositionPlacementWay positionPlacementWay,
+                                            string roomName = "") {
+
+            List<RoomFromRevit> rooms = GroupRoomsForPlacement(RoomGroups, 
+                                                              groupPlacementWay, 
+                                                              roomName);
 
             View activeView = Document.ActiveView;
             ElementOwnerViewFilter viewFilter = new ElementOwnerViewFilter(activeView.Id);
@@ -127,6 +135,7 @@ namespace RevitRoomTagPlacement.Models {
                     var depElements = room.RoomObject
                         .GetDependentElements(viewFilter)
                         .Select(x => Document.GetElement(x))
+                        .Where(x => x != null)
                         .Select(x => x.GetTypeId())
                         .ToList();
 
@@ -143,6 +152,14 @@ namespace RevitRoomTagPlacement.Models {
 
                         RoomTag newTag;
 
+                        /* Ќевозможно отфильтровать помещени€ из св€занного файла дл€ активного вида.
+                           —пособ получени€ помещений через CustomExporter не работает, так как помещени€ не экспортируютс€.
+                           ¬ качестве решени€ прин€то брать все помещени€ из св€занного файла и размещать марку на каждом.
+                           ¬ таком случае все марки размещаютс€ в проекте, но если помещение отсутсвует на виде, то марка не отображаетс€.
+                           ƒл€ удалени€ марок, которые не отображаютс€, скрипт пытаетс€ получить BoundingBox дл€ каждой марки, 
+                           если он null, то марка удал€етс€.                         
+                           */
+
                         if(room.LinkId == null) {
                             newTag = Document.Create.NewRoomTag(new LinkElementId(room.RoomObject.Id), point, activeView.Id);
                         } 
@@ -150,8 +167,11 @@ namespace RevitRoomTagPlacement.Models {
                             newTag = Document.Create.NewRoomTag(new LinkElementId(room.LinkId, room.RoomObject.Id), point, activeView.Id);
                         }
 
-                        if(newTag != null) { 
-                            newTag.ChangeTypeId(SelectedTagType);                        
+                        if(newTag.get_BoundingBox(activeView) == null) {
+                            Document.Delete(newTag.Id);
+                        }
+                        else if(newTag != null) { 
+                            newTag.ChangeTypeId(SelectedTagType);
                         }
                     }
                 }
