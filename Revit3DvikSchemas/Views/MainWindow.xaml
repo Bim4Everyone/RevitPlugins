@@ -9,10 +9,6 @@
     xmlns:local="clr-namespace:Revit3DvikSchemas.Views"
     xmlns:vms="clr-namespace:Revit3DvikSchemas.ViewModels"
     
-    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-	xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
