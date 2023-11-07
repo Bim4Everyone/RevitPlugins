@@ -125,11 +125,13 @@ namespace RevitMepTotals.Services.Implements {
             return _revitRepository
                 .GetDucts(document)
                 .GroupBy(duct => new {
+                    SystemName = _revitRepository.GetMepCurveElementMepSystemName(document, duct),
                     TypeName = _revitRepository.GetDuctTypeName(duct),
                     Size = GetStandardSizeFormat(_revitRepository.GetDuctSize(document, duct)),
                     Name = _revitRepository.GetMepCurveElementSharedName(document, duct)
                 })
-                .Select(group => new DuctData(group.Key.TypeName, group.Key.Size, group.Key.Name) {
+                .Select(group =>
+                new DuctData(group.Key.SystemName, group.Key.TypeName, group.Key.Size, group.Key.Name) {
                     Length = group.Sum(duct => _revitRepository.GetMepCurveElementLength(document, duct))
                 })
                 .ToArray();
@@ -141,11 +143,13 @@ namespace RevitMepTotals.Services.Implements {
             return _revitRepository
                 .GetPipes(document)
                 .GroupBy(pipe => new {
+                    SystemName = _revitRepository.GetMepCurveElementMepSystemName(document, pipe),
                     TypeName = _revitRepository.GetPipeTypeName(pipe),
                     Size = GetStandardSizeFormat(_revitRepository.GetPipeSize(document, pipe)),
                     Name = _revitRepository.GetMepCurveElementSharedName(document, pipe)
                 })
-                .Select(group => new PipeData(group.Key.TypeName, group.Key.Size, group.Key.Name) {
+                .Select(group =>
+                new PipeData(group.Key.SystemName, group.Key.TypeName, group.Key.Size, group.Key.Name) {
                     Length = group.Sum(pipe => _revitRepository.GetMepCurveElementLength(document, pipe))
                 })
                 .ToArray();
@@ -157,12 +161,14 @@ namespace RevitMepTotals.Services.Implements {
             return _revitRepository
                 .GetPipeInsulations(document)
                 .GroupBy(pipeInsulation => new {
+                    SystemName = _revitRepository.GetMepCurveElementMepSystemName(document, pipeInsulation),
                     TypeName = _revitRepository.GetPipeInsulationTypeName(document, pipeInsulation),
                     PipeSize = GetStandardSizeFormat(_revitRepository.GetPipeInsulationSize(document, pipeInsulation)),
                     Name = _revitRepository.GetMepCurveElementSharedName(document, pipeInsulation),
                     Thickness = _revitRepository.GetPipeInsulationThickness(document, pipeInsulation)
                 })
-                .Select(group => new PipeInsulationData(group.Key.TypeName, group.Key.PipeSize, group.Key.Name) {
+                .Select(group =>
+                new PipeInsulationData(group.Key.SystemName, group.Key.TypeName, group.Key.PipeSize, group.Key.Name) {
                     Thickness = group.Key.Thickness,
                     Length = group.Sum(
                         pipeInsulation => _revitRepository.GetMepCurveElementLength(document, pipeInsulation))

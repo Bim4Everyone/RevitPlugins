@@ -78,6 +78,23 @@ namespace RevitMepTotals.Models {
         }
 
         /// <summary>
+        /// Возвращает значение параметра "Имя системы"
+        /// </summary>
+        /// <param name="document"></param>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public string GetMepCurveElementMepSystemName(Document document, MEPCurve element) {
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+            if(element is null) { throw new ArgumentNullException(nameof(element)); }
+
+            SystemParam param = SystemParamsConfig.Instance
+                .CreateRevitParam(document, BuiltInParameter.RBS_SYSTEM_NAME_PARAM);
+            string systemName = element.GetParamValueOrDefault(param, _default);
+            return systemName;
+        }
+
+        /// <summary>
         /// Возвращает значение параметра "Длина" у воздуховодов и труб и их изоляции в мм
         /// </summary>
         /// <param name="document"></param>
