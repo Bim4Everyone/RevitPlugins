@@ -45,17 +45,17 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private ViewFamilyType _selectedViewFamilyType;
         private ElementType _selectedViewportType;
         private FamilySymbol _selectedTitleBlock;
+        private List<View> _selectedViews = new List<View>();
         private ObservableCollection<TaskInfo> _tasksForWork = new ObservableCollection<TaskInfo>();
         private TaskInfo _selectedTask;
         private string _viewNamePrefix = string.Empty;
         private string _selectedFilterNameForSpecs = string.Empty;
         private string _sheetNamePrefix = string.Empty;
-        //private List<SpecHelper> _scheduleSheetInstances = new List<SpecHelper>();
         private List<string> _filterNamesFromSpecs = new List<string>();
         private bool _workWithSheets = true;
         private bool _workWithViews = true;
         private bool _workWithSpecs = true;
-        private bool _createViewsBasedOnSelections = false;
+        private bool _createViewsFromScratch = true;
 
         private StringBuilder _report = new StringBuilder();
         private Regex _regexForBuildingPart = new Regex(@"К(.*?)_");
@@ -84,7 +84,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             DeleteTaskCommand = RelayCommand.Create(DeleteTask);
             //SelectSpecCommand = RelayCommand.Create(SelectSpec);
 
-            TestCommand = new RelayCommand(Test);
+            SelectSpecsCommand = new RelayCommand(SelectSpecs);
         }
 
         public ICommand LoadViewCommand { get; }
@@ -92,10 +92,9 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
         public ICommand AddTaskCommand { get; }
         public ICommand DeleteTaskCommand { get; }
-        //public ICommand SelectSpecCommand { get; }
 
 
-        public ICommand TestCommand { get; }
+        public ICommand SelectSpecsCommand { get; }
 
 
         public StringBuilder Report {
@@ -123,6 +122,10 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _regexForView, value);
         }
 
+        public List<View> SelectedViews {
+            get => _selectedViews;
+            set => this.RaiseAndSetIfChanged(ref _selectedViews, value);
+        }
 
         public ObservableCollection<TaskInfo> TasksForWork {
             get => _tasksForWork;
@@ -164,9 +167,9 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedViewportType, value);
         }
 
-        public bool CreateViewsBasedOnSelections {
-            get => _createViewsBasedOnSelections;
-            set => this.RaiseAndSetIfChanged(ref _createViewsBasedOnSelections, value);
+        public bool CreateViewsFromScratch {
+            get => _createViewsFromScratch;
+            set => this.RaiseAndSetIfChanged(ref _createViewsFromScratch, value);
         }
 
         public List<FamilySymbol> TitleBlocksInProject {
@@ -204,11 +207,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _workWithSpecs, value);
         }
 
-        //public List<SpecHelper> ScheduleSheetInstances {
-        //    get => _scheduleSheetInstances;
-        //    set => this.RaiseAndSetIfChanged(ref _scheduleSheetInstances, value);
-        //}
-
         public List<string> FilterNamesFromSpecs {
             get => _filterNamesFromSpecs;
             set => this.RaiseAndSetIfChanged(ref _filterNamesFromSpecs, value);
@@ -232,6 +230,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private void LoadView() {
 
             LoadConfig();
+            GetSelectedViews();
         }
 
         /// <summary>
@@ -294,7 +293,18 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             _pluginConfig.SaveProjectConfig();
         }
 
+        private void GetSelectedViews() {
 
+            // При работе с ДДУ листы пользователь должен выбрать заранее, т.к. селектор API не позволяет выбирать элементы из диспетчера
+            foreach(ElementId id in _revitRepository.ActiveUIDocument.Selection.GetElementIds()) {
+
+                View view = _revitRepository.Document.GetElement(id) as View;
+                if(view != null) {
+                    SelectedViews.Add(view);
+                }
+            }
+            Report.AppendLine($"Выбрано видов до запуска плагина: {SelectedViews.Count}");
+        }
 
         private void AddTask() {
 
@@ -310,36 +320,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         }
 
 
-        //private void SelectSpec() {
 
-        //    ScheduleSheetInstances.Clear();
-
-        //    ISelectionFilter selectFilter = new ScheduleSelectionFilter();
-        //    IList<Reference> references = _revitRepository.ActiveUIDocument.Selection
-        //                    .PickObjects(ObjectType.Element, selectFilter, "Выберите спецификации на листе");
-            
-        //    foreach(Reference reference in references) {
-
-        //        ScheduleSheetInstance elem = _revitRepository.Document.GetElement(reference) as ScheduleSheetInstance;
-        //        if(elem is null) {
-        //            continue;
-        //        }
-
-        //        SpecHelper specHelper = new SpecHelper(elem);
-        //        ScheduleSheetInstances.Add(specHelper);
-        //        specHelper.GetInfo();
-        //        FilterNamesFromSpecs.AddRange(specHelper.GetFilterNames());
-        //    }
-
-
-        //    MainWindow mainWindow = new MainWindow();
-        //    mainWindow.DataContext = this;
-        //    mainWindow.ShowDialog();
-        //}
-
-
-
-        private void Test(object obj) {
+        private void SelectSpecs(object obj) {
 
             TaskInfo task = obj as TaskInfo;
             if(task != null) {
@@ -359,11 +341,10 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                     SpecHelper specHelper = new SpecHelper(this, elem);
                     task.ScheduleSheetInstances.Add(specHelper);
                     specHelper.GetInfo();
-                    //FilterNamesFromSpecs.Intersect(specHelper.GetFilterNames());
-                    //FilterNamesFromSpecs.AddRange(specHelper.GetFilterNames());
                 }
                 GetFilterNames();
             }
+
 
             MainWindow mainWindow = new MainWindow();
             mainWindow.DataContext = this;
@@ -412,7 +393,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             ViewSheet newSheet = _revitRepository.GetSheetByName(newSheetName);
             if(newSheet is null) {
-                Report.AppendLine($"                Лист с именим {newSheetName} не найден в проекте, приступаем к созданию");
+                Report.AppendLine($"                Лист с именем {newSheetName} не найден в проекте, приступаем к созданию");
                 try {
                     newSheet = ViewSheet.Create(_revitRepository.Document, SelectedTitleBlock.Id);
                     Report.AppendLine($"                Лист успешно создан!");
@@ -424,22 +405,33 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                     Report.AppendLine($"❗               Произошла ошибка при создании листа!");
                 }
             } else {
-                Report.AppendLine($"                Лист с именим {newSheetName} успешно найден в проекте!");
+                Report.AppendLine($"                Лист с именем {newSheetName} успешно найден в проекте!");
             }
             return newSheet;
         }
 
+
         /// <summary>
-        /// Метод находит в проекте, а если не нашел, то создает вид с указанным именем
+        /// Метод находит в проекте, а если не нашел, то создает/дублирует вид с указанным именем
         /// </summary>
-        private ViewPlan GetOrCreateView(TaskInfo task, Level level, string newViewName) {
+        private ViewPlan GetOrCreateView(TaskInfo task, string newViewName, Level level = null, View view = null) {
 
             ViewPlan newViewPlan = _revitRepository.GetViewByName(newViewName);
             if(newViewPlan is null) {
-                Report.AppendLine($"                Вид с именим {newViewName} не найден в проекте, приступаем к созданию");
+                Report.AppendLine($"                Вид с именем {newViewName} не найден в проекте, приступаем к созданию");
                 try {
-                    newViewPlan = ViewPlan.Create(_revitRepository.Document, SelectedViewFamilyType.Id, level.Id);
-                    Report.AppendLine($"                Вид успешно создан!");
+                    if(CreateViewsFromScratch) {
+                        newViewPlan = ViewPlan.Create(_revitRepository.Document, SelectedViewFamilyType.Id, level.Id);
+                        Report.AppendLine($"                Вид успешно создан!");
+                    } else {
+                        ElementId newViewPlanId = view.Duplicate(ViewDuplicateOption.WithDetailing);
+                        newViewPlan = view.Document.GetElement(newViewPlanId) as ViewPlan;
+                        if(newViewPlan is null) {
+                            Report.AppendLine($"❗               Произошла ошибка при дублировании вида!");
+                            return null;
+                        }
+                        Report.AppendLine($"                Вид успешно продублирован!");
+                    }
                     newViewPlan.Name = newViewName;
                     Report.AppendLine($"                Задано имя: {newViewPlan.Name}");
                     newViewPlan.get_Parameter(BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP).Set(task.SelectedVisibilityScope.Id);
@@ -448,12 +440,10 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                     Report.AppendLine($"❗               Произошла ошибка при работе с видом!");
                 }
             } else {
-                Report.AppendLine($"                Вид с именим {newViewName} успешно найден в проекте!");
+                Report.AppendLine($"                Вид с именем {newViewName} успешно найден в проекте!");
             }
             return newViewPlan;
         }
-
-
 
 
         /// <summary>
@@ -464,24 +454,23 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             ViewSchedule newViewSpec = _revitRepository.GetSpecByName(newSpecName);
             if(newViewSpec is null) {
                 try {
-                    Report.AppendLine($"                Спецификация с именим {newSpecName} не найдена в проекте, приступаем к созданию");
+                    Report.AppendLine($"                Спецификация с именем {newSpecName} не найдена в проекте, приступаем к созданию");
                     newViewSpec = _revitRepository.Document.GetElement(specHelper.Specification.Duplicate(ViewDuplicateOption.Duplicate)) as ViewSchedule;
                     Report.AppendLine($"                Спецификация успешно создана!");
                     newViewSpec.Name = newSpecName;
                     Report.AppendLine($"                Задано имя: {newViewSpec.Name}");
-                    SpecHelper newSpec = new SpecHelper(newViewSpec);
+                    SpecHelper newSpec = new SpecHelper(this, newViewSpec);
                     newSpec.ChangeSpecFilters(SelectedFilterNameForSpecs, numberOfLevelAsInt);
                     Report.AppendLine($"                Фильтрация задана успешно!");
                 } catch(Exception) {
                     Report.AppendLine($"❗               Произошла ошибка при работе со спецификацией!");
                 }
             } else {
-                Report.AppendLine($"                Спецификация с именим {newSpecName} успешно найдена в проекте!");
+                Report.AppendLine($"                Спецификация с именем {newSpecName} успешно найдена в проекте!");
             }
 
             return newViewSpec;
         }
-
 
 
 
@@ -547,132 +536,268 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
 
 
+        /// <summary>
+        /// Метод находит на листе, а если не нашел, то создает видовой экран спецификации
+        /// </summary>
+        private ScheduleSheetInstance PlaceSpecViewportOnSheet(SpecHelper specHelper, ViewSheet viewSheet, ViewSchedule viewSchedule) {
+
+            ScheduleSheetInstance newScheduleSheetInstance = _revitRepository.GetSpecFromSheetByName(viewSheet, viewSchedule.Name);
+
+            // Если спека не найдена на листе, то добавляем ее
+            if(newScheduleSheetInstance is null) {
+                newScheduleSheetInstance = ScheduleSheetInstance.Create(
+                    _revitRepository.Document,
+                    viewSheet.Id,
+                    viewSchedule.Id,
+                    specHelper.SpecSheetInstancePoint);
+
+                Report.AppendLine($"        Спецификация успешно размещена на листе!");
+            } else {
+                Report.AppendLine($"        Спецификация уже была размещена на листе!");
+            }
+
+            return newScheduleSheetInstance;
+        }
+
+
+
+
         private void DoWork() {
 
-            // При работе с ДДУ листы пользователь должен выбрать заранее, т.к. селектор API не позволяет выбирать элементы из диспетчера
-            List<View> views = new List<View>();
-            foreach(ElementId id in _revitRepository.ActiveUIDocument.Selection.GetElementIds()) {
-
-                View view = _revitRepository.Document.GetElement(id) as View;
-                if(view != null) {
-                    views.Add(view);
-                }
-            }
-            Report.AppendLine($"Выбрано видов до запуска плагина: {views.Count}");
 
             AnalizeTasks();
 
             if(TasksForWork.FirstOrDefault(o => o.CanWorkWithIt) is null) {
-                
+
                 Report.AppendLine("❗   Все задания имеют ошибки. Выполнение скрипта остановлено!");
                 TaskDialog.Show("Документатор АР. Отчет", Report.ToString());
                 return;
             }
 
             Report.AppendLine($"Приступаю к выполнению задания. Всего задач: {TasksForWork.Count}");
-            Report.AppendLine($"Плагин перебирает уровни и на каждом пытается выполнить задания по очереди.");
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Документатор АР")) {
 
-                foreach(Level level in Levels) {
+                CreateViewsFromScratch = true;
+                if(CreateViewsFromScratch) {
 
-                    Report.AppendLine($"Уровень \"{level.Name}\"");
+                    TaskDialog.Show("fd", "создание с нуля");
 
-                    string numberOfLevel = RegexForLevel.Match(level.Name).Groups[1].Value;
-                    if(!int.TryParse(numberOfLevel, out int numberOfLevelAsInt)) {
-                        Report.AppendLine($"❗       Не удалось определить номер уровня {level.Name}!");
-                        continue;
-                    }
-                    Report.AppendLine($"    Уровень номер: {numberOfLevelAsInt}");
+                    Report.AppendLine($"Плагин перебирает уровни и на каждом пытается выполнить задания по очереди.");
+                    foreach(Level level in Levels) {
 
-                    int c = 0;
-                    foreach(TaskInfo task in TasksForWork) {
+                        Report.AppendLine($"Уровень \"{level.Name}\"");
 
-                        // Пропускаем те задания, в которых есть ошибки
-                        if(!task.CanWorkWithIt) { continue; }
-
-                        c++;
-                        Report.AppendLine($"    Задание номер {c}");
-
-                        string strForLevelSearch = "К" + task.NumberOfBuildingPartAsInt.ToString() + "_";
-                        if(!level.Name.Contains(strForLevelSearch)) {
-                            Report.AppendLine($"        Уровень не относится к нужному корпусу, т.к. не содержит: \"{strForLevelSearch}\":");
-                            continue;
-                        } else {
-                            Report.AppendLine($"        Уровень относится к нужному корпусу, т.к. содержит: \"{strForLevelSearch}\":");
-                        }
-
-                        if(numberOfLevelAsInt < task.StartLevelNumberAsInt || numberOfLevelAsInt > task.EndLevelNumberAsInt) {
-                            Report.AppendLine($"        Уровень: {level.Name} не подходит под диапазон {task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}:");
+                        string numberOfLevel = RegexForLevel.Match(level.Name).Groups[1].Value;
+                        if(!int.TryParse(numberOfLevel, out int numberOfLevelAsInt)) {
+                            Report.AppendLine($"❗       Не удалось определить номер уровня {level.Name}!");
                             continue;
                         }
-                        Report.AppendLine($"        Уровень: {level.Name} подходит под диапазон {task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}:");
+                        Report.AppendLine($"    Уровень номер: {numberOfLevelAsInt}");
+
+                        int c = 0;
+                        foreach(TaskInfo task in TasksForWork) {
+
+                            c++;
+                            Report.AppendLine($"    Задание номер {c}");
+
+                            // Пропускаем те задания, в которых есть ошибки
+                            if(!task.CanWorkWithIt) {
+                                Report.AppendLine($"❗               В задании имеются ошибки, работа по нему выполнена не будет!");
+                                continue;
+                            }
+
+                            string strForLevelSearch = "К" + task.NumberOfBuildingPartAsInt.ToString() + "_";
+                            if(!level.Name.Contains(strForLevelSearch)) {
+                                Report.AppendLine($"        Уровень не относится к нужному корпусу, т.к. не содержит: \"{strForLevelSearch}\":");
+                                continue;
+                            } else {
+                                Report.AppendLine($"        Уровень относится к нужному корпусу, т.к. содержит: \"{strForLevelSearch}\":");
+                            }
+
+                            if(numberOfLevelAsInt < task.StartLevelNumberAsInt || numberOfLevelAsInt > task.EndLevelNumberAsInt) {
+                                Report.AppendLine($"        Уровень: {level.Name} не подходит под диапазон {task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}:");
+                                continue;
+                            }
+                            Report.AppendLine($"        Уровень: {level.Name} подходит под диапазон {task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}:");
 
 
-                        ViewSheet newSheet = null;
-                        if(WorkWithSheets) {
-                            
-                            string newSheetName = string.Format("{0}корпус {1}_секция {2}_этаж {3}",
-                                SheetNamePrefix,
-                                task.NumberOfBuildingPartAsInt,
-                                task.NumberOfBuildingSectionAsInt,
-                                numberOfLevel);
+                            ViewSheet newSheet = null;
+                            if(WorkWithSheets) {
 
-                            newSheet = GetOrCreateSheet(newSheetName);
-                        }
+                                string newSheetName = string.Format("{0}корпус {1}_секция {2}_этаж {3}",
+                                    SheetNamePrefix,
+                                    task.NumberOfBuildingPartAsInt,
+                                    task.NumberOfBuildingSectionAsInt,
+                                    numberOfLevel);
+
+                                newSheet = GetOrCreateSheet(newSheetName);
+                            }
 
 
-                        ViewPlan newViewPlan = null;
-                        if(WorkWithViews) {
-                            
-                            string newViewName = string.Format("{0}{1} этаж К{2}{3}",
-                                ViewNamePrefix,
-                                numberOfLevel,
-                                task.NumberOfBuildingPartAsInt,
-                                task.ViewNameSuffix);
+                            ViewPlan newViewPlan = null;
+                            if(WorkWithViews) {
 
-                            newViewPlan = GetOrCreateView(task, level, newViewName);
+                                string newViewName = string.Format("{0}{1} этаж К{2}{3}",
+                                    ViewNamePrefix,
+                                    numberOfLevel,
+                                    task.NumberOfBuildingPartAsInt,
+                                    task.ViewNameSuffix);
 
-                            if(newSheet != null && newViewPlan != null && Viewport.CanAddViewToSheet(_revitRepository.Document, newSheet.Id, newViewPlan.Id)) {
+                                newViewPlan = GetOrCreateView(task, newViewName, level);
 
-                                PlaceViewportOnSheet(newSheet, newViewPlan);
+                                if(newSheet != null && newViewPlan != null && Viewport.CanAddViewToSheet(_revitRepository.Document, newSheet.Id, newViewPlan.Id)) {
+
+                                    PlaceViewportOnSheet(newSheet, newViewPlan);
+                                }
+                            }
+
+
+                            ViewSchedule newViewSchedule = null;
+                            if(WorkWithSpecs) {
+
+                                foreach(SpecHelper specHelper in task.ScheduleSheetInstances) {
+
+                                    if(!specHelper.CanWorkWithIt) {
+                                        Report.AppendLine($"❗               В задании спецификации имеются ошибки, создание спецификации отменено!");
+                                        continue;
+                                    }
+
+                                    string newScheduleName = specHelper.FirstPartOfSpecName
+                                                            + String.Format(specHelper.FormatOfLevelNumber, numberOfLevelAsInt)
+                                                            + specHelper.SuffixOfLevelNumber
+                                                            + specHelper.LastPartOfSpecName;
+
+                                    newViewSchedule = GetOrCreateSpec(specHelper, newScheduleName, numberOfLevelAsInt);
+
+
+
+                                    // Располагаем созданные спеки на листе в позициях как у спек, с которых производилось копирование, 
+                                    // в случае если лист и спека существуют и видовой экран спеки не найден на листе
+                                    if(newSheet != null && newViewSchedule != null) {
+
+                                        PlaceSpecViewportOnSheet(specHelper, newSheet, newViewSchedule);
+                                    }
+                                }
                             }
                         }
+                    }
+                } else {
+
+                    TaskDialog.Show("fd", "создание с видов");
+                    TaskDialog.Show("Число выбранных видов", SelectedViews.Count.ToString());
 
 
-                        ViewSchedule newViewSchedule = null;
-                        if(WorkWithSpecs) {
+                    foreach(View view in SelectedViews) {
 
-                            foreach(SpecHelper specHelper in task.ScheduleSheetInstances) {
+                        TaskDialog.Show("fd", "1");
 
-                                if(!specHelper.CanWorkWithIt) {
-                                    Report.AppendLine($"❗               В задании спецификации имеются ошибки, создание спецификации отменено!");
-                                    continue;
+
+                        string numberOfLevel = RegexForView.Match(view.Name.ToLower()).Groups[1].Value;
+                        int numberOfLevelAsInt;
+                        TaskDialog.Show("numberOfLevel", numberOfLevel);
+
+                        if(!int.TryParse(numberOfLevel, out numberOfLevelAsInt)) {
+                            continue;
+                        }
+                        TaskDialog.Show("numberOfLevelAsInt", numberOfLevelAsInt.ToString());
+
+
+
+
+                        string viewNamePartWithSectionPart = string.Empty;
+
+                        if(view.Name.ToLower().Contains("_часть ")) {
+                            viewNamePartWithSectionPart = "_часть ";
+                            viewNamePartWithSectionPart += RegexForBuildingSectionPart.Match(view.Name.ToLower()).Groups[1].Value;
+                        }
+                        TaskDialog.Show("fd", "2");
+
+
+                        int c = 0;
+                        foreach(TaskInfo task in TasksForWork) {
+
+                            TaskDialog.Show("task.ViewNameSuffix", task.ViewNameSuffix);
+
+                            c++;
+                            Report.AppendLine($"    Вид \"{view.Name}\", задание номер {c}");
+
+                            // Пропускаем те задания, в которых есть ошибки
+                            if(!task.CanWorkWithIt) {
+                                Report.AppendLine($"❗               В задании имеются ошибки, работа по нему выполнена не будет!");
+                                continue;
+                            }
+
+                            if(numberOfLevelAsInt < task.StartLevelNumberAsInt || numberOfLevelAsInt > task.EndLevelNumberAsInt) {
+
+                                continue;
+                            }
+
+                            ViewSheet newSheet = null;
+                            if(WorkWithSheets) {
+
+                                string newSheetName = string.Format("{0}корпус {1}_секция {2}_этаж {3}",
+                                    SheetNamePrefix,
+                                    task.NumberOfBuildingPartAsInt,
+                                    task.NumberOfBuildingSectionAsInt,
+                                    numberOfLevel);
+
+                                newSheet = GetOrCreateSheet(newSheetName);
+                            }
+
+                            ViewPlan newViewPlan = null;
+                            if(WorkWithViews) {
+
+                                string newViewName = string.Format("{0}{1} этаж К{2}_С{3}{4}{5}",
+                                    ViewNamePrefix,
+                                    numberOfLevel,
+                                    task.NumberOfBuildingPartAsInt,
+                                    task.NumberOfBuildingSectionAsInt,
+                                    viewNamePartWithSectionPart,
+                                    task.ViewNameSuffix);
+
+                                newViewPlan = GetOrCreateView(task, newViewName, null, view);
+
+                                if(newSheet != null && newViewPlan != null && Viewport.CanAddViewToSheet(_revitRepository.Document, newSheet.Id, newViewPlan.Id)) {
+
+                                    PlaceViewportOnSheet(newSheet, newViewPlan);
                                 }
-
-                                string newScheduleName = specHelper.FirstPartOfSpecName
-                                                        + String.Format(specHelper.FormatOfLevelNumber, numberOfLevelAsInt)
-                                                        + specHelper.SuffixOfLevelNumber
-                                                        + specHelper.LastPartOfSpecName;
-
-                                newViewSchedule = GetOrCreateSpec(specHelper, newScheduleName, numberOfLevelAsInt);
+                            }
 
 
-                                
-                                // Располагаем созданные спеки на листе в позициях как у спек, с которых производилось копирование
-                                if(newSheet != null && newViewSchedule != null) {
 
-                                    ScheduleSheetInstance newScheduleSheetInstance = _revitRepository.GetSpecFromSheetByName(newSheet, newScheduleName);
+                            ViewSchedule newViewSchedule = null;
+                            if(WorkWithSpecs) {
 
-                                    if(newScheduleSheetInstance is null) {
-                                        newScheduleSheetInstance = ScheduleSheetInstance.Create(
+                                foreach(SpecHelper specHelper in task.ScheduleSheetInstances) {
+
+                                    if(!specHelper.CanWorkWithIt) {
+                                        Report.AppendLine($"❗               В задании спецификации имеются ошибки, создание спецификации отменено!");
+                                        continue;
+                                    }
+
+                                    string newScheduleName = specHelper.FirstPartOfSpecName
+                                                            + String.Format(specHelper.FormatOfLevelNumber, numberOfLevelAsInt)
+                                                            + specHelper.SuffixOfLevelNumber
+                                                            + specHelper.LastPartOfSpecName;
+
+                                    newViewSchedule = GetOrCreateSpec(specHelper, newScheduleName, numberOfLevelAsInt);
+
+
+
+                                    // Располагаем созданные спеки на листе в позициях как у спек, с которых производилось копирование
+                                    if(newSheet != null && newViewSchedule != null && _revitRepository.GetSpecFromSheetByName(newSheet, newScheduleName) is null) {
+
+                                        ScheduleSheetInstance newScheduleSheetInstance = ScheduleSheetInstance.Create(
                                             _revitRepository.Document,
                                             newSheet.Id,
                                             newViewSchedule.Id,
                                             specHelper.SpecSheetInstancePoint);
-
-                                        Report.AppendLine($"        Спецификация успешно размещена на листе!");
-                                    } else {
-                                        Report.AppendLine($"        Спецификация уже была размещена на листе!");
+                                        
+                                        if(newScheduleSheetInstance is null) {
+                                            Report.AppendLine($"❗       Не удалось создать видовой экран спецификации на листе!");
+                                        } else {
+                                            Report.AppendLine($"        Видовой экран спецификации успешно создан на листе!");
+                                        }
                                     }
                                 }
                             }
@@ -680,11 +805,50 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                     }
                 }
 
-
                 TaskDialog.Show("Документатор АР. Отчет", Report.ToString());
 
                 transaction.Commit();
             }
+
+
+
+
+
+
+            //                foreach(View view in views) {
+
+            //                    string numberOfLevel = regexForView.Match(view.Name.ToLower()).Groups[1].Value;
+
+            //                    int numberOfLevelAsInt;
+            //                    if(!int.TryParse(numberOfLevel, out numberOfLevelAsInt)) {
+            //                        temp += "Не удалось определить номер уровня у вида " + view.Name + Environment.NewLine;
+            //                        continue;
+            //                    }
+
+            //                    if(numberOfLevelAsInt < startLevelNumberAsInt || numberOfLevelAsInt > endLevelNumberAsInt) {
+
+            //                        continue;
+            //                    }
+
+            //                    string viewNamePartWithSectionPart = string.Empty;
+
+            //                    if(view.Name.ToLower().Contains("_часть ")) {
+            //                        viewNamePartWithSectionPart = "_часть ";
+            //                        viewNamePartWithSectionPart += regexForBuildingSectionPart.Match(view.Name.ToLower()).Groups[1].Value;
+            //                    }
+
+
+            //                }
+            //            }
+
+
+            //            if(temp.Length == 0) {
+            //                TaskDialog.Show("Отчет", "Ошибок с " + task.SelectedVisibilityScope.Name + " не было!");
+            //                TaskDialog.Show("Документатор АР. Отчет", report.ToString());
+            //                //MessageBox.Show(report.ToString());
+            //            } else {
+            //                TaskDialog.Show("Ошибка!", temp);
+            //            }
         }
 
 

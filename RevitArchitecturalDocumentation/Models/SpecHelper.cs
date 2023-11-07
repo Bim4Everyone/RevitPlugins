@@ -22,7 +22,9 @@ namespace RevitArchitecturalDocumentation.Models {
             SpecificationFilters = SpecificationDefinition.GetFilters().ToList();
         }
 
-        public SpecHelper(ViewSchedule viewSchedule) {
+        public SpecHelper(MainViewModel mvm, ViewSchedule viewSchedule) {
+
+            MVM = mvm;
 
             Specification = viewSchedule;
             SpecificationDefinition = Specification.Definition;
@@ -70,7 +72,7 @@ namespace RevitArchitecturalDocumentation.Models {
             if(!Specification.Name.Contains("_") || !Specification.Name.Contains("_")) {
 
                 //TaskDialog.Show("fd", "1");
-                CanWorkWithIt= false;
+                CanWorkWithIt = false;
                 return;
             }
 
@@ -135,20 +137,31 @@ namespace RevitArchitecturalDocumentation.Models {
 
             for(int i = 0; i < SpecificationFilters.Count; i++) {
 
-                ScheduleFilter currentFilter = SpecificationFilters[i]; 
-                
+                ScheduleFilter currentFilter = SpecificationFilters[i];
+
                 ScheduleField scheduleFieldFromFilter = SpecificationDefinition.GetField(currentFilter.FieldId);
+
+                //TaskDialog.Show("Ищем", specFilterName);
+                //TaskDialog.Show("Текущий", scheduleFieldFromFilter.GetName());
 
                 if(scheduleFieldFromFilter.GetName() == specFilterName) {
 
                     string filterOldValue = currentFilter.GetStringValue();
+                    //TaskDialog.Show("filterOldValue", filterOldValue);
 
                     string format = GetStringFormatOrDefault(filterOldValue);
 
+                    //TaskDialog.Show("format", format);
+
                     string newVal = String.Format(format, newFilterValue);
+                    //TaskDialog.Show("newVal", newVal);
 
                     currentFilter.SetValue(newVal);
-                    MVM.Report.AppendLine($"        Фильтру задаем значение {currentFilter.GetStringValue()}");
+                    //TaskDialog.Show("newVal", "Вот тут мы пытались записать значение");
+
+                    MVM.Report.AppendLine($"            Фильтру задаем значение {currentFilter.GetStringValue()}");
+                    //TaskDialog.Show("newVal", "Прошли MVM");
+
                     newScheduleFilters.Add(currentFilter);
                 } else {
                     newScheduleFilters.Add(currentFilter);

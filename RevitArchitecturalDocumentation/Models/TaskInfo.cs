@@ -12,10 +12,8 @@ using RevitArchitecturalDocumentation.ViewModels;
 
 using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 
-namespace RevitArchitecturalDocumentation.Models
-{
-    internal class TaskInfo
-    {
+namespace RevitArchitecturalDocumentation.Models {
+    internal class TaskInfo {
         public TaskInfo(MainViewModel mvm) {
             MVM = mvm;
         }

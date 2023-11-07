@@ -122,13 +122,13 @@
                                     Content="Выбрать"
                                     FontSize="14"
                                     Click="ButtonCancel_Click"
-                                    Command="{Binding Path=DataContext.TestCommand, 
+                                    Command="{Binding Path=DataContext.SelectSpecsCommand, 
                                         RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                     CommandParameter="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    
+
                     <GridViewColumn 
                         Header="Выбрано спецификаций" 
                         Width="150"
@@ -256,7 +256,7 @@
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center"
                     IsChecked="{Binding Path=WorkWithSheets}"/>
-                
+
                 <TextBlock
                     Grid.Column="1"
                     Text="Выберите рамку листа:"
@@ -330,11 +330,11 @@
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center"
                     IsChecked="{Binding Path=WorkWithViews}"/>
-                
+
                 <TextBlock
                     Grid.Column="1"
                     Margin="3"
-                    Text="Выберите тип вида:"
+                    Text="Тип вида:"
                     FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"/>
@@ -347,15 +347,15 @@
                     ItemsSource="{Binding Path=ViewFamilyTypes}" 
                     SelectedItem="{Binding Path=SelectedViewFamilyType}">
                 </ComboBox>
-                
+
                 <TextBlock
                     Grid.Column="3"
                     Margin="3"
-                    Text="Выберите тип видового экрана:"
+                    Text="Тип видового экрана:"
                     FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"/>
-                
+
                 <ComboBox
                     Grid.Column="4"
                     Margin="3"
@@ -364,7 +364,7 @@
                     ItemsSource="{Binding Path=ViewportTypes}" 
                     SelectedItem="{Binding Path=SelectedViewportType}">
                 </ComboBox>
-                
+
                 <TextBlock
                     Grid.Column="5"
                     Margin="3"
@@ -372,7 +372,7 @@
                     FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"/>
-                
+
                 <TextBox 
                     Grid.Column="6"
                     Margin="3"
@@ -384,14 +384,14 @@
                     Grid.Column="7"
                     GroupName="TypeOfCreate"
                     IsEnabled="{Binding Path=WorkWithViews}"
-                    Content="Создать на основе выбранных видов"
-                    IsChecked="{Binding Path=CreateViewsBasedOnSelections}"/>
+                    Content="Создать с нуля"
+                    IsChecked="{Binding Path=CreateViewsFromScratch1}"/>
 
                 <RadioButton 
                     Grid.Column="8"
                     GroupName="TypeOfCreate"
                     IsEnabled="{Binding Path=WorkWithViews}"
-                    Content="Создать с нуля"/>
+                    Content="Создать на основе выбранных видов"/>
             </Grid>
         </GroupBox>
 
@@ -458,7 +458,7 @@
                 FontSize="16"
                 Click="ButtonOk_Click"
                 Command="{Binding Path=TestCommand}"/>
-            
+
             <Button
                 Margin="10"
                 Width="80"

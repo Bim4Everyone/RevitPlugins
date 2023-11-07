@@ -59,9 +59,12 @@ namespace RevitArchitecturalDocumentation.Models {
                 .OfType<ViewSchedule>()
                 .FirstOrDefault(o => o.Name.Equals(specName));
 
-        public ScheduleSheetInstance GetSpecFromSheetByName(ViewSheet viewSheet, string specName) => viewSheet.GetDependentViewIds()
-            .Select(id => Document.GetElement(id) as ScheduleSheetInstance)
-            .Where(v => v != null)
-            .FirstOrDefault(v => v.Name == specName);
+        /// <summary>
+        /// Собирает все видовые экраны спецификаций на листе и возвращает ту, что имеет запрошенное имя или null
+        /// </summary>
+        public ScheduleSheetInstance GetSpecFromSheetByName(ViewSheet viewSheet, string specName) => 
+            viewSheet.GetDependentElements(new ElementClassFilter(typeof(ScheduleSheetInstance)))
+                .Select(id => Document.GetElement(id) as ScheduleSheetInstance)
+                .FirstOrDefault(v => v.Name == specName);
     }
 }
