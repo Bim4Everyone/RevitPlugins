@@ -1,4 +1,9 @@
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows.Input;
+
+using Autodesk.Revit.DB;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -7,19 +12,28 @@ using Revit3DvikSchemas.Models;
 
 namespace Revit3DvikSchemas.ViewModels {
     internal class MainViewModel : BaseViewModel {
+
+
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
+        public List<Element> RevitHVACSystems { get; }
+
         private string _errorText;
         private string _saveProperty;
+
+        
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
+            RevitHVACSystems = _revitRepository.GetHVACSystems();
+
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         }
+
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
@@ -65,5 +79,7 @@ namespace Revit3DvikSchemas.ViewModels {
             setting.SaveProperty = SaveProperty;
             _pluginConfig.SaveProjectConfig();
         }
+
+
     }
 }

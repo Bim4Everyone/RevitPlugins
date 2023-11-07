@@ -20,11 +20,13 @@ using Revit3DvikSchemas.Views;
 namespace Revit3DvikSchemas {
     [Transaction(TransactionMode.Manual)]
     public class Revit3DvikSchemasCommand : BasePluginCommand {
+        
         public Revit3DvikSchemasCommand() {
             PluginName = "Revit3DvikSchemas";
         }
 
         protected override void Execute(UIApplication uiApplication) {
+
 			using(IKernel kernel = uiApplication.CreatePlatformServices()) {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
@@ -34,9 +36,13 @@ namespace Revit3DvikSchemas {
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 				
 				kernel.Bind<MainViewModel>().ToSelf();
+
+
+                //«десь мы объ€вл€ем контекст дл€ MainWindow, чтобы работать с MainViewModel
 				kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
+                
 				
 				Notification(kernel.Get<MainWindow>());
 			}
