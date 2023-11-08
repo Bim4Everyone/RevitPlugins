@@ -379,9 +379,8 @@ namespace RevitFamilyParameterAdder.ViewModels {
             Array array = typeof(GroupTypeId).GetProperties();
             BINParameterGroups.Add(new ParameterGroupHelper(new ForgeTypeId()));
             foreach(PropertyInfo group in array) {
-                //PropertyInfo propertyInfo = group as PropertyInfo;
-                if(FamilyManagerFm.IsUserAssignableParameterGroup((ForgeTypeId) group.GetValue(null, null))) {
-                    BINParameterGroups.Add(new ParameterGroupHelper((ForgeTypeId) group.GetValue(null, null)));
+                if(FamilyManagerFm.IsUserAssignableParameterGroup((ForgeTypeId) group.GetValue(null))) {
+                    BINParameterGroups.Add(new ParameterGroupHelper((ForgeTypeId) group.GetValue(null)));
                 }
             }
 #endif
