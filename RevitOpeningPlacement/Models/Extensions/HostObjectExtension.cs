@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,9 +24,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
             SolidOptions opts = new SolidOptions(ElementId.InvalidElementId, ElementId.InvalidElementId);
             Solid solid = default;
             foreach(IList<CurveLoop> loopsPair in loops) {
-                Solid currentSolid = GeometryCreationUtilities.CreateLoftGeometry(
-                loopsPair,
-                opts);
+                Solid currentSolid = GeometryCreationUtilities.CreateLoftGeometry(loopsPair, opts);
                 if(solid is null) {
                     solid = currentSolid;
                 } else {
@@ -88,21 +86,84 @@ namespace RevitOpeningPlacement.Models.Extensions {
                 // если количество CurveLoop одинаковое, будем считать их расположенными друг против друга на гранях
                 for(int i = 0; i < firstLoops.Count; i++) {
                     loops.Add(new List<CurveLoop>() {
-                        firstLoops[i],
-                        secondLoops[i],
+                        SimplifyCurveLoop(firstLoops[i]),
+                        SimplifyCurveLoop(secondLoops[i]),
                     });
                 }
             } else {
                 for(int firstLoopIndex = 0; firstLoopIndex < firstLoops.Count; firstLoopIndex++) {
                     for(int secondLoopIndex = 0; secondLoopIndex < secondLoops.Count; secondLoopIndex++) {
                         loops.Add(new List<CurveLoop>() {
-                            firstLoops[firstLoopIndex],
-                            secondLoops[secondLoopIndex],
+                            SimplifyCurveLoop(firstLoops[firstLoopIndex]),
+                            SimplifyCurveLoop(secondLoops[secondLoopIndex]),
                         });
                     }
                 }
             }
             return loops.Cast<IList<CurveLoop>>().ToList();
+        }
+
+        /// <summary>
+        /// Возвращает контур, в котором отрезки, идущие друг за другом и лежащие на одной прямой превращены в один
+        /// </summary>
+        /// <param name="curveLoopRaw"></param>
+        /// <returns></returns>
+        public static CurveLoop SimplifyCurveLoop(CurveLoop curveLoopRaw) {
+            CurveLoop simplifiedCurves = new CurveLoop();
+            List<Curve> curveLoopList = curveLoopRaw.ToList();
+
+            Curve curvePrevious = null;
+            for(int i = 0; i < curveLoopList.Count; i++) {
+                Curve curveCurrent = curveLoopList[i];
+                if(curvePrevious is null) {
+                    curvePrevious = curveCurrent;
+                    continue;
+                }
+
+                bool isCurveAdded = AppendCurve(ref curvePrevious, curveCurrent);
+                if(i != (curveLoopList.Count - 1) && !isCurveAdded) {
+                    simplifiedCurves.Append(curvePrevious);
+                    curvePrevious = curveCurrent;
+                    continue;
+                }
+                if(i == (curveLoopList.Count - 1)) {
+                    if(isCurveAdded) {
+                        simplifiedCurves.Append(curvePrevious);
+                    } else {
+                        simplifiedCurves.Append(curvePrevious);
+                        simplifiedCurves.Append(curveCurrent);
+                    }
+                }
+            }
+            return simplifiedCurves;
+        }
+
+        /// <summary>
+        /// Добавляет второй отрезок в конец первого отрезка, если отрезки лежат на одной прямой, 
+        /// и конец первого - это начало второго
+        /// </summary>
+        /// <param name="curveStart">Первый отрезок</param>
+        /// <param name="curveEnd">Второй отрезок</param>
+        /// <returns></returns>
+        private static bool AppendCurve(ref Curve curveStart, Curve curveEnd) {
+            if(curveStart is null || curveEnd is null) {
+                return false;
+            }
+
+            if((curveStart is Line lineStart) && (curveEnd is Line lineEnd)) {
+                if(!lineStart.Direction.Normalize().IsAlmostEqualTo(lineEnd.Direction.Normalize())) {
+                    return false;
+                }
+
+                if(curveStart.GetEndPoint(1).IsAlmostEqualTo(curveEnd.GetEndPoint(0))) {
+                    curveStart = Line.CreateBound(curveStart.GetEndPoint(0), curveEnd.GetEndPoint(1));
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
         }
 
         /// <summary>
@@ -125,7 +186,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
                 Curve curve = curveLoopCurrent.First();
                 XYZ curveStart = curve.GetEndPoint(0);
                 XYZ curveEnd = curve.GetEndPoint(1);
-                XYZ curveDirection = curveEnd - curveStart;
+                XYZ curveDirection = (curveEnd - curveStart).Normalize();
                 // вместо неограниченной прямой делаем отрезок длиной 120 метров, который будем принимать за луч
                 Curve ray = Line.CreateBound(curveStart, curveStart + curveDirection * 400);
 
@@ -140,7 +201,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
                 }
                 if(curveLoopIsOuter) {
                     // текущая CurveLoop находится снаружи всех уже добавленных - добавляем ее тоже
-                    outerLoops.Add(curveLoopCurrent);
+                    outerLoops.Add(SimplifyCurveLoop(curveLoopCurrent));
                 }
             }
             return outerLoops;
