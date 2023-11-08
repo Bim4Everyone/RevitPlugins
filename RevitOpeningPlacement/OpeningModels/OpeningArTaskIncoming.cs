@@ -29,16 +29,19 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="revitRepository">Репозиторий активного документа КР</param>
         /// <param name="openingTask">Задание на отверстие от АР</param>
-        /// <param name="transform">Трансформация файла задания на отверстие от АР относительно активного документа КР</param>
+        /// <param name="transform">
+        /// Трансформация файла задания на отверстие от АР относительно активного документа КР</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public OpeningArTaskIncoming(RevitRepository revitRepository, FamilyInstance openingTask, Transform transform) : base(openingTask) {
+        public OpeningArTaskIncoming(RevitRepository revitRepository, FamilyInstance openingTask, Transform transform)
+            : base(openingTask) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             FileName = _familyInstance.Document.PathName;
             Id = _familyInstance.Id;
             Transform = transform;
             Location = Transform.OfPoint((_familyInstance.Location as LocationPoint).Point);
             // https://forums.autodesk.com/t5/revit-api-forum/get-angle-from-transform-basisx-basisy-and-basisz/td-p/5326059
-            Rotation = (_familyInstance.Location as LocationPoint).Rotation + Transform.BasisX.AngleOnPlaneTo(Transform.OfVector(Transform.BasisX), Transform.BasisZ);
+            Rotation = (_familyInstance.Location as LocationPoint).Rotation
+                + Transform.BasisX.AngleOnPlaneTo(Transform.OfVector(Transform.BasisX), Transform.BasisZ);
             OpeningType = RevitRepository.GetOpeningType(_familyInstance.Symbol.FamilyName);
 
             DisplayDiameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArDiameter);
@@ -66,12 +69,14 @@ namespace RevitOpeningPlacement.OpeningModels {
         public Transform Transform { get; } = Transform.Identity;
 
         /// <summary>
-        /// Точка расположения экземпляра семейства входящего задания на отверстие в координатах активного документа - получателя заданий
+        /// Точка расположения экземпляра семейства входящего задания на отверстие 
+        /// в координатах активного документа - получателя заданий
         /// </summary>
         public XYZ Location { get; }
 
         /// <summary>
-        /// Угол поворота задания на отверстие в радианах в координатах активного файла, в который подгружена связь с заданием на отверстие от АР
+        /// Угол поворота задания на отверстие в радианах в координатах активного файла, 
+        /// в который подгружена связь с заданием на отверстие от АР
         /// </summary>
         public double Rotation { get; }
 
@@ -125,7 +130,9 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         public bool Equals(OpeningArTaskIncoming other) {
-            return (other != null) && (Id == other.Id) && FileName.Equals(other.FileName, StringComparison.CurrentCultureIgnoreCase);
+            return (other != null)
+                && (Id == other.Id)
+                && FileName.Equals(other.FileName, StringComparison.CurrentCultureIgnoreCase);
         }
 
         /// <summary>
@@ -133,7 +140,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <returns></returns>
         public override Solid GetSolid() {
-            return SolidUtils.CreateTransformed(_solid, Transform);
+            return SolidUtils.CreateTransformed(GetOpeningSolid(), Transform);
         }
 
         /// <summary>
@@ -147,13 +154,19 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Обновляет <see cref="Status"/> входящего задания на отверстие
         /// </summary>
-        /// <param name="realOpenings">Коллекция чистовых отверстий КР, размещенных в активном КР документе-получателе заданий на отверстия</param>
-        /// <param name="constructureElementsIds">Коллекция элементов конструкций из активного документа-получателя заданий</param>
-        public void UpdateStatus(ICollection<OpeningRealKr> realOpenings, ICollection<ElementId> constructureElementsIds) {
+        /// <param name="realOpenings">Коллекция чистовых отверстий КР, 
+        /// размещенных в активном КР документе-получателе заданий на отверстия</param>
+        /// <param name="constructureElementsIds">
+        /// Коллекция элементов конструкций из активного документа-получателя заданий</param>
+        public void UpdateStatus(
+            ICollection<OpeningRealKr> realOpenings,
+            ICollection<ElementId> constructureElementsIds) {
             var thisOpeningSolid = GetSolid();
             var thisOpeningBBox = GetTransformedBBoxXYZ();
 
-            var intersectingStructureElements = GetIntersectingStructureElementsIds(thisOpeningSolid, constructureElementsIds);
+            var intersectingStructureElements = GetIntersectingStructureElementsIds(
+                thisOpeningSolid,
+                constructureElementsIds);
             var intersectingOpenings = GetIntersectingOpeningsIds(realOpenings, thisOpeningSolid, thisOpeningBBox);
 
             if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count == 0)) {
@@ -169,12 +182,17 @@ namespace RevitOpeningPlacement.OpeningModels {
 
 
         /// <summary>
-        /// Возвращает коллекцию элементов конструкций из активного документа, с которыми пересекается текущее задание на отверстие из связи
+        /// Возвращает коллекцию элементов конструкций из активного документа, 
+        /// с которыми пересекается текущее задание на отверстие из связи
         /// </summary>
-        /// <param name="thisOpeningSolid">Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
-        /// <param name="constructureElementsIds">Коллекция id элементов конструкций из активного документа ревита</param>
+        /// <param name="thisOpeningSolid">
+        /// Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
+        /// <param name="constructureElementsIds">
+        /// Коллекция id элементов конструкций из активного документа ревита</param>
         /// <returns></returns>
-        private ICollection<ElementId> GetIntersectingStructureElementsIds(Solid thisOpeningSolid, ICollection<ElementId> constructureElementsIds) {
+        private ICollection<ElementId> GetIntersectingStructureElementsIds(
+            Solid thisOpeningSolid,
+            ICollection<ElementId> constructureElementsIds) {
             if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0) || (!constructureElementsIds.Any())) {
                 return Array.Empty<ElementId>();
             } else {
@@ -186,17 +204,24 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
-        /// Возвращает коллекцию Id проемов из активного документа, которые пересекаются с текущим заданием на отверстие из связи
+        /// Возвращает коллекцию Id проемов из активного документа, 
+        /// которые пересекаются с текущим заданием на отверстие из связи
         /// </summary>
         /// <param name="realOpenings">Коллекция чистовых отверстий из активного документа ревита</param>
-        /// <param name="thisOpeningSolid">Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
-        /// <param name="thisOpeningBBox">Бокс текущего задания на отверстие в координатах активного файла - получателя заданий</param>
+        /// <param name="thisOpeningSolid">
+        /// Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
+        /// <param name="thisOpeningBBox">
+        /// Бокс текущего задания на отверстие в координатах активного файла - получателя заданий</param>
         /// <returns></returns>
-        private ICollection<ElementId> GetIntersectingOpeningsIds(ICollection<OpeningRealKr> realOpenings, Solid thisOpeningSolid, BoundingBoxXYZ thisOpeningBBox) {
+        private ICollection<ElementId> GetIntersectingOpeningsIds(
+            ICollection<OpeningRealKr> realOpenings,
+            Solid thisOpeningSolid,
+            BoundingBoxXYZ thisOpeningBBox) {
             if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
                 return Array.Empty<ElementId>();
             } else {
-                var opening = realOpenings.FirstOrDefault(realOpening => realOpening.IntersectsSolid(thisOpeningSolid, thisOpeningBBox));
+                var opening = realOpenings.FirstOrDefault(
+                    realOpening => realOpening.IntersectsSolid(thisOpeningSolid, thisOpeningBBox));
                 if(opening != null) {
                     return new ElementId[] { opening.Id };
                 } else {
