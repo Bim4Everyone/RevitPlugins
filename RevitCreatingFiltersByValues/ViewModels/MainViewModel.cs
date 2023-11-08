@@ -286,8 +286,11 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                 // Если он null, значит это встроенный параметр
                 if(paramAsParameterElement is null) {
 
-                    BuiltInParameter parameterAsBuiltIn = (BuiltInParameter) id.GetIdValue();
-
+#if REVIT_2023_OR_LESS
+                    BuiltInParameter parameterAsBuiltIn = (BuiltInParameter) Enum.ToObject(typeof(BuiltInParameter), id.IntegerValue);
+#else
+                    BuiltInParameter parameterAsBuiltIn = (BuiltInParameter) Enum.ToObject(typeof(BuiltInParameter), id.Value);
+#endif
                     parametersHelper.ParamName = LabelUtils.GetLabelFor(parameterAsBuiltIn);
                     parametersHelper.BInParameter = parameterAsBuiltIn;
                     parametersHelper.Id = id;
