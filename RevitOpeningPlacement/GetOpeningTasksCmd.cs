@@ -19,7 +19,8 @@ using RevitOpeningPlacement.Views;
 
 namespace RevitOpeningPlacement {
     /// <summary>
-    /// Команда для просмотра размещенных в текущем файле исходящих заданий на отверстия и полученных из связей входящих заданий
+    /// Команда для просмотра размещенных в текущем файле исходящих заданий на отверстия 
+    /// и полученных из связей входящих заданий
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class GetOpeningTasksCmd : BasePluginCommand {
@@ -38,7 +39,9 @@ namespace RevitOpeningPlacement {
 
 
         protected override void Execute(UIApplication uiApplication) {
-            RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
+            RevitRepository revitRepository = new RevitRepository(
+                uiApplication.Application,
+                uiApplication.ActiveUIDocument.Document);
 
             if(!ModelCorrect(revitRepository)) {
                 return;
@@ -99,7 +102,10 @@ namespace RevitOpeningPlacement {
                 .Select(link => new MepLinkElementsProvider(link) as IMepLinkElementsProvider)
                 .ToHashSet();
 
-            var incomingTasksViewModels = GetOpeningsMepIncomingTasksViewModels(incomingTasks, realOpenings, constructureElementsIds);
+            var incomingTasksViewModels = GetOpeningsMepIncomingTasksViewModels(
+                incomingTasks,
+                realOpenings,
+                constructureElementsIds);
             var openingsRealViewModels = GetOpeningsRealArViewModels(mepLinks, realOpenings);
 
             var navigatorViewModel = new ArchitectureNavigatorForIncomingTasksViewModel(
@@ -125,7 +131,10 @@ namespace RevitOpeningPlacement {
                 .Select(link => new ConstructureLinkElementsProvider(link) as IConstructureLinkElementsProvider)
                 .ToHashSet();
 
-            var incomingTasksViewModels = GetOpeningsArIncomingTasksViewModels(incomingTasks, realOpenings, constructureElementsIds);
+            var incomingTasksViewModels = GetOpeningsArIncomingTasksViewModels(
+                incomingTasks,
+                realOpenings,
+                constructureElementsIds);
             var openingsRealViewModels = GetOpeningsRealKrViewModels(arLinks, realOpenings);
 
             var navigatorViewModel = new ConstructureNavigatorForIncomingTasksViewModel(
@@ -312,8 +321,30 @@ namespace RevitOpeningPlacement {
             var outcomingTasks = revitRepository.GetOpeningsMepTasksOutcoming();
             IList<ElementId> outcomingTasksIds = outcomingTasks.Select(task => task.Id).ToList();
             var mepElementsIds = revitRepository.GetMepElementsIds();
+            var constructureLinks = GetLinkProviders(revitRepository);
+            var openingTaskOutcomingViewModels = GetMepTaskOutcomingViewModels(
+                outcomingTasks,
+                ref outcomingTasksIds,
+                mepElementsIds,
+                constructureLinks);
+
+            var navigatorViewModel = new MepNavigatorForOutcomingTasksViewModel(
+                revitRepository,
+                openingTaskOutcomingViewModels);
+
+            var window = new NavigatorMepOutcomingView() { Title = PluginName, DataContext = navigatorViewModel };
+            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
+
+            window.Show();
+        }
+
+        private ICollection<OpeningMepTaskOutcomingViewModel> GetMepTaskOutcomingViewModels(
+            ICollection<OpeningMepTaskOutcoming> outcomingTasks,
+            ref IList<ElementId> outcomingTasksIds,
+            ICollection<ElementId> mepElementsIds,
+            ICollection<IConstructureLinkElementsProvider> constructureLinks
+            ) {
             var openingTaskOutcomingViewModels = new List<OpeningMepTaskOutcomingViewModel>();
-            var constructureLinks = revitRepository.GetConstructureLinks().Select(link => new ConstructureLinkElementsProvider(link) as IConstructureLinkElementsProvider).ToHashSet();
 
             using(var pb = GetPlatformService<IProgressDialogService>()) {
                 pb.StepValue = _progressBarStepLarge;
@@ -332,12 +363,28 @@ namespace RevitOpeningPlacement {
                     i++;
                 }
             }
-            var navigatorViewModel = new MepNavigatorForOutcomingTasksViewModel(revitRepository, openingTaskOutcomingViewModels);
+            return openingTaskOutcomingViewModels;
+        }
 
-            var window = new NavigatorMepOutcomingView() { Title = PluginName, DataContext = navigatorViewModel };
-            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
+        private ICollection<IConstructureLinkElementsProvider> GetLinkProviders(RevitRepository revitRepository) {
+            var constructureLinks = revitRepository.GetConstructureLinks();
+            List<IConstructureLinkElementsProvider> providers = new List<IConstructureLinkElementsProvider>();
 
-            window.Show();
+            using(var pb = GetPlatformService<IProgressDialogService>()) {
+                pb.StepValue = 1;
+                pb.DisplayTitleFormat = "Анализ связей... [{0}\\{1}]";
+                var progress = pb.CreateProgress();
+                pb.MaxValue = constructureLinks.Count;
+                var ct = pb.CreateCancellationToken();
+                pb.Show();
+                int i = 0;
+                foreach(var constructureLink in constructureLinks) {
+                    ct.ThrowIfCancellationRequested();
+                    providers.Add(new ConstructureLinkElementsProvider(constructureLink));
+                    progress.Report(i++);
+                }
+            }
+            return providers;
         }
 
         /// <summary>
@@ -345,7 +392,8 @@ namespace RevitOpeningPlacement {
         /// </summary>
         /// <param name="revitRepository"></param>
         private void GetOpeningsTaskInDocumentNotDefined(RevitRepository revitRepository) {
-            TaskDialog.Show("BIM", $"Название файла: \"{revitRepository.GetDocumentName()}\" не удовлетворяет BIM стандарту А101. " +
+            TaskDialog.Show("BIM",
+                $"Название файла: \"{revitRepository.GetDocumentName()}\" не удовлетворяет BIM стандарту А101. " +
                 $"Скорректируйте название и запустите команду снова.");
             throw new OperationCanceledException();
         }
@@ -355,7 +403,9 @@ namespace RevitOpeningPlacement {
         /// </summary>
         /// <param name="revitRepository"></param>
         private void GetOpeningsTaskInDocumentKoord(RevitRepository revitRepository) {
-            TaskDialog.Show("BIM", $"Команда не может быть запущена в координационном файле \"{revitRepository.GetDocumentName()}\"");
+            TaskDialog.Show(
+                "BIM",
+                $"Команда не может быть запущена в координационном файле \"{revitRepository.GetDocumentName()}\"");
             throw new OperationCanceledException();
         }
     }
