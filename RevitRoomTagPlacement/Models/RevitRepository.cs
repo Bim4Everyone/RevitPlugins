@@ -78,7 +78,7 @@ namespace RevitRoomTagPlacement.Models {
             IEnumerable<string> uniqueNames = new List<string>();
 
             if(selectedGroups.Count() > 0) {
-               uniqueNames = new List<string>(selectedGroups.First().GroupRoomNames);
+                uniqueNames = new List<string>(selectedGroups.First().GroupRoomNames);
 
                 foreach(var group in selectedGroups) {
                     uniqueNames = uniqueNames.Intersect(group.GroupRoomNames);
@@ -93,26 +93,19 @@ namespace RevitRoomTagPlacement.Models {
                                                         string roomName = "") {
             var selectedGroups = RoomGroups.Where(x => x.IsChecked);
             List<RoomFromRevit> rooms = new List<RoomFromRevit>();
+
             if(groupPlacementWay == GroupPlacementWay.EveryRoom) {
                 rooms = selectedGroups.SelectMany(x => x.Rooms).ToList();
-
-            } else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupRandom) {
+            } 
+            else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupRandom) {
                 RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
                 rooms = selectedGroups
-                    .SelectMany(x => x.Rooms
-                        .GroupBy(r => r.RoomObject.GetParamValue<string>(sectionParam))
-                        .Select(g => g.OrderByDescending(r => r.RoomObject.Area)
-                        .First()))
-                    .ToList();
-
-            } else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupByName) {
+                    .SelectMany(x => x.GetMaxAreaRooms()).ToList();
+            } 
+            else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupByName) {
                 RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
                 rooms = selectedGroups
-                    .SelectMany(x => x.Rooms
-                    .GroupBy(r => r.RoomObject.GetParamValue<string>(sectionParam))
-                    .Select(g => g.Where(y => y.RoomObject.GetParamValue<string>(BuiltInParameter.ROOM_NAME) == roomName)
-                    .First()))
-                    .ToList();
+                    .SelectMany(x => x.GetRoomsByName(roomName)).ToList();
             }
             return rooms;
         }

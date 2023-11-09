@@ -167,7 +167,7 @@ namespace RevitRoomTagPlacement.ViewModels {
 
         private bool CanPlaceTags(object p) {
             if(RoomGroups.Count() == 0) {
-                ErrorText = "В проекте отсутствуют помещения";
+                ErrorText = "Помещения отсутсвуют/не выбраны";
                 return false;
             }
             if(TagFamilies.Count() == 0) {
