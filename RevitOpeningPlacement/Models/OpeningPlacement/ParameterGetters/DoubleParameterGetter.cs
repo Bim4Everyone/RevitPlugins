@@ -1,7 +1,6 @@
 ﻿
 using RevitClashDetective.Models.Value;
 
-using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {

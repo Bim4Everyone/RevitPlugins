@@ -1,4 +1,4 @@
-﻿using System.Windows.Interop;
+using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;

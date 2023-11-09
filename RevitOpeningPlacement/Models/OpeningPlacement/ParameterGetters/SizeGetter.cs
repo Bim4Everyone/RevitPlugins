@@ -5,7 +5,6 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using RevitOpeningPlacement.Models.Extensions;
-using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
     internal class SizeGetter {
