@@ -99,7 +99,8 @@ namespace RevitMepTotals.Services.Implements {
 
         private IList<IDuctData> GetOrderedDuctData(IDocumentData documentData) {
             return documentData.Ducts
-                .OrderBy(d => d.TypeName)
+                .OrderBy(d => d.SystemName)
+                .ThenBy(d => d.TypeName)
                 .ThenBy(d => d.Name)
                 .ThenBy(d => d.Size)
                 .ToList();
@@ -107,7 +108,8 @@ namespace RevitMepTotals.Services.Implements {
 
         private IList<IPipeData> GetOrderedPipeData(IDocumentData documentData) {
             return documentData.Pipes
-                .OrderBy(d => d.TypeName)
+                .OrderBy(d => d.SystemName)
+                .ThenBy(d => d.TypeName)
                 .ThenBy(d => d.Name)
                 .ThenBy(d => d.Size)
                 .ToList();
@@ -115,7 +117,8 @@ namespace RevitMepTotals.Services.Implements {
 
         private IList<IPipeInsulationData> GetOrderedPipeInsulationData(IDocumentData documentData) {
             return documentData.PipeInsulations
-                .OrderBy(d => d.TypeName)
+                .OrderBy(d => d.SystemName)
+                .ThenBy(d => d.TypeName)
                 .ThenBy(d => d.Name)
                 .ThenBy(d => d.PipeSize)
                 .ThenBy(d => d.Thickness)
@@ -134,19 +137,21 @@ namespace RevitMepTotals.Services.Implements {
             worksheet.Rows[startRow][0].Value = "Воздуховоды";
             worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
             startRow++;
-            worksheet.Rows[startRow][0].Value = "Тип";
-            worksheet.Rows[startRow][1].Value = "ФОП_ВИС_Наименование комбинированное";
-            worksheet.Rows[startRow][2].Value = "Размер";
-            worksheet.Rows[startRow][3].Value = "Длина, м";
+            worksheet.Rows[startRow][0].Value = "Имя системы";
+            worksheet.Rows[startRow][1].Value = "Тип";
+            worksheet.Rows[startRow][2].Value = "ФОП_ВИС_Наименование комбинированное";
+            worksheet.Rows[startRow][3].Value = "Размер";
+            worksheet.Rows[startRow][4].Value = "Длина, м";
             worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
             startRow++;
             int ductsCount = ductData.Count;
             int lastRow = startRow + ductsCount - 1;
             for(int row = startRow; row < lastRow + 1; row++) {
-                worksheet.Rows[row][0].Value = ductData[row - startRow].TypeName;
-                worksheet.Rows[row][1].Value = ductData[row - startRow].Name;
-                worksheet.Rows[row][2].Value = ductData[row - startRow].Size;
-                worksheet.Rows[row][3].Value = ductData[row - startRow].Length / 1000;
+                worksheet.Rows[row][0].Value = ductData[row - startRow].SystemName;
+                worksheet.Rows[row][1].Value = ductData[row - startRow].TypeName;
+                worksheet.Rows[row][2].Value = ductData[row - startRow].Name;
+                worksheet.Rows[row][3].Value = ductData[row - startRow].Size;
+                worksheet.Rows[row][4].Value = ductData[row - startRow].Length / 1000;
             }
             return lastRow;
         }
@@ -162,19 +167,21 @@ namespace RevitMepTotals.Services.Implements {
             worksheet.Rows[startRow][0].Value = "Трубы";
             worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
             startRow++;
-            worksheet.Rows[startRow][0].Value = "Тип";
-            worksheet.Rows[startRow][1].Value = "ФОП_ВИС_Наименование комбинированное";
-            worksheet.Rows[startRow][2].Value = "Размер";
-            worksheet.Rows[startRow][3].Value = "Длина, м";
+            worksheet.Rows[startRow][0].Value = "Имя системы";
+            worksheet.Rows[startRow][1].Value = "Тип";
+            worksheet.Rows[startRow][2].Value = "ФОП_ВИС_Наименование комбинированное";
+            worksheet.Rows[startRow][3].Value = "Размер";
+            worksheet.Rows[startRow][4].Value = "Длина, м";
             worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
             startRow++;
             int pipesCount = pipeData.Count;
             int lastRow = startRow + pipesCount - 1;
             for(int row = startRow; row < lastRow + 1; row++) {
-                worksheet.Rows[row][0].Value = pipeData[row - startRow].TypeName;
-                worksheet.Rows[row][1].Value = pipeData[row - startRow].Name;
-                worksheet.Rows[row][2].Value = pipeData[row - startRow].Size;
-                worksheet.Rows[row][3].Value = pipeData[row - startRow].Length / 1000;
+                worksheet.Rows[row][0].Value = pipeData[row - startRow].SystemName;
+                worksheet.Rows[row][1].Value = pipeData[row - startRow].TypeName;
+                worksheet.Rows[row][2].Value = pipeData[row - startRow].Name;
+                worksheet.Rows[row][3].Value = pipeData[row - startRow].Size;
+                worksheet.Rows[row][4].Value = pipeData[row - startRow].Length / 1000;
             }
             return lastRow;
         }
@@ -194,21 +201,23 @@ namespace RevitMepTotals.Services.Implements {
             worksheet.Rows[startRow][0].Value = "Изоляция трубопроводов";
             worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
             startRow++;
-            worksheet.Rows[startRow][0].Value = "Тип";
-            worksheet.Rows[startRow][1].Value = "ФОП_ВИС_Наименование комбинированное";
-            worksheet.Rows[startRow][2].Value = "Размер трубы";
-            worksheet.Rows[startRow][3].Value = "Толщина, мм";
-            worksheet.Rows[startRow][4].Value = "Длина, м";
+            worksheet.Rows[startRow][0].Value = "Имя системы";
+            worksheet.Rows[startRow][1].Value = "Тип";
+            worksheet.Rows[startRow][2].Value = "ФОП_ВИС_Наименование комбинированное";
+            worksheet.Rows[startRow][3].Value = "Размер трубы";
+            worksheet.Rows[startRow][4].Value = "Толщина, мм";
+            worksheet.Rows[startRow][5].Value = "Длина, м";
             worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
             startRow++;
             int count = pipeInsulationData.Count;
             int lastRow = startRow + count - 1;
             for(int row = startRow; row < lastRow + 1; row++) {
-                worksheet.Rows[row][0].Value = pipeInsulationData[row - startRow].TypeName;
-                worksheet.Rows[row][1].Value = pipeInsulationData[row - startRow].Name;
-                worksheet.Rows[row][2].Value = pipeInsulationData[row - startRow].PipeSize;
-                worksheet.Rows[row][3].Value = pipeInsulationData[row - startRow].Thickness;
-                worksheet.Rows[row][4].Value = pipeInsulationData[row - startRow].Length / 1000;
+                worksheet.Rows[row][0].Value = pipeInsulationData[row - startRow].SystemName;
+                worksheet.Rows[row][1].Value = pipeInsulationData[row - startRow].TypeName;
+                worksheet.Rows[row][2].Value = pipeInsulationData[row - startRow].Name;
+                worksheet.Rows[row][3].Value = pipeInsulationData[row - startRow].PipeSize;
+                worksheet.Rows[row][4].Value = pipeInsulationData[row - startRow].Thickness;
+                worksheet.Rows[row][5].Value = pipeInsulationData[row - startRow].Length / 1000;
             }
             return lastRow;
         }

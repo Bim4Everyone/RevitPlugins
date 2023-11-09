@@ -21,12 +21,12 @@ using RevitMepTotals.Views;
 
 namespace RevitMepTotals {
     /// <summary>
-    /// Команда для выбора моделей Revit и последующей выгрузки информации из них в Excel файл.
+    /// РљРѕРјР°РЅРґР° РґР»СЏ РІС‹Р±РѕСЂР° РјРѕРґРµР»РµР№ Revit Рё РїРѕСЃР»РµРґСѓСЋС‰РµР№ РІС‹РіСЂСѓР·РєРё РёРЅС„РѕСЂРјР°С†РёРё РёР· РЅРёС… РІ Excel С„Р°Р№Р».
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class RevitMepTotalsCommand : BasePluginCommand {
         public RevitMepTotalsCommand() {
-            PluginName = "Выгрузить объемы";
+            PluginName = "Р’С‹РіСЂСѓР·РёС‚СЊ РѕР±СЉРµРјС‹";
         }
 
         protected override void Execute(UIApplication uiApplication) {

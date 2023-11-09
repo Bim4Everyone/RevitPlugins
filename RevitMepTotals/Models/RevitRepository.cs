@@ -14,8 +14,8 @@ using dosymep.Bim4Everyone.SystemParams;
 
 namespace RevitMepTotals.Models {
     internal class RevitRepository {
-        private const string _sharedName = "ФОП_ВИС_Наименование комбинированное";
-        private const string _default = "отсутствует";
+        private const string _sharedName = "Р¤РћРџ_Р’РРЎ_РќР°РёРјРµРЅРѕРІР°РЅРёРµ РєРѕРјР±РёРЅРёСЂРѕРІР°РЅРЅРѕРµ";
+        private const string _default = "РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚";
 
 
         public RevitRepository(UIApplication uiApplication) {
@@ -61,7 +61,7 @@ namespace RevitMepTotals.Models {
         }
 
         /// <summary>
-        /// Возвращает значение параметра "ФОП_ВИС_Наименование"
+        /// Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° "Р¤РћРџ_Р’РРЎ_РќР°РёРјРµРЅРѕРІР°РЅРёРµ"
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
@@ -78,7 +78,24 @@ namespace RevitMepTotals.Models {
         }
 
         /// <summary>
-        /// Возвращает значение параметра "Длина" у воздуховодов и труб и их изоляции в мм
+        /// Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° "РРјСЏ СЃРёСЃС‚РµРјС‹"
+        /// </summary>
+        /// <param name="document"></param>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public string GetMepCurveElementMepSystemName(Document document, MEPCurve element) {
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+            if(element is null) { throw new ArgumentNullException(nameof(element)); }
+
+            SystemParam param = SystemParamsConfig.Instance
+                .CreateRevitParam(document, BuiltInParameter.RBS_SYSTEM_NAME_PARAM);
+            string systemName = element.GetParamValueOrDefault(param, _default);
+            return systemName;
+        }
+
+        /// <summary>
+        /// Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° "Р”Р»РёРЅР°" Сѓ РІРѕР·РґСѓС…РѕРІРѕРґРѕРІ Рё С‚СЂСѓР± Рё РёС… РёР·РѕР»СЏС†РёРё РІ РјРј
         /// </summary>
         /// <param name="document"></param>
         /// <param name="element"></param>
@@ -95,7 +112,7 @@ namespace RevitMepTotals.Models {
         }
 
         /// <summary>
-        /// Возвращает толщину изоляции в мм
+        /// Р’РѕР·РІСЂР°С‰Р°РµС‚ С‚РѕР»С‰РёРЅСѓ РёР·РѕР»СЏС†РёРё РІ РјРј
         /// </summary>
         /// <param name="document"></param>
         /// <param name="insulation"></param>
@@ -109,7 +126,7 @@ namespace RevitMepTotals.Models {
         }
 
         /// <summary>
-        /// Возвращает название типоразмера воздуховода
+        /// Р’РѕР·РІСЂР°С‰Р°РµС‚ РЅР°Р·РІР°РЅРёРµ С‚РёРїРѕСЂР°Р·РјРµСЂР° РІРѕР·РґСѓС…РѕРІРѕРґР°
         /// </summary>
         /// <param name="duct"></param>
         /// <returns></returns>
@@ -121,7 +138,7 @@ namespace RevitMepTotals.Models {
         }
 
         /// <summary>
-        /// Возвращает значение параметра "Размер"
+        /// Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° "Р Р°Р·РјРµСЂ"
         /// </summary>
         /// <param name="document"></param>
         /// <param name="duct"></param>
@@ -135,7 +152,7 @@ namespace RevitMepTotals.Models {
         }
 
         /// <summary>
-        /// Возвращает значение типоразмера трубы
+        /// Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ С‚РёРїРѕСЂР°Р·РјРµСЂР° С‚СЂСѓР±С‹
         /// </summary>
         /// <param name="pipe"></param>
         /// <returns></returns>
@@ -147,7 +164,7 @@ namespace RevitMepTotals.Models {
         }
 
         /// <summary>
-        /// Возвращает значение параметра "Размер"
+        /// Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° "Р Р°Р·РјРµСЂ"
         /// </summary>
         /// <param name="document"></param>
         /// <param name="pipe"></param>
@@ -161,7 +178,7 @@ namespace RevitMepTotals.Models {
         }
 
         /// <summary>
-        /// Возвращает название типоразмера изоляции воздуховодов
+        /// Р’РѕР·РІСЂР°С‰Р°РµС‚ РЅР°Р·РІР°РЅРёРµ С‚РёРїРѕСЂР°Р·РјРµСЂР° РёР·РѕР»СЏС†РёРё РІРѕР·РґСѓС…РѕРІРѕРґРѕРІ
         /// </summary>
         /// <param name="document"></param>
         /// <param name="pipeInsulation"></param>
@@ -176,7 +193,7 @@ namespace RevitMepTotals.Models {
 
 
         /// <summary>
-        /// Возвращает значение параметра "Размер воздуховода"
+        /// Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° "Р Р°Р·РјРµСЂ РІРѕР·РґСѓС…РѕРІРѕРґР°"
         /// </summary>
         /// <param name="document"></param>
         /// <param name="pipeInsulation"></param>
@@ -192,7 +209,7 @@ namespace RevitMepTotals.Models {
         }
 
         /// <summary>
-        /// Возвращает название типоразмера элемента
+        /// Р’РѕР·РІСЂР°С‰Р°РµС‚ РЅР°Р·РІР°РЅРёРµ С‚РёРїРѕСЂР°Р·РјРµСЂР° СЌР»РµРјРµРЅС‚Р°
         /// </summary>
         /// <param name="document"></param>
         /// <param name="element"></param>
@@ -206,7 +223,7 @@ namespace RevitMepTotals.Models {
         }
 
         /// <summary>
-        /// Возвращает значение параметра "Размер" из воздуховода или трубы
+        /// Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° "Р Р°Р·РјРµСЂ" РёР· РІРѕР·РґСѓС…РѕРІРѕРґР° РёР»Рё С‚СЂСѓР±С‹
         /// </summary>
         /// <param name="document"></param>
         /// <param name="element"></param>
@@ -222,7 +239,7 @@ namespace RevitMepTotals.Models {
         }
 
         /// <summary>
-        /// Конвертирует футы в мм
+        /// РљРѕРЅРІРµСЂС‚РёСЂСѓРµС‚ С„СѓС‚С‹ РІ РјРј
         /// </summary>
         /// <param name="feetValue"></param>
         /// <returns></returns>
@@ -236,7 +253,7 @@ namespace RevitMepTotals.Models {
         }
 
         /// <summary>
-        /// Конвертирует квадратные футы в квадратные метры
+        /// РљРѕРЅРІРµСЂС‚РёСЂСѓРµС‚ РєРІР°РґСЂР°С‚РЅС‹Рµ С„СѓС‚С‹ РІ РєРІР°РґСЂР°С‚РЅС‹Рµ РјРµС‚СЂС‹
         /// </summary>
         /// <param name="squareFeetValue"></param>
         /// <returns></returns>

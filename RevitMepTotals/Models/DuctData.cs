@@ -5,11 +5,13 @@ using RevitMepTotals.Models.Interfaces;
 
 namespace RevitMepTotals.Models {
     internal class DuctData : IDuctData, IEquatable<DuctData> {
-        public DuctData(string typeName, string size, string name) {
+        public DuctData(string systemName, string typeName, string size, string name) {
+            if(string.IsNullOrWhiteSpace(systemName)) { throw new ArgumentException(nameof(systemName)); }
             if(string.IsNullOrWhiteSpace(typeName)) { throw new ArgumentException(nameof(typeName)); }
             if(string.IsNullOrWhiteSpace(size)) { throw new ArgumentException(nameof(size)); }
             if(string.IsNullOrWhiteSpace(name)) { throw new ArgumentException(nameof(name)); }
 
+            SystemName = systemName;
             TypeName = typeName;
             Size = size;
             Name = name;
@@ -24,12 +26,15 @@ namespace RevitMepTotals.Models {
 
         public double Length { get; set; }
 
+        public string SystemName { get; }
+
         public override bool Equals(object obj) {
             return Equals(obj as DuctData);
         }
 
         public override int GetHashCode() {
             int hashCode = 608894917;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(SystemName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(TypeName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Size);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
@@ -41,7 +46,8 @@ namespace RevitMepTotals.Models {
             if(ReferenceEquals(null, other)) { return false; }
             if(ReferenceEquals(this, other)) { return true; }
 
-            return TypeName == other.TypeName
+            return SystemName == other.SystemName
+                && TypeName == other.TypeName
                 && Size == other.Size
                 && Name == other.Name
                 && Length == other.Length

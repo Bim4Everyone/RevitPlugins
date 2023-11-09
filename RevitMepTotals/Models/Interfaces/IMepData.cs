@@ -12,5 +12,10 @@
         /// Значение параметра "ФОП_ВИС_Наименование"
         /// </summary>
         string Name { get; }
+
+        /// <summary>
+        /// Значение параметра "Имя системы"
+        /// </summary>
+        string SystemName { get; }
     }
 }
