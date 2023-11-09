@@ -39,6 +39,16 @@ namespace RevitFamilyParameterAdder.ViewModels {
         public StringBuilder _reportAlreadyBeen = new StringBuilder();
         private List<SharedParam> _selectedParams = new List<SharedParam>();
         private List<ParameterGroupHelper> _bINParameterGroups = new List<ParameterGroupHelper>();
+
+        // Представленный ниже список параметров по умолчанию используется для ускоренного добавления пакета параметров в семейства армирования.
+        // Данный перечень базируется на файле общих параметров компании А101 и применяется при разработке семейств только внутри компании А101.
+        // Т.к. разработка семейств ведется компанией только в русскоязычной версии программы Revit, то адаптация формул следующих параметров
+        // для других языковых версий Revit выполнена не будет.
+
+        // The list of default parameters presented below is used to quickly add a parameter package to reinforcement families.
+        // This list is based on the shared parameters file of the A101 company and is used when developing families only within the A101 company.
+        // Since the development of families is carried out by the company only in the Russian version of the Revit program, the adaptation
+        // of the formulas of the following parameters for other language versions of Revit will not be performed.
         private List<DefaultParam> _defaultParamsKR = new List<DefaultParam>() {
 #if REVIT_2023_OR_LESS
             new DefaultParam("обр_ФОП_Форма_префикс", BuiltInParameterGroup.PG_CONSTRUCTION, 
