@@ -6,6 +6,8 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
+using RevitClashDetective.Models.Clashes;
+
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
@@ -13,7 +15,7 @@ using RevitOpeningPlacement.OpeningModels;
 namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// <summary>
     /// Модель представления чистового отверстия в навигаторе КР по входящим заданиям на отверстия.
-    /// Использовать для отображения чистовых отверстий, которые требуют внимания конструктора
+    /// Использовать для отображения чистовых отверстий КР из активного документа, которые требуют внимания конструктора
     /// </summary>
     internal class OpeningRealKrViewModel : BaseViewModel, ISelectorAndHighlighter, IEquatable<OpeningRealKrViewModel> {
         private readonly OpeningRealKr _openingReal;
@@ -77,9 +79,9 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
                 && (OpeningId == other.OpeningId);
         }
 
-        public ICollection<Element> GetElementsToSelect() {
-            return new Element[] {
-                _openingReal.GetFamilyInstance()
+        public ICollection<ElementModel> GetElementsToSelect() {
+            return new ElementModel[] {
+                new ElementModel( _openingReal.GetFamilyInstance())
             };
         }
 

@@ -67,7 +67,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
             }
 
             var fileName = Path.GetFileNameWithoutExtension(match.Groups["fileName"].Value.Trim());
-            return _revitRepository.GetDocumentName().Equals(_revitRepository.GetDocumentName(fileName), StringComparison.CurrentCultureIgnoreCase);
+            return _revitRepository.GetDocumentName().Equals(RevitRepository.GetDocumentName(fileName), StringComparison.CurrentCultureIgnoreCase);
         }
 
 

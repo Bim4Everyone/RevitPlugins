@@ -17,7 +17,8 @@ using RevitOpeningPlacement.OpeningModels.Enums;
 
 namespace RevitOpeningPlacement.OpeningModels {
     /// <summary>
-    /// Класс, обозначающий чистовое отверстие КР, идущее на чертежи. Использовать для обертки проемов из активного файла КР
+    /// Класс, обозначающий чистовое отверстие КР, идущее на чертежи. 
+    /// Использовать для обертки проемов из активного файла КР
     /// </summary>
     internal class OpeningRealKr : OpeningRealBase, IEquatable<OpeningRealKr> {
         public OpeningRealKr(FamilyInstance openingReal) : base(openingReal) {
@@ -78,7 +79,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         public override Solid GetSolid() {
-            return _solid;
+            return GetOpeningSolid();
         }
 
         public override BoundingBoxXYZ GetTransformedBBoxXYZ() {
@@ -94,7 +95,10 @@ namespace RevitOpeningPlacement.OpeningModels {
             Solid thisOpeningRealSolidAfterIntersection = thisOpeningRealSolid;
 
             foreach(IConstructureLinkElementsProvider link in arLinkElementsProviders) {
-                thisOpeningRealSolidAfterIntersection = SubtractLinkOpenings(link, thisOpeningRealSolidAfterIntersection, out bool openingIsNotActual);
+                thisOpeningRealSolidAfterIntersection = SubtractLinkOpenings(
+                    link,
+                    thisOpeningRealSolidAfterIntersection,
+                    out bool openingIsNotActual);
                 if(openingIsNotActual) {
                     Status = OpeningRealStatus.NotActual;
                     return;
@@ -128,16 +132,26 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="thisOpeningSolidForSubtraction">
         /// Солид текущего отверстия в исходных координатах активного документа, 
         /// из которого вычтены пересекающие его задания на отверстия</param>
-        /// <param name="linkOpeningsIntersectConstructions">Флаг, показывающий, полностью ли текущее чистовое отверстие закрывает собой пересекающие его задания на отверстия</param>
+        /// <param name="linkOpeningsIntersectConstructions">
+        /// Флаг, показывающий, 
+        /// полностью ли текущее чистовое отверстие закрывает собой пересекающие его задания на отверстия</param>
         /// <returns></returns>
-        private Solid SubtractLinkOpenings(IConstructureLinkElementsProvider link, Solid thisOpeningSolidForSubtraction, out bool linkOpeningsIntersectConstructions) {
+        private Solid SubtractLinkOpenings(
+            IConstructureLinkElementsProvider link,
+            Solid thisOpeningSolidForSubtraction,
+            out bool linkOpeningsIntersectConstructions) {
+
             Solid thisOpeningRealSolid = GetSolid();
-            Solid thisOpeningSolidInLinkCoordinates = SolidUtils.CreateTransformed(thisOpeningRealSolid, link.DocumentTransform.Inverse);
-            BoundingBoxXYZ thisBBoxInLinkCoordinates = GetTransformedBBoxXYZ().GetTransformedBoundingBox(link.DocumentTransform.Inverse);
+            Solid thisOpeningSolidInLinkCoordinates = SolidUtils.CreateTransformed(
+                thisOpeningRealSolid, link.DocumentTransform.Inverse);
+            BoundingBoxXYZ thisBBoxInLinkCoordinates = GetTransformedBBoxXYZ()
+                .GetTransformedBoundingBox(link.DocumentTransform.Inverse);
 
             ICollection<Solid> intersectingTasksSolidsInActiveDocCoordinates = link
                 .GetOpeningsReal()
-                .Where(openingTask => openingTask.IntersectsSolid(thisOpeningSolidInLinkCoordinates, thisBBoxInLinkCoordinates))
+                .Where(openingTask => openingTask.IntersectsSolid(
+                    thisOpeningSolidInLinkCoordinates,
+                    thisBBoxInLinkCoordinates))
                 .Select(task => SolidUtils.CreateTransformed(task.GetSolid(), link.DocumentTransform))
                 .ToHashSet();
 

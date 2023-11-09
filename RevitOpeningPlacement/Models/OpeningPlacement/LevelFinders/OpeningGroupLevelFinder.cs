@@ -7,16 +7,14 @@ using RevitOpeningPlacement.Models.OpeningUnion;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.LevelFinders {
     internal class OpeningsGroupLevelFinder : ILevelFinder {
-        private readonly RevitRepository _revitRepository;
         private readonly OpeningsGroup _openingsGroup;
 
-        public OpeningsGroupLevelFinder(RevitRepository revitRepository, OpeningsGroup openingsGroup) {
-            _revitRepository = revitRepository;
+        public OpeningsGroupLevelFinder(OpeningsGroup openingsGroup) {
             _openingsGroup = openingsGroup;
         }
 
         public Level GetLevel() {
-            return _revitRepository.GetLevel(_openingsGroup.Elements.First().GetFamilyInstance());
+            return RevitRepository.GetLevel(_openingsGroup.Elements.First().GetFamilyInstance());
         }
     }
 }

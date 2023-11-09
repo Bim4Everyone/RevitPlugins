@@ -35,8 +35,10 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
         public void InitializeParameters() {
             var parameters =
-                _revitRepository.GetDocuments()
-                .SelectMany(item => _revitRepository.GetParameters(item, Categories))
+                _revitRepository.DocInfos
+                .GroupBy(item => item.Name)
+                .Select(group => group.ToList().First())
+                .SelectMany(item => _revitRepository.GetParameters(item.Doc, Categories))
                 .Distinct()
                 .Select(item => new ParameterViewModel(item))
                 .ToList();

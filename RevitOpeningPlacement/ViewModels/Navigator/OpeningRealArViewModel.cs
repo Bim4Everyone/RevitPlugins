@@ -6,6 +6,8 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
+using RevitClashDetective.Models.Clashes;
+
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
@@ -13,7 +15,7 @@ using RevitOpeningPlacement.OpeningModels;
 namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// <summary>
     /// Модель представления чистового отверстия в навигаторе АР по входящим заданиям на отверстия.
-    /// Использовать для отображения чистовых отверстий, которые требуют внимания архитектора
+    /// Использовать для отображения чистовых отверстий АР из активного документа, которые требуют внимания архитектора
     /// </summary>
     internal class OpeningRealArViewModel : BaseViewModel, ISelectorAndHighlighter, IEquatable<OpeningRealArViewModel> {
         private readonly OpeningRealAr _openingReal;
@@ -89,9 +91,9 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// Возвращает коллекцию, в которой находится чистовое отверстие, которое надо выделить на виде
         /// </summary>
         /// <returns></returns>
-        public ICollection<Element> GetElementsToSelect() {
-            return new Element[] {
-                _openingReal.GetFamilyInstance()
+        public ICollection<ElementModel> GetElementsToSelect() {
+            return new ElementModel[] {
+                new ElementModel(_openingReal.GetFamilyInstance())
             };
         }
     }

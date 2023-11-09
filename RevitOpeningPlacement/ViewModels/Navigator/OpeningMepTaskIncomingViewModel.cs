@@ -8,6 +8,8 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
+using RevitClashDetective.Models.Clashes;
+
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
@@ -157,9 +159,9 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// Возвращает коллекцию элементов, в которой находится входящее задание на отверстие, которое надо выделить на виде
         /// </summary>
         /// <returns></returns>
-        public ICollection<Element> GetElementsToSelect() {
-            return new Element[] {
-                _openingTask.GetFamilyInstance()
+        public ICollection<ElementModel> GetElementsToSelect() {
+            return new ElementModel[] {
+                new ElementModel(_openingTask.GetFamilyInstance(), _openingTask.Transform)
             };
         }
     }

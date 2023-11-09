@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using dosymep.WPF.ViewModels;
 
@@ -35,10 +32,10 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
         public void InitializeParameters() {
             var parameters =
-                _revitRepository.GetDocuments()
-                .SelectMany(item => _revitRepository.GetParameters(item, Categories.Select(c => c.Category)))
+                _revitRepository.DocInfos
+                .SelectMany(item => _revitRepository.GetParameters(item.Doc, Categories.Select(c => c.Category)))
                 .Distinct()
-                .Select(item=>new ParameterViewModel(item))
+                .Select(item => new ParameterViewModel(item))
                 .ToList();
             parameters.Add(new ParameterViewModel(new WorksetValueProvider(_revitRepository)));
             Parameters = new ObservableCollection<ParameterViewModel>(parameters.OrderBy(item => item.Name));

@@ -1,7 +1,4 @@
-﻿
-using dosymep.Bim4Everyone;
-
-using RevitClashDetective.Models.Value;
+﻿using RevitClashDetective.Models.Value;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement {
 

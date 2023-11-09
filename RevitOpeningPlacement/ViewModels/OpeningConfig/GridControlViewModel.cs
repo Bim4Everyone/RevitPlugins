@@ -11,6 +11,7 @@ using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.FilterModel;
 
 using RevitClashDetective.Models.Interfaces;
@@ -19,7 +20,8 @@ using RevitOpeningPlacement.Models;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
     /// <summary>
-    /// Динамический Grid для перечисления элементов, попадающих в заданный фильтр
+    /// Динамический Grid для перечисления элементов, попадающих в заданный фильтр. 
+    /// Использовать для проверки фильтра в настройках расстановки заданий на отверстия в активном файле ВИС
     /// </summary>
     internal class GridControlViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
@@ -114,7 +116,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             }
             var element = GetElement(resultId);
             if(element != null) {
-                _revitRepository.SelectAndShowElement(new[] { element });
+                _revitRepository.SelectAndShowElement(new[] { new ElementModel(element) });
             }
         }
 
