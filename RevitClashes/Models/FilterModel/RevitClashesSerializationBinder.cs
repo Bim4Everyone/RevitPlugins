@@ -1,6 +1,7 @@
 ﻿using System;
-using pyRevitLabs.Json.Serialization;
 using System.Reflection;
+
+using pyRevitLabs.Json.Serialization;
 
 namespace RevitClashDetective.Models.FilterModel {
     public class RevitClashesSerializationBinder : ISerializationBinder {

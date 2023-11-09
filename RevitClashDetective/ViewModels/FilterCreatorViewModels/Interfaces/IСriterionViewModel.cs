@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using RevitClashDetective.Models.FilterModel;
-using RevitClashDetective.Models.Interfaces;
+﻿using RevitClashDetective.Models.FilterModel;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels.Interfaces {
     interface IСriterionViewModel {

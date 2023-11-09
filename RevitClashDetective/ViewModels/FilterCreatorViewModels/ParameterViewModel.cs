@@ -1,17 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
 using Autodesk.Revit.DB;
 
-using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
-using RevitClashDetective.Models;
 using RevitClashDetective.Models.Evaluators;
 using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.Models.Value;

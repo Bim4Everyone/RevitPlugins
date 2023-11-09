@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.UI;
 
 using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models {
-    internal class NameResolver<T> where T: INamedEntity {
+    internal class NameResolver<T> where T : INamedEntity {
         private IEnumerable<T> _oldCollection;
         private IEnumerable<T> _addedCollection;
         private List<T> _intersection;
