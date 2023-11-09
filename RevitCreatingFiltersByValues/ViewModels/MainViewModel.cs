@@ -278,13 +278,11 @@ namespace RevitCreatingFiltersByValues.ViewModels {
             List<ElementId> elementIds = ParameterFilterUtilities.GetFilterableParametersInCommon(_revitRepository.Document, SelectedCatIds).ToList();
 
             foreach(ElementId id in elementIds) {
-                // Переводим сначала в ParameterElement, если null, значит это BuiltInParameter
-                ParameterElement paramAsParameterElement = _revitRepository.Document.GetElement(id) as ParameterElement;
-
+                
                 ParametersHelper parametersHelper = new ParametersHelper();
 
-                // Если он null, значит это встроенный параметр
-                if(paramAsParameterElement is null) {
+                // Проверяем является ли параметр встроенным параметром
+                if(id.IsSystemId()) {
 
                     BuiltInParameter parameterAsBuiltIn = (BuiltInParameter) id.GetIdValue();
 
@@ -293,6 +291,8 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                     parametersHelper.Id = id;
                     parametersHelper.IsBInParam = true;
                 } else {
+                    ParameterElement paramAsParameterElement = _revitRepository.Document.GetElement(id) as ParameterElement;
+
                     parametersHelper.ParamName = paramAsParameterElement.Name;
                     parametersHelper.ParamElement = paramAsParameterElement;
                     parametersHelper.Id = id;
