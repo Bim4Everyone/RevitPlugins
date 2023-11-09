@@ -38,6 +38,13 @@
             Margin="10,5"
             SelectionMode="Extended"
             ItemsSource="{Binding RevitHVACSystems }">
+            <ListView.View>
+                <GridView AllowsColumnReorder="False" ColumnHeaderToolTip="Список систем">
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=SystemName}" Header="Имя системы" Width="100"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=FopName}" Header="_ФОП_ВИС_Имя системы" Width="200"/>
+                    
+                </GridView>
+            </ListView.View>
 
         </ListView>
 

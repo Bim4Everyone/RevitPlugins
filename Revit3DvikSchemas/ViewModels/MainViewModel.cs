@@ -1,9 +1,5 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using System.Windows.Input;
-
-using Autodesk.Revit.DB;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -17,12 +13,12 @@ namespace Revit3DvikSchemas.ViewModels {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
-        public List<Element> RevitHVACSystems { get; }
+        public List<HvacSystem> RevitHVACSystems { get; }
 
         private string _errorText;
         private string _saveProperty;
 
-        
+
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
@@ -55,7 +51,7 @@ namespace Revit3DvikSchemas.ViewModels {
         private void AcceptView() {
             SaveConfig();
         }
-        
+
         private bool CanAcceptView() {
             if(string.IsNullOrEmpty(SaveProperty)) {
                 ErrorText = "Введите значение сохраняемого свойства.";
