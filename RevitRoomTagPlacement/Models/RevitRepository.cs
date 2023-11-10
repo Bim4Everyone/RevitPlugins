@@ -74,14 +74,14 @@ namespace RevitRoomTagPlacement.Models {
         }
 
         public ObservableCollection<string> GetRoomNames(IList<RoomGroupViewModel> RoomGroups) {
-            var selectedGroups = RoomGroups.Where(x => x.IsChecked);
+            var selectedAparts = RoomGroups.Where(x => x.IsChecked).SelectMany(x => x.Apartments);
             IEnumerable<string> uniqueNames = new List<string>();
 
-            if(selectedGroups.Count() > 0) {
-                uniqueNames = new List<string>(selectedGroups.First().GroupRoomNames);
+            if(selectedAparts.Count() > 0) {
+                uniqueNames = new List<string>(selectedAparts.First().RoomNames);
 
-                foreach(var group in selectedGroups) {
-                    uniqueNames = uniqueNames.Intersect(group.GroupRoomNames);
+                foreach(var group in selectedAparts) {
+                    uniqueNames = uniqueNames.Intersect(group.RoomNames);
                 }
             }
 
@@ -91,21 +91,19 @@ namespace RevitRoomTagPlacement.Models {
         public List<RoomFromRevit> GroupRoomsForPlacement(IList<RoomGroupViewModel> RoomGroups,
                                                         GroupPlacementWay groupPlacementWay,
                                                         string roomName = "") {
-            var selectedGroups = RoomGroups.Where(x => x.IsChecked);
+            var selectedAparts = RoomGroups.Where(x => x.IsChecked).SelectMany(x => x.Apartments);
             List<RoomFromRevit> rooms = new List<RoomFromRevit>();
 
             if(groupPlacementWay == GroupPlacementWay.EveryRoom) {
-                rooms = selectedGroups.SelectMany(x => x.Rooms).ToList();
+                rooms = selectedAparts.SelectMany(x => x.Rooms).ToList();
             } 
             else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupRandom) {
                 RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
-                rooms = selectedGroups
-                    .SelectMany(x => x.GetMaxAreaRooms()).ToList();
+                rooms = selectedAparts.Select(x => x.GetMaxAreaRoom()).ToList();
             } 
             else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupByName) {
                 RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
-                rooms = selectedGroups
-                    .SelectMany(x => x.GetRoomsByName(roomName)).ToList();
+                rooms = selectedAparts.Select(x => x.GetRoomByName(roomName)).ToList();
             }
             return rooms;
         }

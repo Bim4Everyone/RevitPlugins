@@ -21,19 +21,21 @@ namespace RevitRoomTagPlacement.ViewModels {
 
         string _name;
         IEnumerable<RoomFromRevit> _rooms;
-        IEnumerable<string> _groupRoomNames;
+        IEnumerable<Apartment> _apartments;
 
         public RoomGroupViewModel(string name, IEnumerable<RoomFromRevit> rooms) {
-            _name = name;   
+            _name = name;
             _rooms = rooms;
 
-            _groupRoomNames = GetRoomNames();
+            RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
+            _apartments = rooms
+                .GroupBy(r => r.RoomObject.GetParamValue<string>(sectionParam))
+                .Select(x => new Apartment(x));
         }
 
         public string Name => _name;
         public IEnumerable<RoomFromRevit> Rooms => _rooms;
-
-        public IEnumerable<string> GroupRoomNames => _groupRoomNames;
+        public IEnumerable<Apartment> Apartments => _apartments;
 
         private bool isChecked;
         public bool IsChecked {
@@ -42,41 +44,6 @@ namespace RevitRoomTagPlacement.ViewModels {
                 isChecked = value;
                 OnPropertyChanged();
             }
-        }
-
-        private IEnumerable<string> GetRoomNames() {
-            RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
-            var roomsBySection = _rooms
-                .GroupBy(r => r.RoomObject.GetParamValue<string>(sectionParam));
-
-            IEnumerable<string> uniqueNames = new List<string>(roomsBySection
-                .First()
-                .Select(x => x.RoomObject.GetParamValue<string>(BuiltInParameter.ROOM_NAME)));
-
-            foreach(var group in roomsBySection) {
-                uniqueNames = uniqueNames.Intersect(group.Select(x => x.RoomObject.GetParamValue<string>(BuiltInParameter.ROOM_NAME)));
-            }
-
-            return uniqueNames;
-        }
-
-        public List<RoomFromRevit> GetMaxAreaRooms() {
-            RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
-
-            return _rooms
-                .GroupBy(r => r.RoomObject.GetParamValue<string>(sectionParam))
-                .Select(g => g.OrderByDescending(r => r.RoomObject.Area).First())
-                .ToList();
-        }
-
-        public List<RoomFromRevit> GetRoomsByName(string roomName) {
-            RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
-
-            return _rooms
-                .GroupBy(r => r.RoomObject.GetParamValue<string>(sectionParam))
-                .Select(g => g.Where(y => y.RoomObject.GetParamValue<string>(BuiltInParameter.ROOM_NAME) == roomName).First())
-                .ToList();
-
         }
     }
 }

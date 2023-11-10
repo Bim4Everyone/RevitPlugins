@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
+using dosymep.Revit;
+
 namespace RevitRoomTagPlacement.Models {
     internal class RoomFromRevit {
         private Room _room;
@@ -18,6 +20,7 @@ namespace RevitRoomTagPlacement.Models {
 
         public bool IsFromLink { get; set; }
         public Room RoomObject => _room;
+        public string Name => _room.GetParamValue<string>(BuiltInParameter.ROOM_NAME);
         public ElementId LinkId => _linkId;
     }
 }
