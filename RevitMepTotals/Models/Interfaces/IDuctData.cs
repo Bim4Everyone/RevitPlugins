@@ -1,4 +1,4 @@
-﻿namespace RevitMepTotals.Models.Interfaces {
+namespace RevitMepTotals.Models.Interfaces {
     /// <summary>
     /// Данные из Revit документа по воздуховодам для экспорта
     /// </summary>
@@ -12,5 +12,10 @@
         /// Длина в мм
         /// </summary>
         double Length { get; }
+
+        /// <summary>
+        /// Площадь в м кв.
+        /// </summary>
+        double Area { get; }
     }
 }

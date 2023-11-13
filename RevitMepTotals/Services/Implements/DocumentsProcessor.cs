@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -132,7 +132,8 @@ namespace RevitMepTotals.Services.Implements {
                 })
                 .Select(group =>
                 new DuctData(group.Key.SystemName, group.Key.TypeName, group.Key.Size, group.Key.Name) {
-                    Length = group.Sum(duct => _revitRepository.GetMepCurveElementLength(document, duct))
+                    Length = group.Sum(duct => _revitRepository.GetMepCurveElementLength(document, duct)),
+                    Area = group.Sum(duct => _revitRepository.GetMepCurveElementArea(document, duct))
                 })
                 .ToArray();
         }

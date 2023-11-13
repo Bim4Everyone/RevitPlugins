@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using RevitMepTotals.Models.Interfaces;
@@ -28,6 +28,8 @@ namespace RevitMepTotals.Models {
 
         public string SystemName { get; }
 
+        public double Area { get; set; }
+
         public override bool Equals(object obj) {
             return Equals(obj as DuctData);
         }
@@ -39,6 +41,7 @@ namespace RevitMepTotals.Models {
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Size);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
             hashCode = hashCode * -1521134295 + Length.GetHashCode();
+            hashCode = hashCode * -1521134295 + Area.GetHashCode();
             return hashCode;
         }
 
@@ -51,6 +54,7 @@ namespace RevitMepTotals.Models {
                 && Size == other.Size
                 && Name == other.Name
                 && Length == other.Length
+                && Area == other.Area
                 ;
         }
     }

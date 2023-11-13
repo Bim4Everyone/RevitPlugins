@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -142,6 +142,7 @@ namespace RevitMepTotals.Services.Implements {
             worksheet.Rows[startRow][2].Value = "ФОП_ВИС_Наименование комбинированное";
             worksheet.Rows[startRow][3].Value = "Размер";
             worksheet.Rows[startRow][4].Value = "Длина, м";
+            worksheet.Rows[startRow][5].Value = "Площадь, м2";
             worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
             startRow++;
             int ductsCount = ductData.Count;
@@ -152,6 +153,7 @@ namespace RevitMepTotals.Services.Implements {
                 worksheet.Rows[row][2].Value = ductData[row - startRow].Name;
                 worksheet.Rows[row][3].Value = ductData[row - startRow].Size;
                 worksheet.Rows[row][4].Value = ductData[row - startRow].Length / 1000;
+                worksheet.Rows[row][5].Value = ductData[row - startRow].Area;
             }
             return lastRow;
         }

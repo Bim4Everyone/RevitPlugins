@@ -112,6 +112,23 @@ namespace RevitMepTotals.Models {
         }
 
         /// <summary>
+        /// Возвращает значение параметра "Площадь" у воздуховодов
+        /// </summary>
+        /// <param name="document"></param>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public double GetMepCurveElementArea(Document document, MEPCurve element) {
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+            if(element is null) { throw new ArgumentNullException(nameof(element)); }
+
+            SystemParam param = SystemParamsConfig.Instance
+                .CreateRevitParam(document, BuiltInParameter.RBS_CURVE_SURFACE_AREA);
+            double feetValue = element.GetParamValueOrDefault(param, 0.0);
+            return ConvertSquareFeetToSquareMeters(feetValue);
+        }
+
+        /// <summary>
         /// Возвращает толщину изоляции в мм
         /// </summary>
         /// <param name="document"></param>
