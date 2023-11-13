@@ -95,7 +95,9 @@ namespace RevitMepTotals.Services.Implements {
 
         /// <summary>
         /// Проверяет документы на конфликты имен и возвращает коллекцию документов из заданной коллекции,
-        /// которые НЕ образуют конфликты.
+        /// которые НЕ образуют конфликты и из имен документов можно сделать названия листов Excel.
+        /// Правила именования листов Excel:
+        /// https://docs.devexpress.com/OfficeFileAPI/DevExpress.Spreadsheet.Worksheet.Name#remarks
         /// </summary>
         /// <param name="data"></param>
         /// <param name="errorMessage">Сообщение об ошибке, или пустая строка, если ошибок нет</param>
@@ -104,10 +106,11 @@ namespace RevitMepTotals.Services.Implements {
             ICollection<IDocument> data,
             out string errorMessage) {
 
+            // 31 - ограничение длины названия листа Excel
             var docsWithNameConflicts = data
                 .GroupBy(doc => string.Concat(doc.Name.Take(31)))
                 .Where(group => group.Count() > 1)
-                .SelectMany(group => group.ToArray())
+                .SelectMany(group => group)
                 .ToArray();
             if(docsWithNameConflicts.Length > 0) {
                 errorMessage = $"Документы:\n" +

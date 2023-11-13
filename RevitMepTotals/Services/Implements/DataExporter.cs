@@ -83,7 +83,7 @@ namespace RevitMepTotals.Services.Implements {
             var docsWithNameConflicts = data
                 .GroupBy(doc => CleanSheetName(doc.Title))
                 .Where(group => group.Count() > 1)
-                .SelectMany(group => group.ToList())
+                .SelectMany(group => group)
                 .ToArray();
             if(docsWithNameConflicts.Length > 0) {
                 errorMessage = $"{string.Join(Environment.NewLine, docsWithNameConflicts.Select(doc => doc.Title))}" +
