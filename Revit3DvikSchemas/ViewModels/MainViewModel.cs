@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
 
 using dosymep.WPF.Commands;
@@ -9,15 +10,18 @@ using Revit3DvikSchemas.Models;
 namespace Revit3DvikSchemas.ViewModels {
     internal class MainViewModel : BaseViewModel {
 
-
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
-        public List<HvacSystem> RevitHVACSystems { get; }
+        public List<HvacSystemViewModel> RevitHVACSystems { get; }
+
+        public ICommand CreateViewCommand { get; }
 
         private string _errorText;
-        private string _saveProperty;
 
+        private bool _combineFilters;
+
+        private bool _useFopNames;
 
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
@@ -26,56 +30,40 @@ namespace Revit3DvikSchemas.ViewModels {
 
             RevitHVACSystems = _revitRepository.GetHVACSystems();
 
-            LoadViewCommand = RelayCommand.Create(LoadView);
-            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+            bool RevitUseFopNames = UseFopNames;
+            bool RevitCombineFilters = CombineFilters;
+
+            CreateViewCommand = RelayCommand.Create(CreateViews, CanCreateView);
         }
-
-
-        public ICommand LoadViewCommand { get; }
-        public ICommand AcceptViewCommand { get; }
 
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public string SaveProperty {
-            get => _saveProperty;
-            set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
+        public bool CombineFilters {
+            get => _combineFilters;
+            set => this.RaiseAndSetIfChanged(ref _combineFilters, value);
         }
 
-        private void LoadView() {
-            LoadConfig();
+        public bool UseFopNames {
+            get => _useFopNames;
+            set => this.RaiseAndSetIfChanged(ref _useFopNames, value);
         }
 
-        private void AcceptView() {
-            SaveConfig();
+        private void CreateViews() {
+            _revitRepository.CreateSelectedCommand(RevitHVACSystems, _useFopNames, _combineFilters);
         }
 
-        private bool CanAcceptView() {
-            if(string.IsNullOrEmpty(SaveProperty)) {
-                ErrorText = "Введите значение сохраняемого свойства.";
+        private bool CanCreateView() {
+            if(!RevitHVACSystems.Any(x => x.IsChecked)) {
+                ErrorText = "Не выбраны элементы.";
                 return false;
             }
-
-            ErrorText = null;
+            ErrorText = "";
             return true;
         }
-
-        private void LoadConfig() {
-            RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
-            SaveProperty = setting?.SaveProperty ?? "Привет Revit!";
-        }
-
-        private void SaveConfig() {
-            RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                                    ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
-            setting.SaveProperty = SaveProperty;
-            _pluginConfig.SaveProjectConfig();
-        }
-
-
     }
+
 }
+

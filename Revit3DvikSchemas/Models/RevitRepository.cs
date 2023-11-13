@@ -8,13 +8,9 @@ using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 
-namespace Revit3DvikSchemas.Models {
-    internal class HvacSystem {
-        public string SystemName { get; set; }
-        public string FopName { get; set; }
-        public Element SystemElement { get; set; }
+using Revit3DvikSchemas.ViewModels;
 
-    }
+namespace Revit3DvikSchemas.Models {
 
     internal class RevitRepository {
         public RevitRepository(UIApplication uiApplication) {
@@ -62,22 +58,25 @@ namespace Revit3DvikSchemas.Models {
 
         }
 
+        public void CreateSelectedCommand(List<HvacSystemViewModel> list, bool useFopNames, bool combineViews) {
+            TaskDialog.Show("Test", useFopNames.ToString());
+            TaskDialog.Show("Test", combineViews.ToString());
+            foreach(HvacSystemViewModel vm in list) {
+                string test = vm.IsChecked.ToString();
+            }
+        }
 
-        public List<HvacSystem> GetHVACSystems() {
-            List<Element> ducts = GetCollection(BuiltInCategory.OST_DuctCurves);
-
-            List<Element> pipes = GetCollection(BuiltInCategory.OST_PipeCurves);
-
+        public List<HvacSystemViewModel> GetHVACSystems() {
             List<Element> ductSystems = GetCollection(BuiltInCategory.OST_DuctSystem);
 
             List<Element> pipeSystems = GetCollection(BuiltInCategory.OST_PipingSystem);
 
             List<Element> allSystems = ductSystems.Concat(pipeSystems).ToList();
 
-            List<HvacSystem> newSystems = new List<HvacSystem>();
+            List<HvacSystemViewModel> newSystems = new List<HvacSystemViewModel>();
 
             foreach(Element system in allSystems) {
-                var newSystem = new HvacSystem();
+                var newSystem = new HvacSystemViewModel();
                 newSystem.SystemElement = system;
                 newSystem.SystemName = system.Name;
                 newSystem.FopName = GetSystemFopName(system);

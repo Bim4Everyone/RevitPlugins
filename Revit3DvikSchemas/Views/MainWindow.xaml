@@ -13,7 +13,8 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    Height="450" Width="800"    
+    Height="450" Width="500"
+    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     
@@ -23,7 +24,7 @@
             <RowDefinition Height="35"/>
             <RowDefinition Height="35"/>
             <RowDefinition/>
-            <RowDefinition Height="35" />
+            <RowDefinition Height="50" />
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
 
@@ -37,16 +38,53 @@
             Grid.Row="2"
             Margin="10,5"
             SelectionMode="Extended"
-            ItemsSource="{Binding RevitHVACSystems }">
+            ItemsSource="{Binding RevitHVACSystems }" SelectionChanged="ListView_SelectionChanged"
+            >
+
             <ListView.View>
                 <GridView AllowsColumnReorder="False" ColumnHeaderToolTip="Список систем">
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=SystemName}" Header="Имя системы" Width="100"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=FopName}" Header="_ФОП_ВИС_Имя системы" Width="200"/>
-                    
+                    <GridView.Columns>
+
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=SystemName}" Header="Имя системы" />
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=FopName}" Header="_ФОП_ВИС_Имя системы"/>
+                        <GridViewColumn
+                        Width="150"
+                        Header="Создать схему"    
+                            >
+                            <GridViewColumn.CellTemplate >
+                                <DataTemplate>
+                                    <CheckBox
+                                    IsChecked="{Binding IsChecked}"
+                                    />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView.Columns>
                 </GridView>
             </ListView.View>
-
         </ListView>
+
+        
+        
+        <StackPanel
+            Grid.Row="3"
+            Orientation="Vertical"
+            HorizontalAlignment="Left"
+
+            >
+            <CheckBox 
+                Margin="5"
+                IsChecked="{Binding CombineFilters}">
+                <TextBlock Text="Все выделенные на один вид"></TextBlock>
+            </CheckBox>
+            
+            <CheckBox 
+                Margin="5"
+                IsChecked="{Binding UseFopNames}">
+                
+                <TextBlock Text="Схемы по ФОП_ВИС_Имя системы"/>
+            </CheckBox>
+        </StackPanel>
 
         <StackPanel
             Grid.Row="4"
@@ -64,7 +102,7 @@
                 Content="ОК"
                 IsDefault="True"
                 Click="ButtonOk_Click"
-                Command="{Binding AcceptViewCommand}" />
+                Command="{Binding CreateViewCommand}" />
 
             <Button
                 Margin="10"
