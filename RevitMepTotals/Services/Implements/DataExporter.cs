@@ -5,18 +5,24 @@ using System.Linq;
 
 using DevExpress.Spreadsheet;
 
-using dosymep.SimpleServices;
-
 using RevitMepTotals.Models.Interfaces;
 
 namespace RevitMepTotals.Services.Implements {
     internal class DataExporter : IDataExporter {
         private readonly ICopyNameProvider _copyNameProvider;
-        private readonly IMessageBoxService _messageBoxService;
+        private readonly IConstantsProvider _constantsProvider;
+        private readonly IErrorMessagesProvider _errorMessagesProvider;
 
-        public DataExporter(ICopyNameProvider copyNameProvider, IMessageBoxService messageBoxService) {
-            _copyNameProvider = copyNameProvider ?? throw new ArgumentNullException(nameof(copyNameProvider));
-            _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        public DataExporter(
+            ICopyNameProvider copyNameProvider,
+            IConstantsProvider constantsProvider,
+            IErrorMessagesProvider errorMessagesProvider) {
+            _copyNameProvider = copyNameProvider
+                ?? throw new ArgumentNullException(nameof(copyNameProvider));
+            _constantsProvider = constantsProvider
+                ?? throw new ArgumentNullException(nameof(constantsProvider));
+            _errorMessagesProvider = errorMessagesProvider
+                ?? throw new ArgumentNullException(nameof(errorMessagesProvider));
         }
 
 
@@ -86,11 +92,8 @@ namespace RevitMepTotals.Services.Implements {
                 .SelectMany(group => group)
                 .ToArray();
             if(docsWithNameConflicts.Length > 0) {
-                errorMessage = $"{string.Join(Environment.NewLine, docsWithNameConflicts.Select(doc => doc.Title))}" +
-                    $"\nЭти документы нельзя выгрузить за один раз, т.к. они образуют конфликт имен в листах Excel." +
-                    "\nИмя листа Excel должно быть не более 31 символа" +
-                    "\nне должно начинаться или заканчиваться с (')" +
-                    "\nне должно содержать \\, /, ?, :, *, [, ] ";
+                errorMessage = _errorMessagesProvider
+                    .GetFileNamesConflictMessage(docsWithNameConflicts.Select(doc => doc.Title).ToArray());
             } else {
                 errorMessage = string.Empty;
             }
@@ -257,8 +260,8 @@ namespace RevitMepTotals.Services.Implements {
         /// <param name="name"></param>
         /// <returns></returns>
         private string CleanSheetName(string name) {
-            var charsToRemove = new char[] { '\\', '/', '?', ':', '*', '[', ']', '\'' };
-            string trimName = string.Concat(name.Trim().Take(31)).Trim();
+            var charsToRemove = _constantsProvider.ProhibitedChars;
+            string trimName = string.Concat(name.Trim().Take(_constantsProvider.DocNameMaxLength)).Trim();
             foreach(char charToRemove in charsToRemove) {
                 trimName = trimName.Replace(charToRemove, '_');
             }

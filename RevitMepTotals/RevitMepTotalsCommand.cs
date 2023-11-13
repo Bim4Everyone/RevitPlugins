@@ -36,10 +36,12 @@ namespace RevitMepTotals {
                     .InSingletonScope();
 
                 kernel.Bind<IDocument>().To<RevitDocument>();
-                kernel.Bind<IDocumentsProcessor>().To<DocumentsProcessor>();
-                kernel.Bind<IDataExporter>().To<DataExporter>();
-                kernel.Bind<ICopyNameProvider>().To<CopyNameProvider>();
-                kernel.Bind<IDirectoryProvider>().To<DirectoryProvider>();
+                kernel.Bind<IDocumentsProcessor>().To<DocumentsProcessor>().InSingletonScope();
+                kernel.Bind<IDataExporter>().To<DataExporter>().InSingletonScope();
+                kernel.Bind<ICopyNameProvider>().To<CopyNameProvider>().InSingletonScope();
+                kernel.Bind<IDirectoryProvider>().To<DirectoryProvider>().InSingletonScope();
+                kernel.Bind<IConstantsProvider>().To<ConstantsProvider>().InSingletonScope();
+                kernel.Bind<IErrorMessagesProvider>().To<ErrorMessagesProvider>().InSingletonScope();
                 kernel.UseXtraProgressDialog<MainViewModel>();
                 kernel.UseXtraOpenFileDialog<MainViewModel>(
                     filter: "Revit projects |*.rvt",

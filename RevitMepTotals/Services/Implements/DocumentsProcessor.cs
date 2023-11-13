@@ -14,10 +14,19 @@ using RevitMepTotals.Models.Interfaces;
 namespace RevitMepTotals.Services.Implements {
     internal class DocumentsProcessor : IDocumentsProcessor {
         private readonly RevitRepository _revitRepository;
+        private readonly IConstantsProvider _constantsProvider;
+        private readonly IErrorMessagesProvider _errorMessagesProvider;
 
-
-        public DocumentsProcessor(RevitRepository revitRepository) {
-            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        public DocumentsProcessor(
+            RevitRepository revitRepository,
+            IConstantsProvider constantsProvider,
+            IErrorMessagesProvider errorMessagesProvider) {
+            _revitRepository = revitRepository
+                ?? throw new ArgumentNullException(nameof(revitRepository));
+            _constantsProvider = constantsProvider
+                ?? throw new ArgumentNullException(nameof(constantsProvider));
+            _errorMessagesProvider = errorMessagesProvider
+                ?? throw new ArgumentNullException(nameof(errorMessagesProvider));
         }
 
 
@@ -49,25 +58,23 @@ namespace RevitMepTotals.Services.Implements {
                         }
                     }
                 } catch(Autodesk.Revit.Exceptions.CannotOpenBothCentralAndLocalException) {
-                    errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать, т.к. он уже открыт.");
+                    errors.Add(_errorMessagesProvider.GetFileAlreadyOpenedMessage(documentToProcess.Path));
                 } catch(Autodesk.Revit.Exceptions.CorruptModelException) {
                     var test = new RevitFileInfo(documentToProcess.Path).BasicFileInfo.AppInfo.Format;
                     if(new RevitFileInfo(documentToProcess.Path).BasicFileInfo.AppInfo.Format
                         != _revitRepository.Application.VersionNumber) {
-                        errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать, " +
-                            $"т.к. он создан в более поздней версии.");
+                        errors.Add(_errorMessagesProvider.GetFileVersionIsInvalidMessage(documentToProcess.Path));
                     } else {
-                        errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать, " +
-                            $"т.к. в нем слишком много ошибок.");
+                        errors.Add(_errorMessagesProvider.GetFileDataCorruptionMessage(documentToProcess.Path));
                     }
                 } catch(Autodesk.Revit.Exceptions.FileAccessException) {
-                    errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать.");
+                    errors.Add(_errorMessagesProvider.GetFileCannotBeProcessMessage(documentToProcess.Path));
                 } catch(Autodesk.Revit.Exceptions.FileNotFoundException) {
-                    errors.Add($"Документ \'{documentToProcess.Path}\' удален");
+                    errors.Add(_errorMessagesProvider.GetFileRemovedMessage(documentToProcess.Path));
                 } catch(Autodesk.Revit.Exceptions.InsufficientResourcesException) {
-                    throw new OperationCanceledException("У компьютера недостаточно ресурсов, чтобы открыть модель, ");
+                    throw new OperationCanceledException(_errorMessagesProvider.GetInsufficientResourcesMessage());
                 } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                    errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать");
+                    errors.Add(_errorMessagesProvider.GetFileCannotBeProcessMessage(documentToProcess.Path));
                 }
             }
             errorMessage = errors.Count > 0 ? string.Join(Environment.NewLine, errors) : string.Empty;
@@ -106,16 +113,14 @@ namespace RevitMepTotals.Services.Implements {
             ICollection<IDocument> data,
             out string errorMessage) {
 
-            // 31 - ограничение длины названия листа Excel
             var docsWithNameConflicts = data
-                .GroupBy(doc => string.Concat(doc.Name.Take(31)))
+                .GroupBy(doc => string.Concat(doc.Name.Take(_constantsProvider.DocNameMaxLength)))
                 .Where(group => group.Count() > 1)
                 .SelectMany(group => group)
                 .ToArray();
             if(docsWithNameConflicts.Length > 0) {
-                errorMessage = $"Документы:\n" +
-                    $"{string.Join(Environment.NewLine, docsWithNameConflicts.Select(doc => doc.Name))}\n" +
-                    $"нельзя выгрузить за один раз, т.к. они образуют конфликты имен";
+                errorMessage = _errorMessagesProvider
+                    .GetFileNamesConflictMessage(docsWithNameConflicts.Select(doc => doc.Name).ToArray());
             } else {
                 errorMessage = string.Empty;
             }
