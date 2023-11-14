@@ -15,6 +15,7 @@ using System.Windows.Media.Media3D;
 using System.Xml.Linq;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
@@ -22,6 +23,8 @@ using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
+
+using Ninject.Planning.Targets;
 
 using RevitArchitecturalDocumentation.Models;
 using RevitArchitecturalDocumentation.Views;
@@ -66,6 +69,12 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
         private string _errorText;
 
+
+
+        private List<RoomTag> _roomTagsForMove = new List<RoomTag>();
+        private string _moveLeftRight = "0";
+        private string _moveUpDown = "0";
+
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
@@ -85,6 +94,13 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             //SelectSpecCommand = RelayCommand.Create(SelectSpec);
 
             SelectSpecsCommand = new RelayCommand(SelectSpecs);
+
+
+
+
+            MoveCommand = RelayCommand.Create(Move, CanMove);
+            DeleteCommand = RelayCommand.Create(Delete, CanMove);
+            SelectRoomTagsForMoveCommand = new RelayCommand(SelectRoomTagsForMove);
         }
 
         public ICommand LoadViewCommand { get; }
@@ -92,6 +108,11 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
         public ICommand AddTaskCommand { get; }
         public ICommand DeleteTaskCommand { get; }
+
+
+        public ICommand MoveCommand { get; }
+        public ICommand DeleteCommand { get; }
+        public ICommand SelectRoomTagsForMoveCommand { get; }
 
 
         public ICommand SelectSpecsCommand { get; }
@@ -224,6 +245,22 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         }
 
 
+        public List<RoomTag> RoomTagsForMove {
+            get => _roomTagsForMove;
+            set => this.RaiseAndSetIfChanged(ref _roomTagsForMove, value);
+        }
+        public string MoveLeftRight {
+            get => _moveLeftRight;
+            set => this.RaiseAndSetIfChanged(ref _moveLeftRight, value);
+        }
+        public string MoveUpDown {
+            get => _moveUpDown;
+            set => this.RaiseAndSetIfChanged(ref _moveUpDown, value);
+        }
+      
+
+
+
         /// <summary>
         /// Метод, отрабатывающий при загрузке окна
         /// </summary>
@@ -350,6 +387,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             mainWindow.DataContext = this;
             mainWindow.ShowDialog();
         }
+
+
 
         /// <summary>
         /// Метод перебирает все выбранные спеки во всех заданиях и собирает список параметров фильтрации. принадлежащий всем одновременно
@@ -1241,5 +1280,140 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
 
         //}
+
+
+
+
+
+
+
+
+        private void SelectRoomTagsForMove(object obj) {
+
+            foreach(Reference reference in _revitRepository.ActiveUIDocument.Selection.PickObjects(ObjectType.Element, "Выберите марку на виде")) {
+
+                RoomTag roomTag = _revitRepository.Document.GetElement(reference) as RoomTag;
+                if(roomTag is null) { TaskDialog.Show("Ошибка", "Вы выбрали не марку помещения!"); } else {
+                    RoomTagsForMove.Add(roomTag);
+                }
+
+            }
+            
+            MainWindow mainWindow = new MainWindow();
+            mainWindow.DataContext = this;
+            mainWindow.ShowDialog();
+        }
+
+
+
+        private void Move() {
+
+
+            if(RoomTagsForMove.Count == 0) {
+                
+                TaskDialog.Show("fd", "Не выбрана ни одна марка помещения!");
+                return;
+            }
+
+            if(!int.TryParse(MoveLeftRight, out int moveLeftRightAsInt)) {
+                TaskDialog.Show("fd", "Не удалось перевести в цифры смещение по горизонтали");
+                return;
+            }
+            if(!int.TryParse(MoveUpDown, out int moveUpDownAsInt)) {
+                TaskDialog.Show("fd", "Не удалось перевести в цифры смещение по вертикали");
+                return;
+            }
+
+            double moveLeftRightAsDouble = UnitUtilsHelper.ConvertToInternalValue((double)moveLeftRightAsInt);
+            double moveUpDownAsDouble = UnitUtilsHelper.ConvertToInternalValue((double) moveUpDownAsInt);
+
+
+            using(Transaction transaction = _revitRepository.Document.StartTransaction("Перемещение марок помещений")) {
+
+
+                foreach(RoomTag roomTagForMove in RoomTagsForMove) {
+
+                    XYZ tagHeaderPosititon = roomTagForMove.TagHeadPosition;
+
+                    foreach(View view in SelectedViews) {
+
+                        List<SpatialElementTag> roomTagsForMove = new FilteredElementCollector(_revitRepository.Document, view.Id)
+                            .OfClass(typeof(SpatialElementTag))
+                            .OfType<SpatialElementTag>()
+                            .ToList();
+
+                        foreach(SpatialElementTag tag in roomTagsForMove) {
+
+                            XYZ tagHeadPtCurrent = tag.TagHeadPosition;
+
+                            if(tagHeadPtCurrent.X == tagHeaderPosititon.X && tagHeadPtCurrent.Y == tagHeaderPosititon.Y) {
+
+                                tag.HasLeader = true;
+                                tag.LeaderEnd = new XYZ(tagHeadPtCurrent.X, tagHeadPtCurrent.Y, tagHeadPtCurrent.Z);
+
+                                tag.TagHeadPosition = new XYZ(tagHeadPtCurrent.X + moveLeftRightAsDouble, tagHeadPtCurrent.Y + moveUpDownAsDouble, tagHeadPtCurrent.Z);
+                            }
+                        }
+                    }
+                }
+                
+
+                transaction.Commit();
+            }
+        }
+
+        private void Delete() {
+
+
+            if(RoomTagsForMove.Count == 0) {
+
+                TaskDialog.Show("fd", "Не выбрана ни одна марка помещения!");
+                return;
+            }
+
+            
+            List<ElementId> tagsForDel = new List<ElementId>();
+
+            using(Transaction transaction = _revitRepository.Document.StartTransaction("Удаление марок помещений")) {
+
+                foreach(RoomTag roomTagForMove in RoomTagsForMove) {
+
+                    XYZ tagHeaderPosititon = roomTagForMove.TagHeadPosition;
+                    
+                    foreach(View view in SelectedViews) {
+
+                        List<SpatialElementTag> roomTagsOnAnotherVews = new FilteredElementCollector(_revitRepository.Document, view.Id)
+                            .OfClass(typeof(SpatialElementTag))
+                            .OfType<SpatialElementTag>()
+                            .ToList();
+
+                        foreach(SpatialElementTag tag in roomTagsOnAnotherVews) {
+
+                            XYZ tagHeadPtCurrent = tag.TagHeadPosition;
+
+                            if(tagHeadPtCurrent.X == tagHeaderPosititon.X && tagHeadPtCurrent.Y == tagHeaderPosititon.Y) {
+
+                                tagsForDel.Add(tag.Id);
+                            }
+                        }
+                    }
+                }
+
+
+
+                _revitRepository.Document.Delete(tagsForDel);
+
+                transaction.Commit();
+            }
+        }
+
+        private bool CanMove() {
+
+            if(RoomTagsForMove.Count == 0) {
+                return false;
+            }
+
+            return true;
+        }
     }
 }
