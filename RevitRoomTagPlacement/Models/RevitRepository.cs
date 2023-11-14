@@ -88,7 +88,7 @@ namespace RevitRoomTagPlacement.Models {
             return new ObservableCollection<string>(uniqueNames);
         }
 
-        public List<RoomFromRevit> GroupRoomsForPlacement(IList<RoomGroupViewModel> RoomGroups,
+        public List<RoomFromRevit> FilterRoomsForPlacement(IList<RoomGroupViewModel> RoomGroups,
                                                         GroupPlacementWay groupPlacementWay,
                                                         string roomName = "") {
             var selectedAparts = RoomGroups.Where(x => x.IsChecked).SelectMany(x => x.Apartments);
@@ -114,7 +114,7 @@ namespace RevitRoomTagPlacement.Models {
                                             PositionPlacementWay positionPlacementWay,
                                             string roomName = "") {
 
-            List<RoomFromRevit> rooms = GroupRoomsForPlacement(RoomGroups, 
+            List<RoomFromRevit> rooms = FilterRoomsForPlacement(RoomGroups, 
                                                               groupPlacementWay, 
                                                               roomName);
 

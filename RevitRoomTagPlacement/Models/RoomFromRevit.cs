@@ -11,16 +11,19 @@ using dosymep.Revit;
 
 namespace RevitRoomTagPlacement.Models {
     internal class RoomFromRevit {
-        private Room _room;
-        private ElementId _linkId;
+        private readonly Room _room;
+        private readonly ElementId _linkId;
+
         public RoomFromRevit(Room room, ElementId linkId = null) {
             _room = room;
             _linkId = linkId;
         }
 
-        public bool IsFromLink { get; set; }
         public Room RoomObject => _room;
-        public string Name => _room.GetParamValue<string>(BuiltInParameter.ROOM_NAME);
+
+        // Стандартное свойство Name нельзя использовать,
+        // так как оно возвращает имя вместе с номером помещения
+        public string Name => _room.GetParamValueOrDefault(BuiltInParameter.ROOM_NAME, "<Без имени>");
         public ElementId LinkId => _linkId;
     }
 }

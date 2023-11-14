@@ -9,8 +9,6 @@ using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Revit;
 
-using pyRevitLabs.Json.Linq;
-
 namespace RevitRoomTagPlacement.Models {
     internal class TagPointFinder {
         // Отступ марки от края всегда будет 7 мм
