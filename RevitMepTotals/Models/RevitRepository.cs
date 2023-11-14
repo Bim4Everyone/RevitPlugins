@@ -9,8 +9,7 @@ using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SharedParams;
-using dosymep.Bim4Everyone.SystemParams;
+using dosymep.Revit;
 
 namespace RevitMepTotals.Models {
     internal class RevitRepository {
@@ -70,8 +69,7 @@ namespace RevitMepTotals.Models {
             if(element is null) { throw new ArgumentNullException(nameof(element)); }
 
             if(element.GetParameters(_sharedName).FirstOrDefault(item => item.IsShared) != null) {
-                SharedParam param = SharedParamsConfig.Instance.CreateRevitParam(document, _sharedName);
-                return element.GetParamValueOrDefault(param, _default);
+                return element.GetParamValueOrDefault(_sharedName, _default);
             } else {
                 return _default;
             }
@@ -88,9 +86,7 @@ namespace RevitMepTotals.Models {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
             if(element is null) { throw new ArgumentNullException(nameof(element)); }
 
-            SystemParam param = SystemParamsConfig.Instance
-                .CreateRevitParam(document, BuiltInParameter.RBS_SYSTEM_NAME_PARAM);
-            string systemName = element.GetParamValueOrDefault(param, _default);
+            string systemName = element.GetParamValueOrDefault(BuiltInParameter.RBS_SYSTEM_NAME_PARAM, _default);
             return systemName;
         }
 
@@ -105,9 +101,7 @@ namespace RevitMepTotals.Models {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
             if(element is null) { throw new ArgumentNullException(nameof(element)); }
 
-            SystemParam param = SystemParamsConfig.Instance
-                .CreateRevitParam(document, BuiltInParameter.CURVE_ELEM_LENGTH);
-            double feetValue = element.GetParamValueOrDefault(param, 0.0);
+            double feetValue = element.GetParamValueOrDefault(BuiltInParameter.CURVE_ELEM_LENGTH, 0.0);
             return ConvertFeetToMillimeters(feetValue);
         }
 
@@ -122,9 +116,7 @@ namespace RevitMepTotals.Models {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
             if(element is null) { throw new ArgumentNullException(nameof(element)); }
 
-            SystemParam param = SystemParamsConfig.Instance
-                .CreateRevitParam(document, BuiltInParameter.RBS_CURVE_SURFACE_AREA);
-            double feetValue = element.GetParamValueOrDefault(param, 0.0);
+            double feetValue = element.GetParamValueOrDefault(BuiltInParameter.RBS_CURVE_SURFACE_AREA, 0.0);
             return ConvertSquareFeetToSquareMeters(feetValue);
         }
 
@@ -220,9 +212,7 @@ namespace RevitMepTotals.Models {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
             if(pipeInsulation is null) { throw new ArgumentNullException(nameof(pipeInsulation)); }
 
-            SystemParam param = SystemParamsConfig.Instance
-                .CreateRevitParam(document, BuiltInParameter.RBS_PIPE_CALCULATED_SIZE);
-            return pipeInsulation.GetParamValueOrDefault(param, _default);
+            return pipeInsulation.GetParamValueOrDefault(BuiltInParameter.RBS_PIPE_CALCULATED_SIZE, _default);
         }
 
         /// <summary>
@@ -250,9 +240,7 @@ namespace RevitMepTotals.Models {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
             if(element is null) { throw new ArgumentNullException(nameof(element)); }
 
-            SystemParam param = SystemParamsConfig.Instance
-                .CreateRevitParam(document, BuiltInParameter.RBS_CALCULATED_SIZE);
-            return element.GetParamValueOrDefault(param, _default);
+            return element.GetParamValueOrDefault(BuiltInParameter.RBS_CALCULATED_SIZE, _default);
         }
 
         /// <summary>
