@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -14,10 +14,19 @@ using RevitMepTotals.Models.Interfaces;
 namespace RevitMepTotals.Services.Implements {
     internal class DocumentsProcessor : IDocumentsProcessor {
         private readonly RevitRepository _revitRepository;
+        private readonly IConstantsProvider _constantsProvider;
+        private readonly IErrorMessagesProvider _errorMessagesProvider;
 
-
-        public DocumentsProcessor(RevitRepository revitRepository) {
-            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        public DocumentsProcessor(
+            RevitRepository revitRepository,
+            IConstantsProvider constantsProvider,
+            IErrorMessagesProvider errorMessagesProvider) {
+            _revitRepository = revitRepository
+                ?? throw new ArgumentNullException(nameof(revitRepository));
+            _constantsProvider = constantsProvider
+                ?? throw new ArgumentNullException(nameof(constantsProvider));
+            _errorMessagesProvider = errorMessagesProvider
+                ?? throw new ArgumentNullException(nameof(errorMessagesProvider));
         }
 
 
@@ -49,25 +58,23 @@ namespace RevitMepTotals.Services.Implements {
                         }
                     }
                 } catch(Autodesk.Revit.Exceptions.CannotOpenBothCentralAndLocalException) {
-                    errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать, т.к. он уже открыт.");
+                    errors.Add(_errorMessagesProvider.GetFileAlreadyOpenedMessage(documentToProcess.Path));
                 } catch(Autodesk.Revit.Exceptions.CorruptModelException) {
                     var test = new RevitFileInfo(documentToProcess.Path).BasicFileInfo.AppInfo.Format;
                     if(new RevitFileInfo(documentToProcess.Path).BasicFileInfo.AppInfo.Format
                         != _revitRepository.Application.VersionNumber) {
-                        errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать, " +
-                            $"т.к. он создан в более поздней версии.");
+                        errors.Add(_errorMessagesProvider.GetFileVersionIsInvalidMessage(documentToProcess.Path));
                     } else {
-                        errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать, " +
-                            $"т.к. в нем слишком много ошибок.");
+                        errors.Add(_errorMessagesProvider.GetFileDataCorruptionMessage(documentToProcess.Path));
                     }
                 } catch(Autodesk.Revit.Exceptions.FileAccessException) {
-                    errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать.");
+                    errors.Add(_errorMessagesProvider.GetFileCannotBeProcessMessage(documentToProcess.Path));
                 } catch(Autodesk.Revit.Exceptions.FileNotFoundException) {
-                    errors.Add($"Документ \'{documentToProcess.Path}\' удален");
+                    errors.Add(_errorMessagesProvider.GetFileRemovedMessage(documentToProcess.Path));
                 } catch(Autodesk.Revit.Exceptions.InsufficientResourcesException) {
-                    throw new OperationCanceledException("У компьютера недостаточно ресурсов, чтобы открыть модель, ");
+                    throw new OperationCanceledException(_errorMessagesProvider.GetInsufficientResourcesMessage());
                 } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                    errors.Add($"Документ \'{documentToProcess.Path}\' нельзя обработать");
+                    errors.Add(_errorMessagesProvider.GetFileCannotBeProcessMessage(documentToProcess.Path));
                 }
             }
             errorMessage = errors.Count > 0 ? string.Join(Environment.NewLine, errors) : string.Empty;
@@ -95,7 +102,9 @@ namespace RevitMepTotals.Services.Implements {
 
         /// <summary>
         /// Проверяет документы на конфликты имен и возвращает коллекцию документов из заданной коллекции,
-        /// которые НЕ образуют конфликты.
+        /// которые НЕ образуют конфликты и из имен документов можно сделать названия листов Excel.
+        /// Правила именования листов Excel:
+        /// https://docs.devexpress.com/OfficeFileAPI/DevExpress.Spreadsheet.Worksheet.Name#remarks
         /// </summary>
         /// <param name="data"></param>
         /// <param name="errorMessage">Сообщение об ошибке, или пустая строка, если ошибок нет</param>
@@ -105,14 +114,13 @@ namespace RevitMepTotals.Services.Implements {
             out string errorMessage) {
 
             var docsWithNameConflicts = data
-                .GroupBy(doc => string.Concat(doc.Name.Take(31)))
+                .GroupBy(doc => string.Concat(doc.Name.Take(_constantsProvider.DocNameMaxLength)))
                 .Where(group => group.Count() > 1)
-                .SelectMany(group => group.ToArray())
+                .SelectMany(group => group)
                 .ToArray();
             if(docsWithNameConflicts.Length > 0) {
-                errorMessage = $"Документы:\n" +
-                    $"{string.Join(Environment.NewLine, docsWithNameConflicts.Select(doc => doc.Name))}\n" +
-                    $"нельзя выгрузить за один раз, т.к. они образуют конфликты имен";
+                errorMessage = _errorMessagesProvider
+                    .GetFileNamesConflictMessage(docsWithNameConflicts.Select(doc => doc.Name).ToArray());
             } else {
                 errorMessage = string.Empty;
             }
@@ -122,17 +130,22 @@ namespace RevitMepTotals.Services.Implements {
         private ICollection<IDuctData> GetDuctData(Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
+            bool ductsHaveSharedName = _revitRepository.SharedNameForDuctsExists(document);
+
             return _revitRepository
                 .GetDucts(document)
                 .GroupBy(duct => new {
-                    SystemName = _revitRepository.GetMepCurveElementMepSystemName(document, duct),
+                    SystemName = _revitRepository.GetMepCurveElementMepSystemName(duct),
                     TypeName = _revitRepository.GetDuctTypeName(duct),
-                    Size = GetStandardSizeFormat(_revitRepository.GetDuctSize(document, duct)),
-                    Name = _revitRepository.GetMepCurveElementSharedName(document, duct)
+                    Size = GetStandardSizeFormat(_revitRepository.GetDuctSize(duct)),
+                    Name = ductsHaveSharedName
+                         ? _revitRepository.GetMepCurveElementSharedName(duct)
+                         : RevitRepository.DefaultStringParamValue
                 })
                 .Select(group =>
                 new DuctData(group.Key.SystemName, group.Key.TypeName, group.Key.Size, group.Key.Name) {
-                    Length = group.Sum(duct => _revitRepository.GetMepCurveElementLength(document, duct))
+                    Length = group.Sum(duct => _revitRepository.GetMepCurveElementLength(duct)),
+                    Area = group.Sum(duct => _revitRepository.GetMepCurveElementArea(duct))
                 })
                 .ToArray();
         }
@@ -140,17 +153,21 @@ namespace RevitMepTotals.Services.Implements {
         private ICollection<IPipeData> GetPipeData(Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
+            bool pipesHaveSharedName = _revitRepository.SharedNameForPipesExists(document);
+
             return _revitRepository
                 .GetPipes(document)
                 .GroupBy(pipe => new {
-                    SystemName = _revitRepository.GetMepCurveElementMepSystemName(document, pipe),
+                    SystemName = _revitRepository.GetMepCurveElementMepSystemName(pipe),
                     TypeName = _revitRepository.GetPipeTypeName(pipe),
-                    Size = GetStandardSizeFormat(_revitRepository.GetPipeSize(document, pipe)),
-                    Name = _revitRepository.GetMepCurveElementSharedName(document, pipe)
+                    Size = GetStandardSizeFormat(_revitRepository.GetPipeSize(pipe)),
+                    Name = pipesHaveSharedName
+                         ? _revitRepository.GetMepCurveElementSharedName(pipe)
+                         : RevitRepository.DefaultStringParamValue
                 })
                 .Select(group =>
                 new PipeData(group.Key.SystemName, group.Key.TypeName, group.Key.Size, group.Key.Name) {
-                    Length = group.Sum(pipe => _revitRepository.GetMepCurveElementLength(document, pipe))
+                    Length = group.Sum(pipe => _revitRepository.GetMepCurveElementLength(pipe))
                 })
                 .ToArray();
         }
@@ -158,26 +175,30 @@ namespace RevitMepTotals.Services.Implements {
         private ICollection<IPipeInsulationData> GetPipeInsulationData(Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
+            bool pipeInsulationsHaveSharedName = _revitRepository.SharedNameForPipeInsulationsExists(document);
+
             return _revitRepository
                 .GetPipeInsulations(document)
                 .GroupBy(pipeInsulation => new {
-                    SystemName = _revitRepository.GetMepCurveElementMepSystemName(document, pipeInsulation),
-                    TypeName = _revitRepository.GetPipeInsulationTypeName(document, pipeInsulation),
-                    PipeSize = GetStandardSizeFormat(_revitRepository.GetPipeInsulationSize(document, pipeInsulation)),
-                    Name = _revitRepository.GetMepCurveElementSharedName(document, pipeInsulation),
-                    Thickness = _revitRepository.GetPipeInsulationThickness(document, pipeInsulation)
+                    SystemName = _revitRepository.GetMepCurveElementMepSystemName(pipeInsulation),
+                    TypeName = _revitRepository.GetPipeInsulationTypeName(pipeInsulation),
+                    PipeSize = GetStandardSizeFormat(_revitRepository.GetPipeInsulationSize(pipeInsulation)),
+                    Thickness = _revitRepository.GetPipeInsulationThickness(pipeInsulation),
+                    Name = pipeInsulationsHaveSharedName
+                         ? _revitRepository.GetMepCurveElementSharedName(pipeInsulation)
+                         : RevitRepository.DefaultStringParamValue
                 })
                 .Select(group =>
                 new PipeInsulationData(group.Key.SystemName, group.Key.TypeName, group.Key.PipeSize, group.Key.Name) {
                     Thickness = group.Key.Thickness,
                     Length = group.Sum(
-                        pipeInsulation => _revitRepository.GetMepCurveElementLength(document, pipeInsulation))
+                        pipeInsulation => _revitRepository.GetMepCurveElementLength(pipeInsulation))
                 })
                 .ToArray();
         }
 
         /// <summary>
-        /// Преобразует строку в формате 650x1000 к 1000x650б то есть наибольшее число вначале.
+        /// Преобразует строку в формате 650x1000 к 1000x650, то есть наибольшее число в начале.
         /// Если формат поданной строки другой, вернется эта же строка.
         /// Символ 'x' может быть RUS или ENG
         /// </summary>

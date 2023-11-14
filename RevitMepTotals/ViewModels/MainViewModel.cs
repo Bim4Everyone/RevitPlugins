@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -90,7 +91,7 @@ namespace RevitMepTotals.ViewModels {
                 if(!Documents.Contains(docViewModel)) {
                     Documents.Add(docViewModel);
                 } else {
-                    errors.Add($"{docViewModel} óæå äîáàâëåí â ñïèñîê");
+                    errors.Add($"{docViewModel} ÑƒÐ¶Ðµ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½ Ð² ÑÐ¿Ð¸ÑÐ¾Ðº");
                 }
             }
             if(errors.Count > 0) {
@@ -101,7 +102,7 @@ namespace RevitMepTotals.ViewModels {
 
         private void RemoveDocument() {
             if(_messageBoxService.Show(
-                $"Èç ñïèñêà áóäåò óäàëåí äîêóìåíò:\n{SelectedDocument.Name}\nÏðîäîëæèòü?",
+                $"Ð˜Ð· ÑÐ¿Ð¸ÑÐºÐ° Ð±ÑƒÐ´ÐµÑ‚ ÑƒÐ´Ð°Ð»ÐµÐ½ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚:\n{SelectedDocument.Name}\nÐŸÑ€Ð¾Ð´Ð¾Ð»Ð¶Ð¸Ñ‚ÑŒ?",
                 "BIM",
                 MessageBoxButton.OKCancel,
                 MessageBoxImage.Warning,
@@ -117,25 +118,28 @@ namespace RevitMepTotals.ViewModels {
 
         private void ProcessDocuments() {
             var documents = Documents.Select(vm => vm.GetDocument()).ToHashSet();
-            string errorMsg;
-            IList<IDocumentData> processedData;
-            using(var progressDialogService = _progressDialogFactory.CreateDialog()) {
-                progressDialogService.StepValue = 1;
-                progressDialogService.DisplayTitleFormat = "Îáðàáîòêà äîêóìåíòîâ... [{0}]\\[{1}]";
-                var progress = progressDialogService.CreateProgress();
-                progressDialogService.MaxValue = documents.Count;
-                var ct = progressDialogService.CreateCancellationToken();
-                progressDialogService.Show();
+            if(documents.Count > 0) {
+                DirectoryInfo directory = _directoryProvider.GetDirectory();
+                string errorMsg;
+                IList<IDocumentData> processedData;
+                using(var progressDialogService = _progressDialogFactory.CreateDialog()) {
+                    progressDialogService.StepValue = 1;
+                    progressDialogService.DisplayTitleFormat = "ÐžÐ±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ° Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð¾Ð²... [{0}]\\[{1}]";
+                    var progress = progressDialogService.CreateProgress();
+                    progressDialogService.MaxValue = documents.Count;
+                    var ct = progressDialogService.CreateCancellationToken();
+                    progressDialogService.Show();
 
-                processedData = _documentsProcessor.ProcessDocuments(documents, out string processError, progress, ct);
-                errorMsg = processError;
-            }
-            ShowMessageBoxError(errorMsg);
-
-            if(processedData.Count > 0) {
-                _dataExporter.ExportData(_directoryProvider.GetDirectory(), processedData, out string exportError);
-                errorMsg = exportError;
+                    processedData = _documentsProcessor.ProcessDocuments(documents, out string processError, progress, ct);
+                    errorMsg = processError;
+                }
                 ShowMessageBoxError(errorMsg);
+
+                if(processedData.Count > 0) {
+                    _dataExporter.ExportData(directory, processedData, out string exportError);
+                    errorMsg = exportError;
+                    ShowMessageBoxError(errorMsg);
+                }
             }
         }
 

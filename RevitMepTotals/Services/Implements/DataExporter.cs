@@ -1,22 +1,28 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 using DevExpress.Spreadsheet;
 
-using dosymep.SimpleServices;
-
 using RevitMepTotals.Models.Interfaces;
 
 namespace RevitMepTotals.Services.Implements {
     internal class DataExporter : IDataExporter {
         private readonly ICopyNameProvider _copyNameProvider;
-        private readonly IMessageBoxService _messageBoxService;
+        private readonly IConstantsProvider _constantsProvider;
+        private readonly IErrorMessagesProvider _errorMessagesProvider;
 
-        public DataExporter(ICopyNameProvider copyNameProvider, IMessageBoxService messageBoxService) {
-            _copyNameProvider = copyNameProvider ?? throw new ArgumentNullException(nameof(copyNameProvider));
-            _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        public DataExporter(
+            ICopyNameProvider copyNameProvider,
+            IConstantsProvider constantsProvider,
+            IErrorMessagesProvider errorMessagesProvider) {
+            _copyNameProvider = copyNameProvider
+                ?? throw new ArgumentNullException(nameof(copyNameProvider));
+            _constantsProvider = constantsProvider
+                ?? throw new ArgumentNullException(nameof(constantsProvider));
+            _errorMessagesProvider = errorMessagesProvider
+                ?? throw new ArgumentNullException(nameof(errorMessagesProvider));
         }
 
 
@@ -83,14 +89,11 @@ namespace RevitMepTotals.Services.Implements {
             var docsWithNameConflicts = data
                 .GroupBy(doc => CleanSheetName(doc.Title))
                 .Where(group => group.Count() > 1)
-                .SelectMany(group => group.ToList())
+                .SelectMany(group => group)
                 .ToArray();
             if(docsWithNameConflicts.Length > 0) {
-                errorMessage = $"{string.Join(Environment.NewLine, docsWithNameConflicts.Select(doc => doc.Title))}" +
-                    $"\nЭти документы нельзя выгрузить за один раз, т.к. они образуют конфликт имен в листах Excel." +
-                    "\nИмя листа Excel должно быть не более 31 символа" +
-                    "\nне должно начинаться или заканчиваться с (')" +
-                    "\nне должно содержать \\, /, ?, :, *, [, ] ";
+                errorMessage = _errorMessagesProvider
+                    .GetFileNamesConflictMessage(docsWithNameConflicts.Select(doc => doc.Title).ToArray());
             } else {
                 errorMessage = string.Empty;
             }
@@ -142,6 +145,7 @@ namespace RevitMepTotals.Services.Implements {
             worksheet.Rows[startRow][2].Value = "ФОП_ВИС_Наименование комбинированное";
             worksheet.Rows[startRow][3].Value = "Размер";
             worksheet.Rows[startRow][4].Value = "Длина, м";
+            worksheet.Rows[startRow][5].Value = "Площадь, м2";
             worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
             startRow++;
             int ductsCount = ductData.Count;
@@ -152,6 +156,7 @@ namespace RevitMepTotals.Services.Implements {
                 worksheet.Rows[row][2].Value = ductData[row - startRow].Name;
                 worksheet.Rows[row][3].Value = ductData[row - startRow].Size;
                 worksheet.Rows[row][4].Value = ductData[row - startRow].Length / 1000;
+                worksheet.Rows[row][5].Value = ductData[row - startRow].Area;
             }
             return lastRow;
         }
@@ -255,8 +260,8 @@ namespace RevitMepTotals.Services.Implements {
         /// <param name="name"></param>
         /// <returns></returns>
         private string CleanSheetName(string name) {
-            var charsToRemove = new char[] { '\\', '/', '?', ':', '*', '[', ']', '\'' };
-            string trimName = string.Concat(name.Trim().Take(31)).Trim();
+            var charsToRemove = _constantsProvider.ProhibitedExcelChars;
+            string trimName = new string(name.Trim().Take(_constantsProvider.DocNameMaxLength).ToArray()).Trim();
             foreach(char charToRemove in charsToRemove) {
                 trimName = trimName.Replace(charToRemove, '_');
             }
