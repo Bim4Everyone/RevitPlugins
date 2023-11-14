@@ -175,7 +175,7 @@ namespace RevitMepTotals.Services.Implements {
         private ICollection<IPipeInsulationData> GetPipeInsulationData(Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
-            bool pipeInsulationsHaveSharedName = _revitRepository.SharedNameForPipesExists(document);
+            bool pipeInsulationsHaveSharedName = _revitRepository.SharedNameForPipeInsulationsExists(document);
 
             return _revitRepository
                 .GetPipeInsulations(document)
