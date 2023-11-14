@@ -13,8 +13,9 @@ using dosymep.Revit;
 
 namespace RevitMepTotals.Models {
     internal class RevitRepository {
+        public const string DefaultStringParamValue = "отсутствует";
+
         private const string _sharedName = "ФОП_ВИС_Наименование комбинированное";
-        private const string _default = "отсутствует";
 
 
         public RevitRepository(UIApplication uiApplication) {
@@ -64,41 +65,32 @@ namespace RevitMepTotals.Models {
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
-        public string GetMepCurveElementSharedName(Document document, MEPCurve element) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+        public string GetMepCurveElementSharedName(MEPCurve element) {
             if(element is null) { throw new ArgumentNullException(nameof(element)); }
 
-            if(element.GetParameters(_sharedName).FirstOrDefault(item => item.IsShared) != null) {
-                return element.GetParamValueOrDefault(_sharedName, _default);
-            } else {
-                return _default;
-            }
+            return element.GetSharedParamValueOrDefault(_sharedName, DefaultStringParamValue);
         }
 
         /// <summary>
         /// Возвращает значение параметра "Имя системы"
         /// </summary>
-        /// <param name="document"></param>
         /// <param name="element"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public string GetMepCurveElementMepSystemName(Document document, MEPCurve element) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+        public string GetMepCurveElementMepSystemName(MEPCurve element) {
             if(element is null) { throw new ArgumentNullException(nameof(element)); }
 
-            string systemName = element.GetParamValueOrDefault(BuiltInParameter.RBS_SYSTEM_NAME_PARAM, _default);
+            string systemName = element.GetParamValueOrDefault(BuiltInParameter.RBS_SYSTEM_NAME_PARAM, DefaultStringParamValue);
             return systemName;
         }
 
         /// <summary>
         /// Возвращает значение параметра "Длина" у воздуховодов и труб и их изоляции в мм
         /// </summary>
-        /// <param name="document"></param>
         /// <param name="element"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public double GetMepCurveElementLength(Document document, MEPCurve element) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+        public double GetMepCurveElementLength(MEPCurve element) {
             if(element is null) { throw new ArgumentNullException(nameof(element)); }
 
             double feetValue = element.GetParamValueOrDefault(BuiltInParameter.CURVE_ELEM_LENGTH, 0.0);
@@ -108,12 +100,10 @@ namespace RevitMepTotals.Models {
         /// <summary>
         /// Возвращает значение параметра "Площадь" у воздуховодов
         /// </summary>
-        /// <param name="document"></param>
         /// <param name="element"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public double GetMepCurveElementArea(Document document, MEPCurve element) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+        public double GetMepCurveElementArea(MEPCurve element) {
             if(element is null) { throw new ArgumentNullException(nameof(element)); }
 
             double feetValue = element.GetParamValueOrDefault(BuiltInParameter.RBS_CURVE_SURFACE_AREA, 0.0);
@@ -123,12 +113,10 @@ namespace RevitMepTotals.Models {
         /// <summary>
         /// Возвращает толщину изоляции в мм
         /// </summary>
-        /// <param name="document"></param>
         /// <param name="insulation"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public double GetPipeInsulationThickness(Document document, InsulationLiningBase insulation) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+        public double GetPipeInsulationThickness(InsulationLiningBase insulation) {
             if(insulation is null) { throw new ArgumentNullException(nameof(insulation)); }
 
             return ConvertFeetToMillimeters(insulation.Thickness);
@@ -149,15 +137,13 @@ namespace RevitMepTotals.Models {
         /// <summary>
         /// Возвращает значение параметра "Размер"
         /// </summary>
-        /// <param name="document"></param>
         /// <param name="duct"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public string GetDuctSize(Document document, Duct duct) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+        public string GetDuctSize(Duct duct) {
             if(duct is null) { throw new ArgumentNullException(nameof(duct)); }
 
-            return GetMepCurveElementSize(document, duct);
+            return GetMepCurveElementSize(duct);
         }
 
         /// <summary>
@@ -175,72 +161,119 @@ namespace RevitMepTotals.Models {
         /// <summary>
         /// Возвращает значение параметра "Размер"
         /// </summary>
-        /// <param name="document"></param>
         /// <param name="pipe"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public string GetPipeSize(Document document, Pipe pipe) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+        public string GetPipeSize(Pipe pipe) {
             if(pipe is null) { throw new ArgumentNullException(nameof(pipe)); }
 
-            return GetMepCurveElementSize(document, pipe);
+            return GetMepCurveElementSize(pipe);
         }
 
         /// <summary>
         /// Возвращает название типоразмера изоляции воздуховодов
         /// </summary>
-        /// <param name="document"></param>
         /// <param name="pipeInsulation"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public string GetPipeInsulationTypeName(Document document, PipeInsulation pipeInsulation) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+        public string GetPipeInsulationTypeName(PipeInsulation pipeInsulation) {
             if(pipeInsulation is null) { throw new ArgumentNullException(nameof(pipeInsulation)); }
 
-            return GetMepElementTypeName(document, pipeInsulation);
+            return GetMepElementTypeName(pipeInsulation);
         }
 
 
         /// <summary>
         /// Возвращает значение параметра "Размер воздуховода"
         /// </summary>
-        /// <param name="document"></param>
         /// <param name="pipeInsulation"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public string GetPipeInsulationSize(Document document, PipeInsulation pipeInsulation) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+        public string GetPipeInsulationSize(PipeInsulation pipeInsulation) {
             if(pipeInsulation is null) { throw new ArgumentNullException(nameof(pipeInsulation)); }
 
-            return pipeInsulation.GetParamValueOrDefault(BuiltInParameter.RBS_PIPE_CALCULATED_SIZE, _default);
+            return pipeInsulation.GetParamValueOrDefault(BuiltInParameter.RBS_PIPE_CALCULATED_SIZE, DefaultStringParamValue);
+        }
+
+        /// <summary>
+        /// Возвращает, присутствует ли в документе общий параметр <see cref="_sharedName"/> у воздуховодов
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public bool SharedNameForDuctsExists(Document document) {
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+
+            return SharedNameForCategoryExists(document, BuiltInCategory.OST_DuctCurves);
+        }
+
+        /// <summary>
+        /// Возвращает, присутствует ли в документе общий параметр <see cref="_sharedName"/> у труб
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public bool SharedNameForPipesExists(Document document) {
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+
+            return SharedNameForCategoryExists(document, BuiltInCategory.OST_PipeCurves);
+        }
+
+        /// <summary>
+        /// Возвращает, присутствует ли в документе общий параметр <see cref="_sharedName"/> у изоляции трубопроводов
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public bool SharedNameForPipeInsulationsExists(Document document) {
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+
+            return SharedNameForCategoryExists(document, BuiltInCategory.OST_PipeInsulations);
+        }
+
+
+        /// <summary>
+        /// Проверяет, присутствует ли в документе у заданной категории общий параметр <see cref="_sharedName"/>
+        /// </summary>
+        /// <param name="document"></param>
+        /// <param name="builtInCategory"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        private bool SharedNameForCategoryExists(Document document, BuiltInCategory builtInCategory) {
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+
+            if(!document.IsExistsSharedParam(_sharedName)) { return false; }
+
+            return document
+                .GetSharedParamBinding(_sharedName)
+                .Binding
+                .GetCategories()
+                .Select(category => category.GetBuiltInCategory())
+                .Contains(builtInCategory);
         }
 
         /// <summary>
         /// Возвращает название типоразмера элемента
         /// </summary>
-        /// <param name="document"></param>
         /// <param name="element"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        private string GetMepElementTypeName(Document document, Element element) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+        private string GetMepElementTypeName(Element element) {
             if(element is null) { throw new ArgumentNullException(nameof(element)); }
 
-            return document.GetElement(element.GetTypeId()).Name;
+            return element.HasElementType() ? element.GetElementType().Name : DefaultStringParamValue;
         }
 
         /// <summary>
         /// Возвращает значение параметра "Размер" из воздуховода или трубы
         /// </summary>
-        /// <param name="document"></param>
         /// <param name="element"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        private string GetMepCurveElementSize(Document document, Element element) {
-            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+        private string GetMepCurveElementSize(Element element) {
             if(element is null) { throw new ArgumentNullException(nameof(element)); }
 
-            return element.GetParamValueOrDefault(BuiltInParameter.RBS_CALCULATED_SIZE, _default);
+            return element.GetParamValueOrDefault(BuiltInParameter.RBS_CALCULATED_SIZE, DefaultStringParamValue);
         }
 
         /// <summary>

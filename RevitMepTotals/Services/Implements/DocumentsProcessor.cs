@@ -130,18 +130,22 @@ namespace RevitMepTotals.Services.Implements {
         private ICollection<IDuctData> GetDuctData(Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
+            bool ductsHaveSharedName = _revitRepository.SharedNameForDuctsExists(document);
+
             return _revitRepository
                 .GetDucts(document)
                 .GroupBy(duct => new {
-                    SystemName = _revitRepository.GetMepCurveElementMepSystemName(document, duct),
+                    SystemName = _revitRepository.GetMepCurveElementMepSystemName(duct),
                     TypeName = _revitRepository.GetDuctTypeName(duct),
-                    Size = GetStandardSizeFormat(_revitRepository.GetDuctSize(document, duct)),
-                    Name = _revitRepository.GetMepCurveElementSharedName(document, duct)
+                    Size = GetStandardSizeFormat(_revitRepository.GetDuctSize(duct)),
+                    Name = ductsHaveSharedName
+                         ? _revitRepository.GetMepCurveElementSharedName(duct)
+                         : RevitRepository.DefaultStringParamValue
                 })
                 .Select(group =>
                 new DuctData(group.Key.SystemName, group.Key.TypeName, group.Key.Size, group.Key.Name) {
-                    Length = group.Sum(duct => _revitRepository.GetMepCurveElementLength(document, duct)),
-                    Area = group.Sum(duct => _revitRepository.GetMepCurveElementArea(document, duct))
+                    Length = group.Sum(duct => _revitRepository.GetMepCurveElementLength(duct)),
+                    Area = group.Sum(duct => _revitRepository.GetMepCurveElementArea(duct))
                 })
                 .ToArray();
         }
@@ -149,17 +153,21 @@ namespace RevitMepTotals.Services.Implements {
         private ICollection<IPipeData> GetPipeData(Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
+            bool pipesHaveSharedName = _revitRepository.SharedNameForPipesExists(document);
+
             return _revitRepository
                 .GetPipes(document)
                 .GroupBy(pipe => new {
-                    SystemName = _revitRepository.GetMepCurveElementMepSystemName(document, pipe),
+                    SystemName = _revitRepository.GetMepCurveElementMepSystemName(pipe),
                     TypeName = _revitRepository.GetPipeTypeName(pipe),
-                    Size = GetStandardSizeFormat(_revitRepository.GetPipeSize(document, pipe)),
-                    Name = _revitRepository.GetMepCurveElementSharedName(document, pipe)
+                    Size = GetStandardSizeFormat(_revitRepository.GetPipeSize(pipe)),
+                    Name = pipesHaveSharedName
+                         ? _revitRepository.GetMepCurveElementSharedName(pipe)
+                         : RevitRepository.DefaultStringParamValue
                 })
                 .Select(group =>
                 new PipeData(group.Key.SystemName, group.Key.TypeName, group.Key.Size, group.Key.Name) {
-                    Length = group.Sum(pipe => _revitRepository.GetMepCurveElementLength(document, pipe))
+                    Length = group.Sum(pipe => _revitRepository.GetMepCurveElementLength(pipe))
                 })
                 .ToArray();
         }
@@ -167,26 +175,30 @@ namespace RevitMepTotals.Services.Implements {
         private ICollection<IPipeInsulationData> GetPipeInsulationData(Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
+            bool pipeInsulationsHaveSharedName = _revitRepository.SharedNameForPipesExists(document);
+
             return _revitRepository
                 .GetPipeInsulations(document)
                 .GroupBy(pipeInsulation => new {
-                    SystemName = _revitRepository.GetMepCurveElementMepSystemName(document, pipeInsulation),
-                    TypeName = _revitRepository.GetPipeInsulationTypeName(document, pipeInsulation),
-                    PipeSize = GetStandardSizeFormat(_revitRepository.GetPipeInsulationSize(document, pipeInsulation)),
-                    Name = _revitRepository.GetMepCurveElementSharedName(document, pipeInsulation),
-                    Thickness = _revitRepository.GetPipeInsulationThickness(document, pipeInsulation)
+                    SystemName = _revitRepository.GetMepCurveElementMepSystemName(pipeInsulation),
+                    TypeName = _revitRepository.GetPipeInsulationTypeName(pipeInsulation),
+                    PipeSize = GetStandardSizeFormat(_revitRepository.GetPipeInsulationSize(pipeInsulation)),
+                    Thickness = _revitRepository.GetPipeInsulationThickness(pipeInsulation),
+                    Name = pipeInsulationsHaveSharedName
+                         ? _revitRepository.GetMepCurveElementSharedName(pipeInsulation)
+                         : RevitRepository.DefaultStringParamValue
                 })
                 .Select(group =>
                 new PipeInsulationData(group.Key.SystemName, group.Key.TypeName, group.Key.PipeSize, group.Key.Name) {
                     Thickness = group.Key.Thickness,
                     Length = group.Sum(
-                        pipeInsulation => _revitRepository.GetMepCurveElementLength(document, pipeInsulation))
+                        pipeInsulation => _revitRepository.GetMepCurveElementLength(pipeInsulation))
                 })
                 .ToArray();
         }
 
         /// <summary>
-        /// Преобразует строку в формате 650x1000 к 1000x650б то есть наибольшее число вначале.
+        /// Преобразует строку в формате 650x1000 к 1000x650, то есть наибольшее число в начале.
         /// Если формат поданной строки другой, вернется эта же строка.
         /// Символ 'x' может быть RUS или ENG
         /// </summary>
