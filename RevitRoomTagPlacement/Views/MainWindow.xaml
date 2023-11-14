@@ -53,6 +53,7 @@
             SelectedItem="{Binding RevitViewModel}"/>
 
         <ListBox
+            x:Name="RoomGroups"
             Grid.Row="1"
             Margin="10,5,10,5"
             SelectionMode="Extended"
@@ -60,7 +61,9 @@
             ItemsSource="{Binding RoomGroups}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <CheckBox Content="{Binding Name}" 
+                    <CheckBox Content="{Binding Name}"
+                              Checked="CheckBox_Checked"
+                              Unchecked="CheckBox_Unchecked"
                               IsChecked="{Binding IsChecked}"/>
                 </DataTemplate>
             </ListBox.ItemTemplate>
