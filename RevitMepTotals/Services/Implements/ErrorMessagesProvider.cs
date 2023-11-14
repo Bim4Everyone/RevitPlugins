@@ -15,7 +15,7 @@ namespace RevitMepTotals.Services.Implements {
             return $"{string.Join(Environment.NewLine, conflictNames)}" +
                 $"\nЭти документы нельзя выгрузить за один раз, т.к. они образуют конфликт имен в листах Excel." +
                 $"\nИмя листа Excel должно быть не более {_constantsProvider.DocNameMaxLength} символа" +
-                $"\nи не должно содержать {string.Join(", ", _constantsProvider.ProhibitedChars)} ";
+                $"\nи не должно содержать {string.Join(", ", _constantsProvider.ProhibitedExcelChars)} ";
         }
 
         public string GetFileAlreadyOpenedMessage(string path) {

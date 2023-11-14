@@ -260,7 +260,7 @@ namespace RevitMepTotals.Services.Implements {
         /// <param name="name"></param>
         /// <returns></returns>
         private string CleanSheetName(string name) {
-            var charsToRemove = _constantsProvider.ProhibitedChars;
+            var charsToRemove = _constantsProvider.ProhibitedExcelChars;
             string trimName = new string(name.Trim().Take(_constantsProvider.DocNameMaxLength).ToArray()).Trim();
             foreach(char charToRemove in charsToRemove) {
                 trimName = trimName.Replace(charToRemove, '_');

@@ -11,8 +11,8 @@ namespace RevitMepTotals.Services {
         int DocNameMaxLength { get; }
 
         /// <summary>
-        /// Символы, которые нельзя использовать
+        /// Символы, которые нельзя использовать в названиях листов Excel
         /// </summary>
-        IReadOnlyCollection<char> ProhibitedChars { get; }
+        IReadOnlyCollection<char> ProhibitedExcelChars { get; }
     }
 }

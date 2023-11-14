@@ -18,6 +18,6 @@ namespace RevitMepTotals.Services.Implements {
         /// Символы, которые нельзя использовать в названии документа:
         /// '\\', '/', '?', ':', '*', '[', ']', '\''
         /// </summary>
-        public IReadOnlyCollection<char> ProhibitedChars => _prohibitedChars;
+        public IReadOnlyCollection<char> ProhibitedExcelChars => _prohibitedChars;
     }
 }
