@@ -29,7 +29,7 @@ namespace RevitRoomTagPlacement.ViewModels {
 
             RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
             _apartments = rooms
-                .GroupBy(r => r.RoomObject.GetParamValue<string>(sectionParam))
+                .GroupBy(r => r.RoomObject.GetParamValueOrDefault(sectionParam, "<Без секции>"))
                 .Select(x => new Apartment(x));
         }
 
