@@ -18,9 +18,11 @@ namespace RevitRoomTagPlacement.ViewModels {
         }
 
         protected override BindingList<RoomGroupViewModel> GetGroupViewModels() {
+            RevitParam groupParam = ProjectParamsConfig.Instance.RoomGroupName;
+
             var roomGroupsList = _revitRepository.GetRoomsOnActiveView()
                 .Where(r => r.RoomObject.Area > 0)
-                .GroupBy(x => x.RoomObject.GetParamValueStringOrDefault(ProjectParamsConfig.Instance.RoomGroupName, "<Без группы>"))
+                .GroupBy(x => x.RoomObject.GetParamValueString(groupParam))
                 .Select(x => new RoomGroupViewModel(x.Key.ToString(), x))
                 .OrderBy(x => x.Name)
                 .ToList();

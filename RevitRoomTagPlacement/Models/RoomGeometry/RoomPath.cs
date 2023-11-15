@@ -11,11 +11,11 @@ namespace RevitRoomTagPlacement.Models {
     internal class RoomPath {
         private TriangulatedRoom triRoom;
 
-        private List<PathTriangle> triangles;
-        private List<List<PathTriangle>> startTriangles;
-        private List<List<PathTriangle>> allPathes;
-        private List<PathTriangle> mainPath;
-        private double centerPoint;
+        private readonly List<PathTriangle> triangles;
+        private readonly List<List<PathTriangle>> startTriangles;
+        private readonly List<List<PathTriangle>> allPathes;
+        private readonly List<PathTriangle> mainPath;
+        private readonly double centerPoint;
 
         public UV _tagPoint;
 

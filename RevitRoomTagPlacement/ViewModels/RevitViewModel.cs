@@ -20,21 +20,21 @@ namespace RevitRoomTagPlacement.ViewModels {
     
     internal abstract class RevitViewModel : BaseViewModel {
         protected readonly RevitRepository _revitRepository;
+
         private RoomTagTypeModel _selectedTagType;
         private string _selectedRoomName;
+
         private GroupPlacementWay placementWayByGroups = GroupPlacementWay.EveryRoom;
         private PositionPlacementWay placementWayByPosition = PositionPlacementWay.CenterCenter;
-        private ObservableCollection<string> roomNames;
+
         private string _errorText;
 
         public RevitViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
 
             RoomGroups = new BindingList<RoomGroupViewModel>(GetGroupViewModels());
-            RoomNames = new ObservableCollection<string>();
 
             TagFamilies = revitRepository.GetRoomTags();
-
             if(TagFamilies.Count != 0) SelectedTagType = TagFamilies[0];
 
             PlaceTagsCommand = new RelayCommand(PlaceTags, CanPlaceTags);
@@ -53,10 +53,7 @@ namespace RevitRoomTagPlacement.ViewModels {
 
         public BindingList<RoomGroupViewModel> RoomGroups { get; }
 
-        public ObservableCollection<string> RoomNames {
-            get => _revitRepository.GetRoomNames(RoomGroups);  
-            set { }
-        }
+        public ObservableCollection<string> RoomNames => _revitRepository.GetRoomNames(RoomGroups);
 
         public List<RoomTagTypeModel> TagFamilies { get; }
 
@@ -167,14 +164,14 @@ namespace RevitRoomTagPlacement.ViewModels {
 
         private bool CanPlaceTags(object p) {
             if(RoomGroups.Count() == 0) {
-                ErrorText = "Помещения отсутсвуют/не выбраны";
+                ErrorText = "Помещения отсутствуют/не выбраны";
                 return false;
             }
             if(TagFamilies.Count() == 0) {
                 ErrorText = "В проекте отсутствуют марки помещений";
                 return false;
             }
-            if(RoomGroups.Where(x => x.IsChecked).Count() == 0) {
+            if(!RoomGroups.Any(x => x.IsChecked)) {
                 ErrorText = "Группы не выбраны";
                 return false; 
             }

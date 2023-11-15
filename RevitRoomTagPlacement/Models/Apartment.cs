@@ -12,8 +12,8 @@ using dosymep.Revit;
 namespace RevitRoomTagPlacement.Models {
     internal class Apartment {
 
-        IEnumerable<RoomFromRevit> _rooms;
-        IEnumerable<string> _roomNames;
+        private readonly IEnumerable<RoomFromRevit> _rooms;
+        private readonly IEnumerable<string> _roomNames;
 
         public Apartment(IEnumerable<RoomFromRevit> rooms) {
             _rooms = rooms;

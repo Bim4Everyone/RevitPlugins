@@ -141,8 +141,6 @@ namespace RevitRoomTagPlacement.Models {
 
                         if(!room.RoomObject.IsPointInRoom(testPoint)) point = pathFinder.GetPointByPath();
 
-                        RoomTag newTag;
-
                         /* Невозможно отфильтровать помещения из связанного файла для активного вида.
                            Способ получения помещений через CustomExporter не работает, так как помещения не экспортируются.
                            В качестве решения принято брать все помещения из связанного файла и размещать марку на каждом.
@@ -151,6 +149,8 @@ namespace RevitRoomTagPlacement.Models {
                            если он null, то марка удаляется.                         
                            */
 
+                        RoomTag newTag;
+
                         if(room.LinkId == null) {
                             newTag = Document.Create.NewRoomTag(new LinkElementId(room.RoomObject.Id), point, activeView.Id);
                         } 
@@ -158,7 +158,7 @@ namespace RevitRoomTagPlacement.Models {
                             newTag = Document.Create.NewRoomTag(new LinkElementId(room.LinkId, room.RoomObject.Id), point, activeView.Id);
                         }
 
-                        if(newTag.get_BoundingBox(activeView) == null) {
+                        if(newTag?.get_BoundingBox(activeView) == null) {
                             Document.Delete(newTag.Id);
                         }
                         else if(newTag != null) { 

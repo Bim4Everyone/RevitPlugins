@@ -13,13 +13,16 @@ using RevitRoomTagPlacement.Models;
 
 namespace RevitRoomTagPlacement.ViewModels {
     internal class SelectedRevitViewModel : RevitViewModel {
-        public SelectedRevitViewModel(RevitRepository revitRepository) : base(revitRepository) {
+        public SelectedRevitViewModel(RevitRepository revitRepository) 
+            : base(revitRepository) {
         }
 
         protected override BindingList<RoomGroupViewModel> GetGroupViewModels() {
+            RevitParam groupParam = ProjectParamsConfig.Instance.RoomGroupName;
+
             var selectedRoomsList = _revitRepository.GetSelectedRooms()
                 .Where(r => r.RoomObject.Area > 0)
-                .GroupBy(x => x.RoomObject.GetParamValueStringOrDefault(ProjectParamsConfig.Instance.RoomGroupName, "<Без группы>"))
+                .GroupBy(x => x.RoomObject.GetParamValueString(groupParam))
                 .Select(x => new RoomGroupViewModel(x.Key.ToString(), x))
                 .OrderBy(x => x.Name)
                 .ToList();

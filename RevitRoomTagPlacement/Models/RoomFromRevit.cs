@@ -24,6 +24,7 @@ namespace RevitRoomTagPlacement.Models {
         // Стандартное свойство Name нельзя использовать,
         // так как оно возвращает имя вместе с номером помещения
         public string Name => _room.GetParamValueOrDefault(BuiltInParameter.ROOM_NAME, "<Без имени>");
+
         public ElementId LinkId => _linkId;
     }
 }

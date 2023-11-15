@@ -19,9 +19,9 @@ using RevitRoomTagPlacement.Models;
 namespace RevitRoomTagPlacement.ViewModels {
     internal class RoomGroupViewModel : BaseViewModel {
 
-        string _name;
-        IEnumerable<RoomFromRevit> _rooms;
-        IEnumerable<Apartment> _apartments;
+        private readonly string _name;
+        private readonly IEnumerable<RoomFromRevit> _rooms;
+        private readonly IEnumerable<Apartment> _apartments;
 
         public RoomGroupViewModel(string name, IEnumerable<RoomFromRevit> rooms) {
             _name = name;
