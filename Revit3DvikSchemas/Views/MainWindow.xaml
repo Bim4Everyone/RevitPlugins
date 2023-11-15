@@ -36,7 +36,7 @@
 
         <ListView 
             Grid.Row="2"
-            Margin="10,5"
+            Width="450"
             SelectionMode="Extended"
             ItemsSource="{Binding RevitHVACSystems }" SelectionChanged="ListView_SelectionChanged"
             >
@@ -44,9 +44,8 @@
             <ListView.View>
                 <GridView AllowsColumnReorder="False" ColumnHeaderToolTip="Список систем">
                     <GridView.Columns>
-
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=SystemName}" Header="Имя системы" />
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=FopName}" Header="_ФОП_ВИС_Имя системы"/>
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=SystemName}" Header="Имя системы" Width="150" />
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=FopName}" Header="_ФОП_ВИС_Имя системы" Width="150"/>
                         <GridViewColumn
                         Width="150"
                         Header="Создать схему"    

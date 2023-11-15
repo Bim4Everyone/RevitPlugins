@@ -8,16 +8,23 @@ using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 
+
 using Revit3DvikSchemas.ViewModels;
 
 namespace Revit3DvikSchemas.Models {
 
     internal class RevitRepository {
-        public RevitRepository(UIApplication uiApplication) {
+        private readonly ViewMaker _viewMaker;
+
+
+        public RevitRepository(UIApplication uiApplication, ViewMaker viewMaker) {
             UIApplication = uiApplication;
+            _viewMaker = viewMaker;
         }
         public UIApplication UIApplication { get; }
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
+
+
 
         //public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
@@ -59,11 +66,17 @@ namespace Revit3DvikSchemas.Models {
         }
 
         public void CreateSelectedCommand(List<HvacSystemViewModel> list, bool useFopNames, bool combineViews) {
-            TaskDialog.Show("Test", useFopNames.ToString());
-            TaskDialog.Show("Test", combineViews.ToString());
-            foreach(HvacSystemViewModel vm in list) {
-                string test = vm.IsChecked.ToString();
+            List<HvacSystemViewModel> systems = new List<HvacSystemViewModel>();
+            foreach(HvacSystemViewModel system in list) {
+                if(system.IsChecked) {
+                    systems.Add(system);
+                }
             }
+            Transaction t = Document.StartTransaction("Удалить неиспользуемые");
+            _viewMaker.CopyViewCreateFilters(this, systems, useFopNames, combineViews);
+
+            t.Commit();
+
         }
 
         public List<HvacSystemViewModel> GetHVACSystems() {
