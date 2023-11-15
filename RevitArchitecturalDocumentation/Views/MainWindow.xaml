@@ -452,57 +452,6 @@
                 Text="{Binding ErrorText}" />
 
 
-            <TextBlock
-                    Margin="3"
-                    Text="Ось X:"
-                    FontSize="14"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Right"/>
-            
-            <TextBox 
-                    Width="100"
-                    Margin="5"
-                    VerticalContentAlignment="Center"
-                    Text="{Binding Path=MoveLeftRight}"/>
-
-            <TextBlock
-                    Margin="3"
-                    Text="Ось Y:"
-                    FontSize="14"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Right"/>
-            
-            <TextBox 
-                   Width="100"
-                    Margin="5"
-                    VerticalContentAlignment="Center"
-                    Text="{Binding Path=MoveUpDown}"/>
-
-
-            <Button
-                Margin="5"
-                Width="150"
-                Content="Выбрать марки"
-                FontSize="16"
-                Click="ButtonCancel_Click"
-                Command="{Binding Path=SelectRoomTagsForMoveCommand}"/>
-                        
-            <Button
-                Margin="5"
-                Width="120"
-                Content="Переместить"
-                FontSize="16"
-                Click="ButtonOk_Click"
-                Command="{Binding Path=MoveCommand}"/>
-
-            <Button
-                Margin="5"
-                Width="80"
-                Content="Удалить"
-                FontSize="16"
-                Click="ButtonOk_Click"
-                Command="{Binding Path=DeleteCommand}"/>
-
             <Button
                 Margin="10"
                 Width="80"

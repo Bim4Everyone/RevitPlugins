@@ -70,11 +70,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private string _errorText;
 
 
-
-        private List<RoomTag> _roomTagsForMove = new List<RoomTag>();
-        private string _moveLeftRight = "0";
-        private string _moveUpDown = "0";
-
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
@@ -91,16 +86,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             AddTaskCommand = RelayCommand.Create(AddTask);
             DeleteTaskCommand = RelayCommand.Create(DeleteTask);
-            //SelectSpecCommand = RelayCommand.Create(SelectSpec);
 
             SelectSpecsCommand = new RelayCommand(SelectSpecs);
-
-
-
-
-            MoveCommand = RelayCommand.Create(Move, CanMove);
-            DeleteCommand = RelayCommand.Create(Delete, CanMove);
-            SelectRoomTagsForMoveCommand = new RelayCommand(SelectRoomTagsForMove);
         }
 
         public ICommand LoadViewCommand { get; }
@@ -109,10 +96,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         public ICommand AddTaskCommand { get; }
         public ICommand DeleteTaskCommand { get; }
 
-
-        public ICommand MoveCommand { get; }
-        public ICommand DeleteCommand { get; }
-        public ICommand SelectRoomTagsForMoveCommand { get; }
 
 
         public ICommand SelectSpecsCommand { get; }
@@ -243,21 +226,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
-
-
-        public List<RoomTag> RoomTagsForMove {
-            get => _roomTagsForMove;
-            set => this.RaiseAndSetIfChanged(ref _roomTagsForMove, value);
-        }
-        public string MoveLeftRight {
-            get => _moveLeftRight;
-            set => this.RaiseAndSetIfChanged(ref _moveLeftRight, value);
-        }
-        public string MoveUpDown {
-            get => _moveUpDown;
-            set => this.RaiseAndSetIfChanged(ref _moveUpDown, value);
-        }
-      
 
 
 
@@ -616,7 +584,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             Report.AppendLine($"Приступаю к выполнению задания. Всего задач: {TasksForWork.Count}");
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Документатор АР")) {
 
-                CreateViewsFromScratch = true;
+                CreateViewsFromScratch = false;
                 if(CreateViewsFromScratch) {
 
                     TaskDialog.Show("fd", "создание с нуля");
@@ -727,9 +695,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
 
                     foreach(View view in SelectedViews) {
-
-                        TaskDialog.Show("fd", "1");
-
 
                         string numberOfLevel = RegexForView.Match(view.Name.ToLower()).Groups[1].Value;
                         int numberOfLevelAsInt;
@@ -854,6 +819,28 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             //                foreach(View view in views) {
 
             //                    string numberOfLevel = regexForView.Match(view.Name.ToLower()).Groups[1].Value;
@@ -899,16 +886,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
 
 
-
-
-
-
-
-
-
-
-
-
         //private void DoWork() {
 
         //    StringBuilder report = new StringBuilder();
@@ -937,23 +914,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
         //    report.AppendLine($"Приступаю к выполнению задания. Всего задач: {TasksForWork.Count}");
         //    using(Transaction transaction = _revitRepository.Document.StartTransaction("Документатор АР")) {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1281,139 +1241,5 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
         //}
 
-
-
-
-
-
-
-
-        private void SelectRoomTagsForMove(object obj) {
-
-            foreach(Reference reference in _revitRepository.ActiveUIDocument.Selection.PickObjects(ObjectType.Element, "Выберите марку на виде")) {
-
-                RoomTag roomTag = _revitRepository.Document.GetElement(reference) as RoomTag;
-                if(roomTag is null) { TaskDialog.Show("Ошибка", "Вы выбрали не марку помещения!"); } else {
-                    RoomTagsForMove.Add(roomTag);
-                }
-
-            }
-            
-            MainWindow mainWindow = new MainWindow();
-            mainWindow.DataContext = this;
-            mainWindow.ShowDialog();
-        }
-
-
-
-        private void Move() {
-
-
-            if(RoomTagsForMove.Count == 0) {
-                
-                TaskDialog.Show("fd", "Не выбрана ни одна марка помещения!");
-                return;
-            }
-
-            if(!int.TryParse(MoveLeftRight, out int moveLeftRightAsInt)) {
-                TaskDialog.Show("fd", "Не удалось перевести в цифры смещение по горизонтали");
-                return;
-            }
-            if(!int.TryParse(MoveUpDown, out int moveUpDownAsInt)) {
-                TaskDialog.Show("fd", "Не удалось перевести в цифры смещение по вертикали");
-                return;
-            }
-
-            double moveLeftRightAsDouble = UnitUtilsHelper.ConvertToInternalValue((double)moveLeftRightAsInt);
-            double moveUpDownAsDouble = UnitUtilsHelper.ConvertToInternalValue((double) moveUpDownAsInt);
-
-
-            using(Transaction transaction = _revitRepository.Document.StartTransaction("Перемещение марок помещений")) {
-
-
-                foreach(RoomTag roomTagForMove in RoomTagsForMove) {
-
-                    XYZ tagHeaderPosititon = roomTagForMove.TagHeadPosition;
-
-                    foreach(View view in SelectedViews) {
-
-                        List<SpatialElementTag> roomTagsForMove = new FilteredElementCollector(_revitRepository.Document, view.Id)
-                            .OfClass(typeof(SpatialElementTag))
-                            .OfType<SpatialElementTag>()
-                            .ToList();
-
-                        foreach(SpatialElementTag tag in roomTagsForMove) {
-
-                            XYZ tagHeadPtCurrent = tag.TagHeadPosition;
-
-                            if(tagHeadPtCurrent.X == tagHeaderPosititon.X && tagHeadPtCurrent.Y == tagHeaderPosititon.Y) {
-
-                                tag.HasLeader = true;
-                                tag.LeaderEnd = new XYZ(tagHeadPtCurrent.X, tagHeadPtCurrent.Y, tagHeadPtCurrent.Z);
-
-                                tag.TagHeadPosition = new XYZ(tagHeadPtCurrent.X + moveLeftRightAsDouble, tagHeadPtCurrent.Y + moveUpDownAsDouble, tagHeadPtCurrent.Z);
-                            }
-                        }
-                    }
-                }
-                
-
-                transaction.Commit();
-            }
-        }
-
-        private void Delete() {
-
-
-            if(RoomTagsForMove.Count == 0) {
-
-                TaskDialog.Show("fd", "Не выбрана ни одна марка помещения!");
-                return;
-            }
-
-            
-            List<ElementId> tagsForDel = new List<ElementId>();
-
-            using(Transaction transaction = _revitRepository.Document.StartTransaction("Удаление марок помещений")) {
-
-                foreach(RoomTag roomTagForMove in RoomTagsForMove) {
-
-                    XYZ tagHeaderPosititon = roomTagForMove.TagHeadPosition;
-                    
-                    foreach(View view in SelectedViews) {
-
-                        List<SpatialElementTag> roomTagsOnAnotherVews = new FilteredElementCollector(_revitRepository.Document, view.Id)
-                            .OfClass(typeof(SpatialElementTag))
-                            .OfType<SpatialElementTag>()
-                            .ToList();
-
-                        foreach(SpatialElementTag tag in roomTagsOnAnotherVews) {
-
-                            XYZ tagHeadPtCurrent = tag.TagHeadPosition;
-
-                            if(tagHeadPtCurrent.X == tagHeaderPosititon.X && tagHeadPtCurrent.Y == tagHeaderPosititon.Y) {
-
-                                tagsForDel.Add(tag.Id);
-                            }
-                        }
-                    }
-                }
-
-
-
-                _revitRepository.Document.Delete(tagsForDel);
-
-                transaction.Commit();
-            }
-        }
-
-        private bool CanMove() {
-
-            if(RoomTagsForMove.Count == 0) {
-                return false;
-            }
-
-            return true;
-        }
     }
 }
