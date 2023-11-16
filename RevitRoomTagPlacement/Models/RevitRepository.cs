@@ -73,8 +73,8 @@ namespace RevitRoomTagPlacement.Models {
                 .ToList();
         }
 
-        public ObservableCollection<string> GetRoomNames(IList<RoomGroupViewModel> RoomGroups) {
-            var selectedAparts = RoomGroups.Where(x => x.IsChecked).SelectMany(x => x.Apartments);
+        public ObservableCollection<string> GetRoomNames(IList<RoomGroupViewModel> roomGroups) {
+            var selectedAparts = roomGroups.Where(x => x.IsChecked).SelectMany(x => x.Apartments);
             IEnumerable<string> uniqueNames = new List<string>();
 
             if(selectedAparts.Count() > 0) {
@@ -88,10 +88,10 @@ namespace RevitRoomTagPlacement.Models {
             return new ObservableCollection<string>(uniqueNames);
         }
 
-        public List<RoomFromRevit> FilterRoomsForPlacement(IList<RoomGroupViewModel> RoomGroups,
+        public List<RoomFromRevit> FilterRoomsForPlacement(IList<RoomGroupViewModel> roomGroups,
                                                         GroupPlacementWay groupPlacementWay,
                                                         string roomName = "") {
-            var selectedAparts = RoomGroups.Where(x => x.IsChecked).SelectMany(x => x.Apartments);
+            var selectedAparts = roomGroups.Where(x => x.IsChecked).SelectMany(x => x.Apartments);
             List<RoomFromRevit> rooms = new List<RoomFromRevit>();
 
             if(groupPlacementWay == GroupPlacementWay.EveryRoom) {
@@ -108,13 +108,13 @@ namespace RevitRoomTagPlacement.Models {
             return rooms;
         }
 
-        public void PlaceTagsByPositionAndGroup(IList<RoomGroupViewModel> RoomGroups, 
-                                            ElementId SelectedTagType,
+        public void PlaceTagsByPositionAndGroup(IList<RoomGroupViewModel> roomGroups, 
+                                            ElementId selectedTagType,
                                             GroupPlacementWay groupPlacementWay,
                                             PositionPlacementWay positionPlacementWay,
                                             string roomName = "") {
 
-            List<RoomFromRevit> rooms = FilterRoomsForPlacement(RoomGroups, 
+            List<RoomFromRevit> rooms = FilterRoomsForPlacement(roomGroups, 
                                                               groupPlacementWay, 
                                                               roomName);
 
@@ -130,7 +130,7 @@ namespace RevitRoomTagPlacement.Models {
                         .Select(x => x.GetTypeId())
                         .ToList();
 
-                    if(!depElements.Contains(SelectedTagType)) {
+                    if(!depElements.Contains(selectedTagType)) {
                         TagPointFinder pathFinder = new TagPointFinder(room.RoomObject);
                         UV point = pathFinder.GetPointByPlacementWay(positionPlacementWay, activeView);
 
@@ -162,7 +162,7 @@ namespace RevitRoomTagPlacement.Models {
                             Document.Delete(newTag.Id);
                         }
                         else if(newTag != null) { 
-                            newTag.ChangeTypeId(SelectedTagType);
+                            newTag.ChangeTypeId(selectedTagType);
                         }
                     }
                 }

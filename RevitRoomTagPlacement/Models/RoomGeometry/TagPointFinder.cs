@@ -13,8 +13,8 @@ namespace RevitRoomTagPlacement.Models {
     internal class TagPointFinder {
         // Отступ марки от края всегда будет 7 мм
         private const double Indent = 0.0229659;
-        private Room _room;
-        private BoundingBoxXYZ _roomBB;
+        private readonly Room _room;
+        private readonly BoundingBoxXYZ _roomBB;
 
         public TagPointFinder(Room room) {
             _room = room;

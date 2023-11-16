@@ -9,25 +9,25 @@ using Autodesk.Revit.DB.Architecture;
 
 namespace RevitRoomTagPlacement.Models {
     internal class RoomPath {
-        private TriangulatedRoom triRoom;
+        private readonly TriangulatedRoom _triRoom;
 
-        private readonly List<PathTriangle> triangles;
-        private readonly List<List<PathTriangle>> startTriangles;
-        private readonly List<List<PathTriangle>> allPathes;
-        private readonly List<PathTriangle> mainPath;
-        private readonly double centerPoint;
+        private readonly List<PathTriangle> _triangles;
+        private readonly List<List<PathTriangle>> _startTriangles;
+        private readonly List<List<PathTriangle>> _allPathes;
+        private readonly List<PathTriangle> _mainPath;
+        private readonly double _centerPoint;
 
-        public UV _tagPoint;
+        private readonly UV _tagPoint;
 
-        public RoomPath(TriangulatedRoom _triRoom) {
-            triRoom = _triRoom;
+        public RoomPath(TriangulatedRoom triRoom) {
+            _triRoom = triRoom;
 
-            triangles = triRoom.Triangles;            
-            startTriangles = GetStartEndTriangles();
-            allPathes = new List<List<PathTriangle>>();
+            _triangles = this._triRoom.Triangles;            
+            _startTriangles = GetStartEndTriangles();
+            _allPathes = new List<List<PathTriangle>>();
             GetAllPathes();
-            mainPath = GetMainPath();
-            centerPoint = CalculateWeightCenter();
+            _mainPath = GetMainPath();
+            _centerPoint = CalculateWeightCenter();
 
             _tagPoint = GetTagPointBySpline();
         }
@@ -35,13 +35,13 @@ namespace RevitRoomTagPlacement.Models {
         public UV TagPoint => _tagPoint;
 
         private UV GetTagPointBySpline() {
-            if(triangles.Count == 1) {
-                return new UV(triangles[0].Center.X, triangles[0].Center.Y);
+            if(_triangles.Count == 1) {
+                return new UV(_triangles[0].Center.X, _triangles[0].Center.Y);
             } 
             else {
-                List<XYZ> splinePoints = mainPath.Select(x => x.Center).ToList();
+                List<XYZ> splinePoints = _mainPath.Select(x => x.Center).ToList();
                 HermiteSpline spline = HermiteSpline.Create(splinePoints, false);
-                XYZ point = spline.Evaluate(centerPoint, true);
+                XYZ point = spline.Evaluate(_centerPoint, true);
 
                 return new UV(point.X, point.Y);
             }
@@ -51,20 +51,20 @@ namespace RevitRoomTagPlacement.Models {
             double triWeightSum = 0;
             double weightSum = 0;
 
-            for(int i = 0; i < mainPath.Count; i++) {
-                triWeightSum += i * mainPath[i].Weight;
-                weightSum += mainPath[i].Weight;
+            for(int i = 0; i < _mainPath.Count; i++) {
+                triWeightSum += i * _mainPath[i].Weight;
+                weightSum += _mainPath[i].Weight;
             }
 
             double weightCenter = triWeightSum / weightSum;
-            return weightCenter / (mainPath.Count - 1);
+            return weightCenter / (_mainPath.Count - 1);
         }
 
         private List<PathTriangle> GetMainPath() {
-            List<PathTriangle> mainPath = allPathes[0];
+            List<PathTriangle> mainPath = _allPathes[0];
             double mainPathWeight = 0;
 
-            foreach(var path in allPathes) {
+            foreach(var path in _allPathes) {
                 double pathWeight = 0;
                 foreach(var triangle in path) {
                     pathWeight += triangle.Weight;
@@ -81,7 +81,7 @@ namespace RevitRoomTagPlacement.Models {
         private List<List<PathTriangle>> GetStartEndTriangles() {
             List<List<PathTriangle>> triangleList = new List<List<PathTriangle>>();
 
-            List<PathTriangle> starts = triangles
+            List<PathTriangle> starts = _triangles
                 .Where(x => x.NextTriangles.Count == 1)
                 .ToList();
 
@@ -96,16 +96,16 @@ namespace RevitRoomTagPlacement.Models {
         }
 
         private void GetAllPathes() {
-            if(startTriangles.Count != 0) {
-                foreach(var startCouple in startTriangles) {
+            if(_startTriangles.Count != 0) {
+                foreach(var startCouple in _startTriangles) {
                     GoFromStartToEnd(new List<PathTriangle>(), startCouple[0], startCouple[1]);
-                    foreach(var tri in triangles) {
+                    foreach(var tri in _triangles) {
                         tri.IsVisited = false;
                     }
                 }
             } 
             else {
-                PathTriangle minTriangle = triRoom.MinTriangle;
+                PathTriangle minTriangle = _triRoom.MinTriangle;
                 GoFromStart(new List<PathTriangle>(), minTriangle);
             }
         }
@@ -119,7 +119,7 @@ namespace RevitRoomTagPlacement.Models {
                 if(!nextTriangle.IsVisited) { 
                     if(nextTriangle == endTriangle) {
                         newPath.Add(nextTriangle);
-                        allPathes.Add(newPath);
+                        _allPathes.Add(newPath);
                     } 
                     else {
                         GoFromStartToEnd(newPath, nextTriangle, endTriangle);
@@ -139,7 +139,7 @@ namespace RevitRoomTagPlacement.Models {
                     GoFromStart(newPath, nextTriangle);
                 }
             }
-            allPathes.Add(newPath);
+            _allPathes.Add(newPath);
         }
     }
 }
