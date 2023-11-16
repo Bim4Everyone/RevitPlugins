@@ -12,6 +12,7 @@ namespace Revit3DvikSchemas.ViewModels {
 
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
+        private readonly ViewMaker _viewMaker;
 
         public List<HvacSystemViewModel> RevitHVACSystems { get; }
 
@@ -24,7 +25,7 @@ namespace Revit3DvikSchemas.ViewModels {
         private bool _useFopNames;
 
 
-        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
+        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository, ViewMaker viewMaker) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
@@ -34,6 +35,7 @@ namespace Revit3DvikSchemas.ViewModels {
             bool RevitCombineFilters = CombineFilters;
 
             CreateViewCommand = RelayCommand.Create(CreateViews, CanCreateView);
+            _viewMaker = viewMaker;
         }
 
         public string ErrorText {
@@ -52,7 +54,7 @@ namespace Revit3DvikSchemas.ViewModels {
         }
 
         private void CreateViews() {
-            _revitRepository.CreateSelectedCommand(RevitHVACSystems, _useFopNames, _combineFilters);
+            _viewMaker.CreateSelectedCommand(RevitHVACSystems, _useFopNames, _combineFilters);
         }
 
         private bool CanCreateView() {

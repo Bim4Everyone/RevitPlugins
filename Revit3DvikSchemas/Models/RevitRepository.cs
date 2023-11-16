@@ -14,12 +14,11 @@ using Revit3DvikSchemas.ViewModels;
 namespace Revit3DvikSchemas.Models {
 
     internal class RevitRepository {
-        private readonly ViewMaker _viewMaker;
 
 
-        public RevitRepository(UIApplication uiApplication, ViewMaker viewMaker) {
+        public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
-            _viewMaker = viewMaker;
+
         }
         public UIApplication UIApplication { get; }
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
@@ -64,21 +63,6 @@ namespace Revit3DvikSchemas.Models {
             return fopName;
 
         }
-
-        public void CreateSelectedCommand(List<HvacSystemViewModel> list, bool useFopNames, bool combineViews) {
-            List<HvacSystemViewModel> systems = new List<HvacSystemViewModel>();
-            foreach(HvacSystemViewModel system in list) {
-                if(system.IsChecked) {
-                    systems.Add(system);
-                }
-            }
-            Transaction t = Document.StartTransaction("Удалить неиспользуемые");
-            _viewMaker.CopyViewCreateFilters(this, systems, useFopNames, combineViews);
-
-            t.Commit();
-
-        }
-
         public List<HvacSystemViewModel> GetHVACSystems() {
             List<Element> ductSystems = GetCollection(BuiltInCategory.OST_DuctSystem);
 
@@ -99,5 +83,10 @@ namespace Revit3DvikSchemas.Models {
             return newSystems;
 
         }
+
+
     }
+
+
 }
+
