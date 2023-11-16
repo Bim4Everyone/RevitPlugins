@@ -1,0 +1,477 @@
+﻿<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    
+    
+    <Style x:Key="SettingsTooltipStyle" TargetType="{x:Type TextBlock}">
+
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Width" Value="300" />
+        <Setter Property="TextAlignment" Value="Justify" />
+        <Setter Property="FlowDirection" Value="LeftToRight" />
+    </Style>
+
+
+
+    <Style x:Key="MarkParamStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Имя параметра, в котором у пилона прописывается значение марки пилона" />
+    </Style>
+
+    <Style x:Key="PjSectionParamStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Имя параметра, в котором у пилона прописывается комплект документации" />
+    </Style>
+
+    <Style x:Key="TypicalPylonFilterParamStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Имя параметра, в котором у пилона прописывается отличительная черта типовых пилонов" />
+    </Style>
+
+    <Style x:Key="TypicalPylonFilterValueStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Значение параметра, в котором у пилона прописывается отличительная черта типовых пилонов" />
+    </Style>
+
+
+    <Style x:Key="PylonLengthParamNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Имя параметра, в котором у пилона на уровне типоразмера прописывается длина сечения" />
+    </Style>
+
+    <Style x:Key="PylonWidthParamNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Имя параметра, в котором у пилона на уровне типоразмера прописывается ширина сечения" />
+    </Style>
+    
+
+    <Style x:Key="DispGroupingFirstParamStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Имя параметра, который используется в проекте для группировки диспетчера на первом уровне" />
+    </Style>
+
+    <Style x:Key="DispGroupingSecondParamStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Имя параметра, который используется в проекте для группировки диспетчера на втором уровне" />
+    </Style>
+
+    <Style x:Key="SheetNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс и суффикс имени листа, т.е. то, что должно идти в названии листа перед указанием марки пилона и после нее.&#10;Например, в имени листа:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ЖБ&quot; - это суффикс." />
+    </Style>
+
+    <Style x:Key="SheetPrefixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс - часть имени листа, которая должна идти перед указанием марки пилона.&#10;Например, в имени листа:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
+    </Style>
+
+    <Style x:Key="SheetSuffixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Суффикс - часть имени листа, которая должна идти после указания марки пилона.&#10;Например, в имени листа:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_ЖБ&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_ЖБ&quot;" />
+    </Style>
+
+    <Style x:Key="TitleBlockTypeStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Типоразмер рамки (штампа), которая будет размещена на новых листах" />
+    </Style>
+
+    <Style x:Key="SheetSizeParamStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Имя параметра рамки листа, в котором задается значение формата листа.&#10;Например, если вам необходимо задать рамке листа формат &quot;А3&quot;, то в данный параметр вы будете записывать &quot;3&quot;&#10;В этом поле нужно указать имя этого параметра." />
+    </Style>
+
+    <Style x:Key="SheetCoefficientParamStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Имя параметра рамки листа, в котором задается значение множителя формата листа.&#10;Например, если вам необходимо задать рамке листа формат &quot;А2х3&quot;, то в данный параметр вы будете записывать &quot;3&quot;, чтобы указать, что формат &quot;А2&quot; умножен на 3.&#10;В этом поле нужно указать имя этого параметра." />
+    </Style>
+
+    <Style x:Key="GeneralViewNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс и суффикс имени основного вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени основного вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ЖБ&quot; - это суффикс." />
+    </Style>
+
+    <Style x:Key="GeneralViewPrefixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс - часть имени основного вида пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени основного вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
+    </Style>
+
+    <Style x:Key="GeneralViewSuffixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Суффикс - часть имени основного вида пилона, которая должна идти после указания марки пилона.&#10;Например, в имени основного вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_ЖБ&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_ЖБ&quot;" />
+    </Style>
+
+
+    <Style x:Key="GeneralViewPerpendicularNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс и суффикс имени бокового вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени бокового вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ЖБ&quot; - это суффикс." />
+    </Style>
+
+    <Style x:Key="GeneralViewPerpendicularPrefixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс - часть имени бокового вида пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени бокового вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
+    </Style>
+
+    <Style x:Key="GeneralViewPerpendicularSuffixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Суффикс - часть имени бокового вида пилона, которая должна идти после указания марки пилона.&#10;Например, в имени бокового вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_ЖБ&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_ЖБ&quot;" />
+    </Style>
+
+
+    <Style x:Key="GeneralViewTemplateStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Шаблон вида, который необходимо применить к основному и боковому виду при их создании." />
+    </Style>
+
+    <Style x:Key="GeneralViewTypeStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Типоразмер вида, который необходимо применить к основному и боковому виду при их создании." />
+    </Style>
+
+    <Style x:Key="LegendNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Выберите из представленного списка легенду, содержащую примечания листа пилона, которую необходимо разместить на листе." />
+    </Style>
+
+    <Style x:Key="LegendXOffsetStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Укажите смещение по горизонтали (по оси Х) от нижнего правого угла рамки листа до середины видового экрана легенды примечания" />
+    </Style>
+
+    <Style x:Key="LegendYOffsetStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Укажите смещение по вертикали (по оси Y) от нижнего правого угла рамки листа до середины видового экрана легенды примечания" />
+    </Style>
+
+    <Style x:Key="GeneralViewXOffsetStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Укажите отступ от пилона вправо и влево у основного вида" />
+    </Style>
+
+    <Style x:Key="GeneralViewYTopOffsetStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Укажите отступ от пилона сверху у основного вида" />
+    </Style>
+
+    <Style x:Key="GeneralViewYBottomOffsetStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Укажите отступ от пилона снизу у основного вида" />
+    </Style>
+
+
+
+    <Style x:Key="TransViewFirstNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс и суффикс имени первого горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени первого горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.1-1&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.1-1&quot; - это суффикс." />
+    </Style>
+
+    <Style x:Key="TransViewFirstPrefixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс - часть имени первого горизонтального вида пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени первого горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.1-1&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
+    </Style>
+
+    <Style x:Key="TransViewFirstSuffixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Суффикс - часть имени первого горизонтального вида пилона, которая должна идти после указания марки пилона.&#10;Например, в имени первого горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.1-1&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_Сеч.1-1&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_Сеч.1-1&quot;" />
+    </Style>
+
+    <Style x:Key="TransViewFirstElevationStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Положение горизонтального разреза относительно пилона задается при помощи пропорции: высота секущей плоскости горизонтального разреза от низа пилона разделить на высоту пилона.&#10;Так, если задать &quot;0,5&quot;, то сечение разреза будет расположено на половине высоты пилона. &quot;1,25&quot; - на четверть высоты пилона выше верхней грани пилона. В качестве разделителя у пропорции необходимо использовать запятую.&#10;Для первого горизонтального вида стандартным значением является &quot;0,25&quot;" />
+    </Style>
+    
+
+    <Style x:Key="TransViewSecondNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс и суффикс имени второго горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени второго горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.2-2&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.2-2&quot; - это суффикс." />
+    </Style>
+
+    <Style x:Key="TransViewSecondPrefixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс - часть имени второго горизонтального вида пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени второго горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.2-2&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
+    </Style>
+
+    <Style x:Key="TransViewSecondSuffixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Суффикс - часть имени второго горизонтального вида пилона, которая должна идти после указания марки пилона.&#10;Например, в имени второго горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.2-2&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_Сеч.2-2&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_Сеч.2-2&quot;" />
+    </Style>
+
+    <Style x:Key="TransViewSecondElevationStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Положение горизонтального разреза относительно пилона задается при помощи пропорции: высота секущей плоскости горизонтального разреза от низа пилона разделить на высоту пилона.&#10;Так, если задать &quot;0,5&quot;, то сечение разреза будет расположено на половине высоты пилона. &quot;1,25&quot; - на четверть высоты пилона выше верхней грани пилона. В качестве разделителя у пропорции необходимо использовать запятую.&#10;Для второго горизонтального вида стандартным значением является &quot;0,5&quot;" />
+    </Style>
+
+    <Style x:Key="TransViewThirdNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс и суффикс имени второго горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени второго горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.3-3&quot; - это суффикс." />
+    </Style>
+
+    <Style x:Key="TransViewThirdPrefixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс - часть имени второго горизонтального вида пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени второго горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
+    </Style>
+
+    <Style x:Key="TransViewThirdSuffixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Суффикс - часть имени второго горизонтального вида пилона, которая должна идти после указания марки пилона.&#10;Например, в имени второго горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_Сеч.3-3&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_Сеч.3-3&quot;" />
+    </Style>
+
+    <Style x:Key="TransViewThirdElevationStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Положение горизонтального разреза относительно пилона задается при помощи пропорции: высота секущей плоскости горизонтального разреза от низа пилона разделить на высоту пилона.&#10;Так, если задать &quot;0,5&quot;, то сечение разреза будет расположено на половине высоты пилона. &quot;1,25&quot; - на четверть высоты пилона выше верхней грани пилона. В качестве разделителя у пропорции необходимо использовать запятую.&#10;Для третьего горизонтального вида стандартным значением является &quot;1,25&quot;" />
+    </Style>
+
+    <Style x:Key="TransViewTemplateStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Шаблон вида, который необходимо применить к горизонтальным видам при их создании." />
+    </Style>
+
+
+    <Style x:Key="TransViewTypeStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Типоразмер вида, который необходимо применить к горизонтальным видам при их создании." />
+    </Style>
+
+
+    <Style x:Key="TransViewXOffsetStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Укажите отступ от пилона вправо и влево у горизонтальных видов" />
+    </Style>
+
+    <Style x:Key="TransViewYOffsetStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Укажите отступ от пилона сверху и снизу у горизонтальных видов" />
+    </Style>
+
+
+
+    <Style x:Key="RebarScheduleNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс и суффикс имени спецификации армирования пилона, т.е. то, что должно идти в названии спецификации перед указанием марки пилона и после нее.&#10;Например, в имени спецификации армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_СА&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_СА&quot; - это суффикс." />
+    </Style>
+
+    <Style x:Key="RebarSchedulePrefixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс - часть имени спецификации армирования пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени спецификации армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_СА&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
+    </Style>
+
+    <Style x:Key="RebarScheduleSuffixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Суффикс - часть имени спецификации армирования пилона, которая должна идти после указания марки пилона.&#10;Например, в имени спецификации армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_СА&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_СА&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_СА&quot;" />
+    </Style>
+
+
+    <Style x:Key="ReferenceRebarScheduleNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Имя эталонной спецификации армирования, которая будет копироваться для получения спецификации армирования пилона." />
+    </Style>
+
+
+    <Style x:Key="RebarScheduleDisp1Style" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Width" Value="400"/>
+        <Setter Property="Text" Value="Значение, которое будет использовано для заполнения параметра группировки диспетчера на первом уровне у спецификации армирования.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на первом уровне у спецификации армирования.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на первом уровне у спецификации армирования.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на первом уровне у спецификации армирования.&#10;Пример: если записать значение &quot;СА&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;СА&quot; у пилона нет. Тогда он просто запишет &quot;СА&quot; в параметр для группировки диспетчера на первом уровне у спецификации армирования." />
+    </Style>
+
+    <Style x:Key="RebarScheduleDisp2Style" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Width" Value="400"/>
+        <Setter Property="Text" Value="Значение, которое будет использовано для заполнения параметра группировки диспетчера на втором уровне у спецификации армирования.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на втором уровне у спецификации армирования.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на втором уровне у спецификации армирования.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на втором уровне у спецификации армирования.&#10;Пример: если записать значение &quot;СА&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;СА&quot; у пилона нет. Тогда он просто запишет &quot;СА&quot; в параметр для группировки диспетчера на втором уровне у спецификации армирования." />
+    </Style>
+
+
+
+
+
+    <Style x:Key="MaterialScheduleNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс и суффикс имени спецификации материалов пилона, т.е. то, что должно идти в названии спецификации перед указанием марки пилона и после нее.&#10;Например, в имени спецификации материалов пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_СМ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_СМ&quot; - это суффикс." />
+    </Style>
+
+    <Style x:Key="MaterialSchedulePrefixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс - часть имени спецификации материалов пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени спецификации материалов пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_СМ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
+    </Style>
+
+    <Style x:Key="MaterialScheduleSuffixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Суффикс - часть имени спецификации материалов пилона, которая должна идти после указания марки пилона.&#10;Например, в имени спецификации материалов пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_СМ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_СМ&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_СМ&quot;" />
+    </Style>
+
+
+    <Style x:Key="ReferenceMaterialScheduleNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Имя эталонной спецификации материалов, которая будет копироваться для получения спецификации материалов пилона." />
+    </Style>
+
+
+    <Style x:Key="MaterialScheduleDisp1Style" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Width" Value="400"/>
+        <Setter Property="Text" Value="Значение, которое будет использовано для заполнения параметра группировки диспетчера на первом уровне у спецификации материалов.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на первом уровне у спецификации материалов.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на первом уровне у спецификации материалов.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на первом уровне у спецификации материалов.&#10;Пример: если записать значение &quot;СМ&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;СМ&quot; у пилона нет. Тогда он просто запишет &quot;СМ&quot; в параметр для группировки диспетчера на первом уровне у спецификации материалов." />
+    </Style>
+
+    <Style x:Key="MaterialScheduleDisp2Style" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Width" Value="400"/>
+        <Setter Property="Text" Value="Значение, которое будет использовано для заполнения параметра группировки диспетчера на втором уровне у спецификации материалов.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на втором уровне у спецификации материалов.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на втором уровне у спецификации материалов.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на втором уровне у спецификации материалов.&#10;Пример: если записать значение &quot;СМ&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;СМ&quot; у пилона нет. Тогда он просто запишет &quot;СМ&quot; в параметр для группировки диспетчера на втором уровне у спецификации материалов." />
+    </Style>
+
+
+
+
+    <Style x:Key="SystemPartsScheduleNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс и суффикс имени ведомости системных деталей пилона, т.е. то, что должно идти в названии ведомости перед указанием марки пилона и после нее.&#10;Например, в имени ведомости системных деталей пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_СИС&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ВД_СИС&quot; - это суффикс." />
+    </Style>
+
+    <Style x:Key="SystemPartsSchedulePrefixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс - часть имени ведомости системных деталей пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени ведомости системных деталей пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_СИС&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
+    </Style>
+
+    <Style x:Key="SystemPartsScheduleSuffixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Суффикс - часть имени ведомости системных деталей пилона, которая должна идти после указания марки пилона.&#10;Например, в имени ведомости системных деталей пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_IFC&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_ВД_СИС&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_ВД_СИС&quot;" />
+    </Style>
+
+
+    <Style x:Key="ReferenceSystemPartsScheduleNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Имя эталонной ведомости системных деталей, которая будет копироваться для получения ведомости системных деталей пилона." />
+    </Style>
+
+
+    <Style x:Key="SystemPartsScheduleDisp1Style" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Width" Value="400"/>
+        <Setter Property="Text" Value="Значение, которое будет использовано для заполнения параметра группировки диспетчера на первом уровне у ведомости системных деталей.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на первом уровне у ведомости системных деталей.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на первом уровне у ведомости системных деталей.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на первом уровне у ведомости системных деталей.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на первом уровне у ведомости системных деталей." />
+    </Style>
+
+    <Style x:Key="SystemPartsScheduleDisp2Style" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Width" Value="400"/>
+        <Setter Property="Text" Value="Значение, которое будет использовано для заполнения параметра группировки диспетчера на втором уровне у ведомости системных деталей.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на втором уровне у ведомости системных деталей.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на втором уровне у ведомости системных деталей.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на втором уровне у ведомости системных деталей.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на втором уровне у ведомости системных деталей." />
+    </Style>
+
+
+
+
+    <Style x:Key="IFCPartsScheduleNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс и суффикс имени ведомости IFC деталей пилона, т.е. то, что должно идти в названии ведомости перед указанием марки пилона и после нее.&#10;Например, в имени ведомости IFC деталей пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_IFC&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ВД_IFC&quot; - это суффикс." />
+    </Style>
+
+    <Style x:Key="IFCPartsSchedulePrefixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Префикс - часть имени ведомости IFC деталей пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени ведомости IFC деталей пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_IFC&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
+    </Style>
+
+    <Style x:Key="IFCPartsScheduleSuffixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Суффикс - часть имени ведомости IFC деталей пилона, которая должна идти после указания марки пилона.&#10;Например, в имени ведомости IFC деталей пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_IFC&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_ВД_IFC&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_ВД_IFC&quot;" />
+    </Style>
+
+
+    <Style x:Key="ReferenceIFCPartsScheduleNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Имя эталонной ведомости IFC деталей, которая будет копироваться для получения ведомости IFC деталей пилона." />
+    </Style>
+
+
+    <Style x:Key="IFCPartsScheduleDisp1Style" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Width" Value="400"/>
+        <Setter Property="Text" Value="Значение, которое будет использовано для заполнения параметра группировки диспетчера на первом уровне у ведомости IFC деталей.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на первом уровне у ведомости IFC деталей.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на первом уровне у ведомости IFC деталей.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на первом уровне у ведомости IFC деталей.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на первом уровне у ведомости IFC деталей." />
+    </Style>
+
+    <Style x:Key="IFCPartsScheduleDisp2Style" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Width" Value="400"/>
+        <Setter Property="Text" Value="Значение, которое будет использовано для заполнения параметра группировки диспетчера на втором уровне у ведомости IFC деталей.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на втором уровне у ведомости IFC деталей.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на втором уровне у ведомости IFC деталей.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на втором уровне у ведомости IFC деталей.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на втором уровне у ведомости IFC деталей." />
+    </Style>
+
+
+
+
+    <Style x:Key="FiltersLongCommentsStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Width" Value="700"/>
+        <Setter Property="Text" Value="Создание спецификаций и ведомостей при помощи плагина подразумевает собой копирование эталонных спецификаций со всеми фильтрами, которые были в них заложены. При помощи данного блока настроек вы можете указать:&#10;1) какие фильтры, присутствующие в спецификациях не должны удаляться;&#10;2) какие значения необходимо задать оставшимся фильтрам.&#10;Левый столбец списка, который представлен в этом блоке, отвечает за поля фильтров в спецификации, правый используется для задания значений фильтрам.&#10;&#10;Например, есть эталонная спецификация, которую нужно использовать для копирования. В ней имеются фильтры:&#10;- &quot;обр_ФОП_Форма_номер&quot; не равно &quot;1000&quot;;&#10;- &quot;обр_ФОП_Раздел проекта&quot; равно &quot;Блокировка&quot;;&#10;- &quot;обр_ФОП_Орг. уровень&quot; равно &quot;0&quot;;&#10;- &quot;обр_ФОП_Группа КР&quot; равно &quot;Введите арм.группу&quot;;&#10;- &quot;обр_Метка основы_универсальная&quot; равно &quot;МояМеткаПилона&quot;.&#10;&#10;В спецификации, которая будет использоваться для пилона необходимо организовать следующую фильтрацию:&#10;- &quot;обр_ФОП_Форма_номер&quot; не равно &quot;1000&quot;;&#10;- &quot;обр_ФОП_Раздел проекта&quot; равно &quot;КЖ1&quot;;&#10;- &quot;обр_Метка основы_универсальная&quot; равно &quot;12.30.25-12⌀20-П1&quot;.&#10;При этом:&#10;- &quot;КЖ1&quot; - значение параметра &quot;обр_ФОП_Раздел проекта&quot; у пилона;&#10;- &quot;12.30.25-12⌀20-П1&quot; - значение параметра &quot;Марка&quot; у пилона.&#10;&#10;В этом случае в данном блоке необходимо создать 3 строки, в поля которых вручную вписать названия параметров:&#10;1) левое поле: &quot;обр_ФОП_Форма_номер&quot;, правое поле: &quot;&quot;;&#10;2) левое поле: &quot;обр_ФОП_Раздел проекта&quot;, правое поле: &quot;обр_ФОП_Раздел проекта&quot;;&#10;3) левое поле: &quot;обр_Метка основы_универсальная&quot;, правое поле: &quot;Марка&quot;.&#10;&#10;Как это работает? В левый столбец мы записываем поля спецификации, фильтры с которыми нужно оставить. Плагин будет перебирать фильтры, оставшиеся от эталонной спецификации, и если встретит фильтр с полем, которое указано в левом столбце, то не будет удалять этот фильтр. В правый столбец мы записываем:&#10;- ничего - если хотим, чтобы плагин никак не изменял фильтр;&#10;- название параметра пилона - если хотим, чтобы плагин взял значение для фильтра из определенного параметра пилона (установит условие равно);&#10;- текст, отличный от параметров пилона - если хотим, чтобы плагин просто записал его как значение фильтра (установит условие равно).&#10;&#10;Чтобы добавить новую строку нажмите ниже кнопку &quot;Добавить&quot;.&#10;Чтобы удалить лишнюю строку - поставьте галочку у строки, которую нужно удалить и нажмите ниже кнопку &quot;Удалить&quot;" />
+    </Style>
+
+
+
+    <Style x:Key="ProjectSectionStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Выберите комплект документации, с пилонами которого желаете поработать. Если вы хотите поработать с каким то конкретным пилоном, то нажмите кнопку справа &quot;Выбрать пилон&quot;.&#10;После этого выберите в списке ниже нужные марки пилонов, и в списке справа виды/спецификации, которые хотите создать/разместить. Затем нажмите &quot;Ок&quot;&#10;Если в списке ничего не отображается или внизу окна написана ошибка оранжевым текстом - отредактируйте &quot;Настройки&quot; в правом верхем углу." />
+    </Style>
+
+
+    <Style x:Key="SelectPylonStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Чтобы выбрать какой то конкретный пилон вручную:&#10;1) нажмите эту кнопку;&#10;2) окно плагина закроется и вам будет предоставлена возможность выбора элемента - кликните на нужный пилон;&#10;3) окно плагина снова откроется и вы сможете продолжить настройки." />
+    </Style>
+    
+
+    <Style x:Key="MarksStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="После выбора комплекта документации в списке ниже отобразятся доступные для работы марки пилонов.&#10;Выберите нужные марки пилонов, поставив галочку в соответствующей строке.&#10;Затем выберите в списке справа виды/спецификации, которые хотите создать/разместить и нажмите &quot;Ок&quot;.&#10;Если в списке ничего не отображается или внизу окна написана ошибка оранжевым текстом - отредактируйте &quot;Настройки&quot; в правом верхем углу." />
+    </Style>
+    
+
+
+    <Style x:Key="GeneralViewStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов основной вид пилона (вертикальный вид, который смотрит на большую сторону пилона)" />
+    </Style>
+
+    <Style x:Key="GeneralViewPerpendicularStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов боковой вид пилона (вертикальный вид, который смотрит на меньшую сторону пилона)" />
+    </Style>
+
+    <Style x:Key="TransverseViewFirstStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов поперечный разрез на уровне 1/4 высоты пилона" />
+    </Style>
+
+    <Style x:Key="TransverseViewSecondStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов поперечный разрез на уровне 1/2 высоты пилона" />
+    </Style>
+
+    <Style x:Key="TransverseViewThirdStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов поперечный разрез на уровне на 5/4 высоты пилона" />
+    </Style>
+
+    <Style x:Key="RebarScheduleStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов спецификацию армирования" />
+    </Style>
+
+    <Style x:Key="MaterialScheduleStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов спецификацию материалов" />
+    </Style>
+
+    <Style x:Key="SystemPartsScheduleStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов ведомость системной арматуры" />
+    </Style>
+
+    <Style x:Key="IFCPartsScheduleStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов ведомость IFC арматуры" />
+    </Style>
+
+    <Style x:Key="LegendStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Передвиньте тумблер вправо, если хотите, чтобы плагин разместил на листах у выбранных пилонов легенду примечания" />
+    </Style>
+
+
+    
+
+</ResourceDictionary>

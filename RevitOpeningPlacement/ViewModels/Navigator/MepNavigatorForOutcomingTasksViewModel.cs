@@ -73,7 +73,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         private void Renew(object p) {
             Action action = () => {
-                var command = new GetOpeningTaskCommand();
+                var command = new GetOpeningTasksCmd();
                 command.ExecuteCommand(_revitRepository.UIApplication);
             };
             _revitRepository.DoAction(action);

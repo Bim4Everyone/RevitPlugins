@@ -23,10 +23,14 @@ namespace RevitClashDetective.Models.ClashDetection {
         private readonly int _progressBarStep = 100;
 
 
-        public ProvidersClashDetector(RevitRepository revitRepository, IProvider firstProvider, IProvider secondProvider) {
-            _revitRepository = revitRepository;
-            _firstProvider = firstProvider;
-            _secondProvider = secondProvider;
+        public ProvidersClashDetector(
+            RevitRepository revitRepository,
+            IProvider firstProvider,
+            IProvider secondProvider) {
+
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            _firstProvider = firstProvider ?? throw new ArgumentNullException(nameof(firstProvider));
+            _secondProvider = secondProvider ?? throw new ArgumentNullException(nameof(secondProvider));
 
             _mainElements = _firstProvider.GetElements();
             _ids = _mainElements.Select(item => item.Id).ToList();
@@ -95,7 +99,12 @@ namespace RevitClashDetective.Models.ClashDetection {
                 .Excluding(new ElementId[] { element.Id })
                 .WherePasses(new BoundingBoxIntersectsFilter(solid.GetOutline()))
                 .WherePasses(new ElementIntersectsSolidFilter(solid))
-                .Select(item => new ClashModel(_revitRepository, item, element));
+                .Select(item => new ClashModel(
+                    _revitRepository,
+                    item,
+                    _firstProvider.MainTransform,
+                    element,
+                    _secondProvider.MainTransform));
         }
 
         private IEnumerable<ClashModel> GetElementClashesWithIntersection(Element element, Solid solid) {
@@ -103,7 +112,12 @@ namespace RevitClashDetective.Models.ClashDetection {
                     .Excluding(new ElementId[] { element.Id })
                     .WherePasses(new BoundingBoxIntersectsFilter(solid.GetOutline()))
                     .Where(item => HasSolidsIntersection(item, solid))
-                    .Select(item => new ClashModel(_revitRepository, item, element));
+                    .Select(item => new ClashModel(
+                        _revitRepository,
+                        item,
+                        _firstProvider.MainTransform,
+                        element,
+                        _secondProvider.MainTransform));
         }
 
         private bool HasSolidsIntersection(Element element, Solid solid) {
@@ -121,7 +135,10 @@ namespace RevitClashDetective.Models.ClashDetection {
 
         private bool HasSolidIntersection(Element element, Solid solid0, Solid solid1) {
             try {
-                var intersection = BooleanOperationsUtils.ExecuteBooleanOperation(solid0, solid1, BooleanOperationsType.Intersect);
+                var intersection = BooleanOperationsUtils.ExecuteBooleanOperation(
+                    solid0,
+                    solid1,
+                    BooleanOperationsType.Intersect);
                 return intersection.Volume > 0;
             } catch {
                 return new ElementIntersectsSolidFilter(solid1).PassesFilter(element);

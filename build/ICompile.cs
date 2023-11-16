@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 
 using Nuke.Common;
@@ -8,22 +9,28 @@ using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Utilities.Collections;
 using Nuke.Components;
 
+using Serilog;
+
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
 interface ICompile : IClean, IHazSolution, IHazGitVersion, IHazGitRepository, IHazConfigurations {
     Target Compile => _ => _
         .DependsOn(Clean)
-        .Requires(() => Output)
         .Requires(() => PluginName)
+        .Requires(() => PublishDirectory)
         .Executes(() => {
+            string publishDirectory = NukeBuildExtensions.GetExtensionsPath(PublishDirectory);
+            Log.Debug("publishDirectory: {PublishDirectory}", publishDirectory);
+            
             ReportSummary(_ => _
-                .AddPairWhenValueNotNull(nameof(Output), Output)
                 .AddPairWhenValueNotNull(nameof(PluginName), PluginName)
+                .AddPairWhenValueNotNull(nameof(PublishDirectory), PublishDirectory)
             );
 
             DotNetBuild(s => s
                 .Apply(CompileSettingsBase)
                 .SetProjectFile(PluginName)
+                .SetOutputDirectory(publishDirectory)
                 .CombineWith(DebugConfigurations, (settings, config) => settings
                     .SetConfiguration(config)
                     .SetSimpleVersion(Versioning, config)));
@@ -34,6 +41,9 @@ interface ICompile : IClean, IHazSolution, IHazGitVersion, IHazGitRepository, IH
         .Requires(() => PluginName)
         .Requires(() => PublishDirectory)
         .Executes(() => {
+            string publishDirectory = NukeBuildExtensions.GetExtensionsPath(PublishDirectory);
+            Log.Debug("publishDirectory: {PublishDirectory}", publishDirectory);
+            
             ReportSummary(_ => _
                 .AddPairWhenValueNotNull(nameof(PluginName), PluginName)
                 .AddPairWhenValueNotNull(nameof(PublishDirectory), PublishDirectory)
@@ -42,7 +52,7 @@ interface ICompile : IClean, IHazSolution, IHazGitVersion, IHazGitRepository, IH
             DotNetBuild(s => s
                 .Apply(CompileSettingsBase)
                 .SetProjectFile(PluginName)
-                .SetOutputDirectory(PublishDirectory)
+                .SetOutputDirectory(publishDirectory)
                 .CombineWith(ReleaseConfigurations, (settings, config) => settings
                     .SetConfiguration(config)
                     .SetSimpleVersion(Versioning, config)));

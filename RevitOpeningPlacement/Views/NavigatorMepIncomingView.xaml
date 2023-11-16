@@ -187,19 +187,19 @@
                                             IsSmart="True"
                                             FieldName="Date" />
                             <dxg:GridColumn ReadOnly="True"
-                                            Width="60"
+                                            Width="40"
                                             Header="Диаметр"
                                             FieldName="Diameter" />
                             <dxg:GridColumn ReadOnly="True"
-                                            Width="60"
+                                            Width="40"
                                             Header="Ширина"
                                             FieldName="Width" />
                             <dxg:GridColumn ReadOnly="True"
-                                            Width="60"
+                                            Width="40"
                                             Header="Высота"
                                             FieldName="Height" />
                             <dxg:GridColumn ReadOnly="True"
-                                            Width="60"
+                                            Width="40"
                                             Header="Толщина"
                                             FieldName="Thickness" />
                             <dxg:GridColumn ReadOnly="True"
@@ -212,30 +212,30 @@
                                             FieldName="BottomOffset" />
                             <dxg:GridColumn ReadOnly="True"
                                             Width="60"
-                                            Header="Id отверстия"
+                                            Header="Id"
                                             FieldName="OpeningId" />
                             <dxg:GridColumn ReadOnly="True"
                                             Width="60"
                                             Header="Основа"
                                             FieldName="HostName" />
                             <dxg:GridColumn ReadOnly="True"
-                                            Width="60"
+                                            Width="50"
                                             Header="Система ВИС"
                                             FieldName="MepSystem" />
                             <dxg:GridColumn ReadOnly="True"
-                                            Width="60"
+                                            Width="*"
                                             Header="Комментарий"
-                                            FieldName="OwnComment" />
+                                            FieldName="Comment" />
                             <dxg:GridColumn ReadOnly="True"
-                                            Width="60"
+                                            Width="50"
                                             Header="Создатель"
                                             FieldName="Username" />
                             <dxg:GridColumn ReadOnly="True"
-                                            Width="60"
+                                            Width="50"
                                             Header="Тип отверстия"
                                             FieldName="FamilyShortName" />
                             <dxg:GridColumn ReadOnly="True"
-                                            Width="*"
+                                            Width="60"
                                             Header="Описание пересечения"
                                             FieldName="Description" />
                         </dxg:GridControl.Columns>
@@ -247,10 +247,10 @@
                                   ShowCloseButton="False">
                     <dxg:GridControl x:Name="_dgOpeningsReal"
                                      ItemsSource="{Binding OpeningsRealViewSource.View}"
-                                     DefaultSorting="OpeningId"
+                                     DefaultSorting="Diameter"
                                      BorderThickness="0"
                                      SelectionMode="Row"
-                                     CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningRealViewModel"
+                                     CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningRealArViewModel"
                                      SelectedItem="{Binding SelectedOpeningReal}"
                                      MaxHeight="2000">
                         <dxg:GridControl.GroupSummary>
@@ -314,7 +314,7 @@
                                             IsSmart="True"
                                             FieldName="Height" />
                             <dxg:GridColumn ReadOnly="True"
-                                            Width="90"
+                                            Width="*"
                                             Header="Комментарий"
                                             IsSmart="True"
                                             FieldName="Comment" />
@@ -337,9 +337,19 @@
                           EditMode="InplaceActive"
                           EditValue="{Binding MessageText}"
                           Foreground="Green" />
-            <dx:SimpleButton Content="Принять несколько"
-                             Margin="10 0"
-                             Command="{Binding ElementName=_this, Path=DataContext.PlaceRealOpeningByManyTasksCommand}" />
+            <dx:SimpleButton Content="Авторазмещение"
+                             Command="{Binding ElementName=_this, Path=DataContext.PlaceManyRealOpeningsByManyTasksInManyHostsCommand}" />
+            <dx:DropDownButton Height="25"
+                               Width="160"
+                               Margin="10 0"
+                               Content="Принять несколько">
+                <StackPanel Orientation="Vertical">
+                    <dx:SimpleButton Content="Без объединения"
+                                     Command="{Binding ElementName=_this, Path=DataContext.PlaceManyRealOpeningsByManyTasksCommand}" />
+                    <dx:SimpleButton Content="С объединением"
+                                     Command="{Binding ElementName=_this, Path=DataContext.PlaceOneRealOpeningByManyTasksCommand}" />
+                </StackPanel>
+            </dx:DropDownButton>
             <dx:SimpleButton Content="Принять одно"
                              Command="{Binding ElementName=_this, Path=DataContext.PlaceRealOpeningBySingleTaskCommand}" />
             <dx:SimpleButton Content="ОК"

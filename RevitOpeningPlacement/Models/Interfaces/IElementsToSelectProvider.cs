@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-using Autodesk.Revit.DB;
+using RevitClashDetective.Models.Clashes;
 
 namespace RevitOpeningPlacement.Models.Interfaces {
     /// <summary>
@@ -11,6 +11,6 @@ namespace RevitOpeningPlacement.Models.Interfaces {
         /// Возвращает коллекцию элементов, которые надо выделить на виде
         /// </summary>
         /// <returns></returns>
-        ICollection<Element> GetElementsToSelect();
+        ICollection<ElementModel> GetElementsToSelect();
     }
 }

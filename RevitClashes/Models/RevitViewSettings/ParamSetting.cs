@@ -2,9 +2,8 @@
 
 using Autodesk.Revit.DB;
 
-using RevitClashDetective.Models.Value;
-
 using RevitClashDetective.Models.Interfaces;
+using RevitClashDetective.Models.Value;
 
 namespace RevitClashDetective.Models.RevitViewSettings {
     internal class ParamSetting : IView3DSetting {

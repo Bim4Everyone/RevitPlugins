@@ -1,7 +1,14 @@
 # RevitCopingZones (Копирование зон СМР)
 Плагин позволяет копировать зоны по этажам в координационном файле.
 
-# Сборка проекта
+## Сборка проекта
+
 ```
-nuke compile --plugin-name RevitCopingZones
+nuke compile --profile RevitCopingZones
+```
+
+## Публикация проекта
+
+```
+nuke publish --profile RevitCopingZones
 ```

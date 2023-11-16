@@ -30,7 +30,7 @@ namespace RevitWindowGapPlacement.Model {
                 FamilyInstance windowGap =
                     document.Create.NewFamilyInstance(face, PlaceLocation, XYZ.Zero, windowGapType);
 
-                windowGap.SetParamValue("Окно ID", _element.Id.IntegerValue);
+                windowGap.SetParamValue("Окно ID", (int) _element.Id.GetIdValue());
                 yield return UpdateParamsWindowGap(windowGap);
             }
         }

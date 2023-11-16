@@ -16,5 +16,9 @@ namespace RevitOpeningPlacement.Views {
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;
         }
+
+        private void ButtonCheckFilter_Click(object sender, RoutedEventArgs e) {
+            DialogResult = true;
+        }
     }
 }

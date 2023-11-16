@@ -57,7 +57,7 @@ namespace RevitSetLevelSection.ViewModels {
                 : new ObservableCollection<DesignOptionsViewModel>();
         }
 
-        public int Id => _revitLinkType.Id.IntegerValue;
+        public ElementId Id => _revitLinkType.Id;
         public string Name => _revitLinkType.Name;
         public ICommand LoadLinkDocumentCommand { get; }
 

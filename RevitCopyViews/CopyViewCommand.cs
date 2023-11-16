@@ -70,15 +70,8 @@ namespace RevitCopyViews {
                     RestrictedViewNames = views.Select(item => item.Name).ToList()
                 }
             };
-            if(window.ShowDialog() == true) {
-                GetPlatformService<INotificationService>()
-                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                    .ShowAsync();
-            } else {
-                GetPlatformService<INotificationService>()
-                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                    .ShowAsync();
-            }
+
+            Notification(window);
         }
 
         private static bool IsView(View item) {

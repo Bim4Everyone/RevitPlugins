@@ -20,10 +20,6 @@
     x:Name="LintelView"
     Title="Навигатор"
     d:DataContext="{d:DesignInstance vm:LintelCollectionViewModel, IsDesignTimeCreatable=False}">
-    <Window.Resources>
-        <converters:EnumConverter x:Key="EnumConverter" />
-        <converters:IndexConverter x:Key="IndexConverter" />
-    </Window.Resources>
     <dxmvvm:Interaction.Behaviors>
         <dxmvvm:EventToCommand EventName="Closing" Command="{Binding CloseCommand}"/>
     </dxmvvm:Interaction.Behaviors>

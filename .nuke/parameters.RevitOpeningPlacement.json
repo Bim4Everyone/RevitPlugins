@@ -1,0 +1,10 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitOpeningPlacement",
+  "PublishDirectory": "01.BIM.extension\\BIM.tab\\bin",
+  "IconUrl": "https://icons8.com/icon/PGmuOjfnnxLR/search-database",
+  "BundleName": "Навигатор",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "01.BIM.extension\\BIM.tab\\Отверстия Общее.panel"
+}

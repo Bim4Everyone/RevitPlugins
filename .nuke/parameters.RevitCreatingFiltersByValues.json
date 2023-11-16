@@ -1,0 +1,10 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitCreatingFiltersByValues",
+  "PublishDirectory": "01.BIM.extension\\BIM.tab\\bin",
+  "IconUrl": "https://icons8.com/icon/14192/filter",
+  "BundleName": "Раскрасить",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "01.BIM.extension\\BIM.tab\\Анализ.panel\\Окрашивание.stack"
+}

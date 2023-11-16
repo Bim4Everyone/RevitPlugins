@@ -17,8 +17,6 @@ using RevitPluginTemplate.Models;
 using RevitPluginTemplate.ViewModels;
 using RevitPluginTemplate.Views;
 
-using Application = Autodesk.Revit.ApplicationServices.Application;
-
 namespace RevitPluginTemplate {
     [Transaction(TransactionMode.Manual)]
     public class RevitPluginTemplateCommand : BasePluginCommand {
@@ -38,8 +36,7 @@ namespace RevitPluginTemplate {
 				kernel.Bind<MainViewModel>().ToSelf();
 				kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
-                    .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<MainViewModel>());
+                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
 				
 				Notification(kernel.Get<MainWindow>());
 			}

@@ -7,7 +7,6 @@ on:
       - '**.cs'
 
 env:
-  output: ${{ gen.output }}
   plugin_name: ${{ gen.plugin_name }}
 
 jobs:
@@ -24,6 +23,6 @@ jobs:
             ~/.nuget/packages
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
       - name: Run './build.cmd '
-        run: ./build.cmd publish --plugin-name $plugin_name --output $output
+        run: ./build.cmd publish --profile $plugin_name
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

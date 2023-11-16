@@ -1,734 +1,720 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Net;
+using System.Runtime;
 using System.Security.Cryptography;
 using System.Text;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Shapes;
+using System.Xml.Linq;
 
+using Autodesk.AdvanceSteel.CADAccess;
+using Autodesk.AdvanceSteel.Modelling;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
-
+using Autodesk.Revit.UI.Selection;
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using MS.WindowsAPICodePack.Internal;
-
 using RevitPylonDocumentation.Models;
+using RevitPylonDocumentation.Models.PylonSheetNView;
+using RevitPylonDocumentation.Models.UserSettings;
+using RevitPylonDocumentation.Views;
+
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
+
+using Line = Autodesk.Revit.DB.Line;
+using Transaction = Autodesk.Revit.DB.Transaction;
 using View = Autodesk.Revit.DB.View;
 
 namespace RevitPylonDocumentation.ViewModels {
     internal class MainViewModel : BaseViewModel {
-        #region Системные
         private readonly PluginConfig _pluginConfig;
-        public readonly RevitRepository _revitRepository;
-
-        public bool _edited = false;
-
-
-        ReportHelper reportHelper = new ReportHelper();
-        public string Report {
-            get => reportHelper.GetAsString();
-            set {
-                reportHelper.AppendLine(value);
-                this.OnPropertyChanged();
-            }
-        }
-
+        private readonly RevitRepository _revitRepository;
 
         private string _errorText;
-        public string ErrorText {
-            get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
-        }
-        #endregion
+        private bool _pylonSelectedManually = false;
+        private string _selectedProjectSection = string.Empty;
+        private ViewFamilyType _selectedViewFamilyType;
+        private View _selectedGeneralViewTemplate;
+        private View _selectedTransverseViewTemplate;
+        private View _selectedLegend;
+        private FamilySymbol _selectedTitleBlock;
+        private List<PylonSheetInfo> _selectedHostsInfo = new List<PylonSheetInfo>();
 
+        public bool _settingsEdited = false;
 
-
-
-        #region Свойства для параметров и правил
-        #region Параметры
-        public string PROJECT_SECTION { get; set; } = "обр_ФОП_Раздел проекта";
-        private string _projectSectionTemp = "обр_ФОП_Раздел проекта";
-        public string PROJECT_SECTION_TEMP {
-            get => _projectSectionTemp;
-            set {
-                _projectSectionTemp = value;
-                _edited = true;
-            }
-        }
-
-        public string MARK { get; set; } = "Марка";
-        private string _markTemp = "Марка";
-        public string MARK_TEMP {
-            get => _markTemp;
-            set {
-                _markTemp = value;
-                _edited = true;
-            }
-        }
-
-
-        public string SHEET_GROUPING { get; set; } = "_Группа видов 1";
-        private string _sheetGroupingTemp = "_Группа видов 1";
-        public string SHEET_GROUPING_TEMP {
-            get => _sheetGroupingTemp;
-            set {
-                _sheetGroupingTemp = value;
-                _edited = true;
-            }
-        }
-
-
-        public string SHEET_SIZE { get; set; } = "А";
-        private string _sheetSizeTemp = "А";
-        public string SHEET_SIZE_TEMP {
-            get => _sheetSizeTemp;
-            set {
-                _sheetSizeTemp = value;
-                _edited = true;
-            }
-        }
-
-        public string SHEET_COEFFICIENT { get; set; } = "х";
-        private string _sheetCoefficientTemp = "х";
-        public string SHEET_COEFFICIENT_TEMP {
-            get => _sheetCoefficientTemp;
-            set {
-                _sheetCoefficientTemp = value;
-                _edited = true;
-            }
-        }
-        #endregion
-
-        #region Виды
-        public string GENERAL_VIEW_PREFIX { get; set; } = "";
-        private string _generalViewPrefixTemp = "";
-        public string GENERAL_VIEW_PREFIX_TEMP {
-            get => _generalViewPrefixTemp;
-            set {
-                _generalViewPrefixTemp = value;
-                _edited = true;
-            }
-        }
-
-        public string GENERAL_VIEW_SUFFIX { get; set; } = "";
-        private string _generalViewSuffixTemp = "";
-        public string GENERAL_VIEW_SUFFIX_TEMP {
-            get => _generalViewSuffixTemp;
-            set {
-                _generalViewSuffixTemp = value;
-                _edited = true;
-            }
-        }
-
-
-        public string TRANSVERSE_VIEW_FIRST_PREFIX { get; set; } = "";
-        private string _transverseViewFirstPrefixTemp = "";
-        public string TRANSVERSE_VIEW_FIRST_PREFIX_TEMP {
-            get => _transverseViewFirstPrefixTemp;
-            set {
-                _transverseViewFirstPrefixTemp = value;
-                _edited = true;
-            }
-        }
-
-        public string TRANSVERSE_VIEW_FIRST_SUFFIX { get; set; } = "_Сеч.1-1";
-        private string _transverseViewFirstSuffixTemp = "_Сеч.1-1";
-        public string TRANSVERSE_VIEW_FIRST_SUFFIX_TEMP {
-            get => _transverseViewFirstSuffixTemp;
-            set {
-                _transverseViewFirstSuffixTemp = value;
-                _edited = true;
-            }
-        }
-
-
-        public string TRANSVERSE_VIEW_SECOND_PREFIX { get; set; } = "";
-        private string _transverseViewSecondPrefixTemp = "";
-        public string TRANSVERSE_VIEW_SECOND_PREFIX_TEMP {
-            get => _transverseViewSecondPrefixTemp;
-            set {
-                _transverseViewSecondPrefixTemp = value;
-                _edited = true;
-            }
-        }
-
-        public string TRANSVERSE_VIEW_SECOND_SUFFIX { get; set; } = "_Сеч.2-2";
-        private string _transverseViewSecondSuffixTemp = "_Сеч.2-2";
-        public string TRANSVERSE_VIEW_SECOND_SUFFIX_TEMP {
-            get => _transverseViewSecondSuffixTemp;
-            set {
-                _transverseViewSecondSuffixTemp = value;
-                _edited = true;
-            }
-        }
-
-
-        public string TRANSVERSE_VIEW_THIRD_PREFIX { get; set; } = "";
-        private string _transverseViewThirdPrefixTemp = "";
-        public string TRANSVERSE_VIEW_THIRD_PREFIX_TEMP {
-            get => _transverseViewThirdPrefixTemp;
-            set {
-                _transverseViewThirdPrefixTemp = value;
-                _edited = true;
-            }
-        }
-
-        public string TRANSVERSE_VIEW_THIRD_SUFFIX { get; set; } = "_Сеч.3-3";
-        private string _transverseViewThirdSuffixTemp = "_Сеч.3-3";
-        public string TRANSVERSE_VIEW_THIRD_SUFFIX_TEMP {
-            get => _transverseViewThirdSuffixTemp;
-            set {
-                _transverseViewThirdSuffixTemp = value;
-                _edited = true;
-            }
-        }
-        #endregion
-
-        #region Спецификации
-        public string REBAR_SCHEDULE_PREFIX { get; set; } = "Пилон ";
-        private string _rebarSchedulePrefixTemp = "Пилон ";
-        public string REBAR_SCHEDULE_PREFIX_TEMP {
-            get => _rebarSchedulePrefixTemp;
-            set {
-                _rebarSchedulePrefixTemp = value;
-                _edited = true;
-            }
-        }
-
-        public string REBAR_SCHEDULE_SUFFIX { get; set; } = "";
-        private string _rebarScheduleSuffixTemp = "";
-        public string REBAR_SCHEDULE_SUFFIX_TEMP {
-            get => _rebarScheduleSuffixTemp;
-            set {
-                _rebarScheduleSuffixTemp = value;
-                _edited = true;
-            }
-        }
-
-
-        public string MATERIAL_SCHEDULE_PREFIX { get; set; } = "!СМ_Пилон ";
-        private string _materialSchedulePrefixTemp = "!СМ_Пилон ";
-        public string MATERIAL_SCHEDULE_PREFIX_TEMP {
-            get => _materialSchedulePrefixTemp;
-            set {
-                _materialSchedulePrefixTemp = value;
-                _edited = true;
-            }
-        }
-
-        public string MATERIAL_SCHEDULE_SUFFIX { get; set; } = "";
-        private string _materialScheduleSuffixTemp = "";
-        public string MATERIAL_SCHEDULE_SUFFIX_TEMP {
-            get => _materialScheduleSuffixTemp;
-            set {
-                _materialScheduleSuffixTemp = value;
-                _edited = true;
-            }
-        }
-
-
-        public string PARTS_SCHEDULE_PREFIX { get; set; } = "!ВД_IFC_ ";
-        private string _partsSchedulePrefixTemp = "!ВД_IFC_ ";
-        public string PARTS_SCHEDULE_PREFIX_TEMP {
-            get => _partsSchedulePrefixTemp;
-            set {
-                _partsSchedulePrefixTemp = value;
-                _edited = true;
-            }
-        }
-
-        public string PARTS_SCHEDULE_SUFFIX { get; set; } = "";
-        private string _partsScheduleSuffixTemp = "";
-        public string PARTS_SCHEDULE_SUFFIX_TEMP {
-            get => _partsScheduleSuffixTemp;
-            set {
-                _partsScheduleSuffixTemp = value;
-                _edited = true;
-            }
-        }
-        #endregion
-
-
-        // Не будем делать как другие, т.к. это не нужно сохранять для пользователя для следующего запуска
-        public static string DEF_TITLEBLOCK_NAME = "Создать типы по комплектам";
-        #endregion
-
-
-
-
-        #region Инфо проекта
-        // Рабочие наборы
-        public ObservableCollection<string> ProjectSections { get; set; } = new ObservableCollection<string>();     // Список всех комплектов док-ции (обр_ФОП_Раздел проекта)
-        private string _selectedProjectSection { get; set; }                                                        // Выбранный пользователем комплект док-ции
-        public string SelectedProjectSection {
-            get => _selectedProjectSection;
-            set {
-                _selectedProjectSection = value;
-                GetHostMarks();                                                                                     // Запуск обновления списка доступных марок пилонов
-            }
-        }
-        // Листы
-        public Dictionary<string, PylonSheetInfo> existingPylonSheetsInfo = new Dictionary<string, PylonSheetInfo>();       // Инфо про существующие в проекте листы пилонов
-        public Dictionary<string, PylonSheetInfo> missingPylonSheetsInfo = new Dictionary<string, PylonSheetInfo>();        // Инфо про листы пилонов, которые нужно создать
-
-        // Вспомогательные для документации
-        public ObservableCollection<FamilySymbol> TitleBlocks { get; set; } = new ObservableCollection<FamilySymbol>();     // Рамки листов, имеющиеся в проекте
-        public FamilySymbol SelectedTitleBlocks { get; set; }                                                               // Выбранная пользователем рамка листа
-
-        public ObservableCollection<View> Legends { get; set; } = new ObservableCollection<View>();                         // Легенды, имеющиеся в проекте
-        public static View SelectedLegend { get; set; }                                                                            // Выбранная пользователем легенда
-        #endregion
-
-
-
-
-
-
-
-        #region Инфо пилонов (hosts)
-        public ObservableCollection<string> HostMarks { get; set; } = new ObservableCollection<string>();       // Список всех марок пилонов (12.30.25-20⌀32)
-        public System.Collections.IList SelectedHostMarks { get; set; }             // Список меток основ, которые выбрал пользователь
-
-        private string _hostMarkForSearch = string.Empty;
-        public string HostMarkForSearch {
-            get => _hostMarkForSearch;
-            set {
-                //this.RaiseAndSetIfChanged(ref _hostMarkForSearch, value);
-                _hostMarkForSearch = value;
-                GetHostMarks();
-            }
-        }
-
-
-        public Dictionary<string, List<FamilyInstance>> hostData = new Dictionary<string, List<FamilyInstance>>();  // Вспомогательный список
-        #endregion
-
-
-
+        private string _hostsInfoFilter;
+        private ICollectionView _hostsInfoView;
 
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
-            GetRebarProjectSections();
-            
-            CreateSheetsCommand = new RelayCommand(CreateSheets, CanCreateSheets);
-            ApplySettingsCommands = new RelayCommand(ApplySettings, CanApplySettings);
+            SelectionSettings = new UserSelectionSettings();
+            ProjectSettings = new UserProjectSettings(this, _revitRepository);
+            ViewSectionSettings = new UserViewSectionSettings(this);
+            SchedulesSettings = new UserSchedulesSettings(this);
 
+            ViewFamilyTypes = _revitRepository.ViewFamilyTypes;
+            TitleBlocks = _revitRepository.TitleBlocksInProject;
+            Legends = _revitRepository.LegendsInProject;
+            ViewTemplatesInPj = _revitRepository.AllViewTemplates;
 
-            GetTitleBlocks();
-            GetLegends();
+            SetHostsInfoFilters();
+
+            LoadViewCommand = RelayCommand.Create(LoadView);
+            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+
+            SelectPylonCommand = RelayCommand.Create(SelectPylon);
+
+            ApplySettingsCommand = RelayCommand.Create(ApplySettings, CanApplySettings);
+            CheckSettingsCommand = RelayCommand.Create(CheckSettings);
+            GetHostMarksInGUICommand = RelayCommand.Create(GetHostMarksInGUI);
+
+            AddScheduleFilterParamCommand = RelayCommand.Create(AddScheduleFilterParam);
+            DeleteScheduleFilterParamCommand =
+                RelayCommand.Create(DeleteScheduleFilterParam, CanChangeScheduleFilterParam);
+            SettingsChangedCommand = RelayCommand.Create(SettingsChanged);
+
+            ClearHostsInfoFilterInGUICommand = RelayCommand.Create(ClearHostsInfoFilterInGUI);
+            SelectAllHostsInfoInGUICommand = RelayCommand.Create(SelectAllHostsInfoInGUI);
+            UnselectAllHostsInfoInGUICommand = RelayCommand.Create(UnselectAllHostsInfoInGUI);
+
+            SelectAllFuncInGUICommand = RelayCommand.Create(SelectAllFuncInGUI);
+            UnselectAllFuncInGUICommand = RelayCommand.Create(UnselectAllFuncInGUI);
         }
 
 
+        public ICommand LoadViewCommand { get; }
+        public ICommand AcceptViewCommand { get; }
+        public ICommand ApplySettingsCommand { get; }
+        public ICommand CheckSettingsCommand { get; }
+        public ICommand GetHostMarksInGUICommand { get; }
+        public ICommand AddScheduleFilterParamCommand { get; }
+        public ICommand DeleteScheduleFilterParamCommand { get; }
+        public ICommand SettingsChangedCommand { get; }
+        public ICommand SelectPylonCommand { get; }
+        public ICommand ClearHostsInfoFilterInGUICommand { get; }
+        public ICommand SelectAllHostsInfoInGUICommand { get; }
+        public ICommand UnselectAllHostsInfoInGUICommand { get; }
+        public ICommand SelectAllFuncInGUICommand { get; }
+        public ICommand UnselectAllFuncInGUICommand { get; }
+
+        /// <summary>
+        /// Настройки выбора пользователя (с какими компонентами должен работать плагин) с предыдущего сеанса
+        /// </summary>
+        public UserSelectionSettings SelectionSettings { get; set; }
+
+        /// <summary>
+        /// Настройки параметров проекта с предыдущего сеанса
+        /// </summary>
+        public UserProjectSettings ProjectSettings { get; set; }
+
+        /// <summary>
+        /// Настройки параметров и правил создания разрезов с предыдущего сеанса
+        /// </summary>
+        public UserViewSectionSettings ViewSectionSettings { get; set; }
+
+        /// <summary>
+        /// Настройки параметров и правил создания спек с предыдущего сеанса
+        /// </summary>
+        public UserSchedulesSettings SchedulesSettings { get; set; }
 
 
-        /* Вывод ошибок в футере + блок доступа к кнопке
-        private void CanExecute(object p) 
-        {
-            if(SomeMethod()) {
-                ErrorText = "Some Error";
-                return false;
-            }
-
-            return true;
-        }
-        */
+        /// <summary>
+        /// Список всех комплектов документации (по ум. обр_ФОП_Раздел проекта)
+        /// </summary>
+        public ObservableCollection<string> ProjectSections { get; set; } = new ObservableCollection<string>();
 
 
-
-
-        // Получаем названия Комплектов документации по пилонам
-        private void GetRebarProjectSections() 
-        {
-            // Пользователь может перезадать параметр раздела, поэтому сначала чистим
-            ProjectSections.Clear();
-            ErrorText = string.Empty;
-            // Пилоны могут быть выполнены категорией Стены или Несущие колонны
-            List<BuiltInCategory> pylonCategories = new List<BuiltInCategory>() { BuiltInCategory.OST_Walls, BuiltInCategory.OST_StructuralColumns };
-
-            foreach(var cat in pylonCategories) {
-
-                var elems = new FilteredElementCollector(_revitRepository.Document)
-                                    .OfCategory(cat)
-                                    .WhereElementIsNotElementType()
-                                    .ToElements();
-
-
-                foreach(var item in elems) {
-                    FamilyInstance elem = item as FamilyInstance;
-
-                    if(elem is null || !elem.Name.Contains("Пилон")) {
-                        continue;
-                    }
-
-
-                    // Запрашиваем Раздел проекта
-                    Autodesk.Revit.DB.Parameter projectSectionParameter = elem.LookupParameter(PROJECT_SECTION);
-                    if(projectSectionParameter == null) {
-                        ErrorText = "Параметр раздела не найден у элементов Стен или Несущих колонн";
-                        return;
-                    }
-                    string projectSection = projectSectionParameter.AsString();
-
-                    if(projectSection is null) {
-                        continue;
-                    }
-                    // Заполнение словаря Комплект документации - Пилон
-                    if(!hostData.ContainsKey(projectSection)) {
-                        List<FamilyInstance> hostList = new List<FamilyInstance>() { elem };
-
-                        hostData.Add(projectSection, hostList);
-                    } else {
-                        hostData[projectSection].Add(elem);
-                    }
-
-
-                    // Заполнение списка разделов проекта
-                    if(!ProjectSections.Contains(projectSection)) {
-                        ProjectSections.Add(projectSection);
-                    }
-                }
-            }
-            // Сортируем
-            ProjectSections = new ObservableCollection<string>(ProjectSections.OrderBy(i => i));
+        /// <summary>
+        /// Выбранный пользователем комплект документации
+        /// </summary>
+        public string SelectedProjectSection {
+            get => _selectedProjectSection;
+            set => this.RaiseAndSetIfChanged(ref _selectedProjectSection, value);
         }
 
+        /// <summary>
+        /// Список всех найденных пилонов для работы в проекте (оболочек)
+        /// </summary>
+        public ObservableCollection<PylonSheetInfo> HostsInfo { get; set; } =
+            new ObservableCollection<PylonSheetInfo>();
 
-        // Метод для авто обновления списка марок пилонов при выборе рабочего набора
-        private void GetHostMarks() 
-        {
-            HostMarks.Clear();
-            ErrorText= string.Empty;
+        /// <summary>
+        /// Список пилонов (оболочек) для работы из выбранного пользователем комплекта документации
+        /// </summary>
+        public List<PylonSheetInfo> SelectedHostsInfo {
+            get => _selectedHostsInfo;
+            set => this.RaiseAndSetIfChanged(ref _selectedHostsInfo, value);
+        }
 
-            // Перебираем арматуру выбранного
-            foreach(FamilyInstance host in hostData[SelectedProjectSection]) 
-            {
-                Autodesk.Revit.DB.Parameter hostMarkParameter = host.LookupParameter(MARK);
-                if(hostMarkParameter == null) {
-                    ErrorText = "Параметр марки не найден у элементов Стен или Несущих колонн";
-                    return;
-                }
+        /// <summary>
+        /// Рамки листов, имеющиеся в проекте
+        /// </summary>
+        public List<FamilySymbol> TitleBlocks { get; set; } = new List<FamilySymbol>();
 
-                string hostMark = hostMarkParameter.AsString();
-                if(hostMark is null) {
-                    continue;
-                }
-
-                if(!hostMark.Contains(HostMarkForSearch)) {
-                    continue;
-                }
-
-
-                // Заполнение списка марок основ
-                if(!HostMarks.Contains(hostMark)) {
-                    HostMarks.Add(hostMark);
-                }
+        /// <summary>
+        /// Выбранная пользователем рамка листа
+        /// </summary>
+        public FamilySymbol SelectedTitleBlock {
+            get => _selectedTitleBlock;
+            set {
+                this.RaiseAndSetIfChanged(ref _selectedTitleBlock, value);
+                ProjectSettings.TitleBlockNameTemp = value?.Name;
             }
         }
 
+        /// <summary>
+        /// Легенды, имеющиеся в проекте
+        /// </summary>
+        public List<View> Legends { get; set; } = new List<View>();
 
-        private void GetTitleBlocks() {
-            var titleBlocksInProject = new FilteredElementCollector(_revitRepository.Document)
-                .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                .WhereElementIsElementType()
-                .ToElements();
+        /// <summary>
+        /// Выбранная пользователем легенда
+        /// </summary>
+        public View SelectedLegend {
+            get => _selectedLegend;
+            set {
+                this.RaiseAndSetIfChanged(ref _selectedLegend, value);
+                ProjectSettings.LegendNameTemp = value?.Name;
+            }
+        }
 
+        /// <summary>
+        /// Типоразмеры видов, имеющиеся в проекте
+        /// </summary>
+        public List<ViewFamilyType> ViewFamilyTypes { get; set; } = new List<ViewFamilyType>();
 
-            // Перевод и отбор листов с пилонами
-            foreach(var item in titleBlocksInProject) {
-                FamilySymbol titleBlock = item as FamilySymbol;
-                if(titleBlock == null) {
-                    continue;
-                }
+        /// <summary>
+        /// Выбранный пользователем типоразмер вида для создания новых видов
+        /// </summary>
+        public ViewFamilyType SelectedViewFamilyType {
+            get => _selectedViewFamilyType;
+            set {
+                this.RaiseAndSetIfChanged(ref _selectedViewFamilyType, value);
+                ViewSectionSettings.ViewFamilyTypeNameTemp = value?.Name;
+            }
+        }
 
-                TitleBlocks.Add(titleBlock);
+        /// <summary>
+        /// Перечень шаблонов видов в проекте
+        /// </summary>
+        public List<ViewSection> ViewTemplatesInPj { get; set; } = new List<ViewSection>();
 
-                if(titleBlock.Name == DEF_TITLEBLOCK_NAME) {
-                    SelectedTitleBlocks = titleBlock;
-                }
+        /// <summary>
+        /// Выбранный пользователем шаблон вида основных видов
+        /// </summary>
+        public View SelectedGeneralViewTemplate {
+            get => _selectedGeneralViewTemplate;
+            set {
+                this.RaiseAndSetIfChanged(ref _selectedGeneralViewTemplate, value);
+                ViewSectionSettings.GeneralViewTemplateNameTemp = value?.Name;
+            }
+        }
+
+        /// <summary>
+        /// Выбранный пользователем шаблон вида поперечных видов
+        /// </summary>
+        public View SelectedTransverseViewTemplate {
+            get => _selectedTransverseViewTemplate;
+            set {
+                this.RaiseAndSetIfChanged(ref _selectedTransverseViewTemplate, value);
+                ViewSectionSettings.TransverseViewTemplateNameTemp = value?.Name;
             }
         }
 
 
-        private void GetLegends() {
-            var legendsInProject = new FilteredElementCollector(_revitRepository.Document)
-                .OfClass(typeof(View))
-                .WhereElementIsNotElementType()
-                .ToElements();
+        // Инфо по пилонам
+        /// <summary>
+        /// Список всех марок пилонов (напр., "12.30.25-20⌀32")
+        /// </summary>
+        public ObservableCollection<string> HostMarks { get; set; } = new ObservableCollection<string>();
+
+        /// <summary>
+        /// Список меток основ, которые выбрал пользователь
+        /// </summary>
+        public System.Collections.IList SelectedHostMarks { get; set; }
 
 
-            // Перевод и отбор легенд
-            foreach(var item in legendsInProject) {
-                View view = item as View;
-                if(view == null) {
-                    continue;
-                }
+        /// <summary>
+        /// Эталонная спецификация арматуры
+        /// </summary>
+        public ViewSchedule ReferenceRebarSchedule { get; set; }
 
-                if(view.ViewType == ViewType.Legend) {
-                    Legends.Add(view);
+        /// <summary>
+        /// Эталонная спецификация материалов
+        /// </summary>
+        public ViewSchedule ReferenceMaterialSchedule { get; set; }
 
-                    if(view.Name.Contains("илон")) {
-                        SelectedLegend = view;
-                    }
+        /// <summary>
+        /// Эталонная ведомость деталей для системной арматуры
+        /// </summary>
+        public ViewSchedule ReferenceSystemPartsSchedule { get; set; }
+
+        /// <summary>
+        /// Эталонная ведомость деталей для IFC арматуры
+        /// </summary>
+        public ViewSchedule ReferenceIFCPartsSchedule { get; set; }
+
+        /// <summary>
+        /// Фильтр списка марок пилонов
+        /// </summary>
+        public string HostsInfoFilter {
+            get => _hostsInfoFilter;
+            set {
+                if(value != _hostsInfoFilter) {
+                    _hostsInfoFilter = value;
+                    _hostsInfoView.Refresh();
+                    OnPropertyChanged(nameof(HostsInfoFilter));
                 }
             }
         }
 
-
-
-
-
-
-
-        public ICommand ApplySettingsCommands { get; }
-        private void ApplySettings(object p) {
-            // Необходимо будет написать метод проверки имен параметров - есть ли такие параметры у нужных категорий
-            
-            // Получаем заново список заполненных разделов проекта
-            GetRebarProjectSections();
-
-            // Устанавливаем флаг, что применили параметры и перезаписываем параметры
-            PROJECT_SECTION = _projectSectionTemp;
-            MARK = _markTemp;
-            SHEET_GROUPING= _sheetGroupingTemp;
-            SHEET_SIZE = _sheetSizeTemp;
-            SHEET_COEFFICIENT = _sheetCoefficientTemp;
-            GENERAL_VIEW_PREFIX = _generalViewPrefixTemp;
-            GENERAL_VIEW_SUFFIX = _generalViewSuffixTemp;
-            TRANSVERSE_VIEW_FIRST_PREFIX = _transverseViewFirstPrefixTemp;
-            TRANSVERSE_VIEW_FIRST_SUFFIX = _transverseViewFirstSuffixTemp;
-            TRANSVERSE_VIEW_SECOND_PREFIX = _transverseViewSecondPrefixTemp;
-            TRANSVERSE_VIEW_SECOND_SUFFIX = _transverseViewSecondSuffixTemp;
-            TRANSVERSE_VIEW_THIRD_PREFIX = _transverseViewThirdPrefixTemp;
-            TRANSVERSE_VIEW_THIRD_SUFFIX = _transverseViewThirdSuffixTemp;
-            REBAR_SCHEDULE_PREFIX = _rebarSchedulePrefixTemp;
-            REBAR_SCHEDULE_SUFFIX = _rebarScheduleSuffixTemp;
-            MATERIAL_SCHEDULE_PREFIX = _materialSchedulePrefixTemp;
-            MATERIAL_SCHEDULE_SUFFIX = _materialScheduleSuffixTemp;
-            PARTS_SCHEDULE_PREFIX = _partsSchedulePrefixTemp;
-            PARTS_SCHEDULE_SUFFIX = _partsScheduleSuffixTemp;
-
-
-            _edited = false;
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
-        private bool CanApplySettings(object p) {
-            if(_edited) {
+
+
+        /// <summary>
+        /// Метод, отрабатывающий при загрузке окна
+        /// </summary>
+        private void LoadView() {
+            LoadConfig();
+
+            ApplySettings();
+            CheckSettings();
+        }
+
+        /// <summary>
+        /// Метод, отрабатывающий при нажатии кнопки "Ок"
+        /// </summary>
+        private void AcceptView() {
+            SaveConfig();
+            CreateSheetsNViews();
+        }
+
+        /// <summary>
+        /// Определяет можно ли запустить работу плагина
+        /// </summary>
+        private bool CanAcceptView() {
+            if(ErrorText == string.Empty) {
                 return true;
             }
+
             return false;
         }
 
+        /// <summary>
+        /// Подгружает параметры плагина с предыдущего запуска
+        /// </summary>
+        private void LoadConfig() {
+            var settings = _pluginConfig.GetSettings(_revitRepository.Document);
 
-
-        public ICommand CreateSheetsCommand { get; }
-        private void CreateSheets(object p) {
-            // Забираем список выбранных элементов через CommandParameter
-            SelectedHostMarks = p as System.Collections.IList;
-
-            // Перевод списка выбранных марок пилонов в формат листа строк
-            List<string> selectedHostMarks = new List<string>();
-            foreach(var item in SelectedHostMarks) {
-                string hostMark = item as string;
-                if(hostMark == null) {
-                    continue;
-                }
-                selectedHostMarks.Add(hostMark);
-            }
-
-
-            string report = string.Empty;
-            // Получаем инфо о листах, которые нужно создать
-            #region Отчет
-            Report = "Приступаем к созданию документации по выбранным пилонам";
-            Report = "Анализируем...";
-            #endregion
-            AnalyzeExistingSheets();
-
-
-
-            // Проверка,если ли листы для создания
-            if(missingPylonSheetsInfo.Keys.Count > 0) {
-                #region Отчет
-                Report = "Пользователь выбрал типоразмер рамки листа: " + SelectedTitleBlocks.Name;
-                Report = "Пользователь выбрал легенду примечаний: " + SelectedLegend.Name;
-                Report = Environment.NewLine + "Приступаю к созданию листов";
-                #endregion
-            } else {
-                #region Отчет
-                Report = "Все запрошенные листы уже созданы";
-                Report = "Работа завершена";
-                #endregion
-            }
-
-
-            Transaction transaction = new Transaction(_revitRepository.Document, "Создание листов пилонов");
-            transaction.Start();
-
-
-            foreach(string sheetKeyName in missingPylonSheetsInfo.Keys) {
-                // Лист 
-                #region Отчет
-                Report = Environment.NewLine + 
-                    "---------------------------------------------------------------------------" +
-                    "---------------------------------------------------------------------------";
-                Report = " - Пилон " + sheetKeyName;
-                Report = "\tЛист создан";
-                #endregion
-
-                ViewSheet viewSheet = ViewSheet.Create(_revitRepository.Document, SelectedTitleBlocks.Id);
-                viewSheet.Name = "Пилон " + sheetKeyName;
-
-
-                Autodesk.Revit.DB.Parameter viewSheetGroupingParameter = viewSheet.LookupParameter(SHEET_GROUPING);
-                if(viewSheetGroupingParameter == null) {
-                    #region Отчет
-                    Report = "\tПараметр \"" + SHEET_GROUPING + "\" не заполнен, т.к. не был найден у листа";
-                    #endregion
-                } else {
-                    viewSheetGroupingParameter.Set(SelectedProjectSection);
-                    #region Отчет
-                    Report = "\tГруппировка по параметру \"" + SHEET_GROUPING + "\": " + SelectedProjectSection;
-                    #endregion
-                }
-
-
-                // Фиксируем инфо про легенду
-                missingPylonSheetsInfo[sheetKeyName].LegendView.ViewElement = SelectedLegend;
-                missingPylonSheetsInfo[sheetKeyName].LegendView.ViewportTypeName = "Без названия";
-                missingPylonSheetsInfo[sheetKeyName].LegendView.ViewportCenter = new XYZ(-0.34, 0.30, 0);
-
-                missingPylonSheetsInfo[sheetKeyName].PylonViewSheet = viewSheet;
-
-                // Рамка листа
-                FamilyInstance titleBlock = new FilteredElementCollector(_revitRepository.Document, viewSheet.Id)
-                    .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                    .WhereElementIsNotElementType()
-                    .FirstElement() as FamilyInstance;
-
-                missingPylonSheetsInfo[sheetKeyName].TitleBlock = titleBlock;
-
-                // Пытаемся задать габарит листа А3 и получаем габариты рамки
-                missingPylonSheetsInfo[sheetKeyName].SetTitleBlockSize(_revitRepository.Document);
-
-
-                // Размещение видовых экранов
-                missingPylonSheetsInfo[sheetKeyName].PlaceGeneralViewport();
-                missingPylonSheetsInfo[sheetKeyName].PlaceTransverseViewPorts();
-
-                // Размещение спецификаций
-                missingPylonSheetsInfo[sheetKeyName].PlaceRebarSchedule();
-                missingPylonSheetsInfo[sheetKeyName].PlaceMaterialSchedule();
-                missingPylonSheetsInfo[sheetKeyName].PlacePartsSchedule();
-
-
-                // Размещение легенды
-                missingPylonSheetsInfo[sheetKeyName].PlaceLegend(_revitRepository);
-            }
-
-            transaction.Commit();
-        }
-        private bool CanCreateSheets(object p) {
-            if(ErrorText.Length > 0) {
-                return false;
-            }
-            // Проверяем правила поиска видов на уникальность
-            string genView = GENERAL_VIEW_PREFIX + GENERAL_VIEW_SUFFIX;
-            string tranViewFirst = TRANSVERSE_VIEW_FIRST_PREFIX + TRANSVERSE_VIEW_FIRST_SUFFIX;
-            string tranViewSecond = TRANSVERSE_VIEW_SECOND_PREFIX + TRANSVERSE_VIEW_SECOND_SUFFIX;
-            string tranViewThird = TRANSVERSE_VIEW_THIRD_PREFIX + TRANSVERSE_VIEW_THIRD_SUFFIX;
-
-            if(genView == tranViewFirst || genView == tranViewSecond || genView == tranViewThird || tranViewFirst == tranViewSecond
-                || tranViewFirst == tranViewThird || tranViewSecond == tranViewThird) {
-                ErrorText = "Правила поиска видов некорректны. Задайте уникальные правила в настройках";
-                return false;
-            }
-
-            // Проверяем правила поиска спек на уникальность
-            string rebSchedule = REBAR_SCHEDULE_PREFIX + REBAR_SCHEDULE_SUFFIX;
-            string matSchedule = MATERIAL_SCHEDULE_PREFIX + MATERIAL_SCHEDULE_SUFFIX;
-            string partsSchedule = PARTS_SCHEDULE_PREFIX + PARTS_SCHEDULE_SUFFIX;
-
-            if(rebSchedule == matSchedule || rebSchedule == partsSchedule || matSchedule == partsSchedule) {
-                ErrorText = "Правила поиска спецификаций некорректны. Задайте уникальные правила в настройках";
-                return false;
-            }
-
-            return true;
-        }
-
-
-
-        public void AnalyzeExistingSheets() {
-            var allExistingSheets = new FilteredElementCollector(_revitRepository.Document)
-                .OfClass(typeof(ViewSheet))
-                .WhereElementIsNotElementType()
-                .ToElements();
-
-            Report = "В проекте найдено листов: " + allExistingSheets.Count.ToString();
-
-            // Перевод списка выбранных марок пилонов в формат листа строк
-            List<string> selectedHostMarks = new List<string>();
-            foreach(var item in SelectedHostMarks) {
-                string hostMark = item as string;
-                if(hostMark == null) {
-                    continue;
-                }
-
-                selectedHostMarks.Add(hostMark);
-            }
-
-            
-            // Формируем список листов, выбранных для обработки, но уже существущих - existingPylonSheetsInfo
-            foreach(var item in allExistingSheets) {
-                ViewSheet sheet = item as ViewSheet;
-                string sheetKeyName;
-                
-                if(sheet == null || !sheet.Name.Contains("Пилон") || !sheet.Name.Contains(" ") || sheet.Name.Split(' ').Length < 2) {
-                    continue;
-                } else {
-                    sheetKeyName = sheet.Name.Split(' ')[1];
-                }
-
-                if(selectedHostMarks.Contains(sheetKeyName)) {
-                    existingPylonSheetsInfo.Add(sheetKeyName, new PylonSheetInfo(this, sheetKeyName) {
-                        PylonViewSheet = sheet,
-                    });
-                    selectedHostMarks.Remove(sheetKeyName);     // Удаляем имена листов, которые уже есть
-                }
-            }
-            Report = "Из них выбрано для обработки среди уже существующих: " + existingPylonSheetsInfo.Count.ToString();
-            if(existingPylonSheetsInfo.Count > 0) {
-                Report = "Среди которых: ";
-                foreach(string sheetName in existingPylonSheetsInfo.Keys) {
-                    Report = " - " + sheetName;
-                }
-            }
-
-
-            // Формируем список листов, выбранных для обработки и еще не созданных - wbGeneratingPylonSheetsInfo
-            if(selectedHostMarks.Count > 0) {
-                foreach(string hostMark in selectedHostMarks) {
-                    missingPylonSheetsInfo.Add(hostMark, new PylonSheetInfo(this, hostMark));
-                }
-            }
-            Report = "Будут созданы листы в количестве: " + missingPylonSheetsInfo.Count.ToString();
-            if(missingPylonSheetsInfo.Count > 0) {
-                Report = "Среди которых: ";
-                foreach(string sheetName in missingPylonSheetsInfo.Keys) {
-                    Report = " - " + sheetName;
-                }
+            if(settings != null) {
+                _pluginConfig.GetConfigProps(settings, this);
             }
         }
 
+        /// <summary>
+        /// Сохраняет параметры плагина для следующего запуска
+        /// </summary>
+        private void SaveConfig() {
+            var settings = _pluginConfig.GetSettings(_revitRepository.Document)
+                           ?? _pluginConfig.AddSettings(_revitRepository.Document);
+
+            _pluginConfig.SetConfigProps(settings, this);
+            _pluginConfig.SaveProjectConfig();
+        }
+
+
+        /// <summary>
+        /// Получает названия комплектов документации по пилонам
+        /// </summary>
+        private void GetRebarProjectSections() {
+            // Пользователь может перезадать параметр раздела, поэтому сначала чистим
+            ProjectSections.Clear();
+
+            using(Transaction transaction =
+                  _revitRepository.Document.StartTransaction("Получение возможных комплектов документации")) {
+                _revitRepository.GetHostData(this);
+
+                transaction.RollBack();
+            }
+
+            HostsInfo = new ObservableCollection<PylonSheetInfo>(_revitRepository.HostsInfo);
+            ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
+            OnPropertyChanged(nameof(HostsInfo));
+            OnPropertyChanged(nameof(ProjectSections));
+        }
+
+
+        /// <summary>
+        /// Обновляет список пилонов в соответствии с выбранным комплектом документации. 
+        /// Отрабатывает в момент выбора комплекта документации в ComboBox
+        /// </summary>
+        private void GetHostMarksInGUI() {
+            SelectedHostsInfo = new List<PylonSheetInfo>(HostsInfo
+                .Where(item => item.ProjectSection.Equals(SelectedProjectSection))
+                .ToList());
+
+            SetHostsInfoFilters();
+        }
+
+        /// <summary>
+        /// Дает возможность пользователю выбрать вручную нужный для работы пилон
+        /// </summary>
+        private void SelectPylon() {
+            ElementId elementid = _revitRepository.ActiveUIDocument.Selection
+                .PickObject(ObjectType.Element, "Выберите пилон").ElementId;
+            Element element = _revitRepository.Document.GetElement(elementid);
+
+            if(element != null) {
+                HostsInfo.Clear();
+                SelectedHostsInfo.Clear();
+                SelectedProjectSection = string.Empty;
+                _pylonSelectedManually = true;
+
+                _revitRepository.GetHostData(this, new List<Element> {element});
+
+                HostsInfo = new ObservableCollection<PylonSheetInfo>(_revitRepository.HostsInfo);
+                ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
+                OnPropertyChanged(nameof(HostsInfo));
+                OnPropertyChanged(nameof(ProjectSections));
+
+
+                if(HostsInfo.Count > 0) {
+                    SelectedHostsInfo.Add(HostsInfo.FirstOrDefault());
+                    HostsInfo.FirstOrDefault().IsCheck = true;
+                    SelectedProjectSection = ProjectSections.FirstOrDefault();
+                }
+            }
+
+            SelectionSettings.NeedWorkWithGeneralView = false;
+            SelectionSettings.NeedWorkWithGeneralPerpendicularView = false;
+            SelectionSettings.NeedWorkWithTransverseViewFirst = false;
+            SelectionSettings.NeedWorkWithTransverseViewSecond = false;
+            SelectionSettings.NeedWorkWithTransverseViewThird = false;
+
+            SelectionSettings.NeedWorkWithRebarSchedule = false;
+            SelectionSettings.NeedWorkWithMaterialSchedule = false;
+            SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
+            SelectionSettings.NeedWorkWithIFCPartsSchedule = false;
+            SelectionSettings.NeedWorkWithLegend = false;
+
+
+            MainWindow mainWindow = new MainWindow();
+            mainWindow.DataContext = this;
+            mainWindow.ShowDialog();
+        }
+
+
+        /// <summary>
+        /// Применяет изменения настроек плагина (передает данные из временных переменных в постоянные, по которым работает плагин)
+        /// </summary>
+        private void ApplySettings() {
+            ErrorText = string.Empty;
+
+            ProjectSettings.ApplyProjectSettings();
+            ViewSectionSettings.ApplyViewSectionsSettings();
+            SchedulesSettings.ApplySchedulesSettings();
+
+
+            // Получаем заново список заполненных разделов проекта
+            if(!_pylonSelectedManually) {
+                GetRebarProjectSections();
+            }
+
+            FindReferenceSchedules();
+
+            FindGeneralViewTemplate();
+            FindTransverseViewTemplate();
+            FindViewFamilyType();
+            FindLegend();
+            FindTitleBlock();
+
+            _settingsEdited = false;
+        }
+
+        private void CheckSettings() {
+            if(SelectedTitleBlock is null) {
+                ErrorText = "Не выбран типоразмер рамки листа";
+                return;
+            }
+
+            if(SelectedViewFamilyType is null) {
+                ErrorText = "Не выбран типоразмер создаваемого вида";
+                return;
+            }
+
+            if(SelectedGeneralViewTemplate is null) {
+                ErrorText = "Не выбран шаблон основных видов";
+                return;
+            }
+
+            if(SelectedTransverseViewTemplate is null) {
+                ErrorText = "Не выбран шаблон поперечных видов";
+                return;
+            }
+
+            if(SelectedLegend is null) {
+                ErrorText = "Не выбрана легенда примечаний";
+                return;
+            }
+
+            ProjectSettings.CheckProjectSettings();
+            ViewSectionSettings.CheckViewSectionsSettings();
+        }
+
+        /// <summary>
+        /// Определяет можно ли применить изменения настроек плагина (передать данные из временные переменных в постоянные, по которым работает плагин). 
+        /// Доступно при изменении одного из параметров настроек
+        /// </summary>
+        private bool CanApplySettings() {
+            if(_settingsEdited) {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Анализирует выбранные пользователем элементы вида, создает лист, виды, спецификации, и размещает их на листе
+        /// </summary>
+        private void CreateSheetsNViews() {
+            using(Transaction transaction = _revitRepository.Document.StartTransaction("Документатор пилонов")) {
+                foreach(PylonSheetInfo hostsInfo in SelectedHostsInfo) {
+                    hostsInfo.Manager.WorkWithCreation();
+                }
+
+                transaction.Commit();
+            }
+        }
+
+        /// <summary>
+        /// Ищет эталонные спецификации по указанным именам. На основе эталонных спек создаются спеки для пилонов путем копирования
+        /// </summary>
+        private void FindReferenceSchedules() {
+            ReferenceRebarSchedule =
+                _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+                    sch.Name.Equals(SchedulesSettings.RebarScheduleName)) as ViewSchedule;
+            ReferenceMaterialSchedule =
+                _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+                    sch.Name.Equals(SchedulesSettings.MaterialScheduleName)) as ViewSchedule;
+            ReferenceSystemPartsSchedule =
+                _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+                    sch.Name.Equals(SchedulesSettings.SytemPartsScheduleName)) as ViewSchedule;
+            ReferenceIFCPartsSchedule =
+                _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+                    sch.Name.Equals(SchedulesSettings.IFCPartsScheduleName)) as ViewSchedule;
+        }
+
+        /// <summary>
+        /// Получает шаблон для основных видов по имени
+        /// </summary>
+        public void FindGeneralViewTemplate() {
+            if(ViewSectionSettings.GeneralViewTemplateName != string.Empty) {
+                SelectedGeneralViewTemplate = ViewTemplatesInPj
+                    .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.GeneralViewTemplateName));
+            }
+        }
+
+        /// <summary>
+        /// Получает шаблон для поперечных видов по имени
+        /// </summary>
+        public void FindTransverseViewTemplate() {
+            if(ViewSectionSettings.TransverseViewTemplateName != string.Empty) {
+                SelectedTransverseViewTemplate = ViewTemplatesInPj
+                    .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TransverseViewTemplateName));
+            }
+        }
+
+        /// <summary>
+        /// Получает типоразмер вида для создаваемых видов
+        /// </summary>
+        public void FindViewFamilyType() {
+            if(ViewSectionSettings.ViewFamilyTypeName != string.Empty) {
+                SelectedViewFamilyType = ViewFamilyTypes
+                    .FirstOrDefault(familyTypes => familyTypes.Name.Equals(ViewSectionSettings.ViewFamilyTypeName));
+            }
+        }
+
+        /// <summary>
+        /// Получает легенду примечания по имени
+        /// </summary>
+        public void FindLegend() {
+            if(ProjectSettings.LegendName != string.Empty) {
+                SelectedLegend = Legends
+                    .FirstOrDefault(view => view.Name.Contains(ProjectSettings.LegendName));
+            }
+        }
+
+        /// <summary>
+        /// Получает типоразмер рамки листа по имени типа
+        /// </summary>
+        public void FindTitleBlock() {
+            if(ProjectSettings.TitleBlockName != string.Empty) {
+                SelectedTitleBlock = TitleBlocks
+                    .FirstOrDefault(titleBlock => titleBlock.Name.Contains(ProjectSettings.TitleBlockName));
+            }
+        }
+
+
+        /// <summary>
+        /// Добавляет новое имя параметра фильтра спецификаций в настройках плагина
+        /// </summary>
+        private void AddScheduleFilterParam() {
+            SchedulesSettings.ParamsForScheduleFilters.Add(
+                new ScheduleFilterParamHelper("Введите название", "Введите название"));
+            SettingsChanged();
+        }
+
+        /// <summary>
+        /// Удаляет выбранное имя параметра фильтра спецификаций в настройках плагина
+        /// </summary>
+        private void DeleteScheduleFilterParam() {
+            List<ScheduleFilterParamHelper> forDel = new List<ScheduleFilterParamHelper>();
+
+            foreach(ScheduleFilterParamHelper param in SchedulesSettings.ParamsForScheduleFilters) {
+                if(param.IsCheck) {
+                    forDel.Add(param);
+                }
+            }
+
+            foreach(ScheduleFilterParamHelper param in forDel) {
+                SchedulesSettings.ParamsForScheduleFilters.Remove(param);
+            }
+
+            SettingsChanged();
+        }
+
+        /// <summary>
+        /// Ставит флаг, который показывает,что свойства изменились
+        /// </summary>
+        private void SettingsChanged() {
+            _settingsEdited = true;
+        }
+
+        /// <summary>
+        /// Определяет можно ли удалить выбранное имя параметра фильтра спецификаций в настройках плагина
+        /// True, если выбрана штриховка в списке штриховок в настройках плагина
+        /// </summary> 
+        private bool CanChangeScheduleFilterParam() {
+            foreach(ScheduleFilterParamHelper param in SchedulesSettings.ParamsForScheduleFilters) {
+                if(param.IsCheck) { return true; }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Задает фильтрацию списка марок пилонов
+        /// </summary>
+        private void SetHostsInfoFilters() {
+            _hostsInfoView = CollectionViewSource.GetDefaultView(SelectedHostsInfo);
+            _hostsInfoView.Filter = item =>
+                String.IsNullOrEmpty(HostsInfoFilter)
+                    ? true
+                    : ((PylonSheetInfo) item).PylonKeyName.IndexOf(HostsInfoFilter,
+                        StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+
+        /// <summary>
+        /// Обнуление строки фильтра привязанного к тексту, через который фильтруется список марок пилонов в GUI
+        /// Работает при нажатии "x" в правой части области поиска
+        /// </summary>
+        private void ClearHostsInfoFilterInGUI() {
+            HostsInfoFilter = string.Empty;
+        }
+
+        /// <summary>
+        /// Ставит галку выбора всем маркам пилонов, видимым в GUI.
+        /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка марок пилонов в GUI
+        /// </summary>
+        private void SelectAllHostsInfoInGUI() {
+            foreach(PylonSheetInfo pylonSheetInfo in SelectedHostsInfo) {
+                if(String.IsNullOrEmpty(HostsInfoFilter)
+                       ? true
+                       : (pylonSheetInfo.PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >=
+                          0)) {
+                    pylonSheetInfo.IsCheck = true;
+                }
+            }
+
+            // Иначе не работало:
+            _hostsInfoView.Refresh();
+        }
+
+
+        /// <summary>
+        /// Снимает галку выбора у всех марок пилонов, видимых в GUI.
+        /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка марок пилонов в GUI
+        /// </summary>
+        private void UnselectAllHostsInfoInGUI() {
+            foreach(PylonSheetInfo pylonSheetInfo in SelectedHostsInfo) {
+                if(String.IsNullOrEmpty(HostsInfoFilter)
+                       ? true
+                       : (pylonSheetInfo.PylonKeyName.IndexOf(HostsInfoFilter, StringComparison.OrdinalIgnoreCase) >=
+                          0)) {
+                    pylonSheetInfo.IsCheck = false;
+                }
+            }
+
+            // Иначе не работало:
+            _hostsInfoView.Refresh();
+        }
+
+
+        /// <summary>
+        /// Ставит галку выбора всем элементам, доступным для создания, видимым в GUI.
+        /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка тумблеров в GUI
+        /// </summary>
+        private void SelectAllFuncInGUI() {
+            SelectionSettings.NeedWorkWithGeneralView = true;
+            SelectionSettings.NeedWorkWithGeneralPerpendicularView = true;
+            SelectionSettings.NeedWorkWithTransverseViewFirst = true;
+            SelectionSettings.NeedWorkWithTransverseViewSecond = true;
+            SelectionSettings.NeedWorkWithTransverseViewThird = true;
+            SelectionSettings.NeedWorkWithRebarSchedule = true;
+            SelectionSettings.NeedWorkWithMaterialSchedule = true;
+            SelectionSettings.NeedWorkWithSystemPartsSchedule = true;
+            SelectionSettings.NeedWorkWithIFCPartsSchedule = true;
+            SelectionSettings.NeedWorkWithLegend = true;
+        }
+
+
+        /// <summary>
+        /// Снимает галку выбора у всех, доступных для создания, видимых в GUI.
+        /// Отрабатывает при нажатии на кнопку "Выбрать все" возле списка тумблеров в GUI
+        /// </summary>
+        private void UnselectAllFuncInGUI() {
+            SelectionSettings.NeedWorkWithGeneralView = false;
+            SelectionSettings.NeedWorkWithGeneralPerpendicularView = false;
+            SelectionSettings.NeedWorkWithTransverseViewFirst = false;
+            SelectionSettings.NeedWorkWithTransverseViewSecond = false;
+            SelectionSettings.NeedWorkWithTransverseViewThird = false;
+            SelectionSettings.NeedWorkWithRebarSchedule = false;
+            SelectionSettings.NeedWorkWithMaterialSchedule = false;
+            SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
+            SelectionSettings.NeedWorkWithIFCPartsSchedule = false;
+            SelectionSettings.NeedWorkWithLegend = false;
+        }
     }
 }

@@ -1,0 +1,10 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitCopyViews",
+  "PublishDirectory": "01.2D.extension\\2D.tab\\bin",
+  "IconUrl": "https://icons8.com/icon/14345/data-backup",
+  "BundleName": "Обновить отметки этажа",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "01.2D.extension\\2D.tab\\Виды.panel\\Виды 1.stack"
+}

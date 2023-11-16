@@ -133,12 +133,18 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает стандартный фильтр по категории "Соединительные детали воздуховодов"
+        /// Возвращает стандартный фильтр по категориям "Соединительные детали воздуховодов" и "Арматура воздуховодов"
         /// </summary>
         /// <param name="revitRepository"></param>
         /// <returns></returns>
         public static Filter GetDuctFittingFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
-            return CreateFilterByCategory(RevitRepository.FittingCategoryNames[FittingCategoryEnum.DuctFitting], revitRepository, BuiltInCategory.OST_DuctFitting);
+            return CreateFilterByCategory(
+                RevitRepository.FittingCategoryNames[FittingCategoryEnum.DuctFitting],
+                revitRepository,
+                new BuiltInCategory[] {
+                    BuiltInCategory.OST_DuctFitting,
+                    BuiltInCategory.OST_DuctAccessory }
+                );
         }
 
         /// <summary>
@@ -210,11 +216,19 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает фильтр по всем используемым категориям проемов
+        /// Возвращает фильтр по всем используемым категориям чистовых проемов в АР
         /// /// </summary>
         /// <returns></returns>
-        public static ElementMulticategoryFilter GetFilterByAllUsedOpeningsCategories() {
+        public static ElementFilter GetFilterByAllUsedOpeningsArCategories() {
             return new ElementMulticategoryFilter(GetAllUsedOpeningsCategories());
+        }
+
+        /// <summary>
+        /// Возвращает фильтр по всем используемым категориям чистовых проемов в КР
+        /// </summary>
+        /// <returns></returns>
+        public static ElementFilter GetFilterByAllUsedOpeningsKrCategories() {
+            return new ElementCategoryFilter(BuiltInCategory.OST_GenericModel);
         }
 
         /// <summary>
@@ -237,7 +251,7 @@ namespace RevitOpeningPlacement.Models {
         /// <returns></returns>
         private static Filter GetdMepFilter(string name, RevitClashDetective.Models.RevitRepository revitRepository, BuiltInCategory category, IEnumerable<ParamValuePair> paramValuePairs) {
             return new Filter(revitRepository) {
-                CategoryIds = new List<int> { (int) category },
+                CategoryIds = new List<ElementId> { new ElementId(category) },
                 Name = name,
                 Set = new Set() {
                     SetEvaluator = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And),
@@ -257,7 +271,26 @@ namespace RevitOpeningPlacement.Models {
         /// <returns></returns>
         private static Filter CreateFilterByCategory(string name, RevitClashDetective.Models.RevitRepository revitRepository, BuiltInCategory category) {
             return new Filter(revitRepository) {
-                CategoryIds = new List<int> { (int) category },
+                CategoryIds = new List<ElementId> { new ElementId(category) },
+                Name = name,
+                Set = new Set() {
+                    SetEvaluator = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And),
+                    Criteria = new List<Criterion>(),
+                    RevitRepository = revitRepository
+                }
+            };
+        }
+
+        /// <summary>
+        /// Возвращает фильтр по заданной коллекции категорий
+        /// </summary>
+        /// <param name="name">Название фильтра</param>
+        /// <param name="revitRepository">Репозиторий Revit, в котором будет проходить фильтрация элементов</param>
+        /// <param name="categories">Коллекция категорий элементов</param>
+        /// <returns></returns>
+        private static Filter CreateFilterByCategory(string name, RevitClashDetective.Models.RevitRepository revitRepository, ICollection<BuiltInCategory> categories) {
+            return new Filter(revitRepository) {
+                CategoryIds = categories.Select(category => new ElementId(category)).ToList(),
                 Name = name,
                 Set = new Set() {
                     SetEvaluator = SetEvaluatorUtils.GetEvaluators().FirstOrDefault(item => item.Evaluator == SetEvaluators.And),

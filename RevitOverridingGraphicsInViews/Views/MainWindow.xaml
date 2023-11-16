@@ -1,0 +1,189 @@
+﻿<base:PlatformWindow
+    x:Class="RevitOverridingGraphicsInViews.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+
+
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitOverridingGraphicsInViews.Views"
+    xmlns:vms="clr-namespace:RevitOverridingGraphicsInViews.ViewModels"
+
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+    
+    Title="MainWindow"
+    MinHeight="400" MinWidth="400"
+    MaxHeight="400" MaxWidth="400"
+    
+    AllowsTransparency="True"
+    WindowStyle="None"
+    Background="Transparent"
+    
+    
+
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    
+    <Window.Resources>
+        <ResourceDictionary Source="ResourceDictionary.xaml"/>
+    </Window.Resources>
+    
+    <Window.InputBindings>
+        <KeyBinding Command="ApplicationCommands.Close" Key="Esc"/>
+        <KeyBinding Command="{Binding Path=PaintCommand}" Key="Return"/>
+    </Window.InputBindings>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Close" Executed="WindowCloseCommand" />
+    </Window.CommandBindings>
+
+    <Grid MouseDown="Grid_MouseDown">
+        
+        <Border Style="{StaticResource BackStyle}"/>
+
+        <Canvas>
+            <Button 
+                Style="{StaticResource Button1}"
+                Canvas.Top="248.1" Canvas.Left="152.8"
+                Click="ColorButton_Click">
+
+
+                <Button.InputBindings>
+                    <KeyBinding Command="{Binding Path=PaintCommand}" Key="Return"/>
+                </Button.InputBindings>
+                <Button.CommandBindings>
+                    <CommandBinding Command="ApplicationCommands.Close" Executed="WindowCloseCommand" />
+                </Button.CommandBindings>
+
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <i:InvokeCommandAction
+                            Command="{Binding Path=SelectСolor1Command}" />
+                    </i:EventTrigger>
+
+                    <i:EventTrigger EventName="MouseDoubleClick">
+                        <i:InvokeCommandAction
+                            Command="{Binding Path=ChangeСolor1Command}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Button>
+
+            <Button 
+                Style="{StaticResource Button2}" 
+                Canvas.Top="202.1" Canvas.Left="123.2"
+                Click="ColorButton_Click">
+                
+                <Button.InputBindings>
+                    <KeyBinding Command="{Binding Path=PaintCommand}" Key="Return"/>
+                </Button.InputBindings>
+                <Button.CommandBindings>
+                    <CommandBinding Command="ApplicationCommands.Close" Executed="WindowCloseCommand" />
+                </Button.CommandBindings>
+
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <i:InvokeCommandAction
+                            Command="{Binding Path=SelectСolor2Command}" />
+                    </i:EventTrigger>
+
+                    <i:EventTrigger EventName="MouseDoubleClick">
+                        <i:InvokeCommandAction
+                            Command="{Binding Path=ChangeСolor2Command}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Button>
+
+            <Button 
+                Style="{StaticResource Button3}" 
+                Canvas.Top="0" Canvas.Left="0"
+                Click="ColorButton_Click">
+                
+                <Button.InputBindings>
+                    <KeyBinding Command="{Binding Path=PaintCommand}" Key="Return"/>
+                </Button.InputBindings>
+                <Button.CommandBindings>
+                    <CommandBinding Command="ApplicationCommands.Close" Executed="WindowCloseCommand" />
+                </Button.CommandBindings>
+
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <i:InvokeCommandAction
+                            Command="{Binding Path=SelectСolor3Command}" />
+                    </i:EventTrigger>
+
+                    <i:EventTrigger EventName="MouseDoubleClick">
+                        <i:InvokeCommandAction
+                            Command="{Binding Path=ChangeСolor3Command}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Button>
+
+            <Button 
+                Style="{StaticResource Button4}" 
+                Canvas.Top="134.7" Canvas.Left="206.2"
+                Click="ColorButton_Click">
+
+                <Button.InputBindings>
+                    <KeyBinding Command="{Binding Path=PaintCommand}" Key="Return"/>
+                </Button.InputBindings>
+                <Button.CommandBindings>
+                    <CommandBinding Command="ApplicationCommands.Close" Executed="WindowCloseCommand" />
+                </Button.CommandBindings>
+
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <i:InvokeCommandAction
+                            Command="{Binding Path=SelectСolor4Command}" />
+                    </i:EventTrigger>
+
+                    <i:EventTrigger EventName="MouseDoubleClick">
+                        <i:InvokeCommandAction
+                            Command="{Binding Path=ChangeСolor4Command}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Button>
+
+            <Button 
+                Style="{StaticResource Button5}" 
+                Canvas.Top="181.1" Canvas.Left="242"
+                Click="ColorButton_Click">
+
+                <Button.InputBindings>
+                    <KeyBinding Command="{Binding Path=PaintCommand}" Key="Return"/>
+                </Button.InputBindings>
+                <Button.CommandBindings>
+                    <CommandBinding Command="ApplicationCommands.Close" Executed="WindowCloseCommand" />
+                </Button.CommandBindings>
+
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <i:InvokeCommandAction
+                            Command="{Binding Path=SelectСolor5Command}" />
+                    </i:EventTrigger>
+
+                    <i:EventTrigger EventName="MouseDoubleClick">
+                        <i:InvokeCommandAction
+                            Command="{Binding Path=ChangeСolor5Command}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Button>
+
+
+            <Button 
+                Style="{StaticResource BrushTip}" 
+                Canvas.Top="0" Canvas.Left="0"
+                Command="{Binding Path=ChangeColorManuallyCommand}">
+
+                <Button.InputBindings>
+                    <KeyBinding Command="{Binding Path=PaintCommand}" Key="Return"/>
+                </Button.InputBindings>
+
+                <Button.CommandBindings>
+                    <CommandBinding Command="ApplicationCommands.Close" Executed="WindowCloseCommand" />
+                </Button.CommandBindings>
+            </Button>
+        </Canvas>
+    </Grid>
+</base:PlatformWindow>

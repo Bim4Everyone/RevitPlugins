@@ -1,7 +1,14 @@
 # RevitPlugins
-Шаблон Revit плагина.
+Пример Revit плагина.
 
-# Сборка проекта
+## Сборка проекта
+
 ```
-nuke compile --plugin-name RevitPlugins
+nuke compile --profile RevitPlugins
+```
+
+## Публикация проекта
+
+```
+nuke publish --profile RevitPlugins
 ```

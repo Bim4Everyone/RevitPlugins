@@ -1,0 +1,178 @@
+﻿<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ImageBrush x:Key="Palette"
+                    ImageSource="Images/palette.png"
+                    Stretch="Uniform" />
+
+    <Style x:Key="BackStyle"
+               TargetType="Border">
+        
+        <Setter Property="Background"
+                 Value="{StaticResource Palette}" />
+
+        <Setter Property="Margin"
+                 Value="30" />
+
+        <Setter Property="CornerRadius"
+                    Value="50"/>
+        <Setter Property="Border.Effect">
+            <Setter.Value>
+                <DropShadowEffect 
+                    BlurRadius="30"
+                    ShadowDepth="2"
+                    Direction="-90"
+                    Color="Black"
+                    Opacity="0.3" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <Style x:Key="RoundButtonStyle" TargetType="Ellipse">
+
+        <Setter Property="Width" Value="27.5"/>
+        <Setter Property="Height" Value="27.5"/>
+        
+        <Setter Property="StrokeThickness" Value="2"/>
+        <Setter Property="Stroke" Value="#464141" />
+
+        <Style.Triggers>
+            <EventTrigger RoutedEvent="MouseEnter">
+                <BeginStoryboard>
+                    <Storyboard TargetProperty="StrokeThickness">
+
+                        <DoubleAnimation Duration="0:0:0.01" From="2" To="0"/>
+
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+            <EventTrigger RoutedEvent="MouseLeave">
+                <BeginStoryboard>
+                    <Storyboard TargetProperty="StrokeThickness">
+
+                        <DoubleAnimation Duration="0:0:0.01" From="0" To="2"/>
+
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Style.Triggers>
+    </Style>
+
+
+
+    <Style x:Key="Button1" TargetType="{x:Type Button}">
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid>
+                        <Ellipse Style="{StaticResource RoundButtonStyle}" Fill="{Binding Path=Color1.UserBrush}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    
+    
+    <Style x:Key="Button2" TargetType="{x:Type Button}">
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Ellipse Style="{StaticResource RoundButtonStyle}" Fill="{Binding Path=Color2.UserBrush}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Button3" TargetType="{x:Type Button}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid>
+                        <Path Data="M102.35891,106.77893 C100.54007,108.11913 99.25034,110.35543 98.53838,112.66929 97.813193,115.02614 97.343004,117.78739 98.100724,120.43941 98.831484,122.99707 99.572297,124.31376 101.26658,126.24126 103.02848,128.24567 106.55926,130.21964 109.58056,130.65125 111.60327,130.94021 114.66889,130.68773 116.63381,130.03276 117.78613,129.64865 119.94904,128.43169 121.09747,127.44654 121.63665,126.98401 119.42563,120.65398 118.77682,118.38314 118.25571,116.55924 117.46601,113.51058 116.87059,111.58541 114.35384,111.55209 113.72744,111.41686 111.28425,111.16829 110.17394,111.05533 106.20691,109.52063 105.23711,108.93875 104.15273,108.28812 103.40259,107.75356 102.35891,106.77893 z" 
+                              Fill="{Binding Path=Color3.UserBrush}" 
+                              HorizontalAlignment="Left"
+                              Height="24" Margin="143,152,0,0" 
+                              Stretch="Fill" 
+                              VerticalAlignment="Top" Stroke="#464141" StrokeThickness="2"
+                              Width="23">
+                            <Path.Triggers>
+                                <EventTrigger RoutedEvent="MouseEnter">
+                                    <BeginStoryboard>
+                                        <Storyboard TargetProperty="StrokeThickness">
+
+                                            <DoubleAnimation Duration="0:0:0.01" From="2" To="0"/>
+
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="MouseLeave">
+                                    <BeginStoryboard>
+                                        <Storyboard TargetProperty="StrokeThickness">
+
+                                            <DoubleAnimation Duration="0:0:0.01" From="0" To="2"/>
+
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Path.Triggers>
+                        </Path>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <Style x:Key="Button4" TargetType="{x:Type Button}">
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate  TargetType="Button">
+                    <Grid>
+                        <Ellipse Style="{StaticResource RoundButtonStyle}" Fill="{Binding Path=Color4.UserBrush}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Button5" TargetType="{x:Type Button}">
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate  TargetType="Button">
+                    <Grid>
+                        <Ellipse Style="{StaticResource RoundButtonStyle}" Fill="{Binding Path=Color5.UserBrush}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <Style x:Key="BrushTip" TargetType="{x:Type Button}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid>
+                        <Path 
+                            Data="M156.22927,97.494699 C153.94527,98.288089 152.71626,98.851664 150.87496,100.3851 149.97224,101.13689 148.86407,102.23495 148.03333,103.3 147.32657,104.20609 146.85318,105.67603 146.85318,107.06101 146.85318,111.51169 147.4207,113.62634 148.81635,117.81329 149.42808,119.64847 150.57102,122.02269 151.52162,123.83002 152.44226,125.58041 153.40262,127.02808 154.39596,128.82778 155.33258,130.52474 155.79317,130.58655 156.37463,132.7314 156.5101,133.23108 154.15371,132.93593 154.2426,133.00259 152.76472,130.75912 151.95596,128.94567 150.89919,127.18438 150.14773,125.93195 149.20184,124.20892 148.69448,122.77141 147.55401,119.54008 146.10212,115.64657 144.57578,112.41697 143.77627,115.1042 143.14916,119.40761 143.48554,122.77141 143.83103,126.22631 145.19321,129.75309 146.83333,133.03333 147.53407,134.43481 148.05382,135.6943 148.70601,137.10738 149.17569,138.12503 150.25763,139.46539 148.2717,139.42481 147.06528,139.40015 147.24594,138.41626 145.69165,135.30768 145.09582,133.90244 144.02251,131.43709 143.29329,130.72214 142.62567,133.11353 143.73435,136.88515 144.29126,138.83223 144.9473,141.12589 145.61758,142.77767 147.14461,145.2048 147.57531,145.88939 149.26043,147.94457 149.89121,148.58837 150.62266,149.33491 151.84222,150.17838 152.76667,150.76667 154.79719,152.05882 156.49405,152.46858 158.96667,152.7 163.39337,153.11432 165.37401,152.40686 169.5406,149.70443 170.37868,149.16085 170.98113,148.37953 171.71447,147.51381 172.44164,146.65537 172.6749,146.29663 173.23333,145.1 174.22649,142.97181 174.93555,140.75957 174.96667,138.3 174.99961,135.69664 174.71625,134.69835 174.1,132.23333 173.84235,131.20273 173.55613,130.39835 173.231,129.42296 172.83894,128.24677 172.23766,127.494 171.23333,126.36667 169.8085,124.76735 168.03126,123.26326 166.32613,122.06005 164.29101,120.62397 162.8906,120.30645 161.3,118.9 159.20321,117.04596 158.28861,116.43137 156.96667,114.43333 155.74081,112.58052 154.36289,110.95576 154.26683,108.30175 154.07301,102.9469 154.58179,101.63006 156.22927,97.494699 z" 
+                            Fill="{Binding Path=SelectedColor.UserBrush}"
+                            HorizontalAlignment="Left" 
+                            Height="57" Margin="143,97,0,0" 
+                            Stretch="Fill" VerticalAlignment="Top" Width="33"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+</ResourceDictionary>

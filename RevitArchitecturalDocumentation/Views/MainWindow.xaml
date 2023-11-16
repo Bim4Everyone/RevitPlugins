@@ -1,0 +1,235 @@
+﻿<base:PlatformWindow
+    x:Class="RevitArchitecturalDocumentation.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitArchitecturalDocumentation.Views"
+    xmlns:vms="clr-namespace:RevitArchitecturalDocumentation.ViewModels"
+
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+    
+    Title="MainWindow"
+    Height="450" Width="800"    
+
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+
+        <ListView
+            Margin="10"
+            ScrollViewer.VerticalScrollBarVisibility="Visible"
+            ScrollViewer.CanContentScroll="False"
+            ItemsSource="{Binding Path=TasksForWork, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            SelectedItem="{Binding Path=SelectedTask}"
+            SelectionMode="Single">          
+
+
+            <ListView.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="7"/>
+                </Style>
+            </ListView.Resources>
+
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <TextBox 
+                            Margin="10 0 0 0" 
+                            Width="200"
+                            Text="{Binding Path=StartLevelNumber}"/>
+                        <TextBox 
+                            Margin="10 0 0 0"
+                            Width="200"
+                            Text="{Binding Path=EndLevelNumber}"/>
+
+                        <ComboBox
+                            Margin="10 0 0 0"
+                            Height="36"
+                            Width="300"
+                            DisplayMemberPath="Name"
+                            ItemsSource="{Binding Path=DataContext.VisibilityScopes, 
+                                RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
+                            SelectedItem="{Binding Path=SelectedVisibilityScope}">
+                        </ComboBox>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <StackPanel
+            Grid.Row="1"
+            Height="45"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <Button
+                Margin="10"
+                Width="200"
+                Content="Добавить строку"
+                FontSize="16"
+                Command="{Binding Path=AddTaskCommand}"/>
+
+            <Button
+                Margin="10"
+                Width="200"
+                Content="Удалить строку"
+                FontSize="16"
+                Command="{Binding Path=DeleteTaskCommand}"/>
+        </StackPanel>
+
+
+
+
+        <GroupBox Margin="5" Grid.Row="2" Height="65">
+            <GroupBox.Header>
+                <TextBlock 
+                    Text="Для листа:"
+                    FontSize="20"/>
+            </GroupBox.Header>
+
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+
+                <TextBlock
+                    Grid.Column="0"
+                    Text="Выберите рамку листа:"
+                    FontSize="16"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"/>
+
+                <ComboBox
+                    Grid.Column="1"
+                    ItemsSource="{Binding Path=TitleBlocksInProject}" 
+                    SelectedItem="{Binding Path=SelectedTitleBlock}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0}: {1}">
+                                        <Binding Path="FamilyName"/>
+                                        <Binding Path="Name"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <TextBlock
+                    Grid.Column="2"
+                    Margin="20 0 0 0"
+                    Text="Укажите префикс листа:"
+                    FontSize="16"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"/>
+
+                <TextBox 
+                    Grid.Column="3"
+                    Margin="10 0 0 0" 
+                    Text="{Binding Path=SheetNamePrefix}"/>
+            </Grid>
+        </GroupBox>
+
+
+        <GroupBox Margin="5" Grid.Row="3" Height="65">
+            <GroupBox.Header>
+                <TextBlock 
+                    Text="Для вида:"
+                    FontSize="20"/>
+            </GroupBox.Header>
+
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+
+                <TextBlock
+                    Grid.Column="0"
+                    Text="Выберите тип вида:"
+                    FontSize="16"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"/>
+
+                <ComboBox
+                    Grid.Column="1"
+                    DisplayMemberPath="Name"
+                    ItemsSource="{Binding Path=ViewFamilyTypes}" 
+                    SelectedItem="{Binding Path=SelectedViewFamilyType}">
+                    </ComboBox>
+
+                <TextBlock
+                    Grid.Column="2"
+                    Margin="20 0 0 0"
+                    Text="Для вида:"
+                    FontSize="16"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"/>
+                
+                <TextBox 
+                    Grid.Column="3"
+                    Margin="10 0 0 0" 
+                    Text="{Binding Path=ViewNamePrefix}"/>
+            </Grid>
+        </GroupBox>
+
+
+        <StackPanel
+            Grid.Row="4"
+            Height="45"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+
+            <Button
+                Margin="10"
+                Width="80"
+                Content="ОК"
+                FontSize="16"
+                Click="ButtonOk_Click"
+                Command="{Binding Path=AcceptViewCommand}"/>
+
+            <Button
+                Margin="10"
+                Width="80"
+                Content="Отмена"
+                FontSize="16"
+                Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</base:PlatformWindow>

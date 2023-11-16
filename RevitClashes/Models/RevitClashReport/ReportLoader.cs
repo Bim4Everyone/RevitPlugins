@@ -21,7 +21,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
                 throw new ArgumentException("Неверный формат файла.");
             }
 
-            var docNames = revitRepository.GetDocuments().Select(revitRepository.GetDocumentName).ToList();
+            var docNames = revitRepository.DocInfos.Select(item => RevitRepository.GetDocumentName(item.Doc)).ToList();
 
             return loader.GetClashes()
                          .Select(item => item.SetRevitRepository(revitRepository))

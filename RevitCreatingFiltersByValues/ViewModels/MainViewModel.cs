@@ -285,8 +285,12 @@ namespace RevitCreatingFiltersByValues.ViewModels {
 
                 // Если он null, значит это встроенный параметр
                 if(paramAsParameterElement is null) {
-                    BuiltInParameter parameterAsBuiltIn = (BuiltInParameter) Enum.ToObject(typeof(BuiltInParameter), id.IntegerValue);
 
+#if REVIT_2023_OR_LESS
+                    BuiltInParameter parameterAsBuiltIn = (BuiltInParameter) Enum.ToObject(typeof(BuiltInParameter), id.IntegerValue);
+#else
+                    BuiltInParameter parameterAsBuiltIn = (BuiltInParameter) Enum.ToObject(typeof(BuiltInParameter), id.Value);
+#endif
                     parametersHelper.ParamName = LabelUtils.GetLabelFor(parameterAsBuiltIn);
                     parametersHelper.BInParameter = parameterAsBuiltIn;
                     parametersHelper.Id = id;
@@ -405,7 +409,11 @@ namespace RevitCreatingFiltersByValues.ViewModels {
                             // Создаем правила фильтрации в зависимости от типа данных параметра
                             FilterRule filterRule = null;
                             if(pos.StorageParamType == StorageType.String) {
+#if REVIT_2022_OR_LESS
                                 filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, pos.ValueAsString, true);
+#else
+                                filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, pos.ValueAsString);
+#endif
                             } else if(pos.StorageParamType == StorageType.Double) {
                                 filterRule = ParameterFilterRuleFactory.CreateEqualsRule(SelectedFilterableParameter.Id, pos.ValueAsDouble, 0.0000001);
                             } else if(pos.StorageParamType == StorageType.ElementId) {

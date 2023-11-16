@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -16,10 +12,10 @@ namespace RevitClashDetective.Models.FilterableValueProviders {
     internal class ParameterInitializer {
         public static RevitParam InitializeParameter(Document doc, ElementId id) {
             if(id.IsSystemId()) {
-                return SystemParamsConfig.Instance.CreateRevitParam(doc, (BuiltInParameter) id.IntegerValue);
+                return SystemParamsConfig.Instance.CreateRevitParam(doc, (BuiltInParameter) id.GetIdValue());
             } else {
                 var element = doc.GetElement(id);
-                if (element is SharedParameterElement sharedParameterElement) {
+                if(element is SharedParameterElement sharedParameterElement) {
                     return SharedParamsConfig.Instance.CreateRevitParam(doc, sharedParameterElement.Name);
                 }
                 if(element is ParameterElement parameterElement) {

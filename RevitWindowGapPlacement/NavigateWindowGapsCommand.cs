@@ -27,13 +27,19 @@ namespace RevitWindowGapPlacement {
                 if(!windowGapType.IsActive) {
                     windowGapType.Activate();
                 }
-                
+#if REVIT_2023_OR_LESS
+                ElementId hostId = new ElementId(6895552);
+                ElementId levelId = new ElementId(3991953);
+#else
+                ElementId hostId = new ElementId(6895552L);
+                ElementId levelId = new ElementId(3991953L);
+#endif
                 FamilyInstance windowGap =
                     uiApplication.ActiveUIDocument.Document.Create.NewFamilyInstance(
                         new XYZ(30.183727034122, 9.02230971129252, 30 + 15.748031496063),
                         windowGapType,
-                        uiApplication.ActiveUIDocument.Document.GetElement(new ElementId(6895552)),
-                        (Level) revitRepository.Document.GetElement(new ElementId(3991953)),
+                        revitRepository.Document.GetElement(hostId),
+                        (Level) revitRepository.Document.GetElement(levelId),
                         StructuralType.NonStructural);
 
                 t.Commit();

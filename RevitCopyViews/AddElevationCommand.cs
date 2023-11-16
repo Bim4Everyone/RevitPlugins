@@ -9,34 +9,20 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep;
+using dosymep.Bim4Everyone;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitCopyViews.ViewModels;
 
 namespace RevitCopyViews {
     [Transaction(TransactionMode.Manual)]
-    public class AddElevationCommand : IExternalCommand {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            try {
-                Excecute(commandData);
-            } catch(Exception ex) {
-#if DEBUG
-                System.Windows.MessageBox.Show(ex.ToString(), "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-#else
-                System.Windows.MessageBox.Show(ex.Message, "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-#endif
-            } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= AppDomainExtensions.CurrentDomain_AssemblyResolve;
-            }
-
-            return Result.Succeeded;
+    public class AddElevationCommand : BasePluginCommand {
+        public AddElevationCommand() {
+            PluginName = "Добавить отметки этажа";
         }
 
-        private void Excecute(ExternalCommandData commandData) {
-            var uiApplication = commandData.Application;
-            var application = uiApplication.Application;
-
+        protected override void Execute(UIApplication uiApplication) {
             var uiDocument = uiApplication.ActiveUIDocument;
             var document = uiDocument.Document;
 
@@ -48,12 +34,11 @@ namespace RevitCopyViews {
                 .ToArray();
 
             var errors = new List<View>();
-            using(var transaction = new Transaction(document)) {
-                transaction.Start("Добавление отметки этажа");
-
+            using(var transaction = document.StartTransaction("Добавление отметки этажа")) {
                 var selectedViews = uiDocument.GetSelectedElements().OfType<View>();
                 foreach(var view in selectedViews) {
-                    var splittedName = Delimiter.SplitViewName(view.Name, new SplitViewOptions() { ReplacePrefix = false, ReplaceSuffix = false });
+                    var splittedName = Delimiter.SplitViewName(view.Name,
+                        new SplitViewOptions() {ReplacePrefix = false, ReplaceSuffix = false});
                     splittedName.Elevations = SplittedViewName.GetElevation(view);
 
                     string viewName = Delimiter.CreateViewName(splittedName);
@@ -73,8 +58,15 @@ namespace RevitCopyViews {
             }
 
             if(errors.Count > 0) {
-                string message = "Не были изменены имена у следующих видов:" + Environment.NewLine + " - " + string.Join(Environment.NewLine + " - ", errors.Select(item => $"{item.Id.IntegerValue} - {item.Name}"));
+                Notification(false);
+                string message = "Не были изменены имена у следующих видов:"
+                                 + Environment.NewLine +
+                                 " - "
+                                 + string.Join(Environment.NewLine + " - ",
+                                     errors.Select(item => $"{item.Id.GetIdValue()} - {item.Name}"));
                 TaskDialog.Show("Предупреждение!", message, TaskDialogCommonButtons.Ok);
+            } else {
+                Notification(true);
             }
         }
     }

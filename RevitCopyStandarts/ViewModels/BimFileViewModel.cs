@@ -176,12 +176,19 @@ namespace RevitCopyStandarts.ViewModels {
             if(string.IsNullOrEmpty(elementId)) {
                 throw new ArgumentException("Идентификатор элемента не может быть пустым или null.", nameof(elementId));
             }
-
+#if REVIT_2023_OR_LESS
             if(!int.TryParse(elementId, out int result)) {
                 throw new ArgumentException("Идентификатор элемента должен быть числом.", nameof(elementId));
             }
 
             return sourceDocument.GetElement(new ElementId(result));
+#else
+            if(!long.TryParse(elementId, out long result)) {
+                throw new ArgumentException("Идентификатор элемента должен быть числом.", nameof(elementId));
+            }
+
+            return sourceDocument.GetElement(new ElementId(result));
+#endif
         }
     }
 

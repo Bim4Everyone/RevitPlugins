@@ -1,7 +1,12 @@
 # PlatformSettings (Настройки)
 Плагин позволяет редактировать глобальные настройки платформы Bim4Everyone
 
-# Сборка проекта
+## Сборка проекта
 ```
-nuke compile --plugin-name RevitPlatformSettings
+nuke compile --profile RevitPlatformSettings
+```
+
+## Публикация проекта
+```
+nuke publish --profile RevitPlatformSettings
 ```

@@ -24,6 +24,11 @@
 
 # Сборка проекта
 ```
-nuke compile --plugin-name RevitCopyStandarts
+nuke compile --profile RevitCopyStandarts
+```
+
+# Публикация проекта
+```
+nuke publish --profile RevitCopyStandarts
 ```
 
