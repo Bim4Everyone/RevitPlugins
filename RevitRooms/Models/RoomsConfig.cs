@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
@@ -32,7 +34,7 @@ namespace RevitRooms.Models {
     public class RoomsSettingsConfig : ProjectSettings {
         public Guid SelectedRoomId { get; set; }
         
-        public int PhaseElementId { get; set; }
+        public ElementId PhaseElementId { get; set; }
         public int RoundAccuracy { get; set; }
         public string RoomAccuracy { get; set; }
 
@@ -42,7 +44,7 @@ namespace RevitRooms.Models {
         public bool IsSpotCalcArea { get; set; }
         public bool IsCheckRoomsChanges { get; set; }
 
-        public List<int> Levels { get; set; } = new List<int>();
+        public List<ElementId> Levels { get; set; } = new List<ElementId>();
         public override string ProjectName { get; set; }
         
     }

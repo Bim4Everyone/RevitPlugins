@@ -2,6 +2,7 @@
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 using RevitClashDetective.Models.Value;
@@ -50,7 +51,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         }
 
         private string GetElectricMepSystem(Element element) {
-            var doc = _mepElement?.Document.Title ?? string.Empty;
+            var doc = element?.Document.Title ?? string.Empty;
             if(IsEomTitle(doc)) {
                 return "ЭОМ";
             } else if(IsSsTitle(doc)) {
@@ -65,7 +66,13 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
                 return false;
             }
             var service = RevitRepository.GetBimModelPartsService();
-            return service.GetBimModelPart(title) == dosymep.Bim4Everyone.BimModelPart.EOMPart;
+            return service.InAnyBimModelParts(
+                title,
+                new BimModelPart[]{
+                    BimModelPart.EOPart,
+                    BimModelPart.EMPart,
+                    BimModelPart.EOMPart,
+            });
         }
 
         private bool IsSsTitle(string title) {
@@ -73,7 +80,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
                 return false;
             }
             var service = RevitRepository.GetBimModelPartsService();
-            return service.GetBimModelPart(title) == dosymep.Bim4Everyone.BimModelPart.SSPart;
+            return service.GetBimModelPart(title) == BimModelPart.SSPart;
         }
     }
 }

@@ -1,7 +1,14 @@
 # RevitCreateViewSheet (Управление листами)
 Плагин создает листы с выбранными форматами.
 
-# Сборка проекта
+## Сборка проекта
+
 ```
-nuke compile --plugin-name RevitCreateViewSheet
+nuke compile --profile RevitCreateViewSheet
+```
+
+## Публикация проекта
+
+```
+nuke publish --profile RevitCreateViewSheet
 ```

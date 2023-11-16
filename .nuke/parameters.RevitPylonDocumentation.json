@@ -1,0 +1,10 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitPylonDocumentation",
+  "PublishDirectory": "03.KR.extension\\КР.tab\\bin",
+  "IconUrl": "https://icons8.com/icon/14077/document",
+  "BundleName": "Документация пилонов",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "03.KR.extension\\КР.tab\\Документация.panel"
+}

@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -14,20 +11,36 @@ using dosymep.Revit;
 
 using pyRevitLabs.Json;
 
-using RevitClashDetective.Models.Extensions;
-
 namespace RevitClashDetective.Models.Clashes {
     internal class ClashModel : IEquatable<ClashModel> {
         private RevitRepository _revitRepository;
 
-        public ClashModel(RevitRepository revitRepository, Element mainElement, Element otherElement) {
-            _revitRepository = revitRepository;
 
-            MainElement = new ElementModel(_revitRepository, mainElement);
-            OtherElement = new ElementModel(_revitRepository, otherElement);
+        [JsonConstructor]
+        public ClashModel() { }
+
+        public ClashModel(RevitRepository revitRepository, Element mainElement, Element otherElement)
+            : this(revitRepository, mainElement, Transform.Identity, otherElement, Transform.Identity) {
         }
 
-        public ClashModel() { }
+        public ClashModel(
+            RevitRepository revitRepository,
+            Element mainElement,
+            Transform mainElementTransform,
+            Element otherElement,
+            Transform otherElementTransform) {
+
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            if(mainElement is null) { throw new ArgumentNullException(nameof(mainElement)); }
+            if(mainElementTransform is null) { throw new ArgumentNullException(nameof(mainElementTransform)); }
+            if(otherElement is null) { throw new ArgumentNullException(nameof(otherElement)); }
+            if(otherElementTransform is null) { throw new ArgumentNullException(nameof(otherElementTransform)); }
+
+            MainElement = new ElementModel(mainElement, mainElementTransform);
+            OtherElement = new ElementModel(otherElement, otherElementTransform);
+        }
+
+
         public ClashStatus ClashStatus { get; set; }
         public ElementModel MainElement { get; set; }
         public ElementModel OtherElement { get; set; }
@@ -53,17 +66,19 @@ namespace RevitClashDetective.Models.Clashes {
 
         public override int GetHashCode() {
             int hashCode = 2096115351;
-            hashCode *= EqualityComparer<ElementModel>.Default.GetHashCode(MainElement);
-            hashCode *= EqualityComparer<ElementModel>.Default.GetHashCode(OtherElement);
+            hashCode = hashCode * -1521134295 + EqualityComparer<ElementModel>.Default.GetHashCode(MainElement);
+            hashCode = hashCode * -1521134295 + EqualityComparer<ElementModel>.Default.GetHashCode(OtherElement);
             return hashCode;
         }
 
         public bool Equals(ClashModel other) {
-            return other != null
-                && ((EqualityComparer<ElementModel>.Default.Equals(MainElement, other.MainElement)
-                && EqualityComparer<ElementModel>.Default.Equals(OtherElement, other.OtherElement))
-                || (EqualityComparer<ElementModel>.Default.Equals(MainElement, other.OtherElement)
-                && EqualityComparer<ElementModel>.Default.Equals(OtherElement, other.MainElement)));
+            if(ReferenceEquals(null, other)) { return false; }
+            if(ReferenceEquals(this, other)) { return true; }
+
+            return (Equals(MainElement, other.MainElement)
+                && Equals(OtherElement, other.OtherElement))
+                || (Equals(MainElement, other.OtherElement)
+                && Equals(OtherElement, other.MainElement));
         }
     }
 

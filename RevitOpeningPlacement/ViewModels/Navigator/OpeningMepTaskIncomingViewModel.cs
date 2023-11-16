@@ -5,7 +5,10 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.WPF.ViewModels;
+
+using RevitClashDetective.Models.Clashes;
 
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
@@ -35,7 +38,6 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Description = _openingTask.Description;
             CenterOffset = _openingTask.CenterOffset;
             BottomOffset = _openingTask.BottomOffset;
-            IsAccepted = _openingTask.IsAccepted;
             Diameter = _openingTask.DisplayDiameter;
             Width = _openingTask.DisplayWidth;
             Height = _openingTask.DisplayHeight;
@@ -43,7 +45,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             FamilyShortName = _openingTask.FamilyShortName;
             HostName = _openingTask.HostName;
             Status = _openingTask.Status.GetEnumDescription();
-            OwnComment = _openingTask.OwnComment;
+            Comment = _openingTask.Comment;
             Username = _openingTask.Username;
         }
 
@@ -51,7 +53,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// <summary>
         /// Id экземпляра семейства задания на отверстие
         /// </summary>
-        public int OpeningId { get; } = -1;
+        public ElementId OpeningId { get; } = ElementId.InvalidElementId;
 
         /// <summary>
         /// Название связанного файла-источника задания на отверстие
@@ -121,40 +123,12 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// <summary>
         /// Комментарий экземпляра семейства задания на отверстие
         /// </summary>
-        public string OwnComment { get; } = string.Empty;
+        public string Comment { get; } = string.Empty;
 
         /// <summary>
         /// Имя пользователя, создавшего задание на отверстие
         /// </summary>
         public string Username { get; } = string.Empty;
-
-
-        private bool _isAccepted;
-        /// <summary>
-        /// Статус задания: принято/не принято
-        /// </summary>
-        public bool IsAccepted {
-            get => _isAccepted;
-            set => RaiseAndSetIfChanged(ref _isAccepted, value);
-        }
-
-        /// <summary>
-        /// Комментарий к заданию на отверстие
-        /// </summary>
-        private string _comment;
-        public string Comment {
-            get => _comment;
-            set => RaiseAndSetIfChanged(ref _comment, value);
-        }
-
-
-        /// <summary>
-        /// Возвращает экземпляр семейства задания на отверстие
-        /// </summary>
-        /// <returns></returns>
-        public FamilyInstance GetFamilyInstance() {
-            return _openingTask.GetFamilyInstance();
-        }
 
 
         public override bool Equals(object obj) {
@@ -164,7 +138,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         }
 
         public override int GetHashCode() {
-            return OpeningId + FileName.GetHashCode();
+            return (int) OpeningId.GetIdValue() + FileName.GetHashCode();
         }
 
         public bool Equals(OpeningMepTaskIncomingViewModel other) {
@@ -182,12 +156,12 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         }
 
         /// <summary>
-        /// Возвращает коллекцию элементов, в которой находится исходящее задание на отверстие, которое надо выделить на виде
+        /// Возвращает коллекцию элементов, в которой находится входящее задание на отверстие, которое надо выделить на виде
         /// </summary>
         /// <returns></returns>
-        public ICollection<Element> GetElementsToSelect() {
-            return new Element[] {
-                _openingTask.GetFamilyInstance()
+        public ICollection<ElementModel> GetElementsToSelect() {
+            return new ElementModel[] {
+                new ElementModel(_openingTask.GetFamilyInstance(), _openingTask.Transform)
             };
         }
     }

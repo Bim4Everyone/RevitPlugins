@@ -3,5 +3,10 @@
 
 # Сборка проекта
 ```
-nuke compile --plugin-name RevitClashDetective
+nuke compile --profile RevitClashDetective
+```
+
+# Публикация проекта
+```
+nuke publish --profile RevitClashDetective
 ```

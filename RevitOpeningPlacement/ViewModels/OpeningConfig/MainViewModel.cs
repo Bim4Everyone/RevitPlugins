@@ -8,10 +8,14 @@ using System.Windows.Threading;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitClashDetective.Models.FilterModel;
+
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.TypeNamesProviders;
 using RevitOpeningPlacement.ViewModels.Services;
+using RevitOpeningPlacement.Views;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
     internal class MainViewModel : BaseViewModel {
@@ -38,6 +42,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             SaveConfigCommand = new RelayCommand(SaveConfig, CanSaveConfig);
             SaveAsConfigCommand = new RelayCommand(SaveAsConfig, CanSaveConfig);
             LoadConfigCommand = new RelayCommand(LoadConfig);
+            CheckSearchSearchSetCommand = new RelayCommand(CheckSearchSet, CanSaveConfig);
 
             SelectedMepCategoryViewModel = MepCategories.FirstOrDefault(category => category.IsSelected) ?? MepCategories.First();
             foreach(MepCategoryViewModel mepCategoryViewModel in MepCategories) {
@@ -69,6 +74,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         public ICommand SaveConfigCommand { get; }
         public ICommand SaveAsConfigCommand { get; }
         public ICommand LoadConfigCommand { get; }
+        public ICommand CheckSearchSearchSetCommand { get; }
 
 
         private void InitializeCategories() {
@@ -174,6 +180,22 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 _timer.Stop();
             };
         }
+
+        private void CheckSearchSet(object p) {
+            SaveConfig(null);
+
+            var categories = new MepCategoryCollection(MepCategories.Select(item => item.GetMepCategory()));
+            var configurator = new PlacementConfigurator(_revitRepository, categories);
+
+            MepCategory mepCategory = SelectedMepCategoryViewModel.GetMepCategory();
+            Filter linearFilter = configurator.GetLinearFilter(mepCategory);
+            Filter nonLinearFilter = configurator.GetFittingFilter(mepCategory);
+
+            var vm = new MepCategoryFilterViewModel(_revitRepository, linearFilter, nonLinearFilter);
+            var view = new MepCategoryFilterView() { DataContext = vm };
+            view.Show();
+        }
+
         private Models.Configs.OpeningConfig GetOpeningConfig() {
             var config = Models.Configs.OpeningConfig.GetOpeningConfig(_revitRepository.Doc);
             config.Categories = new MepCategoryCollection(MepCategories.Select(item => item.GetMepCategory()));

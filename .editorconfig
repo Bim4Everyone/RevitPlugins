@@ -6,14 +6,23 @@ root = true
 
 #### Core EditorConfig Options ####
 
+# Chars coding
+# https://stackoverflow.com/questions/41335199/how-to-config-visual-studio-to-use-utf-8-as-the-default-encoding-for-all-project
+# https://editorconfig.org/#:~:text=breaks%20are%20represented.-,charset,-%3A%20set%20to%20latin1
+# https://stackoverflow.com/questions/2223882/whats-the-difference-between-utf-8-and-utf-8-with-bom
+charset = utf-8
+
 # Indentation and spacing
 indent_size = 4
 indent_style = space
 tab_width = 4
 
+# Guideline for all files. Sets char position of vertical marker in text editor. https://marketplace.visualstudio.com/items?itemName=PaulHarrington.EditorGuidelinesPreview
+guidelines = 120
+
 # New line preferences
 end_of_line = crlf
-insert_final_newline = false
+insert_final_newline = true
 
 #### .NET Coding Conventions ####
 

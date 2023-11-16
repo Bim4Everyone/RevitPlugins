@@ -7,7 +7,6 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 
 using RevitClashDetective.Models.Visiter;
-
 namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
     internal class ParameterFilterInitializer {
         /// <summary>
@@ -19,10 +18,15 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         public static ParameterFilterElement GetOpeningFilter(Document doc) {
             var category = Category.GetCategory(doc, BuiltInCategory.OST_GenericModel);
             var nameParameter = ParameterFilterUtilities.GetFilterableParametersInCommon(doc, new[] { category.Id })
-                .FirstOrDefault(item => item.IsSystemId() && (BuiltInParameter) item.IntegerValue == BuiltInParameter.ALL_MODEL_FAMILY_NAME);
+                .FirstOrDefault(item => item.IsSystemId() && (BuiltInParameter) item.GetIdValue() == BuiltInParameter.ALL_MODEL_FAMILY_NAME);
             FilterRule filterRule = default;
             if(nameParameter != null) {
-                filterRule = ParameterFilterRuleFactory.CreateBeginsWithRule(nameParameter, "ОбщМд_Отв", false);
+                string famName = "ОбщМд_Отв";
+#if REVIT_2022_OR_LESS
+                filterRule = ParameterFilterRuleFactory.CreateBeginsWithRule(nameParameter, famName, false);
+#else
+                filterRule = ParameterFilterRuleFactory.CreateBeginsWithRule(nameParameter, famName);
+#endif
             }
             if(filterRule == null) {
                 throw new ArgumentException("Отсутствует параметр \"Имя семейства\".", nameof(nameParameter));

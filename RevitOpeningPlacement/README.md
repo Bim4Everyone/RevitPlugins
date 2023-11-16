@@ -1,7 +1,12 @@
-# RevitOpeningPlacement (Расстановщик отверстий)
-Плагин для расстановки заданий на отверстия и последующей работы с ними.
+# RevitOpeningPlacement (Задания на отверстия)
+Плагин для работы с заданиями на отверстия в Revit.
 
 # Сборка проекта
 ```
-nuke compile --plugin-name RevitOpeningPlacement
+nuke compile --profile RevitOpeningPlacement
+```
+
+# Публикация проекта
+```
+nuke publish --profile RevitOpeningPlacement
 ```

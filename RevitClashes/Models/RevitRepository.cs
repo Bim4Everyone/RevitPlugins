@@ -14,6 +14,7 @@ using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
+using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Extensions;
 using RevitClashDetective.Models.FilterableValueProviders;
 using RevitClashDetective.Models.Handlers;
@@ -28,7 +29,7 @@ namespace RevitClashDetective.Models {
         private readonly Document _document;
         private readonly UIDocument _uiDocument;
         private readonly RevitEventHandler _revitEventHandler;
-        private readonly List<string> _endings = new List<string> { "_отсоединено", "_detached" };
+        private static readonly HashSet<string> _endings = new HashSet<string> { "_отсоединено", "_detached" };
         private readonly string _clashViewName = "BIM_Проверка на коллизии";
         private readonly View3D _view;
 
@@ -138,12 +139,12 @@ namespace RevitClashDetective.Models {
             return path;
         }
 
-        public string GetDocumentName(Document doc) {
+        public static string GetDocumentName(Document doc) {
             var title = doc.Title;
             return GetDocumentName(title);
         }
 
-        public string GetDocumentName(string fileName) {
+        public static string GetDocumentName(string fileName) {
             foreach(var ending in _endings) {
                 if(fileName.IndexOf(ending) > -1) {
                     fileName = fileName.Substring(0, fileName.IndexOf(ending));
@@ -160,14 +161,14 @@ namespace RevitClashDetective.Models {
             return _document.GetElement(id);
         }
 
-        public Element GetElement(string fileName, int id) {
+        public Element GetElement(string fileName, ElementId id) {
             Document doc;
             if(fileName == null) {
                 doc = _document;
             } else {
                 doc = DocInfos.FirstOrDefault(item => item.Name.Equals(GetDocumentName(fileName), StringComparison.CurrentCultureIgnoreCase))?.Doc;
             }
-            var elementId = new ElementId(id);
+            var elementId = id;
             if(doc == null || elementId.IsNull()) {
                 return null;
             }
@@ -180,14 +181,14 @@ namespace RevitClashDetective.Models {
         }
 
         public List<Collector> GetCollectors() {
-            return GetDocuments()
-                .Select(item => new Collector(item))
+            return DocInfos
+                .Select(item => new Collector(item.Doc))
                 .ToList();
         }
 
         public List<WorksetCollector> GetWorksetCollectors() {
-            return GetDocuments()
-                .Select(item => new WorksetCollector(item))
+            return DocInfos
+                .Select(item => new WorksetCollector(item.Doc))
                 .ToList();
         }
 
@@ -219,12 +220,10 @@ namespace RevitClashDetective.Models {
                 .OfClass(typeof(RevitLinkInstance))
                 .Cast<RevitLinkInstance>()
                 .Where(item => item.GetLinkDocument() != null)
-                .GroupBy(item => GetDocumentName(item.GetLinkDocument()))
-                .Select(item => item.First())
                 .ToList();
         }
 
-        private bool IsParentLink(RevitLinkInstance link) {
+        public bool IsParentLink(RevitLinkInstance link) {
             if(link.GetTypeId().IsNotNull()) {
                 var type = _document.GetElement(link.GetTypeId());
                 if(type is RevitLinkType linkType) {
@@ -273,14 +272,6 @@ namespace RevitClashDetective.Models {
                 .ToList();
         }
 
-        public IList<Document> GetDocuments() {
-            var linkedDocuments = GetRevitLinkInstances()
-                .Select(item => item.GetLinkDocument())
-                .ToList();
-            linkedDocuments.Add(_document);
-            return linkedDocuments;
-        }
-
         public IEnumerable<Element> GetFilteredElements(Document doc, IEnumerable<ElementId> categories, ElementFilter filter) {
             return new FilteredElementCollector(doc)
                 .WherePasses(new ElementMulticategoryFilter(categories.ToList()))
@@ -289,92 +280,56 @@ namespace RevitClashDetective.Models {
         }
 
         /// <summary>
-        /// Выбирает и элементы на 3D виде и делает подрезку
+        /// Выбирает элементы на 3D виде и делает подрезку
         /// </summary>
         /// <param name="elements">Элементы для выбора</param>
         /// <param name="view">3D вид, на котором надо выбрать и показать элементы</param>
-        public void SelectAndShowElement(IEnumerable<Element> elements, View3D view = null) {
+        public void SelectAndShowElement(IEnumerable<ElementModel> elements, View3D view = null) {
             SelectAndShowElement(elements, 10, view);
         }
 
-        /// <summary>
-        /// Выбирает и элементы на 3D виде и делает подрезку
-        /// </summary>
-        /// <param name="elements">Элементы для выбора</param>
-        /// <param name="additionalSize">Добавочный размер в футах к боксу, ограничивающему элементы</param>
-        /// <param name="view">3D вид, на котором надо выбрать и показать элементы</param>
-        public void SelectAndShowElement(IEnumerable<Element> elements, double additionalSize, View3D view = null) {
-            try {
+        public void SelectAndShowElement(IEnumerable<ElementModel> elements, double additionalSize, View3D view = null) {
+            if(elements is null) { throw new ArgumentNullException(nameof(elements)); }
 
-                if(view == null) {
-                    view = _view;
-                }
+            var bbox = GetCommonBoundingBox(elements);
+            SelectAndShowElement(elements.Select(item => item.GetElement(DocInfos)), bbox, additionalSize, view);
+        }
+
+        private void SelectAndShowElement(
+            IEnumerable<Element> elements,
+            BoundingBoxXYZ elementsBBox,
+            double additionalSize,
+            View3D view = null) {
+
+            if(elements is null) { throw new ArgumentNullException(nameof(elements)); }
+            try {
+                view = view ?? _view;
                 _uiDocument.ActiveView = view;
 
-                _revitEventHandler.TransactAction = () => {
-                    var bb = GetCommonBoundingBox(elements);
-                    if(bb != null) {
-                        SetSectionBox(bb, view, additionalSize);
-                    }
-
-                    if(elements.Where(item => item.IsFromDocument(_document)).Any()) {
-                        _uiDocument.Selection.SetElementIds(elements.Where(item => item.IsFromDocument(_document)).Select(item => item.Id).ToArray());
-                    } else {
-                        var border = _view.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_SectionBox)).FirstOrDefault();
-                        if(border != null) {
-                            _uiDocument.Selection.SetElementIds(new[] { border });
-                        }
-                    }
-                };
-
-                _revitEventHandler.Raise();
+                if(elementsBBox != null) {
+                    _revitEventHandler.TransactAction = () => {
+                        SetSectionBox(elementsBBox, view, additionalSize);
+                    };
+                    _revitEventHandler.Raise();
+                }
+                _uiDocument.Selection.SetElementIds(GetElementsToSelect(elements, view));
             } catch(AccessViolationException) {
-                var dialog = GetPlatformService<IMessageBoxService>();
-                dialog.Show(
-                    $"Окно плагина было открыто в другом документе Revit, который был закрыт, нельзя показать элемент.",
-                    $"BIM",
-                    System.Windows.MessageBoxButton.OK,
-                    System.Windows.MessageBoxImage.Error,
-                    System.Windows.MessageBoxResult.OK);
+                ShowErrorMessage("Окно плагина было открыто в другом документе Revit, который был закрыт, нельзя показать элемент.");
             } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                var dialog = GetPlatformService<IMessageBoxService>();
-                dialog.Show(
-                    $"Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент.",
-                    $"BIM",
-                    System.Windows.MessageBoxButton.OK,
-                    System.Windows.MessageBoxImage.Error,
-                    System.Windows.MessageBoxResult.OK);
+                ShowErrorMessage("Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент.");
             }
         }
-
-        private BoundingBoxXYZ GetCommonBoundingBox(IEnumerable<Element> elements) {
-            return elements.Select(item => new { Bb = item.get_BoundingBox(null), Transform = GetLinkedDocumentTransform(GetDocumentName(item.Document)) })
-                           .Where(item => item.Bb != null)
-                           .Select(item => item.Bb.GetTransformedBoundingBox(item.Transform))
-                           .GetCommonBoundingBox();
-        }
-
-
 
         public void DoAction(Action action) {
             _revitEventHandler.TransactAction = action;
             _revitEventHandler.Raise();
         }
 
-
-        public Transform GetLinkedDocumentTransform(string documTitle) {
-            if(documTitle.Equals(GetDocumentName(), StringComparison.CurrentCultureIgnoreCase))
-                return Transform.Identity;
-            return GetRevitLinkInstances()
-                .FirstOrDefault(item => GetDocumentName(item.GetLinkDocument()).Equals(documTitle, StringComparison.CurrentCultureIgnoreCase))
-                ?.GetTotalTransform();
-        }
-
-        public string GetLevelName(Element element) {
+        public static string GetLevelName(Element element) {
             return GetLevel(element)?.Name;
         }
 
-        public Level GetLevel(Element element) {
+        public static Level GetLevel(Element element) {
             ElementId levelId;
             foreach(var paramName in BaseLevelParameters) {
                 levelId = element.GetParamValueOrDefault<ElementId>(paramName);
@@ -386,6 +341,52 @@ namespace RevitClashDetective.Models {
                 return element.Document.GetElement(element.LevelId) as Level;
             }
             return null;
+        }
+
+
+        private Transform GetDocumentTransform(string docTitle) {
+            if(docTitle.Equals(GetDocumentName(), StringComparison.CurrentCultureIgnoreCase))
+                return Transform.Identity;
+            return GetRevitLinkInstances()
+                .FirstOrDefault(item => GetDocumentName(item.GetLinkDocument())
+                                        .Equals(docTitle, StringComparison.CurrentCultureIgnoreCase))
+                ?.GetTotalTransform();
+        }
+
+        private ICollection<ElementId> GetElementsToSelect(IEnumerable<Element> elements, View3D view = null) {
+            if(elements is null) { throw new ArgumentNullException(nameof(elements)); }
+
+            List<ElementId> elementsFromThisDoc = elements
+                .Where(item => item.IsFromDocument(_document))
+                .Select(item => item.Id)
+                .ToList();
+            if(elementsFromThisDoc.Count > 0) {
+                return elementsFromThisDoc;
+            } else {
+                var view3d = view ?? _view;
+                return view3d.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_SectionBox));
+            }
+        }
+
+        private void ShowErrorMessage(string message) {
+            var dialog = GetPlatformService<IMessageBoxService>();
+            dialog.Show(
+                message,
+                $"BIM",
+                System.Windows.MessageBoxButton.OK,
+                System.Windows.MessageBoxImage.Error,
+                System.Windows.MessageBoxResult.OK);
+        }
+
+        private BoundingBoxXYZ GetCommonBoundingBox(IEnumerable<ElementModel> elements) {
+            return elements
+                .Select(item => new {
+                    Bb = item.GetElement(DocInfos).get_BoundingBox(null),
+                    Transform = item.GetDocInfo(DocInfos).Transform
+                })
+                .Where(item => item.Bb != null)
+                .Select(item => item.Bb.GetTransformedBoundingBox(item.Transform))
+                .GetCommonBoundingBox();
         }
 
         private ParameterValueProvider GetParam(Document doc, Category category, ElementId elementId) {

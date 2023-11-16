@@ -2,19 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
-
-using dosymep.Revit;
 
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.RevitClashReport {
-    internal class RevitClashesLoader : IClashesLoader {
+    internal class RevitClashesLoader : BaseClashesLoader, IClashesLoader {
         private readonly RevitRepository _revitRepository;
 
         public string FilePath { get; }
@@ -71,20 +67,12 @@ namespace RevitClashDetective.Models.RevitClashReport {
             }
 
             var fileName = Path.GetFileNameWithoutExtension(match.Groups["fileName"].Value.Trim());
-            return _revitRepository.GetDocumentName().Equals(_revitRepository.GetDocumentName(fileName), StringComparison.CurrentCultureIgnoreCase);
+            return _revitRepository.GetDocumentName().Equals(RevitRepository.GetDocumentName(fileName), StringComparison.CurrentCultureIgnoreCase);
         }
+
 
         private Element GetElement(IEnumerable<string> elementString) {
             return _revitRepository.GetElement(GetFile(elementString.FirstOrDefault()?.Trim()), GetId(elementString.LastOrDefault()));
-        }
-
-        private int GetId(string idString) {
-            var match = Regex.Match(idString, @"(?'id'\d+)");
-            if(match.Success) {
-                return int.Parse(match.Groups["id"].Value);
-            }
-
-            return -1;
         }
 
         private string GetFile(string fileString) {

@@ -1,0 +1,10 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitMepTotals",
+  "PublishDirectory": "01.BIM.extension\\BIM.tab\\bin",
+  "IconUrl": "https://icons8.com/icon/mH_zQ9g2Mmer/database-export",
+  "BundleName": "Выгрузить объемы",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "01.BIM.extension\\BIM.tab\\Экспорт.panel\\экспорт 2.stack"
+}

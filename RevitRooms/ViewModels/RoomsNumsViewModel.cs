@@ -534,45 +534,40 @@ namespace RevitRooms.ViewModels {
         }
 
         private void LoadPluginConfig() {
-            var roomsConfig = RoomsNumsConfig.GetConfig();
-            var settings = roomsConfig.GetRoomsNumsSettingsConfig(_revitRepository.DocumentName);
-            if(settings == null) {
-                return;
+            RoomsNumsConfig roomsConfig = RoomsNumsConfig.GetPluginConfig();
+            RoomsNumsSettings settings = roomsConfig.GetSettings(_revitRepository.DocumentName);
+
+            StartNumber = settings?.StartNumber ?? "1";
+            IsNumFlats = settings?.IsNumFlats ?? default;
+            IsNumRooms = settings?.IsNumRooms ?? default;
+            IsNumRoomsGroup = settings?.IsNumRoomsGroup ?? default;
+            IsNumRoomsSection =settings?.IsNumRoomsSection ?? default;
+            IsNumRoomsSectionLevels =settings?.IsNumRoomsSectionLevels ?? default;
+
+            if(_revitRepository.GetElement(settings?.PhaseElementId ?? ElementId.InvalidElementId) is Phase phase) {
+                Phase = Phases.FirstOrDefault(item => item.ElementId == phase.Id) ?? Phases.FirstOrDefault();
             }
 
-            StartNumber = settings.StartNumber ?? "1";
-            IsNumFlats = settings.IsNumFlats;
-            IsNumRooms = settings.IsNumRooms;
-            IsNumRoomsGroup = settings.IsNumRoomsGroup;
-            IsNumRoomsSection = settings.IsNumRoomsSection;
-            IsNumRoomsSectionLevels = settings.IsNumRoomsSectionLevels;
-
-            if(_revitRepository.GetElement(new ElementId(settings.PhaseElementId)) is Phase phase) {
-                if(!(phase == null || Phase?.ElementId == phase.Id)) {
-                    Phase = Phases.FirstOrDefault(item => item.ElementId == phase.Id) ?? Phases.FirstOrDefault();
-                }
-            }
-
-            foreach(var level in Levels.Where(item => settings.Levels.Contains(item.ElementId.IntegerValue))) {
+            foreach(LevelViewModel level in Levels
+                        .Where(item => settings?.Levels.Contains(item.ElementId) == true)) {
                 level.IsSelected = true;
             }
 
-            foreach(var group in Groups.Where(item => settings.Groups.Contains(item.ElementId.IntegerValue))) {
+            foreach(IElementViewModel<Element> group in Groups
+                        .Where(item => settings?.Groups.Contains(item.ElementId) == true)) {
                 group.IsSelected = true;
             }
 
-            foreach(var section in Sections.Where(item => settings.Sections.Contains(item.ElementId.IntegerValue))) {
+            foreach(IElementViewModel<Element> section in Sections
+                        .Where(item => settings?.Sections.Contains(item.ElementId) == true)) {
                 section.IsSelected = true;
             }
         }
 
         private void SavePluginConfig() {
-            var roomsConfig = RoomsNumsConfig.GetConfig();
-            var settings = roomsConfig.GetRoomsNumsSettingsConfig(_revitRepository.DocumentName);
-            if(settings == null) {
-                settings = new RoomsNumsSettings();
-                roomsConfig.AddRoomsNumsSettingsConfig(settings);
-            }
+            RoomsNumsConfig roomsConfig = RoomsNumsConfig.GetPluginConfig();
+            RoomsNumsSettings settings = roomsConfig.GetSettings(_revitRepository.DocumentName)
+                                         ?? roomsConfig.AddSettings(_revitRepository.DocumentName);
 
             settings.StartNumber = StartNumber;
             settings.IsNumFlats = IsNumFlats;
@@ -582,25 +577,25 @@ namespace RevitRooms.ViewModels {
             settings.IsNumRoomsSectionLevels = IsNumRoomsSectionLevels;
 
             settings.SelectedRoomId = _id;
-            settings.PhaseElementId = Phase.ElementId.IntegerValue;
+            settings.PhaseElementId = Phase.ElementId;
             settings.DocumentName = _revitRepository.DocumentName;
 
             settings.Levels = Levels
                 .Where(item => item.IsSelected)
-                .Select(item => item.ElementId.IntegerValue)
+                .Select(item => item.ElementId)
                 .ToList();
 
             settings.Groups = Groups
                 .Where(item => item.IsSelected)
-                .Select(item => item.ElementId.IntegerValue)
+                .Select(item => item.ElementId)
                 .ToList();
 
             settings.Sections = Sections
                 .Where(item => item.IsSelected)
-                .Select(item => item.ElementId.IntegerValue)
+                .Select(item => item.ElementId)
                 .ToList();
 
-            RoomsNumsConfig.SaveConfig(roomsConfig);
+            roomsConfig.SaveProjectConfig();
         }
     }
 }

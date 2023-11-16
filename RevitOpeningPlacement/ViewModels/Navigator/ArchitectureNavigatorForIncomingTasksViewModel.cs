@@ -21,7 +21,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         public ArchitectureNavigatorForIncomingTasksViewModel(
             RevitRepository revitRepository,
             ICollection<OpeningMepTaskIncomingViewModel> openingsMepTasksIncomingViewModels,
-            ICollection<OpeningRealViewModel> openingsRealViewModels) {
+            ICollection<OpeningRealArViewModel> openingsRealViewModels) {
 
             if(revitRepository is null) {
                 throw new ArgumentNullException(nameof(revitRepository));
@@ -35,7 +35,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             OpeningsMepTaskIncoming = new ObservableCollection<OpeningMepTaskIncomingViewModel>(openingsMepTasksIncomingViewModels);
             OpeningsMepTasksIncomingViewSource = new CollectionViewSource() { Source = OpeningsMepTaskIncoming };
 
-            OpeningsReal = new ObservableCollection<OpeningRealViewModel>(openingsRealViewModels);
+            OpeningsReal = new ObservableCollection<OpeningRealArViewModel>(openingsRealViewModels);
             OpeningsRealViewSource = new CollectionViewSource() { Source = OpeningsReal };
 
             SelectCommand = new RelayCommand(SelectElement);
@@ -43,7 +43,9 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             OpeningRealSelectionChangedCommand = new RelayCommand(OpeningRealSelectionChanged, CanSelect);
             RenewCommand = new RelayCommand(Renew);
             PlaceRealOpeningBySingleTaskCommand = new RelayCommand(PlaceRealOpeningBySingleTask);
-            PlaceRealOpeningByManyTasksCommand = new RelayCommand(PlaceRealOpeningByManyTasks);
+            PlaceOneRealOpeningByManyTasksCommand = new RelayCommand(PlaceOneRealOpeningByManyTasks);
+            PlaceManyRealOpeningsByManyTasksCommand = new RelayCommand(PlaceManyRealOpeningsByManyTasks);
+            PlaceManyRealOpeningsByManyTasksInManyHostsCommand = new RelayCommand(PlaceManyRealOpeningsByManyTasksInManyHosts);
         }
 
 
@@ -61,12 +63,12 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         // Чистовые отверстия из активного документа
         public bool ShowOpeningsReal => OpeningsReal.Count > 0;
-        public ObservableCollection<OpeningRealViewModel> OpeningsReal { get; }
+        public ObservableCollection<OpeningRealArViewModel> OpeningsReal { get; }
 
         public CollectionViewSource OpeningsRealViewSource { get; private set; }
 
-        private OpeningRealViewModel _selectedOpeningReal;
-        public OpeningRealViewModel SelectedOpeningReal {
+        private OpeningRealArViewModel _selectedOpeningReal;
+        public OpeningRealArViewModel SelectedOpeningReal {
             get => _selectedOpeningReal;
             set => RaiseAndSetIfChanged(ref _selectedOpeningReal, value);
         }
@@ -82,7 +84,12 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         public ICommand PlaceRealOpeningBySingleTaskCommand { get; }
 
-        public ICommand PlaceRealOpeningByManyTasksCommand { get; }
+        public ICommand PlaceOneRealOpeningByManyTasksCommand { get; }
+
+        public ICommand PlaceManyRealOpeningsByManyTasksCommand { get; }
+
+        public ICommand PlaceManyRealOpeningsByManyTasksInManyHostsCommand { get; }
+
 
         private void SelectElement(object p) {
             if(!(p is ISelectorAndHighlighter famInstanceProvider)) { return; }
@@ -99,7 +106,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         private void OpeningRealSelectionChanged(object p) {
             if(OpeningsRealViewSource.View.CurrentPosition > -1
                 && OpeningsRealViewSource.View.CurrentPosition < OpeningsReal.Count) {
-                SelectElement((OpeningRealViewModel) p);
+                SelectElement((OpeningRealArViewModel) p);
             }
         }
 
@@ -109,7 +116,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         private void Renew(object p) {
             Action action = () => {
-                var command = new GetOpeningTaskCommand();
+                var command = new GetOpeningTasksCmd();
                 command.ExecuteCommand(_revitRepository.UIApplication);
             };
             _revitRepository.DoAction(action);
@@ -117,15 +124,31 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         private void PlaceRealOpeningBySingleTask(object p) {
             Action action = () => {
-                var cmd = new PlaceOpeningRealCommand();
+                var cmd = new PlaceOneOpeningRealByOneTaskCmd();
                 cmd.ExecuteCommand(_revitRepository.UIApplication);
             };
             _revitRepository.DoAction(action);
         }
 
-        private void PlaceRealOpeningByManyTasks(object p) {
+        private void PlaceOneRealOpeningByManyTasks(object p) {
             Action action = () => {
-                var cmd = new PlaceUnitedOpeningRealCommand();
+                var cmd = new PlaceOneOpeningRealByManyTasksCmd();
+                cmd.ExecuteCommand(_revitRepository.UIApplication);
+            };
+            _revitRepository.DoAction(action);
+        }
+
+        private void PlaceManyRealOpeningsByManyTasks(object p) {
+            Action action = () => {
+                var cmd = new PlaceManyOpeningRealsByManyTasksInOneHostCmd();
+                cmd.ExecuteCommand(_revitRepository.UIApplication);
+            };
+            _revitRepository.DoAction(action);
+        }
+
+        private void PlaceManyRealOpeningsByManyTasksInManyHosts(object p) {
+            Action action = () => {
+                var cmd = new PlaceManyOpeningRealsByManyTasksInManyHostsCmd();
                 cmd.ExecuteCommand(_revitRepository.UIApplication);
             };
             _revitRepository.DoAction(action);

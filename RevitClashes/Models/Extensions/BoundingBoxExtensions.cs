@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -39,10 +37,10 @@ namespace RevitClashDetective.Models.Extensions {
         }
 
         public static bool IntersectedWith(this BoundingBoxXYZ currentBb, BoundingBoxXYZ bb) {
-            return !((currentBb.Min.X > bb.Max.X && currentBb.Min.Y > bb.Max.Y) 
+            return !((currentBb.Min.X > bb.Max.X && currentBb.Min.Y > bb.Max.Y)
                     || (currentBb.Min.Z > bb.Max.Z && currentBb.Min.X > bb.Max.X)
                     || (currentBb.Min.Z > bb.Max.Z && currentBb.Min.Y > bb.Max.Y)
-                    || (currentBb.Max.X < bb.Min.X && currentBb.Max.Y < bb.Min.Y) 
+                    || (currentBb.Max.X < bb.Min.X && currentBb.Max.Y < bb.Min.Y)
                     || (currentBb.Max.Z < bb.Min.Z && currentBb.Max.X < bb.Min.X)
                     || (currentBb.Max.Z < bb.Min.Z && currentBb.Max.Y < bb.Min.Y));
         }

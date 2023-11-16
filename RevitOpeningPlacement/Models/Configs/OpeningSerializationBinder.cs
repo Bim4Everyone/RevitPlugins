@@ -6,7 +6,7 @@ using pyRevitLabs.Json.Serialization;
 namespace RevitOpeningPlacement.Models.Configs {
     internal class OpeningSerializationBinder : ISerializationBinder {
 
-        DefaultSerializationBinder _defaultBinder = new DefaultSerializationBinder();
+        private readonly DefaultSerializationBinder _defaultBinder = new DefaultSerializationBinder();
 
         public void BindToName(Type serializedType, out string assemblyName, out string typeName) {
             if(serializedType.Assembly.GetName().Name.Equals(GetCurrentAssemblyName())) {

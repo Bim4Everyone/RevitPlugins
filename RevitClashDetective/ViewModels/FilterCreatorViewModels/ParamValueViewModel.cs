@@ -13,7 +13,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         public string DisplayValue => ParamValue.DisplayValue;
         public ParamValue ParamValue { get; set; }
 
-        
+
 
         public override bool Equals(object obj) {
             return Equals(obj as ParamValueViewModel);

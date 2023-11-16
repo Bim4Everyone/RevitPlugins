@@ -5,6 +5,8 @@ using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
 
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
@@ -16,7 +18,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly Filter _filter;
         private readonly Delay _delay;
-        private string _id;
+        private readonly string _id;
         private string _name;
         private SetViewModel _set;
         private CategoriesInfoViewModel _categoriesInfoViewModel;
@@ -88,15 +90,12 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             Set = new SetViewModel(_revitRepository, _categoriesInfoViewModel, set);
         }
 
-        private void InitializeCategories(IEnumerable<int> ids = null) {
-            Categories = new ObservableCollection<CategoryViewModel>(
-                _revitRepository.GetCategories()
-                    .Select(item => new CategoryViewModel(item))
-                    .OrderBy(item => item.Name));
+        private void InitializeCategories(IEnumerable<ElementId> categoryIds = null) {
+            Categories = new ObservableCollection<CategoryViewModel>(GetCategoriesViewModels(_revitRepository));
 
-            if(ids != null) {
+            if(categoryIds != null) {
                 foreach(var category in Categories
-                    .Where(item => ids.Any(id => id == item.Category.Id.IntegerValue))) {
+                    .Where(item => categoryIds.Any(id => id == item.Category.Id))) {
                     category.IsSelected = true;
                 }
             }
@@ -106,6 +105,16 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             }
 
             _categoriesInfoViewModel = new CategoriesInfoViewModel(_revitRepository, SelectedCategories);
+        }
+
+        private ICollection<CategoryViewModel> GetCategoriesViewModels(RevitRepository revitRepository) {
+            if(revitRepository is null) { throw new ArgumentNullException(nameof(revitRepository)); }
+
+            return revitRepository
+                .GetCategories()
+                .Select(item => new CategoryViewModel(item))
+                .OrderBy(item => item.Name)
+                .ToList();
         }
 
         private void Category_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
@@ -118,7 +127,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             return new Filter(_revitRepository) {
                 Name = Name,
                 Set = (Set) Set.GetCriterion(),
-                CategoryIds = SelectedCategories.Select(item => item.Category.Id.IntegerValue).ToList()
+                CategoryIds = SelectedCategories.Select(item => item.Category.Id).ToList()
             };
         }
 
@@ -137,7 +146,9 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         public bool Equals(FilterViewModel other) {
-            return other != null && _id == other._id;
+            if(ReferenceEquals(null, other)) { return false; }
+            if(ReferenceEquals(this, other)) { return true; }
+            return _id == other._id;
         }
     }
 

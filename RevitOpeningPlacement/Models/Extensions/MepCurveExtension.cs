@@ -6,8 +6,6 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-using RevitOpeningPlacement.Models.OpeningPlacement;
-
 namespace RevitOpeningPlacement.Models.Extensions {
     internal static class MepCurveExtension {
         public static Line GetLine(this MEPCurve curve) {

@@ -32,8 +32,9 @@ interface IPluginCreate : ICreateScript, ICreateProfile, ICreateBranch {
 
             Log.Debug("HazProject: {HazProject}", Solution.GetProject(PluginName) != null);
             Log.Debug("HazDirectory: {HazDirectory}", PluginDirectory.Exists());
-            
-            CopyDirectory(TemplateDirectory, PluginDirectory);
+
+            CopyDirectory(TemplateDirectory, PluginDirectory,
+                new Dictionary<string, string>() {{"${{ gen.bundle_name }}", BundleName ?? "Название плагина"}});
 
             DotNet(arguments: $"sln add {PluginFile}");
             PluginFile.WriteAllText(PluginTemplateFile.ReadAllText());

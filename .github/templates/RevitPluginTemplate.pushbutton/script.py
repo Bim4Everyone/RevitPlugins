@@ -9,11 +9,14 @@ clr.ImportExtensions(dosymep.Revit)
 clr.ImportExtensions(dosymep.Bim4Everyone)
 
 from Autodesk.Revit.DB import *
-from dosymep_libs.bim4everyone import *
 
 from pyrevit import forms
 from pyrevit import revit
+from pyrevit import script
 from pyrevit import EXEC_PARAMS
+
+from dosymep_libs.bim4everyone import *
+
 
 @notification()
 @log_plugin(EXEC_PARAMS.command_name)

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
@@ -21,7 +14,7 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
         private readonly Filter _filter;
         private string _name;
 
-        public FilterProviderViewModel() {}
+        public FilterProviderViewModel() { }
 
         public FilterProviderViewModel(RevitRepository revitRepository, Filter filter) {
             _revitRepository = revitRepository;

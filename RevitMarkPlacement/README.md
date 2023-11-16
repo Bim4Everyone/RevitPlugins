@@ -2,6 +2,13 @@
 Плагин расставляет отметки согласно настройкам.
 
 # Сборка проекта
+
 ```
-nuke compile --plugin-name RevitMarkPlacement
+nuke compile --profile RevitMarkPlacement
+```
+
+# Публикация проекта
+
+```
+nuke publish --profile RevitMarkPlacement
 ```

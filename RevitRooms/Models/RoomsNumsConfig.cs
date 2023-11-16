@@ -5,47 +5,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB;
+
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Serializers;
+
 using pyRevitLabs.Json;
 
 namespace RevitRooms.Models {
-    public class RoomsNumsConfig {
-        public List<RoomsNumsSettings> RoomsSettings { get; set; }
+    public class RoomsNumsConfig : ProjectConfig<RoomsNumsSettings> {
+        [JsonIgnore]
+        public override string ProjectConfigPath { get; set; }
 
-        public void AddRoomsNumsSettingsConfig(RoomsNumsSettings printSettingsConfig) {
-            RoomsSettings = RoomsSettings ?? new List<RoomsNumsSettings>();
-            if(RoomsSettings.Count > 10) {
-                foreach(int index in Enumerable.Range(0, RoomsSettings.Count - 10)) {
-                    RoomsSettings.RemoveAt(index);
-                }
-            }
+        [JsonIgnore]
+        public override IConfigSerializer Serializer { get; set; }
 
-            RoomsSettings.Add(printSettingsConfig);
-        }
-
-        public RoomsNumsSettings GetRoomsNumsSettingsConfig(string documentName) {
-            documentName = string.IsNullOrEmpty(documentName) ? "Без имени.rvt" : documentName;
-            return RoomsSettings?.FirstOrDefault(item => documentName.Equals(item.DocumentName));
-        }
-
-        public static RoomsNumsConfig GetConfig() {
-            if(File.Exists(GetConfigPath())) {
-                return JsonConvert.DeserializeObject<RoomsNumsConfig>(File.ReadAllText(GetConfigPath()));
-            }
-
-            return new RoomsNumsConfig();
-        }
-
-        public static void SaveConfig(RoomsNumsConfig config) {
-            Directory.CreateDirectory(Path.GetDirectoryName(GetConfigPath()));
-            File.WriteAllText(GetConfigPath(), JsonConvert.SerializeObject(config));
-        }
-
-        private static string GetConfigPath() {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dosymep", "RevitRooms", "RoomsNumsConfig.json");
+        public static RoomsNumsConfig GetPluginConfig() {
+            return new ProjectConfigBuilder()
+                .SetSerializer(new ConfigSerializer())
+                .SetPluginName(nameof(RevitRooms))
+                .SetRevitVersion(ModuleEnvironment.RevitVersion)
+                .SetProjectConfigName(nameof(RoomsNumsConfig) + ".json")
+                .Build<RoomsNumsConfig>();
         }
     }
 
-    public class RoomsNumsSettings {
+    public class RoomsNumsSettings : ProjectSettings {
+        public override string ProjectName { get; set; }
+        
         public Guid SelectedRoomId { get; set; }
         public string DocumentName { get; set; }
 
@@ -57,11 +45,11 @@ namespace RevitRooms.Models {
         
         public bool IsNumRoomsSectionLevels { get; set; }
 
-        public int PhaseElementId { get; set; }
+        public ElementId PhaseElementId { get; set; }
 
-        public List<int> Levels { get; set; } = new List<int>();
-        public List<int> Groups { get; set; } = new List<int>();
-        public List<int> Sections { get; set; } = new List<int>();
+        public List<ElementId> Levels { get; set; } = new List<ElementId>();
+        public List<ElementId> Groups { get; set; } = new List<ElementId>();
+        public List<ElementId> Sections { get; set; } = new List<ElementId>();
     }
 
 }

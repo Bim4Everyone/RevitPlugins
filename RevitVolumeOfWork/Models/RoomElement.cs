@@ -25,24 +25,25 @@ namespace RevitVolumeOfWork.Models {
         public string Name => _room.GetParamValueOrDefault(BuiltInParameter.ROOM_NAME, "<Пусто>"); 
         public string Number => _room.GetParamValueOrDefault(BuiltInParameter.ROOM_NUMBER, "<Пусто>");       
         public string Group { 
-            get { 
-                var keyParamValueId = _room.GetParamValueOrDefault(ProjectParamsConfig.Instance.RoomGroupName, ElementId.InvalidElementId);
-                if(keyParamValueId == ElementId.InvalidElementId) return "<Пусто>";
-                else return _document.GetElement(keyParamValueId).Name;
+            get {
+                var keyParamValueId = _room.GetParamValueOrDefault<ElementId>(ProjectParamsConfig.Instance.RoomGroupName);
+
+                return keyParamValueId.IsNull() 
+                    ? "<Пусто>" 
+                    : _document.GetElement(keyParamValueId).Name;
             } 
         }
-        public string ID => _room.Id.ToString();
+        public string Id => _room.Id.ToString();
 
         public List<Element> GetBoundaryWalls() {
-            Category wallCategory = Category.GetCategory(_document, BuiltInCategory.OST_Walls);
-            SpatialElementBoundaryOptions options = new SpatialElementBoundaryOptions();
+            ElementId wallCategoryId = new ElementId(BuiltInCategory.OST_Walls);
 
-            return _room.GetBoundarySegments(options)
+            return _room.GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions)
                 .SelectMany(x => x)
                 .Select(x => x.ElementId)
-                .Where(x => x != ElementId.InvalidElementId)
+                .Where(x => x.IsNotNull())
                 .Select(x => _document.GetElement(x))
-                .Where(x => x.Category.Id == wallCategory.Id)
+                .Where(x => x.Category?.Id == wallCategoryId)
                 .ToList();
         } 
     }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
@@ -30,7 +32,7 @@ namespace RevitMarkPlacement.Models {
     internal class AnnotationsSettings : ProjectSettings {
         public override string ProjectName { get; set; }
         public int LevelCount { get; set; } = 5;
-        public int GlobalParameterId { get; set; }
+        public ElementId GlobalParameterId { get; set; }
         public SelectionMode SelectionMode { get; set; } = SelectionMode.SelectedElements;
         public LevelHeightProvider LevelHeightProvider { get; set; } = LevelHeightProvider.GlobalParameter;
         public double LevelHeight { get; set; } = 3000;

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -104,7 +103,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private void InitializeClashes(IEnumerable<ClashModel> clashModels) {
             _allClashes = clashModels.Select(item => new ClashViewModel(_revitRepository, item))
                                      .ToList();
-            var documentNames = _revitRepository.GetDocuments().Select(item => item.Title).ToList();
+            var documentNames = _revitRepository.DocInfos.Select(item => item.Doc.Title).ToList();
             Clashes = _allClashes.Where(item => IsValid(documentNames, item))
                                  .ToList();
         }
@@ -116,8 +115,10 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private void SelectClash(object p) {
             var clash = (ClashViewModel) p;
 
-            var elements = new[] {_revitRepository.GetElement(clash.Clash.MainElement.DocumentName, clash.Clash.MainElement.Id),
-                                  _revitRepository.GetElement(clash.Clash.OtherElement.DocumentName, clash.Clash.OtherElement.Id)};
+            var elements = new[] {
+                clash.Clash.MainElement,
+                clash.Clash.OtherElement
+            };
             _revitRepository.SelectAndShowElement(elements.Where(item => item != null));
         }
 

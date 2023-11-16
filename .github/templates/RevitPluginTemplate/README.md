@@ -1,12 +1,12 @@
-# RevitPluginTemplate (Название плагина)
+# RevitPluginTemplate (${{ gen.bundle_name }})
 Описание проекта 
 
 # Сборка проекта
 ```
-nuke compile --plugin-name RevitPluginTemplate
+nuke compile --profile RevitPluginTemplate
 ```
 
 # Публикация проекта
 ```
-nuke publish --plugin-name RevitPluginTemplate
+nuke publish --profile RevitPluginTemplate
 ```

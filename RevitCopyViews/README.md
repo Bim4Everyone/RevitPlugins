@@ -2,6 +2,13 @@
 Плагин управляет видами: копировать виды, добавить виды для пользователя, переименовать виды и добавлять\обновлять пометку уровня.
 
 # Сборка проекта
+
 ```
-nuke compile --plugin-name RevitCopyViews
+nuke compile --profile RevitCopyViews
+```
+
+# Публикация проекта
+
+```
+nuke publish --profile RevitCopyViews
 ```

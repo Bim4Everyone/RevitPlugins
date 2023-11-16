@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
 
-using Autodesk.Revit.DB;
-
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
-
-using RevitClashDetective.Models.Clashes;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.OpeningPlacement;
@@ -44,8 +37,8 @@ namespace RevitOpeningPlacement.ViewModels.ReportViewModel {
         private void Select(object p) {
             var clash = (ClashViewModel) p;
             var elements = new[]{
-                _revitRepository.GetElement(clash.Clash.MainElement.DocumentName, clash.Clash.MainElement.Id),
-                _revitRepository.GetElement(clash.Clash.OtherElement.DocumentName, clash.Clash.OtherElement.Id)
+                clash.Clash.MainElement,
+                clash.Clash.OtherElement
             };
             _revitRepository.SelectAndShowElement(elements);
         }

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
-
-using pyRevitLabs.Json;
 
 using RevitClashDetective.Models.Evaluators;
 using RevitClashDetective.Models.Interfaces;

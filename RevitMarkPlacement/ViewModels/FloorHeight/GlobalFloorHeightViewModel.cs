@@ -27,7 +27,7 @@ namespace RevitMarkPlacement.ViewModels {
                 .Select(item => new GlobalParameterViewModel(item.Name, GetValue(item), item.Id))
                 .ToList();
             if(GlobalParameters.Count > 0) {
-                var configGlobalParameter = _revitRepository.GetElement(new ElementId(_settings.GlobalParameterId)) as GlobalParameter;
+                var configGlobalParameter = _revitRepository.GetElement(_settings.GlobalParameterId) as GlobalParameter;
                 if(configGlobalParameter == null) {
                     SelectedGlobalParameter = GlobalParameters[0];
                 } else {

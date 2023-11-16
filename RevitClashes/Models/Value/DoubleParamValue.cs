@@ -2,7 +2,6 @@
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 
 using RevitClashDetective.Models.Interfaces;

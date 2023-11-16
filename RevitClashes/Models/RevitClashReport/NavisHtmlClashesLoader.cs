@@ -2,19 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
-
-using dosymep.Revit;
 
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.RevitClashReport {
-    internal class NavisHtmlClashesLoader : IClashesLoader {
+    internal class NavisHtmlClashesLoader : BaseClashesLoader, IClashesLoader {
         private readonly RevitRepository _revitRepository;
         private readonly string[] _extensions = new[] { ".nwc", ".nwf", ".nwd" };
 
@@ -54,9 +50,6 @@ namespace RevitClashDetective.Models.RevitClashReport {
                         .ToArray();
         }
 
-        private Element GetElement(IEnumerable<string> cells) {
-            return _revitRepository.GetElement(GetFileName(cells), GetId(cells));
-        }
 
         public bool IsValid() {
             return !string.IsNullOrEmpty(FilePath)
@@ -71,17 +64,13 @@ namespace RevitClashDetective.Models.RevitClashReport {
                         .ToArray();
         }
 
-        private int GetId(IEnumerable<string> cells) {
-            var idString = cells.FirstOrDefault(item => item.IndexOf("ID") > 0);
-            if(idString == null) {
-                return -1;
-            }
-            var match = Regex.Match(idString, @"(?'id'\d+)");
-            if(match.Success) {
-                return int.Parse(match.Groups["id"].Value);
-            }
+        private Element GetElement(IEnumerable<string> cells) {
+            return _revitRepository.GetElement(GetFileName(cells), GetId(cells));
+        }
 
-            return -1;
+        private ElementId GetId(IEnumerable<string> cells) {
+            var idString = cells.FirstOrDefault(item => item.IndexOf("ID") > 0);
+            return GetId(idString);
         }
 
         private string GetFileName(IEnumerable<string> cells) {
@@ -93,7 +82,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
                 Extension = _extensions.FirstOrDefault(e => fileCell.IndexOf(e, StringComparison.CurrentCultureIgnoreCase) > 0),
                 CellContent = fileCell
             };
-            
+
             var match = Regex.Match(fileCellInfo.CellContent, $"(?'fileName'[^>&gt;]+?){fileCellInfo.Extension}");
             return match.Success ? match.Groups["fileName"].Value.Trim() : null;
         }
@@ -112,7 +101,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
             return new[] {
                 GetFileName(cells),
                 GetFileName(cells.Reverse())
-            }.Any(item => _revitRepository.DocInfos.Any(d => d.Name.Equals(_revitRepository.GetDocumentName(Path.GetFileNameWithoutExtension(item)), StringComparison.CurrentCultureIgnoreCase)));
+            }.Any(item => _revitRepository.DocInfos.Any(d => d.Name.Equals(RevitRepository.GetDocumentName(Path.GetFileNameWithoutExtension(item)), StringComparison.CurrentCultureIgnoreCase)));
         }
     }
 }

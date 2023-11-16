@@ -148,10 +148,7 @@ namespace RevitCopyViews.ViewModels {
         }
 
         private void CopyViews(object p) {
-            var createdViews = new List<ElementId>();
-            using(var transaction = new Transaction(Document)) {
-                transaction.BIMStart("Копирование видов");
-
+            using(var transaction = Document.StartTransaction("Копирование видов")) {
                 foreach(RevitViewViewModel revitView in RevitViewViewModels) {
                     var copyOption = CopyWithDetail ? ViewDuplicateOption.WithDetailing : ViewDuplicateOption.Duplicate;
 
@@ -163,8 +160,6 @@ namespace RevitCopyViews.ViewModels {
                     // удаление шаблона разрешает изменение данного атрибута
                     newView.ViewTemplateId = ElementId.InvalidElementId;
                     newView.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, GroupView);
-
-                    createdViews.Add(newView.Id);
                 }
 
                 transaction.Commit();

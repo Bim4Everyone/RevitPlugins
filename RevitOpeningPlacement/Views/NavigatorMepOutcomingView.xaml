@@ -136,13 +136,13 @@
                 </dxg:GridColumn>
                 <dxg:GridColumn ReadOnly="True" Width="60" Header="Статус" IsSmart="True" FieldName="Status"/>
                 <dxg:GridColumn ReadOnly="True" Width="60" Header="Дата" IsSmart="True" FieldName="Date"/>
-                <dxg:GridColumn ReadOnly="True" Width="80" Header="Id отверстия" FieldName="OpeningId"/>
-                <dxg:GridColumn ReadOnly="True" Width="100" Header="Имя системы" FieldName="MepSystem"/>
-                <dxg:GridColumn ReadOnly="True" Width="*" Header="Описание пересечения" FieldName="Description"/>
-                <dxg:GridColumn ReadOnly="True" Width="80" Header="Отметка оси" FieldName="CenterOffset"/>
-                <dxg:GridColumn ReadOnly="True" Width="90" Header="Отметка низа" FieldName="BottomOffset"/>
-                <dxg:GridColumn ReadOnly="True" Width="90" Header="Комментарий" FieldName="Comment" />
-                <dxg:GridColumn ReadOnly="True" Width="90" Header="Создатель" FieldName="Username" />
+                <dxg:GridColumn ReadOnly="True" Width="60" Header="Id" FieldName="OpeningId"/>
+                <dxg:GridColumn ReadOnly="True" Width="60" Header="Имя системы" FieldName="MepSystem"/>
+                <dxg:GridColumn ReadOnly="True" Width="60" Header="Описание пересечения" FieldName="Description"/>
+                <dxg:GridColumn ReadOnly="True" Width="60" Header="Отм. оси" FieldName="CenterOffset"/>
+                <dxg:GridColumn ReadOnly="True" Width="60" Header="Отм. низа" FieldName="BottomOffset"/>
+                <dxg:GridColumn ReadOnly="True" Width="*" Header="Комментарий" FieldName="Comment" />
+                <dxg:GridColumn ReadOnly="True" Width="60" Header="Создатель" FieldName="Username" />
             </dxg:GridControl.Columns>
         </dxg:GridControl>
 

@@ -2,6 +2,13 @@
 Плагин экспорта файлов Revit из Revit Server, либо в файлы Navisworks
 
 # Сборка проекта
+
 ```
-nuke compile --plugin-name RevitServerFolders
+nuke compile --profile RevitServerFolders
+```
+
+## Публикация проекта
+
+```
+nuke publish --profile RevitServerFolders
 ```
