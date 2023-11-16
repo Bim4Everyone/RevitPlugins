@@ -82,9 +82,9 @@ namespace RevitFamilyParameterAdder.ViewModels {
             new DefaultParam("обр_ФОП_Изделие_Главная деталь", GroupTypeId.General),
             new DefaultParam("обр_ФОП_Габарит А_ВД", ForgeTypeIdExtensions.EmptyForgeTypeId,
                 "roundup((мод_ФОП_Габарит А) / 5) * 5"),
-            new DefaultParam("обр_ФОП_Габарит Б_ВД", new ForgeTypeId(),
+            new DefaultParam("обр_ФОП_Габарит Б_ВД", ForgeTypeIdExtensions.EmptyForgeTypeId,
                 "roundup((мод_ФОП_Габарит Б) / 5) * 5"),
-            new DefaultParam("обр_ФОП_Габарит В_ВД", new ForgeTypeId(),
+            new DefaultParam("обр_ФОП_Габарит В_ВД", ForgeTypeIdExtensions.EmptyForgeTypeId,
                 "roundup((мод_ФОП_Габарит В) / 5) * 5")
 #endif
         };
@@ -379,7 +379,7 @@ namespace RevitFamilyParameterAdder.ViewModels {
             }
 #else
             Array array = typeof(GroupTypeId).GetProperties();
-            BINParameterGroups.Add(new ParameterGroupHelper(new ForgeTypeId()));
+            BINParameterGroups.Add(new ParameterGroupHelper(ForgeTypeIdExtensions.EmptyForgeTypeId));
             foreach(PropertyInfo group in array) {
                 if(FamilyManagerFm.IsUserAssignableParameterGroup((ForgeTypeId) group.GetValue(null))) {
                     BINParameterGroups.Add(new ParameterGroupHelper((ForgeTypeId) group.GetValue(null)));
