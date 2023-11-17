@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -19,10 +19,10 @@ namespace RevitRoomTagPlacement.ViewModels {
 
         protected override BindingList<RoomGroupViewModel> GetGroupViewModels() {
             RevitParam groupParam = ProjectParamsConfig.Instance.RoomGroupName;
-
+            
             var selectedRoomsList = _revitRepository.GetSelectedRooms()
                 .Where(r => r.RoomObject.Area > 0)
-                .GroupBy(x => x.RoomObject.GetParamValueString(groupParam))
+                .GroupBy(x => x.RoomObject.GetParamValueStringOrDefault(groupParam, "<Без группы>"))
                 .Select(x => new RoomGroupViewModel(x.Key.ToString(), x))
                 .OrderBy(x => x.Name)
                 .ToList();
