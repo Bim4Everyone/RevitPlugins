@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,7 +25,7 @@ namespace RevitCopyScheduleInstance {
     [Transaction(TransactionMode.Manual)]
     public class RevitCopyScheduleInstanceCommand : BasePluginCommand {
         public RevitCopyScheduleInstanceCommand() {
-            PluginName = "RevitCopyScheduleInstance";
+            PluginName = "Скопировать спецификации";
         }
 
         protected override void Execute(UIApplication uiApplication) {

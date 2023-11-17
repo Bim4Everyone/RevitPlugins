@@ -1,4 +1,4 @@
-# RevitCopyScheduleInstance (Название плагина)
+# RevitCopyScheduleInstance (Скопировать спецификации)
 Описание проекта 
 
 # Сборка проекта
