@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,7 +18,7 @@ namespace RevitRoomTagPlacement.Models {
             
             string familyName = RoomTagTypeElement.FamilyName;
             string typeName = roomTagTypeElement.Name;
-            _name = string.Format("{0} : {1}", familyName, typeName);
+            _name = string.Format($"{familyName} : {typeName}");
         }
 
         public string Name => _name;

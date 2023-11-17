@@ -95,15 +95,21 @@ namespace RevitRoomTagPlacement.Models {
             List<RoomFromRevit> rooms = new List<RoomFromRevit>();
 
             if(groupPlacementWay == GroupPlacementWay.EveryRoom) {
-                rooms = selectedAparts.SelectMany(x => x.Rooms).ToList();
+                rooms = selectedAparts
+                    .SelectMany(x => x.Rooms)
+                    .ToList();
             } 
             else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupRandom) {
                 RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
-                rooms = selectedAparts.Select(x => x.GetMaxAreaRoom()).ToList();
+                rooms = selectedAparts
+                    .Select(x => x.GetMaxAreaRoom())
+                    .ToList();
             } 
             else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupByName) {
                 RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
-                rooms = selectedAparts.Select(x => x.GetRoomByName(roomName)).ToList();
+                rooms = selectedAparts
+                    .Select(x => x.GetRoomByName(roomName))
+                    .ToList();
             }
             return rooms;
         }
@@ -121,7 +127,7 @@ namespace RevitRoomTagPlacement.Models {
             View activeView = Document.ActiveView;
             ElementOwnerViewFilter viewFilter = new ElementOwnerViewFilter(activeView.Id);
 
-            using(Transaction t = Document.StartTransaction("Маркировать помещения")) {
+            using(Transaction t = Document.StartTransaction("РњР°СЂРєРёСЂРѕРІР°С‚СЊ РїРѕРјРµС‰РµРЅРёСЏ")) {
                 foreach(var room in rooms) {
                     var depElements = room.RoomObject
                         .GetDependentElements(viewFilter)
@@ -141,12 +147,12 @@ namespace RevitRoomTagPlacement.Models {
 
                         if(!room.RoomObject.IsPointInRoom(testPoint)) point = pathFinder.GetPointByPath();
 
-                        /* Невозможно отфильтровать помещения из связанного файла для активного вида.
-                           Способ получения помещений через CustomExporter не работает, так как помещения не экспортируются.
-                           В качестве решения принято брать все помещения из связанного файла и размещать марку на каждом.
-                           В таком случае все марки размещаются в проекте, но если помещение отсутсвует на виде, то марка не отображается.
-                           Для удаления марок, которые не отображаются, скрипт пытается получить BoundingBox для каждой марки, 
-                           если он null, то марка удаляется.                         
+                        /* РќРµРІРѕР·РјРѕР¶РЅРѕ РѕС‚С„РёР»СЊС‚СЂРѕРІР°С‚СЊ РїРѕРјРµС‰РµРЅРёСЏ РёР· СЃРІСЏР·Р°РЅРЅРѕРіРѕ С„Р°Р№Р»Р° РґР»СЏ Р°РєС‚РёРІРЅРѕРіРѕ РІРёРґР°.
+                           РЎРїРѕСЃРѕР± РїРѕР»СѓС‡РµРЅРёСЏ РїРѕРјРµС‰РµРЅРёР№ С‡РµСЂРµР· CustomExporter РЅРµ СЂР°Р±РѕС‚Р°РµС‚, С‚Р°Рє РєР°Рє РїРѕРјРµС‰РµРЅРёСЏ РЅРµ СЌРєСЃРїРѕСЂС‚РёСЂСѓСЋС‚СЃСЏ.
+                           Р’ РєР°С‡РµСЃС‚РІРµ СЂРµС€РµРЅРёСЏ РїСЂРёРЅСЏС‚Рѕ Р±СЂР°С‚СЊ РІСЃРµ РїРѕРјРµС‰РµРЅРёСЏ РёР· СЃРІСЏР·Р°РЅРЅРѕРіРѕ С„Р°Р№Р»Р° Рё СЂР°Р·РјРµС‰Р°С‚СЊ РјР°СЂРєСѓ РЅР° РєР°Р¶РґРѕРј.
+                           Р’ С‚Р°РєРѕРј СЃР»СѓС‡Р°Рµ РІСЃРµ РјР°СЂРєРё СЂР°Р·РјРµС‰Р°СЋС‚СЃСЏ РІ РїСЂРѕРµРєС‚Рµ, РЅРѕ РµСЃР»Рё РїРѕРјРµС‰РµРЅРёРµ РѕС‚СЃСѓС‚СЃРІСѓРµС‚ РЅР° РІРёРґРµ, С‚Рѕ РјР°СЂРєР° РЅРµ РѕС‚РѕР±СЂР°Р¶Р°РµС‚СЃСЏ.
+                           Р”Р»СЏ СѓРґР°Р»РµРЅРёСЏ РјР°СЂРѕРє, РєРѕС‚РѕСЂС‹Рµ РЅРµ РѕС‚РѕР±СЂР°Р¶Р°СЋС‚СЃСЏ, СЃРєСЂРёРїС‚ РїС‹С‚Р°РµС‚СЃСЏ РїРѕР»СѓС‡РёС‚СЊ BoundingBox РґР»СЏ РєР°Р¶РґРѕР№ РјР°СЂРєРё, 
+                           РµСЃР»Рё РѕРЅ null, С‚Рѕ РјР°СЂРєР° СѓРґР°Р»СЏРµС‚СЃСЏ.                         
                            */
 
                         RoomTag newTag;

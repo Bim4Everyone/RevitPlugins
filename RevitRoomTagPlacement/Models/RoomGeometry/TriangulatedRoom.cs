@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,16 +33,11 @@ namespace RevitRoomTagPlacement.Models {
                 .OfType<Solid>()
                 .First();
 
-            var faceArray = roomSolid.Faces;
-            List<Face> faceList = new List<Face>();
-            foreach(Face face in faceArray) { faceList.Add(face); }
-
-            PlanarFace lowestFace = faceList
+            return roomSolid.Faces
+                .Cast<Face>()
                 .OfType<PlanarFace>()
                 .Where(y => y.FaceNormal.Z != 0)
                 .First();
-
-            return lowestFace;
         }
 
         private List<PathTriangle> GetTriangleList() {
@@ -92,7 +87,7 @@ namespace RevitRoomTagPlacement.Models {
 
             foreach(XYZ point1 in points1) {
                 foreach(XYZ point2 in points2) {
-                    if(point1.X == point2.X && point1.Y == point2.Y) {
+                    if(CompareDouble(point1.X, point2.X) && CompareDouble(point1.Y, point2.Y)) {
                         commonPoints++;
                     }
                 }
@@ -103,6 +98,10 @@ namespace RevitRoomTagPlacement.Models {
                 return true;
 
             return false;
+        }
+
+        private static bool CompareDouble(double a, double b) { 
+            return Math.Abs(a - b) < 1e-9;
         }
     }
 }
