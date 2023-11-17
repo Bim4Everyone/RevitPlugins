@@ -21,7 +21,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
         }
 
         public static bool IsParallel(this Line line, Line otherLine) {
-            return line.Direction.IsPapallel(otherLine.Direction);
+            return line.Direction.IsParallel(otherLine.Direction);
         }
 
         public static bool RunAlongWall(this Line line, Wall wall) {

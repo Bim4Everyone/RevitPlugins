@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
 
@@ -22,7 +22,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
 #endif
 
 
-        internal static bool IsPapallel(this XYZ vector1, XYZ vector2) {
+        internal static bool IsParallel(this XYZ vector1, XYZ vector2) {
             return Math.Abs(Math.Abs(Math.Cos(vector1.AngleTo(vector2))) - 1) < 0.0001;
         }
 
@@ -45,7 +45,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
         public static bool RunAlongWall(this XYZ direction, Wall wall) {
             var plane = wall.GetHorizontalNormalPlane();
             var wallLine = wall.GetLine();
-            return plane.ProjectVector(direction).IsPapallel(plane.ProjectVector(wallLine.Direction));
+            return plane.ProjectVector(direction).IsParallel(plane.ProjectVector(wallLine.Direction));
         }
 
         /// <summary>

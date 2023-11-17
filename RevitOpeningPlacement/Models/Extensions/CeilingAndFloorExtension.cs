@@ -29,7 +29,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
 
         public static bool IsHorizontal(this CeilingAndFloor floor) {
             var normal = floor.GetTopFace().ComputeNormal(new UV(0, 0));
-            return normal.IsPapallel(new XYZ(0, 0, 1));
+            return normal.IsParallel(new XYZ(0, 0, 1));
         }
     }
 }
