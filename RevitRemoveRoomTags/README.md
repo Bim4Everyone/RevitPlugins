@@ -1,4 +1,4 @@
-# RevitRemoveRoomTags (Название плагина)
+# RevitRemoveRoomTags (Удалить марки помещений)
 Описание проекта 
 
 # Сборка проекта
