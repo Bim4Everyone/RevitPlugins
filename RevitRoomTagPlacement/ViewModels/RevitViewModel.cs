@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -24,20 +24,22 @@ namespace RevitRoomTagPlacement.ViewModels {
         private RoomTagTypeModel _selectedTagType;
         private string _selectedRoomName;
 
-        private GroupPlacementWay placementWayByGroups = GroupPlacementWay.EveryRoom;
-        private PositionPlacementWay placementWayByPosition = PositionPlacementWay.CenterCenter;
+        private GroupPlacementWay _placementWayByGroups;
+        private PositionPlacementWay _placementWayByPosition;
 
         private string _errorText;
 
         public RevitViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
+            _placementWayByGroups = GroupPlacementWay.EveryRoom;
+            _placementWayByPosition = PositionPlacementWay.CenterCenter;
 
             RoomGroups = new BindingList<RoomGroupViewModel>(GetGroupViewModels());
 
             TagFamilies = revitRepository.GetRoomTags();
             if(TagFamilies.Count != 0) SelectedTagType = TagFamilies[0];
 
-            PlaceTagsCommand = new RelayCommand(PlaceTags, CanPlaceTags);
+            PlaceTagsCommand = RelayCommand.Create(PlaceTags, CanPlaceTags);
 
             RoomGroups.ListChanged += RoomGroups_ListChanged;
         }
@@ -60,12 +62,11 @@ namespace RevitRoomTagPlacement.ViewModels {
         protected abstract BindingList<RoomGroupViewModel> GetGroupViewModels();
 
         public GroupPlacementWay PlacementWayByGroups {
-            get { return placementWayByGroups; }
+            get => _placementWayByGroups;
             set {
-                if (placementWayByGroups == value) return;
+                if (_placementWayByGroups == value) return;
 
-                placementWayByGroups = value;
-                OnPropertyChanged(nameof(RoomNames));
+                RaiseAndSetIfChanged(ref _placementWayByGroups, value);
             }
         }
 
@@ -85,12 +86,11 @@ namespace RevitRoomTagPlacement.ViewModels {
         }
 
         public PositionPlacementWay PlacementWayByPosition {
-            get { return placementWayByPosition; }
+            get => _placementWayByPosition;
             set {
-                if(placementWayByPosition == value)
-                    return;
+                if(_placementWayByPosition == value) return;
 
-                placementWayByPosition = value;
+                _placementWayByPosition = value;
             }
         }
 
@@ -154,7 +154,7 @@ namespace RevitRoomTagPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        private void PlaceTags(object p) {
+        private void PlaceTags() {
             _revitRepository.PlaceTagsByPositionAndGroup(RoomGroups, 
                                               SelectedTagType.TagId,
                                               PlacementWayByGroups,
@@ -162,7 +162,7 @@ namespace RevitRoomTagPlacement.ViewModels {
                                               SelectedRoomName);
         }
 
-        private bool CanPlaceTags(object p) {
+        private bool CanPlaceTags() {
             if(RoomGroups.Count() == 0) {
                 ErrorText = "Помещения отсутствуют/не выбраны";
                 return false;

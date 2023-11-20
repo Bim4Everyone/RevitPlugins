@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,11 +39,8 @@ namespace RevitRoomTagPlacement.ViewModels {
 
         private bool isChecked;
         public bool IsChecked {
-            get { return isChecked; }
-            set {
-                isChecked = value;
-                OnPropertyChanged();
-            }
+            get => isChecked;
+            set => RaiseAndSetIfChanged(ref isChecked, value);
         }
     }
 }
