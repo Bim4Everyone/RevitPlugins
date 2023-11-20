@@ -23,7 +23,7 @@ namespace RevitRoomTagPlacement {
     [Transaction(TransactionMode.Manual)]
     public class RevitRoomTagPlacementCommand : BasePluginCommand {
         public RevitRoomTagPlacementCommand() {
-            PluginName = "RevitRoomTagPlacement";
+            PluginName = "Маркировать помещения";
         }
 
         protected override void Execute(UIApplication uiApplication) {
