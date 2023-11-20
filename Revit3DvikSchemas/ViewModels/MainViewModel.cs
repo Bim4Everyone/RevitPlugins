@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
+using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -36,6 +39,7 @@ namespace Revit3DvikSchemas.ViewModels {
 
             CreateViewCommand = RelayCommand.Create(CreateViews, CanCreateView);
             _viewMaker = viewMaker;
+
         }
 
         public string ErrorText {
@@ -58,10 +62,25 @@ namespace Revit3DvikSchemas.ViewModels {
         }
 
         private bool CanCreateView() {
+            List<BuiltInCategory> SystemAndFopCats = _revitRepository.SystemAndFopCats;
+
             if(!RevitHVACSystems.Any(x => x.IsChecked)) {
                 ErrorText = "Не выбраны элементы.";
                 return false;
             }
+
+            if(!_revitRepository.Document.IsExistsSharedParam("ФОП_ВИС_Имя системы")) {
+                ErrorText = "Не добавлен параметр ФОП_ВИС_Имя системы";
+                return false;
+            } else {
+                foreach(BuiltInCategory fopCat in _revitRepository.FopNameCategoriesBI) {
+                    if(_revitRepository.SystemAndFopCats.Contains(fopCat)) {
+                        ErrorText = "Параметр ФОП_ВИС_Имя системы не назначен для категории " + fopCat.ToString();
+                        return false;
+                    }
+                }
+            }
+
             ErrorText = "";
             return true;
         }

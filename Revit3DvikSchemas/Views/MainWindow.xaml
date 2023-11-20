@@ -22,10 +22,10 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
+            <RowDefinition Height="5"/>
             <RowDefinition/>
-            <RowDefinition Height="50" />
-            <RowDefinition Height="40" />
+            <RowDefinition Height="60" />
+            <RowDefinition Height="70" />
         </Grid.RowDefinitions>
 
         <TextBlock 
@@ -91,8 +91,11 @@
             HorizontalAlignment="Right">
             <TextBlock
                 Margin="10"
+                Width="250"
                 Foreground="Orange"
                 VerticalAlignment="Center"
+                TextWrapping="Wrap"
+                
                 Text="{Binding ErrorText}" />
 
             <Button

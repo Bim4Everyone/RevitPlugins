@@ -31,6 +31,7 @@ namespace Revit3DvikSchemas.Models {
             if(useFopNames) {
 
                 ParameterElement parameterElement = _revitRepository.Document.GetSharedParam("ФОП_ВИС_Имя системы");
+
                 nameId = parameterElement.Id;
                 ;
             } else {
@@ -72,6 +73,9 @@ namespace Revit3DvikSchemas.Models {
 
 
             List<ElementFilter> elementFilterList = CreateElementFilter(systemNameList);
+
+
+
             LogicalAndFilter andFilter = new LogicalAndFilter(elementFilterList);
 
             ParameterFilterElement parameterFilterElement = ParameterFilterElement.Create(_revitRepository.Document, filterName, categories, andFilter);
@@ -134,6 +138,8 @@ namespace Revit3DvikSchemas.Models {
 
                     }
                     ParameterFilterElement parameterFilterElement = CreateFilter(filterName, systemNameList);
+                    newView.AddFilter(parameterFilterElement.Id);
+                    newView.SetFilterVisibility(parameterFilterElement.Id, false);
                 }
             } else {
                 foreach(HvacSystemViewModel system in systems) {
