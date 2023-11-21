@@ -27,29 +27,16 @@ namespace Revit3DvikSchemas.ViewModels {
 
         private string _errorText;
 
-        private string _filterBy;
-
         private bool _combineFilters;
 
         private bool _useFopNames;
 
         private ICollectionView _categoriesView;
-
-
-        private void SetCategoriesFilters() {
-            // Организуем фильтрацию списка категорий
-            _categoriesView = CollectionViewSource.GetDefaultView(RevitHVACSystems);
-            _categoriesView.Filter = item => String.IsNullOrEmpty(FilterBy) ? true :
-                ((HvacSystemViewModel) item).SystemName.IndexOf(FilterBy, StringComparison.OrdinalIgnoreCase) >= 0;
-        }
-
+        private string _categoriesFilter = string.Empty;
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository, ViewMaker viewMaker) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
-
-
-            RevitHVACSystems = _revitRepository.GetHVACSystems();
 
             bool RevitUseFopNames = UseFopNames;
             bool RevitCombineFilters = CombineFilters;
@@ -57,17 +44,30 @@ namespace Revit3DvikSchemas.ViewModels {
             CreateViewCommand = RelayCommand.Create(CreateViews, CanCreateView);
             _viewMaker = viewMaker;
 
+            _revitHVACSystems = _revitRepository.GetHVACSystems();
+            RevitHVACSystems = _revitHVACSystems;
+            SetCategoriesFilters();
+
         }
 
-
-        public ObservableCollection<HvacSystemViewModel> RevitHVACSystems {
-            get => _revitHVACSystems;
-            set => this.RaiseAndSetIfChanged(ref _revitHVACSystems, value);
+        private void SetCategoriesFilters() {
+            // Организуем фильтрацию списка категорий
+            _categoriesView = CollectionViewSource.GetDefaultView(RevitHVACSystems);
+            _categoriesView.Filter = item => String.IsNullOrEmpty(CategoriesFilter) ? true :
+                ((HvacSystemViewModel) item).SystemName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        public string FilterBy {
-            get => _filterBy;
-            set => this.RaiseAndSetIfChanged(ref _filterBy, value);
+        public ObservableCollection<HvacSystemViewModel> RevitHVACSystems { get; set; } = new ObservableCollection<HvacSystemViewModel>();
+
+        public string CategoriesFilter {
+            get => _categoriesFilter;
+            set {
+                if(value != _categoriesFilter) {
+                    _categoriesFilter = value;
+                    _categoriesView.Refresh();
+                    OnPropertyChanged(nameof(CategoriesFilter));
+                }
+            }
         }
 
         public string ErrorText {

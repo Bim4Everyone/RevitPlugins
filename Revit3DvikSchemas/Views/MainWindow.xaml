@@ -48,7 +48,7 @@
                 Margin="25,0,0,0"
             />
             <TextBox
-                Text="{Binding Path=FilterBy, UpdateSourceTrigger=PropertyChanged}"
+                Text="{Binding Path=CategoriesFilter, UpdateSourceTrigger=PropertyChanged}"
                 Width="150" Height="20"
                 Margin="25,0,0,0"
                 />
@@ -61,7 +61,7 @@
             Grid.Row="2"
             SelectionMode="Extended"
             x:Name="MyList"
-            ItemsSource="{Binding RevitHVACSystems }" SelectionChanged="ListView_SelectionChanged"
+            ItemsSource="{Binding RevitHVACSystems, UpdateSourceTrigger=PropertyChanged }"
             >
             <ListView.View>
                 <GridView AllowsColumnReorder="False" ColumnHeaderToolTip="Список систем">
