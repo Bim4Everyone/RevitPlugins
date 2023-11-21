@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 using Autodesk.Revit.DB;
 
@@ -84,7 +85,7 @@ namespace Revit3DvikSchemas.Models {
         }
 
 
-        public void CreateSelectedCommand(List<HvacSystemViewModel> list, bool _useFopNames, bool _combineViews) {
+        public void CreateSelectedCommand(ObservableCollection<HvacSystemViewModel> list, bool _useFopNames, bool _combineViews) {
             combineViews = _combineViews;
             useFopNames = _useFopNames;
             List<HvacSystemViewModel> systems = new List<HvacSystemViewModel>();

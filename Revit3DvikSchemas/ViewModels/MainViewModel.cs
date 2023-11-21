@@ -1,5 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Windows.Data;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -17,20 +21,33 @@ namespace Revit3DvikSchemas.ViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly ViewMaker _viewMaker;
 
-        public List<HvacSystemViewModel> RevitHVACSystems { get; }
-
         public ICommand CreateViewCommand { get; }
 
+        private ObservableCollection<HvacSystemViewModel> _revitHVACSystems;
+
         private string _errorText;
+
+        private string _filterBy;
 
         private bool _combineFilters;
 
         private bool _useFopNames;
 
+        private ICollectionView _categoriesView;
+
+
+        private void SetCategoriesFilters() {
+            // Организуем фильтрацию списка категорий
+            _categoriesView = CollectionViewSource.GetDefaultView(RevitHVACSystems);
+            _categoriesView.Filter = item => String.IsNullOrEmpty(FilterBy) ? true :
+                ((HvacSystemViewModel) item).SystemName.IndexOf(FilterBy, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository, ViewMaker viewMaker) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
+
 
             RevitHVACSystems = _revitRepository.GetHVACSystems();
 
@@ -40,6 +57,17 @@ namespace Revit3DvikSchemas.ViewModels {
             CreateViewCommand = RelayCommand.Create(CreateViews, CanCreateView);
             _viewMaker = viewMaker;
 
+        }
+
+
+        public ObservableCollection<HvacSystemViewModel> RevitHVACSystems {
+            get => _revitHVACSystems;
+            set => this.RaiseAndSetIfChanged(ref _revitHVACSystems, value);
+        }
+
+        public string FilterBy {
+            get => _filterBy;
+            set => this.RaiseAndSetIfChanged(ref _filterBy, value);
         }
 
         public string ErrorText {
@@ -64,6 +92,11 @@ namespace Revit3DvikSchemas.ViewModels {
         private bool CanCreateView() {
             List<BuiltInCategory> SystemAndFopCats = _revitRepository.SystemAndFopCats;
 
+            if(!(_revitRepository.Document.ActiveView.ViewType == ViewType.ThreeD)) {
+                ErrorText = "Для старта требуется активный 3D-вид";
+                return false;
+            }
+
             if(!RevitHVACSystems.Any(x => x.IsChecked)) {
                 ErrorText = "Не выбраны элементы.";
                 return false;
@@ -73,8 +106,8 @@ namespace Revit3DvikSchemas.ViewModels {
                 ErrorText = "Не добавлен параметр ФОП_ВИС_Имя системы";
                 return false;
             } else {
-                foreach(BuiltInCategory fopCat in _revitRepository.FopNameCategoriesBI) {
-                    if(_revitRepository.SystemAndFopCats.Contains(fopCat)) {
+                foreach(BuiltInCategory fopCat in _revitRepository.FopNameCategoriesBIC) {
+                    if(!_revitRepository.SystemAndFopCats.Contains(fopCat)) {
                         ErrorText = "Параметр ФОП_ВИС_Имя системы не назначен для категории " + fopCat.ToString();
                         return false;
                     }

@@ -4,6 +4,8 @@ namespace Revit3DvikSchemas.Views {
     public partial class MainWindow {
         public MainWindow() {
             InitializeComponent();
+            FilterVars.ItemsSource = new string[] { "Имя системы", "ФОП_ВИС_Имя системы" };
+
         }
 
         public override string PluginName => nameof(Revit3DvikSchemas);
@@ -16,6 +18,8 @@ namespace Revit3DvikSchemas.Views {
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;
         }
+
+
 
         private void ListView_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
 

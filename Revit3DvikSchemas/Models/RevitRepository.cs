@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -15,9 +16,9 @@ namespace Revit3DvikSchemas.Models {
     internal class RevitRepository {
 
 
-        public RevitRepository(UIApplication uiApplication, List<BuiltInCategory> systemAndFopCats, List<BuiltInCategory> fopNameCategoriesBI) {
+        public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
-            systemAndFopCats = new List<BuiltInCategory>() { BuiltInCategory.OST_DuctFitting,
+            List<BuiltInCategory> systemAndFopCats = new List<BuiltInCategory>() { BuiltInCategory.OST_DuctFitting,
                 BuiltInCategory.OST_PipeFitting, BuiltInCategory.OST_PipeCurves,
                 BuiltInCategory.OST_DuctCurves, BuiltInCategory.OST_FlexDuctCurves, BuiltInCategory.OST_FlexPipeCurves,
                 BuiltInCategory.OST_DuctTerminal, BuiltInCategory.OST_DuctAccessory, BuiltInCategory.OST_PipeAccessory,
@@ -26,18 +27,17 @@ namespace Revit3DvikSchemas.Models {
             };
             SystemAndFopCats = systemAndFopCats;
 
-            fopNameCategoriesBI = getfopNameCategoriesBIC();
-            FopNameCategoriesBI = fopNameCategoriesBI;
-
+            List<BuiltInCategory> fopNameCategoriesBIC = GetfopNameCategoriesBIC();
+            FopNameCategoriesBIC = fopNameCategoriesBIC;
         }
         public UIApplication UIApplication { get; }
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
 
         public List<BuiltInCategory> SystemAndFopCats { get; }
 
-        public List<BuiltInCategory> FopNameCategoriesBI { get; }
+        public List<BuiltInCategory> FopNameCategoriesBIC { get; }
 
-        public List<BuiltInCategory> getfopNameCategoriesBIC() {
+        public List<BuiltInCategory> GetfopNameCategoriesBIC() {
             if(Document.IsExistsSharedParam("ÔÎÏ_ÂÈÑ_Èìÿ ñèñòåìû")) {
                 (Definition Definition, Binding Binding) fopName = Document.GetSharedParamBinding("ÔÎÏ_ÂÈÑ_Èìÿ ñèñòåìû");
                 Binding parameterBinding = fopName.Binding;
@@ -53,6 +53,7 @@ namespace Revit3DvikSchemas.Models {
             }
 
         }
+
 
 
         //public Application Application => UIApplication.Application;
@@ -94,14 +95,14 @@ namespace Revit3DvikSchemas.Models {
             return fopName;
 
         }
-        public List<HvacSystemViewModel> GetHVACSystems() {
+        public ObservableCollection<HvacSystemViewModel> GetHVACSystems() {
             List<Element> ductSystems = GetCollection(BuiltInCategory.OST_DuctSystem);
 
             List<Element> pipeSystems = GetCollection(BuiltInCategory.OST_PipingSystem);
 
             List<Element> allSystems = ductSystems.Concat(pipeSystems).ToList();
 
-            List<HvacSystemViewModel> newSystems = new List<HvacSystemViewModel>();
+            ObservableCollection<HvacSystemViewModel> newSystems = new ObservableCollection<HvacSystemViewModel>();
 
             foreach(Element system in allSystems) {
                 var newSystem = new HvacSystemViewModel();

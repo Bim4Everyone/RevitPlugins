@@ -14,33 +14,55 @@
     
     Title="MainWindow"
     Height="450" Width="500"
-    
+    ResizeMode="NoResize"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
+    >
 
-    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
-    
-    
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="5"/>
+            <RowDefinition Height="15"/>
+            <RowDefinition Height="30"/>
             <RowDefinition/>
             <RowDefinition Height="60" />
             <RowDefinition Height="70" />
         </Grid.RowDefinitions>
 
-        <TextBlock 
+        <StackPanel
             Grid.Row="0"
-            Margin="10,5"
-            VerticalAlignment="Center"
-            Text="Выберите системы для генерации схем"/>
+            Orientation="Horizontal">
+            <TextBlock
+                Width="108" Height="20"
+                Margin="25,0,0,0" Text="Фильтровать по:">
+            </TextBlock>
+        </StackPanel>
+
+        <StackPanel
+            Grid.Row="1"
+            Orientation="Horizontal"
+            >
+            <ComboBox
+                Name="FilterVars"
+                SelectedIndex="0"
+                Width="170" Height="20"
+                Margin="25,0,0,0"
+            />
+            <TextBox
+                Text="{Binding Path=FilterBy, UpdateSourceTrigger=PropertyChanged}"
+                Width="150" Height="20"
+                Margin="25,0,0,0"
+                />
+
+
+        </StackPanel>
 
         <ListView 
+            Margin="25,0,25,0"
             Grid.Row="2"
-            Width="450"
             SelectionMode="Extended"
+            x:Name="MyList"
             ItemsSource="{Binding RevitHVACSystems }" SelectionChanged="ListView_SelectionChanged"
             >
-
             <ListView.View>
                 <GridView AllowsColumnReorder="False" ColumnHeaderToolTip="Список систем">
                     <GridView.Columns>
@@ -53,6 +75,7 @@
                             <GridViewColumn.CellTemplate >
                                 <DataTemplate>
                                     <CheckBox
+                                        
                                     IsChecked="{Binding IsChecked}"
                                     />
                                 </DataTemplate>
@@ -63,8 +86,8 @@
             </ListView.View>
         </ListView>
 
-        
-        
+
+
         <StackPanel
             Grid.Row="3"
             Orientation="Vertical"
@@ -72,15 +95,15 @@
 
             >
             <CheckBox 
-                Margin="5"
+                Margin="25,5,0,0"
                 IsChecked="{Binding CombineFilters}">
                 <TextBlock Text="Все выделенные на один вид"></TextBlock>
             </CheckBox>
-            
+
             <CheckBox 
-                Margin="5"
+                Margin="25,5,0,0"
                 IsChecked="{Binding UseFopNames}">
-                
+
                 <TextBlock Text="Схемы по ФОП_ВИС_Имя системы"/>
             </CheckBox>
         </StackPanel>
@@ -104,14 +127,14 @@
                 Content="ОК"
                 IsDefault="True"
                 Click="ButtonOk_Click"
-                Command="{Binding CreateViewCommand}" />
+                Command="{Binding CreateViewCommand}" Height="20" />
 
             <Button
                 Margin="10"
                 Width="80"
                 Content="Отмена"
                 IsCancel="True"
-                Click="ButtonCancel_Click" />
+                Click="ButtonCancel_Click" Height="20" />
         </StackPanel>
     </Grid>
 </base:PlatformWindow>
