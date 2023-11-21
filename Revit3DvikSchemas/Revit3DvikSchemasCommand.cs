@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
@@ -20,32 +15,32 @@ using Revit3DvikSchemas.Views;
 namespace Revit3DvikSchemas {
     [Transaction(TransactionMode.Manual)]
     public class Revit3DvikSchemasCommand : BasePluginCommand {
-        
+
         public Revit3DvikSchemasCommand() {
-            PluginName = "Revit3DvikSchemas";
+            PluginName = "—формировать схемы";
         }
 
         protected override void Execute(UIApplication uiApplication) {
 
-			using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
-					
-				kernel.Bind<PluginConfig>()
+
+                kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
-				
-				kernel.Bind<MainViewModel>().ToSelf();
+
+                kernel.Bind<MainViewModel>().ToSelf();
 
 
                 //«десь мы объ€вл€ем контекст дл€ MainWindow, чтобы работать с MainViewModel
-				kernel.Bind<MainWindow>().ToSelf()
+                kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
-                
-				
-				Notification(kernel.Get<MainWindow>());
-			}
+
+
+                Notification(kernel.Get<MainWindow>());
+            }
         }
     }
 }
