@@ -20,10 +20,13 @@ namespace Revit3DvikSchemas.ViewModels {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly ViewMaker _viewMaker;
+        private string _selectedElementType;
 
-        public ICommand CreateViewCommand { get; }
+
 
         private ObservableCollection<HvacSystemViewModel> _revitHVACSystems;
+
+
 
         private string _errorText;
 
@@ -41,20 +44,42 @@ namespace Revit3DvikSchemas.ViewModels {
             bool RevitUseFopNames = UseFopNames;
             bool RevitCombineFilters = CombineFilters;
 
-            CreateViewCommand = RelayCommand.Create(CreateViews, CanCreateView);
+            ComboBoxVars = new ObservableCollection<String>() { "Имя системы", "ФОП_ВИС_Имя системы" };
+
+            SelectedElementType = ComboBoxVars[0];
+
+
             _viewMaker = viewMaker;
 
             _revitHVACSystems = _revitRepository.GetHVACSystems();
             RevitHVACSystems = _revitHVACSystems;
             SetCategoriesFilters();
 
+            CreateViewCommand = RelayCommand.Create(CreateViews, CanCreateView);
+            SelectionFilterCommand = RelayCommand.Create(SetCategoriesFilters);
+        }
+
+        public ICommand CreateViewCommand { get; }
+        public ICommand SelectionFilterCommand { get; }
+
+        public ObservableCollection<string> ComboBoxVars { get; }
+
+        public string SelectedElementType {
+            get => _selectedElementType;
+            set => RaiseAndSetIfChanged(ref _selectedElementType, value);
         }
 
         private void SetCategoriesFilters() {
             // Организуем фильтрацию списка категорий
             _categoriesView = CollectionViewSource.GetDefaultView(RevitHVACSystems);
-            _categoriesView.Filter = item => String.IsNullOrEmpty(CategoriesFilter) ? true :
+            if(SelectedElementType == "ФОП_ВИС_Имя системы") {
+                _categoriesView.Filter = item => String.IsNullOrEmpty(CategoriesFilter) ? true :
+                ((HvacSystemViewModel) item).FopName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+            } else {
+                _categoriesView.Filter = item => String.IsNullOrEmpty(CategoriesFilter) ? true :
                 ((HvacSystemViewModel) item).SystemName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+            }
+
         }
 
         public ObservableCollection<HvacSystemViewModel> RevitHVACSystems { get; set; } = new ObservableCollection<HvacSystemViewModel>();

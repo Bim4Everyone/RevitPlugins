@@ -8,6 +8,7 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:Revit3DvikSchemas.Views"
     xmlns:vms="clr-namespace:Revit3DvikSchemas.ViewModels"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -42,18 +43,29 @@
             Orientation="Horizontal"
             >
             <ComboBox
-                Name="FilterVars"
                 SelectedIndex="0"
                 Width="170" Height="20"
                 Margin="25,0,0,0"
-            />
+                ItemsSource="{Binding ComboBoxVars}"
+                SelectedItem="{Binding SelectedElementType}">
+
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding Path=SelectionFilterCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+
+            </ComboBox>
+
+
+
+
+
             <TextBox
                 Text="{Binding Path=CategoriesFilter, UpdateSourceTrigger=PropertyChanged}"
                 Width="150" Height="20"
                 Margin="25,0,0,0"
                 />
-
-
         </StackPanel>
 
         <ListView 
