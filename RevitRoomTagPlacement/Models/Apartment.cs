@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,23 +12,29 @@ using dosymep.Revit;
 namespace RevitRoomTagPlacement.Models {
     internal class Apartment {
 
-        private readonly IEnumerable<RoomFromRevit> _rooms;
-        private readonly IEnumerable<string> _roomNames;
+        private readonly IReadOnlyCollection<RoomFromRevit> _rooms;
+        private readonly IReadOnlyCollection<string> _roomNames;
+        private readonly RoomFromRevit _maxAreaRoom;
 
         public Apartment(IEnumerable<RoomFromRevit> rooms) {
-            _rooms = rooms;
-            _roomNames = rooms.Select(x => x.Name).Distinct();
+            _rooms = rooms.ToList();
+            _roomNames = _rooms
+                .Select(x => x.Name)
+                .Distinct()
+                .ToList();
+            _maxAreaRoom = _rooms
+                .OrderByDescending(r => r.RoomObject.Area)
+                .First();
         }
 
-        public IEnumerable<RoomFromRevit> Rooms => _rooms;
-        public IEnumerable<string> RoomNames => _roomNames;
+        public IReadOnlyCollection<RoomFromRevit> Rooms => _rooms;
+        public IReadOnlyCollection<string> RoomNames => _roomNames;
+        public RoomFromRevit MaxAreaRoom => _maxAreaRoom;
 
-        public RoomFromRevit GetMaxAreaRoom() {
-            return _rooms.OrderByDescending(r => r.RoomObject.Area).First();
-        }
-
-        public RoomFromRevit GetRoomByName(string roomName) {       
-            return _rooms.Where(y => y.Name.Equals(roomName)).First();
+        public RoomFromRevit GetRoomByName(string roomName) {
+            return _rooms
+                .Where(y => y.Name.Equals(roomName))
+                .First();
         }
     }
 }

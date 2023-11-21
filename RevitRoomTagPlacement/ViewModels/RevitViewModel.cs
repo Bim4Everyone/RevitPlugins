@@ -8,9 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
-
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -67,11 +64,7 @@ namespace RevitRoomTagPlacement.ViewModels {
 
         public GroupPlacementWay PlacementWayByGroups {
             get => _placementWayByGroups;
-            set {
-                if (_placementWayByGroups == value) return;
-
-                RaiseAndSetIfChanged(ref _placementWayByGroups, value);
-            }
+            set => RaiseAndSetIfChanged(ref _placementWayByGroups, value);
         }
 
         public bool IsEveryRoom {
@@ -206,7 +199,10 @@ namespace RevitRoomTagPlacement.ViewModels {
                 settings = config.AddSettings(_revitRepository.Document);
             }
 
-            settings.RoomGroups = RoomGroups.Where(x => x.IsChecked).Select(x => x.Name).ToList();
+            settings.RoomGroups = RoomGroups
+                .Where(x => x.IsChecked)
+                .Select(x => x.Name)
+                .ToList();
             settings.SelectedRoomTag = SelectedTagType.TagId;
             settings.SelectedGroupPlacementWay = PlacementWayByGroups;
             settings.SelectedPositionPlacementWay = PlacementWayByPosition;

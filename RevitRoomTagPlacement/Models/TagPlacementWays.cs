@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +20,6 @@ namespace RevitRoomTagPlacement.Models {
         RightCenter = 5,
         LeftBottom = 6,
         CenterBottom = 7,
-        RightBottom = 8,
+        RightBottom = 8
     }
 }

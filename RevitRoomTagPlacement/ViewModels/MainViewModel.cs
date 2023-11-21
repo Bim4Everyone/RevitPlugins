@@ -14,7 +14,6 @@ using RevitRoomTagPlacement.Models;
 
 namespace RevitRoomTagPlacement.ViewModels {
     internal class MainViewModel : BaseViewModel {
-        private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
         private RevitViewModel _revitViewModel;
@@ -22,7 +21,6 @@ namespace RevitRoomTagPlacement.ViewModels {
         private string _saveProperty;
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
-            _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
             RevitViewModels = new ObservableCollection<RevitViewModel> {

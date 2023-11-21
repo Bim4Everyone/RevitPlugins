@@ -91,27 +91,29 @@ namespace RevitRoomTagPlacement.Models {
         public List<RoomFromRevit> FilterRoomsForPlacement(IList<RoomGroupViewModel> roomGroups,
                                                         GroupPlacementWay groupPlacementWay,
                                                         string roomName = "") {
-            var selectedAparts = roomGroups.Where(x => x.IsChecked).SelectMany(x => x.Apartments);
-            List<RoomFromRevit> rooms = new List<RoomFromRevit>();
+            var selectedAparts = roomGroups
+                .Where(x => x.IsChecked)
+                .SelectMany(x => x.Apartments)
+                .ToList();
 
             if(groupPlacementWay == GroupPlacementWay.EveryRoom) {
-                rooms = selectedAparts
+                return selectedAparts
                     .SelectMany(x => x.Rooms)
                     .ToList();
             } 
             else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupRandom) {
-                RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
-                rooms = selectedAparts
-                    .Select(x => x.GetMaxAreaRoom())
+                return selectedAparts
+                    .Select(x => x.MaxAreaRoom)
                     .ToList();
             } 
             else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupByName) {
-                RevitParam sectionParam = SharedParamsConfig.Instance.RoomSectionShortName;
-                rooms = selectedAparts
+                return selectedAparts
                     .Select(x => x.GetRoomByName(roomName))
                     .ToList();
+            } 
+            else {
+                return new List<RoomFromRevit>();
             }
-            return rooms;
         }
 
         public void PlaceTagsByPositionAndGroup(IList<RoomGroupViewModel> roomGroups, 
@@ -120,9 +122,7 @@ namespace RevitRoomTagPlacement.Models {
                                             PositionPlacementWay positionPlacementWay,
                                             string roomName = "") {
 
-            List<RoomFromRevit> rooms = FilterRoomsForPlacement(roomGroups, 
-                                                              groupPlacementWay, 
-                                                              roomName);
+            List<RoomFromRevit> rooms = FilterRoomsForPlacement(roomGroups, groupPlacementWay, roomName);
 
             View activeView = Document.ActiveView;
             ElementOwnerViewFilter viewFilter = new ElementOwnerViewFilter(activeView.Id);
@@ -150,7 +150,7 @@ namespace RevitRoomTagPlacement.Models {
                         /* Невозможно отфильтровать помещения из связанного файла для активного вида.
                            Способ получения помещений через CustomExporter не работает, так как помещения не экспортируются.
                            В качестве решения принято брать все помещения из связанного файла и размещать марку на каждом.
-                           В таком случае все марки размещаются в проекте, но если помещение отсутсвует на виде, то марка не отображается.
+                           В таком случае все марки размещаются в проекте, но если помещение отсутствует на виде, то марка не отображается.
                            Для удаления марок, которые не отображаются, скрипт пытается получить BoundingBox для каждой марки, 
                            если он null, то марка удаляется.                         
                            */
