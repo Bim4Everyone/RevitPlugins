@@ -1,8 +1,14 @@
+using System;
+using System.Collections.Generic;
+
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
-
 using pyRevitLabs.Json;
+
+using RevitRoomTagPlacement.ViewModels;
 
 namespace RevitRoomTagPlacement.Models {
     internal class PluginConfig : ProjectConfig<RevitSettings> {
@@ -21,6 +27,12 @@ namespace RevitRoomTagPlacement.Models {
     }
 
     internal class RevitSettings : ProjectSettings {
+        public List<string> RoomGroups { get; set; }
+        public ElementId SelectedRoomTag { get; set; }
+        public GroupPlacementWay SelectedGroupPlacementWay { get; set; }
+        public PositionPlacementWay SelectedPositionPlacementWay { get; set; }
+        public string RoomName { get; set; }
+
         public override string ProjectName { get; set; }
         public string SaveProperty { get; set; }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -14,6 +15,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitRoomTagPlacement.Models;
+
 
 namespace RevitRoomTagPlacement.ViewModels {
     
@@ -42,6 +44,8 @@ namespace RevitRoomTagPlacement.ViewModels {
             PlaceTagsCommand = RelayCommand.Create(PlaceTags, CanPlaceTags);
 
             RoomGroups.ListChanged += RoomGroups_ListChanged;
+
+            SetPluginConfig();
         }
 
         private void RoomGroups_ListChanged(object sender, ListChangedEventArgs e) {
@@ -160,6 +164,8 @@ namespace RevitRoomTagPlacement.ViewModels {
                                               PlacementWayByGroups,
                                               PlacementWayByPosition,
                                               SelectedRoomName);
+
+            SavePluginConfig();
         }
 
         private bool CanPlaceTags() {
@@ -190,6 +196,40 @@ namespace RevitRoomTagPlacement.ViewModels {
 
             ErrorText = "";
             return true;
+        }
+
+        public void SavePluginConfig() {
+            var config = PluginConfig.GetPluginConfig();
+            var settings = config.GetSettings(_revitRepository.Document);
+
+            if(settings is null) {
+                settings = config.AddSettings(_revitRepository.Document);
+            }
+
+            settings.RoomGroups = RoomGroups.Where(x => x.IsChecked).Select(x => x.Name).ToList();
+            settings.SelectedRoomTag = SelectedTagType.TagId;
+            settings.SelectedGroupPlacementWay = PlacementWayByGroups;
+            settings.SelectedPositionPlacementWay = PlacementWayByPosition;
+            settings.RoomName = SelectedRoomName;
+
+            config.SaveProjectConfig();
+        }
+
+        public void SetPluginConfig() {
+            var config = PluginConfig.GetPluginConfig();
+            var settings = config.GetSettings(_revitRepository.Document);
+
+            if(settings == null) { return; }
+
+            foreach(var group in RoomGroups.Where(x => settings.RoomGroups.Contains(x.Name))) { 
+                group.IsChecked = true;
+            }
+            SelectedTagType = TagFamilies.FirstOrDefault(x => x.TagId == settings.SelectedRoomTag);
+            PlacementWayByGroups = settings.SelectedGroupPlacementWay;
+            PlacementWayByPosition = settings.SelectedPositionPlacementWay;
+            SelectedRoomName = settings.RoomName;
+
+            config.SaveProjectConfig();
         }
     }
 
