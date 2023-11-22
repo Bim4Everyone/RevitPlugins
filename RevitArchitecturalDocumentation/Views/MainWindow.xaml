@@ -28,6 +28,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -37,8 +38,36 @@
         </Grid.RowDefinitions>
 
 
+        <StackPanel
+            Grid.Row="0"
+            Height="45"
+            Orientation="Horizontal"
+            HorizontalAlignment="Left">
+
+            <TextBlock
+                Margin="10"
+                VerticalAlignment="Center"
+                Text="Выбрано видов: "/>
+
+            <TextBlock
+                Margin="10"
+                VerticalAlignment="Center"
+                Text="{Binding Path=SelectedViews.Count}"/>
+
+            
+        </StackPanel>
+
+        <CheckBox
+            Grid.Row="0"
+            Margin="3"
+            Content="Создавать на основе выбранных видов"
+            FontSize="14"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Right"
+            IsChecked="{Binding Path=CreateViewsFromSelected}"/>
 
         <ListView 
+            Grid.Row="1"
             Margin="10"
             ScrollViewer.VerticalScrollBarVisibility="Visible"
             ScrollViewer.CanContentScroll="False"
@@ -138,75 +167,8 @@
         </ListView>
 
 
-
-
-        <!--<ListView
-            Margin="10"
-            ScrollViewer.VerticalScrollBarVisibility="Visible"
-            ScrollViewer.CanContentScroll="False"
-            ItemsSource="{Binding Path=TasksForWork, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-            SelectedItem="{Binding Path=SelectedTask}"
-            SelectionMode="Single">          
-
-
-            <ListView.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="7"/>
-                </Style>
-            </ListView.Resources>
-
-            
-            
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal" Margin="5">
-                        <TextBox 
-                            Margin="10 0 0 0" 
-                            Width="100"
-                            Text="{Binding Path=StartLevelNumber}"/>
-                        <TextBox 
-                            Margin="10 0 0 0"
-                            Width="100"
-                            Text="{Binding Path=EndLevelNumber}"/>
-
-                        <ComboBox
-                            Margin="10 0 0 0"
-                            Height="36"
-                            Width="300"
-                            DisplayMemberPath="Name"
-                            ItemsSource="{Binding Path=DataContext.VisibilityScopes, 
-                                RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
-                            SelectedItem="{Binding Path=SelectedVisibilityScope}">
-                        </ComboBox>
-                        
-                        <TextBox 
-                            Margin="10 0 0 0"
-                            Width="100"
-                            Text="{Binding Path=ViewNameSuffix}"/>
-                        
-                        <Button
-                            Margin="10 0 0 0"
-                            Width="80"
-                            Content="Выбрать"
-                            FontSize="16"
-                            Click="ButtonCancel_Click"
-                            Command="{Binding Path=DataContext.TestCommand, 
-                                RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                            CommandParameter="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
-
-                        <TextBlock
-                            Margin="5"
-                            Text="{Binding Path=ScheduleSheetInstances.Count}"
-                            FontSize="16"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Left"/>
-                    </StackPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>-->
-
         <StackPanel
-            Grid.Row="1"
+            Grid.Row="2"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
@@ -230,7 +192,7 @@
 
 
         <GroupBox 
-            Grid.Row="2"
+            Grid.Row="3"
             Margin="5"
             Height="65">
             <GroupBox.Header>
@@ -300,7 +262,7 @@
         </GroupBox>
 
         <GroupBox 
-            Grid.Row="3"
+            Grid.Row="4"
             Margin="5"
             Height="65">
             <GroupBox.Header>
@@ -315,8 +277,6 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="1.4*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -379,24 +339,11 @@
                     VerticalContentAlignment="Center"
                     IsEnabled="{Binding Path=WorkWithViews}"
                     Text="{Binding Path=ViewNamePrefix}"/>
-
-                <RadioButton 
-                    Grid.Column="7"
-                    GroupName="TypeOfCreate"
-                    IsEnabled="{Binding Path=WorkWithViews}"
-                    Content="Создать с нуля"
-                    IsChecked="{Binding Path=CreateViewsFromScratch1}"/>
-
-                <RadioButton 
-                    Grid.Column="8"
-                    GroupName="TypeOfCreate"
-                    IsEnabled="{Binding Path=WorkWithViews}"
-                    Content="Создать на основе выбранных видов"/>
             </Grid>
         </GroupBox>
 
         <GroupBox 
-            Grid.Row="4" 
+            Grid.Row="5" 
             Grid.Column="1"
             Margin="5" 
             Height="65">
@@ -441,7 +388,7 @@
         </GroupBox>
 
         <StackPanel
-            Grid.Row="5"
+            Grid.Row="6"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
