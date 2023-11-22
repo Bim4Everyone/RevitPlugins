@@ -34,7 +34,6 @@ namespace RevitRoomTagPlacement.Models {
                 .First();
 
             return roomSolid.Faces
-                .Cast<Face>()
                 .OfType<PlanarFace>()
                 .Where(y => y.FaceNormal.Z != 0)
                 .First();
