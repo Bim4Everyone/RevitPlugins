@@ -44,7 +44,6 @@ namespace RevitArchitecturalDocumentation.Models {
         public string FormatOfLevelNumber { get; set; } = string.Empty;
         public string FirstPartOfSpecName { get; set; }
         public string LastPartOfSpecName { get; set; }
-        //public string PrefixOfSpecName { get; set; }
         public string SuffixOfLevelNumber { get; set; }
 
 
@@ -69,9 +68,8 @@ namespace RevitArchitecturalDocumentation.Models {
             // [FirstPartOfSpecName][PrefixOfSpecName] NUMBER [SuffixOfSpecName][LastPartOfSpecName]
             // [О_ПСО_][0] 5 [ этаж][_Жилье Корпуса 1-3]
 
-            if(!Specification.Name.Contains("_") || !Specification.Name.Contains("_")) {
+            if(!Specification.Name.Contains("_")) {
 
-                //TaskDialog.Show("fd", "1");
                 CanWorkWithIt = false;
                 return;
             }
@@ -81,8 +79,6 @@ namespace RevitArchitecturalDocumentation.Models {
                                                 .FirstOrDefault(o => o.Contains("этаж"));
 
             if(keyPartOfName is null) {
-                //TaskDialog.Show("fd", "2");
-
                 CanWorkWithIt = false;
                 return;
             }
@@ -100,8 +96,6 @@ namespace RevitArchitecturalDocumentation.Models {
 
             int levelNumberAsInt;
             if(!int.TryParse(levelNumberAsStr, out levelNumberAsInt)) {
-                //TaskDialog.Show("fd", levelNumberAsStr);
-
                 CanWorkWithIt = false;
                 return;
             }
@@ -119,8 +113,7 @@ namespace RevitArchitecturalDocumentation.Models {
         public string GetStringFormatOrDefault(string numAsString) {
             string format = string.Empty;
 
-            int test;
-            if(!int.TryParse(numAsString, out test)) {
+            if(!int.TryParse(numAsString, out _)) {
                 return "{0:0}";
             }
 
@@ -141,27 +134,14 @@ namespace RevitArchitecturalDocumentation.Models {
 
                 ScheduleField scheduleFieldFromFilter = SpecificationDefinition.GetField(currentFilter.FieldId);
 
-                //TaskDialog.Show("Ищем", specFilterName);
-                //TaskDialog.Show("Текущий", scheduleFieldFromFilter.GetName());
-
                 if(scheduleFieldFromFilter.GetName() == specFilterName) {
 
                     string filterOldValue = currentFilter.GetStringValue();
-                    //TaskDialog.Show("filterOldValue", filterOldValue);
-
                     string format = GetStringFormatOrDefault(filterOldValue);
-
-                    //TaskDialog.Show("format", format);
-
                     string newVal = String.Format(format, newFilterValue);
-                    //TaskDialog.Show("newVal", newVal);
-
                     currentFilter.SetValue(newVal);
-                    //TaskDialog.Show("newVal", "Вот тут мы пытались записать значение");
 
                     MVM.Report.AppendLine($"            Фильтру задаем значение {currentFilter.GetStringValue()}");
-                    //TaskDialog.Show("newVal", "Прошли MVM");
-
                     newScheduleFilters.Add(currentFilter);
                 } else {
                     newScheduleFilters.Add(currentFilter);

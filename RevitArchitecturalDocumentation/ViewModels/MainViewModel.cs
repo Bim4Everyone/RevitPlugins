@@ -46,8 +46,11 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private List<ElementType> _viewportTypes;
         private List<FamilySymbol> _titleBlocksInProject;
         private ViewFamilyType _selectedViewFamilyType;
+        private string _selectedViewFamilyTypeName;
         private ElementType _selectedViewportType;
+        private string _selectedViewportTypeName;
         private FamilySymbol _selectedTitleBlock;
+        private string _selectedTitleBlockName;
         private List<View> _selectedViews = new List<View>();
         private ObservableCollection<TaskInfo> _tasksForWork = new ObservableCollection<TaskInfo>();
         private TaskInfo _selectedTask;
@@ -75,12 +78,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             _revitRepository = revitRepository;
 
 
-            VisibilityScopes = _revitRepository.VisibilityScopes;
-            Levels = _revitRepository.Levels;
-            ViewFamilyTypes = _revitRepository.ViewFamilyTypes;
-            ViewportTypes = _revitRepository.ViewportTypes;
-            TitleBlocksInProject = _revitRepository.TitleBlocksInProject;
-
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
@@ -95,10 +92,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
         public ICommand AddTaskCommand { get; }
         public ICommand DeleteTaskCommand { get; }
-
-
-
         public ICommand SelectSpecsCommand { get; }
+
 
 
         public StringBuilder Report {
@@ -161,6 +156,11 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedViewFamilyType, value);
         }
 
+        public string SelectedViewFamilyTypeName {
+            get => _selectedViewFamilyTypeName;
+            set => this.RaiseAndSetIfChanged(ref _selectedViewFamilyTypeName, value);
+        }
+
         public List<ElementType> ViewportTypes {
             get => _viewportTypes;
             set => this.RaiseAndSetIfChanged(ref _viewportTypes, value);
@@ -169,6 +169,11 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         public ElementType SelectedViewportType {
             get => _selectedViewportType;
             set => this.RaiseAndSetIfChanged(ref _selectedViewportType, value);
+        }
+
+        public string SelectedViewportTypeName {
+            get => _selectedViewportTypeName;
+            set => this.RaiseAndSetIfChanged(ref _selectedViewportTypeName, value);
         }
 
         public bool CreateViewsFromSelected {
@@ -184,6 +189,11 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         public FamilySymbol SelectedTitleBlock {
             get => _selectedTitleBlock;
             set => this.RaiseAndSetIfChanged(ref _selectedTitleBlock, value);
+        }
+
+        public string SelectedTitleBlockName {
+            get => _selectedTitleBlockName;
+            set => this.RaiseAndSetIfChanged(ref _selectedTitleBlockName, value);
         }
 
         public string ViewNamePrefix {
@@ -235,6 +245,21 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private void LoadView() {
 
             LoadConfig();
+
+            VisibilityScopes = _revitRepository.VisibilityScopes;
+            Levels = _revitRepository.Levels;
+            ViewFamilyTypes = _revitRepository.ViewFamilyTypes;
+            ViewportTypes = _revitRepository.ViewportTypes;
+            TitleBlocksInProject = _revitRepository.TitleBlocksInProject;
+
+            SelectedViewFamilyType = ViewFamilyTypes.FirstOrDefault(a => a.Name.Equals(SelectedViewFamilyTypeName));
+            SelectedViewportType = ViewportTypes.FirstOrDefault(a => a.Name.Equals(SelectedViewportTypeName));
+            SelectedTitleBlock = TitleBlocksInProject.FirstOrDefault(a => a.Name.Equals(SelectedTitleBlockName));
+
+            if(TasksForWork.Count == 0) {
+                TasksForWork.Add(new TaskInfo(this));
+            }
+
             GetSelectedViews();
         }
 
@@ -244,7 +269,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private void AcceptView() {
 
             SaveConfig();
-
             DoWork();
         }
 
@@ -278,8 +302,16 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             if(settings is null) { return; }
 
+            WorkWithSheets = settings.WorkWithSheets;
+            WorkWithViews = settings.WorkWithViews;
+            WorkWithSpecs = settings.WorkWithSpecs;
+
+            CreateViewsFromSelected = settings.CreateViewsFromSelected;
             SheetNamePrefix = settings.SheetNamePrefix;
             ViewNamePrefix = settings.ViewNamePrefix;
+            SelectedTitleBlockName = settings.SelectedTitleBlockName;
+            SelectedViewFamilyTypeName = settings.SelectedViewFamilyTypeName;
+            SelectedViewportTypeName = settings.SelectedViewportTypeName;
         }
 
 
@@ -291,9 +323,18 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             var settings = _pluginConfig.GetSettings(_revitRepository.Document)
                           ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
+            settings.WorkWithSheets = WorkWithSheets;
+            settings.WorkWithViews = WorkWithViews;
+            settings.WorkWithSpecs = WorkWithSpecs;
 
+            settings.CreateViewsFromSelected = CreateViewsFromSelected;
             settings.SheetNamePrefix = SheetNamePrefix;
             settings.ViewNamePrefix = ViewNamePrefix;
+
+            settings.SelectedTitleBlockName = SelectedTitleBlock.Name;
+            settings.SelectedViewFamilyTypeName = SelectedViewFamilyType.Name;
+            settings.SelectedViewportTypeName = SelectedViewportType.Name;
+
 
             _pluginConfig.SaveProjectConfig();
         }
@@ -693,8 +734,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                                             + specHelper.LastPartOfSpecName;
 
                                     newViewSchedule = GetOrCreateSpec(specHelper, newScheduleName, numberOfLevelAsInt);
-
-
 
                                     // Располагаем созданные спеки на листе в позициях как у спек, с которых производилось копирование
                                     if(newSheet != null && newViewSchedule != null && _revitRepository.GetSpecFromSheetByName(newSheet, newScheduleName) is null) {
