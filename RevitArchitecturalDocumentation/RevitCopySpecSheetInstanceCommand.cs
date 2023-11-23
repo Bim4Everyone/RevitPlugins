@@ -23,9 +23,9 @@ using Application = Autodesk.Revit.ApplicationServices.Application;
 
 namespace RevitArchitecturalDocumentation {
     [Transaction(TransactionMode.Manual)]
-    public class RevitPCOnASPDocsCommand : BasePluginCommand {
-        public RevitPCOnASPDocsCommand() {
-            PluginName = "Создать документацию ПСО и ДДУ";
+    public class RevitCopySpecSheetInstanceCommand : BasePluginCommand {
+        public RevitCopySpecSheetInstanceCommand() {
+            PluginName = "Скопировать спецификации на листы";
         }
 
         protected override void Execute(UIApplication uiApplication) {
@@ -44,13 +44,13 @@ namespace RevitArchitecturalDocumentation {
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
-                kernel.Bind<PCOnASPDocsVM>().ToSelf();
-                kernel.Bind<PCOnASPDocsV>().ToSelf()
+                kernel.Bind<CopySpecSheetInstanceVM>().ToSelf();
+                kernel.Bind<CopySpecSheetInstanceV>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<PCOnASPDocsVM>());
+                        c => c.Kernel.Get<CopySpecSheetInstanceVM>());
 
-                PCOnASPDocsV window = kernel.Get<PCOnASPDocsV>();
+                CopySpecSheetInstanceV window = kernel.Get<CopySpecSheetInstanceV>();
                 if(window.ShowDialog() == true) {
                     GetPlatformService<INotificationService>()
                         .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")

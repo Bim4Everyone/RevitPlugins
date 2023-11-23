@@ -36,7 +36,7 @@ using Parameter = Autodesk.Revit.DB.Parameter;
 using View = Autodesk.Revit.DB.View;
 
 namespace RevitArchitecturalDocumentation.ViewModels {
-    internal class PCOnASPDocsViewModel : BaseViewModel {
+    internal class PCOnASPDocsVM : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
@@ -61,7 +61,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private bool _workWithSheets = true;
         private bool _workWithViews = true;
         private bool _workWithSpecs = true;
-        private bool _createViewsFromSelected = true;
+        private bool _createViewsFromSelected = false;
 
         private StringBuilder _report = new StringBuilder();
         private Regex _regexForBuildingPart = new Regex(@"К(.*?)_");
@@ -73,7 +73,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private string _errorText;
 
 
-        public PCOnASPDocsViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
+        public PCOnASPDocsVM(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
@@ -257,7 +257,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             SelectedTitleBlock = TitleBlocksInProject.FirstOrDefault(a => a.Name.Equals(SelectedTitleBlockName));
 
             if(TasksForWork.Count == 0) {
-                TasksForWork.Add(new TaskInfo(this));
+                TasksForWork.Add(new TaskInfo(RegexForBuildingPart, RegexForBuildingSection, Report));
             }
 
             GetSelectedViews();
@@ -323,6 +323,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             SelectedTitleBlockName = settings.SelectedTitleBlockName;
             SelectedViewFamilyTypeName = settings.SelectedViewFamilyTypeName;
             SelectedViewportTypeName = settings.SelectedViewportTypeName;
+            SelectedFilterNameForSpecs = settings.SelectedFilterNameForSpecs;
         }
 
 
@@ -345,6 +346,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             settings.SelectedTitleBlockName = SelectedTitleBlock.Name;
             settings.SelectedViewFamilyTypeName = SelectedViewFamilyType.Name;
             settings.SelectedViewportTypeName = SelectedViewportType.Name;
+            settings.SelectedFilterNameForSpecs = SelectedFilterNameForSpecs;
 
 
             _pluginConfig.SaveProjectConfig();
@@ -365,7 +367,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
         private void AddTask() {
 
-            TasksForWork.Add(new TaskInfo(this));
+            TasksForWork.Add(new TaskInfo(RegexForBuildingPart, RegexForBuildingSection, Report));
         }
 
         private void DeleteTask() {
@@ -392,23 +394,23 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                 foreach(Reference reference in references) {
 
-                    ScheduleSheetInstance elem = _revitRepository.Document.GetElement(reference) as ScheduleSheetInstance;
-                    if(elem is null) {
+                    ScheduleSheetInstance scheduleSheetInstance = _revitRepository.Document.GetElement(reference) as ScheduleSheetInstance;
+                    if(scheduleSheetInstance is null) {
                         continue;
                     }
 
-                    SpecHelper specHelper = new SpecHelper(Report, _revitRepository, elem);
+                    SpecHelper specHelper = new SpecHelper(_revitRepository, scheduleSheetInstance, Report);
                     task.ScheduleSheetInstances.Add(specHelper);
-                    specHelper.GetInfo();
+                    specHelper.GetNameInfo();
                 }
                 GetFilterNames();
             }
 
 
-            PCOnASPDocsView mainWindow = new PCOnASPDocsView {
+            PCOnASPDocsV window = new PCOnASPDocsV {
                 DataContext = this
             };
-            mainWindow.ShowDialog();
+            window.ShowDialog();
         }
 
 
@@ -508,7 +510,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                     task.NumberOfBuildingSectionAsInt,
                                     numberOfLevel);
 
-                                sheetHelper = new SheetHelper(Report, _revitRepository);
+                                sheetHelper = new SheetHelper(_revitRepository, Report);
                                 sheetHelper.GetOrCreateSheet(newSheetName, SelectedTitleBlock, "Ширина", "Высота", 150, 110);
                             }
 
@@ -539,7 +541,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                                 foreach(SpecHelper specHelper in task.ScheduleSheetInstances) {
 
-                                    if(!specHelper.CanWorkWithIt) {
+                                    if(!specHelper.HasProblemWithLevelDetection) {
                                         Report.AppendLine($"❗               В задании спецификации имеются ошибки, создание спецификации отменено!");
                                         continue;
                                     }
@@ -610,7 +612,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                     task.NumberOfBuildingSectionAsInt,
                                     numberOfLevel);
 
-                                sheetHelper = new SheetHelper(Report, _revitRepository);
+                                sheetHelper = new SheetHelper(_revitRepository, Report);
                                 sheetHelper.GetOrCreateSheet(newSheetName, SelectedTitleBlock);
                             }
 
@@ -639,7 +641,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                                 foreach(SpecHelper specHelper in task.ScheduleSheetInstances) {
 
-                                    if(!specHelper.CanWorkWithIt) {
+                                    if(!specHelper.HasProblemWithLevelDetection) {
                                         Report.AppendLine($"❗               В задании спецификации имеются ошибки, создание спецификации отменено!");
                                         continue;
                                     }

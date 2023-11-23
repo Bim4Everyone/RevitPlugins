@@ -11,7 +11,7 @@ using RevitArchitecturalDocumentation.ViewModels;
 
 namespace RevitArchitecturalDocumentation.Models {
     internal class SpecHelper {
-        public SpecHelper(StringBuilder report, RevitRepository revitRepository, ScheduleSheetInstance scheduleSheetInstance) {
+        public SpecHelper(RevitRepository revitRepository, ScheduleSheetInstance scheduleSheetInstance, StringBuilder report = null) {
 
             Report = report;
             Repository = revitRepository;
@@ -23,7 +23,7 @@ namespace RevitArchitecturalDocumentation.Models {
             SpecificationFilters = SpecificationDefinition.GetFilters().ToList();
         }
 
-        public SpecHelper(StringBuilder report, RevitRepository revitRepository, ViewSchedule viewSchedule) {
+        public SpecHelper(RevitRepository revitRepository, ViewSchedule viewSchedule, StringBuilder report = null) {
 
             Report = report;
             Repository = revitRepository;
@@ -36,7 +36,7 @@ namespace RevitArchitecturalDocumentation.Models {
         public StringBuilder Report { get; set; }
         public RevitRepository Repository { get; set; }
 
-        public bool CanWorkWithIt { get; set; } = true;
+        public bool HasProblemWithLevelDetection { get; set; } = true;
         public ScheduleSheetInstance SpecSheetInstance { get; set; }
         public XYZ SpecSheetInstancePoint { get; set; }
         public ViewSchedule Specification { get; set; }
@@ -65,7 +65,7 @@ namespace RevitArchitecturalDocumentation.Models {
 
 
 
-        public void GetInfo() {
+        public void GetNameInfo() {
 
             // "О_ПСО_05 этаж_Жилье Корпуса 1-3"
             // [FirstPartOfSpecName][PrefixOfSpecName] NUMBER [SuffixOfSpecName][LastPartOfSpecName]
@@ -73,7 +73,7 @@ namespace RevitArchitecturalDocumentation.Models {
 
             if(!Specification.Name.Contains("_")) {
 
-                CanWorkWithIt = false;
+                HasProblemWithLevelDetection = false;
                 return;
             }
 
@@ -82,7 +82,7 @@ namespace RevitArchitecturalDocumentation.Models {
                                                 .FirstOrDefault(o => o.Contains("этаж"));
 
             if(keyPartOfName is null) {
-                CanWorkWithIt = false;
+                HasProblemWithLevelDetection = false;
                 return;
             }
 
@@ -99,7 +99,7 @@ namespace RevitArchitecturalDocumentation.Models {
 
             int levelNumberAsInt;
             if(!int.TryParse(levelNumberAsStr, out levelNumberAsInt)) {
-                CanWorkWithIt = false;
+                HasProblemWithLevelDetection = false;
                 return;
             }
             LevelNumber = levelNumberAsInt;
@@ -140,16 +140,16 @@ namespace RevitArchitecturalDocumentation.Models {
             SpecHelper newSpecHelper;
             // Если спеку с указанным именем не нашли, то будем создавать дублированием
             if(newViewSpec is null) {
-                Report.AppendLine($"                Спецификация с именем {specName} не найдена в проекте, приступаем к созданию");
+                Report?.AppendLine($"                Спецификация с именем {specName} не найдена в проекте, приступаем к созданию");
                 newViewSpec = Repository.Document.GetElement(Specification.Duplicate(ViewDuplicateOption.Duplicate)) as ViewSchedule;
-                Report.AppendLine($"                Спецификация успешно создана!");
+                Report?.AppendLine($"                Спецификация успешно создана!");
                 newViewSpec.Name = specName;
-                Report.AppendLine($"                Задано имя: {newViewSpec.Name}");
-                newSpecHelper = new SpecHelper(Report, Repository, newViewSpec);
+                Report?.AppendLine($"                Задано имя: {newViewSpec.Name}");
+                newSpecHelper = new SpecHelper(Repository, newViewSpec, Report);
                 newSpecHelper.ChangeSpecFilters(filterName, numberOfLevelAsInt);
             } else {
-                Report.AppendLine($"                Спецификация с именем {newViewSpec.Name} успешно найдена в проекте!");
-                newSpecHelper = new SpecHelper(Report, Repository, newViewSpec);
+                Report?.AppendLine($"                Спецификация с именем {newViewSpec.Name} успешно найдена в проекте!");
+                newSpecHelper = new SpecHelper(Repository, newViewSpec, Report);
             }
             newSpecHelper.SpecSheetInstancePoint = SpecSheetInstancePoint;
 
@@ -176,7 +176,7 @@ namespace RevitArchitecturalDocumentation.Models {
                     string newVal = String.Format(format, newFilterValue);
                     currentFilter.SetValue(newVal);
 
-                    Report.AppendLine($"               Фильтру задали значение {currentFilter.GetStringValue()}");
+                    Report?.AppendLine($"               Фильтру задали значение {currentFilter.GetStringValue()}");
                     newScheduleFilters.Add(currentFilter);
                 } else {
                     newScheduleFilters.Add(currentFilter);
@@ -201,9 +201,9 @@ namespace RevitArchitecturalDocumentation.Models {
             SpecSheetInstance = newScheduleSheetInstance;
 
             if(newScheduleSheetInstance is null) {
-                Report.AppendLine($"❗          Не удалось создать видовой экран спецификации на листе!");
+                Report?.AppendLine($"❗          Не удалось создать видовой экран спецификации на листе!");
             } else {
-                Report.AppendLine($"           Видовой экран спецификации успешно создан на листе!");
+                Report?.AppendLine($"           Видовой экран спецификации успешно создан на листе!");
             }
 
             return newScheduleSheetInstance;

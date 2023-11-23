@@ -36,5 +36,6 @@ namespace RevitArchitecturalDocumentation.Models {
         public string SelectedTitleBlockName { get; set; }
         public string SelectedViewFamilyTypeName { get; set; }
         public string SelectedViewportTypeName { get; set; }
+        public string SelectedFilterNameForSpecs { get; set; }
     }
 }

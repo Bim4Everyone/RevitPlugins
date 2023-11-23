@@ -27,17 +27,17 @@ namespace RevitArchitecturalDocumentation.Models {
         public ViewPlan GetView(string newViewName, Element visibilityScope = null, ViewFamilyType viewFamilyType = null, Level level = null, ViewPlan viewForDublicate = null) {
 
             if(newViewName.Length == 0) {
-                Report.AppendLine($"❗               Произошла ошибка при работе с видом! Передано некорректное имя для задания!");
+                Report?.AppendLine($"❗               Произошла ошибка при работе с видом! Передано некорректное имя для задания!");
                 return null;
             }
 
             ViewPlan newViewPlan = Repository.FindViewByName(newViewName);
             // Если newViewPlan is null, значит вид с указанным именем не найден в проекте и его нужно создать
             if(newViewPlan is null) {
-                Report.AppendLine($"                Вид с именем {newViewName} не найден в проекте, приступаем к созданию!");
+                Report?.AppendLine($"                Вид с именем {newViewName} не найден в проекте, приступаем к созданию!");
 
                 if(level is null && viewForDublicate is null) {
-                    Report.AppendLine($"❗               Произошла ошибка при создании вида! Не передано для задания уровень и область видимости!");
+                    Report?.AppendLine($"❗               Произошла ошибка при создании вида! Не передано для задания уровень и область видимости!");
                     return null;
                 }
 
@@ -51,7 +51,7 @@ namespace RevitArchitecturalDocumentation.Models {
                 }
 
             } else {
-                Report.AppendLine($"                Вид с именем {newViewName} успешно найден в проекте!");
+                Report?.AppendLine($"                Вид с именем {newViewName} успешно найден в проекте!");
                 View = newViewPlan;
             }
                         
@@ -66,27 +66,27 @@ namespace RevitArchitecturalDocumentation.Models {
         public ViewPlan CreateView(string newViewName, ViewFamilyType viewFamilyType, Level level) {
 
             if(newViewName.Length == 0) {
-                Report.AppendLine($"❗               Произошла ошибка при создании нового вида! Передано некорректное имя для задания!");
+                Report?.AppendLine($"❗               Произошла ошибка при создании нового вида! Передано некорректное имя для задания!");
                 return null;
             }
             if(viewFamilyType is null) {
-                Report.AppendLine($"❗               Произошла ошибка при создании нового вида! Не указан типоразмер вида!");
+                Report?.AppendLine($"❗               Произошла ошибка при создании нового вида! Не указан типоразмер вида!");
                 return null;
             }
             if(level is null) {
-                Report.AppendLine($"❗               Произошла ошибка при создании нового вида! Не указан уровень, на котором нужно создать вид!");
+                Report?.AppendLine($"❗               Произошла ошибка при создании нового вида! Не указан уровень, на котором нужно создать вид!");
                 return null;
             }
 
             ViewPlan newViewPlan;
             try {
                 newViewPlan = ViewPlan.Create(Repository.Document, viewFamilyType.Id, level.Id);
-                Report.AppendLine($"                Вид успешно создан!");
-                Report.AppendLine($"                Виду назначен тип {viewFamilyType.Name}!");
+                Report?.AppendLine($"                Вид успешно создан!");
+                Report?.AppendLine($"                Виду назначен тип {viewFamilyType.Name}!");
                 newViewPlan.Name = newViewName;
-                Report.AppendLine($"                Задано имя: {newViewPlan.Name}");
+                Report?.AppendLine($"                Задано имя: {newViewPlan.Name}");
             } catch(Exception) {
-                Report.AppendLine($"❗               Произошла ошибка при создании нового вида!");
+                Report?.AppendLine($"❗               Произошла ошибка при создании нового вида!");
                 return null;
             }
 
@@ -101,12 +101,12 @@ namespace RevitArchitecturalDocumentation.Models {
         public ViewPlan DublicateView(string newViewName, ViewPlan viewForDublicate) {
 
             if(newViewName.Length == 0) {
-                Report.AppendLine($"❗               Произошла ошибка при настройке вида! Передано некорректное имя для задания!");
+                Report?.AppendLine($"❗               Произошла ошибка при настройке вида! Передано некорректное имя для задания!");
                 return null;
             }
 
             if(viewForDublicate is null) {
-                Report.AppendLine($"❗               Произошла ошибка при создании нового вида! Не указан вид, который нужно продублировать!");
+                Report?.AppendLine($"❗               Произошла ошибка при создании нового вида! Не указан вид, который нужно продублировать!");
                 return null;
             }
 
@@ -114,11 +114,11 @@ namespace RevitArchitecturalDocumentation.Models {
             try {
                 ElementId newViewPlanId = viewForDublicate.Duplicate(ViewDuplicateOption.WithDetailing);
                 newViewPlan = viewForDublicate.Document.GetElement(newViewPlanId) as ViewPlan;
-                Report.AppendLine($"                Вид успешно продублирован!");
+                Report?.AppendLine($"                Вид успешно продублирован!");
                 newViewPlan.Name = newViewName;
-                Report.AppendLine($"                Задано имя: {newViewName}");
+                Report?.AppendLine($"                Задано имя: {newViewName}");
             } catch(Exception) {
-                Report.AppendLine($"❗               Произошла ошибка при дублировании вида!");
+                Report?.AppendLine($"❗               Произошла ошибка при дублировании вида!");
             }
 
             View = newViewPlan;
@@ -132,21 +132,21 @@ namespace RevitArchitecturalDocumentation.Models {
         public void SetUpView(Element visibilityScope) {
 
             if(visibilityScope is null) {
-                Report.AppendLine($"❗               Произошла ошибка при работе с видом! Передана некорректная область видимости!");
+                Report?.AppendLine($"❗               Произошла ошибка при работе с видом! Передана некорректная область видимости!");
                 return;
             }
 
             if(View is null) {
-                Report.AppendLine($"❗               Произошла ошибка при настройке вида, вид для работы не найден!");
+                Report?.AppendLine($"❗               Произошла ошибка при настройке вида, вид для работы не найден!");
                 return;
             }
 
             try {
                 View.get_Parameter(BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP).Set(visibilityScope.Id);
-                Report.AppendLine($"                Задана область видимости: {visibilityScope.Name}");
+                Report?.AppendLine($"                Задана область видимости: {visibilityScope.Name}");
 
                 View.get_Parameter(BuiltInParameter.VIEWER_ANNOTATION_CROP_ACTIVE).Set(1);
-                Report.AppendLine($"                Задана образка аннотаций на виде");
+                Report?.AppendLine($"                Задана образка аннотаций на виде");
 
                 ViewCropRegionShapeManager cropManager = View.GetCropRegionShapeManager();
                 double dim = UnitUtilsHelper.ConvertToInternalValue(3);
@@ -154,10 +154,10 @@ namespace RevitArchitecturalDocumentation.Models {
                 cropManager.BottomAnnotationCropOffset = dim;
                 cropManager.LeftAnnotationCropOffset = dim;
                 cropManager.RightAnnotationCropOffset = dim;
-                Report.AppendLine($"                Задано минимальное смещение обрезки аннотаций");
+                Report?.AppendLine($"                Задано минимальное смещение обрезки аннотаций");
 
             } catch(Exception) {
-                Report.AppendLine($"❗               Произошла ошибка при настройке вида!");
+                Report?.AppendLine($"❗               Произошла ошибка при настройке вида!");
             }
         }
 
@@ -170,29 +170,29 @@ namespace RevitArchitecturalDocumentation.Models {
 
             // Если переданный лист или вид is null или вид.экран вида нельзя добавить на лист, то возвращаем null
             if(viewSheet is null) {
-                Report.AppendLine($"❗               Произошла ошибка при размещении вида! Лист для размещения не найден!");
+                Report?.AppendLine($"❗               Произошла ошибка при размещении вида! Лист для размещения не найден!");
                 return null;
             }
             if(View is null) {
-                Report.AppendLine($"❗               Произошла ошибка при размещении вида! Вид для размещения не найден!");
+                Report?.AppendLine($"❗               Произошла ошибка при размещении вида! Вид для размещения не найден!");
                 return null;
             }
             if(!Viewport.CanAddViewToSheet(Repository.Document, viewSheet.Id, View.Id)) {
-                Report.AppendLine($"❗               Произошла ошибка при размещении вида! Нельзя разместить вид на листе!");
+                Report?.AppendLine($"❗               Произошла ошибка при размещении вида! Нельзя разместить вид на листе!");
                 return null;
             }
 
             // Размещаем план на листе в начальной точке, чтобы оценить габариты
             Viewport viewPort = Viewport.Create(Repository.Document, viewSheet.Id, View.Id, new XYZ(0, 0, 0));
             if(viewPort is null) {
-                Report.AppendLine($"❗       Не удалось создать вид на листе!");
+                Report?.AppendLine($"❗       Не удалось создать вид на листе!");
                 return null;
             }
-            Report.AppendLine($"        Видовой экран успешно создан на листе!");
+            Report?.AppendLine($"        Видовой экран успешно создан на листе!");
 
             if(viewportType != null) {
                 viewPort.ChangeTypeId(viewportType.Id);
-                Report.AppendLine($"        Видовому экрану задан тип {viewportType.Name}!");
+                Report?.AppendLine($"        Видовому экрану задан тип {viewportType.Name}!");
             }
 
             XYZ viewportCenter = viewPort.GetBoxCenter();
@@ -207,7 +207,7 @@ namespace RevitArchitecturalDocumentation.Models {
                 .FirstOrDefault() as FamilyInstance;
 
             if(titleBlock is null) {
-                Report.AppendLine($"❗       Не удалось найти рамку листа, она нужна для правильного расположения вида на листе!");
+                Report?.AppendLine($"❗       Не удалось найти рамку листа, она нужна для правильного расположения вида на листе!");
                 return null;
             }
 
@@ -227,11 +227,11 @@ namespace RevitArchitecturalDocumentation.Models {
                 0);
 
             viewPort.SetBoxCenter(correctPosition);
-            Report.AppendLine($"        Вид успешно спозиционирован на листе!");
+            Report?.AppendLine($"        Вид успешно спозиционирован на листе!");
 
 #if REVIT_2022_OR_GREATER
             viewPort.LabelOffset = new XYZ(0.142591947719928, 0.318344950433976, 0);
-            Report.AppendLine($"        Оглавление вида успешно спозиционировано на листе!");
+            Report?.AppendLine($"        Оглавление вида успешно спозиционировано на листе!");
 #endif
 
             return viewPort;
