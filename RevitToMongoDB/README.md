@@ -3,10 +3,10 @@
 
 # Сборка проекта
 ```
-nuke compile --profile RevitToMongoDB
+nuke compile --plugin-name RevitToMongoDB
 ```
 
 # Публикация проекта
 ```
-nuke publish --profile RevitToMongoDB
+nuke publish --plugin-name RevitToMongoDB
 ```
