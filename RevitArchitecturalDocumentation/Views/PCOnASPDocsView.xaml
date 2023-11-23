@@ -1,5 +1,5 @@
 ﻿<base:PlatformWindow
-    x:Class="RevitArchitecturalDocumentation.Views.MainWindow"
+    x:Class="RevitArchitecturalDocumentation.Views.PCOnASPDocsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -13,11 +13,11 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
-    Title="MainWindow"
+    Title="PCOnASPDocsView"
     Height="600" Width="1060"
     MinHeight="600" MinWidth="1060"
 
-    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    d:DataContext="{d:DesignInstance vms:PCOnASPDocsViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">

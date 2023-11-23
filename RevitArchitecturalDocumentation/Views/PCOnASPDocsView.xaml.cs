@@ -1,13 +1,13 @@
 ﻿using System.Windows;
 
 namespace RevitArchitecturalDocumentation.Views {
-    public partial class MainWindow {
-        public MainWindow() {
+    public partial class PCOnASPDocsView {
+        public PCOnASPDocsView() {
             InitializeComponent();
         }
 
         public override string PluginName => nameof(RevitArchitecturalDocumentation);
-        public override string ProjectConfigName => nameof(MainWindow);
+        public override string ProjectConfigName => nameof(PCOnASPDocsView);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;

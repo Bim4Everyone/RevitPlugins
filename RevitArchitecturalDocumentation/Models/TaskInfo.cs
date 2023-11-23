@@ -14,11 +14,11 @@ using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.
 
 namespace RevitArchitecturalDocumentation.Models {
     internal class TaskInfo {
-        public TaskInfo(MainViewModel mvm) {
+        public TaskInfo(PCOnASPDocsViewModel mvm) {
             MVM = mvm;
         }
 
-        public MainViewModel MVM { get; set; }
+        public PCOnASPDocsViewModel MVM { get; set; }
         public bool CanWorkWithIt { get; set; } = true;
 
         public Element SelectedVisibilityScope { get; set; }

@@ -23,9 +23,9 @@ using Application = Autodesk.Revit.ApplicationServices.Application;
 
 namespace RevitArchitecturalDocumentation {
     [Transaction(TransactionMode.Manual)]
-    public class RevitArchitecturalDocumentationCommand : BasePluginCommand {
-        public RevitArchitecturalDocumentationCommand() {
-            PluginName = "Создание архитектурной документации";
+    public class RevitPCOnASPDocsCommand : BasePluginCommand {
+        public RevitPCOnASPDocsCommand() {
+            PluginName = "Создание документации ПСО и ДДУ";
         }
 
         protected override void Execute(UIApplication uiApplication) {
@@ -44,13 +44,13 @@ namespace RevitArchitecturalDocumentation {
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
-                kernel.Bind<MainViewModel>().ToSelf();
-                kernel.Bind<MainWindow>().ToSelf()
+                kernel.Bind<PCOnASPDocsViewModel>().ToSelf();
+                kernel.Bind<PCOnASPDocsView>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<MainViewModel>());
+                        c => c.Kernel.Get<PCOnASPDocsViewModel>());
 
-                MainWindow window = kernel.Get<MainWindow>();
+                PCOnASPDocsView window = kernel.Get<PCOnASPDocsView>();
                 if(window.ShowDialog() == true) {
                     GetPlatformService<INotificationService>()
                         .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")

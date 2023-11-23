@@ -36,7 +36,7 @@ using Parameter = Autodesk.Revit.DB.Parameter;
 using View = Autodesk.Revit.DB.View;
 
 namespace RevitArchitecturalDocumentation.ViewModels {
-    internal class MainViewModel : BaseViewModel {
+    internal class PCOnASPDocsViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
@@ -73,7 +73,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private string _errorText;
 
 
-        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
+        public PCOnASPDocsViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
@@ -405,7 +405,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             }
 
 
-            MainWindow mainWindow = new MainWindow {
+            PCOnASPDocsView mainWindow = new PCOnASPDocsView {
                 DataContext = this
             };
             mainWindow.ShowDialog();
