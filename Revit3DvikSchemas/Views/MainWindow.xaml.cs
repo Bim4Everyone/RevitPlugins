@@ -1,4 +1,7 @@
 using System.Windows;
+using System.Windows.Controls;
+
+using Revit3DvikSchemas.ViewModels;
 
 namespace Revit3DvikSchemas.Views {
     public partial class MainWindow {
@@ -21,6 +24,22 @@ namespace Revit3DvikSchemas.Views {
 
         private void ListView_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
 
+        }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e) {
+            ChangeSelected(true);
+        }
+
+        private void CheckBox_Unchecked(object sender, RoutedEventArgs e) {
+            ChangeSelected(false);
+        }
+
+        private void ChangeSelected(bool state) {
+            var listView = (ListView) FindName("HvacSystems");
+            var hvacSystems = listView.SelectedItems;
+            foreach(HvacSystemViewModel hvacSystem in hvacSystems) {
+                hvacSystem.IsChecked = state;
+            }
         }
     }
 }

@@ -57,10 +57,6 @@
 
             </ComboBox>
 
-
-
-
-
             <TextBox
                 Text="{Binding Path=CategoriesFilter, UpdateSourceTrigger=PropertyChanged}"
                 Width="150" Height="20"
@@ -68,11 +64,11 @@
                 />
         </StackPanel>
 
-        <ListView 
+        <ListView
+            x:Name="HvacSystems"
             Margin="25,0,25,0"
             Grid.Row="2"
             SelectionMode="Extended"
-            x:Name="MyList"
             ItemsSource="{Binding RevitHVACSystems, UpdateSourceTrigger=PropertyChanged }"
             >
             <ListView.View>
@@ -87,9 +83,9 @@
                             <GridViewColumn.CellTemplate >
                                 <DataTemplate>
                                     <CheckBox
-                                        
-                                    IsChecked="{Binding IsChecked}"
-                                    />
+                                        Checked="CheckBox_Checked"
+                                        Unchecked="CheckBox_Unchecked"
+                                        IsChecked="{Binding IsChecked}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -98,26 +94,52 @@
             </ListView.View>
         </ListView>
 
-
-
         <StackPanel
-            Grid.Row="3"
-            Orientation="Vertical"
-            HorizontalAlignment="Left"
+            Grid.Row="3">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-            >
-            <CheckBox 
-                Margin="25,5,0,0"
-                IsChecked="{Binding CombineFilters}">
-                <TextBlock Text="Все выделенные на один вид"></TextBlock>
-            </CheckBox>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <CheckBox 
+                        Grid.Column="0"
+                        Margin="10 5"
+                        FlowDirection="RightToLeft"
+                        Content="Все выделенные на один вид"
+                        IsChecked="{Binding CombineFilters}">
+                </CheckBox>
 
-            <CheckBox 
-                Margin="25,5,0,0"
-                IsChecked="{Binding UseFopNames}">
+                <CheckBox 
+                        Grid.Column="1"
+                        Margin="10 5"
+                        Content="Схемы по ФОП_ВИС_Имя системы"
+                        IsChecked="{Binding UseFopNames}"/>
 
-                <TextBlock Text="Схемы по ФОП_ВИС_Имя системы"/>
-            </CheckBox>
+
+                <Button 
+                    Grid.Row="1"
+                    Margin="25,0,0,0"
+                    FlowDirection="RightToLeft"
+                    Content="Выделить все"/>
+                <Button
+                    Content="Отменить выбор"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="25,0,0,0"/>
+            </Grid>
+
+            <StackPanel
+                    Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center">
+
+            </StackPanel>
         </StackPanel>
 
         <StackPanel
