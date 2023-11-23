@@ -11,9 +11,10 @@ using RevitArchitecturalDocumentation.ViewModels;
 
 namespace RevitArchitecturalDocumentation.Models {
     internal class SpecHelper {
-        public SpecHelper(MainViewModel mvm, ScheduleSheetInstance scheduleSheetInstance) {
+        public SpecHelper(StringBuilder report, RevitRepository revitRepository, ScheduleSheetInstance scheduleSheetInstance) {
 
-            MVM = mvm;
+            Report = report;
+            Repository = revitRepository;
 
             SpecSheetInstance = scheduleSheetInstance;
             SpecSheetInstancePoint = scheduleSheetInstance.Point;
@@ -22,18 +23,20 @@ namespace RevitArchitecturalDocumentation.Models {
             SpecificationFilters = SpecificationDefinition.GetFilters().ToList();
         }
 
-        public SpecHelper(MainViewModel mvm, ViewSchedule viewSchedule) {
+        public SpecHelper(StringBuilder report, RevitRepository revitRepository, ViewSchedule viewSchedule) {
 
-            MVM = mvm;
+            Report = report;
+            Repository = revitRepository;
 
             Specification = viewSchedule;
             SpecificationDefinition = Specification.Definition;
             SpecificationFilters = SpecificationDefinition.GetFilters().ToList();
         }
 
-        public MainViewModel MVM { get; set; }
-        public bool CanWorkWithIt { get; set; } = true;
+        public StringBuilder Report { get; set; }
+        public RevitRepository Repository { get; set; }
 
+        public bool CanWorkWithIt { get; set; } = true;
         public ScheduleSheetInstance SpecSheetInstance { get; set; }
         public XYZ SpecSheetInstancePoint { get; set; }
         public ViewSchedule Specification { get; set; }
@@ -106,6 +109,7 @@ namespace RevitArchitecturalDocumentation.Models {
             SuffixOfLevelNumber = keyPartOfName.Replace(levelNumberAsStr, "");
         }
 
+
         /// <summary>
         /// Получает строку формата на основе количества символов подаваемой строки с числом
         /// Строка формата представляет собой последовательность "{0:" + "0"*{Длина входной строки} + "}"
@@ -119,6 +123,37 @@ namespace RevitArchitecturalDocumentation.Models {
 
             for(int i = 0; i < numAsString.Length; i++) { format += "0"; }
             return "{0:" + format + "}";
+        }
+
+
+        /// <summary>
+        /// Метод находит в проекте, а если не нашел, то создает спецификацию с указанным именем и задает ей фильтрацию
+        /// </summary>
+        public SpecHelper GetOrDublicateNSetSpec(string filterName, int numberOfLevelAsInt) {
+
+            string specName = FirstPartOfSpecName
+                              + String.Format(FormatOfLevelNumber, numberOfLevelAsInt)
+                              + SuffixOfLevelNumber
+                              + LastPartOfSpecName;
+
+            ViewSchedule newViewSpec = Repository.GetSpecByName(specName);
+            SpecHelper newSpecHelper;
+            // Если спеку с указанным именем не нашли, то будем создавать дублированием
+            if(newViewSpec is null) {
+                Report.AppendLine($"                Спецификация с именем {specName} не найдена в проекте, приступаем к созданию");
+                newViewSpec = Repository.Document.GetElement(Specification.Duplicate(ViewDuplicateOption.Duplicate)) as ViewSchedule;
+                Report.AppendLine($"                Спецификация успешно создана!");
+                newViewSpec.Name = specName;
+                Report.AppendLine($"                Задано имя: {newViewSpec.Name}");
+                newSpecHelper = new SpecHelper(Report, Repository, newViewSpec);
+                newSpecHelper.ChangeSpecFilters(filterName, numberOfLevelAsInt);
+            } else {
+                Report.AppendLine($"                Спецификация с именем {newViewSpec.Name} успешно найдена в проекте!");
+                newSpecHelper = new SpecHelper(Report, Repository, newViewSpec);
+            }
+            newSpecHelper.SpecSheetInstancePoint = SpecSheetInstancePoint;
+
+            return newSpecHelper;
         }
 
 
@@ -141,7 +176,7 @@ namespace RevitArchitecturalDocumentation.Models {
                     string newVal = String.Format(format, newFilterValue);
                     currentFilter.SetValue(newVal);
 
-                    MVM.Report.AppendLine($"            Фильтру задаем значение {currentFilter.GetStringValue()}");
+                    Report.AppendLine($"               Фильтру задали значение {currentFilter.GetStringValue()}");
                     newScheduleFilters.Add(currentFilter);
                 } else {
                     newScheduleFilters.Add(currentFilter);
@@ -149,6 +184,29 @@ namespace RevitArchitecturalDocumentation.Models {
             }
 
             SpecificationDefinition.SetFilters(newScheduleFilters);
+        }
+
+
+        /// <summary>
+        /// Размещает спецификацию на листе
+        /// </summary>
+        public ScheduleSheetInstance PlaceSpec(SheetHelper sheetHelper) {
+
+            ScheduleSheetInstance newScheduleSheetInstance = ScheduleSheetInstance.Create(
+                    Repository.Document,
+                    sheetHelper.Sheet.Id,
+                    Specification.Id,
+                    SpecSheetInstancePoint);
+
+            SpecSheetInstance = newScheduleSheetInstance;
+
+            if(newScheduleSheetInstance is null) {
+                Report.AppendLine($"❗          Не удалось создать видовой экран спецификации на листе!");
+            } else {
+                Report.AppendLine($"           Видовой экран спецификации успешно создан на листе!");
+            }
+
+            return newScheduleSheetInstance;
         }
     }
 }

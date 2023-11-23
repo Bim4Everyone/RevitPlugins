@@ -49,7 +49,7 @@ namespace RevitArchitecturalDocumentation.Models {
                 .OfType<ViewSheet>()
                 .FirstOrDefault(o => o.Name.Equals(sheetName));
 
-        public ViewPlan GetViewByName(string viewName) => new FilteredElementCollector(Document)
+        public ViewPlan FindViewByName(string viewName) => new FilteredElementCollector(Document)
                 .OfClass(typeof(ViewPlan))
                 .OfType<ViewPlan>()
                 .FirstOrDefault(o => o.Name.Equals(viewName));

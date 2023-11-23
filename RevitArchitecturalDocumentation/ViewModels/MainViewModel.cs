@@ -51,7 +51,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private string _selectedViewportTypeName;
         private FamilySymbol _selectedTitleBlock;
         private string _selectedTitleBlockName;
-        private List<View> _selectedViews = new List<View>();
+        private ObservableCollection<ViewPlan> _selectedViews = new ObservableCollection<ViewPlan>();
         private ObservableCollection<TaskInfo> _tasksForWork = new ObservableCollection<TaskInfo>();
         private TaskInfo _selectedTask;
         private string _viewNamePrefix = string.Empty;
@@ -121,7 +121,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _regexForView, value);
         }
 
-        public List<View> SelectedViews {
+        public ObservableCollection<ViewPlan> SelectedViews {
             get => _selectedViews;
             set => this.RaiseAndSetIfChanged(ref _selectedViews, value);
         }
@@ -289,6 +289,17 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                 return false;
             }
 
+            if(WorkWithSpecs && SelectedFilterNameForSpecs is null) {
+                return false;
+            }
+
+            foreach(TaskInfo task in TasksForWork) {
+
+                if(task.SelectedVisibilityScope is null) {
+                    return false;
+                }
+            }
+
             return true;
         }
 
@@ -344,7 +355,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             // При работе с ДДУ листы пользователь должен выбрать заранее, т.к. селектор API не позволяет выбирать элементы из диспетчера
             foreach(ElementId id in _revitRepository.ActiveUIDocument.Selection.GetElementIds()) {
 
-                View view = _revitRepository.Document.GetElement(id) as View;
+                ViewPlan view = _revitRepository.Document.GetElement(id) as ViewPlan;
                 if(view != null) {
                     SelectedViews.Add(view);
                 }
@@ -366,7 +377,9 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         }
 
 
-
+        /// <summary>
+        /// После скрытия окна позволяет выбрать видовые экраны спек в Revit
+        /// </summary>
         private void SelectSpecs(object obj) {
 
             TaskInfo task = obj as TaskInfo;
@@ -384,7 +397,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                         continue;
                     }
 
-                    SpecHelper specHelper = new SpecHelper(this, elem);
+                    SpecHelper specHelper = new SpecHelper(Report, _revitRepository, elem);
                     task.ScheduleSheetInstances.Add(specHelper);
                     specHelper.GetInfo();
                 }
@@ -434,207 +447,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         }
 
 
-        /// <summary>
-        /// Метод находит в проекте, а если не нашел, то создает лист с указанным именем
-        /// </summary>
-        private ViewSheet GetOrCreateSheet(string newSheetName) {
-
-            ViewSheet newSheet = _revitRepository.GetSheetByName(newSheetName);
-            if(newSheet is null) {
-                Report.AppendLine($"                Лист с именем {newSheetName} не найден в проекте, приступаем к созданию");
-                try {
-                    newSheet = ViewSheet.Create(_revitRepository.Document, SelectedTitleBlock.Id);
-                    Report.AppendLine($"                Лист успешно создан!");
-                    newSheet.Name = newSheetName;
-                    Report.AppendLine($"                Задано имя: {newSheet.Name}");
-
-                    // Ищем рамку листа
-                    FamilyInstance titleBlock = new FilteredElementCollector(_revitRepository.Document, newSheet.Id)
-                        .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                        .WhereElementIsNotElementType()
-                        .FirstOrDefault() as FamilyInstance;
-
-                    if(titleBlock != null) {
-                        Parameter widthParam = titleBlock.LookupParameter("Ширина");
-                        Parameter heightParam = titleBlock.LookupParameter("Высота");
-
-                        if(widthParam != null && heightParam != null) {
-                            titleBlock.LookupParameter("Ширина").Set(150 / 304.8);
-                            titleBlock.LookupParameter("Высота").Set(110 / 304.8);
-                        }
-                    }
-
-                    _revitRepository.Document.Regenerate();
-                } catch(Exception) {
-                    Report.AppendLine($"❗               Произошла ошибка при создании листа!");
-                }
-            } else {
-                Report.AppendLine($"                Лист с именем {newSheetName} успешно найден в проекте!");
-            }
-            return newSheet;
-        }
-
-
-        /// <summary>
-        /// Метод находит в проекте, а если не нашел, то создает/дублирует вид с указанным именем
-        /// </summary>
-        private ViewPlan GetOrCreateView(TaskInfo task, string newViewName, Level level = null, View view = null) {
-
-            ViewPlan newViewPlan = _revitRepository.GetViewByName(newViewName);
-            if(newViewPlan is null) {
-                Report.AppendLine($"                Вид с именем {newViewName} не найден в проекте, приступаем к созданию");
-                try {
-                    if(CreateViewsFromSelected) {
-                        ElementId newViewPlanId = view.Duplicate(ViewDuplicateOption.WithDetailing);
-                        newViewPlan = view.Document.GetElement(newViewPlanId) as ViewPlan;
-                        if(newViewPlan is null) {
-                            Report.AppendLine($"❗               Произошла ошибка при дублировании вида!");
-                            return null;
-                        }
-                        Report.AppendLine($"                Вид успешно продублирован!");
-                    } else {
-                        newViewPlan = ViewPlan.Create(_revitRepository.Document, SelectedViewFamilyType.Id, level.Id);
-                        Report.AppendLine($"                Вид успешно создан!");
-                    }
-                    newViewPlan.Name = newViewName;
-                    Report.AppendLine($"                Задано имя: {newViewPlan.Name}");
-                    newViewPlan.get_Parameter(BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP).Set(task.SelectedVisibilityScope.Id);
-                    Report.AppendLine($"                Задана область видимости: {task.SelectedVisibilityScope.Name}");
-
-                    newViewPlan.get_Parameter(BuiltInParameter.VIEWER_ANNOTATION_CROP_ACTIVE).Set(1);
-                    Report.AppendLine($"                Задана образка аннотаций на виде");
-
-                    ViewCropRegionShapeManager cropManager = newViewPlan.GetCropRegionShapeManager();
-                    double dim = UnitUtilsHelper.ConvertToInternalValue(3);
-                    cropManager.TopAnnotationCropOffset = dim;
-                    cropManager.BottomAnnotationCropOffset = dim;
-                    cropManager.LeftAnnotationCropOffset = dim;
-                    cropManager.RightAnnotationCropOffset = dim;
-                    Report.AppendLine($"                Задано минимальное смещение обрезки аннотаций");
-
-                } catch(Exception) {
-                    Report.AppendLine($"❗               Произошла ошибка при работе с видом!");
-                }
-            } else {
-                Report.AppendLine($"                Вид с именем {newViewName} успешно найден в проекте!");
-            }
-            return newViewPlan;
-        }
-
-
-        /// <summary>
-        /// Метод находит в проекте, а если не нашел, то создает спецификацию с указанным именем и задает ей фильрацию
-        /// </summary>
-        private ViewSchedule GetOrCreateSpec(SpecHelper specHelper, string newSpecName, int numberOfLevelAsInt) {
-
-            ViewSchedule newViewSpec = _revitRepository.GetSpecByName(newSpecName);
-            if(newViewSpec is null) {
-                try {
-                    Report.AppendLine($"                Спецификация с именем {newSpecName} не найдена в проекте, приступаем к созданию");
-                    newViewSpec = _revitRepository.Document.GetElement(specHelper.Specification.Duplicate(ViewDuplicateOption.Duplicate)) as ViewSchedule;
-                    Report.AppendLine($"                Спецификация успешно создана!");
-                    newViewSpec.Name = newSpecName;
-                    Report.AppendLine($"                Задано имя: {newViewSpec.Name}");
-                    SpecHelper newSpec = new SpecHelper(this, newViewSpec);
-                    newSpec.ChangeSpecFilters(SelectedFilterNameForSpecs, numberOfLevelAsInt);
-                    Report.AppendLine($"                Фильтрация задана успешно!");
-                } catch(Exception) {
-                    Report.AppendLine($"❗               Произошла ошибка при работе со спецификацией!");
-                }
-            } else {
-                Report.AppendLine($"                Спецификация с именем {newSpecName} успешно найдена в проекте!");
-            }
-
-            return newViewSpec;
-        }
-
-
-
-        /// <summary>
-        /// Метод находит в проекте, а если не нашел, то создает спецификацию с указанным именем и задает ей фильрацию
-        /// </summary>
-        private Viewport PlaceViewportOnSheet(ViewSheet viewSheet, ViewPlan viewPlan) {
-
-            // Размещаем план на листе
-            Viewport viewPort = Viewport.Create(_revitRepository.Document, viewSheet.Id, viewPlan.Id, new XYZ(0, 0, 0));
-            if(viewPort is null) {
-                Report.AppendLine($"❗       Не удалось создать вид на листе!");
-                return null;
-            }
-            Report.AppendLine($"        Видовой экран успешно создан на листе!");
-
-            if(SelectedViewportType != null) {
-                viewPort.ChangeTypeId(SelectedViewportType.Id);
-                Report.AppendLine($"        Видовому экрану задан тип {SelectedViewportType.Name}!");
-            }
-
-            XYZ viewportCenter = viewPort.GetBoxCenter();
-            Outline viewportOutline = viewPort.GetBoxOutline();
-            double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
-            //double viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
-
-            // Ищем рамку листа
-            FamilyInstance titleBlock = new FilteredElementCollector(_revitRepository.Document, viewSheet.Id)
-                .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                .WhereElementIsNotElementType()
-                .FirstOrDefault() as FamilyInstance;
-
-            if(titleBlock is null) {
-                Report.AppendLine($"❗       Не удалось найти рамку листа, она нужна для правильного расположения вида на листе!");
-                return null;
-            }
-
-            _revitRepository.Document.Regenerate();
-
-            // Получение габаритов рамки листа
-            BoundingBoxXYZ boundingBoxXYZ = titleBlock.get_BoundingBox(viewSheet);
-            double titleBlockWidth = boundingBoxXYZ.Max.X - boundingBoxXYZ.Min.X;
-            double titleBlockHeight = boundingBoxXYZ.Max.Y - boundingBoxXYZ.Min.Y;
-
-            double titleBlockMinY = boundingBoxXYZ.Min.Y;
-            double titleBlockMinX = boundingBoxXYZ.Min.X;
-
-            XYZ correctPosition = new XYZ(
-                titleBlockMinX + viewportHalfWidth,
-                titleBlockHeight / 2 + titleBlockMinY,
-                0);
-
-            viewPort.SetBoxCenter(correctPosition);
-            Report.AppendLine($"        Вид успешно спозиционирован на листе!");
-
-#if REVIT_2022_OR_GREATER
-            viewPort.LabelOffset = new XYZ(0.142591947719928, 0.318344950433976, 0);
-            Report.AppendLine($"        Оглавление вида успешно спозиционировано на листе!");
-#endif
-
-            return viewPort;
-        }
-
-
-
-        /// <summary>
-        /// Метод находит на листе, а если не нашел, то создает видовой экран спецификации
-        /// </summary>
-        private ScheduleSheetInstance PlaceSpecViewportOnSheet(SpecHelper specHelper, ViewSheet viewSheet, ViewSchedule viewSchedule) {
-
-            ScheduleSheetInstance newScheduleSheetInstance = _revitRepository.GetSpecFromSheetByName(viewSheet, viewSchedule.Name);
-
-            // Если спека не найдена на листе, то добавляем ее
-            if(newScheduleSheetInstance is null) {
-                newScheduleSheetInstance = ScheduleSheetInstance.Create(
-                    _revitRepository.Document,
-                    viewSheet.Id,
-                    viewSchedule.Id,
-                    specHelper.SpecSheetInstancePoint);
-
-                Report.AppendLine($"        Спецификация успешно размещена на листе!");
-            } else {
-                Report.AppendLine($"        Спецификация уже была размещена на листе!");
-            }
-
-            return newScheduleSheetInstance;
-        }
-
 
         private void DoWork() {
 
@@ -655,7 +467,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                     TaskDialog.Show("fd", "создание с видов");
                     TaskDialog.Show("Число выбранных видов", SelectedViews.Count.ToString());
 
-                    foreach(View view in SelectedViews) {
+                    foreach(ViewPlan view in SelectedViews) {
 
                         string numberOfLevel = RegexForView.Match(view.Name.ToLower()).Groups[1].Value;
 
@@ -687,7 +499,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                 continue;
                             }
 
-                            ViewSheet newSheet = null;
+                            SheetHelper sheetHelper = null;
                             if(WorkWithSheets) {
 
                                 string newSheetName = string.Format("{0}корпус {1}_секция {2}_этаж {3}",
@@ -696,10 +508,12 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                     task.NumberOfBuildingSectionAsInt,
                                     numberOfLevel);
 
-                                newSheet = GetOrCreateSheet(newSheetName);
+                                sheetHelper = new SheetHelper(Report, _revitRepository);
+                                sheetHelper.GetOrCreateSheet(newSheetName, SelectedTitleBlock, "Ширина", "Высота", 150, 110);
                             }
 
-                            ViewPlan newViewPlan = null;
+
+                            ViewHelper viewHelper = null;
                             if(WorkWithViews) {
 
                                 string newViewName = string.Format("{0}{1} этаж К{2}_С{3}{4}{5}",
@@ -710,15 +524,17 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                     viewNamePartWithSectionPart,
                                     task.ViewNameSuffix);
 
-                                newViewPlan = GetOrCreateView(task, newViewName, null, view);
+                                viewHelper = new ViewHelper(Report, _revitRepository);
+                                viewHelper.GetView(newViewName, task.SelectedVisibilityScope, viewForDublicate: view);
 
-                                if(newSheet != null && newViewPlan != null && Viewport.CanAddViewToSheet(_revitRepository.Document, newSheet.Id, newViewPlan.Id)) {
+                                if(sheetHelper.Sheet != null 
+                                    && viewHelper.View != null 
+                                    && Viewport.CanAddViewToSheet(_revitRepository.Document, sheetHelper.Sheet.Id, viewHelper.View.Id)) {
 
-                                    PlaceViewportOnSheet(newSheet, newViewPlan);
+                                    viewHelper.PlaceViewportOnSheet(sheetHelper.Sheet, SelectedViewportType);
                                 }
                             }
 
-                            ViewSchedule newViewSchedule = null;
                             if(WorkWithSpecs) {
 
                                 foreach(SpecHelper specHelper in task.ScheduleSheetInstances) {
@@ -728,27 +544,15 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                         continue;
                                     }
 
-                                    string newScheduleName = specHelper.FirstPartOfSpecName
-                                                            + String.Format(specHelper.FormatOfLevelNumber, numberOfLevelAsInt)
-                                                            + specHelper.SuffixOfLevelNumber
-                                                            + specHelper.LastPartOfSpecName;
-
-                                    newViewSchedule = GetOrCreateSpec(specHelper, newScheduleName, numberOfLevelAsInt);
+                                    SpecHelper newSpecHelper = specHelper.GetOrDublicateNSetSpec(SelectedFilterNameForSpecs, numberOfLevelAsInt);                                  
 
                                     // Располагаем созданные спеки на листе в позициях как у спек, с которых производилось копирование
-                                    if(newSheet != null && newViewSchedule != null && _revitRepository.GetSpecFromSheetByName(newSheet, newScheduleName) is null) {
+                                    // В случае если лист и размещаемая на нем спека не null и на листе еще нет вид.экрана этой спеки
+                                    if(sheetHelper.Sheet != null 
+                                        && newSpecHelper.Specification != null
+                                        && !sheetHelper.HasSpecWithName(newSpecHelper.Specification.Name)) {
 
-                                        ScheduleSheetInstance newScheduleSheetInstance = ScheduleSheetInstance.Create(
-                                            _revitRepository.Document,
-                                            newSheet.Id,
-                                            newViewSchedule.Id,
-                                            specHelper.SpecSheetInstancePoint);
-
-                                        if(newScheduleSheetInstance is null) {
-                                            Report.AppendLine($"❗       Не удалось создать видовой экран спецификации на листе!");
-                                        } else {
-                                            Report.AppendLine($"        Видовой экран спецификации успешно создан на листе!");
-                                        }
+                                        ScheduleSheetInstance newScheduleSheetInstance = newSpecHelper.PlaceSpec(sheetHelper);
                                     }
                                 }
                             }
@@ -797,7 +601,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                             Report.AppendLine($"        Уровень: {level.Name} подходит под диапазон {task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}:");
 
 
-                            ViewSheet newSheet = null;
+                            SheetHelper sheetHelper = null;
                             if(WorkWithSheets) {
 
                                 string newSheetName = string.Format("{0}корпус {1}_секция {2}_этаж {3}",
@@ -806,29 +610,31 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                     task.NumberOfBuildingSectionAsInt,
                                     numberOfLevel);
 
-                                newSheet = GetOrCreateSheet(newSheetName);
+                                sheetHelper = new SheetHelper(Report, _revitRepository);
+                                sheetHelper.GetOrCreateSheet(newSheetName, SelectedTitleBlock);
                             }
 
-
-                            ViewPlan newViewPlan = null;
+                            ViewHelper viewHelper = null;
                             if(WorkWithViews) {
 
                                 string newViewName = string.Format("{0}{1} этаж К{2}{3}",
                                     ViewNamePrefix,
                                     numberOfLevel,
-                                    task.NumberOfBuildingPartAsInt,
+                                    task.NumberOfBuildingPartAsInt, 
                                     task.ViewNameSuffix);
 
-                                newViewPlan = GetOrCreateView(task, newViewName, level);
+                                viewHelper = new ViewHelper(Report, _revitRepository);
+                                viewHelper.GetView(newViewName, task.SelectedVisibilityScope, SelectedViewFamilyType, level);
 
-                                if(newSheet != null && newViewPlan != null && Viewport.CanAddViewToSheet(_revitRepository.Document, newSheet.Id, newViewPlan.Id)) {
+                                if(sheetHelper.Sheet != null 
+                                    && viewHelper.View != null 
+                                    && Viewport.CanAddViewToSheet(_revitRepository.Document, sheetHelper.Sheet.Id, viewHelper.View.Id)) {
 
-                                    PlaceViewportOnSheet(newSheet, newViewPlan);
+                                    viewHelper.PlaceViewportOnSheet(sheetHelper.Sheet, SelectedViewportType);
                                 }
                             }
 
 
-                            ViewSchedule newViewSchedule = null;
                             if(WorkWithSpecs) {
 
                                 foreach(SpecHelper specHelper in task.ScheduleSheetInstances) {
@@ -838,20 +644,15 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                         continue;
                                     }
 
-                                    string newScheduleName = specHelper.FirstPartOfSpecName
-                                                            + String.Format(specHelper.FormatOfLevelNumber, numberOfLevelAsInt)
-                                                            + specHelper.SuffixOfLevelNumber
-                                                            + specHelper.LastPartOfSpecName;
+                                    SpecHelper newSpecHelper = specHelper.GetOrDublicateNSetSpec(SelectedFilterNameForSpecs, numberOfLevelAsInt);
 
-                                    newViewSchedule = GetOrCreateSpec(specHelper, newScheduleName, numberOfLevelAsInt);
+                                    // Располагаем созданные спеки на листе в позициях как у спек, с которых производилось копирование
+                                    // В случае если лист и размещаемая на нем спека не null и на листе еще нет вид.экрана этой спеки
+                                    if(sheetHelper.Sheet != null 
+                                        && newSpecHelper.Specification != null
+                                        && !sheetHelper.HasSpecWithName(newSpecHelper.Specification.Name)) {
 
-
-
-                                    // Располагаем созданные спеки на листе в позициях как у спек, с которых производилось копирование, 
-                                    // в случае если лист и спека существуют и видовой экран спеки не найден на листе
-                                    if(newSheet != null && newViewSchedule != null) {
-
-                                        PlaceSpecViewportOnSheet(specHelper, newSheet, newViewSchedule);
+                                        newSpecHelper.PlaceSpec(sheetHelper);
                                     }
                                 }
                             }
