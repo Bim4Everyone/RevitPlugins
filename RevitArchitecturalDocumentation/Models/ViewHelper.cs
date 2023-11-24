@@ -198,7 +198,7 @@ namespace RevitArchitecturalDocumentation.Models {
             XYZ viewportCenter = viewPort.GetBoxCenter();
             Outline viewportOutline = viewPort.GetBoxOutline();
             double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
-            //double viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
+            double viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
 
             // Ищем рамку листа
             FamilyInstance titleBlock = new FilteredElementCollector(Repository.Document, viewSheet.Id)
@@ -223,14 +223,14 @@ namespace RevitArchitecturalDocumentation.Models {
 
             XYZ correctPosition = new XYZ(
                 titleBlockMinX + viewportHalfWidth,
-                titleBlockHeight / 2 + titleBlockMinY,
+                titleBlockMinY + titleBlockHeight / 2,
                 0);
 
             viewPort.SetBoxCenter(correctPosition);
             Report?.AppendLine($"        Вид успешно спозиционирован на листе!");
 
 #if REVIT_2022_OR_GREATER
-            viewPort.LabelOffset = new XYZ(0.142591947719928, 0.318344950433976, 0);
+            viewPort.LabelOffset = new XYZ(viewportHalfWidth * 0.9, viewportHalfHeight * 2, 0);
             Report?.AppendLine($"        Оглавление вида успешно спозиционировано на листе!");
 #endif
 
