@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using RevitArchitecturalDocumentation.ViewModels;
 
@@ -171,15 +173,16 @@ namespace RevitArchitecturalDocumentation.Models {
                 return;
             }
 
-            // Предполагаем, что лист назван: "ПСО_корпус 1_секция 1_этаж 4", т.е. блок с этажом отделен "_"
-            // ищем "05 этаж"
+            // Предполагаем, что лист назван: "ПСО_корпус 1_секция 1_этаж 5", т.е. блок с этажом отделен "_"
+            // ищем "05 этаж" или "этаж 05"
             if(!Sheet.Name.Contains("_")) { return; }
             string keyPartOfName = Sheet.Name.ToLower().Split('_').FirstOrDefault(o => o.Contains("этаж"));
 
             if(keyPartOfName is null) { return; }
 
             // Получаем "05"
-            string levelNumberAsStr = keyPartOfName.Replace(" ", "").Replace("этаж", "");
+            Regex regex = new Regex(@"\d+");
+            string levelNumberAsStr = regex.Match(keyPartOfName).Groups[0].Value;
 
             // Получаем int(5)
             if(!int.TryParse(levelNumberAsStr, out int numberOfLevelAsInt)) { return; }
