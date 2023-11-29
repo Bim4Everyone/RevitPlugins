@@ -143,6 +143,8 @@ namespace RevitRemoveRoomTags.ViewModels {
             var settings = _pluginConfig.GetSettings(_revitRepository.Document);
 
             if(settings is null) { return; }
+
+            NeedOpenSelectedViews = settings.NeedOpenSelectedViews;
         }
 
 
@@ -153,6 +155,8 @@ namespace RevitRemoveRoomTags.ViewModels {
 
             var settings = _pluginConfig.GetSettings(_revitRepository.Document)
                           ?? _pluginConfig.AddSettings(_revitRepository.Document);
+
+            settings.NeedOpenSelectedViews = NeedOpenSelectedViews;
 
             _pluginConfig.SaveProjectConfig();
         }

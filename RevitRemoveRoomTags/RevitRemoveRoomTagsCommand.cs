@@ -50,16 +50,20 @@ namespace RevitRemoveRoomTags {
                     .WithPropertyValue(nameof(Window.DataContext),
                         c => c.Kernel.Get<MainViewModel>());
 
-                MainWindow window = kernel.Get<MainWindow>();
-                if(window.ShowDialog() == true) {
-                    GetPlatformService<INotificationService>()
-                        .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                        .ShowAsync();
-                } else {
-                    GetPlatformService<INotificationService>()
-                        .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                        .ShowAsync();
-                }
+
+                Notification(kernel.Get<MainWindow>());
+
+
+                //MainWindow window = kernel.Get<MainWindow>();
+                //if(window.ShowDialog() == true) {
+                //    GetPlatformService<INotificationService>()
+                //        .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                //        .ShowAsync();
+                //} else {
+                //    GetPlatformService<INotificationService>()
+                //        .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                //        .ShowAsync();
+                //}
             }
         }
     }

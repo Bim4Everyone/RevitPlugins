@@ -1,4 +1,4 @@
-﻿using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
 
@@ -22,5 +22,7 @@ namespace RevitRemoveRoomTags.Models {
 
     internal class PluginSettings : ProjectSettings {
         public override string ProjectName { get; set; }
+
+        public bool NeedOpenSelectedViews { get; set; }
     }
 }
