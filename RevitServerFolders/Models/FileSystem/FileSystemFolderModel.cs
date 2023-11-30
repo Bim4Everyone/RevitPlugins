@@ -17,10 +17,12 @@ namespace RevitServerFolders.Models.FileSystem {
         public override bool HasChildren => true;
 
         public override Task<IEnumerable<ModelObject>> GetChildrenObjects() {
-            IEnumerable<ModelObject> modelOObjects = _directoryInfo.GetFiles("*.rvt", SearchOption.AllDirectories)
-                .Select(item => new FileSystemFileModel(item));
+            return Task.Run(() => {
+                IEnumerable<ModelObject> modelOObjects = _directoryInfo.GetFiles("*.rvt", SearchOption.AllDirectories)
+                    .Select(item => new FileSystemFileModel(item));
 
-            return Task.FromResult(modelOObjects.ToArray().AsEnumerable());
+                return modelOObjects.ToArray().AsEnumerable();
+            });
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -42,6 +43,14 @@ namespace RevitServerFolders.Services {
                 .Select(item => new FileSystemFolderModel(item));
 
             return Task.FromResult(folders.ToArray().AsEnumerable());
+        }
+
+        public Task<ModelObject> GetFromString(string folderName) {
+            if(Directory.Exists(folderName)) {
+                return Task.FromResult((ModelObject) new FileSystemFolderModel(new DirectoryInfo(folderName)));
+            }
+
+            return Task.FromResult((ModelObject) default);
         }
     }
 }

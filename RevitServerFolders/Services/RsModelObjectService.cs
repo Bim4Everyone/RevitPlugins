@@ -12,5 +12,9 @@ namespace RevitServerFolders.Services {
         public Task<IEnumerable<ModelObject>> SelectModelObjectsDialog() {
             throw new System.NotImplementedException();
         }
+        
+        public Task<ModelObject> GetFromString(string folderName) {
+            throw new System.NotImplementedException();
+        }
     }
 }
