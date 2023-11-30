@@ -5,11 +5,13 @@ using dosymep.Serializers;
 using pyRevitLabs.Json;
 
 namespace RevitServerFolders.Models {
-    internal class PluginConfig : ProjectConfig<RevitSettings> {
+    internal class PluginConfig : ProjectConfig {
         [JsonIgnore] public override string ProjectConfigPath { get; set; }
 
         [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
-
+        
+        public string TargetFolder { get; set; }
+        
         public static PluginConfig GetPluginConfig() {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())
@@ -18,10 +20,5 @@ namespace RevitServerFolders.Models {
                 .SetProjectConfigName(nameof(PluginConfig) + ".json")
                 .Build<PluginConfig>();
         }
-    }
-
-    internal class RevitSettings : ProjectSettings {
-        public override string ProjectName { get; set; }
-        public string SaveProperty { get; set; }
     }
 }

@@ -97,8 +97,13 @@ namespace RevitServerFolders.ViewModels {
         }
 
         private bool CanAcceptView() {
-            if(string.IsNullOrEmpty(SaveProperty)) {
-                ErrorText = "Введите значение сохраняемого свойства.";
+            if(string.IsNullOrEmpty(TargetFolder)) {
+                ErrorText = "Выберите папку назначения.";
+                return false;
+            }
+            
+            if(!Directory.Exists(TargetFolder)) {
+                ErrorText = "Выберите существующую папку назначения.";
                 return false;
             }
 
@@ -141,16 +146,11 @@ namespace RevitServerFolders.ViewModels {
         }
 
         private void LoadConfig() {
-            RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
-            SaveProperty = setting?.SaveProperty ?? "Привет Revit!";
+            TargetFolder = _pluginConfig?.TargetFolder ?? Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         }
 
         private void SaveConfig() {
-            RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                                    ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
-            setting.SaveProperty = SaveProperty;
+            _pluginConfig.TargetFolder = TargetFolder;
             _pluginConfig.SaveProjectConfig();
         }
 

@@ -121,6 +121,7 @@
 
         <dxg:TreeViewControl
             Grid.Row="2"
+            Margin="5"
             ShowNodeImages="True"
 
             TreeViewFieldName="Name"
