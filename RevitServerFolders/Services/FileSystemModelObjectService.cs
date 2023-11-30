@@ -16,18 +16,32 @@ namespace RevitServerFolders.Services {
             _openFolderDialogService = openFolderDialogService;
         }
 
-        public Task<IEnumerable<ModelObject>> OpenModelObjectDialog() {
+        public Task<ModelObject> SelectModelObjectDialog() {
+            _openFolderDialogService.Multiselect = false;
+            _openFolderDialogService.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+            if(!_openFolderDialogService.ShowDialog()) {
+                throw new OperationCanceledException();
+            }
+
+            IEnumerable<ModelObject> folders = _openFolderDialogService.Folders
+                .Select(item => new FileSystemFolderModel(item));
+
+            return Task.FromResult(folders.FirstOrDefault());
+        }
+
+        public Task<IEnumerable<ModelObject>> SelectModelObjectsDialog() {
             _openFolderDialogService.Multiselect = true;
             _openFolderDialogService.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
-            if(_openFolderDialogService.ShowDialog()) {
-                IEnumerable<ModelObject> folders = _openFolderDialogService.Folders
-                    .Select(item => new FileSystemFolderModel(item));
-
-                return Task.FromResult(folders.ToArray().AsEnumerable());
+            if(!_openFolderDialogService.ShowDialog()) {
+                throw new OperationCanceledException();
             }
 
-            return Task.FromResult(Enumerable.Empty<ModelObject>());
+            IEnumerable<ModelObject> folders = _openFolderDialogService.Folders
+                .Select(item => new FileSystemFolderModel(item));
+
+            return Task.FromResult(folders.ToArray().AsEnumerable());
         }
     }
 }

@@ -12,8 +12,8 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-    xmlns:selectors="clr-namespace:RevitServerFolders.TemplateSelectors"
     xmlns:services="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
+    xmlns:converters="clr-namespace:RevitServerFolders.Converters"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -31,39 +31,8 @@
     </dxmvvm:Interaction.Behaviors>
 
     <Window.Resources>
-        <DataTemplate
-            x:Key="FolderTemplate"
-            DataType="{x:Type vms:ModelObjectViewModel}">
-            <DockPanel>
-                <TextBlock
-                    DockPanel.Dock="Left"
-                    Text="{Binding Name}" />
-                <dx:SimpleButton
-                    DockPanel.Dock="Right"
-                    Content="Удалить" />
-            </DockPanel>
-        </DataTemplate>
-
-        <DataTemplate
-            x:Key="ModelTemplate"
-            DataType="{x:Type vms:ModelObjectViewModel}">
-            <DockPanel>
-                <TextBlock
-                    DockPanel.Dock="Left"
-                    Text="{Binding Name}" />
-                <dx:SimpleButton
-                    DockPanel.Dock="Right"
-                    Content="Удалить" />
-            </DockPanel>
-        </DataTemplate>
-
-        <selectors:FoldersTreeTemplateSelector
-            x:Key="TreeTemplateSelector"
-            ModelNodeTemplate="{StaticResource ModelTemplate}"
-            FolderNodeTemplate="{StaticResource FolderTemplate}" />
-
-        <selectors:TreeImageSelector
-            x:Key="TreeImageSelector"
+        <converters:CellImageConverter
+            x:Key="CellImageConverter"
             Empty="{dx:DXImage 'Office2013/Actions/New_16x16.png'}"
             Model="{dx:DXImage 'Office2013/Actions/Group_16x16.png'}"
             Folder="{dx:DXImage 'Office2013/Support/Article_16x16.png'}" />
@@ -71,6 +40,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -118,22 +88,65 @@
                 </dxe:ButtonInfo>
             </dxe:ButtonEdit.Buttons>
         </dxe:ButtonEdit>
-
-        <dxg:TreeViewControl
+        
+        <dxe:ButtonEdit
             Grid.Row="2"
             Margin="5"
-            ShowNodeImages="True"
+            AllowDefaultButton="False"
+            EditValue="{Binding SourceFolder.FullName}">
+            <dxe:ButtonEdit.Buttons>
+                <dxe:ButtonInfo Command="{Binding OpenFromFoldersCommand}">
+                    <dxe:ButtonInfo.ContentTemplate>
+                        <DataTemplate>
+                            <dx:DXImage Source="{dx:DXImage 'Office2013/Alignment/ContentArrangeInRows_16x16.png'}" />
+                        </DataTemplate>
+                    </dxe:ButtonInfo.ContentTemplate>
+                </dxe:ButtonInfo>
+            </dxe:ButtonEdit.Buttons>
+        </dxe:ButtonEdit>
 
-            TreeViewFieldName="Name"
-            ChildNodesPath="Children"
-            ExpandStateFieldName="IsExpanded"
-
+        <dxg:GridControl
+            Grid.Row="3"
+            Margin="5"
             ItemsSource="{Binding ModelObjects}"
-            NodeImageSelector="{StaticResource TreeImageSelector}" />
+            SelectedItem="{Binding SelectedObject}">
+
+            <dxg:GridControl.View>
+                <dxg:TableView AutoWidth="True"
+                               AllowEditing="False"
+                               AllowGrouping="False"
+                               ShowGroupPanel="True" />
+            </dxg:GridControl.View>
+
+            <dxg:GridColumn
+                Width="25"
+                MinWidth="25"
+                MaxWidth="25"
+                AllowMoving="False"
+                AllowSorting="False"
+                AllowResizing="False"
+                AllowGrouping="False"
+                UnboundType="Object"
+                Header="">
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate DataType="{x:Type dxg:EditGridCellData}">
+                        <Image
+                            Source="{Binding RowData.Row, 
+                                Converter={StaticResource CellImageConverter}}" />
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+            </dxg:GridColumn>
+
+            <dxg:GridColumn
+                FieldName="Name"
+                Header="Наименование" />
+            <dxg:GridColumn
+                FieldName="FullName"
+                Header="Полное наименование" />
+        </dxg:GridControl>
 
         <StackPanel
-            Grid.Row="3"
-            Height="45"
+            Grid.Row="4"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <TextBlock

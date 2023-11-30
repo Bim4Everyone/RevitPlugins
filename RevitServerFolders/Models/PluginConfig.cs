@@ -11,7 +11,8 @@ namespace RevitServerFolders.Models {
         [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
         
         public string TargetFolder { get; set; }
-        
+        public string SourceFolder { get; set; }
+
         public static PluginConfig GetPluginConfig() {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())

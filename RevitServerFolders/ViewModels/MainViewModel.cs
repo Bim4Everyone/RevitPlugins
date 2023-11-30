@@ -23,6 +23,8 @@ namespace RevitServerFolders.ViewModels {
         private string _saveProperty;
 
         private string _targetFolder;
+        private ModelObjectViewModel _sourceFolder;
+
         private ModelObjectViewModel _selectedObject;
         private ObservableCollection<ModelObjectViewModel> _modelObjects;
 
@@ -77,6 +79,11 @@ namespace RevitServerFolders.ViewModels {
             }
         }
 
+        public ModelObjectViewModel SourceFolder {
+            get => _sourceFolder;
+            set => this.RaiseAndSetIfChanged(ref _sourceFolder, value);
+        }
+
         public ModelObjectViewModel SelectedObject {
             get => _selectedObject;
             set => this.RaiseAndSetIfChanged(ref _selectedObject, value);
@@ -101,7 +108,7 @@ namespace RevitServerFolders.ViewModels {
                 ErrorText = "Выберите папку назначения.";
                 return false;
             }
-            
+
             if(!Directory.Exists(TargetFolder)) {
                 ErrorText = "Выберите существующую папку назначения.";
                 return false;
@@ -122,7 +129,7 @@ namespace RevitServerFolders.ViewModels {
         }
 
         private async Task OpenFromRs() {
-            await AddModelObjects(_rsObjectService);
+            await SelectModelObject(_rsObjectService);
         }
 
         private bool CanOpenFromRs() {
@@ -130,7 +137,7 @@ namespace RevitServerFolders.ViewModels {
         }
 
         private async Task OpenFromFolder() {
-            await AddModelObjects(_fileSystemObjectService);
+            await SelectModelObject(_fileSystemObjectService);
         }
 
         private bool CanOpenFromFolder() {
@@ -146,19 +153,21 @@ namespace RevitServerFolders.ViewModels {
         }
 
         private void LoadConfig() {
-            TargetFolder = _pluginConfig?.TargetFolder ?? Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            TargetFolder = _pluginConfig?.TargetFolder;
+            // SourceFolder = _pluginConfig?.SourceFolder;
         }
 
         private void SaveConfig() {
             _pluginConfig.TargetFolder = TargetFolder;
+            _pluginConfig.SourceFolder = SourceFolder.FullName;
             _pluginConfig.SaveProjectConfig();
         }
 
-        private async Task AddModelObjects(IModelObjectService modelObjectService) {
-            foreach(ModelObject modelObject in await modelObjectService.OpenModelObjectDialog()) {
-                var modelObjectViewModel = new ModelObjectViewModel(modelObject);
-                modelObjectViewModel.LoadChildrenCommand.Execute(null);
-                ModelObjects.Add(modelObjectViewModel);
+        private async Task SelectModelObject(IModelObjectService modelObjectService) {
+            ModelObjects.Clear();
+            ModelObject modelObject = await modelObjectService.SelectModelObjectDialog();
+            foreach(ModelObject child in await modelObject.GetChildrenObjects()) {
+                ModelObjects.Add(new ModelObjectViewModel(child));
             }
         }
     }

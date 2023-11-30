@@ -5,6 +5,6 @@ using RevitServerFolders.Models;
 
 namespace RevitServerFolders.Services {
     internal interface IModelObjectService {
-        Task<IEnumerable<ModelObject>> OpenModelObjectDialog();
+        Task<ModelObject> SelectModelObjectDialog();
     }
 }
