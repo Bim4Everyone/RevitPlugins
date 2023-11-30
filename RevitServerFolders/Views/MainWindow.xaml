@@ -9,37 +9,105 @@
     xmlns:vms="clr-namespace:RevitServerFolders.ViewModels"
 
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-	xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:selectors="clr-namespace:RevitServerFolders.TemplateSelectors"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    
+
     Title="MainWindow"
-    Height="450" Width="800"    
+    Height="450" Width="800"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
-    
+
     <dxmvvm:Interaction.Behaviors>
-        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding LoadViewCommand}"/>
+        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding LoadViewCommand}" />
     </dxmvvm:Interaction.Behaviors>
-    
+
+    <Window.Resources>
+        <DataTemplate
+            x:Key="FolderTemplate"
+            DataType="{x:Type vms:ModelObjectViewModel}">
+            <DockPanel>
+                <TextBlock
+                    DockPanel.Dock="Left"
+                    Text="{Binding Name}" />
+                <dx:SimpleButton
+                    DockPanel.Dock="Right"
+                    Content="Удалить" />
+            </DockPanel>
+        </DataTemplate>
+
+        <DataTemplate
+            x:Key="ModelTemplate"
+            DataType="{x:Type vms:ModelObjectViewModel}">
+            <DockPanel>
+                <TextBlock
+                    DockPanel.Dock="Left"
+                    Text="{Binding Name}" />
+                <dx:SimpleButton
+                    DockPanel.Dock="Right"
+                    Content="Удалить" />
+            </DockPanel>
+        </DataTemplate>
+
+        <selectors:FoldersTreeTemplateSelector
+            x:Key="TreeTemplateSelector"
+            ModelNodeTemplate="{StaticResource ModelTemplate}"
+            FolderNodeTemplate="{StaticResource FolderTemplate}" />
+
+        <selectors:TreeImageSelector
+            x:Key="TreeImageSelector"
+            Empty="{dx:DXImage 'Office2013/Actions/New_16x16.png'}"
+            Model="{dx:DXImage 'Office2013/Actions/Group_16x16.png'}"
+            Folder="{dx:DXImage 'Office2013/Support/Article_16x16.png'}" />
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="45" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
-        <dxe:TextEdit
-            Grid.Row="0"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-
-            Text="{Binding SaveProperty}" />
 
         <StackPanel
+            Grid.Row="0"
+            Orientation="Horizontal">
+
+            <dx:SimpleButton
+                Margin="10"
+                Width="45"
+                Content="Открыть с RS"
+                Command="{Binding OpenFromRsCommand}" />
+
+            <dx:SimpleButton
+                Margin="10"
+                Width="45"
+                Content="Открыть с папки"
+                Command="{Binding OpenFromFoldersCommand}" />
+
+            <dx:SimpleButton
+                Margin="10"
+                Width="45"
+                Content="Удалить"
+                Command="{Binding RemoveModelFolderCommand}" />
+        </StackPanel>
+
+        <dxg:TreeViewControl
             Grid.Row="1"
+            ShowNodeImages="True"
+            
+            TreeViewFieldName="Name"
+            ChildNodesPath="Children"
+            ExpandStateFieldName="IsExpanded"
+            
+            ItemsSource="{Binding ModelObjects}"
+            NodeImageSelector="{StaticResource TreeImageSelector}" />
+
+        <StackPanel
+            Grid.Row="2"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">

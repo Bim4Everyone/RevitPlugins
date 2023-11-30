@@ -1,28 +1,53 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Windows.Input;
+using System.Threading.Tasks;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitServerFolders.Models;
+using RevitServerFolders.Services;
 
 namespace RevitServerFolders.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
+        private readonly IModelObjectService _rsObjectService;
+        private readonly IModelObjectService _fileSystemObjectService;
 
         private string _errorText;
         private string _saveProperty;
 
-        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
+        private ModelObjectViewModel _selectedObject;
+        private ObservableCollection<ModelObjectViewModel> _modelObjects;
+
+        public MainViewModel(
+            PluginConfig pluginConfig,
+            RevitRepository revitRepository,
+            [RsNeeded] IModelObjectService rsObjectService,
+            [FileSystemNeeded] IModelObjectService fileSystemObjectService) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
+            _rsObjectService = rsObjectService;
+            _fileSystemObjectService = fileSystemObjectService;
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+
+            OpenFromRsCommand = RelayCommand.CreateAsync(OpenFromRs, CanOpenFromRs);
+            OpenFromFoldersCommand = RelayCommand.CreateAsync(OpenFromFolder, CanOpenFromFolder);
+            RemoveModelFolderCommand = RelayCommand.Create(RemoveModelFolder, CanRemoveModelFolder);
         }
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
+
+        public ICommand OpenFromRsCommand { get; }
+        public ICommand OpenFromFoldersCommand { get; }
+        public ICommand RemoveModelFolderCommand { get; }
 
         public string ErrorText {
             get => _errorText;
@@ -34,14 +59,25 @@ namespace RevitServerFolders.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
         }
 
+        public ModelObjectViewModel SelectedObject {
+            get => _selectedObject;
+            set => this.RaiseAndSetIfChanged(ref _selectedObject, value);
+        }
+
+        public ObservableCollection<ModelObjectViewModel> ModelObjects {
+            get => _modelObjects;
+            set => this.RaiseAndSetIfChanged(ref _modelObjects, value);
+        }
+
         private void LoadView() {
             LoadConfig();
+            ModelObjects = new ObservableCollection<ModelObjectViewModel>();
         }
 
         private void AcceptView() {
             SaveConfig();
         }
-        
+
         private bool CanAcceptView() {
             if(string.IsNullOrEmpty(SaveProperty)) {
                 ErrorText = "Введите значение сохраняемого свойства.";
@@ -49,6 +85,30 @@ namespace RevitServerFolders.ViewModels {
             }
 
             ErrorText = null;
+            return true;
+        }
+
+        private async Task OpenFromRs() {
+            await AddModelObjects(_rsObjectService);
+        }
+
+        private bool CanOpenFromRs() {
+            return true;
+        }
+
+        private async Task OpenFromFolder() {
+            await AddModelObjects(_fileSystemObjectService);
+        }
+
+        private bool CanOpenFromFolder() {
+            return true;
+        }
+
+        private void RemoveModelFolder() {
+            throw new System.NotImplementedException();
+        }
+
+        private bool CanRemoveModelFolder() {
             return true;
         }
 
@@ -64,6 +124,14 @@ namespace RevitServerFolders.ViewModels {
 
             setting.SaveProperty = SaveProperty;
             _pluginConfig.SaveProjectConfig();
+        }
+
+        private async Task AddModelObjects(IModelObjectService modelObjectService) {
+            foreach(ModelObject modelObject in await modelObjectService.OpenModelObjectDialog()) {
+                var modelObjectViewModel = new ModelObjectViewModel(modelObject);
+                modelObjectViewModel.LoadChildrenCommand.Execute(null);
+                ModelObjects.Add(modelObjectViewModel);
+            }
         }
     }
 }
