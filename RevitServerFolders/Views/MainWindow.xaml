@@ -88,7 +88,7 @@
                 <dxg:TableView AutoWidth="True"
                                AllowEditing="False"
                                AllowGrouping="False"
-                               ShowGroupPanel="True" />
+                               ShowGroupPanel="False" />
             </dxg:GridControl.View>
 
             <dxg:GridColumn
