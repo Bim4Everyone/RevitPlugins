@@ -42,39 +42,12 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel
-            Grid.Row="0"
-            Margin="5"
-            Orientation="Horizontal">
-
-            <dx:SimpleButton
-                Padding="5"
-                ToolTip="Открыть с RS"
-                Command="{Binding OpenFromRsCommand}"
-                Glyph="{dx:DXImage 'Office2013/Alignment/ContentArrangeInRows_16x16.png'}" />
-
-            <dx:SimpleButton
-                Padding="5"
-                Margin="5 0 0 0"
-                ToolTip="Открыть с папки"
-                Command="{Binding OpenFromFoldersCommand}"
-                Glyph="{dx:DXImage 'Office2013/Support/Article_16x16.png'}" />
-
-            <dx:SimpleButton
-                Padding="5"
-                Margin="5 0 0 0"
-                ToolTip="Удалить"
-                Command="{Binding RemoveModelFolderCommand}"
-                Glyph="{dx:DXImage 'Office2013/Edit/Delete_16x16.png'}" />
-        </StackPanel>
-
         <dxe:ButtonEdit
-            Grid.Row="1"
+            Grid.Row="0"
             Margin="5"
             AllowDefaultButton="False"
             EditValue="{Binding TargetFolder}">
@@ -90,7 +63,7 @@
         </dxe:ButtonEdit>
         
         <dxe:ButtonEdit
-            Grid.Row="2"
+            Grid.Row="1"
             Margin="5"
             AllowDefaultButton="False"
             EditValue="{Binding SourceFolder.FullName}">
@@ -106,7 +79,7 @@
         </dxe:ButtonEdit>
 
         <dxg:GridControl
-            Grid.Row="3"
+            Grid.Row="2"
             Margin="5"
             ItemsSource="{Binding ModelObjects}"
             SelectedItem="{Binding SelectedObject}">
@@ -146,7 +119,7 @@
         </dxg:GridControl>
 
         <StackPanel
-            Grid.Row="4"
+            Grid.Row="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <TextBlock
