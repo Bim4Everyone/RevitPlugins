@@ -67,42 +67,45 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="45" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <StackPanel
             Grid.Row="0"
+            Margin="5"
             Orientation="Horizontal">
 
             <dx:SimpleButton
-                Margin="10"
-                Width="45"
-                Content="Открыть с RS"
-                Command="{Binding OpenFromRsCommand}" />
+                Padding="5"
+                ToolTip="Открыть с RS"
+                Command="{Binding OpenFromRsCommand}"
+                Glyph="{dx:DXImage 'Office2013/Alignment/ContentArrangeInRows_16x16.png'}" />
 
             <dx:SimpleButton
-                Margin="10"
-                Width="45"
-                Content="Открыть с папки"
-                Command="{Binding OpenFromFoldersCommand}" />
+                Padding="5"
+                Margin="5 0 0 0"
+                ToolTip="Открыть с папки"
+                Command="{Binding OpenFromFoldersCommand}"
+                Glyph="{dx:DXImage 'Office2013/Support/Article_16x16.png'}" />
 
             <dx:SimpleButton
-                Margin="10"
-                Width="45"
-                Content="Удалить"
-                Command="{Binding RemoveModelFolderCommand}" />
+                Padding="5"
+                Margin="5 0 0 0"
+                ToolTip="Удалить"
+                Command="{Binding RemoveModelFolderCommand}"
+                Glyph="{dx:DXImage 'Office2013/Edit/Delete_16x16.png'}" />
         </StackPanel>
 
         <dxg:TreeViewControl
             Grid.Row="1"
             ShowNodeImages="True"
-            
+
             TreeViewFieldName="Name"
             ChildNodesPath="Children"
             ExpandStateFieldName="IsExpanded"
-            
+
             ItemsSource="{Binding ModelObjects}"
             NodeImageSelector="{StaticResource TreeImageSelector}" />
 
