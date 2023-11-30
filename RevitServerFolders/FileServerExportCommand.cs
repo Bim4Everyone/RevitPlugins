@@ -40,6 +40,9 @@ namespace RevitServerFolders {
                 kernel.Bind<IModelObjectService>()
                     .To<FileSystemModelObjectService>().WhenTargetHas<FileSystemNeeded>();
 
+                kernel.UseXtraOpenFolderDialog<MainWindow>(
+                    initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+
                 kernel.Bind<MainViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)

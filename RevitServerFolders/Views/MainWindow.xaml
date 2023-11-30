@@ -13,6 +13,7 @@
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:selectors="clr-namespace:RevitServerFolders.TemplateSelectors"
+    xmlns:services="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -23,6 +24,9 @@
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <dxmvvm:Interaction.Behaviors>
+        <services:AttachServiceBehavior
+            AttachableService="{Binding OpenFolderDialogService}" />
+
         <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding LoadViewCommand}" />
     </dxmvvm:Interaction.Behaviors>
 
@@ -68,6 +72,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -98,8 +103,24 @@
                 Glyph="{dx:DXImage 'Office2013/Edit/Delete_16x16.png'}" />
         </StackPanel>
 
-        <dxg:TreeViewControl
+        <dxe:ButtonEdit
             Grid.Row="1"
+            Margin="5"
+            AllowDefaultButton="False"
+            EditValue="{Binding TargetFolder}">
+            <dxe:ButtonEdit.Buttons>
+                <dxe:ButtonInfo Command="{Binding OpenFolderDialogCommand}">
+                    <dxe:ButtonInfo.ContentTemplate>
+                        <DataTemplate>
+                            <dx:DXImage Source="{dx:DXImage 'Office2013/Alignment/ContentArrangeInRows_16x16.png'}" />
+                        </DataTemplate>
+                    </dxe:ButtonInfo.ContentTemplate>
+                </dxe:ButtonInfo>
+            </dxe:ButtonEdit.Buttons>
+        </dxe:ButtonEdit>
+
+        <dxg:TreeViewControl
+            Grid.Row="2"
             ShowNodeImages="True"
 
             TreeViewFieldName="Name"
@@ -110,7 +131,7 @@
             NodeImageSelector="{StaticResource TreeImageSelector}" />
 
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="3"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">

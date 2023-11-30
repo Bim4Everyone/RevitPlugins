@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows.Input;
 using System.Threading.Tasks;
 
@@ -21,6 +22,7 @@ namespace RevitServerFolders.ViewModels {
         private string _errorText;
         private string _saveProperty;
 
+        private string _targetFolder;
         private ModelObjectViewModel _selectedObject;
         private ObservableCollection<ModelObjectViewModel> _modelObjects;
 
@@ -28,14 +30,18 @@ namespace RevitServerFolders.ViewModels {
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
             [RsNeeded] IModelObjectService rsObjectService,
-            [FileSystemNeeded] IModelObjectService fileSystemObjectService) {
+            [FileSystemNeeded] IModelObjectService fileSystemObjectService,
+            IOpenFolderDialogService openFolderDialogService) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
             _rsObjectService = rsObjectService;
             _fileSystemObjectService = fileSystemObjectService;
 
+            OpenFolderDialogService = openFolderDialogService;
+
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+            OpenFolderDialogCommand = RelayCommand.Create(OpenFolderDialog, CanOpenFolderDialog);
 
             OpenFromRsCommand = RelayCommand.CreateAsync(OpenFromRs, CanOpenFromRs);
             OpenFromFoldersCommand = RelayCommand.CreateAsync(OpenFromFolder, CanOpenFromFolder);
@@ -44,10 +50,13 @@ namespace RevitServerFolders.ViewModels {
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
+        public ICommand OpenFolderDialogCommand { get; }
 
         public ICommand OpenFromRsCommand { get; }
         public ICommand OpenFromFoldersCommand { get; }
         public ICommand RemoveModelFolderCommand { get; }
+
+        public IOpenFolderDialogService OpenFolderDialogService { get; }
 
         public string ErrorText {
             get => _errorText;
@@ -57,6 +66,15 @@ namespace RevitServerFolders.ViewModels {
         public string SaveProperty {
             get => _saveProperty;
             set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
+        }
+
+        public string TargetFolder {
+            get => _targetFolder;
+            set {
+                if(Directory.Exists(value)) {
+                    this.RaiseAndSetIfChanged(ref _targetFolder, value);
+                }
+            }
         }
 
         public ModelObjectViewModel SelectedObject {
@@ -85,6 +103,16 @@ namespace RevitServerFolders.ViewModels {
             }
 
             ErrorText = null;
+            return true;
+        }
+
+        private void OpenFolderDialog() {
+            if(OpenFolderDialogService.ShowDialog()) {
+                TargetFolder = OpenFolderDialogService.Folder.FullName;
+            }
+        }
+
+        private bool CanOpenFolderDialog() {
             return true;
         }
 
