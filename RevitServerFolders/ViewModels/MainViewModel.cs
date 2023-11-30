@@ -16,12 +16,9 @@ namespace RevitServerFolders.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
-        private readonly IModelObjectService _rsObjectService;
-        private readonly IModelObjectService _fileSystemObjectService;
+        private readonly IModelObjectService _objectService;
 
         private string _errorText;
-        private string _saveProperty;
-
         private string _targetFolder;
         private ModelObjectViewModel _sourceFolder;
 
@@ -31,43 +28,31 @@ namespace RevitServerFolders.ViewModels {
         public MainViewModel(
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
-            [RsNeeded] IModelObjectService rsObjectService,
-            [FileSystemNeeded] IModelObjectService fileSystemObjectService,
+            IModelObjectService objectService,
             IOpenFolderDialogService openFolderDialogService) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
-            _rsObjectService = rsObjectService;
-            _fileSystemObjectService = fileSystemObjectService;
+            _objectService = objectService;
 
             OpenFolderDialogService = openFolderDialogService;
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-            OpenFolderDialogCommand = RelayCommand.Create(OpenFolderDialog, CanOpenFolderDialog);
-
-            OpenFromRsCommand = RelayCommand.CreateAsync(OpenFromRs, CanOpenFromRs);
             OpenFromFoldersCommand = RelayCommand.CreateAsync(OpenFromFolder, CanOpenFromFolder);
-            RemoveModelFolderCommand = RelayCommand.Create(RemoveModelFolder, CanRemoveModelFolder);
+            OpenFolderDialogCommand = RelayCommand.Create(OpenFolderDialog, CanOpenFolderDialog);
         }
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
-        public ICommand OpenFolderDialogCommand { get; }
-
-        public ICommand OpenFromRsCommand { get; }
+        
         public ICommand OpenFromFoldersCommand { get; }
-        public ICommand RemoveModelFolderCommand { get; }
+        public ICommand OpenFolderDialogCommand { get; }
 
         public IOpenFolderDialogService OpenFolderDialogService { get; }
 
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
-        }
-
-        public string SaveProperty {
-            get => _saveProperty;
-            set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
         }
 
         public string TargetFolder {
@@ -117,6 +102,20 @@ namespace RevitServerFolders.ViewModels {
             ErrorText = null;
             return true;
         }
+        
+        private async Task OpenFromFolder() {
+            ModelObjects.Clear();
+            ModelObject modelObject = await _objectService.SelectModelObjectDialog();
+            foreach(ModelObject child in await modelObject.GetChildrenObjects()) {
+                ModelObjects.Add(new ModelObjectViewModel(child));
+            }
+
+            SourceFolder = new ModelObjectViewModel(modelObject);
+        }
+
+        private bool CanOpenFromFolder() {
+            return true;
+        }
 
         private void OpenFolderDialog() {
             if(OpenFolderDialogService.ShowDialog()) {
@@ -125,30 +124,6 @@ namespace RevitServerFolders.ViewModels {
         }
 
         private bool CanOpenFolderDialog() {
-            return true;
-        }
-
-        private async Task OpenFromRs() {
-            await SelectModelObject(_rsObjectService);
-        }
-
-        private bool CanOpenFromRs() {
-            return true;
-        }
-
-        private async Task OpenFromFolder() {
-            await SelectModelObject(_fileSystemObjectService);
-        }
-
-        private bool CanOpenFromFolder() {
-            return true;
-        }
-
-        private void RemoveModelFolder() {
-            throw new System.NotImplementedException();
-        }
-
-        private bool CanRemoveModelFolder() {
             return true;
         }
 
@@ -161,14 +136,6 @@ namespace RevitServerFolders.ViewModels {
             _pluginConfig.TargetFolder = TargetFolder;
             _pluginConfig.SourceFolder = SourceFolder.FullName;
             _pluginConfig.SaveProjectConfig();
-        }
-
-        private async Task SelectModelObject(IModelObjectService modelObjectService) {
-            ModelObjects.Clear();
-            ModelObject modelObject = await modelObjectService.SelectModelObjectDialog();
-            foreach(ModelObject child in await modelObject.GetChildrenObjects()) {
-                ModelObjects.Add(new ModelObjectViewModel(child));
-            }
         }
     }
 }

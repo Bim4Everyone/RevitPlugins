@@ -20,5 +20,9 @@ namespace RevitServerFolders.ViewModels {
         public string FullName => _modelObject.FullName;
         public bool IsFolder => _modelObject.IsFolder;
         public bool HasChildren => _modelObject.HasChildren;
+
+        public override string ToString() {
+            return FullName;
+        }
     }
 }

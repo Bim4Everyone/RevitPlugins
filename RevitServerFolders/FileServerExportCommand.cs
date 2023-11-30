@@ -35,10 +35,7 @@ namespace RevitServerFolders {
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
                 kernel.Bind<IModelObjectService>()
-                    .To<RsModelObjectService>().WhenTargetHas<RsNeeded>();
-                
-                kernel.Bind<IModelObjectService>()
-                    .To<FileSystemModelObjectService>().WhenTargetHas<FileSystemNeeded>();
+                    .To<RsModelObjectService>();
 
                 kernel.UseXtraOpenFolderDialog<MainWindow>(
                     initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
@@ -52,11 +49,5 @@ namespace RevitServerFolders {
                 Notification(kernel.Get<MainWindow>());
             }
         }
-    }
-
-    internal class RsNeeded : Attribute {
-    }
-
-    internal class FileSystemNeeded : Attribute {
     }
 }
