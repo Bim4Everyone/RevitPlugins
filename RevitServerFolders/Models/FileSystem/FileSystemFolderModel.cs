@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
+using dosymep.Bim4Everyone;
+
 namespace RevitServerFolders.Models.FileSystem {
     internal sealed class FileSystemFolderModel : ModelObject {
         private readonly DirectoryInfo _directoryInfo;
@@ -19,10 +21,20 @@ namespace RevitServerFolders.Models.FileSystem {
         public override Task<IEnumerable<ModelObject>> GetChildrenObjects() {
             return Task.Run(() => {
                 IEnumerable<ModelObject> modelOObjects = _directoryInfo.GetFiles("*.rvt", SearchOption.AllDirectories)
+                    .Where(item => IsSupportedVersion(item))
                     .Select(item => new FileSystemFileModel(item));
 
                 return modelOObjects.ToArray().AsEnumerable();
             });
+        }
+
+        private static bool IsSupportedVersion(FileInfo item) {
+            try {
+                return new dosymep.Revit.FileInfo.RevitFileInfo(item.FullName)
+                    .BasicFileInfo.AppInfo.Format.Equals(ModuleEnvironment.RevitVersion);
+            } catch {
+                return false;
+            }
         }
     }
 }
