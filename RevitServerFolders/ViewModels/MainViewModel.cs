@@ -136,7 +136,7 @@ namespace RevitServerFolders.ViewModels {
         }
 
         private async Task OpenFromFolder() {
-            ModelObject modelObject = await _objectService.SelectModelObjectDialog();
+            ModelObject modelObject = await _objectService.SelectModelObjectDialog(SourceFolder);
             SourceFolder = modelObject.FullName;
             await AddModelObjects(modelObject);
         }

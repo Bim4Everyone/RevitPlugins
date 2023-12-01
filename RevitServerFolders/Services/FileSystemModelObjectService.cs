@@ -17,16 +17,24 @@ namespace RevitServerFolders.Services {
             _openFolderDialogService = openFolderDialogService;
         }
 
-        public async Task<ModelObject> SelectModelObjectDialog() {
+        public Task<ModelObject> SelectModelObjectDialog() {
+            return SelectModelObjectDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+        }
+
+        public async Task<ModelObject> SelectModelObjectDialog(string rootFolder) {
             _openFolderDialogService.Multiselect = false;
-            _openFolderDialogService.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            _openFolderDialogService.InitialDirectory = rootFolder ?? Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
             return (await ShowDialog()).FirstOrDefault();
         }
 
         public Task<IEnumerable<ModelObject>> SelectModelObjectsDialog() {
+            return SelectModelObjectsDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+        }
+        
+        public Task<IEnumerable<ModelObject>> SelectModelObjectsDialog(string rootFolder) {
             _openFolderDialogService.Multiselect = true;
-            _openFolderDialogService.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            _openFolderDialogService.InitialDirectory = rootFolder ?? Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
             return ShowDialog();
         }
