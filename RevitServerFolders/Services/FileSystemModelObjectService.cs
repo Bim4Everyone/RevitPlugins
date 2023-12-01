@@ -17,32 +17,18 @@ namespace RevitServerFolders.Services {
             _openFolderDialogService = openFolderDialogService;
         }
 
-        public Task<ModelObject> SelectModelObjectDialog() {
+        public async Task<ModelObject> SelectModelObjectDialog() {
             _openFolderDialogService.Multiselect = false;
             _openFolderDialogService.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
-            if(!_openFolderDialogService.ShowDialog()) {
-                throw new OperationCanceledException();
-            }
-
-            IEnumerable<ModelObject> folders = _openFolderDialogService.Folders
-                .Select(item => new FileSystemFolderModel(item));
-
-            return Task.FromResult(folders.FirstOrDefault());
+            return (await ShowDialog()).FirstOrDefault();
         }
 
         public Task<IEnumerable<ModelObject>> SelectModelObjectsDialog() {
             _openFolderDialogService.Multiselect = true;
             _openFolderDialogService.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
-            if(!_openFolderDialogService.ShowDialog()) {
-                throw new OperationCanceledException();
-            }
-
-            IEnumerable<ModelObject> folders = _openFolderDialogService.Folders
-                .Select(item => new FileSystemFolderModel(item));
-
-            return Task.FromResult(folders.ToArray().AsEnumerable());
+            return ShowDialog();
         }
 
         public Task<ModelObject> GetFromString(string folderName) {
@@ -51,6 +37,17 @@ namespace RevitServerFolders.Services {
             }
 
             return Task.FromResult((ModelObject) default);
+        }
+        
+        private Task<IEnumerable<ModelObject>> ShowDialog() {
+            if(!_openFolderDialogService.ShowDialog()) {
+                throw new OperationCanceledException();
+            }
+
+            IEnumerable<ModelObject> folders = _openFolderDialogService.Folders
+                .Select(item => new FileSystemFolderModel(item));
+
+            return Task.FromResult(folders);
         }
     }
 }

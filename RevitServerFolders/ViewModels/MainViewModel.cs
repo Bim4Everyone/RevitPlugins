@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Windows.Input;
 using System.Threading.Tasks;
 
@@ -107,12 +108,30 @@ namespace RevitServerFolders.ViewModels {
                 return false;
             }
 
+            if(ModelObjects.Count == 0) {
+                ErrorText = "Выберите папку источника c моделями.";
+                return false;
+            }
+
+            string duplicateModelObject = ModelObjects
+                .GroupBy(item => item.Name)
+                .Where(item => item.Count() > 1)
+                .Select(item => item.Key)
+                .FirstOrDefault();
+
+            if(!string.IsNullOrEmpty(duplicateModelObject)) {
+                ErrorText = $"Папка источника содержит дубликаты \"{duplicateModelObject}\".";
+                return false;
+            }
+
             ErrorText = null;
             return true;
         }
 
         private async Task OpenFromFolder() {
-            await AddModelObjects(await _objectService.SelectModelObjectDialog());
+            ModelObject modelObject = await _objectService.SelectModelObjectDialog();
+            SourceFolder = modelObject.FullName;
+            await AddModelObjects(modelObject);
         }
 
         private bool CanOpenFromFolder() {
@@ -151,7 +170,12 @@ namespace RevitServerFolders.ViewModels {
         private async Task AddModelObjects(ModelObject modelObject) {
             ModelObjects.Clear();
             if(modelObject != null) {
-                foreach(ModelObject child in await modelObject.GetChildrenObjects()) {
+                IEnumerable<ModelObject> modelObjects = await modelObject.GetChildrenObjects();
+                
+                modelObjects = modelObjects
+                    .OrderBy(item => item.Name);
+                
+                foreach(ModelObject child in modelObjects) {
                     ModelObjects.Add(new ModelObjectViewModel(child));
                 }
             }
