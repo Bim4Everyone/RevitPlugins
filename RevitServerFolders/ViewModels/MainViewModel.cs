@@ -20,7 +20,7 @@ namespace RevitServerFolders.ViewModels {
 
         private string _errorText;
         private string _targetFolder;
-        private ModelObjectViewModel _sourceFolder;
+        private string _sourceFolder;
 
         private ModelObjectViewModel _selectedObject;
         private ObservableCollection<ModelObjectViewModel> _modelObjects;
@@ -37,10 +37,12 @@ namespace RevitServerFolders.ViewModels {
             OpenFolderDialogService = openFolderDialogService;
             ModelObjects = new ObservableCollection<ModelObjectViewModel>();
 
-            LoadViewCommand = RelayCommand.CreateAsync(LoadView);
+            LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+            
             OpenFromFoldersCommand = RelayCommand.CreateAsync(OpenFromFolder, CanOpenFromFolder);
             OpenFolderDialogCommand = RelayCommand.Create(OpenFolderDialog, CanOpenFolderDialog);
+            SourceFolderChangedCommand = RelayCommand.CreateAsync(SourceFolderChanged, CanSourceFolderChanged);
         }
 
         public ICommand LoadViewCommand { get; }
@@ -48,6 +50,7 @@ namespace RevitServerFolders.ViewModels {
 
         public ICommand OpenFromFoldersCommand { get; }
         public ICommand OpenFolderDialogCommand { get; }
+        public ICommand SourceFolderChangedCommand { get; }
 
         public IOpenFolderDialogService OpenFolderDialogService { get; }
 
@@ -65,7 +68,7 @@ namespace RevitServerFolders.ViewModels {
             }
         }
 
-        public ModelObjectViewModel SourceFolder {
+        public string SourceFolder {
             get => _sourceFolder;
             set => this.RaiseAndSetIfChanged(ref _sourceFolder, value);
         }
@@ -80,8 +83,8 @@ namespace RevitServerFolders.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _modelObjects, value);
         }
 
-        private async Task LoadView() {
-            await LoadConfig();
+        private void LoadView() {
+            LoadConfig();
         }
 
         private void AcceptView() {
@@ -96,6 +99,11 @@ namespace RevitServerFolders.ViewModels {
 
             if(!Directory.Exists(TargetFolder)) {
                 ErrorText = "Выберите существующую папку назначения.";
+                return false;
+            }
+            
+            if(SourceFolder == null) {
+                ErrorText = "Выберите папку источника.";
                 return false;
             }
 
@@ -120,22 +128,29 @@ namespace RevitServerFolders.ViewModels {
         private bool CanOpenFolderDialog() {
             return true;
         }
+        
+        private async Task SourceFolderChanged() {
+            await AddModelObjects(await _objectService.GetFromString(SourceFolder));
+        }
 
-        private async Task LoadConfig() {
+        private bool CanSourceFolderChanged() {
+            return true;
+        }
+
+        private void LoadConfig() {
             TargetFolder = _pluginConfig?.TargetFolder;
-            await AddModelObjects(await _objectService.GetFromString(_pluginConfig?.SourceFolder));
+            SourceFolder = _pluginConfig?.SourceFolder;
         }
 
         private void SaveConfig() {
             _pluginConfig.TargetFolder = TargetFolder;
-            _pluginConfig.SourceFolder = SourceFolder.FullName;
+            _pluginConfig.SourceFolder = SourceFolder;
             _pluginConfig.SaveProjectConfig();
         }
 
         private async Task AddModelObjects(ModelObject modelObject) {
             ModelObjects.Clear();
             if(modelObject != null) {
-                SourceFolder = new ModelObjectViewModel(modelObject);
                 foreach(ModelObject child in await modelObject.GetChildrenObjects()) {
                     ModelObjects.Add(new ModelObjectViewModel(child));
                 }

@@ -27,7 +27,14 @@
         <services:AttachServiceBehavior
             AttachableService="{Binding OpenFolderDialogService}" />
 
-        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding LoadViewCommand}" />
+        <dxmvvm:EventToCommand 
+            EventName="Loaded" 
+            Command="{Binding LoadViewCommand}" />
+        
+        <dxmvvm:EventToCommand 
+            SourceName="_sourceFolderEdit"
+            EventName="EditValueChanged"
+            Command="{Binding SourceFolderChangedCommand}" />
     </dxmvvm:Interaction.Behaviors>
 
     <Window.Resources>
@@ -64,9 +71,10 @@
         
         <dxe:ButtonEdit
             Grid.Row="1"
+            x:Name="_sourceFolderEdit"
             Margin="5"
             AllowDefaultButton="False"
-            EditValue="{Binding SourceFolder}">
+            EditValue="{Binding SourceFolder, UpdateSourceTrigger=PropertyChanged}">
             <dxe:ButtonEdit.Buttons>
                 <dxe:ButtonInfo Command="{Binding OpenFromFoldersCommand}">
                     <dxe:ButtonInfo.ContentTemplate>
