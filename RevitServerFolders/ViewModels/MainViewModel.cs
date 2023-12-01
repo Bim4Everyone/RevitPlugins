@@ -40,7 +40,7 @@ namespace RevitServerFolders.ViewModels {
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-            
+
             OpenFromFoldersCommand = RelayCommand.CreateAsync(OpenFromFolder, CanOpenFromFolder);
             OpenFolderDialogCommand = RelayCommand.Create(OpenFolderDialog, CanOpenFolderDialog);
             SourceFolderChangedCommand = RelayCommand.CreateAsync(SourceFolderChanged, CanSourceFolderChanged);
@@ -102,7 +102,7 @@ namespace RevitServerFolders.ViewModels {
                 ErrorText = "Выберите существующую папку назначения.";
                 return false;
             }
-            
+
             if(SourceFolder == null) {
                 ErrorText = "Выберите папку источника.";
                 return false;
@@ -113,7 +113,14 @@ namespace RevitServerFolders.ViewModels {
                 return false;
             }
 
+            if(!ModelObjects
+                   .Any(item => !item.SkipObject)) {
+                ErrorText = "Все модели помечены признаком пропустить.";
+                return false;
+            }
+
             string duplicateModelObject = ModelObjects
+                .Where(item => !item.SkipObject)
                 .GroupBy(item => item.Name)
                 .Where(item => item.Count() > 1)
                 .Select(item => item.Key)
@@ -147,7 +154,7 @@ namespace RevitServerFolders.ViewModels {
         private bool CanOpenFolderDialog() {
             return true;
         }
-        
+
         private async Task SourceFolderChanged() {
             await AddModelObjects(await _objectService.GetFromString(SourceFolder));
         }
@@ -164,6 +171,10 @@ namespace RevitServerFolders.ViewModels {
         private void SaveConfig() {
             _pluginConfig.TargetFolder = TargetFolder;
             _pluginConfig.SourceFolder = SourceFolder;
+            _pluginConfig.SkippedObjects = ModelObjects
+                .Where(item => item.SkipObject)
+                .Select(item => item.FullName)
+                .ToArray();
             _pluginConfig.SaveProjectConfig();
         }
 
@@ -171,12 +182,17 @@ namespace RevitServerFolders.ViewModels {
             ModelObjects.Clear();
             if(modelObject != null) {
                 IEnumerable<ModelObject> modelObjects = await modelObject.GetChildrenObjects();
-                
+
                 modelObjects = modelObjects
                     .OrderBy(item => item.Name);
-                
+
                 foreach(ModelObject child in modelObjects) {
                     ModelObjects.Add(new ModelObjectViewModel(child));
+                }
+
+                foreach(ModelObjectViewModel modelObjectViewModel in ModelObjects) {
+                    modelObjectViewModel.SkipObject = _pluginConfig?.SkippedObjects
+                        .Contains(modelObjectViewModel.FullName, StringComparer.OrdinalIgnoreCase) == true;
                 }
             }
         }

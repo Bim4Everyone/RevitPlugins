@@ -12,6 +12,7 @@ namespace RevitServerFolders.Models {
         
         public string TargetFolder { get; set; }
         public string SourceFolder { get; set; }
+        public string[] SkippedObjects { get; set; }
 
         public static PluginConfig GetPluginConfig() {
             return new ProjectConfigBuilder()

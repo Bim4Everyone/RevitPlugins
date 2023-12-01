@@ -27,11 +27,11 @@
         <services:AttachServiceBehavior
             AttachableService="{Binding OpenFolderDialogService}" />
 
-        <dxmvvm:EventToCommand 
-            EventName="Loaded" 
+        <dxmvvm:EventToCommand
+            EventName="Loaded"
             Command="{Binding LoadViewCommand}" />
-        
-        <dxmvvm:EventToCommand 
+
+        <dxmvvm:EventToCommand
             SourceName="_sourceFolderEdit"
             EventName="EditValueChanged"
             Command="{Binding SourceFolderChangedCommand}" />
@@ -68,7 +68,7 @@
                 </dxe:ButtonInfo>
             </dxe:ButtonEdit.Buttons>
         </dxe:ButtonEdit>
-        
+
         <dxe:ButtonEdit
             Grid.Row="1"
             x:Name="_sourceFolderEdit"
@@ -100,6 +100,31 @@
             </dxg:GridControl.View>
 
             <dxg:GridColumn
+                FieldName="SkipObject"
+                Header=""
+                AllowEditing="True"
+                AllowMoving="False"
+                AllowResizing="False"
+                AllowSorting="False"
+                AllowGrouping="False"
+                AllowAutoFilter="False"
+                AllowColumnFiltering="False"
+                Width="43"
+                MinWidth="43"
+                MaxWidth="43"
+                ShowCheckBoxInHeader="True">
+
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate DataType="{x:Type dxg:RowData}">
+                        <dxe:CheckEdit
+                            Name="PART_Editor"
+                            EditValue="{Binding Row.SkipObject, UpdateSourceTrigger=PropertyChanged}" />
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+
+            </dxg:GridColumn>
+
+            <dxg:GridColumn
                 Width="25"
                 MinWidth="25"
                 MaxWidth="25"
@@ -109,6 +134,7 @@
                 AllowGrouping="False"
                 UnboundType="Object"
                 Header="">
+                
                 <dxg:GridColumn.CellTemplate>
                     <DataTemplate DataType="{x:Type dxg:EditGridCellData}">
                         <Image
@@ -116,6 +142,7 @@
                                 Converter={StaticResource CellImageConverter}}" />
                     </DataTemplate>
                 </dxg:GridColumn.CellTemplate>
+                
             </dxg:GridColumn>
 
             <dxg:GridColumn
