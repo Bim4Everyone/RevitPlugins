@@ -17,7 +17,7 @@ namespace Revit3DvikSchemas {
     public class Revit3DvikSchemasCommand : BasePluginCommand {
 
         public Revit3DvikSchemasCommand() {
-            PluginName = "—формировать схемы";
+            PluginName = "Cформировать схемы";
         }
 
         protected override void Execute(UIApplication uiApplication) {
@@ -30,8 +30,6 @@ namespace Revit3DvikSchemas {
 
                 kernel.Bind<MainViewModel>().ToSelf();
 
-
-                //«десь мы объ¤вл¤ем контекст дл¤ MainWindow, чтобы работать с MainViewModel
                 kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
