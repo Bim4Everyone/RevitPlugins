@@ -17,7 +17,7 @@ namespace Revit3DvikSchemas {
     public class Revit3DvikSchemasCommand : BasePluginCommand {
 
         public Revit3DvikSchemasCommand() {
-            PluginName = "Сформировать схемы";
+            PluginName = "вЂ”С„РѕСЂРјРёСЂРѕРІР°С‚СЊ СЃС…РµРјС‹";
         }
 
         protected override void Execute(UIApplication uiApplication) {
@@ -31,7 +31,7 @@ namespace Revit3DvikSchemas {
                 kernel.Bind<MainViewModel>().ToSelf();
 
 
-                //Здесь мы объявляем контекст для MainWindow, чтобы работать с MainViewModel
+                //В«РґРµСЃСЊ РјС‹ РѕР±СЉВ¤РІР»В¤РµРј РєРѕРЅС‚РµРєСЃС‚ РґР»В¤ MainWindow, С‡С‚РѕР±С‹ СЂР°Р±РѕС‚Р°С‚СЊ СЃ MainViewModel
                 kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());

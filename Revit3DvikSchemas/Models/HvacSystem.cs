@@ -12,12 +12,9 @@ namespace Revit3DvikSchemas.ViewModels {
 
 
         public bool IsChecked {
-            get { return _isChecked; }
-            set {
-                _isChecked = value;
-                OnPropertyChanged();
-                //RaisePropertyChanged("_isChecked");
-            }
+            get => _isChecked;
+            set => RaiseAndSetIfChanged(ref _isChecked, value);
+
         }
     }
 }
