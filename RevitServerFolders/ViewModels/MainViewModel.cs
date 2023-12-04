@@ -159,7 +159,7 @@ namespace RevitServerFolders.ViewModels {
         }
 
         private void OpenFolderDialog() {
-            if(OpenFolderDialogService.ShowDialog()) {
+            if(OpenFolderDialogService.ShowDialog(TargetFolder)) {
                 TargetFolder = OpenFolderDialogService.Folder.FullName;
             }
         }
