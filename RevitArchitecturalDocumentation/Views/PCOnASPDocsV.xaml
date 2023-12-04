@@ -163,7 +163,7 @@
                     <GridViewColumn 
                         Header="Выбрано спецификаций" 
                         Width="150"
-                        DisplayMemberBinding="{Binding ScheduleSheetInstances.Count}"/>
+                        DisplayMemberBinding="{Binding Path=ListSpecHelpers.Count}"/>
                 </GridView>
             </ListView.View>
         </ListView>

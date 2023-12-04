@@ -21,6 +21,7 @@ namespace RevitArchitecturalDocumentation.Models {
             Specification = scheduleSheetInstance.Document.GetElement(scheduleSheetInstance.ScheduleId) as ViewSchedule;
             SpecificationDefinition = Specification.Definition;
             SpecificationFilters = SpecificationDefinition.GetFilters().ToList();
+            NameHelper = new ViewNameHelper(Specification.Name);
         }
 
         public SpecHelper(RevitRepository revitRepository, ViewSchedule viewSchedule, StringBuilder report = null) {
@@ -31,26 +32,23 @@ namespace RevitArchitecturalDocumentation.Models {
             Specification = viewSchedule;
             SpecificationDefinition = Specification.Definition;
             SpecificationFilters = SpecificationDefinition.GetFilters().ToList();
+            NameHelper = new ViewNameHelper(Specification.Name);
         }
 
         public StringBuilder Report { get; set; }
         public RevitRepository Repository { get; set; }
-
-        public bool HasProblemWithLevelDetection { get; set; } = true;
         public ScheduleSheetInstance SpecSheetInstance { get; set; }
         public XYZ SpecSheetInstancePoint { get; set; }
         public ViewSchedule Specification { get; set; }
         public ScheduleDefinition SpecificationDefinition { get; set; }
         public List<ScheduleFilter> SpecificationFilters { get; set; }
         public List<string> SpecFilterNames { get; set; }
-        public int LevelNumber { get; set; }
-        public string FormatOfLevelNumber { get; set; } = string.Empty;
-        public string FirstPartOfSpecName { get; set; }
-        public string LastPartOfSpecName { get; set; }
-        public string SuffixOfLevelNumber { get; set; }
+        public ViewNameHelper NameHelper { get; set; }
 
 
-
+        /// <summary>
+        /// Метод получает список имен полей спецификации, которые применяются в фильтрах спеки
+        /// </summary>
         public List<string> GetFilterNames() {
 
             SpecFilterNames = SpecificationFilters
@@ -64,77 +62,16 @@ namespace RevitArchitecturalDocumentation.Models {
         }
 
 
-
-        public void GetNameInfo() {
-
-            // "О_ПСО_05 этаж_Жилье Корпуса 1-3"
-            // [FirstPartOfSpecName][PrefixOfSpecName] NUMBER [SuffixOfSpecName][LastPartOfSpecName]
-            // [О_ПСО_][0] 5 [ этаж][_Жилье Корпуса 1-3]
-
-            if(!Specification.Name.Contains("_")) {
-
-                HasProblemWithLevelDetection = false;
-                return;
-            }
-
-            // "05 этаж"
-            string keyPartOfName = Specification.Name.Split('_')
-                                                .FirstOrDefault(o => o.Contains("этаж"));
-
-            if(keyPartOfName is null) {
-                HasProblemWithLevelDetection = false;
-                return;
-            }
-
-            // "О_ПСО_"
-            FirstPartOfSpecName = Specification.Name.Replace(keyPartOfName, "`")
-                                                .Split('`')[0];
-            // "_Жилье Корпуса 1-3"
-            LastPartOfSpecName = Specification.Name.Replace(keyPartOfName, "`")
-                                    .Split('`')[1];
-
-            // "05"
-            string levelNumberAsStr = keyPartOfName.Replace(" ", "").Replace("этаж", "");
-
-
-            int levelNumberAsInt;
-            if(!int.TryParse(levelNumberAsStr, out levelNumberAsInt)) {
-                HasProblemWithLevelDetection = false;
-                return;
-            }
-            LevelNumber = levelNumberAsInt;
-
-            FormatOfLevelNumber = GetStringFormatOrDefault(levelNumberAsStr);
-
-            SuffixOfLevelNumber = keyPartOfName.Replace(levelNumberAsStr, "");
-        }
-
-
-        /// <summary>
-        /// Получает строку формата на основе количества символов подаваемой строки с числом
-        /// Строка формата представляет собой последовательность "{0:" + "0"*{Длина входной строки} + "}"
-        /// </summary>
-        public string GetStringFormatOrDefault(string numAsString) {
-            string format = string.Empty;
-
-            if(!int.TryParse(numAsString, out _)) {
-                return "{0:0}";
-            }
-
-            for(int i = 0; i < numAsString.Length; i++) { format += "0"; }
-            return "{0:" + format + "}";
-        }
-
-
         /// <summary>
         /// Метод находит в проекте, а если не нашел, то создает спецификацию с указанным именем и задает ей фильтрацию
         /// </summary>
         public SpecHelper GetOrDublicateNSetSpec(string filterName, int numberOfLevelAsInt) {
 
-            string specName = FirstPartOfSpecName
-                              + String.Format(FormatOfLevelNumber, numberOfLevelAsInt)
-                              + SuffixOfLevelNumber
-                              + LastPartOfSpecName;
+            string specName = NameHelper.Prefix
+                              + NameHelper.PrefixOfLevelBlock
+                              + String.Format(NameHelper.LevelNumberFormat, numberOfLevelAsInt)
+                              + NameHelper.SuffixOfLevelBlock
+                              + NameHelper.Suffix;
 
             ViewSchedule newViewSpec = Repository.GetSpecByName(specName);
             SpecHelper newSpecHelper;
@@ -157,12 +94,15 @@ namespace RevitArchitecturalDocumentation.Models {
         }
 
 
+        /// <summary>
+        /// Метод по изменению фильтра спецификации с указанным именем на указанное значение с учетом формата предыдущего значения
+        /// </summary>
         public void ChangeSpecFilters(string specFilterName, int newFilterValue) {
 
             // В дальнейшем нужно предусмотреть проверки, что поле фильрации принимает строки + сеттеры для других типов
-
             List<ScheduleFilter> newScheduleFilters = new List<ScheduleFilter>();
 
+            // Перебираем фильтры и записываем каждый, изменяя только тот, что ищем потому что механизм изменения значения конкретного фильтра работал нестабильно
             for(int i = 0; i < SpecificationFilters.Count; i++) {
 
                 ScheduleFilter currentFilter = SpecificationFilters[i];
@@ -172,7 +112,7 @@ namespace RevitArchitecturalDocumentation.Models {
                 if(scheduleFieldFromFilter.GetName() == specFilterName) {
 
                     string filterOldValue = currentFilter.GetStringValue();
-                    string format = GetStringFormatOrDefault(filterOldValue);
+                    string format = ViewNameHelper.GetStringFormatOrDefault(filterOldValue);
                     string newVal = String.Format(format, newFilterValue);
                     currentFilter.SetValue(newVal);
 

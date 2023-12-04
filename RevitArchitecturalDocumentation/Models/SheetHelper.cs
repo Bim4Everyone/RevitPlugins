@@ -11,16 +11,22 @@ using Autodesk.Revit.UI;
 
 using RevitArchitecturalDocumentation.ViewModels;
 
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
+
+using Document = Autodesk.Revit.DB.Document;
+
 namespace RevitArchitecturalDocumentation.Models {
     internal class SheetHelper {
         public SheetHelper(RevitRepository revitRepository, StringBuilder report = null) {
             Repository = revitRepository;
             Report = report;
+            NameHelper = new ViewNameHelper(null);
         }
         public SheetHelper(RevitRepository revitRepository, ViewSheet sheet, StringBuilder report = null) {
             Repository = revitRepository;
             Sheet = sheet;
             Report = report;
+            NameHelper = new ViewNameHelper(sheet.Name);
         }
 
 
@@ -28,10 +34,10 @@ namespace RevitArchitecturalDocumentation.Models {
         public RevitRepository Repository { get; set; }
         public ViewSheet Sheet { get; set; }
 
-        public int NumberOfLevel { get; set; }
-        public bool HasProblemWithLevelName { get; set; } = true;
+        public ViewNameHelper NameHelper { get; set; }
 
-        
+
+
 
         /// <summary>
         /// Находит в проекте, а если не нашел, то создает лист с указанным именем.
@@ -54,6 +60,8 @@ namespace RevitArchitecturalDocumentation.Models {
                 }
             } else {
                 Report?.AppendLine($"                Лист с именем {newSheetName} успешно найден в проекте!");
+                NameHelper = new ViewNameHelper(newSheet.Name);
+                NameHelper.AnilizeNGetLevelNumber();
             }
 
             return newSheet;
@@ -87,7 +95,8 @@ namespace RevitArchitecturalDocumentation.Models {
             }
 
             Sheet = newSheet;
-            GetNumberOfLevel();
+            NameHelper = new ViewNameHelper(newSheet.Name);
+            NameHelper.AnilizeNGetLevelNumber();
             return newSheet;
         }
 
@@ -161,34 +170,6 @@ namespace RevitArchitecturalDocumentation.Models {
             } else {
                 return true;
             }
-        }
-
-
-        /// <summary>
-        /// Получает номер этажа по имени листа. Указывает через HasProblemWithLevelName, получилось ли это сделать
-        /// </summary>
-        public void GetNumberOfLevel() {
-
-            if(Sheet is null) {
-                return;
-            }
-
-            // Предполагаем, что лист назван: "ПСО_корпус 1_секция 1_этаж 5", т.е. блок с этажом отделен "_"
-            // ищем "05 этаж" или "этаж 05"
-            if(!Sheet.Name.Contains("_")) { return; }
-            string keyPartOfName = Sheet.Name.ToLower().Split('_').FirstOrDefault(o => o.Contains("этаж"));
-
-            if(keyPartOfName is null) { return; }
-
-            // Получаем "05"
-            Regex regex = new Regex(@"\d+");
-            string levelNumberAsStr = regex.Match(keyPartOfName).Groups[0].Value;
-
-            // Получаем int(5)
-            if(!int.TryParse(levelNumberAsStr, out int numberOfLevelAsInt)) { return; }
-            NumberOfLevel = numberOfLevelAsInt;
-
-            HasProblemWithLevelName = false;
         }
     }
 }

@@ -34,7 +34,7 @@ namespace RevitArchitecturalDocumentation.Models {
         public int NumberOfBuildingPartAsInt { get; set; }
         public int NumberOfBuildingSectionAsInt { get; set; }
         public string ViewNameSuffix { get; set; }
-        public List<SpecHelper> ScheduleSheetInstances { get; set; } = new List<SpecHelper>();
+        public List<SpecHelper> ListSpecHelpers { get; set; } = new List<SpecHelper>();
 
         public void AnalizeTask() {
 

@@ -300,6 +300,24 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                 }
             }
 
+            foreach(TaskInfo task in TasksForWork) {
+                foreach(SpecHelper specHelper in task.ListSpecHelpers) {
+
+                    // LevelNumberFormat заполняется после последней проверки при получении имени, поэтому, если он заполнен, значит все ок
+                    if(specHelper.NameHelper.LevelNumberFormat.Length == 0) {
+                        try {
+                            // Анализируем и получаем номер одновременно, т.к. чтобы проанализировать номер уровня
+                            // нужно получить другую информацию, что по факту равно загрузке при получении уровня
+                            specHelper.NameHelper.AnilizeNGetLevelNumber();
+
+                        } catch(ViewNameException ex) {
+                            ErrorText = ex.Message;
+                            return false;
+                        }
+                    }
+                }
+            }
+
             return true;
         }
 
@@ -352,6 +370,11 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             _pluginConfig.SaveProjectConfig();
         }
 
+
+        /// <summary>
+        /// Метод для получения видов, выбранных до запуска плагина.
+        /// Нужен для случая, когда производится создание новых видов путем дублирования
+        /// </summary>
         private void GetSelectedViews() {
 
             // При работе с ДДУ листы пользователь должен выбрать заранее, т.к. селектор API не позволяет выбирать элементы из диспетчера
@@ -365,11 +388,18 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             Report.AppendLine($"Выбрано видов до запуска плагина: {SelectedViews.Count}");
         }
 
+        /// <summary>
+        /// Добавляет задачу в список. 
+        /// Задача содержит информацию о начальном и конечном уровне, с которыми нужно работать; выбранную область видимости и спеки
+        /// </summary>
         private void AddTask() {
 
             TasksForWork.Add(new TaskInfo(RegexForBuildingPart, RegexForBuildingSection, Report));
         }
 
+        /// <summary>
+        /// Удаляет выбранную в интерфейсе задачу из списка. 
+        /// </summary>
         private void DeleteTask() {
 
             if(SelectedTask != null) {
@@ -386,7 +416,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             TaskInfo task = obj as TaskInfo;
             if(task != null) {
-                task.ScheduleSheetInstances.Clear();
+                task.ListSpecHelpers.Clear();
 
                 ISelectionFilter selectFilter = new ScheduleSelectionFilter();
                 IList<Reference> references = _revitRepository.ActiveUIDocument.Selection
@@ -400,12 +430,17 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                     }
 
                     SpecHelper specHelper = new SpecHelper(_revitRepository, scheduleSheetInstance, Report);
-                    task.ScheduleSheetInstances.Add(specHelper);
-                    specHelper.GetNameInfo();
+                    task.ListSpecHelpers.Add(specHelper);
+                    try {
+                        specHelper.NameHelper.AnilizeNGetNameInfo();
+
+                    } catch(ViewNameException ex) {
+                        ErrorText = ex.Message;
+                    }
+
                 }
                 GetFilterNames();
             }
-
 
             PCOnASPDocsV window = new PCOnASPDocsV {
                 DataContext = this
@@ -423,7 +458,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             FilterNamesFromSpecs.Clear();
             foreach(TaskInfo task in TasksForWork) {
 
-                foreach(SpecHelper spec in task.ScheduleSheetInstances) {
+                foreach(SpecHelper spec in task.ListSpecHelpers) {
                     if(FilterNamesFromSpecs.Count == 0) {
                         FilterNamesFromSpecs.AddRange(spec.GetFilterNames());
                     } else {
@@ -449,7 +484,9 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         }
 
 
-
+        /// <summary>
+        /// Основной метод, выполняющий работу по созданию листов, видов, спек и выносу спек и видов на листы
+        /// </summary>
         private void DoWork() {
 
             AnalizeTasks();
@@ -539,12 +576,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                             if(WorkWithSpecs) {
 
-                                foreach(SpecHelper specHelper in task.ScheduleSheetInstances) {
-
-                                    if(!specHelper.HasProblemWithLevelDetection) {
-                                        Report.AppendLine($"❗               В задании спецификации имеются ошибки, создание спецификации отменено!");
-                                        continue;
-                                    }
+                                foreach(SpecHelper specHelper in task.ListSpecHelpers) {
 
                                     SpecHelper newSpecHelper = specHelper.GetOrDublicateNSetSpec(SelectedFilterNameForSpecs, numberOfLevelAsInt);                                  
 
@@ -639,12 +671,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                             if(WorkWithSpecs) {
 
-                                foreach(SpecHelper specHelper in task.ScheduleSheetInstances) {
-
-                                    if(!specHelper.HasProblemWithLevelDetection) {
-                                        Report.AppendLine($"❗               В задании спецификации имеются ошибки, создание спецификации отменено!");
-                                        continue;
-                                    }
+                                foreach(SpecHelper specHelper in task.ListSpecHelpers) {
 
                                     SpecHelper newSpecHelper = specHelper.GetOrDublicateNSetSpec(SelectedFilterNameForSpecs, numberOfLevelAsInt);
 

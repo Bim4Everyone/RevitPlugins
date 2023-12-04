@@ -59,7 +59,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// <summary>
         /// Список оболочек над элементами спецификаций, выбранных пользователем.
         /// Оболочка имеют функционал по работе с именем спецификации и ее фильтрами
-        /// </summary>
+        /// </summary]
         public ObservableCollection<SpecHelper> ScheduleSheetInstances {
             get => _scheduleSheetInstances;
             set => this.RaiseAndSetIfChanged(ref _scheduleSheetInstances, value);
@@ -115,12 +115,23 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                 return false;
             }
 
+
             foreach(SheetHelper sheetHelper in SelectedSheets) {
-                if(sheetHelper.HasProblemWithLevelName) {
-                    ErrorText = "Этаж неопределим у одного из листов";
-                    return false;
+
+                // LevelNumberFormat заполняется после последней проверки при получении имени, поэтому, если он не заполнен, значит все есть ошибки, обновляем их
+                if(sheetHelper.NameHelper.LevelNumberFormat.Length == 0) {
+                    try {
+                        // Анализируем и получаем номер одновременно, т.к. чтобы проанализировать номер уровня
+                        // нужно получить другую информацию, что по факту равно загрузке при получении уровня
+                        sheetHelper.NameHelper.AnilizeNGetLevelNumber();
+
+                    } catch(ViewNameException ex) {
+                        ErrorText = ex.Message;
+                        return false;
+                    }
                 }
             }
+
 
             if(ScheduleSheetInstances.Count == 0) {
                 ErrorText = "Не выбрано ни одной спецификации на листе";
@@ -128,17 +139,25 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             }
 
 
+            foreach(SpecHelper specHelper in ScheduleSheetInstances) {
+
+                // LevelNumberFormat заполняется после последней проверки при получении имени, поэтому, если он заполнен, значит все ок
+                if(specHelper.NameHelper.LevelNumberFormat.Length == 0) {
+                    try {
+                        // Анализируем и получаем номер одновременно, т.к. чтобы проанализировать номер уровня
+                        // нужно получить другую информацию, что по факту равно загрузке при получении уровня
+                        specHelper.NameHelper.AnilizeNGetLevelNumber();
+
+                    } catch(ViewNameException ex) {
+                        ErrorText = ex.Message;
+                        return false;
+                    }
+                }
+            }
+
             if(SelectedFilterNameForSpecs == string.Empty) {
                 ErrorText = "Не выбрано поле фильтрации этажа";
                 return false;
-            }
-
-            foreach(SpecHelper specHelper in ScheduleSheetInstances) {
-
-                if(!specHelper.HasProblemWithLevelDetection) {
-                    ErrorText = "Уровень неопределим у одной из спецификаций";
-                    return false;
-                }
             }
 
             ErrorText = string.Empty;
@@ -184,17 +203,23 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                 if(sheet != null) {
 
                     SheetHelper sheetHelper = new SheetHelper(_revitRepository, sheet);
-                    sheetHelper.GetNumberOfLevel();
+                    try {
+                        sheetHelper.NameHelper.AnilizeNGetLevelNumber();
+
+                    } catch(ViewNameException ex) {
+                        ErrorText = ex.Message;
+                    }
                     SelectedSheets.Add(sheetHelper);
                 }
             }
         }
 
         /// <summary>
-        /// Метод команды по выбору видовых окон спецификаций в прстранстве Revit после закрытия окна плагина
+        /// Метод команды по выбору видовых окон спецификаций в пространстве Revit после закрытия окна плагина
         /// </summary>
         private void SelectSpecs() {
 
+            ErrorText = string.Empty;
             ScheduleSheetInstances.Clear();
             ISelectionFilter selectFilter = new ScheduleSelectionFilter();
             IList<Reference> references = _revitRepository.ActiveUIDocument.Selection
@@ -209,7 +234,12 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                 SpecHelper specHelper = new SpecHelper(_revitRepository, elem);
                 ScheduleSheetInstances.Add(specHelper);
-                specHelper.GetNameInfo();
+                try {
+                    specHelper.NameHelper.AnilizeNGetNameInfo();
+
+                } catch(ViewNameException ex) {
+                    ErrorText = ex.Message;
+                }
             }
             GetFilterNames();
 
@@ -249,8 +279,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                 foreach(SheetHelper sheetHelper in SelectedSheets) {
 
                     foreach(SpecHelper specHelper in ScheduleSheetInstances) {
-
-                        SpecHelper newSpecHelper = specHelper.GetOrDublicateNSetSpec(SelectedFilterNameForSpecs, sheetHelper.NumberOfLevel);
+                        
+                        SpecHelper newSpecHelper = specHelper.GetOrDublicateNSetSpec(SelectedFilterNameForSpecs, sheetHelper.NameHelper.LevelNumber);
 
                         // Располагаем созданные спеки на листе в позициях как у спек, с которых производилось копирование, 
                         newSpecHelper.PlaceSpec(sheetHelper);
