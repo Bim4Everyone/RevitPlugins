@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
@@ -41,10 +42,23 @@ namespace RevitServerFolders.ViewModels {
 
             var modelFiles = ModelObjects
                 .Where(item => !item.SkipObject)
-                .Select(item => item.FullName);
+                .Select(item => item.FullName)
+                .ToArray();
 
-            foreach(string fileName in modelFiles) {
-                ExportDocument(fileName);
+            using(IProgressDialogService dialog = ProgressDialogFactory.CreateDialog()) {
+                dialog.Show();
+                dialog.StepValue = 1;
+                dialog.MaxValue = modelFiles.Length;
+
+                IProgress<int> progress= dialog.CreateProgress();
+                CancellationToken cancellationToken = dialog.CreateCancellationToken();
+                int count = 0;
+                foreach(string fileName in modelFiles) {
+                    progress.Report(++count);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    
+                    ExportDocument(fileName);
+                }
             }
         }
 
