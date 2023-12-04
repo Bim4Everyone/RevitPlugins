@@ -28,8 +28,8 @@ namespace RevitServerFolders {
                     .ToSelf()
                     .InSingletonScope();
 
-                kernel.Bind<PluginConfig>()
-                    .ToMethod(c => PluginConfig.GetPluginConfig());
+                kernel.Bind<FileModelObjectConfig>()
+                    .ToMethod(c => FileModelObjectConfig.GetPluginConfig());
                 
                 kernel.Bind<IModelObjectService>()
                     .To<FileSystemModelObjectService>();
@@ -37,11 +37,11 @@ namespace RevitServerFolders {
                 kernel.UseXtraOpenFolderDialog<MainWindow>(
                     initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
 
-                kernel.Bind<MainViewModel>().ToSelf();
+                kernel.Bind<FileSystemViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<MainViewModel>());
+                        c => c.Kernel.Get<FileSystemViewModel>());
 
                 Notification(kernel.Get<MainWindow>());
             }

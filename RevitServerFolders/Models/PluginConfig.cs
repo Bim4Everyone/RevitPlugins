@@ -5,7 +5,7 @@ using dosymep.Serializers;
 using pyRevitLabs.Json;
 
 namespace RevitServerFolders.Models {
-    internal class PluginConfig : ProjectConfig {
+    internal abstract class PluginConfig : ProjectConfig {
         [JsonIgnore] public override string ProjectConfigPath { get; set; }
 
         [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
@@ -13,14 +13,27 @@ namespace RevitServerFolders.Models {
         public string TargetFolder { get; set; }
         public string SourceFolder { get; set; }
         public string[] SkippedObjects { get; set; }
+    }
 
-        public static PluginConfig GetPluginConfig() {
+    internal class FileModelObjectConfig : PluginConfig {
+        public static FileModelObjectConfig GetPluginConfig() {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())
                 .SetPluginName(nameof(RevitServerFolders))
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
-                .SetProjectConfigName(nameof(PluginConfig) + ".json")
-                .Build<PluginConfig>();
+                .SetProjectConfigName(nameof(FileModelObjectConfig) + ".json")
+                .Build<FileModelObjectConfig>();
+        }
+    }
+    
+    internal class RsModelObjectConfig : PluginConfig {
+        public static RsModelObjectConfig GetPluginConfig() {
+            return new ProjectConfigBuilder()
+                .SetSerializer(new ConfigSerializer())
+                .SetPluginName(nameof(RevitServerFolders))
+                .SetRevitVersion(ModuleEnvironment.RevitVersion)
+                .SetProjectConfigName(nameof(RsModelObjectConfig) + ".json")
+                .Build<RsModelObjectConfig>();
         }
     }
 }

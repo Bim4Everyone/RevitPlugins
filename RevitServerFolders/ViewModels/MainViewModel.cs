@@ -16,7 +16,6 @@ using RevitServerFolders.Services;
 namespace RevitServerFolders.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
-        private readonly RevitRepository _revitRepository;
         private readonly IModelObjectService _objectService;
 
         private string _errorText;
@@ -28,11 +27,9 @@ namespace RevitServerFolders.ViewModels {
 
         public MainViewModel(
             PluginConfig pluginConfig,
-            RevitRepository revitRepository,
             IModelObjectService objectService,
             IOpenFolderDialogService openFolderDialogService) {
             _pluginConfig = pluginConfig;
-            _revitRepository = revitRepository;
             _objectService = objectService;
 
             OpenFolderDialogService = openFolderDialogService;
@@ -90,6 +87,7 @@ namespace RevitServerFolders.ViewModels {
 
         private void AcceptView() {
             SaveConfig();
+            AcceptViewImpl();
         }
 
         private bool CanAcceptView() {
@@ -166,6 +164,8 @@ namespace RevitServerFolders.ViewModels {
         private void LoadConfig() {
             TargetFolder = _pluginConfig?.TargetFolder;
             SourceFolder = _pluginConfig?.SourceFolder;
+            
+            LoadConfigImpl();
         }
 
         private void SaveConfig() {
@@ -175,8 +175,15 @@ namespace RevitServerFolders.ViewModels {
                 .Where(item => item.SkipObject)
                 .Select(item => item.FullName)
                 .ToArray();
+            
+            
+            SaveConfigImpl();
             _pluginConfig.SaveProjectConfig();
         }
+        
+        protected virtual void LoadConfigImpl() { }
+        protected virtual void SaveConfigImpl() { }
+        protected  virtual void AcceptViewImpl() { }
 
         private async Task AddModelObjects(ModelObject modelObject) {
             ModelObjects.Clear();
