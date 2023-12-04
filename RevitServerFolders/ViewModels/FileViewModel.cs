@@ -44,7 +44,13 @@ namespace RevitServerFolders.ViewModels {
         protected override void AcceptViewImpl() {
             Directory.CreateDirectory(TargetFolder);
 
-            var modelFiles = ModelObjects
+            var navisFiles = Directory.GetFiles(TargetFolder, "*.nwc");
+            foreach(string navisFile in navisFiles) {
+                File.SetAttributes(navisFile, FileAttributes.Normal);
+                File.Delete(navisFile);
+            }
+
+            string[] modelFiles = ModelObjects
                 .Where(item => !item.SkipObject)
                 .Select(item => item.FullName)
                 .ToArray();
