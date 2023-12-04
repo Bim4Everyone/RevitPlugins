@@ -104,9 +104,9 @@ namespace RevitServerFolders.ViewModels {
                     .Where(item => !item.GetTransform().AlmostEqual(Transform.Identity))
                     .ToArray();
                 
-                if(projectLocations.Length == 1) {
+                if(projectLocations.Length == 0) {
                     ExportDocument(fileName, navisView, document);
-                } else if(projectLocations.Length > 1) {
+                } else if(projectLocations.Length > 0) {
                     foreach(ProjectLocation projectLocation in projectLocations) {
                         using(Transaction transaction = document.StartTransaction("Смена площадки")) {
                             document.ActiveProjectLocation = projectLocation;
