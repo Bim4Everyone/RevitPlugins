@@ -16,6 +16,8 @@ namespace RevitServerFolders.Models {
     }
 
     internal class FileModelObjectConfig : PluginConfig {
+        public bool IsExportRooms { get; set; }
+        
         public static FileModelObjectConfig GetPluginConfig() {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())

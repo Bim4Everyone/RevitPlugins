@@ -24,6 +24,9 @@ namespace RevitServerFolders.ViewModels {
 
         private ModelObjectViewModel _selectedObject;
         private ObservableCollection<ModelObjectViewModel> _modelObjects;
+        
+        private bool _isExportRooms;
+        private bool _isExportRoomsVisible;
 
         public MainViewModel(
             PluginConfig pluginConfig,
@@ -79,6 +82,16 @@ namespace RevitServerFolders.ViewModels {
         public ObservableCollection<ModelObjectViewModel> ModelObjects {
             get => _modelObjects;
             set => this.RaiseAndSetIfChanged(ref _modelObjects, value);
+        }
+
+        public bool IsExportRooms {
+            get => _isExportRooms;
+            set => this.RaiseAndSetIfChanged(ref _isExportRooms, value);
+        }
+
+        public bool IsExportRoomsVisible {
+            get => _isExportRoomsVisible;
+            set => this.RaiseAndSetIfChanged(ref _isExportRoomsVisible, value);
         }
 
         private void LoadView() {

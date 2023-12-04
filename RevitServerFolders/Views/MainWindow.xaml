@@ -38,6 +38,9 @@
     </dxmvvm:Interaction.Behaviors>
 
     <Window.Resources>
+        <BooleanToVisibilityConverter 
+            x:Key="BooleanToVisibilityConverter"/>
+        
         <converters:CellImageConverter
             x:Key="CellImageConverter"
             Empty="{dx:DXImage 'Office2013/Actions/New_16x16.png'}"
@@ -76,10 +79,22 @@
             </dxe:ButtonEdit.Buttons>
         </dxe:ButtonEdit>
         
-        <Label
+
+        <StackPanel
             Grid.Row="2"
             Margin="5 0 5 0"
-            Content="Папка источника" />
+            Orientation="Horizontal">
+            <Label
+                Margin="0 0 5 0"
+                Content="Папка источника" />
+            
+            <dxe:CheckEdit
+                Content="Выгрузка помещений"
+                EditValue="{Binding IsExportRooms}"
+                Visibility="{Binding IsExportRoomsVisible, 
+                    Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        </StackPanel>
+
 
         <dxe:ButtonEdit
             Grid.Row="3"

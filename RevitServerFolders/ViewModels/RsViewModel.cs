@@ -12,14 +12,7 @@ namespace RevitServerFolders.ViewModels {
             IOpenFolderDialogService openFolderDialogService)
             : base(pluginConfig, objectService, openFolderDialogService) {
             _pluginConfig = pluginConfig;
-        }
-        
-        protected override void LoadConfigImpl() {
-            base.LoadConfigImpl();
-        }
-
-        protected override void SaveConfigImpl() {
-            base.SaveConfigImpl();
+            IsExportRoomsVisible = false;
         }
 
         protected override void AcceptViewImpl() {
