@@ -98,15 +98,13 @@ namespace RevitServerFolders.ViewModels {
                     return;
                 }
 
-                ProjectLocation[] projectLocations = new FilteredElementCollector(document)
-                    .OfClass(typeof(ProjectLocation))
+                ProjectLocation[] projectLocations = document.ProjectLocations
                     .OfType<ProjectLocation>()
-                    .Where(item => !item.GetTransform().AlmostEqual(Transform.Identity))
                     .ToArray();
                 
-                if(projectLocations.Length == 0) {
+                if(projectLocations.Length == 1) {
                     ExportDocument(fileName, navisView, document);
-                } else if(projectLocations.Length > 0) {
+                } else if(projectLocations.Length > 1) {
                     foreach(ProjectLocation projectLocation in projectLocations) {
                         using(Transaction transaction = document.StartTransaction("Смена площадки")) {
                             document.ActiveProjectLocation = projectLocation;
