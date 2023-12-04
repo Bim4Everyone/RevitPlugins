@@ -30,7 +30,9 @@ namespace RevitServerFolders {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
-
+                
+                kernel.UseXtraProgressDialog<FileSystemViewModel>();
+                
                 kernel.Bind<RsModelObjectConfig>()
                     .ToMethod(c => RsModelObjectConfig.GetPluginConfig());
 
