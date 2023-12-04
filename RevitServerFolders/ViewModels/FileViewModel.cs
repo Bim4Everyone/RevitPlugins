@@ -10,6 +10,7 @@ using Autodesk.Revit.UI.Events;
 
 using DevExpress.CodeParser;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitServerFolders.Models;
@@ -91,16 +92,21 @@ namespace RevitServerFolders.ViewModels {
                     return;
                 }
 
-                ProjectLocation[]projectLocations = new FilteredElementCollector(document)
+                ProjectLocation[] projectLocations = new FilteredElementCollector(document)
                     .OfClass(typeof(ProjectLocation))
                     .OfType<ProjectLocation>()
+                    .Where(item => !item.GetTransform().AlmostEqual(Transform.Identity))
                     .ToArray();
                 
                 if(projectLocations.Length == 1) {
                     ExportDocument(fileName, navisView, document);
                 } else if(projectLocations.Length > 1) {
-                    foreach (ProjectLocation projectLocation in projectLocations) {
-                        document.ActiveProjectLocation = projectLocation;
+                    foreach(ProjectLocation projectLocation in projectLocations) {
+                        using(Transaction transaction = document.StartTransaction("Смена площадки")) {
+                            document.ActiveProjectLocation = projectLocation;
+                            transaction.Commit();
+                        }
+
                         ExportDocument(fileName, navisView, document, projectLocation);
                     }
                 }
@@ -111,7 +117,10 @@ namespace RevitServerFolders.ViewModels {
             }
         }
 
-        private void ExportDocument(string fileName, View3D navisView, Document document, ProjectLocation location = null) {
+        private void ExportDocument(string fileName,
+            View3D navisView,
+            Document document,
+            ProjectLocation location = null) {
             string exportFileName = IsExportRooms
                 ? _revitRepository.GetRoomsFileName(fileName)
                 : _revitRepository.GetFileName(fileName);
@@ -120,7 +129,10 @@ namespace RevitServerFolders.ViewModels {
                 ? _revitRepository.GetRoomsExportOptions(navisView)
                 : _revitRepository.GetExportOptions(navisView);
 
-            exportFileName += location?.Name;
+            exportFileName += location == null
+                ? null
+                : "_" + location?.Name;
+
             document.Export(TargetFolder, exportFileName, exportOptions);
         }
 
