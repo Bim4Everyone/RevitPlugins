@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
@@ -66,5 +67,12 @@ namespace RevitArchitecturalDocumentation.Models {
             viewSheet.GetDependentElements(new ElementClassFilter(typeof(ScheduleSheetInstance)))
                 .Select(id => Document.GetElement(id) as ScheduleSheetInstance)
                 .FirstOrDefault(v => v.Name == specName);
+
+
+        /// <summary>
+        /// Получает виды в плане, выбранных до запуска плагина.
+        /// </summary>
+        public ObservableCollection<ViewPlan> GetSelectedViewPlans() => new ObservableCollection<ViewPlan>(ActiveUIDocument.Selection.GetElementIds()
+            .Select(id => Document.GetElement(id) as ViewPlan));
     }
 }

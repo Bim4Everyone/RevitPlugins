@@ -19,7 +19,7 @@ namespace RevitArchitecturalDocumentation.Models {
     internal class ViewNameHelper {
         public ViewNameHelper(View view) {
             RevitView = view;
-            ViewName = view.Name;
+            ViewName = view?.Name;
 
             GetViewCatName();
         }
