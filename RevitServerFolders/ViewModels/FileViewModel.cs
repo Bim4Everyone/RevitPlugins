@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -6,6 +7,8 @@ using System.Threading;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI.Events;
+
+using DevExpress.CodeParser;
 
 using dosymep.SimpleServices;
 
@@ -88,20 +91,37 @@ namespace RevitServerFolders.ViewModels {
                     return;
                 }
 
-                string exportFileName = IsExportRooms
-                    ? _revitRepository.GetRoomsFileName(fileName)
-                    : _revitRepository.GetFileName(fileName);
-
-                NavisworksExportOptions exportOptions = IsExportRooms
-                    ? _revitRepository.GetRoomsExportOptions(navisView)
-                    : _revitRepository.GetExportOptions(navisView);
-
-                document.Export(TargetFolder, exportFileName, exportOptions);
+                ProjectLocation[]projectLocations = new FilteredElementCollector(document)
+                    .OfClass(typeof(ProjectLocation))
+                    .OfType<ProjectLocation>()
+                    .ToArray();
+                
+                if(projectLocations.Length == 1) {
+                    ExportDocument(fileName, navisView, document);
+                } else if(projectLocations.Length > 1) {
+                    foreach (ProjectLocation projectLocation in projectLocations) {
+                        document.ActiveProjectLocation = projectLocation;
+                        ExportDocument(fileName, navisView, document, projectLocation);
+                    }
+                }
             } finally {
                 document.Close(false);
                 _revitRepository.Application.FailuresProcessing -= ApplicationOnFailuresProcessing;
                 _revitRepository.UIApplication.DialogBoxShowing -= UIApplicationOnDialogBoxShowing;
             }
+        }
+
+        private void ExportDocument(string fileName, View3D navisView, Document document, ProjectLocation location = null) {
+            string exportFileName = IsExportRooms
+                ? _revitRepository.GetRoomsFileName(fileName)
+                : _revitRepository.GetFileName(fileName);
+
+            NavisworksExportOptions exportOptions = IsExportRooms
+                ? _revitRepository.GetRoomsExportOptions(navisView)
+                : _revitRepository.GetExportOptions(navisView);
+
+            exportFileName += location?.Name;
+            document.Export(TargetFolder, exportFileName, exportOptions);
         }
 
         private void UIApplicationOnDialogBoxShowing(object sender, DialogBoxShowingEventArgs e) {
