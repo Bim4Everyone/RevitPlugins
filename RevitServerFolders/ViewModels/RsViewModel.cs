@@ -9,8 +9,9 @@ namespace RevitServerFolders.ViewModels {
 
         public RsViewModel(RsModelObjectConfig pluginConfig,
             IModelObjectService objectService,
-            IOpenFolderDialogService openFolderDialogService)
-            : base(pluginConfig, objectService, openFolderDialogService) {
+            IOpenFolderDialogService openFolderDialogService,
+            IProgressDialogFactory progressDialogFactory)
+            : base(pluginConfig, objectService, openFolderDialogService, progressDialogFactory) {
             _pluginConfig = pluginConfig;
             IsExportRoomsVisible = false;
         }

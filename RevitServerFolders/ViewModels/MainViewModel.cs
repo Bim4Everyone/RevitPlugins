@@ -28,14 +28,15 @@ namespace RevitServerFolders.ViewModels {
         private bool _isExportRooms;
         private bool _isExportRoomsVisible;
 
-        public MainViewModel(
-            PluginConfig pluginConfig,
+        public MainViewModel(PluginConfig pluginConfig,
             IModelObjectService objectService,
-            IOpenFolderDialogService openFolderDialogService) {
+            IOpenFolderDialogService openFolderDialogService, 
+            IProgressDialogFactory progressDialogFactory) {
             _pluginConfig = pluginConfig;
             _objectService = objectService;
 
             OpenFolderDialogService = openFolderDialogService;
+            ProgressDialogFactory = progressDialogFactory;
             ModelObjects = new ObservableCollection<ModelObjectViewModel>();
 
             LoadViewCommand = RelayCommand.Create(LoadView);
@@ -54,6 +55,7 @@ namespace RevitServerFolders.ViewModels {
         public ICommand SourceFolderChangedCommand { get; }
 
         public IOpenFolderDialogService OpenFolderDialogService { get; }
+        public IProgressDialogFactory ProgressDialogFactory { get; }
 
         public string ErrorText {
             get => _errorText;

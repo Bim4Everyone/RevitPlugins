@@ -24,6 +24,9 @@
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <dxmvvm:Interaction.Behaviors>
+        <services:AttachServiceBehavior 
+            AttachableService="{Binding ProgressDialogFactory}"/>
+        
         <services:AttachServiceBehavior
             AttachableService="{Binding OpenFolderDialogService}" />
 
