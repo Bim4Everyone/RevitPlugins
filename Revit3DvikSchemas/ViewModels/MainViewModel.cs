@@ -1,14 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
 
-using Autodesk.Revit.DB;
-
-using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -17,7 +13,7 @@ using Revit3DvikSchemas.Models;
 namespace Revit3DvikSchemas.ViewModels {
     internal class MainViewModel : BaseViewModel {
 
-        private readonly PluginConfig _pluginConfig;
+
         private readonly RevitRepository _revitRepository;
         private readonly ViewMaker _viewMaker;
         private string _selectedElementType;
@@ -37,16 +33,16 @@ namespace Revit3DvikSchemas.ViewModels {
         private ICollectionView _categoriesView;
         private string _categoriesFilter = string.Empty;
 
-        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository, ViewMaker viewMaker) {
-            _pluginConfig = pluginConfig;
+        public MainViewModel(RevitRepository revitRepository, ViewMaker viewMaker) {
+
             _revitRepository = revitRepository;
 
-            bool RevitUseFopNames = UseFopNames;
-            bool RevitCombineFilters = CombineFilters;
+            bool revitUseFopNames = UseFopNames;
+            bool revitCombineFilters = CombineFilters;
 
-            ComboBoxVars = new ObservableCollection<String>() { "Имя системы", "ФОП_ВИС_Имя системы" };
+            FilterCriterionVariants = new ObservableCollection<String>() { "Имя системы", "ФОП_ВИС_Имя системы" };
 
-            SelectedElementType = ComboBoxVars[0];
+            SelectedElementType = FilterCriterionVariants[0];
 
 
             _viewMaker = viewMaker;
@@ -62,7 +58,7 @@ namespace Revit3DvikSchemas.ViewModels {
         public ICommand CreateViewCommand { get; }
         public ICommand SelectionFilterCommand { get; }
 
-        public ObservableCollection<string> ComboBoxVars { get; }
+        public ObservableCollection<string> FilterCriterionVariants { get; }
 
         public string SelectedElementType {
             get => _selectedElementType;
@@ -115,9 +111,8 @@ namespace Revit3DvikSchemas.ViewModels {
         }
 
         private bool CanCreateView() {
-            List<BuiltInCategory> SystemAndFopCats = _revitRepository.SystemAndFopCats;
 
-            if(!(_revitRepository.Document.ActiveView.ViewType == ViewType.ThreeD)) {
+            if(!_revitRepository.IsView3D) {
                 ErrorText = "Для старта требуется активный 3D-вид";
                 return false;
             }
@@ -127,22 +122,26 @@ namespace Revit3DvikSchemas.ViewModels {
                 return false;
             }
 
-            if(!_revitRepository.Document.IsExistsSharedParam("ФОП_ВИС_Имя системы")) {
-                ErrorText = "Не добавлен параметр ФОП_ВИС_Имя системы";
-                return false;
-            } else {
-                foreach(BuiltInCategory fopCat in _revitRepository.FopNameCategoriesBIC) {
-                    if(!_revitRepository.SystemAndFopCats.Contains(fopCat)) {
-                        ErrorText = "Параметр ФОП_ВИС_Имя системы не назначен для категории " + fopCat.ToString();
-                        return false;
-                    }
+
+            if(UseFopNames) {
+                if(!_revitRepository.IsFopNameInProject) {
+                    ErrorText = "Не добавлен параметр ФОП_ВИС_Имя системы";
+                    return false;
+                }
+                if(!_revitRepository.IsFopNameCatsIsOk) {
+                    ErrorText = "Параметр ФОП_ВИС_Имя системы не назначен для категории " + _revitRepository.MissingCat;
+                    return false;
                 }
             }
-
             ErrorText = "";
             return true;
         }
+
     }
 
+
 }
+
+
+
 

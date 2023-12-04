@@ -25,8 +25,8 @@
             <RowDefinition Height="15"/>
             <RowDefinition Height="30"/>
             <RowDefinition/>
-            <RowDefinition Height="60" />
-            <RowDefinition Height="70" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="40" />
         </Grid.RowDefinitions>
 
         <StackPanel
@@ -97,11 +97,6 @@
         <StackPanel
             Grid.Row="3">
             <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -117,58 +112,44 @@
                 <CheckBox 
                         Grid.Column="1"
                         Margin="10 5"
-                        Content="Схемы по ФОП_ВИС_Имя системы"
+                        Content="Схемы по ФОП__ВИС__Имя системы"
                         IsChecked="{Binding UseFopNames}"/>
 
-
-                <Button 
-                    Grid.Row="1"
-                    Margin="25,0,0,0"
-                    FlowDirection="RightToLeft"
-                    Content="Выделить все"/>
-                <Button
-                    Content="Отменить выбор"
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    Margin="25,0,0,0"/>
             </Grid>
-
-            <StackPanel
-                    Grid.Row="1"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Center">
-
-            </StackPanel>
         </StackPanel>
 
         <StackPanel
             Grid.Row="4"
             Orientation="Horizontal"
-            HorizontalAlignment="Right">
+            HorizontalAlignment="Center"
+            Margin="0,0,0,0" Grid.RowSpan="2" Width="450">
             <TextBlock
-                Margin="10"
+
                 Width="250"
+                Margin="10,5,10,0"
                 Foreground="Orange"
-                VerticalAlignment="Center"
+                VerticalAlignment="Top"
                 TextWrapping="Wrap"
                 
                 Text="{Binding ErrorText}" />
 
             <Button
-                Margin="10"
+                VerticalAlignment="Top"
+                Margin="0,5,5,0"
                 Width="80"
                 Content="ОК"
                 IsDefault="True"
                 Click="ButtonOk_Click"
-                Command="{Binding CreateViewCommand}" Height="20" />
+                Command="{Binding CreateViewCommand}" Height="30" />
 
             <Button
-                Margin="10"
+                VerticalAlignment="Top"
+                Margin="0,5,0,0"
                 Width="80"
+                
                 Content="Отмена"
                 IsCancel="True"
-                Click="ButtonCancel_Click" Height="20" />
+                Click="ButtonCancel_Click" Height="30" />
         </StackPanel>
     </Grid>
 </base:PlatformWindow>

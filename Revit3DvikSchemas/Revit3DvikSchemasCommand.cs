@@ -27,8 +27,6 @@ namespace Revit3DvikSchemas {
                     .ToSelf()
                     .InSingletonScope();
 
-                kernel.Bind<PluginConfig>()
-                    .ToMethod(c => PluginConfig.GetPluginConfig());
 
                 kernel.Bind<MainViewModel>().ToSelf();
 

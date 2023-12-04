@@ -18,28 +18,67 @@ namespace Revit3DvikSchemas.Models {
 
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
-            List<BuiltInCategory> systemAndFopCats = new List<BuiltInCategory>() { BuiltInCategory.OST_DuctFitting,
-                BuiltInCategory.OST_PipeFitting, BuiltInCategory.OST_PipeCurves,
-                BuiltInCategory.OST_DuctCurves, BuiltInCategory.OST_FlexDuctCurves, BuiltInCategory.OST_FlexPipeCurves,
-                BuiltInCategory.OST_DuctTerminal, BuiltInCategory.OST_DuctAccessory, BuiltInCategory.OST_PipeAccessory,
-                BuiltInCategory.OST_MechanicalEquipment, BuiltInCategory.OST_DuctInsulations, BuiltInCategory.OST_PipeInsulations,
-                BuiltInCategory.OST_PlumbingFixtures, BuiltInCategory.OST_Sprinklers, BuiltInCategory.OST_GenericModel
+            List<BuiltInCategory> systemAndFopCats = new List<BuiltInCategory>() {
+                BuiltInCategory.OST_DuctFitting,
+                BuiltInCategory.OST_PipeFitting,
+                BuiltInCategory.OST_PipeCurves,
+                BuiltInCategory.OST_DuctCurves,
+                BuiltInCategory.OST_FlexDuctCurves,
+                BuiltInCategory.OST_FlexPipeCurves,
+                BuiltInCategory.OST_DuctTerminal,
+                BuiltInCategory.OST_DuctAccessory,
+                BuiltInCategory.OST_PipeAccessory,
+                BuiltInCategory.OST_MechanicalEquipment,
+                BuiltInCategory.OST_DuctInsulations,
+                BuiltInCategory.OST_PipeInsulations,
+                BuiltInCategory.OST_PlumbingFixtures,
+                BuiltInCategory.OST_Sprinklers,
+                BuiltInCategory.OST_GenericModel
             };
-            SystemAndFopCats = systemAndFopCats;
 
             List<BuiltInCategory> fopNameCategoriesBIC = GetfopNameCategoriesBIC();
-            FopNameCategoriesBIC = fopNameCategoriesBIC;
+
+            bool isFopNameInProject = true;
+            if(!Document.IsExistsSharedParam("Ğ¤ĞĞŸ_Ğ’Ğ˜Ğ¡_Ğ˜Ğ¼Ñ ÑĞ¸ÑÑ‚ĞµĞ¼Ñ‹")) {
+                isFopNameInProject = false;
+            }
+            IsFopNameInProject = isFopNameInProject;
+
+            bool isFopNameCatsIsOk = true;
+            string missingCat = "";
+            if(isFopNameInProject) {
+                foreach(BuiltInCategory fopCat in systemAndFopCats) {
+                    if(!fopNameCategoriesBIC.Contains(fopCat)) {
+                        isFopNameCatsIsOk = false;
+                        missingCat = fopCat.ToString();
+                    }
+                }
+            }
+
+            IsFopNameCatsIsOk = isFopNameCatsIsOk;
+            MissingCat = missingCat;
+
+            bool isView3D = false;
+            if(Document.ActiveView.ViewType == ViewType.ThreeD) {
+                isView3D = true;
+            }
+            IsView3D = isView3D;
         }
+
+
         public UIApplication UIApplication { get; }
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
 
-        public List<BuiltInCategory> SystemAndFopCats { get; }
+        public string MissingCat { get; }
+        public bool IsFopNameInProject { get; }
 
-        public List<BuiltInCategory> FopNameCategoriesBIC { get; }
+        public bool IsFopNameCatsIsOk { get; }
 
-        public List<BuiltInCategory> GetfopNameCategoriesBIC() {
-            if(Document.IsExistsSharedParam("ÔÎÏ_ÂÈÑ_Èìÿ ñèñòåìû")) {
-                (Definition Definition, Binding Binding) fopName = Document.GetSharedParamBinding("ÔÎÏ_ÂÈÑ_Èìÿ ñèñòåìû");
+        public bool IsView3D { get; }
+
+        private List<BuiltInCategory> GetfopNameCategoriesBIC() {
+            if(Document.IsExistsSharedParam("Ğ¤ĞĞŸ_Ğ’Ğ˜Ğ¡_Ğ˜Ğ¼Ñ ÑĞ¸ÑÑ‚ĞµĞ¼Ñ‹")) {
+                (Definition Definition, Binding Binding) fopName = Document.GetSharedParamBinding("Ğ¤ĞĞŸ_Ğ’Ğ˜Ğ¡_Ğ˜Ğ¼Ñ ÑĞ¸ÑÑ‚ĞµĞ¼Ñ‹");
                 Binding parameterBinding = fopName.Binding;
                 IEnumerable<Category> fopNameCategories = parameterBinding.GetCategories();
                 List<BuiltInCategory> fopNameCategoriesBIC = new List<BuiltInCategory>();
@@ -69,13 +108,13 @@ namespace Revit3DvikSchemas.Models {
 
         public string GetSystemFopName(Element system) {
             string fopName = "None";
-            if(Document.IsExistsSharedParam("ÔÎÏ_ÂÈÑ_Èìÿ ñèñòåìû")) {
+            if(Document.IsExistsSharedParam("Ğ¤ĞĞŸ_Ğ’Ğ˜Ğ¡_Ğ˜Ğ¼Ñ ÑĞ¸ÑÑ‚ĞµĞ¼Ñ‹")) {
                 if(system.Category.IsId(BuiltInCategory.OST_DuctSystem)) {
                     MechanicalSystem ductSystemElement = system as MechanicalSystem;
                     foreach(Element duct in ductSystemElement.DuctNetwork) {
                         if(duct.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
-                            if(duct.LookupParameter("ÔÎÏ_ÂÈÑ_Èìÿ ñèñòåìû").HasValue) {
-                                return duct.LookupParameter("ÔÎÏ_ÂÈÑ_Èìÿ ñèñòåìû").AsString();
+                            if(duct.LookupParameter("Ğ¤ĞĞŸ_Ğ’Ğ˜Ğ¡_Ğ˜Ğ¼Ñ ÑĞ¸ÑÑ‚ĞµĞ¼Ñ‹").HasValue) {
+                                return duct.LookupParameter("Ğ¤ĞĞŸ_Ğ’Ğ˜Ğ¡_Ğ˜Ğ¼Ñ ÑĞ¸ÑÑ‚ĞµĞ¼Ñ‹").AsString();
                             }
                         }
                     }
@@ -84,8 +123,8 @@ namespace Revit3DvikSchemas.Models {
                     PipingSystem pipeSystemElement = system as PipingSystem;
                     foreach(Element pipe in pipeSystemElement.PipingNetwork) {
                         if(pipe.Category.IsId(BuiltInCategory.OST_PipeCurves)) {
-                            if(pipe.LookupParameter("ÔÎÏ_ÂÈÑ_Èìÿ ñèñòåìû").HasValue) {
-                                return pipe.LookupParameter("ÔÎÏ_ÂÈÑ_Èìÿ ñèñòåìû").AsString();
+                            if(pipe.LookupParameter("Ğ¤ĞĞŸ_Ğ’Ğ˜Ğ¡_Ğ˜Ğ¼Ñ ÑĞ¸ÑÑ‚ĞµĞ¼Ñ‹").HasValue) {
+                                return pipe.LookupParameter("Ğ¤ĞĞŸ_Ğ’Ğ˜Ğ¡_Ğ˜Ğ¼Ñ ÑĞ¸ÑÑ‚ĞµĞ¼Ñ‹").AsString();
                             }
                         }
                     }

@@ -11,35 +11,25 @@ using Revit3DvikSchemas.ViewModels;
 namespace Revit3DvikSchemas.Models {
 
     internal class UniqName {
-        public bool wasMet = true;
-        public string name = null;
+        public bool WasMet { get; set; }
+        public string Name { get; set; }
     }
 
 
 
     internal class ViewMaker {
         private RevitRepository _revitRepository;
-        private bool combineViews;
-        private bool useFopNames;
+        private bool _combineViews;
+        private bool _useFopNames;
 
 
         public ViewMaker(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
         }
-        ElementId nameId = null;
-        public List<ElementFilter> CreateElementFilter(List<string> systemNameList) {
+
+        public List<ElementFilter> CreateElementFilterList(ElementId nameId, List<string> systemNameList) {
+
             List<ElementFilter> elementFilterList = new List<ElementFilter>();
-            if(useFopNames) {
-
-                ParameterElement parameterElement = _revitRepository.Document.GetSharedParam("ФОП_ВИС_Имя системы");
-
-                nameId = parameterElement.Id;
-                ;
-            } else {
-                nameId = new ElementId(BuiltInParameter.RBS_SYSTEM_NAME_PARAM);
-            }
-
-
             foreach(string systemName in systemNameList) {
 #if REVIT_2022_OR_LESS
                 ElementParameterFilter filterRule = new ElementParameterFilter(ParameterFilterRuleFactory.CreateNotEqualsRule(nameId, systemName, true));
@@ -47,35 +37,55 @@ namespace Revit3DvikSchemas.Models {
             ElementParameterFilter filterRule = new ElementParameterFilter(ParameterFilterRuleFactory.CreateNotEqualsRule(nameId, systemName));
 #endif
                 elementFilterList.Add(filterRule);
-
-
-
             }
             return elementFilterList;
 
         }
 
+        public ElementId getCriterionParamId() {
+            ElementId nameId = null;
+            if(_useFopNames) {
+                ParameterElement parameterElement = _revitRepository.Document.GetSharedParam("ФОП_ВИС_Имя системы");
+                nameId = parameterElement.Id;
+                ;
+            } else {
+                nameId = new ElementId(BuiltInParameter.RBS_SYSTEM_NAME_PARAM);
+            }
+            return nameId;
+
+        }
+
         public ParameterFilterElement CreateFilter(string filterName, List<string> systemNameList) {
             List<ElementId> categories = new List<ElementId>();
-            List<BuiltInCategory> allCategories = new List<BuiltInCategory>() { BuiltInCategory.OST_DuctFitting,
-                BuiltInCategory.OST_PipeFitting, BuiltInCategory.OST_PipeCurves,
-                BuiltInCategory.OST_DuctCurves, BuiltInCategory.OST_FlexDuctCurves, BuiltInCategory.OST_FlexPipeCurves,
-                BuiltInCategory.OST_DuctTerminal, BuiltInCategory.OST_DuctAccessory, BuiltInCategory.OST_PipeAccessory,
-                BuiltInCategory.OST_MechanicalEquipment, BuiltInCategory.OST_DuctInsulations, BuiltInCategory.OST_PipeInsulations,
-                BuiltInCategory.OST_PlumbingFixtures, BuiltInCategory.OST_Sprinklers
+            List<BuiltInCategory> allCategories = new List<BuiltInCategory>() {
+                BuiltInCategory.OST_DuctFitting,
+                BuiltInCategory.OST_PipeFitting,
+                BuiltInCategory.OST_PipeCurves,
+                BuiltInCategory.OST_DuctCurves,
+                BuiltInCategory.OST_FlexDuctCurves,
+                BuiltInCategory.OST_FlexPipeCurves,
+                BuiltInCategory.OST_DuctTerminal,
+                BuiltInCategory.OST_DuctAccessory,
+                BuiltInCategory.OST_PipeAccessory,
+                BuiltInCategory.OST_MechanicalEquipment,
+                BuiltInCategory.OST_DuctInsulations,
+                BuiltInCategory.OST_PipeInsulations,
+                BuiltInCategory.OST_PlumbingFixtures,
+                BuiltInCategory.OST_Sprinklers
             };
 
             foreach(BuiltInCategory category in allCategories) {
                 categories.Add(new ElementId(category));
             }
-            if(useFopNames) {
+            if(_useFopNames) {
                 categories.Add(new ElementId(BuiltInCategory.OST_GenericModel));
             }
 
+            //айди параметра по которому мы будем фильтровать
+            ElementId criterionParamId = getCriterionParamId();
 
-            List<ElementFilter> elementFilterList = CreateElementFilter(systemNameList);
-
-
+            //создаем лист из фильтров по именам систем
+            List<ElementFilter> elementFilterList = CreateElementFilterList(criterionParamId, systemNameList);
 
             LogicalAndFilter andFilter = new LogicalAndFilter(elementFilterList);
 
@@ -85,9 +95,9 @@ namespace Revit3DvikSchemas.Models {
         }
 
 
-        public void CreateSelectedCommand(ObservableCollection<HvacSystemViewModel> list, bool _useFopNames, bool _combineViews) {
-            combineViews = _combineViews;
-            useFopNames = _useFopNames;
+        public void CreateSelectedCommand(ObservableCollection<HvacSystemViewModel> list, bool useFopNames, bool combineViews) {
+            _combineViews = combineViews;
+            _useFopNames = useFopNames;
             List<HvacSystemViewModel> systems = new List<HvacSystemViewModel>();
             foreach(HvacSystemViewModel system in list) {
                 if(system.IsChecked) {
@@ -95,97 +105,87 @@ namespace Revit3DvikSchemas.Models {
                 }
             }
 
-            Transaction t = _revitRepository.Document.StartTransaction("Создать схемы");
+            using(Transaction t = _revitRepository.Document.StartTransaction("Создать схемы")) {
+                CopyViewCreateFilters(systems);
 
-            CopyViewCreateFilters(systems);
+                t.Commit();
 
-            t.Commit();
+            }
+
         }
 
         private void CopyViewCreateFilters(List<HvacSystemViewModel> systems) {
-
-            RevitRepository revitRepository = _revitRepository;
-
-            List<Element> viewCol = revitRepository.GetCollection(BuiltInCategory.OST_Views);
-
-            FilteredElementCollector collector = new FilteredElementCollector(_revitRepository.Document);
-
-            List<Element> filterCol = (List<Element>) collector.OfClass(typeof(ParameterFilterElement)).ToElements();
-
-
-
-
-            View activeView = _revitRepository.ActiveUIDocument.ActiveView;
-
-            if(combineViews) {
-                if(activeView.CanViewBeDuplicated(ViewDuplicateOption.WithDetailing)) {
-
-                    string groupName = MakeGroupViewName(systems, useFopNames);
-                    string uniqViewName = IsNameUniqOrMakeNew(groupName, viewCol);
+            if(_combineViews) {
+                if(_revitRepository.ActiveUIDocument.ActiveView.CanViewBeDuplicated(ViewDuplicateOption.WithDetailing)) {
+                    string groupName = MakeGroupViewName(systems, _useFopNames);
                     string filterName = "B4E_" + groupName;
-                    filterName = IsNameUniqOrMakeNew(filterName, filterCol);
-
-                    ElementId newViewId = activeView.Duplicate(ViewDuplicateOption.WithDetailing);
-                    View newView = _revitRepository.Document.GetElement(newViewId) as View;
-                    newView.Name = uniqViewName;
 
                     List<string> systemNameList = new List<string>();
                     foreach(HvacSystemViewModel system in systems) {
-                        if(useFopNames) {
-                            systemNameList.Add(system.FopName);
-                        } else {
-                            systemNameList.Add(system.SystemName);
-                        }
-
+                        string systemOrFopSystemName = GetSystemOrFopSystemName(system, _useFopNames);
+                        systemNameList.Add(systemOrFopSystemName);
                     }
-                    ParameterFilterElement parameterFilterElement = CreateFilter(filterName, systemNameList);
-                    newView.AddFilter(parameterFilterElement.Id);
-                    newView.SetFilterVisibility(parameterFilterElement.Id, false);
+
+                    CopyView(groupName, filterName, systemNameList);
+
                 }
             } else {
                 foreach(HvacSystemViewModel system in systems) {
-                    string systemName = MakeViewName(system, useFopNames);
-                    if(activeView.CanViewBeDuplicated(ViewDuplicateOption.WithDetailing)) {
-                        string uniqViewName = IsNameUniqOrMakeNew(systemName, viewCol);
+                    string systemOrFopSystemName = GetSystemOrFopSystemName(system, _useFopNames);
+                    if(_revitRepository.ActiveUIDocument.ActiveView.CanViewBeDuplicated(ViewDuplicateOption.WithDetailing)) {
+
+                        string filterName = "B4E_" + systemOrFopSystemName;
+
                         List<string> systemNameList = new List<string>();
-                        systemNameList.Add(systemName);
-                        string filterName = "B4E_" + systemName;
-                        filterName = IsNameUniqOrMakeNew(filterName, filterCol);
+                        systemNameList.Add(systemOrFopSystemName);
 
-                        ElementId newViewId = activeView.Duplicate(ViewDuplicateOption.WithDetailing);
-                        View newView = _revitRepository.Document.GetElement(newViewId) as View;
-                        newView.Name = uniqViewName;
-                        ParameterFilterElement parameterFilterElement = CreateFilter(filterName, systemNameList);
-
-                        newView.AddFilter(parameterFilterElement.Id);
-                        newView.SetFilterVisibility(parameterFilterElement.Id, false);
+                        CopyView(systemOrFopSystemName, filterName, systemNameList);
                     }
                 }
             }
+        }
+
+        private void CopyView(string viewName, string filterName, List<string> systemNameList) {
+            FilteredElementCollector collector = new FilteredElementCollector(_revitRepository.Document);
+            List<Element> filterCol = (List<Element>) collector.OfClass(typeof(ParameterFilterElement)).ToElements();
+            List<Element> viewCol = _revitRepository.GetCollection(BuiltInCategory.OST_Views);
+
+
+            string uniqFilterName = IsNameUniqOrMakeNew(filterName, filterCol);
+            string uniqViewName = IsNameUniqOrMakeNew(viewName, viewCol);
+
+            ElementId newViewId = _revitRepository.ActiveUIDocument.ActiveView.Duplicate(ViewDuplicateOption.WithDetailing);
+            View newView = _revitRepository.Document.GetElement(newViewId) as View;
+            newView.Name = uniqViewName;
+            ParameterFilterElement parameterFilterElement = CreateFilter(uniqFilterName, systemNameList);
+            newView.AddFilter(parameterFilterElement.Id);
+            newView.SetFilterVisibility(parameterFilterElement.Id, false);
+
         }
 
 
         private static UniqName WasMet(List<Element> elements, UniqName uniqName) {
             foreach(Element element in elements) {
-                if(element.Name == uniqName.name) {
-                    uniqName.name = uniqName.name + "_" + "Копия";
+                if(element.Name == uniqName.Name) {
+                    uniqName.Name = uniqName.Name + "_" + "Копия";
                     return uniqName;
                 }
             }
 
-            uniqName.wasMet = false;
+            uniqName.WasMet = false;
             return uniqName;
         }
 
         private static string IsNameUniqOrMakeNew(string name, List<Element> elements) {
             UniqName uniqName = new UniqName();
-            uniqName.name = name;
+            uniqName.Name = name;
+            uniqName.WasMet = true;
 
-            while(uniqName.wasMet == true) {
+            while(uniqName.WasMet == true) {
                 uniqName = WasMet(elements,
                                   uniqName);
             }
-            string newName = uniqName.name;
+            string newName = uniqName.Name;
             return newName;
         }
 
@@ -204,7 +204,7 @@ namespace Revit3DvikSchemas.Models {
             return name;
         }
 
-        private static string MakeViewName(HvacSystemViewModel system, bool useFopNames) {
+        private static string GetSystemOrFopSystemName(HvacSystemViewModel system, bool useFopNames) {
             string name = null;
 
             if(useFopNames) {
