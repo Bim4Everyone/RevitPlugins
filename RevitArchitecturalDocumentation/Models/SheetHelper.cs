@@ -26,7 +26,7 @@ namespace RevitArchitecturalDocumentation.Models {
             Repository = revitRepository;
             Sheet = sheet;
             Report = report;
-            NameHelper = new ViewNameHelper(sheet.Name);
+            NameHelper = new ViewNameHelper(sheet);
         }
 
 
@@ -60,7 +60,7 @@ namespace RevitArchitecturalDocumentation.Models {
                 }
             } else {
                 Report?.AppendLine($"                Лист с именем {newSheetName} успешно найден в проекте!");
-                NameHelper = new ViewNameHelper(newSheet.Name);
+                NameHelper = new ViewNameHelper(newSheet);
                 NameHelper.AnilizeNGetLevelNumber();
             }
 
@@ -95,7 +95,7 @@ namespace RevitArchitecturalDocumentation.Models {
             }
 
             Sheet = newSheet;
-            NameHelper = new ViewNameHelper(newSheet.Name);
+            NameHelper = new ViewNameHelper(Sheet);
             NameHelper.AnilizeNGetLevelNumber();
             return newSheet;
         }

@@ -4,13 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
+using System.Xml.Linq;
 
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+
+using dosymep.Revit;
+
+using View = Autodesk.Revit.DB.View;
+
 
 namespace RevitArchitecturalDocumentation.Models {
     internal class ViewNameHelper {
-        public ViewNameHelper(string viewName) {
-            ViewName = viewName;
+        public ViewNameHelper(View view) {
+            RevitView = view;
+            ViewName = view.Name;
+
+            GetViewCatName();
         }
 
 
@@ -23,6 +34,8 @@ namespace RevitArchitecturalDocumentation.Models {
         public string Suffix { get; set; }
         public string LevelPartOfName { get; set; }
         public string LevelNumberAsStr { get; set; }
+        public View RevitView { get; set; }
+        public string RevitViewCatName { get; set; } = string.Empty;
 
 
         /// <summary>
@@ -66,7 +79,7 @@ namespace RevitArchitecturalDocumentation.Models {
 
             // Т.к. дальше будем резать строку на блоки через символ "_", то этот символ должен в строке быть
             if(!ViewName.Contains("_")) {
-                throw new ViewNameException($"Разделите имя на блоки при помощи символа \"_\" у \"{ViewName}\"");
+                throw new ViewNameException($"Разделите имя на блоки при помощи символа \"_\" - {RevitViewCatName} \"{ViewName}\"");
             }
 
             string[] splittedName = ViewName.Split('_');
@@ -74,12 +87,12 @@ namespace RevitArchitecturalDocumentation.Models {
             // Ищем блок после резки по _, в котором содержится слово "этаж"
             // Получаем "05 этаж" или "этаж 05", либо бросаем исключение, что не нашли блок с ключевым словом "этаж"
             LevelPartOfName = splittedName.FirstOrDefault(o => o.IndexOf("этаж", StringComparison.OrdinalIgnoreCase) != -1) ??
-                throw new ViewNameException($"Рядом с номером этажа должно быть указано слово \"этаж\" у \"{ViewName}\"");
+                throw new ViewNameException($"Рядом с номером этажа должно быть указано слово \"этаж\" - {RevitViewCatName} \"{ViewName}\"");
 
             // Проверяем есть ли цифры в блоке уровня
             Regex regex = new Regex(@"\d+");
             if(!regex.IsMatch(LevelPartOfName)) {
-                throw new ViewNameException($"Не найден номер этажа у \"{ViewName}\"");
+                throw new ViewNameException($"Не найден номер этажа - {RevitViewCatName} \"{ViewName}\"");
             }
 
             // Получаем "05"
@@ -87,7 +100,7 @@ namespace RevitArchitecturalDocumentation.Models {
 
             // Получаем int(5)
             if(!int.TryParse(LevelNumberAsStr, out int levelNumberAsInt)) {
-                throw new ViewNameException($"Не удалось определить номер этажа у \"{ViewName}\"");
+                throw new ViewNameException($"Не удалось определить номер этажа - {RevitViewCatName} \"{ViewName}\"");
             }
             LevelNumber = levelNumberAsInt;
 
@@ -106,7 +119,7 @@ namespace RevitArchitecturalDocumentation.Models {
             // "-AAAA-|XXXX|-BBBB-"
             
             if(stringForAnalyze is null || keyString is null) {
-                throw new ViewNameException($"Не удалось получить префикс и суффикс у \"{ViewName}\"");
+                throw new ViewNameException($"Не удалось получить префикс и суффикс - {RevitViewCatName} \"{ViewName}\"");
             }
 
             if(stringForAnalyze.StartsWith(keyString)) {
@@ -144,6 +157,26 @@ namespace RevitArchitecturalDocumentation.Models {
 
             for(int i = 0; i < numAsString.Length; i++) { format += "0"; }
             return "{0:" + format + "}";
+        }
+
+
+        /// <summary>
+        /// Получает имя типа вида, применяемое в тексте ошибок
+        /// </summary>
+        public void GetViewCatName() {
+            if(RevitView is null) { return; }
+
+            switch(RevitView.Category.GetBuiltInCategory()) {
+                case BuiltInCategory.OST_Sheets:
+                RevitViewCatName = "лист";
+                break;
+                case BuiltInCategory.OST_Views:
+                RevitViewCatName = "вид";
+                break;
+                case BuiltInCategory.OST_Schedules:
+                RevitViewCatName = "спецификация";
+                break;
+            }
         }
     }
 }

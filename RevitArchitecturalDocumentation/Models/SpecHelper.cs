@@ -21,7 +21,7 @@ namespace RevitArchitecturalDocumentation.Models {
             Specification = scheduleSheetInstance.Document.GetElement(scheduleSheetInstance.ScheduleId) as ViewSchedule;
             SpecificationDefinition = Specification.Definition;
             SpecificationFilters = SpecificationDefinition.GetFilters().ToList();
-            NameHelper = new ViewNameHelper(Specification.Name);
+            NameHelper = new ViewNameHelper(Specification);
         }
 
         public SpecHelper(RevitRepository revitRepository, ViewSchedule viewSchedule, StringBuilder report = null) {
@@ -32,7 +32,7 @@ namespace RevitArchitecturalDocumentation.Models {
             Specification = viewSchedule;
             SpecificationDefinition = Specification.Definition;
             SpecificationFilters = SpecificationDefinition.GetFilters().ToList();
-            NameHelper = new ViewNameHelper(Specification.Name);
+            NameHelper = new ViewNameHelper(Specification);
         }
 
         public StringBuilder Report { get; set; }
