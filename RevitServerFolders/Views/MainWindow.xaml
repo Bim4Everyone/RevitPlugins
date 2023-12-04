@@ -24,9 +24,9 @@
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <dxmvvm:Interaction.Behaviors>
-        <services:AttachServiceBehavior 
-            AttachableService="{Binding ProgressDialogFactory}"/>
-        
+        <services:AttachServiceBehavior
+            AttachableService="{Binding ProgressDialogFactory}" />
+
         <services:AttachServiceBehavior
             AttachableService="{Binding OpenFolderDialogService}" />
 
@@ -41,9 +41,12 @@
     </dxmvvm:Interaction.Behaviors>
 
     <Window.Resources>
-        <BooleanToVisibilityConverter 
-            x:Key="BooleanToVisibilityConverter"/>
-        
+        <dxg:InverseBooleanConverter
+            x:Key="InverseBooleanConverter" />
+
+        <BooleanToVisibilityConverter
+            x:Key="BooleanToVisibilityConverter" />
+
         <converters:CellImageConverter
             x:Key="CellImageConverter"
             Empty="{dx:DXImage 'Office2013/Actions/New_16x16.png'}"
@@ -65,7 +68,7 @@
             Grid.Row="0"
             Margin="5 5 5 0 "
             Content="Папка назначения" />
-        
+
         <dxe:ButtonEdit
             Grid.Row="1"
             Margin="5"
@@ -81,7 +84,7 @@
                 </dxe:ButtonInfo>
             </dxe:ButtonEdit.Buttons>
         </dxe:ButtonEdit>
-        
+
 
         <StackPanel
             Grid.Row="2"
@@ -90,12 +93,12 @@
             <Label
                 Margin="0 0 5 0"
                 Content="Папка источника" />
-            
+
             <dxe:CheckEdit
                 Content="Выгрузка помещений"
                 EditValue="{Binding IsExportRooms}"
                 Visibility="{Binding IsExportRoomsVisible, 
-                    Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    Converter={StaticResource BooleanToVisibilityConverter}}" />
         </StackPanel>
 
 
@@ -126,7 +129,19 @@
                 <dxg:TableView AutoWidth="True"
                                AllowEditing="False"
                                AllowGrouping="False"
-                               ShowGroupPanel="False" />
+                               ShowGroupPanel="False">
+                    <dxg:TableView.RowStyle>
+                        <Style TargetType="dxg:RowControl">
+                            <Style.Triggers>
+                                <DataTrigger
+                                    Value="True"
+                                    Binding="{Binding Row.SkipObject}">
+                                    <Setter Property="Foreground" Value="DarkGray" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </dxg:TableView.RowStyle>
+                </dxg:TableView>
             </dxg:GridControl.View>
 
             <dxg:GridColumn
@@ -148,7 +163,9 @@
                     <DataTemplate DataType="{x:Type dxg:RowData}">
                         <dxe:CheckEdit
                             Name="PART_Editor"
-                            EditValue="{Binding Row.SkipObject, UpdateSourceTrigger=PropertyChanged}" />
+                            EditValue="{Binding Row.SkipObject, 
+                            UpdateSourceTrigger=PropertyChanged,
+                            Converter={StaticResource InverseBooleanConverter}}" />
                     </DataTemplate>
                 </dxg:GridColumn.CellTemplate>
 
@@ -164,7 +181,7 @@
                 AllowGrouping="False"
                 UnboundType="Object"
                 Header="">
-                
+
                 <dxg:GridColumn.CellTemplate>
                     <DataTemplate DataType="{x:Type dxg:EditGridCellData}">
                         <Image
@@ -172,7 +189,7 @@
                                 Converter={StaticResource CellImageConverter}}" />
                     </DataTemplate>
                 </dxg:GridColumn.CellTemplate>
-                
+
             </dxg:GridColumn>
 
             <dxg:GridColumn
