@@ -56,11 +56,8 @@ namespace RevitServerFolders {
                             .SetServerVersion(ModuleEnvironment.RevitVersion)
                             .Build())
                         .ToArray());
-                
-                kernel.Bind<Views.Rs.MainWindow>().ToSelf()
-                    .WithPropertyValue(nameof(Window.Title), "Выберите папку")
-                    .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<ViewModels.Rs.MainViewModel>());
+
+                kernel.Bind<ViewModels.Rs.MainViewModel>().ToSelf();
 
                 kernel.Bind<RsViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()

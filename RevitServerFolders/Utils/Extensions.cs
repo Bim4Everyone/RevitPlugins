@@ -27,7 +27,10 @@ namespace RevitServerFolders.Utils {
         public static string GetVisibleModelPath(this IServerClient serverClient,
             FolderContents folderContents,
             ObjectData objectData) {
-            return Path.Combine("RSN://" + serverClient.ServerName, folderContents.GetRelativeModelPath(objectData));
+            return new UriBuilder("RSN",
+                serverClient.ServerName,
+                -1,
+                folderContents.GetRelativeModelPath(objectData)).Uri.ToString();
         }
     }
 }

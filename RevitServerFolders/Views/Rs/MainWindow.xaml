@@ -53,7 +53,7 @@
             SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
 
             <dxg:TreeListControl.Columns>
-                <dxg:TreeListColumn FieldName="Name" Header="Имя" />
+                <dxg:TreeListColumn FieldName="Name" Header="Наименование" />
                 <dxg:TreeListColumn FieldName="FullName" Header="Полное наименование" />
                 <dxg:TreeListColumn FieldName="Size" Header="Размер" />
             </dxg:TreeListControl.Columns>

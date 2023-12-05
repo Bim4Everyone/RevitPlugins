@@ -22,7 +22,7 @@ namespace RevitServerFolders.ViewModels.Rs {
         }
 
         public override string Name => _serverClient.ServerName;
-        public override string FullName => Path.Combine(_serverClient.ServerName, _serverClient.ServerVersion);
+        public override string FullName => $"{_serverClient.ServerName}/{_serverClient.ServerVersion}";
 
         public override bool HasChildren => true;
 

@@ -44,7 +44,7 @@ namespace RevitServerFolders.Services {
                 return Task.FromResult((ModelObject) new FileSystemFolderModel(new DirectoryInfo(folderName)));
             }
 
-            return Task.FromResult((ModelObject) default);
+            throw new OperationCanceledException();
         }
         
         private Task<IEnumerable<ModelObject>> ShowDialog() {

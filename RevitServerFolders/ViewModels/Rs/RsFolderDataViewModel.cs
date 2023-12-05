@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using dosymep.Revit.ServerClient;
 using dosymep.Revit.ServerClient.DataContracts;
 
+using RevitServerFolders.Models;
+using RevitServerFolders.Models.Rs;
 using RevitServerFolders.Utils;
 
 namespace RevitServerFolders.ViewModels.Rs {
@@ -31,6 +33,10 @@ namespace RevitServerFolders.ViewModels.Rs {
             return folderContents.Folders
                 .Select(item => new RsFolderDataViewModel(_serverClient, item, folderContents))
                 .ToArray();
+        }
+
+        public override ModelObject GetModelObject() {
+            return new RsFolderModel(_folderData, _folderContents, _serverClient);
         }
     }
 }

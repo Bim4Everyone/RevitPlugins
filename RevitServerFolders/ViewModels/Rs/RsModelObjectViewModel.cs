@@ -8,12 +8,16 @@ using dosymep.Revit.ServerClient;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitServerFolders.Models;
+
 namespace RevitServerFolders.ViewModels.Rs {
     internal class RsModelObjectViewModel : BaseViewModel {
         protected readonly IServerClient _serverClient;
 
         private string _size;
         private ObservableCollection<RsModelObjectViewModel> _children;
+
+        private bool _isLoadedChildren;
 
         protected RsModelObjectViewModel(IServerClient serverClient) {
             _serverClient = serverClient;
@@ -27,7 +31,7 @@ namespace RevitServerFolders.ViewModels.Rs {
         public virtual string Name => "";
         public virtual string FullName => "";
         public virtual bool HasChildren => false;
-        
+
         public virtual string Version => _serverClient.ServerVersion;
 
         public string Size {
@@ -41,15 +45,23 @@ namespace RevitServerFolders.ViewModels.Rs {
         }
 
         private async Task LoadChildrenObjects() {
-            Children = new ObservableCollection<RsModelObjectViewModel>(await GetChildrenObjects());
+            try {
+                Children = new ObservableCollection<RsModelObjectViewModel>(await GetChildrenObjects());
+            } finally {
+                _isLoadedChildren = true;
+            }
         }
 
         private bool CanLoadChildrenObjects() {
-            return true;
+            return !_isLoadedChildren;
         }
 
         protected virtual Task<IEnumerable<RsModelObjectViewModel>> GetChildrenObjects() {
             return Task.FromResult(Enumerable.Empty<RsModelObjectViewModel>());
+        }
+
+        public virtual ModelObject GetModelObject() {
+            return default;
         }
     }
 }

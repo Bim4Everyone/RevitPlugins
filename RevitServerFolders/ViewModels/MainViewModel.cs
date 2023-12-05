@@ -27,6 +27,9 @@ namespace RevitServerFolders.ViewModels {
         
         private bool _isExportRooms;
         private bool _isExportRoomsVisible;
+        
+        private string _errorSourceFolder;
+        private string _errorTextSourceFolder;
 
         public MainViewModel(PluginConfig pluginConfig,
             IModelObjectService objectService,
@@ -120,6 +123,11 @@ namespace RevitServerFolders.ViewModels {
                 ErrorText = "Выберите папку источника.";
                 return false;
             }
+            
+            if(SourceFolder.Equals(_errorSourceFolder)) {
+                ErrorText = _errorTextSourceFolder;
+                return false;
+            }
 
             if(ModelObjects.Count == 0) {
                 ErrorText = "Выберите папку источника c моделями.";
@@ -169,7 +177,15 @@ namespace RevitServerFolders.ViewModels {
         }
 
         private async Task SourceFolderChanged() {
-            await AddModelObjects(await _objectService.GetFromString(SourceFolder));
+            _errorSourceFolder = null;
+            _errorTextSourceFolder = null;
+            
+            try {
+                await AddModelObjects(await _objectService.GetFromString(SourceFolder));
+            } catch(Exception ex) {
+                _errorSourceFolder = SourceFolder;
+                _errorTextSourceFolder = ex.Message;
+            }
         }
 
         private bool CanSourceFolderChanged() {
