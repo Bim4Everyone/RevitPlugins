@@ -14,15 +14,16 @@
     WindowStartupLocation="CenterOwner"
     
     Title="PCOnASPDocsV"
-    Height="600" Width="1060"
-    MinHeight="600" MinWidth="1060"
+    Height="600" Width="1000"
+    MinHeight="600" MinWidth="1000"
 
     d:DataContext="{d:DesignInstance vms:PCOnASPDocsVM, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction
-                Command="{Binding LoadViewCommand}" />
+                Command="{Binding LoadViewCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
@@ -173,18 +174,13 @@
                                     HorizontalAlignment="Center"
                                     Content="Выбрать"
                                     FontSize="14"
-                                    Click="ButtonCancel_Click"
+                                    
                                     Command="{Binding Path=DataContext.SelectSpecsCommand, 
                                         RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                     CommandParameter="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-
-                    <GridViewColumn 
-                        Header="Выбрано спецификаций" 
-                        Width="150"
-                        DisplayMemberBinding="{Binding Path=ListSpecHelpers.Count}"/>
                 </GridView>
             </ListView.View>
         </ListView>
@@ -437,7 +433,7 @@
                 Width="80"
                 Content="Отмена"
                 FontSize="14"
-                Click="ButtonCancel_Click" />
+                Click="ButtonCancel_Click"/>
         </StackPanel>
     </Grid>
 </base:PlatformWindow>

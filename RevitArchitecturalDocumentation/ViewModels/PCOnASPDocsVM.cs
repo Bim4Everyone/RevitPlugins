@@ -24,7 +24,11 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Microsoft.WindowsAPICodePack.ShellExtensions;
+
 using Ninject.Planning.Targets;
+
+using pyRevitLabs.Json.Linq;
 
 using RevitArchitecturalDocumentation.Models;
 using RevitArchitecturalDocumentation.Models.Exceptions;
@@ -52,6 +56,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private string _selectedFilterNameForSpecs;
         private string _sheetNamePrefix = string.Empty;
         private string _errorText;
+        private PCOnASPDocsV _pCOnASPDocsView;
         private ViewFamilyType _selectedViewFamilyType;
         private ElementType _selectedViewportType;
         private FamilySymbol _selectedTitleBlock;
@@ -78,11 +83,12 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             _revitRepository = revitRepository;
 
 
-            LoadViewCommand = RelayCommand.Create(LoadView);
+            LoadViewCommand = new RelayCommand(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
             AddTaskCommand = RelayCommand.Create(AddTask);
             DeleteTaskCommand = RelayCommand.Create(DeleteTask);
+
 
             SelectSpecsCommand = new RelayCommand(SelectSpecs);
         }
@@ -231,6 +237,10 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedFilterNameForSpecs, value);
         }
 
+        public PCOnASPDocsV PCOnASPDocsView {
+            get => _pCOnASPDocsView;
+            set => this.RaiseAndSetIfChanged(ref _pCOnASPDocsView, value);
+        }
 
         public string ErrorText {
             get => _errorText;
@@ -241,8 +251,9 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// <summary>
         /// Метод, отрабатывающий при загрузке окна
         /// </summary>
-        private void LoadView() {
+        private void LoadView(object obj) {
 
+            PCOnASPDocsView = obj as PCOnASPDocsV;
             LoadConfig();
 
             VisibilityScopes = _revitRepository.VisibilityScopes;
@@ -404,6 +415,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// </summary>
         private void SelectSpecs(object obj) {
 
+            PCOnASPDocsView.Hide();
+
             TaskInfo task = obj as TaskInfo;
             if(task != null) {
                 task.ListSpecHelpers.Clear();
@@ -431,13 +444,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                 }
                 GetFilterNames();
             }
-
-            PCOnASPDocsV window = new PCOnASPDocsV {
-                DataContext = this
-            };
-            window.ShowDialog();
+            PCOnASPDocsView.ShowDialog();
         }
-
 
 
         /// <summary>

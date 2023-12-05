@@ -56,6 +56,10 @@ namespace RevitArchitecturalDocumentation.Models {
             }
             EndLevelNumberAsInt = endLevelNumberAsInt;
 
+            if(StartLevelNumberAsInt > EndLevelNumberAsInt) {
+                throw new TaskException($"Начальный уровень должен быть не больше конечного в задании №{TaskNumber}");
+            }
+
             // Проверка, что пользователь выбрал область видимости и ее данных
             if(SelectedVisibilityScope is null) {
                 throw new TaskException($"Не выбрана область видимости в задании №{TaskNumber}");
