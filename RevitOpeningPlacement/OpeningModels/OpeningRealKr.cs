@@ -20,7 +20,7 @@ namespace RevitOpeningPlacement.OpeningModels {
     /// Класс, обозначающий чистовое отверстие КР, идущее на чертежи. 
     /// Использовать для обертки проемов из активного файла КР
     /// </summary>
-    internal class OpeningRealKr : OpeningRealBase, IEquatable<OpeningRealKr> {
+    internal class OpeningRealKr : OpeningRealByMep, IEquatable<OpeningRealKr> {
         public OpeningRealKr(FamilyInstance openingReal) : base(openingReal) {
             Diameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningKrPlacer.RealOpeningKrDiameter);
             Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningKrPlacer.RealOpeningKrInWallWidth);
@@ -78,6 +78,14 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         public override BoundingBoxXYZ GetTransformedBBoxXYZ() {
             return _boundingBox;
+        }
+
+        /// <summary>
+        /// Обновляет свойство <see cref="Status"/>
+        /// </summary>
+        /// <param name="mepLinkElementsProviders">Коллекция связей с элементами ВИС и заданиями на отверстиями</param>
+        public void UpdateStatus(ICollection<IMepLinkElementsProvider> mepLinkElementsProviders) {
+            Status = DetermineStatus(mepLinkElementsProviders);
         }
 
         /// <summary>
