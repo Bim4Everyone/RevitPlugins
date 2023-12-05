@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,7 +18,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// <summary>
     /// Модель представления окна для работы с конкретным входящим заданием на отверстие от инженера в файле архитектора или конструктора
     /// </summary>
-    internal class OpeningMepTaskIncomingViewModel : BaseViewModel, ISelectorAndHighlighter, IEquatable<OpeningMepTaskIncomingViewModel> {
+    internal class OpeningMepTaskIncomingViewModel : BaseViewModel, IOpeningTaskIncomingForKrViewModel, IEquatable<OpeningMepTaskIncomingViewModel> {
         /// <summary>
         /// Экземпляр семейства задания на отверстие
         /// </summary>
