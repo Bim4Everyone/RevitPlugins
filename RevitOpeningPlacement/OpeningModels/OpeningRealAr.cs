@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -26,7 +26,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="openingReal">Экземпляр семейства чистового отверстия АР, идущего на чертежи</param>
         public OpeningRealAr(FamilyInstance openingReal) : base(openingReal) {
-            Id = _familyInstance.Id;
             Diameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArDiameter);
             Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArWidth);
             Height = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningArPlacer.RealOpeningArHeight);
@@ -38,11 +37,6 @@ namespace RevitOpeningPlacement.OpeningModels {
                 string.Empty);
         }
 
-
-        /// <summary>
-        /// Id экземпляра семейства задания на отверстие
-        /// </summary>
-        public ElementId Id { get; }
 
         /// <summary>
         /// Диаметр в мм, если есть

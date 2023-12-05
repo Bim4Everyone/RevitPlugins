@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -36,7 +36,6 @@ namespace RevitOpeningPlacement.OpeningModels {
             : base(openingTask) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             FileName = _familyInstance.Document.PathName;
-            Id = _familyInstance.Id;
             Transform = transform;
             Location = Transform.OfPoint((_familyInstance.Location as LocationPoint).Point);
             // https://forums.autodesk.com/t5/revit-api-forum/get-angle-from-transform-basisx-basisy-and-basisz/td-p/5326059
@@ -61,7 +60,6 @@ namespace RevitOpeningPlacement.OpeningModels {
 
         public string FileName { get; }
 
-        public ElementId Id { get; }
 
         /// <summary>
         /// Трансформация связанного файла с заданием на отверстие относительно активного документа - получателя заданий

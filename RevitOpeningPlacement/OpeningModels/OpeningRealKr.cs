@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -22,7 +22,6 @@ namespace RevitOpeningPlacement.OpeningModels {
     /// </summary>
     internal class OpeningRealKr : OpeningRealBase, IEquatable<OpeningRealKr> {
         public OpeningRealKr(FamilyInstance openingReal) : base(openingReal) {
-            Id = _familyInstance.Id;
             Diameter = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningKrPlacer.RealOpeningKrDiameter);
             Width = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningKrPlacer.RealOpeningKrInWallWidth);
             Height = GetFamilyInstanceStringParamValueOrEmpty(RealOpeningKrPlacer.RealOpeningKrInWallHeight);
@@ -33,11 +32,6 @@ namespace RevitOpeningPlacement.OpeningModels {
                 string.Empty);
         }
 
-
-        /// <summary>
-        /// Id экземпляра семейства задания на отверстие
-        /// </summary>
-        public ElementId Id { get; }
 
         /// <summary>
         /// Диаметр в мм, если есть

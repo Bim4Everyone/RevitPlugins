@@ -104,7 +104,7 @@ namespace RevitOpeningPlacement {
 
             var incomingTasksViewModels = GetOpeningsMepIncomingTasksViewModels(
                 incomingTasks,
-                realOpenings,
+                realOpenings.ToArray<IOpeningReal>(),
                 constructureElementsIds);
             var openingsRealViewModels = GetOpeningsRealArViewModels(mepLinks, realOpenings);
 
@@ -191,7 +191,7 @@ namespace RevitOpeningPlacement {
         /// <returns></returns>
         private ICollection<OpeningMepTaskIncomingViewModel> GetOpeningsMepIncomingTasksViewModels(
             ICollection<OpeningMepTaskIncoming> incomingTasks,
-            ICollection<OpeningRealAr> realOpenings,
+            ICollection<IOpeningReal> realOpenings,
             ICollection<ElementId> constructureElementsIds) {
 
             var incomingTasksViewModels = new HashSet<OpeningMepTaskIncomingViewModel>();

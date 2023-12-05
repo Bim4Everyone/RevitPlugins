@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -44,9 +44,15 @@ namespace RevitOpeningPlacement.OpeningModels {
                     $"{nameof(openingReal)} с Id {openingReal.Id} не содержит ссылки на хост элемент");
             }
             _familyInstance = openingReal;
+            Id = _familyInstance.Id;
 
             SetTransformedBBoxXYZ();
         }
+
+        /// <summary>
+        /// Id экземпляра семейства чистового проема
+        /// </summary>
+        public ElementId Id { get; }
 
 
         public abstract Solid GetSolid();

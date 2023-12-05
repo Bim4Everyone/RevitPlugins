@@ -1,4 +1,4 @@
-﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB;
 
 namespace RevitOpeningPlacement.Models.Interfaces {
     /// <summary>
@@ -10,5 +10,10 @@ namespace RevitOpeningPlacement.Models.Interfaces {
         /// </summary>
         /// <returns></returns>
         Element GetHost();
+
+        /// <summary>
+        /// Id экземпляра семейства чистового проема
+        /// </summary>
+        ElementId Id { get; }
     }
 }
