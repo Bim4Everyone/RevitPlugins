@@ -32,6 +32,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         public const string RealOpeningKrInFloorWidth = "мод_ФОП_Габарит Б";
         public const string RealOpeningTaskId = "ФОП_ID задания";
 
+        private const string _configErrorMessage = "Настройки расстановки отверстий КР некорректны. Пересохраните их.";
+
 
         /// <summary>
         /// Конструктор класса для размещения чистовых отверстий КР в активном документе в местах расположений заданий на отверстия из связанных файлов АР
@@ -45,10 +47,55 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         }
 
 
+        public void PlaceSingleOpeningByOneTask() {
+            if(_config.PlacementType == OpeningRealKrPlacementType.PlaceByAr) {
+                PlaceSingleOpeningByOneArTask();
+            } else if(_config.PlacementType == OpeningRealKrPlacementType.PlaceByMep) {
+
+            } else {
+                _revitRepository.ShowErrorMessage(_configErrorMessage);
+                throw new OperationCanceledException();
+            }
+        }
+
+        public void PlaceUnitedOpeningByManyTasks() {
+            if(_config.PlacementType == OpeningRealKrPlacementType.PlaceByAr) {
+                PlaceUnitedOpeningByManyArTasks();
+            } else if(_config.PlacementType == OpeningRealKrPlacementType.PlaceByMep) {
+
+            } else {
+                _revitRepository.ShowErrorMessage(_configErrorMessage);
+                throw new OperationCanceledException();
+            }
+        }
+
+        public void PlaceSingleOpeningsInOneHost() {
+            if(_config.PlacementType == OpeningRealKrPlacementType.PlaceByAr) {
+                PlaceSingleOpeningsInOneHostByArTasks();
+            } else if(_config.PlacementType == OpeningRealKrPlacementType.PlaceByMep) {
+
+            } else {
+                _revitRepository.ShowErrorMessage(_configErrorMessage);
+                throw new OperationCanceledException();
+            }
+        }
+
+        public void PlaceSingleOpeningsInManyHosts() {
+            if(_config.PlacementType == OpeningRealKrPlacementType.PlaceByAr) {
+                PlaceSingleOpeningsInManyHostsByArTasks();
+            } else if(_config.PlacementType == OpeningRealKrPlacementType.PlaceByMep) {
+
+            } else {
+                _revitRepository.ShowErrorMessage(_configErrorMessage);
+                throw new OperationCanceledException();
+            }
+        }
+
+
         /// <summary>
         /// Размещение чистового отверстия КР по одному заданию на отверстие из связи АР в одном хосте
         /// </summary>
-        public void PlaceSingleOpeningByOneTask() {
+        private void PlaceSingleOpeningByOneArTask() {
             Element host = _revitRepository.PickHostForRealOpening();
             OpeningArTaskIncoming openingTask = _revitRepository.PickSingleOpeningArTaskIncoming();
 
@@ -71,7 +118,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <summary>
         /// Размещение объединенного чистового отверстия КР по одному или нескольким заданиям на отверстия из связи(ей) АР в одном хосте
         /// </summary>
-        public void PlaceUnitedOpeningByManyTasks() {
+        private void PlaceUnitedOpeningByManyArTasks() {
             Element host = _revitRepository.PickHostForRealOpening();
             HashSet<OpeningArTaskIncoming> openingTasks = _revitRepository
                 .PickManyOpeningArTasksIncoming()
@@ -96,7 +143,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <summary>
         /// Размещение нескольких одиночных чистовых отверстий КР по нескольким заданиям на отверстия из связи(ей) АР без их объединения
         /// </summary>
-        public void PlaceSingleOpeningsInOneHost() {
+        private void PlaceSingleOpeningsInOneHostByArTasks() {
             Element host = _revitRepository.PickHostForRealOpening();
             HashSet<OpeningArTaskIncoming> openingTasks = _revitRepository
                 .PickManyOpeningArTasksIncoming()
@@ -125,7 +172,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <summary>
         /// Размещение нескольких одиночных чистовых отверстий КР в выбранных хостах по всем заданиям на отверстия из связи(ей) АР, которые пересекаются с этими хостами
         /// </summary>
-        public void PlaceSingleOpeningsInManyHosts() {
+        private void PlaceSingleOpeningsInManyHostsByArTasks() {
             ICollection<Element> hosts = _revitRepository.PickHostsForRealOpenings();
             ICollection<OpeningArTaskIncoming> allOpeningTasks = _revitRepository.GetOpeningsArTasksIncoming();
 
