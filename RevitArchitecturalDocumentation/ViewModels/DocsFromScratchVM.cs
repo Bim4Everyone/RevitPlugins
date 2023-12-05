@@ -33,32 +33,20 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
 
         /// <summary>
-        /// Анализируем каждую задачу, проверяя выбор пользователя и получая данные в числовом формате
-        /// </summary>
-        private void AnalizeTasks() {
-
-            Report.AppendLine("Анализируем задачи:");
-
-            foreach(TaskInfo task in MVM.TasksForWork) {
-                Report.AppendLine($"    Задача {MVM.TasksForWork.IndexOf(task) + 1}");
-                task.AnalizeTask();
-            }
-        }
-
-
-        /// <summary>
         /// В зависимости от выбора пользователя метод создает листы, виды (создает с нуля, а не копированием выбранных видов), спеки и выносит виды и спеки на листы
         /// </summary>
         public void CreateDocs() {
 
-            AnalizeTasks();
-
-            if(MVM.TasksForWork.FirstOrDefault(o => o.CanWorkWithIt) is null) {
-
-                Report.AppendLine("❗   Все задания имеют ошибки. Выполнение скрипта остановлено!");
-                TaskDialog.Show("Документатор АР. Отчет", Report.ToString());
-                return;
+            Report.AppendLine($"Исходные данные в заданиях:");
+            foreach(TaskInfo task in MVM.TasksForWork) {
+                Report.AppendLine($"Номер задания: {task.TaskNumber}");
+                Report.AppendLine($"        Начальный уровень: {task.StartLevelNumberAsInt}");
+                Report.AppendLine($"        Конечный уровень: {task.EndLevelNumberAsInt}");
+                Report.AppendLine($"        Область видимости: {task.SelectedVisibilityScope.Name}");
+                Report.AppendLine($"        Номер корпуса области видимости: {task.NumberOfBuildingPartAsInt}");
+                Report.AppendLine($"        Номер секции области видимости: {task.NumberOfBuildingSectionAsInt}");
             }
+
 
             Report.AppendLine($"Приступаю к выполнению задания. Всего задач: {MVM.TasksForWork.Count}");
             using(Transaction transaction = Repository.Document.StartTransaction("Документатор АР")) {
@@ -82,12 +70,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                         c++;
                         Report.AppendLine($"    Задание номер {c}");
-
-                        // Пропускаем те задания, в которых есть ошибки
-                        if(!task.CanWorkWithIt) {
-                            Report.AppendLine($"❗               В задании имеются ошибки, работа по нему выполнена не будет!");
-                            continue;
-                        }
 
                         string strForLevelSearch = "К" + task.NumberOfBuildingPartAsInt.ToString() + "_";
                         if(!level.Name.Contains(strForLevelSearch)) {

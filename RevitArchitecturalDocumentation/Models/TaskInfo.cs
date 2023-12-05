@@ -4,25 +4,27 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using RevitArchitecturalDocumentation.Models.Exceptions;
 using RevitArchitecturalDocumentation.ViewModels;
 
 using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 
 namespace RevitArchitecturalDocumentation.Models {
     internal class TaskInfo {
-        public TaskInfo(Regex regexForBuildingPart, Regex regexForBuildingSection, StringBuilder report = null) {
+        public TaskInfo(Regex regexForBuildingPart, Regex regexForBuildingSection, int taskNumber) {
 
             RegexForBuildingPart = regexForBuildingPart;
             RegexForBuildingSection = regexForBuildingSection;
-            Report = report;
+            TaskNumber = taskNumber;
         }
 
         public StringBuilder Report { get; set; }
-        public bool CanWorkWithIt { get; set; } = true;
+        public int TaskNumber { get; set; }
 
         public Regex RegexForBuildingPart { get; set; }
         public Regex RegexForBuildingSection { get; set; }
@@ -36,53 +38,42 @@ namespace RevitArchitecturalDocumentation.Models {
         public string ViewNameSuffix { get; set; }
         public List<SpecHelper> ListSpecHelpers { get; set; } = new List<SpecHelper>();
 
-        public void AnalizeTask() {
 
-            // Проверка, что пользователь выбрал область видимости
-            if(SelectedVisibilityScope is null) {
-                Report?.AppendLine($"❗       Не выбрана область видимости!");
-                CanWorkWithIt = false;
-                return;
-            }
-            Report?.AppendLine($"        Работа с областью видимости: {SelectedVisibilityScope.Name}");
+        /// <summary>
+        /// Проверяет на наличие ошибок в задании - корректность заполнения номеров уровней, имени области видимости и т.д.
+        /// </summary>
+        public void СheckTasksForErrors() {
 
             // Попытка запарсить уровень с которого нужно начать создавать виды
             if(!int.TryParse(StartLevelNumber, out int startLevelNumberAsInt)) {
-                Report?.AppendLine($"❗       Начальный уровень некорректен!");
-                CanWorkWithIt = false;
-                return;
+                throw new TaskException($"Не удалось определить начальный уровень в задании №{TaskNumber}");
             }
             StartLevelNumberAsInt = startLevelNumberAsInt;
-            Report?.AppendLine($"        Начальный уровень: {startLevelNumberAsInt}");
 
             // Попытка запарсить уровень на котором нужно закончить создавать виды
             if(!int.TryParse(EndLevelNumber, out int endLevelNumberAsInt)) {
-                Report?.AppendLine($"❗       Конечный уровень некорректен!");
-                CanWorkWithIt = false;
-                return;
+                throw new TaskException($"Не удалось определить конечный уровень в задании №{TaskNumber}");
             }
             EndLevelNumberAsInt = endLevelNumberAsInt;
-            Report?.AppendLine($"        Конечный уровень: {endLevelNumberAsInt}");
 
-            // Попытка запарсить номер корпуса из имени области видимости
-            string numberOfBuildingPart = RegexForBuildingPart.Match(SelectedVisibilityScope.Name).Groups[1].Value;
-            if(!int.TryParse(numberOfBuildingPart, out int numberOfBuildingPartAsInt)) {
-                Report?.AppendLine($"❗       Не удалось определить корпус у области видимости: {SelectedVisibilityScope.Name}!");
-                CanWorkWithIt = false;
-                return;
-            }
-            NumberOfBuildingPartAsInt = numberOfBuildingPartAsInt;
-            Report?.AppendLine($"        Номер корпуса: {numberOfBuildingPartAsInt}");
+            // Проверка, что пользователь выбрал область видимости и ее данных
+            if(SelectedVisibilityScope is null) {
+                throw new TaskException($"Не выбрана область видимости в задании №{TaskNumber}");
+            } else {
+                // Попытка запарсить номер корпуса из имени области видимости
+                string numberOfBuildingPart = RegexForBuildingPart.Match(SelectedVisibilityScope.Name).Groups[1].Value;
+                if(!int.TryParse(numberOfBuildingPart, out int numberOfBuildingPartAsInt)) {
+                    throw new TaskException($"Не удалось определить корпус у области видимости в задании №{TaskNumber}");
+                }
+                NumberOfBuildingPartAsInt = numberOfBuildingPartAsInt;
 
-            // Попытка запарсить номер секции из имени области видимости
-            string numberOfBuildingSection = RegexForBuildingSection.Match(SelectedVisibilityScope.Name).Groups[1].Value;
-            if(!int.TryParse(numberOfBuildingSection, out int numberOfBuildingSectionAsInt)) {
-                Report?.AppendLine($"❗       Не удалось определить секцию у области видимости: {SelectedVisibilityScope.Name}!");
-                CanWorkWithIt = false;
-                return;
+                // Попытка запарсить номер секции из имени области видимости
+                string numberOfBuildingSection = RegexForBuildingSection.Match(SelectedVisibilityScope.Name).Groups[1].Value;
+                if(!int.TryParse(numberOfBuildingSection, out int numberOfBuildingSectionAsInt)) {
+                    throw new TaskException($"Не удалось определить секцию у области видимости в задании №{TaskNumber}");
+                }
+                NumberOfBuildingSectionAsInt = numberOfBuildingSectionAsInt;
             }
-            NumberOfBuildingSectionAsInt = numberOfBuildingSectionAsInt;
-            Report?.AppendLine($"        Номер секции: {numberOfBuildingSectionAsInt}");
         }
     }
 }

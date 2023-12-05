@@ -12,6 +12,8 @@ using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 
+using RevitArchitecturalDocumentation.Models.Exceptions;
+
 using View = Autodesk.Revit.DB.View;
 
 

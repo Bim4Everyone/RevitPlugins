@@ -74,10 +74,31 @@
             ScrollViewer.VerticalScrollBarVisibility="Visible"
             ScrollViewer.CanContentScroll="False"
             ItemsSource="{Binding Path=TasksForWork, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-            SelectedItem="{Binding Path=SelectedTask}"
             SelectionMode="Single">
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="Focusable" Value="False"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+            
             <ListView.View>
                 <GridView>
+                    <GridViewColumn 
+                        Header="№"
+                        Width="30">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Margin="5" 
+                                    Height="30"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Path=TaskNumber}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
                     <GridViewColumn 
                         Header="Начальный уровень"
                         Width="180">
@@ -402,7 +423,6 @@
                 Foreground="Orange"
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}" />
-
 
             <Button
                 Margin="10"

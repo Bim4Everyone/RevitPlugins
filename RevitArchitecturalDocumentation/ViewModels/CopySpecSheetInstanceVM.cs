@@ -15,6 +15,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitArchitecturalDocumentation.Models;
+using RevitArchitecturalDocumentation.Models.Exceptions;
 using RevitArchitecturalDocumentation.Views;
 
 using Reference = Autodesk.Revit.DB.Reference;

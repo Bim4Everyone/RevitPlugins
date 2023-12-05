@@ -27,6 +27,7 @@ using dosymep.WPF.ViewModels;
 using Ninject.Planning.Targets;
 
 using RevitArchitecturalDocumentation.Models;
+using RevitArchitecturalDocumentation.Models.Exceptions;
 using RevitArchitecturalDocumentation.Views;
 
 using static System.Net.Mime.MediaTypeNames;
@@ -48,7 +49,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private string _selectedViewportTypeName;
         private string _selectedTitleBlockName;
         private string _viewNamePrefix = string.Empty;
-        private string _selectedFilterNameForSpecs = string.Empty;
+        private string _selectedFilterNameForSpecs;
         private string _sheetNamePrefix = string.Empty;
         private string _errorText;
         private ViewFamilyType _selectedViewFamilyType;
@@ -237,7 +238,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         }
 
 
-
         /// <summary>
         /// Метод, отрабатывающий при загрузке окна
         /// </summary>
@@ -256,7 +256,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             SelectedTitleBlock = TitleBlocksInProject.FirstOrDefault(a => a.Name.Equals(SelectedTitleBlockName));
 
             if(TasksForWork.Count == 0) {
-                TasksForWork.Add(new TaskInfo(RegexForBuildingPart, RegexForBuildingSection, Report));
+                TasksForWork.Add(new TaskInfo(RegexForBuildingPart, RegexForBuildingSection, 1));
             }
 
             if(SelectedViews.Count == 0) {
@@ -278,30 +278,16 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// </summary>
         private bool CanAcceptView() {
 
-            if(WorkWithViews && SelectedViewFamilyType is null) {
-                return false;
-            }
-
-            if(WorkWithViews && SelectedViewportType is null) {
-                return false;
-            }
-
-            if(WorkWithSheets && SelectedTitleBlock is null) {
-                return false;
-            }
-
-            if(WorkWithSpecs && SelectedFilterNameForSpecs is null) {
-                return false;
-            }
-
             foreach(TaskInfo task in TasksForWork) {
+                // Проверяем и получаем данные по каждому заданию
+                try {
+                    task.СheckTasksForErrors();
 
-                if(task.SelectedVisibilityScope is null) {
+                } catch(TaskException ex) {
+                    ErrorText = ex.Message;
                     return false;
                 }
-            }
-
-            foreach(TaskInfo task in TasksForWork) {
+                // Отдельно проверяем и получаем данные по спецификациям в задании
                 foreach(SpecHelper specHelper in task.ListSpecHelpers) {
 
                     // LevelNumberFormat заполняется после последней проверки при получении имени, поэтому, если он заполнен, значит все ок
@@ -319,6 +305,27 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                 }
             }
 
+            if(WorkWithSheets && SelectedTitleBlock is null) {
+                ErrorText = "Не выбран тип рамки листа";
+                return false;
+            }
+
+            if(WorkWithViews && SelectedViewFamilyType is null) {
+                ErrorText = "Не выбран тип вида";
+                return false;
+            }
+
+            if(WorkWithViews && SelectedViewportType is null) {
+                ErrorText = "Не выбран тип видового экрана";
+                return false;
+            }
+
+            if(WorkWithSpecs && FilterNamesFromSpecs.Count > 0 && SelectedFilterNameForSpecs is null) {
+                ErrorText = "Не выбрано имя поля фильтра спецификации";
+                return false;
+            }
+
+            ErrorText = "";
             return true;
         }
 
@@ -367,7 +374,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             settings.SelectedViewportTypeName = SelectedViewportType.Name;
             settings.SelectedFilterNameForSpecs = SelectedFilterNameForSpecs;
 
-
             _pluginConfig.SaveProjectConfig();
         }
 
@@ -378,7 +384,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// </summary>
         private void AddTask() {
 
-            TasksForWork.Add(new TaskInfo(RegexForBuildingPart, RegexForBuildingSection, Report));
+            TasksForWork.Add(new TaskInfo(RegexForBuildingPart, RegexForBuildingSection, TasksForWork.Count + 1));
         }
 
         /// <summary>
@@ -386,8 +392,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// </summary>
         private void DeleteTask() {
 
-            if(SelectedTask != null) {
-                TasksForWork.Remove(SelectedTask);
+            if(TasksForWork.Count > 0) {
+                TasksForWork.RemoveAt(TasksForWork.Count - 1);
             }
             GetFilterNames();
         }
