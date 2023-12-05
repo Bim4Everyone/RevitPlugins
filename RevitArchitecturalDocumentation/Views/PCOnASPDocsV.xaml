@@ -110,7 +110,7 @@
                                     Height="30"
                                     HorizontalAlignment="Center"
                                     VerticalContentAlignment="Center"
-                                    Text="{Binding Path=StartLevelNumber}"/>
+                                    Text="{Binding Path=StartLevelNumber, UpdateSourceTrigger=PropertyChanged}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -126,7 +126,7 @@
                                     Height="30"
                                     HorizontalAlignment="Center"
                                     VerticalContentAlignment="Center"
-                                    Text="{Binding Path=EndLevelNumber}"/>
+                                    Text="{Binding Path=EndLevelNumber, UpdateSourceTrigger=PropertyChanged}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
