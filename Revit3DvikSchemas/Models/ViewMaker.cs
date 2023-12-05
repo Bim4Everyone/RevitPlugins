@@ -11,6 +11,7 @@ using Revit3DvikSchemas.ViewModels;
 namespace Revit3DvikSchemas.Models {
 
     internal class UniqName {
+
         public bool WasMet { get; set; }
         public string Name { get; set; }
     }
@@ -163,27 +164,19 @@ namespace Revit3DvikSchemas.Models {
 
         }
 
-
-        private static UniqName WasMet(List<Element> elements, UniqName uniqName) {
-            foreach(Element element in elements) {
-                if(element.Name == uniqName.Name) {
-                    uniqName.Name = uniqName.Name + "_" + "Копия";
-                    return uniqName;
-                }
-            }
-
-            uniqName.WasMet = false;
-            return uniqName;
-        }
-
         private static string IsNameUniqOrMakeNew(string name, List<Element> elements) {
             UniqName uniqName = new UniqName();
             uniqName.Name = name;
             uniqName.WasMet = true;
 
             while(uniqName.WasMet == true) {
-                uniqName = WasMet(elements,
-                                  uniqName);
+                uniqName.WasMet = false;
+                foreach(Element element in elements) {
+                    if(element.Name == uniqName.Name) {
+                        uniqName.Name = uniqName.Name + "_" + "Копия";
+                        uniqName.WasMet = true;
+                    }
+                }
             }
             string newName = uniqName.Name;
             return newName;
