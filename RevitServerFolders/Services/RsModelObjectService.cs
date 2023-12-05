@@ -2,19 +2,26 @@
 using System.Threading.Tasks;
 
 using RevitServerFolders.Models;
+using RevitServerFolders.Views.Rs;
 
 namespace RevitServerFolders.Services {
     internal sealed class RsModelObjectService : IModelObjectService {
+        private readonly MainWindow _mainWindow;
+
+        public RsModelObjectService(MainWindow mainWindow) {
+            _mainWindow = mainWindow;
+        }
+        
         public Task<ModelObject> SelectModelObjectDialog() {
-            throw new System.NotImplementedException();
+            return SelectModelObjectDialog(null);
         }
 
         public Task<ModelObject> SelectModelObjectDialog(string rootFolder) {
-            throw new System.NotImplementedException();
-        }
+            if(_mainWindow.ShowDialog() == true) {
+                return Task.FromResult((ModelObject) null);
+            }
 
-        public Task<IEnumerable<ModelObject>> SelectModelObjectsDialog() {
-            throw new System.NotImplementedException();
+            return Task.FromResult((ModelObject) null);
         }
         
         public Task<ModelObject> GetFromString(string folderName) {

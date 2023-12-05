@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
@@ -9,6 +11,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Revit.ServerClient;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -17,6 +20,8 @@ using RevitServerFolders.Models;
 using RevitServerFolders.Services;
 using RevitServerFolders.ViewModels;
 using RevitServerFolders.Views;
+
+using Application = Autodesk.Revit.ApplicationServices.Application;
 
 namespace RevitServerFolders {
     [Transaction(TransactionMode.Manual)]
@@ -31,6 +36,7 @@ namespace RevitServerFolders {
                     .ToSelf()
                     .InSingletonScope();
                 
+                kernel.UseXtraProgressDialog<RsViewModel>();
                 kernel.UseXtraProgressDialog<FileSystemViewModel>();
                 
                 kernel.Bind<RsModelObjectConfig>()
@@ -41,6 +47,20 @@ namespace RevitServerFolders {
 
                 kernel.UseXtraOpenFolderDialog<MainWindow>(
                     initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+
+                kernel.Bind<IReadOnlyCollection<IServerClient>>()
+                    .ToMethod(c => c.Kernel.Get<Application>()
+                        .GetRevitServerNetworkHosts()
+                        .Select(item => new ServerClientBuilder()
+                            .SetServerName(item)
+                            .SetServerVersion(ModuleEnvironment.RevitVersion)
+                            .Build())
+                        .ToArray());
+                
+                kernel.Bind<Views.Rs.MainWindow>().ToSelf()
+                    .WithPropertyValue(nameof(Window.Title), "Выберите папку")
+                    .WithPropertyValue(nameof(Window.DataContext),
+                        c => c.Kernel.Get<ViewModels.Rs.MainViewModel>());
 
                 kernel.Bind<RsViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()
