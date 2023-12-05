@@ -122,6 +122,7 @@
         <dxg:GridControl
             Grid.Row="4"
             Margin="5"
+            ShowLoadingPanel="{Binding SourceFolderChangedCommand.IsExecuting}"
             ItemsSource="{Binding ModelObjects}"
             SelectedItem="{Binding SelectedObject}">
 

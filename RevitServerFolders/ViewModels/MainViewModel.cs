@@ -181,6 +181,7 @@ namespace RevitServerFolders.ViewModels {
             _errorTextSourceFolder = null;
             
             try {
+                ModelObjects.Clear();
                 await AddModelObjects(await _objectService.GetFromString(SourceFolder));
             } catch(Exception ex) {
                 _errorSourceFolder = SourceFolder;
