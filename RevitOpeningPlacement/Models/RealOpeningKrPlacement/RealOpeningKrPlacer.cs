@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +9,7 @@ using dosymep.Revit;
 
 using RevitClashDetective.Models.Extensions;
 
+using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Exceptions;
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
@@ -22,6 +23,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
     /// </summary>
     internal class RealOpeningKrPlacer {
         private readonly RevitRepository _revitRepository;
+        private readonly OpeningRealsKrConfig _config;
 
         public const string RealOpeningKrDiameter = "ФОП_РАЗМ_Диаметр";
         public const string RealOpeningKrInWallWidth = "ФОП_РАЗМ_Ширина";
@@ -35,9 +37,11 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// Конструктор класса для размещения чистовых отверстий КР в активном документе в местах расположений заданий на отверстия из связанных файлов АР
         /// </summary>
         /// <param name="revitRepository">Репозиторий активного КР документа ревита, в котором будет происходить размещение чистовых отверстий</param>
+        /// <param name="config">Конфигурация расстановки заданий на отверстия в файле КР</param>
         /// <exception cref="System.ArgumentNullException"></exception>
-        public RealOpeningKrPlacer(RevitRepository revitRepository) {
-            _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
+        public RealOpeningKrPlacer(RevitRepository revitRepository, OpeningRealsKrConfig config) {
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
 

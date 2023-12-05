@@ -1,7 +1,8 @@
-﻿using Autodesk.Revit.Attributes;
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using RevitOpeningPlacement.Models;
+using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.RealOpeningArPlacement;
 using RevitOpeningPlacement.Models.RealOpeningArPlacement.Checkers;
 using RevitOpeningPlacement.Models.RealOpeningKrPlacement;
@@ -39,7 +40,8 @@ namespace RevitOpeningPlacement {
                     if(!ModelCorrect(new RealOpeningsKrChecker(revitRepository))) {
                         return;
                     }
-                    var placer = new RealOpeningKrPlacer(revitRepository);
+                    var config = OpeningRealsKrConfig.GetOpeningConfig(revitRepository.Doc);
+                    var placer = new RealOpeningKrPlacer(revitRepository, config);
                     placer.PlaceSingleOpeningsInManyHosts();
                     break;
                 }
