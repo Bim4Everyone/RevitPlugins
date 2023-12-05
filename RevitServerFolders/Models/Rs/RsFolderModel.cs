@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using dosymep.Revit.ServerClient;
 using dosymep.Revit.ServerClient.DataContracts;
 
+using RevitServerFolders.Utils;
+
 namespace RevitServerFolders.Models.Rs {
     internal sealed class RsFolderModel : ModelObject {
         private readonly FolderData _folderData;
@@ -30,20 +32,6 @@ namespace RevitServerFolders.Models.Rs {
                 .Select(modelData => new RsFileModel(modelData, contents, _serverClient)));
 
             return rsFileModels.ToArray().AsEnumerable();
-        }
-    }
-
-    internal static class ServerClientExtension {
-        /// <summary>Returns visible model path for RS.</summary>
-        /// <param name="serverClient">Server client connection.</param>
-        /// <param name="folderContents">Parent folder contents.</param>
-        /// <param name="objectData">Object data.</param>
-        /// <returns>Returns visible model path for RS.</returns>
-        public static string GetVisibleModelPath(
-            this IServerClient serverClient,
-            FolderContents folderContents,
-            ObjectData objectData) {
-            return Path.Combine("RSN://" + serverClient.ServerName, folderContents.GetRelativeModelPath(objectData));
         }
     }
 }
