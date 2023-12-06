@@ -38,7 +38,7 @@ using View = Autodesk.Revit.DB.View;
 namespace RevitArchitecturalDocumentation.ViewModels {
     internal class DocsFromSelectedViewsVM {
 
-        public DocsFromSelectedViewsVM(PCOnASPDocsVM pCOnASPDocsVM, RevitRepository revitRepository, StringBuilder report) {
+        public DocsFromSelectedViewsVM(PCOnASPDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report) {
             MVM = pCOnASPDocsVM;
             Repository = revitRepository;
             Report = report;
@@ -46,53 +46,41 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
         public PCOnASPDocsVM MVM { get; set; }
         public RevitRepository Repository { get; set; }
-        public StringBuilder Report { get; set; }
+        public ObservableCollection<TreeReportNode> Report { get; set; }
 
+        
 
         /// <summary>
         /// В зависимости от выбора пользователя метод создает листы, виды (создает путем копирования выбранных видов), спеки и выносит виды и спеки на листы
         /// </summary>
         public void CreateDocs() {
 
-            Report.AppendLine($"Исходные данные в заданиях:");
-            foreach(TaskInfo task in MVM.TasksForWork) {
-                Report.AppendLine($"Номер задания: {task.TaskNumber}");
-                Report.AppendLine($"        Начальный уровень: {task.StartLevelNumberAsInt}");
-                Report.AppendLine($"        Конечный уровень: {task.EndLevelNumberAsInt}");
-                Report.AppendLine($"        Область видимости: {task.SelectedVisibilityScope.Name}");
-                Report.AppendLine($"        Номер корпуса области видимости: {task.NumberOfBuildingPartAsInt}");
-                Report.AppendLine($"        Номер секции области видимости: {task.NumberOfBuildingSectionAsInt}");
-            }
-
-            Report.AppendLine($"Приступаю к выполнению задания. Всего задач: {MVM.TasksForWork.Count}");
+            //Report.AppendLine($"Приступаю к выполнению задания. Всего задач: {MVM.TasksForWork.Count}");
             using(Transaction transaction = Repository.Document.StartTransaction("Документатор АР")) {
 
-                TaskDialog.Show("Отчет", "Создание на основе выбранных видов");
-                TaskDialog.Show("Число выбранных видов", MVM.SelectedViews.Count.ToString());
+                TreeReportNode rep = new TreeReportNode() { Name = "Создание видов будет производиться на основе выбранных. Перебираем выбранные виды" };
 
-                foreach(ViewPlan view in MVM.SelectedViews) {
-
-                    string numberOfLevel = MVM.RegexForView.Match(view.Name.ToLower()).Groups[1].Value;
-
-                    if(!int.TryParse(numberOfLevel, out int numberOfLevelAsInt)) {
-                        continue;
-                    }
+                foreach(ViewHelper viewHelper in MVM.SelectedViewHelpers) {
+                    int numberOfLevelAsInt = viewHelper.NameHelper.LevelNumber;
+                    string numberOfLevelAsStr = viewHelper.NameHelper.LevelNumberAsStr;
+                    
+                    TreeReportNode selectedViewRep = new TreeReportNode() { Name = $"Работаем с видом: \"{viewHelper.View.Name}\", номер этажа: \"{numberOfLevelAsInt}\"" };
 
                     string viewNamePartWithSectionPart = string.Empty;
 
-                    if(view.Name.ToLower().Contains("_часть ")) {
+                    if(viewHelper.View.Name.ToLower().Contains("_часть ")) {
                         viewNamePartWithSectionPart = "_часть ";
-                        viewNamePartWithSectionPart += MVM.RegexForBuildingSectionPart.Match(view.Name.ToLower()).Groups[1].Value;
+                        viewNamePartWithSectionPart += MVM.RegexForBuildingSectionPart.Match(viewHelper.View.Name.ToLower()).Groups[1].Value;
                     }
 
-                    int c = 0;
                     foreach(TaskInfo task in MVM.TasksForWork) {
 
-                        c++;
-                        Report.AppendLine($"    Вид \"{view.Name}\", задание номер {c}");
+                        TreeReportNode taskRep = new TreeReportNode() { Name = $"Задание номер: \"{task.TaskNumber}\"" };
 
                         if(numberOfLevelAsInt < task.StartLevelNumberAsInt || numberOfLevelAsInt > task.EndLevelNumberAsInt) {
-
+                            taskRep.Nodes.Add(new TreeReportNode() { Name = $"Уровень вида \"{numberOfLevelAsInt}\" не подходит под искомый диапазон: " +
+                                $"{task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}" });
+                            selectedViewRep.Nodes.Add(taskRep);
                             continue;
                         }
 
@@ -103,38 +91,46 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                 MVM.SheetNamePrefix,
                                 task.NumberOfBuildingPartAsInt,
                                 task.NumberOfBuildingSectionAsInt,
-                                numberOfLevel);
+                                numberOfLevelAsStr);
 
-                            sheetHelper = new SheetHelper(Repository, Report);
+                            TreeReportNode sheetRep = new TreeReportNode() { Name = $"Работа с листом \"{newSheetName}\"" };
+
+                            sheetHelper = new SheetHelper(Repository, sheetRep);
                             sheetHelper.GetOrCreateSheet(newSheetName, MVM.SelectedTitleBlock, "Ширина", "Высота", 150, 110);
+                            taskRep.Nodes.Add(sheetRep);
                         }
 
 
-                        ViewHelper viewHelper = null;
+                        ViewHelper newViewHelper = null;
                         if(MVM.WorkWithViews) {
 
                             string newViewName = string.Format("{0}{1} этаж К{2}_С{3}{4}{5}",
                                 MVM.ViewNamePrefix,
-                                numberOfLevel,
+                                numberOfLevelAsStr,
                                 task.NumberOfBuildingPartAsInt,
                                 task.NumberOfBuildingSectionAsInt,
                                 viewNamePartWithSectionPart,
                                 task.ViewNameSuffix);
 
-                            viewHelper = new ViewHelper(Report, Repository);
-                            viewHelper.GetView(newViewName, task.SelectedVisibilityScope, viewForDublicate: view);
+                            TreeReportNode viewRep = new TreeReportNode() { Name = $"Работа с видом \"{newViewName}\"" };
+
+                            newViewHelper = new ViewHelper(Repository, viewRep);
+                            newViewHelper.GetView(newViewName, task.SelectedVisibilityScope, viewForDublicate: viewHelper.View);
 
                             if(sheetHelper.Sheet != null
-                                && viewHelper.View != null
-                                && Viewport.CanAddViewToSheet(Repository.Document, sheetHelper.Sheet.Id, viewHelper.View.Id)) {
+                                && newViewHelper.View != null
+                                && Viewport.CanAddViewToSheet(Repository.Document, sheetHelper.Sheet.Id, newViewHelper.View.Id)) {
 
-                                viewHelper.PlaceViewportOnSheet(sheetHelper.Sheet, MVM.SelectedViewportType);
+                                newViewHelper.PlaceViewportOnSheet(sheetHelper.Sheet, MVM.SelectedViewportType);
                             }
+                            taskRep.Nodes.Add(viewRep);
                         }
 
                         if(MVM.WorkWithSpecs) {
 
                             foreach(SpecHelper specHelper in task.ListSpecHelpers) {
+                                TreeReportNode specRep = new TreeReportNode() { Name = $"Работа со спецификацией \"{specHelper.Specification.Name}\"" };
+                                specHelper.Report = specRep;
 
                                 SpecHelper newSpecHelper = specHelper.GetOrDublicateNSetSpec(MVM.SelectedFilterNameForSpecs, numberOfLevelAsInt);
 
@@ -146,13 +142,16 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                                     ScheduleSheetInstance newScheduleSheetInstance = newSpecHelper.PlaceSpec(sheetHelper);
                                 }
+                                taskRep.Nodes.Add(specRep);
                             }
                         }
-                    }
 
-                    TaskDialog.Show("Документатор АР. Отчет", Report.ToString());
-                    transaction.Commit();
+                        selectedViewRep.Nodes.Add(taskRep);
+                    }
+                    rep.Nodes.Add(selectedViewRep);
+                    Report.Add(rep);
                 }
+                transaction.Commit();
             }
         }
     }

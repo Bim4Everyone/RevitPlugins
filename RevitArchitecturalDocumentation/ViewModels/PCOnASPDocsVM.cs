@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media.Media3D;
 using System.Xml.Linq;
 
+using Autodesk.AdvanceSteel.StructuralAnalysis;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
@@ -57,6 +58,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private string _sheetNamePrefix = string.Empty;
         private string _errorText;
         private PCOnASPDocsV _pCOnASPDocsView;
+        private ObservableCollection<TreeReportNode> _report = new ObservableCollection<TreeReportNode>();
         private ViewFamilyType _selectedViewFamilyType;
         private ElementType _selectedViewportType;
         private FamilySymbol _selectedTitleBlock;
@@ -68,9 +70,10 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private List<FamilySymbol> _titleBlocksInProject;
         private List<string> _filterNamesFromSpecs = new List<string>();
         private ObservableCollection<ViewPlan> _selectedViews = new ObservableCollection<ViewPlan>();
+        private ObservableCollection<ViewHelper> _selectedViewHelpers = new ObservableCollection<ViewHelper>();
         private ObservableCollection<TaskInfo> _tasksForWork = new ObservableCollection<TaskInfo>();
 
-        private StringBuilder _report = new StringBuilder();
+        //private StringBuilder _report = new StringBuilder();
         private Regex _regexForBuildingPart = new Regex(@"К(.*?)_");
         private Regex _regexForBuildingSection = new Regex(@"С(.*?)$");
         private Regex _regexForBuildingSectionPart = new Regex(@"часть (.*?)$");
@@ -102,10 +105,10 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
 
 
-        public StringBuilder Report {
-            get => _report;
-            set => this.RaiseAndSetIfChanged(ref _report, value);
-        }
+        //public StringBuilder Report {
+        //    get => _report;
+        //    set => this.RaiseAndSetIfChanged(ref _report, value);
+        //}
         public Regex RegexForBuildingPart {
             get => _regexForBuildingPart;
             set => this.RaiseAndSetIfChanged(ref _regexForBuildingPart, value);
@@ -130,6 +133,11 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         public ObservableCollection<ViewPlan> SelectedViews {
             get => _selectedViews;
             set => this.RaiseAndSetIfChanged(ref _selectedViews, value);
+        }
+
+        public ObservableCollection<ViewHelper> SelectedViewHelpers {
+            get => _selectedViewHelpers;
+            set => this.RaiseAndSetIfChanged(ref _selectedViewHelpers, value);
         }
 
         public ObservableCollection<TaskInfo> TasksForWork {
@@ -242,6 +250,11 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _pCOnASPDocsView, value);
         }
 
+        public ObservableCollection<TreeReportNode> TreeReport {
+            get => _report;
+            set => this.RaiseAndSetIfChanged(ref _report, value);
+        }
+
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
@@ -272,6 +285,16 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             if(SelectedViews.Count == 0) {
                 SelectedViews = _revitRepository.GetSelectedViewPlans();
+                SelectedViewHelpers = new ObservableCollection<ViewHelper>();
+                foreach(ViewPlan viewPlan in SelectedViews) {
+                    ViewHelper viewHelper = new ViewHelper(viewPlan);
+                    SelectedViewHelpers.Add(viewHelper);
+                    try {
+                        viewHelper.NameHelper.AnilizeNGetLevelNumber();
+                    } catch(ViewNameException ex) {
+                        ErrorText = ex.Message;
+                    }
+                }
             }
         }
 
@@ -288,6 +311,16 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// Определяет можно ли запустить работу плагина
         /// </summary>
         private bool CanAcceptView() {
+
+            foreach(ViewHelper viewHelper in SelectedViewHelpers) {
+                try {
+                    viewHelper.NameHelper.AnilizeNGetLevelNumber();
+
+                } catch(ViewNameException ex) {
+                    ErrorText = ex.Message;
+                    return false;
+                }
+            }
 
             foreach(TaskInfo task in TasksForWork) {
                 // Проверяем и получаем данные по каждому заданию
@@ -432,7 +465,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                         continue;
                     }
 
-                    SpecHelper specHelper = new SpecHelper(_revitRepository, scheduleSheetInstance, Report);
+                    //SpecHelper specHelper = new SpecHelper(_revitRepository, scheduleSheetInstance, TreeReport);
+                    SpecHelper specHelper = new SpecHelper(_revitRepository, scheduleSheetInstance);
                     task.ListSpecHelpers.Add(specHelper);
                     try {
                         specHelper.NameHelper.AnilizeNGetNameInfo();
@@ -468,19 +502,62 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
 
         /// <summary>
+        /// Подготавливает и передает информацию в древовидный отчет об исходных данных заданий
+        /// </summary>
+        private TreeReportNode GetInitialDataForReport() {
+
+            TreeReportNode rep = new TreeReportNode() { Name = "Исходные данные:" };
+
+            rep.AddNodeWithName($"Выбрано видов до запуска плагина: {SelectedViews.Count}");
+            rep.AddNodeWithName($"Выбран тип вида: {SelectedViewFamilyTypeName}");
+            rep.AddNodeWithName($"Выбран тип видового экрана: {SelectedViewportTypeName}");
+            rep.AddNodeWithName($"Выбран тип рамки листа: {SelectedTitleBlockName}");
+            rep.AddNodeWithName($"Выбрано поле параметра фильтрации спецификации: {SelectedFilterNameForSpecs}");
+
+            foreach(TaskInfo task in TasksForWork) {
+                TreeReportNode taskRep = new TreeReportNode() { Name = $"Номер задания: {task.TaskNumber}" };
+                taskRep.AddNodeWithName($"Начальный уровень: {task.StartLevelNumberAsInt}");
+                taskRep.AddNodeWithName($"Конечный уровень: {task.EndLevelNumberAsInt}");
+                taskRep.AddNodeWithName($"Область видимости: {task.SelectedVisibilityScope.Name}");
+                taskRep.AddNodeWithName($"Номер корпуса области видимости: {task.NumberOfBuildingPartAsInt}");
+                taskRep.AddNodeWithName($"Номер секции области видимости: {task.NumberOfBuildingSectionAsInt}");
+
+                rep.Nodes.Add(taskRep);
+            }
+            return rep;
+        }
+
+
+        /// <summary>
+        /// Метод перебирает все выбранные спеки во всех заданиях и собирает список параметров фильтрации. принадлежащий всем одновременно
+        /// </summary>
+        private void OpenReportWindow() {
+
+            TreeReportV window = new TreeReportV {
+                DataContext = new TreeReportVM(TreeReport)
+            };
+            window.ShowDialog();
+        }
+
+
+        /// <summary>
         /// Основной метод, выполняющий работу по созданию листов, видов, спек и выносу спек и видов на листы
         /// </summary>
         private void DoWork() {
 
+            TreeReport.Add(GetInitialDataForReport());
+
             if(CreateViewsFromSelected) {
 
-                DocsFromSelectedViewsVM docsFromSelectedViewsVM = new DocsFromSelectedViewsVM(this, _revitRepository, Report);
+                DocsFromSelectedViewsVM docsFromSelectedViewsVM = new DocsFromSelectedViewsVM(this, _revitRepository, TreeReport);
                 docsFromSelectedViewsVM.CreateDocs();
             } else {
 
-                DocsFromScratchVM docsFromScratchVM = new DocsFromScratchVM(this, _revitRepository, Report);
+                DocsFromScratchVM docsFromScratchVM = new DocsFromScratchVM(this, _revitRepository, TreeReport);
                 docsFromScratchVM.CreateDocs();
             }
+
+            OpenReportWindow();
         }
     }
 }

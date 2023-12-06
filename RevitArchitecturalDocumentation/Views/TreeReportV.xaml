@@ -1,0 +1,31 @@
+﻿<base:PlatformWindow
+    x:Class="RevitArchitecturalDocumentation.Views.TreeReportV"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitArchitecturalDocumentation.Views"
+    xmlns:vms="clr-namespace:RevitArchitecturalDocumentation.ViewModels"
+
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+    
+    Title="Отчет"
+    Height="280" Width="400"    
+    MinHeight="280" MinWidth="400"    
+
+    d:DataContext="{d:DesignInstance vms:TreeReportVM, IsDesignTimeCreatable=False}">
+    <Grid>
+        <TreeView 
+            ItemsSource="{Binding Path=Data}">
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Path=Nodes}">
+                    <TextBlock Text="{Binding Name}" />
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+    </Grid>
+</base:PlatformWindow>

@@ -11,7 +11,7 @@ using RevitArchitecturalDocumentation.ViewModels;
 
 namespace RevitArchitecturalDocumentation.Models {
     internal class SpecHelper {
-        public SpecHelper(RevitRepository revitRepository, ScheduleSheetInstance scheduleSheetInstance, StringBuilder report = null) {
+        public SpecHelper(RevitRepository revitRepository, ScheduleSheetInstance scheduleSheetInstance, TreeReportNode report = null) {
 
             Report = report;
             Repository = revitRepository;
@@ -24,7 +24,7 @@ namespace RevitArchitecturalDocumentation.Models {
             NameHelper = new ViewNameHelper(Specification);
         }
 
-        public SpecHelper(RevitRepository revitRepository, ViewSchedule viewSchedule, StringBuilder report = null) {
+        public SpecHelper(RevitRepository revitRepository, ViewSchedule viewSchedule, TreeReportNode report = null) {
 
             Report = report;
             Repository = revitRepository;
@@ -35,7 +35,7 @@ namespace RevitArchitecturalDocumentation.Models {
             NameHelper = new ViewNameHelper(Specification);
         }
 
-        public StringBuilder Report { get; set; }
+        public TreeReportNode Report { get; set; }
         public RevitRepository Repository { get; set; }
         public ScheduleSheetInstance SpecSheetInstance { get; set; }
         public XYZ SpecSheetInstancePoint { get; set; }
@@ -77,15 +77,16 @@ namespace RevitArchitecturalDocumentation.Models {
             SpecHelper newSpecHelper;
             // Если спеку с указанным именем не нашли, то будем создавать дублированием
             if(newViewSpec is null) {
-                Report?.AppendLine($"                Спецификация с именем {specName} не найдена в проекте, приступаем к созданию");
+                Report?.AddNodeWithName($"Спецификация с именем {specName} не найдена в проекте, приступаем к созданию");
                 newViewSpec = Repository.Document.GetElement(Specification.Duplicate(ViewDuplicateOption.Duplicate)) as ViewSchedule;
-                Report?.AppendLine($"                Спецификация успешно создана!");
+                Report?.AddNodeWithName($"Спецификация успешно создана!");
                 newViewSpec.Name = specName;
-                Report?.AppendLine($"                Задано имя: {newViewSpec.Name}");
+                Report?.AddNodeWithName($"Задано имя: {newViewSpec.Name}");
+
                 newSpecHelper = new SpecHelper(Repository, newViewSpec, Report);
                 newSpecHelper.ChangeSpecFilters(filterName, numberOfLevelAsInt);
             } else {
-                Report?.AppendLine($"                Спецификация с именем {newViewSpec.Name} успешно найдена в проекте!");
+                Report?.AddNodeWithName($"Спецификация с именем {newViewSpec.Name} успешно найдена в проекте!");
                 newSpecHelper = new SpecHelper(Repository, newViewSpec, Report);
             }
             newSpecHelper.SpecSheetInstancePoint = SpecSheetInstancePoint;
@@ -116,7 +117,7 @@ namespace RevitArchitecturalDocumentation.Models {
                     string newVal = String.Format(format, newFilterValue);
                     currentFilter.SetValue(newVal);
 
-                    Report?.AppendLine($"               Фильтру задали значение {currentFilter.GetStringValue()}");
+                    Report?.AddNodeWithName($"Фильтру задали значение {currentFilter.GetStringValue()}");
                     newScheduleFilters.Add(currentFilter);
                 } else {
                     newScheduleFilters.Add(currentFilter);
@@ -141,9 +142,9 @@ namespace RevitArchitecturalDocumentation.Models {
             SpecSheetInstance = newScheduleSheetInstance;
 
             if(newScheduleSheetInstance is null) {
-                Report?.AppendLine($"❗          Не удалось создать видовой экран спецификации на листе!");
+                Report?.AddNodeWithName($"❗ Не удалось создать видовой экран спецификации на листе!");
             } else {
-                Report?.AppendLine($"           Видовой экран спецификации успешно создан на листе!");
+                Report?.AddNodeWithName($"Видовой экран спецификации успешно создан на листе!");
             }
 
             return newScheduleSheetInstance;

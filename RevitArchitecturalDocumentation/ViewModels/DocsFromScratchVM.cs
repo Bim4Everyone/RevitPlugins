@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
@@ -21,7 +22,7 @@ using RevitArchitecturalDocumentation.Models;
 namespace RevitArchitecturalDocumentation.ViewModels {
     internal class DocsFromScratchVM : BaseViewModel {
 
-        public DocsFromScratchVM(PCOnASPDocsVM pCOnASPDocsVM, RevitRepository revitRepository, StringBuilder report) {
+        public DocsFromScratchVM(PCOnASPDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report) {
             MVM = pCOnASPDocsVM;
             Repository = revitRepository;
             Report = report;
@@ -29,7 +30,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
         public PCOnASPDocsVM MVM { get; set; }
         public RevitRepository Repository { get; set; }
-        public StringBuilder Report { get; set; }
+        public ObservableCollection<TreeReportNode> Report { get; set; }
 
 
         /// <summary>
@@ -37,53 +38,42 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// </summary>
         public void CreateDocs() {
 
-            Report.AppendLine($"Исходные данные в заданиях:");
-            foreach(TaskInfo task in MVM.TasksForWork) {
-                Report.AppendLine($"Номер задания: {task.TaskNumber}");
-                Report.AppendLine($"        Начальный уровень: {task.StartLevelNumberAsInt}");
-                Report.AppendLine($"        Конечный уровень: {task.EndLevelNumberAsInt}");
-                Report.AppendLine($"        Область видимости: {task.SelectedVisibilityScope.Name}");
-                Report.AppendLine($"        Номер корпуса области видимости: {task.NumberOfBuildingPartAsInt}");
-                Report.AppendLine($"        Номер секции области видимости: {task.NumberOfBuildingSectionAsInt}");
-            }
-
-
-            Report.AppendLine($"Приступаю к выполнению задания. Всего задач: {MVM.TasksForWork.Count}");
+            //Report.AppendLine($"Приступаю к выполнению задания. Всего задач: {MVM.TasksForWork.Count}");
             using(Transaction transaction = Repository.Document.StartTransaction("Документатор АР")) {
 
                 TaskDialog.Show("Отчет", "Создание с нуля");
 
-                Report.AppendLine($"Плагин перебирает уровни и на каждом пытается выполнить задания по очереди.");
+                //Report.AppendLine($"Плагин перебирает уровни и на каждом пытается выполнить задания по очереди.");
                 foreach(Level level in MVM.Levels) {
 
-                    Report.AppendLine($"Уровень \"{level.Name}\"");
+                    //Report.AppendLine($"Уровень \"{level.Name}\"");
 
                     string numberOfLevel = MVM.RegexForLevel.Match(level.Name).Groups[1].Value;
                     if(!int.TryParse(numberOfLevel, out int numberOfLevelAsInt)) {
-                        Report.AppendLine($"❗       Не удалось определить номер уровня {level.Name}!");
+                        //Report.AppendLine($"❗       Не удалось определить номер уровня {level.Name}!");
                         continue;
                     }
-                    Report.AppendLine($"    Уровень номер: {numberOfLevelAsInt}");
+                    //Report.AppendLine($"    Уровень номер: {numberOfLevelAsInt}");
 
                     int c = 0;
                     foreach(TaskInfo task in MVM.TasksForWork) {
 
                         c++;
-                        Report.AppendLine($"    Задание номер {c}");
+                        //Report.AppendLine($"    Задание номер {c}");
 
                         string strForLevelSearch = "К" + task.NumberOfBuildingPartAsInt.ToString() + "_";
                         if(!level.Name.Contains(strForLevelSearch)) {
-                            Report.AppendLine($"        Уровень не относится к нужному корпусу, т.к. не содержит: \"{strForLevelSearch}\":");
+                            //Report.AppendLine($"        Уровень не относится к нужному корпусу, т.к. не содержит: \"{strForLevelSearch}\":");
                             continue;
                         } else {
-                            Report.AppendLine($"        Уровень относится к нужному корпусу, т.к. содержит: \"{strForLevelSearch}\":");
+                            //Report.AppendLine($"        Уровень относится к нужному корпусу, т.к. содержит: \"{strForLevelSearch}\":");
                         }
 
                         if(numberOfLevelAsInt < task.StartLevelNumberAsInt || numberOfLevelAsInt > task.EndLevelNumberAsInt) {
-                            Report.AppendLine($"        Уровень: {level.Name} не подходит под диапазон {task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}:");
+                            //Report.AppendLine($"        Уровень: {level.Name} не подходит под диапазон {task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}:");
                             continue;
                         }
-                        Report.AppendLine($"        Уровень: {level.Name} подходит под диапазон {task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}:");
+                        //Report.AppendLine($"        Уровень: {level.Name} подходит под диапазон {task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}:");
 
 
                         SheetHelper sheetHelper = null;
@@ -95,7 +85,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                 task.NumberOfBuildingSectionAsInt,
                                 numberOfLevel);
 
-                            sheetHelper = new SheetHelper(Repository, Report);
+                            //sheetHelper = new SheetHelper(Repository, Report);
+                            sheetHelper = new SheetHelper(Repository);
                             sheetHelper.GetOrCreateSheet(newSheetName, MVM.SelectedTitleBlock);
                         }
 
@@ -108,7 +99,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                 task.NumberOfBuildingPartAsInt,
                                 task.ViewNameSuffix);
 
-                            viewHelper = new ViewHelper(Report, Repository);
+                            //viewHelper = new ViewHelper(Report, Repository);
+                            viewHelper = new ViewHelper(Repository);
                             viewHelper.GetView(newViewName, task.SelectedVisibilityScope, MVM.SelectedViewFamilyType, level);
 
                             if(sheetHelper.Sheet != null
@@ -138,7 +130,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                     }
                 }
 
-                TaskDialog.Show("Документатор АР. Отчет", Report.ToString());
+                //TaskDialog.Show("Документатор АР. Отчет", Report.ToString());
 
                 transaction.Commit();
             }

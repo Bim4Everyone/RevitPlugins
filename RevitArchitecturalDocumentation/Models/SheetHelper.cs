@@ -17,12 +17,12 @@ using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitArchitecturalDocumentation.Models {
     internal class SheetHelper {
-        public SheetHelper(RevitRepository revitRepository, StringBuilder report = null) {
+        public SheetHelper(RevitRepository revitRepository, TreeReportNode report = null) {
             Repository = revitRepository;
             Report = report;
             NameHelper = new ViewNameHelper(null);
         }
-        public SheetHelper(RevitRepository revitRepository, ViewSheet sheet, StringBuilder report = null) {
+        public SheetHelper(RevitRepository revitRepository, ViewSheet sheet, TreeReportNode report = null) {
             Repository = revitRepository;
             Sheet = sheet;
             Report = report;
@@ -30,13 +30,10 @@ namespace RevitArchitecturalDocumentation.Models {
         }
 
 
-        public StringBuilder Report { get; set; }
         public RevitRepository Repository { get; set; }
         public ViewSheet Sheet { get; set; }
-
         public ViewNameHelper NameHelper { get; set; }
-
-
+        public TreeReportNode Report { get; set; }
 
 
         /// <summary>
@@ -47,19 +44,19 @@ namespace RevitArchitecturalDocumentation.Models {
             ViewSheet newSheet = Repository.GetSheetByName(newSheetName);
             Sheet = newSheet;
             if(newSheet is null) {               
-                Report?.AppendLine($"                Лист с именем {newSheetName} не найден в проекте, приступаем к созданию");
+                Report?.AddNodeWithName($"Лист с именем {newSheetName} не найден в проекте, приступаем к созданию");
                 try {
                     CreateSheet(newSheetName, titleBlockType);
 
                     if(widthParamName.Length != 0 && heightParamName.Length != 0) {
                         SetUpSheetDimensions(widthParamName, heightParamName, width, height);
                     }
-                    //Repository.Document.Regenerate();
                 } catch(Exception) {
-                    Report?.AppendLine($"❗               Произошла ошибка при создании листа!");
+                    Report?.AddNodeWithName($"❗ Произошла ошибка при создании листа!");
                 }
             } else {
-                Report?.AppendLine($"                Лист с именем {newSheetName} успешно найден в проекте!");
+                Report?.AddNodeWithName($"Лист с именем {newSheetName} успешно найден в проекте!");
+
                 NameHelper = new ViewNameHelper(newSheet);
                 NameHelper.AnilizeNGetLevelNumber();
             }
@@ -75,23 +72,23 @@ namespace RevitArchitecturalDocumentation.Models {
         public ViewSheet CreateSheet(string newSheetName, FamilySymbol titleBlockType) {
 
             if(newSheetName.Length == 0) {
-                Report?.AppendLine($"❗               Произошла ошибка при работе с листом! Передано некорректное имя для задания!");
+                Report?.AddNodeWithName($"❗ Произошла ошибка при работе с листом! Передано некорректное имя для задания!");
+
                 return null;
             }
             if(titleBlockType is null) {
-                Report?.AppendLine($"❗               Произошла ошибка при работе с листом! Передана некорректный тип рамки листа!");
+                Report?.AddNodeWithName($"❗ Произошла ошибка при работе с листом! Передана некорректный тип рамки листа!");
                 return null;
             }
 
             ViewSheet newSheet = null;
             try {
                 newSheet = ViewSheet.Create(Repository.Document, titleBlockType.Id);
-                Report?.AppendLine($"                Лист успешно создан!");
+                Report?.AddNodeWithName($"Лист успешно создан!");
                 newSheet.Name = newSheetName;
-                Report?.AppendLine($"                Задано имя: {newSheet.Name}");
-
+                Report?.AddNodeWithName($"Задано имя: {newSheet.Name}");
             } catch(Exception) {
-                Report?.AppendLine($"❗               Произошла ошибка при создании листа!");
+                Report?.AddNodeWithName($"❗ Произошла ошибка при создании листа!");
             }
 
             Sheet = newSheet;
@@ -107,19 +104,19 @@ namespace RevitArchitecturalDocumentation.Models {
         public void SetUpSheetDimensions(string widthParamName, string heightParamName, int width, int height) {
 
             if(widthParamName.Length == 0) {
-                Report?.AppendLine($"❗               Произошла ошибка при работе с листом! Передано некорректное имя параметра ширины рамки листа!");
+                Report?.AddNodeWithName($"❗ Произошла ошибка при работе с листом! Передано некорректное имя параметра ширины рамки листа!");
                 return;
             }
             if(heightParamName.Length == 0) {
-                Report?.AppendLine($"❗               Произошла ошибка при работе с листом! Передано некорректное имя параметра высоты рамки листа!");
+                Report?.AddNodeWithName($"❗ Произошла ошибка при работе с листом! Передано некорректное имя параметра высоты рамки листа!");
                 return;
             }
             if(width == 0) {
-                Report?.AppendLine($"❗               Произошла ошибка при работе с листом! Передано некорректное значение для задания ширины рамки листа!");
+                Report?.AddNodeWithName($"❗ Произошла ошибка при работе с листом! Передано некорректное значение для задания ширины рамки листа!");
                 return;
             }
             if(height == 0) {
-                Report?.AppendLine($"❗               Произошла ошибка при работе с листом! Передано некорректное значение для задания высоты рамки листа!");
+                Report?.AddNodeWithName($"❗ Произошла ошибка при работе с листом! Передано некорректное значение для задания высоты рамки листа!");
                 return;
             }
 
@@ -131,7 +128,7 @@ namespace RevitArchitecturalDocumentation.Models {
                     .FirstOrDefault() as FamilyInstance;
 
                 if(titleBlock is null) {
-                    Report?.AppendLine($"❗               Произошла ошибка при работе с листом! Не найдена рамка листа!");
+                    Report?.AddNodeWithName($"❗ Произошла ошибка при работе с листом! Не найдена рамка листа!");
                     return;
 
                 } else {
@@ -141,16 +138,16 @@ namespace RevitArchitecturalDocumentation.Models {
                     if(widthParam != null && heightParam != null) {
                         widthParam.Set(UnitUtilsHelper.ConvertToInternalValue(width));
                         heightParam.Set(UnitUtilsHelper.ConvertToInternalValue(height));
-                        Report?.AppendLine($"                Заданы габариты рамки: {width}х{height}");
+                        Report?.AddNodeWithName($"Заданы габариты рамки: {width}х{height}");
                     } else {
-                        Report?.AppendLine($"❗               Произошла ошибка при работе с листом! У рамки не найден один из параметров!");
+                        Report?.AddNodeWithName($"❗ Произошла ошибка при работе с листом! У рамки не найден один из габаритных параметров!");
                         return;
                     }
                     Repository.Document.Regenerate();
                 }
 
             } catch(Exception) {
-                Report?.AppendLine($"❗               Произошла ошибка при создании листа!");
+                Report?.AddNodeWithName($"❗ Произошла ошибка при создании листа!");
             }
         }
 
