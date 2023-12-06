@@ -1,11 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
+
 using RevitOpeningPlacement.Models.Interfaces;
-using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models {
     internal class ConstructureLinkElementsProvider : IConstructureLinkElementsProvider {
@@ -23,15 +25,19 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <param name="linkDocument">Связанный файл с конструкциями</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public ConstructureLinkElementsProvider(RevitLinkInstance linkDocument) {
+        public ConstructureLinkElementsProvider(RevitRepository revitRepository, RevitLinkInstance linkDocument) {
+            if(revitRepository is null) {
+                throw new ArgumentNullException(nameof(revitRepository));
+            }
+
             if(linkDocument is null) {
                 throw new ArgumentNullException(nameof(linkDocument));
             }
 
             _document = linkDocument.GetLinkDocument();
             _transform = linkDocument.GetTransform();
-            _elementIds = GetElementIds(_document);
-            _openingsReal = GetOpeningsReal(_document);
+            _elementIds = GetElementIds(revitRepository, _document);
+            _openingsReal = GetOpeningsReal(revitRepository, _document);
         }
 
 
@@ -47,23 +53,32 @@ namespace RevitOpeningPlacement.Models {
             return _openingsReal;
         }
 
-        private ICollection<ElementId> GetElementIds(Document document) {
-            return new FilteredElementCollector(document)
-                .WhereElementIsNotElementType()
-                .WherePasses(FiltersInitializer.GetFilterByAllUsedStructureCategories())
-                .ToElementIds();
+        private ICollection<ElementId> GetElementIds(RevitRepository revitRepository, Document document) {
+            if(revitRepository is null) {
+                throw new ArgumentNullException(nameof(revitRepository));
+            }
+
+            if(document is null) {
+                throw new ArgumentNullException(nameof(document));
+            }
+
+            return revitRepository.GetConstructureElementsIds(document);
         }
 
-        private ICollection<IOpeningReal> GetOpeningsReal(Document document) {
-            return new FilteredElementCollector(document)
-                .WhereElementIsNotElementType()
-                .WherePasses(FiltersInitializer.GetFilterByAllUsedOpeningsArCategories())
-                .OfClass(typeof(FamilyInstance))
-                .Cast<FamilyInstance>()
-                .Where(famInst => famInst.Host != null)
-                .Where(famInst => famInst.Symbol.FamilyName.Contains("Отв"))
-                .Select(famInst => new OpeningRealAr(famInst) as IOpeningReal)
-                .ToHashSet();
+        private ICollection<IOpeningReal> GetOpeningsReal(RevitRepository revitRepository, Document document) {
+            if(revitRepository is null) {
+                throw new ArgumentNullException(nameof(revitRepository));
+            }
+
+            if(document is null) {
+                throw new ArgumentNullException(nameof(document));
+            }
+
+            if(RevitRepository.GetBimModelPartsService().InAnyBimModelParts(document, BimModelPart.ARPart)) {
+                return revitRepository.GetRealOpeningsAr(document).ToArray<IOpeningReal>();
+            } else {
+                return revitRepository.GetRealOpeningsKr(document).ToArray<IOpeningReal>();
+            }
         }
     }
 }

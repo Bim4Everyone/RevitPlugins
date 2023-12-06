@@ -172,7 +172,7 @@ namespace RevitOpeningPlacement {
             ICollection<ElementId> constructureElementsIds = revitRepository.GetConstructureElementsIds();
             ICollection<IConstructureLinkElementsProvider> arLinks = revitRepository
                 .GetArLinks()
-                .Select(link => new ConstructureLinkElementsProvider(link) as IConstructureLinkElementsProvider)
+                .Select(link => new ConstructureLinkElementsProvider(revitRepository, link) as IConstructureLinkElementsProvider)
                 .ToArray();
 
             var incomingTasksViewModels = GetOpeningsArIncomingTasksViewModels(
@@ -455,7 +455,7 @@ namespace RevitOpeningPlacement {
                 int i = 0;
                 foreach(var constructureLink in constructureLinks) {
                     ct.ThrowIfCancellationRequested();
-                    providers.Add(new ConstructureLinkElementsProvider(constructureLink));
+                    providers.Add(new ConstructureLinkElementsProvider(revitRepository, constructureLink));
                     progress.Report(i++);
                 }
             }
