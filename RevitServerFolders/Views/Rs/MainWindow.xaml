@@ -43,12 +43,24 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        
+        <DockPanel
+            Grid.Row="0"
+            Margin="5"
+            LastChildFill="False">
+            <dx:SimpleButton
+                ToolTip="Обновить узел"
+                Glyph="{dx:DXImage 'Office2013/Actions/Refresh_16x16.png'}"
+                Command="{Binding ReloadChildrenCommand}"/>
+        </DockPanel>
 
         <dxg:TreeListControl
-            Grid.Row="0"
+            Grid.Row="1"
+            Margin="5"
             ItemsSource="{Binding Items}"
             SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
 
@@ -78,7 +90,7 @@
         </dxg:TreeListControl>
 
         <StackPanel
-            Grid.Row="1"
+            Grid.Row="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <TextBlock

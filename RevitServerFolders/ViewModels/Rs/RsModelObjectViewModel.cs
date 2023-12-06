@@ -17,6 +17,7 @@ namespace RevitServerFolders.ViewModels.Rs {
         private string _size;
         private ObservableCollection<RsModelObjectViewModel> _children;
 
+        private bool _isExpanded;
         private bool _isLoadedChildren;
 
         protected RsModelObjectViewModel(IServerClient serverClient) {
@@ -24,9 +25,11 @@ namespace RevitServerFolders.ViewModels.Rs {
 
             Children = new ObservableCollection<RsModelObjectViewModel>() {null};
             LoadChildrenCommand = RelayCommand.CreateAsync(LoadChildrenObjects, CanLoadChildrenObjects);
+            ReloadChildrenCommand = RelayCommand.CreateAsync(ReLoadChildrenObjects, CanReLoadChildrenObjects);
         }
 
-        public ICommand LoadChildrenCommand { get; }
+        public AsyncRelayCommand LoadChildrenCommand { get; }
+        public AsyncRelayCommand ReloadChildrenCommand { get; }
 
         public virtual string Name => "";
         public virtual string FullName => "";
@@ -38,6 +41,16 @@ namespace RevitServerFolders.ViewModels.Rs {
             get => _size;
             set => this.RaiseAndSetIfChanged(ref _size, value);
         }
+        
+        public bool IsExpanded {
+            get => _isExpanded;
+            set => this.RaiseAndSetIfChanged(ref _isExpanded, value);
+        }
+
+        public bool IsLoadedChildren {
+            get => _isLoadedChildren;
+            set => this.RaiseAndSetIfChanged(ref _isLoadedChildren, value);
+        }
 
         public ObservableCollection<RsModelObjectViewModel> Children {
             get => _children;
@@ -48,12 +61,22 @@ namespace RevitServerFolders.ViewModels.Rs {
             try {
                 Children = new ObservableCollection<RsModelObjectViewModel>(await GetChildrenObjects());
             } finally {
-                _isLoadedChildren = true;
+                IsLoadedChildren = true;
             }
         }
 
         private bool CanLoadChildrenObjects() {
-            return !_isLoadedChildren;
+            return !IsLoadedChildren;
+        }
+        
+        private async Task ReLoadChildrenObjects() {
+            Children.Clear();
+            IsLoadedChildren = false;
+            await LoadChildrenObjects();
+        }
+
+        private bool CanReLoadChildrenObjects() {
+            return IsLoadedChildren;
         }
 
         protected virtual Task<IEnumerable<RsModelObjectViewModel>> GetChildrenObjects() {

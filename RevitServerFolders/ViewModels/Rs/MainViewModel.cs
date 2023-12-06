@@ -23,12 +23,16 @@ namespace RevitServerFolders.ViewModels.Rs {
             _serverClients = serverClients;
             LoadViewCommand = RelayCommand.CreateAsync(LoadView);
             AcceptViewCommand = RelayCommand.CreateAsync(AcceptView, CanAcceptView);
+            
             LoadChildrenCommand = RelayCommand.CreateAsync<TreeListNodeEventArgs>(LoadChildren, CanLoadChildren);
+            ReloadChildrenCommand = RelayCommand.CreateAsync(ReloadChildren, CanReloadChildren);
         }
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
+        
         public ICommand LoadChildrenCommand { get; }
+        public ICommand ReloadChildrenCommand { get; }
 
         public string ErrorText {
             get => _errorText;
@@ -61,17 +65,26 @@ namespace RevitServerFolders.ViewModels.Rs {
             return SelectedItem is RsFolderDataViewModel;
         }
 
-        private Task LoadChildren(TreeListNodeEventArgs args) {
+        private async Task LoadChildren(TreeListNodeEventArgs args) {
             if(args.Row is RsModelObjectViewModel rsModelObject) {
-                rsModelObject.LoadChildrenCommand.Execute(null);
+                await rsModelObject.LoadChildrenCommand.ExecuteAsync(default);
             }
-
-            return Task.CompletedTask;
         }
 
         private bool CanLoadChildren(TreeListNodeEventArgs args) {
-            return args.Row is RsServerDataViewModel
-                   || args.Row is RsFolderDataViewModel;
+            if(args.Row is RsModelObjectViewModel rsModelObject) {
+                return rsModelObject.LoadChildrenCommand.CanExecute(default);
+            }
+
+            return false;
+        }
+        
+        private async Task ReloadChildren() {
+            await SelectedItem.ReloadChildrenCommand.ExecuteAsync(default);
+        }
+
+        private bool CanReloadChildren() {
+            return SelectedItem != null && SelectedItem.ReloadChildrenCommand.CanExecute(default);
         }
     }
 }
