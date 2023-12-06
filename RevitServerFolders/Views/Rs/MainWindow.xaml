@@ -34,11 +34,12 @@
     </dxmvvm:Interaction.Behaviors>
 
     <Window.Resources>
-        <converters:CellImageConverter
-            x:Key="CellImageConverter"
+        <converters:RsNodeImageSelector
+            x:Key="RsNodeImageSelector"
             Empty="{dx:DXImage 'Office2013/Actions/New_16x16.png'}"
-            Model="{dx:DXImage 'Office2013/Actions/Group_16x16.png'}"
-            Folder="{dx:DXImage 'Office2013/Support/Article_16x16.png'}" />
+            Server="{dx:DXImage 'Office2013/Data/Database_16x16.png'}"
+            Folder="{dx:DXImage 'Office2013/Support/Product_16x16.png'}"
+            OpenedFolder="{dx:DXImage 'Office2013/Support/PackageProduct_16x16.png'}" />
     </Window.Resources>
 
     <Grid>
@@ -47,7 +48,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
+
         <DockPanel
             Grid.Row="0"
             Margin="5"
@@ -55,7 +56,7 @@
             <dx:SimpleButton
                 ToolTip="Обновить узел"
                 Glyph="{dx:DXImage 'Office2013/Actions/Refresh_16x16.png'}"
-                Command="{Binding ReloadChildrenCommand}"/>
+                Command="{Binding ReloadChildrenCommand}" />
         </DockPanel>
 
         <dxg:TreeListControl
@@ -78,7 +79,7 @@
                     AllowChildNodeSourceUpdates="True"
 
                     ShowNodeImages="True"
-                    ImageFieldName="TypeIcon"
+                    NodeImageSelector="{StaticResource RsNodeImageSelector}"
 
                     ShowCheckboxes="False"
                     ExpandStateFieldName="IsExpanded"
@@ -87,6 +88,7 @@
                     ChildNodesPath="Children"
                     TreeDerivationMode="ChildNodesSelector" />
             </dxg:TreeListControl.View>
+
         </dxg:TreeListControl>
 
         <StackPanel
