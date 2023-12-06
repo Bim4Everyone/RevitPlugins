@@ -73,7 +73,7 @@
             Grid.Row="1"
             Margin="5"
             AllowDefaultButton="False"
-            EditValue="{Binding TargetFolder}">
+            EditValue="{Binding TargetFolder, UpdateSourceTrigger=PropertyChanged}">
             <dxe:ButtonEdit.Buttons>
                 <dxe:ButtonInfo Command="{Binding OpenFolderDialogCommand}">
                     <dxe:ButtonInfo.ContentTemplate>
@@ -107,9 +107,14 @@
             x:Name="_sourceFolderEdit"
             Margin="5"
             AllowDefaultButton="False"
+            EditValuePostDelay="250"
+            EditValuePostMode="Delayed"
             EditValue="{Binding SourceFolder, UpdateSourceTrigger=PropertyChanged}">
             <dxe:ButtonEdit.Buttons>
-                <dxe:ButtonInfo Command="{Binding OpenFromFoldersCommand}">
+                <dxe:ButtonInfo
+                    Command="{Binding OpenFromFoldersCommand}"
+                    IsEnabled="{Binding SourceFolderChangedCommand.IsExecuting,
+                        Converter={StaticResource InverseBooleanConverter}}">
                     <dxe:ButtonInfo.ContentTemplate>
                         <DataTemplate>
                             <dx:DXImage Source="{dx:DXImage 'Office2013/Alignment/ContentArrangeInRows_16x16.png'}" />

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using System.Threading.Tasks;
+using System.Windows;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -24,16 +25,13 @@ namespace RevitServerFolders.ViewModels {
 
         private ModelObjectViewModel _selectedObject;
         private ObservableCollection<ModelObjectViewModel> _modelObjects;
-        
+
         private bool _isExportRooms;
         private bool _isExportRoomsVisible;
-        
-        private string _errorSourceFolder;
-        private string _errorTextSourceFolder;
 
         public MainViewModel(PluginConfig pluginConfig,
             IModelObjectService objectService,
-            IOpenFolderDialogService openFolderDialogService, 
+            IOpenFolderDialogService openFolderDialogService,
             IProgressDialogFactory progressDialogFactory) {
             _pluginConfig = pluginConfig;
             _objectService = objectService;
@@ -123,11 +121,6 @@ namespace RevitServerFolders.ViewModels {
                 ErrorText = "Выберите папку источника.";
                 return false;
             }
-            
-            if(SourceFolder.Equals(_errorSourceFolder)) {
-                ErrorText = _errorTextSourceFolder;
-                return false;
-            }
 
             if(ModelObjects.Count == 0) {
                 ErrorText = "Выберите папку источника c моделями.";
@@ -177,15 +170,11 @@ namespace RevitServerFolders.ViewModels {
         }
 
         private async Task SourceFolderChanged() {
-            _errorSourceFolder = null;
-            _errorTextSourceFolder = null;
-            
             try {
                 ModelObjects.Clear();
                 await AddModelObjects(await _objectService.GetFromString(SourceFolder));
-            } catch(Exception ex) {
-                _errorSourceFolder = SourceFolder;
-                _errorTextSourceFolder = ex.Message;
+            } catch {
+                // pass
             }
         }
 
@@ -196,7 +185,7 @@ namespace RevitServerFolders.ViewModels {
         private void LoadConfig() {
             TargetFolder = _pluginConfig?.TargetFolder;
             SourceFolder = _pluginConfig?.SourceFolder;
-            
+
             LoadConfigImpl();
         }
 
@@ -207,15 +196,15 @@ namespace RevitServerFolders.ViewModels {
                 .Where(item => item.SkipObject)
                 .Select(item => item.FullName)
                 .ToArray();
-            
-            
+
+
             SaveConfigImpl();
             _pluginConfig.SaveProjectConfig();
         }
-        
+
         protected virtual void LoadConfigImpl() { }
         protected virtual void SaveConfigImpl() { }
-        protected  virtual void AcceptViewImpl() { }
+        protected virtual void AcceptViewImpl() { }
 
         private async Task AddModelObjects(ModelObject modelObject) {
             ModelObjects.Clear();
