@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.RealOpeningKrPlacement.ParameterGetters;
-using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
     /// <summary>
@@ -13,7 +12,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
     /// </summary>
     internal class ManyOpeningArTasksParameterGettersProvider {
         private readonly Element _host;
-        private readonly ICollection<OpeningArTaskIncoming> _incomingTasks;
+        private readonly ICollection<IOpeningTaskIncoming> _incomingTasks;
         private readonly IPointFinder _pointFinder;
 
 
@@ -21,11 +20,11 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
         /// Конструктор класса, предоставляющего провайдеров для параметров размещаемого отверстия КР
         /// </summary>
         /// <param name="host">Основа для отверстия КР</param>
-        /// <param name="incomingTasks">Входящие задания от АР</param>
+        /// <param name="incomingTasks">Входящие задания</param>
         /// <param name="pointFinder">Провайдер точки вставки отверстия КР</param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public ManyOpeningArTasksParameterGettersProvider(Element host, ICollection<OpeningArTaskIncoming> incomingTasks, IPointFinder pointFinder) {
+        public ManyOpeningArTasksParameterGettersProvider(Element host, ICollection<IOpeningTaskIncoming> incomingTasks, IPointFinder pointFinder) {
             if(host is null) { throw new ArgumentNullException(nameof(host)); }
             if(!((host is Wall) || (host is Floor))) { throw new ArgumentException(nameof(host)); }
             if(incomingTasks is null) { throw new ArgumentNullException(nameof(incomingTasks)); }

@@ -1,28 +1,26 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
 
-using RevitOpeningPlacement.OpeningModels;
-
 namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
     /// <summary>
-    /// Класс, предоставляющий типоразмер семейства чистового отверстия КР по одному заданию на отверстие от АР
+    /// Класс, предоставляющий типоразмер семейства чистового отверстия КР по одному заданию на отверстие
     /// </summary>
     internal class SingleOpeningArTaskFamilySymbolProvider {
         private readonly RevitRepository _revitRepository;
         private readonly Element _host;
-        private readonly OpeningArTaskIncoming _incomingTask;
+        private readonly OpeningType _openingTaskType;
 
 
         /// <summary>
-        /// Конструктор класса, предоставляющего типоразмер семейства чистового отверстия КР по одному заданию на отверстие от АР
+        /// Конструктор класса, предоставляющего типоразмер семейства чистового отверстия КР по одному заданию на отверстие
         /// </summary>
         /// <param name="revitRepository">Репозиторий активного документа КР, в котором будет происходить размещение чистового семейства отверстия</param>
         /// <param name="host">Хост чистового отверстия - стена или перекрытие</param>
-        /// <param name="incomingTask">Входящее задание на отверстие от АР</param>
+        /// <param name="openingTaskType">Тип проема входящего задания на отверстие</param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SingleOpeningArTaskFamilySymbolProvider(RevitRepository revitRepository, Element host, OpeningArTaskIncoming incomingTask) {
+        public SingleOpeningArTaskFamilySymbolProvider(RevitRepository revitRepository, Element host, OpeningType openingTaskType) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             if(host is null) {
                 throw new ArgumentNullException(nameof(host));
@@ -31,14 +29,14 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
                 throw new ArgumentException(nameof(host));
             }
             _host = host;
-            _incomingTask = incomingTask ?? throw new ArgumentNullException(nameof(incomingTask));
+            _openingTaskType = openingTaskType;
         }
 
 
         /// <exception cref="ArgumentException"></exception>
         public FamilySymbol GetFamilySymbol() {
             if(_host is Wall) {
-                switch(_incomingTask.OpeningType) {
+                switch(_openingTaskType) {
                     case OpeningType.WallRound:
                     return _revitRepository.GetOpeningRealKrType(OpeningType.WallRound);
                     case OpeningType.WallRectangle:
@@ -46,7 +44,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
                     return _revitRepository.GetOpeningRealKrType(OpeningType.WallRectangle);
                 }
             } else if(_host is Floor) {
-                switch(_incomingTask.OpeningType) {
+                switch(_openingTaskType) {
                     default:
                     return _revitRepository.GetOpeningRealKrType(OpeningType.FloorRectangle);
                 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,25 +8,24 @@ using dosymep.Revit.Geometry;
 
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.RealOpeningArPlacement.PointFinders;
-using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
     /// <summary>
-    /// Класс, предоставляющий интерфейс для получения точки вставки отверстия КР, размещаемого по нескольким входящим заданиям от АР
+    /// Класс, предоставляющий интерфейс для получения точки вставки отверстия КР, размещаемого по нескольким входящим заданиям
     /// </summary>
     internal class ManyOpeningArTasksPointFinderProvider {
         private readonly Element _host;
-        private readonly ICollection<OpeningArTaskIncoming> _incomingTasks;
+        private readonly ICollection<IOpeningTaskIncoming> _incomingTasks;
 
 
         /// <summary>
-        /// Конструктор класса, предоставляющего интерфейс для получения точки вставки отверстия КР, размещаемого по нескольким входящим заданиям от АР
+        /// Конструктор класса, предоставляющего интерфейс для получения точки вставки отверстия КР, размещаемого по нескольким входящим заданиям
         /// </summary>
         /// <param name="host">Основа для размещаемого отверстия КР</param>
-        /// <param name="incomingTasks">Входящие задания на отверстия от АР</param>
+        /// <param name="incomingTasks">Входящие задания на отверстия</param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public ManyOpeningArTasksPointFinderProvider(Element host, ICollection<OpeningArTaskIncoming> incomingTasks) {
+        public ManyOpeningArTasksPointFinderProvider(Element host, ICollection<IOpeningTaskIncoming> incomingTasks) {
             if(host is null) { throw new ArgumentNullException(nameof(host)); }
             if(!((host is Wall) || (host is Floor))) { throw new ArgumentException(nameof(host)); }
             if(incomingTasks is null) { throw new ArgumentNullException(nameof(incomingTasks)); }
@@ -50,7 +49,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
         }
 
 
-        private BoundingBoxXYZ GetUnitedBBox(ICollection<OpeningArTaskIncoming> incomingTasks) {
+        private BoundingBoxXYZ GetUnitedBBox(ICollection<IOpeningTaskIncoming> incomingTasks) {
             return incomingTasks.Select(task => task.GetTransformedBBoxXYZ()).ToList().CreateUnitedBoundingBox();
         }
     }
