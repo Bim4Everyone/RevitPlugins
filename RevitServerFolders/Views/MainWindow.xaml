@@ -50,7 +50,7 @@
         <converters:CellImageConverter
             x:Key="CellImageConverter"
             Empty="{dx:DXImage 'Office2013/Actions/New_16x16.png'}"
-            Model="{dx:DXImage 'Office2013/Actions/Group_16x16.png'}"
+            Model="../Resources/Revit.png"
             Folder="{dx:DXImage 'Office2013/Support/Article_16x16.png'}" />
     </Window.Resources>
 
@@ -78,7 +78,7 @@
                 <dxe:ButtonInfo Command="{Binding OpenFolderDialogCommand}">
                     <dxe:ButtonInfo.ContentTemplate>
                         <DataTemplate>
-                            <dx:DXImage Source="{dx:DXImage 'Office2013/Alignment/ContentArrangeInRows_16x16.png'}" />
+                            <dx:DXImage Source="{dx:DXImage 'Office2013/Actions/Open_16x16.png'}" />
                         </DataTemplate>
                     </dxe:ButtonInfo.ContentTemplate>
                 </dxe:ButtonInfo>
@@ -117,7 +117,7 @@
                         Converter={StaticResource InverseBooleanConverter}}">
                     <dxe:ButtonInfo.ContentTemplate>
                         <DataTemplate>
-                            <dx:DXImage Source="{dx:DXImage 'Office2013/Alignment/ContentArrangeInRows_16x16.png'}" />
+                            <dx:DXImage Source="{dx:DXImage 'Office2013/Actions/Open_16x16.png'}" />
                         </DataTemplate>
                     </dxe:ButtonInfo.ContentTemplate>
                 </dxe:ButtonInfo>

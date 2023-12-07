@@ -1,4 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <Import Project="..\ProjectProps\Common.props" />
     <Import Project="..\ProjectProps\DevExpress.props" />
+    <ItemGroup>
+      <None Remove="Resources\Revit.png" />
+      <Resource Include="Resources\Revit.png" />
+    </ItemGroup>
 </Project>
