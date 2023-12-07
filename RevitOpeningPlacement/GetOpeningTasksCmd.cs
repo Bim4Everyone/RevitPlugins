@@ -350,16 +350,16 @@ namespace RevitOpeningPlacement {
             var navigatorModeDialog = new TaskDialog("Навигатор по заданиям для КР") {
                 MainInstruction = "Режим навигатора:"
             };
-            navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Задания от ВИС");
-            navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Задания от АР");
+            navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Задания от АР");
+            navigatorModeDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Задания от ВИС");
             navigatorModeDialog.CommonButtons = TaskDialogCommonButtons.Close;
             navigatorModeDialog.DefaultButton = TaskDialogResult.Close;
             TaskDialogResult result = navigatorModeDialog.Show();
             switch(result) {
                 case TaskDialogResult.CommandLink1:
-                return KrNavigatorMode.IncomingMep;
-                case TaskDialogResult.CommandLink2:
                 return KrNavigatorMode.IncomingAr;
+                case TaskDialogResult.CommandLink2:
+                return KrNavigatorMode.IncomingMep;
                 default:
                 throw new OperationCanceledException();
             }
