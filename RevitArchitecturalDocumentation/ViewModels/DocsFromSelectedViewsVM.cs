@@ -58,13 +58,12 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             //Report.AppendLine($"Приступаю к выполнению задания. Всего задач: {MVM.TasksForWork.Count}");
             using(Transaction transaction = Repository.Document.StartTransaction("Документатор АР")) {
 
-                TreeReportNode rep = new TreeReportNode() { Name = "Создание видов будет производиться на основе выбранных. Перебираем выбранные виды" };
-
                 foreach(ViewHelper viewHelper in MVM.SelectedViewHelpers) {
                     int numberOfLevelAsInt = viewHelper.NameHelper.LevelNumber;
                     string numberOfLevelAsStr = viewHelper.NameHelper.LevelNumberAsStr;
                     
-                    TreeReportNode selectedViewRep = new TreeReportNode() { Name = $"Работаем с видом: \"{viewHelper.View.Name}\", номер этажа: \"{numberOfLevelAsInt}\"" };
+                    TreeReportNode selectedViewRep = new TreeReportNode() { Name = $"Работаем с выбранным видом: \"{viewHelper.View.Name}\"" };
+                    selectedViewRep.Nodes.Add(new TreeReportNode() { Name = $"Номер этажа в соответствии с именем выбранного вида: \"{numberOfLevelAsInt}\""});
 
                     string viewNamePartWithSectionPart = string.Empty;
 
@@ -75,7 +74,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                     foreach(TaskInfo task in MVM.TasksForWork) {
 
-                        TreeReportNode taskRep = new TreeReportNode() { Name = $"Задание номер: \"{task.TaskNumber}\"" };
+                        TreeReportNode taskRep = new TreeReportNode() { Name = $"Задание номер: \"{task.TaskNumber}\" - " +
+                            $"уровни ({task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}), {task.SelectedVisibilityScope.Name}" };
 
                         if(numberOfLevelAsInt < task.StartLevelNumberAsInt || numberOfLevelAsInt > task.EndLevelNumberAsInt) {
                             taskRep.Nodes.Add(new TreeReportNode() { Name = $"Уровень вида \"{numberOfLevelAsInt}\" не подходит под искомый диапазон: " +
@@ -101,7 +101,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                         }
 
 
-                        ViewHelper newViewHelper = null;
                         if(MVM.WorkWithViews) {
 
                             string newViewName = string.Format("{0}{1} этаж К{2}_С{3}{4}{5}",
@@ -114,7 +113,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                             TreeReportNode viewRep = new TreeReportNode() { Name = $"Работа с видом \"{newViewName}\"" };
 
-                            newViewHelper = new ViewHelper(Repository, viewRep);
+                            ViewHelper newViewHelper = new ViewHelper(Repository, viewRep);
                             newViewHelper.GetView(newViewName, task.SelectedVisibilityScope, viewForDublicate: viewHelper.View);
 
                             if(sheetHelper.Sheet != null
@@ -140,7 +139,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                     && newSpecHelper.Specification != null
                                     && !sheetHelper.HasSpecWithName(newSpecHelper.Specification.Name)) {
 
-                                    ScheduleSheetInstance newScheduleSheetInstance = newSpecHelper.PlaceSpec(sheetHelper);
+                                    newSpecHelper.PlaceSpec(sheetHelper);
                                 }
                                 taskRep.Nodes.Add(specRep);
                             }
@@ -148,8 +147,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                         selectedViewRep.Nodes.Add(taskRep);
                     }
-                    rep.Nodes.Add(selectedViewRep);
-                    Report.Add(rep);
+                    Report.Add(selectedViewRep);
                 }
                 transaction.Commit();
             }

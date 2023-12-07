@@ -508,6 +508,11 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             TreeReportNode rep = new TreeReportNode() { Name = "Исходные данные:" };
 
+            if(CreateViewsFromSelected) {
+                rep.AddNodeWithName($"Создание видов будет производиться на основе выбранных видов. Перебираем выбранные виды и поочередно применяем задания:");
+            } else {
+                rep.AddNodeWithName($"Создание видов будет производиться с нуля. Перебираем задания:");
+            }
             rep.AddNodeWithName($"Выбрано видов до запуска плагина: {SelectedViews.Count}");
             rep.AddNodeWithName($"Выбран тип вида: {SelectedViewFamilyTypeName}");
             rep.AddNodeWithName($"Выбран тип видового экрана: {SelectedViewportTypeName}");
@@ -524,6 +529,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                 rep.Nodes.Add(taskRep);
             }
+
             return rep;
         }
 
