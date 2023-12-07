@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,19 +9,20 @@ using dosymep.Revit;
 
 using RevitClashDetective.Models.Extensions;
 
+using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Exceptions;
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.RealOpeningKrPlacement.PointFinders;
 using RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers;
-using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
     /// <summary>
-    /// Класс для размещения чистовых отверстий КР в активном документе в местах расположений заданий на отверстия из связанных файлов АР
+    /// Класс для размещения чистовых отверстий КР в активном документе в местах расположений заданий на отверстия из связанных файлов АР или ВИС
     /// </summary>
     internal class RealOpeningKrPlacer {
         private readonly RevitRepository _revitRepository;
+        private readonly OpeningRealsKrConfig _config;
 
         public const string RealOpeningKrDiameter = "ФОП_РАЗМ_Диаметр";
         public const string RealOpeningKrInWallWidth = "ФОП_РАЗМ_Ширина";
@@ -30,24 +31,107 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         public const string RealOpeningKrInFloorWidth = "мод_ФОП_Габарит Б";
         public const string RealOpeningTaskId = "ФОП_ID задания";
 
+        private const string _configErrorMessage = "Настройки расстановки отверстий КР некорректны. Пересохраните их.";
+
 
         /// <summary>
-        /// Конструктор класса для размещения чистовых отверстий КР в активном документе в местах расположений заданий на отверстия из связанных файлов АР
+        /// Конструктор класса для размещения чистовых отверстий КР в активном документе в местах расположений заданий на отверстия из связанных файлов АР или ВИС
         /// </summary>
         /// <param name="revitRepository">Репозиторий активного КР документа ревита, в котором будет происходить размещение чистовых отверстий</param>
+        /// <param name="config">Конфигурация расстановки заданий на отверстия в файле КР, в которой задается обработка заданий ВИС или АР</param>
         /// <exception cref="System.ArgumentNullException"></exception>
-        public RealOpeningKrPlacer(RevitRepository revitRepository) {
-            _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
+        public RealOpeningKrPlacer(RevitRepository revitRepository, OpeningRealsKrConfig config) {
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+        }
+
+
+        public void PlaceSingleOpeningByOneTask() {
+            Element host = _revitRepository.PickHostForRealOpening();
+            IOpeningTaskIncoming openingTask = PickOpeningTaskIncoming(_config);
+            PlaceSingleOpeningByOneIncomingTask(host, openingTask);
+        }
+
+        public void PlaceUnitedOpeningByManyTasks() {
+            Element host = _revitRepository.PickHostForRealOpening();
+            ICollection<IOpeningTaskIncoming> openingTasks = PickOpeningsTaskIncoming(_config);
+            PlaceUnitedOpeningByManyIncomingTasks(
+                host,
+                openingTasks.Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToArray()
+                );
+        }
+
+        public void PlaceSingleOpeningsInOneHost() {
+            Element host = _revitRepository.PickHostForRealOpening();
+            ICollection<IOpeningTaskIncoming> openingTasks = PickOpeningsTaskIncoming(_config);
+            PlaceSingleOpeningsInOneHostByIncomingTasks(
+                host,
+                openingTasks.Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToArray()
+                );
+        }
+
+        public void PlaceSingleOpeningsInManyHosts() {
+            ICollection<Element> hosts = _revitRepository.PickHostsForRealOpenings();
+            ICollection<IOpeningTaskIncoming> allOpeningTasks = GetAllOpeningsTaskIncoming(_config);
+            PlaceSingleOpeningsInManyHostsByIncomingTasks(hosts, allOpeningTasks);
+        }
+
+        /// <summary>
+        /// Возвращает входящее задание на отверстие, выбранное пользователем в соответствии с настройками
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        /// <exception cref="OperationCanceledException"></exception>
+        private IOpeningTaskIncoming PickOpeningTaskIncoming(OpeningRealsKrConfig config) {
+            if(config.PlacementType == OpeningRealKrPlacementType.PlaceByAr) {
+                return _revitRepository.PickSingleOpeningArTaskIncoming();
+            } else if(config.PlacementType == OpeningRealKrPlacementType.PlaceByMep) {
+                return _revitRepository.PickSingleOpeningMepTaskIncoming();
+            } else {
+                _revitRepository.ShowErrorMessage(_configErrorMessage);
+                throw new OperationCanceledException();
+            }
+        }
+
+        /// <summary>
+        /// Возвращает входящие задания на отверстия, выбранные пользователем в соответствии с настройками
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        /// <exception cref="OperationCanceledException"></exception>
+        private ICollection<IOpeningTaskIncoming> PickOpeningsTaskIncoming(OpeningRealsKrConfig config) {
+            if(config.PlacementType == OpeningRealKrPlacementType.PlaceByAr) {
+                return _revitRepository.PickManyOpeningArTasksIncoming().ToArray<IOpeningTaskIncoming>();
+            } else if(config.PlacementType == OpeningRealKrPlacementType.PlaceByMep) {
+                return _revitRepository.PickManyOpeningMepTasksIncoming().ToArray<IOpeningTaskIncoming>();
+            } else {
+                _revitRepository.ShowErrorMessage(_configErrorMessage);
+                throw new OperationCanceledException();
+            }
+        }
+
+        /// <summary>
+        /// Возвращает все входящие задания на отверстия в соответствии с заданными настройками
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        /// <exception cref="OperationCanceledException"></exception>
+        private ICollection<IOpeningTaskIncoming> GetAllOpeningsTaskIncoming(OpeningRealsKrConfig config) {
+            if(config.PlacementType == OpeningRealKrPlacementType.PlaceByAr) {
+                return _revitRepository.GetOpeningsArTasksIncoming().ToArray<IOpeningTaskIncoming>();
+            } else if(config.PlacementType == OpeningRealKrPlacementType.PlaceByMep) {
+                return _revitRepository.GetOpeningsMepTasksIncoming().ToArray<IOpeningTaskIncoming>();
+            } else {
+                _revitRepository.ShowErrorMessage(_configErrorMessage);
+                throw new OperationCanceledException();
+            }
         }
 
 
         /// <summary>
-        /// Размещение чистового отверстия КР по одному заданию на отверстие из связи АР в одном хосте
+        /// Размещение чистового отверстия КР по одному заданию на отверстие из связи в одном хосте
         /// </summary>
-        public void PlaceSingleOpeningByOneTask() {
-            Element host = _revitRepository.PickHostForRealOpening();
-            OpeningArTaskIncoming openingTask = _revitRepository.PickSingleOpeningArTaskIncoming();
-
+        private void PlaceSingleOpeningByOneIncomingTask(Element host, IOpeningTaskIncoming openingTask) {
             using(var transaction = _revitRepository.GetTransaction("Размещение одиночного отверстия")) {
                 try {
                     if(openingTask.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())) {
@@ -65,14 +149,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         }
 
         /// <summary>
-        /// Размещение объединенного чистового отверстия КР по одному или нескольким заданиям на отверстия из связи(ей) АР в одном хосте
+        /// Размещение объединенного чистового отверстия КР по одному или нескольким заданиям на отверстия из связи(ей) в одном хосте
         /// </summary>
-        public void PlaceUnitedOpeningByManyTasks() {
-            Element host = _revitRepository.PickHostForRealOpening();
-            HashSet<OpeningArTaskIncoming> openingTasks = _revitRepository
-                .PickManyOpeningArTasksIncoming()
-                .Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox()))
-                .ToHashSet();
+        private void PlaceUnitedOpeningByManyIncomingTasks(Element host, ICollection<IOpeningTaskIncoming> openingTasks) {
             try {
                 if(openingTasks.Count > 0) {
                     using(var transaction = _revitRepository.GetTransaction("Размещение объединенного отверстия")) {
@@ -90,18 +169,12 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         }
 
         /// <summary>
-        /// Размещение нескольких одиночных чистовых отверстий КР по нескольким заданиям на отверстия из связи(ей) АР без их объединения
+        /// Размещение нескольких одиночных чистовых отверстий КР по нескольким заданиям на отверстия из связи(ей) без их объединения
         /// </summary>
-        public void PlaceSingleOpeningsInOneHost() {
-            Element host = _revitRepository.PickHostForRealOpening();
-            HashSet<OpeningArTaskIncoming> openingTasks = _revitRepository
-                .PickManyOpeningArTasksIncoming()
-                .Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox()))
-                .ToHashSet();
-
+        private void PlaceSingleOpeningsInOneHostByIncomingTasks(Element host, ICollection<IOpeningTaskIncoming> openingTasks) {
             StringBuilder sb = new StringBuilder();
             using(var transaction = _revitRepository.GetTransaction("Одиночные отверстия в одном хосте")) {
-                foreach(OpeningArTaskIncoming openingTask in openingTasks) {
+                foreach(IOpeningTaskIncoming openingTask in openingTasks) {
                     try {
                         PlaceByOneTask(host, openingTask);
 
@@ -119,12 +192,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         }
 
         /// <summary>
-        /// Размещение нескольких одиночных чистовых отверстий КР в выбранных хостах по всем заданиям на отверстия из связи(ей) АР, которые пересекаются с этими хостами
+        /// Размещение нескольких одиночных чистовых отверстий КР в выбранных хостах по всем заданиям на отверстия из связи(ей), которые пересекаются с этими хостами
         /// </summary>
-        public void PlaceSingleOpeningsInManyHosts() {
-            ICollection<Element> hosts = _revitRepository.PickHostsForRealOpenings();
-            ICollection<OpeningArTaskIncoming> allOpeningTasks = _revitRepository.GetOpeningsArTasksIncoming();
-
+        private void PlaceSingleOpeningsInManyHostsByIncomingTasks(ICollection<Element> hosts, ICollection<IOpeningTaskIncoming> allOpeningTasks) {
             StringBuilder sb = new StringBuilder();
             using(var transaction = _revitRepository.GetTransaction("Одиночные отверстия в нескольких хостах")) {
                 using(var progressBar = _revitRepository.GetProgressDialogService()) {
@@ -139,11 +209,11 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
                     foreach(Element host in hosts) {
                         ct.ThrowIfCancellationRequested();
 
-                        ICollection<OpeningArTaskIncoming> openingTasks = allOpeningTasks.Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
+                        ICollection<IOpeningTaskIncoming> openingTasks = allOpeningTasks.Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
                         if(openingTasks.Count == 0) {
                             sb.AppendLine($"Конструкция с ID: {host.Id} не пересекается ни с одним заданием");
                         }
-                        foreach(OpeningArTaskIncoming openingTask in openingTasks) {
+                        foreach(IOpeningTaskIncoming openingTask in openingTasks) {
                             try {
                                 PlaceByOneTask(host, openingTask);
                             } catch(OpeningNotPlacedException e) {
@@ -165,15 +235,15 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
 
 
         /// <summary>
-        /// Размещает экземпляр семейства чистового отверстия по одному заданию на отверстие из АР
+        /// Размещает экземпляр семейства чистового отверстия по одному заданию на отверстие
         /// <para>Транзакция внутри метода не запускается</para>
         /// </summary>
         /// <param name="host">Основа для чистового отверстия КР - стена или перекрытие</param>
-        /// <param name="openingTask">Входящее задание на отверстие из АР</param>
+        /// <param name="openingTask">Входящее задание на отверстие</param>
         /// <exception cref="OpeningNotPlacedException"></exception>
-        private void PlaceByOneTask(Element host, OpeningArTaskIncoming openingTask) {
+        private void PlaceByOneTask(Element host, IOpeningTaskIncoming openingTask) {
             try {
-                var symbol = GetFamilySymbol(host, openingTask);
+                var symbol = GetFamilySymbol(host, openingTask.OpeningType);
                 var pointFinder = GetPointFinder(openingTask);
                 var point = pointFinder.GetPoint();
 
@@ -199,13 +269,13 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         }
 
         /// <summary>
-        /// Размещает объединенное прямоугольное чистовое отверстие по одному или нескольким заданиям на отверстия АР из коллекции
+        /// Размещает объединенное прямоугольное чистовое отверстие по одному или нескольким заданиям на отверстия из коллекции
         /// <para>Транзакция внутри метода не запускается</para>
         /// </summary>
         /// <param name="host">Основа для чистового отверстия КР</param>
-        /// <param name="incomingTasks">Входящие задания на отверстия из АР</param>
+        /// <param name="incomingTasks">Входящие задания на отверстия</param>
         /// <exception cref="OpeningNotPlacedException"></exception>
-        private void PlaceUnitedByManyTasks(Element host, ICollection<OpeningArTaskIncoming> incomingTasks) {
+        private void PlaceUnitedByManyTasks(Element host, ICollection<IOpeningTaskIncoming> incomingTasks) {
             try {
                 var symbol = GetFamilySymbol(host);
                 var pointFinder = GetPointFinder(host, incomingTasks);
@@ -232,9 +302,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <summary>
         /// Возвращает интерфейс, предоставляющий угол поворота размещаемого КР отверстия
         /// </summary>
-        /// <param name="incomingTask">Входящее задание на отверстие от АР</param>
+        /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <returns></returns>
-        private IAngleFinder GetAngleFinder(OpeningArTaskIncoming incomingTask) {
+        private IAngleFinder GetAngleFinder(IOpeningTaskIncoming incomingTask) {
             var provider = new SingleOpeningArTaskAngleFinderProvider(incomingTask);
             return provider.GetAngleFinder();
         }
@@ -260,19 +330,19 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <param name="incomingTask"></param>
         /// <param name="pointFinder"></param>
         /// <returns></returns>
-        private IParametersGetter GetParameterGetter(OpeningArTaskIncoming incomingTask, IPointFinder pointFinder) {
+        private IParametersGetter GetParameterGetter(IOpeningTaskIncoming incomingTask, IPointFinder pointFinder) {
             var provider = new SingleOpeningArTaskParameterGettersProvider(incomingTask, pointFinder);
             return provider.GetParametersGetter();
         }
 
         /// <summary>
-        /// Возвращает интерфейс, предоставляющий точку вставки отверстия КР для размещения по нескольким заданиям от АР
+        /// Возвращает интерфейс, предоставляющий точку вставки отверстия КР для размещения по нескольким заданиям
         /// </summary>
         /// <param name="host">Основа для отверстия КР</param>
-        /// <param name="incomingTasks">Входящие задания на отверстия от АР</param>
+        /// <param name="incomingTasks">Входящие задания на отверстия</param>
         /// <param name="pointFinder"></param>
         /// <returns></returns>
-        private IParametersGetter GetParameterGetter(Element host, ICollection<OpeningArTaskIncoming> incomingTasks, IPointFinder pointFinder) {
+        private IParametersGetter GetParameterGetter(Element host, ICollection<IOpeningTaskIncoming> incomingTasks, IPointFinder pointFinder) {
             var provider = new ManyOpeningArTasksParameterGettersProvider(host, incomingTasks, pointFinder);
             return provider.GetParametersGetter();
         }
@@ -280,31 +350,31 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <summary>
         /// Возвращает интерфейс, предоставляющий точку вставки отверстия КР
         /// </summary>
-        /// <param name="openingTask">Входящее задание на отверстие от АР</param>
+        /// <param name="openingTask">Входящее задание на отверстие</param>
         /// <returns></returns>
-        private IPointFinder GetPointFinder(OpeningArTaskIncoming openingTask) {
+        private IPointFinder GetPointFinder(IOpeningTaskIncoming openingTask) {
             return new SingleOpeningArTaskPointFinder(openingTask);
         }
 
         /// <summary>
-        /// Возвращает интерфейс, предоставляющий точку вставки отверстия КР по нескольким заданиям от АР
+        /// Возвращает интерфейс, предоставляющий точку вставки отверстия КР по нескольким заданиям
         /// </summary>
         /// <param name="host">Основа для отверстия КР</param>
-        /// <param name="incomingTasks">Входящие задания на отверстия от АР</param>
+        /// <param name="incomingTasks">Входящие задания на отверстия</param>
         /// <returns></returns>
-        private IPointFinder GetPointFinder(Element host, ICollection<OpeningArTaskIncoming> incomingTasks) {
+        private IPointFinder GetPointFinder(Element host, ICollection<IOpeningTaskIncoming> incomingTasks) {
             var provider = new ManyOpeningArTasksPointFinderProvider(host, incomingTasks);
             return provider.GetPointFinder();
         }
 
         /// <summary>
-        /// Возвращает типоразмер чистового отверстия КР на основе хоста и входящего задания на отверстие от АР
+        /// Возвращает типоразмер чистового отверстия КР на основе хоста и типа входящего задания на отверстие
         /// </summary>
         /// <param name="host"></param>
-        /// <param name="openingTask"></param>
+        /// <param name="openingTaskType"></param>
         /// <returns></returns>
-        private FamilySymbol GetFamilySymbol(Element host, OpeningArTaskIncoming openingTask) {
-            var provider = new SingleOpeningArTaskFamilySymbolProvider(_revitRepository, host, openingTask);
+        private FamilySymbol GetFamilySymbol(Element host, OpeningType openingTaskType) {
+            var provider = new SingleOpeningArTaskFamilySymbolProvider(_revitRepository, host, openingTaskType);
             return provider.GetFamilySymbol();
         }
 

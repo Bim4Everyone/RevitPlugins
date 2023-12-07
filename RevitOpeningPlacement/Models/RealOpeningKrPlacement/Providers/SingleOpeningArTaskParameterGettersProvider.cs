@@ -1,25 +1,24 @@
-﻿using System;
+using System;
 
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.RealOpeningKrPlacement.ParameterGetters;
-using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
     /// <summary>
-    /// Класс, предоставляющий <see cref="IParametersGetter"/> для чистового отверстия КР, размещаемого по одному заданию на отверстие от АР
+    /// Класс, предоставляющий <see cref="IParametersGetter"/> для чистового отверстия КР, размещаемого по одному заданию на отверстие
     /// </summary>
     internal class SingleOpeningArTaskParameterGettersProvider {
-        private readonly OpeningArTaskIncoming _incomingTask;
+        private readonly IOpeningTaskIncoming _incomingTask;
         private readonly IPointFinder _pointFinder;
 
 
         /// <summary>
-        /// Конструктор класса, предоставляющего <see cref="IParametersGetter"/> для чистового отверстия КР, размещаемого по одному заданию на отверстие от АР
+        /// Конструктор класса, предоставляющего <see cref="IParametersGetter"/> для чистового отверстия КР, размещаемого по одному заданию на отверстие
         /// </summary>
-        /// <param name="incomingTask">Входящее задание на отверстие от АР</param>
+        /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <param name="pointFinder">Провайдер точки вставки отверстия КР</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public SingleOpeningArTaskParameterGettersProvider(OpeningArTaskIncoming incomingTask, IPointFinder pointFinder) {
+        public SingleOpeningArTaskParameterGettersProvider(IOpeningTaskIncoming incomingTask, IPointFinder pointFinder) {
             _incomingTask = incomingTask ?? throw new ArgumentNullException(nameof(incomingTask));
             _pointFinder = pointFinder ?? throw new ArgumentNullException(nameof(pointFinder));
         }

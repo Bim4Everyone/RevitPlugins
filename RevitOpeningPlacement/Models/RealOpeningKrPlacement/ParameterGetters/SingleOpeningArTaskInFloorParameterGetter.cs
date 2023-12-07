@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using RevitOpeningPlacement.Models.Interfaces;
@@ -6,22 +6,21 @@ using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 using RevitOpeningPlacement.Models.RealOpeningKrPlacement.ValueGetters;
 using RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters;
-using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.ParameterGetters {
     /// <summary>
-    /// Класс, предоставляющий значения параметров для КР отверстия, размещаемого по одному заданию на отверстие от АР
+    /// Класс, предоставляющий значения параметров для КР отверстия, размещаемого по одному заданию на отверстие
     /// </summary>
     internal class SingleOpeningArTaskInFloorParameterGetter : IParametersGetter {
-        private readonly OpeningArTaskIncoming _incomingTask;
+        private readonly IOpeningTaskIncoming _incomingTask;
 
 
         /// <summary>
-        /// Конструктор класса, предоставляющего значения параметров для КР отверстия, размещаемого по одному заданию на отверстие от АР
+        /// Конструктор класса, предоставляющего значения параметров для КР отверстия, размещаемого по одному заданию на отверстие
         /// </summary>
-        /// <param name="incomingTask">Входящее задание на отверстие от АР</param>
+        /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public SingleOpeningArTaskInFloorParameterGetter(OpeningArTaskIncoming incomingTask) {
+        public SingleOpeningArTaskInFloorParameterGetter(IOpeningTaskIncoming incomingTask) {
             _incomingTask = incomingTask ?? throw new ArgumentNullException(nameof(incomingTask));
         }
 

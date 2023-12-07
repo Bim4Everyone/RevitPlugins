@@ -130,11 +130,11 @@
                                   ShowCloseButton="False">
                     <dxg:GridControl x:Name="_dgIncomingTasks"
                                      Grid.Row="0"
-                                     ItemsSource="{Binding OpeningsArTasksIncomingViewSource.View}"
+                                     ItemsSource="{Binding OpeningsTasksIncomingViewSource.View}"
                                      BorderThickness="0"
                                      SelectionMode="Row"
-                                     CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningArTaskIncomingViewModel"
-                                     SelectedItem="{Binding SelectedOpeningArTaskIncoming}"
+                                     CurrentItem="RevitOpeningPlacement.Models.Interfaces.IOpeningTaskIncomingForKrViewModel"
+                                     SelectedItem="{Binding SelectedOpeningTaskIncoming}"
                                      MaxHeight="2000">
                         <dxg:GridControl.GroupSummary>
                             <dxg:GridSummaryItem SummaryType="Count" />
