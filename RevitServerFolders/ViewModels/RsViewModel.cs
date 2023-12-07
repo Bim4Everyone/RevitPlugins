@@ -48,6 +48,7 @@ namespace RevitServerFolders.ViewModels {
                     cancellationToken.ThrowIfCancellationRequested();
 
                     ExportDocument(fileName);
+                    dosymep.Revit.DocumentExtensions.UnloadAllLinks(Directory.GetFiles(TargetFolder, "*.rvt"));
                 }
             }
         }
