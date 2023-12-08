@@ -55,7 +55,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// </summary>
         public void CreateDocs() {
 
-            //Report.AppendLine($"Приступаю к выполнению задания. Всего задач: {MVM.TasksForWork.Count}");
             using(Transaction transaction = Repository.Document.StartTransaction("Документатор АР")) {
 
                 foreach(ViewHelper viewHelper in MVM.SelectedViewHelpers) {
@@ -144,7 +143,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                 taskRep.Nodes.Add(specRep);
                             }
                         }
-
                         selectedViewRep.Nodes.Add(taskRep);
                     }
                     Report.Add(selectedViewRep);

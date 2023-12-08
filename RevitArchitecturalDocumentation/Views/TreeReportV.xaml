@@ -14,8 +14,8 @@
     WindowStartupLocation="CenterOwner"
     
     Title="Отчет"
-    Height="280" Width="400"    
-    MinHeight="280" MinWidth="400"    
+    Height="600" Width="800"    
+    MinHeight="600" MinWidth="800"    
 
     d:DataContext="{d:DesignInstance vms:TreeReportVM, IsDesignTimeCreatable=False}">
     <Grid>

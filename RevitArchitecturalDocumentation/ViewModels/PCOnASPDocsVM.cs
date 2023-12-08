@@ -511,7 +511,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             if(CreateViewsFromSelected) {
                 rep.AddNodeWithName($"Создание видов будет производиться на основе выбранных видов. Перебираем выбранные виды и поочередно применяем задания:");
             } else {
-                rep.AddNodeWithName($"Создание видов будет производиться с нуля. Перебираем задания:");
+                rep.AddNodeWithName($"Создание видов будет производиться с нуля. Перебираем уровни проекта и поочередно применяем задания:");
             }
             rep.AddNodeWithName($"Выбрано видов до запуска плагина: {SelectedViews.Count}");
             rep.AddNodeWithName($"Выбран тип вида: {SelectedViewFamilyTypeName}");
@@ -542,7 +542,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             TreeReportV window = new TreeReportV {
                 DataContext = new TreeReportVM(TreeReport)
             };
-            window.ShowDialog();
+            window.Show();
         }
 
 

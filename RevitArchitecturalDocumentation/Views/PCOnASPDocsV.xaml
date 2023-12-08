@@ -14,8 +14,8 @@
     WindowStartupLocation="CenterOwner"
     
     Title="PCOnASPDocsV"
-    Height="600" Width="1000"
-    MinHeight="600" MinWidth="1000"
+    Height="600" Width="1080"
+    MinHeight="600" MinWidth="1080"
 
     d:DataContext="{d:DesignInstance vms:PCOnASPDocsVM, IsDesignTimeCreatable=False}">
 
@@ -181,6 +181,11 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+
+                    <GridViewColumn 
+                        Header="Выбрано спецификаций" 
+                        Width="150"
+                        DisplayMemberBinding="{Binding Path=ListSpecHelpers.Count}"/>
                 </GridView>
             </ListView.View>
         </ListView>
