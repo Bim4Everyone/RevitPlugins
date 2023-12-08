@@ -87,18 +87,9 @@
                 <GridView>
                     <GridViewColumn 
                         Header="№"
-                        Width="30">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock
-                                    Margin="5" 
-                                    Height="30"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Text="{Binding Path=TaskNumber}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+                        Width="30"
+                        DisplayMemberBinding="{Binding Path=TaskNumber}">
+                    </GridViewColumn>                    
                     
                     <GridViewColumn 
                         Header="Начальный уровень"
@@ -236,11 +227,11 @@
 
                 <CheckBox 
                     Grid.Column="0"
-                    Margin="3"
+                    Margin="10"
                     Content="Создавать/размещать листы"
                     FontSize="14"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
+                    HorizontalAlignment="Left"
                     IsChecked="{Binding Path=WorkWithSheets}"/>
 
                 <TextBlock
@@ -272,7 +263,7 @@
                 <TextBlock
                     Grid.Column="3"
                     Margin="20 0 0 0"
-                    Text="Укажите префикс листа:"
+                    Text="Префикс листа:"
                     FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"/>
@@ -298,21 +289,21 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="0.6*"/>
+                    <ColumnDefinition Width="1.8*"/>
                     <ColumnDefinition Width="1.4*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1.2*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <CheckBox 
                     Grid.Column="0"
-                    Margin="3"
+                    Margin="10"
                     Content="Создавать/размещать виды"
                     FontSize="14"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
+                    HorizontalAlignment="Left"
                     IsChecked="{Binding Path=WorkWithViews}"/>
 
                 <TextBlock
@@ -354,7 +345,7 @@
                 <TextBlock
                     Grid.Column="5"
                     Margin="3"
-                    Text="Для вида:"
+                    Text="Префикс вида:"
                     FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"/>
@@ -388,11 +379,11 @@
 
 
                 <CheckBox 
-                    Margin="3"
+                    Margin="10"
                     Content="Создавать/размещать спецификации"
                     FontSize="14"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
+                    HorizontalAlignment="Left"
                     IsChecked="{Binding Path=WorkWithSpecs}"/>
 
                 <TextBlock

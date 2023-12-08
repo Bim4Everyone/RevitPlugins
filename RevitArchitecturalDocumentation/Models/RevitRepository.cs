@@ -30,12 +30,14 @@ namespace RevitArchitecturalDocumentation.Models {
                 .OfClass(typeof(ViewFamilyType))
                 .OfType<ViewFamilyType>()
                 .Where(a => ViewFamily.FloorPlan == a.ViewFamily)
+                .OrderBy(a => a.Name)
                 .ToList();
 
         public List<ElementType> ViewportTypes => new FilteredElementCollector(Document)
                 .OfClass(typeof(ElementType))
                 .OfType<ElementType>()
                 .Where(a => a.get_Parameter(BuiltInParameter.VIEWPORT_ATTR_SHOW_EXTENSION_LINE) != null)
+                .OrderBy(a => a.Name)
                 .ToList();
 
         public List<FamilySymbol> TitleBlocksInProject => new FilteredElementCollector(Document)

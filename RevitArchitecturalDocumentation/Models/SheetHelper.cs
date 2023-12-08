@@ -44,7 +44,7 @@ namespace RevitArchitecturalDocumentation.Models {
             ViewSheet newSheet = Repository.GetSheetByName(newSheetName);
             Sheet = newSheet;
             if(newSheet is null) {               
-                Report?.AddNodeWithName($"Лист с именем {newSheetName} не найден в проекте, приступаем к созданию");
+                Report?.AddNodeWithName($"Лист с именем \"{newSheetName}\" не найден в проекте, приступаем к созданию");
                 try {
                     CreateSheet(newSheetName, titleBlockType);
 
@@ -55,7 +55,7 @@ namespace RevitArchitecturalDocumentation.Models {
                     Report?.AddNodeWithName($"❗ Произошла ошибка при создании листа!");
                 }
             } else {
-                Report?.AddNodeWithName($"Лист с именем {newSheetName} успешно найден в проекте!");
+                Report?.AddNodeWithName($"Лист с именем \"{newSheetName}\" успешно найден в проекте!");
 
                 NameHelper = new ViewNameHelper(newSheet);
                 NameHelper.AnilizeNGetLevelNumber();

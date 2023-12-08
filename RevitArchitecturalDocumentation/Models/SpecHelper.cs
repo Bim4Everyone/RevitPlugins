@@ -77,7 +77,7 @@ namespace RevitArchitecturalDocumentation.Models {
             SpecHelper newSpecHelper;
             // Если спеку с указанным именем не нашли, то будем создавать дублированием
             if(newViewSpec is null) {
-                Report?.AddNodeWithName($"Спецификация с именем {specName} не найдена в проекте, приступаем к созданию");
+                Report?.AddNodeWithName($"Спецификация с именем \"{specName}\" не найдена в проекте, приступаем к созданию");
                 newViewSpec = Repository.Document.GetElement(Specification.Duplicate(ViewDuplicateOption.Duplicate)) as ViewSchedule;
                 Report?.AddNodeWithName($"Спецификация успешно создана!");
                 newViewSpec.Name = specName;
@@ -86,7 +86,7 @@ namespace RevitArchitecturalDocumentation.Models {
                 newSpecHelper = new SpecHelper(Repository, newViewSpec, Report);
                 newSpecHelper.ChangeSpecFilters(filterName, numberOfLevelAsInt);
             } else {
-                Report?.AddNodeWithName($"Спецификация с именем {newViewSpec.Name} успешно найдена в проекте!");
+                Report?.AddNodeWithName($"Спецификация с именем \"{newViewSpec.Name}\" успешно найдена в проекте!");
                 newSpecHelper = new SpecHelper(Repository, newViewSpec, Report);
             }
             newSpecHelper.SpecSheetInstancePoint = SpecSheetInstancePoint;

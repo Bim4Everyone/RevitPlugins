@@ -349,6 +349,11 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                 }
             }
 
+            if(SelectedViews.Count == 0 && CreateViewsFromSelected) {
+                ErrorText = "Не выбрано видов, на основе которых создавать документацию";
+                return false;
+            }
+
             if(WorkWithSheets && SelectedTitleBlock is null) {
                 ErrorText = "Не выбран тип рамки листа";
                 return false;
@@ -545,7 +550,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             }
 
             TreeReportV window = new TreeReportV {
-                DataContext = new TreeReportVM(TreeReport)
+                DataContext = new TreeReportVM(TreeReport, "  ~  ")
             };
             window.Show();
         }

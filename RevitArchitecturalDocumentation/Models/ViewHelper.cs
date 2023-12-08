@@ -46,7 +46,7 @@ namespace RevitArchitecturalDocumentation.Models {
             ViewPlan newViewPlan = Repository.FindViewByName(newViewName);
             // Если newViewPlan is null, значит вид с указанным именем не найден в проекте и его нужно создать
             if(newViewPlan is null) {
-                Report?.AddNodeWithName($"Вид с именем {newViewName} не найден в проекте, приступаем к созданию!");
+                Report?.AddNodeWithName($"Вид с именем \"{newViewName}\" не найден в проекте, приступаем к созданию!");
 
                 if(level is null && viewForDublicate is null) {
                     Report?.AddNodeWithName($"❗               Произошла ошибка при создании вида! Не передано для задания уровень и область видимости!");
@@ -63,7 +63,7 @@ namespace RevitArchitecturalDocumentation.Models {
                 }
 
             } else {
-                Report?.AddNodeWithName($"Вид с именем {newViewName} успешно найден в проекте!");
+                Report?.AddNodeWithName($"Вид с именем \"{newViewName}\" успешно найден в проекте!");
                 View = newViewPlan;
             }
                         
