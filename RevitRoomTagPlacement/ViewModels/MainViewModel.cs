@@ -28,7 +28,7 @@ namespace RevitRoomTagPlacement.ViewModels {
                 new SelectedRevitViewModel(revitRepository) { Name = "Выборка по выделенным элементам" }
             };
 
-            if(_revitRepository.GetSelectedRooms().Count() > 0) {
+            if(_revitRepository.GetSelectedRooms().Count > 0) {
                 RevitViewModel = RevitViewModels[1];
             } 
             else {
@@ -43,10 +43,5 @@ namespace RevitRoomTagPlacement.ViewModels {
         }
 
         public ObservableCollection<RevitViewModel> RevitViewModels { get; }
-
-        public string SaveProperty {
-            get => _saveProperty;
-            set => RaiseAndSetIfChanged(ref _saveProperty, value);
-        }
     }
 }

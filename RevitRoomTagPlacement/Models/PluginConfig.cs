@@ -34,6 +34,5 @@ namespace RevitRoomTagPlacement.Models {
         public string RoomName { get; set; }
 
         public override string ProjectName { get; set; }
-        public string SaveProperty { get; set; }
     }
 }
