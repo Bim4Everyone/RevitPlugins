@@ -42,25 +42,25 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                 foreach(Level level in MVM.Levels) {
 
-                    TreeReportNode levelRep = new TreeReportNode() { Name = $"Работаем с уровнем: \"{level.Name}\"" };
+                    TreeReportNode levelRep = new TreeReportNode(null) { Name = $"Работаем с уровнем: \"{level.Name}\"" };
 
                     string numberOfLevel = MVM.RegexForLevel.Match(level.Name).Groups[1].Value;
                     if(!int.TryParse(numberOfLevel, out int numberOfLevelAsInt)) {
-                        levelRep.Nodes.Add(new TreeReportNode() { Name = $"❗ Не удалось определить номер уровня {level.Name}!" });
+                        levelRep.AddNodeWithName($"❗ Не удалось определить номер уровня {level.Name}!");
                         continue;
                     }
-                    levelRep.Nodes.Add(new TreeReportNode() { Name = $"Номер уровня: \"{numberOfLevelAsInt}\"" });
+                    levelRep.AddNodeWithName($"Номер уровня: \"{numberOfLevelAsInt}\"");
 
                     foreach(TaskInfo task in MVM.TasksForWork) {
 
-                        TreeReportNode taskRep = new TreeReportNode() {
+                        TreeReportNode taskRep = new TreeReportNode(levelRep) {
                             Name = $"Задание номер: \"{task.TaskNumber}\" - " +
                             $"уровни ({task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}), {task.SelectedVisibilityScope.Name}"
                         };
 
                         string strForLevelSearch = "К" + task.NumberOfBuildingPartAsInt.ToString() + "_";
                         if(!level.Name.Contains(strForLevelSearch)) {
-                            taskRep.AddNodeWithName($"Уровень не относится к нужному корпусу, т.к. не содержит: \"{strForLevelSearch}\"");
+                            taskRep.AddNodeWithName($"  ~  Уровень не относится к нужному корпусу, т.к. не содержит: \"{strForLevelSearch}\"");
                             levelRep.Nodes.Add(taskRep);
                             continue;
                         } else {
@@ -68,7 +68,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                         }
 
                         if(numberOfLevelAsInt < task.StartLevelNumberAsInt || numberOfLevelAsInt > task.EndLevelNumberAsInt) {
-                            taskRep.AddNodeWithName($"Уровень \"{numberOfLevelAsInt}\" не подходит под искомый диапазон: " +
+                            taskRep.AddNodeWithName($"  ~  Уровень \"{numberOfLevelAsInt}\" не подходит под искомый диапазон: " +
                                          $"{task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}");
                             levelRep.Nodes.Add(taskRep);
                             continue;
@@ -87,14 +87,13 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                 task.NumberOfBuildingSectionAsInt,
                                 numberOfLevel);
 
-                            TreeReportNode sheetRep = new TreeReportNode() { Name = $"Работа с листом \"{newSheetName}\"" };
+                            TreeReportNode sheetRep = new TreeReportNode(taskRep) { Name = $"Работа с листом \"{newSheetName}\"" };
 
                             sheetHelper = new SheetHelper(Repository, sheetRep);
                             sheetHelper.GetOrCreateSheet(newSheetName, MVM.SelectedTitleBlock);
                             taskRep.Nodes.Add(sheetRep);
                         }
 
-                        ViewHelper newViewHelper = null;
                         if(MVM.WorkWithViews) {
 
                             string newViewName = string.Format("{0}{1} этаж К{2}{3}",
@@ -103,9 +102,9 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                 task.NumberOfBuildingPartAsInt,
                                 task.ViewNameSuffix);
 
-                            TreeReportNode viewRep = new TreeReportNode() { Name = $"Работа с видом \"{newViewName}\"" };
+                            TreeReportNode viewRep = new TreeReportNode(taskRep) { Name = $"Работа с видом \"{newViewName}\"" };
 
-                            newViewHelper = new ViewHelper(Repository, viewRep);
+                            ViewHelper newViewHelper = new ViewHelper(Repository, viewRep);
                             newViewHelper.GetView(newViewName, task.SelectedVisibilityScope, MVM.SelectedViewFamilyType, level);
 
                             if(sheetHelper.Sheet != null
@@ -120,7 +119,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                         if(MVM.WorkWithSpecs) {
 
                             foreach(SpecHelper specHelper in task.ListSpecHelpers) {
-                                TreeReportNode specRep = new TreeReportNode() { Name = $"Работа со спецификацией \"{specHelper.Specification.Name}\"" };
+                                TreeReportNode specRep = new TreeReportNode(taskRep) { Name = $"Работа со спецификацией \"{specHelper.Specification.Name}\"" };
                                 specHelper.Report = specRep;
 
                                 SpecHelper newSpecHelper = specHelper.GetOrDublicateNSetSpec(MVM.SelectedFilterNameForSpecs, numberOfLevelAsInt);

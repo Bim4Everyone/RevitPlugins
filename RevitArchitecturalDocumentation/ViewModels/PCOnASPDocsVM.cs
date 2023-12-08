@@ -506,7 +506,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// </summary>
         private TreeReportNode GetInitialDataForReport() {
 
-            TreeReportNode rep = new TreeReportNode() { Name = "Исходные данные:" };
+            TreeReportNode rep = new TreeReportNode(null) { Name = "Исходные данные:" };
 
             if(CreateViewsFromSelected) {
                 rep.AddNodeWithName($"Создание видов будет производиться на основе выбранных видов. Перебираем выбранные виды и поочередно применяем задания:");
@@ -520,7 +520,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             rep.AddNodeWithName($"Выбрано поле параметра фильтрации спецификации: {SelectedFilterNameForSpecs}");
 
             foreach(TaskInfo task in TasksForWork) {
-                TreeReportNode taskRep = new TreeReportNode() { Name = $"Номер задания: {task.TaskNumber}" };
+                TreeReportNode taskRep = new TreeReportNode(rep) { Name = $"Номер задания: {task.TaskNumber}" };
                 taskRep.AddNodeWithName($"Начальный уровень: {task.StartLevelNumberAsInt}");
                 taskRep.AddNodeWithName($"Конечный уровень: {task.EndLevelNumberAsInt}");
                 taskRep.AddNodeWithName($"Область видимости: {task.SelectedVisibilityScope.Name}");
@@ -538,6 +538,11 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// Метод перебирает все выбранные спеки во всех заданиях и собирает список параметров фильтрации. принадлежащий всем одновременно
         /// </summary>
         private void OpenReportWindow() {
+
+            foreach(TreeReportNode item in TreeReport) {
+                item.FindInChildName("❗ ");
+                item.FindInChildName("  ~  ");
+            }
 
             TreeReportV window = new TreeReportV {
                 DataContext = new TreeReportVM(TreeReport)

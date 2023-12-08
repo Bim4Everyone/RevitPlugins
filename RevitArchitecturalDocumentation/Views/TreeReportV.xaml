@@ -19,7 +19,46 @@
 
     d:DataContext="{d:DesignInstance vms:TreeReportVM, IsDesignTimeCreatable=False}">
     <Grid>
-        <TreeView 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <RadioButton 
+            Grid.Column="0"
+            Margin="10"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Right"
+            FlowDirection="RightToLeft"
+            GroupName="choice" 
+            Content="Показывать все"/>
+
+        <RadioButton 
+            Grid.Column="1"
+            Margin="10"
+            VerticalAlignment="Center"
+            GroupName="choice" 
+            Content="Показывать важное" 
+            IsChecked="{Binding Path=ShowImportant}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Checked">
+                    <i:InvokeCommandAction
+                        Command="{Binding RefreshTreeViewCommand}"/>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="Unchecked">
+                    <i:InvokeCommandAction
+                        Command="{Binding RefreshTreeViewCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </RadioButton>
+
+        <TreeView
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
             ItemsSource="{Binding Path=Data}">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Nodes}">

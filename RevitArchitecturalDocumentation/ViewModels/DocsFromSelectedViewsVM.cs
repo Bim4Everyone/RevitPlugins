@@ -61,8 +61,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                     int numberOfLevelAsInt = viewHelper.NameHelper.LevelNumber;
                     string numberOfLevelAsStr = viewHelper.NameHelper.LevelNumberAsStr;
                     
-                    TreeReportNode selectedViewRep = new TreeReportNode() { Name = $"Работаем с выбранным видом: \"{viewHelper.View.Name}\"" };
-                    selectedViewRep.Nodes.Add(new TreeReportNode() { Name = $"Номер этажа в соответствии с именем выбранного вида: \"{numberOfLevelAsInt}\""});
+                    TreeReportNode selectedViewRep = new TreeReportNode(null) { Name = $"Работаем с выбранным видом: \"{viewHelper.View.Name}\"" };
+                    selectedViewRep.AddNodeWithName($"Номер этажа в соответствии с именем выбранного вида: \"{numberOfLevelAsInt}\"");
 
                     string viewNamePartWithSectionPart = string.Empty;
 
@@ -73,12 +73,12 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                     foreach(TaskInfo task in MVM.TasksForWork) {
 
-                        TreeReportNode taskRep = new TreeReportNode() { Name = $"Задание номер: \"{task.TaskNumber}\" - " +
+                        TreeReportNode taskRep = new TreeReportNode(selectedViewRep) { Name = $"Задание номер: \"{task.TaskNumber}\" - " +
                             $"уровни ({task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}), {task.SelectedVisibilityScope.Name}" };
 
                         if(numberOfLevelAsInt < task.StartLevelNumberAsInt || numberOfLevelAsInt > task.EndLevelNumberAsInt) {
-                            taskRep.Nodes.Add(new TreeReportNode() { Name = $"Уровень вида \"{numberOfLevelAsInt}\" не подходит под искомый диапазон: " +
-                                $"{task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}" });
+                            taskRep.AddNodeWithName($"  ~  Уровень вида \"{numberOfLevelAsInt}\" не подходит под искомый диапазон: " +
+                                $"{task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}");
                             selectedViewRep.Nodes.Add(taskRep);
                             continue;
                         }
@@ -92,7 +92,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                 task.NumberOfBuildingSectionAsInt,
                                 numberOfLevelAsStr);
 
-                            TreeReportNode sheetRep = new TreeReportNode() { Name = $"Работа с листом \"{newSheetName}\"" };
+                            TreeReportNode sheetRep = new TreeReportNode(taskRep) { Name = $"Работа с листом \"{newSheetName}\"" };
 
                             sheetHelper = new SheetHelper(Repository, sheetRep);
                             sheetHelper.GetOrCreateSheet(newSheetName, MVM.SelectedTitleBlock, "Ширина", "Высота", 150, 110);
@@ -110,7 +110,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                 viewNamePartWithSectionPart,
                                 task.ViewNameSuffix);
 
-                            TreeReportNode viewRep = new TreeReportNode() { Name = $"Работа с видом \"{newViewName}\"" };
+                            TreeReportNode viewRep = new TreeReportNode(taskRep) { Name = $"Работа с видом \"{newViewName}\"" };
 
                             ViewHelper newViewHelper = new ViewHelper(Repository, viewRep);
                             newViewHelper.GetView(newViewName, task.SelectedVisibilityScope, viewForDublicate: viewHelper.View);
@@ -127,7 +127,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                         if(MVM.WorkWithSpecs) {
 
                             foreach(SpecHelper specHelper in task.ListSpecHelpers) {
-                                TreeReportNode specRep = new TreeReportNode() { Name = $"Работа со спецификацией \"{specHelper.Specification.Name}\"" };
+                                TreeReportNode specRep = new TreeReportNode(taskRep) { Name = $"Работа со спецификацией \"{specHelper.Specification.Name}\"" };
                                 specHelper.Report = specRep;
 
                                 SpecHelper newSpecHelper = specHelper.GetOrDublicateNSetSpec(MVM.SelectedFilterNameForSpecs, numberOfLevelAsInt);
