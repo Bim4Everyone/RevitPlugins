@@ -18,8 +18,6 @@ namespace RevitRoomTagPlacement.ViewModels {
 
         private RevitViewModel _revitViewModel;
 
-        private string _saveProperty;
-
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _revitRepository = revitRepository;
 

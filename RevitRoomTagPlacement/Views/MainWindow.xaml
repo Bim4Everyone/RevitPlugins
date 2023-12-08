@@ -17,8 +17,8 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    Height="600" Width="500"  
-    MinHeight="600" MinWidth="500"
+    SizeToContent="Height"
+    ResizeMode="NoResize"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -36,10 +36,10 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="300"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="45"/>
         </Grid.RowDefinitions>
