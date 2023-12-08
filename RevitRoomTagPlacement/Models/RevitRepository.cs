@@ -143,7 +143,7 @@ namespace RevitRoomTagPlacement.Models {
                         Location roomLocation = room.RoomObject.Location;
 
                         LocationPoint roomLocationPoint = (LocationPoint) roomLocation;
-                        XYZ testPoint = new XYZ(point.U, point.V, roomLocationPoint.Point.Z);
+                        XYZ testPoint = new XYZ(point.U, point.V, room.CenterPoint.Z);
 
                         if(!room.RoomObject.IsPointInRoom(testPoint)) point = pathFinder.GetPointByPath();
 

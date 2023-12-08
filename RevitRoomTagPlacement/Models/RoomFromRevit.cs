@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,5 +26,10 @@ namespace RevitRoomTagPlacement.Models {
         public string Name => _room.GetParamValueOrDefault(BuiltInParameter.ROOM_NAME, "<Без имени>");
 
         public ElementId LinkId => _linkId;
+
+        public XYZ CenterPoint => _room.ClosedShell
+            .OfType<Solid>()
+            .First()
+            .ComputeCentroid();
     }
 }
