@@ -42,7 +42,7 @@ using Parameter = Autodesk.Revit.DB.Parameter;
 using View = Autodesk.Revit.DB.View;
 
 namespace RevitArchitecturalDocumentation.ViewModels {
-    internal class PCOnASPDocsVM : BaseViewModel {
+    internal class CreatingARDocsVM : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
@@ -57,7 +57,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private string _selectedFilterNameForSpecs;
         private string _sheetNamePrefix = string.Empty;
         private string _errorText;
-        private PCOnASPDocsV _pCOnASPDocsView;
+        private CreatingARDocsV _pCOnASPDocsView;
         private ObservableCollection<TreeReportNode> _report = new ObservableCollection<TreeReportNode>();
         private ViewFamilyType _selectedViewFamilyType;
         private ElementType _selectedViewportType;
@@ -81,7 +81,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private Regex _regexForView = new Regex(@"_(.*?) этаж");
 
 
-        public PCOnASPDocsVM(PluginConfig pluginConfig, RevitRepository revitRepository) {
+        public CreatingARDocsVM(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
@@ -245,7 +245,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedFilterNameForSpecs, value);
         }
 
-        public PCOnASPDocsV PCOnASPDocsView {
+        public CreatingARDocsV PCOnASPDocsView {
             get => _pCOnASPDocsView;
             set => this.RaiseAndSetIfChanged(ref _pCOnASPDocsView, value);
         }
@@ -266,7 +266,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// </summary>
         private void LoadView(object obj) {
 
-            PCOnASPDocsView = obj as PCOnASPDocsV;
+            PCOnASPDocsView = obj as CreatingARDocsV;
             LoadConfig();
 
             VisibilityScopes = _revitRepository.VisibilityScopes;

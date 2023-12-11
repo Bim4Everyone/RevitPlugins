@@ -38,13 +38,13 @@ using View = Autodesk.Revit.DB.View;
 namespace RevitArchitecturalDocumentation.ViewModels {
     internal class DocsFromSelectedViewsVM {
 
-        public DocsFromSelectedViewsVM(PCOnASPDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report) {
+        public DocsFromSelectedViewsVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report) {
             MVM = pCOnASPDocsVM;
             Repository = revitRepository;
             Report = report;
         }
 
-        public PCOnASPDocsVM MVM { get; set; }
+        public CreatingARDocsVM MVM { get; set; }
         public RevitRepository Repository { get; set; }
         public ObservableCollection<TreeReportNode> Report { get; set; }
 

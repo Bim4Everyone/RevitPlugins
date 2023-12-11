@@ -23,8 +23,8 @@ using Application = Autodesk.Revit.ApplicationServices.Application;
 
 namespace RevitArchitecturalDocumentation {
     [Transaction(TransactionMode.Manual)]
-    public class RevitPCOnASPDocsCommand : BasePluginCommand {
-        public RevitPCOnASPDocsCommand() {
+    public class CreatingARDocsCommand : BasePluginCommand {
+        public CreatingARDocsCommand() {
             PluginName = "Создать документацию ПСО и ДДУ";
         }
 
@@ -44,13 +44,13 @@ namespace RevitArchitecturalDocumentation {
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
-                kernel.Bind<PCOnASPDocsVM>().ToSelf();
-                kernel.Bind<PCOnASPDocsV>().ToSelf()
+                kernel.Bind<CreatingARDocsVM>().ToSelf();
+                kernel.Bind<CreatingARDocsV>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<PCOnASPDocsVM>());
+                        c => c.Kernel.Get<CreatingARDocsVM>());
 
-                PCOnASPDocsV window = kernel.Get<PCOnASPDocsV>();
+                CreatingARDocsV window = kernel.Get<CreatingARDocsV>();
                 if(window.ShowDialog() == true) {
                     GetPlatformService<INotificationService>()
                         .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")

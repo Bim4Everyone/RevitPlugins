@@ -22,13 +22,13 @@ using RevitArchitecturalDocumentation.Models;
 namespace RevitArchitecturalDocumentation.ViewModels {
     internal class DocsFromScratchVM : BaseViewModel {
 
-        public DocsFromScratchVM(PCOnASPDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report) {
+        public DocsFromScratchVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report) {
             MVM = pCOnASPDocsVM;
             Repository = revitRepository;
             Report = report;
         }
 
-        public PCOnASPDocsVM MVM { get; set; }
+        public CreatingARDocsVM MVM { get; set; }
         public RevitRepository Repository { get; set; }
         public ObservableCollection<TreeReportNode> Report { get; set; }
 
