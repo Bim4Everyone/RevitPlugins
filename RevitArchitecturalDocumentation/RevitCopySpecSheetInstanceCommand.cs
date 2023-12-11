@@ -50,16 +50,7 @@ namespace RevitArchitecturalDocumentation {
                     .WithPropertyValue(nameof(Window.DataContext),
                         c => c.Kernel.Get<CopySpecSheetInstanceVM>());
 
-                CopySpecSheetInstanceV window = kernel.Get<CopySpecSheetInstanceV>();
-                if(window.ShowDialog() == true) {
-                    GetPlatformService<INotificationService>()
-                        .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                        .ShowAsync();
-                } else {
-                    GetPlatformService<INotificationService>()
-                        .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                        .ShowAsync();
-                }
+                Notification(kernel.Get<CopySpecSheetInstanceV>());
             }
         }
     }
