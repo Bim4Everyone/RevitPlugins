@@ -25,6 +25,11 @@ namespace RevitArchitecturalDocumentation.ViewModels
         private string _stringForUnimportantNodes = string.Empty;
         private ObservableCollection<TreeReportNode> _data = new ObservableCollection<TreeReportNode>();
 
+        /// <summary>
+        /// Модель вида древовидного отчета. Строкой для неважных узлов
+        /// </summary>
+        /// <param name="treeReportNodes"></param>
+        /// <param name="stringForUnimportantNodes"></param>
         public TreeReportVM(ObservableCollection<TreeReportNode> treeReportNodes, string stringForUnimportantNodes) {
             Data = treeReportNodes;
             StringForUnimportantNodes = stringForUnimportantNodes;
@@ -67,6 +72,9 @@ namespace RevitArchitecturalDocumentation.ViewModels
             _treeView.Filter = item => ShowImportant ? ((TreeReportNode) item).Name.IndexOf(StringForUnimportantNodes, StringComparison.OrdinalIgnoreCase) == -1 : true;
         }
 
+        /// <summary>
+        /// Обновляет элемент вида, связанный с коллекцией при изменении выбора фильтрации списка в интерфейсе
+        /// </summary>
         private void RefreshTreeView() {
             _treeView.Refresh();
         }

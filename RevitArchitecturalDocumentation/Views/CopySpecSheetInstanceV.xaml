@@ -14,8 +14,8 @@
     WindowStartupLocation="CenterOwner"
     
     Title="CopySpecSheetInstanceV"
-    Height="280" Width="400"    
-    MinHeight="280" MinWidth="400"    
+    Height="280" Width="450"    
+    MinHeight="280" MinWidth="450"    
 
     d:DataContext="{d:DesignInstance vms:CopySpecSheetInstanceVM, IsDesignTimeCreatable=False}">
 

@@ -312,6 +312,12 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// </summary>
         private bool CanAcceptView() {
 
+
+            if(SelectedViews.Count == 0 && CreateViewsFromSelected) {
+                ErrorText = "Не выбрано видов, на основе которых создавать документацию";
+                return false;
+            }
+
             foreach(ViewHelper viewHelper in SelectedViewHelpers) {
                 try {
                     viewHelper.NameHelper.AnilizeNGetLevelNumber();
@@ -347,11 +353,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                         }
                     }
                 }
-            }
-
-            if(SelectedViews.Count == 0 && CreateViewsFromSelected) {
-                ErrorText = "Не выбрано видов, на основе которых создавать документацию";
-                return false;
             }
 
             if(WorkWithSheets && SelectedTitleBlock is null) {
@@ -545,11 +546,19 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private void OpenReportWindow() {
 
             foreach(TreeReportNode item in TreeReport) {
-                item.FindInChildName("❗ ");
-                item.FindInChildName("  ~  ");
+                // Ищем указанные подстроки по всем узлам сверху вниз
+                // Если находим у какого то дочернего элемента указанную подстроку,
+                // то прописываем ее всем узлам снизу вверху (начиная с родителя узла, в котором ее нашли)
+                item.RewriteByChildNamesRecursively("❗ ");
+                item.RewriteByChildNamesRecursively("  ~  ");
+
+                // В случае, когда заданий несколько возможна ситуация, когда один узел не важный, а другой важный, т.к. содержит информацию о создании чего-либо
+                // В этом случае в узле самого верхнего уровня нужно удалить соответствующую строку, чтобы его не скрывала фильтрация
+                item.RewriteByChildNames("Задание", "  ~  ");
             }
 
             TreeReportV window = new TreeReportV {
+                // Передаем VM и указываем, что фильтрацию для сепарации на важные/не важные узлы будем выполнять через "  ~  "
                 DataContext = new TreeReportVM(TreeReport, "  ~  ")
             };
             window.Show();
