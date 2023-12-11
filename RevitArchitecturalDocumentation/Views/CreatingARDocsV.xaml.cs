@@ -1,13 +1,13 @@
 ﻿using System.Windows;
 
 namespace RevitArchitecturalDocumentation.Views {
-    public partial class MainWindow {
-        public MainWindow() {
+    public partial class CreatingARDocsV {
+        public CreatingARDocsV() {
             InitializeComponent();
         }
 
         public override string PluginName => nameof(RevitArchitecturalDocumentation);
-        public override string ProjectConfigName => nameof(MainWindow);
+        public override string ProjectConfigName => nameof(CreatingARDocsV);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;
@@ -15,6 +15,7 @@ namespace RevitArchitecturalDocumentation.Views {
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;
+            Close();
         }
     }
 }
