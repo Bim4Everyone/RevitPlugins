@@ -17,6 +17,7 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
+    Width="530"
     SizeToContent="Height"
     ResizeMode="NoResize"
 
@@ -36,7 +37,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="300"/>
+            <RowDefinition Height="250"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -48,7 +49,7 @@
         <ComboBox
             Grid.Row="0"
             Height="25"
-            Margin="10,10,10,5"
+            Margin="10"
             ItemsSource="{Binding RevitViewModels}"
             DisplayMemberPath="Name"
             SelectedItem="{Binding RevitViewModel}"/>
@@ -56,7 +57,7 @@
         <ListBox
             x:Name="RoomGroups"
             Grid.Row="1"
-            Margin="10,5,10,5"
+            Margin="10, 5"
             SelectionMode="Extended"
             DataContext="{Binding RevitViewModel}"
             ItemsSource="{Binding RoomGroups}">
@@ -70,11 +71,12 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <StackPanel
+        <DockPanel
             Grid.Row="2"
-            Margin="10, 15">
-            <TextBlock 
-                DockPanel.Dock="Top"
+            Margin="10">
+            <TextBlock
+                DockPanel.Dock="Left"
+                Width="130"
                 Text="Семейство марки:"/>
             <ComboBox
                 Height="25"
@@ -82,59 +84,62 @@
                 ItemsSource="{Binding TagFamilies}"
                 DisplayMemberPath="Name"
                 SelectedItem="{Binding SelectedTagType}"/>
-        </StackPanel>
+        </DockPanel>
 
 
-        <StackPanel
+        <DockPanel
             Grid.Row="3"
-            Margin="10, 15"
+            Margin="10"
+            
             DataContext="{Binding RevitViewModel}">
             <TextBlock 
-                DockPanel.Dock="Top"
-                Text="Способ размещения марок:"/>
-            <RadioButton
-                GroupName="PlacementWays" 
-                Content="Для каждого помещения в группе" 
-                IsChecked="{Binding IsEveryRoom}"/>
-            <RadioButton
-                GroupName="PlacementWays" 
-                Content="Для одного помещения в каждой группе (самое большое помещение)" 
-                IsChecked="{Binding IsOneRoomPerGroupRandom}"/>
-            <RadioButton
-                x:Name="_placementWay"
-                GroupName="PlacementWays" 
-                Content="Для одного помещения в каждой группе (выбрать по имени)" 
-                IsChecked="{Binding IsOneRoomPerGroupByName}"/>
-        </StackPanel>
+                DockPanel.Dock="Left"
+                Width="130"
+                Text="Способ размещения:"/>
+            <StackPanel>                
+                <RadioButton
+                    GroupName="PlacementWays" 
+                    Content="Каждое помещения в группе" 
+                    IsChecked="{Binding IsEveryRoom}"/>
+                <RadioButton
+                    GroupName="PlacementWays" 
+                    Content="Одно помещение в каждой группе (максимальная площадь)" 
+                    IsChecked="{Binding IsOneRoomPerGroupRandom}"/>
+                <RadioButton
+                    x:Name="_placementWay"
+                    GroupName="PlacementWays" 
+                    Content="Одно помещение в каждой группе (выбрать по имени)" 
+                    IsChecked="{Binding IsOneRoomPerGroupByName}"/>
+            </StackPanel>
+        </DockPanel>
 
-        <StackPanel
+        <DockPanel
             Grid.Row="4"
-            Margin="10, 15"
+            Margin="10"
             DataContext="{Binding RevitViewModel}"
             Visibility="{Binding ElementName=_placementWay,
                         Path=IsChecked, 
                         Converter={StaticResource BoolToVis}}"
             d:Visibility="Visible">
             <TextBlock 
-                DockPanel.Dock="Top"
-                Text="Помещение для размещения марок:"/>
+                DockPanel.Dock="Left"
+                Width="130"
+                Text="Имя помещения:"/>
             <ComboBox
                 Height="25"                
                 ItemsSource="{Binding RoomNames}"
                 SelectedItem="{Binding SelectedRoomName}"/>
-        </StackPanel>
+        </DockPanel>
 
-        <StackPanel
+        <DockPanel
             Grid.Row="5"
-            Margin="10, 15"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right"
+            Margin="10"
+            HorizontalAlignment="Left"
             DataContext="{Binding RevitViewModel}">
-
             <TextBlock
-                Margin="0,0,10,0"
-                VerticalAlignment="Top"                
-                Text="Позиция размещения марки:" />
+                VerticalAlignment="Top"              
+                Width="130"
+                Text="Позиция марки:" />
             <UniformGrid
                 Height="90"
                 Width="90"
@@ -174,20 +179,21 @@
                     GroupName="PlacementPosition"
                     IsChecked="{Binding IsPositionRightBottom}"/>
             </UniformGrid>            
-        </StackPanel>
+        </DockPanel>
 
-        <StackPanel
+        <DockPanel
             Grid.Row="6"
-            Margin="10, 10">
+            Margin="10">
             <TextBlock 
-                DockPanel.Dock="Top"
-                Text="Отступ марки от края, мм:"/>
+                DockPanel.Dock="Left"
+                Width="130"
+                Text="Отступ от края, мм:"/>
             <TextBox
                 PreviewTextInput="IndentValidation"
                 PreviewKeyDown="TextBox_PreviewKeyDown"
                 DataContext="{Binding RevitViewModel}"
                 Text="{Binding Indent}"/>
-        </StackPanel>
+        </DockPanel>
 
         <StackPanel
             Grid.Row="7"
@@ -200,7 +206,6 @@
                 VerticalAlignment="Center"
                 DataContext="{Binding RevitViewModel}"
                 Text="{Binding ErrorText}" />
-
             <Button
                 Margin="10"
                 Width="80"
@@ -209,7 +214,6 @@
                 Click="ButtonOk_Click"
                 DataContext="{Binding RevitViewModel}"
                 Command="{Binding PlaceTagsCommand}" />
-
             <Button
                 Margin="10"
                 Width="80"
