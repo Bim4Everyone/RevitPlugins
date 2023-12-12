@@ -1,5 +1,9 @@
+using System.Globalization;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 using RevitRoomTagPlacement.ViewModels;
 
@@ -18,6 +22,15 @@ namespace RevitRoomTagPlacement.Views {
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;
+        }
+
+        private void IndentValidation(object sender, TextCompositionEventArgs e) {
+            e.Handled = !e.Text.All(char.IsDigit);
+        }
+
+        private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e) {
+            if(e.Key == Key.Space)
+                e.Handled = true;
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e) {

@@ -26,17 +26,21 @@ namespace RevitRoomTagPlacement.ViewModels {
         private GroupPlacementWay _placementWayByGroups;
         private PositionPlacementWay _placementWayByPosition;
 
+        private double _indent;
+
         private string _errorText;
 
         public RevitViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
             _placementWayByGroups = GroupPlacementWay.EveryRoom;
             _placementWayByPosition = PositionPlacementWay.CenterCenter;
+            _indent = 7;
 
             RoomGroups = new BindingList<RoomGroupViewModel>(GetGroupViewModels());
 
             TagFamilies = revitRepository.GetRoomTags();
             if(TagFamilies.Count != 0) SelectedTagType = TagFamilies[0];
+
 
             PlaceTagsCommand = RelayCommand.Create(PlaceTags, CanPlaceTags);
 
@@ -146,6 +150,11 @@ namespace RevitRoomTagPlacement.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedRoomName, value);
         }
 
+        public double Indent {
+            get => _indent;
+            set => this.RaiseAndSetIfChanged(ref _indent, value);
+        }
+
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
@@ -156,6 +165,7 @@ namespace RevitRoomTagPlacement.ViewModels {
                                               SelectedTagType.TagId,
                                               PlacementWayByGroups,
                                               PlacementWayByPosition,
+                                              Indent,
                                               SelectedRoomName);
 
             SavePluginConfig();
@@ -207,6 +217,7 @@ namespace RevitRoomTagPlacement.ViewModels {
             settings.SelectedGroupPlacementWay = PlacementWayByGroups;
             settings.SelectedPositionPlacementWay = PlacementWayByPosition;
             settings.RoomName = SelectedRoomName;
+            settings.Indent = Indent;
 
             config.SaveProjectConfig();
         }
@@ -224,6 +235,7 @@ namespace RevitRoomTagPlacement.ViewModels {
             PlacementWayByGroups = settings.SelectedGroupPlacementWay;
             PlacementWayByPosition = settings.SelectedPositionPlacementWay;
             SelectedRoomName = settings.RoomName;
+            Indent = settings.Indent;
 
             config.SaveProjectConfig();
         }

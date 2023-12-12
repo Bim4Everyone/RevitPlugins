@@ -40,6 +40,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="45"/>
         </Grid.RowDefinitions>
@@ -177,6 +178,19 @@
 
         <StackPanel
             Grid.Row="6"
+            Margin="10, 10">
+            <TextBlock 
+                DockPanel.Dock="Top"
+                Text="Отступ марки от края, мм:"/>
+            <TextBox
+                PreviewTextInput="IndentValidation"
+                PreviewKeyDown="TextBox_PreviewKeyDown"
+                DataContext="{Binding RevitViewModel}"
+                Text="{Binding Indent}"/>
+        </StackPanel>
+
+        <StackPanel
+            Grid.Row="7"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">

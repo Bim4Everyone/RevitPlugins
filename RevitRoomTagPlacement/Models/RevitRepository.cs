@@ -120,12 +120,14 @@ namespace RevitRoomTagPlacement.Models {
                                             ElementId selectedTagType,
                                             GroupPlacementWay groupPlacementWay,
                                             PositionPlacementWay positionPlacementWay,
+                                            double indent,
                                             string roomName = "") {
 
             List<RoomFromRevit> rooms = FilterRoomsForPlacement(roomGroups, groupPlacementWay, roomName);
 
             View activeView = Document.ActiveView;
             ElementOwnerViewFilter viewFilter = new ElementOwnerViewFilter(activeView.Id);
+            double indentFeet = ConvertIndentToFeet(indent);
 
             using(Transaction t = Document.StartTransaction("Маркировать помещения")) {
                 foreach(var room in rooms) {
@@ -137,7 +139,7 @@ namespace RevitRoomTagPlacement.Models {
                         .ToList();
 
                     if(!depElements.Contains(selectedTagType)) {
-                        TagPointFinder pathFinder = new TagPointFinder(room.RoomObject);
+                        TagPointFinder pathFinder = new TagPointFinder(room.RoomObject, indentFeet);
                         UV point = pathFinder.GetPointByPlacementWay(positionPlacementWay, activeView);
 
                         Location roomLocation = room.RoomObject.Location;
@@ -175,5 +177,15 @@ namespace RevitRoomTagPlacement.Models {
                 t.Commit();
             }
         }
+
+#if REVIT_2020_OR_LESS
+        private double ConvertIndentToFeet(double indent) {
+            return UnitUtils.ConvertToInternalUnits(indent, DisplayUnitType.DUT_MILLIMETERS);
+        }
+#else
+        private double ConvertIndentToFeet(double indent) {
+            return UnitUtils.ConvertToInternalUnits(indent, UnitTypeId.Millimeters);
+        }
+#endif
     }
 }
