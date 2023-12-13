@@ -7,16 +7,18 @@ using dosymep.Revit.ServerClient.DataContracts;
 
 namespace RevitServerFolders.Utils {
     internal static class Extensions {
+        private const int Size = 1024;
+        private static readonly string[] _units = {"б", "Кб", "Мб", "Гб", "Тб", "Пб", "Еб"};
+        
         public static string BytesToString(long size) {
-            string[] suf = {"б", "Кб", "Мб", "Гб", "Тб", "Пб", "Еб"};
             if(size == 0) {
-                return "0 " + suf[0];
+                return "0 " + _units[0];
             }
 
             long bytes = Math.Abs(size);
-            int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
-            double num = Math.Round(bytes / Math.Pow(1024, place), 1);
-            return (Math.Sign(size) * num).ToString(CultureInfo.CurrentCulture) + " " + suf[place];
+            int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, Size)));
+            double num = Math.Round(bytes / Math.Pow(Size, place), 1);
+            return (Math.Sign(size) * num).ToString(CultureInfo.CurrentCulture) + " " + _units[place];
         }
 
         /// <summary>Returns visible model path for RS.</summary>

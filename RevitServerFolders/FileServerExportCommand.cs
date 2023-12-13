@@ -27,7 +27,7 @@ namespace RevitServerFolders {
     [Transaction(TransactionMode.Manual)]
     internal sealed class FileServerExportCommand : BasePluginCommand {
         public FileServerExportCommand() {
-            PluginName = "Экспорт rvt файлов из RS";
+            PluginName = "Экспорт RVT файлов из RS";
         }
 
         protected override void Execute(UIApplication uiApplication) {

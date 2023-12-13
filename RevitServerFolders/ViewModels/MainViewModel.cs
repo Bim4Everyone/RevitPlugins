@@ -96,6 +96,10 @@ namespace RevitServerFolders.ViewModels {
             get => _isExportRoomsVisible;
             set => this.RaiseAndSetIfChanged(ref _isExportRoomsVisible, value);
         }
+        
+        protected virtual void LoadConfigImpl() { }
+        protected virtual void SaveConfigImpl() { }
+        protected virtual void AcceptViewImpl() { }
 
         private void LoadView() {
             LoadConfig();
@@ -183,8 +187,8 @@ namespace RevitServerFolders.ViewModels {
         }
 
         private void LoadConfig() {
-            TargetFolder = _pluginConfig?.TargetFolder;
-            SourceFolder = _pluginConfig?.SourceFolder;
+            TargetFolder = _pluginConfig.TargetFolder;
+            SourceFolder = _pluginConfig.SourceFolder;
 
             LoadConfigImpl();
         }
@@ -202,10 +206,6 @@ namespace RevitServerFolders.ViewModels {
             _pluginConfig.SaveProjectConfig();
         }
 
-        protected virtual void LoadConfigImpl() { }
-        protected virtual void SaveConfigImpl() { }
-        protected virtual void AcceptViewImpl() { }
-
         private async Task AddModelObjects(ModelObject modelObject) {
             ModelObjects.Clear();
             if(modelObject != null) {
@@ -219,7 +219,7 @@ namespace RevitServerFolders.ViewModels {
                 }
 
                 foreach(ModelObjectViewModel modelObjectViewModel in ModelObjects) {
-                    modelObjectViewModel.SkipObject = _pluginConfig?.SkippedObjects
+                    modelObjectViewModel.SkipObject = _pluginConfig.SkippedObjects?
                         .Contains(modelObjectViewModel.FullName, StringComparer.OrdinalIgnoreCase) == true;
                 }
             }

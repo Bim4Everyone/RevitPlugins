@@ -60,13 +60,13 @@ namespace RevitServerFolders.ViewModels {
                 dialog.StepValue = 1;
                 dialog.MaxValue = modelFiles.Length;
 
-                IProgress<int> progress= dialog.CreateProgress();
+                IProgress<int> progress = dialog.CreateProgress();
                 CancellationToken cancellationToken = dialog.CreateCancellationToken();
                 int count = 0;
                 foreach(string fileName in modelFiles) {
                     progress.Report(++count);
                     cancellationToken.ThrowIfCancellationRequested();
-                    
+
                     ExportDocument(fileName);
                 }
             }
@@ -76,6 +76,7 @@ namespace RevitServerFolders.ViewModels {
             _revitRepository.Application.FailuresProcessing += ApplicationOnFailuresProcessing;
             _revitRepository.UIApplication.DialogBoxShowing += UIApplicationOnDialogBoxShowing;
 
+            DocumentExtensions.UnloadAllLinks(fileName);
             Document document = _revitRepository.OpenDocumentFile(fileName);
             try {
                 View3D navisView = new FilteredElementCollector(document)
@@ -90,9 +91,14 @@ namespace RevitServerFolders.ViewModels {
                 }
 
                 var hasElements = new FilteredElementCollector(document, navisView.Id)
-                    .WhereElementIsNotElementType()
-                    .Any(item =>
-                        item.get_Geometry(new Options() {View = navisView})?.Any() == true);
+                        .WhereElementIsNotElementType()
+#if REVIT_2021_OR_LESS
+                        .Where(item =>
+                            item.get_Geometry(new Options() {View = navisView})?.Any() == true)
+#else
+                        .WherePasses(new VisibleInViewFilter(document, navisView.Id))
+#endif
+                        .Any();
 
                 if(!hasElements) {
                     return;
@@ -101,7 +107,7 @@ namespace RevitServerFolders.ViewModels {
                 ProjectLocation[] projectLocations = document.ProjectLocations
                     .OfType<ProjectLocation>()
                     .ToArray();
-                
+
                 if(projectLocations.Length == 1) {
                     ExportDocument(fileName, navisView, document);
                 } else if(projectLocations.Length > 1) {
@@ -135,7 +141,7 @@ namespace RevitServerFolders.ViewModels {
 
             exportFileName += location == null
                 ? null
-                : "_" + location?.Name;
+                : "_" + location.Name;
 
             document.Export(TargetFolder, exportFileName, exportOptions);
         }

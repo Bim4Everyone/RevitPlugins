@@ -72,11 +72,8 @@ namespace RevitServerFolders.ViewModels.Rs {
         }
 
         private bool CanLoadChildren(TreeListNodeEventArgs args) {
-            if(args.Row is RsModelObjectViewModel rsModelObject) {
-                return rsModelObject.LoadChildrenCommand.CanExecute(default);
-            }
-
-            return false;
+            return args.Row is RsModelObjectViewModel rsModelObject
+                   && rsModelObject.LoadChildrenCommand.CanExecute(default);
         }
         
         private async Task ReloadChildren() {

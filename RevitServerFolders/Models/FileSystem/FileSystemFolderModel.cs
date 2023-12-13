@@ -20,11 +20,11 @@ namespace RevitServerFolders.Models.FileSystem {
 
         public override Task<IEnumerable<ModelObject>> GetChildrenObjects() {
             return Task.Run(() => {
-                IEnumerable<ModelObject> modelOObjects = _directoryInfo.GetFiles("*.rvt", SearchOption.AllDirectories)
+                IEnumerable<ModelObject> modelObjects = _directoryInfo.GetFiles("*.rvt", SearchOption.AllDirectories)
                     .Where(item => IsSupportedVersion(item))
                     .Select(item => new FileSystemFileModel(item));
 
-                return modelOObjects.ToArray().AsEnumerable();
+                return modelObjects.ToArray().AsEnumerable();
             });
         }
 
