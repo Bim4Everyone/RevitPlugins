@@ -56,7 +56,15 @@ namespace RevitServerFolders.ViewModels.Rs {
             get => _children;
             set => this.RaiseAndSetIfChanged(ref _children, value);
         }
-
+        
+        public virtual ModelObject GetModelObject() {
+            return default;
+        }
+        
+        protected virtual Task<IEnumerable<RsModelObjectViewModel>> GetChildrenObjects() {
+            return Task.FromResult(Enumerable.Empty<RsModelObjectViewModel>());
+        }
+        
         private async Task LoadChildrenObjects() {
             try {
                 Children = new ObservableCollection<RsModelObjectViewModel>(await GetChildrenObjects());
@@ -77,14 +85,6 @@ namespace RevitServerFolders.ViewModels.Rs {
 
         private bool CanReLoadChildrenObjects() {
             return IsLoadedChildren;
-        }
-
-        protected virtual Task<IEnumerable<RsModelObjectViewModel>> GetChildrenObjects() {
-            return Task.FromResult(Enumerable.Empty<RsModelObjectViewModel>());
-        }
-
-        public virtual ModelObject GetModelObject() {
-            return default;
         }
     }
 }

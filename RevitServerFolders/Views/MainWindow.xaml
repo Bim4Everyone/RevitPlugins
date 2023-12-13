@@ -20,6 +20,7 @@
 
     Title="MainWindow"
     Height="450" Width="800"
+    MinHeight="450" MinWidth="800"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -85,11 +86,9 @@
             </dxe:ButtonEdit.Buttons>
         </dxe:ButtonEdit>
 
-
-        <StackPanel
+        <DockPanel
             Grid.Row="2"
-            Margin="5 0 5 0"
-            Orientation="Horizontal">
+            Margin="5 0 5 0">
             <Label
                 Margin="0 0 5 0"
                 Content="Папка источника" />
@@ -99,9 +98,8 @@
                 EditValue="{Binding IsExportRooms}"
                 Visibility="{Binding IsExportRoomsVisible, 
                     Converter={StaticResource BooleanToVisibilityConverter}}" />
-        </StackPanel>
-
-
+        </DockPanel>
+        
         <dxe:ButtonEdit
             Grid.Row="3"
             x:Name="_sourceFolderEdit"
