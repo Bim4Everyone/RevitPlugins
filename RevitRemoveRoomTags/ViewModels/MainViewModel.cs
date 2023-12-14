@@ -235,7 +235,7 @@ namespace RevitRemoveRoomTags.ViewModels {
 
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Работа с марками помещений")) {
 
-                List<ElementId> tagsForDel = new List<ElementId>();
+                HashSet<ElementId> tagsForDel = new HashSet<ElementId>();
 
                 // Перебираем задачи, созданные пользователем
                 foreach(RoomTagTaskHelper roomTagTask in RoomTagTasks) {
@@ -270,7 +270,7 @@ namespace RevitRemoveRoomTags.ViewModels {
 
                                 // Получаем точку текстового блока некой марки,если она совпадает с ранее запрошенной, то работаем с ней
                                 XYZ tagHeaderPointCurrent = tag.TagHeadPosition;
-                                if(tagHeaderPointCurrent.X == tagHeaderPointForCheck.X && tagHeaderPointCurrent.Y == tagHeaderPointForCheck.Y) {
+                                if(new UV(tagHeaderPointCurrent.X, tagHeaderPointCurrent.Y).IsAlmostEqualTo(new UV(tagHeaderPointForCheck.X, tagHeaderPointForCheck.Y))) {
 
                                     // Если пользователь выбрал в задаче удаление марок, то сохраняем найденные марки с той же позицией и затем удалим
                                     if(roomTagTask.RemoveTags) {
@@ -295,7 +295,7 @@ namespace RevitRemoveRoomTags.ViewModels {
                 }
                 // Если есть марки, которые нужно удалить - удаляем
                 if(tagsForDel.Count > 0) {
-                    _revitRepository.Document.Delete(tagsForDel.Distinct().ToList());
+                    _revitRepository.Document.Delete(tagsForDel);
                 }
 
                 transaction.Commit();
@@ -327,11 +327,7 @@ namespace RevitRemoveRoomTags.ViewModels {
         /// <returns></returns>
         private bool CanDeleteTask() {
 
-            if(SelectedRoomTagTask is null) {
-                return false;
-            }
-
-            return true;
+            return SelectedRoomTagTask != null;
         }
     }
 }

@@ -12,7 +12,7 @@ namespace RevitRemoveRoomTags.Models {
         public RoomTagTaskHelper() {
 
         }
-        public List<RoomTag> RoomTags { get; set; } = new List<RoomTag>();
+        public ICollection<RoomTag> RoomTags { get; } = new List<RoomTag>();
 
         public string XOffset { get; set; } = "0";
         public string YOffset { get; set; } = "0";

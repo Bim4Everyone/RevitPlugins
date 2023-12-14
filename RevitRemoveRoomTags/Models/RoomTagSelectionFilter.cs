@@ -11,10 +11,7 @@ using Autodesk.Revit.UI.Selection;
 namespace RevitRemoveRoomTags.Models {
     internal class RoomTagSelectionFilter : ISelectionFilter {
         public bool AllowElement(Element element) {
-            if(element is RoomTag) {
-                return true;
-            }
-            return false;
+            return element is RoomTag;
         }
 
         public bool AllowReference(Reference refer, XYZ point) {

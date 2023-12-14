@@ -14,6 +14,7 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
+    MinHeight="450" MinWidth="765"    
     Height="450" Width="765"    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
@@ -25,6 +26,18 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
+    <Window.Resources>
+        <TextBlock x:Key="TextBlockToolTip" 
+                   Text="Плагин позволяет переносить или удалять совпадающие марки помещений на разных видах.&#10;Совпадающими считаются те марки, которые имеют абсолютно одинаковые координаты на виде, например, когда вы произвели копирование марок с одного вида на другой.&#10;Принцип работы:&#10;- выберите виды через диспетчер проекта, а затем запустите плагин;&#10;- в строке задания выберите марки на одном из видов;&#10;- если вы хотите переместить совпадающие марки, то введите значения смещений, отличные от нуля;&#10;- если вы хотите удалить совпадающие марки, то поставьте галочку в столбце &quot;Удалить?&quot;;&#10;- чтобы добавить еще одну строку задания нажмите кнопки &quot;Добавить задачу&quot;&#10;- чтобы удалить лишнюю задачу, выберите ее в списке и нажмите кнопку &quot;Удалить задачу&quot;;&#10;- запустите плагин нажав кнопку &quot;Ок&quot;;&#10;- плагин переберет все выбранные до запуска виды, найдет на них марки помещений и, если они совпадают по координатам с марками из заданий, произведет с ними манипуляции."
+                   TextWrapping="Wrap"
+                   Width="400"
+                   TextAlignment="Justify"
+                   FlowDirection="LeftToRight"
+                   ToolTipService.InitialShowDelay="500"
+                   ToolTipService.ShowDuration="40000"
+                   ToolTipService.BetweenShowDelay="1" />
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -34,71 +47,49 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Rectangle 
-            Grid.Row="0"
-            HorizontalAlignment="Right"
-            Margin="10"
-            Fill="WhiteSmoke"
-            Stroke="Black"
-            Width="20"
-            Height="20"
-            RadiusX="8"
-            RadiusY="8">
-            <Rectangle.ToolTip>
-                <TextBlock 
-                        Text="Плагин позволяет переносить или удалять совпадающие марки помещений на разных видах.&#10;Совпадающими считаются те марки, которые имеют абсолютно одинаковые координаты на виде, например, когда вы произвели копирование марок с одного вида на другой.&#10;Принцип работы:&#10;- выберите виды через диспетчер проекта, а затем запустите плагин;&#10;- в строке задания выберите марки на одном из видов;&#10;- если вы хотите переместить совпадающие марки, то введите значения смещений, отличные от нуля;&#10;- если вы хотите удалить совпадающие марки, то поставьте галочку в столбце &quot;Удалить?&quot;;&#10;- чтобы добавить еще одну строку задания нажмите кнопки &quot;Добавить задачу&quot;&#10;- чтобы удалить лишнюю задачу, выберите ее в списке и нажмите кнопку &quot;Удалить задачу&quot;;&#10;- запустите плагин нажав кнопку &quot;Ок&quot;;&#10;- плагин переберет все выбранные до запуска виды, найдет на них марки помещений и, если они совпадают по координатам с марками из заданий, произведет с ними манипуляции." 
-                        TextWrapping="Wrap"
-                        Width="400"
-                        TextAlignment="Justify"
-                        FlowDirection="LeftToRight"
-                        ToolTipService.InitialShowDelay="500"
-                        ToolTipService.ShowDuration="40000"
-                        ToolTipService.BetweenShowDelay="1"/>
-            </Rectangle.ToolTip>
-        </Rectangle>
 
-        <TextBlock
-            Grid.Row="0"
-            HorizontalAlignment="Right"
-            Margin="10 10 18.5 10"
-            VerticalAlignment="Center"
-            FontSize="16"
-            Text="i" FontFamily="Arial">
-            <TextBlock.ToolTip>
-                <TextBlock 
-                        Text="Плагин позволяет переносить или удалять совпадающие марки помещений на разных видах.&#10;Совпадающими считаются те марки, которые имеют абсолютно одинаковые координаты на виде, например,&#10;когда вы произвели копирование марок с одного вида на другой.&#10;Принцип работы:&#10;- выберите виды через диспетчер проекта, а затем запустите плагин;&#10;- в строке задания выберите марки на одном из видов;&#10;- если вы хотите переместить совпадающие марки, то введите значения смещений, отличные от нуля;&#10;- если вы хотите удалить совпадающие марки, то поставьте галочку в столбце &quot;Удалить?&quot;;&#10;- чтобы добавить еще одну строку задания нажмите кнопки &quot;Добавить задачу&quot;&#10;- чтобы удалить лишнюю задачу, выберите ее в списке и нажмите кнопку &quot;Удалить задачу&quot;;&#10;- запустите плагин нажав кнопку &quot;Ок&quot;;&#10;- плагин переберет все выбранные до запуска виды, найдет на них марки помещений и, если они совпадают по координатам с марками из заданий, произведет с ними манипуляции." 
-                        TextWrapping="Wrap"
-                        Width="400"
-                        TextAlignment="Justify"
-                        FlowDirection="LeftToRight"
-                        ToolTipService.InitialShowDelay="500"
-                        ToolTipService.ShowDuration="40000"
-                        ToolTipService.BetweenShowDelay="1"/>
-            </TextBlock.ToolTip>
-        </TextBlock>
-
-        <StackPanel
-            Grid.Row="0"
-            Height="45"
-            Orientation="Horizontal"
-            HorizontalAlignment="Left">
-
+        <DockPanel>
             <TextBlock
+                DockPanel.Dock="Left"
                 Margin="10 5 5 5"
                 VerticalAlignment="Center"
                 Text="Выбрано видов до запуска плагина: " />
 
             <TextBlock
+                DockPanel.Dock="Left"
                 Margin="5"
                 VerticalAlignment="Center"
                 Text="{Binding Path=SelectedViews.Count}" />
 
             <CheckBox
+                DockPanel.Dock="Left"
                 Margin="100 5 5 5"
                 VerticalContentAlignment="Center"
                 Content="Открыть выбранные виды"
                 IsChecked="{Binding Path=NeedOpenSelectedViews}"/>
-        </StackPanel>
+            
+            <Grid DockPanel.Dock="Right">
+                <Rectangle 
+                    HorizontalAlignment="Right"
+                    Margin="10"
+                    Fill="WhiteSmoke"
+                    Stroke="Black"
+                    Width="20"
+                    Height="20"
+                    RadiusX="8"
+                    RadiusY="8"/>
+                <TextBlock
+                    HorizontalAlignment="Right"
+                    Margin="10 10 18.5 10"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Text="i" FontFamily="Arial">
+                    <TextBlock.ToolTip>
+                        <StaticResource ResourceKey="TextBlockToolTip" />
+                    </TextBlock.ToolTip>
+                </TextBlock>
+            </Grid>
+        </DockPanel>
 
 
         <TextBlock
@@ -187,7 +178,6 @@
             </ListView.View>
         </ListView>
 
-
         <StackPanel
             Grid.Row="3"
             Height="45"
@@ -208,6 +198,9 @@
                 Content="Удалить задачу"
                 Command="{Binding Path=DeleteTaskCommand}"/>
         </StackPanel>
+        
+        
+        
 
         <StackPanel
             Grid.Row="4"
