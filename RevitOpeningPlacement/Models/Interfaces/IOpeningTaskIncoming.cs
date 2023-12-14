@@ -1,4 +1,4 @@
-﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB;
 
 namespace RevitOpeningPlacement.Models.Interfaces {
     /// <summary>
@@ -24,5 +24,26 @@ namespace RevitOpeningPlacement.Models.Interfaces {
         /// Координата точки размещения задания на отверстие в координатах активного файла-получателя заданий
         /// </summary>
         XYZ Location { get; }
+
+        /// <summary>
+        /// Тип задания на отверстие
+        /// </summary>
+        OpeningType OpeningType { get; }
+
+        /// <summary>
+        /// Id экземпляра семейства задания на отверстие
+        /// </summary>
+        ElementId Id { get; }
+
+        /// <summary>
+        /// Путь к файлу, в котором создано задание на отверстие
+        /// </summary>
+        string FileName { get; }
+
+        /// <summary>
+        /// Угол поворота задания на отверстие в радианах в координатах активного файла, 
+        /// в который подгружена связь с заданием на отверстие
+        /// </summary>
+        double Rotation { get; }
     }
 }

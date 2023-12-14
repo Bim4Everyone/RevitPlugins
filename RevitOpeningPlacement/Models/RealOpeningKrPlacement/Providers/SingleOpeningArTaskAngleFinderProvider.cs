@@ -1,24 +1,23 @@
-﻿using System;
+using System;
 
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
 using RevitOpeningPlacement.Models.RealOpeningKrPlacement.AngleFinders;
-using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
     /// <summary>
     /// Класс, предоставляющий интерфейс для определения угла поворота размещаемого отверстия КР
     /// </summary>
     internal class SingleOpeningArTaskAngleFinderProvider {
-        private readonly OpeningArTaskIncoming _incomingTask;
+        private readonly IOpeningTaskIncoming _incomingTask;
 
 
         /// <summary>
         /// Конструктор класса, предоставляющего интерфейс для определения угла поворота размещаемого отверстия КР
         /// </summary>
-        /// <param name="incomingTask">Входящее задание на отверсите от АР</param>
+        /// <param name="incomingTask">Входящее задание на отверстие от АР</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public SingleOpeningArTaskAngleFinderProvider(OpeningArTaskIncoming incomingTask) {
+        public SingleOpeningArTaskAngleFinderProvider(IOpeningTaskIncoming incomingTask) {
             _incomingTask = incomingTask ?? throw new ArgumentNullException(nameof(incomingTask));
         }
 

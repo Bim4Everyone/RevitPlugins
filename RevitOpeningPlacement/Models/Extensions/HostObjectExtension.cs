@@ -51,6 +51,22 @@ namespace RevitOpeningPlacement.Models.Extensions {
         }
 
         /// <summary>
+        /// Возвращает нижнюю поверхность <paramref name="hostObject"/>, если он является "плитным" элементом: Перекрытие | Потолок | Крыша
+        /// </summary>
+        /// <param name="hostObject">Плитный элемент: Перекрытие | Потолок | Крыша</param>
+        /// <returns>Нижнюю поверхность Перекрытия | Потолка | Крыши</returns>
+        /// <exception cref="ArgumentException">Исключение, если <paramref name="hostObject"/> не является Перекрытием | Потолком | Крышей</exception>
+        public static Face GetBottomFace(this HostObject hostObject) {
+            if(!IsVerticallyCompound(hostObject)) {
+                var faceRefs = HostObjectUtils.GetBottomFaces(hostObject);
+                return (Face) hostObject.GetGeometryObjectFromReference(faceRefs[0]);
+            } else {
+                throw new ArgumentException($"Слои структуры элемента с Id {hostObject.Id} расположены вертикально. Нельзя определить нижнюю поверхность.");
+            }
+        }
+
+
+        /// <summary>
         /// Возвращает перечисление, состоящее из внутренней и внешней поверхности <paramref name="hostObject"/>, если он является Стеной
         /// </summary>
         /// <param name="hostObject">Стена</param>
@@ -235,21 +251,6 @@ namespace RevitOpeningPlacement.Models.Extensions {
         /// <returns>True, если <paramref name="hostObject"/> - стена, иначе False (перекрытия, крыши, потолки)</returns>
         private static bool IsVerticallyCompound(this HostObject hostObject) {
             return hostObject.GetElementType<HostObjAttributes>().GetCompoundStructure().IsVerticallyCompound;
-        }
-
-        /// <summary>
-        /// Возвращает нижнюю поверхность <paramref name="hostObject"/>, если он является "плитным" элементом: Перекрытие | Потолок | Крыша
-        /// </summary>
-        /// <param name="hostObject">Плитный элемент: Перекрытие | Потолок | Крыша</param>
-        /// <returns>Нижнюю поверхность Перекрытия | Потолка | Крыши</returns>
-        /// <exception cref="ArgumentException">Исключение, если <paramref name="hostObject"/> не является Перекрытием | Потолком | Крышей</exception>
-        private static Face GetBottomFace(this HostObject hostObject) {
-            if(!IsVerticallyCompound(hostObject)) {
-                var faceRefs = HostObjectUtils.GetBottomFaces(hostObject);
-                return (Face) hostObject.GetGeometryObjectFromReference(faceRefs[0]);
-            } else {
-                throw new ArgumentException($"Слои структуры элемента с Id {hostObject.Id} расположены вертикально. Нельзя определить нижнюю поверхность.");
-            }
         }
     }
 }

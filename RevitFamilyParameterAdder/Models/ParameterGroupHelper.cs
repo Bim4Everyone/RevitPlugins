@@ -10,16 +10,20 @@ namespace RevitFamilyParameterAdder.Models
 {
     internal class ParameterGroupHelper
     {
-        public ParameterGroupHelper(object builtInParameterGroup) {
-            BuiltInParamGroup = builtInParameterGroup;
+
 #if REVIT_2023_OR_LESS
-            GroupName = LabelUtils.GetLabelFor((BuiltInParameterGroup) builtInParameterGroup);
-#else
-            if(builtInParameterGroup != null) {
-                GroupName = LabelUtils.GetLabelForGroup((ForgeTypeId) builtInParameterGroup);
-            }
-#endif
+        public ParameterGroupHelper(BuiltInParameterGroup builtInParameterGroup) {
+            BuiltInParamGroup = builtInParameterGroup;
+            GroupName = LabelUtils.GetLabelFor(builtInParameterGroup);
         }
+#else
+        public ParameterGroupHelper(ForgeTypeId builtInParameterGroup) {
+            BuiltInParamGroup = builtInParameterGroup;
+            if(builtInParameterGroup != null) {
+                GroupName = LabelUtils.GetLabelForGroup(builtInParameterGroup);
+            }
+        }
+#endif
 
         internal object BuiltInParamGroup { get; set; }
         public string GroupName { get; set; }

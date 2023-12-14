@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
 
@@ -10,6 +10,9 @@ using pyRevitLabs.Json;
 using RevitClashDetective.Models.FilterModel;
 
 namespace RevitOpeningPlacement.Models.Configs {
+    /// <summary>
+    /// Настройки расстановки заданий на отверстия в файле ВИС
+    /// </summary>
     internal class OpeningConfig : ProjectConfig {
         public string RevitVersion { get; set; }
         [JsonIgnore]

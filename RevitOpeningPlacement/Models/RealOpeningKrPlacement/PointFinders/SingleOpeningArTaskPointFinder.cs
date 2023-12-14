@@ -1,23 +1,22 @@
-﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB;
 
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
-using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.PointFinders {
     /// <summary>
     /// Класс, предоставляющий точку вставки для чистового отверстия КР
     /// </summary>
     internal class SingleOpeningArTaskPointFinder : RoundValueGetter, IPointFinder {
-        private readonly OpeningArTaskIncoming _openingArTaskIncoming;
+        private readonly IOpeningTaskIncoming _openingArTaskIncoming;
 
 
         /// <summary>
         /// Конструктор класса, предоставляющего точку вставки для чистового отверстия КР
         /// </summary>
-        /// <param name="incomingTask">Входящее задание на отверстие от АР</param>
+        /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <exception cref="System.ArgumentNullException"></exception>
-        public SingleOpeningArTaskPointFinder(OpeningArTaskIncoming incomingTask) {
+        public SingleOpeningArTaskPointFinder(IOpeningTaskIncoming incomingTask) {
             _openingArTaskIncoming = incomingTask ?? throw new System.ArgumentNullException(nameof(incomingTask));
         }
 

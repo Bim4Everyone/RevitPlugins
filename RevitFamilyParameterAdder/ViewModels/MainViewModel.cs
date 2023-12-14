@@ -20,6 +20,8 @@ using System.Text;
 using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Web.UI.WebControls;
+using dosymep.Revit;
 
 namespace RevitFamilyParameterAdder.ViewModels {
     internal class MainViewModel : BaseViewModel {
@@ -48,7 +50,7 @@ namespace RevitFamilyParameterAdder.ViewModels {
             new DefaultParam("обр_ФОП_Количество типовых этажей", BuiltInParameterGroup.PG_REBAR_ARRAY),
             new DefaultParam("обр_ФОП_Количество типовых на этаже", BuiltInParameterGroup.PG_REBAR_ARRAY),
             new DefaultParam("обр_ФОП_Длина", BuiltInParameterGroup.PG_GEOMETRY, 
-                "roundup(мод_ФОП_Габарит А / 5 мм) * 5 мм + roundup(мод_ФОП_Габарит Б / 5 мм) * 5 мм + roundup(мод_ФОП_Габарит В / 5 мм) * 5 мм"),
+                "roundup(мод_ФОП_Габарит А / 5) * 5 + roundup(мод_ФОП_Габарит Б / 5) * 5 + roundup(мод_ФОП_Габарит В / 5) * 5"),
             new DefaultParam("мод_ФОП_Габарит А", BuiltInParameterGroup.PG_GEOMETRY),
             new DefaultParam("мод_ФОП_Габарит Б", BuiltInParameterGroup.PG_GEOMETRY),
             new DefaultParam("мод_ФОП_Габарит В", BuiltInParameterGroup.PG_GEOMETRY),
@@ -57,11 +59,11 @@ namespace RevitFamilyParameterAdder.ViewModels {
             new DefaultParam("обр_ФОП_Изделие_Марка", BuiltInParameterGroup.PG_GENERAL),
             new DefaultParam("обр_ФОП_Изделие_Главная деталь", BuiltInParameterGroup.PG_GENERAL),
             new DefaultParam("обр_ФОП_Габарит А_ВД", BuiltInParameterGroup.INVALID,
-                "roundup((мод_ФОП_Габарит А) / 5 мм) * 5 мм"),
+                "roundup((мод_ФОП_Габарит А) / 5) * 5"),
             new DefaultParam("обр_ФОП_Габарит Б_ВД", BuiltInParameterGroup.INVALID,
-                "roundup((мод_ФОП_Габарит Б) / 5 мм) * 5 мм"),
+                "roundup((мод_ФОП_Габарит Б) / 5) * 5"),
             new DefaultParam("обр_ФОП_Габарит В_ВД", BuiltInParameterGroup.INVALID,
-                "roundup((мод_ФОП_Габарит В) / 5 мм) * 5 мм")
+                "roundup((мод_ФОП_Габарит В) / 5) * 5")
 #else
             new DefaultParam("обр_ФОП_Форма_префикс", GroupTypeId.Construction,
                 "\"П\""),
@@ -70,7 +72,7 @@ namespace RevitFamilyParameterAdder.ViewModels {
             new DefaultParam("обр_ФОП_Количество типовых этажей", GroupTypeId.RebarArray),
             new DefaultParam("обр_ФОП_Количество типовых на этаже", GroupTypeId.RebarArray),
             new DefaultParam("обр_ФОП_Длина", GroupTypeId.Geometry,
-                "roundup(мод_ФОП_Габарит А / 5 мм) * 5 мм + roundup(мод_ФОП_Габарит Б / 5 мм) * 5 мм + roundup(мод_ФОП_Габарит В / 5 мм) * 5 мм"),
+                "roundup(мод_ФОП_Габарит А / 5) * 5 + roundup(мод_ФОП_Габарит Б / 5) * 5 + roundup(мод_ФОП_Габарит В / 5) * 5"),
             new DefaultParam("мод_ФОП_Габарит А", GroupTypeId.Geometry),
             new DefaultParam("мод_ФОП_Габарит Б", GroupTypeId.Geometry),
             new DefaultParam("мод_ФОП_Габарит В", GroupTypeId.Geometry),
@@ -78,12 +80,12 @@ namespace RevitFamilyParameterAdder.ViewModels {
             new DefaultParam("обр_ФОП_Изделие_Наименование", GroupTypeId.General),
             new DefaultParam("обр_ФОП_Изделие_Марка", GroupTypeId.General),
             new DefaultParam("обр_ФОП_Изделие_Главная деталь", GroupTypeId.General),
-            new DefaultParam("обр_ФОП_Габарит А_ВД", new ForgeTypeId(),
-                "roundup((мод_ФОП_Габарит А) / 5 мм) * 5 мм"),
-            new DefaultParam("обр_ФОП_Габарит Б_ВД", new ForgeTypeId(),
-                "roundup((мод_ФОП_Габарит Б) / 5 мм) * 5 мм"),
-            new DefaultParam("обр_ФОП_Габарит В_ВД", new ForgeTypeId(),
-                "roundup((мод_ФОП_Габарит В) / 5 мм) * 5 мм")
+            new DefaultParam("обр_ФОП_Габарит А_ВД", ForgeTypeIdExtensions.EmptyForgeTypeId,
+                "roundup((мод_ФОП_Габарит А) / 5) * 5"),
+            new DefaultParam("обр_ФОП_Габарит Б_ВД", ForgeTypeIdExtensions.EmptyForgeTypeId,
+                "roundup((мод_ФОП_Габарит Б) / 5) * 5"),
+            new DefaultParam("обр_ФОП_Габарит В_ВД", ForgeTypeIdExtensions.EmptyForgeTypeId,
+                "roundup((мод_ФОП_Габарит В) / 5) * 5")
 #endif
         };
 
@@ -377,11 +379,10 @@ namespace RevitFamilyParameterAdder.ViewModels {
             }
 #else
             Array array = typeof(GroupTypeId).GetProperties();
-            BINParameterGroups.Add(new ParameterGroupHelper(new ForgeTypeId()));
+            BINParameterGroups.Add(new ParameterGroupHelper(ForgeTypeIdExtensions.EmptyForgeTypeId));
             foreach(PropertyInfo group in array) {
-                //PropertyInfo propertyInfo = group as PropertyInfo;
-                if(FamilyManagerFm.IsUserAssignableParameterGroup((ForgeTypeId) group.GetValue(null, null))) {
-                    BINParameterGroups.Add(new ParameterGroupHelper((ForgeTypeId) group.GetValue(null, null)));
+                if(FamilyManagerFm.IsUserAssignableParameterGroup((ForgeTypeId) group.GetValue(null))) {
+                    BINParameterGroups.Add(new ParameterGroupHelper((ForgeTypeId) group.GetValue(null)));
                 }
             }
 #endif

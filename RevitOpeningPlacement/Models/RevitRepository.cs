@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -661,7 +661,15 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <returns></returns>
         public ICollection<OpeningRealAr> GetRealOpeningsAr() {
-            return GetOpeningsAr(_document)
+            return GetRealOpeningsAr(_document);
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию чистовых экземпляров семейств отверстий из заданного АР документа Revit
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<OpeningRealAr> GetRealOpeningsAr(Document document) {
+            return GetOpeningsAr(document)
                 .Select(famInst => new OpeningRealAr(famInst))
                 .ToHashSet();
         }
@@ -671,7 +679,15 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <returns></returns>
         public ICollection<OpeningRealKr> GetRealOpeningsKr() {
-            return new FilteredElementCollector(_document)
+            return GetRealOpeningsKr(_document);
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию чистовых экземпляров семейств отверстий из заданного КР документа Revit
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<OpeningRealKr> GetRealOpeningsKr(Document document) {
+            return new FilteredElementCollector(document)
                 .WhereElementIsNotElementType()
                 .WherePasses(FiltersInitializer.GetFilterByAllUsedOpeningsKrCategories())
                 .OfClass(typeof(FamilyInstance))
@@ -688,7 +704,16 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <returns></returns>
         public ICollection<ElementId> GetConstructureElementsIds() {
-            return new FilteredElementCollector(_document)
+            return GetConstructureElementsIds(_document);
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию Id всех элементов конструкций из заданного документа ревита, 
+        /// для которых создаются задания на отверстия
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<ElementId> GetConstructureElementsIds(Document document) {
+            return new FilteredElementCollector(document)
                 .WhereElementIsNotElementType()
                 .WherePasses(FiltersInitializer.GetFilterByAllUsedStructureCategories())
                 .ToElementIds();

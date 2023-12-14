@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
@@ -20,15 +20,15 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         public ConstructureNavigatorForIncomingTasksViewModel(
             RevitRepository revitRepository,
-            ICollection<OpeningArTaskIncomingViewModel> openingsArTasksIncomingViewModels,
+            ICollection<IOpeningTaskIncomingForKrViewModel> openingsTasksIncomingViewModels,
             ICollection<OpeningRealKrViewModel> openingsRealViewModels) {
 
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-            if(openingsArTasksIncomingViewModels is null) { throw new ArgumentNullException(nameof(openingsArTasksIncomingViewModels)); }
+            if(openingsTasksIncomingViewModels is null) { throw new ArgumentNullException(nameof(openingsTasksIncomingViewModels)); }
             if(openingsRealViewModels is null) { throw new ArgumentNullException(nameof(openingsRealViewModels)); }
 
-            OpeningsArTasksIncoming = new ObservableCollection<OpeningArTaskIncomingViewModel>(openingsArTasksIncomingViewModels);
-            OpeningsArTasksIncomingViewSource = new CollectionViewSource() { Source = OpeningsArTasksIncoming };
+            OpeningsTasksIncoming = new ObservableCollection<IOpeningTaskIncomingForKrViewModel>(openingsTasksIncomingViewModels);
+            OpeningsTasksIncomingViewSource = new CollectionViewSource() { Source = OpeningsTasksIncoming };
 
             OpeningsReal = new ObservableCollection<OpeningRealKrViewModel>(openingsRealViewModels);
             OpeningsRealViewSource = new CollectionViewSource() { Source = OpeningsReal };
@@ -45,15 +45,15 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
 
         // Входящие задания на отверстия из АР
-        public ObservableCollection<OpeningArTaskIncomingViewModel> OpeningsArTasksIncoming { get; }
+        public ObservableCollection<IOpeningTaskIncomingForKrViewModel> OpeningsTasksIncoming { get; }
 
-        public CollectionViewSource OpeningsArTasksIncomingViewSource { get; private set; }
+        public CollectionViewSource OpeningsTasksIncomingViewSource { get; private set; }
 
-        private OpeningArTaskIncomingViewModel _selectedOpeningArTaskIncoming;
+        private IOpeningTaskIncomingForKrViewModel _selectedOpeningTaskIncoming;
 
-        public OpeningArTaskIncomingViewModel SelectedOpeningArTaskIncoming {
-            get => _selectedOpeningArTaskIncoming;
-            set => RaiseAndSetIfChanged(ref _selectedOpeningArTaskIncoming, value);
+        public IOpeningTaskIncomingForKrViewModel SelectedOpeningTaskIncoming {
+            get => _selectedOpeningTaskIncoming;
+            set => RaiseAndSetIfChanged(ref _selectedOpeningTaskIncoming, value);
         }
 
 
@@ -96,9 +96,9 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         }
 
         private void IncomingTaskSelectionChanged(object p) {
-            if(OpeningsArTasksIncomingViewSource.View.CurrentPosition > -1
-                && OpeningsArTasksIncomingViewSource.View.CurrentPosition < OpeningsArTasksIncoming.Count) {
-                SelectElement((OpeningArTaskIncomingViewModel) p);
+            if(OpeningsTasksIncomingViewSource.View.CurrentPosition > -1
+                && OpeningsTasksIncomingViewSource.View.CurrentPosition < OpeningsTasksIncoming.Count) {
+                SelectElement((IOpeningTaskIncomingForKrViewModel) p);
             }
         }
 
