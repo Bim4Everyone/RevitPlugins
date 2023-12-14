@@ -1,3 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\ProjectProps\Common.props" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\ProjectProps\Common.props" />
+ 
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="2.22.0" />
+  </ItemGroup>
+ 
+  <ItemGroup>
+    <PackageReference Update="ModPlus.Revit.API.2022" Version="4.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>
