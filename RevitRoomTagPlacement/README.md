@@ -3,10 +3,10 @@
 
 # Сборка проекта
 ```
-nuke compile --plugin-name RevitRoomTagPlacement
+nuke compile --profile RevitRoomTagPlacement
 ```
 
 # Публикация проекта
 ```
-nuke publish --plugin-name RevitRoomTagPlacement
+nuke publish --profile RevitRoomTagPlacement
 ```

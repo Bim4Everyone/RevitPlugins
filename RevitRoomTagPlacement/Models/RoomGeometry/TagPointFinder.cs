@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,21 +11,20 @@ using dosymep.Revit;
 
 namespace RevitRoomTagPlacement.Models {
     internal class TagPointFinder {
-        // Отступ марки от края всегда будет 7 мм
-        private const double Indent = 0.0229659;
         private readonly Room _room;
         private readonly BoundingBoxXYZ _roomBB;
+        private readonly double _indent;
 
-        public TagPointFinder(Room room) {
+        public TagPointFinder(Room room, double indent) {
             _room = room;
             _roomBB = room.GetBoundingBox();
+            _indent = indent;
         }
 
         public UV GetPointByPlacementWay(PositionPlacementWay positionPlacementWay, View roomView) {
-
             double xValue;
             double yValue;
-            double indentByScale = roomView.Scale * Indent;
+            double indentByScale = roomView.Scale * _indent;
 
             switch(positionPlacementWay) {
                 case PositionPlacementWay.LeftTop:
@@ -37,7 +36,7 @@ namespace RevitRoomTagPlacement.Models {
                 yValue = _roomBB.Max.Y - indentByScale;
                 break;
                 case PositionPlacementWay.RightTop:
-                xValue = _roomBB.Max.X - roomView.Scale * Indent;
+                xValue = _roomBB.Max.X - indentByScale;
                 yValue = _roomBB.Max.Y - indentByScale;
                 break;
                 case PositionPlacementWay.LeftCenter:

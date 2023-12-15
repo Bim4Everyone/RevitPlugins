@@ -32,8 +32,8 @@ namespace RevitRoomTagPlacement.Models {
         public GroupPlacementWay SelectedGroupPlacementWay { get; set; }
         public PositionPlacementWay SelectedPositionPlacementWay { get; set; }
         public string RoomName { get; set; }
+        public double Indent { get; set; }
 
         public override string ProjectName { get; set; }
-        public string SaveProperty { get; set; }
     }
 }
