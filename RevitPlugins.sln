@@ -260,11 +260,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitIsolateByParameter", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitVolumeOfWork", "RevitVolumeOfWork\RevitVolumeOfWork.csproj", "{68F00EE4-FAE1-48A5-9831-E5A2EB5D76B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitRoomTagPlacement", "RevitRoomTagPlacement\RevitRoomTagPlacement.csproj", "{74007891-BCB9-40B9-993D-8D86DB5CD8F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitRoomTagPlacement", "RevitRoomTagPlacement\RevitRoomTagPlacement.csproj", "{74007891-BCB9-40B9-993D-8D86DB5CD8F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitMepTotals", "RevitMepTotals\RevitMepTotals.csproj", "{FEAE3AF1-6122-4BBC-A2F4-1246AC8051FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitMepTotals", "RevitMepTotals\RevitMepTotals.csproj", "{FEAE3AF1-6122-4BBC-A2F4-1246AC8051FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitRemoveRoomTags", "RevitRemoveRoomTags\RevitRemoveRoomTags.csproj", "{DC5CC041-62D8-493A-A4D8-C0183C830EAE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitRemoveRoomTags", "RevitRemoveRoomTags\RevitRemoveRoomTags.csproj", "{DC5CC041-62D8-493A-A4D8-C0183C830EAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
