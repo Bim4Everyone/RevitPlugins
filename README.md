@@ -34,6 +34,7 @@
 | 21. | Удалить неиспользуемые    | [RevitDeleteUnused](RevitDeleteUnused)             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67830008)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Прочее        |
 | 22. | Выгрузить объемы          | [RevitMepTotals](RevitMepTotals)                   | [Confluence]()                                                          | [BIM](https://github.com/dosymep/BIMExtensions)     | Экспорт       |
 | 23. | Маркировать помещения     | [RevitRoomTagPlacement](RevitRoomTagPlacement)     | [Confluence]()                                                          | [АР](https://github.com/dosymep/ARExtensions)       | Квартирограия |
+| 24. | Удалить марки помещений   | [RevitRemoveRoomTags](RevitRemoveRoomTags)         | [Confluence]()                                                          | [АР](https://github.com/dosymep/ARExtensions)       | Прочее        |
 
 # Сборка проекта
 

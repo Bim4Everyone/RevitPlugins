@@ -1,0 +1,233 @@
+﻿<base:ThemedPlatformWindow
+    x:Class="RevitServerFolders.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:vms="clr-namespace:RevitServerFolders.ViewModels"
+
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:services="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
+    xmlns:converters="clr-namespace:RevitServerFolders.Converters"
+
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+
+    Title="MainWindow"
+    Height="450" Width="800"
+    MinHeight="450" MinWidth="800"
+
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <dxmvvm:Interaction.Behaviors>
+        <services:AttachServiceBehavior
+            AttachableService="{Binding ProgressDialogFactory}" />
+
+        <services:AttachServiceBehavior
+            AttachableService="{Binding OpenFolderDialogService}" />
+
+        <dxmvvm:EventToCommand
+            EventName="Loaded"
+            Command="{Binding LoadViewCommand}" />
+
+        <dxmvvm:EventToCommand
+            SourceName="_sourceFolderEdit"
+            EventName="EditValueChanged"
+            Command="{Binding SourceFolderChangedCommand}" />
+    </dxmvvm:Interaction.Behaviors>
+
+    <Window.Resources>
+        <dxg:InverseBooleanConverter
+            x:Key="InverseBooleanConverter" />
+
+        <BooleanToVisibilityConverter
+            x:Key="BooleanToVisibilityConverter" />
+
+        <converters:CellImageConverter
+            x:Key="CellImageConverter"
+            Empty="{dx:DXImage 'Office2013/Actions/New_16x16.png'}"
+            Model="../Resources/Revit.png"
+            Folder="{dx:DXImage 'Office2013/Support/Article_16x16.png'}" />
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Label
+            Grid.Row="0"
+            Margin="5 5 5 0 "
+            Content="Папка назначения" />
+
+        <dxe:ButtonEdit
+            Grid.Row="1"
+            Margin="5"
+            AllowDefaultButton="False"
+            EditValue="{Binding TargetFolder, UpdateSourceTrigger=PropertyChanged}">
+            <dxe:ButtonEdit.Buttons>
+                <dxe:ButtonInfo Command="{Binding OpenFolderDialogCommand}">
+                    <dxe:ButtonInfo.ContentTemplate>
+                        <DataTemplate>
+                            <dx:DXImage Source="{dx:DXImage 'Office2013/Actions/Open_16x16.png'}" />
+                        </DataTemplate>
+                    </dxe:ButtonInfo.ContentTemplate>
+                </dxe:ButtonInfo>
+            </dxe:ButtonEdit.Buttons>
+        </dxe:ButtonEdit>
+
+        <DockPanel
+            Grid.Row="2"
+            Margin="5 0 5 0">
+            <Label
+                Margin="0 0 5 0"
+                Content="Папка источника" />
+
+            <dxe:CheckEdit
+                Content="Выгрузка помещений"
+                EditValue="{Binding IsExportRooms}"
+                Visibility="{Binding IsExportRoomsVisible, 
+                    Converter={StaticResource BooleanToVisibilityConverter}}" />
+        </DockPanel>
+        
+        <dxe:ButtonEdit
+            Grid.Row="3"
+            x:Name="_sourceFolderEdit"
+            Margin="5"
+            AllowDefaultButton="False"
+            EditValuePostDelay="250"
+            EditValuePostMode="Delayed"
+            EditValue="{Binding SourceFolder, UpdateSourceTrigger=PropertyChanged}">
+            <dxe:ButtonEdit.Buttons>
+                <dxe:ButtonInfo
+                    Command="{Binding OpenFromFoldersCommand}"
+                    IsEnabled="{Binding SourceFolderChangedCommand.IsExecuting,
+                        Converter={StaticResource InverseBooleanConverter}}">
+                    <dxe:ButtonInfo.ContentTemplate>
+                        <DataTemplate>
+                            <dx:DXImage Source="{dx:DXImage 'Office2013/Actions/Open_16x16.png'}" />
+                        </DataTemplate>
+                    </dxe:ButtonInfo.ContentTemplate>
+                </dxe:ButtonInfo>
+            </dxe:ButtonEdit.Buttons>
+        </dxe:ButtonEdit>
+
+        <dxg:GridControl
+            Grid.Row="4"
+            Margin="5"
+            ShowLoadingPanel="{Binding SourceFolderChangedCommand.IsExecuting}"
+            ItemsSource="{Binding ModelObjects}"
+            SelectedItem="{Binding SelectedObject}">
+
+            <dxg:GridControl.View>
+                <dxg:TableView AutoWidth="True"
+                               AllowEditing="False"
+                               AllowGrouping="False"
+                               ShowGroupPanel="False">
+                    <dxg:TableView.RowStyle>
+                        <Style TargetType="dxg:RowControl">
+                            <Style.Triggers>
+                                <DataTrigger
+                                    Value="True"
+                                    Binding="{Binding Row.SkipObject}">
+                                    <Setter Property="Foreground" Value="DarkGray" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </dxg:TableView.RowStyle>
+                </dxg:TableView>
+            </dxg:GridControl.View>
+
+            <dxg:GridColumn
+                FieldName="SkipObject"
+                Header=""
+                AllowEditing="True"
+                AllowMoving="False"
+                AllowResizing="False"
+                AllowSorting="False"
+                AllowGrouping="False"
+                AllowAutoFilter="False"
+                AllowColumnFiltering="False"
+                Width="43"
+                MinWidth="43"
+                MaxWidth="43"
+                ShowCheckBoxInHeader="True">
+
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate DataType="{x:Type dxg:RowData}">
+                        <dxe:CheckEdit
+                            Name="PART_Editor"
+                            EditValue="{Binding Row.SkipObject, 
+                            UpdateSourceTrigger=PropertyChanged,
+                            Converter={StaticResource InverseBooleanConverter}}" />
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+
+            </dxg:GridColumn>
+
+            <dxg:GridColumn
+                Width="25"
+                MinWidth="25"
+                MaxWidth="25"
+                AllowMoving="False"
+                AllowSorting="False"
+                AllowResizing="False"
+                AllowGrouping="False"
+                UnboundType="Object"
+                Header="">
+
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate DataType="{x:Type dxg:EditGridCellData}">
+                        <Image
+                            Source="{Binding RowData.Row, 
+                                Converter={StaticResource CellImageConverter}}" />
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+
+            </dxg:GridColumn>
+
+            <dxg:GridColumn
+                FieldName="Name"
+                Header="Наименование" />
+            <dxg:GridColumn
+                FieldName="FullName"
+                Header="Полное наименование" />
+        </dxg:GridControl>
+
+        <StackPanel
+            Grid.Row="5"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+
+            <dx:SimpleButton
+                Margin="10"
+                Width="80"
+                Content="ОК"
+                IsDefault="True"
+                Click="ButtonOk_Click"
+                Command="{Binding AcceptViewCommand}" />
+
+            <dx:SimpleButton
+                Margin="10"
+                Width="80"
+                Content="Отмена"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</base:ThemedPlatformWindow>
