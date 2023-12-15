@@ -8,7 +8,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
 
 
         /// <summary>
-        /// Возвращает Id или InvalidElementId, если не удалось преобразовать строку
+        /// ���������� Id ��� InvalidElementId, ���� �� ������� ������������� ������
         /// </summary>
         private protected ElementId GetId(string idString) {
             if(string.IsNullOrWhiteSpace(idString)) { return ElementId.InvalidElementId; }

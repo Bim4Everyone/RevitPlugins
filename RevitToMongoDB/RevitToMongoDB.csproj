@@ -1,5 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\ProjectProps\Common.props" />
+  <ItemGroup>
+    <None Remove="config.txt" />
+  </ItemGroup>
  
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.22.0" />
