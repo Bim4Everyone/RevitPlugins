@@ -23,11 +23,12 @@ namespace RevitToMongoDB.Connections {
 
         public async Task<List<ElementDto>> GetElementsAsync() {
             return await (await _mongoClientCollection.FindAsync(f => true)).ToListAsync();
-
         }
+
         public void Insert(ElementDto element) {
             _mongoClientCollection.InsertOne(element);
         }
+
         public async Task InsertAsync(ElementDto element) {
             await _mongoClientCollection.InsertOneAsync(element);
         }
