@@ -36,7 +36,7 @@ namespace RevitRemoveRoomTags.ViewModels {
             _revitRepository = revitRepository;
 
             LoadViewCommand = RelayCommand.Create(LoadView);
-            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+            AcceptViewCommand = RelayCommand.Create(AcceptView);
 
             AddTaskCommand = RelayCommand.Create(AddTask);
             DeleteTaskCommand = RelayCommand.Create(DeleteTask, CanDeleteTask);
@@ -119,15 +119,16 @@ namespace RevitRemoveRoomTags.ViewModels {
                     return false;
                 }
 
-                if(!double.TryParse(roomTagTask.XOffset, out _)) {
-                    ErrorText = "Ошибка в заполнении смещения по X";
-                    return false;
-                }
 
-                if(!double.TryParse(roomTagTask.YOffset, out _)) {
-                    ErrorText = "Ошибка в заполнении смещения по Y";
-                    return false;
-                }
+                //if(roomTagTask.XOffset) {
+                //    ErrorText = "Ошибка в заполнении смещения по X";
+                //    return false;
+                //}
+
+                //if(roomTagTask.YOffset is null) {
+                //    ErrorText = "Ошибка в заполнении смещения по Y";
+                //    return false;
+                //}
             }
 
             ErrorText = string.Empty;
@@ -244,8 +245,8 @@ namespace RevitRemoveRoomTags.ViewModels {
                     double xOffset;
                     double yOffset;
                     if(!roomTagTask.RemoveTags) {
-                        xOffset = UnitUtilsHelper.ConvertToInternalValue(double.Parse(roomTagTask.XOffset));
-                        yOffset = UnitUtilsHelper.ConvertToInternalValue(double.Parse(roomTagTask.YOffset));
+                        xOffset = UnitUtilsHelper.ConvertToInternalValue(roomTagTask.XOffset);
+                        yOffset = UnitUtilsHelper.ConvertToInternalValue(roomTagTask.YOffset);
                     } else {
                         xOffset = 0;
                         yOffset = 0;
