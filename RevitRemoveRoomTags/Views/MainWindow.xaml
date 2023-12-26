@@ -29,74 +29,12 @@
     </i:Interaction.Triggers>
 
     <Window.Resources>
-        <local:InverseAndBooleansToBooleanConverter x:Key="inverseAndBooleansToBooleanConverter"/>
-        
-        <TextBlock x:Key="TextBlockToolTip" 
-                   Text="Плагин позволяет переносить или удалять совпадающие марки помещений на разных видах.&#10;Совпадающими считаются те марки, которые имеют абсолютно одинаковые координаты на виде, например, когда вы произвели копирование марок с одного вида на другой.&#10;Принцип работы:&#10;- выберите виды через диспетчер проекта, а затем запустите плагин;&#10;- в строке задания выберите марки на одном из видов;&#10;- если вы хотите переместить совпадающие марки, то введите значения смещений, отличные от нуля;&#10;- если вы хотите удалить совпадающие марки, то поставьте галочку в столбце &quot;Удалить?&quot;;&#10;- чтобы добавить еще одну строку задания нажмите кнопки &quot;Добавить задачу&quot;&#10;- чтобы удалить лишнюю задачу, выберите ее в списке и нажмите кнопку &quot;Удалить задачу&quot;;&#10;- запустите плагин нажав кнопку &quot;Ок&quot;;&#10;- плагин переберет все выбранные до запуска виды, найдет на них марки помещений и, если они совпадают по координатам с марками из заданий, произведет с ними манипуляции."
-                   TextWrapping="Wrap"
-                   Width="400"
-                   TextAlignment="Justify"
-                   FlowDirection="LeftToRight"
-                   ToolTipService.InitialShowDelay="500"
-                   ToolTipService.ShowDuration="40000"
-                   ToolTipService.BetweenShowDelay="1" />
-
-        <ControlTemplate x:Key="validationFailed">
-            <StackPanel Orientation="Horizontal">
-                <Border
-                    BorderBrush="Red" 
-                    BorderThickness="2">
-                    <AdornedElementPlaceholder />
-                </Border>
-                <TextBlock 
-                    Foreground="Red"
-                    FontSize="26" 
-                    Margin="3 0"
-                    Text="!"/>
-            </StackPanel>
-        </ControlTemplate>
-
-
-        <Style TargetType="TextBox">
-            <Style.Triggers>
-                <Trigger Property="Validation.HasError" Value="True">
-                    <Setter
-                        Property="ToolTip"
-                        Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
-                    <Setter Property="Foreground" Value="Red" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-
-        <Style x:Key="ErrorTextBlock" TargetType="TextBlock">
-            <Setter Property="Text" 
-                    Value="{Binding 
-                         RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, 
-                         Path=ValidationErrors[0].ErrorContent}"/>
-            
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding 
-                         RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, 
-                         Path=ValidationErrors.Count}" 
-                         Value="0">
-                    <Setter Property="Text" Value="{Binding ErrorText}"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
-
-        <Style x:Key="AcceptViewButton" TargetType="Button">
-            <Setter Property="IsEnabled" Value="False"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding 
-                             RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, 
-                             Path=ValidationErrors.Count}" 
-                             Value="0">
-                    <Setter Property="IsEnabled" Value="True"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/MainResources.xaml"/>
+                <ResourceDictionary Source="Resources/ToolTipResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
@@ -160,7 +98,6 @@
             Text="Задачи для работы: " />
 
         <ListView 
-            x:Name="test0"
             Grid.Row="2"
             Margin="10"
             ScrollViewer.VerticalScrollBarVisibility="Visible"
@@ -177,9 +114,7 @@
                                     Margin="3"
                                     Width="155"
                                     Height="30"
-                                    HorizontalAlignment="Center"
                                     Content="Выбрать"
-                                    FontSize="14"
                                     Click="ButtonCancel_Click"
                                     Command="{Binding Path=DataContext.SelectRoomTagsCommand, 
                                         RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
@@ -190,8 +125,16 @@
 
                     <GridViewColumn 
                         Header="Выбрано:" 
-                        Width="80"
-                        DisplayMemberBinding="{Binding RoomTags.Count}"/>
+                        Width="60">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Width="50" 
+                                    TextAlignment="Center"
+                                    Text="{Binding RoomTags.Count}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
 
                     <GridViewColumn 
                         Header="Смещение по X"
@@ -204,7 +147,7 @@
                                     Height="30"
                                     HorizontalAlignment="Center"
                                     VerticalContentAlignment="Center"
-                                    Validation.ErrorTemplate="{StaticResource validationFailed}"
+                                    Validation.ErrorTemplate="{StaticResource ValidationFailed}"
                                     
                                     Text="{Binding 
                                         Path=XOffset,
@@ -226,7 +169,7 @@
                                     Height="30"
                                     HorizontalAlignment="Center"
                                     VerticalContentAlignment="Center"
-                                    Validation.ErrorTemplate="{StaticResource validationFailed}"
+                                    Validation.ErrorTemplate="{StaticResource ValidationFailed}"
                                     
                                     Text="{Binding 
                                         Path=YOffset,
@@ -282,7 +225,7 @@
                 Margin="10"
                 Foreground="Orange"
                 VerticalAlignment="Center"
-                Style="{StaticResource ErrorTextBlock}"/>
+                Text="{Binding ErrorText}"/>
 
             <Button
                 Margin="10"

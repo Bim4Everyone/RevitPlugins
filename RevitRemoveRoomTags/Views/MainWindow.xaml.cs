@@ -7,6 +7,8 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 
+using RevitRemoveRoomTags.ViewModels;
+
 namespace RevitRemoveRoomTags.Views {
     public partial class MainWindow {
 
@@ -34,6 +36,15 @@ namespace RevitRemoveRoomTags.Views {
                 ValidationErrors.Add(e.Error);
             } else {
                 ValidationErrors.Remove(e.Error);
+            }
+
+            MainViewModel mainViewModel = DataContext as MainViewModel;
+            if(mainViewModel != null) {
+                if(ValidationErrors.Count > 0) {
+                    mainViewModel.ErrorTextFromGUI = ValidationErrors[0].ErrorContent.ToString();
+                } else {
+                    mainViewModel.ErrorTextFromGUI = "";
+                }
             }
         }
     }

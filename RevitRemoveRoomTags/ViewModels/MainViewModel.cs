@@ -29,6 +29,7 @@ namespace RevitRemoveRoomTags.ViewModels {
         private bool _needOpenSelectedViews = false;
 
         private string _errorText;
+        private string _errorTextFromGUI;
 
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
@@ -36,7 +37,7 @@ namespace RevitRemoveRoomTags.ViewModels {
             _revitRepository = revitRepository;
 
             LoadViewCommand = RelayCommand.Create(LoadView);
-            AcceptViewCommand = RelayCommand.Create(AcceptView);
+            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
             AddTaskCommand = RelayCommand.Create(AddTask);
             DeleteTaskCommand = RelayCommand.Create(DeleteTask, CanDeleteTask);
@@ -75,6 +76,11 @@ namespace RevitRemoveRoomTags.ViewModels {
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        public string ErrorTextFromGUI {
+            get => _errorTextFromGUI;
+            set => this.RaiseAndSetIfChanged(ref _errorTextFromGUI, value);
         }
 
 
@@ -131,7 +137,12 @@ namespace RevitRemoveRoomTags.ViewModels {
                 //}
             }
 
-            ErrorText = string.Empty;
+            if(ErrorTextFromGUI == string.Empty) {
+                ErrorText = string.Empty;
+            } else {
+                ErrorText = ErrorTextFromGUI;
+            }
+            
             return true;
         }
 
