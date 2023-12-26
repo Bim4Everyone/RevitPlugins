@@ -15,7 +15,9 @@ namespace RevitRemoveRoomTags.Models {
         public ICollection<RoomTag> RoomTags { get; } = new List<RoomTag>();
 
         public double XOffset { get; set; } = 0;
+        public string XOffsetAsStr { get; set; } = "0";
         public double YOffset { get; set; } = 0;
+        public string YOffsetAsStr { get; set; } = "0";
 
         public bool RemoveTags { get; set; } = false;
 
@@ -24,10 +26,17 @@ namespace RevitRemoveRoomTags.Models {
             get {
                 string error = String.Empty;
                 switch(columnName) {
-                    case "YOffset":
-                    if((YOffset < 0) || (YOffset > 100)) {
+                    case "XOffsetAsStr":
+                    if(!double.TryParse(XOffsetAsStr, out double tempX)) {
+                        error = "Ошибка в заполнении смещения по X";
+                    }
+                    XOffset = tempX;
+                    break;
+                    case "YOffsetAsStr":
+                    if(!double.TryParse(YOffsetAsStr, out double tempY)) {
                         error = "Ошибка в заполнении смещения по Y";
                     }
+                    YOffset = tempY;
                     break;
                 }
                 return error;

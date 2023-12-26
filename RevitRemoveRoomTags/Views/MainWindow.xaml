@@ -150,7 +150,7 @@
                                     Validation.ErrorTemplate="{StaticResource ValidationFailed}"
                                     
                                     Text="{Binding 
-                                        Path=XOffset,
+                                        Path=XOffsetAsStr,
                                         UpdateSourceTrigger=PropertyChanged, 
                                         ValidatesOnDataErrors=True, 
                                         NotifyOnValidationError=True}"/>
@@ -172,7 +172,7 @@
                                     Validation.ErrorTemplate="{StaticResource ValidationFailed}"
                                     
                                     Text="{Binding 
-                                        Path=YOffset,
+                                        Path=YOffsetAsStr,
                                         UpdateSourceTrigger=PropertyChanged, 
                                         ValidatesOnDataErrors=True, 
                                         NotifyOnValidationError=True}"/>

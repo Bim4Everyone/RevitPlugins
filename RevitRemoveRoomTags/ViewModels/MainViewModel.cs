@@ -124,17 +124,6 @@ namespace RevitRemoveRoomTags.ViewModels {
                     ErrorText = "Не во всех задачах выбраны марки помещений";
                     return false;
                 }
-
-
-                //if(roomTagTask.XOffset) {
-                //    ErrorText = "Ошибка в заполнении смещения по X";
-                //    return false;
-                //}
-
-                //if(roomTagTask.YOffset is null) {
-                //    ErrorText = "Ошибка в заполнении смещения по Y";
-                //    return false;
-                //}
             }
 
             if(ErrorTextFromGUI == string.Empty) {
