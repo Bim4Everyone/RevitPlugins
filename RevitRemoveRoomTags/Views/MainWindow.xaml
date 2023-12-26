@@ -67,6 +67,36 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+
+        <Style x:Key="ErrorTextBlock" TargetType="TextBlock">
+            <Setter Property="Text" 
+                    Value="{Binding 
+                         RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, 
+                         Path=ValidationErrors[0].ErrorContent}"/>
+            
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding 
+                         RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, 
+                         Path=ValidationErrors.Count}" 
+                         Value="0">
+                    <Setter Property="Text" Value="{Binding ErrorText}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+
+        <Style x:Key="AcceptViewButton" TargetType="Button">
+            <Setter Property="IsEnabled" Value="False"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding 
+                             RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, 
+                             Path=ValidationErrors.Count}" 
+                             Value="0">
+                    <Setter Property="IsEnabled" Value="True"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -249,18 +279,17 @@
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <TextBlock
-                x:Name="ErrorTextBlock"
                 Margin="10"
                 Foreground="Orange"
                 VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
+                Style="{StaticResource ErrorTextBlock}"/>
 
             <Button
                 Margin="10"
                 Width="80"
                 Content="ОК"
-                x:Name="AcceptViewButton"
                 Click="ButtonOk_Click"
+                Style="{StaticResource AcceptViewButton}"
                 Command="{Binding Path=AcceptViewCommand}"/>
 
             <Button
