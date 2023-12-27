@@ -277,12 +277,12 @@ namespace RevitRemoveRoomTags.ViewModels {
                                     if(roomTagTask.RemoveTags) {
                                         tagsForDel.Add(tag.Id);
                                     } else {
-
                                         tag.HasLeader = true;
+                                        double z = tag.LeaderEnd.Z;
                                         tag.LeaderEnd = new XYZ(
                                             tagHeaderPointCurrent.X,
-
-                                            tagHeaderPointCurrent.Y, tagHeaderPointCurrent.Z);
+                                            tagHeaderPointCurrent.Y,
+                                            z);
 
                                         tag.TagHeadPosition = new XYZ(
                                             tagHeaderPointCurrent.X + xOffset,
