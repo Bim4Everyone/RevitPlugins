@@ -17,6 +17,7 @@ using dosymep.WPF.ViewModels;
 using Ninject.Planning.Targets;
 
 using RevitArchitecturalDocumentation.Models;
+using RevitArchitecturalDocumentation.Models.Options;
 
 
 namespace RevitArchitecturalDocumentation.ViewModels {

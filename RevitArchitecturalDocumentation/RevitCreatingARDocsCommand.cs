@@ -16,6 +16,7 @@ using dosymep.SimpleServices;
 using Ninject;
 
 using RevitArchitecturalDocumentation.Models;
+using RevitArchitecturalDocumentation.Models.Options;
 using RevitArchitecturalDocumentation.ViewModels;
 using RevitArchitecturalDocumentation.Views;
 
@@ -42,6 +43,8 @@ namespace RevitArchitecturalDocumentation {
                     .InSingletonScope();
 
                 kernel.Bind<SheetOptions>()
+                    .ToSelf();
+                kernel.Bind<ViewOptions>()
                     .ToSelf();
 
                 kernel.Bind<PluginConfig>()

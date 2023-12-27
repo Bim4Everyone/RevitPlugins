@@ -27,6 +27,7 @@ using dosymep.WPF.ViewModels;
 using Ninject.Planning.Targets;
 
 using RevitArchitecturalDocumentation.Models;
+using RevitArchitecturalDocumentation.Models.Options;
 using RevitArchitecturalDocumentation.Views;
 
 using static System.Net.Mime.MediaTypeNames;
@@ -38,11 +39,13 @@ using View = Autodesk.Revit.DB.View;
 namespace RevitArchitecturalDocumentation.ViewModels {
     internal class DocsFromSelectedViewsVM {
 
-        public DocsFromSelectedViewsVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report, SheetOptions sheetOptions) {
+        public DocsFromSelectedViewsVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report, 
+            SheetOptions sheetOptions, ViewOptions viewOptions) {
             MVM = pCOnASPDocsVM;
             Repository = revitRepository;
             Report = report;
             SheetOpts = sheetOptions;
+            ViewOpts = viewOptions;
         }
 
         public CreatingARDocsVM MVM { get; set; }
