@@ -14,9 +14,9 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    MinHeight="450" MinWidth="765"
-    Height="450" Width="765"
-    
+    MinHeight="450" MinWidth="765"    
+    Height="450" Width="765"    
+
     Validation.Error="Window_Error"
     
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
@@ -114,7 +114,9 @@
                                     Margin="3"
                                     Width="155"
                                     Height="30"
+                                    HorizontalAlignment="Center"
                                     Content="Выбрать"
+                                    FontSize="14"
                                     Click="ButtonCancel_Click"
                                     Command="{Binding Path=DataContext.SelectRoomTagsCommand, 
                                         RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
@@ -141,8 +143,8 @@
                         Width="180">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox 
-                                    Margin="5"
+                                <TextBox
+                                    Margin="5" 
                                     Width="155"
                                     Height="30"
                                     HorizontalAlignment="Center"
@@ -158,7 +160,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn
+                    <GridViewColumn 
                         Header="Смещение по Y" 
                         Width="180">
                         <GridViewColumn.CellTemplate>
@@ -214,6 +216,8 @@
                 Content="Удалить задачу"
                 Command="{Binding Path=DeleteTaskCommand}"/>
         </StackPanel>
+        
+        
         
 
         <StackPanel

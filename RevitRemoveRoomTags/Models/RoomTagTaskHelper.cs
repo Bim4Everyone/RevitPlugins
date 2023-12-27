@@ -12,6 +12,7 @@ namespace RevitRemoveRoomTags.Models {
 
         public RoomTagTaskHelper() {}
 
+        }
         public ICollection<RoomTag> RoomTags { get; } = new List<RoomTag>();
 
         public double XOffset { get; set; } = 0;
@@ -28,13 +29,13 @@ namespace RevitRemoveRoomTags.Models {
                 switch(columnName) {
                     case "XOffsetAsStr":
                     if(!double.TryParse(XOffsetAsStr, out double tempX)) {
-                        error = "Ошибка в заполнении смещения по X";
+                        error = "������ � ���������� �������� �� X";
                     }
                     XOffset = tempX;
                     break;
                     case "YOffsetAsStr":
                     if(!double.TryParse(YOffsetAsStr, out double tempY)) {
-                        error = "Ошибка в заполнении смещения по Y";
+                        error = "������ � ���������� �������� �� Y";
                     }
                     YOffset = tempY;
                     break;
