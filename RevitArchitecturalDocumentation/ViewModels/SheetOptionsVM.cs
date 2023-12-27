@@ -28,17 +28,13 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             _revitRepository = revitRepository;
             _sheetOptions = sheetOptions;
 
-            WorkWithSheets = _sheetOptions.WorkWithSheets;                             // Используется в интерфейсе и работе                                    || Берется из выбора пользователя
-            SheetNamePrefix = _sheetOptions.SheetNamePrefix;                           // Используется в интерфейсе и работе                                    || Берется из выбора пользователя
-            SelectedTitleBlockName = _sheetOptions.SelectedTitleBlockName;             // Используется опосредованно только в интерфейсе для сохранения имени   || Берется из выбора пользователя
-
-
+            WorkWithSheets = _sheetOptions.WorkWithSheets;
+            SheetNamePrefix = _sheetOptions.SheetNamePrefix;
 
             LoadConfig();
 
-
-            TitleBlocksInProject = _revitRepository.TitleBlocksInProject;                                           // Используется только в интерфейсе для заполнения комбобокса
-            SelectedTitleBlock = TitleBlocksInProject.FirstOrDefault(a => a.Name.Equals(SelectedTitleBlockName));   // Используется в интерфейсе и работе
+            TitleBlocksInProject = _revitRepository.TitleBlocksInProject;                                          
+            SelectedTitleBlock = TitleBlocksInProject.FirstOrDefault(a => a.Name.Equals(SelectedTitleBlockName));
         }
 
 
@@ -72,7 +68,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// <summary>
         /// Подгружает параметры плагина с предыдущего запуска
         /// </summary>
-        private void LoadConfig() {
+        public void LoadConfig() {
 
             var settings = _pluginConfig.GetSettings(_revitRepository.Document);
 
@@ -87,7 +83,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// <summary>
         /// Сохраняет параметры плагина для следующего запуска
         /// </summary>
-        private void SaveConfig() {
+        public void SaveConfig() {
 
             var settings = _pluginConfig.GetSettings(_revitRepository.Document)
                           ?? _pluginConfig.AddSettings(_revitRepository.Document);
@@ -97,6 +93,15 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             settings.SelectedTitleBlockName = SelectedTitleBlock.Name;
 
             _pluginConfig.SaveProjectConfig();
+        }
+
+
+        public SheetOptions GetSheetOption() {
+            return new SheetOptions() { 
+                WorkWithSheets = WorkWithSheets, 
+                SelectedTitleBlock = SelectedTitleBlock, 
+                SheetNamePrefix = SheetNamePrefix 
+            };
         }
     }
 }

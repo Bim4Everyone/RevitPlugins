@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
@@ -22,15 +22,17 @@ using RevitArchitecturalDocumentation.Models;
 namespace RevitArchitecturalDocumentation.ViewModels {
     internal class DocsFromScratchVM : BaseViewModel {
 
-        public DocsFromScratchVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report) {
+        public DocsFromScratchVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report, SheetOptions sheetOptions) {
             MVM = pCOnASPDocsVM;
             Repository = revitRepository;
             Report = report;
+            SheetOpts = sheetOptions;
         }
 
         public CreatingARDocsVM MVM { get; set; }
         public RevitRepository Repository { get; set; }
         public ObservableCollection<TreeReportNode> Report { get; set; }
+        public SheetOptions SheetOpts { get; set; }
 
 
         /// <summary>
@@ -79,10 +81,10 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
 
                         SheetHelper sheetHelper = null;
-                        if(MVM.WorkWithSheets) {
+                        if(SheetOpts.WorkWithSheets) {
 
                             string newSheetName = string.Format("{0}корпус {1}_секция {2}_этаж {3}",
-                                MVM.SheetNamePrefix,
+                                SheetOpts.SheetNamePrefix,
                                 task.NumberOfBuildingPartAsInt,
                                 task.NumberOfBuildingSectionAsInt,
                                 numberOfLevel);
@@ -90,7 +92,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                             TreeReportNode sheetRep = new TreeReportNode(taskRep) { Name = $"Работа с листом \"{newSheetName}\"" };
 
                             sheetHelper = new SheetHelper(Repository, sheetRep);
-                            sheetHelper.GetOrCreateSheet(newSheetName, MVM.SelectedTitleBlock);
+                            sheetHelper.GetOrCreateSheet(newSheetName, SheetOpts.SelectedTitleBlock);
                             taskRep.Nodes.Add(sheetRep);
                         }
 

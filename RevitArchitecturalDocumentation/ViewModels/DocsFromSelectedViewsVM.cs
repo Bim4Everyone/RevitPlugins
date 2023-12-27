@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -38,17 +38,19 @@ using View = Autodesk.Revit.DB.View;
 namespace RevitArchitecturalDocumentation.ViewModels {
     internal class DocsFromSelectedViewsVM {
 
-        public DocsFromSelectedViewsVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report) {
+        public DocsFromSelectedViewsVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report, SheetOptions sheetOptions) {
             MVM = pCOnASPDocsVM;
             Repository = revitRepository;
             Report = report;
+            SheetOpts = sheetOptions;
         }
 
         public CreatingARDocsVM MVM { get; set; }
         public RevitRepository Repository { get; set; }
         public ObservableCollection<TreeReportNode> Report { get; set; }
+        public SheetOptions SheetOpts { get; set; }
 
-        
+
 
         /// <summary>
         /// В зависимости от выбора пользователя метод создает листы, виды (создает путем копирования выбранных видов), спеки и выносит виды и спеки на листы
@@ -84,10 +86,10 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                         }
 
                         SheetHelper sheetHelper = null;
-                        if(MVM.WorkWithSheets) {
+                        if(SheetOpts.WorkWithSheets) {
 
                             string newSheetName = string.Format("{0}корпус {1}_секция {2}_этаж {3}",
-                                MVM.SheetNamePrefix,
+                                SheetOpts.SheetNamePrefix,
                                 task.NumberOfBuildingPartAsInt,
                                 task.NumberOfBuildingSectionAsInt,
                                 numberOfLevelAsStr);
@@ -95,7 +97,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                             TreeReportNode sheetRep = new TreeReportNode(taskRep) { Name = $"Работа с листом \"{newSheetName}\"" };
 
                             sheetHelper = new SheetHelper(Repository, sheetRep);
-                            sheetHelper.GetOrCreateSheet(newSheetName, MVM.SelectedTitleBlock, "Ширина", "Высота", 150, 110);
+                            sheetHelper.GetOrCreateSheet(newSheetName, SheetOpts.SelectedTitleBlock, "Ширина", "Высота", 150, 110);
                             taskRep.Nodes.Add(sheetRep);
                         }
 

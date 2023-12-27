@@ -232,7 +232,7 @@
                     FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
-                    IsChecked="{Binding Path=WorkWithSheets}"/>
+                    IsChecked="{Binding Path=SheetOptsVM.WorkWithSheets}"/>
 
                 <TextBlock
                     Grid.Column="1"
@@ -244,8 +244,8 @@
                 <ComboBox
                     Grid.Column="2"
                     VerticalContentAlignment="Center"
-                    ItemsSource="{Binding Path=TitleBlocksInProject}" 
-                    SelectedItem="{Binding Path=SelectedTitleBlock}">
+                    ItemsSource="{Binding Path=SheetOptsVM.TitleBlocksInProject}" 
+                    SelectedItem="{Binding Path=SheetOptsVM.SelectedTitleBlock}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock>
@@ -272,7 +272,7 @@
                     Grid.Column="4"
                     Margin="3"
                     VerticalContentAlignment="Center"
-                    Text="{Binding Path=SheetNamePrefix}"/>
+                    Text="{Binding Path=SheetOptsVM.SheetNamePrefix}"/>
             </Grid>
         </GroupBox>
 

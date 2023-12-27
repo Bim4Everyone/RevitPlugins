@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,6 +40,9 @@ namespace RevitArchitecturalDocumentation {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
+
+                kernel.Bind<SheetOptions>()
+                    .ToSelf();
 
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
