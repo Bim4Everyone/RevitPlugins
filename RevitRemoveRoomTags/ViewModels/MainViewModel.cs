@@ -29,6 +29,7 @@ namespace RevitRemoveRoomTags.ViewModels {
         private bool _needOpenSelectedViews = false;
 
         private string _errorText;
+        private string _errorTextFromGUI;
 
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
@@ -77,6 +78,11 @@ namespace RevitRemoveRoomTags.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
+        public string ErrorTextFromGUI {
+            get => _errorTextFromGUI;
+            set => this.RaiseAndSetIfChanged(ref _errorTextFromGUI, value);
+        }
+
 
 
         /// <summary>
@@ -118,19 +124,14 @@ namespace RevitRemoveRoomTags.ViewModels {
                     ErrorText = "Не во всех задачах выбраны марки помещений";
                     return false;
                 }
-
-                if(!double.TryParse(roomTagTask.XOffset, out _)) {
-                    ErrorText = "Ошибка в заполнении смещения по X";
-                    return false;
-                }
-
-                if(!double.TryParse(roomTagTask.YOffset, out _)) {
-                    ErrorText = "Ошибка в заполнении смещения по Y";
-                    return false;
-                }
             }
 
-            ErrorText = string.Empty;
+            if(ErrorTextFromGUI == string.Empty) {
+                ErrorText = string.Empty;
+            } else {
+                ErrorText = ErrorTextFromGUI;
+            }
+
             return true;
         }
 
@@ -244,8 +245,8 @@ namespace RevitRemoveRoomTags.ViewModels {
                     double xOffset;
                     double yOffset;
                     if(!roomTagTask.RemoveTags) {
-                        xOffset = UnitUtilsHelper.ConvertToInternalValue(double.Parse(roomTagTask.XOffset));
-                        yOffset = UnitUtilsHelper.ConvertToInternalValue(double.Parse(roomTagTask.YOffset));
+                        xOffset = UnitUtilsHelper.ConvertToInternalValue(roomTagTask.XOffset);
+                        yOffset = UnitUtilsHelper.ConvertToInternalValue(roomTagTask.YOffset);
                     } else {
                         xOffset = 0;
                         yOffset = 0;
@@ -276,12 +277,12 @@ namespace RevitRemoveRoomTags.ViewModels {
                                     if(roomTagTask.RemoveTags) {
                                         tagsForDel.Add(tag.Id);
                                     } else {
-
                                         tag.HasLeader = true;
+                                        double z = tag.LeaderEnd.Z;
                                         tag.LeaderEnd = new XYZ(
                                             tagHeaderPointCurrent.X,
-
-                                            tagHeaderPointCurrent.Y, tagHeaderPointCurrent.Z);
+                                            tagHeaderPointCurrent.Y,
+                                            z);
 
                                         tag.TagHeadPosition = new XYZ(
                                             tagHeaderPointCurrent.X + xOffset,
