@@ -1,47 +1,20 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Media3D;
-using System.Xml.Linq;
 
-using Autodesk.AdvanceSteel.StructuralAnalysis;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
-using dosymep.Revit;
-using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
-
-using Microsoft.WindowsAPICodePack.ShellExtensions;
-
-using Ninject.Planning.Targets;
-
-using pyRevitLabs.Json.Linq;
 
 using RevitArchitecturalDocumentation.Models;
 using RevitArchitecturalDocumentation.Models.Exceptions;
 using RevitArchitecturalDocumentation.Models.Options;
 using RevitArchitecturalDocumentation.ViewModels.Components;
 using RevitArchitecturalDocumentation.Views;
-
-using static System.Net.Mime.MediaTypeNames;
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
-
-using Parameter = Autodesk.Revit.DB.Parameter;
-using View = Autodesk.Revit.DB.View;
 
 namespace RevitArchitecturalDocumentation.ViewModels {
     internal class CreatingARDocsVM : BaseViewModel {
@@ -370,6 +343,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             if(settings is null) { return; }
 
             SheetOptsVM.LoadConfig();
+            ViewOptsVM.LoadConfig();
 
             //WorkWithViews = settings.WorkWithViews;
             WorkWithSpecs = settings.WorkWithSpecs;
@@ -391,6 +365,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                           ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
             SheetOptsVM.SaveConfig();
+            ViewOptsVM.SaveConfig();
 
             //settings.WorkWithViews = WorkWithViews;
             settings.WorkWithSpecs = WorkWithSpecs;
@@ -552,11 +527,13 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             if(CreateViewsFromSelected) {
 
-                DocsFromSelectedViewsVM docsFromSelectedViewsVM = new DocsFromSelectedViewsVM(this, _revitRepository, TreeReport, SheetOptsVM.GetSheetOption());
+                DocsFromSelectedViewsVM docsFromSelectedViewsVM = new DocsFromSelectedViewsVM(this, _revitRepository, TreeReport
+                    , SheetOptsVM.GetSheetOption(), ViewOptsVM.GetViewOption());
                 docsFromSelectedViewsVM.CreateDocs();
             } else {
 
-                DocsFromScratchVM docsFromScratchVM = new DocsFromScratchVM(this, _revitRepository, TreeReport, SheetOptsVM.GetSheetOption());
+                DocsFromScratchVM docsFromScratchVM = new DocsFromScratchVM(this, _revitRepository, TreeReport,
+                    SheetOptsVM.GetSheetOption(), ViewOptsVM.GetViewOption());
                 docsFromScratchVM.CreateDocs();
             }
 

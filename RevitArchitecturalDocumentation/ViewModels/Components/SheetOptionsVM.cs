@@ -1,9 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -31,11 +27,7 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
 
             WorkWithSheets = _sheetOptions.WorkWithSheets;
             SheetNamePrefix = _sheetOptions.SheetNamePrefix;
-
-            LoadConfig();
-
             TitleBlocksInProject = _revitRepository.TitleBlocksInProject;
-            SelectedTitleBlock = TitleBlocksInProject.FirstOrDefault(a => a.Name.Equals(SelectedTitleBlockName));
         }
 
 
@@ -77,6 +69,8 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
             WorkWithSheets = settings.WorkWithSheets;
             SheetNamePrefix = settings.SheetNamePrefix;
             SelectedTitleBlockName = settings.SelectedTitleBlockName;
+
+            SelectedTitleBlock = TitleBlocksInProject?.FirstOrDefault(a => a.Name.Equals(SelectedTitleBlockName));
         }
 
 

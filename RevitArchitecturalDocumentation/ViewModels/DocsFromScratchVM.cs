@@ -1,20 +1,10 @@
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
-using dosymep.SimpleServices;
-using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
-
-using Ninject.Planning.Targets;
 
 using RevitArchitecturalDocumentation.Models;
 using RevitArchitecturalDocumentation.Models.Options;
@@ -23,17 +13,21 @@ using RevitArchitecturalDocumentation.Models.Options;
 namespace RevitArchitecturalDocumentation.ViewModels {
     internal class DocsFromScratchVM : BaseViewModel {
 
-        public DocsFromScratchVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report, SheetOptions sheetOptions) {
+        public DocsFromScratchVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report,
+            SheetOptions sheetOptions, ViewOptions viewOptions) {
             MVM = pCOnASPDocsVM;
             Repository = revitRepository;
             Report = report;
             SheetOpts = sheetOptions;
+            ViewOpts = viewOptions;
         }
 
         public CreatingARDocsVM MVM { get; set; }
         public RevitRepository Repository { get; set; }
         public ObservableCollection<TreeReportNode> Report { get; set; }
         public SheetOptions SheetOpts { get; set; }
+        public ViewOptions ViewOpts { get; set; }
+
 
 
         /// <summary>
@@ -97,10 +91,10 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                             taskRep.Nodes.Add(sheetRep);
                         }
 
-                        if(MVM.WorkWithViews) {
+                        if(ViewOpts.WorkWithViews) {
 
                             string newViewName = string.Format("{0}{1} этаж К{2}{3}",
-                                MVM.ViewNamePrefix,
+                                ViewOpts.ViewNamePrefix,
                                 numberOfLevel,
                                 task.NumberOfBuildingPartAsInt,
                                 task.ViewNameSuffix);
@@ -108,13 +102,13 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                             TreeReportNode viewRep = new TreeReportNode(taskRep) { Name = $"Работа с видом \"{newViewName}\"" };
 
                             ViewHelper newViewHelper = new ViewHelper(Repository, viewRep);
-                            newViewHelper.GetView(newViewName, task.SelectedVisibilityScope, MVM.SelectedViewFamilyType, level);
+                            newViewHelper.GetView(newViewName, task.SelectedVisibilityScope, ViewOpts.SelectedViewFamilyType, level);
 
                             if(sheetHelper.Sheet != null
                                 && newViewHelper.View != null
                                 && Viewport.CanAddViewToSheet(Repository.Document, sheetHelper.Sheet.Id, newViewHelper.View.Id)) {
 
-                                newViewHelper.PlaceViewportOnSheet(sheetHelper.Sheet, MVM.SelectedViewportType);
+                                newViewHelper.PlaceViewportOnSheet(sheetHelper.Sheet, ViewOpts.SelectedViewportType);
                             }
                             taskRep.Nodes.Add(viewRep);
                         }

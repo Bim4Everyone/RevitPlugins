@@ -304,7 +304,7 @@
                     FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
-                    IsChecked="{Binding Path=WorkWithViews}"/>
+                    IsChecked="{Binding Path=ViewOptsVM.WorkWithViews}"/>
 
                 <TextBlock
                     Grid.Column="1"
@@ -318,10 +318,10 @@
                     Grid.Column="2"
                     Margin="3"
                     VerticalContentAlignment="Center"
-                    IsEnabled="{Binding Path=WorkWithViews}"
+                    IsEnabled="{Binding Path=ViewOptsVM.WorkWithViews}"
                     DisplayMemberPath="Name"
-                    ItemsSource="{Binding Path=ViewFamilyTypes}" 
-                    SelectedItem="{Binding Path=SelectedViewFamilyType}">
+                    ItemsSource="{Binding Path=ViewOptsVM.ViewFamilyTypes}" 
+                    SelectedItem="{Binding Path=ViewOptsVM.SelectedViewFamilyType}">
                 </ComboBox>
 
                 <TextBlock
@@ -336,10 +336,10 @@
                     Grid.Column="4"
                     Margin="3"
                     VerticalContentAlignment="Center"
-                    IsEnabled="{Binding Path=WorkWithViews}"
+                    IsEnabled="{Binding Path=ViewOptsVM.WorkWithViews}"
                     DisplayMemberPath="Name"
-                    ItemsSource="{Binding Path=ViewportTypes}" 
-                    SelectedItem="{Binding Path=SelectedViewportType}">
+                    ItemsSource="{Binding Path=ViewOptsVM.ViewportTypes}" 
+                    SelectedItem="{Binding Path=ViewOptsVM.SelectedViewportType}">
                 </ComboBox>
 
                 <TextBlock
@@ -354,8 +354,8 @@
                     Grid.Column="6"
                     Margin="3"
                     VerticalContentAlignment="Center"
-                    IsEnabled="{Binding Path=WorkWithViews}"
-                    Text="{Binding Path=ViewNamePrefix}"/>
+                    IsEnabled="{Binding Path=ViewOptsVM.WorkWithViews}"
+                    Text="{Binding Path=ViewOptsVM.ViewNamePrefix}"/>
             </Grid>
         </GroupBox>
 

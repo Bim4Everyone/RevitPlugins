@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -34,13 +31,8 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
             WorkWithViews = viewOptions.WorkWithViews;
             ViewNamePrefix = viewOptions.ViewNamePrefix;
 
-            LoadConfig();
-
             ViewFamilyTypes = _revitRepository.ViewFamilyTypes;
             ViewportTypes = _revitRepository.ViewportTypes;
-
-            SelectedViewFamilyType = ViewFamilyTypes.FirstOrDefault(a => a.Name.Equals(SelectedViewFamilyTypeName));
-            SelectedViewportType = ViewportTypes.FirstOrDefault(a => a.Name.Equals(SelectedViewportTypeName));
         }
 
 
@@ -86,15 +78,11 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
         }
 
 
-        
-
-
-
 
         /// <summary>
         /// Подгружает параметры плагина с предыдущего запуска
         /// </summary>
-        private void LoadConfig() {
+        public void LoadConfig() {
 
             var settings = _pluginConfig.GetSettings(_revitRepository.Document);
 
@@ -104,13 +92,16 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
             SelectedViewFamilyTypeName = settings.SelectedViewFamilyTypeName;
             SelectedViewportTypeName = settings.SelectedViewportTypeName;
             ViewNamePrefix = settings.ViewNamePrefix;
+
+            SelectedViewFamilyType = ViewFamilyTypes?.FirstOrDefault(a => a.Name.Equals(SelectedViewFamilyTypeName));
+            SelectedViewportType = ViewportTypes?.FirstOrDefault(a => a.Name.Equals(SelectedViewportTypeName));
         }
 
 
         /// <summary>
         /// Сохраняет параметры плагина для следующего запуска
         /// </summary>
-        private void SaveConfig() {
+        public void SaveConfig() {
 
             var settings = _pluginConfig.GetSettings(_revitRepository.Document)
                           ?? _pluginConfig.AddSettings(_revitRepository.Document);
@@ -121,6 +112,16 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
             settings.ViewNamePrefix = ViewNamePrefix;
 
             _pluginConfig.SaveProjectConfig();
+        }
+
+
+        public ViewOptions GetViewOption() {
+            return new ViewOptions() {
+                WorkWithViews = WorkWithViews,
+                SelectedViewFamilyType = SelectedViewFamilyType,
+                SelectedViewportType = SelectedViewportType,
+                ViewNamePrefix = ViewNamePrefix
+            };
         }
     }
 }

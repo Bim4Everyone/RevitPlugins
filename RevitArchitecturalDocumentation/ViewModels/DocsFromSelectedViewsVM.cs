@@ -1,45 +1,16 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media.Media3D;
-using System.Xml.Linq;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
-using dosymep.SimpleServices;
-using dosymep.WPF.Commands;
-using dosymep.WPF.ViewModels;
-
-using Ninject.Planning.Targets;
 
 using RevitArchitecturalDocumentation.Models;
 using RevitArchitecturalDocumentation.Models.Options;
-using RevitArchitecturalDocumentation.Views;
-
-using static System.Net.Mime.MediaTypeNames;
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
-
-using Parameter = Autodesk.Revit.DB.Parameter;
-using View = Autodesk.Revit.DB.View;
 
 namespace RevitArchitecturalDocumentation.ViewModels {
     internal class DocsFromSelectedViewsVM {
 
-        public DocsFromSelectedViewsVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report, 
+        public DocsFromSelectedViewsVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report,
             SheetOptions sheetOptions, ViewOptions viewOptions) {
             MVM = pCOnASPDocsVM;
             Repository = revitRepository;
@@ -52,6 +23,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         public RevitRepository Repository { get; set; }
         public ObservableCollection<TreeReportNode> Report { get; set; }
         public SheetOptions SheetOpts { get; set; }
+        public ViewOptions ViewOpts { get; set; }
 
 
 
@@ -65,7 +37,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                 foreach(ViewHelper viewHelper in MVM.SelectedViewHelpers) {
                     int numberOfLevelAsInt = viewHelper.NameHelper.LevelNumber;
                     string numberOfLevelAsStr = viewHelper.NameHelper.LevelNumberAsStr;
-                    
+
                     TreeReportNode selectedViewRep = new TreeReportNode(null) { Name = $"Работаем с выбранным видом: \"{viewHelper.View.Name}\"" };
                     selectedViewRep.AddNodeWithName($"Номер этажа в соответствии с именем выбранного вида: \"{numberOfLevelAsInt}\"");
 
@@ -78,8 +50,10 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                     foreach(TaskInfo task in MVM.TasksForWork) {
 
-                        TreeReportNode taskRep = new TreeReportNode(selectedViewRep) { Name = $"Задание номер: \"{task.TaskNumber}\" - " +
-                            $"уровни ({task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}), {task.SelectedVisibilityScope.Name}" };
+                        TreeReportNode taskRep = new TreeReportNode(selectedViewRep) {
+                            Name = $"Задание номер: \"{task.TaskNumber}\" - " +
+                            $"уровни ({task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}), {task.SelectedVisibilityScope.Name}"
+                        };
 
                         if(numberOfLevelAsInt < task.StartLevelNumberAsInt || numberOfLevelAsInt > task.EndLevelNumberAsInt) {
                             taskRep.AddNodeWithName($"  ~  Уровень вида \"{numberOfLevelAsInt}\" не подходит под искомый диапазон: " +
@@ -105,10 +79,10 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                         }
 
 
-                        if(MVM.WorkWithViews) {
+                        if(ViewOpts.WorkWithViews) {
 
                             string newViewName = string.Format("{0}{1} этаж К{2}_С{3}{4}{5}",
-                                MVM.ViewNamePrefix,
+                                ViewOpts.ViewNamePrefix,
                                 numberOfLevelAsStr,
                                 task.NumberOfBuildingPartAsInt,
                                 task.NumberOfBuildingSectionAsInt,
@@ -124,7 +98,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                 && newViewHelper.View != null
                                 && Viewport.CanAddViewToSheet(Repository.Document, sheetHelper.Sheet.Id, newViewHelper.View.Id)) {
 
-                                newViewHelper.PlaceViewportOnSheet(sheetHelper.Sheet, MVM.SelectedViewportType);
+                                newViewHelper.PlaceViewportOnSheet(sheetHelper.Sheet, ViewOpts.SelectedViewportType);
                             }
                             taskRep.Nodes.Add(viewRep);
                         }
