@@ -244,6 +244,7 @@
                 <ComboBox
                     Grid.Column="2"
                     VerticalContentAlignment="Center"
+                    IsEnabled="{Binding Path=SheetOptsVM.WorkWithSheets}"
                     ItemsSource="{Binding Path=SheetOptsVM.TitleBlocksInProject}" 
                     SelectedItem="{Binding Path=SheetOptsVM.SelectedTitleBlock}">
                     <ComboBox.ItemTemplate>
@@ -384,7 +385,7 @@
                     FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
-                    IsChecked="{Binding Path=WorkWithSpecs}"/>
+                    IsChecked="{Binding Path=SpecOptsVM.WorkWithSpecs}"/>
 
                 <TextBlock
                     Grid.Column="1"
@@ -398,9 +399,9 @@
                     Grid.Column="2"
                     Margin="3"
                     VerticalContentAlignment="Center"
-                    IsEnabled="{Binding Path=WorkWithSpecs}"
-                    ItemsSource="{Binding Path=FilterNamesFromSpecs, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedItem="{Binding Path=SelectedFilterNameForSpecs}">
+                    IsEnabled="{Binding Path=SpecOptsVM.WorkWithSpecs}"
+                    ItemsSource="{Binding Path=SpecOptsVM.FilterNamesFromSpecs, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedItem="{Binding Path=SpecOptsVM.SelectedFilterNameForSpecs}">
                 </ComboBox>
             </Grid>
         </GroupBox>

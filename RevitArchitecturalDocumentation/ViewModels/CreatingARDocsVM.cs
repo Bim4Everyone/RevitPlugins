@@ -21,24 +21,13 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
-        //private bool _workWithViews = true;
-        private bool _workWithSpecs = true;
         private bool _createViewsFromSelected = false;
-        //private string _selectedViewFamilyTypeName;
-        //private string _selectedViewportTypeName;
-        //private string _viewNamePrefix = string.Empty;
-        private string _selectedFilterNameForSpecs;
         private string _errorText;
         private CreatingARDocsV _pCOnASPDocsView;
         private ObservableCollection<TreeReportNode> _report = new ObservableCollection<TreeReportNode>();
-        //private ViewFamilyType _selectedViewFamilyType;
-        //private ElementType _selectedViewportType;
         private TaskInfo _selectedTask;
         private List<Element> _visibilityScopes;
         private List<Level> _levels;
-        //private List<ViewFamilyType> _viewFamilyTypes;
-        //private List<ElementType> _viewportTypes;
-        private List<string> _filterNamesFromSpecs = new List<string>();
         private ObservableCollection<ViewPlan> _selectedViews = new ObservableCollection<ViewPlan>();
         private ObservableCollection<ViewHelper> _selectedViewHelpers = new ObservableCollection<ViewHelper>();
         private ObservableCollection<TaskInfo> _tasksForWork = new ObservableCollection<TaskInfo>();
@@ -50,13 +39,14 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private Regex _regexForView = new Regex(@"_(.*?) этаж");
 
 
-        public CreatingARDocsVM(PluginConfig pluginConfig, RevitRepository revitRepository, SheetOptions sheetOptions, ViewOptions viewOptions) {
+        public CreatingARDocsVM(PluginConfig pluginConfig, RevitRepository revitRepository,
+            SheetOptions sheetOptions, ViewOptions viewOptions, SpecOptions specOptions) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
             SheetOptsVM = new SheetOptionsVM(pluginConfig, revitRepository, sheetOptions);
             ViewOptsVM = new ViewOptionsVM(pluginConfig, revitRepository, viewOptions);
-
+            SpecOptsVM = new SpecOptionsVM(pluginConfig, revitRepository, specOptions);
 
 
 
@@ -65,7 +55,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             AddTaskCommand = RelayCommand.Create(AddTask);
             DeleteTaskCommand = RelayCommand.Create(DeleteTask);
-
 
             SelectSpecsCommand = new RelayCommand(SelectSpecs);
         }
@@ -78,12 +67,9 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         public ICommand SelectSpecsCommand { get; }
 
 
-
-
         public SheetOptionsVM SheetOptsVM { get; }
         public ViewOptionsVM ViewOptsVM { get; }
-
-
+        public SpecOptionsVM SpecOptsVM { get; }
 
 
 
@@ -138,66 +124,10 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _levels, value);
         }
 
-        //public List<ViewFamilyType> ViewFamilyTypes {
-        //    get => _viewFamilyTypes;
-        //    set => this.RaiseAndSetIfChanged(ref _viewFamilyTypes, value);
-        //}
-
-        //public ViewFamilyType SelectedViewFamilyType {
-        //    get => _selectedViewFamilyType;
-        //    set => this.RaiseAndSetIfChanged(ref _selectedViewFamilyType, value);
-        //}
-
-        //public string SelectedViewFamilyTypeName {
-        //    get => _selectedViewFamilyTypeName;
-        //    set => this.RaiseAndSetIfChanged(ref _selectedViewFamilyTypeName, value);
-        //}
-
-        //public List<ElementType> ViewportTypes {
-        //    get => _viewportTypes;
-        //    set => this.RaiseAndSetIfChanged(ref _viewportTypes, value);
-        //}
-
-        //public ElementType SelectedViewportType {
-        //    get => _selectedViewportType;
-        //    set => this.RaiseAndSetIfChanged(ref _selectedViewportType, value);
-        //}
-
-        //public string SelectedViewportTypeName {
-        //    get => _selectedViewportTypeName;
-        //    set => this.RaiseAndSetIfChanged(ref _selectedViewportTypeName, value);
-        //}
 
         public bool CreateViewsFromSelected {
             get => _createViewsFromSelected;
             set => this.RaiseAndSetIfChanged(ref _createViewsFromSelected, value);
-        }
-
-
-        //public string ViewNamePrefix {
-        //    get => _viewNamePrefix;
-        //    set => this.RaiseAndSetIfChanged(ref _viewNamePrefix, value);
-        //}
-
-
-        //public bool WorkWithViews {
-        //    get => _workWithViews;
-        //    set => this.RaiseAndSetIfChanged(ref _workWithViews, value);
-        //}
-
-        public bool WorkWithSpecs {
-            get => _workWithSpecs;
-            set => this.RaiseAndSetIfChanged(ref _workWithSpecs, value);
-        }
-
-        public List<string> FilterNamesFromSpecs {
-            get => _filterNamesFromSpecs;
-            set => this.RaiseAndSetIfChanged(ref _filterNamesFromSpecs, value);
-        }
-
-        public string SelectedFilterNameForSpecs {
-            get => _selectedFilterNameForSpecs;
-            set => this.RaiseAndSetIfChanged(ref _selectedFilterNameForSpecs, value);
         }
 
         public CreatingARDocsV PCOnASPDocsView {
@@ -226,11 +156,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             VisibilityScopes = _revitRepository.VisibilityScopes;
             Levels = _revitRepository.Levels;
-            //ViewFamilyTypes = _revitRepository.ViewFamilyTypes;
-            //ViewportTypes = _revitRepository.ViewportTypes;
 
-            //SelectedViewFamilyType = ViewFamilyTypes.FirstOrDefault(a => a.Name.Equals(SelectedViewFamilyTypeName));
-            //SelectedViewportType = ViewportTypes.FirstOrDefault(a => a.Name.Equals(SelectedViewportTypeName));
 
             if(TasksForWork.Count == 0) {
                 TasksForWork.Add(new TaskInfo(RegexForBuildingPart, RegexForBuildingSection, 1));
@@ -264,7 +190,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// Определяет можно ли запустить работу плагина
         /// </summary>
         private bool CanAcceptView() {
-
 
             if(SelectedViews.Count == 0 && CreateViewsFromSelected) {
                 ErrorText = "Не выбрано видов, на основе которых создавать документацию";
@@ -323,7 +248,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                 return false;
             }
 
-            if(WorkWithSpecs && FilterNamesFromSpecs.Count > 0 && SelectedFilterNameForSpecs is null) {
+            if(SpecOptsVM.WorkWithSpecs && SpecOptsVM.FilterNamesFromSpecs.Count > 0 && SpecOptsVM.SelectedFilterNameForSpecs is null) {
                 ErrorText = "Не выбрано имя поля фильтра спецификации";
                 return false;
             }
@@ -344,15 +269,9 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             SheetOptsVM.LoadConfig();
             ViewOptsVM.LoadConfig();
-
-            //WorkWithViews = settings.WorkWithViews;
-            WorkWithSpecs = settings.WorkWithSpecs;
+            SpecOptsVM.LoadConfig();
 
             CreateViewsFromSelected = settings.CreateViewsFromSelected;
-            //ViewNamePrefix = settings.ViewNamePrefix;
-            //SelectedViewFamilyTypeName = settings.SelectedViewFamilyTypeName;
-            //SelectedViewportTypeName = settings.SelectedViewportTypeName;
-            SelectedFilterNameForSpecs = settings.SelectedFilterNameForSpecs;
         }
 
 
@@ -366,16 +285,9 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             SheetOptsVM.SaveConfig();
             ViewOptsVM.SaveConfig();
-
-            //settings.WorkWithViews = WorkWithViews;
-            settings.WorkWithSpecs = WorkWithSpecs;
+            SpecOptsVM.SaveConfig();
 
             settings.CreateViewsFromSelected = CreateViewsFromSelected;
-            //settings.ViewNamePrefix = ViewNamePrefix;
-
-            //settings.SelectedViewFamilyTypeName = SelectedViewFamilyType.Name;
-            //settings.SelectedViewportTypeName = SelectedViewportType.Name;
-            settings.SelectedFilterNameForSpecs = SelectedFilterNameForSpecs;
 
             _pluginConfig.SaveProjectConfig();
         }
@@ -424,7 +336,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                         continue;
                     }
 
-                    //SpecHelper specHelper = new SpecHelper(_revitRepository, scheduleSheetInstance, TreeReport);
                     SpecHelper specHelper = new SpecHelper(_revitRepository, scheduleSheetInstance);
                     task.ListSpecHelpers.Add(specHelper);
                     try {
@@ -446,14 +357,14 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         /// </summary>
         private void GetFilterNames() {
 
-            FilterNamesFromSpecs.Clear();
+            SpecOptsVM.FilterNamesFromSpecs.Clear();
             foreach(TaskInfo task in TasksForWork) {
 
                 foreach(SpecHelper spec in task.ListSpecHelpers) {
-                    if(FilterNamesFromSpecs.Count == 0) {
-                        FilterNamesFromSpecs.AddRange(spec.GetFilterNames());
+                    if(SpecOptsVM.FilterNamesFromSpecs.Count == 0) {
+                        SpecOptsVM.FilterNamesFromSpecs.AddRange(spec.GetFilterNames());
                     } else {
-                        FilterNamesFromSpecs = FilterNamesFromSpecs.Intersect(spec.GetFilterNames()).ToList();
+                        SpecOptsVM.FilterNamesFromSpecs = SpecOptsVM.FilterNamesFromSpecs.Intersect(spec.GetFilterNames()).ToList();
                     }
                 }
             }
@@ -476,7 +387,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             rep.AddNodeWithName($"Выбран тип вида: {ViewOptsVM.SelectedViewFamilyTypeName}");
             rep.AddNodeWithName($"Выбран тип видового экрана: {ViewOptsVM.SelectedViewportTypeName}");
             rep.AddNodeWithName($"Выбран тип рамки листа: {SheetOptsVM.SelectedTitleBlockName}");
-            rep.AddNodeWithName($"Выбрано поле параметра фильтрации спецификации: {SelectedFilterNameForSpecs}");
+            rep.AddNodeWithName($"Выбрано поле параметра фильтрации спецификации: {SpecOptsVM.SelectedFilterNameForSpecs}");
 
             foreach(TaskInfo task in TasksForWork) {
                 TreeReportNode taskRep = new TreeReportNode(rep) { Name = $"Номер задания: {task.TaskNumber}" };
@@ -527,13 +438,13 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             if(CreateViewsFromSelected) {
 
-                DocsFromSelectedViewsVM docsFromSelectedViewsVM = new DocsFromSelectedViewsVM(this, _revitRepository, TreeReport
-                    , SheetOptsVM.GetSheetOption(), ViewOptsVM.GetViewOption());
+                DocsFromSelectedViewsVM docsFromSelectedViewsVM = new DocsFromSelectedViewsVM(this, _revitRepository, TreeReport,
+                    SheetOptsVM.GetSheetOption(), ViewOptsVM.GetViewOption(), SpecOptsVM.GetSpecOption());
                 docsFromSelectedViewsVM.CreateDocs();
             } else {
 
                 DocsFromScratchVM docsFromScratchVM = new DocsFromScratchVM(this, _revitRepository, TreeReport,
-                    SheetOptsVM.GetSheetOption(), ViewOptsVM.GetViewOption());
+                    SheetOptsVM.GetSheetOption(), ViewOptsVM.GetViewOption(), SpecOptsVM.GetSpecOption());
                 docsFromScratchVM.CreateDocs();
             }
 

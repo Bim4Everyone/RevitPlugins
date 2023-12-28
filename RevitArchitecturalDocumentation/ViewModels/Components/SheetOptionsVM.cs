@@ -14,7 +14,7 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
         private readonly RevitRepository _revitRepository;
         private readonly SheetOptions _sheetOptions;
 
-        private bool _workWithSheets = true;
+        private bool _workWithSheets;
         private List<FamilySymbol> _titleBlocksInProject;
         private FamilySymbol _selectedTitleBlock;
         private string _selectedTitleBlockName;

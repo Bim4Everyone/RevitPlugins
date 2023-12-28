@@ -14,12 +14,13 @@ namespace RevitArchitecturalDocumentation.ViewModels {
     internal class DocsFromScratchVM : BaseViewModel {
 
         public DocsFromScratchVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report,
-            SheetOptions sheetOptions, ViewOptions viewOptions) {
+            SheetOptions sheetOptions, ViewOptions viewOptions, SpecOptions specOptions) {
             MVM = pCOnASPDocsVM;
             Repository = revitRepository;
             Report = report;
             SheetOpts = sheetOptions;
             ViewOpts = viewOptions;
+            SpecOpts = specOptions;
         }
 
         public CreatingARDocsVM MVM { get; set; }
@@ -27,6 +28,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         public ObservableCollection<TreeReportNode> Report { get; set; }
         public SheetOptions SheetOpts { get; set; }
         public ViewOptions ViewOpts { get; set; }
+        public SpecOptions SpecOpts { get; set; }
 
 
 
@@ -113,13 +115,13 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                             taskRep.Nodes.Add(viewRep);
                         }
 
-                        if(MVM.WorkWithSpecs) {
+                        if(SpecOpts.WorkWithSpecs) {
 
                             foreach(SpecHelper specHelper in task.ListSpecHelpers) {
                                 TreeReportNode specRep = new TreeReportNode(taskRep) { Name = $"Работа со спецификацией \"{specHelper.Specification.Name}\"" };
                                 specHelper.Report = specRep;
 
-                                SpecHelper newSpecHelper = specHelper.GetOrDublicateNSetSpec(MVM.SelectedFilterNameForSpecs, numberOfLevelAsInt);
+                                SpecHelper newSpecHelper = specHelper.GetOrDublicateNSetSpec(SpecOpts.SelectedFilterNameForSpecs, numberOfLevelAsInt);
 
                                 // Располагаем созданные спеки на листе в позициях как у спек, с которых производилось копирование
                                 // В случае если лист и размещаемая на нем спека не null и на листе еще нет вид.экрана этой спеки

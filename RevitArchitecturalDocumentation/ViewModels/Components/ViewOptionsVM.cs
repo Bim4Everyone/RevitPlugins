@@ -13,15 +13,14 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
-
+        private bool _workWithViews;
         private List<ViewFamilyType> _viewFamilyTypes;
         private ViewFamilyType _selectedViewFamilyType;
         private string _selectedViewFamilyTypeName;
         private List<ElementType> _viewportTypes;
-        private bool _workWithViews = true;
+        private ElementType _selectedViewportType;
         private string _selectedViewportTypeName;
         private string _viewNamePrefix = string.Empty;
-        private ElementType _selectedViewportType;
 
 
         public ViewOptionsVM(PluginConfig pluginConfig, RevitRepository revitRepository, ViewOptions viewOptions) {
@@ -55,7 +54,6 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
             get => _selectedViewFamilyTypeName;
             set => this.RaiseAndSetIfChanged(ref _selectedViewFamilyTypeName, value);
         }
-
 
         public List<ElementType> ViewportTypes {
             get => _viewportTypes;
