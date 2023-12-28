@@ -1,11 +1,7 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI.Selection;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -25,18 +21,8 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private string _errorText;
         private CreatingARDocsV _pCOnASPDocsView;
         private ObservableCollection<TreeReportNode> _report = new ObservableCollection<TreeReportNode>();
-        private TaskInfo _selectedTask;
-        private List<Element> _visibilityScopes;
-        private List<Level> _levels;
         private ObservableCollection<ViewPlan> _selectedViews = new ObservableCollection<ViewPlan>();
         private ObservableCollection<ViewHelper> _selectedViewHelpers = new ObservableCollection<ViewHelper>();
-        private ObservableCollection<TaskInfo> _tasksForWork = new ObservableCollection<TaskInfo>();
-
-        private Regex _regexForBuildingPart = new Regex(@"К(.*?)_");
-        private Regex _regexForBuildingSection = new Regex(@"С(.*?)$");
-        private Regex _regexForBuildingSectionPart = new Regex(@"часть (.*?)$");
-        private Regex _regexForLevel = new Regex(@"^(.*?) ");
-        private Regex _regexForView = new Regex(@"_(.*?) этаж");
 
 
         public CreatingARDocsVM(PluginConfig pluginConfig, RevitRepository revitRepository,
@@ -44,55 +30,24 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
+            TaskInformationVM = new TaskInfoVM(pluginConfig, revitRepository, this);
             SheetOptsVM = new SheetOptionsVM(pluginConfig, revitRepository, sheetOptions);
             ViewOptsVM = new ViewOptionsVM(pluginConfig, revitRepository, viewOptions);
             SpecOptsVM = new SpecOptionsVM(pluginConfig, revitRepository, specOptions);
 
 
-
             LoadViewCommand = new RelayCommand(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-
-            AddTaskCommand = RelayCommand.Create(AddTask);
-            DeleteTaskCommand = RelayCommand.Create(DeleteTask);
-
-            SelectSpecsCommand = new RelayCommand(SelectSpecs);
         }
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
 
-        public ICommand AddTaskCommand { get; }
-        public ICommand DeleteTaskCommand { get; }
-        public ICommand SelectSpecsCommand { get; }
-
-
+        public TaskInfoVM TaskInformationVM { get; }
         public SheetOptionsVM SheetOptsVM { get; }
         public ViewOptionsVM ViewOptsVM { get; }
         public SpecOptionsVM SpecOptsVM { get; }
 
-
-
-        public Regex RegexForBuildingPart {
-            get => _regexForBuildingPart;
-            set => this.RaiseAndSetIfChanged(ref _regexForBuildingPart, value);
-        }
-        public Regex RegexForBuildingSection {
-            get => _regexForBuildingSection;
-            set => this.RaiseAndSetIfChanged(ref _regexForBuildingSection, value);
-        }
-        public Regex RegexForBuildingSectionPart {
-            get => _regexForBuildingSectionPart;
-            set => this.RaiseAndSetIfChanged(ref _regexForBuildingSectionPart, value);
-        }
-        public Regex RegexForLevel {
-            get => _regexForLevel;
-            set => this.RaiseAndSetIfChanged(ref _regexForLevel, value);
-        }
-        public Regex RegexForView {
-            get => _regexForView;
-            set => this.RaiseAndSetIfChanged(ref _regexForView, value);
-        }
 
         public ObservableCollection<ViewPlan> SelectedViews {
             get => _selectedViews;
@@ -103,27 +58,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             get => _selectedViewHelpers;
             set => this.RaiseAndSetIfChanged(ref _selectedViewHelpers, value);
         }
-
-        public ObservableCollection<TaskInfo> TasksForWork {
-            get => _tasksForWork;
-            set => this.RaiseAndSetIfChanged(ref _tasksForWork, value);
-        }
-
-        public TaskInfo SelectedTask {
-            get => _selectedTask;
-            set => this.RaiseAndSetIfChanged(ref _selectedTask, value);
-        }
-
-        public List<Element> VisibilityScopes {
-            get => _visibilityScopes;
-            set => this.RaiseAndSetIfChanged(ref _visibilityScopes, value);
-        }
-
-        public List<Level> Levels {
-            get => _levels;
-            set => this.RaiseAndSetIfChanged(ref _levels, value);
-        }
-
 
         public bool CreateViewsFromSelected {
             get => _createViewsFromSelected;
@@ -153,14 +87,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             PCOnASPDocsView = obj as CreatingARDocsV;
             LoadConfig();
-
-            VisibilityScopes = _revitRepository.VisibilityScopes;
-            Levels = _revitRepository.Levels;
-
-
-            if(TasksForWork.Count == 0) {
-                TasksForWork.Add(new TaskInfo(RegexForBuildingPart, RegexForBuildingSection, 1));
-            }
 
             if(SelectedViews.Count == 0) {
                 SelectedViews = _revitRepository.GetSelectedViewPlans();
@@ -206,7 +132,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                 }
             }
 
-            foreach(TaskInfo task in TasksForWork) {
+            foreach(TaskInfo task in TaskInformationVM.TasksForWork) {
                 // Проверяем и получаем данные по каждому заданию
                 try {
                     task.СheckTasksForErrors();
@@ -294,84 +220,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
 
         /// <summary>
-        /// Добавляет задачу в список. 
-        /// Задача содержит информацию о начальном и конечном уровне, с которыми нужно работать; выбранную область видимости и спеки
-        /// </summary>
-        private void AddTask() {
-
-            TasksForWork.Add(new TaskInfo(RegexForBuildingPart, RegexForBuildingSection, TasksForWork.Count + 1));
-        }
-
-        /// <summary>
-        /// Удаляет выбранную в интерфейсе задачу из списка. 
-        /// </summary>
-        private void DeleteTask() {
-
-            if(TasksForWork.Count > 0) {
-                TasksForWork.RemoveAt(TasksForWork.Count - 1);
-            }
-            GetFilterNames();
-        }
-
-
-        /// <summary>
-        /// После скрытия окна позволяет выбрать видовые экраны спек в Revit
-        /// </summary>
-        private void SelectSpecs(object obj) {
-
-            PCOnASPDocsView.Hide();
-
-            TaskInfo task = obj as TaskInfo;
-            if(task != null) {
-                task.ListSpecHelpers.Clear();
-
-                ISelectionFilter selectFilter = new ScheduleSelectionFilter();
-                IList<Reference> references = _revitRepository.ActiveUIDocument.Selection
-                                .PickObjects(ObjectType.Element, selectFilter, "Выберите спецификации на листе");
-
-                foreach(Reference reference in references) {
-
-                    ScheduleSheetInstance scheduleSheetInstance = _revitRepository.Document.GetElement(reference) as ScheduleSheetInstance;
-                    if(scheduleSheetInstance is null) {
-                        continue;
-                    }
-
-                    SpecHelper specHelper = new SpecHelper(_revitRepository, scheduleSheetInstance);
-                    task.ListSpecHelpers.Add(specHelper);
-                    try {
-                        specHelper.NameHelper.AnilizeNGetNameInfo();
-
-                    } catch(ViewNameException ex) {
-                        ErrorText = ex.Message;
-                    }
-
-                }
-                GetFilterNames();
-            }
-            PCOnASPDocsView.ShowDialog();
-        }
-
-
-        /// <summary>
-        /// Метод перебирает все выбранные спеки во всех заданиях и собирает список параметров фильтрации. принадлежащий всем одновременно
-        /// </summary>
-        private void GetFilterNames() {
-
-            SpecOptsVM.FilterNamesFromSpecs.Clear();
-            foreach(TaskInfo task in TasksForWork) {
-
-                foreach(SpecHelper spec in task.ListSpecHelpers) {
-                    if(SpecOptsVM.FilterNamesFromSpecs.Count == 0) {
-                        SpecOptsVM.FilterNamesFromSpecs.AddRange(spec.GetFilterNames());
-                    } else {
-                        SpecOptsVM.FilterNamesFromSpecs = SpecOptsVM.FilterNamesFromSpecs.Intersect(spec.GetFilterNames()).ToList();
-                    }
-                }
-            }
-        }
-
-
-        /// <summary>
         /// Подготавливает и передает информацию в древовидный отчет об исходных данных заданий
         /// </summary>
         private TreeReportNode GetInitialDataForReport() {
@@ -389,7 +237,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             rep.AddNodeWithName($"Выбран тип рамки листа: {SheetOptsVM.SelectedTitleBlockName}");
             rep.AddNodeWithName($"Выбрано поле параметра фильтрации спецификации: {SpecOptsVM.SelectedFilterNameForSpecs}");
 
-            foreach(TaskInfo task in TasksForWork) {
+            foreach(TaskInfo task in TaskInformationVM.TasksForWork) {
                 TreeReportNode taskRep = new TreeReportNode(rep) { Name = $"Номер задания: {task.TaskNumber}" };
                 taskRep.AddNodeWithName($"Начальный уровень: {task.StartLevelNumberAsInt}");
                 taskRep.AddNodeWithName($"Конечный уровень: {task.EndLevelNumberAsInt}");
@@ -439,12 +287,12 @@ namespace RevitArchitecturalDocumentation.ViewModels {
             if(CreateViewsFromSelected) {
 
                 DocsFromSelectedViewsVM docsFromSelectedViewsVM = new DocsFromSelectedViewsVM(this, _revitRepository, TreeReport,
-                    SheetOptsVM.GetSheetOption(), ViewOptsVM.GetViewOption(), SpecOptsVM.GetSpecOption());
+                    TaskInformationVM.TasksForWork, SheetOptsVM.GetSheetOption(), ViewOptsVM.GetViewOption(), SpecOptsVM.GetSpecOption());
                 docsFromSelectedViewsVM.CreateDocs();
             } else {
 
                 DocsFromScratchVM docsFromScratchVM = new DocsFromScratchVM(this, _revitRepository, TreeReport,
-                    SheetOptsVM.GetSheetOption(), ViewOptsVM.GetViewOption(), SpecOptsVM.GetSpecOption());
+                    TaskInformationVM.TasksForWork, SheetOptsVM.GetSheetOption(), ViewOptsVM.GetViewOption(), SpecOptsVM.GetSpecOption());
                 docsFromScratchVM.CreateDocs();
             }
 

@@ -74,7 +74,7 @@
             Margin="10"
             ScrollViewer.VerticalScrollBarVisibility="Visible"
             ScrollViewer.CanContentScroll="False"
-            ItemsSource="{Binding Path=TasksForWork, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            ItemsSource="{Binding Path=TaskInformationVM.TasksForWork, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
             SelectionMode="Single">
 
             <ListView.ItemContainerStyle>
@@ -133,7 +133,7 @@
                                     Height="30"
                                     HorizontalAlignment="Center"
                                     DisplayMemberPath="Name"
-                                    ItemsSource="{Binding Path=DataContext.VisibilityScopes, 
+                                    ItemsSource="{Binding Path=DataContext.TaskInformationVM.VisibilityScopes, 
                                         RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
                                     SelectedItem="{Binding Path=SelectedVisibilityScope}">
                                 </ComboBox>
@@ -166,7 +166,7 @@
                                     Content="Выбрать"
                                     FontSize="14"
                                     
-                                    Command="{Binding Path=DataContext.SelectSpecsCommand, 
+                                    Command="{Binding Path=DataContext.TaskInformationVM.SelectSpecsCommand, 
                                         RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                     CommandParameter="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
                             </DataTemplate>
@@ -193,14 +193,14 @@
                 Width="200"
                 Content="Добавить строку"
                 FontSize="14"
-                Command="{Binding Path=AddTaskCommand}"/>
+                Command="{Binding Path=TaskInformationVM.AddTaskCommand}"/>
 
             <Button
                 Margin="10 5 10 10"
                 Width="200"
                 Content="Удалить строку"
                 FontSize="14"
-                Command="{Binding Path=DeleteTaskCommand}"/>
+                Command="{Binding Path=TaskInformationVM.DeleteTaskCommand}"/>
         </StackPanel>
 
 

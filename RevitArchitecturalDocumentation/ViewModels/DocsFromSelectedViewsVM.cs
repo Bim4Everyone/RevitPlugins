@@ -11,10 +11,11 @@ namespace RevitArchitecturalDocumentation.ViewModels {
     internal class DocsFromSelectedViewsVM {
 
         public DocsFromSelectedViewsVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report,
-            SheetOptions sheetOptions, ViewOptions viewOptions, SpecOptions specOptions) {
+            ObservableCollection<TaskInfo> tasksForWork, SheetOptions sheetOptions, ViewOptions viewOptions, SpecOptions specOptions) {
             MVM = pCOnASPDocsVM;
             Repository = revitRepository;
             Report = report;
+            TasksForWork = tasksForWork;
             SheetOpts = sheetOptions;
             ViewOpts = viewOptions;
             SpecOpts = specOptions;
@@ -26,6 +27,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         public SheetOptions SheetOpts { get; set; }
         public ViewOptions ViewOpts { get; set; }
         public SpecOptions SpecOpts { get; set; }
+        public ObservableCollection<TaskInfo> TasksForWork { get; set; }
 
 
 
@@ -47,10 +49,10 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                     if(viewHelper.View.Name.ToLower().Contains("_часть ")) {
                         viewNamePartWithSectionPart = "_часть ";
-                        viewNamePartWithSectionPart += MVM.RegexForBuildingSectionPart.Match(viewHelper.View.Name.ToLower()).Groups[1].Value;
+                        viewNamePartWithSectionPart += Repository.RegexForBuildingSectionPart.Match(viewHelper.View.Name.ToLower()).Groups[1].Value;
                     }
 
-                    foreach(TaskInfo task in MVM.TasksForWork) {
+                    foreach(TaskInfo task in TasksForWork) {
 
                         TreeReportNode taskRep = new TreeReportNode(selectedViewRep) {
                             Name = $"Задание номер: \"{task.TaskNumber}\" - " +

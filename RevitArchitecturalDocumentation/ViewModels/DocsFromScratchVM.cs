@@ -14,10 +14,11 @@ namespace RevitArchitecturalDocumentation.ViewModels {
     internal class DocsFromScratchVM : BaseViewModel {
 
         public DocsFromScratchVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report,
-            SheetOptions sheetOptions, ViewOptions viewOptions, SpecOptions specOptions) {
+            ObservableCollection<TaskInfo> tasksForWork, SheetOptions sheetOptions, ViewOptions viewOptions, SpecOptions specOptions) {
             MVM = pCOnASPDocsVM;
             Repository = revitRepository;
             Report = report;
+            TasksForWork = tasksForWork;
             SheetOpts = sheetOptions;
             ViewOpts = viewOptions;
             SpecOpts = specOptions;
@@ -29,6 +30,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         public SheetOptions SheetOpts { get; set; }
         public ViewOptions ViewOpts { get; set; }
         public SpecOptions SpecOpts { get; set; }
+        public ObservableCollection<TaskInfo> TasksForWork { get; set; }
 
 
 
@@ -39,18 +41,18 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             using(Transaction transaction = Repository.Document.StartTransaction("Документатор АР")) {
 
-                foreach(Level level in MVM.Levels) {
+                foreach(Level level in Repository.Levels) {
 
                     TreeReportNode levelRep = new TreeReportNode(null) { Name = $"Работаем с уровнем: \"{level.Name}\"" };
 
-                    string numberOfLevel = MVM.RegexForLevel.Match(level.Name).Groups[1].Value;
+                    string numberOfLevel = Repository.RegexForLevel.Match(level.Name).Groups[1].Value;
                     if(!int.TryParse(numberOfLevel, out int numberOfLevelAsInt)) {
                         levelRep.AddNodeWithName($"❗ Не удалось определить номер уровня {level.Name}!");
                         continue;
                     }
                     levelRep.AddNodeWithName($"Номер уровня: \"{numberOfLevelAsInt}\"");
 
-                    foreach(TaskInfo task in MVM.TasksForWork) {
+                    foreach(TaskInfo task in TasksForWork) {
 
                         TreeReportNode taskRep = new TreeReportNode(levelRep) {
                             Name = $"Задание номер: \"{task.TaskNumber}\" - " +

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using dosymep.WPF.ViewModels;
 
@@ -63,6 +64,24 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
             settings.SelectedFilterNameForSpecs = SelectedFilterNameForSpecs;
 
             _pluginConfig.SaveProjectConfig();
+        }
+
+        /// <summary>
+        /// Метод перебирает все выбранные спеки во всех заданиях и собирает список параметров фильтрации. принадлежащий всем одновременно
+        /// </summary>
+        public void GetFilterNames(IEnumerable<TaskInfo> tasksForWork) {
+
+            FilterNamesFromSpecs.Clear();
+            foreach(TaskInfo task in tasksForWork) {
+
+                foreach(SpecHelper spec in task.ListSpecHelpers) {
+                    if(FilterNamesFromSpecs.Count == 0) {
+                        FilterNamesFromSpecs.AddRange(spec.GetFilterNames());
+                    } else {
+                        FilterNamesFromSpecs = FilterNamesFromSpecs.Intersect(spec.GetFilterNames()).ToList();
+                    }
+                }
+            }
         }
 
         public SpecOptions GetSpecOption() {
