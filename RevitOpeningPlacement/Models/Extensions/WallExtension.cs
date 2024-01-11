@@ -37,14 +37,20 @@ namespace RevitOpeningPlacement.Models.Extensions {
 
             PlanarFace exteriorFace = wall.GetGeometryObjectFromReference(
                 HostObjectUtils.GetSideFaces(wall, ShellLayerType.Exterior)[0]) as PlanarFace;
-            Plane exteriorPlane = Plane.CreateByNormalAndOrigin(exteriorFace.FaceNormal, exteriorFace.Origin);
+            XYZ alignVector;
+            if(exteriorFace != null) {
 
-            XYZ bbCenterProjection = exteriorPlane.ProjectPoint(bbCenter);
-            XYZ bbCenterToProjectionVector = bbCenterProjection - bbCenter;
+                Plane exteriorPlane = Plane.CreateByNormalAndOrigin(exteriorFace.FaceNormal, exteriorFace.Origin);
 
-            //получение вектора, который надо прибавить к центру бокса, чтобы получившаяся точка была ровно посередине толщины стены
-            XYZ alignVector = bbCenterToProjectionVector.Normalize()
-                * (bbCenterToProjectionVector.GetLength() - wall.Width / 2);
+                XYZ bbCenterProjection = exteriorPlane.ProjectPoint(bbCenter);
+                XYZ bbCenterToProjectionVector = bbCenterProjection - bbCenter;
+
+                //получение вектора, который надо прибавить к центру бокса, чтобы получившаяся точка была ровно посередине толщины стены
+                alignVector = bbCenterToProjectionVector.Normalize()
+                    * (bbCenterToProjectionVector.GetLength() - wall.Width / 2);
+            } else {
+                alignVector = XYZ.Zero;
+            }
 
             return bbCenter + alignVector;
         }
