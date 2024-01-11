@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB;
+
+using dosymep.Revit;
 
 namespace RevitOpeningPlacement.Models.Extensions {
     internal static class WallExtension {
@@ -28,8 +30,23 @@ namespace RevitOpeningPlacement.Models.Extensions {
         }
 
         private static XYZ GetCentralPoint(Wall wall) {
-            var bb = wall.get_BoundingBox(null);
-            return bb.Min + (bb.Max - bb.Min) / 2;
+            var bb = wall.GetBoundingBox();
+            XYZ bbCenter = bb.Min + (bb.Max - bb.Min) / 2;
+            //если стена соединена с другой стеной, то торец в месте соединения образует острый угол,
+            //из-за чего центр бокса - это не геометрический центр стены.
+
+            PlanarFace exteriorFace = wall.GetGeometryObjectFromReference(
+                HostObjectUtils.GetSideFaces(wall, ShellLayerType.Exterior)[0]) as PlanarFace;
+            Plane exteriorPlane = Plane.CreateByNormalAndOrigin(exteriorFace.FaceNormal, exteriorFace.Origin);
+
+            XYZ bbCenterProjection = exteriorPlane.ProjectPoint(bbCenter);
+            XYZ bbCenterToProjectionVector = bbCenterProjection - bbCenter;
+
+            //получение вектора, который надо прибавить к центру бокса, чтобы получившаяся точка была ровно посередине толщины стены
+            XYZ alignVector = bbCenterToProjectionVector.Normalize()
+                * (bbCenterToProjectionVector.GetLength() - wall.Width / 2);
+
+            return bbCenter + alignVector;
         }
     }
 }
