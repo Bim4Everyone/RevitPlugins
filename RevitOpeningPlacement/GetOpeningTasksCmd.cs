@@ -11,6 +11,7 @@ using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 
 using RevitOpeningPlacement.Models;
+using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.Navigator.Checkers;
 using RevitOpeningPlacement.OpeningModels;
@@ -372,13 +373,20 @@ namespace RevitOpeningPlacement {
         /// <param name="revitRepository"></param>
         private void GetOpeningsTaskInDocumentKR(UIApplication uiApplication, RevitRepository revitRepository) {
             var navigatorMode = GetKrNavigatorMode();
+            var config = OpeningRealsKrConfig.GetOpeningConfig(revitRepository.Doc);
             switch(navigatorMode) {
-                case KrNavigatorMode.IncomingAr:
-                GetIncomingTasksFromArInDocKR(uiApplication, revitRepository);
-                break;
-                case KrNavigatorMode.IncomingMep:
-                GetIncomingTasksFromMepInDocKR(uiApplication, revitRepository);
-                break;
+                case KrNavigatorMode.IncomingAr: {
+                    config.PlacementType = OpeningRealKrPlacementType.PlaceByAr;
+                    config.SaveProjectConfig();
+                    GetIncomingTasksFromArInDocKR(uiApplication, revitRepository);
+                    break;
+                }
+                case KrNavigatorMode.IncomingMep: {
+                    config.PlacementType = OpeningRealKrPlacementType.PlaceByMep;
+                    config.SaveProjectConfig();
+                    GetIncomingTasksFromMepInDocKR(uiApplication, revitRepository);
+                    break;
+                }
                 default:
                 throw new OperationCanceledException();
             }
