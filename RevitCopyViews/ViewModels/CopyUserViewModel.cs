@@ -53,28 +53,13 @@ namespace RevitCopyViews.ViewModels {
         public ICommand CopyUserCommand { get; }
 
         private void CopyUser(object p) {
-            var createdViews = new List<ElementId>();
             using(var transaction = Document.StartTransaction("Копирование видов")) {
-                View viewTemplate = CreateViewTemplate(GroupView);
-                ParameterFilterElement paramFilter = CreateParameterFilterElement(GroupView);
-                AddParamFilter(viewTemplate, paramFilter);
-
                 foreach(View revitView in Views) {
                     View newView = (View) Document.GetElement(revitView.Duplicate(ViewDuplicateOption.Duplicate));
 
                     newView.Name = GetViewName(revitView);
-                    if(HasViewTemplate(newView)) {
-                        newView.ViewTemplateId = viewTemplate?.Id ?? ElementId.InvalidElementId;
-                    } else {
-                        newView.ViewTemplateId = ElementId.InvalidElementId;
-                        newView.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, GroupView);
-
-                        if(newView.ViewType != ViewType.ThreeD) {
-                            AddParamFilter(newView, paramFilter);
-                        }
-                    }
-
-                    createdViews.Add(newView.Id);
+                    newView.ViewTemplateId = ElementId.InvalidElementId;
+                    newView.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, GroupView);
                 }
 
                 transaction.Commit();
@@ -97,7 +82,8 @@ namespace RevitCopyViews.ViewModels {
                 return false;
             }
 
-            if(RestrictedViewNames.Any(item => item.StartsWith(Prefix + "_", StringComparison.CurrentCultureIgnoreCase))) {
+            if(RestrictedViewNames.Any(item =>
+                   item.StartsWith(Prefix + "_", StringComparison.CurrentCultureIgnoreCase))) {
                 ErrorText = "Данный префикс уже используется.";
                 return false;
             }
@@ -108,72 +94,6 @@ namespace RevitCopyViews.ViewModels {
 
         private string GetViewName(View revitView) {
             return revitView.Name.Replace("User_", Prefix + "_");
-        }
-
-        private View CreateViewTemplate(string viewTemplateName) {
-            View viewTemplate = new FilteredElementCollector(Document)
-                .WhereElementIsNotElementType()
-                .OfClass(typeof(View))
-                .OfType<View>()
-                .Where(item => item.IsTemplate)
-                .FirstOrDefault(item => item.Name.Equals("99 User_План"));
-
-            if(viewTemplate == null) {
-                return null;
-            }
-
-            ElementId viewTemplateId = ElementTransformUtils.CopyElements(Document, new[] { viewTemplate.Id }, Document, Transform.Identity, new CopyPasteOptions()).First();
-
-            viewTemplate = (View) Document.GetElement(viewTemplateId);
-            viewTemplate.Name = viewTemplateName;
-            viewTemplate.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, GroupView);
-            
-            return viewTemplate;
-        }
-
-        private ParameterFilterElement CreateParameterFilterElement(string filterName) {
-            ParameterElement parameterElement = new FilteredElementCollector(Document)
-                .WhereElementIsNotElementType()
-                .OfClass(typeof(ParameterElement))
-                .OfType<ParameterElement>()
-                .FirstOrDefault(item => item.Name.Equals(ProjectParamsConfig.Instance.ViewGroup.Name));
-
-
-            var logicalFilter = new LogicalAndFilter(new[] {
-#if REVIT_2021_OR_LESS
-            new ElementParameterFilter(new FilterInverseRule(new FilterStringRule(new ParameterValueProvider(parameterElement.Id), new FilterStringEquals(), filterName, true)))
-#else
-            new ElementParameterFilter(new FilterInverseRule(new FilterStringRule(new ParameterValueProvider(parameterElement.Id), new FilterStringEquals(), filterName)))
-#endif
-                
-            });
-
-            var categories = new[] {
-                Category.GetCategory(Document, BuiltInCategory.OST_Elev).Id,
-                Category.GetCategory(Document, BuiltInCategory.OST_Callouts).Id,
-                Category.GetCategory(Document, BuiltInCategory.OST_Sections).Id,
-            };
-
-            return ParameterFilterElement.Create(Document, $"Виды_НЕ_{filterName}", categories, logicalFilter);
-        }
-
-        private void AddParamFilter(View view, ParameterFilterElement paramFilter) {
-            if(view == null) {
-                return;
-            }
-
-            foreach(var filter in view.GetFilters()) {
-                view.RemoveFilter(filter);
-            }
-
-            view.AddFilter(paramFilter.Id);
-            view.SetFilterVisibility(paramFilter.Id, false);
-        }
-
-        private bool HasViewTemplate(View view) {
-            return view.ViewType == ViewType.FloorPlan
-                || view.ViewType == ViewType.CeilingPlan
-                || view.ViewType == ViewType.EngineeringPlan;
         }
     }
 }
