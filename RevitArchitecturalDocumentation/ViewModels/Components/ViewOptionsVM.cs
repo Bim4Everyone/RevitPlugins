@@ -16,10 +16,8 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
         private bool _workWithViews;
         private List<ViewFamilyType> _viewFamilyTypes;
         private ViewFamilyType _selectedViewFamilyType;
-        private string _selectedViewFamilyTypeName;
         private List<ElementType> _viewportTypes;
         private ElementType _selectedViewportType;
-        private string _selectedViewportTypeName;
         private string _viewNamePrefix = string.Empty;
 
 
@@ -32,6 +30,8 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
 
             ViewFamilyTypes = _revitRepository.ViewFamilyTypes;
             ViewportTypes = _revitRepository.ViewportTypes;
+            SelectedViewFamilyType = ViewFamilyTypes?.FirstOrDefault(a => a.Name.Equals(viewOptions.SelectedViewFamilyTypeName));
+            SelectedViewportType = ViewportTypes?.FirstOrDefault(a => a.Name.Equals(viewOptions.SelectedViewportTypeName));
         }
 
 
@@ -50,11 +50,6 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
             set => this.RaiseAndSetIfChanged(ref _selectedViewFamilyType, value);
         }
 
-        public string SelectedViewFamilyTypeName {
-            get => _selectedViewFamilyTypeName;
-            set => this.RaiseAndSetIfChanged(ref _selectedViewFamilyTypeName, value);
-        }
-
         public List<ElementType> ViewportTypes {
             get => _viewportTypes;
             set => this.RaiseAndSetIfChanged(ref _viewportTypes, value);
@@ -65,61 +60,26 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
             set => this.RaiseAndSetIfChanged(ref _selectedViewportType, value);
         }
 
-        public string SelectedViewportTypeName {
-            get => _selectedViewportTypeName;
-            set => this.RaiseAndSetIfChanged(ref _selectedViewportTypeName, value);
-        }
-
         public string ViewNamePrefix {
             get => _viewNamePrefix;
             set => this.RaiseAndSetIfChanged(ref _viewNamePrefix, value);
         }
 
 
-
-        /// <summary>
-        /// Подгружает параметры плагина с предыдущего запуска
-        /// </summary>
-        public void LoadConfig() {
-
-            var settings = _pluginConfig.GetSettings(_revitRepository.Document);
-
-            if(settings is null) { return; }
-
-            WorkWithViews = settings.WorkWithViews;
-            SelectedViewFamilyTypeName = settings.SelectedViewFamilyTypeName;
-            SelectedViewportTypeName = settings.SelectedViewportTypeName;
-            ViewNamePrefix = settings.ViewNamePrefix;
-
-            SelectedViewFamilyType = ViewFamilyTypes?.FirstOrDefault(a => a.Name.Equals(SelectedViewFamilyTypeName));
-            SelectedViewportType = ViewportTypes?.FirstOrDefault(a => a.Name.Equals(SelectedViewportTypeName));
-        }
-
-
-        /// <summary>
-        /// Сохраняет параметры плагина для следующего запуска
-        /// </summary>
-        public void SaveConfig() {
-
-            var settings = _pluginConfig.GetSettings(_revitRepository.Document)
-                          ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
-            settings.WorkWithViews = WorkWithViews;
-            settings.SelectedViewFamilyTypeName = SelectedViewFamilyType.Name;
-            settings.SelectedViewportTypeName = SelectedViewportType.Name;
-            settings.ViewNamePrefix = ViewNamePrefix;
-
-            _pluginConfig.SaveProjectConfig();
-        }
-
-
         public ViewOptions GetViewOption() {
-            return new ViewOptions() {
+
+            ViewOptions viewOptions = new ViewOptions(_pluginConfig, _revitRepository) {
                 WorkWithViews = WorkWithViews,
                 SelectedViewFamilyType = SelectedViewFamilyType,
+                SelectedViewFamilyTypeName = SelectedViewFamilyType.Name,
                 SelectedViewportType = SelectedViewportType,
+                SelectedViewportTypeName = SelectedViewportType.Name,
                 ViewNamePrefix = ViewNamePrefix
             };
+
+            viewOptions.SaveConfig();
+
+            return viewOptions;
         }
     }
 }

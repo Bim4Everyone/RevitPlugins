@@ -1,17 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using dosymep;
 using dosymep.Bim4Everyone;
-using dosymep.SimpleServices;
 
 using Ninject;
 
@@ -45,6 +38,8 @@ namespace RevitArchitecturalDocumentation {
                 kernel.Bind<SheetOptions>()
                     .ToSelf();
                 kernel.Bind<ViewOptions>()
+                    .ToSelf();
+                kernel.Bind<SpecOptions>()
                     .ToSelf();
 
                 kernel.Bind<PluginConfig>()

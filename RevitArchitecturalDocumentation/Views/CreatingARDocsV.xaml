@@ -38,6 +38,10 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
         <StackPanel
             Grid.Row="0"
@@ -62,6 +66,7 @@
 
         <CheckBox
             Grid.Row="0"
+            Grid.Column="1"
             Margin="10"
             Content="Создавать на основе выбранных видов"
             FontSize="14"
@@ -71,6 +76,7 @@
 
         <ListView 
             Grid.Row="1"
+            Grid.ColumnSpan="2"
             Margin="10"
             ScrollViewer.VerticalScrollBarVisibility="Visible"
             ScrollViewer.CanContentScroll="False"
@@ -184,20 +190,21 @@
 
         <StackPanel
             Grid.Row="2"
+            Grid.Column="1"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
             <Button
                 Margin="10 5 10 10"
-                Width="200"
+                Width="150"
                 Content="Добавить строку"
                 FontSize="14"
                 Command="{Binding Path=TaskInformationVM.AddTaskCommand}"/>
 
             <Button
                 Margin="10 5 10 10"
-                Width="200"
+                Width="150"
                 Content="Удалить строку"
                 FontSize="14"
                 Command="{Binding Path=TaskInformationVM.DeleteTaskCommand}"/>
@@ -208,45 +215,23 @@
 
         <GroupBox 
             Grid.Row="3"
-            Margin="5"
-            Height="65">
+            Margin="10 5 5 5">
             <GroupBox.Header>
                 <TextBlock 
-                    Text="Для листа:"
+                    Text="Листы:"
                     FontSize="14"/>
             </GroupBox.Header>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1.2*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <CheckBox 
-                    Grid.Column="0"
-                    Margin="10"
-                    Content="Создавать/размещать листы"
-                    FontSize="14"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Left"
-                    IsChecked="{Binding Path=SheetOptsVM.WorkWithSheets}"/>
-
-                <TextBlock
-                    Grid.Column="1"
-                    Text="Выберите рамку листа:"
-                    FontSize="14"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Right"/>
-
+            <DockPanel>
                 <ComboBox
-                    Grid.Column="2"
-                    VerticalContentAlignment="Center"
-                    IsEnabled="{Binding Path=SheetOptsVM.WorkWithSheets}"
-                    ItemsSource="{Binding Path=SheetOptsVM.TitleBlocksInProject}" 
-                    SelectedItem="{Binding Path=SheetOptsVM.SelectedTitleBlock}">
+                     DockPanel.Dock="Bottom" 
+                     Margin="5 3"
+                     Height="30"
+     
+                     VerticalContentAlignment="Center"
+                     IsEnabled="{Binding Path=SheetOptsVM.WorkWithSheets}"
+                     ItemsSource="{Binding Path=SheetOptsVM.TitleBlocksInProject}" 
+                     SelectedItem="{Binding Path=SheetOptsVM.SelectedTitleBlock}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock>
@@ -262,152 +247,175 @@
                 </ComboBox>
 
                 <TextBlock
-                    Grid.Column="3"
-                    Margin="20 0 0 0"
+                    DockPanel.Dock="Bottom"                        
+                    Margin="5 3"
+                    Text="Выберите рамку листа:"
+                    FontSize="14"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"/>
+
+
+                <CheckBox 
+                    DockPanel.Dock="Left"
+                    Margin="5"
+                    Content="Создавать/размещать листы"
+                    FontSize="14"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"
+                    IsChecked="{Binding Path=SheetOptsVM.WorkWithSheets}"/>
+
+                <TextBox 
+                    DockPanel.Dock="Right"
+                    Width="150"
+                    Height="30"
+                    Margin="5 3"
+                    VerticalContentAlignment="Center"
+                    Text="{Binding Path=SheetOptsVM.SheetNamePrefix}"/>
+
+                <TextBlock
+                    DockPanel.Dock="Right"
+                    Margin="3"
                     Text="Префикс листа:"
                     FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"/>
-
-                <TextBox 
-                    Grid.Column="4"
-                    Margin="3"
-                    VerticalContentAlignment="Center"
-                    Text="{Binding Path=SheetOptsVM.SheetNamePrefix}"/>
-            </Grid>
+            </DockPanel>
         </GroupBox>
 
         <GroupBox 
-            Grid.Row="4"
-            Margin="5"
-            Height="65">
-            <GroupBox.Header>
-                <TextBlock 
-                    Text="Для вида:"
-                    FontSize="14"/>
-            </GroupBox.Header>
-
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="0.6*"/>
-                    <ColumnDefinition Width="1.8*"/>
-                    <ColumnDefinition Width="1.4*"/>
-                    <ColumnDefinition Width="1.2*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <CheckBox 
-                    Grid.Column="0"
-                    Margin="10"
-                    Content="Создавать/размещать виды"
-                    FontSize="14"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Left"
-                    IsChecked="{Binding Path=ViewOptsVM.WorkWithViews}"/>
-
-                <TextBlock
-                    Grid.Column="1"
-                    Margin="3"
-                    Text="Тип вида:"
-                    FontSize="14"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Right"/>
-
-                <ComboBox
-                    Grid.Column="2"
-                    Margin="3"
-                    VerticalContentAlignment="Center"
-                    IsEnabled="{Binding Path=ViewOptsVM.WorkWithViews}"
-                    DisplayMemberPath="Name"
-                    ItemsSource="{Binding Path=ViewOptsVM.ViewFamilyTypes}" 
-                    SelectedItem="{Binding Path=ViewOptsVM.SelectedViewFamilyType}">
-                </ComboBox>
-
-                <TextBlock
-                    Grid.Column="3"
-                    Margin="3"
-                    Text="Тип видового экрана:"
-                    FontSize="14"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Right"/>
-
-                <ComboBox
-                    Grid.Column="4"
-                    Margin="3"
-                    VerticalContentAlignment="Center"
-                    IsEnabled="{Binding Path=ViewOptsVM.WorkWithViews}"
-                    DisplayMemberPath="Name"
-                    ItemsSource="{Binding Path=ViewOptsVM.ViewportTypes}" 
-                    SelectedItem="{Binding Path=ViewOptsVM.SelectedViewportType}">
-                </ComboBox>
-
-                <TextBlock
-                    Grid.Column="5"
-                    Margin="3"
-                    Text="Префикс вида:"
-                    FontSize="14"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Right"/>
-
-                <TextBox 
-                    Grid.Column="6"
-                    Margin="3"
-                    VerticalContentAlignment="Center"
-                    IsEnabled="{Binding Path=ViewOptsVM.WorkWithViews}"
-                    Text="{Binding Path=ViewOptsVM.ViewNamePrefix}"/>
-            </Grid>
-        </GroupBox>
-
-        <GroupBox 
-            Grid.Row="5" 
+            Grid.Row="3"
+            Grid.RowSpan="2"
             Grid.Column="1"
-            Margin="5" 
-            Height="65">
+            Margin="5 5 10 5">
             <GroupBox.Header>
                 <TextBlock 
-                    Text="Спеки:"
+                    Text="Виды:"
                     FontSize="14"/>
             </GroupBox.Header>
 
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
+                <DockPanel>
+                    <ComboBox
+                        DockPanel.Dock="Bottom"
+                        Height="30"
+                        Margin="5 3"
+                        VerticalContentAlignment="Center"
+                        IsEnabled="{Binding Path=ViewOptsVM.WorkWithViews}"
+                        ItemsSource="{Binding Path=ViewOptsVM.ViewFamilyTypes}" 
+                        SelectedItem="{Binding Path=ViewOptsVM.SelectedViewFamilyType}"
+                        DisplayMemberPath="Name">
+                    </ComboBox>
 
+                    <TextBlock
+                        DockPanel.Dock="Bottom"
+                        Margin="5 3"
+                        Text="Тип вида:"
+                        FontSize="14"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Left"/>
+                    
+                    <CheckBox 
+                        DockPanel.Dock="Left"
+                        Margin="5"
+                        Content="Создавать/размещать виды"
+                        FontSize="14"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        IsChecked="{Binding Path=ViewOptsVM.WorkWithViews}"/>
+
+                    <TextBox 
+                        DockPanel.Dock="Right"
+                        Width="150"
+                        Height="30"
+                        Margin="5 3"
+                        VerticalContentAlignment="Center"
+                        IsEnabled="{Binding Path=ViewOptsVM.WorkWithViews}"
+                        Text="{Binding Path=ViewOptsVM.ViewNamePrefix}"/>
+                    
+                    <TextBlock
+                        DockPanel.Dock="Right"
+                        Margin="3 0"
+                        Text="Префикс вида:"
+                        FontSize="14"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right"/>
+                </DockPanel>
+
+                <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
+
+                    <WebBrowser 
+                        x:Name="WB" 
+
+                        Source="https://64.media.tumblr.com/30019c36f243fb4f77a7f29006487b3c/tumblr_nahxp6u1Yw1qg6rkio1_500.gifv" 
+                        LoadCompleted="WB_LoadCompleted" />
+
+                    <TextBlock
+                        Margin="5 3"
+                        Text="Тип видового экрана:"
+                        FontSize="14"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Left"/>
+
+                    <ComboBox
+                        Height="30"
+                        Margin="5 3"
+                        VerticalContentAlignment="Center"
+                        IsEnabled="{Binding Path=ViewOptsVM.WorkWithViews}"
+                        DisplayMemberPath="Name"
+                        ItemsSource="{Binding Path=ViewOptsVM.ViewportTypes}" 
+                        SelectedItem="{Binding Path=ViewOptsVM.SelectedViewportType}">
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox 
+            Grid.Row="4" 
+            Margin="10 5 5 5">
+            <GroupBox.Header>
+                <TextBlock 
+                    Text="Спецификации:"
+                    FontSize="14"/>
+            </GroupBox.Header>
+
+            <DockPanel>
                 <CheckBox 
-                    Margin="10"
+                    DockPanel.Dock="Top"
+                    Margin="5"
                     Content="Создавать/размещать спецификации"
                     FontSize="14"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
                     IsChecked="{Binding Path=SpecOptsVM.WorkWithSpecs}"/>
 
-                <TextBlock
-                    Grid.Column="1"
-                    Margin="3"
-                    Text="Выберите поле этажа:"
-                    FontSize="14"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Right"/>
-
                 <ComboBox
-                    Grid.Column="2"
-                    Margin="3"
+                    DockPanel.Dock="Bottom"
+                    Height="30"
+                    Margin="5 3"
                     VerticalContentAlignment="Center"
                     IsEnabled="{Binding Path=SpecOptsVM.WorkWithSpecs}"
                     ItemsSource="{Binding Path=SpecOptsVM.FilterNamesFromSpecs, UpdateSourceTrigger=PropertyChanged}"
                     SelectedItem="{Binding Path=SpecOptsVM.SelectedFilterNameForSpecs}">
                 </ComboBox>
-            </Grid>
+
+                <TextBlock
+                    DockPanel.Dock="Bottom"
+                    Margin="5 3"
+                    Text="Выберите поле этажа:"
+                    FontSize="14"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"/>
+            </DockPanel>
         </GroupBox>
 
         <StackPanel
             Grid.Row="6"
+            Grid.Column="1"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">

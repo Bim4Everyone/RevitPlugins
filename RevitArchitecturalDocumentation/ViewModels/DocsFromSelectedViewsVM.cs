@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -76,8 +77,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                 numberOfLevelAsStr);
 
                             TreeReportNode sheetRep = new TreeReportNode(taskRep) { Name = $"Работа с листом \"{newSheetName}\"" };
-
-                            sheetHelper = new SheetHelper(Repository, sheetRep);
+                            SheetOpts.SelectedTitleBlock = SheetOpts.SelectedTitleBlock ?? Repository.TitleBlocksInProject?.FirstOrDefault(a => a.Name.Equals(SheetOpts.SelectedTitleBlockName));
                             sheetHelper.GetOrCreateSheet(newSheetName, SheetOpts.SelectedTitleBlock, "Ширина", "Высота", 150, 110);
                             taskRep.Nodes.Add(sheetRep);
                         }
@@ -101,7 +101,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                             if(sheetHelper.Sheet != null
                                 && newViewHelper.View != null
                                 && Viewport.CanAddViewToSheet(Repository.Document, sheetHelper.Sheet.Id, newViewHelper.View.Id)) {
-
+                                ViewOpts.SelectedViewportType = ViewOpts.SelectedViewportType ?? Repository.ViewportTypes?.FirstOrDefault(a => a.Name.Equals(ViewOpts.SelectedViewportTypeName));
                                 newViewHelper.PlaceViewportOnSheet(sheetHelper.Sheet, ViewOpts.SelectedViewportType);
                             }
                             taskRep.Nodes.Add(viewRep);

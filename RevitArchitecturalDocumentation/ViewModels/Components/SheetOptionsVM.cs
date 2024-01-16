@@ -17,7 +17,6 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
         private bool _workWithSheets;
         private List<FamilySymbol> _titleBlocksInProject;
         private FamilySymbol _selectedTitleBlock;
-        private string _selectedTitleBlockName;
         private string _sheetNamePrefix;
 
         public SheetOptionsVM(PluginConfig pluginConfig, RevitRepository revitRepository, SheetOptions sheetOptions) {
@@ -28,6 +27,7 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
             WorkWithSheets = _sheetOptions.WorkWithSheets;
             SheetNamePrefix = _sheetOptions.SheetNamePrefix;
             TitleBlocksInProject = _revitRepository.TitleBlocksInProject;
+            SelectedTitleBlock = TitleBlocksInProject?.FirstOrDefault(a => a.Name.Equals(_sheetOptions.SelectedTitleBlockName));
         }
 
 
@@ -46,56 +46,23 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
             set => RaiseAndSetIfChanged(ref _selectedTitleBlock, value);
         }
 
-        public string SelectedTitleBlockName {
-            get => _selectedTitleBlockName;
-            set => RaiseAndSetIfChanged(ref _selectedTitleBlockName, value);
-        }
-
         public string SheetNamePrefix {
             get => _sheetNamePrefix;
             set => RaiseAndSetIfChanged(ref _sheetNamePrefix, value);
         }
 
 
-        /// <summary>
-        /// Подгружает параметры плагина с предыдущего запуска
-        /// </summary>
-        public void LoadConfig() {
-
-            var settings = _pluginConfig.GetSettings(_revitRepository.Document);
-
-            if(settings is null) { return; }
-
-            WorkWithSheets = settings.WorkWithSheets;
-            SheetNamePrefix = settings.SheetNamePrefix;
-            SelectedTitleBlockName = settings.SelectedTitleBlockName;
-
-            SelectedTitleBlock = TitleBlocksInProject?.FirstOrDefault(a => a.Name.Equals(SelectedTitleBlockName));
-        }
-
-
-        /// <summary>
-        /// Сохраняет параметры плагина для следующего запуска
-        /// </summary>
-        public void SaveConfig() {
-
-            var settings = _pluginConfig.GetSettings(_revitRepository.Document)
-                          ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
-            settings.WorkWithSheets = WorkWithSheets;
-            settings.SheetNamePrefix = SheetNamePrefix;
-            settings.SelectedTitleBlockName = SelectedTitleBlock.Name;
-
-            _pluginConfig.SaveProjectConfig();
-        }
-
-
         public SheetOptions GetSheetOption() {
-            return new SheetOptions() {
+
+            SheetOptions sheetOptions = new SheetOptions(_pluginConfig, _revitRepository) {
                 WorkWithSheets = WorkWithSheets,
                 SelectedTitleBlock = SelectedTitleBlock,
+                SelectedTitleBlockName = SelectedTitleBlock.Name,
                 SheetNamePrefix = SheetNamePrefix
             };
+            sheetOptions.SaveConfig();
+
+            return sheetOptions;
         }
     }
 }

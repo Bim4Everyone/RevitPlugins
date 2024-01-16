@@ -193,10 +193,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             if(settings is null) { return; }
 
-            SheetOptsVM.LoadConfig();
-            ViewOptsVM.LoadConfig();
-            SpecOptsVM.LoadConfig();
-
             CreateViewsFromSelected = settings.CreateViewsFromSelected;
         }
 
@@ -208,10 +204,6 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             var settings = _pluginConfig.GetSettings(_revitRepository.Document)
                           ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
-            SheetOptsVM.SaveConfig();
-            ViewOptsVM.SaveConfig();
-            SpecOptsVM.SaveConfig();
 
             settings.CreateViewsFromSelected = CreateViewsFromSelected;
 
@@ -232,9 +224,9 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                 rep.AddNodeWithName($"Создание видов будет производиться с нуля. Перебираем уровни проекта и поочередно применяем задания:");
             }
             rep.AddNodeWithName($"Выбрано видов до запуска плагина: {SelectedViews.Count}");
-            rep.AddNodeWithName($"Выбран тип вида: {ViewOptsVM.SelectedViewFamilyTypeName}");
-            rep.AddNodeWithName($"Выбран тип видового экрана: {ViewOptsVM.SelectedViewportTypeName}");
-            rep.AddNodeWithName($"Выбран тип рамки листа: {SheetOptsVM.SelectedTitleBlockName}");
+            rep.AddNodeWithName($"Выбран тип вида: {ViewOptsVM.SelectedViewFamilyType.Name}");
+            rep.AddNodeWithName($"Выбран тип видового экрана: {ViewOptsVM.SelectedViewportType.Name}");
+            rep.AddNodeWithName($"Выбран тип рамки листа: {SheetOptsVM.SelectedTitleBlock.Name}");
             rep.AddNodeWithName($"Выбрано поле параметра фильтрации спецификации: {SpecOptsVM.SelectedFilterNameForSpecs}");
 
             foreach(TaskInfo task in TaskInformationVM.TasksForWork) {

@@ -38,33 +38,6 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
             set => this.RaiseAndSetIfChanged(ref _selectedFilterNameForSpecs, value);
         }
 
-        /// <summary>
-        /// Подгружает параметры плагина с предыдущего запуска
-        /// </summary>
-        public void LoadConfig() {
-
-            var settings = _pluginConfig.GetSettings(_revitRepository.Document);
-
-            if(settings is null) { return; }
-
-            WorkWithSpecs = settings.WorkWithSpecs;
-            SelectedFilterNameForSpecs = settings.SelectedFilterNameForSpecs;
-        }
-
-
-        /// <summary>
-        /// Сохраняет параметры плагина для следующего запуска
-        /// </summary>
-        public void SaveConfig() {
-
-            var settings = _pluginConfig.GetSettings(_revitRepository.Document)
-                          ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
-            settings.WorkWithSpecs = WorkWithSpecs;
-            settings.SelectedFilterNameForSpecs = SelectedFilterNameForSpecs;
-
-            _pluginConfig.SaveProjectConfig();
-        }
 
         /// <summary>
         /// Метод перебирает все выбранные спеки во всех заданиях и собирает список параметров фильтрации. принадлежащий всем одновременно
@@ -85,10 +58,14 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
         }
 
         public SpecOptions GetSpecOption() {
-            return new SpecOptions() {
+
+            SpecOptions specOptions = new SpecOptions(_pluginConfig, _revitRepository) {
                 WorkWithSpecs = WorkWithSpecs,
                 SelectedFilterNameForSpecs = SelectedFilterNameForSpecs,
             };
+            specOptions.SaveConfig();
+
+            return specOptions;
         }
     }
 }
