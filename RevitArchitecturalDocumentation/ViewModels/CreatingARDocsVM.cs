@@ -25,15 +25,14 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private ObservableCollection<ViewHelper> _selectedViewHelpers = new ObservableCollection<ViewHelper>();
 
 
-        public CreatingARDocsVM(PluginConfig pluginConfig, RevitRepository revitRepository,
-            SheetOptions sheetOptions, ViewOptions viewOptions, SpecOptions specOptions) {
+        public CreatingARDocsVM(PluginConfig pluginConfig, RevitRepository revitRepository, MainOptions mainOptions) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
             TaskInformationVM = new TaskInfoVM(pluginConfig, revitRepository, this);
-            SheetOptsVM = new SheetOptionsVM(pluginConfig, revitRepository, sheetOptions);
-            ViewOptsVM = new ViewOptionsVM(pluginConfig, revitRepository, viewOptions);
-            SpecOptsVM = new SpecOptionsVM(pluginConfig, revitRepository, specOptions);
+            SheetOptsVM = new SheetOptionsVM(pluginConfig, revitRepository, mainOptions.SheetOpts);
+            ViewOptsVM = new ViewOptionsVM(pluginConfig, revitRepository, mainOptions.ViewOpts);
+            SpecOptsVM = new SpecOptionsVM(pluginConfig, revitRepository, mainOptions.SpecOpts);
 
 
             LoadViewCommand = new RelayCommand(LoadView);

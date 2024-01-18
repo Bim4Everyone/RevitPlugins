@@ -35,6 +35,8 @@ namespace RevitArchitecturalDocumentation {
                     .ToSelf()
                     .InSingletonScope();
 
+                kernel.Bind<MainOptions>()
+                    .ToSelf();
                 kernel.Bind<SheetOptions>()
                     .ToSelf();
                 kernel.Bind<ViewOptions>()

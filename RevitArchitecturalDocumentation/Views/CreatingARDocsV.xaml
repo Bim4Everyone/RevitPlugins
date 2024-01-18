@@ -347,13 +347,6 @@
                 </DockPanel>
 
                 <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
-
-                    <WebBrowser 
-                        x:Name="WB" 
-
-                        Source="https://64.media.tumblr.com/30019c36f243fb4f77a7f29006487b3c/tumblr_nahxp6u1Yw1qg6rkio1_500.gifv" 
-                        LoadCompleted="WB_LoadCompleted" />
-
                     <TextBlock
                         Margin="5 3"
                         Text="Тип видового экрана:"

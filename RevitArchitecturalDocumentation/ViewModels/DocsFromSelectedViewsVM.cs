@@ -77,6 +77,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                 numberOfLevelAsStr);
 
                             TreeReportNode sheetRep = new TreeReportNode(taskRep) { Name = $"Работа с листом \"{newSheetName}\"" };
+                            sheetHelper = new SheetHelper(Repository, sheetRep);
                             SheetOpts.SelectedTitleBlock = SheetOpts.SelectedTitleBlock ?? Repository.TitleBlocksInProject?.FirstOrDefault(a => a.Name.Equals(SheetOpts.SelectedTitleBlockName));
                             sheetHelper.GetOrCreateSheet(newSheetName, SheetOpts.SelectedTitleBlock, "Ширина", "Высота", 150, 110);
                             taskRep.Nodes.Add(sheetRep);
