@@ -4,27 +4,26 @@
                            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                            xmlns:base="clr-namespace:dosymep.WPF.Views"
+                           xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
                            xmlns:local="clr-namespace:RevitFinishingWalls.Views"
                            xmlns:vms="clr-namespace:RevitFinishingWalls.ViewModels"
                            xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                            xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
                            xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
                            xmlns:converters="clr-namespace:RevitFinishingWalls.Resources.Converters"
-                           xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
                            mc:Ignorable="d"
                            WindowStartupLocation="CenterOwner"
-                           Title="{Binding Title}"
                            MinHeight="250"
-                           MinWidth="500"
+                           MinWidth="560"
                            MaxHeight="250"
-                           MaxWidth="500"
+                           MaxWidth="560"
                            d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
                            ResizeMode="NoResize">
-    <b:Interaction.Triggers>
-        <b:EventTrigger EventName="Loaded">
-            <b:InvokeCommandAction Command="{Binding LoadConfigCommand}" />
-        </b:EventTrigger>
-    </b:Interaction.Triggers>
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand EventName="Loaded"
+                               Command="{Binding LoadConfigCommand}" />
+        <common:AttachServiceBehavior AttachableService="{Binding MessageBoxService}" />
+    </dxmvvm:Interaction.Behaviors>
     <Window.Resources>
         <Style TargetType="dxe:TextEdit">
             <Setter Property="Width"
@@ -55,7 +54,7 @@
             <Setter Property="Margin"
                     Value="5 0" />
             <Setter Property="Width"
-                    Value="100" />
+                    Value="160" />
             <Setter Property="TextAlignment"
                     Value="Justify" />
             <Setter Property="VerticalAlignment"
@@ -85,13 +84,13 @@
             </DockPanel>
 
             <DockPanel Style="{StaticResource DockPanelInput}">
-                <TextBlock Text="Тип стен:"
+                <TextBlock Text="Тип отделочных стен:"
                            Style="{StaticResource InputDescription}" />
                 <dxe:ComboBoxEdit ItemsSource="{Binding WallTypes}"
                                   SelectedItem="{Binding SelectedWallType}"
                                   Style="{StaticResource ComboBoxInput}"
                                   AutoComplete="True"
-                                  IncrementalSearch="True" 
+                                  IncrementalSearch="True"
                                   ImmediatePopup="True"
                                   IncrementalFiltering="True"
                                   IsCaseSensitiveFilter="False"
@@ -99,12 +98,12 @@
                                   DisplayMember="Name">
                 </dxe:ComboBoxEdit>
             </DockPanel>
-
+            <!--TODO tooltip с описанием работы: стены создаются только по элементам из активного документа и т.д.-->
             <DockPanel Style="{StaticResource DockPanelInput}">
-                <TextBlock Text="Высота стен:"
+                <TextBlock Text="Отметка верха от уровня:"
                            Style="{StaticResource InputDescription}" />
-                <ComboBox ItemsSource="{Binding WallHeightModes}"
-                          SelectedItem="{Binding SelectedWallHeightMode}"
+                <ComboBox ItemsSource="{Binding WallElevationModes}"
+                          SelectedItem="{Binding SelectedWallElevationMode}"
                           Style="{StaticResource ComboBoxInput}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
@@ -112,7 +111,7 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
-                <dxe:TextEdit Text="{Binding WallHeightByUser, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                <dxe:TextEdit Text="{Binding WallElevationByUser, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                               IsEnabled="{Binding IsWallHeightByUserEnabled}" />
                 <TextBlock Text="мм"
                            Width="Auto"
@@ -120,7 +119,7 @@
             </DockPanel>
 
             <DockPanel Style="{StaticResource DockPanelInput}">
-                <TextBlock Text="Отступ низа стен:"
+                <TextBlock Text="Смещение снизу от уровня:"
                            Style="{StaticResource InputDescription}" />
                 <dxe:TextEdit Text="{Binding WallBaseOffset, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
                 <TextBlock Text="мм"

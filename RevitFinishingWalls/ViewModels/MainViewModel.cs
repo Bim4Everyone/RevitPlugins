@@ -2,42 +2,52 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitFinishingWalls.Models;
 using RevitFinishingWalls.Models.Enums;
+using RevitFinishingWalls.Services.Creation;
 
 namespace RevitFinishingWalls.ViewModels {
     internal class MainViewModel : BaseViewModel, IDataErrorInfo {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
+        private readonly IRoomFinisher _roomFinisher;
+        private readonly IMessageBoxService _messageBoxService;
 
-
-        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
+        public MainViewModel(
+            PluginConfig pluginConfig,
+            RevitRepository revitRepository,
+            IRoomFinisher roomFinisher,
+            IMessageBoxService messageBoxService
+            ) {
             _pluginConfig = pluginConfig ?? throw new ArgumentNullException(nameof(pluginConfig));
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            _roomFinisher = roomFinisher ?? throw new ArgumentNullException(nameof(roomFinisher));
+            _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
 
             RoomGetterModes = new ObservableCollection<RoomGetterMode>(
                 Enum.GetValues(typeof(RoomGetterMode)).Cast<RoomGetterMode>());
-            WallHeightModes = new ObservableCollection<WallHeightMode>(
-                Enum.GetValues(typeof(WallHeightMode)).Cast<WallHeightMode>());
+            WallElevationModes = new ObservableCollection<WallElevationMode>(
+                Enum.GetValues(typeof(WallElevationMode)).Cast<WallElevationMode>());
             WallTypes = new ObservableCollection<WallType>(_revitRepository.GetWallTypes().OrderBy(wt => wt.Name));
 
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             LoadConfigCommand = RelayCommand.Create(LoadConfig);
         }
 
-        public string Title => "Настройки отделки стен";
-
-
         public ICommand LoadConfigCommand { get; }
 
         public ICommand AcceptViewCommand { get; }
+
+        public IMessageBoxService MessageBoxService => _messageBoxService;
 
         public string ErrorText => Error;
 
@@ -64,7 +74,7 @@ namespace RevitFinishingWalls.ViewModels {
 
 
         private string _wallHeightByUser;
-        public string WallHeightByUser {
+        public string WallElevationByUser {
             get => _wallHeightByUser;
             set {
                 RaiseAndSetIfChanged(ref _wallHeightByUser, value);
@@ -73,13 +83,13 @@ namespace RevitFinishingWalls.ViewModels {
         }
 
 
-        public bool IsWallHeightByUserEnabled => SelectedWallHeightMode == WallHeightMode.ManualHeight;
+        public bool IsWallHeightByUserEnabled => SelectedWallElevationMode == WallElevationMode.ManualHeight;
 
 
-        public ObservableCollection<WallHeightMode> WallHeightModes { get; }
+        public ObservableCollection<WallElevationMode> WallElevationModes { get; }
 
-        private WallHeightMode _selectedWallHeightMode;
-        public WallHeightMode SelectedWallHeightMode {
+        private WallElevationMode _selectedWallHeightMode;
+        public WallElevationMode SelectedWallElevationMode {
             get => _selectedWallHeightMode;
             set {
                 RaiseAndSetIfChanged(ref _selectedWallHeightMode, value);
@@ -113,16 +123,18 @@ namespace RevitFinishingWalls.ViewModels {
                         }
                         break;
                     }
-                    case nameof(WallHeightByUser): {
-                        if(SelectedWallHeightMode == WallHeightMode.ManualHeight) {
-                            if(int.TryParse(WallHeightByUser, out int height)) {
+                    case nameof(WallElevationByUser): {
+                        if(SelectedWallElevationMode == WallElevationMode.ManualHeight) {
+                            if(int.TryParse(WallElevationByUser, out int height)) {
                                 if(height <= 0) {
-                                    error = "Высота должна быть больше 0";
+                                    error = "Отметка верха должна быть больше 0";
                                 } else if(height > 50000) {
-                                    error = "Слишком большая высота стены";
+                                    error = "Слишком большая отметка верха стены";
+                                } else if(int.TryParse(WallBaseOffset, out int offset) && (height <= offset)) {
+                                    error = "Отметка верха должна быть больше смещения";
                                 }
                             } else {
-                                error = "Высота должна быть целым числом";
+                                error = "Отметка верха должна быть целым числом";
                             }
                         }
                         break;
@@ -146,6 +158,10 @@ namespace RevitFinishingWalls.ViewModels {
 
         private void AcceptView() {
             SaveConfig();
+            _roomFinisher.CreateWallsFinishing(_pluginConfig, out string error);
+            if(!string.IsNullOrWhiteSpace(error)) {
+                _messageBoxService.Show(error, "BIM", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+            }
         }
 
         private bool CanAcceptView() {
@@ -154,18 +170,20 @@ namespace RevitFinishingWalls.ViewModels {
 
         private void LoadConfig() {
             SelectedRoomGetterMode = _pluginConfig.RoomGetterMode;
-            SelectedWallHeightMode = _pluginConfig.WallHeightMode;
-            WallHeightByUser = _pluginConfig.WallHeightByUser.ToString();
+            SelectedWallElevationMode = _pluginConfig.WallElevationMode;
+            WallElevationByUser = _pluginConfig.WallElevation.ToString();
             WallBaseOffset = _pluginConfig.WallBaseOffset.ToString();
+            SelectedWallType = _revitRepository.GetWallType(_pluginConfig.WallTypeId);
 
             OnPropertyChanged(nameof(ErrorText));
         }
 
         private void SaveConfig() {
             _pluginConfig.RoomGetterMode = SelectedRoomGetterMode;
-            _pluginConfig.WallHeightMode = SelectedWallHeightMode;
+            _pluginConfig.WallElevationMode = SelectedWallElevationMode;
             _pluginConfig.WallBaseOffset = int.TryParse(WallBaseOffset, out int offset) ? offset : 0;
-            _pluginConfig.WallHeightByUser = int.TryParse(WallHeightByUser, out int height) ? height : 0;
+            _pluginConfig.WallElevation = int.TryParse(WallElevationByUser, out int height) ? height : 0;
+            _pluginConfig.WallTypeId = SelectedWallType.Id;
             _pluginConfig.SaveProjectConfig();
         }
     }

@@ -10,7 +10,7 @@ using RevitFinishingWalls.Models.Enums;
 
 namespace RevitFinishingWalls.Models {
     /// <summary>
-    /// Настройки расстановки
+    /// Настройки расстановки отделочных стен
     /// </summary>
     internal class PluginConfig : ProjectConfig {
         [JsonIgnore] public override string ProjectConfigPath { get; set; }
@@ -20,27 +20,27 @@ namespace RevitFinishingWalls.Models {
         /// <summary>
         /// Тип отделочной стены
         /// </summary>
-        [JsonIgnore] public WallType WallType { get; set; }
+        public ElementId WallTypeId { get; set; } = ElementId.InvalidElementId;
 
         /// <summary>
-        /// Высота стен, заданная пользователем
+        /// Отметка верха стены от уровня, заданная пользователем в мм
         /// </summary>
-        public int WallHeightByUser { get; set; } = 3000;
+        public double WallElevation { get; set; } = 3000;
 
         /// <summary>
         /// Режим выбора помещений для обработки
         /// </summary>
-        public RoomGetterMode RoomGetterMode { get; set; }
+        public RoomGetterMode RoomGetterMode { get; set; } = RoomGetterMode.RoomsOnActiveView;
 
         /// <summary>
-        /// Режим задания высоты стен
+        /// Режим задания верхней отметки стен от уровня
         /// </summary>
-        public WallHeightMode WallHeightMode { get; set; }
+        public WallElevationMode WallElevationMode { get; set; } = WallElevationMode.HeightByRoom;
 
         /// <summary>
-        /// Отступ низа стены от уровня
+        /// Отступ низа стены от уровня в мм
         /// </summary>
-        public int WallBaseOffset { get; set; }
+        public double WallBaseOffset { get; set; } = 0;
 
 
         public static PluginConfig GetPluginConfig() {

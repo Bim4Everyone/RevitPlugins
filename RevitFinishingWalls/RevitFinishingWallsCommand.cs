@@ -5,10 +5,13 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
 using RevitFinishingWalls.Models;
+using RevitFinishingWalls.Services.Creation;
+using RevitFinishingWalls.Services.Creation.Implements;
 using RevitFinishingWalls.ViewModels;
 using RevitFinishingWalls.Views;
 
@@ -25,8 +28,11 @@ namespace RevitFinishingWalls {
                     .ToSelf()
                     .InSingletonScope();
 
+                kernel.Bind<IRoomFinisher>().To<RoomFinisher>().InSingletonScope();
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
+
+                kernel.UseXtraMessageBox<MainViewModel>();
 
                 kernel.Bind<MainViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()
