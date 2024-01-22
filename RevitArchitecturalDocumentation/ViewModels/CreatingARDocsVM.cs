@@ -274,16 +274,17 @@ namespace RevitArchitecturalDocumentation.ViewModels {
         private void DoWork() {
 
             TreeReport.Add(GetInitialDataForReport());
+            MainOptions mainOptions = new MainOptions(SheetOptsVM.GetSheetOption(), ViewOptsVM.GetViewOption(), SpecOptsVM.GetSpecOption());
 
             if(CreateViewsFromSelected) {
 
-                DocsFromSelectedViewsVM docsFromSelectedViewsVM = new DocsFromSelectedViewsVM(this, _revitRepository, TreeReport,
-                    TaskInformationVM.TasksForWork, SheetOptsVM.GetSheetOption(), ViewOptsVM.GetViewOption(), SpecOptsVM.GetSpecOption());
+                DocsFromSelectedViews docsFromSelectedViewsVM = new DocsFromSelectedViews(this, _revitRepository, TreeReport,
+                    TaskInformationVM.TasksForWork, mainOptions);
                 docsFromSelectedViewsVM.CreateDocs();
             } else {
 
-                DocsFromScratchVM docsFromScratchVM = new DocsFromScratchVM(this, _revitRepository, TreeReport,
-                    TaskInformationVM.TasksForWork, SheetOptsVM.GetSheetOption(), ViewOptsVM.GetViewOption(), SpecOptsVM.GetSpecOption());
+                DocsFromScratch docsFromScratchVM = new DocsFromScratch(this, _revitRepository, TreeReport,
+                    TaskInformationVM.TasksForWork, mainOptions);
                 docsFromScratchVM.CreateDocs();
             }
 

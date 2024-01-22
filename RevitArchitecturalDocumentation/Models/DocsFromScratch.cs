@@ -5,21 +5,22 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-using RevitArchitecturalDocumentation.Models;
 using RevitArchitecturalDocumentation.Models.Options;
+using RevitArchitecturalDocumentation.ViewModels;
 
-namespace RevitArchitecturalDocumentation.ViewModels {
-    internal class DocsFromSelectedViewsVM {
 
-        public DocsFromSelectedViewsVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report,
-            ObservableCollection<TaskInfo> tasksForWork, SheetOptions sheetOptions, ViewOptions viewOptions, SpecOptions specOptions) {
+namespace RevitArchitecturalDocumentation.Models {
+    internal class DocsFromScratch {
+
+        public DocsFromScratch(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report,
+            ObservableCollection<TaskInfo> tasksForWork, MainOptions mainOptions) {
             MVM = pCOnASPDocsVM;
             Repository = revitRepository;
             Report = report;
             TasksForWork = tasksForWork;
-            SheetOpts = sheetOptions;
-            ViewOpts = viewOptions;
-            SpecOpts = specOptions;
+            SheetOpts = mainOptions.SheetOpts;
+            ViewOpts = mainOptions.ViewOpts;
+            SpecOpts = mainOptions.SpecOpts;
         }
 
         public CreatingARDocsVM MVM { get; set; }
@@ -33,39 +34,49 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
 
         /// <summary>
-        /// В зависимости от выбора пользователя метод создает листы, виды (создает путем копирования выбранных видов), спеки и выносит виды и спеки на листы
+        /// В зависимости от выбора пользователя метод создает листы, виды (создает с нуля, а не копированием выбранных видов), спеки и выносит виды и спеки на листы
         /// </summary>
         public void CreateDocs() {
 
             using(Transaction transaction = Repository.Document.StartTransaction("Документатор АР")) {
 
-                foreach(ViewHelper viewHelper in MVM.SelectedViewHelpers) {
-                    int numberOfLevelAsInt = viewHelper.NameHelper.LevelNumber;
-                    string numberOfLevelAsStr = viewHelper.NameHelper.LevelNumberAsStr;
+                foreach(Level level in Repository.Levels) {
 
-                    TreeReportNode selectedViewRep = new TreeReportNode(null) { Name = $"Работаем с выбранным видом: \"{viewHelper.View.Name}\"" };
-                    selectedViewRep.AddNodeWithName($"Номер этажа в соответствии с именем выбранного вида: \"{numberOfLevelAsInt}\"");
+                    TreeReportNode levelRep = new TreeReportNode(null) { Name = $"Работаем с уровнем: \"{level.Name}\"" };
 
-                    string viewNamePartWithSectionPart = string.Empty;
-
-                    if(viewHelper.View.Name.ToLower().Contains("_часть ")) {
-                        viewNamePartWithSectionPart = "_часть ";
-                        viewNamePartWithSectionPart += Repository.RegexForBuildingSectionPart.Match(viewHelper.View.Name.ToLower()).Groups[1].Value;
+                    string numberOfLevel = Repository.RegexForLevel.Match(level.Name).Groups[1].Value;
+                    if(!int.TryParse(numberOfLevel, out int numberOfLevelAsInt)) {
+                        levelRep.AddNodeWithName($"❗ Не удалось определить номер уровня {level.Name}!");
+                        continue;
                     }
+                    levelRep.AddNodeWithName($"Номер уровня: \"{numberOfLevelAsInt}\"");
 
                     foreach(TaskInfo task in TasksForWork) {
 
-                        TreeReportNode taskRep = new TreeReportNode(selectedViewRep) {
+                        TreeReportNode taskRep = new TreeReportNode(levelRep) {
                             Name = $"Задание номер: \"{task.TaskNumber}\" - " +
                             $"уровни ({task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}), {task.SelectedVisibilityScope.Name}"
                         };
 
-                        if(numberOfLevelAsInt < task.StartLevelNumberAsInt || numberOfLevelAsInt > task.EndLevelNumberAsInt) {
-                            taskRep.AddNodeWithName($"  ~  Уровень вида \"{numberOfLevelAsInt}\" не подходит под искомый диапазон: " +
-                                $"{task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}");
-                            selectedViewRep.Nodes.Add(taskRep);
+                        string strForLevelSearch = "К" + task.NumberOfBuildingPartAsInt.ToString() + "_";
+                        if(!level.Name.Contains(strForLevelSearch)) {
+                            taskRep.AddNodeWithName($"  ~  Уровень не относится к нужному корпусу, т.к. не содержит: \"{strForLevelSearch}\"");
+                            levelRep.Nodes.Add(taskRep);
                             continue;
+                        } else {
+                            taskRep.AddNodeWithName($"Уровень относится к нужному корпусу, т.к. содержит: \"{strForLevelSearch}\"");
                         }
+
+                        if(numberOfLevelAsInt < task.StartLevelNumberAsInt || numberOfLevelAsInt > task.EndLevelNumberAsInt) {
+                            taskRep.AddNodeWithName($"  ~  Уровень \"{numberOfLevelAsInt}\" не подходит под искомый диапазон: " +
+                                         $"{task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}");
+                            levelRep.Nodes.Add(taskRep);
+                            continue;
+                        } else {
+                            taskRep.AddNodeWithName($"Уровень \"{numberOfLevelAsInt}\" подходит под искомый диапазон: " +
+                                        $"{task.StartLevelNumberAsInt} - {task.EndLevelNumberAsInt}");
+                        }
+
 
                         SheetHelper sheetHelper = null;
                         if(SheetOpts.WorkWithSheets) {
@@ -74,30 +85,28 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                 SheetOpts.SheetNamePrefix,
                                 task.NumberOfBuildingPartAsInt,
                                 task.NumberOfBuildingSectionAsInt,
-                                numberOfLevelAsStr);
+                                numberOfLevel);
 
                             TreeReportNode sheetRep = new TreeReportNode(taskRep) { Name = $"Работа с листом \"{newSheetName}\"" };
+
                             sheetHelper = new SheetHelper(Repository, sheetRep);
                             SheetOpts.SelectedTitleBlock = SheetOpts.SelectedTitleBlock ?? Repository.TitleBlocksInProject?.FirstOrDefault(a => a.Name.Equals(SheetOpts.SelectedTitleBlockName));
-                            sheetHelper.GetOrCreateSheet(newSheetName, SheetOpts.SelectedTitleBlock, "Ширина", "Высота", 150, 110);
+                            sheetHelper.GetOrCreateSheet(newSheetName, SheetOpts.SelectedTitleBlock);
                             taskRep.Nodes.Add(sheetRep);
                         }
 
-
                         if(ViewOpts.WorkWithViews) {
 
-                            string newViewName = string.Format("{0}{1} этаж К{2}_С{3}{4}{5}",
+                            string newViewName = string.Format("{0}{1} этаж К{2}{3}",
                                 ViewOpts.ViewNamePrefix,
-                                numberOfLevelAsStr,
+                                numberOfLevel,
                                 task.NumberOfBuildingPartAsInt,
-                                task.NumberOfBuildingSectionAsInt,
-                                viewNamePartWithSectionPart,
                                 task.ViewNameSuffix);
 
                             TreeReportNode viewRep = new TreeReportNode(taskRep) { Name = $"Работа с видом \"{newViewName}\"" };
 
                             ViewHelper newViewHelper = new ViewHelper(Repository, viewRep);
-                            newViewHelper.GetView(newViewName, task.SelectedVisibilityScope, viewForDublicate: viewHelper.View);
+                            newViewHelper.GetView(newViewName, task.SelectedVisibilityScope, ViewOpts.SelectedViewFamilyType, level);
 
                             if(sheetHelper.Sheet != null
                                 && newViewHelper.View != null
@@ -127,12 +136,13 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                                 taskRep.Nodes.Add(specRep);
                             }
                         }
-                        selectedViewRep.Nodes.Add(taskRep);
+                        levelRep.Nodes.Add(taskRep);
                     }
-                    Report.Add(selectedViewRep);
+                    Report.Add(levelRep);
                 }
                 transaction.Commit();
             }
         }
     }
 }
+
