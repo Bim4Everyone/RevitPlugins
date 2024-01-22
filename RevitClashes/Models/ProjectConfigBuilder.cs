@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 
 using dosymep.Bim4Everyone.ProjectConfigs;
@@ -65,10 +65,12 @@ namespace RevitClashDetective.Models {
                 string fileContent = File.ReadAllText(projectConfigPath);
 
                 T projectConfig = _serializer.Deserialize<T>(fileContent);
-                projectConfig.Serializer = _serializer;
-                projectConfig.ProjectConfigPath = projectConfigPath;
+                if(projectConfig != null) {
+                    projectConfig.Serializer = _serializer;
+                    projectConfig.ProjectConfigPath = projectConfigPath;
 
-                return projectConfig;
+                    return projectConfig;
+                }
             }
 
             return new T() { Serializer = _serializer, ProjectConfigPath = projectConfigPath };
