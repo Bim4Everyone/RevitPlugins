@@ -94,7 +94,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                     ViewHelper viewHelper = new ViewHelper(viewPlan);
                     SelectedViewHelpers.Add(viewHelper);
                     try {
-                        viewHelper.NameHelper.AnilizeNGetLevelNumber();
+                        viewHelper.NameHelper.AnalyzeNGetLevelNumber();
                     } catch(ViewNameException ex) {
                         ErrorText = ex.Message;
                     }
@@ -123,7 +123,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             foreach(ViewHelper viewHelper in SelectedViewHelpers) {
                 try {
-                    viewHelper.NameHelper.AnilizeNGetLevelNumber();
+                    viewHelper.NameHelper.AnalyzeNGetLevelNumber();
 
                 } catch(ViewNameException ex) {
                     ErrorText = ex.Message;
@@ -148,7 +148,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                         try {
                             // Анализируем и получаем номер одновременно, т.к. чтобы проанализировать номер уровня
                             // нужно получить другую информацию, что по факту равно загрузке при получении уровня
-                            specHelper.NameHelper.AnilizeNGetLevelNumber();
+                            specHelper.NameHelper.AnalyzeNGetLevelNumber();
 
                         } catch(ViewNameException ex) {
                             ErrorText = ex.Message;

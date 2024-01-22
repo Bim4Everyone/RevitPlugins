@@ -83,6 +83,7 @@ namespace RevitArchitecturalDocumentation.Models {
         /// Получает виды в плане, выбранных до запуска плагина.
         /// </summary>
         public ObservableCollection<ViewPlan> GetSelectedViewPlans() => new ObservableCollection<ViewPlan>(ActiveUIDocument.Selection.GetElementIds()
-            .Select(id => Document.GetElement(id) as ViewPlan));
+            .Select(id => Document.GetElement(id) as ViewPlan)
+            .Where(v => v != null));
     }
 }

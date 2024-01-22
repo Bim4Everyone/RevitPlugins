@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.Exceptions;
 using Autodesk.Revit.UI.Selection;
 
 using dosymep.WPF.Commands;
@@ -87,11 +88,19 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
 
             TaskInfo task = obj as TaskInfo;
             if(task != null) {
-                task.ListSpecHelpers.Clear();
 
                 ISelectionFilter selectFilter = new ScheduleSelectionFilter();
-                IList<Reference> references = _revitRepository.ActiveUIDocument.Selection
+                IList<Reference> references = new List<Reference>();
+                try {
+                    references = _revitRepository.ActiveUIDocument.Selection
                                 .PickObjects(ObjectType.Element, selectFilter, "Выберите спецификации на листе");
+                } catch(OperationCanceledException) {
+
+                    _creatingARDocsVM.PCOnASPDocsView.ShowDialog();
+                    return;
+                }
+
+                task.ListSpecHelpers.Clear();
 
                 foreach(Reference reference in references) {
 
@@ -103,7 +112,7 @@ namespace RevitArchitecturalDocumentation.ViewModels.Components {
                     SpecHelper specHelper = new SpecHelper(_revitRepository, scheduleSheetInstance);
                     task.ListSpecHelpers.Add(specHelper);
                     try {
-                        specHelper.NameHelper.AnilizeNGetNameInfo();
+                        specHelper.NameHelper.AnalyzeNGetNameInfo();
 
                     } catch(ViewNameException ex) {
                         _creatingARDocsVM.ErrorText = ex.Message;
