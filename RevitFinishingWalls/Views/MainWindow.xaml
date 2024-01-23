@@ -14,9 +14,9 @@
                            mc:Ignorable="d"
                            WindowStartupLocation="CenterOwner"
                            MinHeight="250"
-                           MinWidth="560"
+                           MinWidth="600"
                            MaxHeight="250"
-                           MaxWidth="560"
+                           MaxWidth="600"
                            d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
                            ResizeMode="NoResize">
     <dxmvvm:Interaction.Behaviors>
