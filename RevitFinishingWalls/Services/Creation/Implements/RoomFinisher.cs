@@ -8,6 +8,7 @@ using dosymep.Revit;
 
 using RevitFinishingWalls.Exceptions;
 using RevitFinishingWalls.Models;
+using RevitFinishingWalls.Services.FailureHandlers;
 
 namespace RevitFinishingWalls.Services.Creation.Implements {
     internal class RoomFinisher : IRoomFinisher {
@@ -28,6 +29,9 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
             StringBuilder sb = new StringBuilder();
 
             using(var transaction = _revitRepository.Document.StartTransaction("BIM: Создание отделочных стен")) {
+                FailureHandlingOptions failOpt = transaction.GetFailureHandlingOptions();
+                failOpt.SetFailuresPreprocessor(new WallAndRoomSeparationLineOverlapHandler());
+                transaction.SetFailureHandlingOptions(failOpt);
                 foreach(var room in rooms) {
                     IList<WallCreationData> datas = _revitRepository.GetWallCreationData(room, config);
                     for(int i = 0; i < datas.Count; i++) {
