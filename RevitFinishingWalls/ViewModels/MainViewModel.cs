@@ -5,8 +5,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
-using Autodesk.Revit.DB;
-
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -37,7 +35,8 @@ namespace RevitFinishingWalls.ViewModels {
                 Enum.GetValues(typeof(RoomGetterMode)).Cast<RoomGetterMode>());
             WallElevationModes = new ObservableCollection<WallElevationMode>(
                 Enum.GetValues(typeof(WallElevationMode)).Cast<WallElevationMode>());
-            WallTypes = new ObservableCollection<WallType>(_revitRepository.GetWallTypes().OrderBy(wt => wt.Name));
+            WallTypes = new ObservableCollection<WallTypeViewModel>(
+                _revitRepository.GetWallTypes().Select(wt => new WallTypeViewModel(wt)).OrderBy(wt => wt.Name));
 
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             LoadConfigCommand = RelayCommand.Create(LoadConfig);
@@ -61,10 +60,10 @@ namespace RevitFinishingWalls.ViewModels {
         }
 
 
-        public ObservableCollection<WallType> WallTypes { get; }
+        public ObservableCollection<WallTypeViewModel> WallTypes { get; }
 
-        private WallType _selectedWallType;
-        public WallType SelectedWallType {
+        private WallTypeViewModel _selectedWallType;
+        public WallTypeViewModel SelectedWallType {
             get => _selectedWallType;
             set {
                 RaiseAndSetIfChanged(ref _selectedWallType, value);
@@ -173,7 +172,7 @@ namespace RevitFinishingWalls.ViewModels {
             SelectedWallElevationMode = _pluginConfig.WallElevationMode;
             WallElevationByUser = _pluginConfig.WallElevation.ToString();
             WallBaseOffset = _pluginConfig.WallBaseOffset.ToString();
-            SelectedWallType = _revitRepository.GetWallType(_pluginConfig.WallTypeId);
+            SelectedWallType = WallTypes.FirstOrDefault(wtvm => wtvm.WallTypeId == _pluginConfig.WallTypeId);
 
             OnPropertyChanged(nameof(ErrorText));
         }
@@ -183,7 +182,7 @@ namespace RevitFinishingWalls.ViewModels {
             _pluginConfig.WallElevationMode = SelectedWallElevationMode;
             _pluginConfig.WallBaseOffset = int.TryParse(WallBaseOffset, out int offset) ? offset : 0;
             _pluginConfig.WallElevation = int.TryParse(WallElevationByUser, out int height) ? height : 0;
-            _pluginConfig.WallTypeId = SelectedWallType.Id;
+            _pluginConfig.WallTypeId = SelectedWallType.WallTypeId;
             _pluginConfig.SaveProjectConfig();
         }
     }
