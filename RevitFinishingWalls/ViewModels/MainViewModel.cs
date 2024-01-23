@@ -124,29 +124,29 @@ namespace RevitFinishingWalls.ViewModels {
                     }
                     case nameof(WallElevationByUser): {
                         if(SelectedWallElevationMode == WallElevationMode.ManualHeight) {
-                            if(int.TryParse(WallElevationByUser, out int height)) {
+                            if(double.TryParse(WallElevationByUser, out double height)) {
                                 if(height <= 0) {
                                     error = "Отметка верха должна быть больше 0";
                                 } else if(height > 50000) {
                                     error = "Слишком большая отметка верха стены";
-                                } else if(int.TryParse(WallBaseOffset, out int offset) && (height <= offset)) {
+                                } else if(double.TryParse(WallBaseOffset, out double offset) && (height <= offset)) {
                                     error = "Отметка верха должна быть больше смещения";
                                 }
                             } else {
-                                error = "Отметка верха должна быть целым числом";
+                                error = "Отметка верха должна быть числом";
                             }
                         }
                         break;
                     }
                     case nameof(WallBaseOffset): {
-                        if(int.TryParse(WallBaseOffset, out int offset)) {
+                        if(double.TryParse(WallBaseOffset, out double offset)) {
                             if(offset < -5000) {
                                 error = "Слишком большое смещение вниз";
                             } else if(offset > 5000) {
                                 error = "Слишком большое смещение вверх";
                             }
                         } else {
-                            error = "Смещение должно быть целым числом";
+                            error = "Смещение должно быть числом";
                         }
                         break;
                     }
@@ -180,8 +180,8 @@ namespace RevitFinishingWalls.ViewModels {
         private void SaveConfig() {
             _pluginConfig.RoomGetterMode = SelectedRoomGetterMode;
             _pluginConfig.WallElevationMode = SelectedWallElevationMode;
-            _pluginConfig.WallBaseOffset = int.TryParse(WallBaseOffset, out int offset) ? offset : 0;
-            _pluginConfig.WallElevation = int.TryParse(WallElevationByUser, out int height) ? height : 0;
+            _pluginConfig.WallBaseOffset = double.TryParse(WallBaseOffset, out double offset) ? offset : 0;
+            _pluginConfig.WallElevation = double.TryParse(WallElevationByUser, out double height) ? height : 0;
             _pluginConfig.WallTypeId = SelectedWallType.WallTypeId;
             _pluginConfig.SaveProjectConfig();
         }
