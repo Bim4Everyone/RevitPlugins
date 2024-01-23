@@ -19,7 +19,7 @@ namespace RevitFinishingWalls {
     [Transaction(TransactionMode.Manual)]
     public class RevitFinishingWallsCommand : BasePluginCommand {
         public RevitFinishingWallsCommand() {
-            PluginName = "RevitFinishingWalls";
+            PluginName = "Отделка стен";
         }
 
         protected override void Execute(UIApplication uiApplication) {
