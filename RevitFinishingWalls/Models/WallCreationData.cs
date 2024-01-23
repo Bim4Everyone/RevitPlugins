@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
@@ -39,5 +40,21 @@ namespace RevitFinishingWalls.Models {
         /// Коллекция элементов, с которыми нужно соединить созданную стену
         /// </summary>
         public ICollection<Element> ElementsForJoin { get; }
+
+
+        /// <summary>
+        /// Добавляет коллекцию элементов в <see cref="ElementsForJoin"/>
+        /// </summary>
+        /// <param name="elements"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public void AddRangeElementsForJoin(ICollection<Element> elements) {
+            if(elements is null) { throw new ArgumentNullException(nameof(elements)); }
+
+            foreach(Element element in elements) {
+                if(element != null) {
+                    ElementsForJoin.Add(element);
+                }
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -7,9 +8,9 @@ namespace RevitFinishingWalls.Models {
     /// Класс для хранения линии сегмента границы помещения и элементе, который этот сегмент образует
     /// </summary>
     internal class CurveSegmentElement {
-        public CurveSegmentElement(Element element, Curve curve) {
+        public CurveSegmentElement(ICollection<Element> elements, Curve curve) {
             Curve = curve ?? throw new ArgumentNullException(nameof(curve));
-            Element = element ?? throw new ArgumentNullException(nameof(element));
+            Elements = elements ?? throw new ArgumentNullException(nameof(elements));
         }
 
 
@@ -20,8 +21,9 @@ namespace RevitFinishingWalls.Models {
         public Curve Curve { get; }
 
         /// <summary>
-        /// Элемент, который образует линию сегмента границы помещения, с которым нужно будет соединить отделочную стену
+        /// Элемент(ы), который(ые) образует линию сегмента границы помещения, 
+        /// с которыми нужно будет соединить отделочную стену
         /// </summary>
-        public Element Element { get; }
+        public ICollection<Element> Elements { get; }
     }
 }

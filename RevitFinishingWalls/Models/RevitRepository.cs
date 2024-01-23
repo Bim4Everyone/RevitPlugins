@@ -135,7 +135,7 @@ namespace RevitFinishingWalls.Models {
                         && IsContinuation(lastWallCreationData.Curve, curveSegmentElement.Curve)) {
 
                         lastWallCreationData.Curve = CombineCurves(lastWallCreationData.Curve, curveSegmentElement.Curve);
-                        lastWallCreationData.ElementsForJoin.Add(curveSegmentElement.Element);
+                        lastWallCreationData.AddRangeElementsForJoin(curveSegmentElement.Elements);
                     } else {
                         lastWallCreationData = new WallCreationData(Document) {
                             Curve = curveSegmentElement.Curve,
@@ -144,7 +144,7 @@ namespace RevitFinishingWalls.Models {
                             WallTypeId = config.WallTypeId,
                             BaseOffset = wallBaseOffset
                         };
-                        lastWallCreationData.ElementsForJoin.Add(curveSegmentElement.Element);
+                        lastWallCreationData.AddRangeElementsForJoin(curveSegmentElement.Elements);
                         wallCreationData.Add(lastWallCreationData);
                     }
                 }
@@ -229,13 +229,13 @@ namespace RevitFinishingWalls.Models {
 
             for(int i = 0; i < segmentsLoop.Count; i++) {
                 BoundarySegment segment = segmentsLoop[i];
-                Element segmentElement = GetBoundaryElement(segment);
-                if(segmentElement != null) {
+                ICollection<Element> segmentElements = GetBoundaryElement(segment);
+                if(segmentElements.Count > 0) {
                     // получение лини оси отделочной стены,
                     // смещенной влево на 1/2 толщины отделочной стены относительно исходной границы помещения
                     double finishingWallTypeHalfWidth = GetWallTypeWidth(finishingWallTypeId) / 2;
                     Curve curveWithOffset = segment.GetCurve().CreateOffset(-finishingWallTypeHalfWidth, XYZ.BasisZ);
-                    curveSegmentsElements.Add(new CurveSegmentElement(segmentElement, curveWithOffset));
+                    curveSegmentsElements.Add(new CurveSegmentElement(segmentElements, curveWithOffset));
                 }
             }
             return curveSegmentsElements;
@@ -349,66 +349,104 @@ namespace RevitFinishingWalls.Models {
         }
 
         /// <summary>
-        /// Возвращает элемент, который определяет сегмент границы помещения
+        /// Возвращает элементы, которые определяют сегмент границы помещения.
+        /// Метод возвращает коллекцию, т.к. разделитель помещений может перекрывать несколько элементов, 
+        /// но этот перекрытый участок будет представлен одним сегментом границы помещения (по крайней мере в ревит 2022)
         /// </summary>
         /// <param name="boundarySegment"></param>
-        /// <returns></returns>
-        private Element GetBoundaryElement(BoundarySegment boundarySegment) {
+        /// <returns>Коллекция с элементами, которые определяют границу помещения</returns>
+        private ICollection<Element> GetBoundaryElement(BoundarySegment boundarySegment) {
             Element borderEl = Document.GetElement(boundarySegment.ElementId);
-            Element element;
             if(borderEl is ModelLine) {
                 var categoryFilter = new ElementMulticategoryFilter(
                     new BuiltInCategory[] {
                         BuiltInCategory.OST_Walls,
                         BuiltInCategory.OST_StructuralColumns,
                         BuiltInCategory.OST_Columns });
-                element = GetElementByRay(_defaultView3D, boundarySegment.GetCurve(), categoryFilter);
+                return GetElementByRay(_defaultView3D, boundarySegment.GetCurve(), categoryFilter);
+            } else if(borderEl != null) {
+                return new Element[] { borderEl };
             } else {
-                element = borderEl;
+                return Array.Empty<Element>();
             }
-            return element;
         }
 
         /// <summary>
-        /// Возвращает элемент модели из активного документа Revit, который определяет заданную линию границы помещения,
-        /// предполагая, что помещение расположено слева от линии границы помещения, если смотреть из начала линии в конец.
+        /// Возвращает элементы модели из активного документа Revit, которые определяет заданную линию границы помещения
+        /// и которые перекрыты разделителем помещений.
+        /// Метод предполагает, что помещение расположено слева от линии границы помещения, 
+        /// если смотреть из начала линии в конец.
         /// </summary>
         /// <param name="view3D"></param>
         /// <param name="curve"></param>
         /// <param name="elementFilter"></param>
         /// <returns></returns>
+        //Исходный алгоритм метода по нахождению элемента, который перекрывается разделителем помещений:
         //https://thebuildingcoder.typepad.com/blog/2013/10/determining-a-room-boundary-segment-generating-element.html
-        private Element GetElementByRay(View3D view3D, Curve curve, ElementFilter elementFilter) {
-            Element boundaryElement = null;
+        private ICollection<Element> GetElementByRay(View3D view3D, Curve curve, ElementFilter elementFilter) {
+            Element currentBoundaryElement = null;
 
             const double minTolerance = 0.00000001;
             const double maxTolerance = 0.01;
             const double stepInRoom = 0.1;
+            const double step = 0.328; //~100 мм
 
             XYZ lineDirection = (curve.GetEndPoint(1) - curve.GetEndPoint(0)).Normalize();
 
+            //получить вектор для смещения точек линии внутрь помещения
             XYZ toRoomVector = stepInRoom * GetLeftDirection(lineDirection);
-            XYZ pointBottomInRoom = curve.Evaluate(0.5, true) + toRoomVector;
-            XYZ startPoint = pointBottomInRoom + XYZ.BasisZ;
+            //получить точки линии с шагом, потом сместить их внутрь помещения, потом сместить из вверх
+            XYZ[] startPoints = SplitCurveToPoints(curve, step)
+                .Select(point => point + toRoomVector + XYZ.BasisZ)
+                .ToArray();
 
             ReferenceIntersector intersector
                 = new ReferenceIntersector(elementFilter, FindReferenceTarget.Element, view3D) {
                     FindReferencesInRevitLinks = false
                 };
+            //получить вектор направления луча, который должен перечь элемент, который задает границу помещения
             XYZ toElementDirection = GetRightDirection(lineDirection);
 
-            ReferenceWithContext context = intersector.FindNearest(startPoint, toElementDirection);
-            Reference closestReference;
-            if(context != null) {
-                if((context.Proximity > minTolerance) && (context.Proximity < (maxTolerance + stepInRoom))) {
-                    closestReference = context.GetReference();
-                    if(closestReference != null) {
-                        boundaryElement = Document.GetElement(closestReference);
+            List<Element> boundaryElements = new List<Element>();
+            foreach(XYZ startPoint in startPoints) {
+                //стрельнуть линию из стартовой точки в сторону предполагаемого элемента
+                ReferenceWithContext context = intersector.FindNearest(startPoint, toElementDirection);
+                Reference closestReference;
+                if(context != null) {
+                    if((minTolerance < context.Proximity) && (context.Proximity < (maxTolerance + stepInRoom))) {
+                        closestReference = context.GetReference();
+                        if(closestReference != null) {
+                            currentBoundaryElement = Document.GetElement(closestReference);
+                            if((currentBoundaryElement != null)
+                                && !boundaryElements.Any(element => element.Id == currentBoundaryElement.Id)) {
+                                //добавить текущий найденный лучом элемент, если он не null и еще не был получен
+                                boundaryElements.Add(currentBoundaryElement);
+                            }
+                        }
                     }
                 }
             }
+            return boundaryElements;
+        }
 
-            return boundaryElement;
+        /// <summary>
+        /// Получает точки, расположенные на заданной линии с заданным шагом
+        /// </summary>
+        /// <param name="curve"></param>
+        /// <param name="step">Шаг разбиения в единицах ревита</param>
+        /// <returns>Коллекция точек линии</returns>
+        private ICollection<XYZ> SplitCurveToPoints(Curve curve, double step) {
+            double curveLength = curve.Length;
+            if(step >= curveLength) {
+                //Если шаг больше длины линии, то возвращаем середину линии
+                return new XYZ[] { curve.Evaluate(0.5, true) };
+            } else {
+                List<XYZ> points = new List<XYZ>();
+                for(double lengthOfPiece = step; lengthOfPiece < curveLength; lengthOfPiece += step) {
+                    points.Add(curve.Evaluate(lengthOfPiece / curveLength, true));
+                }
+                return points;
+            }
         }
 
         /// <summary>
