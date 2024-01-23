@@ -18,6 +18,7 @@ namespace RevitFinishingWalls.Models {
     internal class RevitRepository {
         private readonly SpatialElementBoundaryOptions _spatialElementBoundaryOptions;
         private readonly View3D _defaultView3D;
+        private readonly Dictionary<ElementId, double> _wallTypesWidthById;
 
 
         public RevitRepository(UIApplication uiApplication) {
@@ -28,6 +29,7 @@ namespace RevitFinishingWalls.Models {
                 StoreFreeBoundaryFaces = false
             };
             _defaultView3D = GetDefaultView3D();
+            _wallTypesWidthById = new Dictionary<ElementId, double>();
         }
 
         public UIApplication UIApplication { get; }
@@ -126,7 +128,7 @@ namespace RevitFinishingWalls.Models {
             double wallBaseOffset = ConvertMmToFeet(config.WallBaseOffset);
 
             foreach(IList<BoundarySegment> loop in GetBoundarySegments(room)) {
-                IList<CurveSegmentElement> curveSegmentsElements = GetCurveSegmentsElements(loop);
+                IList<CurveSegmentElement> curveSegmentsElements = GetCurveSegmentsElements(loop, config.WallTypeId);
                 for(int i = 0; i < curveSegmentsElements.Count; i++) {
                     CurveSegmentElement curveSegmentElement = curveSegmentsElements[i];
                     if((lastWallCreationData != null)
@@ -160,7 +162,6 @@ namespace RevitFinishingWalls.Models {
         public Wall CreateWall(WallCreationData wallCreationData, out ICollection<ElementId> notJoinedElements) {
             Wall wall;
             try {
-                //TODO сюда нужно передавать линию с оффсетом, т.к. аргумент Curve - это будущая осевая линия стены
                 wall = Wall.Create(
                     wallCreationData.Document,
                     wallCreationData.Curve,
@@ -193,19 +194,48 @@ namespace RevitFinishingWalls.Models {
 
 
         /// <summary>
+        /// Возвращает толщину стены по Id типа стены из активного документа
+        /// </summary>
+        /// <param name="wallTypeId"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        private double GetWallTypeWidth(ElementId wallTypeId) {
+            if(_wallTypesWidthById.TryGetValue(wallTypeId, out var width)) {
+                return width;
+            } else {
+                var wallType = Document.GetElement(wallTypeId) as WallType;
+                if(wallType != null) {
+                    double wallTypeWidth = wallType.Width;
+                    _wallTypesWidthById.Add(wallTypeId, wallTypeWidth);
+                    return _wallTypesWidthById[wallTypeId];
+                } else {
+                    throw new ArgumentException(nameof(wallTypeId));
+                }
+            }
+        }
+
+        /// <summary>
         /// Определяет пары сегмент границы помещения-элемент, который образует этот сегмент.
         /// </summary>
         /// <param name="segmentsLoop">Исходная коллекция сегментов границ помещения</param>
+        /// <param name="finishingWallTypeId">Id типа отделочной стены</param>
         /// <returns>Коллекция классов, в которых содержатся линия границы помещения, 
         /// смещенная вверх на заданное расстояние и элемент, который образует эту границу</returns>
-        private IList<CurveSegmentElement> GetCurveSegmentsElements(IList<BoundarySegment> segmentsLoop) {
+        private IList<CurveSegmentElement> GetCurveSegmentsElements(
+            IList<BoundarySegment> segmentsLoop,
+            ElementId finishingWallTypeId) {
+
             List<CurveSegmentElement> curveSegmentsElements = new List<CurveSegmentElement>();
 
             for(int i = 0; i < segmentsLoop.Count; i++) {
                 BoundarySegment segment = segmentsLoop[i];
                 Element segmentElement = GetBoundaryElement(segment);
                 if(segmentElement != null) {
-                    curveSegmentsElements.Add(new CurveSegmentElement(segmentElement, segment.GetCurve()));
+                    // получение лини оси отделочной стены,
+                    // смещенной влево на 1/2 толщины отделочной стены относительно исходной границы помещения
+                    double finishingWallTypeHalfWidth = GetWallTypeWidth(finishingWallTypeId) / 2;
+                    Curve curveWithOffset = segment.GetCurve().CreateOffset(-finishingWallTypeHalfWidth, XYZ.BasisZ);
+                    curveSegmentsElements.Add(new CurveSegmentElement(segmentElement, curveWithOffset));
                 }
             }
             return curveSegmentsElements;

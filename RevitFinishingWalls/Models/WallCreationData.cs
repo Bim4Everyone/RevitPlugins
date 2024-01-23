@@ -17,7 +17,7 @@ namespace RevitFinishingWalls.Models {
         public Document Document { get; }
 
         /// <summary>
-        /// Линия чистовой наружной грани стены
+        /// Осевая линия стены
         /// </summary>
         public Curve Curve { get; set; }
 
