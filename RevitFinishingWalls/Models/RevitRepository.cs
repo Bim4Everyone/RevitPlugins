@@ -324,16 +324,27 @@ namespace RevitFinishingWalls.Models {
         }
 
         /// <summary>
-        /// Возвращает существующий 3D вид по умолчанию
+        /// Возвращает 3D вид по умолчанию
         /// </summary>
         /// <returns></returns>
         private View3D GetDefaultView3D() {
-            string defaultViewName = "{3D}";
-            var view = new FilteredElementCollector(Document)
+            //хоть в ревите по умолчанию и присутствует "{3D}" вид, фигурные скобки запрещены в названиях
+            const string defaultRevitView3dName = "{3D}";
+            const string defaultView3dName = "3D";
+            var views3D = new FilteredElementCollector(Document)
                 .OfClass(typeof(View3D))
                 .Cast<View3D>()
-                .FirstOrDefault(item => item.Name.Equals(defaultViewName, StringComparison.CurrentCultureIgnoreCase));
+                .ToArray();
+            //ищем ревитовский 3D вид по умолчанию
+            var view = views3D.FirstOrDefault(
+                item => item.Name.Equals(defaultRevitView3dName, StringComparison.CurrentCultureIgnoreCase));
             if(view == null) {
+                //ищем наш 3D вид по умолчанию
+                view = views3D.FirstOrDefault(
+                    item => item.Name.Equals(defaultView3dName, StringComparison.CurrentCultureIgnoreCase));
+            }
+            if(view == null) {
+                //создаем наш 3D вид по умолчанию
                 using(Transaction t = Document.StartTransaction("BIM: Создание 3D-вида")) {
                     var type = new FilteredElementCollector(Document)
                         .OfClass(typeof(ViewFamilyType))
@@ -341,7 +352,7 @@ namespace RevitFinishingWalls.Models {
                         .First(v => v.ViewFamily == ViewFamily.ThreeDimensional);
                     type.DefaultTemplateId = ElementId.InvalidElementId;
                     view = View3D.CreateIsometric(Document, type.Id);
-                    view.Name = defaultViewName;
+                    view.Name = defaultView3dName;
                     t.Commit();
                 }
             }
