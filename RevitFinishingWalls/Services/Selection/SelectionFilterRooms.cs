@@ -16,7 +16,7 @@ namespace RevitFinishingWalls.Services.Selection {
 
 
         public bool AllowElement(Element elem) {
-            return elem != null;
+            return (elem != null) && (elem is Room);
         }
 
         public bool AllowReference(Reference reference, XYZ position) {
