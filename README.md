@@ -32,9 +32,10 @@
 | 19. | Копирование зон СМР       | [RevitCopingZones](RevitCopingZones)               | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67844245)  | [BIM](https://github.com/dosymep/BIMExtensions)     | СМР            |
 | 20. | Документация пилонов      | [RevitPylonDocumentation](RevitPylonDocumentation) | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829985)  | [КР](https://github.com/dosymep/KRExtensions)       | Документация   |
 | 21. | Удалить неиспользуемые    | [RevitDeleteUnused](RevitDeleteUnused)             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67830008)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Прочее         |
-| 22. | Выгрузить объемы          | [RevitMepTotals](RevitMepTotals)                   | [Confluence]()                                                          | [BIM](https://github.com/dosymep/BIMExtensions)     | Экспорт        |
+| 22. | Выгрузить объемы          | [RevitMepTotals](RevitMepTotals)                   | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=123568466) | [BIM](https://github.com/dosymep/BIMExtensions)     | Экспорт        |
 | 23. | Маркировать помещения     | [RevitRoomTagPlacement](RevitRoomTagPlacement)     | [Confluence]()                                                          | [АР](https://github.com/dosymep/ARExtensions)       | Квартирография |
 | 24. | Удалить марки помещений   | [RevitRemoveRoomTags](RevitRemoveRoomTags)         | [Confluence]()                                                          | [АР](https://github.com/dosymep/ARExtensions)       | Прочее         |
+| 25. | Отделка стен              | [RevitFinishingWalls](RevitFinishingWalls)         | [Confluence]()                                                          | [АР](https://github.com/Bim4Everyone/ARExtensions)  | РД             |
 
 # Сборка проекта
 
