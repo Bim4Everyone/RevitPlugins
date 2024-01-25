@@ -144,6 +144,8 @@ namespace RevitLintelPlacement.Models {
             View activeView = _uiDocument.ActiveGraphicalView;
             view.SetParamValue(BuiltInParameter.VIEW_PHASE,
                 activeView.GetParamValue<ElementId>(BuiltInParameter.VIEW_PHASE));
+            view.SetParamValue(BuiltInParameter.VIEW_PHASE_FILTER,
+                activeView.GetParamValue<ElementId>(BuiltInParameter.VIEW_PHASE_FILTER));
         }
 
         private View3D CreateView3d() {
