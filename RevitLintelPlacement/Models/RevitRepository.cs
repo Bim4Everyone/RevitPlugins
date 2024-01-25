@@ -55,7 +55,7 @@ namespace RevitLintelPlacement.Models {
         public LintelsConfig LintelsConfig { get; set; }
         public LintelsCommonConfig LintelsCommonConfig { get; set; }
 
-        public string View3DName => string.Concat(_view3DName, "_", _application.Username);
+        public string View3dName => string.Concat(_view3DName, "_", _application.Username);
 
         public static string ProfilePath {
             get {
@@ -123,44 +123,66 @@ namespace RevitLintelPlacement.Models {
             var view = new FilteredElementCollector(_document)
                 .OfClass(typeof(View3D))
                 .Cast<View3D>()
-                .FirstOrDefault(item => item.Name.Equals(_view3DName + "_" + _application.Username, StringComparison.CurrentCultureIgnoreCase));
+                .FirstOrDefault(item => item.Name.Equals(View3dName, StringComparison.OrdinalIgnoreCase));
 
             if(view == null) {
-                using(Transaction t = _document.StartTransaction("Создание 3D-вида")) {
-                    var type = new FilteredElementCollector(_document)
-                        .OfClass(typeof(ViewFamilyType))
-                        .Cast<ViewFamilyType>()
-                        .First(v => v.ViewFamily == ViewFamily.ThreeDimensional);
-                    type.DefaultTemplateId = ElementId.InvalidElementId;
-                    view = View3D.CreateIsometric(_document, type.Id);
-                    view.Name = View3DName;
-                    var categories = new[] { new ElementId(BuiltInCategory.OST_Levels),
-                        new ElementId(BuiltInCategory.OST_WallRefPlanes),
-                        new ElementId(BuiltInCategory.OST_Grids),
-                        new ElementId(BuiltInCategory.OST_VolumeOfInterest) };
+                using(Transaction transaction = _document.StartTransaction("Создание 3D-вида")) {
+                    view = CreateView3d();
 
-                    foreach(var category in categories) {
-                        if(view.CanCategoryBeHidden(category)) {
-                            view.SetCategoryHidden(category, true);
-                        }
-                    }
+                    UpdatePhase(view);
+                    HideCategories(view);
+                    UpdateViewGroup(view);
 
-                    var bimGroup = new FilteredElementCollector(_document)
-                        .OfClass(typeof(View))
-                        .Cast<View>()
-                        .Where(item => item.Category?.Id != new ElementId(BuiltInCategory.OST_Schedules)
-                                    && item.Category?.Id != new ElementId(BuiltInCategory.OST_Sheets))
-                        .Select(item => item.GetParamValueOrDefault<string>(ProjectParamsConfig.Instance.ViewGroup))
-                        .FirstOrDefault(item => !string.IsNullOrEmpty(item) && item.Contains("BIM"));
-
-                    if(bimGroup != null) {
-                        view.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, bimGroup);
-                    }
-
-                    t.Commit();
+                    transaction.Commit();
                 }
             }
+
             return view;
+        }
+
+        private void UpdatePhase(View3D view) {
+            View activeView = _uiDocument.ActiveGraphicalView;
+            view.CreatedPhaseId = activeView.CreatedPhaseId;
+            view.DemolishedPhaseId = activeView.DemolishedPhaseId;
+        }
+
+        private View3D CreateView3d() {
+            ViewFamilyType type = new FilteredElementCollector(_document)
+                .OfClass(typeof(ViewFamilyType))
+                .Cast<ViewFamilyType>()
+                .First(v => v.ViewFamily == ViewFamily.ThreeDimensional);
+
+            type.DefaultTemplateId = ElementId.InvalidElementId;
+            View3D view = View3D.CreateIsometric(_document, type.Id);
+            view.Name = View3dName;
+            return view;
+        }
+
+        private void UpdateViewGroup(View3D view) {
+            string bimGroup = new FilteredElementCollector(_document)
+                .OfClass(typeof(View))
+                .Cast<View>()
+                .Where(item => item.InAnyCategory( 
+                    BuiltInCategory.OST_Schedules, BuiltInCategory.OST_Sheets))
+                .Select(item => item.GetParamValueOrDefault<string>(ProjectParamsConfig.Instance.ViewGroup))
+                .FirstOrDefault(item => !string.IsNullOrEmpty(item) && item.Contains("BIM"));
+
+            if(bimGroup != null) {
+                view.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, bimGroup);
+            }
+        }
+
+        private static void HideCategories(View3D view) {
+            var categories = new[] {
+                new ElementId(BuiltInCategory.OST_Levels), new ElementId(BuiltInCategory.OST_WallRefPlanes),
+                new ElementId(BuiltInCategory.OST_Grids), new ElementId(BuiltInCategory.OST_VolumeOfInterest)
+            };
+
+            foreach(ElementId category in categories) {
+                if(view.CanCategoryBeHidden(category)) {
+                    view.SetCategoryHidden(category, true);
+                }
+            }
         }
 
         public IEnumerable<WallType> GetWallTypes() {
@@ -377,7 +399,7 @@ namespace RevitLintelPlacement.Models {
             var view3D = new FilteredElementCollector(_document)
                 .OfClass(typeof(View3D))
                 .Cast<View3D>()
-                .First(v => !v.IsTemplate && v.Name.Equals(View3DName, StringComparison.CurrentCultureIgnoreCase));
+                .First(v => !v.IsTemplate && v.Name.Equals(View3dName, StringComparison.CurrentCultureIgnoreCase));
             return view3D.GetOrientation();
         }
 
@@ -589,7 +611,7 @@ namespace RevitLintelPlacement.Models {
                     })
                     .ToList();
             } catch {
-
+                // pass
             } finally {
                 if(familyDocument != null) {
                     familyDocument.Close(false);

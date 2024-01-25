@@ -16,7 +16,6 @@ using RevitLintelPlacement.ViewModels;
 using RevitLintelPlacement.Views;
 
 namespace RevitLintelPlacement {
-
     [Transaction(TransactionMode.Manual)]
     public class PlaceLintelCommand : BasePluginCommand {
         public PlaceLintelCommand() {
@@ -24,30 +23,29 @@ namespace RevitLintelPlacement {
         }
 
         protected override void Execute(UIApplication uiApplication) {
+            View activeView = uiApplication.ActiveUIDocument.ActiveGraphicalView;
+            if(!(activeView.ViewType == ViewType.ThreeD
+                 || activeView.ViewType == ViewType.Schedule
+                 || activeView.ViewType == ViewType.FloorPlan)) {
+                throw new Exception("Откройте 3Д вид, план этажа или спецификацию.");
+            }
+            
             var lintelsConfig = LintelsConfig.GetLintelsConfig();
-            var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document, lintelsConfig);
-            if(!HasConfig(revitRepository.LintelsCommonConfig)) {
-                return;
-            }
+            var revitRepository = new RevitRepository(
+                uiApplication.Application,
+                uiApplication.ActiveUIDocument.Document, lintelsConfig);
+
+            CheckConfig(revitRepository.LintelsCommonConfig);
+
             var mainViewModel = new MainViewModel(revitRepository);
-            var window = new MainWindow() { DataContext = mainViewModel };
-            if(window.ShowDialog() == true) {
-                GetPlatformService<INotificationService>()
-                   .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                   .ShowAsync();
-            } else {
-                GetPlatformService<INotificationService>()
-                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                    .ShowAsync();
-            }
+            var window = new MainWindow() {DataContext = mainViewModel};
+            Notification(window);
         }
 
-        private bool HasConfig(LintelsCommonConfig lintelsConfig) {
+        private void CheckConfig(LintelsCommonConfig lintelsConfig) {
             if(lintelsConfig.IsEmpty()) {
-                TaskDialog.Show("BIM", "Необходимо заполнить настройки плагина");
-                return false;
+                throw new Exception("Необходимо заполнить настройки плагина.");
             }
-            return true;
         }
     }
 }
