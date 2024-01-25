@@ -142,8 +142,8 @@ namespace RevitLintelPlacement.Models {
 
         private void UpdatePhase(View3D view) {
             View activeView = _uiDocument.ActiveGraphicalView;
-            view.CreatedPhaseId = activeView.CreatedPhaseId;
-            view.DemolishedPhaseId = activeView.DemolishedPhaseId;
+            view.SetParamValue(BuiltInParameter.VIEW_PHASE,
+                activeView.GetParamValue<ElementId>(BuiltInParameter.VIEW_PHASE));
         }
 
         private View3D CreateView3d() {
@@ -162,7 +162,8 @@ namespace RevitLintelPlacement.Models {
             string bimGroup = new FilteredElementCollector(_document)
                 .OfClass(typeof(View))
                 .Cast<View>()
-                .Where(item => item.InAnyCategory( 
+                .Where(item => item.Category != null)
+                .Where(item => item.InAnyCategory(
                     BuiltInCategory.OST_Schedules, BuiltInCategory.OST_Sheets))
                 .Select(item => item.GetParamValueOrDefault<string>(ProjectParamsConfig.Instance.ViewGroup))
                 .FirstOrDefault(item => !string.IsNullOrEmpty(item) && item.Contains("BIM"));
