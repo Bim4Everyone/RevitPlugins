@@ -165,7 +165,7 @@ namespace RevitLintelPlacement.Models {
                 .OfClass(typeof(View))
                 .Cast<View>()
                 .Where(item => item.Category != null)
-                .Where(item => item.InAnyCategory(
+                .Where(item => !item.InAnyCategory(
                     BuiltInCategory.OST_Schedules, BuiltInCategory.OST_Sheets))
                 .Select(item => item.GetParamValueOrDefault<string>(ProjectParamsConfig.Instance.ViewGroup))
                 .FirstOrDefault(item => !string.IsNullOrEmpty(item) && item.Contains("BIM"));
