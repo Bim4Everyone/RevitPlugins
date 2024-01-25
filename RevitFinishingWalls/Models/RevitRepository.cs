@@ -83,7 +83,6 @@ namespace RevitFinishingWalls.Models {
                 return new FilteredElementCollector(Document, Document.ActiveView.Id)
                     .WhereElementIsNotElementType()
                     .WherePasses(new RoomFilter())
-                    .OfClass(typeof(Room))
                     .Where(element => element is Room room && room.Area > 0)
                     .Cast<Room>()
                     .ToArray();
