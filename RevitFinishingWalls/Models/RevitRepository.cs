@@ -367,7 +367,7 @@ namespace RevitFinishingWalls.Models {
         /// <returns>Коллекция с элементами, которые определяют границу помещения</returns>
         private ICollection<Element> GetBoundaryElement(BoundarySegment boundarySegment) {
             Element borderEl = Document.GetElement(boundarySegment.ElementId);
-            if(borderEl is ModelLine) {
+            if(borderEl is ModelLine || borderEl is null) {
                 var categoryFilter = new ElementMulticategoryFilter(
                     new BuiltInCategory[] {
                         BuiltInCategory.OST_Walls,
