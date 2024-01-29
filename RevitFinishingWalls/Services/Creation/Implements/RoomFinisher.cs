@@ -42,7 +42,7 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                             if(notJoinedElements.Count > 0) {
                                 sb.AppendLine(
                                     $"Не удалось соединить стену с Id={wall.Id} и элементы с Id: " +
-                                    $"{string.Join(", ", notJoinedElements)}\n");
+                                    $"{string.Join(", ", notJoinedElements)}");
                             }
                         } catch(CannotCreateWallException e) {
                             sb.AppendLine(e.Message + "\n");
