@@ -284,6 +284,16 @@ dotnet_naming_symbols.locals_and_parameters.applicable_kinds = parameter, local
 
 dotnet_naming_style.camel_case_style.capitalization = camel_case
 
+# Interfaces in PascalCase and start with I
+dotnet_naming_rule.interfaces_should_be_pascal_case.severity = warning
+dotnet_naming_rule.interfaces_should_be_pascal_case.symbols = interfaces
+dotnet_naming_rule.interfaces_should_be_pascal_case.style = interfaces_style
+
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+
+dotnet_naming_style.interfaces_style.capitalization = pascal_case
+dotnet_naming_style.interfaces_style.required_prefix = I
+
 # By default, name items with PascalCase
 dotnet_naming_rule.members_should_be_pascal_case.severity = warning
 dotnet_naming_rule.members_should_be_pascal_case.symbols = all_members
