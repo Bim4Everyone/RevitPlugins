@@ -121,7 +121,7 @@ dotnet_remove_unnecessary_suppression_exclusions = none
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0007-ide0008
 csharp_style_var_elsewhere = false
 csharp_style_var_for_built_in_types = false
-csharp_style_var_when_type_is_apparent = false
+csharp_style_var_when_type_is_apparent = true
 
 # Expression-bodied members
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0027
