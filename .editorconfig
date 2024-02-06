@@ -162,7 +162,7 @@ csharp_style_conditional_delegate_call = true
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0062
 csharp_prefer_static_local_function = true
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0036
-csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async
+csharp_preferred_modifier_order = public,private,protected,internal,file,new,static,abstract,virtual,sealed,readonly,override,extern,unsafe,volatile,async,required:warning
 
 # Code-block preferences
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0011
