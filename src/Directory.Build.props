@@ -7,12 +7,10 @@
         
         <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
         <IncludePackageReferencesDuringMarkupCompilation>false</IncludePackageReferencesDuringMarkupCompilation>
-
-        <AssemblyName>$(AssemblyName)_$(RevitVersion)</AssemblyName>
-        <RevitVersion Condition="'$(RevitVersion)' == ''">2024</RevitVersion>
         
         <UseWPF>true</UseWPF>
         <UseWindowsForms>true</UseWindowsForms>
+        <RevitVersion Condition="'$(RevitVersion)' == ''">2024</RevitVersion>
         
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <Configurations>D2020;D2021;D2022;D2023;D2024;Debug;Release</Configurations>

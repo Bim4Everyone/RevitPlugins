@@ -19,6 +19,14 @@
             "PushButton"
           ]
         },
+        "Configuration": {
+          "type": "string",
+          "description": "Configuration to build - Default is 'Debug' (local) or 'Release' (server)",
+          "enum": [
+            "Debug",
+            "Release"
+          ]
+        },
         "Continue": {
           "type": "boolean",
           "description": "Indicates to continue a previously failed build attempt"
@@ -51,6 +59,36 @@
         "IconUrl": {
           "type": "string"
         },
+        "MaxVersion": {
+          "type": "string",
+          "description": "Max Revit version",
+          "enum": [
+            "Rv2016",
+            "Rv2017",
+            "Rv2018",
+            "Rv2019",
+            "Rv2020",
+            "Rv2021",
+            "Rv2022",
+            "Rv2023",
+            "Rv2024"
+          ]
+        },
+        "MinVersion": {
+          "type": "string",
+          "description": "Min Revit version",
+          "enum": [
+            "Rv2016",
+            "Rv2017",
+            "Rv2018",
+            "Rv2019",
+            "Rv2020",
+            "Rv2021",
+            "Rv2022",
+            "Rv2023",
+            "Rv2024"
+          ]
+        },
         "NoLogo": {
           "type": "boolean",
           "description": "Disables displaying the NUKE logo"
@@ -81,6 +119,24 @@
         "PublishDirectory": {
           "type": "string"
         },
+        "RevitVersions": {
+          "type": "array",
+          "description": "Build Revit versions",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Rv2016",
+              "Rv2017",
+              "Rv2018",
+              "Rv2019",
+              "Rv2020",
+              "Rv2021",
+              "Rv2022",
+              "Rv2023",
+              "Rv2024"
+            ]
+          }
+        },
         "Root": {
           "type": "string",
           "description": "Root directory during build execution"
@@ -99,8 +155,6 @@
               "CreateProfile",
               "CreateScript",
               "FullClean",
-              "FullCompile",
-              "FullPublish",
               "Publish"
             ]
           }
@@ -123,8 +177,6 @@
               "CreateProfile",
               "CreateScript",
               "FullClean",
-              "FullCompile",
-              "FullPublish",
               "Publish"
             ]
           }

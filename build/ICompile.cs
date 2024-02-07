@@ -13,7 +13,7 @@ using Serilog;
 
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
-interface ICompile : IClean, IHazSolution, IHazGitVersion, IHazGitRepository, IHazConfigurations {
+interface ICompile : IClean, IHazSolution, IHazGitVersion, IHazGitRepository, IHazRevitVersion, IHazConfigurations {
     Target Compile => _ => _
         .DependsOn(Clean)
         .Requires(() => PluginName)
@@ -21,7 +21,7 @@ interface ICompile : IClean, IHazSolution, IHazGitVersion, IHazGitRepository, IH
         .Executes(() => {
             string publishDirectory = NukeBuildExtensions.GetExtensionsPath(PublishDirectory);
             Log.Debug("publishDirectory: {PublishDirectory}", publishDirectory);
-            
+
             ReportSummary(_ => _
                 .AddPairWhenValueNotNull(nameof(PluginName), PluginName)
                 .AddPairWhenValueNotNull(nameof(PublishDirectory), PublishDirectory)
@@ -29,11 +29,12 @@ interface ICompile : IClean, IHazSolution, IHazGitVersion, IHazGitRepository, IH
 
             DotNetBuild(s => s
                 .Apply(CompileSettingsBase)
-                .SetProjectFile(PluginName)
+                .SetProjectFile("src/" + PluginName)
+                .SetConfiguration(Configuration.Debug)
                 .SetOutputDirectory(publishDirectory)
-                .CombineWith(DebugConfigurations, (settings, config) => settings
-                    .SetConfiguration(config)
-                    .SetSimpleVersion(Versioning, config)));
+                .CombineWith(BuildRevitVersions, (settings, revitVersion) => settings
+                    .SetSimpleVersion(Versioning, revitVersion)
+                    .SetProperty("AssemblyName", $"{PluginName}_{revitVersion}")));
         });
 
     Target Publish => _ => _
@@ -43,7 +44,7 @@ interface ICompile : IClean, IHazSolution, IHazGitVersion, IHazGitRepository, IH
         .Executes(() => {
             string publishDirectory = NukeBuildExtensions.GetExtensionsPath(PublishDirectory);
             Log.Debug("publishDirectory: {PublishDirectory}", publishDirectory);
-            
+
             ReportSummary(_ => _
                 .AddPairWhenValueNotNull(nameof(PluginName), PluginName)
                 .AddPairWhenValueNotNull(nameof(PublishDirectory), PublishDirectory)
@@ -51,35 +52,12 @@ interface ICompile : IClean, IHazSolution, IHazGitVersion, IHazGitRepository, IH
 
             DotNetBuild(s => s
                 .Apply(CompileSettingsBase)
-                .SetProjectFile(PluginName)
+                .SetProjectFile("src/" + PluginName)
+                .SetConfiguration(Configuration.Release)
                 .SetOutputDirectory(publishDirectory)
-                .CombineWith(ReleaseConfigurations, (settings, config) => settings
-                    .SetConfiguration(config)
-                    .SetSimpleVersion(Versioning, config)));
-        });
-
-    Target FullCompile => _ => _
-        .DependsOn(FullClean)
-        .Requires(() => Output)
-        .Executes(() => {
-            DotNetBuild(s => s
-                .Apply(CompileSettingsBase)
-                .SetProjectFile(Solution)
-                .CombineWith(DebugConfigurations, (settings, config) => settings
-                    .SetConfiguration(config)
-                    .SetSimpleVersion(Versioning, config)));
-        });
-    
-    Target FullPublish => _ => _
-        .DependsOn(FullClean)
-        .Requires(() => Output)
-        .Executes(() => {
-            DotNetBuild(s => s
-                .Apply(CompileSettingsBase)
-                .SetProjectFile(Solution)
-                .CombineWith(ReleaseConfigurations, (settings, config) => settings
-                    .SetConfiguration(config)
-                    .SetSimpleVersion(Versioning, config)));
+                .CombineWith(BuildRevitVersions, (settings, revitVersion) => settings
+                    .SetSimpleVersion(Versioning, revitVersion)
+                    .SetProperty("AssemblyName", $"{PluginName}_{revitVersion}")));
         });
 
     sealed Configure<DotNetBuildSettings> CompileSettingsBase => _ => _

@@ -4,9 +4,7 @@ using System.Linq;
 using Nuke.Common;
 
 interface IHazConfigurations : INukeBuild {
-    int MinReleaseVersion => ReleaseConfigurations.Min(item => item.Version);
-    int MaxReleaseVersion => ReleaseConfigurations.Max(item => item.Version);
-    
-    IEnumerable<RevitConfiguration> DebugConfigurations => RevitConfiguration.GetDebugConfiguration();
-    IEnumerable<RevitConfiguration> ReleaseConfigurations => RevitConfiguration.GetReleaseConfiguration();
+    [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
+    Configuration Configuration => TryGetValue(() => Configuration)
+                                   ?? (IsLocalBuild ? Configuration.Debug : Configuration.Release);
 }
