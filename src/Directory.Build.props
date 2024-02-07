@@ -1,17 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <PropertyGroup>
-        <TargetFramework>net48</TargetFramework>
+<Project>
+    <PropertyGroup>     
+        <Platforms>x64</Platforms>
         <OutputType>Library</OutputType>
+        <NoWarn>1701;1702;MSB3246</NoWarn>
+        <TargetFramework>net48</TargetFramework>
+        
         <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
         <IncludePackageReferencesDuringMarkupCompilation>false</IncludePackageReferencesDuringMarkupCompilation>
-        <UseWPF>true</UseWPF>
-        <Platforms>x64</Platforms>
-        <NoWarn>1701;1702;MSB3246</NoWarn>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <Configurations>D2020;D2021;D2022;D2023;D2024;R2020;R2021;R2022;R2023;R2024</Configurations>
-    </PropertyGroup>
 
+        <AssemblyName>$(AssemblyName)_$(RevitVersion)</AssemblyName>
+        <RevitVersion Condition="'$(RevitVersion)' == ''">2024</RevitVersion>
+        
+        <UseWPF>true</UseWPF>
+        <UseWindowsForms>true</UseWindowsForms>
+        
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <Configurations>D2020;D2021;D2022;D2023;D2024;Debug;Release</Configurations>
+    </PropertyGroup>
+    
     <PropertyGroup Condition="'$(Configuration.StartsWith(`D`))'">
         <Optimization>false</Optimization>
         <DebugSymbols>true</DebugSymbols>
@@ -26,97 +32,13 @@
         <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)'=='D2020' OR '$(Configuration)'=='R2020'">
-        <RevitVersion>2020</RevitVersion>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)'=='D2021' OR '$(Configuration)'=='R2021'">
-        <RevitVersion>2021</RevitVersion>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)'=='D2022' OR '$(Configuration)'=='R2022'">
-        <RevitVersion>2022</RevitVersion>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)'=='D2023' OR '$(Configuration)'=='R2023'">
-        <RevitVersion>2023</RevitVersion>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)'=='D2024' OR '$(Configuration)'=='R2024'">
-        <RevitVersion>2024</RevitVersion>
-    </PropertyGroup>
-    
-    <PropertyGroup Condition="'$(RevitVersion)'=='2020'">
-        <DefineConstants>$(DefineConstants);REVIT_2020</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(RevitVersion)'=='2021'">
-        <DefineConstants>$(DefineConstants);REVIT_2021</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(RevitVersion)'=='2022'">
-        <DefineConstants>$(DefineConstants);REVIT_2022</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(RevitVersion)'=='2023'">
-        <DefineConstants>$(DefineConstants);REVIT_2023</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(RevitVersion)'=='2024'">
-        <DefineConstants>$(DefineConstants);REVIT_2024</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(RevitVersion)'&lt;='2020'">
-        <DefineConstants>$(DefineConstants);REVIT_2020_OR_LESS</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(RevitVersion)'&lt;='2021'">
-        <DefineConstants>$(DefineConstants);REVIT_2021_OR_LESS</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(RevitVersion)'&lt;='2022'">
-        <DefineConstants>$(DefineConstants);REVIT_2022_OR_LESS</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(RevitVersion)'&lt;='2023'">
-        <DefineConstants>$(DefineConstants);REVIT_2023_OR_LESS</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(RevitVersion)'&lt;='2024'">
-        <DefineConstants>$(DefineConstants);REVIT_2024_OR_LESS</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(RevitVersion)'>='2020'">
-        <DefineConstants>$(DefineConstants);REVIT_2020_OR_GREATER</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(RevitVersion)'>='2021'">
-        <DefineConstants>$(DefineConstants);REVIT_2021_OR_GREATER</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(RevitVersion)'>='2022'">
-        <DefineConstants>$(DefineConstants);REVIT_2022_OR_GREATER</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(RevitVersion)'>='2023'">
-        <DefineConstants>$(DefineConstants);REVIT_2023_OR_GREATER</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(RevitVersion)'>='2024'">
-        <DefineConstants>$(DefineConstants);REVIT_2024_OR_GREATER</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(RevitVersion)'>'2020'">
-        <AssemblyName>$(AssemblyName)_$(RevitVersion)</AssemblyName>
-    </PropertyGroup>
-
-    <PropertyGroup>
+    <PropertyGroup Condition="$(RevitVersion) != ''">
         <Version>$(RevitVersion).2.4</Version>
         <FileVersion>$(RevitVersion).2.4</FileVersion>
         <Company>dosymep</Company>
         <Authors>dosymep, budaevaler, sssenya, DivinN, vlastroG</Authors>
         <PackageTags>dosymep, revit, plugins</PackageTags>
-        <Copyright>Copyright © 2022</Copyright>
+        <Copyright>Copyright © 2024</Copyright>
         <PackageProjectUrl>https://github.com/dosymep/RevitPlugins.git</PackageProjectUrl>
         <RepositoryUrl>https://github.com/dosymep/RevitPlugins.git</RepositoryUrl>
         <RepositoryType>Git</RepositoryType>
@@ -145,11 +67,8 @@
         <Compile Include="..\dosymep\AsyncRelayCommand.T.cs" Link="dosymep\BaseCommands\AsyncRelayCommand.T.cs"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="ModPlus.Revit.API.$(RevitVersion)" Version="*">
-            <PrivateAssets>all</PrivateAssets>
-            <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
+    <ItemGroup Condition="$(RevitVersion) != ''">
+        <PackageReference Include="Autodesk.Revit.Sdk.Refs.$(RevitVersion)" Version="*" />
         
         <Reference Include="dosymep.Bim4Everyone">
             <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\$(RevitVersion)\dosymep.Bim4Everyone.dll</HintPath>
@@ -160,7 +79,9 @@
             <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\$(RevitVersion)\dosymep.Revit.dll</HintPath>
             <Private>False</Private>
         </Reference>
-
+    </ItemGroup>
+    
+    <ItemGroup>
         <Reference Include="dosymep.SimpleServices">
             <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.SimpleServices.dll</HintPath>
             <Private>False</Private>

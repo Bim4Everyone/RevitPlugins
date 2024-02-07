@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="..\ProjectProps\Common.props" />
-	<ItemGroup>
-	  <None Remove="Views\Images\palette.png" />
-	</ItemGroup>
+	<PropertyGroup>
+		<UseDevExpress>true</UseDevExpress>
+	</PropertyGroup>
 	<ItemGroup>
 	  <Resource Include="Views\Images\palette.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>

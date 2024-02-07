@@ -1,15 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="..\ProjectProps\Common.props" />
-	<Import Project="..\ProjectProps\DevExpress.props" />
-	<Import Project="..\ProjectProps\RevitClashes.props" />
-	
-	<ItemGroup>
-	  <None Remove="Resources\conduit.png" />
-	  <None Remove="Resources\pipe.png" />
-	  <None Remove="Resources\rectangleDuct.png" />
-	  <None Remove="Resources\roundDuct.png" />
-	  <None Remove="Resources\tray.png" />
-	</ItemGroup>
+	<PropertyGroup>
+		<UseDevExpress>true</UseDevExpress>
+		<UseRevitClashes>true</UseRevitClashes>
+	</PropertyGroup>
 	
 	<ItemGroup>
 	  <Resource Include="Resources\conduit.png" />
