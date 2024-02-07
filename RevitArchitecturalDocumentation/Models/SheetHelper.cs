@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Media.Media3D;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
-
-using RevitArchitecturalDocumentation.ViewModels;
-
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 
 using Document = Autodesk.Revit.DB.Document;
 
@@ -43,7 +33,7 @@ namespace RevitArchitecturalDocumentation.Models {
 
             ViewSheet newSheet = Repository.GetSheetByName(newSheetName);
             Sheet = newSheet;
-            if(newSheet is null) {               
+            if(newSheet is null) {
                 Report?.AddNodeWithName($"Лист с именем \"{newSheetName}\" не найден в проекте, приступаем к созданию");
                 try {
                     CreateSheet(newSheetName, titleBlockType);
@@ -58,7 +48,7 @@ namespace RevitArchitecturalDocumentation.Models {
                 Report?.AddNodeWithName($"Лист с именем \"{newSheetName}\" успешно найден в проекте!");
 
                 NameHelper = new ViewNameHelper(newSheet);
-                NameHelper.AnilizeNGetLevelNumber();
+                NameHelper.AnalyzeNGetLevelNumber();
             }
 
             return newSheet;
@@ -93,7 +83,7 @@ namespace RevitArchitecturalDocumentation.Models {
 
             Sheet = newSheet;
             NameHelper = new ViewNameHelper(Sheet);
-            NameHelper.AnilizeNGetLevelNumber();
+            NameHelper.AnalyzeNGetLevelNumber();
             return newSheet;
         }
 
@@ -156,7 +146,7 @@ namespace RevitArchitecturalDocumentation.Models {
         /// Проверяет есть ли спецификация с указанным именем на листе
         /// </summary>
         public bool HasSpecWithName(string specName) {
-            
+
             Document doc = Sheet.Document;
             ScheduleSheetInstance schedule = Sheet.GetDependentElements(new ElementClassFilter(typeof(ScheduleSheetInstance)))
                 .Select(id => doc.GetElement(id) as ScheduleSheetInstance)

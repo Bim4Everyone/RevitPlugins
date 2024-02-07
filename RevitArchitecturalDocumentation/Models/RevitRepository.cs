@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -8,15 +9,22 @@ using Autodesk.Revit.UI;
 
 namespace RevitArchitecturalDocumentation.Models {
     internal class RevitRepository {
+
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
         }
 
         public UIApplication UIApplication { get; }
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
+
+
+        public Regex RegexForBuildingPart { get; set; } = new Regex(@"К(.*?)_");
+        public Regex RegexForBuildingSection { get; set; } = new Regex(@"С(.*?)$");
+        public Regex RegexForBuildingSectionPart { get; set; } = new Regex(@"часть (.*?)$");
+        public Regex RegexForLevel { get; set; } = new Regex(@"^(.*?) ");
+
         public List<Element> VisibilityScopes => new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_VolumeOfInterest)
             .ToList();
@@ -65,7 +73,7 @@ namespace RevitArchitecturalDocumentation.Models {
         /// <summary>
         /// Собирает все видовые экраны спецификаций на листе и возвращает ту, что имеет запрошенное имя или null
         /// </summary>
-        public ScheduleSheetInstance GetSpecFromSheetByName(ViewSheet viewSheet, string specName) => 
+        public ScheduleSheetInstance GetSpecFromSheetByName(ViewSheet viewSheet, string specName) =>
             viewSheet.GetDependentElements(new ElementClassFilter(typeof(ScheduleSheetInstance)))
                 .Select(id => Document.GetElement(id) as ScheduleSheetInstance)
                 .FirstOrDefault(v => v.Name == specName);
@@ -75,6 +83,7 @@ namespace RevitArchitecturalDocumentation.Models {
         /// Получает виды в плане, выбранных до запуска плагина.
         /// </summary>
         public ObservableCollection<ViewPlan> GetSelectedViewPlans() => new ObservableCollection<ViewPlan>(ActiveUIDocument.Selection.GetElementIds()
-            .Select(id => Document.GetElement(id) as ViewPlan));
+            .Select(id => Document.GetElement(id) as ViewPlan)
+            .Where(v => v != null));
     }
 }

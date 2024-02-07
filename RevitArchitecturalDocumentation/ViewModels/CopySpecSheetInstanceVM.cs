@@ -1,13 +1,9 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
-using System.Windows.Markup;
 
-using Autodesk.AdvanceSteel.CADAccess;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
@@ -124,7 +120,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                     try {
                         // Анализируем и получаем номер одновременно, т.к. чтобы проанализировать номер уровня
                         // нужно получить другую информацию, что по факту равно загрузке при получении уровня
-                        sheetHelper.NameHelper.AnilizeNGetLevelNumber();
+                        sheetHelper.NameHelper.AnalyzeNGetLevelNumber();
 
                     } catch(ViewNameException ex) {
                         ErrorText = ex.Message;
@@ -147,7 +143,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                     try {
                         // Анализируем и получаем номер одновременно, т.к. чтобы проанализировать номер уровня
                         // нужно получить другую информацию, что по факту равно загрузке при получении уровня
-                        specHelper.NameHelper.AnilizeNGetLevelNumber();
+                        specHelper.NameHelper.AnalyzeNGetLevelNumber();
 
                     } catch(ViewNameException ex) {
                         ErrorText = ex.Message;
@@ -205,7 +201,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
                     SheetHelper sheetHelper = new SheetHelper(_revitRepository, sheet);
                     try {
-                        sheetHelper.NameHelper.AnilizeNGetLevelNumber();
+                        sheetHelper.NameHelper.AnalyzeNGetLevelNumber();
 
                     } catch(ViewNameException ex) {
                         ErrorText = ex.Message;
@@ -236,7 +232,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                 SpecHelper specHelper = new SpecHelper(_revitRepository, elem);
                 ScheduleSheetInstances.Add(specHelper);
                 try {
-                    specHelper.NameHelper.AnilizeNGetNameInfo();
+                    specHelper.NameHelper.AnalyzeNGetNameInfo();
 
                 } catch(ViewNameException ex) {
                     ErrorText = ex.Message;
@@ -280,7 +276,7 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                 foreach(SheetHelper sheetHelper in SelectedSheets) {
 
                     foreach(SpecHelper specHelper in ScheduleSheetInstances) {
-                        
+
                         SpecHelper newSpecHelper = specHelper.GetOrDublicateNSetSpec(SelectedFilterNameForSpecs, sheetHelper.NameHelper.LevelNumber);
 
                         // Располагаем созданные спеки на листе в позициях как у спек, с которых производилось копирование, 

@@ -1,36 +1,36 @@
-﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
-using dosymep.SimpleServices;
-using dosymep.WPF.Commands;
-using dosymep.WPF.ViewModels;
 
-using Ninject.Planning.Targets;
-
-using RevitArchitecturalDocumentation.Models;
+using RevitArchitecturalDocumentation.Models.Options;
+using RevitArchitecturalDocumentation.ViewModels;
 
 
-namespace RevitArchitecturalDocumentation.ViewModels {
-    internal class DocsFromScratchVM : BaseViewModel {
+namespace RevitArchitecturalDocumentation.Models {
+    internal class DocsFromScratch {
 
-        public DocsFromScratchVM(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report) {
+        public DocsFromScratch(CreatingARDocsVM pCOnASPDocsVM, RevitRepository revitRepository, ObservableCollection<TreeReportNode> report,
+            ObservableCollection<TaskInfo> tasksForWork, MainOptions mainOptions) {
             MVM = pCOnASPDocsVM;
             Repository = revitRepository;
             Report = report;
+            TasksForWork = tasksForWork;
+            SheetOpts = mainOptions.SheetOpts;
+            ViewOpts = mainOptions.ViewOpts;
+            SpecOpts = mainOptions.SpecOpts;
         }
 
         public CreatingARDocsVM MVM { get; set; }
         public RevitRepository Repository { get; set; }
         public ObservableCollection<TreeReportNode> Report { get; set; }
+        public SheetOptions SheetOpts { get; set; }
+        public ViewOptions ViewOpts { get; set; }
+        public SpecOptions SpecOpts { get; set; }
+        public ObservableCollection<TaskInfo> TasksForWork { get; set; }
+
 
 
         /// <summary>
@@ -40,18 +40,18 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
             using(Transaction transaction = Repository.Document.StartTransaction("Документатор АР")) {
 
-                foreach(Level level in MVM.Levels) {
+                foreach(Level level in Repository.Levels) {
 
                     TreeReportNode levelRep = new TreeReportNode(null) { Name = $"Работаем с уровнем: \"{level.Name}\"" };
 
-                    string numberOfLevel = MVM.RegexForLevel.Match(level.Name).Groups[1].Value;
+                    string numberOfLevel = Repository.RegexForLevel.Match(level.Name).Groups[1].Value;
                     if(!int.TryParse(numberOfLevel, out int numberOfLevelAsInt)) {
                         levelRep.AddNodeWithName($"❗ Не удалось определить номер уровня {level.Name}!");
                         continue;
                     }
                     levelRep.AddNodeWithName($"Номер уровня: \"{numberOfLevelAsInt}\"");
 
-                    foreach(TaskInfo task in MVM.TasksForWork) {
+                    foreach(TaskInfo task in TasksForWork) {
 
                         TreeReportNode taskRep = new TreeReportNode(levelRep) {
                             Name = $"Задание номер: \"{task.TaskNumber}\" - " +
@@ -79,10 +79,10 @@ namespace RevitArchitecturalDocumentation.ViewModels {
 
 
                         SheetHelper sheetHelper = null;
-                        if(MVM.WorkWithSheets) {
+                        if(SheetOpts.WorkWithSheets) {
 
                             string newSheetName = string.Format("{0}корпус {1}_секция {2}_этаж {3}",
-                                MVM.SheetNamePrefix,
+                                SheetOpts.SheetNamePrefix,
                                 task.NumberOfBuildingPartAsInt,
                                 task.NumberOfBuildingSectionAsInt,
                                 numberOfLevel);
@@ -90,14 +90,15 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                             TreeReportNode sheetRep = new TreeReportNode(taskRep) { Name = $"Работа с листом \"{newSheetName}\"" };
 
                             sheetHelper = new SheetHelper(Repository, sheetRep);
-                            sheetHelper.GetOrCreateSheet(newSheetName, MVM.SelectedTitleBlock);
+                            SheetOpts.SelectedTitleBlock = SheetOpts.SelectedTitleBlock ?? Repository.TitleBlocksInProject?.FirstOrDefault(a => a.Name.Equals(SheetOpts.SelectedTitleBlockName));
+                            sheetHelper.GetOrCreateSheet(newSheetName, SheetOpts.SelectedTitleBlock);
                             taskRep.Nodes.Add(sheetRep);
                         }
 
-                        if(MVM.WorkWithViews) {
+                        if(ViewOpts.WorkWithViews) {
 
                             string newViewName = string.Format("{0}{1} этаж К{2}{3}",
-                                MVM.ViewNamePrefix,
+                                ViewOpts.ViewNamePrefix,
                                 numberOfLevel,
                                 task.NumberOfBuildingPartAsInt,
                                 task.ViewNameSuffix);
@@ -105,24 +106,24 @@ namespace RevitArchitecturalDocumentation.ViewModels {
                             TreeReportNode viewRep = new TreeReportNode(taskRep) { Name = $"Работа с видом \"{newViewName}\"" };
 
                             ViewHelper newViewHelper = new ViewHelper(Repository, viewRep);
-                            newViewHelper.GetView(newViewName, task.SelectedVisibilityScope, MVM.SelectedViewFamilyType, level);
+                            newViewHelper.GetView(newViewName, task.SelectedVisibilityScope, ViewOpts.SelectedViewFamilyType, level);
 
                             if(sheetHelper.Sheet != null
                                 && newViewHelper.View != null
                                 && Viewport.CanAddViewToSheet(Repository.Document, sheetHelper.Sheet.Id, newViewHelper.View.Id)) {
-
-                                newViewHelper.PlaceViewportOnSheet(sheetHelper.Sheet, MVM.SelectedViewportType);
+                                ViewOpts.SelectedViewportType = ViewOpts.SelectedViewportType ?? Repository.ViewportTypes?.FirstOrDefault(a => a.Name.Equals(ViewOpts.SelectedViewportTypeName));
+                                newViewHelper.PlaceViewportOnSheet(sheetHelper.Sheet, ViewOpts.SelectedViewportType);
                             }
                             taskRep.Nodes.Add(viewRep);
                         }
 
-                        if(MVM.WorkWithSpecs) {
+                        if(SpecOpts.WorkWithSpecs) {
 
                             foreach(SpecHelper specHelper in task.ListSpecHelpers) {
                                 TreeReportNode specRep = new TreeReportNode(taskRep) { Name = $"Работа со спецификацией \"{specHelper.Specification.Name}\"" };
                                 specHelper.Report = specRep;
 
-                                SpecHelper newSpecHelper = specHelper.GetOrDublicateNSetSpec(MVM.SelectedFilterNameForSpecs, numberOfLevelAsInt);
+                                SpecHelper newSpecHelper = specHelper.GetOrDublicateNSetSpec(SpecOpts.SelectedFilterNameForSpecs, numberOfLevelAsInt);
 
                                 // Располагаем созданные спеки на листе в позициях как у спек, с которых производилось копирование
                                 // В случае если лист и размещаемая на нем спека не null и на листе еще нет вид.экрана этой спеки
