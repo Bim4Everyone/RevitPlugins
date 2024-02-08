@@ -34,6 +34,7 @@ interface ICompile : IClean, IHazSolution, IHazGitVersion, IHazGitRepository, IH
                 .SetOutputDirectory(publishDirectory)
                 .CombineWith(BuildRevitVersions, (settings, revitVersion) => settings
                     .SetSimpleVersion(Versioning, revitVersion)
+                    .SetProperty("RevitVersion", (int) revitVersion)
                     .SetProperty("AssemblyName", $"{PluginName}_{revitVersion}")));
         });
 
@@ -57,6 +58,7 @@ interface ICompile : IClean, IHazSolution, IHazGitVersion, IHazGitRepository, IH
                 .SetOutputDirectory(publishDirectory)
                 .CombineWith(BuildRevitVersions, (settings, revitVersion) => settings
                     .SetSimpleVersion(Versioning, revitVersion)
+                    .SetProperty("RevitVersion", (int) revitVersion)
                     .SetProperty("AssemblyName", $"{PluginName}_{revitVersion}")));
         });
 
