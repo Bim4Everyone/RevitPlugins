@@ -3,6 +3,7 @@
   "Solution": "RevitPlugins.sln",
   "PluginName": "RevitSuperfilter",
   "PublishDirectory": "01.BIM.extension\\BIM.tab\\bin",
+  "RevitVersions": ["Rv2020", "Rv2021", "Rv2022", "Rv2023", "Rv2024"],
   "IconUrl": "",
   "BundleName": "Суперфильтр",
   "BundleType": "InvokeButton",
