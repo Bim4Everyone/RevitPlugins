@@ -2,7 +2,7 @@
     <PropertyGroup>     
         <Platforms>x64</Platforms>
         <OutputType>Library</OutputType>
-        <NoWarn>1701;1702;MSB3246</NoWarn>
+        <NoWarn>1701;1702;MSB3246;MSB3277</NoWarn>
         <TargetFramework>net48</TargetFramework>
         
         <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
