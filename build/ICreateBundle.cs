@@ -53,8 +53,8 @@ interface ICreateBundle : IHazPluginName, IHazOutput, IHazTemplate, IHazGitUserN
                     {"${{ gen.plugin_name }}", PluginName},
                     {"${{ gen.plugin_command }}", PluginName + "Command"},
                     {"${{ gen.author }}", UserName},
-                    {"${{ gen.min_revit_version }}", MaxVersion},
-                    {"${{ gen.max_revit_version }}", MinVersion}
+                    {"${{ gen.min_revit_version }}", MinVersion},
+                    {"${{ gen.max_revit_version }}", MaxVersion}
                 });
 
             await IconSize.CreateImages(GetImageUri(), BundleDirectory / "icon.png");
