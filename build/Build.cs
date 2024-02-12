@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+
+using dosymep.Nuke.RevitVersions;
 
 using Nuke.Common;
 using Nuke.Common.CI.GitHubActions;
@@ -31,7 +34,16 @@ class Build : NukeBuild, ICompile, ICreateScript, IPluginCreate, ICreateBundle, 
     ///   - Microsoft VSCode           https://nuke.build/vscode
     public static int Main() => Execute<Build>();
 
+    public IEnumerable<RevitVersion> BuildRevitVersions { get; set; }
+
     protected override void OnBuildInitialized() {
+        base.OnBuildInitialized();
+        var hazRevitVersion = this.From<IHazRevitVersion>();
+        BuildRevitVersions = hazRevitVersion.RevitVersions.Length > 0
+            ? hazRevitVersion.RevitVersions
+            : RevitVersion.GetRevitVersions(hazRevitVersion.MinVersion, hazRevitVersion.MaxVersion);
+        
+        Log.Information("Build revit versions: {BuildRevitVersions}", BuildRevitVersions);
         Log.Information("Build plugin: {PluginName}", this.From<IHazPluginName>().PluginName);
         Log.Information("Plugin directory: {PluginDirectory}", this.From<IHazPluginName>().PluginDirectory);
 

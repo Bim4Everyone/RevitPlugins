@@ -3,6 +3,7 @@
   "Solution": "RevitPlugins.sln",
   "PluginName": "RevitFamilyParameterAdder",
   "PublishDirectory": "03.KR.extension\\КР.tab\\bin",
+  "RevitVersions": ["Rv2020", "Rv2021", "Rv2022", "Rv2023", "Rv2024"],
   "IconUrl": "https://icons8.com/icon/iyK9ZX69nYUU/insert-row",
   "BundleName": "Добавить параметры в семейство",
   "BundleType": "InvokeButton",

@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<UseDevExpress>true</UseDevExpress>
+	</PropertyGroup>
+	
+	<ItemGroup>
+	  <Resource Include="Resources\icons8-show-property-96.png" />
+	</ItemGroup>
+</Project>

@@ -3,6 +3,7 @@
   "Solution": "RevitPlugins.sln",
   "PluginName": "RevitGenLookupTables",
   "PublishDirectory": "00.Admin.extension\\Admin.tab\\Доработка.panel\\Доработка.stack\\GenLookupTable.invokebutton\\bin",
+  "RevitVersions": ["Rv2020", "Rv2021", "Rv2022", "Rv2023", "Rv2024"],
   "IconUrl": "https://icons8.com/icon/41134/timetable",
   "BundleName": "GenLookupTable",
   "BundleType": "InvokeButton",

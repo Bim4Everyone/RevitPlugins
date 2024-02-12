@@ -14,8 +14,8 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
 [ParameterPrefix(nameof(IPluginCreate))]
 interface IPluginCreate : ICreateScript, ICreateProfile, ICreateBranch {
-    AbsolutePath PluginFile => RootDirectory / PluginName / $"{PluginName}.csproj";
-    AbsolutePath PluginTemplateFile => RootDirectory / "RevitPlugins" / "RevitPlugins.csproj";
+    AbsolutePath PluginFile => PluginDirectory / $"{PluginName}.csproj";
+    AbsolutePath PluginTemplateFile => RootDirectory / "src" / "RevitPlugins" / "RevitPlugins.csproj";
 
     Target CreatePlugin => _ => _
         .Triggers(CreateBranch)
@@ -36,7 +36,7 @@ interface IPluginCreate : ICreateScript, ICreateProfile, ICreateBranch {
             CopyDirectory(TemplateDirectory, PluginDirectory,
                 new Dictionary<string, string>() {{"${{ gen.bundle_name }}", BundleName ?? "Название плагина"}});
 
-            DotNet(arguments: $"sln add {PluginFile}");
+            DotNet(arguments: $"sln add {PluginFile} --in-root");
             PluginFile.WriteAllText(PluginTemplateFile.ReadAllText());
         });
 }
