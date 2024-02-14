@@ -1,0 +1,36 @@
+name: RevitMepTotals publish
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'RevitMepTotals**.cs'
+      - 'RevitMepTotals**.xaml'
+
+env:
+  Plugin_Repo_Url: https://github.com/Bim4Everyone/BIMExtensions.git # Plugin's github repository for pyRevit ribbon
+  Plugin_Name: RevitMepTotals                                        # Plugin name
+
+jobs:
+  build:
+    name: build
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout RevitPlugins
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    # Install the .netframework4.8 workload
+    - name: Install .netframework4.8
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 4.8.0
+
+    # Install nuke-build
+    - name: Install nuke-build
+      run: dotnet tool install Nuke.GlobalTool --global
+
+
