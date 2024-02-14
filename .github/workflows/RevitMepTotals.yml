@@ -5,8 +5,8 @@ on:
     branches:
       - 'vlastroG/workflows'
     paths:
-      - 'RevitMepTotals**.cs'
-      - 'RevitMepTotals**.xaml'
+      - '**RevitMepTotals**.cs'
+      - '**RevitMepTotals**.xaml'
 
 env:
   Plugin_Repo_Url: https://github.com/Bim4Everyone/BIMExtensions.git # Plugin's github repository for pyRevit ribbon
