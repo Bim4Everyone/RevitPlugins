@@ -32,3 +32,6 @@ jobs:
     # Install nuke-build
     - name: Install nuke-build
       run: dotnet tool install Nuke.GlobalTool --global
+
+    - name: Add DevExpress package source
+      run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p ${{ secrets.DEVEXPRESS_FEED_URL }}
