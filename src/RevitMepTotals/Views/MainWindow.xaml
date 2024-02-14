@@ -35,7 +35,7 @@
         </Grid.RowDefinitions>
 
         <dxdo:LayoutControlItem>
-            <lc:GroupBox Header="Выбранные проекты">
+            <lc:GroupBox Header="Выбранные проекты тест">
                 <dxe:ListBoxEdit ItemsSource="{Binding Documents}"
                                  EditValue="{Binding SelectedDocument, UpdateSourceTrigger=PropertyChanged}">
                 </dxe:ListBoxEdit>
