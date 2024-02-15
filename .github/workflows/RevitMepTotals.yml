@@ -51,7 +51,7 @@ jobs:
         curl.exe -LO $download
         ls
         echo $file
-        .\$file /silent
+        start .\pyRevit_4.8.14.24016+1909_signed.exe /silent
         rm $file
 
     - name: Checkout RevitPlugins
