@@ -1,4 +1,4 @@
-name: RevitMepTotals publish
+name: RevitMepTotals publish test
 
 on:
   push:
