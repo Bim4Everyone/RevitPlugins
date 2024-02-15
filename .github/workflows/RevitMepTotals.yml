@@ -34,7 +34,7 @@ jobs:
       run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p ${{ secrets.DEVEXPRESS_FEED_AUTHORIZATION_KEY }}
 
     - name: Clone Bim4Everyone.lib
-      run: git clone env.Bim4Everyone_lib_Repo_Url $env:APPDATA\pyRevit\Extensions\BIM4Everyone.lib
+      run: git clone $Bim4Everyone_lib_Repo_Url $env:APPDATA\pyRevit\Extensions\BIM4Everyone.lib
 
     # https://gist.github.com/MarkTiedemann/c0adc1701f3f5c215fc2c2d5b1d5efd3
     - name: Download pyRevit latest release
