@@ -44,14 +44,14 @@ jobs:
         echo $releases
         $tag = (curl.exe -L $releases | ConvertFrom-Json)[0].tag_name.Split("v")[1]
         echo $tag
-        $file = "pyRevit_" + $tag + "_signed.exe"
+        $file = (curl.exe -L $releases | ConvertFrom-Json)[0].assets.Where({($_.name -Like "*_signed.exe") -and ($_.name -NotLike "*_admin_signed.exe") -and ($_.name -NotLike "*CLI*")})[0].name
         echo $file
         $download = "https://github.com/$repo/releases/latest/download/$file"
         echo $download
         curl.exe -LO $download
         ls
         echo $file
-        start .\pyRevit_4.8.14.24016+1909_signed.exe /silent
+        start .\$file /silent
         rm $file
 
     - name: Checkout RevitPlugins
