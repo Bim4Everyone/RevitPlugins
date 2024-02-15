@@ -35,7 +35,7 @@ jobs:
 
     - name: Clone Bim4Everyone to Bim4Everyone.lib
       run: |
-        echo $Bim4Everyone_lib_Repo_Url
+        mkdir $env:APPDATA\pyRevit\Extensions\BIM4Everyone.lib
         git clone $Bim4Everyone_lib_Repo_Url $env:APPDATA\pyRevit\Extensions\BIM4Everyone.lib
 
     # https://gist.github.com/MarkTiedemann/c0adc1701f3f5c215fc2c2d5b1d5efd3
