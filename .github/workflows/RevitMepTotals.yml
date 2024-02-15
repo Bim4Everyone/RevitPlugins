@@ -9,9 +9,9 @@ on:
       - '**RevitMepTotals**.xaml'
 
 env:
-  Plugin_Repo_Url: https://github.com/vlastroG/BIMExtensions.git
-  Plugin_Name: RevitMepTotals
-  Bim4Everyone_lib_Repo_Url: https://github.com/Bim4Everyone/BIM4Everyone.git
+  Plugin_Repo_Url: "https://github.com/vlastroG/BIMExtensions.git"
+  Plugin_Name: "RevitMepTotals"
+  Bim4Everyone_lib_Repo_Url: "https://github.com/Bim4Everyone/BIM4Everyone.git"
 
 jobs:
   build:
@@ -33,19 +33,7 @@ jobs:
     - name: Add DevExpress package source
       run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p ${{ secrets.DEVEXPRESS_FEED_AUTHORIZATION_KEY }}
 
-    - name: Check access for directory APPDATA
-      run: get-acl -path $env:APPDATA
-
-    - name: Create directory BIM4Everyone.lib
-      run: mkdir $env:APPDATA\pyRevit\Extensions\BIM4Everyone.lib
-
-    - name: Check access for directory BIM4Eveyone.lib
-      run: get-acl -path $env:APPDATA\pyRevit\Extensions\BIM4Everyone.lib
-
-    - name: Try clone Bim4Everyone in active directory
-      run: git clone $Bim4Everyone_lib_Repo_Url
-
-    - name: Clone Bim4Everyone.lib
+    - name: Clone Bim4Everyone to Bim4Everyone.lib
       run: git clone $Bim4Everyone_lib_Repo_Url $env:APPDATA\pyRevit\Extensions\BIM4Everyone.lib
 
     # https://gist.github.com/MarkTiedemann/c0adc1701f3f5c215fc2c2d5b1d5efd3
