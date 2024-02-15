@@ -49,6 +49,7 @@ jobs:
         $download = "https://github.com/$repo/releases/latest/download/$file"
         echo $download
         curl.exe -LO $download
+        ls
         echo $file
         start .\$file /silent
         rm $file
