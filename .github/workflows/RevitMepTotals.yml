@@ -9,10 +9,9 @@ on:
       - '**RevitMepTotals**.xaml'
 
 env:
-  Plugin_Repo_Url: "https://github.com/vlastroG/BIMExtensions.git"
+  Plugin_Repo_Url: "https://${{ secrets.BIMEXTENSIONS_PUSH_TOKEN }}@github.com/vlastroG/BIMExtensions.git"
   Plugin_Name: "RevitMepTotals"
   Bim4Everyone_lib_Repo_Url: "https://github.com/Bim4Everyone/BIM4Everyone.git"
-
 jobs:
   build:
     name: build
@@ -70,7 +69,16 @@ jobs:
         fetch-depth: 0
 
     - name: Clone plugin repository
-      run: git clone https://github.com/Bim4Everyone/BIM4Everyone.git $env:APPDATA\pyRevit\Extensions\BIM4Everyone.lib  
+      run: |
+        $plugindir = (Get-Content .\.nuke.\parameters.$pluginname.json | Out-String | ConvertFrom-Json).PublishDirectory.Split("\")[0]
+        git clone ${{ env.Plugin_Repo_Url }} $env:APPDATA\pyRevit\Extensions\$plugindir
 
     - name: Build plugin
-      run: nuke publish --profile RevitMepTotals
+      run: nuke publish --profile ${{ env.Plugin_Name }}
+
+    - name: Go to plugin repo
+      run: |
+        echo "log plugindir -->" + $plugindir
+        $plugindir = (Get-Content .\.nuke.\parameters.$pluginname.json | Out-String | ConvertFrom-Json).PublishDirectory.Split("\")[0]
+        cd $env:APPDATA\pyRevit\Extensions\$plugindir
+        git status
