@@ -80,6 +80,8 @@ jobs:
       run: |
         $plugindir = (Get-Content .\.nuke.\parameters.${{ env.Plugin_Name }}.json | Out-String | ConvertFrom-Json).PublishDirectory.Split("\")[0]
         cd $env:APPDATA\pyRevit\Extensions\$plugindir
+        git config --local user.email "${{ secrets.EMAIL }}"
+        git config --local user.name "${{ secrets.NAME }}"
         git add *.dll
         git commit -m "Обновление библиотек плагина ${{ env.Plugin_Name }}"
         git push
