@@ -36,6 +36,7 @@ jobs:
     - name: Clone Bim4Everyone to Bim4Everyone.lib
       run: git clone https://github.com/Bim4Everyone/BIM4Everyone.git $env:APPDATA\pyRevit\Extensions\BIM4Everyone.lib
 
+    # We need to install pyRevit just because we need it's pyRevitLabs.Json.dll
     # https://gist.github.com/MarkTiedemann/c0adc1701f3f5c215fc2c2d5b1d5efd3
     - name: Download and install pyRevit latest release
       run: |
@@ -48,10 +49,13 @@ jobs:
         start .\$file /silent -Wait
         echo "log --> installation finished"
       
-    - name: Check pyRevit Installation
-      run: ls $env:APPDATA\pyRevit-master
+    - name: Check pyRevitLabs.Json.dll is exists
+      run: Test-Path  $env:APPDATA\pyRevit-master\bin\pyRevitLabs.Json.dll -PathType Leaf
 
     - name: Checkout RevitPlugins
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
+
+    - name: Build plugin
+      run: nuke publish --profile RevitMepTotals
