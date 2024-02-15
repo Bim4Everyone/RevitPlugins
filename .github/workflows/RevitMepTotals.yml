@@ -41,19 +41,14 @@ jobs:
       run: |
         $repo = "eirannejad/pyRevit"
         $releases = "https://api.github.com/repos/$repo/releases"
-        echo $releases
-        $tag = (curl.exe -L $releases | ConvertFrom-Json)[0].tag_name.Split("v")[1]
-        echo $tag
-        $file = (curl.exe -L $releases | ConvertFrom-Json)[0].assets.Where({($_.name -Like "*_signed.exe") -and ($_.name -NotLike "*_admin_signed.exe") -and ($_.name -NotLike "*CLI*")})[0].name
-        echo $file
+        $file = |
+          (curl.exe -L $releases | ConvertFrom-Json)[0].assets \
+          .Where({($_.name -Like "*_signed.exe") -and ($_.name -NotLike "*_admin_signed.exe") -and ($_.name -NotLike "*CLI*")})[0].name
         $download = "https://github.com/$repo/releases/latest/download/$file"
-        echo $download
         curl.exe -LO $download
-        ls
-        echo $file
-        start .\$file /silent
-        ls
-      # rm .\$file
+        echo "log --> installation started"
+        start .\$file /silent -Wait
+        echo "log --> installation finished"
       
     - name: Check pyRevit Installation
       run: ls $env:APPDATA\pyRevit-master
