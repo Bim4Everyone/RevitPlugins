@@ -36,10 +36,10 @@ jobs:
     - name: Checkout Bim4Everyone to Bim4Everyone.lib
       uses: actions/checkout@v3
       with:
-        path: $env:APPDATA\pyRevit\Extensions\BIM4Everyone.lib
+        path: ${{ env.APPDATA }}\pyRevit\Extensions\BIM4Everyone.lib
         repository: Bim4Everyone/BIM4Everyone
         fetch-depth: 0
-        
+
     #- name: Clone Bim4Everyone to Bim4Everyone.lib
     #  run: git clone https://github.com/Bim4Everyone/BIM4Everyone.git $env:APPDATA\pyRevit\Extensions\BIM4Everyone.lib
 
