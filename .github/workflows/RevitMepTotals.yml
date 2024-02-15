@@ -52,7 +52,7 @@ jobs:
         ls
         echo $file
         start .\$file /silent
-        rm $file
+        rm .\$file
 
     - name: Checkout RevitPlugins
       uses: actions/checkout@v3
