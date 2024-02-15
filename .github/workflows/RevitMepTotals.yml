@@ -52,7 +52,11 @@ jobs:
         ls
         echo $file
         start .\$file /silent
-        rm .\$file
+        ls
+      # rm .\$file
+      
+    - name: Check pyRevit Installation
+      run: ls $env:APPDATA\pyRevit-master
 
     - name: Checkout RevitPlugins
       uses: actions/checkout@v3
