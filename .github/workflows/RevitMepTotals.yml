@@ -41,9 +41,7 @@ jobs:
       run: |
         $repo = "eirannejad/pyRevit"
         $releases = "https://api.github.com/repos/$repo/releases"
-        $file = |
-          (curl.exe -L $releases | ConvertFrom-Json)[0].assets \
-          .Where({($_.name -Like "*_signed.exe") -and ($_.name -NotLike "*_admin_signed.exe") -and ($_.name -NotLike "*CLI*")})[0].name
+        $file = (curl.exe -L $releases | ConvertFrom-Json)[0].assets.Where({($_.name -Like "*_signed.exe") -and ($_.name -NotLike "*_admin_signed.exe") -and ($_.name -NotLike "*CLI*")})[0].name
         $download = "https://github.com/$repo/releases/latest/download/$file"
         curl.exe -LO $download
         echo "log --> installation started"
