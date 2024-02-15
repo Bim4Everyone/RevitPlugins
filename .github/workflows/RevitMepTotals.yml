@@ -9,7 +9,7 @@ on:
       - '**RevitMepTotals**.xaml'
 
 env:
-  Plugin_Repo_Url: https://github.com/Bim4Everyone/BIMExtensions.git
+  Plugin_Repo_Url: https://github.com/vlastroG/BIMExtensions.git
   Plugin_Name: RevitMepTotals
   Bim4Everyone_lib_Repo_Url: https://github.com/Bim4Everyone/BIM4Everyone.git
 
