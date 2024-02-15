@@ -33,6 +33,12 @@ jobs:
     - name: Add DevExpress package source
       run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p ${{ secrets.DEVEXPRESS_FEED_AUTHORIZATION_KEY }}
 
+    - name: Check access for directory
+      run: get-acl -path $env:APPDATA\pyRevit\Extensions\BIM4Everyone.lib
+
+    - name: Try clone Bim4Everyone in actove directory
+      run: git clone $Bim4Everyone_lib_Repo_Url
+
     - name: Clone Bim4Everyone.lib
       run: git clone $Bim4Everyone_lib_Repo_Url $env:APPDATA\pyRevit\Extensions\BIM4Everyone.lib
 
