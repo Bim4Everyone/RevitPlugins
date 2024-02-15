@@ -70,7 +70,7 @@ jobs:
 
     - name: Clone plugin repository
       run: |
-        $plugindir = (Get-Content .\.nuke.\parameters.$pluginname.json | Out-String | ConvertFrom-Json).PublishDirectory.Split("\")[0]
+        $plugindir = (Get-Content .\.nuke.\parameters.${{ env.Plugin_Name }}.json | Out-String | ConvertFrom-Json).PublishDirectory.Split("\")[0]
         git clone ${{ env.Plugin_Repo_Url }} $env:APPDATA\pyRevit\Extensions\$plugindir
 
     - name: Build plugin
@@ -79,6 +79,6 @@ jobs:
     - name: Go to plugin repo
       run: |
         echo "log plugindir -->" + $plugindir
-        $plugindir = (Get-Content .\.nuke.\parameters.$pluginname.json | Out-String | ConvertFrom-Json).PublishDirectory.Split("\")[0]
+        $plugindir = (Get-Content .\.nuke.\parameters.${{ env.Plugin_Name }}.json | Out-String | ConvertFrom-Json).PublishDirectory.Split("\")[0]
         cd $env:APPDATA\pyRevit\Extensions\$plugindir
         git status
