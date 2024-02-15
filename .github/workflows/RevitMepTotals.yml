@@ -76,9 +76,10 @@ jobs:
     - name: Build plugin
       run: nuke publish --profile ${{ env.Plugin_Name }}
 
-    - name: Go to plugin repo
+    - name: Push updated dll
       run: |
-        echo "log plugindir -->" + $plugindir
         $plugindir = (Get-Content .\.nuke.\parameters.${{ env.Plugin_Name }}.json | Out-String | ConvertFrom-Json).PublishDirectory.Split("\")[0]
         cd $env:APPDATA\pyRevit\Extensions\$plugindir
-        git status
+        git add *.dll
+        git commit -m "Обновление библиотек плагина ${{ env.Plugin_Name }}"
+        git push
