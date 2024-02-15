@@ -2,8 +2,8 @@ name: RevitMepTotals publish
 
 on:
   push:
-    branches:
-      - 'vlastroG:vlastroG/workflow'
+    #branches:
+    #  - 'vlastroG:vlastroG/workflow'
     paths:
       - '**RevitMepTotals**.cs'
       - '**RevitMepTotals**.xaml'
