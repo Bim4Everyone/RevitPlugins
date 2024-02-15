@@ -51,7 +51,7 @@ jobs:
         curl.exe -LO $download
         ls
         echo $file
-        start .\$file /silent
+        .\$file /silent
         rm $file
 
     - name: Checkout RevitPlugins
