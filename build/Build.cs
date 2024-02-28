@@ -26,7 +26,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
     EnableGitHubToken = true,
     OnPushIncludePaths = new[] {"RevitPlugins/**", "**.cs"}
 )]
-class Build : NukeBuild, ICompile, ICreateScript, IPluginCreate, ICreateBundle, ICreateProfile {
+class Build : NukeBuild, ICompile, ICreateScript, IPluginCreate, ICreateBundle, ICreateProfile, IPyRevitInstall {
     /// Support plugins are available for:
     ///   - JetBrains ReSharper        https://nuke.build/resharper
     ///   - JetBrains Rider            https://nuke.build/rider

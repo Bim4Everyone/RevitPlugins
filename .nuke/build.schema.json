@@ -119,6 +119,9 @@
         "PublishDirectory": {
           "type": "string"
         },
+        "PyRevitInstallerUrl": {
+          "type": "string"
+        },
         "RevitVersions": {
           "type": "array",
           "description": "Build Revit versions",
@@ -155,6 +158,7 @@
               "CreateProfile",
               "CreateScript",
               "FullClean",
+              "InstallPyRevit",
               "Publish"
             ]
           }
@@ -177,6 +181,7 @@
               "CreateProfile",
               "CreateScript",
               "FullClean",
+              "InstallPyRevit",
               "Publish"
             ]
           }
