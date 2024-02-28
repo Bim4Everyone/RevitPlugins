@@ -3,11 +3,9 @@ using System.IO;
 
 using Nuke.Common;
 using Nuke.Common.Tooling;
-using Nuke.Common.Tools.CloudFoundry;
 
 using Serilog;
 
-using static Nuke.Common.Tools.CloudFoundry.CloudFoundryTasks;
 using static Nuke.Common.Tools.PowerShell.PowerShellTasks;
 
 interface IPyRevitInstall : INukeBuild {
