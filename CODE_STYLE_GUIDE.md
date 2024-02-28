@@ -84,13 +84,12 @@ Developed from Google Java style.
 ### Example
 
 ```c#
-using System;                                           // `using` находится сверху, вне объявления
-                                                        // namespace.
+using System;                                           // `using` находится сверху, вне объявления namespace.
 
-namespace MyNamespace {                                 // Для Namespaces используется PascalCase.
-    public interface IMyInterface {                     // Для интерфейса начинается с 'I'.
+namespace MyNamespace {                                 // Для namespace используется PascalCase.
+    public interface IMyInterface {                     // Имя интерфейса начинается с 'I'.
         public int Calculate(float value, float exp);   // Для метода используется PascalCase.
-                                                        // ...and space after comma.
+                                                        // ...and space after comma.?
     }
 
     public enum MyEnum {                                // Для перечислений используется PascalCase.
@@ -129,7 +128,7 @@ namespace MyNamespace {                                 // Для Namespaces исполь
             if (!NoCounting) {                          // Нет пробелов перед унарным оператором.
                 if (resultValue < 0) {                  // Пробелы вокруг оператора сравнения.                                                        
                     _results.NumNegativeResults++;      // Скобки используются, даже, если они необязательны.
-                } else if (resultValue > 0) {           // Нет перехода на новую строку между else и '}'.
+                } else if (resultValue > 0) {           // Нет перехода на новую строку между '}' и else.
                     _results.NumPositiveResults++;
                 }
             }
