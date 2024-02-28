@@ -81,7 +81,117 @@ Developed from Google Java style.
         с отступом в 4 пробела.
 
 
-## Рекомендации по написанию кода
+### Example
+
+```c#
+using System;                                           // `using` находится сверху, вне объявления
+                                                        // namespace.
+
+namespace MyNamespace {                                 // Для Namespaces используется PascalCase.
+    public interface IMyInterface {                     // Для интерфейса начинается с 'I'.
+        public int Calculate(float value, float exp);   // Для метода используется PascalCase.
+                                                        // ...and space after comma.
+    }
+
+    public enum MyEnum {                                // Для перечислений используется PascalCase.
+        Yes,                                            
+        No,
+    }
+
+    public class MyClass {                              // Для класса используется PascalCase.
+        public int Foo = 0;                             // Для публичных членов класса используется PascalCase.
+        public bool NoCounting = false;                 // Инициализаторы полей приветствуются.
+        private class Results {
+            public int NumNegativeResults = 0;
+            public int NumPositiveResults = 0;
+        }
+
+        private Results _results;                       // Для приватных членов класса используется _camelCase.
+        public static int NumTimesCalled = 0;
+        private const int _bar = 100;                   // const не влияют на правила именования.
+
+        private int[] _someTable = {                    // При переходе на новую строку добавляются 4 пробела.
+            2, 3, 4,                                    
+        };
+
+        public MyClass() {
+            _results = new Results {
+                NumNegativeResults = 1,                 // При переходе на новую строку добавляются 4 пробела.
+                NumPositiveResults = 1,
+            };
+        }
+
+        public int CalculateValue(int mulNumber) {      // Нет перехода на новую строку перед символом '{'.
+            var resultValue = Foo * mulNumber;          // Для локальных переменных используется camelCase.
+            NumTimesCalled++;
+            Foo += _bar;
+
+            if (!NoCounting) {                          // Нет пробелов перед унарным оператором.
+                if (resultValue < 0) {                  // Пробелы вокруг оператора сравнения.                                                        
+                    _results.NumNegativeResults++;      // Скобки используются, даже, если они необязательны.
+                } else if (resultValue > 0) {           // Нет перехода на новую строку между else и '}'.
+                    _results.NumPositiveResults++;
+                }
+            }
+
+            return resultValue;
+        }
+
+        public void ExpressionBodies() {
+            // Простые лямбда-выражения помещайте в одну строку, если это возможно.
+            Func<int, int> increment = x => x + 1;
+
+            // Закрывающая фигурная скобка выравнивается по первому символу строки с открывающей скобкой.
+            Func<int, int, long> difference1 = (x, y) => {
+                long diff = (long)x - y;
+                return diff >= 0 ? diff : -diff;
+            };
+
+            // Если определенние переносится на новую строку, то отступ имеет все тело объекта.
+            Func<int, int, long> difference2 =
+                (x, y) => {
+                    long diff = (long)x - y;
+                    return diff >= 0 ? diff : -diff;
+                };
+
+            // Встроенные лямбда-аргументы тоже следуют этому правилу. Предпочитайте дополнительную
+            // новую строку перед группой аргументов, которые включают лямбда-выражение.
+            CallWithDelegate(
+                (x, y) => {
+                    long diff = (long)x - y;
+                    return diff >= 0 ? diff : -diff;
+                });
+            }
+
+            void DoNothing() {}                         // Пустые блоки могут быть краткими.
+
+            // Старайтесь выравнивать аргументы на новой строке по первому аргументу.
+            void AVeryLongFunctionNameThatCausesLineWrappingProblems(int longArgumentName,
+                                                                     int p1, int p2) {}
+
+            // Если перенос части аргументов не дает достаточно места, то могут быть перенесены 
+            // все аргументы с отступом в 4 пробела.
+            void AnotherLongFunctionNameThatCausesLineWrappingProblems(
+                int longArgumentName, int longArgumentName2, int longArgumentName3) {}
+
+            void CallingLongFunctionName() {
+                int veryLongArgumentName = 1234;
+                int shortArg = 1;
+            // Старайтесь выравнивать аргументы на новой строке по первому аргументу.
+            AnotherLongFunctionNameThatCausesLineWrappingProblems(shortArg, shortArg,
+                                                                  veryLongArgumentName);
+
+            // Если перенос части аргументов не дает достаточно места, то могут быть перенесены 
+            // все аргументы с отступом в 4 пробела.
+            AnotherLongFunctionNameThatCausesLineWrappingProblems(
+                veryLongArgumentName, veryLongArgumentName, veryLongArgumentName);
+        }
+    }
+}
+```
+
+
+## Рекомендации по написанию кода на C#
 
 ### Константы
 
