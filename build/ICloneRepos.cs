@@ -16,7 +16,7 @@ interface ICloneRepos : IHazOutput {
     Uri ExtensionsJsonUrl
         => new Uri("https://raw.githubusercontent.com/Bim4Everyone/BIMExtensions/master/extensions.json");
 
-    AbsolutePath ExtensionsJsonPath => Path.Combine(RootDirectory, "extensions.json");
+    AbsolutePath ExtensionsJsonPath => Path.Combine(RootDirectory, "bin", "extensions.json");
 
     AbsolutePath ExtensionsDirectory
         => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "pyRevit");

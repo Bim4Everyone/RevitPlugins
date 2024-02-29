@@ -19,7 +19,7 @@ interface IPyRevitInstall : INukeBuild {
         .Requires(() => PyRevitInstallerUrl)
         .OnlyWhenDynamic(() => !PyRevitPath.DirectoryExists(), $"{PyRevitPath} must not exist")
         .Executes(() => {
-            string pyRevitInstallerFile = Path.Combine(RootDirectory, "pyRevitInstaller.exe");
+            string pyRevitInstallerFile = Path.Combine(RootDirectory, "bin", "pyRevitInstaller.exe");
             Log.Debug($"Download pyRevit installer from: {PyRevitInstallerUrl} to: {pyRevitInstallerFile}");
             PowerShell($"curl.exe -L \"{PyRevitInstallerUrl}\" -o \"{pyRevitInstallerFile}\" -s");
             Assert.FileExists(pyRevitInstallerFile, "pyRevitInstaller didn't download");
