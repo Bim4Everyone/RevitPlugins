@@ -22,7 +22,6 @@ interface ICloneRepos : IHazOutput {
         => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "pyRevit");
 
     Target CloneRepos => _ => _
-        .OnlyWhenStatic(() => !IsServerBuild, "TODO after testing make only on ServerBuild")
         .Requires(() => PublishDirectory)
         .OnlyWhenDynamic(() => !ExtensionsDirectory.DirectoryExists(), $"{ExtensionsDirectory} must not exist")
         .Executes(() => {
