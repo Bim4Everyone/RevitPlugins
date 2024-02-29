@@ -10,40 +10,38 @@ using Nuke.Common.IO;
 using Serilog;
 
 using static Nuke.Common.Tools.Git.GitTasks;
+using static Nuke.Common.Tools.PowerShell.PowerShellTasks;
 
 interface ICloneRepos : IHazOutput {
-    Uri BimExtensionsRepoUrl => new Uri("https://github.com/Bim4Everyone/BIMExtensions.git");
+    Uri ExtensionsJsonUrl
+        => new Uri("https://raw.githubusercontent.com/Bim4Everyone/BIMExtensions/master/extensions.json");
 
-    AbsolutePath BimExtensionsDirectory => NukeBuildExtensions.GetExtensionsPath("01.BIM.extension");
+    AbsolutePath ExtensionsJsonPath => Path.Combine(RootDirectory, "extensions.json");
 
-    AbsolutePath ExtensionsJsonPath => Path.Combine(BimExtensionsDirectory, "extensions.json");
-
+    AbsolutePath ExtensionsDirectory
+        => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "pyRevit");
 
     Target CloneRepos => _ => _
         .OnlyWhenStatic(() => !IsServerBuild, "TODO after testing make only on ServerBuild")
         .Requires(() => PublishDirectory)
-        .OnlyWhenStatic(() => !BimExtensionsDirectory.DirectoryExists(), "01.BIM.extension directory must not exist")
+        .OnlyWhenDynamic(() => !ExtensionsDirectory.DirectoryExists(), $"{ExtensionsDirectory} must not exist")
         .Executes(() => {
-            Log.Debug($"Clone BIMExtensions repo: {BimExtensionsRepoUrl} to directory: {BimExtensionsDirectory}");
-            Git($"clone {BimExtensionsRepoUrl} {BimExtensionsDirectory} -q");
-            Assert.FileExists(ExtensionsJsonPath, $"extensions.json must exist in {BimExtensionsDirectory}");
-
+            Log.Debug($"Download extensions.json from: {ExtensionsJsonUrl} to {ExtensionsJsonPath}");
+            PowerShell($"curl.exe -L \"{ExtensionsJsonUrl}\" -o \"{ExtensionsJsonPath}\" -s");
+            Assert.FileExists(ExtensionsJsonPath, $"{ExtensionsJsonPath} must exist");
             string extensionsJson = File.ReadAllText(ExtensionsJsonPath);
-            Log.Debug($"extensions.json content: {extensionsJson}");
 
             string libRepoUrl = GetLibRepoUrl(extensionsJson);
             string libDirPath = NukeBuildExtensions.GetExtensionsPath(GetLibRepoDirectory(extensionsJson));
-            Assert.False(Directory.Exists(libDirPath), "BIM4Everyone.lib directory must not exist");
+            Assert.False(Directory.Exists(libDirPath), $"{libDirPath} must not exist");
             Log.Debug($"Clone BIM4Everyone repo: {libRepoUrl} to directory: {libDirPath}");
-            Git($"clone {libRepoUrl} {libDirPath} -q");
+            Git($"clone \"{libRepoUrl}\" \"{libDirPath}\" -q");
 
             string pluginRepoUrl = GetPluginExtensionRepoUrl(extensionsJson);
             string pluginDirPath = NukeBuildExtensions.GetExtensionsPath(GetPluginExtensionDirectory(PublishDirectory));
-            //we've already cloned BIMExtension
-            if(!Directory.Exists(pluginDirPath)) {
-                Log.Debug($"Clone plugin extension repo: {pluginRepoUrl} to directory: {pluginDirPath}");
-                Git($"clone {pluginRepoUrl} {pluginDirPath} -q");
-            }
+            Assert.False(Directory.Exists(pluginDirPath), $"{pluginDirPath} must not exist");
+            Log.Debug($"Clone plugin extension repo: {pluginRepoUrl} to directory: {pluginDirPath}");
+            Git($"clone \"{pluginRepoUrl}\" \"{pluginDirPath}\" -q");
         });
 
 

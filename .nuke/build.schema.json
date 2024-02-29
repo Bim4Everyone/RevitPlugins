@@ -120,7 +120,8 @@
           "type": "string"
         },
         "PyRevitInstallerUrl": {
-          "type": "string"
+          "type": "string",
+          "description": "Default is pyRevit_4.8.14.24016_signed.exe"
         },
         "RevitVersions": {
           "type": "array",
@@ -160,7 +161,8 @@
               "CreateScript",
               "FullClean",
               "InstallPyRevit",
-              "Publish"
+              "Publish",
+              "PushPluginDll"
             ]
           }
         },
@@ -184,7 +186,8 @@
               "CreateScript",
               "FullClean",
               "InstallPyRevit",
-              "Publish"
+              "Publish",
+              "PushPluginDll"
             ]
           }
         },

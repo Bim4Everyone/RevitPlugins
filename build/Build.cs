@@ -16,7 +16,7 @@ using Serilog;
     EnableGitHubToken = true,
     OnPushIncludePaths = new[] { "RevitPlugins/**", "**.cs" }
 )]
-class Build : NukeBuild, ICompile, ICreateScript, IPluginCreate, ICreateBundle, ICreateProfile, IPyRevitInstall, ICloneRepos {
+class Build : NukeBuild, ICompile, ICreateScript, IPluginCreate, ICreateBundle, ICreateProfile {
     /// Support plugins are available for:
     ///   - JetBrains ReSharper        https://nuke.build/resharper
     ///   - JetBrains Rider            https://nuke.build/rider
