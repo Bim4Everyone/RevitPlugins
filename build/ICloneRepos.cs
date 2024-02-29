@@ -25,6 +25,8 @@ interface ICloneRepos : IHazOutput {
         .Requires(() => PublishDirectory)
         .OnlyWhenDynamic(() => !ExtensionsDirectory.DirectoryExists(), $"{ExtensionsDirectory} must not exist")
         .Executes(() => {
+            Log.Debug("Test powershell.exe on github actions via ls command");
+            PowerShell("ls");
             Log.Debug($"Download extensions.json from: {ExtensionsJsonUrl} to {ExtensionsJsonPath}");
             PowerShell($"curl.exe -L \"{ExtensionsJsonUrl}\" -o \"{ExtensionsJsonPath}\" -s");
             Assert.FileExists(ExtensionsJsonPath, $"{ExtensionsJsonPath} must exist");
