@@ -151,6 +151,7 @@
             "type": "string",
             "enum": [
               "Clean",
+              "CloneRepos",
               "Compile",
               "CreateBranch",
               "CreateBundle",
@@ -174,6 +175,7 @@
             "type": "string",
             "enum": [
               "Clean",
+              "CloneRepos",
               "Compile",
               "CreateBranch",
               "CreateBundle",
