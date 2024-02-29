@@ -17,7 +17,6 @@ interface IPyRevitInstall : INukeBuild {
 
     Target InstallPyRevit => _ => _
         .Requires(() => PyRevitInstallerUrl)
-        .OnlyWhenStatic(() => !IsServerBuild, "TODO after testing make only on ServerBuild")
         .OnlyWhenDynamic(() => !PyRevitPath.DirectoryExists(), $"{PyRevitPath} must not exist")
         .Executes(() => {
             string pyRevitInstallerFile = Path.Combine(RootDirectory, "pyRevitInstaller.exe");
