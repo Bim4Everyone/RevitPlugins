@@ -26,7 +26,7 @@ interface ICloneRepos : IHazOutput {
         .OnlyWhenDynamic(() => !ExtensionsDirectory.DirectoryExists(), $"{ExtensionsDirectory} must not exist")
         .Executes(() => {
             Log.Debug($"Download extensions.json from: {ExtensionsJsonUrl} to {ExtensionsJsonPath}");
-            PowerShell($"curl.exe -L \"{ExtensionsJsonUrl}\" -o \"{ExtensionsJsonPath}\"");
+            PowerShell($"curl.exe -L \"{ExtensionsJsonUrl}\" -o \"{ExtensionsJsonPath}\" --create-dirs -s");
             Assert.FileExists(ExtensionsJsonPath, $"{ExtensionsJsonPath} must exist");
             string extensionsJson = File.ReadAllText(ExtensionsJsonPath);
 
