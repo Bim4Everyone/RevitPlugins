@@ -31,57 +31,11 @@ jobs:
 
     - name: Add DevExpress package source
       run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p ${{ secrets.DEVEXPRESS_FEED_AUTHORIZATION_KEY }}
-
-    - name: Clone Bim4Everyone to Bim4Everyone.lib
-      run: git clone ${{ env.Bim4Everyone_lib_Repo_Url }} $env:APPDATA\pyRevit\Extensions\BIM4Everyone.lib  
-
-    # We need to install pyRevit just because we need it's pyRevitLabs.Json.dll
-    # https://gist.github.com/MarkTiedemann/c0adc1701f3f5c215fc2c2d5b1d5efd3
-    #- name: Download and install pyRevit latest release
-    #  run: |
-    #    $repo = "eirannejad/pyRevit"
-    #    $releases = "https://api.github.com/repos/$repo/releases"
-    #    $file = (curl.exe -L $releases | ConvertFrom-Json)[0].assets.Where({($_.name -Like "*_signed.exe") -and ($_.name -NotLike "*_admin_signed.exe") -and ($_.name -NotLike "*CLI*")})[0].name
-    #    $download = "https://github.com/$repo/releases/latest/download/$file"
-    #    curl.exe -LO $download
-    #    echo "log --> installation started"
-    #    start .\$file /silent -Wait
-    #    echo "log --> installation finished"
-
-    # for frequent testing we don't want to get api rate limit exceeded error
-    - name: Download and install pyRevit HARDCODED release FOR TEST ONLY
-      run: |
-        $repo = "eirannejad/pyRevit"
-        $releases = "https://api.github.com/repos/$repo/releases"
-        $file = "pyRevit_4.8.14.24016_signed.exe"
-        $download = "https://github.com/$repo/releases/latest/download/$file"
-        curl.exe -LO $download
-        echo "log --> installation started"
-        start .\$file /silent -Wait
-        echo "log --> installation finished"
       
-    - name: Check pyRevitLabs.Json.dll is exists
-      run: Test-Path  $env:APPDATA\pyRevit-master\bin\pyRevitLabs.Json.dll -PathType Leaf
-
     - name: Checkout RevitPlugins
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
-    - name: Clone plugin repository
-      run: |
-        $plugindir = (Get-Content .\.nuke.\parameters.${{ env.Plugin_Name }}.json | Out-String | ConvertFrom-Json).PublishDirectory.Split("\")[0]
-        git clone ${{ env.Plugin_Repo_Url }} $env:APPDATA\pyRevit\Extensions\$plugindir
-
-    - name: Build plugin
+    - name: Build plugin and publish *.dll
       run: nuke publish --profile ${{ env.Plugin_Name }}
-
-    - name: Push updated dll
-      run: |
-        $plugindir = (Get-Content .\.nuke.\parameters.${{ env.Plugin_Name }}.json | Out-String | ConvertFrom-Json).PublishDirectory.Split("\")[0]
-        cd $env:APPDATA\pyRevit\Extensions\$plugindir
-        git config --local user.email "${{ secrets.EMAIL }}"
-        git config --local user.name "${{ secrets.USERNAME }}"
-        git add *.dll
-        git commit -m "Обновление библиотек плагина ${{ env.Plugin_Name }}"
-        git push
