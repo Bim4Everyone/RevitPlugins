@@ -18,6 +18,8 @@ interface IPublishDll : IHazOutput, IHazPluginName {
         .Executes(() => {
             string branchName = $"nuke/{PluginName}";
             Log.Debug($"Execute git commands in directory: {PluginExtensionDirectory}");
+            Git($"-C \"{PluginExtensionDirectory}\" config --local user.email \"nuke@gmail.com\""); //just for fun
+            Git($"-C \"{PluginExtensionDirectory}\" config --local user.name \"nuke\"");
             Git($"-C \"{PluginExtensionDirectory}\" switch -c {branchName} -q");
             Git($"-C \"{PluginExtensionDirectory}\" status");
             Log.Debug("Commit updated *.dll");
