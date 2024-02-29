@@ -11,7 +11,7 @@ interface IPublishDll : IHazOutput, IHazPluginName {
         => NukeBuildExtensions.GetExtensionsPath(GetPluginExtensionDirectory(PublishDirectory));
 
     Target PushPluginDll => _ => _
-        .OnlyWhenStatic(() => !IsServerBuild, "TODO after testing make only on ServerBuild")
+        .OnlyWhenStatic(() => IsServerBuild, "Target should be run only on server")
         .Requires(() => PublishDirectory)
         .OnlyWhenDynamic(() => PluginExtensionDirectory.DirectoryExists(), $"{PluginExtensionDirectory} must exist")
         .Requires(() => PluginName)
