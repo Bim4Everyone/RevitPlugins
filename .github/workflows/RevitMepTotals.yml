@@ -11,7 +11,6 @@ on:
 env:
   Plugin_Repo_Url: "https://${{ secrets.BIMEXTENSIONS_PUSH_TOKEN }}@github.com/vlastroG/BIMExtensions.git"
   Plugin_Name: "RevitMepTotals"
-  Bim4Everyone_lib_Repo_Url: "https://github.com/Bim4Everyone/BIM4Everyone.git"
 jobs:
   build:
     name: build
@@ -36,6 +35,11 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
+
+    - name: Authenticate with GitHub
+      run: |
+        git config --global user.email "${{ secrets.EMAIL }}"
+        git config --global user.name "${{ secrets.USERNAME }}"
 
     - name: Build plugin and publish *.dll
       run: nuke publish --profile ${{ env.Plugin_Name }}
