@@ -14,7 +14,7 @@ using static Nuke.Common.Tools.PowerShell.PowerShellTasks;
 
 interface ICloneRepos : IHazOutput {
     Uri ExtensionsJsonUrl
-        => new Uri("https://raw.githubusercontent.com/Bim4Everyone/BIMExtensions/master/extensions.json");
+        => new("https://raw.githubusercontent.com/Bim4Everyone/BIMExtensions/master/extensions.json");
 
     AbsolutePath ExtensionsJsonPath => Path.Combine(RootDirectory, "bin", "extensions.json");
 
