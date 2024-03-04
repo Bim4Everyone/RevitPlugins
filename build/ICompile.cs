@@ -17,7 +17,7 @@ interface ICompile : IClean,
     IHazRevitVersion,
     IHazConfigurations,
     IPyRevitInstall,
-    ICloneRepos,
+    ICloneExtensions,
     IPublishDll {
     Target Compile => _ => _
         .DependsOn(Clean)
