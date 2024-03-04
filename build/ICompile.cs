@@ -18,7 +18,7 @@ interface ICompile : IClean,
     IHazConfigurations,
     IPyRevitInstall,
     ICloneExtensions,
-    IPublishDll {
+    IPublishArtifacts {
     Target Compile => _ => _
         .DependsOn(Clean)
         .Requires(() => PluginName)
