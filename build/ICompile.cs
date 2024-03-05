@@ -16,7 +16,6 @@ interface ICompile : IClean,
     IHazGitRepository,
     IHazRevitVersion,
     IHazConfigurations,
-    IPyRevitInstall,
     ICloneExtensions,
     IPublishArtifacts {
     Target Compile => _ => _
@@ -44,7 +43,7 @@ interface ICompile : IClean,
         });
 
     Target Publish => _ => _
-        .DependsOn(Clean, InstallPyRevit, CloneRepos)
+        .DependsOn(Clean, CloneRepos)
         .Triggers(PushPluginDll)
         .Requires(() => PluginName)
         .Requires(() => PublishDirectory)
