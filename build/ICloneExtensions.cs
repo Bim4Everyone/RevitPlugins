@@ -50,7 +50,7 @@ interface ICloneExtensions : IHazOutput {
                 Log.Debug("DirPath: {@DirPath}", dirPath);
 
                 if(!string.IsNullOrEmpty(GitHubAppToken)) {
-                    // https://TOKEN@github.com/Bim4Everyone/Bim4Everyone
+                    // https://token@github.com/Bim4Everyone/Bim4Everyone
                     repoUrl = new Uri(new UriBuilder(repoUrl) {UserName = GitHubAppToken}.ToString()).ToString();
                 }
 
