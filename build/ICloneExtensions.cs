@@ -37,7 +37,12 @@ interface ICloneExtensions : IHazOutput {
                 Log.Debug("Clone repository: {@RepoName}", token.GetExtensionName());
 
                 string repoUrl = token.GetExtensionUrl();
-                string dirPath = NukeBuildExtensions.GetExtensionsPath(token.GetExtensionDirName());
+                AbsolutePath dirPath = NukeBuildExtensions.GetExtensionsPath(token.GetExtensionDirName());
+                
+                if(dirPath.Existing("*file") is not null) {
+                    Log.Debug("Skipped clone: {@RepoUrl}", repoUrl);
+                    continue;
+                }
 
                 Log.Debug("RepoUrl: {@RepoUrl}", repoUrl);
                 Log.Debug("DirPath: {@DirPath}", dirPath);
