@@ -15,6 +15,8 @@ using static Nuke.Common.Tools.Git.GitTasks;
 using static Nuke.Common.Tools.PowerShell.PowerShellTasks;
 
 interface ICloneExtensions : IHazOutput {
+    [Secret] [Parameter] string GitHubAppToken => TryGetValue(() => GitHubAppToken);
+
     Uri ExtensionsJsonUrl
         => new("https://raw.githubusercontent.com/Bim4Everyone/BIMExtensions/master/extensions.json");
 
@@ -46,6 +48,11 @@ interface ICloneExtensions : IHazOutput {
 
                 Log.Debug("RepoUrl: {@RepoUrl}", repoUrl);
                 Log.Debug("DirPath: {@DirPath}", dirPath);
+
+                if(!string.IsNullOrEmpty(GitHubAppToken)) {
+                    // https://TOKEN@github.com/Bim4Everyone/Bim4Everyone
+                    repoUrl = new Uri(new UriBuilder(repoUrl) {UserName = GitHubAppToken}.ToString()).ToString();
+                }
 
                 Git($"clone \"{repoUrl}\" \"{dirPath}\" -q");
             }
