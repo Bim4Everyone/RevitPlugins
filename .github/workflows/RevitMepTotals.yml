@@ -1,4 +1,4 @@
-name: RevitMepTotals publish
+name: RevitMepTotals publish test
 
 on:
   push:
@@ -9,19 +9,14 @@ on:
       - '**RevitMepTotals**.xaml'
 
 env:
-  Plugin_Repo_Url: https://github.com/Bim4Everyone/BIMExtensions.git # Plugin's github repository for pyRevit ribbon
-  Plugin_Name: RevitMepTotals                                        # Plugin name
-
+  Plugin_Repo_Url: "https://${{ secrets.BIMEXTENSIONS_PUSH_TOKEN }}@github.com/vlastroG/BIMExtensions.git"
+  Plugin_Name: "RevitMepTotals"
 jobs:
   build:
     name: build
     runs-on: windows-latest
 
     steps:
-    - name: Checkout RevitPlugins
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
 
     # Install the .net8 workload
     - name: Install .net8
@@ -34,4 +29,12 @@ jobs:
       run: dotnet tool install Nuke.GlobalTool --global
 
     - name: Add DevExpress package source
-      run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p ${{ secrets.DEVEXPRESS_FEED_URL }}
+      run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p ${{ secrets.DEVEXPRESS_FEED_AUTHORIZATION_KEY }}
+      
+    - name: Checkout RevitPlugins
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Build plugin and publish *.dll
+      run: nuke publish --profile ${{ env.Plugin_Name }}
