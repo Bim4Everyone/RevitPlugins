@@ -26,6 +26,7 @@ interface ICloneExtensions : IHazOutput {
 
     Target CloneRepos => _ => _
         .Requires(() => PublishDirectory)
+        .OnlyWhenStatic(() => IsServerBuild, "Target should be run only on server")
         .Executes(() => {
             Log.Debug("ExtensionName: {@ExtensionName}", ExtensionName);
             Log.Debug("ExtensionsJsonUrl: {@ExtensionsJsonUrl}", ExtensionsJsonUrl);
