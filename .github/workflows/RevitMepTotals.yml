@@ -1,12 +1,13 @@
 name: RevitMepTotals publish test
 
 on:
-  push:
-    branches:
-      - 'vlastroG/workflow'
-    paths:
-      - '**RevitMepTotals**.cs'
-      - '**RevitMepTotals**.xaml'
+  workflow_dispatch:
+#  push:
+#    branches:
+#      - 'vlastroG/workflow'
+#    paths:
+#      - '**RevitMepTotals**.cs'
+#      - '**RevitMepTotals**.xaml'
 
 env:
   Plugin_Repo_Url: "https://${{ secrets.BIMEXTENSIONS_PUSH_TOKEN }}@github.com/vlastroG/BIMExtensions.git"
