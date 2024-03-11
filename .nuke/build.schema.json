@@ -119,6 +119,10 @@
         "PublishDirectory": {
           "type": "string"
         },
+        "PyRevitInstallerUrl": {
+          "type": "string",
+          "description": "Default is pyRevit_4.8.14.24016_signed.exe"
+        },
         "RevitVersions": {
           "type": "array",
           "description": "Build Revit versions",
@@ -148,6 +152,7 @@
             "type": "string",
             "enum": [
               "Clean",
+              "CloneRepos",
               "Compile",
               "CreateBranch",
               "CreateBundle",
@@ -155,7 +160,9 @@
               "CreateProfile",
               "CreateScript",
               "FullClean",
-              "Publish"
+              "InstallPyRevit",
+              "Publish",
+              "PushPluginDll"
             ]
           }
         },
@@ -170,6 +177,7 @@
             "type": "string",
             "enum": [
               "Clean",
+              "CloneRepos",
               "Compile",
               "CreateBranch",
               "CreateBundle",
@@ -177,7 +185,9 @@
               "CreateProfile",
               "CreateScript",
               "FullClean",
-              "Publish"
+              "InstallPyRevit",
+              "Publish",
+              "PushPluginDll"
             ]
           }
         },

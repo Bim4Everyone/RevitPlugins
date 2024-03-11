@@ -126,7 +126,12 @@
         </Reference>
 
         <Reference Include="pyRevitLabs.Json">
-            <HintPath>$(AppData)\pyRevit-Master\bin\pyRevitLabs.Json.dll</HintPath>
+            <HintPath>..\..\libs\pyRevitLabs.Json.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="pyRevitLabs.PyRevit.Runtime.Shared">
+            <HintPath>..\..\libs\pyRevitLabs.PyRevit.Runtime.Shared.dll</HintPath>
             <Private>False</Private>
         </Reference>
     </ItemGroup>
