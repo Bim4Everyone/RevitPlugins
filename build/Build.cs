@@ -1,9 +1,17 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 
 using dosymep.Nuke.RevitVersions;
 
 using Nuke.Common;
 using Nuke.Common.CI.GitHubActions;
+using Nuke.Common.Git;
+using Nuke.Common.IO;
+using Nuke.Common.ProjectModel;
+using Nuke.Common.Tools.GitVersion;
 using Nuke.Components;
 
 using Serilog;
@@ -14,9 +22,9 @@ using Serilog;
     AutoGenerate = false,
     PublishArtifacts = false,
     EnableGitHubToken = true,
-    OnPushIncludePaths = new[] { "RevitPlugins/**", "**.cs" }
+    OnPushIncludePaths = new[] {"RevitPlugins/**", "**.cs"}
 )]
-class Build : NukeBuild, ICompile, ICreateScript, IPluginCreate, ICreateBundle, ICreateProfile {
+partial class Build : NukeBuild {
     /// Support plugins are available for:
     ///   - JetBrains ReSharper        https://nuke.build/resharper
     ///   - JetBrains Rider            https://nuke.build/rider
@@ -24,25 +32,82 @@ class Build : NukeBuild, ICompile, ICreateScript, IPluginCreate, ICreateBundle, 
     ///   - Microsoft VSCode           https://nuke.build/vscode
     public static int Main() => Execute<Build>();
 
-    public IEnumerable<RevitVersion> BuildRevitVersions { get; set; }
+    public BuildParams Params { get; set; }
+
+    [Solution] public Solution Solution { get; set; }
+    [GitVersion] public GitVersion Versioning { get; set; }
+    [GitRepository] public GitRepository GitRepository { get; set; }
 
     protected override void OnBuildInitialized() {
+        Params = new BuildParams(this);
         base.OnBuildInitialized();
-        var hazRevitVersion = this.From<IHazRevitVersion>();
-        BuildRevitVersions = hazRevitVersion.RevitVersions.Length > 0
-            ? hazRevitVersion.RevitVersions
-            : RevitVersion.GetRevitVersions(hazRevitVersion.MinVersion, hazRevitVersion.MaxVersion);
 
-        Log.Information("Build revit versions: {BuildRevitVersions}", BuildRevitVersions);
-        Log.Information("Build plugin: {PluginName}", this.From<IHazPluginName>().PluginName);
-        Log.Information("Plugin directory: {PluginDirectory}", this.From<IHazPluginName>().PluginDirectory);
+        Log.Information("Build plugin: {PluginName}", Params.PluginName);
+        Log.Information("Plugin directory: {PluginDirectory}", Params.PluginDirectory);
+        Log.Information("Build revit versions: {BuildRevitVersions}", Params.BuildRevitVersions);
 
-        Log.Information("Output: {Output}", this.From<IHazOutput>().Output);
+        Log.Information("Output: {Output}", Params.Output);
 
         Log.Information("IsLocalBuild: {IsLocalBuild}", IsLocalBuild);
         Log.Information("IsServerBuild: {IsServerBuild}", IsServerBuild);
 
-        Log.Information("Repository Url: {RepoUrl}", this.From<IHazGitRepository>().GitRepository.HttpsUrl);
-        Log.Information("Repository Branch: {RepoBranch}", this.From<IHazGitRepository>().GitRepository.Branch);
+        Log.Information("Repository Url: {RepoUrl}", GitRepository.HttpsUrl);
+        Log.Information("Repository Branch: {RepoBranch}", GitRepository.Branch);
+
+        void ExecWait(string preamble, string command, string args) {
+            Console.WriteLine(preamble);
+            Process.Start(new ProcessStartInfo(command, args) {UseShellExecute = false})?.WaitForExit();
+        }
+
+        ExecWait("dotnet version:", "dotnet", "--info");
+        ExecWait("dotnet workloads:", "dotnet", "workload list");
+        Log.Information("Processor count: {@ProcessorCount}", Environment.ProcessorCount);
+        Log.Information("Available RAM: {@Ram} MB", GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 0x100000);
+    }
+
+    // https://learn.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
+    void CopyDirectory(AbsolutePath sourceDir, 
+        AbsolutePath targetDir, 
+        Dictionary<string, string> replaceMap = default,
+        bool recursive = true) {
+        // Check if the source directory exists
+        if(!sourceDir.Exists())
+            throw new DirectoryNotFoundException($"Source directory not found: {sourceDir}");
+
+        // Cache directories before we start copying
+        AbsolutePath[] children = sourceDir.GetDirectories().ToArray();
+
+        // Create the destination directory
+        targetDir = UpdateName(targetDir).CreateDirectory();
+
+        // Get the files in the source directory and copy to the destination directory
+        foreach(AbsolutePath file in sourceDir.GetFiles()) {
+            AbsolutePath targetFilePath = UpdateName(targetDir / file.Name);
+
+            string content = file.ReadAllText();
+            if(!file.HasExtension(".png")) {
+                content = content.Replace(Params.TemplateName, Params.PluginName);
+                if(replaceMap != null) {
+                    foreach((string key, string value) in replaceMap) {
+                        content = content.Replace(key, value);
+                    }
+                }
+            }
+
+            targetFilePath.WriteAllText(content);
+        }
+
+        // If recursive and copying subdirectories, recursively call this method
+        if(recursive) {
+            foreach(AbsolutePath childDir in children) {
+                CopyDirectory(childDir, targetDir / childDir.Name);
+            }
+        }
+    }
+
+    AbsolutePath UpdateName(AbsolutePath target) {
+        string targetName = target.Name
+            .Replace(Params.TemplateName, Params.PluginName);
+        return target.Parent / targetName;
     }
 }

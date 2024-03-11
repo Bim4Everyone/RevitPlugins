@@ -10,14 +10,7 @@ using Serilog;
 
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
-interface ICompile : IClean,
-    IHazSolution,
-    IHazGitVersion,
-    IHazGitRepository,
-    IHazRevitVersion,
-    IHazConfigurations,
-    ICloneExtensions,
-    IPublishArtifacts {
+partial class Build {
     Target Compile => _ => _
         .DependsOn(Clean)
         .Requires(() => PluginName)
@@ -36,7 +29,7 @@ interface ICompile : IClean,
                 .SetProjectFile("src/" + PluginName)
                 .SetConfiguration(Configuration.Debug)
                 .SetOutputDirectory(publishDirectory)
-                .CombineWith(BuildRevitVersions, (settings, revitVersion) => settings
+                .CombineWith(Params.BuildRevitVersions, (settings, revitVersion) => settings
                     .SetSimpleVersion(Versioning, revitVersion)
                     .SetProperty("RevitVersion", (int) revitVersion)
                     .SetProperty("AssemblyName", $"{PluginName}_{revitVersion}")));
@@ -61,19 +54,18 @@ interface ICompile : IClean,
                 .SetProjectFile("src/" + PluginName)
                 .SetConfiguration(Configuration.Release)
                 .SetOutputDirectory(publishDirectory)
-                .CombineWith(BuildRevitVersions, (settings, revitVersion) => settings
+                .CombineWith(Params.BuildRevitVersions, (settings, revitVersion) => settings
                     .SetSimpleVersion(Versioning, revitVersion)
                     .SetProperty("RevitVersion", (int) revitVersion)
                     .SetProperty("AssemblyName", $"{PluginName}_{revitVersion}")));
-        })
-    ;
+        });
 
-    sealed Configure<DotNetBuildSettings> CompileSettingsBase => _ => _
+    Configure<DotNetBuildSettings> CompileSettingsBase => _ => _
         .DisableNoRestore()
         .SetOutputDirectory(Output)
         .SetCopyright($"Copyright © {DateTime.Now.Year}")
         .When(IsServerBuild, _ => _
             .EnableContinuousIntegrationBuild())
-        .WhenNotNull(this as IHazGitRepository, (_, o) => _
+        .WhenNotNull(this, (_, o) => _
             .SetRepositoryUrl(o.GitRepository.HttpsUrl));
 }

@@ -6,12 +6,12 @@ using Nuke.Components;
 
 using static Nuke.Common.Tools.Git.GitTasks;
 
-interface ICreateBranch : IHazGitRepository, IHazPluginName, IHazGitUserName {
+partial class Build {
     Target CreateBranch => _ => _
         .OnlyWhenDynamic(() => IsLocalBuild, "Need local build")
-        .OnlyWhenDynamic(() => GitRepository.IsOnDevelopBranch(), "Git branch should be develop")
+        .OnlyWhenDynamic(() => GitRepository.IsOnMainOrMasterBranch(), "Git branch should be develop")
         .Executes(() => {
-            string userName = UserName;
+            string userName = Params.UserName;
             GitRepository.SetBranch($"{userName}/{PluginName}");
             Git($"checkout -b {userName}/{PluginName}");
             Git("add .");
