@@ -13,8 +13,11 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    Height="450" Width="800"    
-
+    MinHeight="250"
+    MaxHeight="250"
+    MinWidth="600"
+    MaxWidth="600"
+    ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -24,18 +27,57 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
+            <RowDefinition/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
-        <TextBox
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Right"
+                       Text="Выберите типоразмер:"/>
+            <ComboBox Grid.Row="0" Grid.Column="1"
+                      VerticalAlignment="Center"
+                      Margin="10 0"
+                      Height="25"
+                      VerticalContentAlignment="Center"
+                      ItemsSource="{Binding SlopeTypes}"
+                      SelectedItem="{Binding SelectedSlopeType}"/>
+            <StackPanel Grid.Row="1" Grid.ColumnSpan="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <RadioButton 
+                    IsEnabled="{Binding IsEnabledAlreadySelected}"
+                    IsChecked="{Binding IsCheckedSelected}">
+                    <RadioButton.Content>
+                        <DockPanel>
+                            <TextBlock Text="По предварительно выбранным окнам"/>
+                            <TextBlock Text="{Binding SelectedWindows.Count, StringFormat={} ({0})}"/>
+                        </DockPanel>
+                    </RadioButton.Content>
+                </RadioButton>
+                <RadioButton 
+                    Content="По выбранным окнам вручную"
+                    IsChecked="{Binding IsCheckedSelect}"/>
+                <RadioButton 
+                    Content="По окнам на активном виде"
+                    IsChecked="{Binding IsCheckedOnView}"/>
+            </StackPanel>
+        </Grid>
+        <!--<TextBox
             Grid.Row="0"
             Width="200"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
 
-            Text="{Binding SaveProperty}" />
-
+            Text="{Binding SaveProperty}" />-->
         <StackPanel
             Grid.Row="1"
             Height="45"

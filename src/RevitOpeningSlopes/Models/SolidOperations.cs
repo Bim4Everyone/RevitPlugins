@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,23 +14,32 @@ namespace RevitOpeningSlopes.Models {
             _revitRepository = revitRepository;
         }
 
-        public Solid GetUnitedSolidFromHostWall(Wall wall) {
-            IList<Solid> solids = GetJoinedWalls(wall)
-                .Select(w => w.GetSolids())
-                .SelectMany(ws => ws)
-                .ToList();
-            IList<Solid> unitedSolids = SolidExtensions.CreateUnitedSolids(solids);
-            return unitedSolids.OrderByDescending(s => s.Volume)
-                .FirstOrDefault();
+        public Solid GetUnitedSolidFromHostElement(Element element) {
+            if(element == null) {
+                throw new ArgumentNullException(nameof(element));
+            } else {
+
+                ICollection<ElementId> elementIds = JoinGeometryUtils
+                    .GetJoinedElements(_revitRepository.Document, element);
+
+                IList<Solid> solids = elementIds
+                    .Select(el => _revitRepository.Document.GetElement(el).GetSolids())
+                    .SelectMany(els => els)
+                    .ToList();
+
+                IList<Solid> unitedSolids = SolidExtensions.CreateUnitedSolids(solids);
+                return unitedSolids.OrderByDescending(s => s.Volume)
+                    .FirstOrDefault();
+            }
         }
 
-        private ICollection<Wall> GetJoinedWalls(Wall wall) {
-            ICollection<ElementId> joinedElementsId = JoinGeometryUtils
-                .GetJoinedElements(_revitRepository.Document, wall);
-            return new FilteredElementCollector(_revitRepository.Document, joinedElementsId)
-                .OfClass(typeof(Wall))
-                .Cast<Wall>()
-                .ToList();
-        }
+        //private ICollection<Element> GetJoinedElements(Element element) {
+        //    ICollection<ElementId> joinedElementsId = JoinGeometryUtils
+        //        .GetJoinedElements(_revitRepository.Document, element);
+        //    return new FilteredElementCollector(_revitRepository.Document, joinedElementsId)
+        //        .OfClass(typeof(Element))
+        //        .Cast<Element>()
+        //        .ToList();
+        //}
     }
 }

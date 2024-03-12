@@ -5,6 +5,8 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitOpeningSlopes.Models.Enums;
+
 namespace RevitOpeningSlopes.Models {
     [Transaction(TransactionMode.Manual)]
 
@@ -110,12 +112,5 @@ namespace RevitOpeningSlopes.Models {
         }
 
     }
-    internal enum DirectionEnum {
-        Right,
-        Left,
-        Forward,
-        Back,
-        Top,
-        Down
-    }
+
 }

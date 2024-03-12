@@ -19,15 +19,16 @@ namespace RevitOpeningSlopes.Models {
             _slopesParams = new SlopesParams(revitRepository);
         }
 
-        public void OpeningPlacements(IList<FamilyInstance> openings) {
+        public void PlaceSlopes(PluginConfig config) {
             using(var transaction = _revitRepository.Document.StartTransaction("Размещение откосов")) {
+                ICollection<FamilyInstance> openings = _revitRepository.GetOpenings(config.WindowsGetterMode);
                 foreach(FamilyInstance opening in openings) {
                     XYZ origin = _openingParams.GetOpeningCenter(opening);
-                    FamilySymbol fm = _revitRepository.GetFamilySymbols()[0];
+                    FamilySymbol slopeType = _revitRepository.GetSlopeType(config.SlopeTypeId);
                     FamilyInstance slope = _revitRepository
                         .Document
                         .Create
-                        .NewFamilyInstance(origin, fm, StructuralType.NonStructural);
+                        .NewFamilyInstance(origin, slopeType, StructuralType.NonStructural);
                     _slopesParams.SetSlopeParams(slope, opening);
                 }
                 transaction.Commit();
