@@ -26,11 +26,14 @@ namespace RevitOpeningSlopes.Models {
             XYZ origin = _revitRepository.GetOpeningLocation(opening);
             Line upwardLine = _linesFromOpening.CreateLineFromOpening(opening, DirectionEnum.Top);
             Element topElement = _nearestElements.GetElementByRay(upwardLine);
-            _linesFromOpening.CreateTestModelLine(upwardLine);
+            //_linesFromOpening.CreateTestModelLine(upwardLine);
             if(topElement == null) {
                 return 100;
             }
             Solid topSolid = _solidOperations.GetUnitedSolidFromHostElement(topElement);
+            //DirectShape ds = DirectShape.CreateElement(_revitRepository.Document,
+            //    new ElementId(BuiltInCategory.OST_GenericModel));
+            //ds.SetShape(new GeometryObject[] { topSolid });
             if(topSolid != null) {
 
                 SolidCurveIntersectionOptions intersectOptOutside = new SolidCurveIntersectionOptions() {
@@ -40,12 +43,15 @@ namespace RevitOpeningSlopes.Models {
                     ResultType = SolidCurveIntersectionMode.CurveSegmentsInside
                 };
                 SolidCurveIntersection intersection = topSolid.IntersectWithCurve(upwardLine, intersectOptInside);
-                if(intersection != null) {
+                if(intersection.SegmentCount > 0) {
                     intersection = topSolid.IntersectWithCurve(upwardLine, intersectOptOutside);
                 } else {
                     throw new ArgumentException("Над окном нет элемента, пересекающегося с окном");
                 }
                 intersectCoord = intersection.GetCurveSegment(0).GetEndPoint(1);
+                //Line testL = Line.CreateBound(intersectCoord, new XYZ(0, 0, 0));
+                //_linesFromOpening.CreateTestModelLine(intersection.GetCurveSegment(0) as Line);
+                //double dist = _revitRepository.ConvertToMillimeters(origin.DistanceTo(intersectCoord));
                 return origin.DistanceTo(intersectCoord);
             } else {
                 return 100;

@@ -20,7 +20,12 @@ namespace RevitOpeningSlopes.Models {
                 _revitRepository.Default3DView) {
                     FindReferencesInRevitLinks = false
                 };
+            //ReferenceIntersector intersector
+            //    = new ReferenceIntersector(_revitRepository.Default3DView) {
+            //        FindReferencesInRevitLinks = false
+            //    };
             ReferenceWithContext context = intersector.FindNearest(curve.GetEndPoint(0), lineDirection);
+
             Reference closestReference;
             if(context != null) {
                 closestReference = context.GetReference();
