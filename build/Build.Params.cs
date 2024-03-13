@@ -41,13 +41,13 @@ partial class Build {
     /// Output directory.
     /// </summary>
     [Parameter("Output directory.")]
-    public AbsolutePath Output { get; set; }
+    public AbsolutePath Output { get; set; } = RootDirectory / "bin";
 
     /// <summary>
     /// Publish directory.
     /// </summary>
     [Parameter("Publish directory.")]
-    public string PublishDirectory { get; set; }
+    public string PublishDirectory { get; set; } = RootDirectory / "bin";
 
     /// <summary>
     /// Configuration to build. Default is 'Debug' (local) or 'Release' (server).
