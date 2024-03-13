@@ -16,10 +16,10 @@ partial class Build {
         .Requires(() => BundleName)
         .Requires(() => BundleType)
         .Requires(() => BundleOutput)
-        .OnlyWhenStatic(() =>
+        .OnlyWhenDynamic(() =>
             !Params.BundleDirectory.DirectoryExists(), "Bundle directory is exists")
-        .OnlyWhenStatic(() =>
-            !IconUrl.AbsolutePath.StartsWith(@"https://icons8.com/icon/"), "Bundle icon must be from icons8 site")
+        .OnlyWhenDynamic(() =>
+            !Params.IconUrl.AbsolutePath.StartsWith(@"https://icons8.com/icon/"), "Bundle icon must be from icons8 site")
         .Executes(async () => {
             Log.Debug("PluginName: {PluginName}", Params.PluginName);
             Log.Debug("TemplateName: {TemplateName}", Params.TemplateName);

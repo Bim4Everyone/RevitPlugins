@@ -37,7 +37,7 @@ partial class Build {
 
     Target Publish => _ => _
         .DependsOn(Clean, CloneRepos)
-        .Triggers(PushPluginDll)
+        .Triggers(PublishArtifacts)
         .Requires(() => PluginName)
         .Requires(() => PublishDirectory)
         .Executes(() => {

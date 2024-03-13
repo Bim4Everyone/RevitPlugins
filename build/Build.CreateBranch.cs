@@ -9,7 +9,7 @@ using static Nuke.Common.Tools.Git.GitTasks;
 partial class Build {
     Target CreateBranch => _ => _
         .OnlyWhenDynamic(() => IsLocalBuild, "Need local build")
-        .OnlyWhenDynamic(() => GitRepository.IsOnMainOrMasterBranch(), "Git branch should be develop")
+        .OnlyWhenDynamic(() => GitRepository.IsOnMainOrMasterBranch(), "Git branch should be main or master")
         .Executes(() => {
             string userName = Params.UserName;
             GitRepository.SetBranch($"{userName}/{PluginName}");

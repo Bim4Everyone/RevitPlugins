@@ -8,11 +8,11 @@ using Serilog;
 using static Nuke.Common.Tools.Git.GitTasks;
 
 partial class Build {
-    Target PushPluginDll => _ => _
+    Target PublishArtifacts => _ => _
         .Requires(() => PluginName)
         .Requires(() => PublishDirectory)
         .OnlyWhenStatic(() => IsServerBuild, "Target should be run only on server")
-        .OnlyWhenDynamic(() => Params.ExtensionDirectory.DirectoryExists(), "ExtensionDirectory must exists")
+        .OnlyWhenDynamic(() => Params.ExtensionDirectory.DirectoryExists(), "ExtensionDirectory does not exists")
         .Executes(() => {
             string branchName = $"nuke/{Params.PluginName}";
            
