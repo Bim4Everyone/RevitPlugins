@@ -12,7 +12,7 @@ partial class Build {
         .Requires(() => PluginName)
         .Requires(() => PublishDirectory)
         .OnlyWhenStatic(() => IsServerBuild, "Target should be run only on server")
-        .OnlyWhenDynamic(() => Params.ExtensionDirectory.DirectoryExists(), $"{Params.ExtensionDirectory} must exist")
+        .OnlyWhenDynamic(() => Params.ExtensionDirectory.DirectoryExists(), "ExtensionDirectory must exists")
         .Executes(() => {
             string branchName = $"nuke/{Params.PluginName}";
            
