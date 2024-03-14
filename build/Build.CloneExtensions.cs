@@ -24,15 +24,16 @@ partial class Build {
             Log.Debug("ExtensionsJsonPath: {@ExtensionsJsonUrl}", Params.ExtensionsJsonPath);
 
             Log.Debug("Download extensions.json");
-            PowerShell($"curl.exe -L \"{Params.ExtensionsJsonUrl}\" -o \"{Params.ExtensionsJsonPath}\" --create-dirs -s");
+            PowerShell(
+                $"curl.exe -L \"{Params.ExtensionsJsonUrl}\" -o \"{Params.ExtensionsJsonPath}\" --create-dirs -s");
 
             Log.Debug("Clone repositories");
-            foreach(JToken token in GetExtensions()) {
+            foreach(JToken token in Params.GetExtensions()) {
                 Log.Debug("Clone repository: {@RepoName}", token.GetExtensionName());
 
                 string repoUrl = token.GetExtensionUrl();
                 AbsolutePath dirPath = NukeBuildExtensions.GetExtensionsPath(token.GetExtensionDirName());
-                
+
                 if(dirPath.Existing("*file") is not null) {
                     Log.Debug("Skipped clone: {@RepoUrl}", repoUrl);
                     continue;
@@ -41,21 +42,12 @@ partial class Build {
                 Log.Debug("RepoUrl: {@RepoUrl}", repoUrl);
                 Log.Debug("DirPath: {@DirPath}", dirPath);
 
-                if(!string.IsNullOrEmpty(GitHubAppToken)) {
+                if(!string.IsNullOrEmpty(Params.GitHubAppToken)) {
                     // https://token@github.com/Bim4Everyone/Bim4Everyone
-                    repoUrl = new Uri(new UriBuilder(repoUrl) {UserName = GitHubAppToken}.ToString()).ToString();
+                    repoUrl = new Uri(new UriBuilder(repoUrl) {UserName = Params.GitHubAppToken}.ToString()).ToString();
                 }
 
                 Git($"clone \"{repoUrl}\" \"{dirPath}\" -q");
             }
         });
-
-    private IEnumerable<JToken> GetExtensions() {
-        string extensionsJsonContent = File.ReadAllText(Params.ExtensionsJsonPath);
-        return JObject.Parse(extensionsJsonContent)
-            ?.GetValue("extensions")
-            ?.ToObject<JToken[]>()
-            ?.Where(item => item.IsLib()
-                            || Params.ExtensionName.Equals(item.GetExtensionName(), StringComparison.OrdinalIgnoreCase));
-    }
 }

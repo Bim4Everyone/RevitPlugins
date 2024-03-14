@@ -5,6 +5,8 @@ using System.Linq;
 
 using dosymep.Nuke.RevitVersions;
 
+using Newtonsoft.Json.Linq;
+
 using Nuke.Common;
 using Nuke.Common.IO;
 
@@ -99,7 +101,7 @@ partial class Build {
             BundleName = build.BundleName;
             BundleType = build.BundleType ?? BundleType.InvokeButton;
             BundleOutput = build.BundleOutput ?? Output;
-            
+
             BuildRevitVersions = build.RevitVersions.Length > 0
                 ? build.RevitVersions
                 : RevitVersion.GetRevitVersions(build.MinVersion, build.MaxVersion);
@@ -236,7 +238,7 @@ partial class Build {
         /// Extension name.
         /// </summary>
         public string ExtensionName => PublishDirectory.Split('\\').First();
-        
+
         /// <summary>
         /// Extension diretory.
         /// </summary>
@@ -246,5 +248,28 @@ partial class Build {
         /// extensions.json path.
         /// </summary>
         public AbsolutePath ExtensionsJsonPath => Path.Combine(PublishDirectory, "extensions.json");
+
+        public string NukeBranchName => $"nuke/{PluginName}";
+        public string MasterBranchName => "master";
+        public string OrganizationName => "Bim4Everyone";
+        public string CurrentRepoName => "RevitPlugins";
+
+        public string RepoName => GetCurrentExtensionUrl().Split('/').LastOrDefault();
+
+        public IEnumerable<JToken> GetExtensions() {
+            string extensionsJsonContent = File.ReadAllText(ExtensionsJsonPath);
+            return JObject.Parse(extensionsJsonContent)
+                ?.GetValue("extensions")
+                ?.ToObject<JToken[]>()
+                ?.Where(item => item.IsLib()
+                                || ExtensionName.Equals(item.GetExtensionName(), StringComparison.OrdinalIgnoreCase));
+        }
+
+        public string GetCurrentExtensionUrl() {
+            return GetExtensions()
+                .FirstOrDefault(item =>
+                    ExtensionName.Equals(item.GetExtensionName(), StringComparison.OrdinalIgnoreCase))
+                .GetExtensionUrl();
+        }
     }
 }
