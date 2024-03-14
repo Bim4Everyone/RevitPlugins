@@ -14,26 +14,17 @@ using Serilog;
 using static Nuke.Common.Tools.Git.GitTasks;
 using static Nuke.Common.Tools.PowerShell.PowerShellTasks;
 
-interface ICloneExtensions : IHazOutput {
-    [Secret] [Parameter] string GitHubAppToken => TryGetValue(() => GitHubAppToken);
-
-    Uri ExtensionsJsonUrl
-        => new("https://raw.githubusercontent.com/Bim4Everyone/BIMExtensions/master/extensions.json");
-
-    string ExtensionName => PublishDirectory.Split('\\').First();
-
-    AbsolutePath ExtensionsJsonPath => Path.Combine(PublishDirectory, "extensions.json");
-
+partial class Build {
     Target CloneRepos => _ => _
         .Requires(() => PublishDirectory)
         .OnlyWhenStatic(() => IsServerBuild, "Target should be run only on server")
         .Executes(() => {
-            Log.Debug("ExtensionName: {@ExtensionName}", ExtensionName);
-            Log.Debug("ExtensionsJsonUrl: {@ExtensionsJsonUrl}", ExtensionsJsonUrl);
-            Log.Debug("ExtensionsJsonPath: {@ExtensionsJsonUrl}", ExtensionsJsonPath);
+            Log.Debug("ExtensionName: {@ExtensionName}", Params.ExtensionName);
+            Log.Debug("ExtensionsJsonUrl: {@ExtensionsJsonUrl}", Params.ExtensionsJsonUrl);
+            Log.Debug("ExtensionsJsonPath: {@ExtensionsJsonUrl}", Params.ExtensionsJsonPath);
 
             Log.Debug("Download extensions.json");
-            PowerShell($"curl.exe -L \"{ExtensionsJsonUrl}\" -o \"{ExtensionsJsonPath}\" --create-dirs -s");
+            PowerShell($"curl.exe -L \"{Params.ExtensionsJsonUrl}\" -o \"{Params.ExtensionsJsonPath}\" --create-dirs -s");
 
             Log.Debug("Clone repositories");
             foreach(JToken token in GetExtensions()) {
@@ -60,11 +51,11 @@ interface ICloneExtensions : IHazOutput {
         });
 
     private IEnumerable<JToken> GetExtensions() {
-        string extensionsJsonContent = File.ReadAllText(ExtensionsJsonPath);
+        string extensionsJsonContent = File.ReadAllText(Params.ExtensionsJsonPath);
         return JObject.Parse(extensionsJsonContent)
             ?.GetValue("extensions")
             ?.ToObject<JToken[]>()
             ?.Where(item => item.IsLib()
-                            || ExtensionName.Equals(item.GetExtensionName(), StringComparison.OrdinalIgnoreCase));
+                            || Params.ExtensionName.Equals(item.GetExtensionName(), StringComparison.OrdinalIgnoreCase));
     }
 }

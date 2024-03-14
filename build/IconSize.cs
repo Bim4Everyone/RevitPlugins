@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Net.Http;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
 
+[TypeConverter(typeof(TypeConverter<IconSize>))]
 class IconSize : Enumeration {
     public static readonly IconSize Size32 = new() {Value = nameof(Size32), Size = 32};
     public static readonly IconSize Size64 = new() {Value = nameof(Size64), Size = 64};

@@ -6,12 +6,12 @@ using Nuke.Common.Tooling;
 using Nuke.Common.Utilities.Collections;
 using Nuke.Components;
 
-interface IClean : IHazOutput, IHazPluginName {
+partial class Build {
     Target Clean => _ => _
         .Requires(() => PluginName)
         .Executes(() => {
-            Output.CreateOrCleanDirectory();
-            PluginDirectory.GlobDirectories("**/bin", "**/obj")
+            Params.Output.CreateOrCleanDirectory();
+            Params.PluginDirectory.GlobDirectories("**/bin", "**/obj")
                 .Where(item => item != (RootDirectory / "build" / "bin"))
                 .Where(item => item != (RootDirectory / "build" / "obj"))
                 .DeleteDirectories();
@@ -19,7 +19,7 @@ interface IClean : IHazOutput, IHazPluginName {
 
     Target FullClean => _ => _
         .Executes(() => {
-            Output.CreateOrCleanDirectory();
+            Params.Output.CreateOrCleanDirectory();
             RootDirectory.GlobDirectories("**/bin", "**/obj")
                 .Where(item => item != (RootDirectory / "build" / "bin"))
                 .Where(item => item != (RootDirectory / "build" / "obj"))
