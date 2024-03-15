@@ -53,16 +53,6 @@ partial class Build : NukeBuild {
 
         Log.Information("Repository Url: {RepoUrl}", GitRepository.HttpsUrl);
         Log.Information("Repository Branch: {RepoBranch}", GitRepository.Branch);
-
-        void ExecWait(string preamble, string command, string args) {
-            Console.WriteLine(preamble);
-            Process.Start(new ProcessStartInfo(command, args) {UseShellExecute = false})?.WaitForExit();
-        }
-
-        ExecWait("dotnet version:", "dotnet", "--info");
-        ExecWait("dotnet workloads:", "dotnet", "workload list");
-        Log.Information("Processor count: {@ProcessorCount}", Environment.ProcessorCount);
-        Log.Information("Available RAM: {@Ram} MB", GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 0x100000);
     }
 
     // https://learn.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
