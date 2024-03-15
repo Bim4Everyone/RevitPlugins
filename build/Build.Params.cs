@@ -5,6 +5,8 @@ using System.Linq;
 
 using dosymep.Nuke.RevitVersions;
 
+using Newtonsoft.Json.Linq;
+
 using Nuke.Common;
 using Nuke.Common.IO;
 
@@ -59,8 +61,8 @@ partial class Build {
     /// GitHub token value.
     /// </summary>
     [Secret]
-    [Parameter("GitHub token value.")]
-    public string GitHubAppToken { get; set; }
+    [Parameter("RevitPlugins token value.")]
+    public string RevitPluginsAppToken { get; set; }
 
     /// <summary>
     /// Bundle icon url.
@@ -93,13 +95,13 @@ partial class Build {
             Output = build.Output ?? DefaultOutput;
             PublishDirectory = build.PublishDirectory ?? Output;
             Configuration = build.Configuration;
-            GitHubAppToken = build.GitHubAppToken;
+            RevitPluginsAppToken = build.RevitPluginsAppToken;
 
             IconUrl = build.IconUrl;
             BundleName = build.BundleName;
             BundleType = build.BundleType ?? BundleType.InvokeButton;
             BundleOutput = build.BundleOutput ?? Output;
-            
+
             BuildRevitVersions = build.RevitVersions.Length > 0
                 ? build.RevitVersions
                 : RevitVersion.GetRevitVersions(build.MinVersion, build.MaxVersion);
@@ -128,7 +130,7 @@ partial class Build {
         /// <summary>
         /// GitHub token value.
         /// </summary>
-        public string GitHubAppToken { get; }
+        public string RevitPluginsAppToken { get; }
 
         /// <summary>
         /// Bundle icon url.
@@ -236,15 +238,38 @@ partial class Build {
         /// Extension name.
         /// </summary>
         public string ExtensionName => PublishDirectory.Split('\\').First();
-        
+
         /// <summary>
-        /// Extension diretory.
+        /// Extension directory.
         /// </summary>
         public AbsolutePath ExtensionDirectory => NukeBuildExtensions.GetExtensionsPath(ExtensionName);
 
         /// <summary>
         /// extensions.json path.
         /// </summary>
-        public AbsolutePath ExtensionsJsonPath => Path.Combine(PublishDirectory, "extensions.json");
+        public AbsolutePath ExtensionsJsonPath => Path.Combine(DefaultOutput, "extensions.json");
+
+        public string NukeBranchName => $"nuke/{PluginName}";
+        public string MasterBranchName => "master";
+        public string OrganizationName => "Bim4Everyone";
+        public string CurrentRepoName => "RevitPlugins";
+
+        public string RepoName => GetCurrentExtensionUrl().Split('/').LastOrDefault();
+
+        public IEnumerable<JToken> GetExtensions() {
+            string extensionsJsonContent = File.ReadAllText(ExtensionsJsonPath);
+            return JObject.Parse(extensionsJsonContent)
+                ?.GetValue("extensions")
+                ?.ToObject<JToken[]>()
+                ?.Where(item => item.IsLib()
+                                || ExtensionName.Equals(item.GetExtensionDirName(), StringComparison.OrdinalIgnoreCase));
+        }
+
+        public string GetCurrentExtensionUrl() {
+            return GetExtensions()
+                .FirstOrDefault(item =>
+                    ExtensionName.Equals(item.GetExtensionDirName(), StringComparison.OrdinalIgnoreCase))
+                .GetExtensionUrl();
+        }
     }
 }

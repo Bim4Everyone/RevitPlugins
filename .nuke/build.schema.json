@@ -164,10 +164,11 @@
               "CreateBundle",
               "CreatePlugin",
               "CreateProfile",
+              "CreatePullRequest",
               "CreateScript",
               "FullClean",
               "Publish",
-              "PushPluginDll"
+              "PublishArtifacts"
             ]
           }
         },
@@ -188,10 +189,11 @@
               "CreateBundle",
               "CreatePlugin",
               "CreateProfile",
+              "CreatePullRequest",
               "CreateScript",
               "FullClean",
               "Publish",
-              "PushPluginDll"
+              "PublishArtifacts"
             ]
           }
         },

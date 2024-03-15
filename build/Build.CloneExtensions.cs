@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 
 using Nuke.Common;
 using Nuke.Common.IO;
+using Nuke.Common.Tooling;
 
 using Serilog;
 
@@ -21,41 +22,34 @@ partial class Build {
         .Executes(() => {
             Log.Debug("ExtensionName: {@ExtensionName}", Params.ExtensionName);
             Log.Debug("ExtensionsJsonUrl: {@ExtensionsJsonUrl}", Params.ExtensionsJsonUrl);
-            Log.Debug("ExtensionsJsonPath: {@ExtensionsJsonUrl}", Params.ExtensionsJsonPath);
+            Log.Debug("ExtensionsJsonPath: {@ExtensionsJsonUrl}", Params.ExtensionsJsonPath.ToString());
 
             Log.Debug("Download extensions.json");
-            PowerShell($"curl.exe -L \"{Params.ExtensionsJsonUrl}\" -o \"{Params.ExtensionsJsonPath}\" --create-dirs -s");
+            PowerShell(
+                $"curl.exe -L \"{Params.ExtensionsJsonUrl}\" -o \"{Params.ExtensionsJsonPath}\" --create-dirs -s");
 
             Log.Debug("Clone repositories");
-            foreach(JToken token in GetExtensions()) {
+            foreach(JToken token in Params.GetExtensions()) {
                 Log.Debug("Clone repository: {@RepoName}", token.GetExtensionName());
 
                 string repoUrl = token.GetExtensionUrl();
                 AbsolutePath dirPath = NukeBuildExtensions.GetExtensionsPath(token.GetExtensionDirName());
-                
-                if(dirPath.Existing("*file") is not null) {
+
+                if(dirPath.DirectoryExists()) {
                     Log.Debug("Skipped clone: {@RepoUrl}", repoUrl);
                     continue;
                 }
 
                 Log.Debug("RepoUrl: {@RepoUrl}", repoUrl);
-                Log.Debug("DirPath: {@DirPath}", dirPath);
+                Log.Debug("DirPath: {@DirPath}", dirPath.ToString());
 
-                if(!string.IsNullOrEmpty(GitHubAppToken)) {
+                if(!string.IsNullOrEmpty(Params.RevitPluginsAppToken)) {
                     // https://token@github.com/Bim4Everyone/Bim4Everyone
-                    repoUrl = new Uri(new UriBuilder(repoUrl) {UserName = GitHubAppToken}.ToString()).ToString();
+                    repoUrl = new Uri(new UriBuilder(repoUrl) {UserName = Params.RevitPluginsAppToken}.ToString()).ToString();
                 }
 
-                Git($"clone \"{repoUrl}\" \"{dirPath}\" -q");
+                ProcessTasks.StartProcess(GitPath, $"clone \"{repoUrl}\" \"{dirPath}\" -q",
+                    outputFilter: m => m.Replace(Params.RevitPluginsAppToken, "****"));
             }
         });
-
-    private IEnumerable<JToken> GetExtensions() {
-        string extensionsJsonContent = File.ReadAllText(Params.ExtensionsJsonPath);
-        return JObject.Parse(extensionsJsonContent)
-            ?.GetValue("extensions")
-            ?.ToObject<JToken[]>()
-            ?.Where(item => item.IsLib()
-                            || Params.ExtensionName.Equals(item.GetExtensionName(), StringComparison.OrdinalIgnoreCase));
-    }
 }
