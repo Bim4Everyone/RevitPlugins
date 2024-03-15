@@ -15,8 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         
-      # Install the .NET 7.0 workload
-      - name: Install .NET 8.0
+      # Install the .NET workload
+      - name: Install .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
