@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 
 using Nuke.Common;
 using Nuke.Common.IO;
+using Nuke.Common.Tooling;
 
 using Serilog;
 
@@ -47,7 +48,8 @@ partial class Build {
                     repoUrl = new Uri(new UriBuilder(repoUrl) {UserName = Params.GitHubAppToken}.ToString()).ToString();
                 }
 
-                Git($"clone \"{repoUrl}\" \"{dirPath}\" -q");
+                ProcessTasks.StartProcess(GitPath, $"clone \"{repoUrl}\" \"{dirPath}\" -q",
+                    outputFilter: m => m.Replace(Params.GitHubAppToken, "****"));
             }
         });
 }
