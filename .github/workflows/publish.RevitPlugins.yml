@@ -14,15 +14,12 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-        
+      
       # Install the .NET workload
       - name: Install .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
-          
-      - name: aaa
-        run dotnet C:\Users\runneradmin\.nuget\packages\gitversion.tool\5.12.0\tools\net6.0\any\gitversion.dll /nocache
       
       # Add DevExrepress package source: https://nuget.devexpress.com/
       - name: Add DevExpress package source
@@ -32,3 +29,4 @@ jobs:
         run: ./build.cmd publish --profile ${{ env.plugin-name }} --revit-plugins-app-token ${{ secrets.REVIT_PLUGINS_APP_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
