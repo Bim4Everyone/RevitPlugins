@@ -21,16 +21,13 @@ jobs:
         with:
           dotnet-version: 8.0.x
       
-      # Install nuke-build
-      - name: Install nuke-build
-        run: dotnet tool install Nuke.GlobalTool --global
-        
-      - name: Install GitVersion
-        run: nuget install GitVersion.Tool -OutputDirectory "C:\Users\runneradmin\.nuget\packages"
-
-      # Add DevExrepress package source: https://nuget.devexpress.com/
-      - name: Add DevExpress package source
-        run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p ${{ secrets.DEVEXPRESS_FEED_AUTHORIZATION_KEY }}
+#      # Install nuke-build
+#      - name: Install nuke-build
+#        run: dotnet tool install Nuke.GlobalTool --global
+#
+#      # Add DevExrepress package source: https://nuget.devexpress.com/
+#      - name: Add DevExpress package source
+#        run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p ${{ secrets.DEVEXPRESS_FEED_AUTHORIZATION_KEY }}
 
       - name: Run './build.cmd '
         run: ./build.cmd publish --profile ${{ env.plugin-name }} --revit-plugins-app-token ${{ secrets.REVIT_PLUGINS_APP_TOKEN }}
