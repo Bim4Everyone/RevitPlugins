@@ -9,6 +9,7 @@ using static Nuke.Common.Tools.Git.GitTasks;
 
 partial class Build {
     Target PublishArtifacts => _ => _
+        .Triggers(CreatePullRequest)
         .Requires(() => PluginName)
         .Requires(() => PublishDirectory)
         .OnlyWhenStatic(() => IsServerBuild, "Target should be run only on server")
