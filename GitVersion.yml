@@ -17,7 +17,7 @@ branches:
   other:
     tag: alpha
     regex: '^(?!.*master|develop)'
-    source-branches: ['main', 'develop']
+    source-branches: ['main', 'master', 'develop']
 ignore:
   sha: []
 increment: Inherit
