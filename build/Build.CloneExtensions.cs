@@ -43,13 +43,13 @@ partial class Build {
                 Log.Debug("RepoUrl: {@RepoUrl}", repoUrl);
                 Log.Debug("DirPath: {@DirPath}", dirPath.ToString());
 
-                if(!string.IsNullOrEmpty(Params.GitHubAppToken)) {
+                if(!string.IsNullOrEmpty(Params.RevitPluginsAppToken)) {
                     // https://token@github.com/Bim4Everyone/Bim4Everyone
-                    repoUrl = new Uri(new UriBuilder(repoUrl) {UserName = Params.GitHubAppToken}.ToString()).ToString();
+                    repoUrl = new Uri(new UriBuilder(repoUrl) {UserName = Params.RevitPluginsAppToken}.ToString()).ToString();
                 }
 
                 ProcessTasks.StartProcess(GitPath, $"clone \"{repoUrl}\" \"{dirPath}\" -q",
-                    outputFilter: m => m.Replace(Params.GitHubAppToken, "****"));
+                    outputFilter: m => m.Replace(Params.RevitPluginsAppToken, "****"));
             }
         });
 }

@@ -61,8 +61,8 @@ partial class Build {
     /// GitHub token value.
     /// </summary>
     [Secret]
-    [Parameter("GitHub token value.")]
-    public string GitHubAppToken { get; set; }
+    [Parameter("RevitPlugins token value.")]
+    public string RevitPluginsAppToken { get; set; }
 
     /// <summary>
     /// Bundle icon url.
@@ -95,7 +95,7 @@ partial class Build {
             Output = build.Output ?? DefaultOutput;
             PublishDirectory = build.PublishDirectory ?? Output;
             Configuration = build.Configuration;
-            GitHubAppToken = build.GitHubAppToken;
+            RevitPluginsAppToken = build.RevitPluginsAppToken;
 
             IconUrl = build.IconUrl;
             BundleName = build.BundleName;
@@ -130,7 +130,7 @@ partial class Build {
         /// <summary>
         /// GitHub token value.
         /// </summary>
-        public string GitHubAppToken { get; }
+        public string RevitPluginsAppToken { get; }
 
         /// <summary>
         /// Bundle icon url.
