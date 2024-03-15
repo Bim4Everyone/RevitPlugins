@@ -24,6 +24,9 @@ jobs:
       # Install nuke-build
       - name: Install nuke-build
         run: dotnet tool install Nuke.GlobalTool --global
+        
+      - name: Install GitVersion
+        run: nuget install GitVersion.Tool -OutputDirectory "C:\Users\runneradmin\.nuget\packages"
 
       # Add DevExrepress package source: https://nuget.devexpress.com/
       - name: Add DevExpress package source
