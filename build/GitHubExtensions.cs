@@ -47,12 +47,12 @@ static class GitHubExtensions {
             new PullRequestUpdate() {Body = pullRequest.Body});
 
         Log.Debug("Merge Pull Request");
-        
+
         await client.PullRequest.Merge(
             buildParams.OrganizationName,
             buildParams.RepoName,
             createdPullRequest.Number,
-            new MergePullRequest() {MergeMethod = PullRequestMergeMethod.Squash});
+            new MergePullRequest() {MergeMethod = PullRequestMergeMethod.Squash, CommitTitle = pullRequest.Title});
 
         Log.Debug("Delete branch {@NukeRef}", nukeBranch.Ref);
         await client.Git.Reference.Delete(buildParams.OrganizationName, buildParams.RepoName, nukeBranch.Ref);
