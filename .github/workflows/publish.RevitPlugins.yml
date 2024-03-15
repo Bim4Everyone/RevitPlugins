@@ -33,5 +33,7 @@ jobs:
       - name: Add DevExpress package source
         run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p ${{ secrets.DEVEXPRESS_FEED_AUTHORIZATION_KEY }}
 
-      - name: Build plugin
-        run: nuke publish --profile ${{ env.plugin-name }} --revit-plugins-app-token ${{ secrets.REVIT_PLUGINS_APP_TOKEN }}
+      - name: Run './build.cmd '
+        run: ./build.cmd publish --profile ${{ env.plugin-name }} --revit-plugins-app-token ${{ secrets.REVIT_PLUGINS_APP_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
