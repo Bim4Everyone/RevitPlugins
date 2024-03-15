@@ -21,7 +21,7 @@ partial class Build {
             Log.Debug("Commit updated *.dll");
             Git($"-C \"{Params.ExtensionDirectory}\" add *.dll");
             Git($"-C \"{Params.ExtensionDirectory}\" status");
-            Git($"-C \"{Params.ExtensionDirectory}\" commit -m \"Обновление библиотек плагина {Params.PluginName}\"");
+            Git($"-C \"{Params.ExtensionDirectory}\" commit -m \"Обновление библиотек плагина \"\"\"{Params.PluginName}\"\"\"\"");
            
             Log.Debug("Push changes to origin");
             Git($"-C \"{Params.ExtensionDirectory}\" push -q -u origin {Params.NukeBranchName}");
