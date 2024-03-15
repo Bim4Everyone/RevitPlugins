@@ -21,7 +21,7 @@ partial class Build {
         .Executes(() => {
             Log.Debug("ExtensionName: {@ExtensionName}", Params.ExtensionName);
             Log.Debug("ExtensionsJsonUrl: {@ExtensionsJsonUrl}", Params.ExtensionsJsonUrl);
-            Log.Debug("ExtensionsJsonPath: {@ExtensionsJsonUrl}", Params.ExtensionsJsonPath);
+            Log.Debug("ExtensionsJsonPath: {@ExtensionsJsonUrl}", Params.ExtensionsJsonPath.ToString());
 
             Log.Debug("Download extensions.json");
             PowerShell(
@@ -34,13 +34,13 @@ partial class Build {
                 string repoUrl = token.GetExtensionUrl();
                 AbsolutePath dirPath = NukeBuildExtensions.GetExtensionsPath(token.GetExtensionDirName());
 
-                if(dirPath.Existing("*file") is not null) {
+                if(dirPath.DirectoryExists()) {
                     Log.Debug("Skipped clone: {@RepoUrl}", repoUrl);
                     continue;
                 }
 
                 Log.Debug("RepoUrl: {@RepoUrl}", repoUrl);
-                Log.Debug("DirPath: {@DirPath}", dirPath);
+                Log.Debug("DirPath: {@DirPath}", dirPath.ToString());
 
                 if(!string.IsNullOrEmpty(Params.GitHubAppToken)) {
                     // https://token@github.com/Bim4Everyone/Bim4Everyone

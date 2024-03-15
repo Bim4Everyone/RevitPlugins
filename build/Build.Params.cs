@@ -247,7 +247,7 @@ partial class Build {
         /// <summary>
         /// extensions.json path.
         /// </summary>
-        public AbsolutePath ExtensionsJsonPath => Path.Combine(PublishDirectory, "extensions.json");
+        public AbsolutePath ExtensionsJsonPath => Path.Combine(DefaultOutput, "extensions.json");
 
         public string NukeBranchName => $"nuke/{PluginName}";
         public string MasterBranchName => "master";
@@ -262,13 +262,13 @@ partial class Build {
                 ?.GetValue("extensions")
                 ?.ToObject<JToken[]>()
                 ?.Where(item => item.IsLib()
-                                || ExtensionName.Equals(item.GetExtensionName(), StringComparison.OrdinalIgnoreCase));
+                                || ExtensionName.Equals(item.GetExtensionDirName(), StringComparison.OrdinalIgnoreCase));
         }
 
         public string GetCurrentExtensionUrl() {
             return GetExtensions()
                 .FirstOrDefault(item =>
-                    ExtensionName.Equals(item.GetExtensionName(), StringComparison.OrdinalIgnoreCase))
+                    ExtensionName.Equals(item.GetExtensionDirName(), StringComparison.OrdinalIgnoreCase))
                 .GetExtensionUrl();
         }
     }
