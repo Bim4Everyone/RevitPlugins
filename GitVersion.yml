@@ -19,7 +19,7 @@ branches:
     regex: '^(?!.*main|master|develop)'
     source-branches: ['main', 'master', 'develop']
 ignore:
-  sha: []
+  sha: ['0577608a407b8a53758c5802f21bafd965b0b3ce']
 increment: Inherit
 commit-date-format: yyyy-MM-dd
 merge-message-formats: {}
