@@ -34,11 +34,6 @@
           "type": "boolean",
           "description": "Indicates to continue a previously failed build attempt"
         },
-        "GitHubAppToken": {
-          "type": "string",
-          "description": "GitHub token value",
-          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
-        },
         "Help": {
           "type": "boolean",
           "description": "Shows the help text for this build assembly"
@@ -128,6 +123,11 @@
         "PublishDirectory": {
           "type": "string",
           "description": "Publish directory"
+        },
+        "RevitPluginsAppToken": {
+          "type": "string",
+          "description": "RevitPlugins token value",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "RevitVersions": {
           "type": "array",
