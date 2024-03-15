@@ -1,0 +1,33 @@
+name: publish RevitPlugins
+
+on:
+  workflow_dispatch:
+#    paths:
+#      - '**RevitPlugins**.cs'
+#      - '**RevitPlugins**.xaml'
+
+env:
+  plugin-name: "RevitPlugins"
+jobs:
+  build:
+    name: build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        
+      # Install the .NET 8.0 workload
+      - name: Install .NET 8.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      
+      # Install nuke-build
+      - name: Install nuke-build
+        run: dotnet tool install Nuke.GlobalTool --global
+
+      # Add DevExrepress package source: https://nuget.devexpress.com/
+      - name: Add DevExpress package source
+        run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p ${{ secrets.DEVEXPRESS_FEED_AUTHORIZATION_KEY }}
+
+      - name: Build plugin
+        run: nuke publish --profile ${{ env.plugin-name }} --revit-plugins-app-token ${{ secrets.REVIT_PLUGINS_APP_TOKEN }}
