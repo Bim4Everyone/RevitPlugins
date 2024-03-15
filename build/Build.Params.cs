@@ -240,7 +240,7 @@ partial class Build {
         public string ExtensionName => PublishDirectory.Split('\\').First();
 
         /// <summary>
-        /// Extension diretory.
+        /// Extension directory.
         /// </summary>
         public AbsolutePath ExtensionDirectory => NukeBuildExtensions.GetExtensionsPath(ExtensionName);
 
