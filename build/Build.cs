@@ -34,9 +34,9 @@ partial class Build : NukeBuild {
 
     public BuildParams Params { get; set; }
 
-    [Solution] public Solution Solution { get; set; }
-    [GitVersion] public GitVersion Versioning { get; set; }
-    [GitRepository] public GitRepository GitRepository { get; set; }
+    [Solution] public readonly Solution Solution;
+    [GitVersion] public readonly GitVersion Versioning;
+    [GitRepository] public readonly GitRepository GitRepository;
 
     protected override void OnBuildInitialized() {
         Params = new BuildParams(this);
