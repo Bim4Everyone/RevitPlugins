@@ -14,7 +14,7 @@ partial class Build {
         .OnlyWhenStatic(() => IsServerBuild, "Target should be run only on server")
         .OnlyWhenDynamic(() => Params.ExtensionDirectory.DirectoryExists(), "ExtensionDirectory does not exists")
         .Executes(() => {
-            Log.Debug("Execute git commands in directory: {@ExtensionDirectory}", Params.ExtensionDirectory);
+            Log.Debug("Execute git commands in directory: {@ExtensionDirectory}", Params.ExtensionDirectory.ToString());
             Git($"-C \"{Params.ExtensionDirectory}\" switch -c {Params.NukeBranchName} -q");
             Git($"-C \"{Params.ExtensionDirectory}\" status");
             
