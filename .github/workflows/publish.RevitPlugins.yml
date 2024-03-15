@@ -29,6 +29,10 @@ jobs:
       - name: Install GitVersion
         run: dotnet tool install --global GitVersion.Tool
 
+      # Install git-version
+      - name: Install GitVersion
+        run: nuke :add-package GitVersion.Tool
+
       # Add DevExrepress package source: https://nuget.devexpress.com/
       - name: Add DevExpress package source
         run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p ${{ secrets.DEVEXPRESS_FEED_AUTHORIZATION_KEY }}
