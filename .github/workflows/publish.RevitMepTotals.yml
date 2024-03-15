@@ -1,0 +1,41 @@
+name: RevitMepTotals publish test
+
+on:
+  workflow_dispatch:
+#  push:
+#    branches:
+#      - 'vlastroG/workflow'
+#    paths:
+#      - '**RevitMepTotals**.cs'
+#      - '**RevitMepTotals**.xaml'
+
+env:
+  Plugin_Repo_Url: "https://${{ secrets.BIMEXTENSIONS_PUSH_TOKEN }}@github.com/vlastroG/BIMExtensions.git"
+  Plugin_Name: "RevitMepTotals"
+jobs:
+  build:
+    name: build
+    runs-on: windows-latest
+
+    steps:
+      
+      # Install the .net8 workload
+      - name: Install .net8
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.x.x
+      
+      # Install nuke-build
+      - name: Install nuke-build
+        run: dotnet tool install Nuke.GlobalTool --global
+
+      - name: Add DevExpress package source
+        run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p ${{ secrets.DEVEXPRESS_FEED_AUTHORIZATION_KEY }}
+
+      - name: Checkout RevitPlugins
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Build plugin and publish *.dll
+        run: nuke publish --profile ${{ env.Plugin_Name }}
