@@ -29,7 +29,7 @@ namespace RevitPlugins {
     [Transaction(TransactionMode.Manual)]
     public class RevitPluginsCommand : BasePluginCommand {
         public RevitPluginsCommand() {
-            PluginName = "Пример команды test";
+            PluginName = "Пример команды";
         }
 
         protected override void Execute(UIApplication uiApplication) {
