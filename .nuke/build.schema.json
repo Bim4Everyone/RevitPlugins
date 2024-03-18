@@ -124,6 +124,10 @@
           "type": "string",
           "description": "Publish directory"
         },
+        "PullRequestMerged": {
+          "type": "boolean",
+          "description": "When PullRequest has merged equals true"
+        },
         "RevitPluginsAppToken": {
           "type": "string",
           "description": "RevitPlugins token value",
