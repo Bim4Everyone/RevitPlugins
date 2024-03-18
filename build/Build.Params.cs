@@ -118,7 +118,7 @@ partial class Build {
 
             BranchName = build.GitRepository.Branch;
             BranchCommitSha = build.GitRepository.Commit;
-            BranchCommitCount = Git("rev-list --count dosymep/RevitPlugins").First().Text;
+            BranchCommitCount = Git("rev-list --count \"dosymep/RevitPlugins\"").First().Text;
 
             if(build.GitRepository.IsOnMainOrMasterBranch()) {
                 BranchTag = "";
