@@ -26,7 +26,7 @@ jobs:
         run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p ${{ secrets.DEVEXPRESS_FEED_AUTHORIZATION_KEY }}
 
       - name: Run './build.cmd '
-        run: ./build.cmd publish --profile ${{ env.plugin-name }} --revit-plugins-app-token ${{ secrets.REVIT_PLUGINS_APP_TOKEN }}
+        run: ./build.cmd publish --profile ${{ env.plugin-name }} --pull-request-merged ${{ github.event.pull_request.merged }} --revit-plugins-app-token ${{ secrets.REVIT_PLUGINS_APP_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           

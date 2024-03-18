@@ -1,6 +1,7 @@
 using System.Linq;
 
 using Nuke.Common;
+using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.IO;
 
 using Serilog;
@@ -13,6 +14,8 @@ partial class Build {
         .Requires(() => PluginName)
         .Requires(() => PublishDirectory)
         .OnlyWhenStatic(() => IsServerBuild, "Target should be run only on server")
+        .OnlyWhenDynamic(() => Params.PullRequestMerged, "Target works when pull request merged.")
+        .OnlyWhenDynamic(() => GitHubActions.Instance.IsPullRequest, $"Target should be run only on pull request.")
         .OnlyWhenDynamic(() => Params.ExtensionDirectory.DirectoryExists(), "ExtensionDirectory does not exists")
         .Executes(() => {
             Log.Debug("Set git user");
@@ -26,7 +29,8 @@ partial class Build {
             Log.Debug("Commit updated *.dll");
             Git($"-C \"{Params.ExtensionDirectory}\" add *.dll");
             Git($"-C \"{Params.ExtensionDirectory}\" status");
-            Git($"-C \"{Params.ExtensionDirectory}\" commit -m \"Обновление библиотек плагина \"\"\"{Params.PluginName}\"\"\"\"");
+            Git($"-C \"{Params.ExtensionDirectory}\" commit -m " +
+                $"\"Обновление библиотек плагина \"\"\"{Params.PluginName}\"\"\"\"");
 
             Log.Debug("Push changes to origin");
             Git($"-C \"{Params.ExtensionDirectory}\" push -q -u origin {Params.NukeBranchName}");
