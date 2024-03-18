@@ -13,7 +13,7 @@ partial class Build {
         .OnlyWhenDynamic(() => GitHubActions.Instance.IsPullRequest, $"Target should be run only on pull request.")
         .Executes(async () => {
             var client = new GitHubClient(new ProductHeaderValue(Params.CurrentRepoName));
-            client.Credentials = new Credentials(Params.RevitPluginsAppToken);
+            client.Credentials = new Credentials(Params.ExtensionsAppToken);
 
             Log.Debug("Create pull request");
             await client.CreatePullRequest(Params, await client.GetCurrentPullRequest(Params));

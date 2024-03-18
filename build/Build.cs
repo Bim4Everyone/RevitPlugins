@@ -19,10 +19,8 @@ using Serilog;
 [GitHubActions(
     "RevitPlugins",
     GitHubActionsImage.WindowsLatest,
-    AutoGenerate = false,
-    PublishArtifacts = false,
     EnableGitHubToken = true,
-    OnPushIncludePaths = new[] {"RevitPlugins/**", "**.cs"}
+    ImportSecrets = new[] { nameof(ExtensionsPluginsAppToken), nameof(RevitPluginsAppToken) }
 )]
 partial class Build : NukeBuild {
     /// Support plugins are available for:
@@ -55,8 +53,8 @@ partial class Build : NukeBuild {
     }
 
     // https://learn.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
-    void CopyDirectory(AbsolutePath sourceDir, 
-        AbsolutePath targetDir, 
+    void CopyDirectory(AbsolutePath sourceDir,
+        AbsolutePath targetDir,
         Dictionary<string, string> replaceMap = default,
         bool recursive = true) {
         // Check if the source directory exists

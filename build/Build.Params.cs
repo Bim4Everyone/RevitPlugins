@@ -61,7 +61,14 @@ partial class Build {
     public Configuration Configuration { get; set; } = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
     /// <summary>
-    /// GitHub token value.
+    /// Extensions GitHub token value.
+    /// </summary>
+    [Secret]
+    [Parameter("Extensions token value.")]
+    public string ExtensionsAppToken { get; set; }
+    
+    /// <summary>
+    /// RevitPlugins GitHub token value.
     /// </summary>
     [Secret]
     [Parameter("RevitPlugins token value.")]
@@ -103,6 +110,8 @@ partial class Build {
             Output = build.Output ?? DefaultOutput;
             PublishDirectory = build.PublishDirectory ?? Output;
             Configuration = build.Configuration;
+
+            ExtensionsAppToken = build.ExtensionsAppToken;
             RevitPluginsAppToken = build.RevitPluginsAppToken;
 
             IconUrl = build.IconUrl;
@@ -155,7 +164,12 @@ partial class Build {
         public Configuration Configuration { get; }
 
         /// <summary>
-        /// GitHub token value.
+        /// Extensions GitHub token value.
+        /// </summary>
+        public string ExtensionsAppToken { get; }
+        
+        /// <summary>
+        /// RevitPlugins GitHub token value.
         /// </summary>
         public string RevitPluginsAppToken { get; }
 
