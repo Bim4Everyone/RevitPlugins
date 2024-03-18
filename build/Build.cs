@@ -30,12 +30,11 @@ partial class Build : NukeBuild {
     ///   - JetBrains Rider            https://nuke.build/rider
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
-    public static int Main() => Execute<Build>();
+    public static int Main() => Execute<Build>(b => b.Compile);
 
     public BuildParams Params { get; set; }
 
     [Solution] public readonly Solution Solution;
-    [GitVersion] public readonly GitVersion Versioning;
     [GitRepository] public readonly GitRepository GitRepository;
 
     protected override void OnBuildInitialized() {

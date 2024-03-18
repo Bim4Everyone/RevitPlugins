@@ -8,6 +8,7 @@ using dosymep.Nuke.RevitVersions;
 using Newtonsoft.Json.Linq;
 
 using Nuke.Common;
+using Nuke.Common.Git;
 using Nuke.Common.IO;
 
 using Serilog;
@@ -105,6 +106,22 @@ partial class Build {
             BuildRevitVersions = build.RevitVersions.Length > 0
                 ? build.RevitVersions
                 : RevitVersion.GetRevitVersions(build.MinVersion, build.MaxVersion);
+
+            BranchName = build.GitRepository.Branch;
+            BranchCommitSha = build.GitRepository.Commit;
+            BranchCommitCount = Git("rev-list --count dosymep/RevitPlugins").First().Text;
+
+            if(build.GitRepository.IsOnMainOrMasterBranch()) {
+                BranchTag = "";
+            } else if(build.GitRepository.IsOnDevelopBranch()) {
+                BranchTag = "-beta";
+            } else if(build.GitRepository.IsOnHotfixBranch()) {
+                BranchTag = "-fix";
+            } else if(build.GitRepository.IsOnReleaseBranch()) {
+                BranchTag = "-release";
+            } else {
+                BranchTag = "-alpha";
+            }
         }
 
         /// <summary>
@@ -255,6 +272,11 @@ partial class Build {
         public string CurrentRepoName => "RevitPlugins";
 
         public string RepoName => GetCurrentExtensionUrl().Split('/').LastOrDefault();
+        
+        public string BranchTag { get; }
+        public string BranchName { get; }
+        public string BranchCommitSha { get; }
+        public string BranchCommitCount { get; }
 
         public IEnumerable<JToken> GetExtensions() {
             string extensionsJsonContent = File.ReadAllText(ExtensionsJsonPath);

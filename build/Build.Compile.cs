@@ -30,7 +30,7 @@ partial class Build {
                 .SetConfiguration(Configuration.Debug)
                 .SetOutputDirectory(publishDirectory)
                 .CombineWith(Params.BuildRevitVersions, (settings, revitVersion) => settings
-                    .SetSimpleVersion(Versioning, revitVersion)
+                    .SetSimpleVersion(Params, revitVersion)
                     .SetProperty("RevitVersion", (int) revitVersion)
                     .SetProperty("AssemblyName", $"{PluginName}_{revitVersion}")));
         });
@@ -55,7 +55,7 @@ partial class Build {
                 .SetConfiguration(Configuration.Release)
                 .SetOutputDirectory(publishDirectory)
                 .CombineWith(Params.BuildRevitVersions, (settings, revitVersion) => settings
-                    .SetSimpleVersion(Versioning, revitVersion)
+                    .SetSimpleVersion(Params, revitVersion)
                     .SetProperty("RevitVersion", (int) revitVersion)
                     .SetProperty("AssemblyName", $"{PluginName}_{revitVersion}")));
         });

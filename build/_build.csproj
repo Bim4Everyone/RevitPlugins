@@ -19,19 +19,4 @@
     <PackageReference Include="System.Drawing.Common" Version="8.0.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageDownload Include="GitVersion.CommandLine" Version="[5.12.0]" />
-    <PackageDownload Include="GitVersion.Tool" Version="[5.12.0]" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="..\GitVersion.yml">
-      <Link>config\GitVersion.yml</Link>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ci" />
-  </ItemGroup>
-
 </Project>
