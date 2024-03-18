@@ -17,6 +17,7 @@ using static Nuke.Common.Tools.PowerShell.PowerShellTasks;
 
 partial class Build {
     Target CloneRepos => _ => _
+        .After(Clean)
         .Requires(() => PublishDirectory)
         .OnlyWhenStatic(() => IsServerBuild, "Target should be run only on server")
         .Executes(() => {
