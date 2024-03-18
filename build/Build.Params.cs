@@ -8,7 +8,10 @@ using dosymep.Nuke.RevitVersions;
 using Newtonsoft.Json.Linq;
 
 using Nuke.Common;
+using Nuke.Common.Git;
 using Nuke.Common.IO;
+
+using Octokit;
 
 using Serilog;
 
@@ -87,8 +90,13 @@ partial class Build {
     /// </summary>
     [Parameter("Bundle output.")]
     public string BundleOutput { get; set; }
-
-
+    
+    /// <summary>
+    /// When PullRequest has merged equals true.
+    /// </summary>
+    [Parameter("When PullRequest has merged equals true.")]
+    public bool PullRequestMerged { get; set; }
+    
     public class BuildParams {
         public BuildParams(Build build) {
             PluginName = build.PluginName;
@@ -102,10 +110,29 @@ partial class Build {
             BundleType = build.BundleType ?? BundleType.InvokeButton;
             BundleOutput = build.BundleOutput ?? Output;
 
+            PullRequestMerged = build.PullRequestMerged;
+
             BuildRevitVersions = build.RevitVersions.Length > 0
                 ? build.RevitVersions
                 : RevitVersion.GetRevitVersions(build.MinVersion, build.MaxVersion);
+
+            BranchName = build.GitRepository.Branch;
+            BranchCommitSha = build.GitRepository.Commit;
+            BranchCommitCount = Git("rev-list --count dosymep/RevitPlugins").First().Text;
+
+            if(build.GitRepository.IsOnMainOrMasterBranch()) {
+                BranchTag = "";
+            } else if(build.GitRepository.IsOnDevelopBranch()) {
+                BranchTag = "-beta";
+            } else if(build.GitRepository.IsOnHotfixBranch()) {
+                BranchTag = "-fix";
+            } else if(build.GitRepository.IsOnReleaseBranch()) {
+                BranchTag = "-release";
+            } else {
+                BranchTag = "-alpha";
+            }
         }
+
 
         /// <summary>
         /// Project (plugin) name in solution.
@@ -152,6 +179,12 @@ partial class Build {
         /// </summary>
         public string BundleOutput { get; }
 
+        
+        /// <summary>
+        /// When PullRequest has merged equals true.
+        /// </summary>
+        public bool PullRequestMerged { get; set; }
+        
         /// <summary>
         /// Build Revit versions. Default is Rv2022-Rv2024.
         /// </summary>
@@ -255,6 +288,11 @@ partial class Build {
         public string CurrentRepoName => "RevitPlugins";
 
         public string RepoName => GetCurrentExtensionUrl().Split('/').LastOrDefault();
+        
+        public string BranchTag { get; }
+        public string BranchName { get; }
+        public string BranchCommitSha { get; }
+        public string BranchCommitCount { get; }
 
         public IEnumerable<JToken> GetExtensions() {
             string extensionsJsonContent = File.ReadAllText(ExtensionsJsonPath);

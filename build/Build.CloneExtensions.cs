@@ -49,7 +49,7 @@ partial class Build {
                 }
 
                 ProcessTasks.StartProcess(GitPath, $"clone \"{repoUrl}\" \"{dirPath}\" -q",
-                    outputFilter: m => m.Replace(Params.RevitPluginsAppToken, "****"));
+                    outputFilter: m => m.Replace(Params.RevitPluginsAppToken, "****")).WaitForExit();
             }
         });
 }
