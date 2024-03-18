@@ -46,6 +46,13 @@ static class GitHubExtensions {
             createdPullRequest.Number,
             new PullRequestUpdate() {Body = pullRequest.Body});
 
+        Log.Debug("Review approve");
+        
+        await client.PullRequest.Review.Create(
+            buildParams.OrganizationName,
+            buildParams.RepoName, createdPullRequest.Number,
+            new PullRequestReviewCreate() {Body = "Отлично, так держать!", Event = PullRequestReviewEvent.Approve});
+
         Log.Debug("Merge Pull Request");
 
         await client.PullRequest.Merge(
