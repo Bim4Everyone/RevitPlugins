@@ -20,7 +20,7 @@ using Serilog;
     "RevitPlugins",
     GitHubActionsImage.WindowsLatest,
     EnableGitHubToken = true,
-    ImportSecrets = new[] { nameof(ExtensionsPluginsAppToken), nameof(RevitPluginsAppToken) }
+    ImportSecrets = new[] { nameof(ExtensionsAppToken), nameof(RevitPluginsAppToken) }
 )]
 partial class Build : NukeBuild {
     /// Support plugins are available for:
