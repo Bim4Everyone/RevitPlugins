@@ -2,9 +2,12 @@ name: publish RevitPlugins
 
 on:
   workflow_dispatch:
-#    paths:
-#      - '**RevitPlugins**.cs'
-#      - '**RevitPlugins**.xaml'
+  pull_request:
+    types: [ opened, closed, review_requested ]
+    branches: [main, master]
+    paths:
+      - '**RevitPlugins**.cs'
+      - '**RevitPlugins**.xaml'
 
 env:
   plugin-name: "RevitPlugins"
