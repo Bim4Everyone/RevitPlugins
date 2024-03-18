@@ -118,7 +118,7 @@ partial class Build {
 
             BranchName = build.GitRepository.Branch;
             BranchCommitSha = build.GitRepository.Commit;
-            BranchCommitCount = Git($"rev-list --count \"origin/{BranchName}\"").First().Text;
+            BranchCommitCount = Git($"rev-list --count \"{BranchCommitSha}\"").First().Text;
 
             if(build.GitRepository.IsOnMainOrMasterBranch()) {
                 BranchTag = "";
