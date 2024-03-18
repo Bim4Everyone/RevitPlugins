@@ -30,13 +30,12 @@ partial class Build : NukeBuild {
     ///   - JetBrains Rider            https://nuke.build/rider
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
-    public static int Main() => Execute<Build>();
+    public static int Main() => Execute<Build>(b => b.Compile);
 
     public BuildParams Params { get; set; }
 
-    [Solution] public Solution Solution { get; set; }
-    [GitVersion] public GitVersion Versioning { get; set; }
-    [GitRepository] public GitRepository GitRepository { get; set; }
+    [Solution] public readonly Solution Solution;
+    [GitRepository] public readonly GitRepository GitRepository;
 
     protected override void OnBuildInitialized() {
         Params = new BuildParams(this);
@@ -53,16 +52,6 @@ partial class Build : NukeBuild {
 
         Log.Information("Repository Url: {RepoUrl}", GitRepository.HttpsUrl);
         Log.Information("Repository Branch: {RepoBranch}", GitRepository.Branch);
-
-        void ExecWait(string preamble, string command, string args) {
-            Console.WriteLine(preamble);
-            Process.Start(new ProcessStartInfo(command, args) {UseShellExecute = false})?.WaitForExit();
-        }
-
-        ExecWait("dotnet version:", "dotnet", "--info");
-        ExecWait("dotnet workloads:", "dotnet", "workload list");
-        Log.Information("Processor count: {@ProcessorCount}", Environment.ProcessorCount);
-        Log.Information("Available RAM: {@Ram} MB", GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 0x100000);
     }
 
     // https://learn.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
