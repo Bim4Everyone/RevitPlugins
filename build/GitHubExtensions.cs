@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -50,7 +51,9 @@ static class GitHubExtensions {
             buildParams.OrganizationName,
             buildParams.RepoName,
             createdPullRequest.Number,
-            new PullRequestUpdate() {Body = pullRequest.Body});
+            new PullRequestUpdate() {
+                Body = pullRequest.Body + $"{Environment.NewLine}------{Environment.NewLine}{createdPullRequest.Url}"
+            });
 
         Log.Debug("Copy assignee Pull Request");
         await client.CopyAssignee(createdPullRequest, buildParams);
@@ -85,7 +88,7 @@ static class GitHubExtensions {
             buildParams.RepoName,
             pullRequest.Number,
             new MergePullRequest() {
-                MergeMethod = PullRequestMergeMethod.Squash, CommitTitle = pullRequest.Title + $"#{pullRequest.Number}"
+                MergeMethod = PullRequestMergeMethod.Squash, CommitTitle = pullRequest.Title + $" (#{pullRequest.Number})"
             });
 
         Log.Debug("Delete branch {@NukeRef}", nukeBranch.Ref);
