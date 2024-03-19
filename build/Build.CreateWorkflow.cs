@@ -5,10 +5,8 @@ using Nuke.Components;
 using Serilog;
 
 partial class Build {
-    Target CreateScript => _ => _
+    Target CreateWorkflow => _ => _
         .Requires(() => PluginName)
-        .Requires(() => PublishDirectory)
-        .OnlyWhenDynamic(() => false, "Skipped not support.")
         .OnlyWhenDynamic(() => !Params.PluginWorkflowFile.FileExists(), $"Plugin workflow file does exists.")
         .Executes(() => {
             Log.Debug("TemplateFile: {TemplateFile}", Params.TemplateWorkflowFile);

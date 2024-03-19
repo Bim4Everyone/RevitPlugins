@@ -15,7 +15,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 partial class Build {
     Target CreatePlugin => _ => _
         .Triggers(CreateBranch)
-        .DependsOn(CreateBundle, CreateScript, CreateProfile)
+        .DependsOn(CreateBundle, CreateWorkflow, CreateProfile)
         .OnlyWhenDynamic(() => Solution.GetProject(PluginName) == null, $"Plugin \"{PluginName}\" does exists.")
         .OnlyWhenDynamic(() => !Params.PluginDirectory.DirectoryExists(), $"Plugin directory \"{PluginName}\" does exists.")
         .Executes(() => {

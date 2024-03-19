@@ -11,6 +11,7 @@ on:
 
 env:
   plugin-name: "${{ gen.plugin_name }}"
+  
 jobs:
   build:
     name: build
