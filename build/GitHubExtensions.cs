@@ -7,6 +7,10 @@ using Octokit;
 using Serilog;
 
 static class GitHubExtensions {
+    public static GitHubClient CreateGitHubClient(string appToken) {
+        return new GitHubClient(new ProductHeaderValue("app")) {Credentials = new Credentials(appToken)};
+    }
+
     public static async Task<PullRequest> GetCurrentPullRequest(
         this GitHubClient client, Build.BuildParams buildParams) {
         // ReSharper disable once PossibleInvalidOperationException
@@ -15,10 +19,10 @@ static class GitHubExtensions {
             buildParams.OrganizationName, buildParams.CurrentRepoName, pullRequestNumber);
     }
 
-    public static async Task CreatePullRequest(
+    public static async Task<PullRequest> CreatePullRequest(
         this GitHubClient client,
         Build.BuildParams buildParams, PullRequest pullRequest) {
-        
+
         Log.Debug("Repository: {@Organization}/{@RepoName}",
             buildParams.OrganizationName, buildParams.RepoName);
 
@@ -39,26 +43,42 @@ static class GitHubExtensions {
             new NewPullRequest(pullRequest.Title, nukeBranch.Ref, defaultBranch.Ref));
 
         Log.Debug("Update Pull Request");
-        
+
         await client.PullRequest.Update(
             buildParams.OrganizationName,
             buildParams.RepoName,
             createdPullRequest.Number,
             new PullRequestUpdate() {Body = pullRequest.Body});
 
+        return createdPullRequest;
+    }
+
+    public static async Task ApprovePullRequest(
+        this GitHubClient client,
+        PullRequest pullRequest,
+        Build.BuildParams buildParams) {
+
         Log.Debug("Review approve");
-        
+
         await client.PullRequest.Review.Create(
             buildParams.OrganizationName,
-            buildParams.RepoName, createdPullRequest.Number,
+            buildParams.RepoName, pullRequest.Number,
             new PullRequestReviewCreate() {Body = "Отлично, так держать!", Event = PullRequestReviewEvent.Approve});
+    }
+
+    public static async Task MergePullRequest(
+        this GitHubClient client,
+        PullRequest pullRequest,
+        Build.BuildParams buildParams) {
+        Reference nukeBranch = await client.Git.Reference.Get(
+            buildParams.OrganizationName, buildParams.RepoName, "heads/" + buildParams.NukeBranchName);
 
         Log.Debug("Merge Pull Request");
 
         await client.PullRequest.Merge(
             buildParams.OrganizationName,
             buildParams.RepoName,
-            createdPullRequest.Number,
+            pullRequest.Number,
             new MergePullRequest() {MergeMethod = PullRequestMergeMethod.Squash, CommitTitle = pullRequest.Title});
 
         Log.Debug("Delete branch {@NukeRef}", nukeBranch.Ref);
