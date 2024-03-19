@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 using Nuke.Common.CI.GitHubActions;
 
@@ -50,6 +52,9 @@ static class GitHubExtensions {
             createdPullRequest.Number,
             new PullRequestUpdate() {Body = pullRequest.Body});
 
+        Log.Debug("Copy assignee Pull Request");
+        await client.CopyAssignee(createdPullRequest, buildParams);
+
         return createdPullRequest;
     }
 
@@ -79,9 +84,20 @@ static class GitHubExtensions {
             buildParams.OrganizationName,
             buildParams.RepoName,
             pullRequest.Number,
-            new MergePullRequest() {MergeMethod = PullRequestMergeMethod.Squash, CommitTitle = pullRequest.Title});
+            new MergePullRequest() {
+                MergeMethod = PullRequestMergeMethod.Squash, CommitTitle = pullRequest.Title + $"#{pullRequest.Number}"
+            });
 
         Log.Debug("Delete branch {@NukeRef}", nukeBranch.Ref);
         await client.Git.Reference.Delete(buildParams.OrganizationName, buildParams.RepoName, nukeBranch.Ref);
+    }
+
+    public static async Task CopyAssignee(this GitHubClient client,
+        PullRequest pullRequest,
+        Build.BuildParams buildParams) {
+        await client.Issue.Assignee.AddAssignees(buildParams.OrganizationName,
+            buildParams.RepoName,
+            pullRequest.Number,
+            new AssigneesUpdate(pullRequest.Assignees.Select(item => item.Login).ToList()));
     }
 }
