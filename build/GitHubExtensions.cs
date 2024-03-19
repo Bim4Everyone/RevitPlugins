@@ -85,7 +85,7 @@ static class GitHubExtensions {
             buildParams.RepoName,
             pullRequest.Number,
             new MergePullRequest() {
-                MergeMethod = PullRequestMergeMethod.Squash, CommitTitle = pullRequest.Title + $"#{pullRequest.Number}"
+                MergeMethod = PullRequestMergeMethod.Squash, CommitTitle = pullRequest.Title + $" (#{pullRequest.Number})"
             });
 
         Log.Debug("Delete branch {@NukeRef}", nukeBranch.Ref);
