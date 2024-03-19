@@ -13,10 +13,13 @@ partial class Build {
         .OnlyWhenDynamic(() => Params.PullRequestMerged, "Target works when pull request merged.")
         .OnlyWhenDynamic(() => GitHubActions.Instance.IsPullRequest, $"Target should be run only on pull request.")
         .Executes(async () => {
-            var client = new GitHubClient(new ProductHeaderValue(Params.CurrentRepoName));
-            client.Credentials = new Credentials(Params.ExtensionsAppToken);
+            var extensionsClient = GitHubExtensions.CreateGitHubClient(Params.ExtensionsAppToken);
+            var revitPluginsClient = GitHubExtensions.CreateGitHubClient(Params.RevitPluginsAppToken);
 
-            Log.Debug("Create pull request");
-            await client.CreatePullRequest(Params, await client.GetCurrentPullRequest(Params));
+            PullRequest pullRequest = await revitPluginsClient.GetCurrentPullRequest(Params);
+            PullRequest createdPullRequest = await revitPluginsClient.CreatePullRequest(Params, pullRequest);
+
+            await extensionsClient.ApprovePullRequest(createdPullRequest, Params);
+            await revitPluginsClient.MergePullRequest(createdPullRequest, Params);
         });
 }
