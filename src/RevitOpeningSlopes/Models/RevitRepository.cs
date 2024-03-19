@@ -54,7 +54,7 @@ namespace RevitOpeningSlopes.Models {
             }
             return Document.GetElement(slopeTypeId) as FamilySymbol ?? throw new ArgumentException(nameof(slopeTypeId));
         }
-        public ICollection<FamilyInstance> GetOpenings(WindowsGetterMode windowsGetterMode) {
+        public ICollection<FamilyInstance> GetWindows(WindowsGetterMode windowsGetterMode) {
             switch(windowsGetterMode) {
                 case WindowsGetterMode.AlreadySelectedWindows: {
                     return GetSelectedWindows();

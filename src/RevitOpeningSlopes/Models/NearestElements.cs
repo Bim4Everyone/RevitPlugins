@@ -10,20 +10,19 @@ namespace RevitOpeningSlopes.Models {
         }
         public Element GetElementByRay(Curve curve) {
             XYZ lineDirection = (curve.GetEndPoint(1) - curve.GetEndPoint(0)).Normalize();
-            ElementMulticategoryFilter categoryFilter = new ElementMulticategoryFilter(
+            ElementFilter categoryFilter = new ElementMulticategoryFilter(
                 new BuiltInCategory[] {
                     BuiltInCategory.OST_Walls,
+                    BuiltInCategory.OST_Columns,
+                    BuiltInCategory.OST_StructuralColumns,
                     BuiltInCategory.OST_Floors});
             Element currentElement = null;
             ReferenceIntersector intersector
-                = new ReferenceIntersector(categoryFilter, FindReferenceTarget.Element,
+                = new ReferenceIntersector(categoryFilter, FindReferenceTarget.All,
                 _revitRepository.Default3DView) {
                     FindReferencesInRevitLinks = false
                 };
-            //ReferenceIntersector intersector
-            //    = new ReferenceIntersector(_revitRepository.Default3DView) {
-            //        FindReferencesInRevitLinks = false
-            //    };
+
             ReferenceWithContext context = intersector.FindNearest(curve.GetEndPoint(0), lineDirection);
 
             Reference closestReference;

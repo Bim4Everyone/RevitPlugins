@@ -76,11 +76,12 @@ namespace RevitOpeningSlopes.Models {
         //    return line;
         //}
         #endregion
-        public Line CreateLineFromOpening(FamilyInstance opening, DirectionEnum direction = DirectionEnum.Top) {
+        public Line CreateLineFromOpening(FamilyInstance opening, DirectionEnum direction = DirectionEnum.Top,
+            double offset = 0) {
             XYZ openingLocation = _revitRepository.GetOpeningLocation(opening);
             XYZ openingVector = _revitRepository.GetOpeningVector(opening);
             XYZ normalVector = XYZ.BasisZ.CrossProduct(openingVector).Normalize();
-            double openingLocationZ = openingLocation.Z;
+            double openingLocationZ = openingLocation.Z + offset;
             double distLeftRight = _revitRepository.ConvertToFeet(2000);
             double distForwardBack = _revitRepository.ConvertToFeet(600);
             double distTopDown = _revitRepository.ConvertToFeet(3000);

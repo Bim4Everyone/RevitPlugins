@@ -11,25 +11,26 @@ using dosymep.WPF.ViewModels;
 
 using RevitOpeningSlopes.Models;
 using RevitOpeningSlopes.Models.Enums;
+using RevitOpeningSlopes.Models.Services;
 
 namespace RevitOpeningSlopes.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly LinesFromOpening _linesFromOpening;
-        private readonly OpeningSlopesPlacement _openingSlopesPlacement;
+        private readonly CreationOpeningSlopes _creationOpeningSlopes;
         private string _errorText;
         private SlopeTypeViewModel _selectedSlopeType;
 
+
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository,
-            LinesFromOpening linesFromOpening, OpeningSlopesPlacement openingSlopesPlacement) {
+            LinesFromOpening linesFromOpening, CreationOpeningSlopes creationOpeningSlopes) {
             _pluginConfig = pluginConfig ?? throw new ArgumentNullException(nameof(pluginConfig));
             _revitRepository = revitRepository;
             _linesFromOpening = linesFromOpening;
-            _openingSlopesPlacement = openingSlopesPlacement;
+            _creationOpeningSlopes = creationOpeningSlopes;
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-            _openingSlopesPlacement = openingSlopesPlacement;
 
             WindowGetterModes = new ObservableCollection<WindowsGetterMode>(
                 Enum.GetValues(typeof(WindowsGetterMode)).Cast<WindowsGetterMode>());
@@ -94,7 +95,7 @@ namespace RevitOpeningSlopes.ViewModels {
 
         private void AcceptView() {
             SaveConfig();
-            _openingSlopesPlacement.PlaceSlopes(_pluginConfig);
+            _creationOpeningSlopes.CreateSlopes(_pluginConfig, out string error);
         }
 
         private bool CanAcceptView() {
