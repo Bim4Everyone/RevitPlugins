@@ -1,4 +1,4 @@
-name: publish ${{ gen.plugin_name }}
+name: publish RevitSetLevelSection
 
 on:
   workflow_dispatch:
@@ -7,11 +7,11 @@ on:
     branches: [ main, master ]
     paths:
       - '**dosymep**.cs'
-      - '**${{ gen.plugin_name }}**.cs'
-      - '**${{ gen.plugin_name }}**.xaml'
+      - '**RevitSetLevelSection**.cs'
+      - '**RevitSetLevelSection**.xaml'
 
 env:
-  plugin-name: "${{ gen.plugin_name }}"
+  plugin-name: "RevitSetLevelSection"
   
 jobs:
   build:

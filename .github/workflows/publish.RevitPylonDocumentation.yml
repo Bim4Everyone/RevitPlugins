@@ -1,4 +1,4 @@
-name: publish ${{ gen.plugin_name }}
+name: publish RevitPylonDocumentation
 
 on:
   workflow_dispatch:
@@ -7,11 +7,11 @@ on:
     branches: [ main, master ]
     paths:
       - '**dosymep**.cs'
-      - '**${{ gen.plugin_name }}**.cs'
-      - '**${{ gen.plugin_name }}**.xaml'
+      - '**RevitPylonDocumentation**.cs'
+      - '**RevitPylonDocumentation**.xaml'
 
 env:
-  plugin-name: "${{ gen.plugin_name }}"
+  plugin-name: "RevitPylonDocumentation"
   
 jobs:
   build:
