@@ -12,11 +12,17 @@ using RevitOpeningSlopes.Services;
 namespace RevitOpeningSlopes.Models.Services {
     internal class CreationOpeningSlopes : ICreationOpeningSlopes {
         private readonly RevitRepository _revitRepository;
-        private readonly OpeningSlopesPlacement _placement;
+
         private readonly SlopeParams _slopeParams;
-        public CreationOpeningSlopes(RevitRepository revitRepository) {
-            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-            _placement = new OpeningSlopesPlacement(revitRepository);
+        private readonly SlopesDataGetter _slopesDataGetter;
+
+        public CreationOpeningSlopes(
+            RevitRepository revitRepository,
+            SlopesDataGetter slopesDataGetter) {
+
+            _revitRepository = revitRepository
+                ?? throw new ArgumentNullException(nameof(revitRepository));
+            _slopesDataGetter = slopesDataGetter ?? throw new ArgumentNullException(nameof(slopesDataGetter));
             _slopeParams = new SlopeParams(revitRepository);
         }
         public void CreateSlope(SlopeCreationData slopeCreationData) {
@@ -32,7 +38,7 @@ namespace RevitOpeningSlopes.Models.Services {
             StringBuilder sb = new StringBuilder();
 
             using(var transaction = _revitRepository.Document.StartTransaction("Размещение откосов")) {
-                IList<SlopeCreationData> slopeCreationData = _placement.GetSlopeCreationData(config);
+                IList<SlopeCreationData> slopeCreationData = _slopesDataGetter.GetSlopeCreationData(config);
                 foreach(SlopeCreationData slope in slopeCreationData) {
                     CreateSlope(slope);
                 }

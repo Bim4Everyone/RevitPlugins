@@ -9,6 +9,7 @@ using dosymep.Bim4Everyone.SimpleServices;
 using Ninject;
 
 using RevitOpeningSlopes.Models;
+using RevitOpeningSlopes.Services.ValueGetter;
 using RevitOpeningSlopes.ViewModels;
 using RevitOpeningSlopes.Views;
 
@@ -27,7 +28,25 @@ namespace RevitOpeningSlopes {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
-                kernel.Bind<OpeningSlopesPlacement>()
+                kernel.Bind<SlopesDataGetter>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<OpeningTopXYZGetter>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<OpeningCenterXYZGetter>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<OpeningRightXYZGetter>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<OpeningFrontPointGetter>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<OpeningHeightGetter>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<OpeningWidthGetter>()
                     .ToSelf()
                     .InSingletonScope();
 
