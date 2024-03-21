@@ -52,7 +52,7 @@ static class GitHubExtensions {
             buildParams.RepoName,
             createdPullRequest.Number,
             new PullRequestUpdate() {
-                Body = pullRequest.Body + $"{Environment.NewLine}------{Environment.NewLine}{createdPullRequest.Url}"
+                Body = pullRequest.Body + $"{Environment.NewLine}------{Environment.NewLine}{pullRequest.HtmlUrl}"
             });
 
         Log.Debug("Copy assignee Pull Request");

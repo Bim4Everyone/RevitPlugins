@@ -1,28 +1,37 @@
-name: ${{ gen.plugin_name }}
+name: publish ${{ gen.plugin_name }}
 
 on:
-  push:
+  workflow_dispatch:
+  pull_request:
+    types: [ closed, synchronize, review_requested ]
+    branches: [ main, master ]
     paths:
-      - '${{ gen.plugin_name }}/**'
-      - '**.cs'
+      - '**${{ gen.plugin_name }}**.cs'
+      - '**${{ gen.plugin_name }}**.xaml'
 
 env:
-  plugin_name: ${{ gen.plugin_name }}
-
+  plugin-name: "${{ gen.plugin_name }}"
+  
 jobs:
-  windows-latest:
-    name: windows-latest
+  build:
+    name: build
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Cache .nuke/temp, ~/.nuget/packages
-        uses: actions/cache@v2
+      - uses: actions/checkout@v3
         with:
-          path: |
-            .nuke/temp
-            ~/.nuget/packages
-          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
+          fetch-depth: 0
+      
+      # Install the .NET workload
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      
+      # Add DevExrepress package source: https://nuget.devexpress.com/
+      - name: Add DevExpress package source
+        run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p ${{ secrets.DEVEXPRESS_FEED_AUTHORIZATION_KEY }}
+
       - name: Run './build.cmd '
-        run: ./build.cmd publish --profile $plugin_name
+        run: ./build.cmd publish --profile ${{ env.plugin-name }} --pull-request-merged ${{ github.event.pull_request.merged }} --extensions-app-token ${{ secrets.EXTENSIONS_APP_TOKEN }} --revit-plugins-app-token ${{ secrets.REVIT_PLUGINS_APP_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

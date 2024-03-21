@@ -242,7 +242,7 @@ partial class Build {
         /// <summary>
         /// Plugin workflow file path.
         /// </summary>
-        public AbsolutePath PluginWorkflowFile => RootDirectory / ".github" / "workflows" / $"{PluginName}.yml";
+        public AbsolutePath PluginWorkflowFile => RootDirectory / ".github" / "workflows" / $"publish.{PluginName}.yml";
 
         /// <summary>
         /// Plugin project file.

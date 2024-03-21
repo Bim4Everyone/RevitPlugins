@@ -1,17 +1,17 @@
-name: publish RevitPlugins
+name: publish RevitFamilyExplorer
 
 on:
   workflow_dispatch:
   pull_request:
     types: [ closed, synchronize, review_requested ]
-    branches: [main, master]
+    branches: [ main, master ]
     paths:
-      - '**RevitPlugins**.cs'
-      - '**RevitPlugins**.xaml'
+      - '**RevitFamilyExplorer**.cs'
+      - '**RevitFamilyExplorer**.xaml'
 
 env:
-  plugin-name: "RevitPlugins"
-
+  plugin-name: "RevitFamilyExplorer"
+  
 jobs:
   build:
     name: build
@@ -35,4 +35,3 @@ jobs:
         run: ./build.cmd publish --profile ${{ env.plugin-name }} --pull-request-merged ${{ github.event.pull_request.merged }} --extensions-app-token ${{ secrets.EXTENSIONS_APP_TOKEN }} --revit-plugins-app-token ${{ secrets.REVIT_PLUGINS_APP_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
