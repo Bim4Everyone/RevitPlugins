@@ -6,7 +6,6 @@ on:
     types: [ closed, synchronize, review_requested ]
     branches: [ main, master ]
     paths:
-      - '**dosymep**.cs'
       - '**RevitSuperfilter**.cs'
       - '**RevitSuperfilter**.xaml'
 

@@ -6,7 +6,6 @@ on:
     types: [ closed, synchronize, review_requested ]
     branches: [ main, master ]
     paths:
-      - '**dosymep**.cs'
       - '**${{ gen.plugin_name }}**.cs'
       - '**${{ gen.plugin_name }}**.xaml'
 
