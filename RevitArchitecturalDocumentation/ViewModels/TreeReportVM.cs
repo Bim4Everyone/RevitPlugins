@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
-
-using Autodesk.Revit.DB;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitArchitecturalDocumentation.Models;
-using RevitArchitecturalDocumentation.Views;
 
-namespace RevitArchitecturalDocumentation.ViewModels
-{
+namespace RevitArchitecturalDocumentation.ViewModels {
     class TreeReportVM : BaseViewModel {
 
         private ICollectionView _treeView;
