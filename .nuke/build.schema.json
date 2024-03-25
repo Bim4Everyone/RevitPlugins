@@ -31,6 +31,10 @@
           "type": "boolean",
           "description": "Indicates to continue a previously failed build attempt"
         },
+        "GitHubAppToken": {
+          "type": "string",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
+        },
         "Help": {
           "type": "boolean",
           "description": "Shows the help text for this build assembly"
@@ -119,10 +123,6 @@
         "PublishDirectory": {
           "type": "string"
         },
-        "PyRevitInstallerUrl": {
-          "type": "string",
-          "description": "Default is pyRevit_4.8.14.24016_signed.exe"
-        },
         "RevitVersions": {
           "type": "array",
           "description": "Build Revit versions",
@@ -160,7 +160,6 @@
               "CreateProfile",
               "CreateScript",
               "FullClean",
-              "InstallPyRevit",
               "Publish",
               "PushPluginDll"
             ]
@@ -185,7 +184,6 @@
               "CreateProfile",
               "CreateScript",
               "FullClean",
-              "InstallPyRevit",
               "Publish",
               "PushPluginDll"
             ]
