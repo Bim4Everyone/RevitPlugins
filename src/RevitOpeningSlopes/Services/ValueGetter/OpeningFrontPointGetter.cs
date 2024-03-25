@@ -36,7 +36,7 @@ namespace RevitOpeningSlopes.Services.ValueGetter {
             XYZ origin = _openingRightXYZGetter.GetOpeningRightXYZ(opening);
             Line rightLine = _linesFromOpening.CreateLineFromOpening(origin, opening, 500, DirectionEnum.Forward);
             Line leftLine = _linesFromOpening.CreateLineFromOpening(origin, opening, 500, DirectionEnum.Back);
-            Line generalLine = _linesFromOpening.MergeLines(rightLine, leftLine);
+            Line generalLine = _linesFromOpening.MergeOppositeLines(rightLine, leftLine);
             //Element window = _nearestElements.GetElementByRay(generalLine, true);
             _linesFromOpening.CreateTestModelLine(generalLine);
 

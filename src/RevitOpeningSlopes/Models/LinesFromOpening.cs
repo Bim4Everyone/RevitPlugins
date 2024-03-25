@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 
@@ -27,7 +29,7 @@ namespace RevitOpeningSlopes.Models {
             ModelLine line = _revitRepository.Document.Create.NewModelCurve(geomLine, sketch) as ModelLine;
 
         }
-        public Line MergeLines(Line firstLine, Line secondLine) {
+        public Line MergeOppositeLines(Line firstLine, Line secondLine) {
             XYZ startPoint = firstLine.GetEndPoint(1);
             XYZ endPoint = secondLine.GetEndPoint(1);
             return Line.CreateBound(startPoint, endPoint);
@@ -42,7 +44,31 @@ namespace RevitOpeningSlopes.Models {
         //        transaction.Commit();
         //    }
         //}
-
+        public Line CreateLineFromOffsetPoint(FamilyInstance opening) {
+            XYZ openingOrigin = _revitRepository.GetOpeningLocation(opening);
+            XYZ openingVector = _revitRepository.GetOpeningVector(opening);
+            const double offset = 300;
+            const double frontLineLength = 900;
+            XYZ frontOffsetPoint = new XYZ(openingOrigin.X, openingOrigin.Y, openingOrigin.Z
+                + _revitRepository.ConvertToFeet(offset))
+                + openingVector * _revitRepository.ConvertToFeet(frontLineLength);
+            Line lineFromOffsetPoint = CreateLineFromOpening(
+                frontOffsetPoint, opening, frontLineLength, DirectionEnum.Back);
+            return lineFromOffsetPoint;
+        }
+        public ICollection<XYZ> SplitCurveToPoints(Curve curve, double step) {
+            double curveLength = curve.Length;
+            if(step >= curveLength) {
+                //Если шаг больше длины линии, то возвращаем середину линии
+                return new XYZ[] { curve.Evaluate(0.5, true) };
+            } else {
+                List<XYZ> points = new List<XYZ>();
+                for(double lengthOfPiece = step; lengthOfPiece < curveLength; lengthOfPiece += step) {
+                    points.Add(curve.Evaluate(lengthOfPiece / curveLength, true));
+                }
+                return points;
+            }
+        }
         public Line CreateLineFromOpening(XYZ origin, FamilyInstance opening, double length = 1000,
             DirectionEnum direction = DirectionEnum.Right) {
 
